@@ -243,7 +243,7 @@ export function pickCandidates(
     if (!instance) return false;
     // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
     if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && state.cards[instance.host ?? ""]?.zone === "heroes") return false;
-    if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code))) return false;
+    if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code), state, id)) return false;
     // "Immune to non-Master card effects": a card without that Trait cannot choose or affect it (families/misc-guards.ts).
     if (!counting && immuneToSource(state, id, sourceId, ctx)) return false;
     return matchesPick(state, id, spec, at, ctx);

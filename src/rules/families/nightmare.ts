@@ -1,12 +1,19 @@
 // Rules: mec109.hide-tests, mec109.hide-x, rr.attachment-cards, rr.search, rr.discard-pile-and-victory-display, rr.forced,
 // rr.quest-advancement (data/rules/entries.json); ledger lines 906101:A:2, 906102:A:3, 906106:A:1, 906107:A:2, 906108:A:1.
-import type { Instruction } from "../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../catalog/boundary.ts";
 
+import { currentCause, UNATTRIBUTED } from "../cause.ts";
+import { beginEnemyAttack } from "../combat.ts";
+import { hasTrait } from "../conditions.ts";
+import { attackBarred } from "../constants.ts";
+import { effectsOf } from "../listen.ts";
+import { dealAttackShadow } from "./defense-listen.ts";
+import { dealForAttack } from "./south-watcher.ts";
 import type { EngineStep } from "../intents.ts";
 import { runEffect, type ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
-import type { HideResult, ScenarioState } from "../state.ts";
-import { modifierActive, updateCard } from "../state.ts";
+import type { GameEvent, HideResult, ResponseOffer, ScenarioState } from "../state.ts";
+import { inPlay, modifierActive, updateCard } from "../state.ts";
 import { fireForced } from "../triggers.ts";
 import { patchTop, topFrame, withFrame } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
@@ -15,12 +22,18 @@ import type { Focus } from "./index.ts";
 // The verbs src/catalog/families/nightmare.ts adds, for the Nightmare decks. The Hide commit limit, the result of an effect's Hide
 // test and the stage reveal are read where they apply (rules/hide.ts, rules/conditions.ts, rules/stage-reveal.ts). Null when the verb
 // is not one of them.
-export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState | null {
+export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "AttachToQuest":
       return attachToQuest(state, focus);
     case "SearchToStaging":
       return searchToStaging(state, instruction.code, ctx);
+    case "AttackActor":
+      return attackActor(state, focus, ctx, steps);
+    case "AttachToDamagedDefender":
+      return instruction.card && instruction.to ? attachIfDamaged(state, instruction.card, instruction.to) : leaveForEnd(state, focus, steps);
+    case "NotCanceledBy":
+      return state;
     default:
       return null;
   }
@@ -113,4 +126,52 @@ export function nightmareSetup(state: ScenarioState, ctx: ReduceContext, steps: 
     }
   }
   return next;
+}
+
+// AttackActor: the source enemy attacks the actor now, from the staging area or while engaged with them (906203:A:1). It is dealt a shadow
+// card of its own, as an attack outside the combat phase is (faq.enemy-attacks-outside-combat).
+function attackActor(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = focus.sourceId;
+  const enemy = id ? state.cards[id] : undefined;
+  if (!id || !enemy || state.seats[focus.seat]?.eliminated || attackBarred(state, id, focus.seat)) return state;
+  const staged = enemy.zone === "staging";
+  if (!staged && !(enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
+  const dealt = staged ? dealForAttack(state, id) : dealAttackShadow(state, id, ctx);
+  const begun = beginEnemyAttack(dealt, focus.seat, id, ctx, steps, staged);
+  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
+}
+
+// The shadow effect leaves the attach for the end of the attack, naming the shadow card and the defender declared now. The attack keeps the
+// damage it deals to the defender (`dealt`, families/defense-excess.ts) for it.
+function leaveForEnd(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack || !focus.sourceId || !attack.defenderId || attack.undefended) return state;
+  const later: Instruction = { verb: "AttachToDamagedDefender", card: focus.sourceId, to: attack.defenderId, dealt: true };
+  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), later], afterCause: currentCause(steps, UNATTRIBUTED) } };
+}
+
+// At the end of the attack (shadow.ts finishAttack): the attack dealt damage to the defender, which is still in play, so the shadow card is
+// attached to it faceup and leaves its enemy (a shadow card is otherwise discarded at the end of the combat phase).
+function attachIfDamaged(state: ScenarioState, cardId: string, defenderId: string): ScenarioState {
+  const data = topFrame(state)?.data;
+  const dealt = data?.kind === "effect" ? (data.dealt ?? 0) : 0;
+  const card = state.cards[cardId];
+  const defender = state.cards[defenderId];
+  if (dealt <= 0 || !card || !defender || !inPlay(defender.zone) || (card.zone !== "shadow" && card.zone !== "encounterDiscard")) return state;
+  return updateCard(attachTo(moveCard(state, cardId, { zone: "attached" }), cardId, defenderId), cardId, { face: "up", controller: null });
+}
+
+// A Response that would cancel the effects of an encounter card being revealed, on a card with the trait its When Revealed record names in
+// NotCanceledBy ("cannot be canceled by the Ring-bearer's effect", 906208:A:1), is not offered (rr.cancel).
+export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, effect: Effect, ctx: ReduceContext): boolean {
+  const event: GameEvent | undefined = offer.event;
+  if (!event || (event.trigger !== "encounterRevealed" && event.trigger !== "whenRevealedPending")) return false;
+  if (!effect.instructions.some((instruction) => instruction.verb === "CancelEffect")) return false;
+  const subject = event.subject ?? event.cardId;
+  const code = subject ? state.cards[subject]?.code : undefined;
+  if (!code) return false;
+  const traits = effectsOf(ctx, code)
+    .filter((record) => record.timing === "whenRevealed")
+    .flatMap((record) => record.instructions.flatMap((instruction) => (instruction.verb === "NotCanceledBy" ? [instruction.trait] : [])));
+  return traits.some((trait) => hasTrait(state, offer.cardId, trait, ctx));
 }

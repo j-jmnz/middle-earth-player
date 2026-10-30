@@ -6,21 +6,22 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../../effects/authored/nightmare/a-shadow-of-the-past.ts";
+import { AUTHORED_EFFECTS as KNIFE_EFFECTS } from "../../effects/authored/nightmare/a-knife-in-the-dark.ts";
 
 import { syncConstants } from "../constants.ts";
-import { pushCardEffects } from "../effect-frames.ts";
+import { pushCardEffects, pushEffectFrame } from "../effect-frames.ts";
 import { byCode, cardMap, expectOk, hero, idleScenario } from "../fixture.ts";
 import { hideWillpower } from "../hide.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
-import { modifiedStat } from "../keywords.ts";
+import { modifiedStat, playerCardEffectCanChoose } from "../keywords.ts";
 import { settle } from "../machine.ts";
 import { definePrinted } from "../printed.ts";
 import { reduce } from "../reduce.ts";
-import { updateCard, type ScenarioState } from "../state.ts";
+import { flagged, updateCard, type ScenarioState } from "../state.ts";
 import { spawn } from "../zones.ts";
 import { finishSetup } from "../setup.ts";
-import { hideCommitLimit, twinCode } from "./nightmare.ts";
+import { cancelNotAllowed, hideCommitLimit, run as runNightmare, twinCode } from "./nightmare.ts";
 
 const SETUP = "906101";
 const KHAMUL = "906102";
@@ -267,5 +268,70 @@ describe("the setup card's own Setup lines (906401:A:2; mec109.setup)", () => {
     expect(done.setAside.map((id) => done.cards[id]?.code)).toEqual(["rider"]);
     expect(done.cards[placed.id]?.zone).toBe("nightmare");
     expect(finishSetup({ ...base, phase: "Setup", setup: [] }, local, []).setAside).toEqual([]);
+  });
+});
+
+describe("A Knife in the Dark Nightmare's vocabulary (906201:A:2, 906203:A:1, 906208:A:1, 906209:A:2)", () => {
+  const knife = new Map(KNIFE_EFFECTS.map((effect) => [effect.id, effect]));
+  const knifeRecord = (id: string): Effect => {
+    const found = knife.get(id);
+    if (!found) throw new Error(`No record ${id}`);
+    return found;
+  };
+  const knifeCards = cardMap([
+    ...cards.values(),
+    definePrinted({ code: "906201", name: "A Knife in the Dark Nightmare", type: "nightmare" }),
+    definePrinted({ code: "141051", name: "Bill Ferny", type: "enemy", traits: ["Spy"], engagementCost: 50, threat: 2, attack: 2, defense: 2, health: 3 }),
+    definePrinted({ code: "906203", name: "Southern Spy", type: "enemy", traits: ["Spy"], engagementCost: 30, threat: 3, attack: 4, defense: 2, health: 4 }),
+    definePrinted({ code: "906208", name: "The Ring's Will", type: "treachery" }),
+    definePrinted({ code: "906209", name: "Blade Tip", type: "treachery" }),
+    definePrinted({ code: "ringbearer", name: "Frodo", type: "hero", traits: ["Hobbit", "Ring-bearer"], threat: 7, willpower: 2, attack: 1, defense: 2, health: 2 }),
+  ]);
+  const knifeCtx: ReduceContext = { effects: KNIFE_EFFECTS, cards: knifeCards };
+
+  it("makes Bill Ferny immune to player card effects while he is in the staging area", () => {
+    const { state: base } = table();
+    const setup = spawn(base, "906201", { zone: "nightmare" }).state;
+    const staged = spawn(setup, "141051", { zone: "staging" });
+    const synced = syncConstants(staged.state, knifeCtx);
+    expect(flagged(synced, staged.id, "immuneToPlayerCards")).toBe(true);
+    expect(playerCardEffectCanChoose(knifeCards.get("141051")!, synced, staged.id)).toBe(false);
+    const engaged = syncConstants(spawn(setup, "141051", { zone: "engaged", seat: 0 }).state, knifeCtx);
+    const bill = byCode(engaged, "141051")[0] ?? "";
+    expect(playerCardEffectCanChoose(knifeCards.get("141051")!, engaged, bill)).toBe(true);
+  });
+
+  it("has Southern Spy attack the revealing player from the staging area when no Ringwraith is out of play", () => {
+    const { state: base } = table();
+    const spy = spawn(deck(base, ["mist"]), "906203", { zone: "staging" });
+    const attacked = settle(pushCardEffects(spy.state, "whenRevealed", spy.id, 0, false, [knifeRecord("906203:whenRevealed:1")], knifeCtx, []), knifeCtx, []);
+    expect(attacked.pendingAttack).toMatchObject({ enemyId: spy.id, seat: 0, immediate: true });
+  });
+
+  it("does not offer the Ring-bearer's cancel against The Ring's Will, and does offer another hero's", () => {
+    const { state: base, heroes } = table();
+    const frodo = spawn(base, "ringbearer", { zone: "heroes", seat: 0 });
+    const will = spawn(frodo.state, "906208", { zone: "staging" });
+    const cancel: Effect = { id: "x:response:1", cardCode: "x", lines: ["fixture:A:1"], timing: "response", trigger: "encounterRevealed", instructions: [{ verb: "CancelEffect" }] };
+    const event = { trigger: "encounterRevealed" as const, seat: 0, subject: will.id };
+    expect(cancelNotAllowed(will.state, { cardId: frodo.id, effectId: cancel.id, seat: 0, event }, cancel, knifeCtx)).toBe(true);
+    expect(cancelNotAllowed(will.state, { cardId: heroes[0] ?? "", effectId: cancel.id, seat: 0, event }, cancel, knifeCtx)).toBe(false);
+  });
+
+  it("attaches Blade Tip to the defending character once the attack has damaged it, and not otherwise", () => {
+    const { state: base, heroes } = table();
+    const defender = heroes[0] ?? "";
+    const enemy = spawn(base, "rider", { zone: "engaged", seat: 0 });
+    const tip = spawn(enemy.state, "906209", { zone: "shadow", enemyId: enemy.id });
+    const attacking = { ...tip.state, pendingAttack: { enemyId: enemy.id, seat: 0, defenderId: defender } };
+    const left = runNightmare(attacking, { verb: "AttachToDamagedDefender" }, { seat: 0, sourceId: tip.id }, knifeCtx, []);
+    const after = left?.pendingAttack?.after ?? [];
+    expect(after).toEqual([{ verb: "AttachToDamagedDefender", card: tip.id, to: defender, dealt: true }]);
+    const ended = { ...left!, pendingAttack: null };
+    const atEnd = (dealt: number) => settle(pushEffectFrame(ended, { frame: "shadow", sourceId: enemy.id, actor: 0, peril: false, effectId: "end", instructions: after, cancel: null, blockCancel: null, dealt }, []), knifeCtx, []);
+    const hit = atEnd(2);
+    expect(hit.cards[tip.id]?.host).toBe(defender);
+    expect(hit.cards[enemy.id]?.shadowId).toBeNull();
+    expect(atEnd(0).cards[tip.id]?.zone).toBe("shadow");
   });
 });

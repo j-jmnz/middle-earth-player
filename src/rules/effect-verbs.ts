@@ -58,7 +58,7 @@ export function targetCandidates(state: ScenarioState, instruction: TargetVerb, 
       return seats
         .flatMap((index) => state.seats[index]?.engaged ?? [])
         .filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy")
-        .filter((id) => instruction.scope !== "any" || playerCardEffectCanChoose(printedOf(ctx.cards, state.cards[id]?.code ?? "")));
+        .filter((id) => instruction.scope !== "any" || playerCardEffectCanChoose(printedOf(ctx.cards, state.cards[id]?.code ?? ""), state, id));
     }
     case "PlaceProgressOnLocation": {
       const open = [...(state.activeLocation ? [state.activeLocation] : []), ...state.staging];

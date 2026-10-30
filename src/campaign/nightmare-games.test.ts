@@ -7,6 +7,8 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/fixture.ts";
+import { pushCardEffects } from "../rules/effect-frames.ts";
+import { settle } from "../rules/machine.ts";
 import { reduce, startScenario } from "../rules/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { playOut } from "../../scripts/auto-player.ts";
@@ -64,4 +66,25 @@ describe("a seeded Nightmare game of each scenario on NIGHTMARE_PLAYABLE", () =>
       }
     }, 120_000);
   }
+});
+
+// A record that names a card the recipe replaced reads the dealt card of the same title (twinCode, src/rules/families/nightmare.ts): The
+// Ringwraiths Attack adds Weathertop (141046) to the staging area, which on Nightmare is Nightmare Weathertop (906204), set aside by the piles.
+describe("the quest's records on Nightmare", () => {
+  it("add Nightmare Weathertop when The Ringwraiths Attack is revealed (141027:A:1)", () => {
+    const campaign = loadCampaign();
+    const seat = seatFor("fellowship-of-the-ring");
+    const world = loadWorld(catalog, campaign, loadScenario("a-knife-in-the-dark"), EFFECTS, [...seat.heroes, ...seat.deck]);
+    const ctx = contextOf(world);
+    const start = buildStart({ campaign, scenario: world.scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: seat.heroes, deck: seat.deck }], difficulty: "Nightmare", effects: world.effects, mode: "standalone" });
+    let state = startScenario(start, ctx);
+    while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+    const codeAt = (id: string) => state.cards[id]?.code;
+    expect(state.setAside.map(codeAt)).toContain("906204");
+    const revealed = EFFECTS.filter((effect) => effect.id === "141027:whenRevealed:1");
+    const stage = state.questStage ?? "";
+    const after = settle(pushCardEffects({ ...state, window: null }, "whenRevealed", stage, 0, false, revealed, ctx, []), ctx, []);
+    expect(after.staging.map((id) => after.cards[id]?.code)).toContain("906204");
+    expect(after.setAside.map((id) => after.cards[id]?.code)).not.toContain("906204");
+  });
 });

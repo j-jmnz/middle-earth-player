@@ -14,6 +14,18 @@ export const VERBS = [
   // adds it to the staging area", 906101:A:2; rr.search). It is not revealed. Nothing happens when no copy is in those places. The deck is
   // shuffled by a ShuffleEncounterDeck after it (the line says so).
   z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), ...when }),
+  // The source enemy attacks the actor now, as an attack outside the combat phase: from the staging area though it is not engaged, or while
+  // it is engaged with the actor ("Southern Spy makes an immediate attack against you", 906203:A:1). It is dealt a shadow card of its own.
+  // Nothing happens when it is engaged with another player or out of play.
+  z.strictObject({ verb: z.literal("AttackActor"), ...when }),
+  // A shadow effect: once the attack in progress ends, the source (the shadow card) is attached faceup to the defending character if this
+  // attack dealt it damage ("If the defending character is damaged by this attack, attach Blade Tip to that character", 906209:A:2). An
+  // undefended attack has no defending character. `card`, `to` and `dealt` are engine use: the instruction the shadow effect leaves for the
+  // end of the attack names the shadow card and the defender, and asks the attack to keep the damage it dealt.
+  z.strictObject({ verb: z.literal("AttachToDamagedDefender"), card: z.string().min(1).optional(), to: z.string().min(1).optional(), dealt: z.literal(true).optional(), ...when }),
+  // A marker on a When Revealed record, which does nothing when it runs: a Response on a card with this trait cannot cancel the card's effects
+  // ("This effect cannot be canceled by the Ring-bearer's effect", 906208:A:1; rr.cancel). Read by the response window (rules/responses.ts).
+  z.strictObject({ verb: z.literal("NotCanceledBy"), trait: z.string().min(1), ...when }),
 ] as const;
 
 export const TRIGGERS = [
@@ -26,4 +38,7 @@ export const FLAGS = [
   // On "table": no player may commit more than this many characters to a Hide test ("players cannot commit more than 2 characters to a Hide
   // test", 906106:A:1). The smallest amount held applies. Read by hideCommitReason (rules/hide.ts) through families/nightmare.ts.
   "hideCommitLimit",
+  // On a card: it is immune to player card effects while the flag holds ("While Bill Ferny is in the staging area, he gains: Immune to player
+  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/keywords.ts playerCardEffectCanChoose).
+  "immuneToPlayerCards",
 ] as const;

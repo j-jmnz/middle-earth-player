@@ -211,7 +211,7 @@ export function attachSourceTo(state: ScenarioState, instruction: Extract<Instru
   const targetId = refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId));
   const target = targetId ? state.cards[targetId] : undefined;
   if (!source || !target || target.id === source.id || target.id === source.host || !inPlay(source.zone) || !inPlay(target.zone)) return state;
-  if (!playerCardEffectCanChoose(printedOf(ctx.cards, target.code)) || attachBlocked(state, ctx, target.id, source.code)) return state;
+  if (!playerCardEffectCanChoose(printedOf(ctx.cards, target.code), state, target.id) || attachBlocked(state, ctx, target.id, source.code)) return state;
   const seat = source.controller ?? focus.seat;
   const old = source.host ? state.cards[source.host] : undefined;
   let moved = old ? updateCard(state, old.id, { attachments: old.attachments.filter((other) => other !== source.id) }) : state;

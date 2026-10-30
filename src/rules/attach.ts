@@ -57,7 +57,7 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
   }
   return candidates.filter((id) => {
     const host = state.cards[id];
-    if (!host || !playerCardEffectCanChoose(printedOf(ctx.cards, host.code))) return false;
+    if (!host || !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, id)) return false;
     if (attachBlocked(state, ctx, id, code)) return false;
     if (!rule) return true;
     if (rule.limitPerHost && host.attachments.some((other) => state.cards[other]?.code === code)) return false;

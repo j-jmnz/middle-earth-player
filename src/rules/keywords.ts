@@ -175,7 +175,10 @@ export function lowerThreat(state: ScenarioState, seat: number, amount: number, 
   return withThreat(state, seat, current.threat - dropped);
 }
 
-export function playerCardEffectCanChoose(printed: PrintedCard): boolean {
+// Immune to player card effects: printed, or gained while a card says so (`immuneToPlayerCards`, families/nightmare.ts: "While Bill Ferny
+// is in the staging area, he gains: Immune to player card effects", 906201:A:2).
+export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string): boolean {
+  if (state && id && flagged(state, id, "immuneToPlayerCards")) return false;
   return !printed.keywords.immuneToPlayerCardEffects;
 }
 
@@ -194,7 +197,7 @@ export function placeDamage(
   // Damage goes only on a card in play (rr.in-play-and-out-of-play): a defender that already left play takes none.
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
-  if (source === "player" && !playerCardEffectCanChoose(printed)) return state;
+  if (source === "player" && !playerCardEffectCanChoose(printed, state, id)) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.

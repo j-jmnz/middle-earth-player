@@ -103,7 +103,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 function shielded(state: ScenarioState, id: string, sourceId: string | null, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   const source = sourceId ? state.cards[sourceId] : undefined;
-  if (!card || !inPlay(card.zone) || playerCardEffectCanChoose(printedOf(ctx.cards, card.code))) return false;
+  if (!card || !inPlay(card.zone) || playerCardEffectCanChoose(printedOf(ctx.cards, card.code), state, id)) return false;
   return source == null || isPlayerType(printedOf(ctx.cards, source.code));
 }
 

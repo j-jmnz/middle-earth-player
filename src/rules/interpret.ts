@@ -253,7 +253,7 @@ function damageTargets(
     if (!instance) continue;
     const printed = printedOf(ctx.cards, instance.code);
     if (printed.type !== "enemy") continue;
-    if (playerEffect && !playerCardEffectCanChoose(printed)) continue;
+    if (playerEffect && !playerCardEffectCanChoose(printed, state, id)) continue;
     ids.push(id);
   }
   return ids;
