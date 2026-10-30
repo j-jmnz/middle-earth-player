@@ -35,8 +35,8 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 12 | A Knife in the Dark | active | 2026-10-24. Engine done. Review fixes not re-reviewed. Phone checks and both Maestro runs open; the won flow has no fixture (user-accepted). |
 | 13 | Flight to the Ford | active | 2026-10-26. Engine done. `/ux` not run. Phone checks; three Maestro flows written, not run; fixtures `ford-*` not committed. |
 | 14 | The Ring Goes South | active | 2026-10-26. Engine done. `/reviewer` and `/ux` not run. Phone checks; four Maestro flows written, not run; fixtures `south-*` not committed. |
-| 15 | Journey in the Dark | not started | Not playable. Setup (142040:A) not built. Lines in `src/effects/open-lines.ts`. |
-| 16 | Breaking of the Fellowship | not started | Not playable. Per-seat staging from stage 2B not built. Lines in `src/effects/open-lines.ts`. |
+| 15 | Journey in the Dark | active | 2026-10-30. Engine done; review round done. Phone checks open; three Maestro flows written, not run; fixtures `moria-*` not committed. Not on Nightmare. |
+| 16 | Breaking of the Fellowship | active | 2026-10-30. Engine done; review round done. Phone checks open (true solo and two-handed through 2B); four Maestro flows written, not run; fixtures `breaking-*` not committed. Not on Nightmare. |
 | 17 | Design system | completed | 2026-10-23. Superseded by Carved Stone (`docs/design-system.md`). |
 | 18 | Card frames follow the card | completed | 2026-10-26. ux fix not re-reviewed. Phone check open. |
 | 19 | Top bar and table menu | completed | 2026-10-26. Phone checks open; `.maestro/table-menu.yaml` not run. |
@@ -65,7 +65,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 - Scenario 1's `won` fixture is not committed. `scripts/e2e-fixtures.ts --won` searches for it. Until it exists `.maestro/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/a-knife-in-the-dark-loss.yaml` cannot run either.
 - A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
-- Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5. A fixture is a real save (phase 13).
+- Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save (phase 13).
 - No Maestro flow has run. The flows that cross a stage advance must pass the quest advance screen (`quest-advance-progress`, Progress is optional); a fixture parked on a When Revealed question shows the question instead.
 - `seat-peek.yaml`, `scenario-1-loss.yaml` and `the-caves-of-nibin-dum.yaml` read `continue-next`, now matched by its accessibility label: run them.
 - `.maestro/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
@@ -86,6 +86,12 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `burden-words.ts`.
 - `CountsAs` and `byEncounterDeck` live in the shared schema, not a family. `why.ts` matches the "different heroes" refusal by its wording.
 - Ledger readings 41050.A, 41012.A and 01090.A were re-checked against the scans, not user-confirmed.
+- Frodo's Choice (142068:A:2): its Ring-bearer clauses find nothing, since stage 2A removed the Ring-bearer from the game; the revealer takes the first player token for the game. Not user-confirmed.
+- One active location per separate stage (phase 16) is read from `rr.active-location` and `mec109.multiple-staging-areas`, not stated by a card. Not user-confirmed.
+- The Balrog's additional attack from the staging area is gated on `engagedWithFirst`; the general rule for any staging attacker would move two Ring Goes South goldens. "After this attack" shadows on an unflagged staging attacker do not run.
+- Lost in the Dark (41039)'s lasting `noQuestProgress` targets `table`, which a lasting `ModifyStat` does not support, so the "no progress" choice does nothing; fixing it moves the Nibin-Dûm golden.
+- Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
+- Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
 
 ### Screens and code
 
@@ -114,6 +120,7 @@ None ran. Each needs a device.
 - Gestures and motion: drag smoothness; the 150 ms scrub hold, the lifted card's grow and the cancel line; peek and back; card motion at Normal and Quick; reduced motion snaps; haptics on iOS and Android.
 - Combat spotlight (redesign): look at Normal and Quick in Dark and Light; cost on a low-end Android; the burn shader on each GPU; additive Atlas blending; skip on canvas, bar and dock. Handover: `docs/handover/combat-spotlight-open.md`.
 - Performance: frame timing of card pickup, the hand scrub, the spotlight and opening the table (Profiler, Perf Monitor), and the loading frame on a cache miss; screens hidden by React Activity re-shown with their state (tabs, stacked screens, the table's pictures, a tab under a sheet's scrim, iOS swipe-back); the Sent and landing ticks' feel.
+- Separate stages (Breaking of the Fellowship): the staging owner tag, per-dial ticks, the peek banner's room, the per-seat quest advance screens and `table-area` with VoiceOver and TalkBack; fallen-hero art.
 - Scenario sheets: Caught in a Web, Wolf Rider's second attack, The Oath's end-of-round Response and Tokens dial, the Pillar on the attack sheet; a person winning and losing each playable scenario with the log matching.
 - Look and theme: Skia fog and its drift (smooth, cheap, still under reduced motion), grit, `filter` effects, Barlow and Marcellus SC weights, Light's multiply and Dark's screen art blends with no hard edge, Small and Large scales, both themes, keep-awake, `userInterfaceStyle: automatic` after a prebuild.
 - Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge and briefing scene on an iPad in landscape.

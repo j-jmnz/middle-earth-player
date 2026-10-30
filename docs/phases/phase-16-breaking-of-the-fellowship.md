@@ -4,7 +4,7 @@ Engine half depends on: phase 15's engine half
 Phone half depends on: phase 15
 Blocks: nothing in the proof of concept
 
-**State (2026-10-30):** engine half done: `breaking-of-the-fellowship` is in `src/campaign/playable.ts` and its goldens run in Node (`src/campaign/golden-breaking.test.ts`). phone half code done: the table draws the shown seat's staging area, stage and active location, the readouts and Choose words follow, and the four flows `.maestro/breaking-of-the-fellowship*.yaml` are written. Open: the fixtures `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` (no chained win of scenarios 1 to 5 yet), the flows run, and the phone checks.
+**State (2026-10-30):** engine half done and reviewed: `breaking-of-the-fellowship` is in `src/campaign/playable.ts` and its goldens run in Node (`src/campaign/golden-breaking.test.ts`). Phone half code done: the table draws the shown seat's staging area, stage and active location, the readouts and Choose words follow, and the four flows `.maestro/breaking-of-the-fellowship*.yaml` are written. Open: the fixtures `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` (no chained win of scenarios 1 to 5 yet), the flows run, and the phone checks.
 
 ## Goal
 
