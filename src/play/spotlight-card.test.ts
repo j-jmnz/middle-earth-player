@@ -59,7 +59,7 @@ describe("a card's transform", () => {
   });
 
   it("drops a burning target only by the fall it is given", () => {
-    const burning = { ...frameAt({ ...SHAPE, destroyed: true }, 1900, 1, 3), flyTarget: 1, knock: 0 };
+    const burning = { ...frameAt({ ...SHAPE, destroyed: true }, 2900, 1, 3), flyTarget: 1, knock: 0 };
     expect(get(cardTransform("target", from, 0, stage.target, 0, stage, burning), "translateY")).toBeCloseTo(0, 9);
     expect(get(cardTransform("target", from, 0, stage.target, 0, stage, burning, 12), "translateY")).toBeCloseTo(12 * burning.dissolve, 9);
     expect(burning.dissolve).toBeGreaterThan(0);
