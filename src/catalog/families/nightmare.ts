@@ -2,7 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare.ts runs them.
 import { z } from "zod";
 
-import { cardRefSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
@@ -66,6 +66,29 @@ export const VERBS = [
   // All damage on the card `from` names moves to the card `to` names; damage that reaches its hit points destroys it ("Move all damage on
   // this enemy to the defending character", 900209:A:2). Nothing moves when either card is missing or out of play.
   z.strictObject({ verb: z.literal("MoveDamageTo"), from: cardRefSchema, to: cardRefSchema, ...when }),
+  // Heard when a hero was taken prisoner at stage 1B (900301:A:2): more heroes are captured at random with the game's seed, from players who have
+  // none captured, until the number captured is 1 with 1 or 2 players, 2 with 3 and 3 with 4. Each is facedown, "the prisoner", as the first
+  // (src/rules/families/prisoner.ts). Nothing is announced for them.
+  z.strictObject({ verb: z.literal("TakeMorePrisoners"), ...when }),
+  // In the effect an attack leaves for its end: the hero the reference names, still in play, is turned facedown as a "prisoner" when this attack
+  // dealt it damage ("Any hero damaged (but not defeated) by this attack is turned face down, as a "prisoner."", 900302:A:2). It keeps its
+  // damage. `dealt` asks the attack to keep the damage it dealt (families/defense-excess.ts).
+  z.strictObject({ verb: z.literal("TakeHeroPrisoner"), card: cardRefSchema, dealt: z.literal(true), ...when }),
+  // The players return to an earlier stage, side B: the current quest card goes back to the quest deck and the quest card of stage `stage` (its
+  // place in the quest deck, counting from 1) is the current quest again, with no progress ("return to stage 2B of the quest", 900302:A:2). Its
+  // When Revealed effects do not resolve again.
+  z.strictObject({ verb: z.literal("ReturnToStage"), stage: z.number().int().positive(), ...when }),
+  // The card with this code is put into play engaged with the first player from wherever it is out of play: set aside, the encounter deck, its
+  // discard pile or the victory display ("put the Nazgûl of Dol Guldur into play (from any out of play area), engaged with the first player",
+  // 900307:A:1). Nothing happens when it is in play.
+  z.strictObject({ verb: z.literal("EngageOutOfPlay"), code: z.string().min(1), ...when }),
+  // 1 resource moves from the pool of each hero the actor controls that has one to the card the reference names ("move 1 resource token from
+  // each of your heroes' resource pools to that location", 900308:A:3).
+  z.strictObject({ verb: z.literal("MoveResourceFromHeroes"), to: cardRefSchema, ...when }),
+  // Places `amount` resource tokens on the card the reference names, an encounter card: it is no hero's resource pool, so nothing collects it and
+  // no `resourcesAdded` is announced ("Add 1 resource token to each Dol Guldur location in play", 900302:A:1; "place 1 resource token on
+  // Dungeon Labyrinth for each player in the game", 900306:A:2).
+  z.strictObject({ verb: z.literal("PlaceResourceTokens"), amount: positiveAmountSchema, on: cardRefSchema, ...when }),
 ] as const;
 
 export const TRIGGERS = [

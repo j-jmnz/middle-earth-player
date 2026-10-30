@@ -151,10 +151,10 @@ export type Frame = {
 export type DelayedEffect = {
   id: string;
   // `questSucceeded`: run when the players quest successfully this phase (families/quest-outcome.ts), dropped when the quest
-  // resolves otherwise.
+  // resolves otherwise. `questFailed`: the same, when they quest unsuccessfully (900307:A:1).
   // `endOfAttack`: the end of the player attack in progress (families/attack-flow.ts).
   // `startOfGame`: run once the opening hands are settled (misc family).
-  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "endOfAttack" | "startOfGame";
+  until: "endOfPhase" | "endOfRound" | "questSucceeded" | "questFailed" | "endOfAttack" | "startOfGame";
   sourceId: string | null;
   seat: number;
   // The phase the effect was scheduled in. An end-of-phase effect fires when that phase ends.

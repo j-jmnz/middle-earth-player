@@ -24,6 +24,11 @@ export function prisonerHero(state: ScenarioState): string | null {
   return Object.values(state.cards).find((card) => card.zone === "captive" && card.prisoner === true && card.host == null)?.id ?? null;
 }
 
+// Every hero that is a prisoner now: on Nightmare more than one can be (900301:A:2, 900302:A:2), and together they are "the prisoner".
+export function prisonerHeroes(state: ScenarioState): string[] {
+  return Object.values(state.cards).filter((card) => card.zone === "captive" && card.prisoner === true && card.host == null).map((card) => card.id);
+}
+
 // The facedown hero that belongs to this seat's player: no list of the seat holds it while it is held (the table draws it among the seat's cards).
 export function prisonersOfSeat(state: ScenarioState, seat: number): string[] {
   return Object.values(state.cards).filter((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner === seat).map((card) => card.id);
@@ -48,12 +53,12 @@ export function run(state: ScenarioState, instruction: Instruction, _focus: Focu
 
 // "Each card attached to that hero is turned facedown" is the campaign card's Forced effect (01131:A:3): only a game with it placed turns the
 // prisoner's attachments facedown. The stage's own line (01123:B:1) turns the hero alone.
-function campaignTurnsDown(state: ScenarioState): boolean {
+export function campaignTurnsDown(state: ScenarioState): boolean {
   return Object.values(state.cards).some((card) => card.code === CAMPAIGN_CARD && card.zone === "campaign");
 }
 
 // The heroes of every living seat, in seat order.
-function heroesOf(state: ScenarioState, ctx: ReduceContext): string[] {
+export function heroesOf(state: ScenarioState, ctx: ReduceContext): string[] {
   return livingSeats(state).flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => state.cards[id] != null && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "hero");
 }
 
@@ -90,13 +95,17 @@ function captureWith(state: ScenarioState, code: string): ScenarioState {
   return updateCard(moveCard(state, card.id, { zone: "captive", hostId: heroId }), card.id, { prisoner: true });
 }
 
-// RescuePrisoner: the hero is faceup in its controller's heroes with `damage` damage on it, and the cards attached to it are faceup in
-// that player's play area again.
+// RescuePrisoner: the hero is faceup in its controller's heroes with `damage` more damage on it, and the cards attached to it are faceup in
+// that player's play area again. When several heroes are captured on Nightmare they are all "the prisoner" (900301:A:2), and each is rescued.
 function rescuePrisoner(state: ScenarioState, damage: number): ScenarioState {
-  const heroId = prisonerHero(state);
-  const seat = heroId ? (state.cards[heroId]?.owner ?? state.firstPlayer) : state.firstPlayer;
-  const next = unholdPrisoner(state, damage);
-  return heroId && next !== state ? queueEvent(next, { trigger: "prisonerRescued", seat, cardId: heroId, subject: heroId }) : state;
+  let next = state;
+  for (const heroId of prisonerHeroes(state)) {
+    const seat = state.cards[heroId]?.owner ?? state.firstPlayer;
+    const released = unholdPrisoner(next, damage);
+    if (released === next) break;
+    next = queueEvent(released, { trigger: "prisonerRescued", seat, cardId: heroId, subject: heroId });
+  }
+  return next;
 }
 
 // The prisoner and the cards attached to it faceup again, the hero with `damage` damage: no event.
@@ -105,7 +114,7 @@ function unholdPrisoner(state: ScenarioState, damage: number): ScenarioState {
   const hero = heroId ? state.cards[heroId] : undefined;
   if (!heroId || !hero) return state;
   const seat = hero.owner ?? state.firstPlayer;
-  const released = releaseHero(state, heroId, seat, { damage, face: "up", prisoner: undefined, owner: undefined, heroSlot: undefined }, { prisoner: undefined, owner: undefined }, true);
+  const released = releaseHero(state, heroId, seat, { damage: hero.damage + damage, face: "up", prisoner: undefined, owner: undefined, heroSlot: undefined }, { prisoner: undefined, owner: undefined }, true);
   return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
 }
 

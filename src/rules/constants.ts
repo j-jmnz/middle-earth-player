@@ -126,9 +126,12 @@ export function syncConstants(state: ScenarioState, ctx: ReduceContext): Scenari
 // puts the enemies out is not won before they arrive. An open window closes: the resolution asks next.
 export function constantWin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (state.stageCleared || state.lost || state.failure || state.stack.length > 0) return state;
-  if (!ctx.effects.some((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "WinGame"))) return state;
-  for (const { instruction } of constantInstructions(state, ctx)) {
+  if (!ctx.effects.some((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "WinGame" || instruction.verb === "LoseGame"))) return state;
+  for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb === "WinGame") return { ...state, stageCleared: true, window: null, pendingAttack: null };
+    // A constant that loses the game while it holds ("If Torture Chamber has 4 or more resource tokens on it, ... the players have lost the
+    // game", 900305:A:1).
+    if (instruction.verb === "LoseGame") return { ...state, lost: true, lossReason: `${printedOf(ctx.cards, source.code).name}: the players lost`, window: null, pendingAttack: null };
   }
   return state;
 }

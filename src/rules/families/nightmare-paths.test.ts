@@ -4,10 +4,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
+import { AUTHORED_EFFECTS as DUNGEONS } from "../../effects/authored/nightmare/escape-from-dol-guldur.ts";
 import { AUTHORED_EFFECTS as ANDUIN } from "../../effects/authored/nightmare/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS as MIRKWOOD } from "../../effects/authored/nightmare/passage-through-mirkwood.ts";
 
-import { syncConstants } from "../constants.ts";
+import { constantWin, syncConstants } from "../constants.ts";
 import { canAttack } from "../combat.ts";
 import { pushCardEffects, pushEffectFrame } from "../effect-frames.ts";
 import { cardMap, expectOk, hero, idleScenario } from "../fixture.ts";
@@ -24,6 +25,8 @@ import { flagged, updateCard, withThreat, type ScenarioState } from "../state.ts
 import { fireForced } from "../triggers.ts";
 import { spawn } from "../zones.ts";
 import { run as runNightmare } from "./nightmare.ts";
+import { prisonerHeroes, run as runPrisoner } from "./prisoner.ts";
+import { afterQuestOutcome } from "./quest-outcome.ts";
 
 const cards = cardMap([
   definePrinted({ code: "900101", name: "Passage Through Mirkwood Nightmare", type: "nightmare" }),
@@ -48,6 +51,13 @@ const cards = cardMap([
   definePrinted({ code: "01082", name: "Hill Troll", type: "enemy", traits: ["Troll"], engagementCost: 30, threat: 1, attack: 6, defense: 3, health: 9 }),
   definePrinted({ code: "s2", name: "Anduin Passage", type: "quest", questPoints: 16 }),
   definePrinted({ code: "s3", name: "Ambush on the Shore", type: "quest", questPoints: 0 }),
+  definePrinted({ code: "900301", name: "Escape from Dol Guldur Nightmare", type: "nightmare" }),
+  definePrinted({ code: "900302", name: "Torture Master", type: "enemy", traits: ["Dol Guldur", "Orc"], engagementCost: 45, threat: 5, attack: 1, defense: 2, health: 4 }),
+  definePrinted({ code: "900305", name: "Torture Chamber", type: "location", traits: ["Dol Guldur"], threat: 3, questPoints: 6 }),
+  definePrinted({ code: "900306", name: "Dungeon Labyrinth", type: "location", traits: ["Dol Guldur"], threat: 1, questPoints: 4 }),
+  definePrinted({ code: "900309", name: "Dark Interrogation", type: "treachery" }),
+  definePrinted({ code: "01102", name: "Nazgûl of Dol Guldur", type: "enemy", traits: ["Nazgûl"], engagementCost: 40, threat: 5, attack: 4, defense: 3, health: 9 }),
+  definePrinted({ code: "blade", name: "Blade", type: "attachment", cost: 1 }),
   hero("frodo", "spirit", 8, 2),
   hero("sam", "spirit", 8, 2),
   hero("gimli", "tactics", 8, 3),
@@ -307,5 +317,103 @@ describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
     const moved = runFrame(hurt, troll.id, [{ verb: "MoveDamageTo", from: "self", to: "other" }], { other: target });
     expect(moved.cards[troll.id]?.damage).toBe(0);
     expect(moved.cards[target]?.damage).toBe(2);
+  });
+});
+
+describe("Escape from Dol Guldur Nightmare (900301-900309)", () => {
+  const ctx: ReduceContext = { effects: DUNGEONS, cards };
+  const fire = (state: ScenarioState, frame: "whenRevealed" | "forced" | "shadow", sourceId: string, id: string) =>
+    settle(pushCardEffects(state, frame, sourceId, 0, false, [record(DUNGEONS, id)], ctx, []), ctx, []);
+  const runFrame = (state: ScenarioState, sourceId: string, instructions: Parameters<typeof pushEffectFrame>[1]["instructions"], extra: { other?: string; dealt?: number } = {}) =>
+    settle(pushEffectFrame(state, { frame: "shadow", sourceId, actor: 0, peril: false, effectId: "fixture", instructions, cancel: null, blockCancel: null, ...extra }, []), ctx, []);
+
+  it("captures one hero in all with 1 or 2 players, and rescues every prisoner together (900301:A:2)", () => {
+    const { state: base } = table(2);
+    const taken = runPrisoner(base, { verb: "TakePrisoner" }, { seat: 0, sourceId: null }, ctx, []) ?? base;
+    const more = runNightmare(taken, { verb: "TakeMorePrisoners" }, { seat: 0, sourceId: null }, ctx, []) ?? taken;
+    expect(prisonerHeroes(more)).toHaveLength(1);
+  });
+
+  it("turns a hero the attack damaged face down as a prisoner, keeping its damage, and rescues each prisoner (900302:A:2)", () => {
+    const { state: base, heroes } = table();
+    const [frodo = "", sam = ""] = heroes[0] ?? [];
+    const master = spawn(updateCard(base, frodo, { damage: 1 }), "900302", { zone: "engaged", seat: 0 });
+    const missed = runFrame(master.state, master.id, [{ verb: "TakeHeroPrisoner", card: "other", dealt: true }], { other: frodo });
+    expect(missed.cards[frodo]?.zone).toBe("heroes");
+    const hit = runFrame(master.state, master.id, [{ verb: "TakeHeroPrisoner", card: "other", dealt: true }], { other: frodo, dealt: 1 });
+    expect(hit.cards[frodo]).toMatchObject({ zone: "captive", prisoner: true, damage: 1 });
+    const second = runFrame(hit, master.id, [{ verb: "TakeHeroPrisoner", card: "other", dealt: true }], { other: sam, dealt: 2 });
+    expect(prisonerHeroes(second)).toHaveLength(2);
+    const rescued = runPrisoner(second, { verb: "RescuePrisoner", damage: 1 }, { seat: 0, sourceId: null }, ctx, []) ?? second;
+    expect(prisonerHeroes(rescued)).toEqual([]);
+    expect(rescued.cards[frodo]).toMatchObject({ zone: "heroes", damage: 2 });
+    expect(rescued.cards[sam]).toMatchObject({ zone: "heroes", damage: 1 });
+  });
+
+  it("returns the players from stage 3 to stage 2B (900302:A:2, ReturnToStage)", () => {
+    const { state: base } = table();
+    const staged: ScenarioState = { ...base, stages: [{ code: "stage" }, { code: "s2" }, { code: "s3" }] };
+    const third = updateCard(staged, staged.questStage ?? "", { code: "s3", progress: 2 });
+    const second = spawn(third, "s2", { zone: "setAside" });
+    const back = runNightmare(second.state, { verb: "ReturnToStage", stage: 2 }, { seat: 0, sourceId: null }, ctx, []) ?? second.state;
+    expect(back.questStage).toBe(second.id);
+    expect(back.cards[second.id]).toMatchObject({ zone: "questStage", face: "B", progress: 0 });
+    expect(back.cards[third.questStage ?? ""]).toMatchObject({ zone: "questDeck", progress: 0 });
+  });
+
+  it("loses the game once Torture Chamber holds 4 resource tokens (900305:A:1), and Dungeon Labyrinth grows with its tokens (900306:A:1)", () => {
+    const { state: base } = table();
+    const chamber = spawn(base, "900305", { zone: "staging" });
+    expect(constantWin(updateCard(chamber.state, chamber.id, { resources: 3 }), ctx).lost).toBe(false);
+    expect(constantWin(updateCard(chamber.state, chamber.id, { resources: 4 }), ctx).lost).toBe(true);
+    const maze = spawn(chamber.state, "900306", { zone: "staging" });
+    const synced = syncConstants(updateCard(maze.state, maze.id, { resources: 2 }), ctx);
+    const card = synced.cards[maze.id];
+    expect(card ? modifiedStat(synced, card, "threat", cards) : 0).toBe(3);
+    expect(card ? modifiedStat(synced, card, "questPoints", cards) : 0).toBe(6);
+    const tokens = fire(synced, "forced", chamber.id, "900305:forced:1");
+    // Each Dol Guldur location in play takes 1 at the end of the round: the chamber itself too.
+    expect(tokens.cards[maze.id]?.resources).toBe(3);
+    expect(tokens.cards[chamber.id]?.resources).toBe(1);
+  });
+
+  it("puts the Nazgûl of Dol Guldur into play engaged with the first player when the players quest unsuccessfully (900307:A:1)", () => {
+    const { state: base } = table(2);
+    const nazgul = spawn({ ...base, firstPlayer: 1 }, "01102", { zone: "setAside" });
+    const delayed = { ...nazgul.state, delayed: [{ id: "d", until: "questFailed" as const, sourceId: null, seat: 0, phase: nazgul.state.phase, instructions: [{ verb: "EngageOutOfPlay" as const, code: "01102" }], uncancelable: null }] };
+    const success = settle(afterQuestOutcome(delayed, { committed: [], result: "success" }, ctx, []), ctx, []);
+    expect(success.cards[nazgul.id]?.zone).toBe("setAside");
+    expect(success.delayed).toEqual([]);
+    const failure = settle(afterQuestOutcome(delayed, { committed: [], result: "failure" }, ctx, []), ctx, []);
+    expect(failure.cards[nazgul.id]).toMatchObject({ zone: "engaged", controller: 1 });
+  });
+
+  it("moves 1 resource from each of the defending player's heroes to a Dol Guldur location in the staging area (900308:A:3)", () => {
+    const { state: base, heroes } = table();
+    const [frodo = "", sam = "", gimli = ""] = heroes[0] ?? [];
+    const chamber = spawn(updateCard(updateCard(base, frodo, { resources: 2 }), sam, { resources: 1 }), "900305", { zone: "staging" });
+    const moved = runFrame(chamber.state, chamber.id, [{ verb: "MoveResourceFromHeroes", to: "self" }]);
+    expect(moved.cards[chamber.id]?.resources).toBe(2);
+    expect([frodo, sam, gimli].map((id) => moved.cards[id]?.resources)).toEqual([1, 0, 0]);
+  });
+
+  it("discards each card the defending player controls with a copy in his discard pile (900309:A:2, copyInDiscard)", () => {
+    const { state: base, heroes } = table();
+    const host = heroes[0]?.[0] ?? "";
+    const blade = spawn(base, "blade", { zone: "play", seat: 0 });
+    const piled = spawn(blade.state, "blade", { zone: "discard", seat: 0 }).state;
+    const interrogation = spawn(piled, "900309", { zone: "staging" });
+    const done = fire(interrogation.state, "shadow", interrogation.id, "900309:shadow:1");
+    expect(done.cards[blade.id]?.zone).toBe("discard");
+    expect(done.cards[host]?.zone).toBe("heroes");
+  });
+
+  it("has a player with 2 or fewer cards in hand reveal an encounter card instead of discarding (900309:A:1)", () => {
+    const { state: base } = table();
+    const hand = spawn(deck(base, ["rider"]), "blade", { zone: "hand", seat: 0 }).state;
+    const interrogation = spawn(hand, "900309", { zone: "staging" });
+    const done = fire(interrogation.state, "whenRevealed", interrogation.id, "900309:whenRevealed:1");
+    expect(done.encounterDeck).toEqual([]);
+    expect(done.seats[0]?.hand).toHaveLength(1);
   });
 });

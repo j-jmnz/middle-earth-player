@@ -10,11 +10,14 @@ import { effectsOf } from "../listen.ts";
 import { dealAttackShadow } from "./defense-listen.ts";
 import { dealForAttack } from "./south-watcher.ts";
 import { effectData, moveEncounter } from "./encounter-moves.ts";
+import { campaignTurnsDown, heroesOf, prisonerHeroes, prisonersOfSeat } from "./prisoner.ts";
+import { captureHero } from "./south-captive.ts";
+import { shuffleIds } from "../seed.ts";
 import { markPicked } from "./play-refs.ts";
 import { askTarget } from "../choices.ts";
-import { frameScope, refCard } from "../amounts.ts";
+import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { pushCardEffects } from "../effect-frames.ts";
-import { modifiedStat, placeDamage, raiseThreat } from "../keywords.ts";
+import { modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../keywords.ts";
 import { matchesPick } from "../pick.ts";
 import { engageEnemy, engageWith } from "../quest.ts";
 import type { EngineStep } from "../intents.ts";
@@ -65,6 +68,23 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return removeEnemyDamage(state, ctx, steps);
     case "MoveDamageTo":
       return moveDamageTo(state, instruction.from, instruction.to, focus, ctx, steps);
+    case "TakeMorePrisoners":
+      return takeMorePrisoners(state, ctx);
+    case "TakeHeroPrisoner":
+      return takeHeroPrisoner(state, instruction.card, focus, ctx);
+    case "ReturnToStage":
+      return returnToStage(state, instruction.stage, ctx, steps);
+    case "EngageOutOfPlay":
+      return engageOutOfPlay(state, instruction.code, ctx, steps);
+    case "MoveResourceFromHeroes":
+      return moveResourceFromHeroes(state, instruction.to, focus);
+    case "PlaceResourceTokens": {
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const id = refCard(state, instruction.on, scope);
+      const card = id ? state.cards[id] : undefined;
+      const amount = resolveAmount(state, instruction.amount, scope, ctx);
+      return card && inPlay(card.zone) && amount > 0 ? updateCard(state, card.id, { resources: card.resources + amount }) : state;
+    }
     default:
       return null;
   }
@@ -354,4 +374,70 @@ function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, focus: F
   const target = state.cards[refCard(state, to, scope) ?? ""];
   if (!source || !target || source.id === target.id || source.damage <= 0 || !inPlay(source.zone) || !inPlay(target.zone)) return state;
   return placeDamage(updateCard(state, source.id, { damage: 0 }), target.id, source.damage, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+}
+
+// TakeMorePrisoners: heroes are captured at random, from the players who have none captured, until 1 (1 or 2 players), 2 (3 players) or 3
+// (4 players) are the prisoner (900301:A:2).
+function takeMorePrisoners(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const players = livingSeats(state).length;
+  const wanted = players <= 2 ? 1 : players - 1;
+  let next = state;
+  while (prisonerHeroes(next).length < wanted) {
+    const free = heroesOf(next, ctx).filter((id) => {
+      const seat = next.cards[id]?.controller;
+      return seat != null && prisonersOfSeat(next, seat).length === 0;
+    });
+    const rolled = shuffleIds(free, next.seed, next.seedCursor);
+    const chosen = rolled.ids[0];
+    if (!chosen) return next;
+    next = captureHero({ ...next, seedCursor: rolled.cursor }, chosen, null, true, campaignTurnsDown(next));
+  }
+  return next;
+}
+
+// TakeHeroPrisoner: the hero this attack damaged, still in play and not yet a prisoner, is turned facedown as one, keeping its damage (900302:A:2).
+function takeHeroPrisoner(state: ScenarioState, card: CardRef, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const data = effectData(state);
+  const id = refCard(state, card, frameScope(state, focus.seat, focus.sourceId));
+  const hero = id ? state.cards[id] : undefined;
+  if (!id || !hero || (data?.dealt ?? 0) <= 0 || hero.zone !== "heroes" || printedOf(ctx.cards, hero.code).type !== "hero") return state;
+  return updateCard(captureHero(state, id, null, true, campaignTurnsDown(state)), id, { damage: hero.damage });
+}
+
+// ReturnToStage: the current quest card goes back into the quest deck, faceup on side A with no progress, and the quest card of stage `stage`
+// (set aside when it was defeated) is the current quest again on side B, with no progress (900302:A:2).
+function returnToStage(state: ScenarioState, stage: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const currentId = state.questStage;
+  const code = state.stages[stage - 1]?.code;
+  const earlier = code ? Object.values(state.cards).find((card) => card.code === code && card.zone === "setAside") : undefined;
+  if (!currentId || !earlier || state.cards[currentId]?.code === code) return state;
+  let next = releaseAttachments(state, currentId, ctx.cards, steps);
+  next = updateCard(moveCard(next, currentId, { zone: "questDeck" }), currentId, { face: "A", progress: 0 });
+  next = updateCard(moveCard(next, earlier.id, { zone: "questStage" }), earlier.id, { face: "B", progress: 0 });
+  steps.push({ kind: "advance", cardId: earlier.id });
+  return next;
+}
+
+// EngageOutOfPlay: the first copy found out of play (set aside, the encounter deck, its discard pile, the victory display) enters play engaged
+// with the first player (900307:A:1).
+function engageOutOfPlay(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const twin = twinCode(state, code, ctx.cards);
+  if (Object.values(state.cards).some((card) => card.code === twin && inPlay(card.zone))) return state;
+  const id = [...state.setAside, ...state.encounterDeck, ...state.encounterDiscard, ...state.victory].find((entry) => state.cards[entry]?.code === twin);
+  if (!id) return state;
+  return moveEncounter(updateCard(state, id, { face: "up" }), id, "engaged", state.firstPlayer, ctx, steps);
+}
+
+// MoveResourceFromHeroes: each hero the actor controls with a resource gives 1 to the card named (900308:A:3).
+function moveResourceFromHeroes(state: ScenarioState, to: CardRef, focus: Focus): ScenarioState {
+  const target = refCard(state, to, frameScope(state, focus.seat, focus.sourceId));
+  if (!target || !state.cards[target]) return state;
+  let next = state;
+  for (const heroId of state.seats[focus.seat]?.heroes ?? []) {
+    const hero = next.cards[heroId];
+    const card = next.cards[target];
+    if (!hero || !card || hero.resources <= 0) continue;
+    next = updateCard(updateCard(next, heroId, { resources: hero.resources - 1 }), target, { resources: card.resources + 1 });
+  }
+  return next;
 }

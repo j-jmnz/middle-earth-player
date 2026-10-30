@@ -30,11 +30,12 @@ export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, c
     next = queueHeard(next, ctx, { trigger: "committedQuestResolved", seat: card.controller, subject: id });
     if (outcome.result === "success") next = queueHeard(next, ctx, { trigger: "questedSuccessfully", seat: card.controller, subject: id });
   }
-  const waiting = next.delayed.filter((entry) => entry.until === "questSucceeded");
+  // And those waiting for the players to quest unsuccessfully (900307:A:1).
+  const waiting = next.delayed.filter((entry) => entry.until === "questSucceeded" || entry.until === "questFailed");
   if (waiting.length === 0) return next;
-  next = { ...next, delayed: next.delayed.filter((entry) => entry.until !== "questSucceeded") };
-  if (outcome.result !== "success") return next;
-  for (const entry of [...waiting].reverse()) {
+  next = { ...next, delayed: next.delayed.filter((entry) => entry.until !== "questSucceeded" && entry.until !== "questFailed") };
+  const due = waiting.filter((entry) => (entry.until === "questSucceeded" ? outcome.result === "success" : outcome.result === "failure"));
+  for (const entry of [...due].reverse()) {
     if (entry.phase !== next.phase) continue;
     next = pushEffectFrame(
       next,
