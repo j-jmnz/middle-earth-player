@@ -1,10 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import Database from "better-sqlite3";
 import sharp from "sharp";
 
+import { SCENE_PICTURE } from "../src/screens/art-crop.ts";
 import { sniffImage } from "../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "./data/paths.ts";
 import { fetchBytes, sha256, type SourceFile, type SourceRecord } from "./data/sources/fetch.ts";
@@ -34,6 +35,9 @@ export type PackScansOptions = {
   fetch?: (url: string) => Promise<Uint8Array>;
   render?: (pdfFile: string, page: number) => Uint8Array;
   shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B") => Promise<Uint8Array>;
+  // The first quest card of each scenario: its scene is also bundled on its own, at the source's size (`<code>.scene`, sceneOf).
+  sceneCodes?: ReadonlySet<string>;
+  scene?: (body: Uint8Array, typeCode: string) => Promise<Uint8Array>;
 };
 
 type Pin = SourceFile & { cacheDir: string };
@@ -102,6 +106,11 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
       const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A");
       total += shown.byteLength;
       packed.push(writeScan(key, shown, options.scansDir));
+      if (key === card.code && options.sceneCodes?.has(key)) {
+        const scene = await (options.scene ?? sceneOf)(body, card.type_code);
+        total += scene.byteLength;
+        packed.push(writeScan(`${key}.scene`, scene, options.scansDir));
+      }
       tick(`${key} ${bytes(shown.byteLength)}`);
     }
   };
@@ -206,6 +215,38 @@ export async function shrinkToMaxSide(body: Uint8Array, typeCode = "", side: "A"
   return new Uint8Array(await image.resize({ width: MAX_SIDE, height: MAX_SIDE, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 85, mozjpeg: true }).toBuffer());
 }
 
+// A source this wide or wider, laid down, is a scan of a printed card (JvZijp's proxies are about 1930, cardgame.tools' 600 dpi
+// scans about 2100): its scene is softened just enough to take out the print's halftone screen, which a scene drawn large across
+// a page shows as grain (user report, 2026-10-30). A smaller, digital picture (Hall of Beorn's 700) is not softened.
+const PRINT_SCAN_WIDTH = 1600;
+const HALFTONE_BLUR = 1.2;
+
+/**
+ * A scenario's scene from its first quest card's picture, laid down: the SCENE_PICTURE region at the source's own size, unscaled, so the
+ * scene a page draws large is never a crop of the shrunk card. A print scan is softened (PRINT_SCAN_WIDTH).
+ */
+export async function sceneOf(body: Uint8Array, typeCode = "quest"): Promise<Uint8Array> {
+  const media = sniffImage(body);
+  if (!media) throw new Error("A scene's picture is not a JPEG or PNG");
+  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const width = turn % 180 === 0 ? media.width : media.height;
+  const height = turn % 180 === 0 ? media.height : media.width;
+  const laid = await sharp(body).rotate(turn).toBuffer();
+  const region = { left: Math.round(SCENE_PICTURE.x * width), top: Math.round(SCENE_PICTURE.y * height), width: Math.round(SCENE_PICTURE.w * width), height: Math.round(SCENE_PICTURE.h * height) };
+  const cropped = sharp(laid).extract(region);
+  return new Uint8Array(await (width >= PRINT_SCAN_WIDTH ? cropped.blur(HALFTONE_BLUR) : cropped).jpeg({ quality: 88, mozjpeg: true }).toBuffer());
+}
+
+/** The first quest card of every scenario in data/scenarios: the cards whose scene a page shows (art.tsx, useSceneCard). */
+export function sceneCodesOf(scenariosDir: string): Set<string> {
+  const codes = new Set<string>();
+  for (const file of readdirSync(scenariosDir).filter((name) => name.endsWith(".json"))) {
+    const first = (JSON.parse(readFileSync(path.join(scenariosDir, file), "utf8")) as { stages?: string[] }).stages?.[0];
+    if (first) codes.add(first);
+  }
+  return codes;
+}
+
 // `code` is the map key: a card's code for side A, `<code>.B` for side B.
 function writeScan(code: string, body: Uint8Array, scansDir: string): PackedScan {
   const media = sniffImage(body);
@@ -251,6 +292,7 @@ if (isDirectRun()) {
         pdfCacheDir: PDF_CACHE_DIR,
         scansDir: path.join(root, "assets/scans"),
         mapPath: path.join(root, "src/screens/images/scan-map.ts"),
+        sceneCodes: sceneCodesOf(path.join(DATA_DIR, "scenarios")),
       },
       log,
     );

@@ -6,7 +6,7 @@ import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
 import { rowSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { SceneArt } from "../../art";
-import { ActionBar, BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
+import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
 import { Road, roadLayout } from "../../path-road";
 import { poolCardWords } from "../../log-facts";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
@@ -28,10 +28,6 @@ import { Text } from "../../../play/text";
 const PATH_SIDE = 360;
 // The room under a stop for its name (up to two lines) and its tag.
 const LABEL = 58;
-
-// The path's one next move: Resume the open scenario, else Begin the current one. `testID` keeps the ids the flows know: `begin` for
-// the current scenario, `resume-<id>` for an open replay of a won one.
-type Next = { label: string; testID: string; words: string; onPress: () => void };
 
 /** The quest stages of a scenario as small chips: "1 Bree-land", in order. */
 function StageChips({ names }: { names: readonly string[] }) {
@@ -111,11 +107,10 @@ export default function CampaignPath() {
       : save.log.campaignPool.map((card) => poolCardWords(card, save.log.usedOnce, name)).join(", ");
 
   const current = currentIndex >= 0 ? nodes[currentIndex] : null;
-  const next: Next | null = open
-    ? { label: "Resume", testID: open.status === "current" ? "begin" : `resume-${open.id}`, words: `On the table: ${open.name}`, onPress: () => router.push(tableHref(save.id)) }
-    : current
-      ? { label: "Begin", testID: "begin", words: `Next: ${current.name}`, onPress: () => router.push(briefingHref(save.id, current.id)) }
-      : null;
+  // The stop a tap begins or resumes the game from: the open scenario, else the current one. The path has no Begin or Resume button
+  // (user request, 2026-10-29): a tap on that stop on the road does it.
+  const goNode = open ?? current;
+  const go = goNode ? { id: goNode.id, action: open ? "Resumes the game on the table" : "Opens the briefing to begin" } : null;
 
   // Every scenario is won: the bar says so, and says what waits for the next campaign (the carry-over a Resolution kept, 41051:B:1).
   const complete = nodes.length > 0 && done === nodes.length;
@@ -141,13 +136,15 @@ export default function CampaignPath() {
   ) : null;
   const scores = new Map(nodes.flatMap((node) => (node.score != null ? [[node.id, String(node.score)] as const] : [])));
   const replay = (node: PathNode) => () => router.push(briefingHref(save.id, node.id));
-  // A won stop opens its summary with Replay; the scenario to play resumes its table when it is the one open, else opens its briefing;
-  // a locked one does nothing.
+  // The open scenario resumes its table (a replay of a won one too); a won stop opens its summary with Replay; the current one opens
+  // its briefing; a locked one does nothing.
   const onStop = (node: PathNode) =>
-    node.status === "completed"
+    open?.id === node.id
+      ? () => router.push(tableHref(save.id))
+      : node.status === "completed"
       ? () => setPicked(picked === node.id ? null : node.id)
       : node.status === "current"
-        ? () => router.push(open?.id === node.id ? tableHref(save.id) : briefingHref(save.id, node.id))
+        ? () => router.push(briefingHref(save.id, node.id))
         : undefined;
   const wide = size !== "compact";
   const stopSize = size === "compact" ? 72 : size === "medium" ? 110 : 96;
@@ -156,7 +153,7 @@ export default function CampaignPath() {
   const roadView = (
     // The current stop's glow reaches 40 pt past its ring: the road starts low enough that the scroll's edge never cuts it.
     <View onLayout={(event) => setRoadWidth(Math.round(event.nativeEvent.layout.width))} style={{ paddingTop: 40 * s }}>
-      {road ? <Road stops={road.stops} height={road.height} width={roadWidth} label={LABEL * s} onStop={onStop} scores={scores} /> : null}
+      {road ? <Road stops={road.stops} height={road.height} width={roadWidth} label={LABEL * s} onStop={onStop} scores={scores} go={go} /> : null}
     </View>
   );
   const poolLine = (
@@ -167,56 +164,20 @@ export default function CampaignPath() {
       </Text>
     </View>
   );
-  const logButton = (width?: number) => (
-    <View style={width ? { width: width * s } : undefined}>
-      <SecondaryButton label="Log" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
+  // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
+  const logButton = (
+    <View className="mt-3">
+      <SecondaryButton label="Campaign log" testID="log-open" compact onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
     </View>
   );
-  // A replay is open while the campaign's next scenario waits: Begin that one too, with what dealing it costs.
-  const beginAnother =
-    open && current && open.id !== current.id ? (
-      <View>
-        <SecondaryButton label={`Begin ${current.name}`} testID="begin" compact onPress={() => router.push(briefingHref(save.id, current.id))} />
-        <Text testID={`hint-${current.id}`} className="mt-1.5 text-label text-muted">
-          A scenario is open. Dealing this one drops it.
-        </Text>
-      </View>
-    ) : null;
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;
   const stagesOf = (id: string) => (scenarioOf(id)?.stages ?? []).map((code) => names.get(code) ?? stageNames.get(code) ?? code);
-  // The panel at the foot: a won stop's summary while one is picked, else the next move, else the campaign's end.
-  const footPanel = (horizontal: boolean) => {
+  // The panel under the road: a won stop's summary while one is picked, else the campaign's end.
+  const footPanel = () => {
     if (pickedNode) {
       return (
         <Panel>
           <WonRow node={pickedNode} rounds={save.log.scenarios[pickedNode.id]?.rounds ?? null} rewards={pickedNode.reward.map(name)} onReplay={replay(pickedNode)} />
-        </Panel>
-      );
-    }
-    if (next) {
-      const node = open ?? current;
-      const stages = node ? scenarioOf(node.id)?.stages.length ?? null : null;
-      return (
-        <Panel>
-          <View className={horizontal ? "flex-row items-center" : undefined} style={{ gap: 16 * s }}>
-            {horizontal && node ? <SceneArt scenarioId={node.id} width={240 * s} height={130 * s} radius={3} /> : null}
-            <View className="min-w-0 flex-1" style={{ gap: 12 * s }}>
-              {/* Centered, not on the baseline: a baseline row collapsed on Android and dropped the name (user screenshot, 2026-10-29). */}
-              <View className="flex-row items-center justify-between gap-2">
-                <Text className="min-w-0 shrink font-display text-bone" style={{ fontSize: 20 * s, lineHeight: 25 * s }} numberOfLines={1}>
-                  {node?.name ?? next.words}
-                </Text>
-                {stages ? <Label>{`${stages} ${stages === 1 ? "stage" : "stages"}`}</Label> : null}
-              </View>
-              <View className="flex-row" style={{ gap: 10 * s }}>
-                {logButton(90)}
-                <View className="flex-1">
-                  <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
-                </View>
-              </View>
-              {beginAnother}
-            </View>
-          </View>
         </Panel>
       );
     }
@@ -234,18 +195,17 @@ export default function CampaignPath() {
               <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
             </>
           ) : null}
-          <View className="mt-2.5 flex-row">{logButton()}</View>
         </Panel>
       );
     }
     return null;
   };
 
-  // A tablet in landscape: the road fills the left, and a 360 pt column at the right holds the won scenarios and the next one, its
-  // scene, its stages, Log and Begin (docs/design-system.md, Campaign path).
+  // A tablet in landscape: the road fills the left with the pool and the log under it, and a 360 pt column at the right holds the won
+  // scenarios and the next one: its scene, its name and its stages (docs/design-system.md, Campaign path). The road's stop begins it.
   if (size === "expanded") {
-    const node = open ?? current;
     const won = nodes.filter((entry) => entry.status === "completed");
+    const footer = footPanel();
     return (
       <Screen scene="path" testID="campaign-path">
         {navBar}
@@ -254,6 +214,7 @@ export default function CampaignPath() {
             {noticeRow}
             {roadView}
             {poolLine}
+            {logButton}
           </ScreenScroll>
           <View style={{ width: PATH_SIDE * s }}>
             <ScreenScroll bottom={24 + bottomInset / s}>
@@ -265,27 +226,19 @@ export default function CampaignPath() {
                   ))}
                 </View>
               ) : null}
-              {next && node ? (
+              {goNode && !complete ? (
                 <Panel padded={false}>
-                  <SceneArt scenarioId={node.id} height={200 * s} fade={0.45} fadeTo={palette.dusk} />
+                  <SceneArt scenarioId={goNode.id} height={200 * s} fade={0.45} fadeTo={palette.dusk} />
                   <View className="px-4 pb-4" style={{ marginTop: -44 * s, gap: 10 * s }}>
-                    <Eyebrow>{`Scenario ${node.number} · ${open ? "On the table" : "Next"}`}</Eyebrow>
+                    <Eyebrow>{`Scenario ${goNode.number} · ${open ? "On the table" : "Next"}`}</Eyebrow>
                     <Text className="font-display text-bone" style={{ fontSize: 26 * s, lineHeight: 30 * s }}>
-                      {node.name}
+                      {goNode.name}
                     </Text>
-                    <StageChips names={stagesOf(node.id)} />
-                    <View className="mt-1 flex-row" style={{ gap: 10 * s }}>
-                      {logButton(90)}
-                      <View className="flex-1">
-                        <PrimaryButton label={next.label} testID={next.testID} accessibilityLabel={`${next.label} ${next.words.replace(/^.*?: /, "")}`} onPress={next.onPress} />
-                      </View>
-                    </View>
-                    {beginAnother}
+                    <StageChips names={stagesOf(goNode.id)} />
                   </View>
                 </Panel>
-              ) : (
-                footPanel(false)
-              )}
+              ) : null}
+              {footer ? <View className="mt-4">{footer}</View> : null}
             </ScreenScroll>
           </View>
         </View>
@@ -293,16 +246,19 @@ export default function CampaignPath() {
     );
   }
 
+  // A phone and a tablet in portrait: one page, nothing pinned at the foot (user request, 2026-10-29: Resume is the road's stop, and
+  // the log sits under the pool). A picked won stop's summary, or the campaign's end, stands under the road.
+  const footer = footPanel();
   return (
     <Screen scene="path" testID="campaign-path">
       {navBar}
-      <ScreenScroll bottom={16} max={wide ? "wide" : "readable"}>
+      <ScreenScroll bottom={24 + bottomInset / s} max={wide ? "wide" : "readable"}>
         {noticeRow}
         {roadView}
+        {footer ? <View className="mt-3">{footer}</View> : null}
         {poolLine}
+        {logButton}
       </ScreenScroll>
-      {/* A tablet in portrait lays the panel across the page (its scene, the name, Log and Begin in a row), not in the bar's 480 group. */}
-      <ActionBar align={size === "medium" ? "fill" : "auto"}>{footPanel(size === "medium")}</ActionBar>
     </Screen>
   );
 }
