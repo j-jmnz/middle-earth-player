@@ -4,6 +4,8 @@ import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
+import { attackBarred } from "./constants.ts";
+import { dealForAttack } from "./families/south-watcher.ts";
 import { askTarget, openBranch } from "./choices.ts";
 import { hasTrait, holds, outOfPlayChoices, searchable } from "./conditions.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
@@ -20,7 +22,7 @@ import { pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
-import { livingSeats, updateCard, withSeat } from "./state.ts";
+import { flagged, livingSeats, updateCard, withSeat } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
@@ -220,7 +222,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return immediateAttack(state, frame.cardId, ctx, steps);
+      return immediateAttack(state, frame.cardId, item.seat, ctx, steps);
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -303,8 +305,14 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.
-function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
+  // The Balrog, considered engaged with the first player from the staging area, makes its additional attack against the same player (142047:A:2).
+  if (sourceId && enemy?.zone === "staging" && flagged(state, sourceId, "engagedWithFirst")) {
+    if (attackBarred(state, sourceId, seat) || state.seats[seat]?.eliminated) return state;
+    const stagedBegun = beginEnemyAttack(dealForAttack(state, sourceId, steps), seat, sourceId, ctx, steps, true);
+    return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
+  }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own (families/defense-listen.ts).
   const dealt = dealAttackShadow(state, sourceId, ctx, steps);
@@ -327,7 +335,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (target.kind === "self") return sourceId ? [sourceId] : [];
       if (target.kind === "host") return source?.host ? [source.host] : [];
       if (target.kind === "activeLocation") return state.activeLocation && state.activeLocation !== sourceId ? [state.activeLocation] : [];
-      if (target.kind === "picked" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
+      if (target.kind === "picked" || target.kind === "previous" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
         const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
         return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" ? [id] : [];
       }

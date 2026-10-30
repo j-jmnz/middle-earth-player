@@ -44,7 +44,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("DamageActiveLocation"), ...when }),
   // The enemy (the picked card) in the staging area attacks the actor now, as an attack outside the combat phase, though it is not
   // engaged (142038:A:2). It is dealt a shadow card of its own.
-  z.strictObject({ verb: z.literal("AttackFromStaging"), ...when }),
+  // `target: self`: the source enemy attacks (a When Revealed on the enemy, 142047:A:1). `who: firstPlayer`: the first player is attacked, whoever
+  // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player).
+  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.literal("self").optional(), who: z.literal("firstPlayer").optional(), ...when }),
   // Choose, among the enemies in the staging area with this trait, the one with the highest engagement cost (ties: the first player
   // chooses) and pick it, or pick nothing when there is none (142038:A:2).
   z.strictObject({ verb: z.literal("PickHighestEngagement"), trait: z.string().min(1), ...when }),

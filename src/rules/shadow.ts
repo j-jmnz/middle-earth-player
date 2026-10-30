@@ -34,10 +34,11 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 
 // A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), repeats an
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
-// \"When Revealed\" effect of Iron Shackles", 01105:A:2), or runs on each card that matches ("exhaust all characters you control", 900103:A:2),
+// \"When Revealed\" effect of Iron Shackles", 01105:A:2), or assigns damage a point at a time ("Assign X damage among characters you control", 142057:A:2),
+// or runs on each card that matches ("exhaust all characters you control", 900103:A:2),
 // runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
 function runsInFrame(effects: readonly Effect[]): boolean {
-  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "ResolveWhenRevealed"));
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "AssignDamage" || instruction.verb === "ResolveWhenRevealed"));
 }
 
 function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -132,7 +133,7 @@ function resolveExtraShadows(state: ScenarioState, ctx: ReduceContext, steps: En
     const attack = next.pendingAttack;
     const shadowId = attack ? nextExtraShadow(next, attack.enemyId) : undefined;
     if (!attack || shadowId == null) return { state: next, waits: false };
-    if (attack.extraOffered !== shadowId && cardHasShadowEffect(next, shadowId, ctx)) {
+    if (attack.extraOffered !== shadowId && cardHasShadowEffect(next, shadowId, ctx) && !flagged(next, attack.enemyId, "shadowsImmune")) {
       const marked: ScenarioState = { ...next, pendingAttack: { ...attack, extraOffered: shadowId, shadowCanceled: false } };
       const offered = offerResponses(marked, { trigger: "shadowPending", seat: attack.seat }, ctx, steps);
       if (offered.stack.length > marked.stack.length) return { state: { ...offered, window: null }, waits: true };
@@ -157,7 +158,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (!begun.shadowResolved) {
     // The shadow effect has just triggered: a Response may cancel it first (Hasty Stroke). The attack waits for the
     // Responses, and settle comes back here when they are done.
-    if (!begun.shadowOffered && hasShadowEffect(next, begun.enemyId, ctx)) {
+    if (!begun.shadowOffered && hasShadowEffect(next, begun.enemyId, ctx) && !flagged(next, begun.enemyId, "shadowsImmune")) {
       const offered = offerResponses({ ...next, pendingAttack: { ...begun, shadowOffered: true } }, { trigger: "shadowPending", seat: begun.seat }, ctx, steps);
       // The defense window is over: the defender is declared. Settle runs the Responses, then the attack goes on.
       if (offered.stack.length > next.stack.length) return { ...offered, window: null };

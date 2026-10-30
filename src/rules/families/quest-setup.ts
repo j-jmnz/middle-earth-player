@@ -14,12 +14,15 @@ import type { ScenarioState } from "../state.ts";
 
 // A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective), or has the
 // first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch): the Setup the piles cannot place.
+// A Setup that searches the encounter deck for each player (142040:A:1, "each player adds 1 different location") or puts damage tokens on a
+// card (PlaceDamageOn) is run here too.
 function revealsPerPlayer(effect: Effect): boolean {
   return (
     effect.timing === "setup" &&
     effect.instructions.some(
       (instruction) =>
-        (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter")) ||
+        (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter" || inner.verb === "SearchMove")) ||
+        instruction.verb === "PlaceDamageOn" ||
         (instruction.verb === "Each" && instruction.instructions.some((inner) => inner.verb === "GuardObjective")) ||
         instruction.verb === "AttachSetAside",
     )

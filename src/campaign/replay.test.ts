@@ -12,6 +12,7 @@ import { playStarter, starterWorld } from "../../scripts/starter-game.ts";
 import { KNIFE_GOLDENS, knifeWorld, playGolden } from "../../scripts/knife-game.ts";
 import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../scripts/ford-game.ts";
 import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../scripts/south-game.ts";
+import { MORIA_GOLDENS, moriaWorld, playGolden as playMoriaGolden } from "../../scripts/moria-game.ts";
 
 import { buildStart } from "./start.ts";
 import { beginActive, recordIntent, replay } from "./replay.ts";
@@ -83,6 +84,18 @@ describe("saves.activeScenario replay", () => {
     if (!golden) throw new Error(name);
     const { ctx } = await southWorld(golden.decks);
     const game = playSouthGolden(golden, ctx);
+    let active = beginActive(game.start, HASH);
+    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
+    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
+    expect(replayed.ok).toBe(true);
+    if (replayed.ok) expect(replayed.state).toEqual(game.state);
+  }, 60_000);
+
+  it.each(MORIA_GOLDENS.map((golden) => golden.name))("replays Journey in the Dark golden game (%s) to the same final state", async (name) => {
+    const golden = MORIA_GOLDENS.find((item) => item.name === name);
+    if (!golden) throw new Error(name);
+    const { ctx } = await moriaWorld(golden.decks);
+    const game = playMoriaGolden(golden, ctx);
     let active = beginActive(game.start, HASH);
     for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
     const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);

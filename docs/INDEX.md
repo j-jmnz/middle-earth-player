@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~44.2K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~45.8K tok)
   - 17–36 Sections (~350)
   - 37–48 Product (~490)
   - 49–62 Non-goals (~550)
@@ -75,32 +75,33 @@ Read the sections your task touches.
     - 291–298 Engine steps (~180)
     - 299–327 Core round (~1.3K) ← 1
     - 328–356 Keywords implemented once (~1.5K)
-  - 357–484 Fellowship of the Ring (~6.8K)
+  - 357–500 Fellowship of the Ring (~8.4K)
     - 381–395 Scenario 1 resolution (~370)
     - 396–409 A Knife in the Dark (~1.6K) ← 1
     - 410–413 Hide tests (~130)
     - 414–437 Flight to the Ford burden deck and life (~1.6K) ← 1
     - 438–452 The Ring Goes South, stage 4 and the damage on locations (~1.3K) ← 1
-    - 453–462 Breaking of the Fellowship, stage 2B (~310)
-    - 463–484 Seeded decks (~660)
-  - 485–584 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
-    - 503–516 Passage Through Mirkwood (~1.6K)
-    - 517–530 Journey Along the Anduin (~2.1K)
-    - 531–551 Escape from Dol Guldur (~2.7K)
-    - 552–566 The Oath (~2.3K)
-    - 567–584 The Caves of Nibin-Dûm (~2.3K)
-  - 585–593 Nightmare (~420)
-  - 594–632 Deckbuilding (~1.8K) ← 1
-  - 633–711 Effects (~3.2K)
-    - 635–693 Three layers (~2.4K)
-    - 694–703 Player side quests, contracts and saga cards (~430)
-    - 704–707 Window stack (~100)
-    - 708–711 Coverage test (~270)
-  - 712–732 Data sources (~560)
-  - 733–751 Card images (~1.1K) ← 6
-  - 752–776 Persistence and shipping (~1.5K)
-  - 777–815 Screens (~3.6K) ← 1
-    - 802–815 Table screen (~1.2K) ← 3
+    - 453–468 Journey in the Dark, the Doom countdown and the Balrog (~1.6K)
+    - 469–478 Breaking of the Fellowship, stage 2B (~310)
+    - 479–500 Seeded decks (~660)
+  - 501–600 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
+    - 519–532 Passage Through Mirkwood (~1.6K)
+    - 533–546 Journey Along the Anduin (~2.1K)
+    - 547–567 Escape from Dol Guldur (~2.7K)
+    - 568–582 The Oath (~2.3K)
+    - 583–600 The Caves of Nibin-Dûm (~2.3K)
+  - 601–609 Nightmare (~420)
+  - 610–648 Deckbuilding (~1.8K) ← 1
+  - 649–727 Effects (~3.2K)
+    - 651–709 Three layers (~2.4K)
+    - 710–719 Player side quests, contracts and saga cards (~430)
+    - 720–723 Window stack (~100)
+    - 724–727 Coverage test (~270)
+  - 728–748 Data sources (~560)
+  - 749–767 Card images (~1.1K) ← 6
+  - 768–792 Persistence and shipping (~1.5K)
+  - 793–831 Screens (~3.6K) ← 1
+    - 818–831 Table screen (~1.2K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~17.4K tok)
   - 5–8 Overview (~150)
   - 9–22 Top bar (~1.4K) ← 1
@@ -199,7 +200,7 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.1K tok)
 - `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~980 tok)
 - `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~1.0K tok)
-- `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~720 tok)
+- `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~780 tok)
 - `docs/phases/phase-16-breaking-of-the-fellowship.md` — Phase 16 — Breaking of the Fellowship (~1.6K tok)
 - `docs/phases/phase-17-design-system.md` — Phase 17 — Design system (~1.4K tok)
 - `docs/phases/phase-18-card-frames.md` — Phase 18 — Card frames follow the card (~790 tok)
@@ -237,8 +238,8 @@ Read when a task names the plan.
   - 120–126 Conditions (~110)
   - 127–146 Triggers and stat flags (~440)
   - 147–208 Patterns (~1.4K)
-  - 209–233 Mechanic families: engine and records together (~600) ← 1
-  - 234–257 Not expressible yet: leave open, report (~510)
+  - 209–234 Mechanic families: engine and records together (~650) ← 1
+  - 235–257 Not expressible yet: leave open, report (~470)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)

@@ -24,6 +24,7 @@ import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, cardsUnder, moveCard } from "./zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "./cause.ts";
 import { noteEncounterThreat } from "./families/encounter-reveal.ts";
+import { moveEncounter } from "./families/encounter-moves.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -93,7 +94,7 @@ export function runExtraVerb(
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
-      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps);
+      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps, instruction.to);
     case "ShuffleSelfIntoEncounterDeck": {
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
@@ -235,7 +236,7 @@ function committedHeroes(state: ScenarioState, seat: number, exceptSphere: strin
 // Cards come off the top of the encounter deck into its discard pile until `count` enemies are among them, or the deck is
 // empty (rr.effects: as many as there are). Each of those enemies is then put into play engaged with the first player
 // (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith).
-function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging"): ScenarioState {
   let next = state;
   const enemies: string[] = [];
   while (enemies.length < count) {
@@ -244,7 +245,8 @@ function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceCon
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up" });
     if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "enemy") enemies.push(top);
   }
-  for (const id of enemies) next = engageWith(next, next.firstPlayer, id, steps);
+  // Engaged with the first player, or added to the staging area (They Are Coming!, 142056:A:2).
+  for (const id of enemies) next = to === "staging" ? moveEncounter(next, id, "staging", next.firstPlayer, ctx, steps) : engageWith(next, next.firstPlayer, id, steps);
   return next;
 }
 
@@ -316,7 +318,7 @@ function discardTarget(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "subject" || kind === "attacker" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
+  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
   return destroyCard(state, id, ctx.cards, steps);
 }

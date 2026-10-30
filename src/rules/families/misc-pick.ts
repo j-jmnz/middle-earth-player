@@ -20,12 +20,17 @@ function pickedOf(state: ScenarioState, at: MiscPickContext): readonly string[] 
 }
 
 export function miscPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: MiscPickContext, ctx: ReduceContext): boolean {
-  if (spec.controlledBy == null && !spec.onPicked && !spec.playerCard && spec.maxDefense == null && !spec.drawn && spec.maxAttachments == null && !spec.exceptNames) return true;
+  if (spec.controlledBy == null && !spec.nonObjective && !spec.onPicked && !spec.playerCard && spec.maxDefense == null && !spec.drawn && spec.maxAttachments == null && !spec.exceptNames) return true;
   const instance = state.cards[id];
   if (!instance) return false;
   if (spec.controlledBy === "picked") {
     const entry = [...pickedOf(state, at)].reverse().find((value) => value.startsWith("seat:"));
     if (entry == null || instance.controller !== Number(entry.slice("seat:".length))) return false;
+  }
+  if (spec.nonObjective && printedOf(ctx.cards, instance.code).type === "objective") return false;
+  if (spec.controlledBy === "host") {
+    const host = at.sourceId ? state.cards[state.cards[at.sourceId]?.host ?? ""] : undefined;
+    if (!host || host.controller == null || instance.controller !== host.controller) return false;
   }
   if (spec.onPicked) {
     const card = [...pickedOf(state, at)].reverse().find((value) => value !== "" && !value.startsWith("seat:"));

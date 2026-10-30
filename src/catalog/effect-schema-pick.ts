@@ -155,8 +155,12 @@ export const pickSchema = z.strictObject({
   // The misc family's filters (src/rules/families/misc-pick.ts). A card controlled by the player the effect last picked ("each hero
   // controlled by that player"); an attachment attached to the last picked card; a player card (not an encounter card); a
   // character whose current Defense is at most this ("an enemy with 0 Defense"); a card in the hand that was drawn by the
-  // resource phase's draw step this round ("choose and discard 1 of those cards").
-  controlledBy: z.literal("picked").optional(),
+  // resource phase's draw step this round ("choose and discard 1 of those cards"). `controlledBy: host`: a card controlled by the player who
+  // controls the source's host ("a character you control", on a Condition attached to a hero by an encounter card that no player controls,
+  // 142087:A:2). `nonObjective`: not a card whose printed type is objective ("a non-objective attachment", 142052:A:2: the burden objectives that
+  // count as attachments are left out).
+  controlledBy: z.enum(["picked", "host"]).optional(),
+  nonObjective: z.literal(true).optional(),
   onPicked: z.boolean().optional(),
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),

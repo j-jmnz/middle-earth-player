@@ -1,6 +1,7 @@
 // Conditions in effect records, the targets an instruction names, and the phase names a condition reads.
 import { z } from "zod";
 
+import { amountSchema } from "./effect-schema-amount.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
 
 export const phaseNameSchema = z.enum([
@@ -77,7 +78,13 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("firstPlayer") }),
   // The card with this code, in play, holds at least `min` resource tokens ("If there are 6 or more resource tokens here", 41050:B:1): read at a
   // campaign card's Resolution (campaign family, src/rules/families/campaign.ts).
-  z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0) }),
+  // With `perPlayer`, `min` is for each player in the game ("X resource tokens on this stage. X is the number of players times 3", 142041:B:2).
+  z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0), perPlayer: z.boolean().optional() }),
+  // The source card holds at most `max` damage tokens (0: none, "if there are no damage tokens here", 142043:A:1). Read by the moria family
+  // (src/rules/families/moria.ts).
+  z.strictObject({ kind: z.literal("damageHere"), max: z.number().int().min(0) }),
+  // The amount `left` is less than the amount `right`: "If that character's printed Willpower is less than the discarded card's Threat" (142058:A:2).
+  z.strictObject({ kind: z.literal("less"), left: amountSchema, right: amountSchema }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the
@@ -215,6 +222,8 @@ export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("subject") }),
   z.strictObject({ kind: z.literal("attacker") }),
   z.strictObject({ kind: z.literal("activeLocation") }),
+  // The card picked before the last ("discard that character" after the top card of the encounter deck was discarded, 142058:A:2).
+  z.strictObject({ kind: z.literal("previous") }),
   // The second card the answered event names (the enemy a character attacked).
   z.strictObject({ kind: z.literal("other") }),
   z.strictObject({

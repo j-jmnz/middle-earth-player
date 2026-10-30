@@ -1,0 +1,89 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# OPEN (2026-10-30): its fixture `moria-pairs` is not committed (see journey-in-the-dark.yaml): it is a real game of Journey in the Dark won before The Balrog
+# came (or after it was destroyed), parked on its win, dealt from the log of four scenarios no win has been found for.
+# Phase 15. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
+# 142039's Resolution with The Balrog out of play: the first player chooses one burden treachery (Pursued by the Enemy or Shadow of Fear), then one burden
+# objective (Grievous Wound or Overcome by Grief), each confirmed before the next is asked. Confirming writes the two and unlocks Breaking of the Fellowship.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/moria-pairs"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+# One burden of each pair, the first player's choice.
+- assertVisible: "Choose a burden"
+- assertVisible:
+    id: resolution-choice-142086
+- assertVisible:
+    id: resolution-choice-142085
+- tapOn:
+    id: resolution-choice-142085
+- assertVisible:
+    id: resolution-consequence
+    text: ".*Shadow of Fear.*"
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: resolution-choice-142088
+    timeout: 15000
+- assertVisible:
+    id: resolution-choice-142087
+- tapOn:
+    id: resolution-choice-142087
+- assertVisible:
+    id: resolution-consequence
+    text: ".*Overcome by Grief.*"
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: resolution-consequence
+      text: "Confirming records .*Shadow of Fear.*Overcome by Grief.* in the campaign and unlocks Breaking of the Fellowship\\."
+    timeout: 15000
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-journey-in-the-dark-status
+    text: "Won.*"
+- assertVisible:
+    id: node-breaking-of-the-fellowship-status
+    text: "Next"
+# Kill and relaunch: the two choices are on the log and Breaking of the Fellowship is unlocked.
+- stopApp
+- launchApp
+- tapOn:
+    id: continue-path
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-breaking-of-the-fellowship-status
+    text: "Next"

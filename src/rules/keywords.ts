@@ -182,6 +182,11 @@ export function playerCardEffectCanChoose(printed: PrintedCard, state?: Scenario
   return !printed.keywords.immuneToPlayerCardEffects;
 }
 
+// An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).
+function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
+  return printed.type === "enemy" && printed.keywords.indestructible && !flagged(state, id, "losesKeywords");
+}
+
 export function placeDamage(
   state: ScenarioState,
   assigned: string,
@@ -211,7 +216,7 @@ export function placeDamage(
   let next = updateCard(state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
   // An indestructible enemy keeps its damage but is never destroyed; it hears that it took damage (the Watcher in the Water, 142024:A:3).
-  if (printed.type === "enemy" && printed.keywords.indestructible) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
+  if (indestructible(state, id, printed)) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
   const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
   // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
   // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
@@ -241,7 +246,7 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
   for (const instance of Object.values(state.cards)) {
     if (instance.damage <= 0 || !inPlay(instance.zone)) continue;
     const printed = printedOf(cards, instance.code);
-    if (printed.health == null || (printed.type === "enemy" && printed.keywords.indestructible)) continue;
+    if (printed.health == null || indestructible(state, instance.id, printed)) continue;
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
     if (held(next, instance.id)) continue;

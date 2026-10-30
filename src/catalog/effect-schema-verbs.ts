@@ -221,6 +221,9 @@ export const simpleVerbs = [
     what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly"]),
     exceptTrait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
+    // With "defend": every ally (not only those with little Willpower) cannot defend the source's attacks ("Allies cannot defend against
+    // Orc-chieftain", 142045:A:1).
+    allies: z.boolean().optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's
@@ -339,7 +342,8 @@ export const simpleVerbs = [
   verb("WinGame"),
   // Discards cards from the top of the encounter deck until `perPlayer` enemies for each player in the game have been
   // discarded, or the deck is empty, and puts each of those enemies into play engaged with the first player (141045:A:2).
-  z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), ...when }),
+  // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2).
+  z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), to: z.literal("staging").optional(), ...when }),
   // The last picked card is placed facedown under the source location. While it is there it is out of play (141049:A:1).
   verb("PlaceUnderSelf"),
   // Each card under the source location returns to the staging area face up (141049:A:2).

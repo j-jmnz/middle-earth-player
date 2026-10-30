@@ -147,8 +147,8 @@ describe("standalone briefing", () => {
   });
 
   it("refuses a scenario whose dealt cards are not all automated", () => {
-    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH, "passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur", "the-oath", "the-caves-of-nibin-dum"]);
-    const world = loadWorld(catalog, campaign, loadScenario("journey-in-the-dark"), EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
+    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH, "journey-in-the-dark", "passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur", "the-oath", "the-caves-of-nibin-dum"]);
+    const world = loadWorld(catalog, campaign, loadScenario("breaking-of-the-fellowship"), EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
     const result = standaloneBriefing({ world, seatCount: 1, seats: loadoutOf().seats, ringBearer: FRODO, difficulty: "Normal" });
     expect(result.dealable).toBe(false);
     expect(result.problems[0]?.rule).toBe("Not playable yet");

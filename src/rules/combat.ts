@@ -212,6 +212,12 @@ export function canAttack(
   if (!isCharacterType(printed) || attacker.host != null) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
+  // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
+  // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
+    if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
+    return attacker.controller === seat || printed.keywords.ranged || flagged(state, attackerId, "ranged");
+  }
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack-targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");

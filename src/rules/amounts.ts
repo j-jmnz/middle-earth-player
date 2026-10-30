@@ -62,6 +62,10 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
     // is immune to player card effects and always the first (mec109.stage-4).
     case "activeLocation":
       return state.secondActiveLocation ?? state.activeLocation;
+    case "previous":
+      return scope.picked?.at(-2) || null;
+    case "discardTop":
+      return state.encounterDiscard.at(-1) ?? null;
   }
 }
 

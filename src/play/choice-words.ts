@@ -10,6 +10,7 @@ import { deckPickWords, deckWords } from "./deck-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 import { attackWords } from "./attack-words.ts";
 import { southWords } from "./south-words.ts";
+import { moriaBranchWords, moriaPickWords, moriaWords } from "./moria-words.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.ts";
 import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
@@ -292,7 +293,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -318,7 +319,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
   if (option.instructions.length === 0) return "Do nothing";
-  const whole = burdenBranchWords(option.instructions);
+  const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions);
   if (whole) return whole;
   // A run of "pick a hero, remove it from the quest" is one decision: how many heroes leave the quest.
   const removals = option.instructions.filter((instruction) => instruction.verb === "RemoveFromQuest").length;
@@ -371,7 +372,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
   const play = playPickWords(pick);
   if (play) return play;
-  const burden = burdenPickWords(pick, next);
+  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names);
   if (burden) return burden;
   if (pick.verb !== "Pick") return cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;

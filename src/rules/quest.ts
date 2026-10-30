@@ -133,7 +133,7 @@ export function placeQuestProgress(
   const placedOn = placeOnActive(state, amount, cards, steps);
   let next = placedOn.state;
   let remaining = placedOn.remaining;
-  if (questing && remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps));
+  if (remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps, questing));
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];

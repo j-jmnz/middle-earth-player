@@ -1,5 +1,6 @@
 import type { Condition } from "../catalog/boundary.ts";
 
+import { resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "./families/costs-pay.ts";
 import { spendablePools } from "./families/costs-verbs.ts";
 import { engagedThisRound } from "./families/attack-events.ts";
@@ -110,7 +111,13 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "firstPlayer":
       return scope.actor === state.firstPlayer;
     case "tokens":
-      return tokensOn(state, condition.code) >= condition.min;
+      return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? state.seatCount : 1);
+    case "damageHere":
+      return (scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0) <= condition.max;
+    case "less": {
+      const read: AmountScope = { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}) };
+      return resolveAmount(state, condition.left, read, ctx) < resolveAmount(state, condition.right, read, ctx);
+    }
     case "heroesAll": {
       const heroes = state.seats[scope.actor]?.heroes ?? [];
       return heroes.length > 0 && heroes.every((id) => hasTrait(state, id, condition.trait, ctx));

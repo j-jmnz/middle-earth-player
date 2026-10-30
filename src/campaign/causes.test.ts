@@ -15,6 +15,8 @@ import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../scr
 import { ford } from "../../scripts/ford-scene.ts";
 import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../scripts/south-game.ts";
 import { south } from "../../scripts/south-scene.ts";
+import { MORIA_GOLDENS, moriaWorld, playGolden as playMoriaGolden } from "../../scripts/moria-game.ts";
+import { moria } from "../../scripts/moria-scene.ts";
 
 import { buildStart } from "./start.ts";
 
@@ -96,6 +98,23 @@ describe("engine step causes in The Ring Goes South goldens", () => {
     const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
     expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
   }, 120_000);
+});
+
+describe("engine step causes in the Journey in the Dark goldens", () => {
+  it("name a verified rule or a ledger line on every number-changing step, the damage tokens on Doom, Doom, Doom and the Balrog's attacks included", async () => {
+    const worlds = new Map<string, Awaited<ReturnType<typeof moriaWorld>>>();
+    const all: EngineStep[] = [];
+    for (const golden of MORIA_GOLDENS) {
+      if (!worlds.has(golden.decks)) worlds.set(golden.decks, await moriaWorld(golden.decks));
+      all.push(...playMoriaGolden(golden, worlds.get(golden.decks)!.ctx).steps);
+    }
+    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
+    expect(causeProblems(all)).toEqual([]);
+    const own = new Set([moria.campaignCard, ...moria.stages, ...moria.cards.map((card) => card.code)]);
+    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
+    expect(causes.some((cause) => "effect" in cause && cause.effect.startsWith("142043:"))).toBe(true);
+    expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
+  }, 240_000);
 });
 
 describe("engine step causes", () => {

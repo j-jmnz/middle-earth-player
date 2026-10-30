@@ -31,13 +31,15 @@ function placingFirst(state: ScenarioState): boolean {
 
 // Progress from questing successfully, after the active location took its share: each location in the staging area that may
 // take it (takesProgressFirst) takes what it needs, when the players said so, and a full one is explored (rr.explored).
-export function progressFirstLocations(state: ScenarioState, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): { state: ScenarioState; remaining: number } {
-  if (!placingFirst(state)) return { state, remaining: amount };
+// A location that must take it (`progressFirstRequired`: "progress must be placed on Mines of Moria before it can be placed on the current quest",
+// 142052:A:1) takes it from every placement; one that may (`takesProgressFirst`) takes what the players said, from questing only.
+export function progressFirstLocations(state: ScenarioState, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], questing = true): { state: ScenarioState; remaining: number } {
+  const chosen = questing && placingFirst(state);
   let next = state;
   let remaining = amount;
   for (const id of state.staging) {
     const location = next.cards[id];
-    if (remaining <= 0 || !location || !flagged(next, id, "takesProgressFirst") || printedOf(cards, location.code).questPoints == null) continue;
+    if (remaining <= 0 || !location || !(flagged(next, id, "progressFirstRequired") || (chosen && flagged(next, id, "takesProgressFirst"))) || printedOf(cards, location.code).questPoints == null) continue;
     const points = modifiedStat(next, location, "questPoints", cards);
     const placed = Math.min(remaining, Math.max(0, points - location.progress));
     if (placed <= 0) continue;

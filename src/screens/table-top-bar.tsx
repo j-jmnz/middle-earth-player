@@ -33,7 +33,8 @@ export type TopBarProps = {
   viewed: number | null;
   life: number | null;
   burdenDeck: number | null;
-  // The resource tokens on the campaign card (The Oath, 41050:A:3) and the card's name, or null when its scenario has none.
+  // The resource tokens on the campaign card (The Oath, 41050:A:3) or on the current stage (Journey in the Dark, 142041:B:3) and the card's name, or null
+  // when its scenario has none.
   tokens?: { name: string; tokens: number } | null;
   // On Nightmare: opens the setup card next to the quest deck (the Eye of Sauron after the dials). Absent on Easy and Normal.
   onNightmare?: (() => void) | null;

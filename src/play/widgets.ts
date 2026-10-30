@@ -61,13 +61,15 @@ export type TokenReadout = { name: string; tokens: number };
 
 /**
  * The resource tokens on the campaign card, when it is in the game and one of its records places them (The Oath, 41050:A:3: "place 1 resource token
- * here" at the end of each round, read at its Resolution); null for a game whose campaign card has none. The engine wrote the number; nothing here
- * changes it.
+ * here" at the end of each round, read at its Resolution), or else on the current stage when one of its records does (Journey in the Dark, 142041:B:3:
+ * "place 1 resource token on this stage" after an enemy is defeated, which holds the stage back until it has enough); null for a game with neither.
+ * The engine wrote the number; nothing here changes it.
  */
 export function campaignTokens(game: ScenarioState, effects: readonly Effect[], nameOf: (code: string) => string): TokenReadout | null {
-  const card = Object.values(game.cards).find((entry) => entry.zone === "campaign");
-  if (!card || !effects.some((effect) => effect.cardCode === card.code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"))) return null;
-  return { name: nameOf(card.code), tokens: card.resources };
+  const places = (code: string) => effects.some((effect) => effect.cardCode === code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"));
+  const holders = [Object.values(game.cards).find((entry) => entry.zone === "campaign"), game.questStage ? game.cards[game.questStage] : undefined];
+  const card = holders.find((entry) => entry != null && places(entry.code));
+  return card ? { name: nameOf(card.code), tokens: card.resources } : null;
 }
 
 /** The Nightmare setup card's instance next to the quest deck (zone `nightmare`), or null on Easy and Normal. */
