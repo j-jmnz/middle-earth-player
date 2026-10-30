@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Problem, ScenarioFacts } from "../campaign/briefing";
 import { cards, packs } from "../catalog/schema";
 import type { Difficulty } from "../catalog/scenario-data";
-import { SceneArt } from "./art";
+import { GroundedScene } from "./art";
 import { dealSentence, problemWords } from "./briefing-words";
 import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "./chrome";
 import { BRIEFING_SCENE_RANGE } from "./briefing-layout";
@@ -150,11 +150,12 @@ export function BriefingScreen({
   const cap = capWidth(size, "readable", s);
   const column = cap == null || expanded ? undefined : ({ width: "100%", maxWidth: cap, alignSelf: "center" } as const);
   const scene = (
-    <SceneArt scenarioId={scenarioId} height={(expanded ? 560 : BANNER_HEIGHT) * s + insets.top} shade={0.4} fade={0.25}>
+    // Met to the ground at its foot, and in two panes at its right edge too, so it ends in the fog with no line (GroundedScene).
+    <GroundedScene scenarioId={scenarioId} height={(expanded ? 560 : BANNER_HEIGHT) * s + insets.top} shade={0.4} fade={0.25} edge={expanded}>
       <View className="absolute bottom-0 left-0 right-0 pb-2" style={expanded ? { ...side, paddingRight: 24 * s } : side}>
         {column ? <View style={column}>{banner}</View> : banner}
       </View>
-    </SceneArt>
+    </GroundedScene>
   );
   const navBar = (
     <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>

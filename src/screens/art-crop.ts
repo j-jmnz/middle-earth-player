@@ -15,6 +15,30 @@ export const COVER: Region = { x: 0.3, y: 0.06, w: 0.62, h: 0.45 };
 /** The scene of a quest card: under its two title banners, above its text box and clear of the encounter-set badge. */
 export const SCENE: Region = { x: 0.02, y: 0.21, w: 0.8, h: 0.36 };
 
+/**
+ * The scene bundled on its own for each scenario (scripts/pack-scans.ts, sceneOf), cut from the laid-down quest picture at the
+ * source's size: SCENE, starting under the stage number's medallion, which reaches a little lower on a printed card's scan.
+ */
+export const SCENE_PICTURE: Region = { x: 0.02, y: 0.235, w: 0.8, h: 0.335 };
+/** The whole of a picture: a bundled scene is drawn entire. */
+export const WHOLE: Region = { x: 0, y: 0, w: 1, h: 1 };
+// A scene drawn large across a page (user report, 2026-10-30: grainy and zoomed in): at most this many device pixels to one of its
+// pixels, and at most this many times the box's width, so the box shows at least half the scene.
+export const MAX_UPSCALE = 2;
+export const MAX_ZOOM = 2;
+
+/**
+ * How tall a scene of `aspect` (width over height) is drawn across a box: it covers the box's width, and it covers the box's height
+ * too only while that spreads none of the picture's `sourceWidth` pixels over more than MAX_UPSCALE device pixels and draws it no
+ * wider than MAX_ZOOM boxes. Shorter than the box, the scene is a band at its top that the caller fades into the ground, rather than
+ * a few of its pixels blown up to fill it.
+ */
+export function sceneBand(box: { width: number; height: number }, aspect: number, sourceWidth: number, pixelRatio: number): number {
+  const cover = Math.max(box.width, box.height * aspect);
+  const widest = Math.min(cover, (sourceWidth * MAX_UPSCALE) / pixelRatio, box.width * MAX_ZOOM);
+  return Math.min(box.height, Math.max(box.width, widest) / aspect);
+}
+
 /** A RingsDB player card, 429×600. */
 export const PLAYER_CARD_ASPECT = 429 / 600;
 /** A Hall of Beorn quest card, 700×494. */
