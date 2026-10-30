@@ -4,13 +4,14 @@
 // this returns and deals only when `dealable` is true.
 import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
-import { recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
+import { placementsAt, recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
 import { printedOf } from "../rules/printed.ts";
 import type { StartScenario } from "../rules/setup.ts";
 
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
+import { isNightmarePlayable } from "./playable.ts";
 import { printedScenarioName } from "./printed-name.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
@@ -119,7 +120,15 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]):
 }
 
 function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
-  return loadoutProblems(input, input.log.fallenHeroesBySeat.flat());
+  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat());
+  return { problems: [...difficultyProblems(input.world, input.difficulty), ...problems], loadout };
+}
+
+// Nightmare deals only where the scenario's Nightmare deck has an effect record for every printed line (NIGHTMARE_PLAYABLE).
+export function difficultyProblems(world: World, difficulty: Difficulty): Problem[] {
+  if (difficulty !== "Nightmare" || isNightmarePlayable(world.scenario.id)) return [];
+  const name = printedScenarioName(world.scenario.name);
+  return [{ rule: "Nightmare not playable yet", message: world.scenario.nightmare ? `${name} on Nightmare is not playable yet: some of its Nightmare cards have no effect record.` : `${name} has no Nightmare deck.` }];
 }
 
 export function briefing(input: BriefingInput): Briefing {
@@ -187,7 +196,7 @@ export type ScenarioFacts = {
 // campaign card, so its rules are not named there.
 export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMode = "campaign"): ScenarioFacts {
   const { scenario } = world;
-  const encounter = scenario.cards.filter((card) => card.pile === "encounter");
+  const encounter = placementsAt(scenario, difficulty).filter((card) => card.pile === "encounter");
   const countOf = (card: (typeof encounter)[number]) => (difficulty === "Easy" ? card.easy : card.normal);
   const bySet = new Map<string, number>();
   for (const card of encounter) {
@@ -195,7 +204,12 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
     if (set) bySet.set(set, (bySet.get(set) ?? 0) + countOf(card));
   }
   const sets = scenario.encounterSets.map((set) => ({ name: set.name, count: bySet.get(set.name) ?? set.count }));
+  // On Nightmare the deck's own set follows the booklet's, with the cards it shuffles in (the ones a Setup places are counted where
+  // they replace a card, as the booklet's sets count theirs).
+  const nightmareSet = difficulty === "Nightmare" ? world.sets.get(scenario.nightmare?.cards[0]?.code ?? "") : undefined;
+  if (nightmareSet) sets.push({ name: nightmareSet, count: bySet.get(nightmareSet) ?? 0 });
   const rules: string[] = [];
+  if (difficulty === "Nightmare") rules.push("Nightmare setup card");
   if (scenario.widgets.hide) rules.push("Hide");
   if (scenario.life != null) rules.push("Ring-bearer life");
   if (scenario.cards.some((card) => card.pile === "burden")) rules.push("Burden deck");

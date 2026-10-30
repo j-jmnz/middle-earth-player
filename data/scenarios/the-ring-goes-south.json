@@ -153,5 +153,77 @@
     "dragnNormal": "Q0C.04",
     "dragnEasy": "E0C.04",
     "hobSlug": "The-Ring-Goes-South"
+  },
+  "nightmare": {
+    "setupCard": "906401",
+    "removed": [
+      {
+        "code": "142027",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "142028",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "142031",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "142032",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "142036",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "142038",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "906402",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "906403",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906404",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906405",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906406",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906407",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906408",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

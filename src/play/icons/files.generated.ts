@@ -27,6 +27,7 @@ export const ICON_FILES: Record<IconName, number> = {
   "playerSideQuest": require("../../../assets/icons/playerSideQuest.svg") as number,
   "contract": require("../../../assets/icons/contract.svg") as number,
   "oneRing": require("../../../assets/icons/oneRing.svg") as number,
+  "nightmare": require("../../../assets/icons/nightmare.svg") as number,
   "questPoints": require("../../../assets/icons/questPoints.png") as number,
   "engagementCost": require("../../../assets/icons/engagementCost.png") as number,
   "resource": require("../../../assets/icons/resource.png") as number,

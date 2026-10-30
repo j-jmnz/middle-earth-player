@@ -25,6 +25,7 @@ import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStanda
 import { useSizeClass } from "../../../play/use-size-class";
 import { useUiScale } from "../../../play/ui-scale";
 import { Text } from "../../../play/text";
+import { GameIcon } from "../../../play/game-icon";
 
 const DELETE_SENTENCE = "Delete this game? It is gone for good. Your decks stay.";
 
@@ -152,7 +153,7 @@ export default function Scenarios() {
                   <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
                     {nameOf(game.scenarioId)}
                   </Text>
-                  <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
+                  <GameLine game={game} />
                 </View>
                 <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
                   <PrimaryButton label="Resume" testID={`resume-${game.id}`} accessibilityLabel={spoken} onPress={() => open(game)} />
@@ -171,7 +172,7 @@ export default function Scenarios() {
             <View className="flex-row items-start justify-between gap-2">
               <View className="flex-1">
                 <Text className="font-display text-heading text-bone">{nameOf(game.scenarioId)}</Text>
-                <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
+                <GameLine game={game} />
               </View>
               <Chip label={statusWord(game)} tone={tone} />
             </View>
@@ -353,5 +354,16 @@ export default function Scenarios() {
       {/* An expanded window scrolls in a wide column, a medium one in a readable column. */}
       <ScreenScroll max={size === "expanded" ? "wide" : "readable"}>{page}</ScreenScroll>
     </Screen>
+  );
+}
+
+/** A game's seats and difficulty under its name, the Eye of Sauron before them on Nightmare. */
+function GameLine({ game }: { game: StandaloneGame }) {
+  const nightmare = game.loadout?.difficulty === "Nightmare";
+  return (
+    <View className="flex-row items-center gap-1.5">
+      {nightmare ? <GameIcon name="nightmare" size={14} tint="threat" /> : null}
+      <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
+    </View>
   );
 }

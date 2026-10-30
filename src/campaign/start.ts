@@ -16,7 +16,7 @@ export type StartInput = {
   threatModifier: number;
   seats: readonly StartSeat[];
   // The encounter deck size the booklet prints for the difficulty, and on Easy one resource on each hero in Setup step 2
-  // (easy-mode.easy-mode). Normal when absent.
+  // (easy-mode.easy-mode); Nightmare deals the Nightmare deck and places its setup card. Normal when absent.
   difficulty?: Difficulty;
   // The effect records. The campaign card's Setup and Resolution records are read from them.
   effects?: readonly Effect[];
@@ -62,6 +62,8 @@ export function buildStart(input: StartInput): StartScenario {
   const poolInPlay = standalone ? [] : (input.poolIntoPlay ?? []).filter((code) => !named.has(code));
   const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" ? [instruction.code] : []));
   const burden = burdenCodes(input.scenario);
+  // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
+  if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
     seatCount: input.seatCount,
     seed: input.seed,

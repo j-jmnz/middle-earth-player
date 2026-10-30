@@ -21,6 +21,20 @@ const placementSchema = z
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
+// A scenario's Nightmare deck (docs/plans/nightmare-mode.md), from its setup card: the standard piles less `removed` (each copy
+// taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
+// Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
+// and its lines stay active all game.
+const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached"] as const;
+const nightmareSchema = z.strictObject({
+  setupCard: z.string().min(1),
+  removed: z.array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES) })),
+  cards: z
+    .array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES), perPlayer: z.number().int().positive().optional() }))
+    .min(1),
+});
+export type NightmareData = z.infer<typeof nightmareSchema>;
+
 export const scenarioDataSchema = z
   .strictObject({
     id: z.string().min(1),
@@ -41,6 +55,8 @@ export const scenarioDataSchema = z
     // The DragnCards decks the Fellowship box is loaded from (null where the box has none: Hall of Beorn's counts and the printed
     // Setup text place its cards), and the Hall of Beorn scenario file.
     source: z.strictObject({ dragnNormal: z.string().nullable(), dragnEasy: z.string().nullable(), hobSlug: z.string() }),
+    // The Nightmare deck played with this scenario, where one is printed.
+    nightmare: nightmareSchema.optional(),
   })
   .superRefine((data, context) => {
     const quest = data.cards.filter((card) => card.pile === "quest").map((card) => card.code);
@@ -135,7 +151,28 @@ export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
   return totals;
 }
 
-export type Difficulty = "Easy" | "Normal";
+// Nightmare plays the scenario's Nightmare deck (docs/plans/nightmare-mode.md), where it has one (`nightmare`).
+export const DIFFICULTIES = ["Easy", "Normal", "Nightmare"] as const;
+export type Difficulty = (typeof DIFFICULTIES)[number];
+
+export function hasNightmare(data: ScenarioData): boolean {
+  return data.nightmare != null;
+}
+
+// The piles at a difficulty. Easy and Normal read each placement's own count. Nightmare starts from the Normal piles, takes out the
+// copies the setup card removes from the pile each came from, and adds the Nightmare deck's cards to theirs (`nightmare`).
+export function placementsAt(data: ScenarioData, difficulty: Difficulty = "Normal"): Placement[] {
+  if (difficulty !== "Nightmare") return data.cards;
+  const nightmare = data.nightmare;
+  if (!nightmare) throw new Error(`Scenario ${data.id} has no Nightmare deck`);
+  const less = (card: Placement) => nightmare.removed.filter((item) => item.code === card.code && item.pile === card.pile).reduce((sum, item) => sum + item.copies, 0);
+  const standard = data.cards.flatMap((card) => {
+    const normal = card.normal - less(card);
+    return normal > 0 ? [{ ...card, normal, easy: Math.min(card.easy, normal) }] : [];
+  });
+  const added = nightmare.cards.map((card): Placement => ({ code: card.code, normal: card.copies, easy: 0, pile: card.pile, ...(card.perPlayer != null ? { perPlayer: card.perPlayer } : {}) }));
+  return [...standard, ...added];
+}
 
 function copiesAt(card: Placement, difficulty: Difficulty): number {
   return difficulty === "Easy" ? card.easy : card.normal;
@@ -148,10 +185,10 @@ function placedCopies(card: Placement, difficulty: Difficulty, seatCount?: numbe
   return card.perPlayer != null && seatCount != null ? Math.min(copies, card.perPlayer * seatCount) : copies;
 }
 
-// The encounter deck at a difficulty. Easy drops the cards the booklet marks (the `easy` count of each placement).
-// The copies of a per-player Setup card the players did not take stay in the encounter deck.
+// The encounter deck at a difficulty. Easy drops the cards the booklet marks (the `easy` count of each placement); Nightmare deals
+// the Nightmare piles (placementsAt). The copies of a per-player Setup card the players did not take stay in the encounter deck.
 export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): string[] {
-  return data.cards.flatMap((card) => {
+  return placementsAt(data, difficulty).flatMap((card) => {
     const copies = card.pile === "encounter" ? copiesAt(card, difficulty) : card.pile === "quest" || card.pile === "burden" ? 0 : copiesAt(card, difficulty) - placedCopies(card, difficulty, seatCount);
     return Array.from({ length: copies }, () => card.code);
   });
@@ -169,8 +206,9 @@ const SETUP_VERB = {
 // (buildStart). The encounter, quest and burden piles are dealt by buildStart.
 export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): Instruction[] {
   const instructions: Instruction[] = [];
+  const cards = placementsAt(data, difficulty);
   for (const pile of ["setAside", "staging", "activeLocation", "attached"] as const) {
-    for (const card of data.cards) {
+    for (const card of cards) {
       if (card.pile !== pile) continue;
       for (let copy = 0; copy < placedCopies(card, difficulty, seatCount); copy += 1) instructions.push({ verb: SETUP_VERB[pile], code: card.code });
     }

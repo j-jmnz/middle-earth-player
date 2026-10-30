@@ -240,6 +240,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   const widgets = widgetReadouts(game);
   const tokens = campaignTokens(game, ctx.effects, nameOf);
+  // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
+  const nightmareId = Object.entries(game.cards).find(([, card]) => card.zone === "nightmare")?.[0] ?? null;
   const held = heldDial(game, nameOf);
   const commandWidth = commandWidthOf(screen.width, s);
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
@@ -302,6 +304,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           tokens={tokens}
+          onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           rail={rail}
           stopAhead={carousel.stopAhead}
           carouselOpen={reading?.kind === "carousel"}

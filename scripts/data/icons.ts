@@ -193,6 +193,48 @@ export function cardBackRecords(rawDir: string = RAW_DIR): CardBackRecord[] {
   });
 }
 
+// A path drawn y down (an SVG's) as a font glyph's, y up: every y value negated. Absolute and relative moves, lines and curves
+// only; an arc would also need its sweep flag turned, and a path with one fails.
+export function flipPathY(d: string): string {
+  const tokens = d.match(/[A-Za-z]|-?(?:\d+\.?\d*|\.\d+)(?:e-?\d+)?/g) ?? [];
+  const arity: Record<string, number> = { M: 2, L: 2, H: 1, V: 1, C: 6, S: 4, Q: 4, T: 2, Z: 0 };
+  const out: string[] = [];
+  let command = "";
+  let index = 0;
+  while (index < tokens.length) {
+    const token = tokens[index] ?? "";
+    if (/^[A-Za-z]$/.test(token)) {
+      command = token;
+      if (command.toUpperCase() === "A") throw new Error("flipPathY: arcs are not supported");
+      out.push(command);
+      index += 1;
+      continue;
+    }
+    const upper = command.toUpperCase();
+    const count = arity[upper] ?? 0;
+    if (count === 0) throw new Error(`flipPathY: a number after ${command}`);
+    const values = tokens.slice(index, index + count).map(Number);
+    index += count;
+    out.push(values.map((value, at) => round(upper === "V" || (upper !== "H" && at % 2 === 1) ? -value : value)).join(" "));
+  }
+  return out.join(" ").replace(/-0(?![.\d])/g, "0");
+}
+
+// The Eye of Sauron that marks Nightmare (user request, 2026-10-30), drawn for the app after the mark FFG prints on every
+// Nightmare card (an almond eye with a slit pupil under a crown of flame): no source carries that mark as a vector. Drawn y down
+// on a 512 grid, nonzero fill: the eye, the iris cut out of it, the pupil, the flames.
+export const EYE_SOURCE = "drawn for the app (scripts/data/icons.ts), after the Nightmare mark FFG prints";
+const EYE_PATH =
+  "M40 300C140 170 372 170 472 300C372 430 140 430 40 300Z" +
+  "M336 300C336 256 300 220 256 220C212 220 176 256 176 300C176 344 212 380 256 380C300 380 336 344 336 300Z" +
+  "M256 232C274 264 274 336 256 368C238 336 238 264 256 232Z" +
+  "M128 240L104 118L168 196L184 66L230 184L256 14L282 184L328 66L344 196L408 118L384 240C330 205 182 205 128 240Z";
+
+export function eyeIcon(): Extract<IconRecord, { kind: "vector" }> {
+  const d = flipPathY(EYE_PATH);
+  return { name: "nightmare", kind: "vector", source: EYE_SOURCE, glyph: "eye", viewBox: flippedViewBox(d), d };
+}
+
 export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
   const font = readFileSync(path.join(rawDir, "icons", "ringsdb.svg"), "utf8");
   const css = parseIconCss(readFileSync(path.join(rawDir, "icons", "ringsdb-app.css"), "utf8"));
@@ -204,6 +246,7 @@ export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
     if (!glyph) throw new Error(`The RingsDB font has no glyph for ${icon.name}`);
     records.push({ name: icon.name, kind: "vector", source: FONT_URL, glyph: glyph.name, viewBox: flippedViewBox(glyph.d), d: glyph.d });
   }
+  records.push(eyeIcon());
   for (const icon of RASTER_ICONS) {
     const size = pngSize(readFileSync(path.join(rawDir, "icons", "dragncards", `${icon.file}.png`)));
     if (Math.min(size.width, size.height) < icon.bar) throw new Error(`${icon.name} is ${size.width}x${size.height}, under its ${icon.bar} px bar`);

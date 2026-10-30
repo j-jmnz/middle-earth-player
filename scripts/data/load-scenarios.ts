@@ -31,14 +31,20 @@ export function loadScenarios(campaignId?: string, dataDir = DATA_DIR): Scenario
 }
 
 // Every card the campaign deals: the prelude, each scenario's piles, its campaign card, and the cards that card names.
-export function dealtCodes(campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[]): Set<string> {
+export function dealtCodes(campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[], { nightmare = true }: { nightmare?: boolean } = {}): Set<string> {
   const codes = new Set<string>(asList(campaign).flatMap((one) => one.prelude.map((card) => card.code)));
   for (const scenario of scenarios) {
     codes.add(scenario.campaignCard);
     for (const card of scenario.cards) codes.add(card.code);
     for (const code of scenario.campaignPlaced) codes.add(code);
+    if (nightmare) for (const code of nightmareCodes([scenario])) codes.add(code);
   }
   return codes;
+}
+
+// The cards a scenario deals on Nightmare that it does not deal otherwise: its Nightmare deck's setup card and cards.
+export function nightmareCodes(scenarios: readonly ScenarioData[]): Set<string> {
+  return new Set(scenarios.flatMap((scenario) => (scenario.nightmare ? [scenario.nightmare.setupCard, ...scenario.nightmare.cards.map((card) => card.code)] : [])));
 }
 
 // Every card of the starter decklists.
@@ -58,7 +64,7 @@ export function loadScenarioDefinitions(dataDir: string, cardsByCode: ReadonlyMa
     for (const code of dealtCodes(campaign, [scenario])) {
       const card = cardsByCode.get(code);
       if (!card) throw new Error(`Scenario ${id} is missing card ${code}`);
-      if (card.type === "nightmare") throw new Error(`Scenario ${id} card ${code} is a nightmare card`);
+      if (card.type === "nightmare" && code !== scenario.nightmare?.setupCard) throw new Error(`Scenario ${id} card ${code} is a nightmare card that is not its setup card`);
     }
     return scenarioDefinition(scenario, campaign, effects);
   });

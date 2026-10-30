@@ -16,6 +16,7 @@ import type { RuleEntry } from "../rules/spans.ts";
 import { sameName } from "./names.ts";
 import { crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
+import { nightmareOf } from "./nightmare.ts";
 import type { RawData } from "./load-raw.ts";
 
 // Dragncards load groups -> our piles.
@@ -337,6 +338,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).
     if (!normalDeck) local.push(...crossCheckProblems(def, decks, raw.dragn, placed, nameOf));
 
+    const nightmare = nightmareOf(id, placed, cards);
+    local.push(...nightmare.problems);
+
     if (local.length > 0) {
       problems.push(...local);
       continue;
@@ -356,6 +360,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         ...(life != null ? { life } : {}),
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
+        ...(nightmare.data ? { nightmare: nightmare.data } : {}),
       }),
     );
   }

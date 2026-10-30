@@ -16,6 +16,8 @@ const NON_PLAYER_TYPE_CODES = new Set([
   "location",
   "treachery",
   "objective",
+  "encounter-side-quest",
+  "ship-enemy",
 ]);
 
 export function deckLegal(typeCode: string, typeName: string): boolean {

@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 
 import { scenarioFacts, type BriefingSeat } from "../../../../campaign/briefing";
 import { dealStandalone, standaloneBriefing, type StandaloneInput, type StandaloneLoadout } from "../../../../campaign/standalone";
+import { isNightmarePlayable } from "../../../../campaign/playable";
 import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
@@ -119,7 +120,7 @@ export default function StandaloneBriefing() {
       <Label tone="muted" className="mt-2">
         No campaign card, boons or burdens. A win is scored; nothing is written to a campaign.
       </Label>
-      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
+      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} nightmare={isNightmarePlayable(world.scenario.id)} />
       {seats.map((seat, index) => (
         <SeatPicker
           key={index}

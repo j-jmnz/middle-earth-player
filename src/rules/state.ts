@@ -51,6 +51,8 @@ export type ZoneName =
   // The campaign card next to the quest deck (rr.campaign-cards). Placed only when the card has an ability that works during
   // the scenario (a Response, a Forced effect, a constant, an Action), so it is in play: 141056:A:2.
   | "campaign"
+  // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/plans/nightmare-mode.md): in play all game.
+  | "nightmare"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
   // nobody. The card's host is the Watcher.
   | "captive";
@@ -489,6 +491,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "seatQuest" ||
     zone === "attached" ||
     zone === "campaign" ||
+    zone === "nightmare" ||
     zone === "captive"
   );
 }

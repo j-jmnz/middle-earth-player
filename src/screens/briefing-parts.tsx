@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Problem, ScenarioFacts } from "../campaign/briefing";
 import { cards, packs } from "../catalog/schema";
-import type { Difficulty } from "../catalog/scenario-data";
+import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data";
 import { GroundedScene } from "./art";
 import { dealSentence, problemWords } from "./briefing-words";
 import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "./chrome";
@@ -28,13 +28,15 @@ import { Text } from "../play/text";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
-const DIFFICULTIES = ["Easy", "Normal"] as const;
-
-// What each difficulty changes (ltp.easy-mode, easy-mode.easy-mode), in the briefing under the switch.
+// What each difficulty changes (ltp.easy-mode, easy-mode.easy-mode, and the Nightmare setup card), in the briefing under the switch.
 const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
   Easy: "Easy: each hero starts with 1 resource, and the encounter cards with the gold difficulty border are left out. Good for a first game.",
   Normal: "Normal: the full encounter deck, and no starting resources.",
+  Nightmare: "Nightmare: the setup card swaps cards of the encounter deck for its Nightmare deck and stays next to the quest deck, its rules active all game. For seasoned players.",
 };
+
+// The Eye of Sauron marks Nightmare wherever the difficulty is named.
+const DIFFICULTY_ICONS: Partial<Record<Difficulty, "nightmare">> = { Nightmare: "nightmare" };
 
 const BANNER_HEIGHT = 330;
 
@@ -260,12 +262,26 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
   );
 }
 
-/** The difficulty, with what it changes and the encounter deck's size beside its heading. */
-export function DifficultyPicker({ facts, difficulty, onDifficulty }: { facts: ScenarioFacts; difficulty: Difficulty; onDifficulty: (next: Difficulty) => void }) {
+/**
+ * The difficulty, with what it changes and the encounter deck's size beside its heading. Nightmare, with the Eye of Sauron, is offered
+ * only for a scenario whose Nightmare deck the app plays (`nightmare`, src/campaign/playable.ts).
+ */
+export function DifficultyPicker({
+  facts,
+  difficulty,
+  onDifficulty,
+  nightmare = false,
+}: {
+  facts: ScenarioFacts;
+  difficulty: Difficulty;
+  onDifficulty: (next: Difficulty) => void;
+  nightmare?: boolean;
+}) {
+  const options = nightmare ? DIFFICULTIES : DIFFICULTIES.filter((option) => option !== "Nightmare");
   return (
     <>
       <Section title="Difficulty" className="mt-4" right={<Chip label={`${facts.deckSize} encounter cards`} />} />
-      <Segmented options={DIFFICULTIES} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" stretch />
+      <Segmented options={options} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" stretch icons={DIFFICULTY_ICONS} />
       {/* What the difficulty changes, for a first game (ltp.easy-mode, easy-mode.easy-mode). */}
       <Label testID="briefing-difficulty-note" tone="muted" className="mt-2">
         {DIFFICULTY_NOTES[difficulty]}

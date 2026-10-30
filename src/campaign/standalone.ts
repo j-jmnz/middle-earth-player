@@ -15,7 +15,7 @@ import type { ScenarioState } from "../rules/reduce.ts";
 import { resolutionResult } from "../rules/resolution.ts";
 import type { StartScenario } from "../rules/setup.ts";
 
-import { loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
+import { difficultyProblems, loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
 import type { LoadoutSeat } from "./loadout.ts";
 import { isPlayable } from "./playable.ts";
 import { beginActive, type ActiveScenario, type ReplayObserver } from "./replay.ts";
@@ -89,7 +89,7 @@ function plan(input: StandaloneInput): { briefing: StandaloneBriefing; seats: Lo
     ? []
     : [{ rule: "Not playable yet", message: `${printedScenarioName(input.world.scenario.name)} is not playable yet: some of its cards have no effect record.` }];
   const { problems, loadout } = loadoutProblems(input, []);
-  const all = [...playable, ...problems];
+  const all = [...playable, ...difficultyProblems(input.world, input.difficulty), ...problems];
   return { briefing: { problems: all, needsRingBearer, dealable: all.length === 0 }, seats: loadout };
 }
 

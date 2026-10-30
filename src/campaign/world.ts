@@ -36,13 +36,18 @@ function instructionCodes(effects: readonly Effect[], card: string): string[] {
   return codes;
 }
 
-// The catalog codes a scenario needs to be dealt and resolved: its piles, its campaign card and what that card names,
+// The catalog codes a scenario needs to be dealt and resolved: its piles and its Nightmare deck, its campaign card and what that card names,
 // the campaign prelude, and any extra codes the caller holds (the heroes and decks of a loadout, the pool).
 export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
   const codes = new Set<string>(campaign.prelude.map((card) => card.code));
   codes.add(scenario.campaignCard);
   for (const card of scenarioCards(scenario)) codes.add(card.code);
   for (const code of scenario.campaignPlaced) codes.add(code);
+  // The Nightmare deck, so a briefing can switch to Nightmare without loading the world again.
+  if (scenario.nightmare) {
+    codes.add(scenario.nightmare.setupCard);
+    for (const card of scenario.nightmare.cards) codes.add(card.code);
+  }
   for (const code of instructionCodes(effects, scenario.campaignCard)) codes.add(code);
   for (const code of extra) codes.add(code);
   return [...codes];

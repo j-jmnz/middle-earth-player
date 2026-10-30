@@ -14,6 +14,7 @@ export type Destination =
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
   | { zone: "campaign" }
+  | { zone: "nightmare" }
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null };

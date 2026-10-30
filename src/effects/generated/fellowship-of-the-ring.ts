@@ -128,4 +128,10 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"142086:shadow:1","cardCode":"142086","lines":["142086:A:3"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ImmediateAttack"}]}]},
   {"id":"142087:setup:1","cardCode":"142087","lines":["142087:A:1"],"timing":"setup","instructions":[{"verb":"AddToStaging","code":"142087"}]},
   {"id":"142088:setup:1","cardCode":"142088","lines":["142088:A:1"],"timing":"setup","instructions":[{"verb":"AddToStaging","code":"142088"}]},
+  {"id":"906102:constant:1","cardCode":"906102","lines":["906102:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]},
+  {"id":"906103:constant:1","cardCode":"906103","lines":["906103:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]},
+  {"id":"906106:shadow:1","cardCode":"906106","lines":["906106:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"hideFailed","scope":"round"}}]},
+  {"id":"906202:constant:1","cardCode":"906202","lines":["906202:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]},
+  {"id":"906302:constant:1","cardCode":"906302","lines":["906302:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]},
+  {"id":"906302:shadow:1","cardCode":"906302","lines":["906302:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"exhausted","code":"141085","is":true}}]},
 ];

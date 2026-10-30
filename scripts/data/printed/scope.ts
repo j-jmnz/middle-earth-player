@@ -5,9 +5,13 @@ import { PRODUCT_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR } from "../paths.ts";
+import { NIGHTMARE_DECKS, NIGHTMARE_PACK } from "../nightmare-defs.ts";
+import { deckFiles, nightmareFiles } from "../sources/nightmare.ts";
+import { driveFileUrl, type DriveFile } from "../sources/jvzijp.ts";
 
 // The cards whose printed text the ledger holds: everything every built scenario deals (the six of the Fellowship box, the
-// three Revised Core scenarios, The Oath and The Caves of Nibin-Dûm), The One Ring, the campaign cards, the boons and
+// three Revised Core scenarios, The Oath and The Caves of Nibin-Dûm), on every difficulty (the Nightmare decks of the nine that
+// have one, read from the Nightmare proxies' pictures), The One Ring, the campaign cards, the boons and
 // burdens of each box, and both starter lists. The player's requests add cards of their own decks.
 export type ScanSide = "A" | "B";
 export type ScanTarget = { code: string; side: ScanSide; printing: string; urls: string[] };
@@ -106,14 +110,41 @@ const CORE_ORDER = ["Revised Core Set", "Core Set"];
 
 // Hall of Beorn's MEC109 scan first (its TFotR printing), then the other printings, DragnCards last. A card the box
 // does not reprint (the core-set cards of the starter lists) takes the Revised Core Set scan.
+// The Nightmare proxies' picture of each side (sources/nightmare.ts), from the listing `pnpm data:sync nightmare` keeps.
+function nightmarePictures(cards: ReadonlyMap<string, { code: string }>): Map<string, string> {
+  const file = path.join(RAW_DIR, "nightmare", "drive.json");
+  const listing = JSON.parse(readFileSync(file, "utf8")) as DriveFile[];
+  const all = loadCards().filter((card) => cards.has(card.code) && card.printings.some((printing) => printing.pack === NIGHTMARE_PACK));
+  const out = new Map<string, string>();
+  for (const deck of NIGHTMARE_DECKS) {
+    const mine = all.filter((card) => card.code.startsWith(deck.prefix) && card.code.length === deck.prefix.length + 2);
+    if (mine.length === 0) continue;
+    for (const [key, drive] of nightmareFiles(deckFiles(listing, deck), mine)) out.set(key, driveFileUrl(drive.id));
+  }
+  return out;
+}
+
 export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget[] {
   const cards = new Map(loadCards().map((card) => [card.code, card]));
   const hob = hobImages();
   const dragn = dragnImages();
   const out: ScanTarget[] = [];
+  const nightmare = nightmarePictures(new Map(codes.flatMap((code) => (cards.has(code) ? [[code, { code }] as const] : []))));
   for (const code of codes) {
     const card = cards.get(code);
     if (!card) throw new Error(`Scan scope names ${code}, which is not in data/cards`);
+    // A Nightmare card is read from its proxy picture (about 2348 px), then from Hall of Beorn's scan.
+    if (card.printings.some((printing) => printing.pack === NIGHTMARE_PACK)) {
+      const hobUrls = card.printings.flatMap((printing) => printing.imageUrls ?? []).filter((url) => !url.includes("dragncards"));
+      for (const side of card.back ? (["A", "B"] as const) : (["A"] as const)) {
+        const proxy = nightmare.get(`${code}.${side}`);
+        const fallback = side === "A" ? hobUrls[0] : hobUrls[1];
+        const urls = [...(proxy ? [proxy] : []), ...(fallback ? [fallback] : [])];
+        if (urls.length === 0) throw new Error(`No scan URL for ${code}.${side} ${card.name}`);
+        out.push({ code, side, printing: NIGHTMARE_PACK, urls });
+      }
+      continue;
+    }
     const mec = card.printings.find((printing) => printing.pack === "TFotR" && printing.imageUrls);
     const sources: { printing: string; urls: string[] }[] = [];
     if (mec?.imageUrls) sources.push({ printing: "MEC109", urls: mec.imageUrls });

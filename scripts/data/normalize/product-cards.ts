@@ -1,5 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { PRODUCTS } from "../campaign-defs.ts";
+import { NIGHTMARE_PACK, NIGHTMARE_SETS, nightmareCode } from "../nightmare-defs.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import type { Overrides } from "./cards.ts";
 
@@ -35,6 +36,22 @@ export function addProductCards(
     if (!pack || !code || !PRODUCT_TYPES.has(source.CardType) || byCode.has(code)) continue;
     const merged = merge(code, source, source);
     merged.printings = merged.printings.map((printing) => ({ ...printing, pack }));
+    byCode.set(code, merged);
+  }
+}
+
+// Every card of every Nightmare deck (nightmare-defs.ts), from Hall of Beorn alone: the setup card, the encounter cards and the
+// quest cards a deck adds. Coded by its deck's prefix and printed in the Nightmare pack. A Hall of Beorn set no row names is a
+// build error, so a new deck in the source is noticed.
+export function addNightmareCards(hob: readonly HobCard[], byCode: Map<string, Card>, merge: (code: string, twin: HobCard | undefined, source: HobCard) => Card): void {
+  for (const source of hob) {
+    if (!/ Nightmare$/.test(source.CardSet)) continue;
+    const deck = NIGHTMARE_SETS.get(source.CardSet);
+    if (!deck) throw new Error(`Nightmare set "${source.CardSet}" has no row in scripts/data/nightmare-defs.ts`);
+    const code = nightmareCode(deck, source.Number);
+    if (byCode.has(code)) throw new Error(`Nightmare card ${code} (${source.Title}) is already built`);
+    const merged = merge(code, source, source);
+    merged.printings = merged.printings.map((printing) => ({ ...printing, pack: NIGHTMARE_PACK }));
     byCode.set(code, merged);
   }
 }

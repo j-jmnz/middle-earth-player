@@ -176,5 +176,77 @@
     "dragnNormal": "Q0C.05",
     "dragnEasy": "E0C.05",
     "hobSlug": "Journey-in-the-Dark"
+  },
+  "nightmare": {
+    "setupCard": "906501",
+    "removed": [
+      {
+        "code": "142049",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "142052",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "142052",
+        "copies": 1,
+        "pile": "staging"
+      },
+      {
+        "code": "142057",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "142058",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "906502",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906503",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "906504",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906505",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906506",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "906507",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "906508",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906509",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

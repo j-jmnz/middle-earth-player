@@ -200,5 +200,102 @@
     "dragnNormal": null,
     "dragnEasy": null,
     "hobSlug": "Escape-from-Dol-Guldur-(Campaign)"
+  },
+  "nightmare": {
+    "setupCard": "900301",
+    "removed": [
+      {
+        "code": "01077",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01078",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01080",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01089",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01093",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01094",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01095",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01104",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01105",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01107",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900302",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900303",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900304",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900305",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900306",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900307",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900308",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900309",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

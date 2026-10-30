@@ -176,5 +176,67 @@
     "dragnNormal": "Q0C.06",
     "dragnEasy": "E0C.06",
     "hobSlug": "Breaking-of-the-Fellowship"
+  },
+  "nightmare": {
+    "setupCard": "906601",
+    "removed": [
+      {
+        "code": "142070",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "142077",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "142079",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "142082",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "906602",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906603",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "906604",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906605",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906606",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906607",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906608",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

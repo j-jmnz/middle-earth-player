@@ -190,5 +190,92 @@
     "dragnNormal": null,
     "dragnEasy": null,
     "hobSlug": "Passage-Through-Mirkwood-(Campaign)"
+  },
+  "nightmare": {
+    "setupCard": "900101",
+    "removed": [
+      {
+        "code": "01076",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01078",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01080",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01089",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01096",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01098",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01099",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "01100",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900102",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "900103",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900104",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900105",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900106",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900107",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900108",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900109",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

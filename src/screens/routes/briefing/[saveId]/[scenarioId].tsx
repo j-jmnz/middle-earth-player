@@ -5,6 +5,7 @@ import { View } from "react-native";
 
 import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "../../../../campaign/briefing";
 import { deal } from "../../../../campaign/session";
+import { isNightmarePlayable } from "../../../../campaign/playable";
 import { logCodes, loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { cards } from "../../../../catalog/schema";
@@ -40,6 +41,7 @@ export default function Briefing() {
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
+  const nightmare = scenarioId != null && isNightmarePlayable(scenarioId);
   const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
   const { savedDecks, candidates } = briefingDecks;
 
@@ -178,7 +180,7 @@ export default function Briefing() {
       ) : null}
 
       {/* The difficulty first: it is decided before the deck, and it must be seen before Deal (it is named over Deal too). */}
-      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} />
+      <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} nightmare={nightmare} />
 
       {seats.map((seat, index) => (
         <SeatPicker

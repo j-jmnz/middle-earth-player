@@ -22,6 +22,8 @@ export type CardType =
   | "treasure"
   // The campaign card, next to the quest deck. The engine holds it only when it has an ability that works during the scenario.
   | "campaign"
+  // The Nightmare setup card, next to the quest deck on Nightmare (zone `nightmare`): its side A's lines stay active all game.
+  | "nightmare"
   // A player card played in the planning phase into its player's quest area (families/sidequests-play.ts), and a contract
   // card that begins the game in its player's play area (families/sidequests-contract.ts).
   | "player-side-quest"
@@ -164,7 +166,7 @@ export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract";
 }
 
-const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign", "player-side-quest", "contract"];
+const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign", "nightmare", "player-side-quest", "contract"];
 const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.

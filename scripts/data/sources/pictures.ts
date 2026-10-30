@@ -14,6 +14,7 @@ import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, jvzijpFile, jvzijpPictures, listDriveTree } from "./jvzijp.ts";
 import { lettersOf } from "./names.ts";
+import { NIGHTMARE_PACK } from "../nightmare-defs.ts";
 import { extensionOf, widthOf } from "./scans.ts";
 
 export { lettersOf };
@@ -185,7 +186,8 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     files.push({ path: pdfPath(url), url, sha256: pdf.sha256, bytes: pdf.bytes });
     pdfs.set(url, pdf.file);
   }
-  const cards = new Map(loadCards().map((card) => [card.code, card]));
+  // The Nightmare decks' pictures are the `nightmare` source's (sources/nightmare.ts).
+  const cards = new Map(loadCards().filter((card) => !card.printings.some((printing) => printing.pack === NIGHTMARE_PACK)).map((card) => [card.code, card]));
   const scoped = scanTargets().map((target) => ({ code: target.code, side: target.side, scoped: true }));
   const scopedCodes = new Set(scoped.map((target) => target.code));
   const targets = [...scoped, ...[...cards.keys()].filter((code) => !scopedCodes.has(code)).map((code) => ({ code, side: "A" as const, scoped: false }))];

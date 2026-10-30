@@ -3,9 +3,11 @@
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
 import { useEffect, useState } from "react";
-import { ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
+import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 
 import { setDialsEdge } from "../play/bar-edge";
+import { GameIcon } from "../play/game-icon";
+import { Text } from "../play/text";
 import { seatDial } from "../play/peek";
 import type { Rail } from "../play/rail";
 import type { SeatThreat } from "../play/selectors";
@@ -33,6 +35,8 @@ export type TopBarProps = {
   burdenDeck: number | null;
   // The resource tokens on the campaign card (The Oath, 41050:A:3) and the card's name, or null when its scenario has none.
   tokens?: { name: string; tokens: number } | null;
+  // On Nightmare: opens the setup card next to the quest deck (the Eye of Sauron after the dials). Absent on Easy and Normal.
+  onNightmare?: (() => void) | null;
   rail: Rail;
   // Stops are on and one of the player's stops lies ahead in this phase: an accent S by the next phase.
   stopAhead: boolean;
@@ -52,7 +56,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, onNightmare = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -110,6 +114,12 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
+            {onNightmare ? (
+              <Pressable testID="nightmare-card" accessibilityRole="button" accessibilityLabel="Nightmare setup card" onPress={onNightmare} hitSlop={8 * s} className="items-center justify-center" style={{ minWidth: 44 * s, minHeight: 44 * s }}>
+                <GameIcon name="nightmare" size={22 * s} tint="threat" />
+                <Text className="text-label text-muted">Nightmare</Text>
+              </Pressable>
+            ) : null}
           </View>
         </ScrollView>
         {/* The dials scroll: a fade at the right edge so a cut dial reads as more to scroll to (bands, no gradient library). */}

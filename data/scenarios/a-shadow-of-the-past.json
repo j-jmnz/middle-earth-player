@@ -175,5 +175,87 @@
     "dragnNormal": "Q0C.01",
     "dragnEasy": "E0C.01",
     "hobSlug": "A-Shadow-of-the-Past"
+  },
+  "nightmare": {
+    "setupCard": "906101",
+    "removed": [
+      {
+        "code": "141032",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "141033",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "141034",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "141036",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141040",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141072",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141075",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "906102",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "906103",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906104",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906105",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906106",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906107",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906108",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906109",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

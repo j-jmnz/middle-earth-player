@@ -1,7 +1,10 @@
-// The segmented switch (docs/design-system.md, Components): two or three words in a sunk track with no edge. It lives in src/play, in the table
+// The segmented switch (docs/design-system.md, Components): two or three words in a sunk track with no edge, a word optionally led by
+// a game icon. It lives in src/play, in the table
 // tokens, because the table's settings panel uses it too and src/play cannot import src/screens; chrome-buttons.tsx re-exports it.
 import { Pressable, View } from "react-native";
 
+import { GameIcon } from "./game-icon.tsx";
+import type { IconName } from "./icon-map.ts";
 import { segmentSurface, sunkSurface } from "./surfaces.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -17,6 +20,7 @@ export function Segmented<T extends string>({
   stretch = false,
   compact = false,
   words,
+  icons,
 }: {
   options: readonly T[];
   value: T;
@@ -30,6 +34,8 @@ export function Segmented<T extends string>({
   compact?: boolean;
   // What each option says when its stored word is not the word to read ("system" says "Follow system"); the test id keeps the option.
   words?: Partial<Record<T, string>>;
+  // An icon before an option's word, in threat red (the Eye of Sauron before Nightmare on the briefing). The word stays, so it reads.
+  icons?: Partial<Record<T, IconName>>;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
@@ -50,7 +56,10 @@ export function Segmented<T extends string>({
             className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
             style={selected ? segmentSurface(t) : undefined}
           >
-            <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
+            <View className="flex-row items-center gap-1.5">
+              {icons?.[option] ? <GameIcon name={icons[option]} size={compact ? 14 : 16} tint="threat" /> : null}
+              <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
+            </View>
           </Pressable>
         );
       })}

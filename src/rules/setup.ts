@@ -44,7 +44,8 @@ export type StartScenario = {
   questDeck: readonly string[];
   // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
   burdenDeck?: readonly string[];
-  // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Normal when absent.
+  // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Nightmare adds nothing here: its
+  // deck and setup card are in the definition and the encounter deck. Normal when absent.
   difficulty?: Difficulty;
   // The campaign log's structured facts (prisoner, once-per-campaign uses, counters), in Campaign Mode.
   facts?: CampaignFacts;
@@ -70,6 +71,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
   }
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
+  // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
+  if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
   if (input.facts) state = { ...state, campaignFacts: input.facts };
   if (input.seats.some((seat) => (seat.afterMulligan?.length ?? 0) > 0)) state = { ...state, afterMulligan: input.seats.slice(0, input.seatCount).map((seat) => seat.afterMulligan ?? []) };
   for (let index = 0; index < input.seatCount; index += 1) {

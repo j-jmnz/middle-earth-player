@@ -54,7 +54,8 @@ type Pin = SourceFile & { cacheDir: string };
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
   const scanPins = sidePins(sources.scans, "scans", options.scanCacheDir);
-  const picturePins = sidePins(sources.pictures, "pictures", options.pictureCacheDir);
+  // The Nightmare decks' pictures are pinned by their own source, cached beside the others (sources/nightmare.ts).
+  const picturePins = new Map([...sidePins(sources.pictures, "pictures", options.pictureCacheDir), ...sidePins(sources.nightmare, "pictures", options.pictureCacheDir)]);
   const pdfPins = new Map((sources.pictures?.files ?? []).filter((file) => file.path.startsWith("pdf/")).map((file) => [file.url, file]));
   const notes: RenderNotes = { noPdftoppm: [], rehashed: [] };
   const context: LoadContext = { ...options, fetchScan: options.fetch ?? ((url: string) => fetchBytes(url, 120_000, log)), pdfPins, notes };

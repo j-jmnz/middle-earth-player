@@ -49,8 +49,10 @@ describe("printedFromRow", () => {
     // Every card type the catalog holds now prints (side quests and contracts included), so a row of a type no engine card has stands in.
     const first = rows[0];
     if (!first) throw new Error("the catalog is empty");
-    const nightmare = { ...first, code: "nightmare-row", typeCode: "nightmare" };
-    expect(unprintable(nightmare)).toBeDefined();
-    expect(() => printedMap([nightmare])).toThrow(nightmare.code);
+    // A Nightmare setup card prints (it is placed next to the quest deck); a Nightmare deck's encounter side quest does not yet.
+    const sideQuest = { ...first, code: "side-quest-row", typeCode: "encounter-side-quest" };
+    expect(unprintable(sideQuest)).toBeDefined();
+    expect(() => printedMap([sideQuest])).toThrow(sideQuest.code);
+    expect(unprintable({ ...first, code: "nightmare-row", typeCode: "nightmare" })).toBeUndefined();
   });
 });

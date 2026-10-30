@@ -198,5 +198,92 @@
     "dragnNormal": null,
     "dragnEasy": null,
     "hobSlug": "Journey-Along-the-Anduin-(Campaign)"
+  },
+  "nightmare": {
+    "setupCard": "900201",
+    "removed": [
+      {
+        "code": "01086",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01089",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01094",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01095",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01111",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01113",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "01116",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "01118",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "900202",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900203",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900204",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900205",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900206",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "900207",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900208",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "900209",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

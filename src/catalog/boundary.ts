@@ -141,6 +141,8 @@ export const scenarioDefinitionSchema = z.strictObject({
   life: z.number().int().positive().optional(),
   // The campaign card whose Setup and Resolution records belong to this scenario.
   campaignCard: z.string().min(1).optional(),
+  // The Nightmare setup card, on Nightmare only: placed next to the quest deck before the Setup runs.
+  nightmareCard: z.string().min(1).optional(),
   bookletPage: z.number().int().optional(),
 });
 

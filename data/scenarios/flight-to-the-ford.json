@@ -195,5 +195,98 @@
     "dragnNormal": "Q0C.03",
     "dragnEasy": "E0C.03",
     "hobSlug": "Flight-to-the-Ford"
+  },
+  "nightmare": {
+    "setupCard": "906301",
+    "removed": [
+      {
+        "code": "141059",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "141060",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "141061",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141062",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141063",
+        "copies": 4,
+        "pile": "staging"
+      },
+      {
+        "code": "141064",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141066",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141072",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "141075",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "906302",
+        "copies": 4,
+        "pile": "staging",
+        "perPlayer": 1
+      },
+      {
+        "code": "906303",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "906304",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906305",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "906306",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906307",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906308",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "906309",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
   }
 }

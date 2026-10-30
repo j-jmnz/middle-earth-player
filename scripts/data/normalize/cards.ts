@@ -8,7 +8,7 @@ import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
 import { titleKey } from "./names.ts";
-import { addProductCards, productCodeOf } from "./product-cards.ts";
+import { addNightmareCards, addProductCards, productCodeOf } from "./product-cards.ts";
 import { timingLabels } from "./timings.ts";
 
 const TFOTR = "The Fellowship of the Ring";
@@ -30,6 +30,9 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   Objective_Ally: { type: "objective", typeName: "Objective Ally" },
   Campaign: { type: "campaign", typeName: "Campaign" },
   Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
+  // Types only Nightmare decks of later cycles print (the encounter side quests of The Lost Realm on, Dream-chaser's ships).
+  Encounter_Side_Quest: { type: "encounter-side-quest", typeName: "Encounter Side Quest" },
+  Ship_Enemy: { type: "ship-enemy", typeName: "Ship-enemy" },
 };
 
 const overridesSchema = z.object({
@@ -145,7 +148,7 @@ function keywordOnly(card: HobCard): (line: string) => boolean {
 }
 
 const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
-const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective"]);
+const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective", "encounter-side-quest", "ship-enemy"]);
 
 // The type bar says Boon or Burden. A burden's burden set is printed where an encounter set icon would be, and
 // Hall of Beorn lists it as the card's encounter set.
@@ -465,6 +468,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   }
 
   addProductCards(raw.hob, byCode, hobCode, merge);
+  addNightmareCards(raw.hob, byCode, merge);
 
   const cards: Card[] = [];
   for (const card of byCode.values()) {

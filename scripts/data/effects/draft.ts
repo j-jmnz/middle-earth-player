@@ -9,7 +9,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
 import { HOB_ONLY_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
-import { dealtCodes, loadCampaigns, loadScenario, loadScenarios, starterCodes } from "../load-scenarios.ts";
+import { dealtCodes, loadCampaigns, loadScenario, loadScenarios, nightmareCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, loadLedger } from "../printed/ledger.ts";
 import { isPoolCard, withPool } from "../printed/pool.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
@@ -78,6 +78,9 @@ function main(log: Log): void {
   const targetOf = (card: Card): string => {
     const pack = card.printings[0]?.pack;
     if ((isPoolCard(card) && !starters.has(card.code)) || (card.campaignKind != null && (pack != null && HOB_ONLY_PACKS.has(pack)))) return `src/effects/authored/pool/${pack}.ts`;
+    // A Nightmare deck's cards go in the Nightmare file of its scenario (docs/plans/nightmare-mode.md).
+    const nightmareOf = scenarios.find((entry) => nightmareCodes([entry]).has(card.code));
+    if (nightmareOf) return `src/effects/authored/nightmare/${nightmareOf.id}.ts`;
     const dealer = scenarios.find((entry) => dealtCodes([], [entry]).has(card.code));
     return dealer && !fellowship.has(dealer.id) ? `src/effects/authored/${dealer.id}.ts` : "src/effects/authored/fellowship-of-the-ring.ts";
   };

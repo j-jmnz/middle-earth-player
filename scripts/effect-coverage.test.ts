@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PLAYABLE_SCENARIOS as PLAYABLE } from "../src/campaign/playable.ts";
+import { NIGHTMARE_PLAYABLE, PLAYABLE_SCENARIOS as PLAYABLE } from "../src/campaign/playable.ts";
 import { AUTHORED_EFFECTS, AUTHORED_REPLACES, EFFECTS, GENERATED_EFFECTS } from "../src/effects/index.ts";
 import { textCheck, unappliedLines } from "../src/catalog/active-text.ts";
 import { shippedLedger } from "../src/catalog/printed-ledger.ts";
@@ -14,7 +14,7 @@ import { isPoolCard, withPool } from "./data/printed/pool.ts";
 import { PLAYER_REQUESTS } from "./data/printed/scope.ts";
 import { openLines } from "./data/effects/open-lines.ts";
 import { OPEN_LINES } from "../src/effects/open-lines.ts";
-import { dealtCodes, loadCampaign, loadScenarios, starterCodes } from "./data/load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadScenarios, nightmareCodes, starterCodes } from "./data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
@@ -36,8 +36,27 @@ const PENDING_LINES: Readonly<Record<string, string>> = {};
 const campaignCards = new Set(Object.values(campaign.campaignCards));
 // The player's requests (scripts/data/printed/scope.ts: The Shirefolk and the four core-set Learn to Play decks) are held to the
 // same rule as the starter cards: every printed line owned.
-const dealt = new Set([...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id))), ...campaignCards, ...starterCodes(campaign), ...PLAYER_REQUESTS]);
+// A scenario's Nightmare deck is held to the rule only once it is in NIGHTMARE_PLAYABLE (docs/plans/nightmare-mode.md).
+const dealt = new Set([
+  ...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id)), { nightmare: false }),
+  ...nightmareCodes(scenarios.filter((scenario) => NIGHTMARE_PLAYABLE.includes(scenario.id))),
+  ...campaignCards,
+  ...starterCodes(campaign),
+  ...PLAYER_REQUESTS,
+]);
 const unplayable = scenarios.filter((scenario) => !PLAYABLE.includes(scenario.id));
+const nightmareUnplayable = scenarios.filter((scenario) => scenario.nightmare && !NIGHTMARE_PLAYABLE.includes(scenario.id));
+
+// The printed lines of these cards that no record, keyword or inert mark owns.
+function openOf(codes: Iterable<string>): string[] {
+  return [...codes].flatMap((code) =>
+    ledger.entries
+      .filter((entry) => entry.code === code)
+      .flatMap((entry) => entry.lines.map((line, at) => ({ id: lineId(code, entry.side, at + 1), line, entry })))
+      .filter(({ id, line, entry }) => !EFFECTS.some((effect) => effect.lines.includes(id)) && !isKeywordLine(line) && !entry.inert.some((mark) => id.endsWith(`:${mark.line}`)))
+      .map(({ id }) => id),
+  );
+}
 
 describe("effect coverage", () => {
   for (const code of [...dealt].sort()) {
@@ -58,13 +77,17 @@ describe("effect coverage", () => {
 
   it("keeps the scenarios that are not playable honest: each has a printed line nobody owns yet", () => {
     for (const scenario of unplayable) {
-      const open = [...dealtCodes(campaign, [scenario])].filter((code) => !campaignCards.has(code)).flatMap((code) =>
-        ledger.entries
-          .filter((entry) => entry.code === code)
-          .flatMap((entry) => entry.lines.map((line, at) => ({ id: lineId(code, entry.side, at + 1), line, entry })))
-          .filter(({ id, line, entry }) => !EFFECTS.some((effect) => effect.lines.includes(id)) && !isKeywordLine(line) && !entry.inert.some((mark) => id.endsWith(`:${mark.line}`))),
-      );
+      const open = openOf([...dealtCodes(campaign, [scenario], { nightmare: false })].filter((code) => !campaignCards.has(code)));
       expect(open.length, `${scenario.id} would be playable: add it to PLAYABLE`).toBeGreaterThan(0);
+    }
+  });
+
+  it("keeps NIGHTMARE_PLAYABLE honest: a playable scenario's Nightmare deck with every line owned is listed, and only a playable scenario is", () => {
+    for (const id of NIGHTMARE_PLAYABLE) expect(PLAYABLE, `${id} is on NIGHTMARE_PLAYABLE but not playable`).toContain(id);
+    for (const scenario of nightmareUnplayable.filter((item) => PLAYABLE.includes(item.id))) {
+      // A deck with no ledger entry yet has nothing owned; with entries, at least one line must still be open.
+      const read = [...nightmareCodes([scenario])].some((code) => ledger.entries.some((entry) => entry.code === code));
+      if (read) expect(openOf(nightmareCodes([scenario])).length, `${scenario.id} on Nightmare would be playable: add it to NIGHTMARE_PLAYABLE`).toBeGreaterThan(0);
     }
   });
 
