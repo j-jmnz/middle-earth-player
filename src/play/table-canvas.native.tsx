@@ -15,7 +15,8 @@ import { beatIds } from "./beat-store.ts";
 import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { seatTag, stagingWord } from "./area-words.ts";
+import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
@@ -163,7 +164,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     return (
       <Group>
         <Group opacity={veiled ? 0.55 : 1}>
-          {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
+          {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} owner={slot.zone === "questStage" ? owner : null} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
           {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
           {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
@@ -181,9 +182,11 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
       {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
     </Moving>
   );
+  // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.
+  const owner = seatTag(game, seat);
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
   const emptyWords: [Rect, string][] = [
-    ...(views.staging.entries.length === 0 ? [[layout.zones.staging, "Staging"] as [Rect, string]] : []),
+    ...(views.staging.entries.length === 0 ? [[layout.zones.staging, stagingWord(game, seat)] as [Rect, string]] : []),
     ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged"] as [Rect, string]] : []),
     ...(views.activeLocation.entries.length === 0 ? [[layout.zones.activeLocation, "No location"] as [Rect, string]] : []),
   ];
@@ -202,6 +205,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             colors={[withAlphaHex(t.threat, t.depth === "light" ? 0.18 : 0.3), withAlphaHex(t.threat, 0)]}
           />
         </SkRect>
+        {owner && views.staging.entries.length > 0 ? <StagingTag rect={layout.zones.staging} text={stagingWord(game, seat)} font={fonts.small} t={t} s={s} /> : null}
         {emptyWords.map(([rect, text]) => (
           <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
         ))}
@@ -215,7 +219,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
         <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
-        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints)} contrast={contrast} />
+        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints, slot.zone === "questStage" ? owner : null)} contrast={contrast} />
         {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
         {layout.marks.map((mark) => (
           <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />

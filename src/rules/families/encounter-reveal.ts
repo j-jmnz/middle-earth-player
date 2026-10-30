@@ -18,6 +18,7 @@ import { queueEvent } from "../queue.ts";
 import type { Frame, Modifier, ScenarioState } from "../state.ts";
 import { inPlay, modifierActive, updateCard } from "../state.ts";
 import { resetEncounterDeck } from "../verbs.ts";
+import { stageSeat } from "./breaking-areas.ts";
 import { popFrame } from "../windows.ts";
 import { moveCard } from "../zones.ts";
 
@@ -59,6 +60,18 @@ export function revealsAllowed(state: ScenarioState, base: number): number {
   if (toZero === 0 && toOne === 0) return base + more;
   const floored = toOne > 0 ? Math.max(Math.min(1, base), base - toOne) : base;
   return Math.max(0, floored - toZero) + more;
+}
+
+// The seat that makes the index-th reveal of the staging step: the seats in turn. While stages are separate the cards beyond one per seat
+// ("reveal one more card for each player", 142067:B:1) go to the seat whose stage says so, since "the quest" is each seat's own
+// (mec109.multiple-staging-areas).
+export function revealSeat(state: ScenarioState, index: number, seats: readonly number[]): number | undefined {
+  if (state.separate && index >= seats.length) {
+    const owner = state.modifiers.filter((modifier) => modifier.stat === "revealMore" && modifierActive(state, modifier)).map((modifier) => stageSeat(state, modifier.sourceId));
+    const mine = owner.find((seat): seat is number => seat != null && seats.includes(seat));
+    if (mine != null) return mine;
+  }
+  return seats[index % Math.max(1, seats.length)];
 }
 
 // The record that set a watcher, for the cause of what it does.

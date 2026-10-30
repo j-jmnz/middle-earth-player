@@ -50,21 +50,24 @@ export function QuestScaleView({ scale, wide = false }: { scale: QuestScale; wid
   const markerColor = marker.tone === "ok" ? t.ok : marker.tone === "danger" ? t.danger : t.muted;
   const even = marker.word === "Even";
   const { live } = scale;
+  // Once stages are separate between players the scale is the acting seat's, which a peek does not change: it says whose staging area it counts.
+  const owner = scale.seat == null ? null : `P${scale.seat + 1}`;
+  const whose = scale.seat == null ? "" : `Player ${scale.seat + 1}'s `;
   return (
     <View
       testID="quest-scale"
       accessible
       accessibilityLabel={
         live
-          ? `Threat in staging ${scale.threat}, willpower committed ${scale.willpower}, ${even ? "even" : `${Math.abs(scale.delta)} ${marker.word.toLowerCase()}`}`
-          : `Quest scale, for the Quest phase. Threat in staging ${scale.threat}`
+          ? `${whose}threat in staging ${scale.threat}, willpower committed ${scale.willpower}, ${even ? "even" : `${Math.abs(scale.delta)} ${marker.word.toLowerCase()}`}`
+          : `Quest scale, for the Quest phase. ${whose}threat in staging ${scale.threat}`
       }
       className="flex-1 items-center"
       style={{ width: (wide ? QUEST_SCALE_WIDE : QUEST_SCALE) * s, paddingVertical: 4 * s, opacity: live ? 1 : 0.4, backgroundImage: `radial-gradient(60% 50% at 50% 50%, ${withAlphaHex(t.night, 0.75)}, ${withAlphaHex(t.night, 0)})` }}
     >
       <Dial value={live ? scale.threat : null} kind="threat" size={dial} testID="quest-scale-threat" />
       <Text className="mt-1 text-micro" style={{ color: t.muted }}>
-        staging
+        {owner ? `${owner} staging` : "staging"}
       </Text>
       {/* How far apart they are, between the dials: "+2" in green, "−1" in red, or Even. */}
       <View className="min-h-0 flex-1 items-center justify-center" style={{ marginVertical: 4 * s }}>

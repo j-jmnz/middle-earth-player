@@ -186,7 +186,7 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
 // eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
 function eliminationWords(game: ScenarioState, shortfall: number, only?: number): string {
   if (shortfall <= 0) return "";
-  const after = failQuest(game, shortfall, []);
+  const after = failQuest(game, shortfall, [], only == null ? undefined : [only]);
   // Stages are separate: only the seat that quests raises its threat, so only it can be eliminated by this quest (mec109.multiple-staging-areas).
   if (only != null) {
     if (livingSeats(after).includes(only)) return "";

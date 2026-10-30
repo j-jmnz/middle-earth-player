@@ -252,11 +252,17 @@ export function threatSelector(): (game: ScenarioState) => readonly SeatThreat[]
   };
 }
 
+function ticksOf(game: ScenarioState, ctx: ReduceContext, seat?: number): string {
+  return threatRows(game, ctx, seat)
+    .filter((row) => !row.blocked)
+    .map((row) => row.cost)
+    .join(",");
+}
+
 /**
- * The engagement costs of the enemies in staging that can be engaged, lowest first, as one string ("2,4"; "" for none): the ticks marked on each
- * dial's meter. A string compares by value, so a subscriber renders only when a cost changes. It is made for one context (`ctx`), and the same game
- * object gives the previous string without asking the engine again. Once stages are separate they are the enemies in the staging area of `shown`, the
- * seat the table draws.
+ * The engagement costs of the enemies in staging that can be engaged, lowest first, as one string ("2,4"; "" for none): the ticks marked on a dial's
+ * meter. A string compares by value, so a subscriber renders only when a cost changes. It is made for one context (`ctx`), and the same game
+ * object gives the previous string without asking the engine again. Once stages are separate they are the enemies in the staging area of `shown`.
  */
 export function tickKeySelector(ctx: ReduceContext, shown?: number): (game: ScenarioState) => string {
   let previous = "";
@@ -264,10 +270,22 @@ export function tickKeySelector(ctx: ReduceContext, shown?: number): (game: Scen
   return (game) => {
     if (game === lastGame) return previous;
     lastGame = game;
-    previous = threatRows(game, ctx, shown)
-      .filter((row) => !row.blocked)
-      .map((row) => row.cost)
-      .join(",");
+    previous = ticksOf(game, ctx, shown);
+    return previous;
+  };
+}
+
+/**
+ * The ticks of every dial, one key for each seat joined by "|": each seat's own staging area once stages are separate (mec109.multiple-staging-areas), the
+ * one staging area for every dial before. Same string-by-value contract as `tickKeySelector`.
+ */
+export function dialTicksSelector(ctx: ReduceContext): (game: ScenarioState) => string {
+  let previous = "";
+  let lastGame: ScenarioState | null = null;
+  return (game) => {
+    if (game === lastGame) return previous;
+    lastGame = game;
+    previous = Array.from({ length: game.seatCount }, (_, seat) => ticksOf(game, ctx, isSeparate(game) ? seat : undefined)).join("|");
     return previous;
   };
 }

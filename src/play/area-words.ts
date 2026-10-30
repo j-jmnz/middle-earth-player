@@ -7,13 +7,28 @@ import type { ScenarioState } from "../rules/state.ts";
 import { zoneIds } from "./selectors.ts";
 
 /**
- * "Player 2's staging area · Orc Hunting · 3 cards · No active location", or null while the table is one area. True solo has no player label.
+ * "P2", the short name of whose area (and stage) the table draws once stage 2B has split it, or null while the table is one area or has one player.
+ * `seat` is the seat the table draws (`shownSeat`).
+ */
+export function seatTag(game: ScenarioState, seat: number): string | null {
+  return isSeparate(game) && game.seatCount > 1 ? `P${seat + 1}` : null;
+}
+
+/** The staging row's word: "P2 staging" once the table is split between players, "Staging" otherwise. */
+export function stagingWord(game: ScenarioState, seat: number): string {
+  const tag = seatTag(game, seat);
+  return tag ? `${tag} staging` : "Staging";
+}
+
+/**
+ * "Player 2's staging area · Stage Orc Hunting · 3 cards · No active location", or null while the table is one area. True solo has no player label.
  * `seat` is the seat the table draws (`shownSeat`).
  */
 export function areaWords(game: ScenarioState, seat: number, nameOf: (code: string) => string): string | null {
   if (!isSeparate(game)) return null;
   const name = (id: string | undefined) => (id ? nameOf(game.cards[id]?.code ?? id) : null);
-  const stage = name(zoneIds(game, "questStage", seat)[0]) ?? "No stage";
+  const stageName = name(zoneIds(game, "questStage", seat)[0]);
+  const stage = stageName ? `Stage ${stageName}` : "No stage";
   const count = zoneIds(game, "staging", seat).length;
   const active = name(zoneIds(game, "activeLocation", seat)[0]);
   const who = game.seatCount > 1 ? `Player ${seat + 1}'s staging area` : "Staging area";

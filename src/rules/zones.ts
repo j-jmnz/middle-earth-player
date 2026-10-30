@@ -12,7 +12,9 @@ export type Destination =
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking-areas.ts); the card is in
   // `staging` and in that seat's list.
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck"; area?: number }
-  | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
+  // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
+  // Without it the card takes the state's own slot, which on a seat's view (families/breaking-areas.ts) is that seat's.
+  | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
   | { zone: "campaign" }
@@ -173,10 +175,15 @@ export function unhost(state: ScenarioState, id: string): ScenarioState {
   ]);
 }
 
+// A destination that is one of a seat's own lists.
+function seatList(dest: Destination): dest is Extract<Destination, { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging" }> {
+  return "seat" in dest && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
+}
+
 function attach(state: ScenarioState, id: string, dest: Destination): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
-  if ("seat" in dest && dest.zone !== "seatQuest") {
+  if (seatList(dest)) {
     const key = SEAT_LIST[dest.zone];
     if (!key) return state;
     const seat = state.seats[dest.seat];
@@ -234,12 +241,18 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, removed: append(stamped.removed, id) };
     case "questDeck":
       return { ...stamped, questDeck: append(stamped.questDeck, id) };
-    case "questStage":
-      return { ...stamped, questStage: id };
+    case "questStage": {
+      const owner = stamped.separate && "seat" in dest && dest.seat != null ? stamped.seats[dest.seat] : undefined;
+      return owner && "seat" in dest && dest.seat != null ? withSeat(stamped, dest.seat, { ...owner, stage: id }) : { ...stamped, questStage: id };
+    }
     case "activeLocation":
-      return { ...stamped, activeLocation: id };
-    case "secondActiveLocation":
-      return { ...stamped, secondActiveLocation: id };
+    case "secondActiveLocation": {
+      const owner = stamped.separate && "seat" in dest && dest.seat != null ? stamped.seats[dest.seat] : undefined;
+      if (!owner || !("seat" in dest) || dest.seat == null) return zone === "activeLocation" ? { ...stamped, activeLocation: id } : { ...stamped, secondActiveLocation: id };
+      // The seat's own slot; the shared slots mirror seat 0's and seat 1's.
+      const seated = withSeat(stamped, dest.seat, { ...owner, active: id });
+      return { ...seated, activeLocation: seated.seats[0].active ?? null, secondActiveLocation: seated.seats[1].active ?? null };
+    }
     default:
       return stamped;
   }

@@ -79,12 +79,18 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
   return total;
 }
 
-// Questing unsuccessfully: each living seat raises its threat by the shortfall (rr.step-3-4). The table's commit readout
-// runs it on a copy to say whether a seat would reach 50.
-export function failQuest(state: ScenarioState, shortfall: number, steps: EngineStep[]): ScenarioState {
-  let next = state;
-  for (const seat of livingSeats(state)) next = raiseThreat(next, seat, shortfall, steps, ruleCause("rr.step-3-4"));
-  return next;
+// Questing unsuccessfully: each seat that quested (every living seat, or the `seats` named) raises its threat by the shortfall (rr.step-3-4); `raise`
+// replaces the plain raise (the quest family's waives it or waits for the Responses). The table's commit readout runs it on a copy to say whether
+// a seat would reach 50.
+export function failQuest(
+  state: ScenarioState,
+  shortfall: number,
+  steps: EngineStep[],
+  seats?: readonly number[],
+  raise?: (state: ScenarioState, seat: number, amount: number) => ScenarioState,
+): ScenarioState {
+  const hearing = seats ?? livingSeats(state);
+  return hearing.reduce((current, seat) => (raise ? raise(current, seat, shortfall) : raiseThreat(current, seat, shortfall, steps, ruleCause("rr.step-3-4"))), state);
 }
 
 // `canAdvance` is asked each time a stage is ready to advance, so a stage that is held back moves on
@@ -108,7 +114,7 @@ export function resolveQuest(
   let next = state;
   if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
-    next = raise ? hearing.reduce((current, seat) => raise(current, seat, threat - willpower), next) : hearing.reduce((current, seat) => raiseThreat(current, seat, threat - willpower, steps, ruleCause("rr.step-3-4")), next);
+    next = failQuest(next, threat - willpower, steps, hearing, raise);
   } else if (willpower > threat) {
     // Progress may be assigned as damage to an enemy instead (08142).
     next = withView(next, only, (view) => placeQuestingProgress(view, willpower - threat, cards, steps, canAdvance));

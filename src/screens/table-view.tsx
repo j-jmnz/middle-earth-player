@@ -14,13 +14,12 @@ import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import { standInText } from "../play/dungeon-preview";
 import type { LogNames } from "../play/log";
-import { prefetchCodes, resolutionCodes } from "../play/prefetch";
 import { dockPills } from "../play/dock-extras";
 import { ChoiceTray } from "../play/choice-tray";
 import { isDense } from "../play/dock-budget";
 import { MorePopoverView, useMorePopover } from "../play/dock-more";
 import { railFor } from "../play/rail";
-import { shownSeat, threatSelector, tickKeySelector } from "../play/selectors";
+import { dialTicksSelector, shownSeat, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
 import { effectById, type ReduceContext, type TableStore } from "../play/store";
 import { createHandoff } from "../play/spotlight-handoff";
@@ -43,7 +42,7 @@ import { pictureCode, pictureKey } from "../play/picture-key";
 import { advanceButton, advanceWords } from "../play/quest-advance";
 import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
-import { PEEK_ROOM } from "../play/peek-banner";
+import { PEEK_ROOM, PEEK_TOP } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { AreaSummary } from "../play/area-summary";
 import { useTableChoice } from "../play/use-table-choice";
@@ -60,7 +59,7 @@ import { BodyText, NavBar, Screen } from "./chrome";
 import { TableTopBar, TOP_BAR } from "./table-top-bar";
 import { BAR_TOP } from "../play/top-bar-layout";
 import { goBack } from "./go-back";
-import { enqueueImageDownloads } from "./images/queue";
+import { useTablePictures } from "./use-table-pictures";
 import { scanAssets } from "./images/scan-map";
 import { cachedImage, useImageRevision, useImageSnapshot } from "./images/store";
 import type { World } from "../campaign/world";
@@ -147,33 +146,12 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
-  // Prefetch the hand, the cards on the table and the screen about to open; never the whole cache. The canvas draws names
-  // until a file lands. The codes are joined into one string so the effect runs when the set changes, not on every intent.
-  const wanted = useMemo(() => prefetchCodes(game, peek.shown, resolutionCodes(game)).join(","), [game, peek.shown]);
-  useEffect(() => {
-    const jobs = wanted.split(",").flatMap((code) => {
-      const imagesrc = session.facts.get(code)?.imagesrc;
-      return imagesrc ? [{ code, imagesrc, first: true }] : [];
-    });
-    if (jobs.length > 0) enqueueImageDownloads(jobs);
-  }, [session, wanted]);
-  // A card picked up (a drag begins, the canvas selects it) is fetched at once if its picture is missing. The pickup is the store's `selected`,
-  // read here from a listener instead of a subscription, so picking a card up does not render this view or the hooks and panels under it.
-  useEffect(
-    () =>
-      store.subscribe((state, before) => {
-        const id = state.selected;
-        if (id == null || id === before.selected) return;
-        const code = state.game.cards[id]?.code;
-        const imagesrc = code ? session.facts.get(code)?.imagesrc : undefined;
-        if (code && imagesrc) enqueueImageDownloads([{ code, imagesrc, first: true }]);
-      }),
-    [store, session],
-  );
+  // The pictures of the hand, the table and the screen about to open, and of a card picked up (use-table-pictures.ts).
+  useTablePictures(store, session, game, peek.shown);
 
   // A fallen hero (`<code>~enemy`) keeps the hero's name.
   const nameOf = useCallback((code: string) => (session.world.cards.get(code) ?? session.world.cards.get(pictureCode(code)))?.name ?? code, [session]);
-  const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
+  const sphereOf = useCallback((code: string) => (session.world.cards.get(code) ?? session.world.cards.get(pictureCode(code)))?.sphere ?? null, [session]);
   const names: SheetNames = useMemo(
     () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
     [nameOf, store, session],
@@ -278,10 +256,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     setSize((current) => (current && current.width === width && current.height === height && current.x === x ? current : { width, height, x }));
   };
 
-  // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own; once stages are separate, the enemies in the staging area the table shows).
-  const tickOf = useMemo(() => tickKeySelector(ctx, peek.shown), [ctx, peek.shown]);
+  // The staging enemies' engagement costs, marked on each dial's meter: the one staging area's for every dial, and once stages are separate each seat's own.
+  const tickOf = useMemo(() => dialTicksSelector(ctx), [ctx]);
   const tickKey = useStore(store, (state) => tickOf(state.game));
-  const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
+  const ticks = useMemo(() => tickKey.split("|").map((key) => (key === "" ? [] : key.split(",").map(Number))), [tickKey]);
   // What the dials and bar read of the game, derived once for each state; the campaign card's tokens are rebuilt only when its name or count changes.
   const widgets = useMemo(() => widgetReadouts(game), [game]);
   const campaign = useMemo(() => campaignTokens(game, ctx.effects, nameOf, peek.shown), [game, ctx, nameOf, peek.shown]);
@@ -303,6 +281,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
   );
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
+  // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
+  const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
   // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
     name: nameOf(code),
@@ -356,7 +336,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           rail={rail}
           stopAhead={stopAhead}
           carouselOpen={carouselOpen}
-          narrow={narrow}
+          narrow={narrow} areas={game.separate === true}
           ticks={ticks}
           ringSeat={held?.seat}
           ringWords={held?.words}
@@ -374,14 +354,14 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               <QuestScaleView scale={scale} wide={tabletTable} />
             </View>
           ) : null}
-          <View className="min-h-0 flex-1" onLayout={onLayout}>
+          <View className="min-h-0 flex-1" style={{ paddingTop: peekRoom }} onLayout={onLayout}>
             {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (area-words.ts). */}
             <AreaSummary store={store} nameOf={nameOf} />
             {size ? (
               <PicturedCanvas
                 store={store}
                 width={size.width}
-                height={size.height}
+                height={size.height - peekRoom}
                 picture={picture}
                 nameOf={nameOf}
                 sphereOf={sphereOf}
@@ -482,7 +462,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         <QuestAdvanceView
           key={advance.shown.seq}
           card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
-          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine)}
+          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine, advance.shown.also, nameOf)}
           button={advanceButton(game, ctx, advance.shown, ledgerLine)}
           asks={advance.asks}
           choice={choice}

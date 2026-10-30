@@ -6,6 +6,7 @@ import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
 import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
+import { activeOf, stagingOf } from "./families/breaking-areas.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
 import { notePlaced, progressRoom } from "./families/south-locations.ts";
@@ -61,7 +62,9 @@ export function targetCandidates(state: ScenarioState, instruction: TargetVerb, 
         .filter((id) => instruction.scope !== "any" || playerCardEffectCanChoose(printedOf(ctx.cards, state.cards[id]?.code ?? ""), state, id));
     }
     case "PlaceProgressOnLocation": {
-      const open = [...(state.activeLocation ? [state.activeLocation] : []), ...state.staging];
+      // The seat's own active location and staging area once stages are separate.
+      const active = activeOf(state, seat);
+      const open = [...(active ? [active] : []), ...stagingOf(state, seat)];
       return open.filter((id) => {
         const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
         return printed.type === "location" && !printed.isUnique;

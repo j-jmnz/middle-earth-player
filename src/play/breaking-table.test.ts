@@ -36,7 +36,7 @@ beforeAll(async () => {
 }, 60_000);
 
 function namesFor(state: ScenarioState): SheetNames {
-  return { card: (id) => ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? id, line: () => null };
+  return { card: (id) => (ctx.cards.get(state.cards[id]?.code ?? "") ?? ctx.cards.get(pictureCode(state.cards[id]?.code ?? "")))?.name ?? id, line: () => null };
 }
 
 const ids = (state: ScenarioState, zone: ZoneId, seat: number): string[] => zoneSelector(zone, seat)(state).entries.map((entry) => entry.card.id);
@@ -77,7 +77,7 @@ function checkTable(state: ScenarioState, seen: Seen): void {
     const count = ids(state, "staging", seat).length;
     expect(words).toContain(`${count} ${count === 1 ? "card" : "cards"}`);
     expect(words?.startsWith(state.seatCount > 1 ? `Player ${seat + 1}'s staging area` : "Staging area")).toBe(true);
-    if (stage) expect(words).toContain(ctx.cards.get(state.cards[stage]?.code ?? "")?.name);
+    if (stage) expect(words).toContain(`Stage ${ctx.cards.get(state.cards[stage]?.code ?? "")?.name}`);
   }
   if (state.seatCount > 1 && stages.size === 2) seen.twoStages = true;
   // The quest numbers are the acting seat's.

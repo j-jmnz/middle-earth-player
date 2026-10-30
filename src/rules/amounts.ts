@@ -11,6 +11,7 @@ import { countMatching, pickCandidates } from "./pick.ts";
 import { printedOf } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { livingSeats } from "./state.ts";
+import { activeOf } from "./families/breaking-areas.ts";
 import { stageNumber } from "./families/caves-progress.ts";
 import { topFrame } from "./windows.ts";
 
@@ -61,7 +62,7 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
     // With two active locations (The Ring Goes South stage 4) "the active location" is the one that is not Doors of Durin, which
     // is immune to player card effects and always the first (mec109.stage-4).
     case "activeLocation":
-      return state.secondActiveLocation ?? state.activeLocation;
+      return state.separate ? activeOf(state, scope.actor) : (state.secondActiveLocation ?? state.activeLocation);
     case "previous":
       return scope.picked?.at(-2) || null;
     case "discardTop":

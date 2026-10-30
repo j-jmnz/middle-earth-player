@@ -9,6 +9,7 @@ import { characters } from "./combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import { playIntoRule } from "./families/attachments-play.ts";
+import { activeOf } from "./families/breaking-areas.ts";
 import { questHosts } from "./families/attachments-quest.ts";
 import { seatThreat } from "./families/play-hooks.ts";
 import { fixedX, grantedSecrecy } from "./families/misc-cost.ts";
@@ -46,9 +47,11 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
   } else if (!rule) {
     candidates.push(...characters(state, seat, ctx.cards));
   } else if (named.kind === "activeLocation") {
-    if (state.activeLocation) candidates.push(state.activeLocation);
+    // The playing seat's own active location once stages are separate (families/breaking-areas.ts).
+    const active = activeOf(state, seat);
+    if (active) candidates.push(active);
   } else if (named.kind === "quest") {
-    candidates.push(...questHosts(state, ctx));
+    candidates.push(...questHosts(state, seat, ctx));
   } else {
     for (const index of livingSeats(state)) {
       if (named.kind === "hero" || named.kind === "ringBearer") candidates.push(...(state.seats[index]?.heroes ?? []));

@@ -159,7 +159,7 @@ export const BREAKING_GOLDENS: readonly BreakingGolden[] = [
   { name: "true solo, strong, won on The Seat of Amon Hen", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", stages: [["142065"]], outcome: "won", separate: true },
   { name: "two-handed, strong, won on Searching the Woods and Orc Hunting", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", stages: [["142063"], ["142066"]], outcome: "won", separate: true },
   { name: "two-handed, strong, won with a hero fallen into evil", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", stages: [["142064"], ["142065"]], outcome: "won", separate: true },
-  { name: "two-handed, strong, won in a long game", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", stages: [["142066"], ["142065"]], outcome: "won", separate: true },
+  { name: "two-handed, strong, won in a long game", seatCount: 2, seed: 14, difficulty: "Normal", decks: "strong", stages: [["142066"], ["142065"]], outcome: "won", separate: true },
   { name: "two-handed, strong, Easy, won", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", stages: [["142064"], ["142066"]], outcome: "won", separate: true },
   { name: "true solo, strong, Easy, won", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", stages: [["142066"]], outcome: "won", separate: true },
   { name: "true solo, weak, lost on threat before the Fellowship breaks", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", stages: [["142063"]], outcome: "lost", lossReason: THREAT, separate: false },

@@ -18,7 +18,7 @@ import { lookedPool } from "./families/deck-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "./printed.ts";
-import { sharedStaging } from "./families/breaking-areas.ts";
+import { activeFor, sharedStaging } from "./families/breaking-areas.ts";
 import { breakingPickMatches } from "./families/breaking-attack.ts";
 import type { ScenarioState } from "./state.ts";
 import { heldAmount, inPlay, livingSeats } from "./state.ts";
@@ -100,7 +100,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
-    if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
+    if (!spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
   } else if (spec.type === "objective") {
     // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
@@ -110,7 +110,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "card") {
     for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));
-    if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...[state.activeLocation].filter((id): id is string => id != null));
+    if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...(state.separate ? activeFor(state, asking, spec.stagingArea === "any").slice(0, 1) : [state.activeLocation].filter((id): id is string => id != null)));
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
   }
@@ -159,7 +159,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
   if (spec.engagedThisRound && heldAmount(state, id, "engagedThisRound") <= 0) return false;
   if (spec.isHost && (at.sourceId == null || state.cards[at.sourceId]?.host !== id)) return false;
-  if (spec.active && state.activeLocation !== id && state.secondActiveLocation !== id) return false;
+  if (spec.active && !activeFor(state, asking, spec.stagingArea === "any").includes(id)) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
   if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;

@@ -112,7 +112,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "firstPlayer":
       return scope.actor === state.firstPlayer;
     case "tokens":
-      return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? state.seatCount : 1);
+      return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? livingSeats(state).length : 1);
     case "stagingThreat":
       return stagingThreat(state, ctx.cards, scope.actor) <= condition.max;
     case "damageHere":

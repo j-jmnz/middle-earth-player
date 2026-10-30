@@ -26,7 +26,8 @@ export function isSeparate(state: ScenarioState): boolean {
 
 // The encounter cards in the seat's staging area; the shared staging area when stages are not separate.
 export function stagingOf(state: ScenarioState, seat: number): readonly string[] {
-  return state.separate ? (state.seats[seat]?.staging ?? []) : state.staging;
+  if (!state.separate) return state.staging;
+  return state.viewSeat === seat ? state.staging : (state.seats[seat]?.staging ?? []);
 }
 
 // The seat whose staging area holds the card, or null when it is in no area (the shared staging area, or not in staging).
@@ -45,7 +46,8 @@ export function sharedStaging(state: ScenarioState): readonly string[] {
 
 // The seat's quest stage, or the shared one when stages are not separate.
 export function stageOf(state: ScenarioState, seat: number): string | null {
-  return state.separate ? (state.seats[seat]?.stage ?? null) : state.questStage;
+  if (!state.separate) return state.questStage;
+  return state.viewSeat === seat ? state.questStage : (state.seats[seat]?.stage ?? null);
 }
 
 // The seat whose stage the card is, or null.
@@ -72,7 +74,15 @@ export function viewOf(state: ScenarioState, seat: number | undefined): Scenario
 
 // The seat's active location, or the shared one when stages are not separate.
 export function activeOf(state: ScenarioState, seat: number): string | null {
-  return state.separate ? (state.seats[seat]?.active ?? null) : state.activeLocation;
+  if (!state.separate) return state.activeLocation;
+  return state.viewSeat === seat ? state.activeLocation : (state.seats[seat]?.active ?? null);
+}
+
+// The active locations a seat's effect sees: its own once stages are separate, unless it reads every area (`all`); the shared slots otherwise.
+export function activeFor(state: ScenarioState, seat: number, all = false): string[] {
+  if (!state.separate || all) return [state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null);
+  const own = activeOf(state, seat);
+  return own ? [own] : [];
 }
 
 // The shared slots mirror the seats' active locations (see the header).
@@ -88,13 +98,16 @@ function mirrored(state: ScenarioState): ScenarioState {
 export function mergeView(state: ScenarioState, seat: number | undefined, view: ScenarioState): ScenarioState {
   if (!state.separate || seat == null || !state.seats[seat]) return view;
   const was = state.seats[seat].staging;
-  const now = view.staging;
   const seats: [typeof view.seats[0], typeof view.seats[1]] = [view.seats[0], view.seats[1]];
+  // A card the view put into another seat's area (`{ zone: "staging", area }`, or an enemy returned from that seat's engagement) is in that area only,
+  // not in this seat's too.
+  const elsewhere = new Set(seats.flatMap((other, index) => (index === seat ? [] : other.staging)));
+  const now = view.staging.filter((id) => !elsewhere.has(id));
   const owner = seats[seat];
   const { stage: _old, active: _active, ...rest } = owner;
   seats[seat] = { ...rest, staging: now, ...(view.questStage != null ? { stage: view.questStage } : {}), ...(view.activeLocation != null ? { active: view.activeLocation } : {}) };
-  const kept = state.staging.filter((id) => !was.includes(id) || now.includes(id));
-  const added = now.filter((id) => !state.staging.includes(id));
+  const kept = state.staging.filter((id) => !was.includes(id) || now.includes(id) || elsewhere.has(id));
+  const added = [...now, ...elsewhere].filter((id) => !state.staging.includes(id));
   const { viewSeat: _seat, ...plain } = view;
   const merged: ScenarioState = { ...plain, seats, questStage: state.questStage, staging: [...kept, ...added] };
   return mirrored({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });

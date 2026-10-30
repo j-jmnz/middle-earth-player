@@ -6,6 +6,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { effectCause, ruleCause } from "../cause.ts";
+import { stageOf } from "./breaking-areas.ts";
 import { pushEffectFrame } from "../effect-frames.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
@@ -16,12 +17,14 @@ import { committedWillpower, stagingThreat } from "../quest.ts";
 import type { Modifier, ScenarioState } from "../state.ts";
 import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../state.ts";
 
-// The quest cards in play an attachment may go on: the current quest card, and any other quest card in play (a side quest).
-export function questHosts(state: ScenarioState, ctx: ReduceContext): string[] {
+// The quest cards in play an attachment may go on: the playing seat's current quest card (its own stage once stages are separate), and any other
+// quest card in play (a side quest).
+export function questHosts(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  const stage = stageOf(state, seat);
   const others = Object.values(state.cards)
-    .filter((card) => card.id !== state.questStage && inPlay(card.zone) && card.zone !== "questStage" && printedOf(ctx.cards, card.code).type === "quest")
+    .filter((card) => card.id !== stage && inPlay(card.zone) && card.zone !== "questStage" && printedOf(ctx.cards, card.code).type === "quest")
     .map((card) => card.id);
-  return [...(state.questStage ? [state.questStage] : []), ...others];
+  return [...(stage ? [stage] : []), ...others];
 }
 
 // The players' answer this quest phase: progress goes on the locations that may take it first.

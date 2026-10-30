@@ -62,7 +62,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ReturnFallenHero"), ...when }),
   // The last picked card leaves the game, and, in Campaign Mode, the campaign pool ("remove it from the game ... remove that card from the campaign pool", 142074:A:2).
   z.strictObject({ verb: z.literal("RemoveFromGame"), ...when }),
-  // "For the rest of the game, you cannot lose control of the first player token" (142068:A:2): the table holds `firstPlayerLocked` while the source is in play, so the
+  // "For the rest of the game, you cannot lose control of the first player token" (142068:A:2): the table holds `firstPlayerLocked` for the rest of the game (`endOfGame`), so the
   // token does not pass at the end of the refresh phase.
   z.strictObject({ verb: z.literal("LockFirstPlayer"), ...when }),
   // "Take control of ... the Ring-bearer (and each card attached to it)" (142068:A:2): the Ring-bearer, if one is in play, and what is attached to it go to the actor.

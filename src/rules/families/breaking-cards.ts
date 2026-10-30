@@ -13,6 +13,7 @@ import { raiseFor } from "../verbs.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { areaOf, stagingDest } from "./breaking-areas.ts";
+import { addTableModifier } from "./encounter.ts";
 import { ringBearerId } from "./burden-deck.ts";
 
 // The verbs src/catalog/families/breaking.ts adds for the stage 3 and 4 cards and the encounter cards. Null when the verb is not one of them.
@@ -33,7 +34,7 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
     case "RemoveFromGame":
       return removeFromGame(state, lastPicked(state));
     case "LockFirstPlayer":
-      return focus.sourceId ? { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId, stat: "firstPlayerLocked", amount: 1, until: "whileSourceInPlay" }] } : state;
+      return focus.sourceId ? addTableModifier(state, { stat: "firstPlayerLocked", amount: 1, until: "endOfGame" }, focus) : state;
     case "TakeRingBearer":
       return takeRingBearer(state, focus.seat, ctx, steps);
     default:

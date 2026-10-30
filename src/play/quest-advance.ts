@@ -7,7 +7,7 @@
 // advanced already: the screen holds the moment so the stage is read before the round goes on, and the table answers nothing for
 // the player meanwhile (use-table-choice.ts). The table also opens on it (user request, 2026-10-29): the stage in play when the game is
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
-import { isSeparate } from "../rules/families/breaking-areas.ts";
+import { isSeparate, stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
 import { stagePlace } from "../rules/families/quest-branch.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { isOver } from "../rules/undo.ts";
@@ -16,8 +16,11 @@ import { topFrame } from "../rules/windows.ts";
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
 import type { TableMoment } from "./store.ts";
 
-/** The accepted intent (`seq`, its moment) that advanced the quest, and the stage it reached. The table's opening is seq 0. */
-export type QuestAdvance = { seq: number; stageId: string };
+/**
+ * The accepted intent (`seq`, its moment) that advanced the quest, and the stage it reached. The table's opening is seq 0. `also`: the other stages the same
+ * intent reached, when stages are separate and it advanced more than one seat (stage 2B gives each seat its stage 3A).
+ */
+export type QuestAdvance = { seq: number; stageId: string; also?: readonly string[] };
 
 // The seq of the table's opening: below every moment's (store.ts counts them from 1).
 const OPENING_SEQ = 0;
@@ -48,11 +51,17 @@ export function questView(game: ScenarioState): QuestView {
   return { questStage: game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game) };
 }
 
-/** The stage a sent intent advanced the quest to, while it is still the stage: the moment's last advance step. Null for any other moment. */
+/**
+ * The stage a sent intent advanced the quest to, while it is still the stage: the moment's last advance step, and any earlier one it also reached that is
+ * still a stage (another seat's). Null for any other moment.
+ */
 export function advancedTo(moment: TableMoment | null, game: Pick<QuestView, "questStage" | "seatStages">): QuestAdvance | null {
   if (moment?.kind !== "sent") return null;
-  const reached = moment.steps.flatMap((step) => (step.kind === "advance" ? [step.cardId] : [])).at(-1);
-  return reached != null && isStage(game, reached) ? { seq: moment.seq, stageId: reached } : null;
+  const stages = [...new Set(moment.steps.flatMap((step) => (step.kind === "advance" ? [step.cardId] : [])))].filter((id) => isStage(game, id));
+  const reached = stages.at(-1);
+  if (reached == null) return null;
+  const also = stages.slice(0, -1);
+  return also.length > 0 ? { seq: moment.seq, stageId: reached, also } : { seq: moment.seq, stageId: reached };
 }
 
 // The windows in which an effect asks its question. The action windows and the Responses to the reveal are the table's.
@@ -66,7 +75,9 @@ export function stageAsks(game: ScenarioState, stageId: string): boolean {
 /**
  * What the screen says over the stage, in one stack: the overline "Stage 2 of 3" (none while the stage has no place), the stage's
  * name ("A Fork in the Road"), and under it how the stage is won (its quest points, or the printed line that wins it), or the rule
- * that holds it back, in the rule's own words.
+ * that holds it back, in the rule's own words. Once stages are separate it is read as the seat that holds the stage sees it, and in two-handed play the
+ * overline names the seat ("Player 2 · Stage 3 of 4"). `also` (the other stages the same intent reached, with `nameOf` for their cards) is told in
+ * a line each: "Player 1 advanced to Searching the Woods".
  */
 export function advanceWords(
   game: ScenarioState,
@@ -74,15 +85,27 @@ export function advanceWords(
   stageId: string,
   name: string,
   line: (id: string) => string | null,
-): { eyebrow: string | null; title: string; detail: string | null } {
-  const stage = game.cards[stageId];
-  const place = stage ? stagePlace(game, stage.code) : null;
-  const points = stage ? stagePoints(game, stage, ctx) : null;
-  const hold = advanceHold(game, ctx, line);
-  const objective = points == null ? questObjective(game, ctx, line) : null;
+  also?: readonly string[],
+  nameOf?: (code: string) => string,
+): { eyebrow: string | null; title: string; detail: string | null; also: readonly string[] } {
+  const seat = stageSeat(game, stageId);
+  const view = viewOf(game, seat ?? undefined);
+  const stage = view.cards[stageId];
+  const place = stage ? stagePlace(view, stage.code) : null;
+  const points = stage ? stagePoints(view, stage, ctx) : null;
+  const hold = advanceHold(view, ctx, line);
+  const objective = points == null ? questObjective(view, ctx, line) : null;
   const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
   const detail = hold ?? won;
-  return { eyebrow: place ? `Stage ${place.at} of ${place.of}` : null, title: name, detail };
+  const who = seat != null && game.seatCount > 1 ? `Player ${seat + 1}` : null;
+  const stageWords = place ? `Stage ${place.at} of ${place.of}` : null;
+  const eyebrow = who && stageWords ? `${who} · ${stageWords}` : (who ?? stageWords);
+  const others = (also ?? []).flatMap((id) => {
+    const code = game.cards[id]?.code;
+    const other = stageSeat(game, id);
+    return code == null ? [] : [`${other != null && game.seatCount > 1 ? `Player ${other + 1}` : "Another seat"} advanced to ${(nameOf ?? ((value: string) => value))(code)}`];
+  });
+  return { eyebrow, title: name, detail, also: others };
 }
 
 /**

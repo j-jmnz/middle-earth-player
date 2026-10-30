@@ -6,4 +6,7 @@
 // advanced reveals, and The Eaves of Mirkwood bars only the Responses that cancel: both can move a replayed game of The Oath.
 // 12: a full quest stage that was held back advances as soon as nothing holds it (To the River... once no Hill Troll is in play),
 // not at the next quest resolution (stage-reveal.ts, advanceFreed): a replayed game can reach the next stage sooner.
-export const ENGINE_VERSION = 12;
+// 13 (phases 15 and 16 review): while a Peril card's staging resolves, an "any player may" Response is offered only to the revealing seat, in every scenario
+// (mec109.peril, responses.ts), which can leave out an offer of a replayed game; the Breaking of the Fellowship fixes (the extra reveals of stage 4B, Drums in the
+// Deep, the first player lock, the 4B Response) move only that scenario.
+export const ENGINE_VERSION = 13;

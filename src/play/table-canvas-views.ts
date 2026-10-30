@@ -38,6 +38,7 @@ export function sphereRing(sphere: string | null, t: TableTokens = tableTokens):
 }
 
 // The "progress / quest points" strip of a quest card or location, which pops when progress is placed on it.
-export function stripText(slot: CardSlot, questPoints: number | null): string | null {
-  return questPoints == null ? null : `${slot.progress} / ${questPoints}`;
+// `owner`: the seat the quest card's stage belongs to once stages are separate between players ("P2 · 2 / 8").
+export function stripText(slot: CardSlot, questPoints: number | null, owner?: string | null): string | null {
+  return questPoints == null ? null : `${owner ? `${owner} · ` : ""}${slot.progress} / ${questPoints}`;
 }

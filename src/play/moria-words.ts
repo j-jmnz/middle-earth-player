@@ -10,7 +10,7 @@ export function moriaWords(instruction: Instruction, names: Names): string | nul
     case "RemoveDamageFrom":
       return `remove ${instruction.amount === 1 ? "a damage token" : `${instruction.amount} damage tokens`} from ${names.code(instruction.code)}`;
     case "PlaceDamageOn":
-      return `place ${instruction.amount} damage tokens on ${names.code(instruction.code)}`;
+      return `place ${instruction.amount === 1 ? "1 damage token" : `${instruction.amount} damage tokens`} on ${names.code(instruction.code)}`;
     case "SacrificeForDamage":
       return `discard it to deal damage equal to its threat cost to ${names.code(instruction.code)}, which then loses all keywords`;
     case "AttachToSubject":

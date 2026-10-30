@@ -10,12 +10,13 @@ import { noteHostDefeated } from "./attachments-hold.ts";
 import { lastPicked } from "../player-verbs.ts";
 import { queueEvent } from "../queue.ts";
 import { shuffleIds } from "../seed.ts";
-import type { Modifier, ScenarioState } from "../state.ts";
+import type { ScenarioState } from "../state.ts";
 import { livingSeats, updateCard } from "../state.ts";
 import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { VERBS } from "../../catalog/families/breaking.ts";
 import { areaOf, mergeView, viewOf } from "./breaking-areas.ts";
+import { addTableModifier } from "./encounter.ts";
 import { runCards } from "./breaking-cards.ts";
 import { ringBearerId } from "./burden-deck.ts";
 
@@ -26,9 +27,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveRingBearer":
       return removeRingBearer(state, ctx, steps);
     case "SkipTravelPhase":
-      return withModifier(state, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "skipTravel", amount: 1, until: "endOfRound" });
+      return addTableModifier(state, { stat: "skipTravel", amount: 1, until: "endOfRound" }, focus);
     case "ZeroEngagementCosts":
-      return withModifier(state, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "engagementCostZero", amount: 1, until: "endOfRound" });
+      return addTableModifier(state, { stat: "engagementCostZero", amount: 1, until: "endOfRound" }, focus);
     case "ShuffleSetAsideIntoDiscard":
       return shuffleSetAsideIntoDiscard(state, instruction.codes);
     case "PlaceDiscardUnderDeck":
@@ -72,10 +73,6 @@ function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, 
   next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
   steps.push({ kind: "advance", cardId: nextId });
   return afterProgress(next, before, ctx, steps);
-}
-
-function withModifier(state: ScenarioState, modifier: Modifier): ScenarioState {
-  return { ...state, modifiers: [...state.modifiers, modifier] };
 }
 
 // RemoveRingBearer (142062:A:1): the Ring-bearer, and each card attached to it, leave the game. The cards go to the removed zone directly: The One Ring

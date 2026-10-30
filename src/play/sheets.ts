@@ -253,7 +253,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,

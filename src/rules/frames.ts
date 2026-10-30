@@ -16,7 +16,7 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { attachTo, moveCard } from "./zones.ts";
-import { announceEntered, noteEncounterThreat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
+import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
 import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
 import { stagingDest } from "./families/breaking-areas.ts";
 
@@ -96,7 +96,7 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const cursor = state.revealCursor;
   // "Reveal 1 less card from the encounter deck this phase" (RevealFewer) ends the step early.
   // Cards beyond one per player ("reveal an additional encounter card") are revealed by the players in turn from the first.
-  const seat = cursor.index < revealsAllowed(state, cursor.seats.length) ? cursor.seats[cursor.index % Math.max(1, cursor.seats.length)] : undefined;
+  const seat = cursor.index < revealsAllowed(state, cursor.seats.length) ? revealSeat(state, cursor.index, cursor.seats) : undefined;
   if (seat == null || state.lost || state.failure) {
     const ended: ScenarioState = { ...withMode(state, "resolution"), revealCursor: null };
     // Responses "at the end of the staging step" (22145:A:1).
@@ -154,7 +154,9 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 3:
       return runRevealed(patchTop(state, { step: 4 }), id, seat, frame.peril, ctx, steps);
     case 4:
-      return fireForced(patchTop(state, { step: 5 }), { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}) }, ctx, steps);
+      // The Responses "after an enemy is revealed" (142067:B:2) are offered once the Forced effects of the reveal have resolved: their frame goes under those.
+      const heard = { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}) } as const;
+      return fireForced(offerResponses(patchTop(state, { step: 5 }), heard, ctx, steps), heard, ctx, steps);
     case 5: {
       // A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise
       // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
