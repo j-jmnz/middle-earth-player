@@ -1,0 +1,53 @@
+appId: com.middleearth.lcg
+---
+# Phase 38. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and a catalog in which
+# `dream-chaser` is marked playable (the first Dream-chaser scenario in PLAYABLE_SCENARIOS, phase 40; its briefing also needs the sea
+# family's ship cards, phase 39). Starts Dream-chaser, which is not a saga: no Ring-bearer slot. The Hard/Expert Mode card is offered at
+# the campaign setup and again in the briefing; the path shows the XP line.
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: campaign-list
+- tapOn:
+    id: new-dream-chaser
+- assertVisible:
+    id: campaign-setup
+- assertVisible:
+    id: mode-dream-chaser-none
+- tapOn:
+    id: mode-dream-chaser-hard
+- assertVisible:
+    id: mode-dream-chaser-note
+- assertVisible:
+    id: start-dream-chaser
+- tapOn:
+    id: start-dream-chaser
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# Nothing is earned yet: the XP line reads zero and there is no XP to spend.
+- assertVisible:
+    id: xp-line
+- assertNotVisible:
+    id: xp-open
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: briefing
+    timeout: 15000
+# The briefing starts on the card the setup chose, and offers the other two.
+- assertVisible:
+    id: mode-hard
+- assertVisible:
+    id: mode-expert
+- tapOn:
+    id: mode-expert
+- assertVisible:
+    id: mode-note
+# No Ring-bearer slot, and no sentence asking for one.
+- assertNotVisible:
+    id: ringbearer-slot
+- assertNotVisible:
+    id: briefing-error-0

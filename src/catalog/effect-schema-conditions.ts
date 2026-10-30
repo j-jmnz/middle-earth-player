@@ -78,6 +78,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The card with this code, in play, holds at least `min` resource tokens ("If there are 6 or more resource tokens here", 41050:B:1): read at a
   // campaign card's Resolution (campaign family, src/rules/families/campaign.ts).
   z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0) }),
+  // Each surviving player's threat is at most `max` ("1 XP if each surviving player's threat is 40 or less", dcce.gaining-xp): read at a campaign
+  // card's Resolution, true with no surviving player.
+  z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the

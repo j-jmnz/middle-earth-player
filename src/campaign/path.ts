@@ -15,6 +15,8 @@ export type PathNode = {
   // The codes the scenario's Resolution recorded; shown on a completed node.
   reward: readonly string[];
   score: number | null;
+  // The XP the scenario's Resolution awarded (Dream-chaser), absent where the campaign has none.
+  xp?: number;
 };
 
 export function campaignPath(campaign: CampaignData, names: Readonly<Record<string, string>>, log: CampaignLog): PathNode[] {
@@ -30,6 +32,7 @@ export function campaignPath(campaign: CampaignData, names: Readonly<Record<stri
       status,
       reward: won ? (log.earned[id] ?? []) : [],
       score: log.scenarios[id]?.score ?? null,
+      ...(log.xpGained[id] != null ? { xp: log.xpGained[id] } : {}),
     };
   });
 }

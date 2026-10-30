@@ -111,6 +111,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.actor === state.firstPlayer;
     case "tokens":
       return tokensOn(state, condition.code) >= condition.min;
+    case "survivorsThreat":
+      return livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max);
     case "heroesAll": {
       const heroes = state.seats[scope.actor]?.heroes ?? [];
       return heroes.length > 0 && heroes.every((id) => hasTrait(state, id, condition.trait, ctx));

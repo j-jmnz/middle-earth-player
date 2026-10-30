@@ -1,3 +1,4 @@
+import type { CampaignData } from "../catalog/scenario-data.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 
 // The loadout rules of a briefing: one deck and its heroes per seat. Pure. Each error names the card and the rule. In a saga
@@ -8,6 +9,21 @@ import type { PrintedCard } from "../rules/printed.ts";
 
 export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[] };
 
+// A hero a campaign refuses in a scenario, with the rule that says so. Campaign Mode only: a standalone game is not bound by it.
+export type HeroBan = { code: string; name: string; rule: string };
+
+// "When playing the Dream-chaser campaign, the Na'asiyah hero cannot be used in scenarios 1 through 7" (dcce.naasiyah).
+const HERO_BANS: Readonly<Record<string, { ban: HeroBan; scenarios: number }>> = {
+  "dream-chaser": { ban: { code: "12109", name: "Na'asiyah", rule: "dcce.naasiyah" }, scenarios: 7 },
+};
+
+/** The heroes the campaign refuses in this scenario (the scenario's place in the campaign's order decides). */
+export function heroBansOf(campaign: Pick<CampaignData, "id" | "scenarios">, scenarioId: string): HeroBan[] {
+  const entry = HERO_BANS[campaign.id];
+  const place = campaign.scenarios.indexOf(scenarioId);
+  return entry && place >= 0 && place < entry.scenarios ? [entry.ban] : [];
+}
+
 export type LoadoutRule =
   | "unknownCard"
   | "fellowshipOutsideSaga"
@@ -16,7 +32,8 @@ export type LoadoutRule =
   | "noRingBearer"
   | "tooManyHeroes"
   | "ringInDeck"
-  | "sameHero";
+  | "sameHero"
+  | "bannedHero";
 
 export type LoadoutError = { rule: LoadoutRule; code: string; card: string; message: string };
 
@@ -30,7 +47,7 @@ function isRingBearer(card: PrintedCard): boolean {
   return isFellowship(card) && card.traits.includes("Ring-bearer");
 }
 
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean): LoadoutError[] {
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = []): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -54,6 +71,11 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   const heroCards = seats.map((seat) => seat.heroes.map(known));
   const deckCards = seats.map((seat) => seat.deck.map(known));
   if (errors.length > 0) return errors;
+
+  for (const card of heroCards.flat()) {
+    const ban = card == null ? undefined : bans.find((item) => item.code === card.code);
+    if (card != null && ban != null) fail("bannedHero", card, `${ban.name} cannot be used in this scenario of the campaign (${ban.rule})`);
+  }
 
   if (!saga) {
     for (const card of heroCards.flat()) {

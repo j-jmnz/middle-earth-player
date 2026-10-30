@@ -9,12 +9,13 @@ import { printedOf } from "../rules/printed.ts";
 import type { StartScenario } from "../rules/setup.ts";
 
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
-import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
+import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
 import { isNightmarePlayable } from "./playable.ts";
 import { printedScenarioName } from "./printed-name.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
+import { xpFacts, type ModeCard } from "./xp.ts";
 
 export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[] };
 
@@ -30,6 +31,8 @@ export type BriefingInput = {
   choices?: readonly string[];
   // The player has read the threat penalty a hero change adds and accepts it.
   acceptPenalty?: boolean;
+  // The Hard/Expert Mode card the players put next to the quest deck (dcce.hard-expert). Only a campaign with XP offers it.
+  modeCard?: ModeCard | undefined;
 };
 
 export type Problem = { rule: string; message: string };
@@ -81,6 +84,7 @@ const RULE_OF: Readonly<Record<string, string>> = {
   tooManyHeroes: "Three heroes besides the Ring-bearer",
   ringInDeck: "The One Ring is not a deck card",
   sameHero: "No two players use the same hero",
+  bannedHero: "A hero the campaign refuses in this scenario",
 };
 
 // A seat's saved deck as the deckbuilding check reads it: its heroes, and its cards counted by code.
@@ -93,7 +97,7 @@ function deckCounts(deck: readonly string[]): { code: string; count: number }[] 
 // What a loadout must satisfy before any deal, campaign or standalone: a saved deck per seat with one to three heroes
 // (rr.deckbuilding), no fallen hero (the campaign's list; none in a standalone game), and the saga rules on the
 // loadout (validateLoadout).
-export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]): { problems: Problem[]; loadout: LoadoutSeat[] } {
+export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], bans: readonly HeroBan[] = []): { problems: Problem[]; loadout: LoadoutSeat[] } {
   const problems: Problem[] = [];
   const { world } = input;
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
@@ -114,13 +118,13 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[]):
   });
   const loadout = loadoutOf(input);
   if (problems.length === 0) {
-    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
+    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
   }
   return { problems, loadout };
 }
 
 function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
-  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat());
+  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat(), heroBansOf(input.world.campaign, input.world.scenario.id));
   return { problems: [...difficultyProblems(input.world, input.difficulty), ...problems], loadout };
 }
 
@@ -178,7 +182,9 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     effects: world.effects,
     poolEncounterCards: plan.poolEncounterCards,
     poolIntoPlay: plan.poolIntoPlay,
-    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters },
+    ...(input.modeCard ? { modeCard: input.modeCard } : {}),
+    // The log's structured facts; a Dream-chaser log adds its scalable cards' levels, its upgraded cards and the Hard/Expert card in play.
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...(input.modeCard ? { modeCard: input.modeCard } : {}) },
   });
 }
 

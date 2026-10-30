@@ -92,6 +92,8 @@ export type CampaignDef = {
   bookletDoc: string;
   // A saga campaign carries the Ring-bearer and the Fellowship rules (Fellowship of the Ring only).
   saga: boolean;
+  // A campaign whose campaign cards award XP, which the players spend on the log's scalable and upgradable cards (Dream-chaser only).
+  xp?: boolean;
   // Where the scan-read ledger for this campaign lives (data/printed/<ledger>.json).
   ledger: string;
 };
@@ -169,6 +171,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     bookletId: "dream-chaser",
     bookletDoc: "dcce",
     saga: false,
+    xp: true,
     ledger: "dream-chaser",
   },
 ];

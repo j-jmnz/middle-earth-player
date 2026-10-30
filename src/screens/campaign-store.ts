@@ -3,6 +3,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import type { PoolCard } from "../campaign/log";
 import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type Save } from "../campaign/save";
+import type { ModeCard } from "../campaign/xp";
 import { booklets, saves, type StoredJson } from "./user-schema";
 
 // user.db `saves` and `booklets`, read and written whole. The screens call these; the rules stay in src/campaign.
@@ -140,9 +141,10 @@ let created = 0;
 
 // A new playthrough. The seat count is chosen here and never changes.
 // `carried` is the carry-over of a finished playthrough (carryOffers): its cards go on the new log's carryIn, and `carriedFrom` (its save id) keeps the offer from being made twice.
-export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now(), carried: readonly PoolCard[] = [], carriedFrom: string | null = null): Save {
+// `modeDefault` is the Hard/Expert Mode card the campaign setup chose to offer each briefing first (Dream-chaser).
+export function createSave<TRun>(user: UserDb<TRun>, campaignId: string, seatCount: 1 | 2, now: number = Date.now(), carried: readonly PoolCard[] = [], carriedFrom: string | null = null, modeDefault: ModeCard | null = null): Save {
   created += 1;
-  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount, carried, carriedFrom);
+  const save = newSave(`save-${now.toString(36)}${created > 1 ? `-${created}` : ""}`, campaignId, seatCount, carried, carriedFrom, modeDefault);
   writeSave(user, save, now);
   return save;
 }

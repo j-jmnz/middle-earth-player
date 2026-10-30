@@ -10,6 +10,7 @@ import { recordInstructions, scenarioCards, type CampaignData, type ScenarioData
 import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
+import { MODE_CARD_CODE } from "./xp.ts";
 
 import { printedFromRow, printedMap, type CatalogRow } from "./cards.ts";
 
@@ -43,6 +44,9 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
   codes.add(scenario.campaignCard);
   for (const card of scenarioCards(scenario)) codes.add(card.code);
   for (const code of scenario.campaignPlaced) codes.add(code);
+  // A campaign game deals the Campaign Expansion's reprint of a card (ScenarioData.reprints), and the Hard/Expert Mode card is put beside the quest deck.
+  for (const code of Object.values(scenario.reprints ?? {})) codes.add(code);
+  if (campaign.xp) codes.add(MODE_CARD_CODE);
   // The Nightmare deck, so a briefing can switch to Nightmare without loading the world again.
   if (scenario.nightmare) {
     codes.add(scenario.nightmare.setupCard);

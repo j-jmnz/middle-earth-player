@@ -143,6 +143,9 @@ export const scenarioDefinitionSchema = z.strictObject({
   campaignCard: z.string().min(1).optional(),
   // The Nightmare setup card, on Nightmare only: placed next to the quest deck before the Setup runs.
   nightmareCard: z.string().min(1).optional(),
+  // The Hard/Expert Mode card (dcce.hard-expert), side A Hard or B Expert, put next to the quest deck at the end of setup and in play all game:
+  // it takes the place the Nightmare setup card has. Its Resolution records are appended to `resolution`.
+  modeCard: z.strictObject({ code: z.string().min(1), side: z.enum(["A", "B"]) }).optional(),
   bookletPage: z.number().int().optional(),
 });
 

@@ -26,6 +26,7 @@ const BOOK_SCENE: Readonly<Record<string, string>> = {
   "fellowship-of-the-ring": "a-shadow-of-the-past",
   "learn-to-play": "passage-through-mirkwood",
   "the-dark-of-mirkwood": "the-oath",
+  "dream-chaser": "voyage-across-belegaer",
 };
 
 // The books as tiles 150 pt tall: the scene of the book dimmed under its name, the Lore book glowing in the corner. Two to a row at

@@ -22,6 +22,8 @@ export type ResolutionLog = {
   // a campaign card by its code (a token count read at Resolution).
   prisoner?: string | null;
   counters?: Readonly<Record<string, number>>;
+  // The XP the Resolution's GainXp lines added up to (dcce.gaining-xp); the campaign log records it. Absent where no line ran.
+  xp?: number;
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
@@ -33,4 +35,11 @@ export type CampaignFacts = {
   usedOnce: readonly string[];
   // Counters on a campaign card, by its code.
   counters: Readonly<Record<string, number>>;
+  // The Dream-chaser log's marks as the game reads them (dcce.scalable-upgradable), left out while none is set: the level of each scalable card
+  // by its code (the boxes marked beside it: its X) and the codes of the upgradable cards whose boxes are all marked, which are dealt on their
+  // Upgraded side. Effect records read them; none does yet.
+  levels?: Readonly<Record<string, number>>;
+  upgraded?: readonly string[];
+  // The Hard/Expert Mode card the players put next to the quest deck this game (dcce.hard-expert): the campaign log records it per scenario.
+  modeCard?: "hard" | "expert";
 };

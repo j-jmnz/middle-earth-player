@@ -28,6 +28,7 @@ function inputOf(save: Save, world: World, loadout: StoredLoadout): BriefingInpu
     difficulty: loadout.difficulty,
     choices: loadout.choices,
     acceptPenalty: loadout.acceptPenalty,
+    modeCard: loadout.modeCard,
   };
 }
 

@@ -74,6 +74,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
+  // The Hard/Expert Mode card goes in the same place, faceup on the side the players chose (dcce.hard-expert).
+  if (input.definition.modeCard) state = spawn(state, input.definition.modeCard.code, { zone: "nightmare" }, input.definition.modeCard.side).state;
   if (input.facts) state = { ...state, campaignFacts: input.facts };
   if (input.seats.some((seat) => (seat.afterMulligan?.length ?? 0) > 0)) state = { ...state, afterMulligan: input.seats.slice(0, input.seatCount).map((seat) => seat.afterMulligan ?? []) };
   for (let index = 0; index < input.seatCount; index += 1) {

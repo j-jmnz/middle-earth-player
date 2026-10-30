@@ -1,6 +1,7 @@
 appId: com.middleearth.lcg
 ---
-# Phase 28. Written in a cloud session: it has not run. The Scenarios tab lists one section for each box the app plays.
+# Phase 28, updated in phase 38. Written in a cloud session: it has not run. The Scenarios tab lists one section for each box that has a playable
+# scenario; the Dream-chaser box (`box-dream-chaser`, all nine scenarios) has none until phase 40, so its scenarios wait under Coming later.
 - launchApp:
     clearState: true
 - tapOn:
@@ -24,3 +25,12 @@ appId: com.middleearth.lcg
     id: standalone-the-oath
 - assertVisible:
     id: standalone-the-caves-of-nibin-dum
+# Dream-chaser: no scenario is playable yet, so there is no box section, and the nine scenarios and the locked box are under Coming later.
+- assertNotVisible:
+    id: box-dream-chaser
+- scrollUntilVisible:
+    element:
+      id: locked-voyage-across-belegaer
+- assertVisible: "Dream-chaser · 1"
+- assertVisible:
+    id: locked-the-city-of-corsairs

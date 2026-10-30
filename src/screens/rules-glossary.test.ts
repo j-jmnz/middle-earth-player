@@ -7,8 +7,9 @@ const GLOSSARY = glossary();
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
     const docs = new Set(GLOSSARY.map((entry) => entry.doc));
-    expect([...docs].sort()).toEqual(["easy-mode", "faq", "learn-to-play", "mec109", "rr", "tdom"]);
-    expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-))/.test(entry.id))).toBe(false);
+    expect([...docs].sort()).toEqual(["dcce", "easy-mode", "faq", "learn-to-play", "mec109", "rr", "tdom"]);
+    expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-)|dcce\.(campaign-)?setup-)/.test(entry.id))).toBe(false);
+    expect(glossaryEntry("dcce.gaining-xp")?.source).toBe("Dream-chaser campaign rulebook · page 29");
     expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship of the Ring campaign book · page 4");
   });
 
@@ -87,6 +88,7 @@ describe("bookPage", () => {
     expect(bookPage(glossaryEntry("ltp.surge")!)).toEqual({ id: "learn-to-play", name: "Learn to Play", page: 22 });
     expect(bookPage(glossaryEntry("rr.surge")!)).toEqual({ id: "rules-reference", name: "Rules Reference", page: 17 });
     expect(bookPage(glossaryEntry("tdom.mirkwood-paths")!)).toEqual({ id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood rulebook", page: 7 });
+    expect(bookPage(glossaryEntry("dcce.gaining-xp")!)).toEqual({ id: "dream-chaser", name: "Dream-chaser campaign rulebook", page: 29 });
     expect(bookPage(glossaryEntry("faq.limitations-on-attacks")!)).toBeNull();
   });
 });

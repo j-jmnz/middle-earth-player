@@ -10,6 +10,8 @@ import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButto
 import { Road, roadLayout } from "../../path-road";
 import { poolCardWords } from "../../log-facts";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
+import { xpWords } from "../../../campaign/xp-view";
+import { xpUnspentOf } from "../../../campaign/xp";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../campaign-data";
 import { cardNames } from "../../card-names";
 import { useDatabases } from "../../databases";
@@ -41,7 +43,7 @@ function StageChips({ names }: { names: readonly string[] }) {
   );
 }
 
-/** A won scenario as a row: a check in a diamond, its name, rounds and score, and Replay. */
+/** A won scenario as a row: a check in a diamond, its name, rounds, score and XP, and Replay. */
 function WonRow({ node, rounds, rewards, onReplay }: { node: PathNode; rounds: number | null; rewards: readonly string[]; onReplay: () => void }) {
   const palette = usePalette();
   const t = useTableTokens();
@@ -55,7 +57,7 @@ function WonRow({ node, rounds, rewards, onReplay }: { node: PathNode; rounds: n
         <Text className="font-display text-heading text-bone" numberOfLines={1}>
           {node.name}
         </Text>
-        <Label>{[rounds != null ? `${rounds} rounds` : null, node.score != null ? `score ${node.score}` : null, rewards.length > 0 ? rewards.join(", ") : null].filter(Boolean).join(" · ")}</Label>
+        <Label>{[rounds != null ? `${rounds} rounds` : null, node.score != null ? `score ${node.score}` : null, node.xp != null ? `${node.xp} XP` : null, rewards.length > 0 ? rewards.join(", ") : null].filter(Boolean).join(" · ")}</Label>
       </View>
       <TextButton label="Replay" testID={`replay-${node.id}`} tone="accent" accessibilityLabel={`Replay ${node.name}`} onPress={onReplay} />
     </View>
@@ -163,6 +165,20 @@ export default function CampaignPath() {
       </Text>
     </View>
   );
+  // A campaign with XP (Dream-chaser): what the won scenarios gave and what is unspent, and Spend XP between scenarios (dcce.scalable-upgradable).
+  const xpLine = campaign.xp ? (
+    <View className="mt-3">
+      <Eyebrow>XP</Eyebrow>
+      <Text testID="xp-line" className="mt-0.5 text-label text-bone">
+        {xpWords(save.log)}
+      </Text>
+      {save.active == null && xpUnspentOf(save.log) > 0 ? (
+        <View className="-ml-3 mt-1 items-start">
+          <TextButton label="Spend XP" testID="xp-open" tone="accent" onPress={() => router.push({ pathname: "/xp/[saveId]", params: { saveId: save.id } })} />
+        </View>
+      ) : null}
+    </View>
+  ) : null;
   // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
   const logButton = (
     <View className="-ml-3 mt-1 items-start">
@@ -211,6 +227,7 @@ export default function CampaignPath() {
             {noticeRow}
             {roadView}
             {poolLine}
+            {xpLine}
             {logButton}
           </ScreenScroll>
           <View style={{ width: PATH_SIDE * s }}>
@@ -254,6 +271,7 @@ export default function CampaignPath() {
         {roadView}
         {footer ? <View className="mt-3">{footer}</View> : null}
         {poolLine}
+        {xpLine}
         {logButton}
       </ScreenScroll>
     </Screen>

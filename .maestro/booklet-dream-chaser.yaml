@@ -1,0 +1,26 @@
+appId: com.middleearth.lcg
+---
+# Phase 38. Written in a cloud session: it has not run. Needs no PDF (like booklet.yaml): the reader opens empty with the book's name.
+# The Dream-chaser campaign rulebook (MEC111) is the fifth book on the Rules tab, and the one the Dream-chaser campaign opens.
+- launchApp:
+    clearState: true
+- tapOn:
+    id: rules-tab
+- assertVisible:
+    id: rules
+- scrollUntilVisible:
+    element:
+      id: booklet-open-dream-chaser
+- tapOn:
+    id: booklet-open-dream-chaser
+- extendedWaitUntil:
+    visible:
+      id: booklet-empty
+    timeout: 15000
+- assertVisible:
+    id: booklet-name
+- assertVisible: "Dream-chaser campaign rulebook"
+- tapOn:
+    id: booklet-close
+- assertVisible:
+    id: rules

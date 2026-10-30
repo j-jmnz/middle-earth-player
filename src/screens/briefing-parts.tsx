@@ -8,6 +8,7 @@ import { ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } f
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Problem, ScenarioFacts } from "../campaign/briefing";
+import type { ModeCard } from "../campaign/xp";
 import { cards, packs } from "../catalog/schema";
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data";
 import { GroundedScene } from "./art";
@@ -304,6 +305,38 @@ export function DifficultyPicker({
       {/* What the difficulty changes, for a first game (ltp.easy-mode, easy-mode.easy-mode). */}
       <Label testID="briefing-difficulty-note" tone="muted" className="mt-2">
         {DIFFICULTY_NOTES[difficulty]}
+      </Label>
+    </>
+  );
+}
+
+// The Hard/Expert Mode card's options (dcce.hard-expert), as the switch words: None leaves the card out. What each side prints is in
+// data/printed/dream-chaser.json (11217); the XP is its Resolution's.
+const MODE_OPTIONS = ["None", "Hard", "Expert"] as const;
+type ModeOption = (typeof MODE_OPTIONS)[number];
+const MODE_NOTES: Readonly<Record<ModeOption, string>> = {
+  None: "No Hard/Expert Mode card.",
+  Hard: "The Hard side goes next to the quest deck: each player's threat cannot be reduced by more than 1 each round, and a player who draws cards raises their threat by that number. Winning gains 1 XP.",
+  Expert: "The Expert side goes next to the quest deck: threat cannot be reduced, a player who draws cards raises their threat by that number, and healing or readying a character with a player card effect raises its controller's threat by 1. Winning gains 2 XP.",
+};
+
+function optionOf(mode: ModeCard | null): ModeOption {
+  return mode == null ? "None" : mode === "hard" ? "Hard" : "Expert";
+}
+
+function modeOfOption(option: ModeOption): ModeCard | null {
+  return option === "None" ? null : option === "Hard" ? "hard" : "expert";
+}
+
+/** The Hard/Expert Mode card for a campaign with XP: the campaign setup offers it for every briefing, each briefing may change it (dcce.hard-expert). */
+export function ModePicker({ mode, onMode, testIDPrefix }: { mode: ModeCard | null; onMode: (next: ModeCard | null) => void; testIDPrefix: string }) {
+  const option = optionOf(mode);
+  return (
+    <>
+      <Section title="Hard/Expert Mode card" className="mt-4" />
+      <Segmented options={MODE_OPTIONS} value={option} onChange={(next) => onMode(modeOfOption(next))} testIDPrefix={testIDPrefix} stretch accessibilityLabel="Hard or Expert Mode card" />
+      <Label testID={`${testIDPrefix}-note`} tone="muted" className="mt-2">
+        {MODE_NOTES[option]}
       </Label>
     </>
   );

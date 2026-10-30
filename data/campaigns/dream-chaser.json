@@ -37,5 +37,6 @@
     "the-city-of-corsairs": 24
   },
   "bookletId": "dream-chaser",
-  "saga": false
+  "saga": false,
+  "xp": true
 }

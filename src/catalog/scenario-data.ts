@@ -121,6 +121,8 @@ export const campaignDataSchema = z.strictObject({
   // A saga campaign carries the Ring-bearer and the Fellowship-sphere rules (the Fellowship of the Ring only). The others
   // are plain campaigns: no Ring-bearer, and Fellowship heroes are not allowed.
   saga: z.boolean(),
+  // The campaign cards award XP the players spend on the log's scalable and upgradable cards (Dream-chaser, dcce.gaining-xp). Absent otherwise.
+  xp: z.boolean().optional(),
   // The page of the campaign's booklet where a scenario's setup is printed, by scenario id. Only scenarios whose
   // `setup-<id>` span (data/rules/index.json) is in that booklet have one; the reader opens on it, otherwise on the saved
   // last page.
@@ -237,6 +239,21 @@ export function burdenCodes(data: ScenarioData): string[] {
 // The records of one timing on a card, in line order, flattened to their instructions.
 export function recordInstructions(effects: readonly Effect[], code: string, timing: Effect["timing"]): Instruction[] {
   return effects.filter((effect) => effect.cardCode === code && effect.timing === timing).flatMap((effect) => effect.instructions);
+}
+
+// The same for one side of a double-sided card whose two sides are both in the game's records but only one is faceup (the Hard/Expert Mode
+// card: side A Hard, side B Expert). A record belongs to a side when every line it implements is a line of that side ("<code>:<side>:<n>").
+export function sideInstructions(effects: readonly Effect[], code: string, side: "A" | "B", timing: Effect["timing"]): Instruction[] {
+  return effects.filter((effect) => effect.cardCode === code && effect.timing === timing && effect.lines.every((line) => line.startsWith(`${code}:${side}:`))).flatMap((effect) => effect.instructions);
+}
+
+// What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
+// pile, the quest stages and the cards the campaign card places (ScenarioData.reprints). Standalone play deals the scenario as it is.
+export function campaignScenario(data: ScenarioData): ScenarioData {
+  const reprints = data.reprints;
+  if (!reprints) return data;
+  const swap = (code: string): string => reprints[code] ?? code;
+  return { ...data, stages: data.stages.map(swap), cards: data.cards.map((card) => ({ ...card, code: swap(card.code), ...(card.back != null ? { back: swap(card.back) } : {}) })), campaignPlaced: data.campaignPlaced.map(swap) };
 }
 
 // A quest card whose Forced effect names the stages its defeat proceeds to (BranchStage, 01120:B:1) carries them as its `branch`.

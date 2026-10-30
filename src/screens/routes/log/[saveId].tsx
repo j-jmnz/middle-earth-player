@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
+import { gavinReturned, MODE_CARD_NAME } from "../../../campaign/xp";
+import { markedLines, xpWords } from "../../../campaign/xp-view";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
 import { BodyText, Column, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
@@ -41,6 +43,11 @@ function Row({ label, value, testID, icon }: { label: string; value: string; tes
       </Text>
     </View>
   );
+}
+
+// "4 rounds · 61 · 5 XP · Hard": a won scenario's row, with the XP its Resolution gave and the Hard/Expert Mode card it was played with.
+function scenarioWords(score: { rounds: number; score: number }, xp: number | undefined, mode: "hard" | "expert" | undefined): string {
+  return [`${score.rounds} rounds`, String(score.score), xp != null ? `${xp} XP` : null, mode ? MODE_CARD_NAME[mode] : null].filter(Boolean).join(" · ");
 }
 
 export default function Log() {
@@ -127,6 +134,11 @@ export default function Log() {
           <Row label="Heroes" value={bySeat(log.heroesBySeat)} testID="log-heroes" />
           <Row label="Fallen Heroes" value={bySeat(log.fallenHeroesBySeat)} testID="log-fallen" />
           <Row label="Threat Modifiers" value={log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
+          {/* Dream-chaser: the XP the Resolutions gave and what is unspent, and the boxes marked beside the scalable and upgradable cards (MEC111 p31). */}
+          {campaign.xp ? <Row label="XP" value={xpWords(log)} testID="log-xp" /> : null}
+          {campaign.xp ? <Row label="Scalable Cards" value={markedLines(log, "scalable").join("\n") || "None"} testID="log-scalable" /> : null}
+          {campaign.xp ? <Row label="Upgradable Cards" value={markedLines(log, "upgradable").join("\n") || "None"} testID="log-upgradable" /> : null}
+          {campaign.xp && gavinReturned(log) ? <Row label="Gavin" value="Returned" testID="log-gavin" /> : null}
           <Row label="Boons" value={pool("boon")} testID="log-boons" />
           <Row label="Burdens" value={pool("burden")} testID="log-burdens" />
           <Row
@@ -149,7 +161,7 @@ export default function Log() {
                   <Text className={score ? "text-body text-ink" : "text-body text-inkMuted"}>{names[id] ?? id}</Text>
                   {/* Dotted leaders to the score, as a printed log ruled by hand. */}
                   <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
-                  <Text className={score ? "font-display text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
+                  <Text className={score ? "font-display text-label text-ink" : "text-label text-inkMuted"}>{score ? scenarioWords(score, log.xpGained[id], log.modes[id]) : "Not completed"}</Text>
                 </View>
               );
             })}

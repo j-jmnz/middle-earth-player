@@ -1,7 +1,9 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup.ts";
+
+import { MODE_CARD_CODE, MODE_CARD_SIDE, type ModeCard } from "./xp.ts";
 
 // Campaign Mode, or the scenario played as a standalone adventure (mec109.campaign-mode: "players can still play the
 // scenarios as standalone adventures"). The campaign card is placed only "while setting up a scenario in Campaign Mode"
@@ -29,6 +31,8 @@ export type StartInput = {
   facts?: CampaignFacts;
   // Campaign when absent.
   mode?: PlayMode;
+  // The Hard/Expert Mode card the players put next to the quest deck (dcce.hard-expert), Campaign Mode only: its Resolution adds its XP.
+  modeCard?: ModeCard;
 };
 
 // The scenario's piles, the campaign card's Setup records (Campaign Mode only) and the campaign's prelude become the engine's start.
@@ -41,18 +45,24 @@ export type StartInput = {
 const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer"]);
 
 function hasFacts(facts: CampaignFacts): boolean {
-  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0;
+  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;
 }
 
-export function buildStart(input: StartInput): StartScenario {
+export function buildStart(start: StartInput): StartScenario {
+  const standalone = start.mode === "standalone";
+  // A campaign game deals the Campaign Expansion's reprint of each card that has one; a standalone game the original (ScenarioData.reprints).
+  const input = standalone ? start : { ...start, scenario: campaignScenario(start.scenario) };
   const effects = input.effects ?? [];
-  const standalone = input.mode === "standalone";
   const full: ScenarioDefinition = scenarioDefinition(input.scenario, input.campaign, effects);
   let definition = full;
   if (standalone) {
     // No campaign card beside the quest deck, so no campaign Setup and no Resolution to follow on a win.
     const { campaignCard: _unused, ...withoutCard } = full;
     definition = { ...withoutCard, resolution: [] };
+  } else if (input.modeCard) {
+    // The Hard/Expert Mode card goes next to the quest deck, and "if you win the game, resolve this card's resolution" after the campaign card's own.
+    const side = MODE_CARD_SIDE[input.modeCard];
+    definition = { ...definition, modeCard: { code: MODE_CARD_CODE, side }, resolution: [...definition.resolution, ...sideInstructions(effects, MODE_CARD_CODE, side, "resolution")] };
   }
   const campaignSetup = standalone ? [] : recordInstructions(effects, input.scenario.campaignCard, "campaignSetup");
   // What the engine runs in Setup, in the campaign card's printed order: the Fellowship's two verbs and the Mirkwood ones (an

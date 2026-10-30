@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 import { BOOKLETS, bookletName, bookletPath, isBookletId, startPage } from "./books";
 
 describe("booklet ids", () => {
-  it("names the four books the app bundles", () => {
-    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood"]);
+  it("names the five books the app bundles", () => {
+    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood", "dream-chaser"]);
     expect(isBookletId("learn-to-play")).toBe(true);
     expect(isBookletId("../etc/passwd")).toBe(false);
     expect(bookletName("learn-to-play")).toBe("Learn to Play");
     expect(bookletPath("learn-to-play")).toBe("booklets/learn-to-play.pdf");
+    expect(bookletName("dream-chaser")).toBe("Dream-chaser campaign rulebook");
   });
 });
 
