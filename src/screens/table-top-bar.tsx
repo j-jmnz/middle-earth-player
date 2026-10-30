@@ -122,7 +122,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
         ) : null}
       </View>
       <View testID="top-bar-middle" collapsable={false} style={{ width: zones?.rail ?? "40%", opacity: zones ? 1 : 0 }} pointerEvents={zones ? "auto" : "none"} importantForAccessibility={zones ? "auto" : "no-hide-descendants"}>
-        <PhaseRail rail={rail} wide={zones != null && railWide(zones.rail, narrow, s)} shortRound={narrow} stopAhead={stopAhead} open={carouselOpen} onPress={onRail} />
+        <PhaseRail rail={rail} wide={zones != null && railWide(zones.rail, narrow, s)} stopAhead={stopAhead} open={carouselOpen} onPress={onRail} />
       </View>
       <View testID="top-bar-right" style={{ width: zones?.right ?? "30%", alignItems: "flex-end" }}>
         <MenuButton open={menuOpen} onPress={onMenu} />

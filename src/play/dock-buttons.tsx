@@ -1,5 +1,5 @@
 // The buttons that answer the open moment, in the dock (docs/design-system.md,
-// Table, Two taps). One filled pill always sits in the same place: the confirm of what is picked, or Pass when nothing is.
+// Table, Two taps). One filled capsule always sits in the same place: the confirm of what is picked, or Pass when nothing is.
 // A button that sends an intent with nothing picked arms on its first tap: the line above the buttons says what the second
 // tap does and a bar runs down under it; the second tap sends, and the bar running out, another button, or a new pick puts
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
@@ -138,8 +138,8 @@ export function DockButtons({
           onPress={() => press(primary)}
         />
       ) : null}
-      {/* The other answers are slate plates in Cinzel capitals on a row of their own; the reading aids are faint plates with small
-          muted words on one row under it (Undo, Read), which wraps if a third shows. No plate draws an edge. */}
+      {/* The other answers are secondary capsules on a row of their own; the reading aids are text buttons with small muted words on
+          one row under it (Undo, Read), which wraps if a third shows. */}
       {dock.secondary.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {dock.secondary.map((button) => (

@@ -6,7 +6,7 @@
 // words are one line, at most 1.3 times the system font scale, so the pill never grows past the room the table keeps for it. It fades
 // in and out over the banner tokens and snaps under reduced motion. It holds no state and sends nothing.
 import { useEffect, useMemo } from "react";
-import { AccessibilityInfo, Pressable, StyleSheet, View } from "react-native";
+import { AccessibilityInfo, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
@@ -58,8 +58,6 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
               {words.back}
             </Text>
           </Pressable>
-          {/* The hairline edge is drawn over the pill, so it takes no room and no touch. */}
-          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: pill / 2, borderWidth: 1, borderColor: t.hairline }]} />
         </View>
       </View>
     </Animated.View>

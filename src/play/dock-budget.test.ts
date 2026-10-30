@@ -2,20 +2,20 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { armedLines, armedRoom, armedWords } from "./armed-room.ts";
-import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, PILL_PT, planWords, STEP_PX, titleLinesOf, TITLE_PX, wordsWindow } from "./dock-budget.ts";
+import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, PILL_PT, planWords, titleLinesOf, TITLE_PX, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 
-// The dense dock's budget (phase 22): the step and one title line stay in view in the worst dock at 667x375 and 844x390.
+// The dense dock's budget (phase 22): one title line and the folded line stay in view in the worst dock at 667x375 and 844x390.
 type Row = { name: string; type: string };
 function longestName(): string {
   const names = readdirSync("data/cards").flatMap((file) => (JSON.parse(readFileSync(`data/cards/${file}`, "utf8")) as Row[]).filter((card) => ["hero", "ally"].includes(card.type)).map((card) => card.name));
   return names.reduce((best, name) => (name.length > best.length ? name : best), "");
 }
 // READOUT and BUTTONS are constants taken from a web measurement of the dense dock (Chromium, 667x375, headless harness): a raised
-// readout tile of a 30 pt numbers row and a three-line result, 4 pt of padding above and below (92 pt with its 4 pt gap); the
-// primary (44), the secondary row (40) and the quiet row (40). They are not derived from the components, so re-measure them when
+// inline readout of a 30 pt numbers row and a three-line result (84 pt); the primary (44), the secondary row (40) and the quiet row
+// (40). They are not derived from the components, so re-measure them when
 // the dock's rows change.
-const READOUT = 4 + 30 + 54 + 4;
+const READOUT = 30 + 54;
 const BUTTONS = 44 + 40 + 40;
 // The pinned block: readout, the armed room, the buttons, and the block's own 2 pt gap.
 const block = (armed: number) => READOUT + 2 + armedRoom(armed, true) + BUTTONS;
@@ -33,24 +33,24 @@ describe("the dense dock's words window", () => {
     expect(wordsWindow({ room: 100, block: 200 })).toBe(0);
   });
 
-  it("holds the step and one full title line in the worst dock at 667x375 and 844x390, with the longest card name in the caution", () => {
+  it("holds one full title line in the worst dock at 667x375 and 844x390, with the longest card name in the caution", () => {
     for (const height of [375, 390]) {
-      expect(space(height), `${height} tall`).toBeGreaterThanOrEqual(STEP_PX + TITLE_PX);
+      expect(space(height), `${height} tall`).toBeGreaterThanOrEqual(TITLE_PX);
       const plan = planWords({ space: space(height), dense: true, title: LONG, textWidth: 168, hasLine: true, foldable: true });
       expect(plan.titleLines).toBeGreaterThanOrEqual(1);
-      expect(STEP_PX + plan.titleLines * TITLE_PX + (plan.showLine ? LABEL_PX : 0)).toBeLessThanOrEqual(space(height));
+      expect(plan.titleLines * TITLE_PX + (plan.showLine ? LABEL_PX : 0)).toBeLessThanOrEqual(space(height));
     }
   });
 
   it("clamps a long title to the lines that fit and cuts it, never to fewer than one", () => {
-    const wide = planWords({ space: STEP_PX + 2 * TITLE_PX + LABEL_PX, dense: true, title: LONG, textWidth: 168, hasLine: true, foldable: false });
+    const wide = planWords({ space: 2 * TITLE_PX + LABEL_PX, dense: true, title: LONG, textWidth: 168, hasLine: true, foldable: false });
     expect(wide).toMatchObject({ titleLines: 2, cut: false, showLine: true });
-    const tight = planWords({ space: STEP_PX + TITLE_PX + LABEL_PX, dense: true, title: LONG, textWidth: 168, hasLine: true, foldable: false });
+    const tight = planWords({ space: TITLE_PX + LABEL_PX, dense: true, title: LONG, textWidth: 168, hasLine: true, foldable: false });
     expect(tight).toMatchObject({ titleLines: 1, cut: true, showLine: true, pill: true, pillOnTitle: false });
   });
 
-  it("drops the folded line and puts the pill on the title row when the room cannot hold the step, a title line and a label line", () => {
-    const plan = planWords({ space: STEP_PX + TITLE_PX + LABEL_PX - 1, dense: true, title: "Defend", textWidth: 168, hasLine: true, foldable: false });
+  it("drops the folded line and puts the pill on the title row when the room cannot hold a title line and a label line", () => {
+    const plan = planWords({ space: TITLE_PX + LABEL_PX - 1, dense: true, title: "Defend", textWidth: 168, hasLine: true, foldable: false });
     expect(plan).toMatchObject({ showLine: false, pill: true, pillOnTitle: true, titleLines: 1 });
     // No room at all still leaves one title line.
     expect(planWords({ space: 5, dense: true, title: "Defend", textWidth: 168, hasLine: true, foldable: true }).titleLines).toBe(1);
@@ -62,7 +62,7 @@ describe("the dense dock's words window", () => {
     const title = "Pick a defender";
     expect(titleLinesOf(title, 168)).toBe(1);
     expect(titleLinesOf(title, 168 - PILL_PT)).toBe(2);
-    const plan = planWords({ space: STEP_PX + TITLE_PX + LABEL_PX - 1, dense: true, title, textWidth: 168, hasLine: true, foldable: true });
+    const plan = planWords({ space: TITLE_PX + LABEL_PX - 1, dense: true, title, textWidth: 168, hasLine: true, foldable: true });
     expect(plan).toMatchObject({ showLine: false, pillOnTitle: true, titleLines: 1, cut: true });
   });
 

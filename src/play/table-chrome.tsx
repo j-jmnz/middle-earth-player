@@ -34,7 +34,7 @@ const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: strin
 });
 
 /**
- * The threat dial of the top bar (`compact`): a round dial, the number in Marcellus SC over the word THREAT on a dark disc, ringed by
+ * The threat dial of the top bar (`compact`): a round dial, the number alone in Marcellus SC on a dark disc, ringed by
  * an arc of threat red that fills toward 50, the elimination level, with a tick at each staging enemy's engagement cost. It warms near elimination,
  * pops when the number changes, and shows the change ("−6" in accent when it fell, "+2" in threat red when it rose) for three
  * seconds; reduced motion keeps it still. `elimination` false (Life) drops the meter and the levels. Elsewhere, a ring with
@@ -190,16 +190,10 @@ function ThreatDial({
                 backgroundImage: critical ? undefined : `radial-gradient(circle, ${withAlphaHex(t.threat, 0.28)}, ${withAlphaHex(t.night, 0.92)})`,
               }}
             >
-              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: 18 * s, lineHeight: 20 * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
+              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: 20 * s, lineHeight: 24 * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
                 {String(threat.threat)}
               </Text>
-              {icon === "threat" ? (
-                <Text className="font-bold uppercase" style={{ fontSize: 7 * s, lineHeight: 8 * s, letterSpacing: 0.8 * s, color: critical ? t.onThreat : t.danger }}>
-                  Threat
-                </Text>
-              ) : icon ? (
-                <GameIcon name={icon} size={9 * s} tint="danger" />
-              ) : null}
+              {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint="danger" /> : null}
             </View>
           </ArcRing>
           {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
@@ -228,7 +222,7 @@ function ThreatDial({
       </Animated.View>
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
-          {/* The dial says THREAT itself; a seat's label (P1) and Life or Burden stand beside theirs. */}
+          {/* A seat's label (P1) and Life or Burden stand beside their dials; the lone threat dial is a number and is named "Threat" to a screen reader. */}
           {label === "Threat" && icon === "threat" ? null : <Text className={`text-label ${role === "acting" ? "text-accent" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>}
           {ring ? (
             <View testID={`${id}-ring`}>

@@ -1,19 +1,18 @@
-// The strip a tap on the phase rail opens (docs/design-system.md, Table; phase 20): the round's seven phases as cards in a
-// horizontal snap-scroll, centered on the current one, each with its steps, what the player decides there and the action
-// windows as Stop switches; the round's track and the master Stops switch sit at its head. It is for reading: a lit night panel
-// floating over the canvas with a hairline, not paper. The data is carousel.ts. The only things it changes are the player's Stops settings (table-settings.ts); it sends
-// no intent. It drops in on open and leaves on close (MOTION.carouselEnter, MOTION.carouselLeave), snaps under reduced motion, and
-// nothing animates while it scrolls.
-import { useEffect, useRef, useState, type ComponentRef } from "react";
+// The panel a tap on the phase rail opens (docs/design-system.md, Table; phase 20): the round's seven phases in a column at the left
+// ("Round 3" above them), and at the right the steps of the phase being read on a dot timeline, each step's action windows as Stop
+// switches on their rows, the Stops switch for the whole table at the top right. A tap on a phase shows its steps; the game's own phase
+// is shown on open. It is for reading: a lit night panel floating over the canvas with 20 pt corners, not paper. The data is
+// carousel.ts. The only things it changes are the player's Stops settings (table-settings.ts); it sends no intent. It drops in on open and
+// leaves on close (MOTION.carouselEnter, MOTION.carouselLeave), snaps under reduced motion, and nothing animates while it scrolls.
+import { useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
-import { cardWidth, startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
-import { PhaseCard, ROW } from "./carousel-cards.tsx";
+import { startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
+import { PhaseRow, ROW, StepBlock } from "./carousel-columns.tsx";
 import { SettingSwitch } from "./setting-switch.tsx";
-import { useOpenMotion, useReduceMotion } from "./motion-run.ts";
+import { useOpenMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
-import { Chevron } from "./phase-rail.tsx";
 import type { TableSettings } from "./table-settings.ts";
 import { CONTAINER_RADIUS, CONTROL_RADIUS } from "./radius.ts";
 import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
@@ -22,173 +21,93 @@ import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
-// The strip drops in by this much (translateY -12 to 0 with a fade).
+// The panel drops in by this much (translateY -12 to 0 with a fade).
 const DROP = 12;
-const GAP = 10;
-// The strip floats this far inside the canvas and under the top bar, a lit panel of its own rather than a slab hung off the bar.
+// The panel floats this far inside the canvas and under the top bar, a lit panel of its own rather than a slab hung off the bar.
 const INSET = 8;
+// The phase column's width: about a third of the panel, at least wide enough for "Encounter" and its dot, at most this.
+const PHASES_MIN = 132;
+const PHASES_MAX = 168;
 
-// The round as seven segments under the head's words: deep accent for the phases done, accent for the game's, a hairline for those to
-// come. The one the strip rests on stands taller, so the track says both where the game is and which card is being read.
-function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: number }) {
+// The accent S in a wash, with its words: a stop of the player's lies ahead in this phase.
+function StopAhead() {
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", alignItems: "center", gap: 3 * s, height: 6 * s, marginTop: 4 * s }}>
-      {phases.map((phase, at) => (
-        <View
-          key={phase.id}
-          style={{
-            flex: 1,
-            height: (at === index ? 5 : 3) * s,
-            borderRadius: CONTROL_RADIUS,
-            backgroundColor: phase.state === "current" ? t.accent : phase.state === "past" ? t.accentDeep : t.hairline,
-          }}
-        />
-      ))}
+    <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6 * s }}>
+      <View style={{ width: 18 * s, height: 18 * s, borderRadius: CONTROL_RADIUS, backgroundColor: withAlphaHex(t.accent, 0.18), alignItems: "center", justifyContent: "center" }}>
+        <Text className="font-display text-micro text-accent" style={{ lineHeight: 14 * s }}>
+          S
+        </Text>
+      </View>
+      <Text numberOfLines={1} className="shrink text-label" style={{ color: t.muted }}>
+        {STOP_AHEAD_WORDS}
+      </Text>
     </View>
   );
 }
 
-// The head: Earlier and Later chevrons (44 pt, one at each side, clear of the cards' text) around the round and the card being read
-// over the round's track, the accent S's meaning while a stop is ahead, and the master Stops switch.
-function CarouselHead({
-  carousel,
-  settings,
-  index,
-  onChange,
-  onGo,
-}: {
-  carousel: Carousel;
-  settings: Pick<TableSettings, "stopsOn">;
-  index: number;
-  onChange: (change: Partial<TableSettings>) => void;
-  onGo: (to: number) => void;
-}) {
+function CarouselBody({ carousel, width, settings, onChange }: { carousel: Carousel; width: number; settings: Pick<TableSettings, "stops" | "stopsOn">; onChange: (change: Partial<TableSettings>) => void }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const row = touch(s, ROW);
-  const last = carousel.phases.length - 1;
-  const arrow = (step: -1 | 1) => {
-    const off = index + step < 0 || index + step > last;
-    return (
-      <Pressable
-        testID={step < 0 ? "carousel-previous" : "carousel-next"}
-        accessibilityRole="button"
-        accessibilityLabel={step < 0 ? "Earlier phase" : "Later phase"}
-        accessibilityState={{ disabled: off }}
-        disabled={off}
-        onPress={() => onGo(index + step)}
-        style={({ pressed }) => ({ width: row, height: row, borderRadius: row / 2, alignItems: "center", justifyContent: "center", opacity: off ? 0.25 : 1, backgroundColor: pressed ? t.pressed : "transparent" })}
-      >
-        <Chevron direction={step < 0 ? "previous" : "next"} color={t.bone} />
-      </Pressable>
-    );
-  };
+  // The phase being read: the game's own on open (fixed at mount, so a re-render never moves it), then the one tapped.
+  const [index, setIndex] = useState(() => startIndex(carousel));
+  const phases = useRef<ComponentRef<typeof ScrollView>>(null);
+  const steps = useRef<ComponentRef<typeof ScrollView>>(null);
   const shown = carousel.phases[index];
+  const nowAt = shown ? shown.steps.findIndex((step) => step.current) : -1;
+  const current = shown?.state === "current";
   const where = carousel.round > 0 ? `Round ${carousel.round}` : "Before the round";
+  const left = Math.min(PHASES_MAX * s, Math.max(PHASES_MIN * s, Math.round(width * 0.34)));
+  const row = touch(s, ROW);
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 4 * s, paddingTop: 4 * s, gap: 4 * s }}>
-      {arrow(-1)}
-      <View style={{ flex: 1, minWidth: 0 }} accessible accessibilityLabel={shown ? `${where}. Phase ${index + 1} of ${carousel.phases.length}, ${shown.name}` : where}>
-        <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 * s }}>
-          <Text numberOfLines={1} className="font-display text-micro uppercase" style={{ color: t.muted }}>
+    <View style={{ flex: 1, flexDirection: "row", paddingHorizontal: 4 * s, paddingBottom: INSET * s }}>
+      <View style={{ width: left }}>
+        {/* "Before the round" wraps to a second line rather than being cut. */}
+        <View style={{ minHeight: row, justifyContent: "center", paddingHorizontal: 12 * s, paddingVertical: 4 * s }}>
+          <Text accessibilityRole="header" className="font-display text-body uppercase" style={{ color: t.muted, letterSpacing: 0.6 * s }}>
             {where}
           </Text>
-          <Text numberOfLines={1} className="text-micro" style={{ color: t.faint }}>
-            {`Phase ${index + 1} of ${carousel.phases.length}`}
-          </Text>
         </View>
-        <RoundTrack phases={carousel.phases} index={index} />
+        <ScrollView ref={phases} testID="carousel-scroll" nestedScrollEnabled showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+          {carousel.phases.map((phase, at) => (
+            <PhaseRow
+              key={phase.id}
+              phase={phase}
+              selected={at === index}
+              onPress={() => setIndex(at)}
+              // The game's own phase opens in view: the column scrolls to it, one row of room above.
+              onLayoutY={at === index ? (y) => phases.current?.scrollTo({ y: Math.max(0, y - row), animated: false }) : undefined}
+            />
+          ))}
+        </ScrollView>
       </View>
-      {carousel.stopAhead ? (
-        <View testID="carousel-stop-ahead" accessible accessibilityLabel={STOP_AHEAD_WORDS} style={{ flexDirection: "row", alignItems: "center", gap: 6 * s, marginLeft: 8 * s }}>
-          <View style={{ width: 18 * s, height: 18 * s, borderRadius: 9 * s, borderWidth: 1, borderColor: t.accent, alignItems: "center", justifyContent: "center" }}>
-            <Text className="font-display text-micro text-accent" style={{ lineHeight: 14 * s }}>
-              S
-            </Text>
-          </View>
-          <Text numberOfLines={1} className="text-label" style={{ color: t.muted }}>
-            {STOP_AHEAD_WORDS}
-          </Text>
+      <View style={{ flex: 1, minWidth: 0, paddingLeft: 8 * s }}>
+        <View style={{ height: row, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", gap: 12 * s, paddingRight: 8 * s }}>
+          {carousel.stopAhead ? <StopAhead /> : null}
+          <SettingSwitch label="Stops" hint={STOPS_TEXT} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID="carousel-stops" />
         </View>
-      ) : null}
-      <View style={{ marginLeft: 8 * s, paddingLeft: 12 * s, borderLeftWidth: 1, borderLeftColor: t.hairline }}>
-        <SettingSwitch label="Stops" hint={STOPS_TEXT} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID="carousel-stops" />
+        {/* Keyed on the phase, so each one opens at its top (the game's own on its current step). */}
+        <ScrollView key={shown?.id} ref={steps} nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar style={{ flex: 1 }} contentContainerStyle={{ paddingRight: 8 * s, paddingBottom: 4 * s }}>
+          {shown?.steps.map((step, at) => (
+            <StepBlock
+              key={step.id}
+              step={step}
+              settings={settings}
+              onChange={onChange}
+              state={shown.state === "past" || (current && nowAt >= 0 && at < nowAt) ? "past" : current && at === nowAt ? "current" : "next"}
+              last={at === shown.steps.length - 1}
+              onLayoutY={step.current && current ? (y) => steps.current?.scrollTo({ y, animated: false }) : undefined}
+            />
+          ))}
+        </ScrollView>
       </View>
-      {arrow(1)}
-    </View>
-  );
-}
-
-function CarouselCards({
-  carousel,
-  width,
-  settings,
-  onChange,
-}: {
-  carousel: Carousel;
-  width: number;
-  settings: Pick<TableSettings, "stops" | "stopsOn">;
-  onChange: (change: Partial<TableSettings>) => void;
-}) {
-  const reduceMotion = useReduceMotion();
-  const s = useUiScale();
-  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
-  const placed = useRef(false);
-  const card = cardWidth(width, s);
-  const interval = card + GAP * s;
-  const last = carousel.phases.length - 1;
-  // Where the strip opens: fixed at mount, so a re-render never moves it.
-  const [start] = useState(() => startIndex(carousel));
-  const [index, setIndex] = useState(start);
-  // The index as the scroll handlers last set it, so a change of width keeps the strip on the same card.
-  const at = useRef(start);
-  const choose = (to: number) => {
-    at.current = to;
-    setIndex(to);
-  };
-  const go = (next: number) => {
-    const to = Math.max(0, Math.min(last, next));
-    choose(to);
-    scroll.current?.scrollTo({ x: to * interval, y: 0, animated: !reduceMotion });
-  };
-  useEffect(() => {
-    scroll.current?.scrollTo({ x: at.current * interval, y: 0, animated: false });
-  }, [interval]);
-  return (
-    <View style={{ flex: 1 }}>
-      <CarouselHead carousel={carousel} settings={settings} index={index} onChange={onChange} onGo={go} />
-      <ScrollView
-        ref={scroll}
-        testID="carousel-scroll"
-        horizontal
-        nestedScrollEnabled
-        showsHorizontalScrollIndicator={false}
-        decelerationRate="fast"
-        snapToInterval={interval}
-        snapToAlignment="start"
-        contentOffset={{ x: start * interval, y: 0 }}
-        onContentSizeChange={() => {
-          // Android ignores contentOffset: place the strip on the current phase once its cards are laid out.
-          if (placed.current) return;
-          placed.current = true;
-          scroll.current?.scrollTo({ x: start * interval, y: 0, animated: false });
-        }}
-        onMomentumScrollEnd={(event) => choose(Math.max(0, Math.min(last, Math.round(event.nativeEvent.contentOffset.x / interval))))}
-        style={{ marginTop: 6 * s }}
-        contentContainerStyle={{ paddingHorizontal: Math.max(0, (width - card) / 2), paddingBottom: INSET * s, gap: GAP * s }}
-      >
-        {carousel.phases.map((phase, at) => (
-          <PhaseCard key={phase.id} phase={phase} number={at + 1} width={card} focused={at === index} settings={settings} onChange={onChange} />
-        ))}
-      </ScrollView>
     </View>
   );
 }
 
 /**
- * The strip, absolutely placed under the top bar over the canvas (`left`, `width`: the canvas, so the dock stays clear) with the
+ * The panel, absolutely placed under the top bar over the canvas (`left`, `width`: the canvas, so the dock stays clear) with the
  * layer behind it that closes it on a tap outside (`onClose`). Render it where the table's other overlays are; it draws nothing
  * while closed.
  */
@@ -204,7 +123,7 @@ export function PhaseCarousel({
   onClose,
 }: {
   open: boolean;
-  // The data of the strip; null while there is none to show (it is built only while the strip is open, and held while it leaves).
+  // The data of the panel; null while there is none to show (it is built only while the panel is open, and held while it leaves).
   carousel: Carousel | null;
   settings: Pick<TableSettings, "stops" | "stopsOn">;
   top: number;
@@ -250,7 +169,7 @@ export function PhaseCarousel({
           motion,
         ]}
       >
-        <CarouselCards carousel={carousel} width={inner} settings={settings} onChange={onChange} />
+        <CarouselBody carousel={carousel} width={inner} settings={settings} onChange={onChange} />
       </Animated.View>
     </View>
   );

@@ -1,5 +1,5 @@
 // The frame of the table's popovers (docs/design-system.md, Table, Table menu): a lit night card (tileSurface) with a deep shadow
-// and container corners, its rows inset item-cornered plates, that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
+// and container corners, its rows inset item-cornered plates (no chevron, no divider between groups), that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
 // that holds it, and a Pressable scrim that fills the screen under it so a tap outside closes it and does nothing else. Not a
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock-more.tsx) both draw in it; Android Back closes either first (back.ts).
@@ -11,7 +11,6 @@ import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
-import { Chevron } from "./phase-rail.tsx";
 import { CONTAINER_RADIUS, ITEM_RADIUS } from "./radius.ts";
 import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
@@ -34,8 +33,8 @@ export type PopoverRowItem = {
   icon?: IconName | null;
   // A mark drawn as views when no printed icon fits: the door of Leave the table.
   glyph?: "leave";
-  // The row opens a screen or a panel: a chevron at its right says so.
-  opens?: boolean;
+  // Leave the table: the word and its mark in danger.
+  tone?: "danger";
 };
 
 /** One 48 pt row of a popover: a rounded plate inside the frame's padding that fills when pressed. */
@@ -67,11 +66,10 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
           }}
         >
           {item.icon ? <GameIcon name={item.icon} size={18 * s} tint="bone" /> : null}
-          {item.glyph === "leave" ? <LeaveMark color={t.muted} s={s} /> : null}
-          <Text className="flex-1 text-body font-medium" style={{ color: t.bone, minWidth: 0 }} numberOfLines={1}>
+          {item.glyph === "leave" ? <LeaveMark color={item.tone === "danger" ? t.danger : t.muted} s={s} /> : null}
+          <Text className="flex-1 text-body font-medium" style={{ color: item.tone === "danger" ? t.danger : t.bone, minWidth: 0 }} numberOfLines={1}>
             {item.label}
           </Text>
-          {item.opens ? <Chevron direction="next" color={t.faint} /> : null}
         </View>
       )}
     </Pressable>
@@ -87,13 +85,6 @@ function LeaveMark({ color, s }: { color: string; s: number }) {
       <View style={{ position: "absolute", left: 10 * s, top: 6 * s, width: 6 * s, height: 6 * s, borderTopWidth: 1.5 * s, borderRightWidth: 1.5 * s, borderColor: color, transform: [{ rotate: "45deg" }] }} />
     </View>
   );
-}
-
-/** A hairline between groups of rows. */
-export function PopoverDivider() {
-  const t = useTableTokens();
-  const s = useUiScale();
-  return <View style={{ height: 1, marginVertical: 4 * s, marginHorizontal: 10 * s, backgroundColor: t.hairline }} />;
 }
 
 // Moves the screen reader's focus to the first row. A module-level function: the React Compiler cannot compile a try/catch inside a component.

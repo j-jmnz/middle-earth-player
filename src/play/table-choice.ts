@@ -395,20 +395,21 @@ export function onTheTable(sheet: Sheet, onTable: (cardId: string) => boolean): 
  * The words over a sheet, in the dock or on a panel: the step (with the timing of a Response or an Action, and the seat in
  * two-handed play), the moment, a sentence, and the engine's numbers for it.
  */
-export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; title: string; note: string | null; stats: readonly SheetStat[] } {
+export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; seat: string; title: string; note: string | null; stats: readonly SheetStat[] } {
+  // The seat that is asked leads the dock's title in two-handed play ("Player 1 · "); the step names it for a screen reader too.
   const seat = game.seatCount > 1 ? `Player ${game.activeSeat + 1} · ` : "";
   switch (sheet.kind) {
     case "pick":
     case "multi":
-      return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
+      return { step: `${seat}${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
     case "distribute":
-      return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: [] };
     case "trigger":
-      return { step: `${seat}${sheet.timing} · ${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.timing} · ${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: [] };
     case "window":
-      return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: [] };
     case "outcome":
-      return { step: sheet.step, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: sheet.step, seat: "", title: sheet.title, note: sheet.note, stats: [] };
   }
 }
 

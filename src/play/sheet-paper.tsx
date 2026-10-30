@@ -9,11 +9,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
 import { CONTROL_RADIUS, SHEET_RADIUS } from "./radius.ts";
-import { parchmentSurface, raisedEdgeOf, selectedWash } from "./surfaces.ts";
+import { chipOnSurface, parchmentSurface } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
-import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -90,10 +90,10 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
 }
 
 /**
- * A choice tile, on paper (a pile's cards) or on night (the choice tray). `leading` is a card picture, `trailing` a pill (the
- * foreseen damage); `dense` puts everything on one line (the tray on a short phone). A night tile has no drawn edge: at rest it
- * is a lit plate, picked it is washed in accent with its name in accentHigh and an accent check (user request, 2026-10-27: fewer
- * borders); a paper one has an inkLine edge, heavier ink when picked. A long press (`onLongPress`) reads the card.
+ * A choice row, on paper (a pile's cards) or on night (the choice in the dock). `leading` is a card picture, `trailing` a pill (the
+ * foreseen damage); `dense` puts everything on one line (the choice on a short phone). A row has no plate and no drawn edge: at rest
+ * it is words on the ground; picked, a night row is washed in accent with its name in accentHigh and an accent check, a paper row in
+ * an ink wash. A long press (`onLongPress`) reads the card.
  */
 export function Tile({
   label,
@@ -148,8 +148,7 @@ export function Tile({
           className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-item ${night ? "px-2" : "px-4"}`}
           style={{
             minHeight: touch(s, dense ? 44 : night ? 50 : 48),
-            ...(night ? {} : { borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine }),
-            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : night ? nightTile(selected, t) : { backgroundColor: "transparent" }),
+            ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : selected ? (night ? chipOnSurface(t) : { backgroundColor: withAlphaHex(t.ink, 0.1) }) : { backgroundColor: "transparent" }),
           }}
         >
           {leading}
@@ -172,11 +171,6 @@ export function Tile({
       )}
     </Pressable>
   );
-}
-
-// A night tile's fill: a dark wash at rest, the selected wash with an accent bar at its leading edge when picked.
-function nightTile(selected: boolean, t: TableTokens) {
-  return selected ? { ...selectedWash(t), boxShadow: `inset 3px 0 0 ${t.accentHigh}` } : { backgroundColor: withAlphaHex(t.bone, 0.05), boxShadow: raisedEdgeOf(t) };
 }
 
 /** One sentence under a disabled action saying what it waits for. */

@@ -21,7 +21,7 @@ import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
-import { TextButton } from "./buttons.tsx";
+import { SecondaryButton } from "./buttons.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { cardCorner } from "./card-corner.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
@@ -143,10 +143,9 @@ export function CardPreview({
     </Animated.View>
   );
   const buttons = onDetails ? (
-    <TextButton
+    <SecondaryButton
       label="Details"
       testID="card-preview-details"
-      tone="accent"
       accessibilityLabel={`Open ${shown.name}`}
       onPress={() => {
         onClose();
@@ -212,7 +211,7 @@ export function CardPreview({
                         {({ pressed }) => (
                           <View
                             className="mt-1 flex-row items-center gap-2 rounded-item px-2"
-                            style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.accentLine : t.hairline }}
+                            style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
                           >
                             <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
                               {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}

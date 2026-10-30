@@ -3,7 +3,6 @@
 import { describe, expect, it } from "vitest";
 
 import { armedRoom } from "./armed-room.ts";
-import { cardWidth } from "./carousel.ts";
 import { isDense, labelChars, linesPlace, planWords, titleLinesOf, wordsWindow } from "./dock-budget.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
 import { stageOf } from "./spotlight-stage.ts";
@@ -59,7 +58,7 @@ describe("scale 1 is unchanged and 1.15 is proportional", () => {
     expect(isDense(430, S)).toBe(false);
   });
 
-  it("armed room, tray, preview, carousel and spotlight stage", () => {
+  it("armed room, tray, preview and spotlight stage", () => {
     expect(armedRoom(3, false, 1)).toBe(armedRoom(3, false));
     expect(armedRoom(3, true, L)).toBeCloseTo(armedRoom(3, true) * L, 9);
     const tray = { commandWidth: 253, insetRight: 0, screenHeight: 390, barBottom: 52, anchorTop: 200 };
@@ -69,8 +68,6 @@ describe("scale 1 is unchanged and 1.15 is proportional", () => {
     const p = previewSideSize(800, 360, true);
     const q = previewSideSize(800 * L, 360 * L, true, L);
     expect(Math.abs(q.width - p.width * L)).toBeLessThanOrEqual(1);
-    expect(cardWidth(500, 1)).toBe(cardWidth(500));
-    expect(cardWidth(500 * L, L)).toBeCloseTo(cardWidth(500) * L, -1);
     const area = (k: number) => ({ width: 800 * k, height: 360 * k, origin: { x: 40 * k, y: 50 * k }, safe: { top: 10 * k, right: 40 * k, bottom: 20 * k, left: 40 * k } });
     const stage = stageOf(area(1), { w: 50, h: 70 }, 2, true);
     const big = stageOf(area(L), { w: 50 * L, h: 70 * L }, 2, true, L);

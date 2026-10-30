@@ -1,12 +1,12 @@
-// The layers over the table that read or answer (phase 21): the choice tray (choice-tray.tsx), the one reading panel (a discard
-// pile, the log, the threat panel, the table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close
-// them on a tap outside. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
+// The layers over the table that read or answer (phase 21): the one reading panel (a discard pile, the log, the threat panel, the
+// table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close them on a tap outside, and the hit
+// layers that fold the choice's rows (choice-tray.tsx), which stand in the dock. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
 // a new one replaces the last.
-//   - The tray folds on a tap on the canvas (use-table-choice.ts, onTap), on the top bar except its menu button and its dials, or on the empty
+//   - The choice folds on a tap on the canvas (use-table-choice.ts, onTap), on the top bar except its menu button and its dials, or on the empty
 //     part of the command column above the dock. That tap is swallowed.
 //   - A reading panel and the carousel have a scrim from the top bar's foot down: a tap anywhere else closes it and does nothing
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
-//   - The carousel hangs over the canvas only, and the tray stays in the command column; neither covers the dock's armed line or buttons.
+//   - The carousel hangs over the canvas only, and the choice stays in the command column; neither covers the dock's armed line or buttons.
 //   - While the combat spotlight plays, its scrim (spotlight-scrim.tsx) is over the top bar and the dock, above all of these.
 //   - The peek banner (peek-banner.tsx) is the lowest of them, over the canvas only: the scrims and panels sit above it, and the spotlight's
 //     scrim (the bar and the dock column) never covers it.
@@ -14,7 +14,6 @@ import { useEffect, useEffectEvent, useMemo } from "react";
 import { Pressable } from "react-native";
 import { useStore } from "zustand";
 
-import { ChoiceTray } from "./choice-tray.tsx";
 import type { Carousel } from "./carousel.ts";
 import { threatRows, threatVerdict } from "./foresight.ts";
 import { logLines, type LogNames } from "./log.ts";
@@ -30,14 +29,12 @@ import { PILE_WORDS, type PileId } from "./selectors.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
-import type { PictureSource } from "./table-canvas-types.ts";
 import { settingsPanelWidth } from "./settings-panel-width.ts";
 import { tableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { usePeek } from "./use-peek.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
-import { isDense } from "./dock-budget.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
 import { discardPlays } from "./table-choice.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
@@ -87,7 +84,6 @@ export function TableLayers({
   ctx,
   names,
   nameOf,
-  picture,
   choice,
   reading,
   onReading,
@@ -105,7 +101,6 @@ export function TableLayers({
   ctx: ReduceContext;
   names: SheetNames;
   nameOf: (code: string) => string;
-  picture: (code: string) => PictureSource | null;
   choice: TableChoice;
   reading: Reading | null;
   onReading: (next: Reading | null) => void;
@@ -117,7 +112,7 @@ export function TableLayers({
   // The screen y under the top bar.
   barBottom: number;
   commandWidth: number;
-  // The screen y of the top of the dock's block of readout, armed line and buttons, or null until it is measured.
+  // The screen y of the top of the dock's content (its words, the choice's rows and its buttons), or null until it is measured.
   anchorTop: number | null;
   onPreview: (cardId: string) => void;
   // The settings panel's All settings: leave the table for the Settings tab (the game is saved), as the menu's Rules does.
@@ -164,10 +159,9 @@ export function TableLayers({
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (
         <>
           <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: insets.left + dialsEdge, right: insets.right + menuZone, height: barBottom }} />
-          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: anchor - barBottom }} />
+          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: Math.max(0, anchor - barBottom) }} />
         </>
       ) : null}
-      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
       <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
         {held?.kind === "pile" ? (

@@ -91,7 +91,6 @@ describe("the tokens", () => {
     expect(MOTION.seatPulseHalf.ms * 2).toBe(MOTION.seatPulse.ms);
     expect(MOTION.toastIn.ms).toBe(160);
     expect(MOTION.toastOut.ms).toBe(120);
-    expect(MOTION.railStep.ms).toBe(200);
     expect(MOTION.carouselEnter.ms).toBe(240);
     expect(MOTION.carouselLeave.ms).toBe(180);
     expect(MOTION.trayEnter.ms).toBe(260);

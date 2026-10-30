@@ -28,13 +28,12 @@ const FLICK = 600;
 
 /**
  * The banner's fill (user request, 2026-10-29): dark and slightly see-through on Dark, a dark red for a failure or an attack
- * (docs/design-system.md, Table: the combat banner), with the lit top edge and a 1 pt edge in the tone. Light keeps its lit
- * panel, a little see-through.
+ * (docs/design-system.md, Table: the combat banner), with the lit top edge and no outline. Light keeps its lit panel, a little
+ * see-through.
  */
-function bannerFill(t: TableTokens, tone: Moment["tone"], edge: string) {
-  const border = { borderWidth: 1, borderColor: withAlphaHex(edge, 0.45) };
-  if (t.depth === "light") return { ...border, backgroundColor: withAlphaHex(t.raisedTop, 0.9), boxShadow: panelSurface(false, t).boxShadow };
-  return { ...border, backgroundColor: tone === "bad" ? "rgba(26,10,9,0.9)" : withAlphaHex(t.night, 0.9), boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
+function bannerFill(t: TableTokens, tone: Moment["tone"]) {
+  if (t.depth === "light") return { backgroundColor: withAlphaHex(t.raisedTop, 0.9), boxShadow: panelSurface(false, t).boxShadow };
+  return { backgroundColor: tone === "bad" ? "rgba(26,10,9,0.9)" : withAlphaHex(t.night, 0.9), boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
 }
 
 /**
@@ -64,7 +63,6 @@ export function MomentBanner({
   const screen = useWindowDimensions();
   const { left, right } = bannerSpan(screen.width, BANNER_WIDTH * s + 2 * SIDE, leftClear, rightClear);
   const room = Math.max(0, screen.width - left - right - 2 * SIDE);
-  const edge = moment.tone === "good" ? t.accentHigh : moment.tone === "bad" ? t.threat : t.faint;
   const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   useEffect(() => {
@@ -132,7 +130,7 @@ export function MomentBanner({
     <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: SIDE }}>
       <GestureDetector gesture={gesture}>
         {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
-        <Animated.View className="rounded-container" style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, ...bannerFill(t, moment.tone, edge) }, swipeStyle]}>
+        <Animated.View className="rounded-container" style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, ...bannerFill(t, moment.tone) }, swipeStyle]}>
           <View
             testID="moment"
             accessible
@@ -144,9 +142,9 @@ export function MomentBanner({
             onAccessibilityEscape={onDismiss}
             className="overflow-hidden rounded-container"
           >
-            {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
-            <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />
-            <View className="items-center px-4 pb-2 pt-1.5">
+            {/* The combat banner (a failure or an attack) keeps its 3 pt threat-red band along the top. */}
+            {moment.tone === "bad" ? <View style={{ height: 3 * s, backgroundColor: t.threat }} /> : null}
+            <View className={`items-center px-4 pb-2 ${moment.tone === "bad" ? "pt-1.5" : "pt-2.5"}`}>
               <Text testID="moment-title" className="text-center font-display text-heading text-bone" style={{ lineHeight: 24 * s }}>
                 {moment.title}
               </Text>

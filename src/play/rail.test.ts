@@ -8,7 +8,7 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
 import { windowSheet } from "./bar-sheets.ts";
-import { cardWidth, phaseCarousel, startIndex, STOPS_TEXT, stopAheadOf } from "./carousel.ts";
+import { phaseCarousel, startIndex, STOPS_TEXT, stopAheadOf } from "./carousel.ts";
 import { phaseIndex, railFor, ROUND_PHASES, windowPoint } from "./rail.ts";
 import { turnReference } from "./reference.ts";
 import { isStepWindow, sheetFor } from "./sheets.ts";
@@ -142,21 +142,13 @@ describe("the rail's words", () => {
   });
 });
 
-describe("the strip's placement", () => {
+describe("the carousel's placement", () => {
   it("starts on the current phase, the first before Resource and the last after Refresh", async () => {
     expect(startIndex(phaseCarousel(await parked("Quest", "staging"), on(), noTitle))).toBe(2);
     expect(startIndex(phaseCarousel(await parked("Combat", "enemyAttacks"), on(), noTitle))).toBe(5);
     expect(startIndex(phaseCarousel(await parked("Beginning of round", "beginRound"), on(), noTitle))).toBe(0);
     expect(startIndex(phaseCarousel(await parked("Setup", "afterOpening", 0), on(), noTitle))).toBe(0);
     expect(startIndex(phaseCarousel(await parked("End of round", "endRound"), on(), noTitle))).toBe(6);
-  });
-
-  it("sizes a card at about 58% of the strip, between 230 and 340 pt", () => {
-    expect(cardWidth(200)).toBe(230);
-    expect(cardWidth(363)).toBe(230);
-    expect(cardWidth(497)).toBe(288);
-    expect(cardWidth(560)).toBe(325);
-    expect(cardWidth(2000)).toBe(340);
   });
 
   it("keeps the Stops sentence in one place", () => {

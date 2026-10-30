@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
-import { barZones, MENU_BUTTON, phaseWidth, pillWidth, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, stepWidth, TICK, TICK_GAP } from "./top-bar-layout.ts";
+import { barZones, headlineWidth, MENU_BUTTON, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, TICK, TICK_GAP } from "./top-bar-layout.ts";
 
-// Phase 19's floor, from the longest step name alone: the rail must not grow past it.
-const PHASE_19_FLOOR = 232;
+// The rail names a phase over its ticks and nothing longer, so it never needs more than this (the old three-line rail needed 232).
+const RAIL_CEILING = 232;
 
 describe("top bar zones", () => {
   it("centers the rail on the screen, clear of the dials and the menu button, while they leave it room", () => {
@@ -38,17 +38,13 @@ describe("top bar zones", () => {
     expect(zones.rail).toBeGreaterThanOrEqual(Math.min(RAIL_FLOOR, bar - MENU_BUTTON));
   });
 
-  it("floors the rail at the widest pill, so no step name and no phase is cut", () => {
-    const phases = [...ROUND_PHASES, "Beginning", "End"];
-    for (const word of [...Object.values(STEP_WORDS), "Victory", "Defeat"]) {
-      expect(RAIL_FLOOR).toBeGreaterThanOrEqual(stepWidth(word));
-      // Every rail it can show: the phase over the ticks over "Round 99 · step".
-      for (const phase of phases) expect(RAIL_FLOOR).toBeGreaterThanOrEqual(pillWidth("Round 99", phase, word));
-    }
+  it("floors the rail at the widest headline, so no phase and no step that stands in for one is cut", () => {
+    // The phase over the ticks, and Setup and the mulligan, whose step takes the phase's place.
+    for (const word of [...ROUND_PHASES, "Beginning", "End", STEP_WORDS.afterOpening, STEP_WORDS.mulligan]) expect(RAIL_FLOOR, word).toBeGreaterThanOrEqual(headlineWidth(word));
     // The floor holds the widest phase and the seven ticks under it.
-    expect(RAIL_FLOOR).toBeGreaterThanOrEqual(phaseWidth("Encounter"));
+    expect(RAIL_FLOOR).toBeGreaterThanOrEqual(headlineWidth("Encounter"));
     expect(RAIL_FLOOR).toBeGreaterThanOrEqual(7 * TICK + 6 * TICK_GAP);
-    expect(RAIL_FLOOR).toBeLessThanOrEqual(PHASE_19_FLOOR);
+    expect(RAIL_FLOOR).toBeLessThanOrEqual(RAIL_CEILING);
     for (const [bar, dials] of [[800, 0], [800, 460], [620, 460], [500, 900]] as const) expect(barZones(bar, dials).rail).toBeGreaterThanOrEqual(Math.min(RAIL_FLOOR, bar - MENU_BUTTON));
   });
 

@@ -16,6 +16,8 @@ import { standInText } from "../play/dungeon-preview";
 import type { LogNames } from "../play/log";
 import { prefetchCodes, resolutionCodes } from "../play/prefetch";
 import { dockPills } from "../play/dock-extras";
+import { ChoiceTray } from "../play/choice-tray";
+import { isDense } from "../play/dock-budget";
 import { MorePopoverView, useMorePopover } from "../play/dock-more";
 import { railFor } from "../play/rail";
 import { shownSeat, threatSelector, tickKeySelector } from "../play/selectors";
@@ -44,6 +46,9 @@ import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
+import { trayCount } from "../play/tray-logic";
+import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
@@ -108,6 +113,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();
   const s = useUiScale();
+  const t = useTableTokens();
   // The canvas wrapper's size, and its left edge in the row (the quest scale's width, when it shows).
   const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
   // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight-handoff.ts).
@@ -128,7 +134,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The one reading layer over the table (reading.ts): a dial's threat panel, the phase carousel (the rail), the table settings,
   // the log (the menu's rows), a discard pile's list. Opening one replaces the last.
   const [reading, setReading] = useState<Reading | null>(null);
-  // The screen y of the top of the dock's buttons block, which the choice tray stays above.
+  // The screen y of the top of the dock's content: the tap layer that folds the choice's rows covers the column above it.
   const [anchor, setAnchor] = useState<number | null>(null);
   // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
   const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
@@ -387,14 +393,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               />
             ) : null}
           </View>
-          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s) }}>
+          {/* The command column stands on a fade to the night at its foot and right edge, soft at the canvas side and at the top so no straight edge shows (one radial gradient from the bottom-right corner); the dock has no panel of its own. */}
+          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s), backgroundImage: `radial-gradient(115% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
             <TableDock
               step={choice.header.step}
+              seat={choice.header.seat}
               title={choice.header.title}
               note={choice.header.note}
               picked={choice.picked}
               unavailable={choice.unavailable}
-              readout={choice.readout}
+              // The quest scale shows the willpower against the threat in the Quest phase, so the dock does not draw its own.
+              readout={scale.live && choice.readout?.kind === "quest" ? null : choice.readout}
               refusal={refusal}
               dock={choice.dock}
               onButton={choice.onButton}
@@ -402,8 +411,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               more={pills.more}
               onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey}
-              guide={choice.guide} trayOpen={choice.panelOpen}
-              onBlock={setAnchor}
+              guide={choice.guide}
+              trayOpen={choice.panelOpen}
+              count={trayCount(choice.sheet, choice.choice)}
+              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
+              onTop={setAnchor}
             />
           </View>
         </View>
@@ -413,7 +425,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         ctx={ctx}
         names={names}
         nameOf={nameOf}
-        picture={picture}
         choice={choice}
         reading={reading}
         onReading={setReading}
@@ -473,7 +484,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
       <TableMenu open={menuOpen} nav={nav} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
-      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
+      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.seat + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
 }

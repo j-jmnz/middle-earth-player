@@ -89,7 +89,6 @@ export const MOTION = {
   railFlashIn: tween(60, null),
   railFlashOut: tween(240, null),
   railFlash: tween(300, null),
-  railStep: tween(200, null),
   previewIn: spring(280, 0.74),
   previewOut: tween(150, "inQuad"),
   dragLift: tween(90, null),

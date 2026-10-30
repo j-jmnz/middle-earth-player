@@ -1,6 +1,6 @@
-// The choice tray's pure half (docs/design-system.md, Table, Choice tray; phase 21): the tiles of a sheet, the muted count at
-// the tray's top, where the tray sits against the command column and the dock, and what a tap outside it does. The component is
-// choice-tray.tsx; the hook that holds the fold is use-table-choice.ts.
+// The choice's pure half (docs/design-system.md, Table, Choice tray; phase 21): the rows of a sheet, the count the dock's title speaks,
+// the command column's box (the width the rows and the reading panels share), and what a tap outside it does. The component is
+// choice-tray.tsx, drawn inside the dock; the hook that holds the fold is use-table-choice.ts.
 import type { Choice } from "./table-choice.ts";
 import type { OptionMark, Sheet, SheetStat } from "./sheet-types.ts";
 
@@ -43,7 +43,7 @@ export function trayTiles(sheet: Sheet): TrayTile[] {
 // The sheet's verb without its trailing preposition ("Defend with" is "Defend").
 const wordOf = (verb: string): string => verb.replace(/\s+(with|to|on|for)$/i, "");
 
-/** The muted count at the tray's top, led by the moment's verb: "Defend · pick 1 of 6", "Commit · 2 of 4 picked". */
+/** The count the dock's title speaks while the rows are open, led by the moment's verb: "Defend · pick 1 of 6", "Commit · 2 of 4 picked". */
 export function trayCount(sheet: Sheet, choice: Choice): string {
   switch (sheet.kind) {
     case "multi":
@@ -108,19 +108,19 @@ export function outsideLayers(a: { trayShown: boolean; reading: boolean; reader:
 }
 
 export const TRAY_MAX = 340;
-// The shortest the tray is drawn, so a tall dock never leaves a tray that is not there.
+// The shortest the box is, so a tall dock never leaves a box that is not there.
 const MIN_HEIGHT = 72;
-// The command column's side padding (table-view.tsx, px-2): the dock stands this far inside it, and so does the tray.
+// The command column's side padding (table-view.tsx, px-2): the dock stands this far inside it, and so do the panels.
 export const COLUMN_PAD = 8;
 
 export type TrayBox = { width: number; right: number; bottom: number; maxHeight: number };
 
 /**
- * Where the tray sits: the dock's width (the command column less its padding, at most TRAY_MAX) with its right edge at the dock's,
- * so it never reaches into the canvas and covers neither encounter pile (the discard stands 8 pt from the canvas's edge:
- * tray-logic.test.ts checks it against the layout). Its foot is `anchorTop` (the screen y of the top of the dock's block of readout,
- * armed line and buttons, which it never covers, and the dock's top while the tray is open: the tray stands on the dock), and it is
- * as tall as the room between the top bar and that, never under MIN_HEIGHT. `scale` is the UI scale.
+ * The command column's box for what stands in it over the table: the column less its padding, at most TRAY_MAX, with its right edge at
+ * the column's, so it never reaches into the canvas and covers neither encounter pile (the discard stands 8 pt from the canvas's edge:
+ * tray-logic.test.ts checks it against the layout). The reading panels take their width from it. Its foot is `anchorTop` (the screen y
+ * of the top of the dock's content), and it is as tall as the room between the top bar and that, never under MIN_HEIGHT. `scale` is
+ * the UI scale.
  */
 export function trayBox(a: { commandWidth: number; insetRight: number; screenHeight: number; barBottom: number; anchorTop: number }, scale = 1): TrayBox {
   // The tray's own sizes are Medium's, drawn at the UI scale (ui-scale.ts); the insets and the anchors are screen points already.

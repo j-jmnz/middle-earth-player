@@ -1,6 +1,6 @@
 // Rules: rr.framework-steps, rr.action-windows, rr.attack-resolution-chart (data/rules/entries.json; data/rules/steps.json).
 //
-// The strip a tap on the phase rail opens (phase-carousel.tsx): the round's seven phases in order, each with its steps from the
+// The panel a tap on the phase rail opens (phase-carousel.tsx): the round's seven phases in order, each with its steps from the
 // turn reference (reference.ts: the rule titles from data/rules and what the player decides), the step the engine is in, and the
 // action windows the player can stop at. Pure and read-only: every word comes from `turnReference`, `STEP_WORDS` and the
 // window points through it, none is written here, and nothing here sends an intent.
@@ -48,7 +48,7 @@ function stateOf(index: number, here: number): CarouselPhase["state"] {
 }
 
 /**
- * The round laid out for the strip. `stops` is the player's standing setting (table-settings.ts); `title` reads a rule span's
+ * The round laid out for the panel. `stops` is the player's standing setting (table-settings.ts); `title` reads a rule span's
  * title (as turnReference does). Before the Resource phase every phase is next, and after Refresh every phase is past.
  */
 export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "stopsOn" | "stops">, title: (id: string) => string | null): Carousel {
@@ -65,7 +65,7 @@ export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "s
   };
 }
 
-// A phase's steps for the strip, each window marked a stop where the player's stops say so.
+// A phase's steps for the panel, each window marked a stop where the player's stops say so.
 function carouselSteps(steps: ReferencePhase["steps"], stops: readonly string[]): CarouselStep[] {
   return steps.map((step): CarouselStep => {
     const windows = step.windows.map((window) => ({
@@ -89,7 +89,7 @@ const noTitle = () => null;
 
 /**
  * Whether a stop of the player's lies after the game's place in its phase (the rail's S, `Carousel.stopAhead`), without laying out the
- * strip: only the game's own phase is built, and no rule title is looked up. The same answer as `phaseCarousel(...).stopAhead`.
+ * panel: only the game's own phase is built, and no rule title is looked up. The same answer as `phaseCarousel(...).stopAhead`.
  */
 export function stopAheadOf(game: ScenarioState, stops: Pick<TableSettings, "stopsOn" | "stops">): boolean {
   if (!stops.stopsOn) return false;
@@ -118,15 +118,7 @@ export const STOPS_TEXT = "Pass the action windows that are not stops, unless a 
 /** The words for the accent S: a stop of the player's lies ahead in this phase. */
 export const STOP_AHEAD_WORDS = "A stop is ahead";
 
-const CARD_MIN = 230;
-const CARD_MAX = 340;
-
-/** The card's width for a strip `width` wide: about 58% of it, so the neighbors show at the sides, clamped to 230..340 (at the UI `scale`, those bounds times it). */
-export function cardWidth(width: number, scale = 1): number {
-  return Math.round(Math.min(CARD_MAX * scale, Math.max(CARD_MIN * scale, width * 0.58)));
-}
-
-/** The index the strip starts on: the current phase; the first before Resource, the last after Refresh. */
+/** The phase the panel opens on: the current phase; the first before Resource, the last after Refresh. */
 export function startIndex(carousel: Carousel): number {
   const at = carousel.phases.findIndex((phase) => phase.state === "current");
   if (at >= 0) return at;

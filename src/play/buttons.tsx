@@ -1,7 +1,7 @@
 // The three word buttons of the chrome (docs/design-system.md, Components): the primary, the secondary and the text button. They live in
 // src/play because the table's dock, its sheets and its settings panel draw them too and src/play cannot import src/screens;
 // chrome-buttons.tsx re-exports them. The glass button (round icon, capsule for a word) is IconButton / PillButton there, on
-// `glassSurface`. Every button is a capsule and draws no glow, lit edge, shadow or ring: depth is tone alone. A press darkens the
+// `glassSurface`; the table's own round glass button, for a mark drawn as views (the menu's dots, a panel's ✕), is GlassIconButton here. Every button is a capsule and draws no glow, lit edge, shadow or ring: depth is tone alone. A press darkens the
 // primary about 8% and sinks it 1 pt, and fills the others. A disabled button keeps its shape at DISABLED_OPACITY, and the sentence
 // beside it says why. Every fill and text colour is a style, not only a class: on the phone a class on a Pressable whose style is a
 // function can be dropped (user report, 2026-10-25), so the pressed state comes from the Pressable's children.
@@ -11,7 +11,8 @@ import type { ReactNode } from "react";
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
-import { accentPlate, DISABLED_OPACITY, slateSurface, textSurface } from "./surfaces.ts";
+import { accentPlate, DISABLED_OPACITY, glassSurface, slateSurface, textSurface } from "./surfaces.ts";
+import { withAlphaHex } from "./tokens.ts";
 import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -229,4 +230,74 @@ export function TextButton({
       )}
     </Pressable>
   );
+}
+
+/**
+ * The round glass icon button of the table: 44 pt, on `glassSurface` (a paper panel takes an ink wash instead), holding a mark the
+ * caller draws in the colour it is given as views, since no printed icon fits. It always carries a label for a screen reader.
+ * `active` turns the mark accent (the menu while it is open); `expanded` is for a button that shows and hides something.
+ */
+export function GlassIconButton({
+  label,
+  onPress,
+  testID,
+  mark,
+  active = false,
+  expanded,
+  paper = false,
+}: {
+  label: string;
+  onPress: () => void;
+  testID: string;
+  mark: (color: string) => ReactNode;
+  active?: boolean;
+  expanded?: boolean;
+  paper?: boolean;
+}) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const box = touch(s, 44);
+  const color = active ? t.accent : paper ? t.ink : t.bone;
+  return (
+    <Pressable
+      testID={testID}
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      {...(expanded == null ? {} : { accessibilityState: { expanded } })}
+      onPress={onPress}
+    >
+      {({ pressed }) => (
+        <View
+          style={{
+            width: box,
+            height: box,
+            borderRadius: CONTROL_RADIUS,
+            alignItems: "center",
+            justifyContent: "center",
+            ...(paper ? { backgroundColor: pressed ? t.paperPressed : withAlphaHex(t.ink, 0.08) } : glassSurface(pressed, t)),
+          }}
+        >
+          {mark(color)}
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
+/** A ✕ of two crossed bars, drawn as views (no printed icon fits, and a glyph depends on the font). */
+export function CrossMark({ color }: { color: string }) {
+  const s = useUiScale();
+  const bar = { position: "absolute", width: 16 * s, height: 1.75 * s, borderRadius: s, backgroundColor: color } as const;
+  return (
+    <View accessible={false} importantForAccessibility="no-hide-descendants" style={{ width: 16 * s, height: 16 * s, alignItems: "center", justifyContent: "center" }}>
+      <View style={{ ...bar, transform: [{ rotate: "45deg" }] }} />
+      <View style={{ ...bar, transform: [{ rotate: "-45deg" }] }} />
+    </View>
+  );
+}
+
+/** The round ✕ that closes a reading panel, labelled "Close": on paper for the parchment panels, on night for the settings panel. */
+export function CloseButton({ onPress, testID, paper = false }: { onPress: () => void; testID: string; paper?: boolean }) {
+  return <GlassIconButton label="Close" testID={testID} paper={paper} onPress={onPress} mark={(color) => <CrossMark color={color} />} />;
 }
