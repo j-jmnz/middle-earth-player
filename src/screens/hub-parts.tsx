@@ -113,14 +113,20 @@ export function RunRow({ testID, title, line, lead, accessibilityLabel, onPress 
   );
 }
 
+/** The hero's primary: full width on a phone, a 320 pt plate on its left outside one. */
+export function PrimaryPlate({ children }: { children: ReactNode }) {
+  const { size, s } = useSizeClass();
+  return size === "compact" ? children : <View style={{ alignSelf: "flex-start", width: 320 * s }}>{children}</View>;
+}
+
 // The number in a small diamond on a scenario's art.
-function NumberBadge({ number, dim }: { number: number; dim: boolean }) {
+function NumberBadge({ number }: { number: number }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
   return (
     <View className="items-center justify-center" style={{ width: 24 * s, height: 24 * s, transform: [{ rotate: "45deg" }], backgroundColor: t.depth === "light" ? palette.raisedTop : withAlphaHex(palette.night, 0.82), boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
-      <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: dim ? palette.faint : palette.accentHigh, transform: [{ rotate: "-45deg" }] }}>
+      <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.accentHigh, transform: [{ rotate: "-45deg" }] }}>
         {String(number)}
       </Text>
     </View>
@@ -142,8 +148,7 @@ export function CatalogGrid({ posters, children }: { posters: number; children: 
 
 /**
  * One catalog entry on its scene: a 64 pt row on a phone (`posters` 0), a poster on a tablet. `number` is the book number in a small
- * diamond on the art. A `disabled` entry is dimmed, its scene veiled and its words faint, and does not press; its chevron is left out.
- * `tone` is the colour of `line`, which is left out when empty.
+ * diamond on the art. `tone` is the colour of `line`, which is left out when empty.
  */
 export function CatalogTile({
   testID,
@@ -154,7 +159,6 @@ export function CatalogTile({
   tone,
   accessibilityLabel,
   posters,
-  disabled,
   onPress,
 }: {
   testID: string;
@@ -165,37 +169,32 @@ export function CatalogTile({
   tone: string;
   accessibilityLabel: string;
   posters: number;
-  disabled?: boolean;
   onPress: () => void;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
   const { size, s } = useSizeClass();
-  const playable = !disabled;
-  const badge = number == null ? null : <NumberBadge number={number} dim={!playable} />;
+  const badge = number == null ? null : <NumberBadge number={number} />;
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
-      accessibilityState={{ disabled: !playable }}
       accessibilityLabel={accessibilityLabel}
-      disabled={!playable}
       onPress={onPress}
       style={posters ? { width: `${100 / posters}%`, paddingHorizontal: 6 * s } : undefined}
     >
       {({ pressed }) =>
         posters ? (
-          <View className="overflow-hidden rounded-item" style={{ ...tileSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
+          <View className="overflow-hidden rounded-item" style={tileSurface(pressed, t)}>
             <SceneArt scenarioId={sceneId} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk}>
-              {playable ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.55) }} />}
               {badge ? (
                 <View className="absolute" style={{ left: 12 * s, top: 12 * s }}>
                   {badge}
                 </View>
               ) : null}
               <View className="absolute bottom-0 left-0 right-0" style={{ padding: 12 * s }}>
-                <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={3}>
+                <Text className="font-display text-heading text-bone" numberOfLines={3}>
                   {name}
                 </Text>
                 {line ? (
@@ -207,11 +206,10 @@ export function CatalogTile({
             </SceneArt>
           </View>
         ) : (
-          <View className="flex-row items-center gap-3.5 overflow-hidden rounded-item pr-3" style={{ ...rowSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
+          <View className="flex-row items-center gap-3.5 overflow-hidden rounded-item pr-3" style={rowSurface(pressed, t)}>
             <View style={{ width: 86 * s, height: 64 * s }}>
               <SceneArt scenarioId={sceneId} width={86 * s} height={64 * s} vivid>
-                {/* A tile that cannot be played keeps its faint words at full strength; only its scene is veiled. */}
-                <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: playable ? withAlphaHex(palette.night, 0.15) : withAlphaHex(palette.night, 0.62) }} />
+                <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.15) }} />
               </SceneArt>
               {badge ? (
                 <View className="absolute" style={{ left: 6 * s, bottom: 6 * s }}>
@@ -220,7 +218,7 @@ export function CatalogTile({
               ) : null}
             </View>
             <View className="min-w-0 flex-1 py-2">
-              <Text className={`font-display text-heading ${playable ? "text-bone" : "text-faint"}`} numberOfLines={2}>
+              <Text className="font-display text-heading text-bone" numberOfLines={2}>
                 {name}
               </Text>
               {line ? (
@@ -229,7 +227,7 @@ export function CatalogTile({
                 </Text>
               ) : null}
             </View>
-            {playable ? <Chevron direction="right" color={palette.faint} size={8} /> : null}
+            <Chevron direction="right" color={palette.faint} size={8} />
           </View>
         )
       }

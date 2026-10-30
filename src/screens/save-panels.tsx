@@ -3,6 +3,7 @@ import { View } from "react-native";
 import type { NextStep, PathNode } from "../campaign/path";
 import { useSizeClass } from "../play/use-size-class";
 import { Eyebrow, PrimaryButton, TextButton } from "./chrome";
+import { PrimaryPlate } from "./hub-parts";
 import { nextLabel } from "./hub-runs";
 import { Text } from "../play/text";
 
@@ -29,7 +30,7 @@ export function nextSummary(next: NextStep): string {
  * phone), then Full path and Campaign log as words under it. Nothing for a playthrough with no scenario left to play.
  */
 export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line: SaveLine; onNext: () => void; onPath: () => void; onLog: () => void }) {
-  const { size, s } = useSizeClass();
+  const { s } = useSizeClass();
   const { next } = line;
   if (next.kind === "finished") return null;
   const label = next.kind === "resume" ? "Resume" : "Begin";
@@ -42,7 +43,7 @@ export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line
           {next.node.name}
         </Text>
       </View>
-      {size === "compact" ? go : <View style={{ alignSelf: "flex-start", width: 320 * s }}>{go}</View>}
+      <PrimaryPlate>{go}</PrimaryPlate>
       <View className="flex-row" style={{ gap: 8 * s }}>
         <TextButton label="Full path" icon="oneRing" tone="accent" testID="continue-path" accessibilityLabel={`Path of ${describe(line)}`} onPress={onPath} />
         <TextButton label="Campaign log" icon="contract" tone="accent" testID="continue-log" accessibilityLabel={`Log of ${describe(line)}`} onPress={onLog} />
