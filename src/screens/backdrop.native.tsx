@@ -1,7 +1,10 @@
-import { BlurMask, Canvas, ColorMatrix, FractalNoise, Group, LinearGradient, Mask, Paint, Path, RadialGradient, Rect, vec } from "@shopify/react-native-skia";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { Blend, BlurMask, Canvas, Group, ImageShader, LinearGradient, Paint, Path, RadialGradient, Rect, Skia, vec, type SkImage } from "@shopify/react-native-skia";
+import { useEffect } from "react";
+import { PixelRatio, StyleSheet, useWindowDimensions, View } from "react-native";
+import { useDerivedValue, useFrameCallback, useSharedValue, type SharedValue } from "react-native-reanimated";
 
 import { useTheme } from "../play/theme";
+import { useDriftRunning } from "./backdrop-drift";
 import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
 
 /** An ellipse as a radial gradient: a circle of radius rx × width, squashed to ry × height about its centre. */
@@ -10,39 +13,83 @@ function Ellipse({ cx, cy, rx, ry, positions, colors }: { cx: number; cy: number
   return <RadialGradient c={center} r={Math.max(rx, 1)} origin={center} transform={[{ scaleY: ry / Math.max(rx, 1) }]} positions={positions} colors={colors} />;
 }
 
-function Noise({ texture, width, height }: { texture: FogTexture; width: number; height: number }) {
-  const [dx, dy] = texture.offset ?? [0, 0];
-  // A moved noise is drawn a little larger than the box, so its edge never shows.
-  return (
-    <Group transform={[{ translateX: dx }, { translateY: dy }]}>
-      <Rect x={-Math.abs(dx)} y={-Math.abs(dy)} width={width + 2 * Math.abs(dx)} height={height + 2 * Math.abs(dy)}>
-        <FractalNoise freqX={texture.freq[0]} freqY={texture.freq[1]} octaves={texture.octaves} seed={texture.seed} tileWidth={0} tileHeight={0} />
-        <ColorMatrix matrix={fogMatrix(texture)} />
-      </Rect>
-    </Group>
-  );
+// Each texture is drawn once into a tile of its own (its noise stitched, so the tile repeats without a seam) and kept for every
+// screen after. A frame then only slides the tiles, instead of working the noise out again for every pixel. The tile is drawn on
+// the GPU and read back, since the canvas draws on another thread than the one that made it.
+const tiles = new Map<FogTexture, SkImage | null>();
+
+function tileOf(texture: FogTexture, scale: number): SkImage | null {
+  if (tiles.has(texture)) return tiles.get(texture) ?? null;
+  const [w, h] = texture.tile;
+  const surface = Skia.Surface.MakeOffscreen(Math.round(w * scale), Math.round(h * scale)) ?? Skia.Surface.Make(Math.round(w * scale), Math.round(h * scale));
+  let image: SkImage | null = null;
+  if (surface) {
+    const canvas = surface.getCanvas();
+    canvas.scale(scale, scale);
+    const paint = Skia.Paint();
+    paint.setShader(Skia.Shader.MakeFractalNoise(texture.freq[0], texture.freq[1], texture.octaves, texture.seed, w, h));
+    paint.setColorFilter(Skia.ColorFilter.MakeMatrix(fogMatrix(texture)));
+    canvas.drawRect(Skia.XYWHRect(0, 0, w, h), paint);
+    surface.flush();
+    image = surface.makeImageSnapshot().makeNonTextureImage();
+  }
+  tiles.set(texture, image);
+  return image;
 }
 
-function Fog({ layer, width, height }: { layer: FogLayer; width: number; height: number }) {
-  const noise = <Noise texture={layer.texture} width={width} height={height} />;
+// The grit is finer than a point, so its tile is drawn at the screen's own pixels.
+const gritScale = () => Math.min(PixelRatio.get(), 3);
+
+// The clock moves the fog about 20 times a second: at a few points a second that is under half a pixel a step, and the canvas
+// redraws only when it moves.
+const STEP = 0.05;
+
+/** Seconds of drift (at `rate`), counted only while the fog runs, so it picks up where it stopped. */
+function useDriftClock(rate: number, running: boolean): SharedValue<number> {
+  const seconds = useSharedValue(0);
+  const pending = useSharedValue(0);
+  const tick = useFrameCallback((frame) => {
+    pending.value += ((frame.timeSincePreviousFrame ?? 0) / 1000) * rate;
+    if (pending.value >= STEP * rate) {
+      seconds.value += pending.value;
+      pending.value = 0;
+    }
+  }, false);
+  const active = running && rate > 0;
+  useEffect(() => {
+    tick.setActive(active);
+  }, [active, tick]);
+  return seconds;
+}
+
+/** A texture's tile, repeated over the box and moved by its offset and its drift. */
+function Tile({ texture, scale, seconds }: { texture: FogTexture; scale: number; seconds: SharedValue<number> }) {
+  const image = tileOf(texture, scale);
+  const [dx, dy] = texture.offset ?? [0, 0];
+  const width = texture.tile[0];
+  const { drift } = texture;
+  const transform = useDerivedValue(() => {
+    const x = (((dx + drift * seconds.value) % width) + width) % width;
+    return [{ translateX: x }, { translateY: dy }, { scale: 1 / scale }];
+  });
+  return <ImageShader image={image} tx="repeat" ty="repeat" transform={transform} />;
+}
+
+/** One fog layer, one draw: the tile, cut by its elliptical mask in the same shader, at its opacity. No offscreen layer, so it is cheap to redraw. */
+function Fog({ layer, width, height, seconds }: { layer: FogLayer; width: number; height: number; seconds: SharedValue<number> }) {
   const { mask } = layer;
+  const tile = <Tile texture={layer.texture} scale={layer.texture.bake ?? 1} seconds={seconds} />;
   return (
-    <Group layer={<Paint opacity={layer.opacity} blendMode={layer.blend ?? "srcOver"} />}>
+    <Rect x={0} y={0} width={width} height={height} opacity={layer.opacity} blendMode={layer.blend ?? "srcOver"}>
       {mask ? (
-        <Mask
-          mode="alpha"
-          mask={
-            <Rect x={0} y={0} width={width} height={height}>
-              <Ellipse cx={mask.cx * width} cy={mask.cy * height} rx={mask.rx * width} ry={mask.ry * height} positions={[0.1, 0.85]} colors={["#000000", "rgba(0,0,0,0)"]} />
-            </Rect>
-          }
-        >
-          {noise}
-        </Mask>
+        <Blend mode="dstIn">
+          {tile}
+          <Ellipse cx={mask.cx * width} cy={mask.cy * height} rx={mask.rx * width} ry={mask.ry * height} positions={[0.1, 0.85]} colors={["#000000", "rgba(0,0,0,0)"]} />
+        </Blend>
       ) : (
-        noise
+        tile
       )}
-    </Group>
+    </Rect>
   );
 }
 
@@ -83,14 +130,16 @@ function WashLayer({ wash, width, height }: { wash: Wash; width: number; height:
 }
 
 /**
- * One static Skia canvas behind the screen, drawn once per size and never inside a list row (docs/design-system.md, Backdrops): the
- * ground, the fog layers each faded at its edges (or Light's wash and morning light), the vignette falling to the ground, and the grit
- * over all of it.
+ * One Skia canvas behind the screen, never inside a list row (docs/design-system.md, Backdrops): the ground, the fog layers each
+ * faded at its edges and drifting (or Light's wash and morning light, still), the vignette falling to the ground, and the grit over
+ * all of it. Only the fog moves, and only Dark has any, so a Light canvas is drawn once per size.
  */
 export function Backdrop({ scene }: { scene: SceneName }) {
   const { width, height } = useWindowDimensions();
   const s = scenesByTheme[useTheme()][scene];
   const { ground, vignette, grit } = s;
+  const seconds = useDriftClock(s.fog.length > 0 ? (s.drift ?? 1) : 0, useDriftRunning());
+  const still = useSharedValue(0);
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <Canvas style={StyleSheet.absoluteFill}>
@@ -110,26 +159,27 @@ export function Backdrop({ scene }: { scene: SceneName }) {
         )}
         {s.wash ? <WashLayer wash={s.wash} width={width} height={height} /> : null}
         {s.fog.map((layer, index) => (
-          <Fog key={index} layer={layer} width={width} height={height} />
+          <Fog key={index} layer={layer} width={width} height={height} seconds={seconds} />
         ))}
         {s.light ? <Light light={s.light} width={width} height={height} /> : null}
         <Rect x={0} y={0} width={width} height={height}>
           <Ellipse cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
         </Rect>
-        <Group layer={<Paint opacity={grit.opacity} blendMode={grit.blend} />}>
-          <Noise texture={gritTexture} width={width} height={height} />
-        </Group>
+        <Rect x={0} y={0} width={width} height={height} opacity={grit.opacity} blendMode={grit.blend}>
+          <Tile texture={gritTexture} scale={gritScale()} seconds={still} />
+        </Rect>
       </Canvas>
     </View>
   );
 }
 
-/** Fog layers in a box of their own, over a picture (HeroArt): one more static canvas, drawn once per size, its masks in the box's fractions. */
+/** Fog layers in a box of their own, over a picture (HeroArt): one more canvas, drifting as the backdrop's does, its masks in the box's fractions. */
 export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]; width: number; height: number }) {
+  const seconds = useDriftClock(1, useDriftRunning());
   return (
     <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
       {layers.map((layer, index) => (
-        <Fog key={index} layer={layer} width={width} height={height} />
+        <Fog key={index} layer={layer} width={width} height={height} seconds={seconds} />
       ))}
     </Canvas>
   );
