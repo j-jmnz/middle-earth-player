@@ -15,21 +15,20 @@ const eyebrowTone = { accent: "text-accent", moon: "text-moon", muted: "text-mut
 /**
  * An overline: one short tag above a title in bold Barlow capitals, tracked wide (Fellowship of the Ring · 2 of 6, In progress ·
  * Round 4). Moon by default; accent above the thing to act on. `rule` draws the short line before it that the hero text opens with.
- * `onArt` is an overline over a picture: Light's moon is too faint there, so it is ink.
+ * `onArt` is an overline over a picture: it takes the title's colour (bone) and its shadow, since moon or accent is too faint on a bright painting.
  */
 export function Eyebrow({ children, tone = "moon", testID, rule = false, onArt = false }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string; rule?: boolean; onArt?: boolean }) {
   const palette = usePalette();
-  const theme = useTheme();
-  const inked = onArt && theme === "light";
+  const shadow = useTitleShadow();
   const text = (
-    <Text testID={testID} className={`font-bold text-eyebrow uppercase ${eyebrowTone[inked ? "bone" : tone]}`}>
+    <Text testID={testID} className={`font-bold text-eyebrow uppercase ${eyebrowTone[onArt ? "bone" : tone]}`} style={onArt ? shadow : undefined}>
       {children}
     </Text>
   );
   if (!rule) return text;
   return (
     <View className="flex-row items-center gap-2.5">
-      <View style={{ width: 22, height: 1, backgroundColor: inked ? palette.bone : palette.moon }} />
+      <View style={{ width: 22, height: 1, backgroundColor: onArt ? palette.bone : palette.moon }} />
       {text}
     </View>
   );

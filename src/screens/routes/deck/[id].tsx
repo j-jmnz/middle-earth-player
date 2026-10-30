@@ -268,19 +268,27 @@ export default function DeckEditor() {
   // The bar: Add cards (opens the pool) on a phone and in portrait, whether the deck is ready, and Save deck, the one primary.
   const actionBar = (align: "auto" | "fill") => (
     <ActionBar align={align}>
-      <View className="flex-row items-center gap-2.5" style={align === "fill" ? { paddingLeft: insets.left } : undefined}>
-        {align === "fill" ? (
+      {align === "fill" ? (
+        <View className="flex-row items-center gap-2.5" style={{ paddingLeft: insets.left }}>
           <View className="flex-1">{status}</View>
-        ) : (
-          <View className="flex-1 gap-1.5">
-            {status}
-            <SecondaryButton testID="deck-add" label="Add cards" onPress={() => addOfType(null)} />
+          <View className="flex-1">
+            <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
           </View>
-        )}
-        <View className="flex-1">
-          <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
         </View>
-      </View>
+      ) : (
+        // Whether it is ready over both buttons, which stand on one centre line (Add cards 44 pt, Save deck 52 pt).
+        <View className="gap-1.5">
+          {status}
+          <View className="flex-row items-center gap-2.5">
+            <View className="flex-1">
+              <SecondaryButton testID="deck-add" label="Add cards" onPress={() => addOfType(null)} />
+            </View>
+            <View className="flex-1">
+              <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
+            </View>
+          </View>
+        </View>
+      )}
     </ActionBar>
   );
   // Back floats over the fan and stays in reach as the list scrolls; its shade and padding belong to its pane.
@@ -288,7 +296,7 @@ export default function DeckEditor() {
     <>
       <FloatingBarShade shown={past} top={insets.top} />
       <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, ...sidePad }}>
-        <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
+        <NavBar backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
       </View>
     </>
   );

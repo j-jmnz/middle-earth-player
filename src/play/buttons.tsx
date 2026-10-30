@@ -6,12 +6,12 @@
 // beside it says why. Every fill and text colour is a style, not only a class: on the phone a class on a Pressable whose style is a
 // function can be dropped (user report, 2026-10-25), so the pressed state comes from the Pressable's children.
 import { Pressable, View } from "react-native";
-import type { ReactNode } from "react";
+import type { ComponentRef, ReactNode, Ref } from "react";
 
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
-import { accentPlate, DISABLED_OPACITY, glassSurface, slateSurface, textSurface } from "./surfaces.ts";
+import { accentPlate, DISABLED_OPACITY, glassSurface, PRESSED_FILTER, slateSurface, textSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -45,10 +45,7 @@ export function PrimaryButton({
   // The table's command column: 46 pt, and a long word takes a second line rather than shrinking.
   dock?: boolean;
 }) {
-  const t = useTableTokens();
-  const s = useUiScale();
   const paper = surface === "paper";
-  const fill = (pressed: boolean) => (paper ? { backgroundColor: t.ink, opacity: pressed && !disabled ? 0.85 : 1 } : accentPlate(pressed && !disabled, t));
   return (
     <Pressable
       testID={testID}
@@ -60,26 +57,52 @@ export function PrimaryButton({
       disabled={disabled}
       onPress={onPress}
     >
-      {({ pressed }) => (
-        <View
-          className="items-center justify-center rounded-control px-5"
-          style={{
-            minHeight: touch(s, compact ? 44 : dock ? 46 : 52),
-            ...fill(pressed),
-            ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
-            transform: [{ translateY: pressed && !disabled ? 1 : 0 }],
-          }}
-        >
-          <Text
-            numberOfLines={dock ? 2 : undefined}
-            className="font-display text-center"
-            style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
-          >
-            {label}
-          </Text>
-        </View>
-      )}
+      {({ pressed }) => <PrimaryFace label={label} pressed={pressed} disabled={disabled} paper={paper} compact={compact} dock={dock} />}
     </Pressable>
+  );
+}
+
+/**
+ * The primary's look with no press of its own: the capsule, its fill and its word. `PrimaryButton` draws it inside its Pressable; a
+ * control that is itself the one press (the Scenarios banner, whose scene is the button) draws it as its "Resume" so the screen has one
+ * primary and one control, not a button inside a button.
+ */
+export function PrimaryFace({
+  label,
+  pressed = false,
+  disabled = false,
+  paper = false,
+  compact = false,
+  dock = false,
+}: {
+  label: string;
+  pressed?: boolean;
+  disabled?: boolean;
+  paper?: boolean;
+  compact?: boolean;
+  dock?: boolean;
+}) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const fill = paper ? { backgroundColor: t.ink, opacity: pressed && !disabled ? 0.85 : 1 } : accentPlate(pressed && !disabled, t);
+  return (
+    <View
+      className="items-center justify-center rounded-control px-5"
+      style={{
+        minHeight: touch(s, compact ? 44 : dock ? 46 : 52),
+        ...fill,
+        ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+        transform: [{ translateY: pressed && !disabled ? 1 : 0 }],
+      }}
+    >
+      <Text
+        numberOfLines={dock ? 2 : undefined}
+        className="font-display text-center"
+        style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
+      >
+        {label}
+      </Text>
+    </View>
   );
 }
 
@@ -155,7 +178,8 @@ export function SecondaryButton({
 /**
  * Words with no fill: the accent by default, a capsule fill while pressed, a 44 pt target. `tone` colours the word (ink on paper, danger
  * for an action that cannot be undone, muted for a reading aid); `small` sets it in label type (the dock's reading aids); `tight` is a
- * short phone's dock, a 40 pt row with a vertical hit slop that makes up the 44.
+ * short phone's dock, a 40 pt row with a vertical hit slop that makes up the 44. A text button that stands alone in content takes an
+ * `icon` (or a trailing chevron from the caller) so it does not read as body text.
  */
 export function TextButton({
   label,
@@ -211,22 +235,23 @@ export function TextButton({
       disabled={disabled}
       onPress={onPress}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}
-      className="items-center justify-center px-3"
-      style={({ pressed }) => ({
-        minHeight: row,
-        minWidth: touch(s, 44),
-        borderRadius: CONTROL_RADIUS,
-        ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
-        ...(tone === "ink" ? { backgroundColor: pressed && !disabled ? t.paperPressed : "transparent" } : textSurface(pressed && !disabled, t)),
-      })}
+      style={{ minHeight: row, justifyContent: "center" }}
     >
-      {icon ? (
-        <View className="flex-row items-center gap-2">
-          <GameIcon name={icon} size={16 * s} tint={tone === "ink" ? "inkLabel" : tone} />
+      {/* The size and the pressed fill are on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+      {({ pressed }) => (
+        <View
+          className="flex-row items-center justify-center gap-2 px-3"
+          style={{
+            minHeight: row,
+            minWidth: touch(s, 44),
+            borderRadius: CONTROL_RADIUS,
+            ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+            ...(tone === "ink" ? { backgroundColor: pressed && !disabled ? t.paperPressed : "transparent" } : textSurface(pressed && !disabled, t)),
+          }}
+        >
+          {icon ? <GameIcon name={icon} size={16 * s} tint={tone === "ink" ? "inkLabel" : tone} /> : null}
           {word}
         </View>
-      ) : (
-        word
       )}
     </Pressable>
   );
@@ -245,6 +270,9 @@ export function GlassIconButton({
   active = false,
   expanded,
   paper = false,
+  tone = "bone",
+  slop,
+  pressRef,
 }: {
   label: string;
   onPress: () => void;
@@ -253,19 +281,27 @@ export function GlassIconButton({
   active?: boolean;
   expanded?: boolean;
   paper?: boolean;
+  // The mark's colour at rest: bone (the table) or accent (a screen's Back, gear and book).
+  tone?: "bone" | "accent";
+  // Hit slop on every side, in points already scaled: a screen's header button reaches a little past its disc.
+  slop?: number;
+  // The Pressable, for a popover that moves a screen reader's focus to its first control.
+  pressRef?: Ref<ComponentRef<typeof Pressable>>;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
   const box = touch(s, 44);
-  const color = active ? t.accent : paper ? t.ink : t.bone;
+  const color = active ? t.accent : paper ? t.ink : tone === "accent" ? t.accent : t.bone;
   return (
     <Pressable
+      ref={pressRef}
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
       accessibilityLabel={label}
       {...(expanded == null ? {} : { accessibilityState: { expanded } })}
       onPress={onPress}
+      hitSlop={slop}
     >
       {({ pressed }) => (
         <View
@@ -275,7 +311,7 @@ export function GlassIconButton({
             borderRadius: CONTROL_RADIUS,
             alignItems: "center",
             justifyContent: "center",
-            ...(paper ? { backgroundColor: pressed ? t.paperPressed : withAlphaHex(t.ink, 0.08) } : glassSurface(pressed, t)),
+            ...(paper ? { backgroundColor: withAlphaHex(t.ink, 0.08), ...(pressed ? { filter: PRESSED_FILTER } : {}) } : glassSurface(pressed, t)),
           }}
         >
           {mark(color)}
@@ -298,6 +334,6 @@ export function CrossMark({ color }: { color: string }) {
 }
 
 /** The round ✕ that closes a reading panel, labelled "Close": on paper for the parchment panels, on night for the settings panel. */
-export function CloseButton({ onPress, testID, paper = false }: { onPress: () => void; testID: string; paper?: boolean }) {
-  return <GlassIconButton label="Close" testID={testID} paper={paper} onPress={onPress} mark={(color) => <CrossMark color={color} />} />;
+export function CloseButton({ onPress, testID, paper = false, pressRef }: { onPress: () => void; testID: string; paper?: boolean; pressRef?: Ref<ComponentRef<typeof Pressable>> }) {
+  return <GlassIconButton label="Close" testID={testID} paper={paper} onPress={onPress} pressRef={pressRef} mark={(color) => <CrossMark color={color} />} />;
 }

@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { armedLines, armedRoom, armedWords } from "./armed-room.ts";
-import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, PILL_PT, planWords, titleLinesOf, TITLE_PX, wordsWindow } from "./dock-budget.ts";
+import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, PILL_PT, planWords, titleLinesOf, TITLE_PX, TRAY_ROOM_PX, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 
 // The dense dock's budget (phase 22): one title line and the folded line stay in view in the worst dock at 667x375 and 844x390.
@@ -77,6 +77,45 @@ describe("the dense dock's words window", () => {
   });
 });
 
+// The choice's rows open in the dock: the words cannot shrink (the rows keep one row of room, TRAY_ROOM_PX), so the title is budgeted against
+// what is left on every screen, dense or not. The pinned block is the sizes the components draw: a taller screen's dock has a 46 pt primary
+// and two 44 pt rows under a readout of a 30 pt numbers row and a three-line result; the dense one's result is one line (18 pt).
+describe("the words window with the choice's rows open", () => {
+  const worst = `Tap again: ${longestName()} falls and the game is lost`;
+  const open = (height: number, dense: boolean, armed: number) => {
+    const readout = dense ? 30 + LABEL_PX : 30 + 3 * LABEL_PX;
+    const buttons = dense ? BUTTONS : 46 + 44 + 44;
+    const pinned = readout + 2 + armedRoom(armed, dense) + buttons;
+    const space = wordsWindow({ room: column(height), block: pinned + TRAY_ROOM_PX, dense });
+    const plan = planWords({ space, dense, clamp: true, title: LONG, textWidth: 168, hasLine: false, foldable: true });
+    const used = plan.titleLines * TITLE_PX + pinned + TRAY_ROOM_PX + (dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX);
+    return { plan, used, room: column(height) };
+  };
+
+  it("keeps the title, the pinned block and one row inside the column at 667x375 and 844x390", () => {
+    for (const height of [375, 390]) {
+      const { plan, used, room } = open(height, true, armedLines([armedWords(worst, true)]));
+      expect(plan.titleLines, `${height} tall`).toBeGreaterThanOrEqual(1);
+      expect(used, `${height} tall`).toBeLessThanOrEqual(room);
+    }
+  });
+
+  it("clamps a two-line title to one on a 430 pt tall phone with a two-line armed line, where it would overflow", () => {
+    const { plan, used, room } = open(430, false, 2);
+    expect(titleLinesOf(LONG, 168)).toBe(2);
+    expect(plan).toMatchObject({ titleLines: 1, cut: true, pill: true });
+    expect(used).toBeLessThanOrEqual(room);
+    // Unclamped the same dock would pass its column.
+    expect(used + TITLE_PX).toBeGreaterThan(room);
+  });
+
+  it("leaves a two-line title whole when the room holds it", () => {
+    const { plan, used, room } = open(520, false, 2);
+    expect(plan).toMatchObject({ titleLines: 2, cut: false });
+    expect(used).toBeLessThanOrEqual(room);
+  });
+});
+
 describe("the \"i\" popover's room", () => {
   const lines = dockLines({
     guide: "Each enemy attacks: declare one defender, or take it undefended on a hero.",
@@ -92,6 +131,6 @@ describe("the \"i\" popover's room", () => {
     const chars = Math.floor((place.width - 28) / 6.6);
     const rows = [lines.first, ...lines.rest].reduce((sum, line) => sum + Math.ceil((line?.text.length ?? 0) / chars), 0);
     const height = 2 * TITLE_PX + 3 * 4 + rows * LABEL_PX + 10;
-    expect(height, `${rows} rows in ${place.width} pt`).toBeLessThanOrEqual(place.maxHeight - 48 - 8);
+    expect(height, `${rows} rows in ${place.width} pt`).toBeLessThanOrEqual(place.maxHeight - 12);
   });
 });

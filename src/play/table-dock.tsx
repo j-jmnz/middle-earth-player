@@ -21,17 +21,19 @@ import { Text } from "./text.tsx";
 
 /** The engine's numbers for the moment, large, and what they come to: inline in the dock, on no band. */
 // `oneLine`: the result is one line (the choice rows are open in the dock on a short phone); its words stay in the label.
-export function ReadoutView({ readout, tight = false, oneLine = false }: { readout: Readout; tight?: boolean; oneLine?: boolean }) {
+function ReadoutView({ readout, tight = false, oneLine = false }: { readout: Readout; tight?: boolean; oneLine?: boolean }) {
   return (
     <View testID={`readout-${readout.kind}`} className="px-2">
-      <View className="flex-row items-center justify-center gap-2">
-        {readout.stats.map((stat, index) => (
-          <View key={stat.word} className="flex-row items-center gap-2">
-            {index > 0 ? <Text className="text-label text-faint">{readout.join ?? "against"}</Text> : null}
-            <Stats stats={[stat]} surface="night" size="title" />
-          </View>
-        ))}
-      </View>
+      {readout.stats.length > 0 ? (
+        <View className="flex-row items-center justify-center gap-2">
+          {readout.stats.map((stat, index) => (
+            <View key={stat.word} className="flex-row items-center gap-2">
+              {index > 0 ? <Text className="text-label text-faint">{readout.join ?? "against"}</Text> : null}
+              <Stats stats={[stat]} surface="night" size="title" />
+            </View>
+          ))}
+        </View>
+      ) : null}
       {readout.result ? (
         <Text testID="readout-result" numberOfLines={oneLine ? 1 : 3} accessibilityLabel={readout.result} className={`${tight ? "" : "mt-0.5"} text-center text-label text-muted`}>
           {readout.result}
@@ -53,7 +55,7 @@ export const lineTone = (kind: "guide" | "note" | "unavailable") => (kind === "u
 
 export function TableDock({
   step,
-  seat = "",
+  lead = "",
   title,
   note,
   picked,
@@ -75,8 +77,9 @@ export function TableDock({
 }: {
   // The step in words ("Combat", "Stops on · Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
   step: string;
-  // The seat that is asked, at the start of the title in two-handed play ("Player 1 · "), or "".
-  seat?: string;
+  // What leads the title: the seat that is asked in two-handed play ("Player 1 · ") and a Response's or an Action's timing
+  // ("Response · "), or "". The step overline is not drawn, so this is how the player knows a chance to respond from a plain question.
+  lead?: string;
   title: string;
   note: string | null;
   // The cards picked so far, in words ("Frodo Baggins, Sam Gamgee"), or an ability's printed line, or null: heard in the
@@ -121,7 +124,7 @@ export function TableDock({
   // choice open, above one row), and the rest of it waits behind the "i", which sits on the title row when the room cannot hold a
   // folded line. With the choice open the folded line waits behind the "i" too.
   const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block + (trayOpen ? TRAY_ROOM_PX * s : 0), dense }, s) : Infinity;
-  const plan = planWords({ space, dense, title: seat + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) }, s);
+  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) }, s);
   const pill = plan.pill ? (
     // The "i" button (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the reading aids.
     // 26 pt round with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
@@ -164,7 +167,7 @@ export function TableDock({
           <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
             <View className="flex-row items-start gap-1.5">
               <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={[step, title, trayOpen ? count : ""].filter(Boolean).join(". ")} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={{ flexShrink: 0 }}>
-                {seat + title}
+                {lead + title}
               </Text>
               {plan.pillOnTitle ? pill : null}
             </View>
@@ -184,7 +187,7 @@ export function TableDock({
           collapsable={false}
           onLayout={(event) => setRoom((now) => ({ ...now, block: Math.round(event.nativeEvent.layout.height) }))}
           className={dense ? "gap-0.5" : "gap-1"}
-          style={{ flexShrink: 0, paddingTop: tray ? (dense ? 2 : 4) * s : 0 }}
+          style={{ flexShrink: 0, paddingTop: trayOpen ? (dense ? 2 : 4) * s : 0 }}
         >
           {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} /> : null}
           {refusal ? (

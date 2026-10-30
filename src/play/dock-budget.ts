@@ -20,7 +20,8 @@ export const TITLE_CHAR_PT = 10.6;
 export const LABEL_CHAR_PT = 6.6;
 // The "i" button's width (26 pt) and its gap beside a line or a title.
 export const PILL_PT = 32;
-// The room kept for one row of the choice, under the title, when it is open in the dock (a row is 48 pt, with its gap).
+// The room kept for one row of the choice, under the title, when it is open in the dock (a row is 48 pt, with its gap): the words are
+// budgeted against it whatever the screen's height.
 export const TRAY_ROOM_PX = 52;
 // A short phone's screen height under which the dock is dense; the choice tray's dense tiles use the same line.
 export const DENSE_BELOW = 400;
@@ -61,13 +62,14 @@ export type WordsPlan = {
  * What the dock draws in its words window. Off a dense screen the title keeps its own lines and the folded line shows. On a dense
  * one the title is clamped to the lines that fit above the folded line, never fewer than one; with room for less than one title
  * line and one label line, the folded line goes and the button moves to the title row, where the title is counted against the
- * width the button leaves. `foldable` is `DockLines.foldable` (lines wait behind the pill).
+ * width the button leaves. `foldable` is `DockLines.foldable` (lines wait behind the pill). `clamp` is the choice's rows being open:
+ * the words are budgeted by their room on a taller screen too, because the rows keep their own minimum and the words cannot shrink.
  */
-export function planWords(a: { space: number; dense: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean }, scale = 1): WordsPlan {
+export function planWords(a: { space: number; dense: boolean; clamp?: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean }, scale = 1): WordsPlan {
   // The room and the width come in as screen points; the budget is counted in logical ones.
   const space = a.space / scale;
   const textWidth = a.textWidth / scale;
-  if (!a.dense) {
+  if (!a.dense && !a.clamp) {
     const natural = titleLinesOf(a.title, textWidth);
     return { titleLines: natural, cut: false, showLine: a.hasLine, pill: a.foldable, pillOnTitle: !a.hasLine && a.foldable };
   }
@@ -85,15 +87,15 @@ export function planWords(a: { space: number; dense: boolean; title: string; tex
   return { titleLines, cut, showLine, pill, pillOnTitle: pill && (onTitle || !a.hasLine) };
 }
 
-// The "i" popover (dock-lines-popover.tsx): its widest, its gap from the screen's edge and its Close row.
+// The "i" popover (dock-lines-popover.tsx): its widest, its gap from the screen's edge and the least room it keeps.
 const POPOVER_MAX_WIDTH = 280;
 const POPOVER_GAP = 6;
 const POPOVER_EDGE = 8;
-export const CLOSE_ROW = 48;
+const POPOVER_MIN_ROOM = 88;
 
 /** The popover's width and its room under `top`: as wide as the canvas beside the command column allows, down to the screen's foot. */
 export function linesPlace(a: { screenWidth: number; screenHeight: number; commandWidth: number; insetLeft: number; insetRight: number; top: number }, scale = 1): { width: number; maxHeight: number } {
   const canvas = (a.screenWidth - a.insetLeft - a.insetRight - a.commandWidth) / scale - POPOVER_GAP - POPOVER_EDGE;
-  return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)) * scale, maxHeight: Math.max(CLOSE_ROW + 40, (a.screenHeight - a.top) / scale - POPOVER_EDGE) * scale };
+  return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)) * scale, maxHeight: Math.max(POPOVER_MIN_ROOM, (a.screenHeight - a.top) / scale - POPOVER_EDGE) * scale };
 }
 

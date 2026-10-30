@@ -9,9 +9,9 @@ import { scheduleOnRN } from "react-native-worklets";
 import { bannerSpan } from "./banner-span.ts";
 import { layoutAnim, timing, useMotionScale, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
+import { CONTAINER_RADIUS } from "./radius.ts";
 import { BEAT_MS, type Moment } from "./outcome.ts";
 import { LineMark } from "./table-chrome.tsx";
-import { panelSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -28,12 +28,12 @@ const FLICK = 600;
 
 /**
  * The banner's fill (user request, 2026-10-29): dark and slightly see-through on Dark, a dark red for a failure or an attack
- * (docs/design-system.md, Table: the combat banner), with the lit top edge and no outline. Light keeps its lit panel, a little
- * see-through.
+ * (docs/design-system.md, Table: the combat banner), with no lit edge and no outline: the red band is its only line. Light keeps its
+ * pale panel, a little see-through.
  */
 function bannerFill(t: TableTokens, tone: Moment["tone"]) {
-  if (t.depth === "light") return { backgroundColor: withAlphaHex(t.raisedTop, 0.9), boxShadow: panelSurface(false, t).boxShadow };
-  return { backgroundColor: tone === "bad" ? "rgba(26,10,9,0.9)" : withAlphaHex(t.night, 0.9), boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
+  if (t.depth === "light") return { backgroundColor: withAlphaHex(t.raisedTop, 0.9), boxShadow: `0 10px 28px ${withAlphaHex(t.shade, 0.35)}` };
+  return { backgroundColor: tone === "bad" ? "rgba(26,10,9,0.9)" : withAlphaHex(t.night, 0.9), boxShadow: `0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
 }
 
 /**
@@ -130,7 +130,8 @@ export function MomentBanner({
     <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: SIDE }}>
       <GestureDetector gesture={gesture}>
         {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
-        <Animated.View className="rounded-container" style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, ...bannerFill(t, moment.tone) }, swipeStyle]}>
+        {/* The corners are a style: a class on a reanimated view does not apply. */}
+        <Animated.View style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, borderRadius: CONTAINER_RADIUS * s, ...bannerFill(t, moment.tone) }, swipeStyle]}>
           <View
             testID="moment"
             accessible

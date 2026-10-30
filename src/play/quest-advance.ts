@@ -94,7 +94,7 @@ export type AdvanceLatch = { latched: QuestAdvance | null; done: number; asked: 
 export const NO_ADVANCE: AdvanceLatch = { latched: null, done: 0, asked: 0 };
 
 /** Whether the advance on screen is the table's opening, not an advance. */
-export function isOpening(advance: QuestAdvance): boolean {
+function isOpening(advance: QuestAdvance): boolean {
   return advance.seq === OPENING_SEQ;
 }
 

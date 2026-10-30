@@ -108,6 +108,7 @@ export function Tile({
   leading = null,
   trailing = null,
   said = "",
+  hint,
 }: {
   label: string;
   selected: boolean;
@@ -122,6 +123,8 @@ export function Tile({
   trailing?: ReactNode;
   // More for a screen reader to say (the foreseen damage).
   said?: string;
+  // What a tap does, when the label does not say ("Tap to play it"); said before the long press's hint.
+  hint?: string;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
@@ -139,7 +142,7 @@ export function Tile({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detail ?? ""].filter((part) => part.length > 0).join(". ")}
-      accessibilityHint={onLongPress ? "Hold to read the card" : undefined}
+      accessibilityHint={[hint, onLongPress ? "Hold to read the card" : null].filter(Boolean).join(". ") || undefined}
       onPress={onPress}
       onLongPress={onLongPress ?? undefined}
     >

@@ -19,6 +19,7 @@ import { threatRows, threatVerdict } from "./foresight.ts";
 import { logLines, type LogNames } from "./log.ts";
 import { useDialsEdge } from "./bar-edge.ts";
 import { PEEK_TOP, PeekBanner } from "./peek-banner.tsx";
+import { carouselHeight } from "./carousel-size.ts";
 import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
@@ -71,7 +72,7 @@ function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore
   const game = useStore(store, (state) => state.game);
   return (
     <ThreatPanel
-      seatLabel={game.seatCount > 1 ? `Player ${seat + 1}` : "Threat"}
+      seatLabel={game.seatCount > 1 ? `Player ${seat + 1}` : null}
       threat={game.seats[seat]?.threat ?? 0}
       rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, seat) }))}
       onClose={onClose}
@@ -206,7 +207,7 @@ export function TableLayers({
         top={barBottom}
         left={insets.left}
         width={canvas}
-        height={Math.round(Math.min(340 * s, (screen.height - barBottom) * 0.92))}
+        height={carouselHeight({ screenHeight: screen.height, barBottom, insetBottom: insets.bottom }, s)}
         onChange={(change) => tableSettings.getState().update(change)}
         onClose={close}
       />

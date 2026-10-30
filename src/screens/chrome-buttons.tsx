@@ -13,12 +13,13 @@ import { chipSurface, glassSurface, sunkSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { touch, useUiScale } from "../play/ui-scale";
 import { Text, TextInput } from "../play/text";
+import { GlassIconButton } from "../play/buttons";
 
 // The night switch row the phase carousel's Stops and the Settings screen share (src/play cannot import screens, so it lives there).
 export { SettingSwitch } from "../play/setting-switch";
 // The segmented switch and the word buttons are shared the same way (src/play/segmented.tsx, src/play/buttons.tsx).
 export { Segmented } from "../play/segmented";
-export { PrimaryButton, SecondaryButton, TextButton } from "../play/buttons";
+export { PrimaryButton, PrimaryFace, SecondaryButton, TextButton } from "../play/buttons";
 
 /** The fill of a pressed button on night, and on paper, in the theme in force. */
 export function usePressedNight() {
@@ -26,15 +27,10 @@ export function usePressedNight() {
   return useMemo(() => ({ backgroundColor: palette.pressed }), [palette]);
 }
 
-export function usePressedPaper() {
-  const palette = usePalette();
-  return useMemo(() => ({ backgroundColor: palette.paperPressed }), [palette]);
-}
-
 /**
  * The round glass button (Back, the gear, the book): 44 pt, a dark disc (a pale one on Light) and one mark in the
- * accent: a chevron, a printed game icon or a glyph. It always carries a label, which a screen reader says. `overlay` is kept for the
- * callers over a picture; the glass reads over a picture and over the fog alike.
+ * accent: a chevron, a printed game icon or a glyph. It always carries a label, which a screen reader says. It is the table's
+ * `GlassIconButton` (src/play/buttons.tsx) with a mark built from its icon, glyph or chevron.
  */
 export function IconButton({
   label,
@@ -55,40 +51,31 @@ export function IconButton({
   // A mark the chrome draws (the gear), in the button's colour.
   mark?: (props: { color: string; size?: number }) => ReactNode;
   chevron?: boolean;
-  overlay?: boolean;
   tone?: "bone" | "accent";
   // Set for a button that shows and hides something (Manage): a screen reader hears whether it is open.
   expanded?: boolean;
 }) {
-  const palette = usePalette();
-  const t = useTableTokens();
   const s = useUiScale();
-  const color = tone === "accent" ? palette.accent : palette.bone;
-  const box = touch(s, 44);
   return (
-    <Pressable
-      testID={testID}
-      collapsable={false}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      {...(expanded == null ? {} : { accessibilityState: { expanded } })}
+    <GlassIconButton
+      label={label}
       onPress={onPress}
-      hitSlop={4 * s}
-    >
-      {({ pressed }) => (
-        <View style={{ width: box, height: box, borderRadius: CONTROL_RADIUS, alignItems: "center", justifyContent: "center", ...glassSurface(pressed, t) }}>
-          {chevron ? (
-            <Chevron color={color} />
-          ) : mark ? (
-            mark({ color, size: 20 })
-          ) : icon ? (
-            <GameIcon name={icon} size={18 * s} tint={tone === "accent" ? "accent" : "bone"} />
-          ) : (
-            <Text style={{ color, fontSize: 20 * s, lineHeight: 22 * s, fontWeight: "700" }}>{glyph}</Text>
-          )}
-        </View>
-      )}
-    </Pressable>
+      testID={testID}
+      tone={tone}
+      expanded={expanded}
+      slop={4 * s}
+      mark={(color) =>
+        chevron ? (
+          <Chevron color={color} />
+        ) : mark ? (
+          mark({ color, size: 20 })
+        ) : icon ? (
+          <GameIcon name={icon} size={18 * s} tint={tone === "accent" ? "accent" : "bone"} />
+        ) : (
+          <Text style={{ color, fontSize: 20 * s, lineHeight: 22 * s, fontWeight: "700" }}>{glyph}</Text>
+        )
+      }
+    />
   );
 }
 
@@ -99,7 +86,7 @@ export function PillButton({ label, onPress, testID, accessibilityLabel }: { lab
   return (
     <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} onPress={onPress}>
       {({ pressed }) => (
-        <View style={{ minHeight: touch(s, 44), minWidth: touch(s, 44), borderRadius: CONTROL_RADIUS, paddingHorizontal: 18 * s, alignItems: "center", justifyContent: "center", ...glassSurface(pressed, t) }}>
+        <View style={{ minHeight: touch(s, 44), minWidth: touch(s, 44), borderRadius: CONTROL_RADIUS, paddingHorizontal: 14 * s, alignItems: "center", justifyContent: "center", ...glassSurface(pressed, t) }}>
           <Text className="text-body" style={{ color: t.muted }}>
             {label}
           </Text>
@@ -171,6 +158,7 @@ export function ToggleChip({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const s = useUiScale();
   const on = selected === true;
   return (
     <Pressable
@@ -184,7 +172,7 @@ export function ToggleChip({
       className="min-h-touch min-w-touch justify-center"
     >
       {({ pressed }) => (
-        <View className="h-9 min-w-touch flex-row items-center justify-center gap-1.5 rounded-control px-3.5" style={chipSurface(on, pressed, t)}>
+        <View className="min-w-touch flex-row items-center justify-center gap-1.5 rounded-control px-3.5" style={{ height: 36 * s, ...chipSurface(on, pressed, t) }}>
           {leading}
           <Text className={`text-label ${on ? "font-semibold" : ""}`} style={{ color: on ? palette.accentHigh : palette.muted }}>
             {label}

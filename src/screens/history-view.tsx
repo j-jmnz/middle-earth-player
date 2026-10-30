@@ -159,7 +159,8 @@ export function HistoryView({ initial }: { initial: RunKind }) {
 
   const listHead = (
     <View className="pb-2">
-      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" />
+      {/* The run count is the first group's label: a scroll container may never announce its own. */}
+      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" accessibilityLabel={shown.length > 0 ? `History, ${plural(shown.length, "run")}` : "History"} />
       <View className="mt-3 gap-1" testID="history-filters">
         {scopes.length > 1 ? (
           <View className="flex-row flex-wrap gap-x-2" accessibilityRole="radiogroup" accessibilityLabel={kind === "campaign" ? "Filter by campaign" : "Filter by box"}>
@@ -193,7 +194,6 @@ export function HistoryView({ initial }: { initial: RunKind }) {
           extraData={{ refs, playthroughs, nameOf }}
           keyExtractor={(item) => (item.type === "group" ? item.id : `run-${item.id}`)}
           getItemType={(item) => (item.type === "group" ? "group" : "run")}
-          accessibilityLabel={shown.length > 0 ? plural(shown.length, "run") : undefined}
           style={{ flex: 1 }}
           contentContainerStyle={list.contentContainerStyle}
           showsVerticalScrollIndicator={false}

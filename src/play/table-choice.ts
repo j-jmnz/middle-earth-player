@@ -395,21 +395,25 @@ export function onTheTable(sheet: Sheet, onTable: (cardId: string) => boolean): 
  * The words over a sheet, in the dock or on a panel: the step (with the timing of a Response or an Action, and the seat in
  * two-handed play), the moment, a sentence, and the engine's numbers for it.
  */
-export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; seat: string; title: string; note: string | null; stats: readonly SheetStat[] } {
-  // The seat that is asked leads the dock's title in two-handed play ("Player 1 · "); the step names it for a screen reader too.
+export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; lead: string; title: string; note: string | null; stats: readonly SheetStat[] } {
+  // What leads the dock's title: the seat that is asked in two-handed play ("Player 1 · "), and for a Response or an Action the timing, since the
+  // step overline is not drawn ("Response · Pathless Country"). The step names both for a screen reader too.
   const seat = game.seatCount > 1 ? `Player ${game.activeSeat + 1} · ` : "";
   switch (sheet.kind) {
     case "pick":
     case "multi":
-      return { step: `${seat}${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
     case "distribute":
-      return { step: `${seat}${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: [] };
-    case "trigger":
-      return { step: `${seat}${sheet.timing} · ${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: [] };
+    case "trigger": {
+      // A title that already says the timing ("Response") is not led by it twice.
+      const timing = sheet.title.startsWith(sheet.timing) ? "" : `${sheet.timing} · `;
+      return { step: `${seat}${sheet.timing} · ${sheet.step}`, lead: seat + timing, title: sheet.title, note: sheet.note, stats: [] };
+    }
     case "window":
-      return { step: `${seat}${sheet.step}`, seat, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: [] };
     case "outcome":
-      return { step: sheet.step, seat: "", title: sheet.title, note: sheet.note, stats: [] };
+      return { step: sheet.step, lead: "", title: sheet.title, note: sheet.note, stats: [] };
   }
 }
 

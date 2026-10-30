@@ -49,6 +49,7 @@ import { useTableChoice } from "../play/use-table-choice";
 import { trayCount } from "../play/tray-logic";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
+import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
@@ -393,17 +394,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               />
             ) : null}
           </View>
-          {/* The command column stands on a fade to the night at its foot and right edge, soft at the canvas side and at the top so no straight edge shows (one radial gradient from the bottom-right corner); the dock has no panel of its own. */}
-          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s), backgroundImage: `radial-gradient(115% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
+          {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
+          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s), backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
             <TableDock
               step={choice.header.step}
-              seat={choice.header.seat}
+              lead={choice.header.lead}
               title={choice.header.title}
               note={choice.header.note}
               picked={choice.picked}
               unavailable={choice.unavailable}
-              // The quest scale shows the willpower against the threat in the Quest phase, so the dock does not draw its own.
-              readout={scale.live && choice.readout?.kind === "quest" ? null : choice.readout}
+              // The quest scale shows the willpower against the threat in the Quest phase, so the dock keeps only the readout's result line.
+              readout={dockReadout(choice.readout, scale.live)}
               refusal={refusal}
               dock={choice.dock}
               onButton={choice.onButton}
@@ -484,7 +485,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
       <TableMenu open={menuOpen} nav={nav} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
-      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.seat + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
+      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
 }

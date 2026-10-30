@@ -9,10 +9,10 @@ export const LINE_PX = 18;
 // No line is held when nothing in the moment can be said there (no button arms, nothing waits): the room is the bar's alone.
 export const MIN_LINES = 0;
 export const MAX_LINES = 4;
-// The bar that runs down under the text (2 pt) and its gap, reserved whether or not a button is armed.
+// The bar that runs down under the text (2 pt) and the 2 pt of clear room under it, so it never touches the primary: 4 pt, reserved
+// whether or not a button is armed, on a short phone's dock too.
 export const BAR_PX = 4;
-// On a short phone's dock (under 400 pt tall) the bar's reserve is 2 pt: the bar itself is 2.
-export const BAR_DENSE_PX = 2;
+export const BAR_DENSE_PX = 4;
 // The words a sheet's armed line leads with; a dense dock drops them from a consequence clause when that saves a line (`armedWords`):
 // the line is accent and a bar runs down under the button, so it is plainly the second tap, and a screen reader hears the full line.
 export const LEAD = "Tap again: ";

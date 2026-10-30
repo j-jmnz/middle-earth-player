@@ -61,7 +61,7 @@ export function PileList({
         {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">The pile is empty.</Text> : null}
         {cards.map((card) =>
           playable.includes(card.id) && onPlay ? (
-            <Tile key={card.id} label={card.label} detail="Playable now" selected testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
+            <Tile key={card.id} label={card.label} detail="Playable now" hint="Tap to play it" selected testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
           ) : (
             <Tile key={card.id} label={card.label} selected={false} testID={`pile-card-${card.id}`} onPress={() => onRead(card.id)} />
           ),
@@ -110,7 +110,8 @@ export function ThreatPanel({
   rows,
   onClose,
 }: {
-  seatLabel: string;
+  // "Player 2" in two-handed play, else null.
+  seatLabel: string | null;
   threat: number;
   rows: readonly { id: string; name: string; cost: number; verdict: { word: string; engages: boolean } }[];
   onClose: () => void;
@@ -118,9 +119,10 @@ export function ThreatPanel({
   const s = useUiScale();
   return (
     <View testID="threat-panel" collapsable={false} style={{ flexShrink: 1 }}>
-      <View className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
-        <Text className="font-display text-eyebrow uppercase text-inkLabel">{seatLabel}</Text>
-        <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Threat ${threat} of 50`}</Text>
+      <View accessible accessibilityRole="header" accessibilityLabel={`${seatLabel ? `${seatLabel}, ` : ""}Threat ${threat} of 50`} className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
+        {seatLabel ? <Text className="font-display text-eyebrow uppercase text-inkLabel">{seatLabel}</Text> : null}
+        <Text className="mt-1 font-display text-title text-ink">Threat</Text>
+        <Text className="font-display text-heading text-inkMuted">{`${threat} of 50`}</Text>
       </View>
       <PanelClose testID="threat-panel-close" onPress={onClose} />
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>

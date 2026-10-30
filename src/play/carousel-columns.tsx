@@ -4,12 +4,13 @@
 import { Pressable, View } from "react-native";
 
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
+import { PHASE_ROW, phaseSlop } from "./carousel-size.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
 import { SettingSwitch } from "./setting-switch.tsx";
 import { ITEM_RADIUS } from "./radius.ts";
 import { chipOnSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
-import { touch, useUiScale } from "./ui-scale.ts";
+import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
@@ -36,7 +37,8 @@ function PhaseDot({ state }: { state: CarouselPhase["state"] }) {
 }
 
 /**
- * One of the round's seven phases, a row of the left column: its dot and its name in Marcellus SC (accent when it is the game's, bone to
+ * One of the round's seven phases, a row of the left column, PHASE_ROW tall with a hit slop that makes up the 44 pt target (seven rows and
+ * the round's label must fit the shortest tables, carousel-size.ts): its dot and its name in Marcellus SC (accent when it is the game's, bone to
  * come, muted when done). The phase being read is washed in accent; a tap on a row shows that phase's steps.
  */
 export function PhaseRow({ phase, selected, onPress, onLayoutY }: { phase: CarouselPhase; selected: boolean; onPress: () => void; onLayoutY?: (y: number) => void }) {
@@ -44,6 +46,7 @@ export function PhaseRow({ phase, selected, onPress, onLayoutY }: { phase: Carou
   const s = useUiScale();
   const past = phase.state === "past";
   const current = phase.state === "current";
+  const slop = phaseSlop(s);
   return (
     <Pressable
       testID={`carousel-phase-${phase.id}`}
@@ -53,12 +56,13 @@ export function PhaseRow({ phase, selected, onPress, onLayoutY }: { phase: Carou
       accessibilityHint="Shows its steps"
       accessibilityState={{ selected }}
       onPress={onPress}
+      hitSlop={{ top: slop, bottom: slop }}
       onLayout={onLayoutY ? (event) => onLayoutY(event.nativeEvent.layout.y) : undefined}
     >
       {({ pressed }) => (
         <View
           style={{
-            minHeight: touch(s, ROW),
+            height: PHASE_ROW * s,
             flexDirection: "row",
             alignItems: "center",
             gap: 10 * s,

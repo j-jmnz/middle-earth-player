@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { barZones, headlineWidth, MENU_BUTTON, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, TICK, TICK_GAP } from "./top-bar-layout.ts";
 
-// The rail names a phase over its ticks and nothing longer, so it never needs more than this (the old three-line rail needed 232).
+// The rail names a phase over its ticks and nothing longer, so it never needs more than this.
 const RAIL_CEILING = 232;
 
 describe("top bar zones", () => {

@@ -77,6 +77,7 @@ export function SeatPicker({
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
   const slot = index === 0 && needsRingBearer;
   const choosing = !pickedDeck || changing;
+  const short = pickedDeck ? deckShortLine(pickedDeck) : null;
   const title = seatCount === 1 ? (saga ? "Your fellowship" : "Your party") : `Seat ${index + 1}`;
   // A Ring-bearer the deck brings itself is one of the candidates (a Fellowship hero with the Ring-bearer trait).
   const carries = (code: string) => candidates.some((candidate) => candidate.code === code);
@@ -171,12 +172,15 @@ export function SeatPicker({
         </View>
       ) : (
         <View testID={`briefing-party-${index}`}>
-          {/* The name gets the row's width less Change (a long one never breaks inside a word); the counts sit under it. */}
+          {/* The name gets the row's width less Change (a long one never breaks inside a word). The hero tiles show the heroes, so the count
+              shows only when the deck is short; a screen reader hears the full count with the name. */}
           <View className="flex-row items-center justify-between gap-3">
-            <Text className="min-w-0 flex-1 font-display text-title text-bone">{pickedDeck.name}</Text>
+            <Text accessibilityLabel={`${pickedDeck.name}, ${deckCountLine(pickedDeck)}`} className="min-w-0 flex-1 font-display text-title text-bone">
+              {pickedDeck.name}
+            </Text>
             <TextButton label="Change" testID={`deck-change-${index}`} tone="accent" accessibilityLabel={`Change the deck of ${title.toLowerCase()}, now ${pickedDeck.name}`} onPress={() => setChanging(true)} />
           </View>
-          <Label>{deckCountLine(pickedDeck)}</Label>
+          {short ? <Label>{short}</Label> : null}
           <View className="mt-3.5 flex-row gap-2">
             {heroes.map((code) => (
               <HeroTile key={code} hero={faceOf(code)} height={TOOL_HEIGHT * s} dense ringBearer={!slot && carries(code)} />

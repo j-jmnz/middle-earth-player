@@ -9,13 +9,14 @@ import { Pressable, ScrollView, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { startIndex, STOP_AHEAD_WORDS, STOPS_TEXT, type Carousel } from "./carousel.ts";
+import { CAROUSEL_FOOT, CAROUSEL_INSET, ROUND_HEAD } from "./carousel-size.ts";
 import { PhaseRow, ROW, StepBlock } from "./carousel-columns.tsx";
 import { SettingSwitch } from "./setting-switch.tsx";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { TableSettings } from "./table-settings.ts";
 import { CONTAINER_RADIUS, CONTROL_RADIUS } from "./radius.ts";
-import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
+import { floatingSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -23,8 +24,8 @@ import { Text } from "./text.tsx";
 
 // The panel drops in by this much (translateY -12 to 0 with a fade).
 const DROP = 12;
-// The panel floats this far inside the canvas and under the top bar, a lit panel of its own rather than a slab hung off the bar.
-const INSET = 8;
+// The panel floats this far inside the canvas and under the top bar (carousel-size.ts), a lit panel of its own rather than a slab hung off the bar.
+const INSET = CAROUSEL_INSET;
 // The phase column's width: about a third of the panel, at least wide enough for "Encounter" and its dot, at most this.
 const PHASES_MIN = 132;
 const PHASES_MAX = 168;
@@ -61,11 +62,11 @@ function CarouselBody({ carousel, width, settings, onChange }: { carousel: Carou
   const left = Math.min(PHASES_MAX * s, Math.max(PHASES_MIN * s, Math.round(width * 0.34)));
   const row = touch(s, ROW);
   return (
-    <View style={{ flex: 1, flexDirection: "row", paddingHorizontal: 4 * s, paddingBottom: INSET * s }}>
+    <View style={{ flex: 1, flexDirection: "row", paddingHorizontal: 4 * s, paddingBottom: CAROUSEL_FOOT * s }}>
       <View style={{ width: left }}>
-        {/* "Before the round" wraps to a second line rather than being cut. */}
-        <View style={{ minHeight: row, justifyContent: "center", paddingHorizontal: 12 * s, paddingVertical: 4 * s }}>
-          <Text accessibilityRole="header" className="font-display text-body uppercase" style={{ color: t.muted, letterSpacing: 0.6 * s }}>
+        {/* The round's label: Marcellus SC (small caps) in label type on one line, clear of the panel's 20 pt corner. */}
+        <View style={{ height: ROUND_HEAD * s, justifyContent: "center", paddingLeft: (CONTAINER_RADIUS - 4) * s, paddingRight: 8 * s }}>
+          <Text accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} className="font-display text-micro" style={{ color: t.muted, letterSpacing: 1.2 * s }}>
             {where}
           </Text>
         </View>
@@ -162,7 +163,7 @@ export function PhaseCarousel({
             width: inner,
             height: height - (INSET * s) / 2,
             borderRadius: CONTAINER_RADIUS * s,
-            ...tileSurface(false, t),
+            ...floatingSurface(t),
             boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.night, 0.6)}`,
             overflow: "hidden",
           },

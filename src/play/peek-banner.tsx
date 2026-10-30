@@ -12,6 +12,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { PeekWords } from "./peek.ts";
+import { textSurface } from "./surfaces.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -51,12 +52,16 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
             accessibilityLabel={words.back}
             hitSlop={{ top: slop, bottom: slop }}
             onPress={onBack}
-            className="h-9 shrink-0 items-center justify-center rounded-control px-3"
-            style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
+            className="shrink-0 justify-center"
           >
-            <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">
-              {words.back}
-            </Text>
+            {/* The fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+            {({ pressed }) => (
+              <View className="items-center justify-center rounded-control px-3" style={{ height: 36 * s, ...textSurface(pressed, t) }}>
+                <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">
+                  {words.back}
+                </Text>
+              </View>
+            )}
           </Pressable>
         </View>
       </View>

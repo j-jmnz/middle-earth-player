@@ -1,4 +1,4 @@
-// The quest scale at the table's left edge (docs/design-system.md, Table): the staging area's threat on a red dial with "threat" under
+// The quest scale at the table's left edge (docs/design-system.md, Table): the staging area's threat on a red dial with "staging" under
 // it, how far apart the two are between them ("+2" in green, "−1" in red, or Even), and the willpower committed on a silver dial with
 // "willpower" under it. No panel: it floats on a soft dark radial. It moves live as characters are committed (quest-scale.ts); the
 // numbers are the engine's. Outside the Quest phase it rests at 40%, its dials showing a dash and no marker. A screen reader hears it
@@ -64,7 +64,7 @@ export function QuestScaleView({ scale, wide = false }: { scale: QuestScale; wid
     >
       <Dial value={live ? scale.threat : null} kind="threat" size={dial} testID="quest-scale-threat" />
       <Text className="mt-1 text-micro" style={{ color: t.muted }}>
-        threat
+        staging
       </Text>
       {/* How far apart they are, between the dials: "+2" in green, "−1" in red, or Even. */}
       <View className="min-h-0 flex-1 items-center justify-center" style={{ marginVertical: 4 * s }}>

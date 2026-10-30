@@ -39,7 +39,7 @@ export type TableChoice = {
   sheet: Sheet;
   choice: Choice;
   dock: Dock;
-  header: { step: string; seat: string; title: string; note: string | null };
+  header: { step: string; lead: string; title: string; note: string | null };
   picked: string | null;
   unavailable: readonly Unavailable[];
   readout: Readout | null;

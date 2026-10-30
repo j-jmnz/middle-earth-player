@@ -74,7 +74,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
   const taken = carry.find((choice) => choice.saveId === taking) ?? null;
   const seatId = (count: Seats) => (isFellowship(data.id) ? `seats-${count}` : `seats-${data.id}-${count}`);
   const title = (
-    <Text className="font-display text-title text-bone" style={titleShadow}>
+    <Text className="font-display text-title text-bone" style={{ ...titleShadow, paddingLeft: 14 * s }}>
       {name}
     </Text>
   );
@@ -148,7 +148,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
         </View>
       </View>
     ) : null;
-  const start = <PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />;
+  const start = <PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}, ${data.scenarios.length} ${data.scenarios.length === 1 ? "scenario" : "scenarios"}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />;
   const startPlate = <View className={landscape ? "mt-3" : "mt-4"}>{start}</View>;
   return compact ? (
     // No scene band and no heading: the selected chip already names the campaign and counts its scenarios, and the primary's
@@ -163,7 +163,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
     </View>
   ) : (
     <View>
-      <GroundedScene scenarioId={data.scenarios[0]} height={(landscape ? 48 : 132) * s} fade={0.3} />
+      <GroundedScene scenarioId={data.scenarios[0]} height={(landscape ? 48 : 132) * s} fade={0.3} soft />
       <View style={{ marginTop: (landscape ? -24 : -36) * s }}>
         {landscape ? (
           <>

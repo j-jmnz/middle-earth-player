@@ -166,7 +166,7 @@ export default function CampaignPath() {
   // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
   const logButton = (
     <View className="-ml-3 mt-1 items-start">
-      <TextButton label="Campaign log" testID="log-open" tone="accent" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
+      <TextButton label="Campaign log" icon="contract" testID="log-open" tone="accent" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
     </View>
   );
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;

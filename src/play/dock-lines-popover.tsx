@@ -1,20 +1,23 @@
 // The dock's "i" popover (docs/design-system.md, Table, Command column; phase 22): the full title, then the guide, the note and
 // what the rules refuse now, in the table menu's frame (popover-frame.tsx) at the left of the command column, level with the "i"
-// pill. Opening it changes nothing in the dock. It has an accessible "✕ Close" row, closes on a tap outside and on Android Back
+// pill. Opening it changes nothing in the dock. It has the round ✕ "Close" button at its top right, closes on a tap outside and on Android Back
 // (back.ts), and scrolls only past the room it has (`maxHeight`), which holds a guide, a note and two refusals.
 import { useRef } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 
-import { CLOSE_ROW, linesPlace } from "./dock-budget.ts";
+import { CloseButton } from "./buttons.tsx";
+import { linesPlace } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 import type { DockWords } from "./dock-more.tsx";
-import { PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
+import { PopoverFrame, type PressableRef } from "./popover-frame.tsx";
 import type { TableTokens } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
 const GAP = 6;
+// The popover frame's padding on both sides of its content (popover-frame.tsx).
+const FRAME_PAD = 12;
 const toneOf = (t: TableTokens) => ({ guide: t.bone, note: t.muted, unavailable: t.faint }) as const;
 
 export function LinesPopover({ open, top, words, commandWidth, insetRight, onClose }: { open: boolean; top: number | null; words: DockWords; commandWidth: number; insetRight: number; onClose: () => void }) {
@@ -38,19 +41,24 @@ export function LinesPopover({ open, top, words, commandWidth, insetRight, onClo
       focusRef={close}
       onClose={onClose}
     >
-      <PopoverRow item={{ testID: "dock-more-lines-close", label: "✕ Close", accessibilityLabel: "Close the notes" }} rowRef={close} onPress={onClose} />
-      <ScrollView testID="dock-more-lines-scroll" style={{ maxHeight: maxHeight - touch(s, CLOSE_ROW) - 8 * s }} showsVerticalScrollIndicator={false}>
-        <View style={{ paddingHorizontal: 14 * s, paddingBottom: 10 * s, gap: 4 * s }}>
-          <Text testID="dock-more-lines-title" accessibilityRole="header" className="font-display text-heading" style={{ color: t.bone, lineHeight: 24 * s }}>
-            {words.title}
-          </Text>
-          {all.map((line) => (
-            <Text key={line.testID} testID={`${line.testID}-full`} className="text-label" style={{ color: tones[line.kind] }}>
-              {line.text}
+      <View>
+        <ScrollView testID="dock-more-lines-scroll" style={{ maxHeight: maxHeight - FRAME_PAD * s }} showsVerticalScrollIndicator={false}>
+          <View style={{ paddingHorizontal: 14 * s, paddingBottom: 10 * s, paddingTop: 4 * s, gap: 4 * s }}>
+            <Text testID="dock-more-lines-title" accessibilityRole="header" className="font-display text-heading" style={{ color: t.bone, lineHeight: 24 * s, paddingRight: touch(s, 44) - 8 * s }}>
+              {words.title}
             </Text>
-          ))}
+            {all.map((line) => (
+              <Text key={line.testID} testID={`${line.testID}-full`} className="text-label" style={{ color: tones[line.kind] }}>
+                {line.text}
+              </Text>
+            ))}
+          </View>
+        </ScrollView>
+        {/* The round ✕ at the top right, over the title's end, which keeps its room clear of it. */}
+        <View style={{ position: "absolute", top: -2 * s, right: -2 * s }}>
+          <CloseButton testID="dock-more-lines-close" onPress={onClose} pressRef={close} />
         </View>
-      </ScrollView>
+      </View>
     </PopoverFrame>
   );
 }

@@ -36,6 +36,8 @@ describe("the armed line's room", () => {
 
   it("reserves the bar under the text, so arming adds nothing", () => {
     expect(armedRoom(2)).toBe(40);
+    // The bar has its 4 pt on a dense dock too: 2 pt of bar and 2 pt clear above the primary.
+    expect(armedRoom(2, true)).toBe(40);
     expect(armedRoom(3)).toBeGreaterThan(armedRoom(2));
   });
 

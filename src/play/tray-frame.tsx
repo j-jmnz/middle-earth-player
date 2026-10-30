@@ -8,14 +8,14 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { MOTION } from "./motion-tokens.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { CONTAINER_RADIUS } from "./radius.ts";
-import { panelSurface, parchmentSurface, raisedEdgeOf } from "./surfaces.ts";
+import { floatingSurface, parchmentSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
 const RISE = 16;
 
-export type TrayPlace = { right: number; width: number; bottom: number; top?: number; maxHeight?: number };
+type TrayPlace = { right: number; width: number; bottom: number; top?: number; maxHeight?: number };
 
 /** A value held while it is null, so a frame that is leaving still shows what it held. */
 export function useHeld<T>(value: T | null): T | null {
@@ -56,7 +56,7 @@ export function TrayFrame({
           bottom: place.bottom,
           ...(place.top != null ? { top: place.top } : {}),
           ...(place.maxHeight != null ? { maxHeight: place.maxHeight } : {}),
-          ...(paper ? parchmentSurface(t) : panelSurface(false, t)),
+          ...(paper ? parchmentSurface(t) : floatingSurface(t)),
           ...(paper ? {} : { boxShadow: `${raisedEdgeOf(t)}, 0 -10px 24px -8px ${withAlphaHex(t.shade, t.depth === "light" ? 0.25 : 0.8)}` }),
           borderRadius: CONTAINER_RADIUS * s,
           paddingHorizontal: 12 * s,

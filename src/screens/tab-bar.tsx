@@ -267,11 +267,11 @@ export function HubHeader({ title, subtitle, children }: { title: string; subtit
   const big = size === "compact" ? 24 : 30;
   return (
     <View className="pb-3 pt-2">
-      <View className="flex-row items-center justify-between gap-2" style={{ minHeight: 48 * s }}>
-        <Text accessibilityRole="header" numberOfLines={1} className="min-w-0 shrink font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.25 * s, letterSpacing: 0.5 * s, ...shadow }}>
+      <View className="flex-row flex-wrap items-center justify-between gap-2" style={{ minHeight: 48 * s }}>
+        <Text accessibilityRole="header" numberOfLines={1} className="shrink-0 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.25 * s, letterSpacing: 0.5 * s, ...shadow }}>
           {title}
         </Text>
-        <View className="flex-row items-center" style={{ gap: 8 * s }}>
+        <View className="ml-auto flex-row items-center" style={{ gap: 8 * s }}>
           {children}
           <GearButton />
         </View>

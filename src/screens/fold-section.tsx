@@ -6,7 +6,9 @@ import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { sectionTitleStyle } from "../play/section-heading";
+import { textSurface } from "../play/surfaces";
 import { useUiScale } from "../play/ui-scale";
+import { useTableTokens } from "../play/use-table-tokens";
 import { Chevron, Chip } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
@@ -72,6 +74,7 @@ export type FoldHeaderProps = {
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
 export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right }: FoldHeaderProps) {
   const palette = usePalette();
+  const t = useTableTokens();
   const s = useUiScale();
   const counted = count == null ? null : unit ? plural(count, unit) : String(count);
   const second = folded && summary ? summary : (detail ?? null);
@@ -91,21 +94,25 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
           onFold(!folded);
           AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
         }}
-        className="min-h-touch flex-1 justify-center rounded-item"
-        style={({ pressed }) => (pressed ? { backgroundColor: palette.pressed } : undefined)}
+        className="flex-1"
       >
-        <View className="flex-row items-center gap-3">
-          <View className="w-3 items-center">
-            <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+        {/* The pressed fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+        {({ pressed }) => (
+          <View className="min-h-touch justify-center rounded-item" style={textSurface(pressed, t)}>
+            <View className="flex-row items-center gap-3">
+              <View className="w-3 items-center">
+                <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+              </View>
+              <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
+                {title}
+              </Text>
+              {badge ? <Chip label={badge} tone="faint" /> : null}
+              <View className="min-w-3 flex-1" />
+              {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
+            </View>
+            {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}
           </View>
-          <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
-            {title}
-          </Text>
-          {badge ? <Chip label={badge} tone="faint" /> : null}
-          <View className="min-w-3 flex-1" />
-          {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
-        </View>
-        {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}
+        )}
       </Pressable>
       {folded ? null : right}
     </View>

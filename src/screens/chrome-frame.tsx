@@ -128,7 +128,6 @@ export function NavBar({
   title,
   subtitle,
   right,
-  overlay = false,
 }: {
   onBack: () => void;
   backTestID: string;
@@ -136,14 +135,12 @@ export function NavBar({
   title?: string;
   subtitle?: string;
   right?: ReactNode;
-  // Over a picture: the buttons take a night disc.
-  overlay?: boolean;
 }) {
   const s = useUiScale();
   return (
     // box-none: floating over a scrolling page, the bar takes only its buttons' touches, so the rows under its empty middle stay live.
     <View pointerEvents="box-none" className="min-h-14 flex-row items-center justify-between gap-3 py-1">
-      <IconButton chevron overlay={overlay} testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
+      <IconButton chevron testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
       {title ? (
         <View className="flex-1 items-center">
           <Text accessibilityRole="header" numberOfLines={1} className="font-display text-title text-bone">

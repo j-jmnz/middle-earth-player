@@ -74,7 +74,18 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
  * The deck at a glance, on the ground: a donut of the spheres' shares with the card count in it (green once the deck is legal) and
  * the cost curve as silver bars over the costs. The counts by type are on the jump chips.
  */
-export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code: string; count: number }[]; faces: ReadonlyMap<string, Pick<DeckFace, "cost" | "sphereCode" | "sphereName" | "typeCode">>; ready: boolean }) {
+export function DeckAnalytics({
+  cards,
+  faces,
+  ready,
+  countLine,
+}: {
+  cards: readonly { code: string; count: number }[];
+  faces: ReadonlyMap<string, Pick<DeckFace, "cost" | "sphereCode" | "sphereName" | "typeCode">>;
+  ready: boolean;
+  // "3 heroes · 50 cards": spoken with the ring, which shows the count alone.
+  countLine: string;
+}) {
   const palette = usePalette();
   const s = useUiScale();
   const cardCount = deckCardCount(cards);
@@ -86,10 +97,14 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
   const parts = split.map((entry) => ({ key: entry.code, share: entry.count / Math.max(1, splitTotal), color: tint(entry.code) }));
   return (
     <View className="flex-row items-center" style={{ gap: 14 * s }}>
-      <View accessible accessibilityLabel={`${cardCount} of ${DECK_MINIMUM} cards. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
-        <ArcRing size={64 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
-          <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 26 * s, color: ready ? palette.ok : palette.bone }}>
+      <View accessible accessibilityLabel={`${countLine}. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
+        <ArcRing size={68 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
+          <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 24 * s, color: ready ? palette.ok : palette.bone }}>
             {String(cardCount)}
+          </Text>
+          {/* "cards" under the number; "of 50" instead while the deck is short of its minimum. */}
+          <Text testID="deck-card-count-word" className="text-micro text-muted" style={{ lineHeight: 12 * s }}>
+            {cardCount < DECK_MINIMUM ? `of ${DECK_MINIMUM}` : "cards"}
           </Text>
         </ArcRing>
       </View>
@@ -151,7 +166,7 @@ export function DeckGlance({
   onName: (next: string) => void;
   ready: boolean;
   threat: number | null;
-  // "3 heroes · 50 cards": spoken with the threat, not shown (the fan shows the heroes, the analytics the count).
+  // "3 heroes · 50 cards": spoken with the analytics' ring, not shown (the fan shows the heroes, the ring the count).
   countLine: string;
   notApplied: string | null;
   droppedNote: string | null;
@@ -184,13 +199,13 @@ export function DeckGlance({
           style={{ minHeight: touch(s, 44), fontSize: 26 * s, lineHeight: 32 * s, ...shadow }}
         />
         {threat == null ? null : (
-          <Text accessibilityLabel={`Threat ${threat}, ${countLine}`} className="text-center text-label text-muted">
+          <Text className="text-center text-label text-muted">
             {`Threat ${threat}`}
           </Text>
         )}
         {/* A tablet in portrait keeps the analytics to a reading width, so its bars and words stay in proportion. */}
         <View className="mt-3" style={{ width: "100%", maxWidth: 560 * s, alignSelf: "center" }}>
-          <DeckAnalytics cards={cards} faces={faces} ready={ready} />
+          <DeckAnalytics cards={cards} faces={faces} ready={ready} countLine={countLine} />
         </View>
         {notApplied ? (
           <Label testID="deck-not-applied" tone="muted" className="mt-1">

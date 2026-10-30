@@ -10,7 +10,7 @@ import { isPlayable } from "../../../campaign/playable";
 import { droppedIfStale, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName, scenarioOf } from "../../campaign-data";
-import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryButton, Screen, ScreenScroll, Section } from "../../chrome";
+import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryFace, Screen, ScreenScroll, Section } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt } from "../../art";
 import { usePalette } from "../../palette-hook";
@@ -144,22 +144,27 @@ export default function Scenarios() {
     // The latest game in progress is a banner on its scene with the one primary, Resume; an older one is a row (below).
     if (status === "playing" && framed) {
       const height = (size === "compact" ? 150 : 220) * s;
+      // The scene is the button (one control with its spoken label and `resume-<id>`); "Resume" is drawn in the primary's look inside it.
       return (
         <View key={game.id} testID={`game-${game.id}`}>
-          <SceneArt scenarioId={game.scenarioId} height={height} radius={ITEM_RADIUS * s} fade={0.2} fadeTo={palette.night}>
-            <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between gap-3" style={{ padding: (size === "compact" ? 12 : 24) * s }}>
-              <View className="min-w-0 flex-1">
-                <Eyebrow tone="accent">In progress</Eyebrow>
-                <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
-                  {nameOf(game.scenarioId)}
-                </Text>
-                <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
-              </View>
-              <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
-                <PrimaryButton label="Resume" testID={`resume-${game.id}`} accessibilityLabel={spoken} onPress={() => open(game)} />
-              </View>
-            </View>
-          </SceneArt>
+          <Pressable testID={`resume-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} onPress={() => open(game)}>
+            {({ pressed }) => (
+              <SceneArt scenarioId={game.scenarioId} height={height} radius={ITEM_RADIUS * s} fade={0.2} fadeTo={palette.night}>
+                <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between gap-3" style={{ padding: (size === "compact" ? 12 : 24) * s }}>
+                  <View className="min-w-0 flex-1" importantForAccessibility="no-hide-descendants">
+                    <Eyebrow tone="accent">In progress</Eyebrow>
+                    <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
+                      {nameOf(game.scenarioId)}
+                    </Text>
+                    <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
+                  </View>
+                  <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
+                    <PrimaryFace label="Resume" pressed={pressed} />
+                  </View>
+                </View>
+              </SceneArt>
+            )}
+          </Pressable>
         </View>
       );
     }

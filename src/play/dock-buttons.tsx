@@ -112,7 +112,7 @@ export function DockButtons({
   return (
     <View className={dense ? "gap-0" : "gap-0.5"}>
       {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
-          primary waits for; the bar that runs down has its own 4 pt under the text. Arming moves nothing. */}
+          primary waits for; the bar that runs down has its own 4 pt under the text (the bar at the top of it, 2 pt clear above the primary). Arming moves nothing. */}
       <View style={{ height: armedRoom(lines, dense, s) }}>
         <View style={{ height: lines * LINE_PX * s, justifyContent: "flex-end" }}>
           {line ? (
@@ -122,7 +122,7 @@ export function DockButtons({
           ) : null}
         </View>
         {armedButton ? (
-          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "center", alignItems: "center" }}>
+          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "flex-start", alignItems: "center" }}>
             <Animated.View style={[{ height: 2 * s, backgroundColor: t.accent }, bar]} />
           </View>
         ) : null}

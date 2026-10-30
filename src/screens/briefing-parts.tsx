@@ -159,7 +159,7 @@ export function BriefingScreen({
   );
   const navBar = (
     <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>
-      <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
+      <NavBar onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
     </View>
   );
 

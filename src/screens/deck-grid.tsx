@@ -174,12 +174,12 @@ export function DeckSectionHeader({ type, title, count, onAdd }: { type: string;
   );
 }
 
-/** The chips that jump the deck's list to a heading. A card type's chip carries its number of cards (Allies 21); Heroes is the word alone. */
+/** The chips that jump the deck's list to a heading. Each chip carries its number of cards (Heroes 3, Allies 21). */
 export function JumpChips({ jumps, onJump }: { jumps: readonly Jump[]; onJump: (jump: Jump) => void }) {
   return (
     <>
       {jumps.map((jump) => (
-        <ToggleChip key={jump.key} testID={`deck-jump-${jump.key}`} label={jump.key === "type-hero" ? jump.title : `${jump.title} ${jump.count}`} accessibilityLabel={`Go to ${jump.title}, ${jump.count}`} onPress={() => onJump(jump)} />
+        <ToggleChip key={jump.key} testID={`deck-jump-${jump.key}`} label={`${jump.title} ${jump.count}`} accessibilityLabel={`Go to ${jump.title}, ${jump.count}`} onPress={() => onJump(jump)} />
       ))}
     </>
   );
