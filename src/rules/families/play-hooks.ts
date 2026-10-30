@@ -38,6 +38,7 @@ export function highestThreatSeats(state: ScenarioState): number[] {
 // ("the hero with the highest threat cost", 41043:A:2: the printed threat cost is the greatest among every player's heroes, a tie keeps each).
 export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, { verb: "AttachSelf" }>["to"], itemSeat: number, cards: ReadonlyMap<string, PrintedCard>): string[] {
   if (to.kind !== "hero") return [];
+  // `picked`: the caller passes the picked player as `itemSeat` (effect-frames.ts attachSeat).
   const seats = to.control === "any" || to.control === "highestThreatCost" ? livingSeats(state) : to.control === "highestThreat" ? highestThreatSeats(state) : [itemSeat];
   const printed = (id: string): PrintedCard => printedOf(cards, state.cards[id]?.code ?? "");
   const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);

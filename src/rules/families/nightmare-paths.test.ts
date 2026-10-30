@@ -13,7 +13,7 @@ import { canAttack } from "../combat.ts";
 import { pushCardEffects, pushEffectFrame } from "../effect-frames.ts";
 import { cardMap, expectOk, hero, idleScenario } from "../fixture.ts";
 import type { EngineStep } from "../intents.ts";
-import type { ReduceContext } from "../interpret.ts";
+import { dealOneShadow, type ReduceContext } from "../interpret.ts";
 import { modifiedStat } from "../keywords.ts";
 import { settle } from "../machine.ts";
 import { readyCard } from "../player-verbs.ts";
@@ -58,6 +58,7 @@ const cards = cardMap([
   definePrinted({ code: "900309", name: "Dark Interrogation", type: "treachery" }),
   definePrinted({ code: "01102", name: "Nazgûl of Dol Guldur", type: "enemy", traits: ["Nazgûl"], engagementCost: 40, threat: 5, attack: 4, defense: 3, health: 9 }),
   definePrinted({ code: "blade", name: "Blade", type: "attachment", cost: 1 }),
+  definePrinted({ code: "guard", name: "Guard", type: "ally", sphere: "tactics", cost: 2, attack: 1, defense: 2, health: 2 }),
   hero("frodo", "spirit", 8, 2),
   hero("sam", "spirit", 8, 2),
   hero("gimli", "tactics", 8, 3),
@@ -149,11 +150,15 @@ describe("Passage Through Mirkwood Nightmare (900101-900109)", () => {
     expect(other ? modifiedStat(quiet, other, "attack", cards) : 0).toBe(2);
   });
 
-  it("attaches The Spider's Web to a hero of the player with the highest threat, who exhausts each hero; each ready deals 1 damage (900106:A:1)", () => {
+  it("has the player with the highest threat exhaust each hero, then attach The Spider's Web to one of them; each ready deals 1 damage (900106:A:1)", () => {
     const { state: base, heroes } = table(2);
     const high = withThreat(base, 1, 40);
     const web = spawn(high, "900106", { zone: "staging" });
     const asked = fire(web.state, "whenRevealed", web.id, "900106:whenRevealed:1");
+    // In printed order: his heroes are already exhausted when he is asked where to attach it, and only his heroes are offered.
+    for (const id of heroes[1] ?? []) expect(asked.cards[id]?.exhausted).toBe(true);
+    expect(asked.cards[web.id]?.host).toBeNull();
+    expect(asked.window).toMatchObject({ kind: "choose", seat: 1, options: heroes[1] });
     const attached = choose(asked, heroes[1]?.[2] ?? "");
     const host = attached.cards[web.id]?.host ?? "";
     expect(host).toBe(heroes[1]?.[2]);
@@ -226,6 +231,16 @@ describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
     // A hero's effect does not damage the Hill Troll either, and does damage Marshland Outlaws.
     expect(runFrame(synced, hero, [{ verb: "DamageCard", amount: 1, target: "other" }], { other: troll.id }).cards[troll.id]?.damage).toBe(0);
     expect(runFrame(synced, hero, [{ verb: "DamageCard", amount: 1, target: "other" }], { other: outlaws.id }).cards[outlaws.id]?.damage).toBe(1);
+    // Nor does a player card's damage to each enemy (DamageEach): only Marshland Outlaws takes it (02095, 12065).
+    const each = runFrame(synced, hero, [{ verb: "DamageEach", amount: 1, pick: { type: "enemy", control: "any", engaged: "you" } }]);
+    expect(each.cards[troll.id]?.damage).toBe(0);
+    expect(each.cards[outlaws.id]?.damage).toBe(1);
+    const picked = runFrame(synced, hero, [{ verb: "Pick", pick: { type: "player", control: "you" } }, { verb: "DamageEach", amount: 2, engagedWith: "picked" }]);
+    expect(picked.cards[troll.id]?.damage).toBe(0);
+    expect(picked.cards[outlaws.id]?.damage).toBe(2);
+    // It bars damage to enemies only: a player card's damage to a hero is placed.
+    const sam = heroes[0]?.[1] ?? "";
+    expect(runFrame(synced, hero, [{ verb: "DamageCard", amount: 1, target: "other" }], { other: sam }).cards[sam]?.damage).toBe(1);
     // In the staging area it holds nobody.
     const staged = syncConstants(spawn(base, "900202", { zone: "staging" }).state, ctx);
     const loose = spawn(staged, "01082", { zone: "engaged", seat: 0 });
@@ -309,6 +324,27 @@ describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
     expect(done.seats[0]?.threat).toBe(threat + 3);
   });
 
+  it("leaves the move of Smoking Blood's damage for the end of the attack only when the attack is undefended (900209:A:2)", () => {
+    const { state: base, heroes } = table();
+    const defender = heroes[0]?.[0] ?? "";
+    const troll = spawn(base, "01082", { zone: "engaged", seat: 0 });
+    const blood = spawn(troll.state, "900209", { zone: "shadow", enemyId: troll.id });
+    const defended = { ...blood.state, pendingAttack: { enemyId: troll.id, seat: 0, defenderId: defender } };
+    expect(fire(defended, "shadow", blood.id, "900209:shadow:1").pendingAttack?.after ?? []).toEqual([]);
+    const undefended = { ...blood.state, pendingAttack: { enemyId: troll.id, seat: 0, undefended: true } };
+    expect(fire(undefended, "shadow", blood.id, "900209:shadow:1").pendingAttack?.after).toEqual([{ verb: "MoveDamageTo", from: "self", to: "other" }]);
+  });
+
+  it("logs the encounter deck's refill when a shadow card is dealt from an empty deck (900201:A:3, rr.running-out-of-cards)", () => {
+    const { state: base } = table();
+    const setup = spawn({ ...base, phase: "Combat" }, "900201", { zone: "nightmare" }).state;
+    const troll = spawn(deck(setup, ["mist", "road"], "encounterDiscard"), "01082", { zone: "engaged", seat: 0 });
+    const steps: EngineStep[] = [];
+    const dealt = dealOneShadow(syncConstants(troll.state, ctx), troll.id, steps);
+    expect(dealt.cards[troll.id]?.shadowId).not.toBeNull();
+    expect(steps.some((step) => step.kind === "resetEncounterDeck")).toBe(true);
+  });
+
   it("moves all damage on the attacking enemy to the character the attack was made against (900209:A:2, MoveDamageTo)", () => {
     const { state: base, heroes } = table();
     const target = heroes[0]?.[2] ?? "";
@@ -359,6 +395,27 @@ describe("Escape from Dol Guldur Nightmare (900301-900309)", () => {
     expect(back.questStage).toBe(second.id);
     expect(back.cards[second.id]).toMatchObject({ zone: "questStage", face: "B", progress: 0 });
     expect(back.cards[third.questStage ?? ""]).toMatchObject({ zone: "questDeck", progress: 0 });
+  });
+
+  it("returns to stage 2B only when Torture Master's shadow took a prisoner (900302:A:2, rr.then)", () => {
+    const { state: base, heroes } = table();
+    const [frodo = "", , gimli = ""] = heroes[0] ?? [];
+    const staged: ScenarioState = { ...base, stages: [{ code: "stage" }, { code: "s2" }, { code: "s3" }] };
+    const third = updateCard(staged, staged.questStage ?? "", { code: "s3" });
+    const second = spawn(third, "s2", { zone: "setAside" });
+    const master = spawn(second.state, "900302", { zone: "engaged", seat: 0 });
+    const shadow = record(DUNGEONS, "900302:shadow:1").instructions[0];
+    const after = shadow?.verb === "AfterAttack" ? shadow.instructions : [];
+    // The attack damaged the hero: it is taken prisoner, then the players return to stage 2B.
+    const taken = runFrame(master.state, master.id, after, { other: frodo, dealt: 1 });
+    expect(taken.cards[frodo]?.prisoner).toBe(true);
+    expect(taken.questStage).toBe(second.id);
+    // An ally defended (no hero to capture), or the attack dealt no damage: nobody is captured, and the stage stays.
+    const ally = spawn(master.state, "guard", { zone: "play", seat: 0 });
+    expect(runFrame(ally.state, master.id, after, { other: ally.id, dealt: 2 }).questStage).toBe(third.questStage);
+    const missed = runFrame(master.state, master.id, after, { other: gimli });
+    expect(missed.cards[gimli]?.prisoner).toBeFalsy();
+    expect(missed.questStage).toBe(third.questStage);
   });
 
   it("loses the game once Torture Chamber holds 4 resource tokens (900305:A:1), and Dungeon Labyrinth grows with its tokens (900306:A:1)", () => {

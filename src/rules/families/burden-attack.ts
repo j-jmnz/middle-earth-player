@@ -37,7 +37,7 @@ function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, s
   if (enemy?.zone !== "engaged" || enemy.controller == null || attackBarred(state, enemyId, enemy.controller)) return state;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const dealt = dealAttackShadow(counted, enemyId, ctx);
+  const dealt = dealAttackShadow(counted, enemyId, ctx, steps);
   const begun = beginEnemyAttack(dealt, enemy.controller, enemyId, ctx, steps);
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }

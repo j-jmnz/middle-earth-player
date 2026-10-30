@@ -2,7 +2,7 @@ import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // Flight to the Ford Nightmare (deck 9063, data/printed/nightmare.json). The Ring-bearer's life and the burden deck are the burden family's
 // (src/catalog/families/burden.ts). Nightmare Ford of Bruinen (906303) takes the standard one's set-aside slot: Race to Rivendell's "Add Ford
-// of Bruinen" reads it (twinCode, src/rules/families/nightmare.ts). Race to Rivendell (141029) is the last stage: defeating it wins
+// of Bruinen" reads it (twinCode, src/rules/families/nightmare-guards.ts). Race to Rivendell (141029) is the last stage: defeating it wins
 // (rr.winning-the-game), so "cannot win" holds the stage back while Ford of Bruinen is in play.
 const RING = "141085";
 const LAST_STAGE = "141029";

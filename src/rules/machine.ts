@@ -220,7 +220,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "combatStart":
       return startCombat(state, ctx);
     case "combatShadows":
-      return withMode(announceShadowsDealt(dealShadows(state, ctx.cards), ctx), "combatActions");
+      return withMode(announceShadowsDealt(dealShadows(state, ctx.cards, steps), ctx), "combatActions");
     case "combatActions":
       return stepWindow(state, ctx, "6.2") ?? withMode(state, "enemyAttacks");
     case "enemyAttacks":

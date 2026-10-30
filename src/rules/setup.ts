@@ -14,7 +14,7 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
-import { nightmareDuringSetup, nightmareSetup } from "./families/nightmare.ts";
+import { nightmareDuringSetup, nightmareSetup } from "./families/nightmare-setup.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import type { CampaignFacts } from "./campaign-state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
@@ -133,7 +133,7 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const players = pushPlayerSetup(state, ctx, steps);
   if (players !== state) return players;
   let next = searchSetup(state, "encounter", ctx, steps);
-  // The Nightmare setup card's own Setup lines (families/nightmare.ts).
+  // The Nightmare setup card's own Setup lines (families/nightmare-setup.ts).
   next = nightmareSetup(next, ctx, steps);
   if (next.failure || next.lost) return next;
   for (const instruction of next.setup) {
@@ -149,7 +149,7 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
   // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest-setup.ts).
   next = questStageStart(next, ctx, steps);
-  // The Nightmare setup card's Forced effects "During setup" (families/nightmare.ts), on top: they resolve first.
+  // The Nightmare setup card's Forced effects "During setup" (families/nightmare-setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
   return withMode(next, "beginRound");
 }

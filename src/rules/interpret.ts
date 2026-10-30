@@ -1,4 +1,4 @@
-import { withTwin } from "./families/nightmare.ts";
+import { withTwin } from "./families/nightmare-guards.ts";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
 import { currentCause, effectCause, inCause, ruleCause, UNATTRIBUTED, type Cause } from "./cause.ts";
@@ -10,7 +10,7 @@ import { frameScope, refCard } from "./amounts.ts";
 import { collectAllyResources } from "./families/costs-pay.ts";
 import { runFamilyVerb } from "./families/index.ts";
 import { commitCard } from "./families/attack.ts";
-import { exhaustCard, readyCard, runPlayerVerb } from "./player-verbs.ts";
+import { exhaustCard, placePlayerDamage, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
 import { runSetupVerb } from "./setup-verbs.ts";
@@ -88,7 +88,7 @@ export function runInstruction(
   return runTwinned(state, withTwin(state, instruction, ctx.cards), focus, ctx, steps);
 }
 
-// runInstruction with a code already read as its Nightmare twin (families/nightmare.ts).
+// runInstruction with a code already read as its Nightmare twin (families/nightmare-guards.ts).
 function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const family = runFamilyVerb(state, instruction, focus, ctx, steps);
   if (family) return family;
@@ -123,7 +123,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "DealShadow":
       if (!focus.sourceId) return state;
-      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId) : dealOneShadow(state, focus.sourceId);
+      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId, steps) : dealOneShadow(state, focus.sourceId, steps);
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
@@ -201,16 +201,16 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
   return updateCard(state, id, { progress: instance.progress + 1 });
 }
 
-// The enemy's shadow card, when it has none yet.
-export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioState {
-  return state.cards[enemyId]?.shadowId ? state : dealAdditionalShadow(state, enemyId);
+// The enemy's shadow card, when it has none yet. `steps` hears the encounter deck being refilled for it.
+export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+  return state.cards[enemyId]?.shadowId ? state : dealAdditionalShadow(state, enemyId, steps);
 }
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string): ScenarioState {
-  // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3).
-  const state = refillEncounterDeck(given, []);
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+  // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
+  const state = refillEncounterDeck(given, steps);
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
@@ -232,7 +232,7 @@ function dealInstructionDamage(
   const playerEffect = printed != null && isPlayerType(printed);
   let next = state;
   for (const id of damageTargets(state, ctx, focus.sourceId, playerEffect)) {
-    next = placeDamage(next, id, 1, ctx.cards, steps, playerEffect ? "player" : "framework", currentCause(steps, UNATTRIBUTED));
+    next = playerEffect ? placePlayerDamage(next, focus.seat, id, 1, ctx, steps) : placeDamage(next, id, 1, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
   }
   return next;
 }

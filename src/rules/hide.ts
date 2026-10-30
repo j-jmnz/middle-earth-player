@@ -12,7 +12,7 @@ import { inPlay, updateCard } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { pruneUses } from "./usage.ts";
 import { fireForced } from "./triggers.ts";
-import { hideCommitLimit, noteEffectHide } from "./families/nightmare.ts";
+import { hideCommitLimit, noteEffectHide } from "./families/nightmare-guards.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 

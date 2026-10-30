@@ -155,9 +155,9 @@ export function runPlayerVerb(
       const scope = frameScope(state, focus.seat, focus.sourceId);
       const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
-      // "You cannot ... deal damage (through effects) to enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
-      if (playerSource(state, focus.sourceId, ctx) && titleBarred(state, focus.seat, id, ctx.cards)) return state;
-      return state.cards[id] && amount > 0 ? placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : state;
+      if (!state.cards[id] || amount <= 0) return state;
+      if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps);
+      return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
     }
     case "PlaceProgressOn": {
       const scope = frameScope(state, focus.seat, focus.sourceId);
@@ -335,6 +335,13 @@ export function putOnDeck(state: ScenarioState, id: string, position: "top" | "b
 }
 
 // The effect's source is a player card (not an encounter card).
+// Damage a player card's effect deals for the seat that used it (DamageCard, DamageEach, DealDamage). "You cannot ... deal damage (through
+// effects) to enemies with a title other than Marshland Outlaws": an enemy the seat is barred from takes none (attackOnlyTitle, 900202:A:1).
+export function placePlayerDamage(state: ScenarioState, seat: number, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (titleBarred(state, seat, id, ctx.cards)) return state;
+  return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
+}
+
 function playerSource(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   return source != null && isPlayerType(printedOf(ctx.cards, source.code));

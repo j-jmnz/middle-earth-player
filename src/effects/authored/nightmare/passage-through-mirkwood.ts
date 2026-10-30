@@ -1,7 +1,7 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
 // Passage Through Mirkwood Nightmare (deck 9001, data/printed/nightmare.json). Nightmare Ungoliant's Spawn (900102) takes the place of the
-// standard one (01076): the quest's records that name it by title or by code read it (twinCode, src/rules/families/nightmare.ts).
+// standard one (01076): the quest's records that name it by title or by code read it (twinCode, src/rules/families/nightmare-guards.ts).
 // Rules: rr.setup, rr.forced, rr.reveal, rr.step-6-4-2, rr.attachment-cards (data/rules/entries.json).
 const UNDEFENDED = { kind: "undefended" } as const;
 const NOT_UNDEFENDED = { kind: "not", condition: UNDEFENDED } as const;
@@ -21,9 +21,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 900105 Spiders of Mirkwood
   {"id":"900105:constant:1","cardCode":"900105","lines":["900105:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"engaged"},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"count":{"type":"character","control":"you","state":"exhausted"}},"until":"whileSourceInPlay","target":"self"}]},
   {"id":"900105:shadow:1","cardCode":"900105","lines":["900105:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":{"type":"character","control":"you","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},{"verb":"DamageCard","amount":2,"target":"picked","when":UNDEFENDED}]},
-  // 900106 The Spider's Web: the player with the highest threat attaches it to one of his heroes (that player chooses; the first player among a
-  // tie), then each hero that player controls exhausts. The attachment's text is a triggered effect of the attached hero's readying.
-  {"id":"900106:whenRevealed:1","cardCode":"900106","lines":["900106:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelf","to":{"kind":"hero","control":"highestThreat"}},{"verb":"PickController","card":"host"},{"verb":"Each","pick":{"type":"hero","control":"any","controlledBy":"picked","state":"ready"},"instructions":[{"verb":"Exhaust","target":{"kind":"picked"}}]}]},
+  // 900106 The Spider's Web, in printed order: the player with the highest threat (the first player chooses among a tie) exhausts each hero he
+  // controls, then attaches it to one of his heroes, which he chooses. The attachment's text is a triggered effect of the attached hero's readying.
+  {"id":"900106:whenRevealed:1","cardCode":"900106","lines":["900106:A:1"],"timing":"whenRevealed","instructions":[{"verb":"PickHighestThreat"},{"verb":"Each","pick":{"type":"hero","control":"any","controlledBy":"picked","state":"ready"},"instructions":[{"verb":"Exhaust","target":{"kind":"picked"}}]},{"verb":"AttachSelf","to":{"kind":"hero","control":"picked"}}]},
   {"id":"900106:constant:1","cardCode":"900106","lines":["900106:A:1"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]},
   {"id":"900106:triggered:1","cardCode":"900106","lines":["900106:A:1"],"timing":"triggered","trigger":"readied","subject":"host","instructions":[{"verb":"DamageCard","amount":1,"target":"host"}]},
   // 900107 Backtrack! (line 1 is Surge)

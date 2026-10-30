@@ -52,7 +52,7 @@ function table() {
   const plain = spawn(immune.state, "orc", { zone: "staging" });
   const unique = spawn(plain.state, "king", { zone: "staging" });
   state = spawn(unique.state, "mist", { zone: "encounterDeck" }, "down").state;
-  state = dealOneShadow(state, immune.id);
+  state = dealOneShadow(state, immune.id, []);
   return { state, hero: aragorn.id, location: location.id, immune: immune.id, plain: plain.id, unique: unique.id };
 }
 

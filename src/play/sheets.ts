@@ -23,7 +23,7 @@ import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
-import { hideCommitLimit } from "../rules/families/nightmare.ts";
+import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -388,8 +388,6 @@ function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number)
   if (first?.zone === "deck") return first.controller === seat ? "The top of your deck. Nothing moves." : "The top of that player's deck. Nothing moves.";
   return "The top of the encounter deck. Nothing moves.";
 }
-
-/** The quest commit the bar sends: the characters dragged to the quest stage, or every legal one picked on the sheet. */
 
 // The Hide sheet's note, with the most characters a card lets commit ("players cannot commit more than 2 characters to a Hide test",
 // 906106:A:1).

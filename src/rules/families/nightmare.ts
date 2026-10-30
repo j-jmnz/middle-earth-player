@@ -1,39 +1,39 @@
-// Rules: mec109.hide-tests, mec109.hide-x, rr.attachment-cards, rr.search, rr.discard-pile-and-victory-display, rr.forced,
-// rr.quest-advancement (data/rules/entries.json); ledger lines 906101:A:2, 906102:A:3, 906106:A:1, 906107:A:2, 906108:A:1.
+// Rules: rr.attachment-cards, rr.search, rr.discard-pile-and-victory-display, rr.forced, rr.cancel, rr.step-6-4-2, rr.damage
+// (data/rules/entries.json); ledger lines 906102:A:3, 906107:A:2, 906203:A:1, 906208:A:1, 906304:A:1, 900107:A:3, 900207:A:1, 900208:A:2,
+// 900209:A:1, 900209:A:2.
 import type { CardRef, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
+import { frameScope, refCard } from "../amounts.ts";
+import { askTarget } from "../choices.ts";
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import { beginEnemyAttack } from "../combat.ts";
 import { hasTrait } from "../conditions.ts";
 import { attackBarred } from "../constants.ts";
-import { effectsOf } from "../listen.ts";
-import { dealAttackShadow } from "./defense-listen.ts";
-import { dealForAttack } from "./south-watcher.ts";
-import { effectData, moveEncounter } from "./encounter-moves.ts";
-import { campaignTurnsDown, heroesOf, prisonerHeroes, prisonersOfSeat } from "./prisoner.ts";
-import { captureHero } from "./south-captive.ts";
-import { shuffleIds } from "../seed.ts";
-import { markPicked } from "./play-refs.ts";
-import { askTarget } from "../choices.ts";
-import { frameScope, refCard, resolveAmount } from "../amounts.ts";
-import { pushCardEffects } from "../effect-frames.ts";
-import { modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../keywords.ts";
-import { matchesPick } from "../pick.ts";
-import { engageEnemy, engageWith } from "../quest.ts";
 import type { EngineStep } from "../intents.ts";
-import { runEffect, type ReduceContext } from "../interpret.ts";
+import type { ReduceContext } from "../interpret.ts";
+import { modifiedStat, placeDamage, raiseThreat } from "../keywords.ts";
+import { effectsOf } from "../listen.ts";
+import { matchesPick } from "../pick.ts";
 import { printedOf } from "../printed.ts";
-import type { GameEvent, HideResult, ResponseOffer, ScenarioState } from "../state.ts";
-import { flagged, inPlay, livingSeats, modifierActive, updateCard } from "../state.ts";
-import { fireForced } from "../triggers.ts";
+import { engageEnemy, engageWith } from "../quest.ts";
 import { queueEvent } from "../queue.ts";
-import { patchTop, topFrame, withFrame } from "../windows.ts";
+import type { GameEvent, ResponseOffer, ScenarioState } from "../state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../state.ts";
+import { patchTop, topFrame } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
+import { dealAttackShadow } from "./defense-listen.ts";
+import { effectData, moveEncounter } from "./encounter-moves.ts";
 import type { Focus } from "./index.ts";
+import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./nightmare-dungeon.ts";
+import { listenerInPlay } from "./nightmare-guards.ts";
+import { seatThreat } from "./play-hooks.ts";
+import { markPicked } from "./play-refs.ts";
+import { dealForAttack } from "./south-watcher.ts";
 
-// The verbs src/catalog/families/nightmare.ts adds, for the Nightmare decks. The Hide commit limit, the result of an effect's Hide
-// test and the stage reveal are read where they apply (rules/hide.ts, rules/conditions.ts, rules/stage-reveal.ts). Null when the verb
-// is not one of them.
+// The verbs src/catalog/families/nightmare.ts adds, for the Nightmare decks. The attack and pick verbs are here; Escape from Dol Guldur's
+// prisoners, stage return and tokens are in nightmare-dungeon.ts, the setup card's own lines in nightmare-setup.ts, and the reads the
+// low-level engine files make (the Hide commit limit, the result of an effect's Hide test, a card's Nightmare twin) in nightmare-guards.ts.
+// Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "AttachToQuest":
@@ -50,18 +50,28 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return setAsideFromDeck(state, instruction.code);
     case "EngageSetAside":
       return engageSetAside(state, instruction.code, focus, ctx, steps);
-    case "PickLowestEngagement":
-      return pickLowestEngagement(state, focus, ctx, steps);
-    case "PickController":
-      return pickController(state, instruction.card, focus);
+    case "PickLowestEngagement": {
+      const enemies = state.staging.filter((id) => ctx.cards.get(state.cards[id]?.code ?? "")?.type === "enemy");
+      const cost = (id: string): number => {
+        const card = state.cards[id];
+        return card ? -modifiedStat(state, card, "engagementCost", ctx.cards) : Number.NEGATIVE_INFINITY;
+      };
+      return pickMost(state, instruction, enemies, cost, focus, steps);
+    }
+    case "PickHighestThreat": {
+      const seats = livingSeats(state).map((seat) => `seat:${seat}`);
+      return pickMost(state, instruction, seats, (id) => seatThreat(state, Number(id.slice("seat:".length))), focus, steps);
+    }
     case "PickDiscardTop":
       return pickDiscardTop(state, instruction.types, ctx);
     case "DealShadowFromDiscard":
       return dealShadowFromDiscard(state, ctx);
     case "EngageSeatWith":
       return engageSeatWith(state, instruction, focus, ctx, steps);
-    case "PickMostHitPoints":
-      return pickMostHitPoints(state, focus, ctx, steps);
+    case "PickMostHitPoints": {
+      const enemies = [...state.victory, ...state.encounterDiscard].filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
+      return pickMost(state, instruction, enemies, (id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").health ?? 0, focus, steps);
+    }
     case "AttackOthersUndefended":
       return attackOthersUndefended(state, focus, ctx);
     case "RemoveEnemyDamage":
@@ -78,13 +88,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return engageOutOfPlay(state, instruction.code, ctx, steps);
     case "MoveResourceFromHeroes":
       return moveResourceFromHeroes(state, instruction.to, focus);
-    case "PlaceResourceTokens": {
-      const scope = frameScope(state, focus.seat, focus.sourceId);
-      const id = refCard(state, instruction.on, scope);
-      const card = id ? state.cards[id] : undefined;
-      const amount = resolveAmount(state, instruction.amount, scope, ctx);
-      return card && inPlay(card.zone) && amount > 0 ? updateCard(state, card.id, { resources: card.resources + amount }) : state;
-    }
+    case "PlaceResourceTokens":
+      return placeResourceTokens(state, instruction.on, instruction.amount, focus, ctx);
     default:
       return null;
   }
@@ -111,74 +116,6 @@ function searchToStaging(state: ScenarioState, code: string, ctx: ReduceContext)
   return updateCard(moveCard(state, found, { zone: "staging" }), found, { face: "up", controller: null, damage: 0, progress: 0, resources: 0 });
 }
 
-// The most characters a player may commit to a Hide test now (the smallest `hideCommitLimit` the table holds), or null with no limit.
-export function hideCommitLimit(state: ScenarioState): number | null {
-  let limit: number | null = null;
-  for (const modifier of state.modifiers) {
-    if (modifier.stat !== "hideCommitLimit" || modifier.instanceId !== "table" || !modifierActive(state, modifier)) continue;
-    limit = limit == null ? modifier.amount : Math.min(limit, modifier.amount);
-  }
-  return limit;
-}
-
-// A Hide test made by an effect (HideTest) leaves its result on that effect's frame, for `lastHideFailed`.
-export function noteEffectHide(state: ScenarioState, result: HideResult | null): ScenarioState {
-  const top = topFrame(state);
-  if (top?.data.kind !== "effect" || !result) return state;
-  return patchTop(state, { data: { ...top.data, hideFailed: !result.success } });
-}
-
-// The `lastHideFailed` condition: the running effect's last Hide test failed.
-export function lastHideFailed(state: ScenarioState): boolean {
-  const data = topFrame(state)?.data;
-  return data?.kind === "effect" && data.hideFailed === true;
-}
-
-// A quest card became the current stage (afterProgress, rules/stage-reveal.ts): Forced effects that listen for it resolve
-// ("Forced: When stage 3A is revealed", 906101:A:2). The event is about no card, so the setup card next to the quest deck hears it; its
-// `subject` names the stage.
-export function announceStageRevealed(state: ScenarioState, stageId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (!ctx.effects.some((effect) => effect.trigger === "stageRevealed")) return state;
-  return fireForced(state, { trigger: "stageRevealed", seat: null, subject: stageId }, ctx, steps);
-}
-
-// On Nightmare the setup card's recipe can replace a scenario card by a Nightmare card of the same title (Weathertop 141046 by 906204,
-// Ford of Bruinen 141059 by 906303; docs/plans/nightmare-mode.md). A record that names the standard card by code ("Add Weathertop to
-// the staging area", 141027:A:1) means the card of that title the game dealt: with no card of the named code in the game, the code of a
-// dealt card with the same printed title stands in for it. Off Nightmare, or when the named card is dealt, the code is kept.
-export function twinCode(state: ScenarioState, code: string, cards: ReduceContext["cards"]): string {
-  const all = Object.values(state.cards);
-  // On Nightmare only: the setup card is in play next to the quest deck (rules/setup.ts).
-  if (!all.some((card) => card.zone === "nightmare")) return code;
-  if (all.some((card) => card.code === code)) return code;
-  const title = cards.get(code)?.name;
-  if (title == null) return code;
-  return all.find((card) => card.code !== code && cards.get(card.code)?.name === title)?.code ?? code;
-}
-
-// An instruction or condition with a `code` field, read with that code's Nightmare twin.
-export function withTwin<T extends object>(state: ScenarioState, named: T, cards: ReduceContext["cards"]): T {
-  if (!("code" in named) || typeof named.code !== "string") return named;
-  const code = twinCode(state, named.code, cards);
-  return code === named.code ? named : { ...named, code };
-}
-
-// The setup card's own Setup lines (906401:A:2, "Setup: Set each copy of Pale-green Tentacle aside, out of play") resolve once the piles are
-// dealt and the encounter cards' Setup has run, before the first quest card's Setup (setup.ts finishSetup; mec109.setup, rr.setup): the
-// recipe is applied before the quest's Setup (docs/plans/nightmare-mode.md). The setup card stays where it is, next to the quest deck.
-export function nightmareSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
-  for (const card of Object.values(state.cards)) {
-    if (card.zone !== "nightmare") continue;
-    for (const effect of ctx.effects) {
-      if (effect.cardCode !== card.code || effect.timing !== "setup") continue;
-      next = withFrame(next, "setup", card.id, false, (framed) => runEffect(framed, effect, card.id, next.firstPlayer, ctx, steps), steps);
-      if (next.failure || next.lost) return next;
-    }
-  }
-  return next;
-}
-
 // AttackActor: the source enemy attacks the actor now, from the staging area or while engaged with them (906203:A:1). It is dealt a shadow
 // card of its own, as an attack outside the combat phase is (faq.enemy-attacks-outside-combat).
 function attackActor(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -187,7 +124,7 @@ function attackActor(state: ScenarioState, focus: Focus, ctx: ReduceContext, ste
   if (!id || !enemy || state.seats[focus.seat]?.eliminated || attackBarred(state, id, focus.seat)) return state;
   const staged = enemy.zone === "staging";
   if (!staged && !(enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
-  const dealt = staged ? dealForAttack(state, id) : dealAttackShadow(state, id, ctx);
+  const dealt = staged ? dealForAttack(state, id, steps) : dealAttackShadow(state, id, ctx, steps);
   const begun = beginEnemyAttack(dealt, focus.seat, id, ctx, steps, staged);
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
@@ -229,9 +166,9 @@ export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, eff
 
 // A Response canceled the "when revealed" effects of an encounter card being revealed (cancelAnswered, rules/player-verbs.ts): a card that
 // listens hears it ("Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1", 906304:A:1; rr.cancel). `before`
-// is the state the cancel was made in: the event is announced only when the cancel changed it, and only when some record listens.
+// is the state the cancel was made in: the event is announced only when the cancel changed it, and only while a card that listens is in play.
 export function announceCanceled(state: ScenarioState, before: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (state === before || !ctx.effects.some((effect) => effect.trigger === "whenRevealedCanceled")) return state;
+  if (state === before || !listenerInPlay(state, "whenRevealedCanceled", ctx.effects)) return state;
   if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;
   return queueEvent(state, { trigger: "whenRevealedCanceled", seat: null });
 }
@@ -253,27 +190,6 @@ function engageSetAside(state: ScenarioState, code: string, focus: Focus, ctx: R
   return moveEncounter(updateCard(state, id, { face: "up" }), id, "engaged", focus.seat, ctx, steps);
 }
 
-// PickLowestEngagement: the enemy in the staging area with the lowest engagement cost is picked; the first player chooses among a tie.
-function pickLowestEngagement(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const enemies = state.staging.filter((id) => ctx.cards.get(state.cards[id]?.code ?? "")?.type === "enemy");
-  const cost = (id: string): number => {
-    const card = state.cards[id];
-    return card ? modifiedStat(state, card, "engagementCost", ctx.cards) : Number.POSITIVE_INFINITY;
-  };
-  const low = Math.min(...enemies.map(cost), Number.POSITIVE_INFINITY);
-  const tied = enemies.filter((id) => cost(id) === low);
-  const chosen = focus.chosen && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
-  if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: "PickLowestEngagement" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
-  return markPicked(state, chosen ?? "");
-}
-
-// PickController: the seat that controls the card the reference names is picked ("one of that player's heroes", 900106:A:1).
-function pickController(state: ScenarioState, card: CardRef, focus: Focus): ScenarioState {
-  const id = refCard(state, card, frameScope(state, focus.seat, focus.sourceId));
-  const controller = id ? state.cards[id]?.controller : null;
-  return controller == null ? state : markPicked(state, `seat:${controller}`);
-}
-
 // PickDiscardTop: the topmost card of the encounter discard pile (its last card) of one of these printed types is picked (900107:A:2).
 function pickDiscardTop(state: ScenarioState, types: readonly string[], ctx: ReduceContext): ScenarioState {
   const found = [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type));
@@ -291,18 +207,6 @@ function dealShadowFromDiscard(state: ScenarioState, ctx: ReduceContext): Scenar
   return found ? updateCard(moveCard(state, found, { zone: "shadow", enemyId }), found, { face: "down", controller: null }) : state;
 }
 
-// The setup card's Forced effects that say "During setup" (900101:A:2) go down once the first quest card's Setup and When Revealed frames are
-// on the stack (setup.ts finishSetup), so they resolve first, before the first round (rr.setup).
-export function nightmareDuringSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
-  for (const card of Object.values(state.cards)) {
-    if (card.zone !== "nightmare") continue;
-    const own = ctx.effects.filter((effect) => effect.cardCode === card.code && effect.timing === "forced" && effect.trigger === "duringSetup");
-    next = pushCardEffects(next, "forced", card.id, next.firstPlayer, false, own, ctx, steps);
-  }
-  return next;
-}
-
 // EngageSeatWith: the source enemy engages a player engaged with an enemy that matches the filter (900203:A:2). The first player chooses among
 // several (a target choice of "seat:N"); nothing happens when the source is already engaged with one of them.
 function engageSeatWith(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageSeatWith" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -317,18 +221,6 @@ function engageSeatWith(state: ScenarioState, instruction: Extract<Instruction, 
   const seat = Number(chosen.slice("seat:".length));
   if (enemy.zone === "engaged") return flagged(state, id, "cannotBeEngaged") ? state : engageWith(state, seat, id, steps);
   return engageEnemy(state, seat, id, steps);
-}
-
-// PickMostHitPoints: among the enemies in the victory display and the encounter discard pile, the one with the most printed hit points is picked;
-// the first player chooses among a tie (900207:A:1).
-function pickMostHitPoints(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const enemies = [...state.victory, ...state.encounterDiscard].filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
-  const health = (id: string): number => printedOf(ctx.cards, state.cards[id]?.code ?? "").health ?? 0;
-  const top = Math.max(...enemies.map(health), Number.NEGATIVE_INFINITY);
-  const tied = enemies.filter((id) => health(id) === top);
-  const chosen = focus.chosen && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
-  if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: "PickMostHitPoints" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
-  return chosen ? markPicked(state, chosen) : state;
 }
 
 // AttackOthersUndefended (in the effect an attack leaves for its end, the source the attacking enemy): each player other than the one it is
@@ -376,68 +268,20 @@ function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, focus: F
   return placeDamage(updateCard(state, source.id, { damage: 0 }), target.id, source.damage, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
 }
 
-// TakeMorePrisoners: heroes are captured at random, from the players who have none captured, until 1 (1 or 2 players), 2 (3 players) or 3
-// (4 players) are the prisoner (900301:A:2).
-function takeMorePrisoners(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const players = livingSeats(state).length;
-  const wanted = players <= 2 ? 1 : players - 1;
-  let next = state;
-  while (prisonerHeroes(next).length < wanted) {
-    const free = heroesOf(next, ctx).filter((id) => {
-      const seat = next.cards[id]?.controller;
-      return seat != null && prisonersOfSeat(next, seat).length === 0;
-    });
-    const rolled = shuffleIds(free, next.seed, next.seedCursor);
-    const chosen = rolled.ids[0];
-    if (!chosen) return next;
-    next = captureHero({ ...next, seedCursor: rolled.cursor }, chosen, null, true, campaignTurnsDown(next));
-  }
-  return next;
-}
-
-// TakeHeroPrisoner: the hero this attack damaged, still in play and not yet a prisoner, is turned facedown as one, keeping its damage (900302:A:2).
-function takeHeroPrisoner(state: ScenarioState, card: CardRef, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const data = effectData(state);
-  const id = refCard(state, card, frameScope(state, focus.seat, focus.sourceId));
-  const hero = id ? state.cards[id] : undefined;
-  if (!id || !hero || (data?.dealt ?? 0) <= 0 || hero.zone !== "heroes" || printedOf(ctx.cards, hero.code).type !== "hero") return state;
-  return updateCard(captureHero(state, id, null, true, campaignTurnsDown(state)), id, { damage: hero.damage });
-}
-
-// ReturnToStage: the current quest card goes back into the quest deck, faceup on side A with no progress, and the quest card of stage `stage`
-// (set aside when it was defeated) is the current quest again on side B, with no progress (900302:A:2).
-function returnToStage(state: ScenarioState, stage: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const currentId = state.questStage;
-  const code = state.stages[stage - 1]?.code;
-  const earlier = code ? Object.values(state.cards).find((card) => card.code === code && card.zone === "setAside") : undefined;
-  if (!currentId || !earlier || state.cards[currentId]?.code === code) return state;
-  let next = releaseAttachments(state, currentId, ctx.cards, steps);
-  next = updateCard(moveCard(next, currentId, { zone: "questDeck" }), currentId, { face: "A", progress: 0 });
-  next = updateCard(moveCard(next, earlier.id, { zone: "questStage" }), earlier.id, { face: "B", progress: 0 });
-  steps.push({ kind: "advance", cardId: earlier.id });
-  return next;
-}
-
-// EngageOutOfPlay: the first copy found out of play (set aside, the encounter deck, its discard pile, the victory display) enters play engaged
-// with the first player (900307:A:1).
-function engageOutOfPlay(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const twin = twinCode(state, code, ctx.cards);
-  if (Object.values(state.cards).some((card) => card.code === twin && inPlay(card.zone))) return state;
-  const id = [...state.setAside, ...state.encounterDeck, ...state.encounterDiscard, ...state.victory].find((entry) => state.cards[entry]?.code === twin);
-  if (!id) return state;
-  return moveEncounter(updateCard(state, id, { face: "up" }), id, "engaged", state.firstPlayer, ctx, steps);
-}
-
-// MoveResourceFromHeroes: each hero the actor controls with a resource gives 1 to the card named (900308:A:3).
-function moveResourceFromHeroes(state: ScenarioState, to: CardRef, focus: Focus): ScenarioState {
-  const target = refCard(state, to, frameScope(state, focus.seat, focus.sourceId));
-  if (!target || !state.cards[target]) return state;
-  let next = state;
-  for (const heroId of state.seats[focus.seat]?.heroes ?? []) {
-    const hero = next.cards[heroId];
-    const card = next.cards[target];
-    if (!hero || !card || hero.resources <= 0) continue;
-    next = updateCard(updateCard(next, heroId, { resources: hero.resources - 1 }), target, { resources: card.resources + 1 });
-  }
-  return next;
+// The candidate with the highest measure is picked; the first player chooses among a tie (PickLowestEngagement measures the staging area's
+// enemies by their engagement cost, negated, 906407:A:2; PickMostHitPoints the enemies in the victory display and the encounter discard pile
+// by their printed hit points, 900207:A:1; PickHighestThreat the players still in the game, as `seat:N`, by their threat, 900106:A:1). With no candidate, nothing is (an empty pick).
+function pickMost(
+  state: ScenarioState,
+  instruction: Extract<Instruction, { verb: "PickLowestEngagement" | "PickMostHitPoints" | "PickHighestThreat" }>,
+  candidates: readonly string[],
+  measure: (id: string) => number,
+  focus: Focus,
+  steps: EngineStep[],
+): ScenarioState {
+  const top = Math.max(...candidates.map(measure), Number.NEGATIVE_INFINITY);
+  const tied = candidates.filter((id) => measure(id) === top);
+  const chosen = focus.chosen && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
+  if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: instruction.verb }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
+  return markPicked(state, chosen ?? "");
 }

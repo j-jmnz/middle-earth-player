@@ -1,5 +1,5 @@
 // The vocabulary the Nightmare decks (phase 36, docs/plans/nightmare-mode.md) add to effect records: verbs, triggers and stat flags.
-// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare.ts runs them.
+// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare.ts runs them (with nightmare-dungeon.ts and nightmare-setup.ts).
 import { z } from "zod";
 
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
@@ -37,9 +37,9 @@ export const VERBS = [
   // The enemy in the staging area with the lowest engagement cost becomes the picked card; the first player chooses among a tie
   // (rr.first-player). Nothing is picked when there is none ("engage the lowest engagement cost enemy in the staging area", 906407:A:2).
   z.strictObject({ verb: z.literal("PickLowestEngagement"), ...when }),
-  // The player who controls the card the reference names becomes the picked player ("attach this card to one of that player's heroes",
-  // 900106:A:1: the controller of the hero the source was attached to). Nothing is picked when that card has no controller.
-  z.strictObject({ verb: z.literal("PickController"), card: cardRefSchema, ...when }),
+  // The player with the highest threat becomes the picked player; the first player chooses among a tie (rr.first-player). "The player with
+  // the highest threat exhausts all heroes he controls. Then, attach this card to one of that player's heroes" (900106:A:1).
+  z.strictObject({ verb: z.literal("PickHighestThreat"), ...when }),
   // The topmost card of the encounter discard pile of one of these printed types becomes the picked card ("The topmost enemy or location
   // card in the encounter discard pile", 900107:A:2). Nothing is picked with none there.
   z.strictObject({ verb: z.literal("PickDiscardTop"), types: z.array(z.enum(["enemy", "location", "treachery"])).min(1), ...when }),

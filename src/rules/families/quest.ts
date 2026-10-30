@@ -11,7 +11,7 @@ import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { addModifier, placeDamage, playerCardEffectCanChoose } from "../keywords.ts";
 import { pickCandidates } from "../pick.ts";
-import { exhaustCard, lastPicked, readyCard, seatOf } from "../player-verbs.ts";
+import { exhaustCard, lastPicked, placePlayerDamage, readyCard, seatOf } from "../player-verbs.ts";
 import { isCharacterType, isPlayerType, printedOf } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import type { Modifier, QueueItem, ScenarioState } from "../state.ts";
@@ -126,7 +126,10 @@ function damageEach(state: ScenarioState, instruction: Verb<"DamageEach">, focus
         : [];
   const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
-  if (amount > 0) for (const id of targets) next = placeDamage(next, id, amount, ctx.cards, steps, player ? "player" : "framework", currentCause(steps, UNATTRIBUTED));
+  if (amount <= 0) return next;
+  for (const id of targets) {
+    next = player ? placePlayerDamage(next, focus.seat, id, amount, ctx, steps) : placeDamage(next, id, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+  }
   return next;
 }
 

@@ -18,11 +18,15 @@ import type { ReduceContext } from "../interpret.ts";
 import { modifiedStat, playerCardEffectCanChoose } from "../keywords.ts";
 import { settle } from "../machine.ts";
 import { definePrinted } from "../printed.ts";
+import { readyCard } from "../player-verbs.ts";
 import { reduce } from "../reduce.ts";
+import { doRefresh } from "../refresh.ts";
 import { flagged, updateCard, type ScenarioState } from "../state.ts";
 import { spawn } from "../zones.ts";
 import { finishSetup } from "../setup.ts";
-import { announceCanceled, cancelNotAllowed, hideCommitLimit, run as runNightmare, twinCode } from "./nightmare.ts";
+import { announceCanceled, cancelNotAllowed, run as runNightmare } from "./nightmare.ts";
+import { hideCommitLimit, twinCode } from "./nightmare-guards.ts";
+import { announceStageRevealed } from "./nightmare-setup.ts";
 
 const SETUP = "906101";
 const KHAMUL = "906102";
@@ -138,8 +142,12 @@ describe("the setup card next to the quest deck (zone nightmare) hears the stage
   it("is not heard without the setup card: Normal places none", () => {
     const { state: base, stageId } = table();
     const state = put(base, KHAMUL, { zone: "victory" }).state;
-    const advanced = settle(updateCard(state, stageId, { progress: 6 }), ctx, []);
+    const steps: EngineStep[] = [];
+    const advanced = settle(updateCard(state, stageId, { progress: 6 }), ctx, steps);
     expect(advanced.victory).toHaveLength(1);
+    // With no listener in play the stage reveal is not announced at all: no Forced frame goes down for it.
+    expect(steps.some((step) => step.kind === "push" && step.frame === "forced")).toBe(false);
+    expect(announceStageRevealed(state, stageId, ctx, [])).toBe(state);
   });
 });
 
@@ -287,6 +295,7 @@ describe("A Knife in the Dark Nightmare's vocabulary (906201:A:2, 906203:A:1, 90
     definePrinted({ code: "906208", name: "The Ring's Will", type: "treachery" }),
     definePrinted({ code: "906209", name: "Blade Tip", type: "treachery" }),
     definePrinted({ code: "ringbearer", name: "Frodo", type: "hero", traits: ["Hobbit", "Ring-bearer"], threat: 7, willpower: 2, attack: 1, defense: 2, health: 2 }),
+    definePrinted({ code: "141085", name: "The One Ring", type: "attachment", cost: 0 }),
   ]);
   const knifeCtx: ReduceContext = { effects: KNIFE_EFFECTS, cards: knifeCards };
 
@@ -300,6 +309,17 @@ describe("A Knife in the Dark Nightmare's vocabulary (906201:A:2, 906203:A:1, 90
     const engaged = syncConstants(spawn(setup, "141051", { zone: "engaged", seat: 0 }).state, knifeCtx);
     const bill = byCode(engaged, "141051")[0] ?? "";
     expect(playerCardEffectCanChoose(knifeCards.get("141051")!, engaged, bill)).toBe(true);
+  });
+
+  it("exhausts The One Ring when Weathertop becomes the active location, and no effect readies it while Weathertop is in play (906204:A:3, cannotReady)", () => {
+    const { state: base } = table();
+    const ring = spawn(base, "141085", { zone: "play", seat: 0 });
+    const top = spawn(ring.state, "906204", { zone: "activeLocation" });
+    const barred = settle(pushCardEffects(top.state, "forced", top.id, 0, false, [knifeRecord("906204:forced:1")], knifeCtx, []), knifeCtx, []);
+    expect(barred.cards[ring.id]?.exhausted).toBe(true);
+    // A card effect cannot ready it ("cannot ready"), nor can the refresh phase.
+    expect(readyCard(barred, ring.id).cards[ring.id]?.exhausted).toBe(true);
+    expect(doRefresh(barred, knifeCtx, []).cards[ring.id]?.exhausted).toBe(true);
   });
 
   it("has Southern Spy attack the revealing player from the staging area when no Ringwraith is out of play", () => {
@@ -356,6 +376,13 @@ describe("Flight to the Ford Nightmare's vocabulary (906301:A:2, 906304:A:1; rr.
     expect(announceCanceled(forest, forest, fordCtx)).toBe(forest);
     const resolved = settle(announced, fordCtx, []);
     expect(resolved.life).toBe(9);
+  });
+
+  it("announces nothing while no card that listens for a canceled when revealed effect is in play", () => {
+    const { state: base } = table();
+    const discarded = spawn({ ...base, life: 10 }, "906304", { zone: "encounterDiscard" }).state;
+    const changed = { ...discarded, round: discarded.round };
+    expect(announceCanceled(changed, discarded, fordCtx)).toBe(changed);
   });
 
   it("holds the last stage back while Ford of Bruinen is in play: the players cannot win (the setup card's constant, zone nightmare)", () => {

@@ -38,7 +38,7 @@ export function startShadowAttack(state: ScenarioState, seat: number, attackers:
   const moved = updateCard(moveCard(state, attackerId, { zone: "engaged", seat }), attackerId, { face: "up" });
   // In the combat phase it has made its attack: the enemies that attack in turn do not call it again.
   const counted = moved.phase === "Combat" ? { ...moved, resolvedAttacks: [...moved.resolvedAttacks, attackKey(moved, attackerId, seat)] } : moved;
-  const begun = beginEnemyAttack(dealAttackShadow(counted, attackerId, ctx), seat, attackerId, ctx, steps);
+  const begun = beginEnemyAttack(dealAttackShadow(counted, attackerId, ctx, steps), seat, attackerId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   const stays: Instruction = { verb: "MoveEncounterCard", card: "self", to: "deckTop", when: { kind: "matches", card: "self", inPlay: true } };
   const after: readonly Instruction[] = [{ verb: "Delay", until: "endOfPhase", instructions: [stays] }];

@@ -1,6 +1,7 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json). Shadow cards in
 // the defense family: looking at one, discarding one, dealing another, dealing them face up, and telling when one raised the
 // attacking enemy's Attack.
+import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { dealAdditionalShadow } from "../interpret.ts";
 import { modifiedStat } from "../keywords.ts";
@@ -39,8 +40,8 @@ export function discardShadowOf(state: ScenarioState, enemyId: string): Scenario
 }
 
 // DealShadowTo: one more shadow card for an engaged enemy; during its attack it resolves after those it has (rr.step-6-4-2).
-export function dealShadowTo(state: ScenarioState, enemyId: string): ScenarioState {
-  return state.cards[enemyId]?.zone === "engaged" ? dealAdditionalShadow(state, enemyId) : state;
+export function dealShadowTo(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+  return state.cards[enemyId]?.zone === "engaged" ? dealAdditionalShadow(state, enemyId, steps) : state;
 }
 
 // How a shadow card is dealt to the enemy: face up while the player it is engaged with holds shadowsFaceUp (Silver Lamp,

@@ -39,9 +39,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 900208 Troll Attack
   {"id":"900208:whenRevealed:1","cardCode":"900208","lines":["900208:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ImmediateAttackEach","trait":"Troll"},{"verb":"GainSurge","when":{"kind":"noneReturned"}}]},
   {"id":"900208:shadow:1","cardCode":"900208","lines":["900208:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"AttackOthersUndefended","when":{"kind":"matches","card":"self","pick":{"type":"enemy","control":"any","trait":"Troll"}}}]}]},
-  // 900209 Smoking Blood
+  // 900209 Smoking Blood: defended, the damage moves to the defender now; undefended, to the hero the attack damaged once it ends.
   {"id":"900209:whenRevealed:1","cardCode":"900209","lines":["900209:A:1"],"timing":"whenRevealed","instructions":[{"verb":"RemoveEnemyDamage"},{"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"x","min":1}}}]},
-  {"id":"900209:shadow:1","cardCode":"900209","lines":["900209:A:2"],"timing":"shadow","instructions":[{"verb":"MoveDamageTo","from":"attacker","to":"defender","when":NOT_UNDEFENDED},{"verb":"AfterAttack","instructions":[{"verb":"MoveDamageTo","from":"self","to":"other"}]}]},
+  {"id":"900209:shadow:1","cardCode":"900209","lines":["900209:A:2"],"timing":"shadow","instructions":[{"verb":"MoveDamageTo","from":"attacker","to":"defender","when":NOT_UNDEFENDED},{"verb":"AfterAttack","when":UNDEFENDED,"instructions":[{"verb":"MoveDamageTo","from":"self","to":"other"}]}]},
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

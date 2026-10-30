@@ -44,8 +44,8 @@ export function stagingAttackers(state: ScenarioState, seat: number): string[] {
 }
 
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.
-export function dealForAttack(state: ScenarioState, enemyId: string): ScenarioState {
-  return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId);
+export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+  return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps);
 }
 
 // AttackFromStaging: the picked enemy in the staging area attacks the actor now (142038:A:2).
@@ -55,7 +55,7 @@ export function attackFromStaging(state: ScenarioState, focus: Focus, ctx: Reduc
   if (!id || enemy?.zone !== "staging" || attackBarred(state, id, focus.seat) || state.seats[focus.seat]?.eliminated) return state;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const begun = beginEnemyAttack(dealForAttack(counted, id), focus.seat, id, ctx, steps, true);
+  const begun = beginEnemyAttack(dealForAttack(counted, id, steps), focus.seat, id, ctx, steps, true);
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
 

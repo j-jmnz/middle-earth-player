@@ -15,7 +15,7 @@ import { offerResponses } from "./responses.ts";
 import { restricted } from "./restrictions.ts";
 import { withMode, type ScenarioState } from "./state.ts";
 import { fireForced } from "./triggers.ts";
-import { announceStageRevealed } from "./families/nightmare.ts";
+import { announceStageRevealed } from "./families/nightmare-setup.ts";
 
 // Resolving the quest is two passes. The first adds progress, and each stage the quest advanced to has
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends

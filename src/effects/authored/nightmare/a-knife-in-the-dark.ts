@@ -2,7 +2,7 @@ import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // A Knife in the Dark Nightmare (deck 9062, data/printed/nightmare.json). The One Ring is 141085, Ringwraith 141069, Trouble in Bree (stage 1)
 // 141025. Nightmare Weathertop (906204) takes the set-aside slot of the standard one: the quest's records that name Weathertop by code read it
-// (twinCode, src/rules/families/nightmare.ts).
+// (twinCode, src/rules/families/nightmare-guards.ts).
 const RING = "141085";
 const RINGWRAITH = "141069";
 const STAGE_ONE = "141025";
@@ -20,7 +20,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 906204 Weathertop (line 1 is the immune keyword)
   {"id":"906204:constant:1","cardCode":"906204","lines":["906204:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotTakeDamage","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","names":["The Witch-king"]}}]},
   // The Ring's "cannot ready" holds while Weathertop is in play from here on: it is the active location until it is explored and leaves play.
-  {"id":"906204:forced:1","cardCode":"906204","lines":["906204:A:3"],"timing":"forced","trigger":"becameActive","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":RING}},{"verb":"Pick","pick":THE_RING},{"verb":"ModifyStat","stat":"doesNotReady","amount":1,"until":"whileSourceInPlay","target":"picked"}]},
+  {"id":"906204:forced:1","cardCode":"906204","lines":["906204:A:3"],"timing":"forced","trigger":"becameActive","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":RING}},{"verb":"Pick","pick":THE_RING},{"verb":"ModifyStat","stat":"cannotReady","amount":1,"until":"whileSourceInPlay","target":"picked"}]},
   // 906205 Weather Hills. Stage 1 is Trouble in Bree, in play while the players are at it.
   {"id":"906205:constant:1","cardCode":"906205","lines":["906205:A:1"],"timing":"constant","condition":{"kind":"inPlay","code":STAGE_ONE,"is":true},"instructions":[{"verb":"ModifyStat","stat":"noProgressPlaced","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"906205:constant:2","cardCode":"906205","lines":["906205:A:2"],"timing":"constant","condition":RING_EXHAUSTED,"instructions":[{"verb":"ModifyStat","stat":"threat","amount":2,"until":"whileSourceInPlay","target":"self"}]},

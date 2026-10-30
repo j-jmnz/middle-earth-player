@@ -192,8 +192,9 @@ export const simpleVerbs = [
       // first player (rr.first-player), or (`highestThreat`, "The player with the highest threat level attaches this card to one of his
       // heroes", 01080:A:1) a hero of the player with the highest threat, who chooses it (the first player chooses among the heroes
       // of the players tied for the highest), or (`highestThreatCost`, "Attach to the hero with the highest threat cost", 41043:A:2) the hero
-      // with the highest printed threat cost among every hero in play (the first player chooses among those tied).
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
+      // with the highest printed threat cost among every hero in play (the first player chooses among those tied), or (`picked`, "attach this
+      // card to one of that player's heroes", 900106:A:1) a hero of the player the effect picked, who chooses it.
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
     ]),
     ...when,

@@ -5,6 +5,8 @@ import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts
 // (src/rules/families/prisoner.ts). Rules: rr.objective-cards, rr.step-3-4, rr.delayed-effects, rr.in-play-and-out-of-play, rr.doomed-x
 // (data/rules/entries.json).
 const UNDEFENDED = { kind: "undefended" } as const;
+// TakeHeroPrisoner leaves X at 1 when it captured a hero: the part after "Then" resolves only if it did (rr.then).
+const CAPTURED = { kind: "x", min: 1 } as const;
 const DOL_GULDUR_LOCATION: PickSpec = { type: "location", control: "any", trait: "Dol Guldur" };
 const UNCLAIMED_OBJECTIVE: PickSpec = { type: "objective", control: "any", stagingOnly: true };
 const ATTACKING: PickSpec = { type: "enemy", control: "any", staging: true, attackingEnemy: true };
@@ -16,7 +18,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"900301:forced:1","cardCode":"900301","lines":["900301:A:2"],"timing":"forced","trigger":"prisonerTaken","subject":{"type":"hero","control":"any"},"instructions":[{"verb":"TakeMorePrisoners"}]},
   // 900302 Torture Master
   {"id":"900302:whenRevealed:1","cardCode":"900302","lines":["900302:A:1"],"timing":"whenRevealed","instructions":[ADD_TOKENS]},
-  {"id":"900302:shadow:1","cardCode":"900302","lines":["900302:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"TakeHeroPrisoner","card":"other","dealt":true},{"verb":"ReturnToStage","stage":2,"when":{"kind":"onStage","stage":3}}]}]},
+  {"id":"900302:shadow:1","cardCode":"900302","lines":["900302:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"TakeHeroPrisoner","card":"other","dealt":true},{"verb":"ReturnToStage","stage":2,"when":{"kind":"all","conditions":[CAPTURED,{"kind":"onStage","stage":3}]}}]}]},
   // 900303 Crazed Captive (line 1 is Doomed 1)
   {"id":"900303:forced:1","cardCode":"900303","lines":["900303:A:2"],"timing":"forced","trigger":"enemyDestroyed","subject":"self","instructions":[{"verb":"RaiseThreat","amount":7,"who":"eachSeat"}]},
   {"id":"900303:shadow:1","cardCode":"900303","lines":["900303:A:3"],"timing":"shadow","instructions":[{"verb":"Pick","pick":ATTACKING},{"verb":"Delay","until":"endOfPhase","subject":"picked","instructions":[{"verb":"RaiseThreat","amount":7,"who":"actor","when":{"kind":"matches","card":"picked","inPlay":true}}]}]},

@@ -1,4 +1,4 @@
-import { withTwin } from "./families/nightmare.ts";
+import { withTwin } from "./families/nightmare-guards.ts";
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
@@ -187,7 +187,7 @@ function runItem(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare.ts).
+  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare-guards.ts).
   const instruction = withTwin(state, item.instruction, ctx.cards);
   const twinned = instruction === item.instruction ? item : { ...item, instruction };
   if (!holdsNow(state, instruction, { actor: item.seat, sourceId: frame.cardId, returned }, ctx)) return state;
@@ -307,7 +307,7 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, ctx: Red
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own (families/defense-listen.ts).
-  const dealt = dealAttackShadow(state, sourceId, ctx);
+  const dealt = dealAttackShadow(state, sourceId, ctx, steps);
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };
@@ -340,7 +340,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     case "AttachSelf": {
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
       const free = (id: string): boolean => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) && (code == null || !attachBlocked(state, ctx, id, code));
-      if (instruction.to.kind === "hero") return attachHeroHosts(state, instruction.to, item.seat, ctx.cards).filter(free);
+      if (instruction.to.kind === "hero") {
+        const seat = attachSeat(state, instruction, item.seat, sourceId);
+        return seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);
+      }
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
     }
@@ -442,7 +445,7 @@ function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Redu
     ids = found.slice(0, 1);
   } else if (picksOne(item.instruction)) {
     const distinct = distinctByCode(state, found);
-    const chooser = attachHostChooser(state, item.instruction, item.seat);
+    const chooser = attachHostChooser(state, item.instruction, attachSeat(state, item.instruction, item.seat, frame.cardId) ?? item.seat);
     if (distinct.length > 1) return askTarget(state, { ...item, seat: chooser }, distinct);
     ids = found.slice(0, 1);
   }
@@ -507,4 +510,13 @@ function applyTargeted(
     default:
       return state;
   }
+}
+
+// The seat whose heroes an AttachSelf to a hero offers and who chooses among them: the player the effect picked for `control: "picked"`
+// ("attach this card to one of that player's heroes", 900106:A:1: the last player picked, though cards were picked since; null when no
+// player is picked), otherwise the seat the item runs for.
+function attachSeat(state: ScenarioState, instruction: Instruction, itemSeat: number, sourceId: string | null): number | null {
+  if (instruction.verb !== "AttachSelf" || instruction.to.kind !== "hero" || instruction.to.control !== "picked") return itemSeat;
+  const player = (frameScope(state, itemSeat, sourceId).picked ?? []).findLast((entry) => entry.startsWith("seat:"));
+  return player ? Number(player.slice("seat:".length)) : null;
 }

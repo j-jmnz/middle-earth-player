@@ -95,7 +95,7 @@ export type EffectData = {
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
   dealt?: number;
   hold?: string;
-  // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare.ts).
+  // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare-guards.ts).
   hideFailed?: boolean;
 };
 

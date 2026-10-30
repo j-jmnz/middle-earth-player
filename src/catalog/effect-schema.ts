@@ -145,10 +145,12 @@ const delaySchema = z.strictObject({
   instructions: z.array(simpleInstructionSchema),
 });
 
-// Instructions that run, with the attacking enemy as the source, once the attack in progress ends.
+// Instructions that run, with the attacking enemy as the source, once the attack in progress ends. `when` is read as the shadow effect
+// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
 const afterAttackSchema = z.strictObject({
   verb: z.literal("AfterAttack"),
   instructions: z.array(simpleInstructionSchema),
+  ...when,
 });
 
 const forEachPlayerSchema = z.strictObject({

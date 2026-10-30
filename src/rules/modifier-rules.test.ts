@@ -229,7 +229,7 @@ describe("the defending character gets a modifier from a shadow effect (141052:A
       const theRing = spawn(base, "ring", { zone: "play", seat: 0 });
       let state = attachTo(updateCard(theRing.state, theRing.id, { exhausted }), theRing.id, heroes[0]?.[0] ?? "");
       const enemy = spawn(state, "wraith", { zone: "engaged", seat: 0 });
-      state = dealOneShadow(spawn(enemy.state, "fear", { zone: "encounterDeck" }, "down").state, enemy.id);
+      state = dealOneShadow(spawn(enemy.state, "fear", { zone: "encounterDeck" }, "down").state, enemy.id, []);
       const asked = settle({ ...withMode(state, "enemyAttacks"), boundaryPhase: "Combat" }, ctx, []);
       const done = expectOk(reduce(asked, { type: "DeclareDefender", defenderId: defender }, ctx));
       // Attack 3 against defense 2, less the shadow.
