@@ -1,6 +1,6 @@
 # Claude Code
 
-The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
+The rules for every session are in `.cursor/rules/authority.mdc`. Read it. Any session or agent that changes code also reads `.cursor/rules/code-standards.mdc` and follows it. The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
 
 ## Data
 
