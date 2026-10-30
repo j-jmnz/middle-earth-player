@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { cardRefSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { pickSchema } from "../effect-schema-pick.ts";
 
 export const VERBS = [
   // The source (a treachery being revealed) attaches to the current quest card ("When Revealed: Attach to the current quest", 906107:A:2).
@@ -46,6 +47,25 @@ export const VERBS = [
   // shadow card, and resolves in this attack after the ones it has ("Deal and resolve the topmost Shadow effect in the encounter discard
   // pile for this attack", 900107:A:3; rr.step-6-4-2). Nothing happens with none there.
   z.strictObject({ verb: z.literal("DealShadowFromDiscard"), ...when }),
+  // The source enemy engages a player who is engaged with an enemy that matches `pick` ("Anduin Troll Spawn engages a player engaged with a
+  // Hill Troll", 900203:A:2); the first player chooses among several (rr.first-player). Nothing happens when no player is, or when the source
+  // is already engaged with one who is. `seat` is engine use: the player chosen.
+  z.strictObject({ verb: z.literal("EngageSeatWith"), pick: pickSchema, ...when }),
+  // The enemy with the most printed hit points in the victory display and the encounter discard pile becomes the picked card; the first player
+  // chooses among a tie ("Search the victory display and encounter discard pile for the enemy with the most hit points", 900207:A:1). Nothing
+  // is picked with no enemy there.
+  z.strictObject({ verb: z.literal("PickMostHitPoints"), ...when }),
+  // A shadow effect left for the end of the attack (inside AfterAttack, the source is the attacking enemy): the attack also resolves against
+  // each other player, undefended ("resolve this attack against each player. (Attack is undefended against each player not engaged with this
+  // enemy.)", 900208:A:2; ltp.undefended-attack): each of them chooses a hero they control, which takes the enemy's Attack as damage.
+  z.strictObject({ verb: z.literal("AttackOthersUndefended"), ...when }),
+  // All damage is removed from every enemy in play; each player raises his threat by the damage removed from the enemies engaged with him.
+  // The effect's X becomes the damage removed ("Remove all damage from all enemies. Then, each player raises his threat by the amount of damage
+  // just removed from his engaged enemies. If no damage is removed by this effect", 900209:A:1).
+  z.strictObject({ verb: z.literal("RemoveEnemyDamage"), ...when }),
+  // All damage on the card `from` names moves to the card `to` names; damage that reaches its hit points destroys it ("Move all damage on
+  // this enemy to the defending character", 900209:A:2). Nothing moves when either card is missing or out of play.
+  z.strictObject({ verb: z.literal("MoveDamageTo"), from: cardRefSchema, to: cardRefSchema, ...when }),
 ] as const;
 
 export const TRIGGERS = [
@@ -71,4 +91,12 @@ export const FLAGS = [
   // On a card: it cannot ready, by a card effect or in the refresh phase, while the flag holds ("your cards cannot ready for the remainder
   // of the round", 900103:A:1). Read wherever a card readies (player-verbs.ts readyCard, refresh.ts, effect-verbs.ts ReadyHero).
   "cannotReady",
+  // On "table": an empty encounter deck is refilled at once, at any time, by shuffling the encounter discard pile into it ("If the encounter
+  // deck is empty (at any time), shuffle the encounter discard pile back into the encounter deck", 900201:A:3; rr.running-out-of-cards
+  // otherwise does so only in the quest phase). Read by verbs.ts resetEncounterDeck, the settle loop and the shadow deal.
+  "encounterRefill",
+  // On "seat:N": that player cannot attack, or damage by his card effects, an enemy whose title is not the title of the modifier's source ("If
+  // you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland
+  // Outlaws", 900202:A:1). Read by combat.ts canAttack and the DamageCard verb (families/nightmare-guards.ts).
+  "attackOnlyTitle",
 ] as const;

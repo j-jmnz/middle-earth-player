@@ -8,7 +8,7 @@ import type { EngineStep } from "./intents.ts";
 import { queueEvent } from "./queue.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { defenseAsDefender, modifiedStat } from "./keywords.ts";
-import type { ScenarioState } from "./state.ts";
+import type { PendingAttack, ScenarioState } from "./state.ts";
 import { expireModifiers, flagged, inPlay, updateCard } from "./state.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard, shadowCards } from "./zones.ts";
@@ -285,9 +285,16 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       cancel: null,
       blockCancel: null,
       ...(destroyed > 0 ? { x: destroyed } : {}),
+      // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
+      ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,
   );
+}
+
+// The character an attack that ended was made against: its defender, or the hero an undefended attack's damage was assigned to.
+function afterTarget(attack: PendingAttack): string | undefined {
+  return attack.undefended || !attack.defenderId ? attack.heroId : attack.defenderId;
 }

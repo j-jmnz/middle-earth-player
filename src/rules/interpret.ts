@@ -18,7 +18,7 @@ import { engageEnemy, engageWith, stagingEnemies, stagingLocations } from "./que
 import { travelNow } from "./travel.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, heldAmount, inPlay, updateCard } from "./state.ts";
-import { raiseFor, runExtraVerb } from "./verbs.ts";
+import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { shadowFace } from "./families/defense-shadow.ts";
@@ -208,7 +208,9 @@ export function dealOneShadow(state: ScenarioState, enemyId: string): ScenarioSt
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-export function dealAdditionalShadow(state: ScenarioState, enemyId: string): ScenarioState {
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string): ScenarioState {
+  // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3).
+  const state = refillEncounterDeck(given, []);
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).

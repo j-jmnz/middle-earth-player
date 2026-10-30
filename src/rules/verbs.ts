@@ -18,6 +18,7 @@ import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
 import { mayGainResources } from "./families/misc-guards.ts";
 import { queueHeard } from "./families/quest-events.ts";
+import { refillsAnyTime } from "./families/nightmare-guards.ts";
 import { encounterRaised } from "./families/quest-threat.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, cardsUnder, moveCard } from "./zones.ts";
@@ -40,7 +41,8 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 // An encounter deck that is out of cards during the quest phase gets the encounter discard pile back, shuffled
 // (rr.running-out-of-cards, rr.step-3-3). Outside the quest phase it stays empty.
 export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
-  if (state.phase !== "Quest" || state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
+  // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
+  if ((state.phase !== "Quest" && !refillsAnyTime(state)) || state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
   const count = state.encounterDiscard.length;
   let next = state;
   for (const id of [...state.encounterDiscard]) {
@@ -48,6 +50,11 @@ export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): S
   }
   steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause("rr.running-out-of-cards") });
   return shuffleEncounterDeck(next);
+}
+
+// The encounter deck emptied while the Nightmare setup card refills it at any time (encounterRefill, 900201:A:3).
+export function refillEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+  return state.encounterDeck.length === 0 && state.encounterDiscard.length > 0 && refillsAnyTime(state) ? resetEncounterDeck(state, steps) : state;
 }
 
 // A card goes into the encounter deck face down, as every card in a deck is, and the deck is shuffled.

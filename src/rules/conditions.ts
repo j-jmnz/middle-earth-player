@@ -22,6 +22,7 @@ import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
 import { lastHideFailed, withTwin } from "./families/nightmare.ts";
+import { onStage } from "./families/nightmare-guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -82,6 +83,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       );
     case "lastHideFailed":
       return lastHideFailed(state);
+    case "onStage":
+      return onStage(state, condition.stage);
     case "hasEngaged": {
       const trait = condition.trait;
       return (state.seats[scope.actor]?.engaged ?? []).some((id) => trait == null || hasTrait(state, id, trait, ctx));

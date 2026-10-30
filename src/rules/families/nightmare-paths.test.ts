@@ -4,10 +4,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
+import { AUTHORED_EFFECTS as ANDUIN } from "../../effects/authored/nightmare/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS as MIRKWOOD } from "../../effects/authored/nightmare/passage-through-mirkwood.ts";
 
 import { syncConstants } from "../constants.ts";
-import { pushCardEffects } from "../effect-frames.ts";
+import { canAttack } from "../combat.ts";
+import { pushCardEffects, pushEffectFrame } from "../effect-frames.ts";
 import { cardMap, expectOk, hero, idleScenario } from "../fixture.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
@@ -18,7 +20,8 @@ import { reduce } from "../reduce.ts";
 import { definePrinted } from "../printed.ts";
 import { doRefresh } from "../refresh.ts";
 import { finishSetup } from "../setup.ts";
-import { updateCard, withThreat, type ScenarioState } from "../state.ts";
+import { flagged, updateCard, withThreat, type ScenarioState } from "../state.ts";
+import { fireForced } from "../triggers.ts";
 import { spawn } from "../zones.ts";
 import { run as runNightmare } from "./nightmare.ts";
 
@@ -34,6 +37,17 @@ const cards = cardMap([
   definePrinted({ code: "road", name: "Road", type: "location", threat: 1, questPoints: 2 }),
   definePrinted({ code: "mist", name: "Mist", type: "treachery" }),
   definePrinted({ code: "stage", name: "Flies and Spiders", type: "quest", questPoints: 8 }),
+  definePrinted({ code: "900201", name: "Journey Along the Anduin Nightmare", type: "nightmare" }),
+  definePrinted({ code: "900202", name: "Marshland Outlaws", type: "enemy", traits: ["Marshland"], engagementCost: 21, threat: 2, attack: 2, defense: 2, health: 8 }),
+  definePrinted({ code: "900203", name: "Anduin Troll Spawn", type: "enemy", traits: ["Troll"], engagementCost: 26, threat: 2, attack: 4, defense: 3, health: 5 }),
+  definePrinted({ code: "900204", name: "Brown Water Rats", type: "enemy", traits: ["Creature", "Rat"], engagementCost: 1, threat: 1, attack: 1, defense: 1, health: null }),
+  definePrinted({ code: "900205", name: "A Flooded Ford", type: "location", traits: ["Riverland"], threat: 3, questPoints: 6 }),
+  definePrinted({ code: "900207", name: "Pursuit on the Shore", type: "treachery" }),
+  definePrinted({ code: "900208", name: "Troll Attack", type: "treachery" }),
+  definePrinted({ code: "900209", name: "Smoking Blood", type: "treachery" }),
+  definePrinted({ code: "01082", name: "Hill Troll", type: "enemy", traits: ["Troll"], engagementCost: 30, threat: 1, attack: 6, defense: 3, health: 9 }),
+  definePrinted({ code: "s2", name: "Anduin Passage", type: "quest", questPoints: 16 }),
+  definePrinted({ code: "s3", name: "Ambush on the Shore", type: "quest", questPoints: 0 }),
   hero("frodo", "spirit", 8, 2),
   hero("sam", "spirit", 8, 2),
   hero("gimli", "tactics", 8, 3),
@@ -167,5 +181,131 @@ describe("Passage Through Mirkwood Nightmare (900101-900109)", () => {
     const asked = settle({ ...spider.state, pendingEvents: [{ trigger: "encounterEnteredPlay", seat: null, subject: spider.id }] }, ctx, []);
     const heard = choose(asked, heroes[0]?.[1] ?? "");
     expect((heroes[0] ?? []).filter((id) => heard.cards[id]?.exhausted)).toHaveLength(1);
+  });
+});
+
+describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
+  const ctx: ReduceContext = { effects: ANDUIN, cards };
+  const choose = (state: ScenarioState, optionId: string): ScenarioState => expectOk(reduce(state, { type: "Choose", optionId }, ctx)).state;
+  const fire = (state: ScenarioState, frame: "whenRevealed" | "forced" | "shadow", sourceId: string, id: string) =>
+    settle(pushCardEffects(state, frame, sourceId, 0, false, [record(ANDUIN, id)], ctx, []), ctx, []);
+  const runFrame = (state: ScenarioState, sourceId: string, instructions: Parameters<typeof pushEffectFrame>[1]["instructions"], extra: { other?: string } = {}) =>
+    settle(pushEffectFrame(state, { frame: "shadow", sourceId, actor: 0, peril: false, effectId: "fixture", instructions, cancel: null, blockCancel: null, ...extra }, []), ctx, []);
+
+  it("gives Troll enemies \"Cannot have attachments\" and refills an empty encounter deck in any phase (900201:A:2, 900201:A:3)", () => {
+    const { state: base } = table();
+    const setup = spawn({ ...base, phase: "Combat" }, "900201", { zone: "nightmare" }).state;
+    const troll = spawn(setup, "01082", { zone: "staging" });
+    const synced = syncConstants(deck(troll.state, ["mist", "road"], "encounterDiscard"), ctx);
+    expect(flagged(synced, troll.id, "cannotHaveAttachments")).toBe(true);
+    const refilled = settle({ ...synced, mode: "stopped" }, ctx, []);
+    expect(refilled.encounterDeck).toHaveLength(2);
+    expect(refilled.encounterDiscard).toEqual([]);
+    const normal = settle({ ...syncConstants(deck({ ...base, phase: "Combat" }, ["mist"], "encounterDiscard"), ctx), mode: "stopped" }, ctx, []);
+    expect(normal.encounterDeck).toEqual([]);
+  });
+
+  it("holds the player engaged with Marshland Outlaws to attacking and damaging Marshland Outlaws (900202:A:1, attackOnlyTitle)", () => {
+    const { state: base, heroes } = table();
+    const hero = heroes[0]?.[0] ?? "";
+    const outlaws = spawn(base, "900202", { zone: "engaged", seat: 0 });
+    const troll = spawn(outlaws.state, "01082", { zone: "engaged", seat: 0 });
+    const synced = syncConstants(troll.state, ctx);
+    expect(canAttack(synced, 0, hero, troll.id, cards)).toBe(false);
+    expect(canAttack(synced, 0, hero, outlaws.id, cards)).toBe(true);
+    // A hero's effect does not damage the Hill Troll either, and does damage Marshland Outlaws.
+    expect(runFrame(synced, hero, [{ verb: "DamageCard", amount: 1, target: "other" }], { other: troll.id }).cards[troll.id]?.damage).toBe(0);
+    expect(runFrame(synced, hero, [{ verb: "DamageCard", amount: 1, target: "other" }], { other: outlaws.id }).cards[outlaws.id]?.damage).toBe(1);
+    // In the staging area it holds nobody.
+    const staged = syncConstants(spawn(base, "900202", { zone: "staging" }).state, ctx);
+    const loose = spawn(staged, "01082", { zone: "engaged", seat: 0 });
+    expect(canAttack(syncConstants(loose.state, ctx), 0, hero, loose.id, cards)).toBe(true);
+  });
+
+  it("has Anduin Troll Spawn engage the player engaged with a Hill Troll at the beginning of the combat phase (900203:A:2)", () => {
+    const { state: base } = table(2);
+    const hill = spawn(base, "01082", { zone: "engaged", seat: 1 });
+    const spawnTroll = spawn(hill.state, "900203", { zone: "staging" });
+    const engaged = fire({ ...spawnTroll.state, phase: "Combat" }, "forced", spawnTroll.id, "900203:forced:1");
+    expect(engaged.cards[spawnTroll.id]).toMatchObject({ zone: "engaged", controller: 1 });
+    const none = fire({ ...spawn(base, "900203", { zone: "staging" }).state, phase: "Combat" }, "forced", "i0", "900203:forced:1");
+    expect(none.staging).toHaveLength(1);
+  });
+
+  it("discards Brown Water Rats on stage 3 once only Rats are left, and not before (900204:A:2, onStage)", () => {
+    const { state: base } = table();
+    const third: ScenarioState = { ...base, stages: [{ code: "stage" }, { code: "s2" }, { code: "s3" }] };
+    const onThird = updateCard(third, third.questStage ?? "", { code: "s3" });
+    const rats = spawn(onThird, "900204", { zone: "staging" });
+    const gone = fire(rats.state, "forced", rats.id, "900204:forced:3");
+    expect(gone.cards[rats.id]?.zone).toBe("encounterDiscard");
+    const withTroll = spawn(rats.state, "01082", { zone: "staging" }).state;
+    expect(fire(withTroll, "forced", rats.id, "900204:forced:3").cards[rats.id]?.zone).toBe("staging");
+    const firstStage = spawn(third, "900204", { zone: "staging" });
+    expect(fire(firstStage.state, "forced", firstStage.id, "900204:forced:3").cards[firstStage.id]?.zone).toBe("staging");
+  });
+
+  it("raises each player's threat by A Flooded Ford's progress when the encounter deck reveals a card (900205:A:1)", () => {
+    const { state: base } = table();
+    const ford = spawn(base, "900205", { zone: "staging" });
+    const placed = updateCard(deck(ford.state, ["mist"]), ford.id, { progress: 2 });
+    const threat = placed.seats[0]?.threat ?? 0;
+    const mist = placed.encounterDeck[0] ?? "";
+    // A Flooded Ford in the staging area hears the encounter deck reveal another card.
+    const fired = settle(fireForced(placed, { trigger: "revealed", seat: 0, cardId: mist, fromDeck: true }, ctx, []), ctx, []);
+    expect(settle(fireForced(placed, { trigger: "revealed", seat: 0, cardId: mist }, ctx, []), ctx, []).seats[0]?.threat).toBe(threat);
+    expect(fired.seats[0]?.threat).toBe(threat + 2);
+  });
+
+  it("returns the enemy with the most hit points from the victory display or discard pile to the staging area (900207:A:1)", () => {
+    const { state: base } = table();
+    const piled = deck(deck(base, ["rider"], "encounterDiscard"), ["mist"]);
+    const troll = spawn(piled, "01082", { zone: "victory" });
+    const pursuit = spawn(troll.state, "900207", { zone: "staging" });
+    const done = fire(pursuit.state, "whenRevealed", pursuit.id, "900207:whenRevealed:1");
+    expect(done.cards[troll.id]?.zone).toBe("staging");
+    expect(done.victory).toEqual([]);
+  });
+
+  it("has only the engaged Troll enemies attack (900208:A:1, ImmediateAttackEach trait)", () => {
+    const { state: base } = table();
+    const rider = spawn(deck(base, ["mist", "mist"]), "rider", { zone: "engaged", seat: 0 });
+    const troll = spawn(rider.state, "01082", { zone: "engaged", seat: 0 });
+    const attack = spawn(troll.state, "900208", { zone: "staging" });
+    const done = fire(attack.state, "whenRevealed", attack.id, "900208:whenRevealed:1");
+    expect(done.pendingAttack?.enemyId).toBe(troll.id);
+  });
+
+  it("resolves a Troll's attack against each other player as an undefended attack (900208:A:2, AttackOthersUndefended)", () => {
+    const { state: base, heroes } = table(2);
+    const troll = spawn(base, "01082", { zone: "engaged", seat: 0 });
+    const asked = runFrame(troll.state, troll.id, [{ verb: "AttackOthersUndefended" }]);
+    const target = heroes[1]?.[2] ?? "";
+    const hit = choose(asked, target);
+    expect(hit.cards[target]?.damage).toBe(6);
+    for (const id of heroes[0] ?? []) expect(hit.cards[id]?.damage).toBe(0);
+  });
+
+  it("removes all damage from enemies and raises each engaged player's threat by it; with none, gains surge (900209:A:1)", () => {
+    const { state: base } = table();
+    const troll = spawn(base, "01082", { zone: "engaged", seat: 0 });
+    const staged = spawn(troll.state, "rider", { zone: "staging" });
+    const hurt = updateCard(updateCard(staged.state, troll.id, { damage: 3 }), staged.id, { damage: 1 });
+    const blood = spawn(deck(hurt, ["mist"]), "900209", { zone: "staging" });
+    const threat = blood.state.seats[0]?.threat ?? 0;
+    const done = fire(blood.state, "whenRevealed", blood.id, "900209:whenRevealed:1");
+    expect(done.cards[troll.id]?.damage).toBe(0);
+    expect(done.cards[staged.id]?.damage).toBe(0);
+    expect(done.seats[0]?.threat).toBe(threat + 3);
+  });
+
+  it("moves all damage on the attacking enemy to the character the attack was made against (900209:A:2, MoveDamageTo)", () => {
+    const { state: base, heroes } = table();
+    const target = heroes[0]?.[2] ?? "";
+    const troll = spawn(base, "01082", { zone: "engaged", seat: 0 });
+    const hurt = updateCard(troll.state, troll.id, { damage: 2 });
+    const moved = runFrame(hurt, troll.id, [{ verb: "MoveDamageTo", from: "self", to: "other" }], { other: target });
+    expect(moved.cards[troll.id]?.damage).toBe(0);
+    expect(moved.cards[target]?.damage).toBe(2);
   });
 });

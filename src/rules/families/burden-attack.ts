@@ -7,6 +7,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import { beginEnemyAttack } from "../combat.ts";
 import { attackBarred } from "../constants.ts";
+import { hasTrait } from "../conditions.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
@@ -47,7 +48,11 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
   if (instruction.enemy != null) return attackWith(state, instruction.enemy, ctx, steps);
   const data = effectData(state);
   if (!data) return state;
-  const queued = engagedEnemies(state).map((enemy): QueueItem => ({ instruction: { ...instruction, enemy }, seat: focus.seat, chosen: null }));
+  // `trait`: only the engaged enemies with it ("All engaged Troll enemies attack", 900208:A:1).
+  const trait = instruction.trait;
+  const queued = engagedEnemies(state)
+    .filter((enemy) => trait == null || hasTrait(state, enemy, trait, ctx))
+    .map((enemy): QueueItem => ({ instruction: { ...instruction, enemy }, seat: focus.seat, chosen: null }));
   return patchTop(state, { data: { ...data, queue: [...queued, ...data.queue] } });
 }
 

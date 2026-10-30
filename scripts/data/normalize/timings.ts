@@ -54,6 +54,7 @@ export function lineTimings(line: string): Set<string> {
   if (/trigger this action/i.test(line)) allowed.add("action");
   // An objective ally that "The first player gains control of" it is put into play by the campaign pool at the start of a scenario (Mendor, 01135:A:2).
   if (/^The first player gains control of /.test(line.trim())) allowed.add("campaignSetup");
-  if (!lead) for (const timing of UNLABELLED) allowed.add(timing);
+  // A lead-in that is not a timing label ("All Troll enemies gain the text: ...", 900201:A:2) leaves the line unlabelled.
+  if (!label) for (const timing of UNLABELLED) allowed.add(timing);
   return allowed;
 }

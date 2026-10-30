@@ -17,7 +17,8 @@ import { placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
-import { printedOf } from "./printed.ts";
+import { isPlayerType, printedOf } from "./printed.ts";
+import { titleBarred } from "./families/nightmare-guards.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { afterCancel } from "./families/defense-damage.ts";
@@ -154,6 +155,8 @@ export function runPlayerVerb(
       const scope = frameScope(state, focus.seat, focus.sourceId);
       const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
+      // "You cannot ... deal damage (through effects) to enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
+      if (playerSource(state, focus.sourceId, ctx) && titleBarred(state, focus.seat, id, ctx.cards)) return state;
       return state.cards[id] && amount > 0 ? placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : state;
     }
     case "PlaceProgressOn": {
@@ -329,4 +332,10 @@ export function putOnDeck(state: ScenarioState, id: string, position: "top" | "b
   if (position === "bottom") return withSeat(moved, seat, { ...pile, deck: [...rest, id] });
   const shuffled = shuffleIds(pile.deck, moved.seed, moved.seedCursor);
   return { ...withSeat(moved, seat, { ...pile, deck: shuffled.ids }), seedCursor: shuffled.cursor };
+}
+
+// The effect's source is a player card (not an encounter card).
+function playerSource(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  return source != null && isPlayerType(printedOf(ctx.cards, source.code));
 }

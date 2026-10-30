@@ -1,6 +1,6 @@
 // Rules: mec109.hide-tests, mec109.hide-x, rr.attachment-cards, rr.search, rr.discard-pile-and-victory-display, rr.forced,
 // rr.quest-advancement (data/rules/entries.json); ledger lines 906101:A:2, 906102:A:3, 906106:A:1, 906107:A:2, 906108:A:1.
-import type { CardRef, Effect, Instruction } from "../../catalog/boundary.ts";
+import type { CardRef, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import { beginEnemyAttack } from "../combat.ts";
@@ -9,17 +9,19 @@ import { attackBarred } from "../constants.ts";
 import { effectsOf } from "../listen.ts";
 import { dealAttackShadow } from "./defense-listen.ts";
 import { dealForAttack } from "./south-watcher.ts";
-import { moveEncounter } from "./encounter-moves.ts";
+import { effectData, moveEncounter } from "./encounter-moves.ts";
 import { markPicked } from "./play-refs.ts";
 import { askTarget } from "../choices.ts";
 import { frameScope, refCard } from "../amounts.ts";
 import { pushCardEffects } from "../effect-frames.ts";
-import { modifiedStat } from "../keywords.ts";
+import { modifiedStat, placeDamage, raiseThreat } from "../keywords.ts";
+import { matchesPick } from "../pick.ts";
+import { engageEnemy, engageWith } from "../quest.ts";
 import type { EngineStep } from "../intents.ts";
 import { runEffect, type ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
 import type { GameEvent, HideResult, ResponseOffer, ScenarioState } from "../state.ts";
-import { inPlay, modifierActive, updateCard } from "../state.ts";
+import { flagged, inPlay, livingSeats, modifierActive, updateCard } from "../state.ts";
 import { fireForced } from "../triggers.ts";
 import { queueEvent } from "../queue.ts";
 import { patchTop, topFrame, withFrame } from "../windows.ts";
@@ -53,6 +55,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return pickDiscardTop(state, instruction.types, ctx);
     case "DealShadowFromDiscard":
       return dealShadowFromDiscard(state, ctx);
+    case "EngageSeatWith":
+      return engageSeatWith(state, instruction, focus, ctx, steps);
+    case "PickMostHitPoints":
+      return pickMostHitPoints(state, focus, ctx, steps);
+    case "AttackOthersUndefended":
+      return attackOthersUndefended(state, focus, ctx);
+    case "RemoveEnemyDamage":
+      return removeEnemyDamage(state, ctx, steps);
+    case "MoveDamageTo":
+      return moveDamageTo(state, instruction.from, instruction.to, focus, ctx, steps);
     default:
       return null;
   }
@@ -269,4 +281,77 @@ export function nightmareDuringSetup(state: ScenarioState, ctx: ReduceContext, s
     next = pushCardEffects(next, "forced", card.id, next.firstPlayer, false, own, ctx, steps);
   }
   return next;
+}
+
+// EngageSeatWith: the source enemy engages a player engaged with an enemy that matches the filter (900203:A:2). The first player chooses among
+// several (a target choice of "seat:N"); nothing happens when the source is already engaged with one of them.
+function engageSeatWith(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageSeatWith" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = focus.sourceId;
+  const enemy = id ? state.cards[id] : undefined;
+  if (!id || !enemy || !inPlay(enemy.zone)) return state;
+  const seats = livingSeats(state).filter((seat) => (state.seats[seat]?.engaged ?? []).some((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)));
+  if (seats.length === 0 || (enemy.zone === "engaged" && enemy.controller != null && seats.includes(enemy.controller))) return state;
+  const options = seats.map((seat) => `seat:${seat}`);
+  const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
+  if (!chosen) return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options);
+  const seat = Number(chosen.slice("seat:".length));
+  if (enemy.zone === "engaged") return flagged(state, id, "cannotBeEngaged") ? state : engageWith(state, seat, id, steps);
+  return engageEnemy(state, seat, id, steps);
+}
+
+// PickMostHitPoints: among the enemies in the victory display and the encounter discard pile, the one with the most printed hit points is picked;
+// the first player chooses among a tie (900207:A:1).
+function pickMostHitPoints(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const enemies = [...state.victory, ...state.encounterDiscard].filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
+  const health = (id: string): number => printedOf(ctx.cards, state.cards[id]?.code ?? "").health ?? 0;
+  const top = Math.max(...enemies.map(health), Number.NEGATIVE_INFINITY);
+  const tied = enemies.filter((id) => health(id) === top);
+  const chosen = focus.chosen && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
+  if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: "PickMostHitPoints" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
+  return chosen ? markPicked(state, chosen) : state;
+}
+
+// AttackOthersUndefended (in the effect an attack leaves for its end, the source the attacking enemy): each player other than the one it is
+// engaged with chooses a hero he controls, which takes the enemy's Attack as damage, as an undefended attack's damage (900208:A:2).
+function attackOthersUndefended(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  const data = effectData(state);
+  if (!enemy || enemy.zone !== "engaged" || !data) return state;
+  const amount = modifiedStat(state, enemy, "attack", ctx.cards);
+  if (amount <= 0) return state;
+  const hero: PickSpec = { type: "hero", control: "you" };
+  const items = livingSeats(state)
+    .filter((seat) => seat !== enemy.controller)
+    .flatMap((seat) => [
+      { instruction: { verb: "Pick", pick: hero } as const, seat, chosen: null },
+      { instruction: { verb: "DamageCard", amount, target: "picked" } as const, seat, chosen: null },
+    ]);
+  return patchTop(state, { data: { ...data, queue: [...items, ...data.queue] } });
+}
+
+// RemoveEnemyDamage: every enemy in play loses its damage; each player raises his threat by what came off the enemies engaged with him. The
+// effect's X is the damage removed in all (900209:A:1).
+function removeEnemyDamage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  let total = 0;
+  for (const card of Object.values(state.cards)) {
+    if (card.damage <= 0 || !inPlay(card.zone) || printedOf(ctx.cards, card.code).type !== "enemy") continue;
+    total += card.damage;
+    next = updateCard(next, card.id, { damage: 0 });
+  }
+  for (const seat of livingSeats(state)) {
+    const removed = (state.seats[seat]?.engaged ?? []).reduce((sum, id) => sum + (state.cards[id]?.damage ?? 0), 0);
+    if (removed > 0) next = raiseThreat(next, seat, removed, steps, currentCause(steps, UNATTRIBUTED));
+  }
+  const data = effectData(next);
+  return data ? patchTop(next, { data: { ...data, x: total } }) : next;
+}
+
+// MoveDamageTo: all damage on one card moves to another (900209:A:2), which it may destroy.
+function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const scope = frameScope(state, focus.seat, focus.sourceId);
+  const source = state.cards[refCard(state, from, scope) ?? ""];
+  const target = state.cards[refCard(state, to, scope) ?? ""];
+  if (!source || !target || source.id === target.id || source.damage <= 0 || !inPlay(source.zone) || !inPlay(target.zone)) return state;
+  return placeDamage(updateCard(state, source.id, { damage: 0 }), target.id, source.damage, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
 }

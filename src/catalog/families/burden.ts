@@ -28,7 +28,8 @@ export const VERBS = [
   // Each enemy engaged with a player makes an immediate attack against that player, one after the other in player order
   // (rr.attacks-outside-the-combat-phase). The running effect counts the attacks made, so `noneReturned` reads true when no
   // enemy attacked. `enemy` is engine use: the enemy whose attack is next.
-  z.strictObject({ verb: z.literal("ImmediateAttackEach"), enemy: z.string().min(1).optional(), ...when }),
+  // `trait`: only the engaged enemies with this trait ("All engaged Troll enemies attack", 900208:A:1).
+  z.strictObject({ verb: z.literal("ImmediateAttackEach"), enemy: z.string().min(1).optional(), trait: z.string().min(1).optional(), ...when }),
   // The first player token passes to the next player in the game; with no other player it stays (rr.first-player).
   z.strictObject({ verb: z.literal("PassFirstPlayer"), ...when }),
   // The quest phase ends at once: the cards it has yet to reveal are not revealed and the quest is not resolved

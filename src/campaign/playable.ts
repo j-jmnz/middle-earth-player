@@ -10,7 +10,7 @@ export function isPlayable(scenarioId: string): boolean {
 // The playable scenarios whose Nightmare deck (data/scenarios/<id>.json `nightmare`) also has an effect record for every printed
 // line: its setup card's and its cards' (docs/plans/nightmare-mode.md). Only these offer Nightmare on the briefing; the effect
 // coverage test keeps the list honest both ways, as it does PLAYABLE_SCENARIOS.
-export const NIGHTMARE_PLAYABLE: readonly string[] = ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "passage-through-mirkwood"];
+export const NIGHTMARE_PLAYABLE: readonly string[] = ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "passage-through-mirkwood", "journey-along-the-anduin"];
 
 export function isNightmarePlayable(scenarioId: string): boolean {
   return isPlayable(scenarioId) && NIGHTMARE_PLAYABLE.includes(scenarioId);

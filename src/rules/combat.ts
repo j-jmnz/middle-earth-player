@@ -13,6 +13,7 @@ import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "./quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
+import { titleBarred } from "./families/nightmare-guards.ts";
 import { ruleCause } from "./cause.ts";
 import { fireForced } from "./triggers.ts";
 import { undefendedExtras } from "./families/defense-damage.ts";
@@ -209,6 +210,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
+  // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
+  if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack-targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");
