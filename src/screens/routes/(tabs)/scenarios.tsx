@@ -14,6 +14,7 @@ import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Pan
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt } from "../../art";
 import { usePalette } from "../../palette-hook";
+import { ITEM_RADIUS } from "../../../play/radius";
 import { dropShadowOf, rowSurface, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
@@ -123,7 +124,7 @@ export default function Scenarios() {
   const playing = games.filter((game) => standaloneStatus(game) === "playing");
   const finished = games.filter((game) => standaloneStatus(game) !== "playing");
 
-  // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a framed card with its scene; a
+  // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a banner on its scene; a
   // finished one a row with its result.
   function renderGame(game: ListedStandalone, framed = false) {
     const status = standaloneStatus(game);
@@ -145,22 +146,20 @@ export default function Scenarios() {
       const height = (size === "compact" ? 150 : 220) * s;
       return (
         <View key={game.id} testID={`game-${game.id}`}>
-          <Panel padded={false}>
-            <SceneArt scenarioId={game.scenarioId} height={height} fade={0.2} fadeTo={palette.night}>
-              <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between gap-3" style={{ padding: (size === "compact" ? 12 : 24) * s }}>
-                <View className="min-w-0 flex-1">
-                  <Eyebrow tone="accent">In progress</Eyebrow>
-                  <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
-                    {nameOf(game.scenarioId)}
-                  </Text>
-                  <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
-                </View>
-                <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
-                  <PrimaryButton label="Resume" testID={`resume-${game.id}`} accessibilityLabel={spoken} onPress={() => open(game)} />
-                </View>
+          <SceneArt scenarioId={game.scenarioId} height={height} radius={ITEM_RADIUS * s} fade={0.2} fadeTo={palette.night}>
+            <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between gap-3" style={{ padding: (size === "compact" ? 12 : 24) * s }}>
+              <View className="min-w-0 flex-1">
+                <Eyebrow tone="accent">In progress</Eyebrow>
+                <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
+                  {nameOf(game.scenarioId)}
+                </Text>
+                <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
               </View>
-            </SceneArt>
-          </Panel>
+              <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
+                <PrimaryButton label="Resume" testID={`resume-${game.id}`} accessibilityLabel={spoken} onPress={() => open(game)} />
+              </View>
+            </View>
+          </SceneArt>
         </View>
       );
     }

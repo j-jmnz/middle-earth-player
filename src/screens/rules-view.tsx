@@ -157,7 +157,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
           }
           end={
             <ScrollView key={picked ?? "none"} testID="rules-detail" className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: 16 * s }} showsVerticalScrollIndicator={false}>
-              {/* The text keeps a reading column's width, at the pane's start edge beside the list, on a floating panel. */}
+              {/* The text keeps a reading column's width, at the pane's start edge beside the list. */}
               <View style={{ width: "100%", maxWidth: capWidth(size, "readable", s) ?? undefined }}>
                 {entry ? (
                   <RuleBody entry={entry} onSeeAlso={setPicked} reading />

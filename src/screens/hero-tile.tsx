@@ -173,46 +173,27 @@ export function HeroTile({
   );
 }
 
-export function EmptyHeroSlot({
-  height,
-  label = "Hero",
-  onPress,
-  testID,
-}: {
-  height: number;
-  label?: string;
-  // An empty slot the player can fill (the deck editor's hero slots) is a button: "+ Add hero".
-  onPress?: () => void;
-  testID?: string;
-}) {
+export function EmptyHeroSlot({ height, label = "Hero", onPress, testID }: { height: number; label?: string; onPress: () => void; testID?: string }) {
   const palette = usePalette();
   const pressedNight = usePressedNight();
   const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: withAlphaHex(palette.accentLine, 0.7), backgroundColor: withAlphaHex(palette.night, 0.45) };
-  if (onPress) {
-    return (
-      <Pressable
-        testID={testID}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={`Add ${label.toLowerCase()}`}
-        onPress={onPress}
-        className="w-full overflow-hidden rounded-item"
-        style={frame}
-      >
-        {({ pressed }) => (
-          <View className="flex-1 items-center justify-center" style={pressed ? pressedNight : undefined}>
-            <Text className="font-display text-title text-accent">+</Text>
-            <Text className="font-display text-label text-accent">{`Add ${label.toLowerCase()}`}</Text>
-          </View>
-        )}
-      </Pressable>
-    );
-  }
   return (
-    <View testID={testID} className="w-full items-center justify-center gap-2 rounded-item px-1" style={frame}>
-      <RingMark size={18} state="current" />
-      <Text className="text-center font-display text-label text-accent">{label}</Text>
-    </View>
+    <Pressable
+      testID={testID}
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel={`Add ${label.toLowerCase()}`}
+      onPress={onPress}
+      className="w-full overflow-hidden rounded-item"
+      style={frame}
+    >
+      {({ pressed }) => (
+        <View className="flex-1 items-center justify-center" style={pressed ? pressedNight : undefined}>
+          <Text className="font-display text-title text-accent">+</Text>
+          <Text className="font-display text-label text-accent">{`Add ${label.toLowerCase()}`}</Text>
+        </View>
+      )}
+    </Pressable>
   );
 }
 

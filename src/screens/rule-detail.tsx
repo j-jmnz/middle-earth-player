@@ -4,20 +4,17 @@ import { useRouter } from "expo-router";
 import { View } from "react-native";
 
 import { CardTextView } from "../play/card-text-view";
-import { panelSurface } from "../play/surfaces";
 import { Text } from "../play/text";
-import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
-import { Eyebrow, Label, Panel, ScreenTitle, SecondaryButton, ToggleChip } from "./chrome";
+import { Eyebrow, Label, ScreenTitle, SecondaryButton, ToggleChip } from "./chrome";
 import { bookPage, glossary, paragraphs, seeAlso, type GlossaryEntry } from "./rules-glossary";
 
 /**
  * One rule: where it is printed, its title, Open in book when the app carries the book, its text, and See also as chips. `reading`
- * sets it as the reading pane beside the list on a tablet: one floating panel, the title at 38, the text at 18/28 in a 560 column.
+ * sets it as the reading pane beside the list on a tablet: on the ground, the title at 38, the text at 18/28 in a 560 column.
  */
 export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: GlossaryEntry; onSeeAlso: (id: string) => void; reading?: boolean }) {
   const router = useRouter();
-  const t = useTableTokens();
   const s = useUiScale();
   const body = paragraphs(entry).filter((paragraph) => !paragraph.startsWith("See also:"));
   const links = seeAlso(entry, glossary());
@@ -64,7 +61,7 @@ export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: Glossar
   if (reading) {
     return (
       <View className="pb-safe">
-        <View className="gap-5 rounded-container" style={{ ...panelSurface(false, t), padding: 40 * s }}>
+        <View className="gap-5">
           <View className="gap-1">
             <Eyebrow>{entry.source}</Eyebrow>
             {title}
@@ -83,7 +80,7 @@ export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: Glossar
         {title}
         {openBook}
       </View>
-      <Panel>{text}</Panel>
+      {text}
       {seeAlsoRow}
     </View>
   );

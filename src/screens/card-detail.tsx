@@ -1,5 +1,5 @@
 // A card's details (docs/design-system.md, Card): its row from the catalog, its picture, the facts under the name (type, sphere and
-// traits on one line, five stat tiles), its text, its errata and the decks it is in. The card screen draws them under the picture;
+// traits on one line, the stats), its text, its errata and the decks it is in. The card screen draws them under the picture;
 // the Cards hub on a tablet in landscape draws them in the pane beside the pool (CardDetailPane), with no navigation.
 import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
@@ -7,7 +7,7 @@ import { useEffect, useMemo } from "react";
 import { Pressable, View } from "react-native";
 
 import { cards } from "../catalog/schema";
-import { Chevron, Eyebrow, Panel, sphereWord, useTitleShadow } from "./chrome";
+import { Chevron, Eyebrow, sphereWord, useTitleShadow } from "./chrome";
 import { useDatabases } from "./databases";
 import { listDecks } from "./deck-store";
 import { enqueueImageDownloads } from "./images/queue";
@@ -23,7 +23,7 @@ import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT, sphereIcon, typeIcon, type IconName } from "../play/icon-map";
 import { notApplied, type NotApplied } from "../play/not-applied";
 import { NotAppliedView } from "../play/not-applied-view";
-import { dropShadowOf, rowSurface, tileSurface } from "../play/surfaces";
+import { dropShadowOf, rowSurface } from "../play/surfaces";
 import { withAlphaHex, type TableTokens } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
@@ -141,12 +141,12 @@ function costOrThreat(row: { typeCode: string; cost: string | null; threat: numb
   return null;
 }
 
-// A number with the game's icon beside it in Marcellus SC, its word in small capitals under them. The word stays in the label.
+// A number with the game's icon beside it in Marcellus SC, its word in small capitals under them, on the ground with no surface. The
+// word stays in the label.
 function Stat({ label, value, icon }: { label: string; value: string; icon: IconName }) {
-  const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-14 flex-1 items-center rounded-item px-1.5 py-2" style={tileSurface(false, t)}>
+    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-14 flex-1 items-center px-1.5 py-1">
       <View className="flex-row items-center gap-1">
         <GameIcon name={icon} size={15 * s} tint="muted" />
         <Text className="font-display text-bone" style={{ fontSize: 22 * s, lineHeight: 27 * s }}>
@@ -197,7 +197,7 @@ export function CardName({ row, size = 28 }: { row: CardRow; size?: number }) {
   );
 }
 
-/** The stat tiles and the card's text, with the lines no effect record reads and what the card still does without them. */
+/** The row of stats and the card's text, with the lines no effect record reads and what the card still does without them. */
 export function CardFacts({ row }: { row: CardRow }) {
   const unapplied: NotApplied | null = notApplied(row.code, row.typeCode, row.errata ?? row.text);
   const cost = costOrThreat(row);
@@ -213,32 +213,28 @@ export function CardFacts({ row }: { row: CardRow }) {
   return (
     <View>
       {stats.length > 0 ? (
-        <View testID="card-stats" className="mt-4 flex-row flex-wrap justify-center gap-1.5">
+        <View testID="card-stats" className="mt-4 flex-row flex-wrap justify-center gap-y-2">
           {stats.map((stat) => (
             <Stat key={stat.label} {...stat} />
           ))}
         </View>
       ) : null}
       {row.text || unapplied ? (
-        <View className="mt-4">
-          <Panel>
-            <CardTextView text={row.text} testID="card-text" />
-            {unapplied ? (
-              <View className={row.text ? "mt-3 pt-3" : undefined}>
-                <NotAppliedView notApplied={unapplied} />
-              </View>
-            ) : null}
-          </Panel>
+        <View className="mt-5">
+          <CardTextView text={row.text} testID="card-text" />
+          {unapplied ? (
+            <View className={row.text ? "mt-3 pt-3" : undefined}>
+              <NotAppliedView notApplied={unapplied} />
+            </View>
+          ) : null}
         </View>
       ) : null}
       {row.errata ? (
-        <View className="mt-4">
-          <Panel>
-            <Eyebrow tone="accent">Errata</Eyebrow>
-            <View className="mt-2">
-              <CardTextView text={row.errata} />
-            </View>
-          </Panel>
+        <View className="mt-5">
+          <Eyebrow tone="accent">Errata</Eyebrow>
+          <View className="mt-2">
+            <CardTextView text={row.errata} />
+          </View>
         </View>
       ) : null}
     </View>

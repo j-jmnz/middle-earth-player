@@ -17,6 +17,8 @@ export function Segmented<T extends string>({
   stretch = false,
   compact = false,
   words,
+  testIDs,
+  labels,
 }: {
   options: readonly T[];
   value: T;
@@ -30,6 +32,9 @@ export function Segmented<T extends string>({
   compact?: boolean;
   // What each option says when its stored word is not the word to read ("system" says "Follow system"); the test id keeps the option.
   words?: Partial<Record<T, string>>;
+  // An option's test id when it is not `<prefix>-<option>` (Campaigns' seats keep `seats-1`), and what a screen reader hears for it when the word alone is not enough.
+  testIDs?: Partial<Record<T, string>>;
+  labels?: Partial<Record<T, string>>;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
@@ -42,8 +47,9 @@ export function Segmented<T extends string>({
         return (
           <Pressable
             key={option}
-            testID={`${testIDPrefix}-${option.toLowerCase()}`}
+            testID={testIDs?.[option] ?? `${testIDPrefix}-${option.toLowerCase()}`}
             accessibilityRole="radio"
+            accessibilityLabel={labels?.[option]}
             accessibilityState={{ selected, checked: selected }}
             onPress={() => onChange(option)}
             hitSlop={compact ? { top: slop, bottom: slop } : undefined}

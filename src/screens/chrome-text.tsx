@@ -35,7 +35,7 @@ export function Eyebrow({ children, tone = "moon", testID, rule = false, onArt =
   );
 }
 
-/** A section's heading: a moonlit eyebrow and a rule that fades out to its right, with one optional control at the end (src/play/section-heading.tsx). */
+/** A section's heading: its name in Marcellus SC in the section colour, with one optional control at the end (src/play/section-heading.tsx). */
 export function Section({ title, right, testID, className }: { title: string; right?: ReactNode; testID?: string; className?: string }) {
   return <SectionHeading title={title} right={right} testID={testID} className={className} />;
 }

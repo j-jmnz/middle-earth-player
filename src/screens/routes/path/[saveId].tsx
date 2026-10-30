@@ -6,7 +6,7 @@ import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
 import { rowSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { SceneArt } from "../../art";
-import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, SecondaryButton, TextButton } from "../../chrome";
+import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { Road, roadLayout } from "../../path-road";
 import { poolCardWords } from "../../log-facts";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
@@ -63,7 +63,6 @@ function WonRow({ node, rounds, rewards, onReplay }: { node: PathNode; rounds: n
 }
 
 export default function CampaignPath() {
-  const t = useTableTokens();
   const { size } = useSizeClass();
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
@@ -157,7 +156,7 @@ export default function CampaignPath() {
     </View>
   );
   const poolLine = (
-    <View className="mt-3 rounded-item px-3.5 py-2.5" style={rowSurface(false, t)}>
+    <View className="mt-3">
       <Eyebrow>Pool</Eyebrow>
       <Text testID="pool" className="mt-0.5 text-label text-bone">
         {poolText}
@@ -166,24 +165,22 @@ export default function CampaignPath() {
   );
   // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
   const logButton = (
-    <View className="mt-3">
-      <SecondaryButton label="Campaign log" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
+    <View className="-ml-3 mt-1 items-start">
+      <TextButton label="Campaign log" testID="log-open" tone="accent" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
     </View>
   );
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;
   const stagesOf = (id: string) => (scenarioOf(id)?.stages ?? []).map((code) => names.get(code) ?? stageNames.get(code) ?? code);
-  // The panel under the road: a won stop's summary while one is picked, else the campaign's end.
+  // Under the road: a won stop's summary while one is picked, else the campaign's end.
   const footPanel = () => {
     if (pickedNode) {
       return (
-        <Panel>
-          <WonRow node={pickedNode} rounds={save.log.scenarios[pickedNode.id]?.rounds ?? null} rewards={pickedNode.reward.map(name)} onReplay={replay(pickedNode)} />
-        </Panel>
+        <WonRow node={pickedNode} rounds={save.log.scenarios[pickedNode.id]?.rounds ?? null} rewards={pickedNode.reward.map(name)} onReplay={replay(pickedNode)} />
       );
     }
     if (complete) {
       return (
-        <Panel>
+        <View>
           <Label testID="path-complete" className="mb-2.5 text-center">
             Campaign complete.
           </Label>
@@ -195,7 +192,7 @@ export default function CampaignPath() {
               <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
             </>
           ) : null}
-        </Panel>
+        </View>
       );
     }
     return null;

@@ -152,7 +152,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     const badge = gone ? "Deleted" : archived ? "Archived" : playthroughs.current === refId ? "Current" : undefined;
     return (
       <View className="pb-3 pt-1">
-        <FoldHeader id={item.id} title={title} detail={detail} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" solid folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
+        <FoldHeader id={item.id} title={title} detail={detail} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
       </View>
     );
   };

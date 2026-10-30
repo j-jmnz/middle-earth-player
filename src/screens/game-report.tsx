@@ -1,9 +1,9 @@
 // The details under Victory or Defeat (src/campaign/report.ts): when the scenario ended, the quest stage it reached, each
-// player's threat and heroes, the victory display, and for a win the parts of its score. Text on raised panels; it sends nothing.
+// player's threat and heroes, the victory display, and for a win the parts of its score. Each section is a heading over plain content; it sends nothing.
 import { View } from "react-native";
 
 import type { GameReport } from "../campaign/report";
-import { BodyText, Label, Panel, Section } from "./chrome";
+import { BodyText, Label, Section } from "./chrome";
 import { Text } from "../play/text";
 
 function Row({ label, value, tone = "bone", testID }: { label: string; value: string; tone?: "bone" | "muted" | "danger"; testID?: string }) {
@@ -15,7 +15,7 @@ function Row({ label, value, tone = "bone", testID }: { label: string; value: st
   );
 }
 
-// `tiles`: the screen already shows the score, rounds and victory points as tiles, so the panel lists only what the score adds up.
+// `tiles`: the screen already shows the score, rounds and victory points as tiles, so the section lists only what the score adds up.
 export function GameReportView({ report, tiles = false, testID = "game-report" }: { report: GameReport; tiles?: boolean; testID?: string }) {
   const score = tiles ? report.score?.slice(0, -1) : report.score;
   return (
@@ -33,32 +33,32 @@ export function GameReportView({ report, tiles = false, testID = "game-report" }
       {score ? (
         <View>
           <Section title={tiles ? "How the score adds up" : "Score"} />
-          <Panel>
+          <View>
             {score.map((line, index) => (
               <Row key={line.label} label={line.label} value={line.value} tone={!tiles && index === score.length - 1 ? "bone" : "muted"} testID={`${testID}-score-${index}`} />
             ))}
             {tiles ? null : <Label className="mt-1">Lower is better.</Label>}
-          </Panel>
+          </View>
         </View>
       ) : null}
       {report.seats.map((seat, at) => (
         <View key={seat.label}>
           <Section title={seat.label} right={<Label>{seat.threat}</Label>} />
-          <Panel>
+          <View>
             {seat.heroes.map((hero) => (
               <Row key={`${at}:${hero.name}`} label={hero.name} value={hero.words} tone={hero.destroyed ? "danger" : "muted"} testID={`${testID}-hero-${at}-${hero.name}`} />
             ))}
-          </Panel>
+          </View>
         </View>
       ))}
       {report.victory.length > 0 ? (
         <View>
           <Section title="Victory display" />
-          <Panel>
+          <View>
             <BodyText tone="muted" testID={`${testID}-victory`}>
               {report.victory.join(" · ")}
             </BodyText>
-          </Panel>
+          </View>
         </View>
       ) : null}
     </View>
