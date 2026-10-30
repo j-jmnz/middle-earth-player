@@ -9,6 +9,7 @@ import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } 
 import { guideLine } from "./reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { alwaysUseIntent, passableWindow, stopDecision, usableIds } from "./stops.ts";
+import { effectsOf } from "../rules/listen.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "./store.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
@@ -33,7 +34,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   const shadow = useCallback(
     (cardId: string) => {
       const code = store.getState().game.cards[cardId]?.code;
-      const effect = ctx.effects.find((candidate) => candidate.cardCode === code && candidate.timing === "shadow");
+      const effect = code == null ? undefined : effectsOf(ctx, code).find((candidate) => candidate.timing === "shadow");
       const lineId = effect?.lines[0];
       return lineId ? names.line(lineId) : null;
     },

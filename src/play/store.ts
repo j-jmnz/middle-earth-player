@@ -16,6 +16,8 @@ import { nextUndoable, type Undoable } from "./undo-history.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
 export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+// An effect record by its id (src/screens may not import src/rules).
+export { effectById } from "../rules/listen.ts";
 
 export type TableState = {
   game: ScenarioState;

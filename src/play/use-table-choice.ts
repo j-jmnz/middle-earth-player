@@ -23,6 +23,7 @@ import { useStable } from "./use-stable.ts";
 import { fightOf, highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
 import { listsResponses, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
+import { effectById } from "../rules/listen.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
@@ -132,7 +133,7 @@ export function useTableChoice({
   // "Pass to next stop" on a step window the table could pass, named by the stop it runs to (stops.ts).
   // Pass to stop is offered while stops are on, naming where the run ends at the latest (a choice on the way ends it sooner).
   const stopPass = settings.stopsOn && !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass until ${nextStopTitle(game, settings, pointTitle)}` : null;
-  const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(ctx.effects.find((effect) => effect.id === item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
+  const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(effectById(ctx, item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
   const dock = dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free });
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)

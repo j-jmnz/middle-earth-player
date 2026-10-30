@@ -7,6 +7,7 @@
 // - a free Response (no cost, nothing to choose) the player set to Always is used when it is offered.
 // Every answer is an ordinary intent in the save: Undo takes it back, and the table then asks at that window.
 import type { Effect, Instruction } from "../catalog/boundary.ts";
+import { effectById } from "../rules/listen.ts";
 import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import { windowPoint } from "./rail.ts";
@@ -85,7 +86,7 @@ export function alwaysUseIntent(game: ScenarioState, sheet: Sheet, ctx: ReduceCo
   if (held || game.window?.kind !== "response" || sheet.kind !== "trigger") return null;
   for (const item of sheet.options) {
     if (item.pay || !settings.alwaysUse.includes(item.effectId)) continue;
-    if (!isFreeResponse(ctx.effects.find((effect) => effect.id === item.effectId))) continue;
+    if (!isFreeResponse(effectById(ctx, item.effectId))) continue;
     return { type: "Trigger", cardId: item.cardId, effectId: item.effectId };
   }
   return null;

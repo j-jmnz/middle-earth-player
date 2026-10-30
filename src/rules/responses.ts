@@ -4,7 +4,7 @@ import { costOfKind } from "../catalog/costs.ts";
 import { holds } from "./conditions.ts";
 import { triggerHears } from "./families/play-hooks.ts";
 import { cancelBarred } from "./families/encounter-cancel.ts";
-import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
+import { aboutCard, effectById, hears, hearsFromAnywhere } from "./listen.ts";
 import { effectsOfCard } from "./families/misc-text.ts";
 import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
@@ -88,14 +88,14 @@ export function offerResponses(state: ScenarioState, event: GameEvent, ctx: Redu
 
 // An offer whose effect cancels an encounter card's effect while The Eaves of Mirkwood bars it (families/encounter-cancel.ts).
 function barred(state: ScenarioState, offer: ResponseOffer, ctx: ReduceContext): boolean {
-  const effect = ctx.effects.find((entry) => entry.id === offer.effectId);
+  const effect = effectById(ctx, offer.effectId);
   return effect != null && offer.event != null && cancelBarred(state, offer.event, effect);
 }
 
 // The offers a seat can use now: those whose cost it can pay at this point of the window.
 function liveOffers(state: ScenarioState, offers: readonly ResponseOffer[], ctx: ReduceContext): ResponseOffer[] {
   return offers.filter((offer) => {
-    const effect = ctx.effects.find((entry) => entry.id === offer.effectId);
+    const effect = effectById(ctx, offer.effectId);
     return effect != null && usable(state, effect, offer.cardId, offer.seat, ctx);
   });
 }
@@ -128,7 +128,7 @@ export function responseReason(state: ScenarioState, intent: TriggerIntent, ctx:
   if (state.window?.kind !== "response") return "That intent is not legal in this window";
   const seat = state.window.seat;
   const offer = offersOf(state).find((entry) => entry.cardId === intent.cardId && entry.effectId === intent.effectId && entry.seat === seat);
-  const effect = offer ? ctx.effects.find((entry) => entry.id === offer.effectId) : undefined;
+  const effect = offer ? effectById(ctx, offer.effectId) : undefined;
   if (!offer || !effect) return "That effect cannot be triggered";
   return usageReason(state, effect, offer.cardId, seat, intent.payments ?? [], ctx);
 }
@@ -137,7 +137,7 @@ export function responseReason(state: ScenarioState, intent: TriggerIntent, ctx:
 // When it pops, the response frame offers whatever is left.
 export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const frame = topFrame(state);
-  const effect = ctx.effects.find((entry) => entry.id === intent.effectId);
+  const effect = effectById(ctx, intent.effectId);
   if (frame?.data.kind !== "responses" || !effect || state.window?.kind !== "response") return state;
   const seat = state.window.seat;
   // The event the used Response answers: one of the occurrence's events, when the window holds several.

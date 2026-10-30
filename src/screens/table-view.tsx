@@ -19,7 +19,7 @@ import { MorePopoverView, useMorePopover } from "../play/dock-more";
 import { railFor } from "../play/rail";
 import { shownSeat, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
-import type { ReduceContext, TableStore } from "../play/store";
+import { effectById, type ReduceContext, type TableStore } from "../play/store";
 import { createHandoff } from "../play/spotlight-handoff";
 import { SpotlightLayer } from "../play/spotlight-layer";
 import type { StageArea } from "../play/spotlight-stage";
@@ -140,7 +140,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const rail = useMemo(() => railFor(game), [game]);
   const carousel = useMemo(() => phaseCarousel(game, { stopsOn: settings.stopsOn, stops: settings.stops }, ruleTitle), [game, settings.stopsOn, settings.stops]);
   const logNames: LogNames = useMemo(
-    () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
+    () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => effectById(ctx, effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
     [names, nameOf, ctx],
   );
 

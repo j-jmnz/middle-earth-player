@@ -528,6 +528,19 @@ export function updateCard(
   return { ...state, cards: { ...state.cards, [id]: { ...current, ...patch } } };
 }
 
+// Several cards patched at once: the card map is copied one time, not once for each card. The patches apply in order, so a card
+// named twice gets both, and an id with no card is skipped, as `updateCard` does. The result equals a chain of `updateCard`s.
+export function updateCards(state: ScenarioState, patches: readonly (readonly [string, Partial<CardInstance>])[]): ScenarioState {
+  let cards: Record<string, CardInstance> | null = null;
+  for (const [id, patch] of patches) {
+    const current = (cards ?? state.cards)[id];
+    if (!current) continue;
+    cards ??= { ...state.cards };
+    cards[id] = { ...current, ...patch };
+  }
+  return cards ? { ...state, cards } : state;
+}
+
 export function livingSeats(state: ScenarioState): number[] {
   const seats: number[] = [];
   for (let step = 0; step < state.seatCount; step += 1) {
