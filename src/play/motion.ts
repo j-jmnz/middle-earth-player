@@ -1,7 +1,7 @@
 // How each card moves when the table changes, so a card is seen entering, moving and leaving: drawn from the deck into the
 // hand, revealed from the encounter deck into staging, played from the hand onto the table, discarded onto its pile. Pure:
 // JavaScript works out where each card comes from (or goes to) once per new state; the UI thread only interpolates
-// (docs/design-system.md, Table, Motion). The rule is already resolved when a card moves; the motion only shows it. This file
+// (docs/design-system-table.md, Motion). The rule is already resolved when a card moves; the motion only shows it. This file
 // says what each card does (flip, wait its turn, rise on an arc, land with a squash or a pop); motion-pose.ts works out the pose
 // at a moment from motion-tokens.ts, and the UI never computes a number of its own.
 import type { ZoneName } from "../rules/state.ts";

@@ -177,7 +177,7 @@ export function notAppliedCards(deck: Pick<DeckContent, "heroes" | "cards">, ina
 
 /**
  * "6 cards with text not applied": the copies in the deck (heroes included) with a printed line the app does not apply, for
- * the deck list, the editor and the briefing (docs/plans/inactive-text.md). Null when the app applies every card. It is
+ * the deck list, the editor and the briefing (docs/plans/done/inactive-text.md). Null when the app applies every card. It is
  * not a readiness rule: such a deck stays ready to play.
  */
 export function notAppliedLine(deck: Pick<DeckContent, "heroes" | "cards">, inactive: ReadonlySet<string>): string | null {

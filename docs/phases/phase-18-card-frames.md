@@ -58,5 +58,5 @@ None. The canvas is phone-only.
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
-- `docs/design-system.md` (Table, Marks of the open moment) says the edge, veil and beat ring follow the card's turn.
+- `docs/design-system-table.md` (Marks of the open moment) says the edge, veil and beat ring follow the card's turn.
 - STATUS.md lists the phone check as open: a five-card fanned hand in planning, with glowing and picked cards, the end cards' frames on the picture, and no blur on the neighbors.

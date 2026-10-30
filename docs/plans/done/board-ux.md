@@ -1,6 +1,6 @@
 # Board UX: motion, focus and a quieter table
 
-User request, 2026-10-26. This plan reworks the landscape table described in `docs/design-system.md` (Table). It does not change a rule. The engine still computes every number, the table only offers legal choices, and an animation never gates a rule or input. The work is split into phases 18 to 26 (`docs/phases/`). In every phase the `implementer` agent runs on Sonnet 5.5 (`model: "sonnet"`), then `reviewer` and `ux` review the diff.
+User request, 2026-10-26. This plan reworks the landscape table described in `docs/design-system-table.md` (). It does not change a rule. The engine still computes every number, the table only offers legal choices, and an animation never gates a rule or input. The work is split into phases 18 to 26 (`docs/phases/`). In every phase the `implementer` agent runs on Sonnet 5.5 (`model: "sonnet"`), then `reviewer` and `ux` review the diff.
 
 ## The user's list
 

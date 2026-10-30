@@ -1,5 +1,5 @@
 // The table chrome's shared pieces: the parchment frame, the choice tile, the engine's numbers with their icons and the
-// sentence under a disabled action (docs/design-system.md, Table). The word buttons are buttons.tsx; the dock's, which arm before
+// sentence under a disabled action (docs/design-system-table.md). The word buttons are buttons.tsx; the dock's, which arm before
 // they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number the engine
 // did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";

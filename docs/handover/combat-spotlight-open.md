@@ -2,7 +2,7 @@
 
 The combat spotlight redesign (user request, 2026-10-29) is built, reviewed and merged to `main`. Every check a cloud session can run is green: `pnpm test`, `pnpm lint`, `tsc --noEmit` and `pnpm data:check`. Nothing native has been seen: a cloud session has no phone, simulator or Maestro, and the web build has no canvas. What is left needs a device. This file says what to look at, where the code is, and what to change if a check fails.
 
-Read first: `docs/plans/done/combat-spotlight-redesign.md` (the plan), `docs/design-system.md` (Table, **Spotlight**, and the Motion table). The plan's decisions are settled and are not reopened by a device check: a lone attack runs about 2.2 s at Normal, the stage is always dark (Light theme too), a destroyed target burns away, and the cards are centered on the whole screen at 60% of its height.
+Read first: `docs/plans/done/combat-spotlight-redesign.md` (the plan), `docs/design-system-table.md` (Spotlight and Motion). The plan's decisions are settled and are not reopened by a device check: a lone attack runs about 2.2 s at Normal, the stage is always dark (Light theme too), a destroyed target burns away, and the cards are centered on the whole screen at 60% of its height.
 
 ## Setting up
 

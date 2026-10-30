@@ -4,7 +4,7 @@
 // How the player answers the open moment on the table. A sheet (sheets.ts, bar-sheets.ts) says what the rules allow; this
 // file says what a tap on a card does with it and which buttons confirm it. A tap only picks: it never sends an intent.
 // Every intent goes out from a button, and a button that sends one without anything picked first (Pass, Keep, Leave
-// undefended, Do not travel) must be tapped twice: once to arm it, once to confirm (docs/design-system.md, Table). The one
+// undefended, Do not travel) must be tapped twice: once to arm it, once to confirm (docs/design-system-table.md). The one
 // exception is a moment with a single answer (`onlyAnswer`): there is no decision to take back, so its answer is picked
 // already and one tap, on the card or the button, sends it.
 //

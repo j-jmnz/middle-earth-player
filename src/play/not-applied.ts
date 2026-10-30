@@ -1,6 +1,6 @@
 // The app's own "not applied" check (src/catalog/active-text.ts) over the effect records it ships and the printed-text
 // ledger: which lines of a card no record reads, and what the player loses with them. One check for the table, the
-// preview, the card screen, the pool, the deck screens and the briefing (docs/plans/inactive-text.md).
+// preview, the card screen, the pool, the deck screens and the briefing (docs/plans/done/inactive-text.md).
 import { inactiveCodes, textCheck, textLoss, unappliedLines, type CardLine, type TextCheck, type TextLoss } from "../catalog/active-text.ts";
 import type { Effect } from "../catalog/boundary.ts";
 import { shippedLedger } from "../catalog/printed-ledger.ts";

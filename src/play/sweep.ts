@@ -1,4 +1,4 @@
-// The phase title sweep (docs/design-system.md, Table, Motion; phase 23): when the round moves forward into a new phase, its name
+// The phase title sweep (docs/design-system-table.md, Motion; phase 23): when the round moves forward into a new phase, its name
 // crosses the canvas once. Pure: whether it shows and what it says. The view is phase-sweep.tsx.
 import { clamp01 } from "./motion-curves.ts";
 import { ROUND_PHASES } from "./rail.ts";

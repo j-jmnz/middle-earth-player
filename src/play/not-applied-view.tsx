@@ -1,5 +1,5 @@
 // The lines of a card the app does not apply, for the card screen and the table's preview: a muted eyebrow, one sentence
-// saying what the card still does, and each line as printed (docs/plans/inactive-text.md).
+// saying what the card still does, and each line as printed (docs/plans/done/inactive-text.md).
 import { View } from "react-native";
 
 import { lossSentence, type NotApplied } from "./not-applied.ts";

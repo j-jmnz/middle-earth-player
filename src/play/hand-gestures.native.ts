@@ -1,4 +1,4 @@
-// The table canvas's gestures (docs/design-system.md, Table, Gestures; phase 25), moved out of table-canvas.native.tsx with the hand
+// The table canvas's gestures (docs/design-system-table.md, Gestures; phase 25), moved out of table-canvas.native.tsx with the hand
 // scrub. They race: a drag (a pan from 6 pt) plays a card, a tap picks, a long press (350 ms) previews a card on the table, and a
 // pan that activates after a 150 ms hold on the hand scrubs through it. A move before the 150 ms is a drag, so the drag-to-play path
 // is never delayed; the scrub is a gesture of its own that fails at once for a press that is not on the hand. All of it runs on the

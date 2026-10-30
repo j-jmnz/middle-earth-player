@@ -54,7 +54,7 @@ Also built, to keep the two-tap rule true: the armed line's room is sized to the
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - The web export at 844×390 and 667×375 shows the command column with the dock only, and the More pill on a window with Actions.
-- `docs/design-system.md` (Table, Command column and Cards) is rewritten.
+- `docs/design-system-table.md` (Command column and Cards) is rewritten.
 - STATUS.md lists the phone checks as open:
   - the dock at 667×375 with the guide on and an armed line;
   - the quest progress readable on the quest card at about 51 pt cards.

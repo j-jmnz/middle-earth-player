@@ -1,4 +1,4 @@
-// The choice (docs/design-system.md, Table, Choice tray; phase 21): a choice whose options are not all whole cards on the table opens
+// The choice (docs/design-system-table.md, Choice tray; phase 21): a choice whose options are not all whole cards on the table opens
 // its options as rows in the command column, in the dock's own space above the numbers and buttons. The rows have no plate: words on
 // the column's fade, a 12 pt accent wash on the one picked. The dock's title asks the question (table-dock.tsx), so there is no count
 // above them; the count stays in the title's spoken label. The readout, the refusal and the buttons are the dock's, once, under the

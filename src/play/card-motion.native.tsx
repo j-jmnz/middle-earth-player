@@ -1,4 +1,4 @@
-// The canvas's card motion (docs/design-system.md, Table, Motion; phase 23): when the table changes, each card moves from where it was,
+// The canvas's card motion (docs/design-system-table.md, Motion; phase 23): when the table changes, each card moves from where it was,
 // a drawn card flips and rises on an arc, a played card lifts and lands with a squash, and a card that left shakes and shrinks to
 // its pile. motion.ts says what each card does and motion-pose.ts works the pose out of one clock; this file runs that clock on the
 // UI thread and draws the cards through it. The canvas still draws only when what it shows changes: the clock runs for one state

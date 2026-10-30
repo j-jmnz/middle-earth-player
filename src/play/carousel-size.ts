@@ -1,4 +1,4 @@
-// The phase carousel's height and what its left column needs (docs/design-system.md, Table, Phase carousel). Pure, so a test reads it: the
+// The phase carousel's height and what its left column needs (docs/design-system-table.md, Phase carousel). Pure, so a test reads it: the
 // round's seven phases and the round's label must fit the panel on the shortest tables (667x375, 844x390) without scrolling.
 import { touchSlop } from "./ui-scale.ts";
 

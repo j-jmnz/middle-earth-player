@@ -15,7 +15,7 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
-// The four piles the table shows. Only the two discard piles open a list (docs/design-system.md, Table).
+// The four piles the table shows. Only the two discard piles open a list (docs/design-system-table.md).
 export type PileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
 
 export const PILES: readonly PileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];

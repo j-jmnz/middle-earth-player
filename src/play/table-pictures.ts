@@ -1,4 +1,4 @@
-// The size each card picture on the table is decoded at (docs/architecture.md, Images; docs/design-system.md, Table — landscape,
+// The size each card picture on the table is decoded at (docs/architecture.md, Images; docs/design-system-table.md,
 // Cards): the largest box the canvas draws that code in, so nothing is drawn larger than its copy. A hand card is drawn up to the
 // scrub's scale times the lifted card's grow (motion-tokens.ts, SHAPE), so it is decoded at that size; every other card at its slot's
 // size. Pure, so a test can weigh a full table's memory.

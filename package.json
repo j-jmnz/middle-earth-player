@@ -68,7 +68,9 @@
     "effects:draft": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/effects/draft.ts",
     "effects:open": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/effects/open.ts",
     "data:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/check.ts",
-    "data:query": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/query.ts"
+    "data:query": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/query.ts",
+    "docs:index": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs-index.ts",
+    "docs:section": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs-index.ts section"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"

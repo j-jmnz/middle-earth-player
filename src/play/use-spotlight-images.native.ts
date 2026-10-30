@@ -1,4 +1,4 @@
-// The pictures the combat spotlight draws (docs/design-system.md, Table, Spotlight): the table's decode is a card's size on screen, and
+// The pictures the combat spotlight draws (docs/design-system-table.md, Spotlight): the table's decode is a card's size on screen, and
 // the spotlight draws cards about 1.8 times as large, so while the spotlight plays the layer decodes the plan's cards (the shadow card's
 // face too) again at the stage's size, with room for the camera's punch-in (FX.push, 1.06), and releases them when it ends. Until a picture
 // is ready the table's own is drawn. The decodes start earlier than the spotlight: when an enemy's attack is declared (`warm`, spotlight-warm.ts),

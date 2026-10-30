@@ -1,6 +1,6 @@
 # Inactive text: a rethink
 
-Proposals for how the app shows and handles a player card's text that no effect record applies. Requested 2026-10-26, alongside the table proposals in `docs/plans/table-experience.md`. None is built. The brief's decisions stay unless a proposal says otherwise:
+Proposals for how the app shows and handles a player card's text that no effect record applies. Requested 2026-10-26, alongside the table proposals in `docs/plans/done/table-experience.md`. None is built. The brief's decisions stay unless a proposal says otherwise:
 
 - no card-text NLP and no manual resolver;
 - the full official pool stays deck-legal;
@@ -79,7 +79,7 @@ These are scratch scripts over `data/`, `src/effects` and the auto-player; none 
 
 ## Built
 
-All seven proposals were built on 2026-10-26 (branch `ccr-c7b5b4ea-4ei4kn`; the rules are in `docs/brief.md`, Effects, layer 3, and the look in `docs/design-system.md`, Table, Card and States). Where the build differs:
+All seven proposals were built on 2026-10-26 (branch `ccr-c7b5b4ea-4ei4kn`; the rules are in `docs/brief.md`, Effects, layer 3, and the look in `docs/design-system-table.md` and `docs/design-system.md`, Card and States). Where the build differs:
 
 - The decision (3) went to not offering an event with no record (`rr.triggered-ability`). Its rows read "Cannot be played", and it opens no action window.
 - Card rows (4) put the loss in the detail line ("Ability not applied") with no extra mark beside the name.

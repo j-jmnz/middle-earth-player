@@ -1,4 +1,4 @@
-// The table menu (docs/design-system.md, Table, top bar): Log, Rules, Booklet, Table settings and, apart, Leave the table, in a
+// The table menu (docs/design-system-table.md, Top bar): Log, Rules, Booklet, Table settings and, apart, Leave the table, in a
 // popover under the menu button at the top right. React Native views over the canvas, never on the canvas. The frame, the scrim
 // and the motion are the shared popover frame (popover-frame.tsx). A row closes the menu and then acts (the caller's onSelect).
 // Android Back closes it first (back.ts).

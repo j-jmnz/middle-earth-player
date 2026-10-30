@@ -1,4 +1,4 @@
-// The hand scrub (docs/design-system.md, Table, Gestures; phase 25): pressed and held, the hand rises and spreads across the
+// The hand scrub (docs/design-system-table.md, Gestures; phase 25): pressed and held, the hand rises and spreads across the
 // canvas, and a finger sliding along it lifts one card at a time; letting go on a card opens its preview. Pure geometry: the
 // canvas animates between the hand layout.ts gives (the peeking, fanned strip) and the spread this works out, and the gesture's
 // worklets ask `cardAt`, `cancelled` and `pick` for the card under the finger on the UI thread. Nothing here sends an intent.

@@ -8,7 +8,7 @@ import { TOP_BAR } from "./top-bar-layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import { COLUMN_PAD, listsResponses, outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
-// The choice tray (docs/design-system.md, Table; phase 21): its tiles, its count, what a tap outside it does, and where it sits
+// The choice tray (docs/design-system-table.md; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
 const damage = { icon: "damage" as const, value: 2, danger: false };
 const pick: PickSheet = {

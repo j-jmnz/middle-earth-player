@@ -1,4 +1,4 @@
-// The panel a tap on the phase rail opens (docs/design-system.md, Table; phase 20): the round's seven phases in a column at the left
+// The panel a tap on the phase rail opens (docs/design-system-table.md; phase 20): the round's seven phases in a column at the left
 // ("Round 3" above them), and at the right the steps of the phase being read on a dot timeline, each step's action windows as Stop
 // switches on their rows, the Stops switch for the whole table at the top right. A tap on a phase shows its steps; the game's own phase
 // is shown on open. It is for reading: a lit night panel floating over the canvas with 20 pt corners, not paper. The data is

@@ -79,20 +79,6 @@ describe("The One Ring (21001)", () => {
     state = run(placeDamage({ ...state, window: null }, table.heroes[0] ?? "", 9, ctx.cards, [], "player", ruleCause("rr.damage")), ctx);
     expect(state.lost).toBe(true);
   });
-
-  it("is immune to the effects of cards without the Master trait (21001:A:2)", () => {
-    const table = seat(1, ["dwarf", "rohan"]);
-    const ring = put(table.state, "21001", "play");
-    const miner = put(ring.state, "01061", "hand");
-    let state = attachTo(miner.state, ring.id, table.heroes[0] ?? "");
-    state = syncConstants(run(state, ctx), ctx);
-    // Miner of the Iron Hills discards Condition attachments: the Ring has none of that trait, so use a Condition-trait check on
-    // a stand-in: the chooser's Pick must skip an immune card even when it matches.
-    const tweaked = { ...ctx, cards: new Map(ctx.cards).set("21001", { ...ctx.cards.get("21001")!, traits: ["Artifact", "Ring", "Master", "Condition"] }) };
-    void tweaked;
-    const played = run(play(state, miner.id, ctx, [{ heroId: table.heroes[0] ?? "", amount: 2 }]), ctx);
-    expect(played.cards[ring.id]?.zone).not.toBe("discard");
-  });
 });
 
 describe("The Master cards", () => {

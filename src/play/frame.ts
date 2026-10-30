@@ -1,6 +1,6 @@
 // The frame of a card: where it is drawn and how it turns. Every mark in the shape of a card (the halo, the accent edge, the
 // picked edge, the veil, the beat ring) is drawn on this frame inside the card's turned group, so it follows the card's
-// quarter turn or fan tilt; tokens, pills and the check ring stay upright (docs/design-system.md, Table). A touch is turned
+// quarter turn or fan tilt; tokens, pills and the check ring stay upright (docs/design-system-table.md). A touch is turned
 // back by the same turn before it is tested against the unturned rectangle.
 import type { CardSlot } from "./layout.ts";
 import { slotRotation } from "./motion.ts";

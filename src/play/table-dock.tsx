@@ -1,6 +1,6 @@
 // The dock beside the table, in reach of the right thumb: what the engine is asking (the moment, a sentence), the engine's
 // numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and the buttons that
-// confirm it (docs/design-system.md, Table). It has no panel: it stands on the command column's fade. A choice's options are rows in
+// confirm it (docs/design-system-table.md). It has no panel: it stands on the command column's fade. A choice's options are rows in
 // its own space, above the buttons (choice-tray.tsx). Picking happens on the table; nothing here is sent until a button is pressed
 // (dock-buttons.tsx). The outcome banner over the table says what the last intent did (moment-banner.tsx).
 import { useRef, useState, type ComponentRef, type ReactNode } from "react";

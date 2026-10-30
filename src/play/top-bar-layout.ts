@@ -1,4 +1,4 @@
-// The top bar's three zones (docs/design-system.md, Table): the dials at the left, the phase rail centered on the screen (user request,
+// The top bar's three zones (docs/design-system-table.md): the dials at the left, the phase rail centered on the screen (user request,
 // 2026-10-29; it sat between the dials and the menu before, right of the middle), one menu button at the right. The rail never truncates
 // its words: its floor is the widest it can be, counted from its own words (the widest phase) at their type size and its seven ticks.
 // Pure, so a test reads it.

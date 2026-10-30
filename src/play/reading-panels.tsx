@@ -1,4 +1,4 @@
-// The reading panels (docs/design-system.md, Table, Panels; phase 21): a discard pile's cards, this round's log, the threat
+// The reading panels (docs/design-system-table.md, Reading panels; phase 21): a discard pile's cards, this round's log, the threat
 // panel from a dial and the table settings from the menu. They open in one place, the same tray frame (tray-frame.tsx), one at a
 // time: a new one replaces the last (reading.ts). Each has a round ✕ labelled "Close" at its top right and closes on a tap outside. They
 // stay on paper: they are what gets read and recorded. The settings panel is the exception, on night like the Settings tab. Text,

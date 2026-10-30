@@ -1,4 +1,4 @@
-// The spotlight's pictures decoded ahead (docs/design-system.md, Table, Spotlight): an enemy's attack is declared a few taps before it
+// The spotlight's pictures decoded ahead (docs/design-system-table.md, Spotlight): an enemy's attack is declared a few taps before it
 // resolves (the defender is chosen, the shadow card is dealt), and the spotlight that plays it needs its cards at the stage's size, which
 // is larger than the table's. So when an attack is pending the layer starts those decodes then, and the first frames of the spotlight do not
 // wait for them. Pure, so a test reads it.

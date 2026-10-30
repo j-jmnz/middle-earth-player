@@ -82,7 +82,7 @@ function windowCards(state: ScenarioState): readonly string[] {
 
 /**
  * True when the intent from `before` to `after` showed the player something they had not seen, so the table's Undo cannot
- * take it back (docs/brief.md, Rules engine): a card that left a deck or turned face up (a draw, a reveal, a shadow card
+ * take it back (docs/brief.md, The engine plays the game): a card that left a deck or turned face up (a draw, a reveal, a shadow card
  * turned), a card in a deck or face down that the open window names (a Look, a Pick among the top cards, a search), a new
  * card on top of a player's deck, a card that did not exist before, or a random result (the seed cursor moved: a shuffle, a
  * random discard).

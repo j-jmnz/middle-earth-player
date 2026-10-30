@@ -1,4 +1,4 @@
-// What the combat spotlight draws for the attacks of one new state (docs/design-system.md, Table, Spotlight; phase 24). Pure: the
+// What the combat spotlight draws for the attacks of one new state (docs/design-system-table.md, Spotlight; phase 24). Pure: the
 // clashes (clash.ts) say who fought and every number; this adds where each card stands on the table now (so it can fly from its slot
 // and back to it), its picture's code, and the target's damage count before and after (the engine's, read from the two states). The
 // canvas holds the pictures; the plan names the codes it needs.

@@ -1,4 +1,4 @@
-// The dock's "i" popover (docs/design-system.md, Table, Command column; phase 22): the full title, then the guide, the note and
+// The dock's "i" popover (docs/design-system-table.md, Command column; phase 22): the full title, then the guide, the note and
 // what the rules refuse now, in the table menu's frame (popover-frame.tsx) at the left of the command column, level with the "i"
 // pill. Opening it changes nothing in the dock. It has the round ✕ "Close" button at its top right, closes on a tap outside and on Android Back
 // (back.ts), and scrolls only past the room it has (`maxHeight`), which holds a guide, a note and two refusals.

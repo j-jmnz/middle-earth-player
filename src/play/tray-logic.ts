@@ -1,4 +1,4 @@
-// The choice's pure half (docs/design-system.md, Table, Choice tray; phase 21): the rows of a sheet, the count the dock's title speaks,
+// The choice's pure half (docs/design-system-table.md, Choice tray; phase 21): the rows of a sheet, the count the dock's title speaks,
 // the command column's box (the width the rows and the reading panels share), and what a tap outside it does. The component is
 // choice-tray.tsx, drawn inside the dock; the hook that holds the fold is use-table-choice.ts.
 import type { Choice } from "./table-choice.ts";

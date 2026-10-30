@@ -1,4 +1,4 @@
-// The frame of the reading panels (docs/design-system.md, Table, Reading panels): a container-cornered box at the command column's
+// The frame of the reading panels (docs/design-system-table.md, Reading panels): a container-cornered box at the command column's
 // right edge, with no drawn edge (user request, 2026-10-27: fewer borders), on parchment, or on night for the table settings. It
 // enters decelerating (16 pt up and a fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced
 // motion. The choice's rows (choice-tray.tsx) share its motion but stand in the dock.

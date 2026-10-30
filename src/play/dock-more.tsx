@@ -1,4 +1,4 @@
-// The dock's More popover (docs/design-system.md, Table, Command column; phase 22), and the "i" popover beside it (dock-lines-popover.tsx): when more than two quiet pills would show
+// The dock's More popover (docs/design-system-table.md, Command column; phase 22), and the "i" popover beside it (dock-lines-popover.tsx): when more than two quiet pills would show
 // (dock-extras.ts, dockPills), they fold into one More pill, and this popover lists them. It draws in the table menu's frame
 // (popover-frame.tsx), left of the command column and level with the pill, so the dock's readout, armed line and buttons stay
 // uncovered. A tap outside closes it and does nothing else; a row closes it and then acts; Android Back closes it first (back.ts).

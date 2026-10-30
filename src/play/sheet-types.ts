@@ -25,7 +25,7 @@ export type OptionMark = { icon: IconName; value: number; danger: boolean };
 export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[]; mark?: OptionMark };
 
 // `caution`: what confirming this option costs that the player may not expect (a hero destroyed and the game lost). The
-// confirm then arms on its first tap and the line above it says this (docs/design-system.md, Table, Two taps).
+// confirm then arms on its first tap and the line above it says this (docs/design-system-table.md, Two taps).
 export type PickOption = SheetOption & ({ intent: PlayerIntent } | { next: Sheet }) & { caution?: string };
 
 // An option the rules do not allow now, shown with the reducer's reason so the player sees why it is missing.

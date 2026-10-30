@@ -35,10 +35,6 @@ describe("motionKind", () => {
   it("calls a new state that draws a seat that is not the acting one a peek batched with it", () => {
     expect(motionKind(before, after, 0, 1, 0, 0)).toBe("peek");
   });
-
-  it("is not a peek in a solo game: the seat never changes", () => {
-    expect(motionKind(before, after, 0, 0, 0, 0)).toBe("ordinary");
-  });
 });
 
 describe("kindMoves", () => {

@@ -1,4 +1,4 @@
-// The combat spotlight's clock and the hooks that wait for it (docs/design-system.md, Table, Spotlight; phase 24). The store opens a
+// The combat spotlight's clock and the hooks that wait for it (docs/design-system-table.md, Spotlight; phase 24). The store opens a
 // gate for each moment's attacks (spotlight-gate.ts); the canvas plays them on one clock (`useSpotlight`), and the scrim over the bar
 // and the dock, the banner, the settle after a moment and the canvas's card motions hold while the gate is open (`useSpotlightHold`).
 // A tap ends the gate, which lands the table on the new state. Nothing here draws, and nothing gates an intent.

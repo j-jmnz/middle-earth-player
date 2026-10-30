@@ -1,4 +1,4 @@
-// Card motion (phase 23; docs/design-system.md, Table, Motion): what each card does when the table changes. The pure half only:
+// Card motion (phase 23; docs/design-system-table.md, Motion): what each card does when the table changes. The pure half only:
 // where a card starts, whether it flips, how long it waits, how high it rises, how it lands.
 import { describe, expect, it } from "vitest";
 

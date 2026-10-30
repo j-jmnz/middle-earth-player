@@ -87,7 +87,7 @@ None. The canvas is phone-only. The settings flow, if one exists, asserts the An
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - `rg -n "duration\\(|withTiming\\(.*[0-9]{3}" src/play` finds no duration literal outside `motion-tokens.ts`.
-- `docs/design-system.md` (Table, Motion; Performance) is rewritten with the tokens.
+- `docs/design-system-table.md` (Motion; Performance) is rewritten with the tokens.
 - STATUS.md lists the phone checks as open:
   - draws, reveals, plays and token pops at Normal and Quick;
   - the hurry tap;

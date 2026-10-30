@@ -1,4 +1,4 @@
-// The token pop and the floating number (docs/design-system.md, Table, Motion; phase 23): when a damage, resource or progress count
+// The token pop and the floating number (docs/design-system-table.md, Motion; phase 23): when a damage, resource or progress count
 // changes, its token pops (1 to 1.4 and back on a spring) and a number rises 20 pt from it and fades ("+2" in accent for a gain,
 // "-1" in danger red for damage or a loss, Cinzel Bold 13 pt with a night outline). Progress placed on a quest card or a location
 // pops its strip's count the same way. The numbers are the reducer's (token-deltas.ts); this only draws them, from the clock of

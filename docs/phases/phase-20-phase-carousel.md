@@ -66,7 +66,7 @@ Update the flows that assert `rail-current`, which is kept. Add a step to `.maes
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - The web export at 844×390 and 667×375 shows the pill, and the open strip with the current phase centered.
-- `docs/design-system.md` (Table): the rail paragraph and the turn reference in Panels are rewritten.
+- `docs/design-system-table.md` (): the rail paragraph and the turn reference in Panels are rewritten.
 - STATUS.md: the open "the rail does not mark each stop" note is closed. The phone checks are open:
   - the slide on a phase change;
   - the strip's swipe;

@@ -75,7 +75,7 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - `docs/brief.md` says in the table section that two-handed play may view the other seat's hand, because both hands are the one player's. It is a product rule, so it goes in the brief in the same change.
-- `docs/design-system.md` (Table, top bar and Cards) is updated.
+- `docs/design-system-table.md` (top bar and Cards) is updated.
 - STATUS.md lists the phone checks as open:
   - the peek and back in planning and in combat;
   - the slide;

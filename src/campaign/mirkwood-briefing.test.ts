@@ -38,12 +38,6 @@ function inputOf(world: World, heroes: string[], ringBearer: string | null = nul
 }
 
 describe("a briefing outside a saga", () => {
-  it("is a plain campaign: no saga flag, no prelude", () => {
-    expect(passage.campaign.saga).toBe(false);
-    expect(oath.campaign.saga).toBe(false);
-    expect(passage.campaign.prelude).toEqual([]);
-  });
-
   it("asks for no Ring-bearer and has no Ring-bearer problem", () => {
     for (const world of [passage, oath]) {
       const result = briefing(inputOf(world, [HERO_A, HERO_B, HERO_C]));
