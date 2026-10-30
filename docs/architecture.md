@@ -1,6 +1,6 @@
 # Architecture
 
-Structural design for the solo Lord of the Rings LCG app. Product rules, the round, and the build order stay in [brief.md](brief.md). This file says how the process is split, who is allowed to write state, and which library owns which job. It does not restate a rule the brief owns.
+Structural design for the solo Lord of the Rings LCG app. Product rules and the round stay in [brief.md](brief.md). This file says how the process is split, who is allowed to write state, and which library owns which job. It does not restate a rule the brief owns.
 
 The app is one Expo binary. The reducer runs in that process. There is no accounts system, no room, and no server on the play loop.
 
