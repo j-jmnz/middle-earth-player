@@ -14002,9 +14002,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "9953242e6d8785c55c8221e5a57027db0311d80b2a4f343523987f5aa2fbde84"
+        "value": "0d8fbdf5ea433ce43bfbfa176bfcd26a87527c6da16007d9b6c4fdfc40d8e447"
       },
-      "fetchedAt": "2026-10-30T21:28:40.934Z",
+      "fetchedAt": "2026-10-30T22:46:36.228Z",
       "files": [
         {
           "path": "scans/01001.A.jpg",
@@ -14919,6 +14919,12 @@
           "bytes": 269511
         },
         {
+          "path": "scans/110013.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b69c7813-2319-49d4-b4a6-157a044ac73c.B.jpg",
+          "sha256": "5aa1ca88970a54b4d249f4b7749a4dc8249e281ec49a221eb2a7fca986d52c1a",
+          "bytes": 126005
+        },
+        {
           "path": "scans/110042.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Stormcaller.jpg",
           "sha256": "5f9b05cb819fae141404a0add7b12de2b28c17a3a52f6263c445b397e9872bd7",
@@ -14973,6 +14979,24 @@
           "bytes": 300345
         },
         {
+          "path": "scans/110102.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ee22a40c-9884-4872-988b-f8468e4ac549.B.jpg",
+          "sha256": "6b773c998ecebde74c8ce4bc4f63add16068ac938ad895e6c2763d1a7ea57d29",
+          "bytes": 125473
+        },
+        {
+          "path": "scans/110129.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d777af13-989a-40b7-8825-61a7dc8e793c.jpg",
+          "sha256": "4c36eee69e3803faaf78131dbd710633b819bf7da14a61a9fced05dc78e32025",
+          "bytes": 145196
+        },
+        {
+          "path": "scans/110129.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d777af13-989a-40b7-8825-61a7dc8e793c.B.jpg",
+          "sha256": "0280c006eb3dfe5855047f0ff1dfe5d9ae7178f117df40e2e5637b6783789e22",
+          "bytes": 142555
+        },
+        {
           "path": "scans/110136.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Dream-chaser.jpg",
           "sha256": "5bb96ea28a728504cd307af5ec9fc95aac9e671242e7170c74ae9ab5cae3e709",
@@ -15003,10 +15027,22 @@
           "bytes": 281098
         },
         {
+          "path": "scans/110138.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/94f2aa12-7d4c-4124-a642-a7f3fb2ca414.B.jpg",
+          "sha256": "2ff183070e0824e43a25c8d54a60507cc59845650cf2bd90d2b0ed8fceeec794",
+          "bytes": 114863
+        },
+        {
           "path": "scans/110139.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Glorinaith.jpg",
           "sha256": "c2de47471c6dcf9d5a1c5039e86d87c431a9a743a5e6a4c5be9b9379ad99562f",
           "bytes": 300641
+        },
+        {
+          "path": "scans/110139.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/814fecd8-1d51-431e-a904-e12ba8747391.B.jpg",
+          "sha256": "1d60f2b9e88aab1a4af05e7eb1cd40bf7286e554400ebde7e097d34c6f46de9d",
+          "bytes": 124825
         },
         {
           "path": "scans/110140.A.jpg",
@@ -15541,6 +15577,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Navigation.jpg",
           "sha256": "e7c3df5e769546739f67fbc059747a769ed3c6ecfacd7a1ca4b921ae6183220f",
           "bytes": 161620
+        },
+        {
+          "path": "scans/11084.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ce1cf93c-68d9-4613-af3a-a08671152358.B.jpg",
+          "sha256": "e88e1ec9ac28eb07b1e9f56b550ec433d131b7b11b935c99281b04c2be956fd5",
+          "bytes": 113488
         },
         {
           "path": "scans/11171.A.jpg",

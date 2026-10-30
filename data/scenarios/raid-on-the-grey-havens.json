@@ -9,7 +9,7 @@
   "encounterSets": [
     {
       "name": "Raid on the Grey Havens",
-      "count": 19
+      "count": 21
     },
     {
       "name": "Corsair Raiders",
@@ -25,6 +25,12 @@
       "code": "11040",
       "normal": 3,
       "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11041",
+      "normal": 2,
+      "easy": 0,
       "pile": "encounter"
     },
     {
@@ -125,25 +131,28 @@
     },
     {
       "code": "11041",
-      "normal": 3,
+      "normal": 1,
       "easy": 1,
       "pile": "staging"
     },
     {
-      "code": "11077",
+      "code": "11076",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11077"
     },
     {
-      "code": "11079",
+      "code": "11078",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11079"
     }
   ],
   "campaignCard": "11182",
   "campaignPlaced": [
+    "11028",
     "11180",
     "11183",
     "11184",
@@ -154,6 +163,9 @@
     "11189",
     "11190"
   ],
+  "reprints": {
+    "11028": "110013"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

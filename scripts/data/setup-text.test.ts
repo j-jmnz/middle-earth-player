@@ -132,7 +132,10 @@ describe("parseSetup: Dream-chaser Setup sentences", () => {
     card("d9", "Armor Plating", "attachment"),
     card("e1", "Galdor's Counsel", "event"),
     card("e2", "Galdor's Counsel", "event"),
-  ].map((entry, at) => ({ ...entry, campaignKind: at === 2 || at === 8 || at === 9 || at === 10 ? "boon" : at === 3 || at === 5 ? "burden" : null, traits: at === 8 ? ["Modification"] : [] }) as Card);
+    card("f1", "Calaerion", "objective"),
+    card("f2", "Cirdan's Blessing", "attachment"),
+    card("f3", "Gavin", "objective"),
+  ].map((entry, at) => ({ ...entry, campaignKind: at === 2 || at === 8 || at === 9 || at === 10 || at === 12 ? "boon" : at === 3 || at === 5 ? "burden" : null, traits: at === 8 ? ["Modification"] : [] }) as Card);
   const dream = nameIndex(cardsOf, new Set());
   const read = (text: string) => parseSetup(text, dream);
 
@@ -163,6 +166,35 @@ describe("parseSetup: Dream-chaser Setup sentences", () => {
     const stormcaller = read(`Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Put Calaerion into play under the control of the player with the Dream-chaser.`);
     expect(stormcaller.clauses.map((clause) => (clause.kind === "step" ? clause.step : clause.kind))).toEqual(["flipToCampaignSide", "attach", "putIntoPlay"]);
     expect(stormcaller.clauses[1]).toMatchObject({ codes: ["d4"], to: ["d8"] });
+  });
+
+  it("matches a name through its accents and curly apostrophes (Círdan's Blessing is Cirdan's Blessing in the data)", () => {
+    const parsed = read("Setup: One player may choose one copy of Círdan’s Blessing and add it to their hand.");
+    expect(parsed.unread).toEqual([]);
+    expect(parsed.clauses).toEqual([{ kind: "step", step: "chooseCopies", codes: ["f2"] }]);
+  });
+
+  it("names the boon, not the burden, for 'Black Key (boon)' and both for the bare name", () => {
+    expect(dream.allCodesOf("Black Key (boon)")).toEqual(["d3"]);
+    expect(dream.allCodesOf("Black Key (burden)")).toEqual(["d4"]);
+    expect(dream.allCodesOf("Black Key").sort()).toEqual(["d3", "d4"]);
+  });
+
+  it("leaves a sentence unread when a name it must hold finds no card, instead of dropping the step", () => {
+    expect(read("Setup: The first player takes control of Aldarion and attaches Spyglass to him.").unread).toEqual(["The first player takes control of Aldarion and attaches Spyglass to him"]);
+    expect(read("Setup: Attach Black Key (boon) to Aldarion.").unread).toEqual(["Attach Black Key (boon) to Aldarion"]);
+    expect(read("Setup: Shuffle Aldarion into the Corsair deck.").unread).toEqual(["Shuffle Aldarion into the Corsair deck"]);
+    expect(read("Setup: Put Aldarion into play under the control of the player with the Dream-chaser.").unread).toEqual(["Put Aldarion into play under the control of the player with the Dream-chaser"]);
+    expect(read("Setup: Attach Black Key (boon) to Captain Sahír.").clauses).toEqual([{ kind: "step", step: "attach", codes: ["d3"], to: ["d5"] }]);
+  });
+
+  it("reads the Setup lines of the campaign cards of The Fate of Númenor to The City of Corsairs that name a campaign log fact or turn the card over", () => {
+    const parsed = read(`Setup: If "Gavin returned," put him into play under any player's control. Flip this card over.`);
+    expect(parsed.unread).toEqual([]);
+    expect(parsed.clauses).toEqual([
+      { kind: "step", step: "putIntoPlayIfLogged", codes: ["f3"] },
+      { kind: "step", step: "flipCampaignCard", codes: [] },
+    ]);
   });
 
   it("reads the set steps of The Thing in the Depths and The City of Corsairs (12039.A, 12147.A)", () => {

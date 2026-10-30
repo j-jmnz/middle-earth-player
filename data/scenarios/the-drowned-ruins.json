@@ -103,49 +103,64 @@
       "code": "12094",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "12095"
     },
     {
       "code": "11077",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11076"
     },
     {
       "code": "11079",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11078"
+    },
+    {
+      "code": "12098",
+      "normal": 2,
+      "easy": 2,
+      "pile": "grottoDeck",
+      "back": "12101"
     },
     {
       "code": "12098",
       "normal": 1,
       "easy": 1,
-      "pile": "grottoDeck"
+      "pile": "grottoDeck",
+      "back": "12102"
+    },
+    {
+      "code": "12099",
+      "normal": 2,
+      "easy": 2,
+      "pile": "grottoDeck",
+      "back": "12102"
     },
     {
       "code": "12099",
       "normal": 1,
       "easy": 1,
-      "pile": "grottoDeck"
+      "pile": "grottoDeck",
+      "back": "12103"
     },
     {
-      "code": "12101",
-      "normal": 3,
-      "easy": 3,
-      "pile": "grottoDeck"
-    },
-    {
-      "code": "12102",
-      "normal": 2,
-      "easy": 2,
-      "pile": "grottoDeck"
-    },
-    {
-      "code": "12103",
+      "code": "12100",
       "normal": 1,
       "easy": 1,
-      "pile": "grottoDeck"
+      "pile": "grottoDeck",
+      "back": "12101"
+    },
+    {
+      "code": "12100",
+      "normal": 1,
+      "easy": 1,
+      "pile": "grottoDeck",
+      "back": "12103"
     }
   ],
   "campaignCard": "11200",
@@ -155,7 +170,11 @@
     "11201",
     "11202",
     "11203",
-    "11204"
+    "11204",
+    "11205",
+    "11206",
+    "11207",
+    "11208"
   ],
   "widgets": {
     "hide": false,

@@ -43,19 +43,19 @@
     {
       "code": "12126",
       "normal": 3,
-      "easy": 3,
+      "easy": 2,
       "pile": "encounter"
     },
     {
       "code": "12127",
       "normal": 1,
-      "easy": 1,
+      "easy": 0,
       "pile": "encounter"
     },
     {
       "code": "12128",
       "normal": 3,
-      "easy": 3,
+      "easy": 1,
       "pile": "encounter"
     },
     {
@@ -79,7 +79,7 @@
     {
       "code": "12132",
       "normal": 2,
-      "easy": 2,
+      "easy": 1,
       "pile": "encounter"
     },
     {
@@ -191,6 +191,18 @@
       "pile": "setAside"
     },
     {
+      "code": "110138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "110139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
       "code": "11080",
       "normal": 1,
       "easy": 1,
@@ -272,8 +284,20 @@
     "11177",
     "11178",
     "11192",
+    "11193",
+    "11205",
+    "11206",
+    "11207",
+    "11208",
     "11210"
   ],
+  "reprints": {
+    "11080": "110136",
+    "11081": "110137",
+    "11082": "110140",
+    "11083": "110141",
+    "12123": "110102"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

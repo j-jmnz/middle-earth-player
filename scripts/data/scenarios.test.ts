@@ -140,15 +140,15 @@ describe("Mirkwood campaigns", () => {
 describe("Dream-chaser campaign", () => {
   const campaign = loadCampaign("dream-chaser");
   const DECK = {
-    "voyage-across-belegaer": { normal: 27, easy: 19, corsair: 9, staging: ["11022", "11051", "11084"], setAside: ["11080", "11081", "11082", "11083"] },
+    "voyage-across-belegaer": { normal: 27, easy: 19, corsair: 9, staging: ["11022", "11051", "11084"], setAside: ["110138", "110139", "11080", "11081", "11082", "11083"] },
     "the-fate-of-numenor": { normal: 24, easy: 17, unchartedDeck: 10, staging: [], setAside: ["11027", "11028"] },
-    "raid-on-the-grey-havens": { normal: 28, easy: 21, staging: ["11038", "11039", "11041"], setAside: ["11077", "11079"] },
-    "flight-of-the-stormcaller": { normal: 31, easy: 23, corsair: 13, stormcallerQuests: 3, staging: ["11051"], setAside: ["11080", "11081", "11082", "11083", "11084", "12019"] },
-    "the-thing-in-the-depths": { normal: 20, easy: 13, encounterDeck2: 18, staging: ["11064", "12042"], setAside: ["11077", "11079", "12049"] },
-    "temple-of-the-deceived": { normal: 31, easy: 24, islandMap: 15, staging: ["12070"], setAside: ["11077", "11079", "12071"] },
+    "raid-on-the-grey-havens": { normal: 30, easy: 21, staging: ["11038", "11039", "11041"], setAside: ["11076", "11078"] },
+    "flight-of-the-stormcaller": { normal: 31, easy: 23, corsair: 13, stormcallerQuests: 3, staging: ["11051"], setAside: ["110138", "110139", "11080", "11081", "11082", "11083", "11084", "12019"] },
+    "the-thing-in-the-depths": { normal: 20, easy: 13, encounterDeck2: 18, staging: ["11064", "12042"], setAside: ["11076", "11078", "12049"] },
+    "temple-of-the-deceived": { normal: 32, easy: 25, islandMap: 15, staging: ["12070"], setAside: ["11077", "11079", "12071"] },
     "the-drowned-ruins": { normal: 30, easy: 21, grottoDeck: 8, staging: [], setAside: ["11077", "11079", "12094"] },
-    "a-storm-on-cobas-haven": { normal: 37, easy: 32, corsair: 16, staging: ["11022", "12124"], setAside: ["11080", "11081", "11082", "11083", "11084", "12123"] },
-    "the-city-of-corsairs": { normal: 32, easy: 22, corsair: 10, encounterDeck2: 17, staging: ["12151", "12154"], setAside: ["11080", "11081", "11082", "11083", "11084"] },
+    "a-storm-on-cobas-haven": { normal: 37, easy: 27, corsair: 16, staging: ["11022", "12124"], setAside: ["110138", "110139", "11080", "11081", "11082", "11083", "11084", "12123"] },
+    "the-city-of-corsairs": { normal: 32, easy: 22, corsair: 10, encounterDeck2: 17, staging: ["12151", "12154"], setAside: ["110138", "110139", "11080", "11081", "11082", "11083", "11084"] },
   } as const;
   const copies = (id: string, pile: string): number => loadScenario(id).cards.filter((card) => card.pile === pile).reduce((sum, card) => sum + card.normal, 0);
 
@@ -199,6 +199,62 @@ describe("Dream-chaser campaign", () => {
     const flight = loadScenario("flight-of-the-stormcaller");
     expect(encounterCodes(flight, "Normal", 1).filter((code) => code === "11051")).toHaveLength(1 + 1);
     expect(encounterCodes(flight, "Normal", 3).filter((code) => code === "11051")).toHaveLength(1);
+  });
+
+  it("stages 1 copy of Sahír's Ravager in Raid on the Grey Havens and leaves the others in the encounter deck, in Normal and Easy", () => {
+    const raid = loadScenario("raid-on-the-grey-havens");
+    expect(raid.cards.filter((card) => card.code === "11041").map((card) => [card.pile, card.normal, card.easy])).toEqual([["encounter", 2, 0], ["staging", 1, 1]]);
+    expect(encounterCodes(raid).filter((code) => code === "11041")).toHaveLength(2);
+    expect(encounterCodes(raid, "Easy").filter((code) => code === "11041")).toHaveLength(0);
+  });
+
+  it("deals the Grotto deck as three Undersea Grotto, three Cursed Caverns and two Water-logged Halls, each paired with its own Underwater side", () => {
+    const grotto = loadScenario("the-drowned-ruins").cards.filter((card) => card.pile === "grottoDeck");
+    const faceups = new Map<string, number>();
+    for (const card of grotto) faceups.set(byCode.get(card.code)?.name ?? "", (faceups.get(byCode.get(card.code)?.name ?? "") ?? 0) + card.normal);
+    expect([...faceups]).toEqual([["Undersea Grotto", 3], ["Cursed Caverns", 3], ["Watter-logged Halls", 2]]);
+    expect(grotto.every((card) => byCode.get(card.code)?.traits.includes("Grotto") && byCode.get(card.back ?? "")?.traits.includes("Underwater"))).toBe(true);
+    // The pairings of dcce.grotto-deck: Dragncards' Q06.7 lines.
+    expect(grotto.map((card) => `${byCode.get(card.code)?.name}/${byCode.get(card.back ?? "")?.name} ${card.normal}`).sort()).toEqual([
+      "Cursed Caverns/Sunken Temple 1",
+      "Cursed Caverns/Twisting Hollow 2",
+      "Undersea Grotto/Dark Abyss 2",
+      "Undersea Grotto/Twisting Hollow 1",
+      "Watter-logged Halls/Dark Abyss 1",
+      "Watter-logged Halls/Sunken Temple 1",
+    ]);
+    expect(loadScenario("the-drowned-ruins").cards.find((card) => card.code === "12094")?.back).toBe("12095");
+  });
+
+  it("deals each Stormcaller Elite card as one two-sided card, the side the Setup names faceup", () => {
+    const sides = (id: string) => loadScenario(id).cards.filter((card) => card.pile === "setAside" && byCode.get(card.code)?.encounterSet === "The Stormcaller Elite").map((card) => `${card.code}/${card.back}`);
+    // Enemy side faceup (stage 1A names it, Raid on the Grey Havens' stage 2A adds them as enemies); objective-ally sides faceup.
+    expect(sides("raid-on-the-grey-havens")).toEqual(["11076/11077", "11078/11079"]);
+    expect(sides("the-thing-in-the-depths")).toEqual(["11076/11077", "11078/11079"]);
+    expect(sides("temple-of-the-deceived")).toEqual(["11077/11076", "11079/11078"]);
+    expect(sides("the-drowned-ruins")).toEqual(["11077/11076", "11079/11078"]);
+  });
+
+  it("deals all six ship-objectives of The Dream-chaser's Fleet wherever the Setup prepares the fleet", () => {
+    for (const id of ["voyage-across-belegaer", "flight-of-the-stormcaller", "a-storm-on-cobas-haven", "the-city-of-corsairs"]) {
+      const ships = loadScenario(id).cards.filter((card) => card.pile === "setAside" && byCode.get(card.code)?.encounterSet === "The Dream-chaser's Fleet" && byCode.get(card.code)?.type === "ship-objective");
+      expect(ships.map((card) => byCode.get(card.code)?.name).sort(), id).toEqual(["Dawn Star", "Dream-chaser", "Duskbringer", "Glórinaith", "Nárelenya", "Silver Wing"]);
+      expect(ships.every((card) => card.normal === 1 && card.easy === 1), id).toBe(true);
+    }
+  });
+
+  it("links each card the Campaign Expansion reprints to its reprint, which a campaign game deals", () => {
+    expect(loadScenario("flight-of-the-stormcaller").reprints).toMatchObject({ "12019": "110042", "11080": "110136" });
+    expect(loadScenario("the-thing-in-the-depths").reprints).toEqual({ "12049": "110063" });
+    expect(loadScenario("the-city-of-corsairs").reprints).toMatchObject({ "12159": "110129" });
+    // The Stormcaller of The City of Corsairs is the Coast of Umbar's card, which has no reprint.
+    expect(loadScenario("the-city-of-corsairs").reprints?.["12151"]).toBeUndefined();
+  });
+
+  it("places the campaign cards' named cards: Círdan's Blessing, Calphon of Raid on the Grey Havens, the Black Keys and Sea Serpent of The Thing in the Depths", () => {
+    for (const id of ["the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"]) expect(loadScenario(id).campaignPlaced, id).toEqual(expect.arrayContaining(["11205", "11206", "11207", "11208"]));
+    expect(loadScenario("raid-on-the-grey-havens").campaignPlaced).toContain("11028");
+    expect(loadScenario("the-thing-in-the-depths").campaignPlaced).toEqual(expect.arrayContaining(["11183", "11192", "11196"]));
   });
 
   it("deals the campaign cards' boons and burdens through the campaign, not the encounter deck", () => {

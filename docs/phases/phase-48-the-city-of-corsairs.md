@@ -6,8 +6,6 @@ Blocks: nothing (the last Dream-chaser phase)
 
 Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
 
-**Review rule (user instruction, 2026-10-30):** one review round per phase, run by the orchestrator (`.cursor/agents/orchestrator.md`, "One review round"). A block the fix pass leaves open is recorded in this phase's `STATUS.md` note. This applies to phases 37 to 48.
-
 ## Goal
 
 `the-city-of-corsairs`, Dream-chaser part 9, is playable in campaign and standalone. Standalone play uses the base sides of the two-sided cards; the campaign uses the Campaign Mode sides (`dcce.campaign-mode`).
@@ -42,4 +40,4 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-city-of-corsairs`, and
 
 **Phone half:** as in phase 12: a person can win and lose the scenario on the phone, the log matches the engine, and no control types damage, resources, threat, progress, life or XP. In a cloud session the phone checks and Maestro runs stay open in `STATUS.md`.
 
-One review round, as above.
+One review round (`.cursor/agents/orchestrator.md`, "One review round").

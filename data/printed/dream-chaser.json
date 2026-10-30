@@ -31,6 +31,26 @@
       "sailingSuccess": 0
     },
     {
+      "code": "110013",
+      "side": "B",
+      "printing": "DCCE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b69c7813-2319-49d4-b4a6-157a044ac73c.B.jpg",
+        "sha256": "5aa1ca88970a54b4d249f4b7749a4dc8249e281ec49a221eb2a7fca986d52c1a"
+      },
+      "lines": [
+        "Campaign Mode only.",
+        "The first player gains control of Calphon.",
+        "Action: Exhaust Calphon to look at the bottom 5 cards of your deck. Then, you may switch one of them with a card in your hand.",
+        "If Calphon leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Upgraded side (traits Gondor. Noble. Upgraded.). Stats: Willpower 2, Attack 1, Defense 2, Hit points 4. Prints \"2 XP\" (the upgrade cost) at the bottom right."
+    },
+    {
       "code": "110042",
       "side": "A",
       "printing": "DCCE",
@@ -214,6 +234,64 @@
       "notes": "Reprint of 12123. Ship-objective stats: Willpower 2, Attack 2, Defense 2, Hit points 8."
     },
     {
+      "code": "110102",
+      "side": "B",
+      "printing": "DCCE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ee22a40c-9884-4872-988b-f8468e4ac549.B.jpg",
+        "sha256": "6b773c998ecebde74c8ce4bc4f63add16068ac938ad895e6c2763d1a7ea57d29"
+      },
+      "lines": [
+        "Campaign Mode only.",
+        "Immune to player card effects.",
+        "Sentinel.",
+        "If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.",
+        "Forced: When Dol Amroth Warship is destroyed, set it aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Upgraded side (traits Gondor. Ship. Upgraded.). Ship-objective stats: Willpower 3, Attack 3, Defense 3, Hit points 10. Prints \"3 XP\" (the upgrade cost) at the bottom right."
+    },
+    {
+      "code": "110129",
+      "side": "A",
+      "printing": "DCCE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d777af13-989a-40b7-8825-61a7dc8e793c.jpg",
+        "sha256": "4c36eee69e3803faaf78131dbd710633b819bf7da14a61a9fced05dc78e32025"
+      },
+      "lines": [
+        "Each Raider enemy with at least 1 resource on it is immune to player events.",
+        "Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Reprint of 12159 (the Forced effect reads \"place\" where 12159 reads \"add\"); Hall of Beorn has no row for it, so the scan is DragnCards' picture. Stats: Threat 4, Quest points 8; Victory 5. Prints \"2 XP\" at the bottom right.",
+      "sailingSuccess": 0
+    },
+    {
+      "code": "110129",
+      "side": "B",
+      "printing": "DCCE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d777af13-989a-40b7-8825-61a7dc8e793c.B.jpg",
+        "sha256": "0280c006eb3dfe5855047f0ff1dfe5d9ae7178f117df40e2e5637b6783789e22"
+      },
+      "lines": [
+        "Campaign Mode only.",
+        "Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Upgraded side (traits Umbar. Upgraded.). Stats: Threat 3, Quest points 7; Victory 3. Prints \"2 XP\" at the bottom right."
+    },
+    {
       "code": "110136",
       "side": "A",
       "printing": "DCCE",
@@ -317,6 +395,27 @@
       "notes": "Ship-objective stats: Willpower 3, Attack 4, Defense 3, Hit points 16."
     },
     {
+      "code": "110138",
+      "side": "B",
+      "printing": "DCCE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/94f2aa12-7d4c-4124-a642-a7f3fb2ca414.B.jpg",
+        "sha256": "2ff183070e0824e43a25c8d54a60507cc59845650cf2bd90d2b0ed8fceeec794"
+      },
+      "lines": [
+        "Campaign Mode only.",
+        "Immune to player card effects.",
+        "Sentinel.",
+        "Response: After you play a card with an odd printed cost, add 1 resource to a hero's resource pool. (Limit twice per round.)",
+        "If the Duskbringer is destroyed, its controller is eliminated from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Upgraded side (traits Gondor. Ship. Upgraded.). Ship-objective stats: Willpower 4, Attack 5, Defense 4, Hit points 17. Prints \"4 XP\" (the upgrade cost) at the bottom right."
+    },
+    {
       "code": "110139",
       "side": "A",
       "printing": "DCCE",
@@ -336,6 +435,28 @@
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
       "notes": "Ship-objective stats: Willpower 4, Attack 4, Defense 3, Hit points 17."
+    },
+    {
+      "code": "110139",
+      "side": "B",
+      "printing": "DCCE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/814fecd8-1d51-431e-a904-e12ba8747391.B.jpg",
+        "sha256": "1d60f2b9e88aab1a4af05e7eb1cd40bf7286e554400ebde7e097d34c6f46de9d"
+      },
+      "lines": [
+        "Campaign Mode only.",
+        "Immune to player card effects.",
+        "Ranged.",
+        "Sentinel.",
+        "Action: Name a card. Discard the top 3 cards of any deck to deal 1 damage to a non-unique enemy (2 damage instead if the named card is discarded this way). (Limit once per round.)",
+        "If the Glórinaith is destroyed, its controller is eliminated from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Upgraded side (traits Grey Havens. Ship. Upgraded.). Ship-objective stats: Willpower 5, Attack 5, Defense 4, Hit points 18. Prints \"4 XP\" (the upgrade cost) at the bottom right."
     },
     {
       "code": "110140",
@@ -1978,6 +2099,21 @@
       "confirmedBy": null,
       "notes": "The Heading card prints no text: a compass with the four heading icons (Sun at the top, Storm at the left, Cloud at the right, Rain at the bottom).",
       "sailingSuccess": 0
+    },
+    {
+      "code": "11084",
+      "side": "B",
+      "printing": "TGH",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ce1cf93c-68d9-4613-af3a-a08671152358.B.jpg",
+        "sha256": "e88e1ec9ac28eb07b1e9f56b550ec433d131b7b11b935c99281b04c2be956fd5"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The back of the Heading card prints no text: the compass of side A turned a quarter turn clockwise, Storm at the top, Rain at the left, Sun at the right, Cloud at the bottom (the pointer tab is at the top right)."
     },
     {
       "code": "11171",

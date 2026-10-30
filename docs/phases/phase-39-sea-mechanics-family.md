@@ -5,8 +5,6 @@ Blocks: phase 40
 
 Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phase 39 - Sea mechanics family" and "Notes for the orchestrator and the implementer agent".
 
-**Review rule (user instruction, 2026-10-30):** one review round per phase, run by the orchestrator (`.cursor/agents/orchestrator.md`, "One review round"). A block the fix pass leaves open is recorded in this phase's `STATUS.md` note. This applies to phases 37 to 48.
-
 ## Goal
 
 The ship, heading, sailing and Corsair-deck vocabulary that scenarios 1, 3, 4, 5, 8 and 9 share exists as a mechanic family, each verb tested. Nothing is built for one scenario's card; no scenario is playable yet.
@@ -30,4 +28,4 @@ None until a scenario phase uses the family.
 
 ## Exit
 
-The family tests green; `src/catalog/families/index.ts` lists the family; no scenario is playable yet. Every Fellowship and Mirkwood golden passes without edits; `ENGINE_VERSION` is bumped only if a replayed game can move. One review round, as above.
+The family tests green; `src/catalog/families/index.ts` lists the family; no scenario is playable yet. Every Fellowship and Mirkwood golden passes without edits; `ENGINE_VERSION` is bumped only if a replayed game can move. One review round (`.cursor/agents/orchestrator.md`, "One review round").

@@ -39,7 +39,7 @@ describe("the registry", () => {
       if (built.includes(entry.id)) {
         expect(campaign?.name, entry.id).toBe(entry.name);
         expect(campaign?.scenarios.length, entry.id).toBe(entry.scenarioCount);
-      } else expect(campaign, entry.id).toBeNull();
+      } else expect(campaign, entry.id).toBeNull(); // dream-chaser is null until phase 38 registers it; that phase deletes UNREGISTERED and this branch.
     }
   });
 

@@ -139,6 +139,36 @@
       },
       "reason": "Hall of Beorn files the Dream-chaser Campaign Expansion's Temple Guardian reprint under 'The Fate of Númenor Campaign'. The card is the reprint of Temple Guardian 12070, a Temple of the Deceived card (the scenario 6 Setup attaches it to the staging area; dcce.setup-temple-of-the-deceived names Temple of the Deceived as the set), and its Campaign Mode only side is used in that scenario (dcce.setup-temple-of-the-deceived, Campaign Setup).",
       "source": "hallofbeorn.com/Export/EncounterCards (Temple-Guardian-DCC); scan 12070.A; dcce.campaign-setup-temple-of-the-deceived"
+    },
+    {
+      "match": {
+        "code": "110129"
+      },
+      "set": {
+        "encounterSet": "The City of Corsairs"
+      },
+      "reason": "Hall of Beorn has no row for the Dream-chaser Campaign Expansion's #129, the reprint of The Shattered Monument 12159; DragnCards has it (d777af13, both sides) with no encounter set. The reprint is a card of The City of Corsairs set (scan 12159.A, dcce.from-sea-to-land).",
+      "source": "dragncards cardDb.tsv (d777af13-989a-40b7-8825-61a7dc8e793c); scan 12159.A; dcce.from-sea-to-land"
+    },
+    {
+      "match": {
+        "code": "110138"
+      },
+      "set": {
+        "encounterSet": "The Dream-chaser's Fleet"
+      },
+      "reason": "Duskbringer is one of the six ship-objectives of The Dream-chaser's Fleet encounter set (dcce.ship-objectives, dcce.prepare-your-fleet). Hall of Beorn gives the ships no encounter info and lists only the four of the original box in its scenario files, so the new ship has no set from the sources.",
+      "source": "dcce.ship-objectives; dcce.prepare-your-fleet"
+    },
+    {
+      "match": {
+        "code": "110139"
+      },
+      "set": {
+        "encounterSet": "The Dream-chaser's Fleet"
+      },
+      "reason": "Glórinaith is one of the six ship-objectives of The Dream-chaser's Fleet encounter set (dcce.ship-objectives, dcce.prepare-your-fleet). Hall of Beorn gives the ships no encounter info and lists only the four of the original box in its scenario files, so the new ship has no set from the sources.",
+      "source": "dcce.ship-objectives; dcce.prepare-your-fleet"
     }
   ],
   "scenarioPiles": [
@@ -187,8 +217,9 @@
     {
       "scenario": "raid-on-the-grey-havens",
       "code": "11041",
+      "from": "setAside",
       "pile": "staging",
-      "reason": "DragnCards sets 1 copy of Sahír's Ravager aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.' The other copies are in the encounter deck.",
+      "reason": "DragnCards loads Sahír's Ravager twice: 2 copies in the encounter deck and 1 set aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.', so only the set-aside copy is staged and the other copies stay in the encounter deck.",
       "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
     },
     {
@@ -269,6 +300,44 @@
       "easy": 1,
       "reason": "The DragnCards Easy deck keeps 3 Black Steed. Hall of Beorn gives 1 in both its scenario list and its card record. The gold Easy mark is printed on individual copies, so one scan cannot show it; the two agreeing Hall of Beorn fields win. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/Flight-to-the-Ford; hallofbeorn.com/Export/EncounterCards (Black Steed EasyModeQuantity 1)"
+    }
+  ],
+  "scenarioCounts": [
+    {
+      "scenario": "temple-of-the-deceived",
+      "code": "12078",
+      "normal": 4,
+      "easy": 4,
+      "reason": "The Temple of the Deceived set prints 31 cards (Deeper into the Ruins 19/31, scan 12078.A). Hall of Beorn's quantities for the set sum to 31 with 4 Deeper into the Ruins; DragnCards' Q06.6 and E06.6 load 3, which makes 30. Hall of Beorn lists 4 in both Normal and Easy.",
+      "source": "scan 12078.A (19/31); hallofbeorn.com Scenarios/Temple-of-the-Deceived; dragncards Q06.6, E06.6"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12128",
+      "easy": 1,
+      "reason": "Hall of Beorn's Easy count is used for Coast of Anfalas (1 of 3 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12127",
+      "easy": 0,
+      "reason": "Hall of Beorn's Easy count is used for Heavy Cruiser (none in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12126",
+      "easy": 2,
+      "reason": "Hall of Beorn's Easy count is used for Siege Ship (2 of 3 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12132",
+      "easy": 1,
+      "reason": "Hall of Beorn's Easy count is used for Taking on Water (1 of 2 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
     }
   ],
   "campaigns": [

@@ -123,16 +123,18 @@
       "pile": "setAside"
     },
     {
-      "code": "11077",
+      "code": "11076",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11077"
     },
     {
-      "code": "11079",
+      "code": "11078",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11079"
     },
     {
       "code": "12050",
@@ -179,8 +181,14 @@
   ],
   "campaignCard": "11194",
   "campaignPlaced": [
-    "11195"
+    "11183",
+    "11192",
+    "11195",
+    "11196"
   ],
+  "reprints": {
+    "12049": "110063"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

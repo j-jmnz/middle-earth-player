@@ -141,6 +141,9 @@
     "11180",
     "11181"
   ],
+  "reprints": {
+    "11028": "110013"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

@@ -26,6 +26,11 @@ const placementSchema = z
     // Staging only: "1 copy of Rolling Seas (2 copies instead if there are 3 or more players in the game)": `few` copies, `many` from `from`
     // players on; the copies of `normal` the Setup does not stage stay in the encounter deck.
     byPlayers: z.strictObject({ few: z.number().int().positive(), many: z.number().int().positive(), from: z.number().int().min(2) }).optional(),
+    // A card with two sides that are two catalog cards, `code` the side dealt faceup and `back` the other side of the same physical card
+    // (the Stormcaller Elite's enemy and objective-ally sides, the Grotto locations and the Underwater side each one is paired with: the pairings
+    // differ card to card, dcce.grotto-deck, so one code can appear in several placements of a pile). A card with a folded second side
+    // (Card.back) has no `back` here.
+    back: z.string().min(1).optional(),
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
@@ -57,6 +62,9 @@ export const scenarioDataSchema = z
     campaignCard: z.string().min(1),
     // Cards the campaign card's Setup places or shuffles in. They are not in `cards`; the records deal them.
     campaignPlaced: z.array(z.string().min(1)),
+    // Dream-chaser: the Campaign Expansion's reprint of a card this scenario deals (in `cards` or `campaignPlaced`), by the code it is dealt under.
+    // A campaign game deals the reprint, with its Campaign Mode only or Upgraded side; standalone play deals the card named in `cards`.
+    reprints: z.record(z.string().min(1), z.string().min(1)).optional(),
     // The Ring-bearer's starting life, when a Setup line sets it.
     life: z.number().int().positive().optional(),
     // Table pieces the cards call for, read from their printed text by the build.
@@ -73,8 +81,8 @@ export const scenarioDataSchema = z
     if (!same) context.addIssue({ code: "custom", message: "stages must be the quest-pile cards" });
     const seen = new Set<string>();
     for (const card of data.cards) {
-      const key = `${card.code}\u0000${card.pile}`;
-      if (seen.has(key)) context.addIssue({ code: "custom", message: `duplicate code and pile ${card.code} ${card.pile}` });
+      const key = `${card.code}\u0000${card.pile}\u0000${card.back ?? ""}`;
+      if (seen.has(key)) context.addIssue({ code: "custom", message: `duplicate code, pile and back ${card.code} ${card.pile} ${card.back ?? ""}` });
       seen.add(key);
     }
   });

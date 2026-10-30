@@ -5,8 +5,6 @@ Blocks: phase 38
 
 Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phase 37 - Dream-chaser data" and "Notes for the orchestrator and the implementer agent". Analogue: [phase 27](phase-27-multi-campaign-data.md).
 
-**Review rule (user instruction, 2026-10-30):** one review round per phase, run by the orchestrator (`.cursor/agents/orchestrator.md`, "One review round"). A block the fix pass leaves open is recorded in this phase's `STATUS.md` note. This applies to phases 37 to 48.
-
 ## Goal
 
 The data pipeline builds the `dream-chaser` campaign from the seven original sets (The Grey Havens and the six Adventure Packs) and the Dream-chaser Campaign Expansion (DCCE, MEC111). Data only: nothing new is playable, no screen changes, and the Fellowship, Mirkwood Paths and The Dark of Mirkwood data are byte-identical.
@@ -34,4 +32,4 @@ None. No screen changes.
 - `pnpm exec tsc --noEmit`, `pnpm lint` and `pnpm test` green. Every Fellowship and Mirkwood golden and test passes without edits to its expectations.
 - `pnpm effects:open` lists the new cards' lines.
 - `pnpm catalog:build`; `src/catalog/version.ts` committed if it changed.
-- One review round, as above.
+- One review round (`.cursor/agents/orchestrator.md`, "One review round").

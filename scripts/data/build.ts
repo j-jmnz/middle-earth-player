@@ -79,10 +79,6 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
     log.info(`unbuilt scenarios (cross-checks failed${verbose() ? "" : "; run with --verbose for each"}): ${[...perScenario].map(([name, count]) => `${name} ${count}`).join(", ")}`);
     log.debug(`  ${buildResult.problems.join("\n  ")}`);
   }
-  if (buildResult.notes.length > 0) {
-    log.info(`Hall of Beorn's counts differ from the DragnCards load list in ${buildResult.notes.length} places${verbose() ? "" : " (--verbose lists them)"}`);
-    log.debug(`  ${buildResult.notes.join("\n  ")}`);
-  }
   // The starter decklists are a hand-checked input (data/starter-decks.json), pinned to the MEC109 span that prints them.
   // Only the saga campaign has them. Key order is the file's: the booklet fields come last so the Fellowship's lines stay put.
   const built = {

@@ -9,6 +9,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - A phase is `completed` when its exit is green and `/reviewer` reports no blocks. A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Write the date.
 - Phases 12 to 16 each have an engine half and a phone half (phase 12 describes them). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active` or `not started`. The phase is completed when both halves are.
 - Phases 27 to 33 (Mirkwood Paths and The Dark of Mirkwood, plan `docs/plans/mirkwood-paths.md`) have **one review round per phase** (user instruction, 2026-10-27). The main session runs `/reviewer` once on the phase's diff, and `/ux` once when `src/screens` or `src/play` changed, hands their blocks to one implementer fix pass, and closes the phase without re-running the reviewers. A block that pass leaves open goes in the phase's note and does not keep the phase open. This replaces "`/reviewer` reports no blocks" for those phases. Phases 29 to 33 have an engine half and a phone half, as phase 12 describes.
+- Phases 37 to 48 (Dream-chaser, plan `docs/plans/dream-chaser.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-10-30). Phases 40 to 48 have an engine half and a phone half, as phase 12 describes.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - A cloud session has no phone, simulator or Maestro. Phone checks stay open and are listed here, not marked done.
 - Current counts live in code: the engine version in `src/rules/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
@@ -58,6 +59,18 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 34 | Nightmare data and pictures | active | 2026-10-30. Built: 72 decks (637 cards), the nine built scenarios' `nightmare` blocks, the `nightmare` source (730 pictures pinned), the ledger (88 sides), the Eye icon. Open: `pnpm scans:pack` on the build machine; pictures on a phone. |
 | 35 | Nightmare difficulty | active | 2026-10-30. Built: the Nightmare deal and setup card, saves, the briefing switch, the list line, the top bar's Eye; `/reviewer` and `/ux` rounds done. Open: the switch, list and top bar on a phone and a tablet. |
 | 36 | Nightmare effects | active | 2026-10-30. Engine done: all seven playable scenarios on `NIGHTMARE_PLAYABLE`; review round done (known limits in the phase file). Open: one Nightmare game per scenario on a phone. |
+| 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
+| 38 | Dream-chaser campaign shell and XP | not started | |
+| 39 | Sea mechanics family | not started | |
+| 40 | Voyage Across Belegaer | not started | |
+| 41 | The Fate of Númenor | not started | |
+| 42 | Raid on the Grey Havens | not started | |
+| 43 | Flight of the Stormcaller | not started | |
+| 44 | The Thing in the Depths | not started | |
+| 45 | Temple of the Deceived | not started | |
+| 46 | The Drowned Ruins | not started | |
+| 47 | A Storm on Cobas Haven | not started | |
+| 48 | The City of Corsairs | not started | Open: which Stormcaller card the campaign Setup flips (12151 has no Campaign Mode only side; only 110042 has one). |
 
 ## Open items
 
@@ -73,6 +86,8 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - No Maestro flow plays an attack through the redesigned combat spotlight.
 
 ### Rules and engine
+
+- Dream-chaser ship stats are not in `data/cards` (ledger notes only); phase 39 needs them. The sea keywords (Sailing, Boarding, Aflame, Grapple, Uncharted) parse as unknown tokens until phase 39.
 
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).
 - Simultaneous Forced and delayed effects resolve in a fixed order, not the first player's choice (FAQ 1.02).

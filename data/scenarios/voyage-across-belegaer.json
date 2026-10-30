@@ -170,6 +170,18 @@
       "pile": "staging"
     },
     {
+      "code": "110138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "110139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
       "code": "11080",
       "normal": 1,
       "easy": 1,
@@ -228,6 +240,12 @@
     "11177",
     "11178"
   ],
+  "reprints": {
+    "11080": "110136",
+    "11081": "110137",
+    "11082": "110140",
+    "11083": "110141"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

@@ -8,7 +8,7 @@
   "encounterSets": [
     {
       "name": "Temple of the Deceived",
-      "count": 28
+      "count": 29
     },
     {
       "name": "Ruins of Númenor",
@@ -44,8 +44,8 @@
     },
     {
       "code": "12078",
-      "normal": 3,
-      "easy": 3,
+      "normal": 4,
+      "easy": 4,
       "pile": "encounter"
     },
     {
@@ -118,13 +118,15 @@
       "code": "11077",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11076"
     },
     {
       "code": "11079",
       "normal": 1,
       "easy": 1,
-      "pile": "setAside"
+      "pile": "setAside",
+      "back": "11078"
     },
     {
       "code": "12068",
@@ -183,6 +185,10 @@
     "11198",
     "11199"
   ],
+  "reprints": {
+    "12070": "110077",
+    "12071": "110078"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

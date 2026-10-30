@@ -12,6 +12,7 @@ import { deckFiles, nightmareFiles } from "../sources/nightmare.ts";
 import { driveFileUrl, type DriveFile } from "../sources/jvzijp.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { foldTwoSided } from "../normalize/product-cards.ts";
+import { titleKey } from "../normalize/names.ts";
 
 // The pack the Dream-chaser Campaign Expansion's cards are printed in (scripts/data/campaign-defs.ts).
 const DREAM_CHASER_EXPANSION = "DCCE";
@@ -115,39 +116,49 @@ function hobImages(): HobImages[] {
   return foldTwoSided(rows).cards as unknown as HobImages[];
 }
 
-// DragnCards' full-size picture for an OCTGN guid, the last resort when Hall of Beorn only has a thumbnail.
-function dragnImages(): ReadonlyMap<string, string> {
+// DragnCards' card database, read once: the picture prefix and every row.
+let dragnTable: { prefix: string; rows: Record<string, string>[] } | null = null;
+function dragnRows(): { prefix: string; rows: Record<string, string>[] } {
+  if (dragnTable) return dragnTable;
   const prefix = (JSON.parse(readFileSync(path.join(RAW_DIR, "dragncards", "imageUrlPrefix.json"), "utf8")) as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English;
   const lines = readFileSync(path.join(RAW_DIR, "dragncards", "cardDb.tsv"), "utf8").split("\n");
   const header = (lines[0] ?? "").split("\t");
-  const idAt = header.indexOf("databaseId");
-  const imageAt = header.indexOf("imageUrl");
-  const out = new Map<string, string>();
-  for (const line of lines.slice(1)) {
+  const rows = lines.slice(1).filter((line) => line !== "").map((line) => {
     const cells = line.split("\t");
-    if (cells[idAt] && cells[imageAt]) out.set(cells[idAt] ?? "", `${prefix}${cells[imageAt] ?? ""}`);
-  }
+    return Object.fromEntries(header.map((key, at) => [key, cells[at] ?? ""]));
+  });
+  dragnTable = { prefix, rows };
+  return dragnTable;
+}
+
+// DragnCards' full-size picture for an OCTGN guid, the last resort when Hall of Beorn only has a thumbnail.
+function dragnImages(): ReadonlyMap<string, string> {
+  const { prefix, rows } = dragnRows();
+  const out = new Map<string, string>();
+  for (const row of rows) if (row.databaseId && row.imageUrl) out.set(row.databaseId, `${prefix}${row.imageUrl}`);
   return out;
 }
 
 // Hall of Beorn has no picture for the second side of some Dream-chaser cards. DragnCards files the facedown side of an Uncharted
 // location ("Lost Island") as a row of its own, and the second side of a multi-sided card as "<id>.B.jpg": that picture is the side's scan.
+// The card is the row of its pack and collector number that bears its name (accents and punctuation aside) or, for a card DragnCards names
+// otherwise (the Heading card Navigation), the one second-side row of its type.
 function dragnOtherSide(card: Card): string | null {
   const printing = card.printings.find((item) => item.hobSlug !== undefined);
   const product = PRODUCTS.find((item) => item.packs.some((pack) => pack === printing?.pack));
   if (!printing || !product) return null;
-  const prefix = (JSON.parse(readFileSync(path.join(RAW_DIR, "dragncards", "imageUrlPrefix.json"), "utf8")) as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English;
-  const lines = readFileSync(path.join(RAW_DIR, "dragncards", "cardDb.tsv"), "utf8").split("\n");
-  const header = (lines[0] ?? "").split("\t");
-  const column = (name: string) => header.indexOf(name);
-  const rows = lines.slice(1).map((line) => line.split("\t")).filter((cells) => cells[column("packName")] === product.name && cells[column("numberInPack")] === String(printing.number));
+  const { prefix, rows: all } = dragnRows();
+  const typeKey = (value: string) => value.toLowerCase().replace(/[\s-]/g, "");
+  const rows = all.filter((row) => row.packName === product.name && row.numberInPack === String(printing.number));
+  const sameType = rows.filter((row) => typeKey(row.type ?? "") === typeKey(card.typeName));
   // A location's facedown side is a row of its own under another name ("Lost Island"); any other multi-sided card keeps its second side
   // in "<id>.B.jpg".
-  const other = rows.find((cells) => cells[column("type")] === card.typeName && cells[column("name")] !== card.name && cells[column("imageUrl")]);
-  if (card.type === "location" && other) return `${prefix}${other[column("imageUrl")] ?? ""}`;
-  const second = rows.find((cells) => (cells[column("imageUrl")] ?? "").endsWith(".B.jpg") && cells[column("name")] === card.name);
-  if (second) return `${prefix}${second[column("imageUrl")] ?? ""}`;
-  return other ? `${prefix}${other[column("imageUrl")] ?? ""}` : null;
+  const other = rows.find((row) => row.type === card.typeName && row.name !== card.name && row.imageUrl);
+  if (card.type === "location" && other) return `${prefix}${other.imageUrl}`;
+  const seconds = sameType.filter((row) => (row.imageUrl ?? "").endsWith(".B.jpg"));
+  const second = seconds.find((row) => titleKey(row.name ?? "") === titleKey(card.name)) ?? (seconds.length === 1 ? seconds[0] : undefined);
+  if (second) return `${prefix}${second.imageUrl}`;
+  return other ? `${prefix}${other.imageUrl}` : null;
 }
 
 const CORE_ORDER = ["Revised Core Set", "Core Set"];
@@ -211,10 +222,12 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
     const first = sources[0];
     if (!first) throw new Error(`No scan URL for ${code} ${card.name}`);
     const isCampaign = card.type === "campaign";
-    const sideA = first.urls.filter((url) => !url.includes("dragncards"));
+    // A card Hall of Beorn has no picture of (the Campaign Expansion's #129) is read from its DragnCards pictures: front, then back.
+    const own = first.urls.filter((url) => !url.includes("dragncards"));
+    const sideA = own.length > 0 ? own : first.urls;
     const front = sideA[0];
     const back = isCampaign && front ? front.replace("SetupA", "SetupB") : (sideA[1] ?? (card.back ? dragnOtherSide(card) : null) ?? undefined);
-    if (!front) throw new Error(`No Hall of Beorn scan for ${code}`);
+    if (!front) throw new Error(`No scan for ${code}`);
     const guid = card.printings.map((printing) => printing.octgnGuid).find((value) => value !== undefined);
     const fromDragn = guid ? dragn.get(guid) : undefined;
     out.push({ code, side: "A", printing: first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : [])] });

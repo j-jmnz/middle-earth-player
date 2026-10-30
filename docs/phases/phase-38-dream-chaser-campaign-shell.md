@@ -6,8 +6,6 @@ May be split into 38 and 38b (as 28 and 28b) if the XP screen is large.
 
 Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phase 38 - Dream-chaser campaign shell and XP" and "Notes for the orchestrator and the implementer agent". Analogue: [phase 28](phase-28-campaign-registry.md).
 
-**Review rule (user instruction, 2026-10-30):** one review round per phase, run by the orchestrator (`.cursor/agents/orchestrator.md`, "One review round"). A block the fix pass leaves open is recorded in this phase's `STATUS.md` note. This applies to phases 37 to 48.
-
 ## Goal
 
 The app knows the Dream-chaser campaign: it is on the campaign list and the Scenarios tab (one box, `dream-chaser`, holding all nine scenarios), opens its booklet, refuses Na'asiyah in scenarios 1 to 7, and carries XP, marks and upgrades in the campaign log. No scenario is playable yet.
@@ -31,4 +29,4 @@ The plan's Phase 38 items 1 to 8:
 
 ## Exit
 
-Fellowship and Mirkwood goldens unchanged and green, new tests green, `pnpm lint`, `npx tsc --noEmit` and `pnpm test` green. In a cloud session the phone checks and Maestro runs stay open in `STATUS.md`. One review round (`ux` too: `src/screens` changes), as above.
+Fellowship and Mirkwood goldens unchanged and green, new tests green, `pnpm lint`, `npx tsc --noEmit` and `pnpm test` green. In a cloud session the phone checks and Maestro runs stay open in `STATUS.md`. One review round (`.cursor/agents/orchestrator.md`, "One review round"; `ux` too: `src/screens` changes).
