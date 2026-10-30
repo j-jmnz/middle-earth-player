@@ -40,9 +40,9 @@ function tileOf(texture: FogTexture, scale: number): SkImage | null {
 // The grit is finer than a point, so its tile is drawn at the screen's own pixels.
 const gritScale = () => Math.min(PixelRatio.get(), 3);
 
-// The clock moves the fog about 20 times a second: at a few points a second that is under half a pixel a step, and the canvas
+// The clock moves the fog about 30 times a second: at its 5 points a second that is about half a pixel a step, and the canvas
 // redraws only when it moves.
-const STEP = 0.05;
+const STEP = 1 / 30;
 
 /** Seconds of drift (at `rate`), counted only while the fog runs, so it picks up where it stopped. */
 function useDriftClock(rate: number, running: boolean): SharedValue<number> {

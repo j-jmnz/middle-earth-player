@@ -76,11 +76,11 @@ const GROUND = "#030405";
 
 // Dark: Ringwraiths. Moonlight gone pale and sickly green, as Minas Morgul's corrupted moonlight is told ("paler indeed than the moon
 // ailing in some slow eclipse"), only a shade off its old teal; and a deep red ember where the enemy is.
-const moonHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 5, rgb: [102, 143, 125], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: 1.2, bake: 0.5 };
-const moonBank: FogTexture = { freq: [0.009, 0.012], octaves: 3, seed: 7, rgb: [102, 143, 125], gain: 3, bias: -1.12, tile: [900, 900], drift: 3 };
+const moonHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 5, rgb: [102, 143, 125], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: 2, bake: 0.5 };
+const moonBank: FogTexture = { freq: [0.009, 0.012], octaves: 3, seed: 7, rgb: [102, 143, 125], gain: 3, bias: -1.12, tile: [900, 900], drift: 5 };
 const moonCrest: FogTexture = { ...moonBank, rgb: [201, 222, 204], gain: 6, bias: -3.75, offset: [0, -3] };
-const emberHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 9, rgb: [150, 38, 22], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: -1, bake: 0.5 };
-const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 3, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700], drift: -2.4 };
+const emberHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 9, rgb: [150, 38, 22], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: -1.7, bake: 0.5 };
+const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 3, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700], drift: -4 };
 const emberCrest: FogTexture = { ...emberBank, rgb: [219, 107, 77], gain: 6, bias: -3.8, offset: [0, -3] };
 export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260], drift: 0 };
 
