@@ -5,6 +5,7 @@ import { CroppedArt } from "./art";
 import { COVER, PAINTING, type Region } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
+import { cardCorner } from "../play/card-corner";
 import { dropShadowOf, nightFade, rowSurface, selectedRingOf } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
@@ -71,21 +72,21 @@ export function HeroTile({
   const mark = markedSphere(hero.sphereCode);
   return (
     <View
-      className={`flex-1 overflow-hidden ${flush ? "" : "rounded-tile"}`}
+      className={`flex-1 overflow-hidden ${flush ? "" : "rounded-item"}`}
       style={{ height, ...(flush ? {} : { boxShadow: ringBearer ? selectedRingOf(t, 1.5) : (shadow ?? dropShadowOf(t, 8, 18, 0.8)) }) }}
     >
       {card != null ? (
         <View>
           <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={card} height={height} />
           {hero.sphereCode === "fellowship" ? (
-            <View className="absolute left-1 rounded px-1.5 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+            <View className="absolute left-1 rounded-control px-1.5 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
               <Text testID={`saga-only-${hero.code}`} className="text-micro font-semibold text-accentHigh" numberOfLines={1}>
                 Saga only
               </Text>
             </View>
           ) : null}
           {loss ? (
-            <View className="absolute left-1 right-1 rounded px-1 py-0.5" style={{ bottom: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+            <View className="absolute left-1 right-1 rounded-control px-1 py-0.5" style={{ bottom: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
               <Text testID={`hero-loss-${hero.code}`} className="text-center text-micro text-muted" numberOfLines={1}>
                 {loss}
               </Text>
@@ -130,7 +131,7 @@ export function HeroTile({
               ) : null}
             </View>
             {ringBearer && !dense ? (
-              <View pointerEvents="none" className="absolute left-1.5 top-1.5 h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(palette.night, 0.8) }}>
+              <View pointerEvents="none" className="absolute left-1.5 top-1.5 h-6 w-6 items-center justify-center rounded-control" style={{ backgroundColor: withAlphaHex(palette.night, 0.8) }}>
                 <RingMark size={12} state="current" />
               </View>
             ) : null}
@@ -162,7 +163,7 @@ export function HeroTile({
           className="absolute right-0 top-0 min-h-touch min-w-touch items-center justify-center"
         >
           {({ pressed }) => (
-            <View className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78), boxShadow: dropShadowOf(t, 4, 10, 0.8) }}>
+            <View className="h-7 w-7 items-center justify-center rounded-control" style={{ backgroundColor: pressed ? palette.pressed : withAlphaHex(palette.night, 0.78) }}>
               <Text style={{ color: palette.bone, fontSize: 13 * s, lineHeight: 15 * s, fontWeight: "700" }}>{"\u2715"}</Text>
             </View>
           )}
@@ -195,7 +196,7 @@ export function EmptyHeroSlot({
         accessibilityRole="button"
         accessibilityLabel={`Add ${label.toLowerCase()}`}
         onPress={onPress}
-        className="w-full overflow-hidden rounded-tile"
+        className="w-full overflow-hidden rounded-item"
         style={frame}
       >
         {({ pressed }) => (
@@ -208,7 +209,7 @@ export function EmptyHeroSlot({
     );
   }
   return (
-    <View testID={testID} className="w-full items-center justify-center gap-2 rounded-tile px-1" style={frame}>
+    <View testID={testID} className="w-full items-center justify-center gap-2 rounded-item px-1" style={frame}>
       <RingMark size={18} state="current" />
       <Text className="text-center font-display text-label text-accent">{label}</Text>
     </View>
@@ -293,7 +294,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
   const foot = t.depth === "light" ? palette.raised : palette.dusk;
   return (
-    <View className="overflow-hidden rounded-card" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
+    <View className="overflow-hidden rounded-item" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
       <Pressable {...pressProps(props)}>
         {({ pressed }) => (
           <View style={pressed && !disabled ? rowSurface(true, t) : undefined}>
@@ -362,7 +363,7 @@ export function DeckRow(props: DeckSummary) {
   const { name, heroes, detail, status, note, testID, children, selected, disabled } = props;
   const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
-    <View className="mb-1.5 overflow-hidden rounded-tile" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
+    <View className="mb-1.5 overflow-hidden rounded-item" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
       {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
       <Pressable {...pressProps(props)}>
         {({ pressed }) => (
@@ -370,12 +371,12 @@ export function DeckRow(props: DeckSummary) {
             <View className="flex-row" style={{ width: thumb.width * 3 - 16 * s, opacity: disabled ? 0.45 : 1 }}>
               {heroes.length > 0 ? (
                 heroes.slice(0, 3).map((hero, at) => (
-                  <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s, borderRadius: 3, overflow: "hidden", boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
+                  <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s, borderRadius: cardCorner(thumb.width, thumb.height), overflow: "hidden", boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
                     <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={thumb.width} height={thumb.height} />
                   </View>
                 ))
               ) : (
-                <View className="items-center justify-center rounded-sm bg-dusk" style={thumb}>
+                <View className="items-center justify-center bg-dusk" style={{ ...thumb, borderRadius: cardCorner(thumb.width, thumb.height) }}>
                   <Text className="text-label text-faint">—</Text>
                 </View>
               )}

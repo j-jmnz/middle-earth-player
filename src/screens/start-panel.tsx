@@ -48,7 +48,7 @@ function SeatTile({ seats, name, selected, testID, onPress, compact = false }: {
   const label = seatWord(seats);
   const s = useUiScale();
   return (
-    <RadioTile selected={selected} testID={testID} label={`${label}, ${name}`} onPress={onPress} className={compact ? "min-h-touch flex-1 flex-row items-center justify-center gap-3 rounded-tile px-3 py-2" : "min-h-14 flex-1 items-center justify-center gap-2 rounded-tile px-3 py-3"}>
+    <RadioTile selected={selected} testID={testID} label={`${label}, ${name}`} onPress={onPress} className={compact ? "min-h-touch flex-1 flex-row items-center justify-center gap-3 rounded-item px-3 py-2" : "min-h-14 flex-1 items-center justify-center gap-2 rounded-item px-3 py-3"}>
       <View className="flex-row">
         <RingMark size={18} state={selected ? "current" : "locked"} />
         {seats === 2 ? (
@@ -112,7 +112,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
                   testID={`campaign-choice-${option.data.id}`}
                   label={`${option.name}, ${option.data.scenarios.length} scenarios`}
                   onPress={() => setCampaignId(option.data.id)}
-                  className={landscape ? "min-h-14 flex-1 justify-center rounded-tile px-4 py-2" : "min-h-14 justify-center rounded-tile px-4 py-3"}
+                  className={landscape ? "min-h-14 flex-1 justify-center rounded-item px-4 py-2" : "min-h-14 justify-center rounded-item px-4 py-3"}
                 >
                   <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{option.name}</Text>
                   <Text className="text-label text-faint">{`${option.data.scenarios.length} scenarios`}</Text>
@@ -136,7 +136,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
         <Label>Carry over from a finished campaign</Label>
         <Text className="text-label text-muted">{"The cards join this campaign's pool at its first scenario."}</Text>
         <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Carry-over for ${name}`}>
-          <RadioTile selected={taking == null} testID="carry-none" label={`Fresh start, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-tile px-4 py-2">
+          <RadioTile selected={taking == null} testID="carry-none" label={`Fresh start, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
             <Text className={taking == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Fresh start</Text>
           </RadioTile>
           {carry.map((choice) => {
@@ -148,7 +148,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
                 testID={`carry-${choice.saveId}`}
                 label={`${choice.label}, ${choice.source}: ${choice.words}`}
                 onPress={() => setTaking(choice.saveId)}
-                className="min-h-touch justify-center rounded-tile px-4 py-2"
+                className="min-h-touch justify-center rounded-item px-4 py-2"
               >
                 <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{choice.label}</Text>
                 <Text className="text-label text-faint">{choice.source}</Text>
@@ -176,7 +176,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
         </View>
       ) : (
         <>
-          <View className="overflow-hidden rounded-t-card">
+          <View className="overflow-hidden rounded-t-container">
             <SceneArt scenarioId={data.scenarios[0]} height={(landscape ? 48 : 132) * s} fade={0.3} fadeTo={palette.raised} />
           </View>
           <View className="px-5 pb-5" style={{ marginTop: (landscape ? -24 : -36) * s }}>

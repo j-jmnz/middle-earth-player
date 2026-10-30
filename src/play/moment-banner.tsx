@@ -132,7 +132,7 @@ export function MomentBanner({
     <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: SIDE }}>
       <GestureDetector gesture={gesture}>
         {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
-        <Animated.View className="rounded-card" style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, ...bannerFill(t, moment.tone, edge) }, swipeStyle]}>
+        <Animated.View className="rounded-container" style={[{ minWidth: Math.min(BANNER_MIN * s, room), maxWidth: room, ...bannerFill(t, moment.tone, edge) }, swipeStyle]}>
           <View
             testID="moment"
             accessible
@@ -142,7 +142,7 @@ export function MomentBanner({
               if (event.nativeEvent.actionName === "escape") onDismiss();
             }}
             onAccessibilityEscape={onDismiss}
-            className="overflow-hidden rounded-card"
+            className="overflow-hidden rounded-container"
           >
             {/* The tone, as a 3 pt band along the top: silver for a success, threat red for a failure or an engagement. */}
             <View style={{ height: 3 * s, backgroundColor: edge, ...(moment.tone === "bad" ? {} : { opacity: 0.8 }) }} />

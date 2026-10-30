@@ -1,5 +1,5 @@
-// The one switch row on the night surface (docs/design-system.md, Components): the phase carousel's Stops and the Settings screen's rows
-// are this same row, so the two do not drift apart. src/screens re-exports it through chrome-buttons.tsx.
+// The one switch row (docs/design-system.md, Components): the phase carousel's Stops and the Settings screen's rows, on night, and the
+// card pool's filter sheet, on paper, are this same row, so they do not drift apart. src/screens re-exports it through chrome-buttons.tsx.
 import { Pressable, View } from "react-native";
 
 import { touch, useUiScale } from "./ui-scale.ts";
@@ -14,14 +14,16 @@ const ROW = 44;
  * The Carved Stone switch, 46 × 26 with a round knob: on, a lit accent track with a glow and a dark knob; off, a sunk track and a
  * grey knob. A drawing, not the platform's Switch, so it looks the same on every platform; the row is the control.
  */
-function SwitchMark({ value }: { value: boolean }) {
+function SwitchMark({ value, paper }: { value: boolean; paper: boolean }) {
   const t = useTableTokens();
   const s = useUiScale();
   const light = t.depth === "light";
   const width = 46 * s;
   const height = 26 * s;
   const knob = 20 * s;
-  const track = value
+  const track = paper
+    ? { backgroundColor: value ? t.ink : withAlphaHex(t.ink, 0.18) }
+    : value
     ? {
         backgroundColor: t.accent,
         backgroundImage: `linear-gradient(180deg, ${light ? t.primaryTop : t.accentHigh} 0%, ${t.accentDeep} 100%)`,
@@ -36,15 +38,15 @@ function SwitchMark({ value }: { value: boolean }) {
           height: knob,
           borderRadius: knob / 2,
           marginLeft: value ? width - knob - 3 * s : 3 * s,
-          backgroundColor: value ? t.onAccent : t.faint,
-          boxShadow: `0 1px 3px ${withAlphaHex(t.shade, 0.5)}`,
+          backgroundColor: paper ? (value ? t.paper : t.inkMuted) : value ? t.onAccent : t.faint,
+          ...(paper ? {} : { boxShadow: `0 1px 3px ${withAlphaHex(t.shade, 0.5)}` }),
         }}
       />
     </View>
   );
 }
 
-// A switch on the night surface: its whole row is one 44 pt target, the label and detail heard with it.
+// A switch on the night surface, or on paper (`surface`): its whole row is one 44 pt target, the label and detail heard with it.
 export function SettingSwitch({
   label,
   detail,
@@ -54,6 +56,7 @@ export function SettingSwitch({
   testID,
   dim = false,
   roomy = false,
+  surface = "night",
 }: {
   label: string;
   detail?: string;
@@ -65,9 +68,11 @@ export function SettingSwitch({
   dim?: boolean;
   // The Settings page's row: a title in semibold body type and room above and below. The carousel keeps the dense row.
   roomy?: boolean;
+  surface?: "night" | "paper";
 }) {
   const t = useTableTokens();
   const s = useUiScale();
+  const paper = surface === "paper";
   return (
     <Pressable
       testID={testID}
@@ -83,21 +88,21 @@ export function SettingSwitch({
         justifyContent: "space-between",
         gap: 12 * s,
         paddingVertical: roomy ? 6 * s : 0,
-        backgroundColor: pressed ? withAlphaHex(t.pressed, 0.6) : "transparent",
+        backgroundColor: pressed ? (paper ? t.paperPressed : withAlphaHex(t.pressed, 0.6)) : "transparent",
         opacity: dim ? 0.75 : 1,
       })}
     >
       <View className="shrink" importantForAccessibility="no-hide-descendants">
-        <Text className={roomy ? "text-body font-semibold" : "text-label font-semibold"} style={{ color: t.bone }}>
+        <Text className={roomy ? "text-body font-semibold" : "text-label font-semibold"} style={{ color: paper ? t.ink : t.bone }}>
           {label}
         </Text>
         {detail ? (
-          <Text className="text-label" style={{ color: t.muted, marginTop: roomy ? 2 * s : 0 }}>
+          <Text className="text-label" style={{ color: paper ? t.inkMuted : t.muted, marginTop: roomy ? 2 * s : 0 }}>
             {detail}
           </Text>
         ) : null}
       </View>
-      <SwitchMark value={value} />
+      <SwitchMark value={value} paper={paper} />
     </Pressable>
   );
 }

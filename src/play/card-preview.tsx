@@ -21,8 +21,9 @@ import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
-import { ChromeButton } from "./sheet-paper.tsx";
+import { TextButton } from "./buttons.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
+import { cardCorner } from "./card-corner.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -137,12 +138,12 @@ export function CardPreview({
   const buttonsStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) }));
 
   const frame = (
-    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : 16 * s, overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
+    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : cardCorner(size.width, size.height), overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
       <PreviewPicture card={shown} width={size.width} height={size.height} />
     </Animated.View>
   );
   const buttons = onDetails ? (
-    <ChromeButton
+    <TextButton
       label="Details"
       testID="card-preview-details"
       tone="accent"
@@ -210,10 +211,10 @@ export function CardPreview({
                         {/* Layout and fill are styles, not classes: a class on a Pressable with a style function can be dropped on the phone. */}
                         {({ pressed }) => (
                           <View
-                            className="mt-1 flex-row items-center gap-2 rounded-tile px-2"
+                            className="mt-1 flex-row items-center gap-2 rounded-item px-2"
                             style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent", borderWidth: 1, borderColor: index === at ? t.accentLine : t.hairline }}
                           >
-                            <View style={{ width: 24 * s, height: 34 * s, borderRadius: 3 * s, overflow: "hidden", backgroundColor: t.raised }}>
+                            <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
                               {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                             </View>
                             <View className="shrink">

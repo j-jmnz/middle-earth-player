@@ -2,6 +2,7 @@
 // deck at a glance (the sphere donut and count, the cost curve, the counts by type), its notes and the jump chips to its headings.
 import { View } from "react-native";
 
+import { cardCorner } from "../play/card-corner";
 import { dropShadowOf, panelSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
@@ -53,7 +54,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
               position: "absolute",
               width: w,
               height: h,
-              borderRadius: 6 * s,
+              borderRadius: cardCorner(w, h),
               overflow: "hidden",
               backgroundColor: palette.raised,
               zIndex: centre ? 2 : 1,
@@ -91,7 +92,7 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
     { word: "Events", count: typeCount("event") },
   ];
   return (
-    <View className="flex-row items-center rounded-card" style={{ ...panelSurface(false, t), padding: 14 * s, gap: 14 * s }}>
+    <View className="flex-row items-center rounded-container" style={{ ...panelSurface(false, t), padding: 14 * s, gap: 14 * s }}>
       <View accessible accessibilityLabel={`${cardCount} of ${DECK_MINIMUM} cards. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
         <ArcRing size={64 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
           <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 26 * s, color: ready ? palette.ok : palette.bone }}>
@@ -230,7 +231,7 @@ export function DeckGlance({
 export function CostCoin({ cost }: { cost: string | null }) {
   const palette = usePalette();
   return (
-    <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: palette.raised }}>
+    <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-control" style={{ backgroundColor: palette.raised }}>
       <Text className="font-display text-label text-bone">{cost ?? "–"}</Text>
     </View>
   );

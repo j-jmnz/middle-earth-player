@@ -1,6 +1,7 @@
 // The Carved Stone surfaces (docs/design-system.md, Surfaces): floating panels lifted by shadow and a lit top edge rather than an outline,
-// the wraith-light primary, the slate secondary plate, the round glass button, the sunk track of a field or a segmented switch, the
-// silver ring and wash of what is selected, parchment, and the fades that lay text over a picture. Each is a style object from the
+// the quiet fills of a control (the wraith-light primary, the tonal secondary, the glass capsule, the tonal track of a field or a
+// segmented switch and its lighter thumb, a chip's tint), the silver ring and wash of what is selected, parchment, and the fades that lay
+// text over a picture. Each is a style object from the
 // tokens: a fill for a platform that draws no gradient, the gradient over it (`backgroundImage`, which React Native draws natively and
 // react-native-web hands to the browser), and its depth as a `boxShadow`. Colours come from the tokens (white for Light's lit edge
 // and the parchment's burnt rim are the only literals); screens and the table both read these, so src/play keeps them. Each takes the tokens of the theme in force as its last parameter (useTableTokens, or the palette's
@@ -66,48 +67,63 @@ export function rowSurface(pressed = false, t: TableTokens = dark): Surface {
 
 export const rowDepthOf = (t: TableTokens = dark) => (isLight(t) ? `0 10px 24px ${shade(t, 0.2)}` : `0 14px 30px ${shade(t, 0.85)}`);
 
-/** The sunk track of a search field, an input or a segmented switch. */
-export function sunkSurface(t: TableTokens = dark): Lifted {
-  if (isLight(t)) return { backgroundColor: withAlphaHex(t.raisedTop, 0.8), boxShadow: `inset 0 1px 3px ${shade(t, 0.25)}` };
-  return { backgroundColor: withAlphaHex(t.night, 0.82), boxShadow: `inset 0 1px 3px ${shade(t, 0.9)}` };
+/** Bone over the ground at this share: the tonal fill of the secondary button, a chip and a field or segmented track. Bone is ink on Light. */
+export const TONAL_ALPHA = 0.08;
+/** The accent tint of a chip that is on (the glow on Dark, the accent on Light) over the ground at this share. */
+export const TINT_ALPHA = 0.16;
+/** A disabled button keeps its shape and takes this opacity; the sentence beside it says why. */
+export const DISABLED_OPACITY = 0.35;
+
+/** The tonal fill: a control that sits on the ground without a plate of its own. Pressed it takes the pressed fill. */
+function tonalSurface(pressed: boolean, t: TableTokens): Surface {
+  return { backgroundColor: pressed ? t.pressed : withAlphaHex(t.bone, TONAL_ALPHA) };
 }
 
-/** The selected segment in a sunk track: a small plate lit from above. */
-export function segmentSurface(t: TableTokens = dark): Lifted {
-  if (isLight(t)) return { backgroundColor: t.raised, backgroundImage: linear(`#FFFFFF 0%, ${t.raised} 100%`), boxShadow: `0 2px 6px ${shade(t, 0.25)}` };
-  return { backgroundColor: t.raised, backgroundImage: linear(`${t.pressed} 0%, ${t.raised} 100%`), boxShadow: `0 2px 6px ${t.shade}` };
+/** The tonal track of a search field, an input or a segmented switch: flat, with no inset shadow. */
+export function sunkSurface(t: TableTokens = dark): Surface {
+  return tonalSurface(false, t);
+}
+
+/** The selected segment in a track: a flat thumb lighter than the track (the pressed fill on Dark, the lit paper on Light). */
+export function segmentSurface(t: TableTokens = dark): Surface {
+  return { backgroundColor: isLight(t) ? t.raisedTop : t.pressed };
+}
+
+/** The accent tint of a toggle chip that is on. */
+export function chipOnSurface(t: TableTokens = dark): Surface {
+  return { backgroundColor: withAlphaHex(isLight(t) ? t.accent : t.glow, TINT_ALPHA) };
+}
+
+/** A filter chip or toggle: the tonal fill off, the accent tint on. */
+export function chipSurface(on: boolean, pressed: boolean, t: TableTokens = dark): Surface {
+  return on ? chipOnSurface(t) : tonalSurface(pressed, t);
 }
 
 /**
- * The one primary action: wraith-light silver on Dark (bright at the top, falling to a green-grey foot) and elven green on Light.
- * Pressed, the press darkens it about 8% (the caller sinks it 1 pt), so the gradient is kept.
+ * The one primary action: wraith-light silver on Dark (bright at the top, falling to a green-grey foot) and elven green on Light. A flat
+ * soft vertical fill with no glow, lit edge, shadow or ring. Pressed, the press darkens it about 8% (the caller sinks it 1 pt).
  */
 export function accentSurface(pressed = false, t: TableTokens = dark): Surface & { filter?: string } {
   const look = { backgroundColor: t.primaryMid, backgroundImage: linear(`${t.primaryTop} 0%, ${t.primaryMid} ${isLight(t) ? 55 : 50}%, ${t.accentDeep} 100%`) };
   return pressed ? { ...look, filter: "brightness(0.92)" } : look;
 }
 
-/** The glow under the one primary action, and under a picked tile. */
-export const accentGlowOf = (t: TableTokens = dark) => (isLight(t) ? `0 8px 18px ${shade(t, 0.35)}` : `0 8px 18px ${shade(t, 0.8)}, 0 0 28px ${withAlphaHex(t.glow, 0.22)}`);
-/** The primary's lit top and dark foot, as inset shadows. */
-export const accentEdgeOf = (t: TableTokens = dark) => (isLight(t) ? "inset 0 1px 0 rgba(255,255,255,0.25)" : `inset 0 1px 0 #FFFFFF, inset 0 -2px 0 ${shade(t, 0.25)}, 0 0 0 1px ${t.night}`);
+/** The primary's plate: the accent surface. Its corners are the capsule's (CONTROL_RADIUS). */
+export const accentPlate = accentSurface;
 
-/** The primary's plate: the accent surface with its lit edges and, at rest and pressed alike, its shadow and glow. Square corners. */
-export function accentPlate(pressed = false, t: TableTokens = dark): Surface & { boxShadow: string; filter?: string } {
-  return { ...accentSurface(pressed, t), boxShadow: `${accentEdgeOf(t)}, ${accentGlowOf(t)}` };
+/** The secondary button and the icon plate: the tonal fill, with no shadow. */
+export function slateSurface(pressed = false, t: TableTokens = dark): Surface {
+  return tonalSurface(pressed, t);
 }
 
-/** A secondary button, an icon plate, a filled chip at rest: slate lit from above with a short shadow. */
-export function slateSurface(pressed = false, t: TableTokens = dark): Lifted {
-  const depth = isLight(t) ? `${raisedEdgeOf(t)}, 0 6px 14px ${shade(t, 0.22)}` : `inset 0 1px 0 ${withAlphaHex(t.accentHigh, 0.1)}, 0 6px 14px ${shade(t, 0.8)}`;
-  if (pressed) return { backgroundColor: t.pressed, boxShadow: depth };
-  return { backgroundColor: t.raised, backgroundImage: linear(`${t.raisedTop} 0%, ${isLight(t) ? t.dusk : t.raised} 100%`), boxShadow: depth };
+/** The glass button (Back, the gear, the menu) and its capsule (History, Manage): a dark or a pale fill over whatever lies under it, with no shadow. */
+export function glassSurface(pressed = false, t: TableTokens = dark): Surface {
+  return { backgroundColor: pressed ? t.pressed : withAlphaHex(isLight(t) ? t.raisedTop : t.dusk, isLight(t) ? 0.7 : 0.62) };
 }
 
-/** The round glass button (Back, the gear, the menu): a dark or a pale disc over whatever lies under it, with a soft shadow. */
-export function glassSurface(pressed = false, t: TableTokens = dark): Lifted {
-  if (isLight(t)) return { backgroundColor: pressed ? t.pressed : withAlphaHex(t.raisedTop, 0.7), boxShadow: `0 6px 16px ${shade(t, 0.25)}` };
-  return { backgroundColor: pressed ? t.pressed : withAlphaHex(t.dusk, 0.62), boxShadow: `0 6px 16px ${t.shade}` };
+/** A text button: no fill, and the pressed fill (a capsule) while it is held. */
+export function textSurface(pressed = false, t: TableTokens = dark): Surface {
+  return { backgroundColor: pressed ? t.pressed : "transparent" };
 }
 
 /** The silver ring and glow of the selected item (a tile, a card, a cover), as a shadow so it moves nothing. */

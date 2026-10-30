@@ -40,7 +40,7 @@ export function CountStepper({
   const t = useTableTokens();
   const pressedNight = usePressedNight();
   return (
-    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: dropShadowOf(t, 6, 14, 0.85) }}>
+    <View className="flex-row items-center rounded-control" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: dropShadowOf(t, 6, 14, 0.85) }}>
       {minus ? (
         <Pressable
           testID={ids.dec}
@@ -48,7 +48,7 @@ export function CountStepper({
           accessibilityRole="button"
           accessibilityLabel={count <= 1 ? `Remove ${name}` : `Remove a copy of ${name}`}
           onPress={() => onChange(-1)}
-          className="min-h-touch min-w-touch items-center justify-center rounded-tile"
+          className="min-h-touch min-w-touch items-center justify-center rounded-control"
           style={({ pressed }) => (pressed ? pressedNight : undefined)}
         >
           <Text className="text-title text-muted">−</Text>
@@ -70,7 +70,7 @@ export function CountStepper({
         accessibilityLabel={`Add ${count > 0 ? "a copy of " : ""}${name}`}
         accessibilityState={{ disabled: full }}
         onPress={() => onChange(1)}
-        className="min-h-touch min-w-touch items-center justify-center rounded-tile"
+        className="min-h-touch min-w-touch items-center justify-center rounded-control"
         style={({ pressed }) => (pressed ? pressedNight : undefined)}
       >
         <Text className={`text-title ${full ? "text-faint" : "text-bone"}`}>+</Text>

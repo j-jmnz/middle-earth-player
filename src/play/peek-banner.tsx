@@ -51,7 +51,7 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
             accessibilityLabel={words.back}
             hitSlop={{ top: slop, bottom: slop }}
             onPress={onBack}
-            className="h-9 shrink-0 items-center justify-center rounded-pill px-3"
+            className="h-9 shrink-0 items-center justify-center rounded-control px-3"
             style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
           >
             <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">

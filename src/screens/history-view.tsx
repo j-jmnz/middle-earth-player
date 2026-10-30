@@ -45,7 +45,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
     <View className="pb-3">
       <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
         {({ pressed }) => (
-          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={rowSurface(pressed, t)}>
+          <View className="min-h-14 flex-row items-center rounded-item px-4 py-3.5" style={rowSurface(pressed, t)}>
             <View className="flex-1">
               <View className="flex-row items-start justify-between gap-2">
                 <View className="flex-1">

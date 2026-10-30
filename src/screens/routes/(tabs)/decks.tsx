@@ -1,9 +1,9 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import { AccessibilityInfo, Pressable, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
 
-import { BodyText, HubHeader, PillButton, Screen, TextButton } from "../../chrome";
+import { BodyText, HubHeader, IconButton, PillButton, Screen, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, newDeckName, notAppliedLine } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
@@ -19,10 +19,7 @@ import {
 } from "../../starter-decks";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
-import { accentPlate } from "../../../play/surfaces";
-import { Text } from "../../../play/text";
-import { touch, useUiScale } from "../../../play/ui-scale";
-import { useTableTokens } from "../../../play/use-table-tokens";
+import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
 
 type Row =
@@ -105,22 +102,6 @@ function DeckActions({
         <TextButton label="Delete" testID={`deck-delete-${deck.id}`} tone="danger" accessibilityLabel={`Delete ${deck.name}`} onPress={() => onAsk("delete")} />
       )}
     </View>
-  );
-}
-
-/** New deck: a 44 pt square of the primary's silver with a + on it. */
-function NewDeckButton({ onPress }: { onPress: () => void }) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  const box = touch(s, 44);
-  return (
-    <Pressable testID="deck-new" collapsable={false} accessibilityRole="button" accessibilityLabel="New deck" onPress={onPress}>
-      {({ pressed }) => (
-        <View className="items-center justify-center rounded-button" style={{ width: box, height: box, ...accentPlate(pressed, t), transform: [{ translateY: pressed ? 1 : 0 }] }}>
-          <Text style={{ color: t.onAccent, fontSize: 24 * s, lineHeight: 26 * s, fontWeight: "600" }}>+</Text>
-        </View>
-      )}
-    </Pressable>
   );
 }
 
@@ -286,13 +267,13 @@ export default function Decks() {
   const filters =
     saved.length > 0 ? <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={saved.length} /> : null;
 
-  // The title with the list's own actions beside it: Import, Manage and New deck (+, a small primary), so the decks start high.
+  // The title with the list's own actions beside it: Import and Manage (glass capsules) and New deck (+, a round glass button), so the decks start high.
   const header = (
     <View>
       <HubHeader title="Decks">
         {seed !== "pending" ? (
           <>
-            <TextButton testID="deck-import" label="Import" tone="muted" accessibilityLabel="Import a deck" onPress={() => router.push("/deck-import")} />
+            <PillButton testID="deck-import" label="Import" accessibilityLabel="Import a deck" onPress={() => router.push("/deck-import")} />
             {saved.length > 0 ? (
               <PillButton
                 testID="decks-manage"
@@ -304,7 +285,7 @@ export default function Decks() {
                 }}
               />
             ) : null}
-            <NewDeckButton onPress={newDeck} />
+            <IconButton testID="deck-new" label="New deck" glyph="+" onPress={newDeck} />
           </>
         ) : null}
       </HubHeader>

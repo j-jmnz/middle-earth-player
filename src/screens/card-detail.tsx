@@ -146,7 +146,7 @@ function Stat({ label, value, icon }: { label: string; value: string; icon: Icon
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-14 flex-1 items-center rounded-tile px-1.5 py-2" style={tileSurface(false, t)}>
+    <View accessible accessibilityLabel={`${label} ${value}`} className="min-w-14 flex-1 items-center rounded-item px-1.5 py-2" style={tileSurface(false, t)}>
       <View className="flex-row items-center gap-1">
         <GameIcon name={icon} size={15 * s} tint="muted" />
         <Text className="font-display text-bone" style={{ fontSize: 22 * s, lineHeight: 27 * s }}>
@@ -263,7 +263,7 @@ export function DeckUse({ code }: { code: string }) {
   return (
     <Pressable testID="card-decks" accessibilityRole="button" accessibilityLabel={`In ${names.length} ${names.length === 1 ? "deck" : "decks"}: ${names.join(", ")}`} onPress={() => router.navigate("/decks")}>
       {({ pressed }) => (
-        <View className="mt-4 flex-row items-center gap-3 rounded-tile px-3.5" style={{ minHeight: 48 * s, ...rowSurface(pressed, t) }}>
+        <View className="mt-4 flex-row items-center gap-3 rounded-item px-3.5" style={{ minHeight: 48 * s, ...rowSurface(pressed, t) }}>
           <Text className="min-w-0 flex-1 text-label text-muted" numberOfLines={1}>
             {`In ${names.length} ${names.length === 1 ? "deck" : "decks"} · ${names.join(", ")}`}
           </Text>

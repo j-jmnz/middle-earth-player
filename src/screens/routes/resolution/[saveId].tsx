@@ -12,7 +12,7 @@ import { gameReport } from "../../../campaign/report";
 import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
 import { scoreParts, scoreTotal } from "../../../campaign/score";
-import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, SecondaryButton, TextButton, TwoPane } from "../../chrome";
+import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, TextButton, TwoPane } from "../../chrome";
 import { selectedRingOf, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { campaignOf, scenarioName } from "../../campaign-data";
@@ -46,7 +46,7 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
     >
       {({ pressed }) => (
         <View
-          className="min-h-14 items-center rounded-card p-3"
+          className="min-h-14 items-center rounded-item p-3"
           style={{ ...tileSurface(pressed, t), ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
         >
           {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72 * s} height={100 * s} /> : null}
@@ -110,7 +110,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           ) : null}
         </ScreenScroll>
         <ActionBar>
-          <SecondaryButton label="Back to path" testID="resolution-back" onPress={close} />
+          <PrimaryButton label="Back to path" testID="resolution-back" onPress={close} />
         </ActionBar>
       </Screen>
     );

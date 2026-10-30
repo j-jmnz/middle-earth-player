@@ -29,7 +29,7 @@ function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
   const s = useUiScale();
   return (
     <View
-      className="flex-row items-center rounded-chip px-2"
+      className="flex-row items-center rounded-control px-2"
       style={{ backgroundColor: mark.danger ? t.threatEdge : withAlphaHex(t.bone, 0.08), minHeight: 24 * s }}
     >
       <IconValue name={mark.icon} value={String(mark.value)} word={mark.danger ? "Destroying damage" : "Damage"} tint="bone" size={14 * s} textClass="font-display text-label text-bone" />

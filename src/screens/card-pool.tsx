@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
-import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, ToggleChip, sphereWord } from "./chrome";
+import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip, sphereWord } from "./chrome";
 import { draftAddRefused, draftCopyCount, useDeckDraft, type TitleLookup } from "./deck-draft";
 import { deckCardCount, deckCountLine, DECK_MINIMUM } from "./deck-status";
 import { useDatabases } from "./databases";
@@ -21,7 +21,7 @@ import { ToastView } from "./toast-view";
 import { gutter } from "../play/size-class";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
-import { rowSurface, segmentSurface, slateSurface } from "../play/surfaces";
+import { chipSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
@@ -64,7 +64,6 @@ function TypeChips({
   request: PoolTypeRequest | null;
 }) {
   const palette = usePalette();
-  const t = useTableTokens();
   const row = useRef<ComponentRef<typeof ScrollView>>(null);
   const chipX = useRef(new Map<string, number>());
   useEffect(() => {
@@ -75,19 +74,15 @@ function TypeChips({
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView ref={row} horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
-      {/* A switch, not a type: an outlined plate with a check when on, and a hairline after it before the type chips. */}
-      <Pressable
+      {/* A switch, not a type: a chip with a check when on, and a hairline after it before the type chips. */}
+      <ToggleChip
         testID="pool-applied-only"
-        accessibilityRole="switch"
-        accessibilityState={{ checked: applied }}
+        asSwitch
+        selected={applied}
+        label={applied ? "✓ Applied only" : "Applied only"}
         accessibilityLabel="Applied only: cards whose text the app applies"
         onPress={() => onApplied(!applied)}
-        className="min-h-touch justify-center"
-      >
-        <View className="h-9 justify-center rounded-tile px-3" style={applied ? { ...segmentSurface(t), boxShadow: `inset 0 -2px 0 ${palette.accentHigh}` } : rowSurface(false, t)}>
-          <Text className={applied ? "text-label font-semibold text-accent" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
-        </View>
-      </Pressable>
+      />
       <View className="my-3 w-px" style={{ backgroundColor: withAlphaHex(palette.bone, 0.12) }} />
       {options.map((option) => (
         <ToggleChip
@@ -103,8 +98,8 @@ function TypeChips({
   );
 }
 
-// The five sphere toggles under the search: a 44 pt plate each, the sphere's printed icon in its colour with a glow and a bar along
-// the plate's foot when on, grey when off. A second tap turns a sphere off again.
+// The five sphere toggles under the search: a 44 pt capsule each, the sphere's printed icon in its colour with a glow on a wash of that
+// colour when on, grey on the tonal fill when off. A second tap turns a sphere off again.
 const SPHERES = ["leadership", "tactics", "spirit", "lore", "neutral"] as const;
 
 function SphereToggles({ value, onChange }: { value: string | null; onChange: (next: string | null) => void }) {
@@ -129,8 +124,8 @@ function SphereToggles({ value, onChange }: { value: string | null; onChange: (n
           >
             {({ pressed }) => (
               <View
-                className="items-center justify-center rounded-tile"
-                style={{ width: box, height: box, ...(on ? { ...segmentSurface(t), boxShadow: `inset 0 -2px 0 ${color}, 0 0 14px ${withAlphaHex(color, 0.35)}` } : rowSurface(pressed, t)) }}
+                className="items-center justify-center rounded-control"
+                style={{ width: box, height: box, ...(on ? { backgroundColor: withAlphaHex(color, 0.22) } : chipSurface(false, pressed, t)) }}
               >
                 <View style={on ? { filter: `drop-shadow(0 0 5px ${withAlphaHex(color, 0.8)})` } : undefined}>
                   <GameIcon name={sphere} size={20 * s} tint={on ? tint : "faint"} />
@@ -339,26 +334,16 @@ export function CardPoolBody({
 /** Filter, with a round count of the filters on beside the word. */
 function FilterButton({ count, onPress }: { count: number; onPress: () => void }) {
   const palette = usePalette();
-  const t = useTableTokens();
   const s = useUiScale();
-  return (
-    <Pressable testID="pool-filter" collapsable={false} accessibilityRole="button" accessibilityLabel={count > 0 ? `Filter, ${count} on` : "Filter"} onPress={onPress}>
-      {({ pressed }) => (
-        <View className="flex-row items-center rounded-tile px-3.5" style={{ minHeight: touch(s, 44), gap: 8 * s, ...slateSurface(pressed, t) }}>
-          <Text className="text-body" style={{ color: palette.muted }}>
-            Filter
-          </Text>
-          {count > 0 ? (
-            <View className="items-center justify-center rounded-pill" style={{ minWidth: 20 * s, height: 20 * s, paddingHorizontal: 5 * s, backgroundColor: palette.accent }}>
-              <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.onAccent }}>
-                {String(count)}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      )}
-    </Pressable>
-  );
+  const badge =
+    count > 0 ? (
+      <View className="items-center justify-center rounded-control" style={{ minWidth: 20 * s, height: 20 * s, paddingHorizontal: 5 * s, backgroundColor: palette.accent }}>
+        <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.onAccent }}>
+          {String(count)}
+        </Text>
+      </View>
+    ) : null;
+  return <SecondaryButton testID="pool-filter" label="Filter" accessibilityLabel={count > 0 ? `Filter, ${count} on` : "Filter"} trailing={badge} onPress={onPress} />;
 }
 
 // The pool on its own route: the Cards tab, or the pool the deck editor pushes on a phone. `header` is the screen's top: the tab's

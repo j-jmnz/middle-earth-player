@@ -1,0 +1,232 @@
+// The three word buttons of the chrome (docs/design-system.md, Components): the primary, the secondary and the text button. They live in
+// src/play because the table's dock, its sheets and its settings panel draw them too and src/play cannot import src/screens;
+// chrome-buttons.tsx re-exports them. The glass button (round icon, capsule for a word) is IconButton / PillButton there, on
+// `glassSurface`. Every button is a capsule and draws no glow, lit edge, shadow or ring: depth is tone alone. A press darkens the
+// primary about 8% and sinks it 1 pt, and fills the others. A disabled button keeps its shape at DISABLED_OPACITY, and the sentence
+// beside it says why. Every fill and text colour is a style, not only a class: on the phone a class on a Pressable whose style is a
+// function can be dropped (user report, 2026-10-25), so the pressed state comes from the Pressable's children.
+import { Pressable, View } from "react-native";
+import type { ReactNode } from "react";
+
+import { GameIcon } from "./game-icon.tsx";
+import type { IconName } from "./icon-map.ts";
+import { CONTROL_RADIUS } from "./radius.ts";
+import { accentPlate, DISABLED_OPACITY, slateSurface, textSurface } from "./surfaces.ts";
+import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
+import { useTableTokens } from "./use-table-tokens.ts";
+import { Text } from "./text.tsx";
+
+/**
+ * The one filled action on a screen: wraith-light silver on Dark, elven green on Light, a capsule 52 pt tall (`compact` 44, `dock` 46:
+ * the table's command column), its word in Marcellus SC 17 tracked 1.2. A press darkens it about 8% and sinks it 1 pt. On paper it is an
+ * ink capsule. Disabled is the same shape at 35%; the sentence near it says why.
+ */
+export function PrimaryButton({
+  label,
+  onPress,
+  testID,
+  disabled = false,
+  surface = "night",
+  accessibilityLabel,
+  accessibilityHint,
+  compact = false,
+  dock = false,
+}: {
+  label: string;
+  onPress: () => void;
+  testID: string;
+  disabled?: boolean;
+  surface?: "night" | "paper";
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  // 44 pt: a tray's foot, a short phone's dock.
+  compact?: boolean;
+  // The table's command column: 46 pt, and a long word takes a second line rather than shrinking.
+  dock?: boolean;
+}) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const paper = surface === "paper";
+  const fill = (pressed: boolean) => (paper ? { backgroundColor: t.ink, opacity: pressed && !disabled ? 0.85 : 1 } : accentPlate(pressed && !disabled, t));
+  return (
+    <Pressable
+      testID={testID}
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+    >
+      {({ pressed }) => (
+        <View
+          className="items-center justify-center rounded-control px-5"
+          style={{
+            minHeight: touch(s, compact ? 44 : dock ? 46 : 52),
+            ...fill(pressed),
+            ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+            transform: [{ translateY: pressed && !disabled ? 1 : 0 }],
+          }}
+        >
+          <Text
+            numberOfLines={dock ? 2 : undefined}
+            className="font-display text-center"
+            style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
+          >
+            {label}
+          </Text>
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
+/**
+ * A button for the actions beside the primary (Path, Log, Change, Add cards, the dock's other answers): a capsule 44 pt tall on the
+ * tonal fill, its word in Marcellus SC 15 in the accent, an optional printed icon before it and `trailing` (a count badge) after.
+ * `tone` colours the word: danger for a loss. `tight` is a short phone's dock: a 36 pt capsule in a 40 pt row, its 44 pt target kept by a
+ * vertical hit slop.
+ */
+export function SecondaryButton({
+  label,
+  onPress,
+  testID,
+  icon,
+  trailing,
+  tone = "accent",
+  tight = false,
+  accessibilityLabel,
+  accessibilityHint,
+  disabled = false,
+}: {
+  label: string;
+  onPress: () => void;
+  testID: string;
+  icon?: IconName;
+  trailing?: ReactNode;
+  tone?: "bone" | "accent" | "danger";
+  tight?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  disabled?: boolean;
+}) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const color = tone === "danger" ? t.danger : tone === "bone" ? t.bone : t.accent;
+  const row = tight ? 40 * s : touch(s, 44);
+  const slop = touchSlop(s, row);
+  return (
+    <Pressable
+      testID={testID}
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={tight ? { top: slop, bottom: slop } : undefined}
+      style={{ minHeight: row, justifyContent: "center" }}
+    >
+      {({ pressed }) => (
+        <View
+          className="flex-row items-center justify-center gap-2 rounded-control"
+          style={{
+            minHeight: tight ? 36 * s : touch(s, 44),
+            minWidth: touch(s, 44),
+            paddingHorizontal: 18 * s,
+            ...slateSurface(pressed && !disabled, t),
+            ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+          }}
+        >
+          {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "danger" ? "danger" : tone === "bone" ? "bone" : "accent"} /> : null}
+          <Text className="font-display" style={{ fontSize: 15 * s, lineHeight: 19 * s, letterSpacing: 1 * s, color }}>
+            {label}
+          </Text>
+          {trailing}
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
+/**
+ * Words with no fill: the accent by default, a capsule fill while pressed, a 44 pt target. `tone` colours the word (ink on paper, danger
+ * for an action that cannot be undone, muted for a reading aid); `small` sets it in label type (the dock's reading aids); `tight` is a
+ * short phone's dock, a 40 pt row with a vertical hit slop that makes up the 44.
+ */
+export function TextButton({
+  label,
+  onPress,
+  testID,
+  tone = "bone",
+  accessibilityLabel,
+  accessibilityHint,
+  selected,
+  expanded,
+  icon,
+  disabled = false,
+  small = false,
+  tight = false,
+}: {
+  label: string;
+  onPress: () => void;
+  testID: string;
+  tone?: "bone" | "accent" | "ink" | "danger" | "muted";
+  // A printed icon before the word, in the word's colour (Full path, Campaign log, New playthrough on Campaigns).
+  icon?: IconName;
+  // What a screen reader says when the visible word is not enough alone ("Booklet" opens the campaign book).
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  // Set for a text option in a radio group (the No boon decline): the button is a radio with this selected state.
+  selected?: boolean;
+  // Set for a button that shows and hides a group (Archived · n): a screen reader hears whether it is open.
+  expanded?: boolean;
+  disabled?: boolean;
+  small?: boolean;
+  tight?: boolean;
+}) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const color = tone === "accent" ? t.accent : tone === "ink" ? t.inkLabel : tone === "danger" ? t.danger : tone === "muted" ? t.muted : t.bone;
+  const row = tight ? 40 * s : touch(s, 44);
+  const slop = touchSlop(s, row);
+  // The state a screen reader hears: selected for a radio, expanded for a toggle of a group, disabled when it waits.
+  const state = selected == null && expanded == null && !disabled ? null : { ...(selected == null ? {} : { selected }), ...(expanded == null ? {} : { expanded }), ...(disabled ? { disabled } : {}) };
+  const word = (
+    <Text className={`${small ? "text-label" : "text-body"} font-medium`} style={{ color }}>
+      {label}
+    </Text>
+  );
+  return (
+    <Pressable
+      testID={testID}
+      collapsable={false}
+      accessibilityRole={selected == null ? "button" : "radio"}
+      {...(state ? { accessibilityState: state } : {})}
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
+      disabled={disabled}
+      onPress={onPress}
+      hitSlop={tight ? { top: slop, bottom: slop } : undefined}
+      className="items-center justify-center px-3"
+      style={({ pressed }) => ({
+        minHeight: row,
+        minWidth: touch(s, 44),
+        borderRadius: CONTROL_RADIUS,
+        ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+        ...(tone === "ink" ? { backgroundColor: pressed && !disabled ? t.paperPressed : "transparent" } : textSurface(pressed && !disabled, t)),
+      })}
+    >
+      {icon ? (
+        <View className="flex-row items-center gap-2">
+          <GameIcon name={icon} size={16 * s} tint={tone === "ink" ? "inkLabel" : tone} />
+          {word}
+        </View>
+      ) : (
+        word
+      )}
+    </Pressable>
+  );
+}

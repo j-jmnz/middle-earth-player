@@ -11,6 +11,7 @@ import { STOP_AHEAD_WORDS } from "./carousel.ts";
 import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { CONTROL_RADIUS } from "./radius.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { ROUND_PHASES, type Rail } from "./rail.ts";
@@ -121,7 +122,7 @@ export function PhaseRail({
         alignItems: "center",
         justifyContent: "center",
         minHeight: touch(s, 44),
-        borderRadius: 10 * s,
+        borderRadius: CONTROL_RADIUS,
         backgroundColor: pressed || open ? withAlphaHex(t.bone, 0.08) : "transparent",
       })}
     >
@@ -138,7 +139,7 @@ export function PhaseRail({
           {rail.phase ? (
             // iOS tracks after the last letter too; Android splits the tracking round each letter.
             <View style={{ paddingLeft: (STOP_MARK + (Platform.OS === "ios" ? 4 : 0)) * s, paddingRight: STOP_MARK * s }}>
-              <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: 12 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
+              <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: CONTROL_RADIUS, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
               <Text
                 testID="rail-phase"
                 numberOfLines={1}

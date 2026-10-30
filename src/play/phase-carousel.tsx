@@ -15,6 +15,7 @@ import { useOpenMotion, useReduceMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
 import type { TableSettings } from "./table-settings.ts";
+import { CONTAINER_RADIUS, CONTROL_RADIUS } from "./radius.ts";
 import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
@@ -40,7 +41,7 @@ function RoundTrack({ phases, index }: { phases: Carousel["phases"]; index: numb
           style={{
             flex: 1,
             height: (at === index ? 5 : 3) * s,
-            borderRadius: 3 * s,
+            borderRadius: CONTROL_RADIUS,
             backgroundColor: phase.state === "current" ? t.accent : phase.state === "past" ? t.accentDeep : t.hairline,
           }}
         />
@@ -241,7 +242,7 @@ export function PhaseCarousel({
             left: left + INSET * s,
             width: inner,
             height: height - (INSET * s) / 2,
-            borderRadius: 18 * s,
+            borderRadius: CONTAINER_RADIUS * s,
             ...tileSurface(false, t),
             boxShadow: `${raisedEdgeOf(t)}, 0 10px 28px ${withAlphaHex(t.night, 0.6)}`,
             overflow: "hidden",

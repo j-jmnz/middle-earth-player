@@ -6,6 +6,7 @@ import { ScrollView, View } from "react-native";
 import type { CarouselPhase, CarouselStep } from "./carousel.ts";
 import { toggleStop, type TableSettings } from "./table-settings.ts";
 import { SettingSwitch } from "./setting-switch.tsx";
+import { CONTAINER_RADIUS, ITEM_RADIUS } from "./radius.ts";
 import { accentSurface, panelSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
@@ -83,7 +84,7 @@ function StepBlock({
         style={{
           flex: 1,
           marginBottom: last ? 0 : 6 * s,
-          borderRadius: 10 * s,
+          borderRadius: ITEM_RADIUS * s,
           paddingHorizontal: now ? 8 * s : 0,
           paddingVertical: (now ? 6 : 1) * s,
           marginLeft: now ? -4 * s : 0,
@@ -145,7 +146,7 @@ export function PhaseCard({
       testID={`carousel-phase-${phase.id}`}
       style={{
         width,
-        borderRadius: 14 * s,
+        borderRadius: CONTAINER_RADIUS * s,
         borderWidth: 1,
         borderColor: current ? t.accentLine : t.hairline,
         ...(current ? panelSurface(false, t) : { backgroundColor: withAlphaHex(t.night, 0.35) }),

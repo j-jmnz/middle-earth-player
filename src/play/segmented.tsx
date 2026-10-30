@@ -1,4 +1,4 @@
-// The segmented switch (docs/design-system.md, Components): two or three words in a sunk track with no edge. It lives in src/play, in the table
+// The segmented switch (docs/design-system.md, Components): two or three words in a tonal capsule track with no edge. It lives in src/play, in the table
 // tokens, because the table's settings panel uses it too and src/play cannot import src/screens; chrome-buttons.tsx re-exports it.
 import { Pressable, View } from "react-native";
 
@@ -7,7 +7,7 @@ import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
-/** Two or three mutually exclusive words in a sunk track. Selected is a small plate lit from above, its word semibold in bone. */
+/** Two or three mutually exclusive words in a tonal capsule track. Selected is a lighter capsule thumb, its word semibold in bone. */
 export function Segmented<T extends string>({
   options,
   value,
@@ -36,7 +36,7 @@ export function Segmented<T extends string>({
   // The compact button is 32 pt tall (min-h-8) times the scale; a vertical slop makes up a 44 pt target at every scale.
   const slop = touchSlop(s, 32 * s);
   return (
-    <View accessibilityRole="radiogroup" accessibilityLabel={accessibilityLabel} className={`flex-row rounded-tile ${compact ? "p-0.5" : "p-1"} ${stretch ? "" : "self-start"}`} style={sunkSurface(t)}>
+    <View accessibilityRole="radiogroup" accessibilityLabel={accessibilityLabel} className={`flex-row rounded-control ${compact ? "p-0.5" : "p-1"} ${stretch ? "" : "self-start"}`} style={sunkSurface(t)}>
       {options.map((option) => {
         const selected = option === value;
         return (
@@ -47,7 +47,7 @@ export function Segmented<T extends string>({
             accessibilityState={{ selected, checked: selected }}
             onPress={() => onChange(option)}
             hitSlop={compact ? { top: slop, bottom: slop } : undefined}
-            className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
+            className={`items-center justify-center rounded-control ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
             style={selected ? segmentSurface(t) : undefined}
           >
             <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>

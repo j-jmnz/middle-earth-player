@@ -11,6 +11,7 @@ import type { DeckSectionRow } from "./deck-status";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { usePalette } from "./palette-hook";
 import { SectionHeading } from "../play/section-heading";
+import { cardCorner } from "../play/card-corner";
 import { dropShadowOf } from "../play/surfaces";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
@@ -113,7 +114,7 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
   const height = Math.round(width * 1.4);
   return (
     <View style={{ width, marginBottom: 30 * s }}>
-      {card.count > 1 ? <View pointerEvents="none" style={{ position: "absolute", left: 4 * s, top: 4 * s, width, height, borderRadius: 4, backgroundColor: palette.raised, boxShadow: dropShadowOf(t, 4, 10, 0.8) }} /> : null}
+      {card.count > 1 ? <View pointerEvents="none" style={{ position: "absolute", left: 4 * s, top: 4 * s, width, height, borderRadius: cardCorner(width, height), backgroundColor: palette.raised, boxShadow: dropShadowOf(t, 4, 10, 0.8) }} /> : null}
       <Pressable
         testID={`deck-card-${card.code}`}
         collapsable={false}
@@ -125,10 +126,10 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
         delayLongPress={350}
       >
         {({ pressed }) => (
-          <View style={{ width, height, borderRadius: 4, overflow: "hidden", opacity: pressed ? 0.8 : 1, backgroundColor: palette.raised, boxShadow: dropShadowOf(t, 8, 18, 0.85) }}>
+          <View style={{ width, height, borderRadius: cardCorner(width, height), overflow: "hidden", opacity: pressed ? 0.8 : 1, backgroundColor: palette.raised, boxShadow: dropShadowOf(t, 8, 18, 0.85) }}>
             <CardThumb code={card.code} imagesrc={card.imagesrc} width={width} height={height} />
             {loss ? (
-              <View className="absolute left-1 right-1 rounded px-1 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+              <View className="absolute left-1 right-1 rounded-control px-1 py-0.5" style={{ top: 4 * s, backgroundColor: withAlphaHex(palette.night, 0.82) }}>
                 <Text className="text-center text-micro text-muted" numberOfLines={1}>
                   {loss}
                 </Text>

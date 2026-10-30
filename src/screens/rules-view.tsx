@@ -48,7 +48,7 @@ function BookCovers({ cover }: { cover: string }) {
           className={cover}
         >
           {({ pressed }) => (
-            <View className="overflow-hidden rounded-card" style={{ height: 150 * s, ...tileSurface(pressed, t) }}>
+            <View className="overflow-hidden rounded-item" style={{ height: 150 * s, ...tileSurface(pressed, t) }}>
               {BOOK_SCENE[book.id] ? <SceneArt scenarioId={BOOK_SCENE[book.id]} height={150 * s} fade={0.25} fadeTo={palette.dusk} /> : null}
               <View className="absolute bottom-0 left-0 right-0 top-0 justify-between p-3">
                 <View style={{ filter: `drop-shadow(0 0 6px ${withAlphaHex(palette.glow, 0.7)})` }}>

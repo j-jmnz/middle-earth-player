@@ -1,12 +1,12 @@
 import { FlashList } from "@shopify/flash-list";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Switch, useWindowDimensions, View } from "react-native";
+import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { traitTokens } from "../catalog/deck-save";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
 import { useReduceMotion } from "../play/motion-run";
-import { PaperSheet, PrimaryButton, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
+import { PaperSheet, PrimaryButton, SettingSwitch, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { SheetModal } from "./sheet-modal";
 import {
@@ -18,6 +18,7 @@ import {
   type PoolCard,
   type PoolFilter,
 } from "./pool-filter";
+import { withAlphaHex } from "../play/tokens";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
@@ -139,8 +140,8 @@ function Chip({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
-      className="mb-2 mr-2 min-h-touch flex-row items-center gap-2 rounded-tile px-3"
-      style={selected ? { backgroundColor: palette.ink } : { borderWidth: 1, borderColor: palette.inkLine }}
+      className="mb-2 mr-2 min-h-touch flex-row items-center gap-2 rounded-control px-4"
+      style={{ backgroundColor: selected ? palette.ink : withAlphaHex(palette.ink, 0.08) }}
     >
       {mark ? <SphereMark sphere={mark} /> : null}
       <Text className={selected ? "text-body font-semibold text-paper" : "text-body text-ink"}>{label}</Text>
@@ -187,7 +188,6 @@ function FilterBody({
   onChange: (next: PoolFilter) => void;
   onChoose: (chooser: "pack" | "trait" | "cost") => void;
 }) {
-  const palette = usePalette();
   return (
     <View>
       <Text className="mb-2 text-label text-inkLabel">Sphere</Text>
@@ -206,24 +206,8 @@ function FilterBody({
       <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
       <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
       <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
-      <View className="min-h-14 flex-row items-center justify-between border-b border-inkLine/25">
-        <Text className="text-body text-ink">Unique</Text>
-        <Switch
-          value={filter.unique}
-          onValueChange={(unique) => onChange({ ...filter, unique })}
-          trackColor={{ false: palette.hairline, true: palette.accent }}
-          ios_backgroundColor={palette.hairline}
-        />
-      </View>
-      <View className="min-h-14 flex-row items-center justify-between">
-        <Text className="text-body text-ink">Active text</Text>
-        <Switch
-          value={filter.activeText}
-          onValueChange={(activeText) => onChange({ ...filter, activeText })}
-          trackColor={{ false: palette.hairline, true: palette.accent }}
-          ios_backgroundColor={palette.hairline}
-        />
-      </View>
+      <SettingSwitch surface="paper" roomy label="Unique" value={filter.unique} onChange={(unique) => onChange({ ...filter, unique })} testID="pool-unique" />
+      <SettingSwitch surface="paper" roomy label="Active text" value={filter.activeText} onChange={(activeText) => onChange({ ...filter, activeText })} testID="pool-active-text" />
     </View>
   );
 }

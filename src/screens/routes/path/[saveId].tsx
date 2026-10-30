@@ -47,7 +47,7 @@ function WonRow({ node, rounds, rewards, onReplay }: { node: PathNode; rounds: n
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View className="flex-row items-center gap-3 rounded-tile px-3 py-2.5" style={rowSurface(false, t)} accessible={false}>
+    <View className="flex-row items-center gap-3 rounded-item px-3 py-2.5" style={rowSurface(false, t)} accessible={false}>
       <View style={{ width: 22 * s, height: 22 * s, transform: [{ rotate: "45deg" }], backgroundColor: palette.accent, alignItems: "center", justifyContent: "center" }}>
         <Text style={{ color: palette.onAccent, fontSize: 12 * s, fontWeight: "700", transform: [{ rotate: "-45deg" }] }}>{"✓"}</Text>
       </View>
@@ -157,7 +157,7 @@ export default function CampaignPath() {
     </View>
   );
   const poolLine = (
-    <View className="mt-3 rounded-tile px-3.5 py-2.5" style={rowSurface(false, t)}>
+    <View className="mt-3 rounded-item px-3.5 py-2.5" style={rowSurface(false, t)}>
       <Eyebrow>Pool</Eyebrow>
       <Text testID="pool" className="mt-0.5 text-label text-bone">
         {poolText}
@@ -167,7 +167,7 @@ export default function CampaignPath() {
   // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
   const logButton = (
     <View className="mt-3">
-      <SecondaryButton label="Campaign log" testID="log-open" compact onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
+      <SecondaryButton label="Campaign log" testID="log-open" onPress={() => router.push({ pathname: "/log/[saveId]", params: { saveId: save.id } })} />
     </View>
   );
   const pickedNode = picked ? (nodes.find((node) => node.id === picked && node.status === "completed") ?? null) : null;

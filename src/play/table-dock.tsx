@@ -26,7 +26,7 @@ export function ReadoutView({ readout, surface = "night", tight = false, oneLine
   return (
     <View
       testID={`readout-${readout.kind}`}
-      className={`rounded-tile px-2 ${tight ? "py-0.5" : "py-1.5"} ${paper ? "border border-inkLine" : ""}`}
+      className={`rounded-item px-2 ${tight ? "py-0.5" : "py-1.5"} ${paper ? "border border-inkLine" : ""}`}
       style={paper ? undefined : { backgroundColor: withAlphaHex(t.night, 0.5) }}
     >
       <View className="flex-row items-center justify-center gap-2">
@@ -130,7 +130,7 @@ export function TableDock({
       hitSlop={{ top: touchSlop(s, 24 * s), bottom: touchSlop(s, 24 * s), left: 6 * s, right: 12 * s }}
       onPress={() => pillRef.current?.measureInWindow((_x, y) => onLines?.(Math.round(y)))}
     >
-      <View className="h-6 w-6 items-center justify-center rounded-pill" style={{ backgroundColor: withAlphaHex(t.bone, 0.1) }}>
+      <View className="h-6 w-6 items-center justify-center rounded-control" style={{ backgroundColor: withAlphaHex(t.bone, 0.1) }}>
         <Text className="text-label font-semibold" style={{ color: t.bone }}>
           i
         </Text>
@@ -144,7 +144,7 @@ export function TableDock({
           as its upper part (tray-frame.tsx): the words are not drawn and the dock's top corners are square, so the two read as one. */}
       <View
         testID="dock"
-        className="rounded-card px-3"
+        className="rounded-container px-3"
         style={{
           ...panelSurface(false, t),
           boxShadow: trayOpen ? dockShadow : panelSurface(false, t).boxShadow,

@@ -13,7 +13,7 @@ import { MORE_ID } from "./dock-extras.ts";
 import { tickArmed } from "./haptics.ts";
 import { armBarEasing, useMotionScale } from "./motion-run.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
+import { PrimaryButton, SecondaryButton, TextButton } from "./buttons.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -128,11 +128,11 @@ export function DockButtons({
         ) : null}
       </View>
       {primary ? (
-        <ChromePrimary
+        <PrimaryButton
           label={primary.label}
           testID={primary.testID}
-          compact
-          tight={dense}
+          dock
+          compact={dense}
           disabled={!primaryReady(dock)}
           accessibilityHint={primaryHint}
           onPress={() => press(primary)}
@@ -143,23 +143,23 @@ export function DockButtons({
       {dock.secondary.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {dock.secondary.map((button) => (
-            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "accent" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+            <SecondaryButton key={button.testID} label={button.label} testID={button.testID} tight={dense} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
         </View>
       ) : null}
       {extras.length > 0 || more.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1">
           {extras.map((item) => (
-            <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tight={dense} tone="bone" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
+            <TextButton key={item.testID} label={item.label} testID={item.testID} small tight={dense} tone="muted" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
           ))}
           {more.length > 0 ? (
             <View ref={moreRef} collapsable={false}>
-              <ChromeButton
+              <TextButton
                 label="More"
                 testID={MORE_ID}
-                variant="quiet"
+                small
                 tight={dense}
-                tone="bone"
+                tone="muted"
                 accessibilityHint={`Lists ${more.map((item) => item.accessibilityLabel ?? item.label).join(", ")}`}
                 onPress={pressMore}
               />

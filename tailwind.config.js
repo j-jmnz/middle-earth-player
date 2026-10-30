@@ -31,15 +31,13 @@ module.exports = {
         eyebrow: [rem(11), { lineHeight: rem(16), letterSpacing: rem(2.6) }],
         micro: [rem(11), { lineHeight: rem(14), letterSpacing: rem(0.4) }],
       },
-      // Carved Stone is cut square (docs/design-system.md, Spacing): panels, plates and fields at 3 or less, a card at 4, a sheet at 6.
+      // Four radii (docs/design-system.md, Spacing, radius, border; src/play/radius.ts holds the same numbers for a style written by hand): a
+      // control is a capsule, an item inside a container 12, a floating container 20, the top of a parchment sheet 24.
       borderRadius: {
-        chip: rem(3),
-        tile: rem(3),
-        button: rem(2),
-        card: rem(4),
-        hero: rem(3),
-        sheet: rem(6),
-        pill: "999px",
+        control: "999px",
+        item: rem(12),
+        container: rem(20),
+        sheet: rem(24),
       },
       // A hit floor that does not scale: 44 points at every size (user request, 2026-10-28). Use min-h-touch / min-w-touch, not min-h-11.
       minHeight: { touch: "44px" },

@@ -274,7 +274,7 @@ export default function DeckEditor() {
         ) : (
           <View className="flex-1 gap-1.5">
             {status}
-            <SecondaryButton testID="deck-add" label="Add cards" compact onPress={() => addOfType(null)} />
+            <SecondaryButton testID="deck-add" label="Add cards" onPress={() => addOfType(null)} />
           </View>
         )}
         <View className="flex-1">
@@ -321,7 +321,7 @@ export default function DeckEditor() {
                 <View className="min-w-0 flex-1 flex-row flex-wrap" style={{ columnGap: 6 * s }}>
                   {adding ? null : <JumpChips jumps={jumps} onJump={jumpTo} />}
                 </View>
-                <SecondaryButton testID="deck-add" label={adding ? "Done" : "+ Add cards"} compact onPress={() => (adding ? setAdding(false) : addOfType(null))} />
+                <SecondaryButton testID="deck-add" label={adding ? "Done" : "+ Add cards"} onPress={() => (adding ? setAdding(false) : addOfType(null))} />
               </View>
               <View
                 className="mt-2 min-h-0 flex-1"

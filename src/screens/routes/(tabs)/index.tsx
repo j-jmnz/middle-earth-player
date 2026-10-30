@@ -335,7 +335,7 @@ export default function CampaignList() {
                 testID={`locked-${tile.id}`}
                 accessible
                 accessibilityLabel={`${tile.name}, ${tile.caption}`}
-                className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-card px-4 py-4"
+                className="min-h-32 min-w-[45%] flex-1 justify-end gap-1 rounded-item px-4 py-4"
                 style={{ ...rowSurface(false, t), opacity: 0.78 }}
               >
                 <RingMark size={14} state="locked" />

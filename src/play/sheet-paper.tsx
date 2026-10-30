@@ -1,23 +1,22 @@
-// The table chrome's shared pieces: the text and pill buttons, the choice tile, the engine's numbers with their icons, the
-// sentence under a disabled action, and the parchment frame (docs/design-system.md, Table). The dock's buttons, which arm
-// before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
-// the engine did not compute.
+// The table chrome's shared pieces: the parchment frame, the choice tile, the engine's numbers with their icons and the
+// sentence under a disabled action (docs/design-system.md, Table). The word buttons are buttons.tsx; the dock's, which arm before
+// they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number the engine
+// did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { Pressable, View, type DimensionValue } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { IconValue } from "./game-icon.tsx";
-import { accentPlate, parchmentSurface, raisedEdgeOf, selectedWash, slateSurface } from "./surfaces.ts";
+import { CONTROL_RADIUS, SHEET_RADIUS } from "./radius.ts";
+import { parchmentSurface, raisedEdgeOf, selectedWash } from "./surfaces.ts";
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
-import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
-
-const SHEET_RADIUS = 6;
 
 /**
  * Which corners the parchment rounds: "top" for a sheet that rises from the bottom edge, "all" for one that floats centred on a wide
@@ -73,150 +72,6 @@ export function SheetFrame({
       {children}
     </View>
   );
-}
-
-// Every fill and text colour of a button is a style object from the tokens, never only a class: on the phone NativeWind can
-// drop a class from a Pressable whose style is a function, and the dock's accent pill was left as dark text on night (user
-// report, 2026-10-25). The pressed state comes from the Pressable's children function, so no style function is needed.
-
-/**
- * A text button on night or paper: 44 pt target, the pressed fill in the same frame. `variant` "text" is a word alone (the
- * top bar, a panel's Close); "plate" is the slate secondary plate with its word in Marcellus SC in the accent (the dock's other
- * answers: Pass, Cancel, the alternative); "quiet" is a fainter plate (4%) with its word small in muted (the dock's reading aids: Undo,
- * Read, List, Actions), so the three tiers of the dock read apart without an outline (user request, 2026-10-27).
- */
-export function ChromeButton({
-  label,
-  onPress,
-  testID,
-  tone = "bone",
-  variant = "text",
-  disabled = false,
-  tight = false,
-  accessibilityLabel,
-  accessibilityHint,
-}: {
-  label: string;
-  onPress: () => void;
-  testID: string;
-  tone?: "bone" | "accent" | "ink" | "muted";
-  variant?: "text" | "plate" | "quiet";
-  disabled?: boolean;
-  // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system.md, Table).
-  tight?: boolean;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
-}) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  const ink = tone === "ink";
-  const quiet = variant === "quiet";
-  const color = disabled ? (ink ? t.inkMuted : t.faint) : tone === "accent" ? t.accent : ink ? t.inkLabel : tone === "muted" || (quiet && tone === "bone") ? t.muted : t.bone;
-  const rest = variant === "text" ? null : ink ? { backgroundColor: t.paper } : quiet ? { backgroundColor: withAlphaHex(t.bone, 0.04) } : slateSurface(false, t);
-  // The row is 44 pt, or 40 on a short phone with a slop that makes up the 44; at a scale both follow it, and the target never drops under 44.
-  const row = tight ? 40 * s : touch(s, 44);
-  const slop = touchSlop(s, row);
-  return (
-    <Pressable
-      testID={testID}
-      collapsable={false}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      hitSlop={tight ? { top: slop, bottom: slop } : undefined}
-      style={{ minHeight: row, minWidth: touch(s, 44), justifyContent: "center", paddingVertical: (variant === "text" ? 0 : 2) * s }}
-    >
-      {({ pressed }) => (
-        <View
-          className={`items-center justify-center rounded-tile ${quiet ? "px-3" : "px-3.5"} ${variant === "text" ? "min-h-touch" : tight ? "min-h-9" : "min-h-10"}`}
-          style={{
-            ...(pressed && !disabled ? { backgroundColor: ink ? t.paperPressed : t.pressed } : (rest ?? { backgroundColor: "transparent" })),
-          }}
-        >
-          {variant === "plate" ? (
-            <Text className="font-display" style={{ color: disabled ? color : tone === "bone" ? t.accent : color, fontSize: 15 * s, lineHeight: 19 * s, letterSpacing: 0.8 * s }}>
-              {label}
-            </Text>
-          ) : (
-            <Text className={`${quiet ? "text-label" : "text-body"} font-medium`} style={{ color }}>
-              {label}
-            </Text>
-          )}
-        </View>
-      )}
-    </Pressable>
-  );
-}
-
-/**
- * The one filled action: the wraith-light primary on night with a lit top edge and a glow, an ink plate on paper; a press darkens it
- * and sinks it 1 pt. Disabled, it is a dashed outline
- * (an accentLine edge with muted text on night, inkLine with inkMuted on paper) that still reads as the button it will be and
- * not as one of the solid-edged answers beside it (docs/design-system.md). A disabled action has a sentence near it saying
- * why.
- */
-export function ChromePrimary({
-  label,
-  onPress,
-  testID,
-  disabled = false,
-  surface = "night",
-  compact = false,
-  tight = false,
-  accessibilityHint,
-}: {
-  label: string;
-  onPress: () => void;
-  testID: string;
-  disabled?: boolean;
-  surface?: "night" | "paper";
-  // In the table's dock: a 46 pt pill whose label keeps its size (no widest tracking) and wraps to two lines when long.
-  compact?: boolean;
-  // A 44 pt pill (not 48) on a short phone's dock.
-  tight?: boolean;
-  accessibilityHint?: string;
-}) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  const paper = surface === "paper";
-  const color = disabled ? (paper ? t.inkMuted : t.muted) : paper ? t.paper : t.onAccent;
-  return (
-    <Pressable
-      testID={testID}
-      collapsable={false}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-    >
-      {({ pressed }) => (
-        <View
-          className={`${compact ? (tight ? "min-h-touch px-3" : "px-3") : "min-h-14 px-5"} items-center justify-center rounded-button`}
-          style={{ ...(compact && !tight ? { minHeight: touch(s, 46) } : {}), ...primaryFill(paper, disabled, pressed, t), transform: [{ translateY: pressed && !disabled ? 1 : 0 }] }}
-        >
-          {/* In the dock a long label ("Leave undefended") takes a second line rather than shrinking. */}
-          <Text
-            numberOfLines={compact ? 2 : 1}
-            className="text-center font-display"
-            style={{ color, fontSize: (compact ? 17 : 20) * s, lineHeight: (compact ? 21 : 25) * s, letterSpacing: (compact ? 1.4 : 2.5) * s }}
-          >
-            {label}
-          </Text>
-        </View>
-      )}
-    </Pressable>
-  );
-}
-
-function primaryFill(paper: boolean, disabled: boolean, pressed: boolean, t: TableTokens) {
-  if (disabled) return { backgroundColor: "transparent", borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: paper ? t.inkLine : t.accentLine };
-  if (paper) return { backgroundColor: t.ink, opacity: pressed ? 0.85 : 1 };
-  return accentPlate(pressed, t);
 }
 
 /** The engine's numbers with the game's icons beside them. Each reads as "Willpower 2" to a screen reader. */
@@ -290,7 +145,7 @@ export function Tile({
     >
       {({ pressed }) => (
         <View
-          className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-tile ${night ? "px-2" : "px-4"}`}
+          className={`${dense ? "mb-1 py-0.5" : night ? "mb-1.5 py-1" : "mb-2 py-2"} flex-row items-center gap-2 rounded-item ${night ? "px-2" : "px-4"}`}
           style={{
             minHeight: touch(s, dense ? 44 : night ? 50 : 48),
             ...(night ? {} : { borderWidth: selected ? 1.5 : 1, borderColor: selected ? t.ink : t.inkLine }),
@@ -309,7 +164,7 @@ export function Tile({
             {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
           {selected && night ? (
-            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: 10 * s, alignItems: "center", justifyContent: "center", backgroundColor: t.accent }}>
+            <View accessible={false} importantForAccessibility="no" style={{ width: 20 * s, height: 20 * s, borderRadius: CONTROL_RADIUS, alignItems: "center", justifyContent: "center", backgroundColor: t.accent }}>
               <Text style={{ color: t.onAccent, fontSize: 13 * s, lineHeight: 16 * s, fontWeight: "700" }}>{"\u2713"}</Text>
             </View>
           ) : null}

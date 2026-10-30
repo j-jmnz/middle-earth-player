@@ -168,7 +168,7 @@ export default function Scenarios() {
     return (
       <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} disabled={action == null} onPress={() => open(game)}>
         {({ pressed }) => (
-          <View className="rounded-tile px-4 py-3" style={tileSurface(pressed, t)}>
+          <View className="rounded-item px-4 py-3" style={tileSurface(pressed, t)}>
             <View className="flex-row items-start justify-between gap-2">
               <View className="flex-1">
                 <Text className="font-display text-heading text-bone">{nameOf(game.scenarioId)}</Text>
@@ -237,7 +237,7 @@ export default function Scenarios() {
             >
               {({ pressed }) =>
                 posters ? (
-                  <View className="overflow-hidden rounded-card" style={{ ...tileSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
+                  <View className="overflow-hidden rounded-item" style={{ ...tileSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
                     <SceneArt scenarioId={id} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk}>
                       {playable ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.55) }} />}
                       <View className="absolute" style={{ left: 12 * s, top: 12 * s }}>
@@ -256,7 +256,7 @@ export default function Scenarios() {
                     </SceneArt>
                   </View>
                 ) : (
-                  <View className="flex-row items-center gap-3.5 overflow-hidden rounded-tile pr-3" style={{ ...rowSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
+                  <View className="flex-row items-center gap-3.5 overflow-hidden rounded-item pr-3" style={{ ...rowSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
                     <View style={{ width: 86 * s, height: 64 * s }}>
                       <SceneArt scenarioId={id} width={86 * s} height={64 * s} vivid>
                         {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}

@@ -215,7 +215,6 @@ export function SceneCard({
   scenarioId,
   sceneHeight,
   pullUp,
-  hero = false,
   pressed = false,
   over,
   children,
@@ -224,8 +223,6 @@ export function SceneCard({
   sceneHeight: number;
   // How far the words rise into the scene's fade.
   pullUp: number;
-  // The Continue card's larger corners (rounded-hero).
-  hero?: boolean;
   pressed?: boolean;
   over?: ReactNode;
   children: ReactNode;
@@ -234,8 +231,8 @@ export function SceneCard({
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View className={hero ? "rounded-hero" : "rounded-card"} style={panelSurface(pressed, t)}>
-      <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
+    <View className="rounded-container" style={panelSurface(pressed, t)}>
+      <View className="overflow-hidden rounded-t-container">
         <SceneArt scenarioId={scenarioId} height={sceneHeight * s} shade={0.4} fade={0.35} fadeTo={palette.dusk}>
           {over}
         </SceneArt>

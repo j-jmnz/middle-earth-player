@@ -37,7 +37,6 @@ export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: Glossar
         label={`Open in book · page ${book.page}`}
         icon="lore"
         testID="rule-open-book"
-        compact
         accessibilityLabel={`Open ${book.name} at page ${book.page}`}
         onPress={() => router.push({ pathname: "/booklet/[id]", params: { id: book.id, page: String(book.page) } })}
       />
@@ -65,7 +64,7 @@ export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: Glossar
   if (reading) {
     return (
       <View className="pb-safe">
-        <View className="gap-5 rounded-card" style={{ ...panelSurface(false, t), padding: 40 * s }}>
+        <View className="gap-5 rounded-container" style={{ ...panelSurface(false, t), padding: 40 * s }}>
           <View className="gap-1">
             <Eyebrow>{entry.source}</Eyebrow>
             {title}

@@ -167,12 +167,12 @@ export function SeatPicker({
           </View>
         </View>
       ) : (
-        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={panelSurface(false, t)}>
+        <View testID={`briefing-party-${index}`} className="rounded-container p-4" style={panelSurface(false, t)}>
           {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits beside the counts, under it. */}
           <Text className="font-display text-title text-bone">{pickedDeck.name}</Text>
           <View className="mt-1 flex-row items-center justify-between gap-3">
             <Label className="flex-1">{deckCountLine(pickedDeck)}</Label>
-            <SecondaryButton label="Change" testID={`deck-change-${index}`} compact accessibilityLabel={`Change the deck of ${title.toLowerCase()}, now ${pickedDeck.name}`} onPress={() => setChanging(true)} />
+            <SecondaryButton label="Change" testID={`deck-change-${index}`} accessibilityLabel={`Change the deck of ${title.toLowerCase()}, now ${pickedDeck.name}`} onPress={() => setChanging(true)} />
           </View>
           <View className="mt-3.5 flex-row gap-2">
             {heroes.map((code) => (
@@ -215,7 +215,7 @@ export function SeatPicker({
                 onPress={() => onRingBearer(candidate.code)}
               >
                 {({ pressed }) => (
-                  <View className="min-h-14 flex-row items-center gap-3 rounded-tile px-3 py-2" style={rowSurface(pressed, t)}>
+                  <View className="min-h-14 flex-row items-center gap-3 rounded-item px-3 py-2" style={rowSurface(pressed, t)}>
                     <Portrait card={faceOf(candidate.code)} size={36} />
                     <View className="flex-1">
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>

@@ -6,9 +6,10 @@
 import { ScrollView, View } from "react-native";
 
 import type { LogLine } from "./log.ts";
-import { ChromeButton, Tile } from "./sheet-paper.tsx";
+import { TextButton } from "./buttons.tsx";
+import { Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
-import { SettingsRows, SettingTextButton } from "./setting-rows.tsx";
+import { SettingsRows } from "./setting-rows.tsx";
 import type { TableSettings } from "./table-settings.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -49,7 +50,7 @@ export function PileList({
         )}
       </ScrollView>
       <View className="items-center pt-1">
-        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="pile-list-close" tone="ink" onPress={onClose} />
+        <TextButton label={"\u2715 Close"} accessibilityLabel="Close" testID="pile-list-close" tone="ink" onPress={onClose} />
       </View>
     </View>
   );
@@ -77,7 +78,7 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
         ))}
       </ScrollView>
       <View className="items-center pt-2">
-        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="log-close" tone="ink" onPress={onClose} />
+        <TextButton label={"\u2715 Close"} accessibilityLabel="Close" testID="log-close" tone="ink" onPress={onClose} />
       </View>
     </View>
   );
@@ -126,7 +127,7 @@ export function ThreatPanel({
         <Text className="mt-2 text-label text-inkMuted">The refresh phase raises your threat by 1 at the end of the round; a failed quest raises it by what it falls short.</Text>
       </ScrollView>
       <View className="items-center pt-2">
-        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="threat-panel-close" tone="ink" onPress={onClose} />
+        <TextButton label={"\u2715 Close"} accessibilityLabel="Close" testID="threat-panel-close" tone="ink" onPress={onClose} />
       </View>
     </View>
   );
@@ -161,9 +162,9 @@ export function SettingsPanel({
       </ScrollView>
       <View className="flex-row items-center justify-between pt-2">
         <View className="-ml-3">
-          <SettingTextButton label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
+          <TextButton tone="accent" label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
         </View>
-        <ChromeButton label={"\u2715 Close"} accessibilityLabel="Close" testID="settings-close" tone="bone" onPress={onClose} />
+        <TextButton label={"\u2715 Close"} accessibilityLabel="Close" testID="settings-close" tone="bone" onPress={onClose} />
       </View>
     </View>
   );

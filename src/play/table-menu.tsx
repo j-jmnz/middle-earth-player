@@ -7,6 +7,7 @@ import { Pressable, View } from "react-native";
 
 import { PopoverDivider, PopoverFrame, PopoverRow, type PressableRef } from "./popover-frame.tsx";
 import { MENU_BUTTON } from "./top-bar-layout.ts";
+import { CONTROL_RADIUS } from "./radius.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { menuItems, type MenuItemId, type MenuNav } from "./table-menu-items.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -30,7 +31,7 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
     >
       {({ pressed }) => (
         <View
-          style={{ width: 40 * s, height: 40 * s, borderRadius: 20 * s, alignItems: "center", justifyContent: "center", gap: 4 * s, backgroundColor: pressed || open ? t.pressed : "transparent" }}
+          style={{ width: 40 * s, height: 40 * s, borderRadius: CONTROL_RADIUS, alignItems: "center", justifyContent: "center", gap: 4 * s, backgroundColor: pressed || open ? t.pressed : "transparent" }}
         >
           {[0, 1, 2].map((dot) => (
             <View key={dot} style={{ width: 4 * s, height: 4 * s, borderRadius: 2 * s, backgroundColor: open ? t.accent : t.bone }} />

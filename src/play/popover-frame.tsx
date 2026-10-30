@@ -1,5 +1,5 @@
 // The frame of the table's popovers (docs/design-system.md, Table, Table menu): a lit night card (tileSurface) with a deep shadow
-// and rounded-card corners, its rows inset rounded plates, that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
+// and container corners, its rows inset item-cornered plates, that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
 // that holds it, and a Pressable scrim that fills the screen under it so a tap outside closes it and does nothing else. Not a
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock-more.tsx) both draw in it; Android Back closes either first (back.ts).
@@ -12,6 +12,7 @@ import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
 import { Chevron } from "./phase-rail.tsx";
+import { CONTAINER_RADIUS, ITEM_RADIUS } from "./radius.ts";
 import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
@@ -61,7 +62,7 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
             alignItems: "center",
             gap: 10 * s,
             paddingHorizontal: 10 * s,
-            borderRadius: 10 * s,
+            borderRadius: ITEM_RADIUS * s,
             backgroundColor: pressed ? t.pressed : "transparent",
           }}
         >
@@ -162,7 +163,7 @@ export function PopoverFrame({
             ...place,
             width,
             padding: PAD * s,
-            borderRadius: 16 * s, // rounded-card
+            borderRadius: CONTAINER_RADIUS * s,
             ...tileSurface(false, t),
             boxShadow: `${raisedEdgeOf(t)}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
             transformOrigin: origin,

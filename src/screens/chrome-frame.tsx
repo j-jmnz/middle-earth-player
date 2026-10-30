@@ -208,7 +208,7 @@ export function ListRow({
     >
       {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
       {({ pressed }) => (
-        <View className="min-h-14 flex-row items-center overflow-hidden rounded-tile py-2" style={{ paddingLeft: 14 * s, paddingRight: 10 * s, ...(selected ? selectedWash(t) : rowSurface(pressed, t)) }}>
+        <View className="min-h-14 flex-row items-center overflow-hidden rounded-item py-2" style={{ paddingLeft: 14 * s, paddingRight: 10 * s, ...(selected ? selectedWash(t) : rowSurface(pressed, t)) }}>
           {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3 * s, backgroundColor: palette.accentHigh }} /> : null}
           {leading ? <View className="mr-3">{leading}</View> : null}
           <View className="flex-1">
@@ -253,7 +253,7 @@ export function Panel({
   const look = panelSurface(pressed, t);
   return (
     <View
-      className={`rounded-card ${padded ? "p-4" : "overflow-hidden"}${className ? ` ${className}` : ""}`}
+      className={`rounded-container ${padded ? "p-4" : "overflow-hidden"}${className ? ` ${className}` : ""}`}
       style={unfilled ? { backgroundColor: withAlphaHex(t.raised, 0.35) } : look}
     >
       {children}
@@ -287,7 +287,7 @@ export function StatTile({
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 items-center rounded-tile px-2 py-2.5" style={tileSurface(false, t)}>
+    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 items-center rounded-item px-2 py-2.5" style={tileSurface(false, t)}>
       <Text className="font-bold uppercase text-faint" style={{ fontSize: 10 * s, lineHeight: 13 * s, letterSpacing: 1.4 * s }} numberOfLines={1}>
         {label}
       </Text>
@@ -343,7 +343,7 @@ export function PaperSheet({ step, title, children }: { step: string; title: str
   const floating = useContext(SheetCornersContext) === "all";
   return (
     <SheetFrame animated={false}>
-      {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-pill bg-inkLine" />}
+      {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-control bg-inkLine" />}
       <View className="items-center">
         <Eyebrow tone="inkLabel">{step}</Eyebrow>
         <Text className="mt-1 text-center font-display text-title text-ink">{title}</Text>
