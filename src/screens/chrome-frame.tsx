@@ -6,6 +6,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Backdrop } from "./backdrop";
 import { useBottomInset } from "./use-bottom-inset";
+import { useOverrun } from "./use-overrun";
 import type { SceneName } from "./backdrop-scenes";
 import { IconButton } from "./chrome-buttons";
 import { Chevron } from "./chrome-marks";
@@ -317,8 +318,18 @@ export function ActionBar({ children, safe = true, testID, align = "auto" }: { c
   // (bottom-inset.ts): back from the landscape table, the provider's insets can still be the landscape ones (no bottom inset) and
   // the bar would sit under the phone's own buttons.
   const bottom = useBottomInset();
+  // And it never runs past the app's root view: where a screen is laid out taller than the window (the campaign path on a phone,
+  // user report, 2026-10-29), the overrun is added to the padding, so the buttons stay in view (use-overrun.ts).
+  const { ref: barRef, onLayout: onBarLayout, overrun: past } = useOverrun();
   return (
-    <SafeAreaView testID={testID} collapsable={false} edges={safe ? { bottom: "maximum" } : []} style={{ paddingTop: 10.5 * s, paddingBottom: safe ? Math.max(bottom, 12 * s) : 12 * s }}>
+    <SafeAreaView
+      ref={barRef}
+      onLayout={onBarLayout}
+      testID={testID}
+      collapsable={false}
+      edges={safe ? { bottom: "maximum" } : []}
+      style={{ paddingTop: 10.5 * s, paddingBottom: (safe ? Math.max(bottom, 12 * s) : 12 * s) + past }}
+    >
       <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: -24 * s, height: 24 * s, ...nightFade(0, 1, undefined, t) }} />
       <View pointerEvents="none" style={{ position: "absolute", left: -24 * s, right: -24 * s, top: 0, bottom: 0, backgroundColor: palette.night }} />
       {group ? <View style={group}>{children}</View> : children}

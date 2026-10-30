@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo, useRef, useState, type ComponentRef } from "react";
+import { useMemo, useState } from "react";
 import { View } from "react-native";
 
 import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
@@ -19,7 +19,6 @@ import { briefingHref, tableHref } from "../../scenario-links";
 import { seatWord } from "../../seats";
 import { goBack } from "../../go-back";
 import { useBottomInset } from "../../use-bottom-inset";
-import { InsetReadout } from "../../inset-readout";
 import { droppedSentence, useSave } from "../../use-save";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
@@ -78,8 +77,6 @@ export default function CampaignPath() {
   const notice = dropped ? droppedSentence(dropped) : null;
   const [picked, setPicked] = useState<string | null>(null);
   const [roadWidth, setRoadWidth] = useState(0);
-  // The foot, measured for the debug-build inset readout (inset-readout.tsx).
-  const footRef = useRef<ComponentRef<typeof View>>(null);
   const palette = usePalette();
   const s = useUiScale();
   // The landscape column has no ActionBar: its scrolls keep the bottom inset clear at their end (use-bottom-inset.ts).
@@ -204,7 +201,8 @@ export default function CampaignPath() {
           <View className={horizontal ? "flex-row items-center" : undefined} style={{ gap: 16 * s }}>
             {horizontal && node ? <SceneArt scenarioId={node.id} width={240 * s} height={130 * s} radius={3} /> : null}
             <View className="min-w-0 flex-1" style={{ gap: 12 * s }}>
-              <View className="flex-row items-baseline justify-between gap-2">
+              {/* Centered, not on the baseline: a baseline row collapsed on Android and dropped the name (user screenshot, 2026-10-29). */}
+              <View className="flex-row items-center justify-between gap-2">
                 <Text className="min-w-0 shrink font-display text-bone" style={{ fontSize: 20 * s, lineHeight: 25 * s }} numberOfLines={1}>
                   {node?.name ?? next.words}
                 </Text>
@@ -304,10 +302,7 @@ export default function CampaignPath() {
         {poolLine}
       </ScreenScroll>
       {/* A tablet in portrait lays the panel across the page (its scene, the name, Log and Begin in a row), not in the bar's 480 group. */}
-      <View ref={footRef} collapsable={false}>
-        <ActionBar align={size === "medium" ? "fill" : "auto"}>{footPanel(size === "medium")}</ActionBar>
-      </View>
-      <InsetReadout bar={footRef} />
+      <ActionBar align={size === "medium" ? "fill" : "auto"}>{footPanel(size === "medium")}</ActionBar>
     </Screen>
   );
 }

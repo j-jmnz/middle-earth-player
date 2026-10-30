@@ -186,7 +186,7 @@ describe("the plan for a real state", () => {
     expect(plan.seq).toBe(7);
     expect(plan.clashes).toHaveLength(1);
     expect(plan.span).toBe(MOTION.spotlight.ms);
-    expect(plan.span).toBe(2200);
+    expect(plan.span).toBe(3200);
     const enemy = first?.attackers[0];
     const slot = before.slots.find((candidate) => candidate.id === enemy?.id && candidate.kind !== "pile");
     // The slot is in canvas points; the plan carries it onto the screen by the canvas's origin.

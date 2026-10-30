@@ -3,8 +3,8 @@
 // (motion-curves.ts draws a curve from a name; motion-run.ts hands the same names to Reanimated).
 //
 // Every duration passes through `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 0 under reduced motion (then
-// everything snaps). Each token is at most 500 ms; the sweep and the whole run of the combat spotlight (phase 24) are the two
-// exceptions.
+// everything snaps). Each token is at most 500 ms; the sweep, the spotlight's hold and its whole run (phase 24), and the lives
+// of its embers and ash are the exceptions.
 // What is not motion stays out of the scale: a gate or a timer (the top bar's 400 ms measure fallback, the dock's second-tap
 // window, the banner's beats, the 350 ms settle after a new moment) is not a token.
 
@@ -102,19 +102,21 @@ export const MOTION = {
   toastOut: tween(120, null),
   // The combat spotlight, one attack (docs/plans/combat-spotlight-redesign.md): the dark comes in and the cards arc to the center
   // (enter), the medallions pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
-  // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it) and both go back
-  // (return). A destroyed target burns inside the return (burn). The seven beats add up to `spotlight`.
+  // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it), the cards and the
+  // result stay (hold) and both go back (return). A destroyed target burns inside the return (burn). The eight beats add up to `spotlight`.
   spotlightEnter: tween(350, "outCubic"),
   spotlightRead: tween(300, "outCubic"),
   spotlightCharge: tween(350, "outQuad"),
   spotlightLunge: tween(120, "inCubic"),
   spotlightStop: tween(100, null),
   spotlightImpact: tween(480, "linear"),
+  // After the impact the cards, the medallions and the result stay so they can be read (user request, 2026-10-30).
+  spotlightHold: tween(1000, null),
   spotlightReturn: tween(500, "inCubic"),
   spotlightBurn: tween(450, "inQuad"),
   // Several attacks in one state: the dark is already in, so the second and later attacks come in over a swap (no flight from the
-  // slots) with a shorter read and charge, and only the last goes back. Swap, readAgain, chargeAgain, lunge, stop and impact add
-  // up to `SPOTLIGHT_AGAIN`.
+  // slots) with a shorter read and charge, and only the last goes back. Swap, readAgain, chargeAgain, lunge, stop, impact and
+  // hold add up to `SPOTLIGHT_AGAIN`.
   spotlightSwap: tween(200, "outCubic"),
   spotlightReadAgain: tween(100, "outCubic"),
   spotlightChargeAgain: tween(200, "outQuad"),
@@ -142,7 +144,7 @@ export const MOTION = {
   spotlightEmber: tween(2000, "linear"),
   spotlightConverge: tween(500, "linear"),
   spotlightAsh: tween(1100, "linear"),
-  spotlight: tween(2200, "linear"),
+  spotlight: tween(3200, "linear"),
   // The hand scrub (phase 25): the held hand rises (and grows and turns its fan) over `scrubRise` and spreads sideways over `scrubSpread`,
   // together; the card under the finger lifts over `scrubLift`; the hand settles back over `scrubFall`. The table's 35% night
   // rides the rise. The 150 ms hold and the 6 pt slop that start it are gesture thresholds (hand-scrub.ts), not tokens.
@@ -152,15 +154,15 @@ export const MOTION = {
   scrubFall: tween(180, "inCubic"),
 } as const;
 
-/** The seven beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
-export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCharge", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightReturn"] as const;
+/** The eight beats of one attack in order; their lengths add up to `MOTION.spotlight` (the run of a lone attack). Read by the tests. */
+export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCharge", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightHold", "spotlightReturn"] as const;
 
 /** The beats of an attack that follows another in the same state, which add up to `SPOTLIGHT_AGAIN` (ms, unscaled): it swaps in, and does not go back unless it is the last. */
-export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact"] as const;
-export const SPOTLIGHT_AGAIN = 1200;
+export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightHold"] as const;
+export const SPOTLIGHT_AGAIN = 2200;
 
-/** The tokens that may pass 500 ms (a title sweep across the canvas, the whole run of the combat spotlight, phase 24, and the lives of its embers and ash). */
-export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightEmber", "spotlightAsh"];
+/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold and its whole run, phase 24, and the lives of its embers and ash). */
+export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightEmber", "spotlightAsh"];
 
 /** The longest a token runs, apart from LONG_TOKENS. */
 export const MAX_TOKEN_MS = 500;
