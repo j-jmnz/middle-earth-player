@@ -60,6 +60,8 @@ export default function CampaignList() {
   const [saved, setSaved] = useState<ReadonlyMap<string, number>>(new Map());
   const [starting, setStarting] = useState(false);
   const folds = useFolds();
+  // The focus effect below must not run again when a section folds, so it depends on the setter, which only a new user changes.
+  const setFolded = folds.setFolded;
   // Manage shows Archive and Delete on each open playthrough instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
   // The save whose delete is waiting on Delete for good.
@@ -118,15 +120,14 @@ export default function CampaignList() {
     useCallback(() => {
       refresh();
       if (startParam === "1") {
-        folds.setFolded("start", false);
+        setFolded("start", false);
         setStarting(true);
       }
       return () => {
         setManaging(false);
         setDeleting(null);
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- the folds hook returns a new object each render: only the param and the refresh matter
-    }, [refresh, startParam]),
+    }, [refresh, startParam, setFolded]),
   );
 
   function openPath(save: Save): void {

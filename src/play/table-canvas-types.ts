@@ -1,3 +1,4 @@
+import type { ScenarioState } from "../rules/state.ts";
 import type { SlotNumbers } from "./card-effects.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import type { LayoutOptions } from "./layout.ts";
@@ -41,9 +42,8 @@ export type TableCanvasProps = {
   sphereOf: (code: string) => string | null;
   // True for a card with a printed line the app does not apply (src/catalog/active-text.ts): the canvas marks it.
   inactive: (code: string) => boolean;
-  // The engine's numbers on a card, read from the latest state. The canvas draws again when the cards, the effects in play
-  // or the attack in progress change.
-  info: (cardId: string) => SlotInfo;
+  // The engine's numbers on a card, read from the state the canvas is handed (so a render never reads the store) and the seat drawn.
+  info: (game: ScenarioState, seat: number, cardId: string) => SlotInfo;
   highlight: TableHighlight;
   // The hand card the player is playing: drawn whole above the bottom edge.
   raised: string | null;

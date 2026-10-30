@@ -61,8 +61,7 @@ function bailouts(file: string): string[] {
   return found;
 }
 
-// Un-skip when section 2 of docs/plans/performance-pass.md lands (it clears today's bailouts).
-describe.skip("React Compiler coverage", () => {
+describe("React Compiler coverage", () => {
   it("compiles every component and hook in src/play and src/screens", () => {
     const files = [...sources(path.join(src, "play")), ...sources(path.join(src, "screens"))];
     expect(files.length).toBeGreaterThan(50);

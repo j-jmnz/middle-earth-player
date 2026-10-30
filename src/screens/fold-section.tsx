@@ -2,7 +2,7 @@
 // open, right while folded), the title, a rule, and the count of what is inside while folded. A screen reader hears whether it is
 // expanded and an announcement on each toggle. The body stays mounted and is hidden, so what it holds keeps its state; there is
 // no animation (docs/design-system.md, Motion: a fold is a state change, not a motion).
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { SectionRule, sectionTitleStyle } from "../play/section-heading";
@@ -31,7 +31,8 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
     },
     [user],
   );
-  return { folded, setFolded };
+  // One object while neither function changes, so a caller can depend on it (or on `setFolded`, which only a new user changes).
+  return useMemo(() => ({ folded, setFolded }), [folded, setFolded]);
 }
 
 /**

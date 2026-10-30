@@ -39,6 +39,35 @@ function reportSplashHideFailure(error: unknown): void {
   console.warn(reason.message);
 }
 
+// A try/catch cannot be compiled inside a component (React Compiler), so the two below live here.
+async function openApp(cancelled: () => boolean, onOpen: (opened: AppDatabases) => void, onFail: (message: string) => void): Promise<void> {
+  try {
+    const opened = await openDatabases();
+    if (cancelled()) return;
+    // The stored settings are read before the first screen mounts, so the first frame already has the chosen scale and theme.
+    // A row that cannot be read leaves the defaults; the binding below reads again and warns too.
+    try {
+      tableSettings.getState().hydrate(readTableSettings(opened.user));
+    } catch (error: unknown) {
+      console.warn(`Table settings did not load (${error instanceof Error ? error.message : "unknown error"}); the defaults are used`);
+    }
+    onOpen(opened);
+  } catch (error: unknown) {
+    if (cancelled()) return;
+    const reason = error instanceof Error ? error : new Error("Database open failed");
+    onFail(reason.message);
+  }
+}
+
+function startDownloads(databases: AppDatabases): void {
+  try {
+    startImageDownloads(databases.user);
+  } catch (error: unknown) {
+    const reason = error instanceof Error ? error : new Error("Image downloads did not start");
+    console.warn(reason.message);
+  }
+}
+
 export default function RootLayout() {
   const [databases, setDatabases] = useState<AppDatabases | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -71,26 +100,7 @@ export default function RootLayout() {
   useEffect(() => {
     let cancelled = false;
 
-    async function start(): Promise<void> {
-      try {
-        const opened = await openDatabases();
-        if (cancelled) return;
-        // The stored settings are read before the first screen mounts, so the first frame already has the chosen scale and theme.
-        // A row that cannot be read leaves the defaults; the binding below reads again and warns too.
-        try {
-          tableSettings.getState().hydrate(readTableSettings(opened.user));
-        } catch (error: unknown) {
-          console.warn(`Table settings did not load (${error instanceof Error ? error.message : "unknown error"}); the defaults are used`);
-        }
-        setDatabases(opened);
-      } catch (error: unknown) {
-        if (cancelled) return;
-        const reason = error instanceof Error ? error : new Error("Database open failed");
-        setFailure(reason.message);
-      }
-    }
-
-    void start();
+    void openApp(() => cancelled, setDatabases, setFailure);
     return () => {
       cancelled = true;
     };
@@ -107,13 +117,7 @@ export default function RootLayout() {
     if (!databases || Platform.OS === "web") return;
     let cancelled = false;
     const frame = requestAnimationFrame(() => {
-      if (cancelled) return;
-      try {
-        startImageDownloads(databases.user);
-      } catch (error: unknown) {
-        const reason = error instanceof Error ? error : new Error("Image downloads did not start");
-        console.warn(reason.message);
-      }
+      if (!cancelled) startDownloads(databases);
     });
     return () => {
       cancelled = true;

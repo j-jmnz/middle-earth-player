@@ -57,12 +57,12 @@ export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: num
 }
 
 // A number that stays readable on any token art or picture: a night outline under a bone fill.
-export function Outlined({ x, y, text, font, t, s, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; s: number; color?: string; heavy?: boolean }) {
+export function Outlined({ x, y, text, font, t, s, color, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; s: number; color?: string; heavy?: boolean }) {
   const width = font.getTextWidth(text);
   return (
     <Group>
       <Text x={x - width / 2} y={y} text={text} font={font} color={t.night} style="stroke" strokeWidth={(heavy ? 4.5 : 3) * s} />
-      <Text x={x - width / 2} y={y} text={text} font={font} color={color} />
+      <Text x={x - width / 2} y={y} text={text} font={font} color={color ?? t.bone} />
     </Group>
   );
 }

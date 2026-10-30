@@ -6,10 +6,13 @@
 // A state with a combat spotlight (spotlight-gate.ts) waits for it: its cards stand where they were under the spotlight's enlarged
 // copies, and its clocks start when the spotlight ends (or are set to the end when a tap skipped it).
 import { Group, vec } from "@shopify/react-native-skia";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
+import { useStore } from "zustand";
 
+import type { ScenarioState } from "../rules/state.ts";
+import type { Clash } from "./clash.ts";
 import { cardFrame } from "./frame.ts";
 import { tickLand } from "./haptics.ts";
 import type { CardSlot, TableLayout } from "./layout.ts";
@@ -47,6 +50,37 @@ export function finishMotions(progress: SharedValue<number>, clear: () => void):
 // `actingLayout`: the last layout drawn from the acting seat's side, which a peek that ends with a new state is diffed from (motion-kind.ts).
 type Track = { layout: TableLayout; actingLayout: TableLayout; seat: number; acting: number; moves: Moves; span: number; fxSpan: number };
 
+// The track for a new layout: how its cards move, and the token changes. `log` is read here, not in the hook, because what it holds changes
+// without a render; every call is for a layout no call has seen, so the compiler's cache never answers with a stale update.
+function nextTrack(track: Track, layout: TableLayout, seat: number, acting: number, k: number, held: boolean, game: ScenarioState, clashes: readonly Clash[], log: UpdateLog): Track {
+  const prevGame = log.pending()?.prev ?? game;
+  const zoneNow = (cardId: string) => game.cards[cardId]?.zone ?? null;
+  // The seat handoff, the state's own motions, or a peek, which is drawn at rest (motion-kind.ts). A peek that ends with a new state is
+  // diffed from the layout the acting seat had, so a card played from its hand still lifts and lands and a drawn one is still dealt.
+  const kind = motionKind(prevGame, game, track.seat, seat, track.acting, acting);
+  const from = kind === "ordinary" && track.seat !== seat ? track.actingLayout : track.layout;
+  const sameSize = from.width === layout.width && from.height === layout.height;
+  const animate = k > 0 && sameSize && kindMoves(kind);
+  const between = animate ? motionsBetween(from, layout, zoneNow, { handoff: kind === "handoff" }) : motionsBetween(null, layout, zoneNow);
+  // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
+  // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
+  // the same card keeps its pop and its number).
+  const placed = new Map<string, number>();
+  if (held) for (const clash of clashes) placed.set(clash.target, (placed.get(clash.target) ?? 0) + clash.damage);
+  const deltas = (kind === "peek" ? [] : tokenDeltas(prevGame, game)).flatMap((delta) => {
+    const change = delta.change - (delta.token === "damage" ? (placed.get(delta.cardId) ?? 0) : 0);
+    return change === 0 ? [] : [{ ...delta, change }];
+  });
+  const fx = animate
+    ? fxPlan(deltas, (cardId) => {
+        const slot = layout.slots.find((candidate) => candidate.id === cardId && candidate.kind !== "pile");
+        const motion = slot ? between.motions.get(slot.id) : undefined;
+        return slot ? (motion && !still(motion) ? motionEnd(motion) : 0) : null;
+      })
+    : [];
+  return { layout, actingLayout: seat === acting ? layout : track.actingLayout, seat, acting, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0 };
+}
+
 /**
  * Works out the motion of each new layout once, during the render (React's pattern for state that follows a prop), and runs the
  * clock for it. With the scale at 0 (reduced motion), or when the canvas changed size, nothing moves and the clock is done.
@@ -54,39 +88,14 @@ type Track = { layout: TableLayout; actingLayout: TableLayout; seat: number; act
 export function useCardMotion(store: TableStore, layout: TableLayout, seat: number, acting: number): { moves: Moves; clock: Clock; fxClock: Clock; k: number; hurry: { progress: SharedValue<number>; clear: () => void } } {
   const k = useMotionScale();
   const held = useSpotlightHold(store);
+  // The state and the attacks a new layout is drawn from, taken from the store here so the compiler sees them as dependencies.
+  const game = useStore(store, (state) => state.game);
+  const gate = useStore(store, (state) => state.spotlight);
   const [track, setTrack] = useState<Track>(() => ({ layout, actingLayout: layout, seat, acting, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0 }));
   // What moved this layout: each update of the store is used by the first new layout after it (update-log.ts).
   const [log] = useState(() => new UpdateLog(store.getState().game));
   useEffect(() => store.subscribe((state, before) => log.note(state, before)), [store, log]);
-  if (track.layout !== layout) {
-    const game = store.getState().game;
-    const prevGame = log.pending()?.prev ?? game;
-    const zoneNow = (cardId: string) => game.cards[cardId]?.zone ?? null;
-    // The seat handoff, the state's own motions, or a peek, which is drawn at rest (motion-kind.ts). A peek that ends with a new state is
-    // diffed from the layout the acting seat had, so a card played from its hand still lifts and lands and a drawn one is still dealt.
-    const kind = motionKind(prevGame, game, track.seat, seat, track.acting, acting);
-    const from = kind === "ordinary" && track.seat !== seat ? track.actingLayout : track.layout;
-    const sameSize = from.width === layout.width && from.height === layout.height;
-    const animate = k > 0 && sameSize && kindMoves(kind);
-    const between = animate ? motionsBetween(from, layout, zoneNow, { handoff: kind === "handoff" }) : motionsBetween(null, layout, zoneNow);
-    // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
-    // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
-    // the same card keeps its pop and its number).
-    const placed = new Map<string, number>();
-    if (held) for (const clash of store.getState().spotlight.clashes) placed.set(clash.target, (placed.get(clash.target) ?? 0) + clash.damage);
-    const deltas = (kind === "peek" ? [] : tokenDeltas(prevGame, game)).flatMap((delta) => {
-      const change = delta.change - (delta.token === "damage" ? (placed.get(delta.cardId) ?? 0) : 0);
-      return change === 0 ? [] : [{ ...delta, change }];
-    });
-    const fx = animate
-      ? fxPlan(deltas, (cardId) => {
-          const slot = layout.slots.find((candidate) => candidate.id === cardId && candidate.kind !== "pile");
-          const motion = slot ? between.motions.get(slot.id) : undefined;
-          return slot ? (motion && !still(motion) ? motionEnd(motion) : 0) : null;
-        })
-      : [];
-    setTrack({ layout, actingLayout: seat === acting ? layout : track.actingLayout, seat, acting, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0 });
-  }
+  if (track.layout !== layout) setTrack(nextTrack(track, layout, seat, acting, k, held, game, gate.clashes, log));
   const { moves, span } = track;
   const progress = useSharedValue(1);
   const fxProgress = useSharedValue(1);
@@ -105,9 +114,12 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   }, [dropTick, store]);
   // The state a spotlight is holding: its clocks wait at 0, so its cards stand where they were.
   const waiting = useRef<number | null>(null);
+  // The clocks' lengths and the speed, read when a new state starts; a change of either alone does not start the effect.
+  const speed = useEffectEvent(() => ({ scaled, fxScaled, k }));
   // Once per new state: start its clock, and time the tick of a played card's landing. A change of the speed setting alone does not
   // play the last state again. A state held for a spotlight starts when the spotlight ends; a skipped one lands at once.
   useLayoutEffect(() => {
+    const { scaled, fxScaled, k } = speed();
     log.consume();
     epoch.set(moves.at);
     cancelAnimation(progress);
@@ -136,8 +148,7 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
     const landing = landAt(moves.motions);
     tick.current = landing == null ? null : setTimeout(tickLand, landing * k);
     return dropTick;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- the clock starts for a new state (`moves`), not for a new speed.
-  }, [moves, held, progress, fxProgress, epoch, dropTick, log]);
+  }, [moves, held, progress, fxProgress, epoch, dropTick, log, store]);
   const clock = useMemo((): Clock => ({ progress, epoch, at: moves.at, k, span: Math.max(1, scaled) }), [progress, epoch, moves.at, k, scaled]);
   const fxClock = useMemo((): Clock => ({ progress: fxProgress, epoch, at: moves.at, k, span: Math.max(1, fxScaled) }), [fxProgress, epoch, moves.at, k, fxScaled]);
   const hurry = useMemo(() => ({ progress, clear }), [progress, clear]);

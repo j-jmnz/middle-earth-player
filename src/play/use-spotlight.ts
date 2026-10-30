@@ -2,7 +2,7 @@
 // gate for each moment's attacks (spotlight-gate.ts); the canvas plays them on one clock (`useSpotlight`), and the scrim over the bar
 // and the dock, the banner, the settle after a moment and the canvas's card motions hold while the gate is open (`useSpotlightHold`).
 // A tap ends the gate, which lands the table on the new state. Nothing here draws, and nothing gates an intent.
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { cancelAnimation, useAnimatedReaction, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -57,10 +57,11 @@ type Track = { layout: TableLayout; area: StageArea; seq: number; plan: Spotligh
 export function useSpotlight(store: TableStore, layout: TableLayout, area: StageArea, k: number): { plan: SpotlightPlan | null; progress: SharedValue<number>; playing: boolean; live: SharedValue<boolean>; swallow: SharedValue<boolean> } {
   const gate = useStore(store, (state) => state.spotlight);
   const gateScale = useSpotlightScale();
+  // The moment the gate was opened for, taken from the store here so the compiler sees it as a dependency.
+  const shown = useStore(store, (state) => state.shown);
   const [track, setTrack] = useState<Track>(() => ({ layout, area, seq: gate.seq, plan: null }));
   if (track.layout !== layout || !sameArea(track.area, area)) {
     const sameSize = track.layout.width === layout.width && track.layout.height === layout.height && sameArea(track.area, area);
-    const shown = store.getState().shown;
     let plan: SpotlightPlan | null = null;
     if (gate.seq !== track.seq) {
       // A new moment's attacks fly from where the cards stood before the state, else from where they stand now.
@@ -81,18 +82,19 @@ export function useSpotlight(store: TableStore, layout: TableLayout, area: Stage
   const count = plan?.clashes.length ?? 1;
   const total = Math.max(1, spotlightRun(count, k));
   const seq = plan?.seq ?? 0;
+  // The clock's length, read when a plan starts; a new speed alone does not start the effect.
+  const runFor = useEffectEvent(() => total);
   // Once per new plan: run the clock.
   useLayoutEffect(() => {
     if (!plan) return;
     const endRun = () => store.getState().endSpotlight("done", plan.seq);
     progress.set(0);
     progress.set(
-      withTiming(1, { duration: total, easing: easingOf("linear") }, (finished) => {
+      withTiming(1, { duration: runFor(), easing: easingOf("linear") }, (finished) => {
         if (finished) scheduleOnRN(endRun);
       }),
     );
     return () => cancelAnimation(progress);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- the clock starts for a new plan, not for a new speed.
   }, [plan, progress, store]);
   // The strikes land (one impact haptic each) and the last attack begins to go back (the scrim fades) as the clock passes them. A skip
   // jumps the clock to its end, past every one of them, and plays none.

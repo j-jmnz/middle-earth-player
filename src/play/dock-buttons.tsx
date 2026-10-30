@@ -100,6 +100,8 @@ export function DockButtons({
   };
   const bar = useAnimatedStyle(() => ({ width: `${Math.round(left.get() * 100)}%` }));
   const primary = dock.primary;
+  const hints = [picked ? `Picked: ${picked}` : null, primary?.arm ? HINT : dock.single ? ONLY_HINT : null].filter(Boolean).join(". ");
+  const primaryHint = hints === "" ? undefined : hints;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
   const said = (button: DockButton) => armedWords(button.armed ?? `Tap again: ${button.label}`, dense, chars);
   const line = armedButton ? said(armedButton) : (dock.why ?? (dock.single ? ONLY : null));
@@ -130,7 +132,7 @@ export function DockButtons({
           compact
           tight={dense}
           disabled={!primaryReady(dock)}
-          accessibilityHint={[picked ? `Picked: ${picked}` : null, primary.arm ? HINT : dock.single ? ONLY_HINT : null].filter(Boolean).join(". ") || undefined}
+          accessibilityHint={primaryHint}
           onPress={() => press(primary)}
         />
       ) : null}

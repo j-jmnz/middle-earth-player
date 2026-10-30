@@ -74,7 +74,9 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   // A scrub started and JavaScript has not yet been told it closed.
   const begun = useSharedValue(false);
 
-  const spread = useMemo(() => spreadLayout(layout, canvas), [layout, canvas.width, canvas.height, canvas.bottom]); // eslint-disable-line react-hooks/exhaustive-deps -- the canvas is its three numbers.
+  // The canvas is its three numbers, so a caller's fresh object with the same ones does not spread the hand again.
+  const { width: canvasWidth, height: canvasHeight, bottom: canvasBottom } = canvas;
+  const spread = useMemo(() => spreadLayout(layout, { width: canvasWidth, height: canvasHeight, bottom: canvasBottom }), [layout, canvasWidth, canvasHeight, canvasBottom]);
   const draggableSet = useMemo(() => new Set(draggable), [draggable]);
   useEffect(() => {
     slots.set(layout.slots);

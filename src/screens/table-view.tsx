@@ -24,7 +24,7 @@ import { createHandoff } from "../play/spotlight-handoff";
 import { SpotlightLayer } from "../play/spotlight-layer";
 import type { StageArea } from "../play/spotlight-stage";
 import { TableCanvas } from "../play/table-canvas";
-import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
+import type { PictureSource, TableCanvasProps } from "../play/table-canvas-types";
 import { MomentBanner } from "../play/moment-banner";
 import { TableDock } from "../play/table-dock";
 import { TableLayers } from "../play/table-layers";
@@ -135,11 +135,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
   const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
-  // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
-  const info = useCallback((cardId: string): SlotInfo => {
-    const { game: now, viewedSeat } = store.getState();
-    return slotNumbers(now, ctx, cardId, shownSeat(now, viewedSeat));
-  }, [store, ctx]);
+  // Read from the state the canvas holds and the seat it draws, never from the store in a render.
+  const info = useCallback<TableCanvasProps["info"]>((now, seat, cardId) => slotNumbers(now, ctx, cardId, seat), [ctx]);
   const rail = useMemo(() => railFor(game), [game]);
   const carousel = useMemo(() => phaseCarousel(game, { stopsOn: settings.stopsOn, stops: settings.stops }, ruleTitle), [game, settings.stopsOn, settings.stops]);
   const logNames: LogNames = useMemo(

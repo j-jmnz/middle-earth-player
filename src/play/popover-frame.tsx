@@ -95,6 +95,16 @@ export function PopoverDivider() {
   return <View style={{ height: 1, marginVertical: 4 * s, marginHorizontal: 10 * s, backgroundColor: t.hairline }} />;
 }
 
+// Moves the screen reader's focus to the first row. A module-level function: the React Compiler cannot compile a try/catch inside a component.
+function focusRow(row: RefObject<PressableRef | null>): void {
+  try {
+    const node = row.current ? findNodeHandle(row.current) : null;
+    if (node != null) AccessibilityInfo.setAccessibilityFocus(node);
+  } catch {
+    // A platform without accessibility focus has nothing to move.
+  }
+}
+
 /**
  * The popover and the layer that closes it. Render it last among the table's panels so it sits over them. `place` positions it
  * (absolute, inside the safe-area insets); `origin` is the corner it grows from. `focusRef` is the first row: focus moves to it
@@ -129,14 +139,7 @@ export function PopoverFrame({
   const s = useUiScale();
   useEffect(() => {
     if (!open) return;
-    const timer = setTimeout(() => {
-      try {
-        const node = first.current ? findNodeHandle(first.current) : null;
-        if (node != null) AccessibilityInfo.setAccessibilityFocus(node);
-      } catch {
-        // A platform without accessibility focus has nothing to move.
-      }
-    }, ms(MOTION.menuEnter, scale));
+    const timer = setTimeout(() => focusRow(first), ms(MOTION.menuEnter, scale));
     return () => clearTimeout(timer);
   }, [open, first, scale]);
 

@@ -7,7 +7,7 @@
 // in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
 import { Canvas, Group, RadialGradient, Rect as SkRect, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
-import { memo, useCallback, useLayoutEffect, useMemo } from "react";
+import { memo, useCallback, useEffectEvent, useLayoutEffect, useMemo } from "react";
 import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
 
@@ -56,12 +56,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
   const draggable = useStore(store, (state) => (state.viewedSeat != null ? NO_DRAG : state.draggable));
-  // Only the slices drawn here: a threat change alone does not draw the table again (docs/architecture.md, State). The
-  // effects in play and the attack in progress change the numbers on cards.
-  const modifiers = useStore(store, (state) => state.game.modifiers);
-  // The shown seat's threat sets which enemies in staging engage it (their marks), and the delayed effects mark cards.
-  const threat = useStore(store, (state) => state.game.seats[seat]?.threat ?? 0);
-  const delayed = useStore(store, (state) => state.game.delayed);
+  // The state the numbers on cards are read from (info): the effects in play, the shown seat's threat (which enemies in staging engage
+  // it), the delayed effects and the attack in progress. The compiler sees this as the dependency, so they are never read stale.
+  const game = useStore(store, (state) => state.game);
   const attacker = useStore(store, (state) => state.game.pendingAttack?.enemyId ?? null);
   const deckTopId = useStore(store, (state) => state.game.seats[seat]?.deck[0] ?? null);
   const deckTopCard = useStore(store, (state) => (deckTopId ? (state.game.cards[deckTopId] ?? null) : null));
@@ -95,10 +92,10 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The plan, the clock and the table's decodes go to the layer when the plan, whether it plays or the motion scale changes; only the
   // layer listens, so this canvas does not render again for it. The decodes are a fallback until the layer's own are ready.
   const { plan, progress, playing } = spot;
+  const decoded = useEffectEvent(() => images);
   useLayoutEffect(() => {
-    handoff.setState({ plan, progress, k, playing, tableImages: images });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- the table's decodes move often and are read when the plan does.
-  }, [handoff, plan, playing, k]);
+    handoff.setState({ plan, progress, k, playing, tableImages: decoded() });
+  }, [handoff, plan, progress, playing, k]);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
   const reader = useScreenReader();
@@ -149,7 +146,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const rect = slotBounds(slot);
-    const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(slot.id) : null;
+    const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(game, seat, slot.id) : null;
     const optionMark = highlight.marks.get(slot.id);
     // The veil is drawn in the card's turned group, under this upright layer, so a veiled card's tokens and marks are faded
     // here instead; the option pill stays bright.
@@ -176,10 +173,6 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     </Moving>
   );
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
-  // The numbers on cards are read again when the effects in play, the threat or the delayed effects change.
-  void modifiers;
-  void threat;
-  void delayed;
   const emptyWords: [Rect, string][] = [
     ...(views.staging.entries.length === 0 ? [[layout.zones.staging, "Staging"] as [Rect, string]] : []),
     ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged"] as [Rect, string]] : []),
@@ -213,7 +206,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         ))}
         {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
         <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
-        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(slot.id).questPoints)} contrast={contrast} />
+        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints)} contrast={contrast} />
         {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
         {layout.marks.map((mark) => (
           <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />

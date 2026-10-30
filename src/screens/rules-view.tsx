@@ -1,6 +1,6 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
 import { BodyText, ListRow, Screen, SearchField, Section, TwoPane } from "./chrome";
@@ -84,13 +84,16 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
   const listRef = useRef<FlashListRef<(typeof visible)[number]>>(null);
   // A pick made in the pane (See also) brings its row into view in the list, when the search leaves it there, and is announced.
   // Only a new pick moves the list; typing in the search does not.
+  const reveal = useEffectEvent((id: string) => {
+    const at = visible.findIndex((item) => item.id === id);
+    if (at >= 0) void listRef.current?.scrollToIndex({ index: at, animated: true });
+    const title = glossaryEntry(id)?.title;
+    if (title) AccessibilityInfo.announceForAccessibility(title);
+  });
   useEffect(() => {
     if (!expanded || !picked) return;
-    const at = visible.findIndex((item) => item.id === picked);
-    if (at >= 0) void listRef.current?.scrollToIndex({ index: at, animated: true });
-    const title = glossaryEntry(picked)?.title;
-    if (title) AccessibilityInfo.announceForAccessibility(title);
-  }, [picked, expanded]); // eslint-disable-line react-hooks/exhaustive-deps
+    reveal(picked);
+  }, [picked, expanded]);
 
   const searchRow = (
     <View className="mt-1 flex-row">

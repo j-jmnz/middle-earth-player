@@ -44,6 +44,26 @@ async function droppedName(code: string): Promise<string> {
   return code;
 }
 
+// The try/catch and try/finally below live here because the React Compiler cannot compile them inside a component.
+// The decklist as fetched, or null when the request failed.
+async function fetchJson(url: string): Promise<{ payload: unknown } | null> {
+  try {
+    return { payload: await readJson(url) };
+  } catch {
+    return null;
+  }
+}
+
+// Runs `run` with the busy flag up, and down again however it ends.
+async function whileBusy(setBusy: (busy: boolean) => void, run: () => Promise<void>): Promise<void> {
+  setBusy(true);
+  try {
+    await run();
+  } finally {
+    setBusy(false);
+  }
+}
+
 export default function DeckImportScreen() {
   const router = useRouter();
   const list = useListGutter("readable", 0);
@@ -90,16 +110,13 @@ export default function DeckImportScreen() {
       setMessage("That is not a RingsDB decklist.");
       return;
     }
-    setBusy(true);
-    try {
-      let payload: unknown;
-      try {
-        payload = await readJson(decklistUrl(id));
-      } catch {
+    await whileBusy(setBusy, async () => {
+      const fetched = await fetchJson(decklistUrl(id));
+      if (!fetched) {
         setMessage(FETCH_FAILURE);
         return;
       }
-      const body = readDecklistBody(payload);
+      const body = readDecklistBody(fetched.payload);
       if (!body) {
         setMessage("That decklist could not be read.");
         return;
@@ -107,9 +124,7 @@ export default function DeckImportScreen() {
       const built = buildDecklist(body, pool);
       const names = await Promise.all(built.droppedCodes.map((code) => droppedName(code)));
       save(built, names);
-    } finally {
-      setBusy(false);
-    }
+    });
   }
 
   // A pre-built deck is local data. It opens in the editor, where Save is the one action: nothing is saved by the tap,

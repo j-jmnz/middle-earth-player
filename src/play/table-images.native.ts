@@ -5,7 +5,7 @@
 // table is released too (docs/architecture.md, Images). Nothing here downloads: a missing file stays missing and the canvas draws
 // the name.
 import { FilterMode, MipmapMode, Skia, type SkImage } from "@shopify/react-native-skia";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { Image as RNImage, PixelRatio } from "react-native";
 
 import type { PictureSource } from "./table-canvas-types.ts";
@@ -77,7 +77,8 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
     for (const image of done) image.dispose();
   }, [images]);
 
-  useEffect(() => {
+  // Decodes what the table wants now. It runs when the boxes' key or the cache revision changes, and reads the latest `boxes` and `picture`.
+  const decodeWanted = useEffectEvent(() => {
     wantedNow.current = boxes;
     const publish = () => setImages(new Map([...held.current].map(([code, copy]) => [code, copy.image])));
     let changed = false;
@@ -110,8 +111,9 @@ export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: 
         publish();
       });
     }
-    // `boxes` is read through `key`; `picture` is read again when the cache revision moves.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
+  useEffect(() => {
+    decodeWanted();
   }, [key, revision]);
 
   useEffect(() => {

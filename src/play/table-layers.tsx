@@ -10,7 +10,7 @@
 //   - While the combat spotlight plays, its scrim (spotlight-scrim.tsx) is over the top bar and the dock, above all of these.
 //   - The peek banner (peek-banner.tsx) is the lowest of them, over the canvas only: the scrims and panels sit above it, and the spotlight's
 //     scrim (the bar and the dock column) never covers it.
-import { useEffect, useMemo } from "react";
+import { useEffect, useEffectEvent, useMemo } from "react";
 import { Pressable } from "react-native";
 import { useStore } from "zustand";
 
@@ -103,9 +103,9 @@ export function TableLayers({
   const close = () => onReading(null);
   // A spotlight plays over the table, so a reading layer (the carousel, a panel) closes as one begins instead of hiding it.
   const spotlit = useSpotlightHold(store);
+  const closeReading = useEffectEvent(() => onReading(null));
   useEffect(() => {
-    if (spotlit) onReading(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when a spotlight begins.
+    if (spotlit) closeReading();
   }, [spotlit]);
   const anchor = anchorTop ?? Math.round(screen.height * 0.55);
   const canvas = screen.width - insets.left - insets.right - commandWidth;

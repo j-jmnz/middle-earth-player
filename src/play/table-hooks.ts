@@ -1,7 +1,7 @@
 // The parts of the table's hook (use-table-choice.ts) that run on their own clock: the outcome banner and the round
 // summary after it, the first-game guide's line, and the answers the table gives for the player from the player's own
 // settings (stops.ts).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 
 import { stageText } from "./objective.ts";
@@ -97,13 +97,14 @@ export function useGuide(settings: TableSettings, game: ScenarioState, sheet: Sh
   const guide = line && (settings.guideSeen[line.key] ?? 0) < 2 && !(note ?? "").includes(line.text) ? line : null;
   const guideKey = guide ? `${guide.key}:${sheet.key}` : "";
   const showing = useRef<string | null>(null);
+  // The line showing now, read when the key changes: the effect runs once per moment the line appears in.
+  const showingNow = useEffectEvent(() => guide?.key ?? null);
   useEffect(() => {
     const ended = showing.current;
-    showing.current = guide?.key ?? null;
+    showing.current = showingNow();
     if (ended == null) return;
     const now = tableSettings.getState().settings;
     tableSettings.getState().update({ guideSeen: { ...now.guideSeen, [ended]: (now.guideSeen[ended] ?? 0) + 1 } });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- counted once per moment the line appears in.
   }, [guideKey]);
   return guide?.text ?? null;
 }
@@ -141,7 +142,8 @@ export function useAutoAnswer({
   // The cards usable where the player was last asked: a new one makes a window ask again.
   const seen = useRef<Set<string>>(new Set());
   const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}:${hold ? "held" : ""}`;
-  useEffect(() => {
+  // What the table answers with, read when the key changes: it runs once per moment; the key holds what decides that.
+  const answer = useEffectEvent(() => {
     if (opened || hold) return;
     // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
     const held = moment?.kind === "undone";
@@ -158,7 +160,9 @@ export function useAutoAnswer({
     // The table asks here: the cards usable now are seen, and a run to the next stop ends.
     for (const id of usableIds(sheet)) seen.current.add(id);
     running.current = false;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per moment; the key holds what it reads.
+  });
+  useEffect(() => {
+    answer();
   }, [autoKey]);
   return useCallback(() => {
     running.current = true;
