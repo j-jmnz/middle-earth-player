@@ -7,7 +7,8 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { sha256 } from "./data/sources/fetch.ts";
 import { createLog } from "./log.ts";
-import { MAX_SIDE, packScans, shrinkToMaxSide } from "./pack-scans.ts";
+import { MAX_SIDE, packScans, sceneOf, shrinkToMaxSide } from "./pack-scans.ts";
+import { SCENE_PICTURE } from "../src/screens/art-crop.ts";
 import sharp from "sharp";
 
 const roots: string[] = [];
@@ -192,6 +193,23 @@ describe("pack scans", () => {
     );
     // Bag End's page could not be rendered: its scan is bundled instead.
     expect(packed.find((entry) => entry.code === "141031")).toMatchObject({ height: 600 });
+  });
+
+  it("bundles each scenario's scene on its own beside its first quest card, keyed `<code>.scene`", async () => {
+    const staged = stage();
+    const packed = await packScans(
+      { ...staged.options, fetch: () => Promise.resolve(new Uint8Array(jpeg(560))), sceneCodes: new Set(["141022"]), scene: () => Promise.resolve(new Uint8Array(jpeg(200))) },
+      log,
+    );
+    expect(readdirSync(staged.options.scansDir)).toContain("141022.scene.jpg");
+    expect(packed.filter((entry) => entry.code.endsWith(".scene")).map((entry) => entry.code)).toEqual(["141022.scene"]);
+    expect(readFileSync(staged.options.mapPath, "utf8")).toContain('"141022.scene": { moduleId: require("../../../assets/scans/141022.scene.jpg")');
+  });
+
+  it("cuts a scene from the laid-down quest picture at the source's own size", async () => {
+    const upright = new Uint8Array(await sharp({ create: { width: 1412, height: 1927, channels: 3, background: "#806040" } }).jpeg().toBuffer());
+    const scene = await sharp(Buffer.from(await sceneOf(upright, "quest"))).metadata();
+    expect([scene.width, scene.height]).toEqual([Math.round(SCENE_PICTURE.w * 1927), Math.round(SCENE_PICTURE.h * 1412)]);
   });
 
   it("scales a picture down to the bundle's size and keeps a small one byte for byte", async () => {
