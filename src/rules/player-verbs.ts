@@ -16,7 +16,7 @@ import { lowerThreatByEffect } from "./families/quest-threat.ts";
 import { placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
-import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
+import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
 import { printedOf } from "./printed.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
@@ -85,11 +85,11 @@ export function runPlayerVerb(
       }
       if (instruction.target === "host") {
         const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
-        return hostId && state.cards[hostId] ? updateCard(state, hostId, { exhausted: false }) : state;
+        return hostId && state.cards[hostId] && !flagged(state, hostId, "cannotReady") ? updateCard(state, hostId, { exhausted: false }) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;
-      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) next = updateCard(next, id, { exhausted: false });
+      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!flagged(state, id, "cannotReady")) next = updateCard(next, id, { exhausted: false });
       return next;
     }
     case "Exhaust": {
@@ -305,7 +305,8 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
 // A card readies or exhausts, and the Responses that hear it are told ("After ~ readies", "After ~ exhausts").
 export function readyCard(state: ScenarioState, id: string): ScenarioState {
   const card = state.cards[id];
-  if (!card?.exhausted) return state;
+  // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
+  if (!card?.exhausted || flagged(state, id, "cannotReady")) return state;
   return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id });
 }
 

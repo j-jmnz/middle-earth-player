@@ -2,6 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare.ts runs them.
 import { z } from "zod";
 
+import { cardRefSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
 export const VERBS = [
@@ -35,6 +36,16 @@ export const VERBS = [
   // The enemy in the staging area with the lowest engagement cost becomes the picked card; the first player chooses among a tie
   // (rr.first-player). Nothing is picked when there is none ("engage the lowest engagement cost enemy in the staging area", 906407:A:2).
   z.strictObject({ verb: z.literal("PickLowestEngagement"), ...when }),
+  // The player who controls the card the reference names becomes the picked player ("attach this card to one of that player's heroes",
+  // 900106:A:1: the controller of the hero the source was attached to). Nothing is picked when that card has no controller.
+  z.strictObject({ verb: z.literal("PickController"), card: cardRefSchema, ...when }),
+  // The topmost card of the encounter discard pile of one of these printed types becomes the picked card ("The topmost enemy or location
+  // card in the encounter discard pile", 900107:A:2). Nothing is picked with none there.
+  z.strictObject({ verb: z.literal("PickDiscardTop"), types: z.array(z.enum(["enemy", "location", "treachery"])).min(1), ...when }),
+  // A shadow effect: the topmost card of the encounter discard pile that has a Shadow effect is dealt to the attacking enemy as one more
+  // shadow card, and resolves in this attack after the ones it has ("Deal and resolve the topmost Shadow effect in the encounter discard
+  // pile for this attack", 900107:A:3; rr.step-6-4-2). Nothing happens with none there.
+  z.strictObject({ verb: z.literal("DealShadowFromDiscard"), ...when }),
 ] as const;
 
 export const TRIGGERS = [
@@ -44,6 +55,10 @@ export const TRIGGERS = [
   // The "when revealed" effects of an encounter card were canceled (a cancel Response to a card just revealed, or to its When Revealed effect;
   // rr.cancel). About no card: every card in play hears it ("After a 'when revealed' effect is canceled", 906304:A:1, 906406:A:1).
   "whenRevealedCanceled",
+  // Setup is under way: a Forced effect of the Nightmare setup card that says "During setup" resolves once the piles are dealt and the
+  // quest's own Setup is placed, before the first round ("Forced: During setup, each player reveals 1 card from the encounter deck",
+  // 900101:A:2; rr.setup: card effects triggered during Setup are fully resolved). Only the setup card in zone `nightmare` hears it.
+  "duringSetup",
 ] as const;
 
 export const FLAGS = [
@@ -53,4 +68,7 @@ export const FLAGS = [
   // On a card: it is immune to player card effects while the flag holds ("While Bill Ferny is in the staging area, he gains: Immune to player
   // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/keywords.ts playerCardEffectCanChoose).
   "immuneToPlayerCards",
+  // On a card: it cannot ready, by a card effect or in the refresh phase, while the flag holds ("your cards cannot ready for the remainder
+  // of the round", 900103:A:1). Read wherever a card readies (player-verbs.ts readyCard, refresh.ts, effect-verbs.ts ReadyHero).
+  "cannotReady",
 ] as const;

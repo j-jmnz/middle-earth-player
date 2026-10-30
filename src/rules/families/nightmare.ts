@@ -1,6 +1,6 @@
 // Rules: mec109.hide-tests, mec109.hide-x, rr.attachment-cards, rr.search, rr.discard-pile-and-victory-display, rr.forced,
 // rr.quest-advancement (data/rules/entries.json); ledger lines 906101:A:2, 906102:A:3, 906106:A:1, 906107:A:2, 906108:A:1.
-import type { Effect, Instruction } from "../../catalog/boundary.ts";
+import type { CardRef, Effect, Instruction } from "../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import { beginEnemyAttack } from "../combat.ts";
@@ -12,6 +12,8 @@ import { dealForAttack } from "./south-watcher.ts";
 import { moveEncounter } from "./encounter-moves.ts";
 import { markPicked } from "./play-refs.ts";
 import { askTarget } from "../choices.ts";
+import { frameScope, refCard } from "../amounts.ts";
+import { pushCardEffects } from "../effect-frames.ts";
 import { modifiedStat } from "../keywords.ts";
 import type { EngineStep } from "../intents.ts";
 import { runEffect, type ReduceContext } from "../interpret.ts";
@@ -45,6 +47,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return engageSetAside(state, instruction.code, focus, ctx, steps);
     case "PickLowestEngagement":
       return pickLowestEngagement(state, focus, ctx, steps);
+    case "PickController":
+      return pickController(state, instruction.card, focus);
+    case "PickDiscardTop":
+      return pickDiscardTop(state, instruction.types, ctx);
+    case "DealShadowFromDiscard":
+      return dealShadowFromDiscard(state, ctx);
     default:
       return null;
   }
@@ -225,4 +233,40 @@ function pickLowestEngagement(state: ScenarioState, focus: Focus, ctx: ReduceCon
   const chosen = focus.chosen && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
   if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: "PickLowestEngagement" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
   return markPicked(state, chosen ?? "");
+}
+
+// PickController: the seat that controls the card the reference names is picked ("one of that player's heroes", 900106:A:1).
+function pickController(state: ScenarioState, card: CardRef, focus: Focus): ScenarioState {
+  const id = refCard(state, card, frameScope(state, focus.seat, focus.sourceId));
+  const controller = id ? state.cards[id]?.controller : null;
+  return controller == null ? state : markPicked(state, `seat:${controller}`);
+}
+
+// PickDiscardTop: the topmost card of the encounter discard pile (its last card) of one of these printed types is picked (900107:A:2).
+function pickDiscardTop(state: ScenarioState, types: readonly string[], ctx: ReduceContext): ScenarioState {
+  const found = [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type));
+  return found ? markPicked(state, found) : state;
+}
+
+// DealShadowFromDiscard: the topmost card of the encounter discard pile with a Shadow effect (a shadow record: every printed line has one) becomes
+// one more shadow card of the attacking enemy, face down; the attack resolves it after the ones it has (900107:A:3, rr.step-6-4-2).
+function dealShadowFromDiscard(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const enemyId = state.pendingAttack?.enemyId;
+  if (!enemyId || !state.cards[enemyId]) return state;
+  const found = [...state.encounterDiscard].reverse().find((id) => {
+    return effectsOf(ctx, state.cards[id]?.code ?? "").some((effect) => effect.timing === "shadow");
+  });
+  return found ? updateCard(moveCard(state, found, { zone: "shadow", enemyId }), found, { face: "down", controller: null }) : state;
+}
+
+// The setup card's Forced effects that say "During setup" (900101:A:2) go down once the first quest card's Setup and When Revealed frames are
+// on the stack (setup.ts finishSetup), so they resolve first, before the first round (rr.setup).
+export function nightmareDuringSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const card of Object.values(state.cards)) {
+    if (card.zone !== "nightmare") continue;
+    const own = ctx.effects.filter((effect) => effect.cardCode === card.code && effect.timing === "forced" && effect.trigger === "duringSetup");
+    next = pushCardEffects(next, "forced", card.id, next.firstPlayer, false, own, ctx, steps);
+  }
+  return next;
 }

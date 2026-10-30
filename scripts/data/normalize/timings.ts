@@ -46,6 +46,10 @@ export function lineTimings(line: string): Set<string> {
   }
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text.
   if (/Counts as an? (?:\w+ )?attachment/.test(line)) allowed.add("constant");
+  // An attachment's quoted text with no label of its own may trigger on a condition, as any unlabelled line may ("Counts as a Condition
+  // attachment with the text, "Each time attached hero readies, deal it 1 damage."", 900106:A:1).
+  const quoted = /Counts as an? (?:\w+ )?attachment with the text[,:]? "([^"]*)"/.exec(line)?.[1];
+  if (quoted != null && !LABEL.test(quoted.trim())) allowed.add("triggered");
   // An unlabelled line that calls itself an action is one ("Any player may trigger this action", Ceorl 12058:A:1).
   if (/trigger this action/i.test(line)) allowed.add("action");
   // An objective ally that "The first player gains control of" it is put into play by the campaign pool at the start of a scenario (Mendor, 01135:A:2).

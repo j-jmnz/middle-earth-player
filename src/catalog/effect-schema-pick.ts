@@ -177,6 +177,9 @@ export const pickSchema = z.strictObject({
   guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),
+  // The nightmare family's filter (read in src/rules/pick.ts): a character whose current Willpower is at most this, a value below 0
+  // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
+  maxWillpower: z.number().int().min(0).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

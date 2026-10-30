@@ -16,7 +16,8 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
     // "Does not ready during the refresh phase" (a flag) leaves the card exhausted.
-    const stays = instance.exhausted && flagged(state, instance.id, "doesNotReady");
+    // So does "cannot ready" (cannotReady, 900103:A:1).
+    const stays = instance.exhausted && (flagged(state, instance.id, "doesNotReady") || flagged(state, instance.id, "cannotReady"));
     next = updateCard(next, instance.id, { exhausted: stays, committed: false });
     if (heard && instance.exhausted && !stays) next = queueEvent(next, { trigger: "readied", seat: instance.controller, cardId: instance.id, phase: "Refresh" });
   }

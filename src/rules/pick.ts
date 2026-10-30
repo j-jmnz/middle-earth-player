@@ -155,6 +155,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The misc family's filters: controlled by the picked player, attached to the picked card, a player card, a Defense limit, drawn
   // in the resource phase (families/misc-pick.ts).
   if (!miscPickMatches(state, id, spec, at, ctx)) return false;
+  // The nightmare family's filter: a Willpower at most this, below 0 counting as 0 (900102:A:1).
+  if (spec.maxWillpower != null && Math.max(0, modifiedStat(state, instance, "willpower", ctx.cards)) > spec.maxWillpower) return false;
   // The sidequests family's filters: a Trait or a title shared with another card, the quest a character is committed to
   // (families/sidequests-pick.ts).
   if (!sidequestsPickMatches(state, id, spec, at, ctx)) return false;

@@ -122,4 +122,20 @@ describe("the quest's records on Nightmare", () => {
     expect(tentacles("encounterDeck")).toBe(3);
     expect(state.encounterDiscard).toEqual([]);
   });
+
+  it("reveal one card for each player during Setup of Passage Through Mirkwood (900101:A:2)", () => {
+    const campaign = loadCampaign("mirkwood-paths");
+    const seat = seatFor("mirkwood-paths");
+    const world = loadWorld(catalog, campaign, loadScenario("passage-through-mirkwood"), EFFECTS, [...seat.heroes, ...seat.deck]);
+    const ctx = contextOf(world);
+    const begin = (effects: typeof world.effects) => {
+      const start = buildStart({ campaign, scenario: world.scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: seat.heroes, deck: seat.deck }], difficulty: "Nightmare", effects, mode: "standalone" });
+      let state = startScenario(start, { ...ctx, effects });
+      while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, { ...ctx, effects })).state;
+      return state;
+    };
+    const withReveal = begin(ctx.effects);
+    const without = begin(ctx.effects.filter((effect) => effect.id !== "900101:forced:1"));
+    expect(withReveal.encounterDeck.length).toBeLessThan(without.encounterDeck.length);
+  });
 });
