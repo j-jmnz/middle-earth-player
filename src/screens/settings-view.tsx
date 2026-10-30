@@ -1,4 +1,4 @@
-// The Settings screen (docs/plans/settings-theme-and-ui-scale.md; user request, 2026-10-28): the app's settings on one page, grouped
+// The Settings screen (docs/plans/done/settings-theme-and-ui-scale.md; user request, 2026-10-28): the app's settings on one page, grouped
 // by topic, no sub-menus. Every change applies at once and is saved by bindTableSettings; the page itself reflows when the scale
 // or the theme changes, which is the feedback. Restore defaults asks twice, in place, as Delete does (keep-or-delete.tsx).
 import Constants from "expo-constants";

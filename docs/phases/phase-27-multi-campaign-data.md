@@ -59,7 +59,7 @@ A sentence no template reads is authored, as in phase 8.
 
 ## Ledger
 
-- `data/printed/mirkwood-paths.json`, read by an agent from the pinned scans (`docs/plans/authoritative-data.md` §A): every dealt, campaign, boon and burden card of both boxes, plus core player cards 01013, 01017 and 01030. Each entry records `readBy`; its scan sha256 matches the pin.
+- `data/printed/mirkwood-paths.json`, read by an agent from the pinned scans (`docs/plans/done/authoritative-data.md` §A): every dealt, campaign, boon and burden card of both boxes, plus core player cards 01013, 01017 and 01030. Each entry records `readBy`; its scan sha256 matches the pin.
 - Order: `pnpm data:build`, then `pnpm data:sync scans`, then read.
 - `loadLedger` merges every `data/printed/*.json` and fails on a duplicate key. `src/catalog/printed-ledger.ts` imports both files. `printed/scope.ts` takes scope from every campaign. Drop the TFotR gate in `applyPrinted`.
 - A scan the agent cannot read is a question for the user, not a guess.

@@ -1,4 +1,4 @@
-// What the table canvas hands the combat spotlight's layer (docs/plans/combat-spotlight-redesign.md, §1). The spotlight is drawn by its
+// What the table canvas hands the combat spotlight's layer (docs/plans/done/combat-spotlight-redesign.md, §1). The spotlight is drawn by its
 // own full-screen canvas (spotlight-layer.native.tsx), but the clock, the plan and the table's pictures are the table canvas's. The
 // screen creates one small vanilla store, passes it to both, and the canvas publishes into it when the plan, whether it plays or the
 // motion scale changes. Only the layer subscribes, so neither the screen nor the memoized table canvas renders again for it. The

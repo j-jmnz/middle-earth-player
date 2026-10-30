@@ -4,7 +4,7 @@ Depends on: phase 8c
 Blocks: phases 10 and 12
 Can run beside: phase 9
 
-Plan: [docs/plans/authoritative-data.md](../plans/authoritative-data.md), changes C, D, F and G.
+Plan: [docs/plans/done/authoritative-data.md](../plans/done/authoritative-data.md), changes C, D, F and G.
 
 ## Goal
 

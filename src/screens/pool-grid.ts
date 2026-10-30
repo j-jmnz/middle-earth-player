@@ -1,7 +1,7 @@
 // The card pool grid's geometry (docs/design-system.md, Card pool). FlashList makes each column exactly a share of the list's width,
 // so a card is narrower than its column by the gaps shared over the columns, and each card sits a little into its column: the gaps
 // come out equal and the last card ends at the list's edge. Pure, so a test reads it.
-// `scale` is the UI scale (docs/plans/settings-theme-and-ui-scale.md): the grid is laid out in logical points, the list's width over
+// `scale` is the UI scale (docs/plans/done/settings-theme-and-ui-scale.md): the grid is laid out in logical points, the list's width over
 // the scale with a 10 point gap, and the results come back times the scale, so a card keeps its share of the screen at any size.
 
 import { columnsFor } from "../play/size-class";

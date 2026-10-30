@@ -6,19 +6,16 @@ and `src/catalog/families/`).
 
 The user's directive (2026-10-26): every deck-legal player card is fully playable, meaning its printed text is automated by
 effect records the engine runs, and every scenario of the Fellowship box follows (phases 13 to 16). The lines still without a
-record are listed in `src/effects/open-lines.ts` (`pnpm effects:open` rewrites it; 100 at the last merge: 98 for scenarios 5 and 6,
-cards 142040 to 142090, and `21072:B:1-2`, Smeagol's Gollum side). The Messenger of the King cards are out of scope
+record are listed in `src/effects/open-lines.ts` (`pnpm effects:open` rewrites it). The Messenger of the King cards are out of scope
 (`outOfScope` in `data/overrides.json`). This brief is reused for each new assignment: you own one **family** (the engine
 support one mechanic needs, and the records for its lines) or one **scenario phase** (phases 15 and 16: the records of the
 scenario's cards, plus the engine support they lack, which is a new family when it is a new mechanic). Other agents may work
 on other assignments at the same time. Below, `<F>` is your family or scenario id and `<BASE>` the integration branch the
-main session names in your task (at the time of writing `ccr-a8ef8247-8087n8`).
+main session names in your task.
 
-Families that exist (`src/catalog/families/index.ts` is the list): encounter, costs, quest, defense, attachments, attack, play,
-deck, sidequests, misc, burden (phase 13: the Ring-bearer's life, the burden deck, the campaign zone), south (phase 14: a
-second active location, the captive Ring-bearer, the Watcher). A scenario's own records are in
-`src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for scenarios 1 and 2, `flight-to-the-ford.ts`,
-`the-ring-goes-south.ts`); the burden and south families have no file under `src/effects/authored/families/`.
+The families that exist are listed in `src/catalog/families/index.ts`. A scenario's own records are in
+`src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for scenarios 1 and 2); families used only by scenario
+cards have no file under `src/effects/authored/families/`.
 
 ## Setup
 
@@ -109,8 +106,7 @@ suite once at the end, and never kill processes you did not start (no `pkill`).
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
 - Full `pnpm test` once at the end (about 10 minutes). The golden snapshots in `src/campaign/golden` (the scenario games and the
   starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
-  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/version.ts`, 6 at the time of
-  writing) and the saves' fixtures are rewritten with `scripts/e2e-fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
+  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e-fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
 
 ## Merge
 

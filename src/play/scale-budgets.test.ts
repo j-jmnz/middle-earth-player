@@ -1,4 +1,4 @@
-// The pure budget modules at a UI scale (docs/plans/settings-theme-and-ui-scale.md, UI scale engine; user request, 2026-10-28): at scale 1
+// The pure budget modules at a UI scale (docs/plans/done/settings-theme-and-ui-scale.md, UI scale engine; user request, 2026-10-28): at scale 1
 // they are what they were; at Large, a screen 1.15 times as large gives 1.15 times the answer, since they work in logical points.
 import { describe, expect, it } from "vitest";
 

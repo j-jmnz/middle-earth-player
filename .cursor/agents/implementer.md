@@ -6,13 +6,11 @@ description: Implements one phase from docs/phases. Use when the user asks to im
 
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
 
-Phase 17 (the design system) is completed and belongs to `/ux`; `docs/design-system.md` is the visual authority. Do not restyle screens while doing another phase.
+Do not restyle screens: the design system is `/ux`'s, and `docs/design-system.md` is the visual authority.
 
 Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.cursor/rules/authority.mdc` gives) beat all three.
 
-If no phase is active, start the lowest-numbered phase whose dependencies are completed. Do not start a later phase while an earlier dependency is open. Phases 12 to 16 have an engine half and a phone half (`docs/phases/STATUS.md`, phase 12); write `engine done` in the note when the engine half's exit is green and leave the phone half's checks open.
-
-When you start, mark that phase `active` and leave a one-line note. When its exit is green, ask `/reviewer` to review the diff. If the phase changes `src/screens` or `src/play`, ask `/ux` as well. Mark the phase `completed` and write the date only when the exit is green and those reviews report no blocks. Do not mark the next phase active.
+Which phase you may start, how to mark it, the engine and phone halves, and when it is `completed` are in the header of `docs/phases/STATUS.md`. Follow it. When the exit is green, ask `/reviewer` to review the diff, and `/ux` as well if the phase changes `src/screens` or `src/play`.
 
 ## Scope
 

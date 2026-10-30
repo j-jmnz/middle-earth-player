@@ -4,7 +4,7 @@ Depends on: phase 19
 Blocks: phase 23
 Can run beside: phases 14, 15, 16, 18 and 21
 
-Plan: `docs/plans/board-ux.md` (user list items 6 and 13). Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list items 6 and 13). Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -71,51 +71,3 @@ Update the flows that assert `rail-current`, which is kept. Add a step to `.maes
   - the slide on a phase change;
   - the strip's swipe;
   - the Stop switches' 44 pt rows.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior. Put the carousel in `src/play/phase-carousel.tsx`, not in `table-chrome.tsx`.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- Use a horizontal `ScrollView` with `snapToInterval` and `pagingEnabled`-like snapping. Seven items do not need FlashList.
-- The Stops logic stays `src/play/stops.ts` and `table-settings.ts`. The strip only reads and toggles them.
-- The strip covers the canvas top while open. It does not cover the dock.
-
-## Handover from phase 19
-
-Phase 19 is merged. What phase 20 builds on, and what its reviews left for it:
-
-- `PhaseRail` (`src/play/table-chrome.tsx`) sits in the bar's center zone. `barZones` (`src/play/top-bar-layout.ts`) gives it at least `RAIL_FLOOR` (about 232 pt, derived from the longest step name plus pill chrome; a test checks every name). The carousel's pill is longer ("Round 3 · QUEST · Staging"), so recompute the floor from the pill's own words and keep the test.
-- With two seats, Life and Burden the dials are about 426 pt wide: the rail sits right of the screen center and, at 667 pt, the dials scroll sideways. The carousel must not make that worse; the 667x375 two-seat bar is still an open phone check.
-- The round has no separate text any more. "R3" (`rail-round`) is drawn between the previous step and the current one, where it reads as part of the previous step ("Staging R3"). The pill should own it, and under 760 pt the pill-only rail must keep "R3": today no round shows below 760 pt.
-- A narrow rail already drops the pill's horizontal margin and the Pressable's padding; keep that or replace it with the carousel's own sizes.
-- The zones start at 30/40/30% until the bar is measured, so the rail can jump once when the table opens. Start from the computed zones, or hold the rail's opacity until it is measured.
-- Table settings opens `ReferencePanel` from the menu row `settings-open`; the menu ids are a closed `MenuItemId` union with an exhaustive switch in `table-view.tsx`.
-- Web check: the real table does not open on web (the SQLite migration fails), so phase 19 rendered `TableTopBar` and `TableMenu` with fake props in a temporary route. Do the same, compute `narrow` as `table-view.tsx` does (width minus both insets under 760), add a 47 pt inset shot, and delete the harness before committing.

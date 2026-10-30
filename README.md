@@ -49,12 +49,12 @@ Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is g
 
 ## Documents
 
-- [docs/brief.md](docs/brief.md): decisions, the stack, the rules the engine implements, the data rules, and the build order.
+- [docs/brief.md](docs/brief.md): decisions, the stack, the rules the engine implements, and the data rules.
 - [docs/architecture.md](docs/architecture.md): how the code is split, and the test layers.
 - [docs/design-system.md](docs/design-system.md): the screens' look.
 - [docs/phases/](docs/phases/): one file per phase, and [STATUS.md](docs/phases/STATUS.md).
-- [docs/plans/](docs/plans/): plans, among them [effect-authoring.md](docs/plans/effect-authoring.md), the cookbook for effect records and mechanic families.
-- [docs/handover/](docs/handover/): where the mechanic-family work stands, and [agent-brief.md](docs/handover/agent-brief.md), the brief a family agent follows.
+- [docs/plans/](docs/plans/): plans, among them [effect-authoring.md](docs/plans/effect-authoring.md), the cookbook for effect records and mechanic families. Plans already carried out are in `docs/plans/done/`.
+- [docs/handover/](docs/handover/): [agent-brief.md](docs/handover/agent-brief.md), the brief a family agent follows, and handovers for work left open.
 
 ## Agents
 

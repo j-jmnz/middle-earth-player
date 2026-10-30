@@ -1,4 +1,4 @@
-// The combat spotlight's effect curves (docs/plans/combat-spotlight-redesign.md, §4): the flash, the shockwave ring, the stamp, the
+// The combat spotlight's effect curves (docs/plans/done/combat-spotlight-redesign.md, §4): the flash, the shockwave ring, the stamp, the
 // trauma shake (Eiserloh's model), the damage number's pop and the camera push. Pure arithmetic on a time, worklet-safe (the
 // functions marked "worklet" run on the UI thread; in Node the directive is an unused string); spotlight-beats.ts reads them into a
 // frame. Lengths are logical points (the layer multiplies by the UI scale) or shares of a card's height.

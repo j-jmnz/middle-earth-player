@@ -1,4 +1,4 @@
-// The theme the app draws in (docs/plans/settings-theme-and-ui-scale.md, Theme engine; user request, 2026-10-28). The setting is Dark,
+// The theme the app draws in (docs/plans/done/settings-theme-and-ui-scale.md, Theme engine; user request, 2026-10-28). The setting is Dark,
 // Light or System; System follows the phone's own scheme. Dark is the default, so nothing changes for a player who never opens Settings.
 import { createContext, useContext } from "react";
 import { useColorScheme } from "react-native";

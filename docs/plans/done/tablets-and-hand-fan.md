@@ -22,7 +22,7 @@ The research behind the tablet design:
 - **Reading width:** about 50–75 characters, so a reading column of about 640 pt.
 - **Reach:** in landscape, controls go toward the sides.
 
-Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vitest on pure modules. Docs change in the same commit: `docs/design-system.md`, `docs/architecture.md`, `docs/brief.md` and `docs/phases/STATUS.md`. Phone checks stay Open, because a cloud session has no device. This plan is `docs/plans/tablets-and-hand-fan.md`.
+Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vitest on pure modules. Docs change in the same commit: `docs/design-system.md`, `docs/architecture.md`, `docs/brief.md` and `docs/phases/STATUS.md`. Phone checks stay Open, because a cloud session has no device. This plan is `docs/plans/done/tablets-and-hand-fan.md`.
 
 ---
 

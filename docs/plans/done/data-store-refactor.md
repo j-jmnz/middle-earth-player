@@ -1,6 +1,6 @@
 # Plan: a local game-data store, fetched once, generated wherever possible
 
-**Status, 2026-10-26: carried out (phase 8b, `docs/phases/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
+**Status, 2026-10-26: carried out (phase 8b, `docs/phases/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/done/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
 
 ## Context
 
@@ -103,7 +103,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 - Cross-checks fail the build unless resolved by an override:
   - Group counts must equal Hall of Beorn's per-scenario Normal and Easy counts for the scenario's encounter sets, minus Nightmare.
   - Placement must agree with the template parse of the stage-1 quest card's `Setup:` text, step 5. This catches Mr. Underhill in staging.
-- Now: the scenario file holds piles, not DragnCards groups, and the start is built from the cards' Setup records (`docs/plans/authoritative-data.md`, C). As planned, the engine read placement from the scenario's groups:
+- Now: the scenario file holds piles, not DragnCards groups, and the start is built from the cards' Setup records (`docs/plans/done/authoritative-data.md`, C). As planned, the engine read placement from the scenario's groups:
   - `startScenario` and `finishSetup` (`src/rules/setup.ts`) spawn each group into its zone, in the order the quest card's Setup text gives (set aside, staging, active, attach). `searchSetup` and `handSetup` (`src/rules/setup-search.ts`) are unchanged in what they compute.
   - `sharedEncounterDeck2`, `sharedQuestDeck2` and `sharedBoons` map to the optional zones the brief already reserves (burden deck, second encounter deck). The widget flags become derived: a non-empty group turns the widget on.
 - Delete the `fixtures/` directory, `src/catalog/scenario-fixture.ts`, `scripts/join-scenario-fixtures.ts`, the authored `141022:setup:1` placement record, `src/campaign/effects-setup-records.test.ts`, `ScenarioScript`, `registry.ts` and `fellowship/a-shadow-of-the-past.ts`.
@@ -114,7 +114,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 
 ### 4. Rules store
 
-Now: the heading splitter was replaced by the curated `data/rules/index.json` (`docs/plans/authoritative-data.md`, E); `scripts/data/rules/` holds `extract.ts`, `spans.ts` and `steps.ts`. The id convention (`rr.surge`) and the header-comment rule below stand.
+Now: the heading splitter was replaced by the curated `data/rules/index.json` (`docs/plans/done/authoritative-data.md`, E); `scripts/data/rules/` holds `extract.ts`, `spans.ts` and `steps.ts`. The id convention (`rr.surge`) and the header-comment rule below stand.
 - `data:build` runs `pdftotext` (reading order, not `-layout`) per page into `data/rules/<doc>.md`, with `## p<N> {#<doc>-p<N>}` headings.
 - A splitter turns the Rules Reference glossary (alphabetical headings), the Learn to Play phase sections and the MEC109 keyword and campaign sections into `data/rules/entries.json`: `{ id: "rr.surge", doc, page, title, text, terms }`.
 - Cleanup is one agent pass, then committed: fixing column interleaving the splitter can't. The extraction is regenerated only when a PDF's sha256 changes. A test asserts each entry's page exists and its title appears on that page.

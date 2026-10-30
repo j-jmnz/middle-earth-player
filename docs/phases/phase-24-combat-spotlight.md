@@ -1,12 +1,12 @@
 # Phase 24 — Combat spotlight
 
-> **Superseded by the 2026-10-29 redesign (`docs/plans/combat-spotlight-redesign.md`).** A user request replaced this phase's look and timing: the spotlight is a full-screen, always-dark layer, a lone attack runs 2200 ms, not 1500, and a destroyed target burns. The gate, skip, Back, banner-wait and engine numbers below still hold. `docs/design-system.md`, Table, Spotlight, is the current description; the sequence and numbers below are history.
+> **Superseded by the 2026-10-29 redesign (`docs/plans/done/combat-spotlight-redesign.md`).** A user request replaced this phase's look and timing: the spotlight is a full-screen, always-dark layer, a lone attack runs 2200 ms, not 1500, and a destroyed target burns. The gate, skip, Back, banner-wait and engine numbers below still hold. `docs/design-system.md`, Table, Spotlight, is the current description; the sequence and numbers below are history.
 
 Depends on: phase 23
 Blocks: nothing
 Can run beside: phases 14, 15, 16, 25 and 26
 
-Plan: `docs/plans/board-ux.md` (user list item 3). Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list item 3). Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -92,58 +92,3 @@ None. The canvas is phone-only. The banner flows still pass, because the banner 
   - three attacks in a row not feeling slow;
   - the token burst readable;
   - reduced motion showing none.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- Every duration comes from `motion-tokens.ts`. Add the spotlight's beats there. The total stays at or under 1.6 s at Normal.
-- Archery damage and damage from a card effect are not attacks and get no spotlight. The banner covers them.
-- An attack that is cancelled, or that ends without a damage step, gets no spotlight.
-- Keep `table-canvas.native.tsx` under 300 lines. The spotlight is its own file, given the images and the clashes as props.
-
-## Handover from phase 22
-
-- The dock's readout, armed line, buttons and quiet pills are pinned to the dock's foot (`src/play/table-dock.tsx`); only the step, title and folded lines above them scroll. The scrim over the dock covers that whole column; the readout block is still what the choice tray's foot is measured against (`onBlock`). On a screen under 400 pt tall (`DENSE_BELOW`, `dock-budget.ts`) the readout shows one line while the tray is open; the full text is its accessibility label.
-- The quest band is gone from the command column; the quest card's preview carries the stage name and progress.
-- A card's edge shows at most two effect pills and "+n" (`badgeSplit` in `src/play/card-effects.ts`); the enlarged cards in the spotlight read the same split unless the spotlight draws its own.
-
-## Handover from phase 23
-
-Phase 23 is merged. What phase 24 builds on:
-
-- Every duration, curve and spring is a token in `src/play/motion-tokens.ts` (`MOTION`, with shapes in `SHAPE`): a `tween(ms, easing)` or a `spring(ms, zeta)`. Add the spotlight's beats there (for example `spotlightDim`, `spotlightDraw`, `spotlightLunge`, `spotlightHold`, `spotlightShake`, `spotlightBurst`, `spotlightReturn`), with the distances and angles (10 pt draw-back, 4° tilt, ±5 pt shake, 42% enlargement) in `SHAPE`. `LONG_TOKENS` already names `spotlight`: one token for the whole 1.5 s run may pass 500 ms (`motion-tokens.test.ts` checks the rest stay at or under `MAX_TOKEN_MS`). `rg -n "duration\(|withTiming\(.*[0-9]{3}" src/play` must still find nothing outside `motion-tokens.ts`.
-- Every duration passes through `motionScale(speed, reduced)` (1 Normal, 0.6 Quick, 0 under reduced motion). On the canvas read the scale once with `useMotionScale()` (`motion-run.ts`); hand Reanimated a token with `timing(token, scale)`, `springConfig(token, scale)` or `layoutAnim(...)`. A scale of 0 is your "no spotlight" signal. Quick runs the spotlight at 0.6 (about 0.9 s).
-- Canvas motion runs on one clock per state (`card-motion.native.tsx`, pure poses in `motion-pose.ts`); token pops and floating numbers run on their own clock (`token-fx.native.tsx`, pure `token-fx.ts`) from `tokenDeltas(prev, next)` (`token-deltas.ts`). The damage count that pops at the end of the strike is that pop (`popScale`, `tokenPopRise`, `tokenPopSettle`, `SHAPE.tokenPop`); reuse it rather than drawing a second one, and make sure the state's normal damage pop does not also fire on top of the spotlight's. The UI never computes a number: the count comes from the reducer's state.
-- The hurry tap: a touch on the canvas calls `finishMotions(progress, clear)` in the canvas pan's `onBegin` (sets the card clock to 1, drops the pending landing tick) and is then handled as usual. The spotlight should finish on the same touch (set its progress to 1 and let the banner and `SETTLE_MS` start), and like it must never delay or swallow an intent.
-- Haptics: `tickLand()` in `src/play/haptics.ts` is a light impact when a played card lands, at most one per new state. Your `tickImpact` goes beside it, at most one per strike.
-- The phase title sweep (`phase-sweep.tsx`, pure `sweep.ts`) is skipped on a busy state (`busyBetween`, `sweep.ts`: a card moved zone or turned, or a count changed). A state that deals damage is busy, so a spotlight never runs under a sweep.
-- Phase 23's open phone checks include a new state arriving mid-motion snapping the cards in flight; the spotlight, which replays a resolved state, makes that case more common.

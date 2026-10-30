@@ -75,7 +75,7 @@ Report these when they appear in the change. Do not spend the review on formatti
 
 - No `any`. No empty `catch`. A rejected intent returns a reason.
 - No commented-out code and no unused exports left behind "for later."
-- A behavior change has a Vitest or a Maestro flow in the same change, matching what the phase exit requires. A flow the phase file names must be in the diff. Do not block because `maestro test` has not been run before the last phase.
+- A behavior change has a Vitest or a Maestro flow in the same change, matching what the phase exit requires.
 - A new dependency that `docs/brief.md` does not pin is a block.
 
 ## How to report
