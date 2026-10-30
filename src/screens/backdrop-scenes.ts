@@ -7,8 +7,9 @@
  * Fog is fractal noise (the SVG feTurbulence algorithm, which Skia's FractalNoise shares) turned into a colour by a matrix that keeps
  * one hue and takes its alpha from the noise's own alpha, so the clouds are the noise and the hue is the fog's. A bank of fog is three
  * layers of it: a soft haze, the banks themselves (a steep alpha, so they have edges), and their lit crests (the same noise, paler, a
- * steeper alpha and nudged up). Each layer is faded out at its edges by an elliptical mask. Ember fog, the red one, goes only where the
- * enemy lives.
+ * steeper alpha and nudged up). The banks keep to three octaves, since their steep alpha turns finer octaves into grain (user
+ * request, 2026-10-29). Each layer is faded out at its edges by an elliptical mask. Ember fog, the red one, goes only where the enemy
+ * lives.
  */
 export type SceneName = "moon" | "hero" | "path" | "ember" | "calm" | "victory" | "table";
 
@@ -66,10 +67,10 @@ const GROUND = "#030405";
 // Dark: Ringwraiths. Moonlight gone pale and sickly green, as Minas Morgul's corrupted moonlight is told ("paler indeed than the moon
 // ailing in some slow eclipse"), only a shade off its old teal; and a deep red ember where the enemy is.
 const moonHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 5, rgb: [102, 143, 125], gain: 1.4, bias: -0.3, tile: [1200, 900] };
-const moonBank: FogTexture = { freq: [0.009, 0.012], octaves: 5, seed: 7, rgb: [102, 143, 125], gain: 3, bias: -1.12, tile: [900, 900] };
+const moonBank: FogTexture = { freq: [0.009, 0.012], octaves: 3, seed: 7, rgb: [102, 143, 125], gain: 3, bias: -1.12, tile: [900, 900] };
 const moonCrest: FogTexture = { ...moonBank, rgb: [201, 222, 204], gain: 6, bias: -3.75, offset: [0, -3] };
 const emberHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 9, rgb: [150, 38, 22], gain: 1.4, bias: -0.3, tile: [1200, 900] };
-const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 5, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700] };
+const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 3, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700] };
 const emberCrest: FogTexture = { ...emberBank, rgb: [219, 107, 77], gain: 6, bias: -3.8, offset: [0, -3] };
 export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260] };
 
