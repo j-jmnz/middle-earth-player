@@ -359,10 +359,11 @@ export default function Scenarios() {
 
 /** A game's seats and difficulty under its name, the Eye of Sauron before them on Nightmare. */
 function GameLine({ game }: { game: StandaloneGame }) {
+  const s = useUiScale();
   const nightmare = game.loadout?.difficulty === "Nightmare";
   return (
     <View className="flex-row items-center gap-1.5">
-      {nightmare ? <GameIcon name="nightmare" size={14} tint="threat" /> : null}
+      {nightmare ? <GameIcon name="nightmare" size={14 * s} tint="threat" /> : null}
       <Label>{`${seatWord(game.seatCount)}${game.loadout ? ` · ${game.loadout.difficulty}` : ""}`}</Label>
     </View>
   );

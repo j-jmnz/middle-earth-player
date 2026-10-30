@@ -35,7 +35,7 @@ const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
   Nightmare: "Nightmare: the setup card swaps cards of the encounter deck for its Nightmare deck and stays next to the quest deck, its rules active all game. For seasoned players.",
 };
 
-// The Eye of Sauron marks Nightmare wherever the difficulty is named.
+// The Eye of Sauron marks Nightmare on the switch (the Scenarios list's game line and the table's top bar carry it too).
 const DIFFICULTY_ICONS: Partial<Record<Difficulty, "nightmare">> = { Nightmare: "nightmare" };
 
 const BANNER_HEIGHT = 330;

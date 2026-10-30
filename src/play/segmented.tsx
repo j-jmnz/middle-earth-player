@@ -34,7 +34,8 @@ export function Segmented<T extends string>({
   compact?: boolean;
   // What each option says when its stored word is not the word to read ("system" says "Follow system"); the test id keeps the option.
   words?: Partial<Record<T, string>>;
-  // An icon before an option's word, in threat red (the Eye of Sauron before Nightmare on the briefing). The word stays, so it reads.
+  // An icon before an option's word (the Eye of Sauron before Nightmare on the briefing): threat red on the selected option, muted
+  // otherwise, so the option not picked never outshouts the one that is. The word stays, so it reads.
   icons?: Partial<Record<T, IconName>>;
 }) {
   const t = useTableTokens();
@@ -53,12 +54,14 @@ export function Segmented<T extends string>({
             accessibilityState={{ selected, checked: selected }}
             onPress={() => onChange(option)}
             hitSlop={compact ? { top: slop, bottom: slop } : undefined}
-            className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : "min-h-touch px-4"} ${stretch ? "flex-1" : ""}`}
-            style={selected ? segmentSurface(t) : undefined}
+            // Stretched, each option grows from its own width (a word with an icon needs more than a third of a 320 pt phone's track),
+            // with tighter padding; a word never breaks.
+            className={`items-center justify-center rounded-chip ${compact ? "min-h-8 px-3" : stretch ? "min-h-touch px-2" : "min-h-touch px-4"}`}
+            style={[stretch ? { flexGrow: 1, flexBasis: "auto" } : null, selected ? segmentSurface(t) : null]}
           >
             <View className="flex-row items-center gap-1.5">
-              {icons?.[option] ? <GameIcon name={icons[option]} size={compact ? 14 : 16} tint="threat" /> : null}
-              <Text className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
+              {icons?.[option] ? <GameIcon name={icons[option]} size={(compact ? 14 : 16) * s} tint={selected ? "threat" : "muted"} /> : null}
+              <Text numberOfLines={1} className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
             </View>
           </Pressable>
         );

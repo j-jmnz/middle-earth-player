@@ -115,7 +115,16 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (
-              <Pressable testID="nightmare-card" accessibilityRole="button" accessibilityLabel="Nightmare setup card" onPress={onNightmare} hitSlop={8 * s} className="items-center justify-center" style={{ minWidth: 44 * s, minHeight: 44 * s }}>
+              // Laid out as Life, Tokens and Burden are (the mark, then its word), with the dials' pressed fill. The word stays at every
+              // width: the peeked seat's eye mark is another eye.
+              <Pressable
+                testID="nightmare-card"
+                accessibilityRole="button"
+                accessibilityLabel="Nightmare setup card"
+                accessibilityHint="Shows the Nightmare setup card"
+                onPress={onNightmare}
+                style={({ pressed }) => ({ minHeight: 44 * s, flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+              >
                 <GameIcon name="nightmare" size={22 * s} tint="threat" />
                 <Text className="text-label text-muted">Nightmare</Text>
               </Pressable>
