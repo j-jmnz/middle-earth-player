@@ -4,7 +4,6 @@ import { AccessibilityInfo, ScrollView, View } from "react-native";
 
 import { carryOffers } from "../../../campaign/carry-over";
 import { campaignPath, nextStep } from "../../../campaign/path";
-import type { Save } from "../../../campaign/save";
 import { Column, Eyebrow, HubHeader, Panel, PillButton, RingMark, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { HeroArt } from "../../art";
@@ -14,7 +13,7 @@ import { campaignListQueries, lockedTiles } from "../../campaign-list";
 import { campaignOf, scenarioNames } from "../../campaign-data";
 import { carrySource, carryWords } from "../../carry-words";
 import { StartPanel, type CarryChoice, type StartOption } from "../../start-panel";
-import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave, savedAt } from "../../campaign-store";
+import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, restoreSave, type ListedSave, savedAt } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { recordUnclosedRun } from "../../table-session";
 import { usePalette } from "../../palette-hook";
@@ -36,7 +35,7 @@ type Seats = 1 | 2;
 const SIDE_RANGE = { min: 360, max: 440 };
 
 // The fellowship a playthrough plays: the heroes the campaign log records, else the heroes the last loadout dealt.
-function partyCodes(save: Save): string[] {
+function partyCodes(save: ListedSave): string[] {
   const logged = save.log.heroesBySeat.flat();
   if (logged.length > 0) return logged;
   return save.loadout?.seats.flatMap((seat) => seat.heroes) ?? [];
@@ -53,9 +52,9 @@ export default function CampaignList() {
   // `start=1`: a finished campaign's path sends the player here with the start panel open, to take its carry-over in.
   const { start: startParam } = useLocalSearchParams<{ start?: string }>();
   const { catalog, user } = useDatabases();
-  const [saves, setSaves] = useState<Save[]>([]);
+  const [saves, setSaves] = useState<ListedSave[]>([]);
   const [pageWidth, setPageWidth] = useState(0);
-  const [archived, setArchived] = useState<Save[]>([]);
+  const [archived, setArchived] = useState<ListedSave[]>([]);
   // When each playthrough was last written: a finished one's date in the carry-over offers.
   const [saved, setSaved] = useState<ReadonlyMap<string, number>>(new Map());
   const [starting, setStarting] = useState(false);
@@ -78,7 +77,7 @@ export default function CampaignList() {
     return data ? [{ data, name: row.name }] : [];
   });
   // Each save's progress line reads its own campaign.
-  const lineOf = (save: Save): SaveLine => {
+  const lineOf = (save: ListedSave): SaveLine => {
     const campaign = campaignOf(save.campaignId);
     const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : [];
     return {
@@ -95,11 +94,11 @@ export default function CampaignList() {
   const offers = useMemo(() => carryOffers([...saves, ...archived], (id) => campaignOf(id)?.scenarios ?? null), [saves, archived]);
   const faces = useMemo(() => deckFaces(catalog, [...saves.flatMap(partyCodes), ...offers.flatMap((offer) => offer.cards.map((card) => card.code))]), [catalog, saves, offers]);
   // The fellowship as the hero words show it, seat by seat: each hero's painting, name and sphere.
-  const fellowshipOf = (save: Save) => {
+  const fellowshipOf = (save: ListedSave) => {
     const seats = save.log.heroesBySeat.flat().length > 0 ? save.log.heroesBySeat : (save.loadout?.seats.map((seat) => seat.heroes) ?? []);
     return seats.map((seat) => seat.map((code) => heroFace(faces, code)));
   };
-  const partyOf = (save: Save): PartyHero[] => partyCodes(save).flatMap((code) => {
+  const partyOf = (save: ListedSave): PartyHero[] => partyCodes(save).flatMap((code) => {
     const face = faces.get(code);
     if (!face) return [];
     const tint = SPHERE_TINT[face.sphereCode ?? ""];
@@ -130,7 +129,7 @@ export default function CampaignList() {
     }, [refresh, startParam, setFolded]),
   );
 
-  function openPath(save: Save): void {
+  function openPath(save: { id: string }): void {
     router.push(pathHref(save.id));
   }
 
@@ -150,13 +149,13 @@ export default function CampaignList() {
   }
 
   // The button a screen reader was on goes away with each of these, so each says what happened.
-  function archive(save: Save): void {
+  function archive(save: ListedSave): void {
     archiveSave(user, save.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Archived ${describe(lineOf(save))}`);
   }
 
-  function restore(save: Save): void {
+  function restore(save: ListedSave): void {
     restoreSave(user, save.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Restored ${describe(lineOf(save))}`);
@@ -167,7 +166,7 @@ export default function CampaignList() {
     AccessibilityInfo.announceForAccessibility(DELETE_SENTENCE);
   }
 
-  function remove(save: Save): void {
+  function remove(save: ListedSave): void {
     if (save.active) recordUnclosedRun(catalog, user, save.id);
     deleteSave(user, save.id);
     refresh();
@@ -181,7 +180,7 @@ export default function CampaignList() {
   }
 
   const showStart = !managing && (saves.length === 0 || starting);
-  const actions = (save: Save, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
+  const actions = (save: ListedSave, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
     <KeepOrDelete
       id={save.id}
       described={describe(lineOf(save))}
@@ -210,7 +209,7 @@ export default function CampaignList() {
   };
   const startPanel = <StartPanel options={startable} carry={carryChoices} onStart={start} />;
   // Manage shows Archive and Delete on a playthrough instead of opening it.
-  const managed = (save: Save, index: number) => (
+  const managed = (save: ListedSave, index: number) => (
     <View key={save.id} testID={`save-${save.id}`}>
       <Panel>
         <SaveSummary line={lineOf(save)} eyebrow={saves.length > 1 && index === 0} />
@@ -218,7 +217,7 @@ export default function CampaignList() {
       </Panel>
     </View>
   );
-  const continuing = (save: Save) => {
+  const continuing = (save: ListedSave) => {
     const line = lineOf(save);
     return (
       <ContinuePanel

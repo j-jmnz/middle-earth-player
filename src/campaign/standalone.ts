@@ -51,9 +51,12 @@ export type StandaloneGame = {
   result: StandaloneResult | null;
 };
 
+// A game as the lists show it: the open game is its engine version and data hash, never its intents (a list row does not parse a long game).
+export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash"> | null };
+
 export type StandaloneStatus = "playing" | "won" | "lost" | "dropped";
 
-export function standaloneStatus(game: StandaloneGame): StandaloneStatus {
+export function standaloneStatus(game: ListedStandalone): StandaloneStatus {
   if (game.result) return game.result.outcome;
   return game.active && game.loadout ? "playing" : "dropped";
 }
@@ -139,8 +142,8 @@ export function dropStandalone(game: StandaloneGame): StandaloneGame {
 
 // The game with its open game dropped when that was played on another engine version or against other data; null when
 // nothing needs dropping.
-export function droppedIfStale(game: StandaloneGame, dataHash: number): StandaloneGame | null {
-  return game.active && staleReason(game.active, dataHash) ? dropStandalone(game) : null;
+export function droppedIfStale<G extends ListedStandalone>(game: G, dataHash: number): (Omit<G, "active"> & { active: null }) | null {
+  return game.active && staleReason(game.active, dataHash) ? { ...game, active: null } : null;
 }
 
 // Ends the open game. A loss records the reason and the rounds completed; a win records its score. With no campaign card

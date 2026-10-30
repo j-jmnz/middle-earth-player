@@ -1,16 +1,16 @@
 // The words the standalone screens show for a game: its status on the list and the lines of its outcome. Pure.
-import { standaloneStatus, type StandaloneGame, type StandaloneResult } from "../campaign/standalone";
+import { standaloneStatus, type ListedStandalone, type StandaloneResult } from "../campaign/standalone";
 import { seatWord } from "./seats";
 
 export const STANDALONE_DROPPED = "The game in progress was dropped because the rules or the card data changed. Your decks are kept; deal it again from Scenarios.";
 
 /** The game's line under its scenario name on the list: seats, difficulty, and how it stands. */
-export function gameCaption(game: StandaloneGame): string {
+export function gameCaption(game: ListedStandalone): string {
   const parts = [seatWord(game.seatCount), ...(game.loadout ? [game.loadout.difficulty] : [])];
   return `${parts.join(" · ")} · ${statusWord(game)}`;
 }
 
-export function statusWord(game: StandaloneGame): string {
+export function statusWord(game: ListedStandalone): string {
   switch (standaloneStatus(game)) {
     case "playing":
       return "In progress";

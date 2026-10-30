@@ -11,7 +11,7 @@ export type CarryOffer = { saveId: string; campaignId: string; seatCount: 1 | 2;
  * other save has taken (`log.carriedFrom`), most recent first as `saves` lists them. `scenarios` is a campaign's scenario ids; a
  * campaign it does not know is never finished. A save that takes an offer holds it until it is deleted: the offer then returns.
  */
-export function carryOffers(saves: readonly Save[], scenarios: (campaignId: string) => readonly string[] | null): CarryOffer[] {
+export function carryOffers(saves: readonly Pick<Save, "id" | "campaignId" | "seatCount" | "log">[], scenarios: (campaignId: string) => readonly string[] | null): CarryOffer[] {
   const taken = new Set(saves.flatMap((save) => (save.log.carriedFrom ? [save.log.carriedFrom] : [])));
   return saves.flatMap((save) => {
     const ids = scenarios(save.campaignId);

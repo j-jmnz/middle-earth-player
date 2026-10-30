@@ -14,7 +14,7 @@ import type { TableStore } from "../play/store";
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
-import { readStandalone, writeStandalone } from "./standalone-store";
+import { readStandalone, writeStandalone, writeStandaloneActive } from "./standalone-store";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
@@ -68,11 +68,11 @@ export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: 
     session,
     (intent) => {
       saved = record(saved, intent);
-      writeStandalone(user, saved);
+      writeStandaloneActive(user, saved);
     },
     () => {
       saved = unrecord(saved);
-      writeStandalone(user, saved);
+      writeStandaloneActive(user, saved);
     },
   );
 }

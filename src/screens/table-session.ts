@@ -13,7 +13,7 @@ import type { TableStore } from "../play/store";
 
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
-import { readSaveChecked, writeSave } from "./campaign-store";
+import { readSaveChecked, writeActive, writeSave } from "./campaign-store";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
 import { recordCampaignRun } from "./run-writers";
 
@@ -75,14 +75,14 @@ export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>,
     session,
     (intent, game) => {
       saved = record(saved, intent);
-      writeSave(user, saved);
+      writeActive(user, saved);
       // A lost game can no longer be undone, and its run id is fixed: write the run now, so closing the Resolution any way (or never)
       // still leaves it. A win waits for its Resolution choices (the reward).
       if (game.lost) recordCampaignRun(user, saved, finish(saved, session.world, game), session.world, game);
     },
     () => {
       saved = unrecord(saved);
-      writeSave(user, saved);
+      writeActive(user, saved);
     },
   );
   return { store, save: () => saved };

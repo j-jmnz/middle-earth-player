@@ -44,7 +44,7 @@ export function deal(save: Save, world: World, loadout: StoredLoadout, seed: num
 }
 
 // An open scenario played on another engine version or against other data is not replayed. This needs no start.
-export function staleReason(active: ActiveScenario, dataHash: number): "engineVersion" | "dataHash" | null {
+export function staleReason(active: Pick<ActiveScenario, "engineVersion" | "dataHash">, dataHash: number): "engineVersion" | "dataHash" | null {
   if (active.engineVersion !== ENGINE_VERSION) return "engineVersion";
   if (active.dataHash !== dataHash) return "dataHash";
   return null;
