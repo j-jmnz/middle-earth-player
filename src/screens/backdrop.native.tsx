@@ -1,8 +1,10 @@
-import { BlurMask, Canvas, ColorMatrix, FractalNoise, Group, LinearGradient, Mask, Paint, Path, RadialGradient, Rect, vec } from "@shopify/react-native-skia";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { BlurMask, Canvas, ColorMatrix, drawAsImage, FractalNoise, Group, Image, LinearGradient, Mask, Paint, Path, RadialGradient, Rect, vec, type SkImage } from "@shopify/react-native-skia";
+import { useEffect, useEffectEvent, useState, type ReactElement } from "react";
+import { PixelRatio, StyleSheet, useWindowDimensions, View } from "react-native";
 
-import { useTheme } from "../play/theme";
-import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
+import { useTheme, type ThemeName } from "../play/theme";
+import { createImageCache } from "./backdrop-image";
+import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type Scene, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
 
 /** An ellipse as a radial gradient: a circle of radius rx × width, squashed to ry × height about its centre. */
 function Ellipse({ cx, cy, rx, ry, positions, colors }: { cx: number; cy: number; rx: number; ry: number; positions: number[]; colors: string[] }) {
@@ -82,55 +84,144 @@ function WashLayer({ wash, width, height }: { wash: Wash; width: number; height:
   );
 }
 
+// The scene's layers in a box of `width` × `height` points: the same tree is drawn live in a Canvas (while its image is not ready) and
+// recorded once into an image (drawAsImage), so the two cannot differ.
+function SceneLayers({ s, width, height }: { s: Scene; width: number; height: number }) {
+  const { ground, vignette, grit } = s;
+  return (
+    <>
+      {ground.kind === "solid" ? (
+        <Rect x={0} y={0} width={width} height={height} color={ground.color} />
+      ) : (
+        <Rect x={0} y={0} width={width} height={height}>
+          <Ellipse
+            cx={ground.cx * width}
+            cy={ground.cy * height}
+            rx={ground.rx * width}
+            ry={ground.ry * height}
+            positions={ground.stops.map((stop) => stop[0])}
+            colors={ground.stops.map((stop) => stop[1])}
+          />
+        </Rect>
+      )}
+      {s.wash ? <WashLayer wash={s.wash} width={width} height={height} /> : null}
+      {s.fog.map((layer, index) => (
+        <Fog key={index} layer={layer} width={width} height={height} />
+      ))}
+      {s.light ? <Light light={s.light} width={width} height={height} /> : null}
+      <Rect x={0} y={0} width={width} height={height}>
+        <Ellipse cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
+      </Rect>
+      <Group layer={<Paint opacity={grit.opacity} blendMode={grit.blend} />}>
+        <Noise texture={gritTexture} width={width} height={height} />
+      </Group>
+    </>
+  );
+}
+
+// The images. A key names what is drawn (theme, scene, size in pixels); the group is what makes an image obsolete (the theme and the
+// size). The elements to record are parked under their key for the render; the cache calls it once per key.
+const elements = new Map<string, { element: ReactElement; width: number; height: number }>();
+
+async function renderKept(key: string): Promise<SkImage | null> {
+  const wanted = elements.get(key);
+  elements.delete(key);
+  if (!wanted) return null;
+  return drawAsImage(wanted.element, { width: wanted.width, height: wanted.height });
+}
+
+// Four idle backdrops stay (a screen pushed and popped again shows its own at once); the rest are released.
+const backdrops = createImageCache<SkImage>(renderKept, (image) => image.dispose(), 4);
+const veils = createImageCache<SkImage>(renderKept, (image) => image.dispose(), 2);
+
+// What the live canvas draws is points; the image is pixels, so the recorded tree is scaled by the pixel ratio, as a Canvas scales its own.
+function scaled(element: ReactElement, ratio: number): ReactElement {
+  return <Group transform={[{ scale: ratio }]}>{element}</Group>;
+}
+
+/**
+ * The image of `element` (a box of `width` × `height` points) for `key`, once it is rendered: null until then, and when it could not be
+ * rendered. The image is shared by every screen that asks for the same key and released with the last of them (backdrop-image.ts).
+ */
+function useSceneImage(cache: typeof backdrops, key: string, group: string, width: number, height: number, element: ReactElement): SkImage | null {
+  const [ready, setReady] = useState<{ key: string; image: SkImage } | null>(null);
+  // Parks the element under its key for the cache's render (which asks for it once, inside `lease`), then leases the image.
+  const start = useEffectEvent(() => {
+    const ratio = PixelRatio.get();
+    elements.set(key, { element: scaled(element, ratio), width: Math.round(width * ratio), height: Math.round(height * ratio) });
+    const lease = cache.lease(key, group);
+    elements.delete(key);
+    return lease;
+  });
+  useEffect(() => {
+    if (width <= 0 || height <= 0) return undefined;
+    const lease = start();
+    let live = true;
+    void lease.image.then((image) => {
+      if (live && image) setReady({ key, image });
+    });
+    return () => {
+      live = false;
+      lease.release();
+    };
+  }, [cache, key, group, width, height]);
+  return ready?.key === key ? ready.image : null;
+}
+
 /**
  * One static Skia canvas behind the screen, drawn once per size and never inside a list row (docs/design-system.md, Backdrops): the
  * ground, the fog layers each faded at its edges (or Light's wash and morning light), the vignette falling to the ground, and the grit
- * over all of it.
+ * over all of it. The scene is rendered once into an image and every screen draws that image; until it is ready, the screen draws the
+ * layers live, as it did before.
  */
 export function Backdrop({ scene }: { scene: SceneName }) {
   const { width, height } = useWindowDimensions();
-  const s = scenesByTheme[useTheme()][scene];
-  const { ground, vignette, grit } = s;
+  const theme = useTheme();
+  const s = scenesByTheme[theme][scene];
+  const group = `${theme}|${width}x${height}|${PixelRatio.get()}`;
+  const image = useSceneImage(backdrops, `${group}|${scene}`, group, width, height, <SceneLayers s={s} width={width} height={height} />);
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <Canvas style={StyleSheet.absoluteFill}>
-        {ground.kind === "solid" ? (
-          <Rect x={0} y={0} width={width} height={height} color={ground.color} />
-        ) : (
-          <Rect x={0} y={0} width={width} height={height}>
-            <Ellipse
-              cx={ground.cx * width}
-              cy={ground.cy * height}
-              rx={ground.rx * width}
-              ry={ground.ry * height}
-              positions={ground.stops.map((stop) => stop[0])}
-              colors={ground.stops.map((stop) => stop[1])}
-            />
-          </Rect>
-        )}
-        {s.wash ? <WashLayer wash={s.wash} width={width} height={height} /> : null}
-        {s.fog.map((layer, index) => (
-          <Fog key={index} layer={layer} width={width} height={height} />
-        ))}
-        {s.light ? <Light light={s.light} width={width} height={height} /> : null}
-        <Rect x={0} y={0} width={width} height={height}>
-          <Ellipse cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
-        </Rect>
-        <Group layer={<Paint opacity={grit.opacity} blendMode={grit.blend} />}>
-          <Noise texture={gritTexture} width={width} height={height} />
-        </Group>
-      </Canvas>
+      <Canvas style={StyleSheet.absoluteFill}>{image ? <Image image={image} x={0} y={0} width={width} height={height} fit="fill" /> : <SceneLayers s={s} width={width} height={height} />}</Canvas>
     </View>
   );
 }
 
-/** Fog layers in a box of their own, over a picture (HeroArt): one more static canvas, drawn once per size, its masks in the box's fractions. */
+// An id for each list of fog layers (the scenes' constants), to name an image by.
+const layerIds = new WeakMap<readonly FogLayer[], number>();
+let lastLayerId = 0;
+
+function layersId(layers: readonly FogLayer[]): number {
+  const known = layerIds.get(layers);
+  if (known !== undefined) return known;
+  lastLayerId += 1;
+  layerIds.set(layers, lastLayerId);
+  return lastLayerId;
+}
+
+/** Fog layers in a box of their own, over a picture (HeroArt): rendered once per size into an image, like the backdrop; its masks in the box's fractions. */
 export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]; width: number; height: number }) {
-  return (
-    <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+  const theme: ThemeName = useTheme();
+  const group = theme;
+  const image = useSceneImage(
+    veils,
+    `${theme}|fog${layersId(layers)}|${width}x${height}|${PixelRatio.get()}`,
+    group,
+    width,
+    height,
+    <>
       {layers.map((layer, index) => (
         <Fog key={index} layer={layer} width={width} height={height} />
       ))}
+    </>,
+  );
+  return (
+    <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+      {image ? (
+        <Image image={image} x={0} y={0} width={width} height={height} fit="fill" />
+      ) : (
+        layers.map((layer, index) => <Fog key={index} layer={layer} width={width} height={height} />)
+      )}
     </Canvas>
   );
 }

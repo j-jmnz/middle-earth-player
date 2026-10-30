@@ -9,7 +9,7 @@ import { Text } from "../play/text";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { Eyebrow, Label, Panel, ScreenTitle, SecondaryButton, ToggleChip } from "./chrome";
-import { GLOSSARY, bookPage, paragraphs, seeAlso, type GlossaryEntry } from "./rules-glossary";
+import { bookPage, glossary, paragraphs, seeAlso, type GlossaryEntry } from "./rules-glossary";
 
 /**
  * One rule: where it is printed, its title, Open in book when the app carries the book, its text, and See also as chips. `reading`
@@ -20,7 +20,7 @@ export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: Glossar
   const t = useTableTokens();
   const s = useUiScale();
   const body = paragraphs(entry).filter((paragraph) => !paragraph.startsWith("See also:"));
-  const links = seeAlso(entry, GLOSSARY);
+  const links = seeAlso(entry, glossary());
   const book = bookPage(entry);
 
   const title = reading ? (

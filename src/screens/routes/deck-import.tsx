@@ -1,29 +1,23 @@
-import { eq } from "drizzle-orm";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { View } from "react-native";
 
 import { formatDeckRefusal } from "../../catalog/deck-save";
-import { cards } from "../../catalog/schema";
 import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
 import { editSavedDeck, startNewDeck } from "../deck-draft";
 import { savedDeckName } from "../deck-status";
 import { listDecks, readDeck, writeDeck } from "../deck-store";
-import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltDecks, prebuiltNotApplied, withNotApplied, prebuiltDetail, prebuiltRows, readDecklistBody, type BuiltDecklist, type PrebuiltRow } from "../deck-import";
+import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, type BuiltDecklist, type PrebuiltRow } from "../deck-import";
 import { useDatabases } from "../databases";
+import { poolOf } from "../pool-cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
-import { notAppliedCodes } from "../../play/not-applied";
 import { useUiScale } from "../../play/ui-scale";
 import { goBack } from "../go-back";
 import { useListGutter } from "../list-gutter";
 import { showToast } from "../toast";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
-
-const PREBUILT_ROWS = prebuiltRows(prebuiltDecks);
-// Each group heading stays at the top while its decks scroll under it.
-const STICKY = PREBUILT_ROWS.flatMap((row, at) => (row.kind === "group" ? [at] : []));
 
 async function readJson(url: string): Promise<unknown> {
   const response = await fetch(url);
@@ -70,27 +64,12 @@ export default function DeckImportScreen() {
   const scale = useUiScale();
   const pad = list.inset > 0 ? { paddingHorizontal: Math.max(list.inset, 24 * scale) } : undefined;
   const { catalog, user } = useDatabases();
-  const pool = useMemo(() => {
-    const rows = catalog
-      .select({
-        code: cards.code,
-        name: cards.name,
-        typeCode: cards.typeCode,
-        sphereCode: cards.sphereCode,
-        deckLimit: cards.deckLimit,
-        deckLegal: cards.deckLegal,
-        traits: cards.traits,
-        text: cards.text,
-        errata: cards.errata,
-      })
-      .from(cards)
-      .where(eq(cards.deckLegal, true))
-      .all();
-    return new Map(rows.map((row) => [row.code, row]));
-  }, [catalog]);
-  // How many cards of each pre-built deck the app does not fully apply (docs/plans/inactive-text.md): the row says so, so
-  // the player can pick a deck the app plays as printed.
-  const inactive = useMemo(() => notAppliedCodes([...pool.values()].map((row) => [row.code, row.errata ?? row.text] as const)), [pool]);
+  // The deck-legal pool and the cards with a line the app does not apply: read once per catalog (pool-cache.ts), shared with the Cards tab and the
+  // deck editor. A pre-built deck row says how many of its cards the app does not fully apply (docs/plans/inactive-text.md), so the
+  // player can pick a deck the app plays as printed.
+  const { byCode: pool, notApplied: inactive } = poolOf(catalog);
+  // The list is built on the first look (deck-import.ts); each group heading stays at the top while its decks scroll under it.
+  const { rows: prebuiltRows, sticky } = prebuiltList();
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -220,11 +199,11 @@ export default function DeckImportScreen() {
       </View>
       <View className="min-h-0 flex-1" onLayout={list.onLayout}>
         <FlashList
-          data={PREBUILT_ROWS}
+          data={prebuiltRows}
           keyExtractor={(item) => (item.kind === "group" ? `group-${item.title}` : item.deck.id)}
           getItemType={(item) => item.kind}
           renderItem={renderRow}
-          stickyHeaderIndices={STICKY}
+          stickyHeaderIndices={sticky}
           ListHeaderComponent={form}
           ListFooterComponent={<View className="pb-safe" />}
           keyboardShouldPersistTaps="handled"

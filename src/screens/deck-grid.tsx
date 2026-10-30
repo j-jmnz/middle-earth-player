@@ -1,11 +1,12 @@
 // The deck editor's cards as a grid (docs/design-system.md, Deck builder): the editor's rows (a heading, the hero strip, a run of
 // cards cut into rows of the grid), one card's cell with its stepper, a section's heading with its count and Add, and the jump chips.
 import { useRouter } from "expo-router";
+import { memo } from "react";
 import { Pressable, View } from "react-native";
 
 import { TextButton, ToggleChip } from "./chrome";
 import { CountStepper } from "./count-stepper";
-import { announceDraftChange, changeDraftCount, type TitleLookup } from "./deck-draft";
+import { announceDraftChange, changeDraftCount, draftAddRefused, type DraftPicks, type TitleLookup } from "./deck-draft";
 import type { DeckSectionRow } from "./deck-status";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { usePalette } from "./palette-hook";
@@ -57,18 +58,16 @@ export function gridRows(rows: readonly DeckSectionRow<EditorCard>[], cols: numb
   return out;
 }
 
-/**
- * One card of the deck in the grid: its picture, a second card peeking out behind it when the deck holds more than one copy, and the
- * − count + stepper overlapping its foot. A tap opens the card, a long press shows it large.
- */
-export function DeckCardCell({
-  card,
-  width,
-  full,
-  lookup,
-  onPreview,
-  loss = null,
-}: {
+/** The codes among `deckCards` whose + would be refused: the title (any printing) is at its copy limit. Worked out once per change of the deck. */
+export function refusedCodes(picks: DraftPicks, deckCards: readonly EditorCard[], lookup: TitleLookup): ReadonlySet<string> {
+  const out = new Set<string>();
+  for (const card of deckCards) {
+    if (draftAddRefused(picks, { code: card.code, name: card.name, typeCode: card.typeCode ?? "", deckLimit: card.deckLimit }, lookup)) out.add(card.code);
+  }
+  return out;
+}
+
+type DeckCardCellProps = {
   card: EditorCard;
   width: number;
   // What the app does not apply of this card ("Ability not applied"), or null.
@@ -77,7 +76,35 @@ export function DeckCardCell({
   full: boolean;
   lookup: TitleLookup;
   onPreview: (code: string, name: string, source: PictureSource | null) => void;
-}) {
+};
+
+// The editor builds a new card object for every card whenever the deck changes; a cell is drawn again only when what it shows changed.
+function sameCell(left: DeckCardCellProps, right: DeckCardCellProps): boolean {
+  const a = left.card;
+  const b = right.card;
+  return (
+    left.width === right.width &&
+    left.full === right.full &&
+    (left.loss ?? null) === (right.loss ?? null) &&
+    left.lookup === right.lookup &&
+    left.onPreview === right.onPreview &&
+    a.code === b.code &&
+    a.count === b.count &&
+    a.cost === b.cost &&
+    a.name === b.name &&
+    a.typeCode === b.typeCode &&
+    a.imagesrc === b.imagesrc &&
+    a.deckLimit === b.deckLimit &&
+    a.sphereCode === b.sphereCode &&
+    a.sphereName === b.sphereName
+  );
+}
+
+/**
+ * One card of the deck in the grid: its picture, a second card peeking out behind it when the deck holds more than one copy, and the
+ * − count + stepper overlapping its foot. A tap opens the card, a long press shows it large.
+ */
+export const DeckCardCell = memo(function DeckCardCell({ card, width, full, lookup, onPreview, loss = null }: DeckCardCellProps) {
   const router = useRouter();
   const palette = usePalette();
   const t = useTableTokens();
@@ -121,7 +148,7 @@ export function DeckCardCell({
       </View>
     </View>
   );
-}
+}, sameCell);
 
 /** A type's heading in the deck: its name, the rule, its count ("2 of 3" for heroes), and Add for a card type (heroes add through their slots). */
 export function DeckSectionHeader({ type, title, count, onAdd }: { type: string; title: string; count: number; onAdd: (type: string) => void }) {

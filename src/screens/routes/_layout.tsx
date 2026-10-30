@@ -167,7 +167,10 @@ export default function RootLayout() {
                 {/* A tablet (shorter side 600 points or more) turns every route but the table, which is landscape only. A phone is portrait
                     except on the table and on the card, booklet, glossary and rule screens, which are "all" on phones and tablets alike,
                     so a phone's landscape table is not turned back to read a card. */}
+                {/* A screen two or more pushes down is hidden (React Activity: its effects stop and its renders wait, its state stays), so a
+                    stack of screens does not keep rendering under the one on top. This is expo-router 58's freezeOnBlur, which it ignores. */}
                 <Stack
+                  activityEnabled
                   screenOptions={{
                     headerShown: false,
                     contentStyle: { backgroundColor: palette.night },

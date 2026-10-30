@@ -7,8 +7,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionBar, Chip, FloatingBarShade, NavBar, PaperSheet, PrimaryButton, Screen, SecondaryButton, TextButton, TwoPane } from "../../chrome";
 import { CardPoolBody, type PoolTypeRequest } from "../../card-pool";
 import { BANNER_HEIGHT, DeckGlance } from "../../deck-glance";
-import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck-grid";
-import { announceDraftChange, discardDraftChanges, draftAddRefused, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
+import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, refusedCodes, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck-grid";
+import { announceDraftChange, discardDraftChanges, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
 import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat } from "../../deck-status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck-store";
 import { notAppliedWords } from "../../../play/not-applied";
@@ -20,7 +20,7 @@ import { routeCode } from "../../route-code";
 import { EmptyHeroSlot, HeroTile, heroFace, Readiness, type HeroFace } from "../../hero-tile";
 import { SheetModal } from "../../sheet-modal";
 import { showToast } from "../../toast";
-import { ToastView } from "../../toast-view";
+import { TOAST_ROOM, ToastDock, ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
 import { MEDIUM_ACTION_GROUP } from "../../../play/size-class";
 import { useUiScale } from "../../../play/ui-scale";
@@ -76,22 +76,28 @@ export default function DeckEditor() {
   const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
   const lookup = useCallback<TitleLookup>((code) => faces.get(code), [faces]);
 
-  const sections = deckSections<EditorCard>(
-    draft.cards.map((card) => {
-      const face = faces.get(card.code);
-      return {
-        code: card.code,
-        count: card.count,
-        cost: face?.cost ?? null,
-        name: face?.name ?? card.code,
-        typeCode: face?.typeCode ?? null,
-        imagesrc: face?.imagesrc ?? null,
-        deckLimit: face?.deckLimit ?? null,
-        sphereCode: face?.sphereCode ?? null,
-        sphereName: face?.sphereName ?? null,
-      };
-    }),
+  // The deck's cards with what the catalog says of each, rebuilt only when the cards or the faces change (not for each key of the name).
+  const editorCards = useMemo<EditorCard[]>(
+    () =>
+      draft.cards.map((card) => {
+        const face = faces.get(card.code);
+        return {
+          code: card.code,
+          count: card.count,
+          cost: face?.cost ?? null,
+          name: face?.name ?? card.code,
+          typeCode: face?.typeCode ?? null,
+          imagesrc: face?.imagesrc ?? null,
+          deckLimit: face?.deckLimit ?? null,
+          sphereCode: face?.sphereCode ?? null,
+          sphereName: face?.sphereName ?? null,
+        };
+      }),
+    [draft.cards, faces],
   );
+  const sections = deckSections<EditorCard>(editorCards);
+  // Which cards' + is refused, once per change of the heroes or the cards: the grid's cells are not asked one by one on each render.
+  const refused = useMemo(() => refusedCodes({ heroes: draft.heroes, cards: draft.cards }, editorCards, lookup), [draft.heroes, draft.cards, editorCards, lookup]);
   // A phone holds three cards a row (each wide enough for its stepper), a tablet in portrait six, the deck's pane in landscape five.
   const cols = size === "compact" ? 3 : size === "medium" ? 6 : 5;
   const rows: EditorRow[] = [
@@ -144,6 +150,8 @@ export default function DeckEditor() {
 
   if (!id) throw new Error("Missing route code");
 
+  // On a phone and in portrait the toast floats over the list's foot (ToastDock), so the list ends above it; beside the deck it has its own room.
+  const toastRoom = expanded ? 0 : TOAST_ROOM;
   // The grid's cells share the list's width: the screen's on a phone and in portrait, the cards pane's beside the deck in landscape.
   const cellGap = (size === "compact" ? 10 : 14) * s;
   const listWidth = expanded ? gridWidth : windowWidth - (24 * s + insets.left) - (24 * s + insets.right) - 2 * (size === "medium" ? 8 * s : 0);
@@ -222,7 +230,7 @@ export default function DeckEditor() {
             key={card.code}
             card={card}
             width={cellWidth}
-            full={draftAddRefused(draft, { code: card.code, name: card.name, typeCode: card.typeCode ?? "", deckLimit: card.deckLimit }, lookup)}
+            full={refused.has(card.code)}
             lookup={lookup}
             onPreview={preview.open}
             loss={inactive.has(card.code) ? notAppliedWords(card.code, card.typeCode) : null}
@@ -242,8 +250,8 @@ export default function DeckEditor() {
       keyExtractor={(item) => item.key}
       getItemType={(item) => item.kind}
       style={{ flex: 1 }}
-      contentContainerStyle={{ paddingBottom: 24 * s }}
-      extraData={{ draft, cellWidth }}
+      contentContainerStyle={{ paddingBottom: (24 + toastRoom) * s }}
+      extraData={{ cards: draft.cards, heroes: draft.heroes, refused, cellWidth }}
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       keyboardShouldPersistTaps="handled"
@@ -335,7 +343,7 @@ export default function DeckEditor() {
           <View style={base}>
             {/* Medium: the toast lines up with the bar's 480 group. */}
             <View style={size === "medium" ? { width: "100%", maxWidth: MEDIUM_ACTION_GROUP * s, alignSelf: "center" } : undefined}>
-              <ToastView />
+              <ToastDock />
             </View>
             {actionBar("auto")}
           </View>

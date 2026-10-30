@@ -6,6 +6,7 @@ import {
   parseDecklistRef,
   prebuiltBody,
   prebuiltDecks,
+  prebuiltList,
   prebuiltDetail,
   prebuiltRows,
   readDecklistBody,
@@ -113,7 +114,7 @@ describe("buildDecklist", () => {
 
 describe("pre-built decks", () => {
   it("reads every deck as a body with its heroes and cards, and no sideboard", () => {
-    const rohan = prebuiltDecks.find((deck) => deck.id === "riders-of-rohan");
+    const rohan = prebuiltDecks().find((deck) => deck.id === "riders-of-rohan");
     expect(rohan).toBeDefined();
     if (!rohan) return;
     const body = prebuiltBody(rohan);
@@ -125,12 +126,12 @@ describe("pre-built decks", () => {
   });
 
   it("lists the four Learn to Play core decks first, then the printed decklists", () => {
-    expect(prebuiltDecks.slice(0, 5).map((deck) => deck.id)).toEqual(["core-leadership", "core-tactics", "core-spirit", "core-lore", "dwarves-of-durin"]);
-    expect(prebuiltDecks.length).toBe(35);
+    expect(prebuiltDecks().slice(0, 5).map((deck) => deck.id)).toEqual(["core-leadership", "core-tactics", "core-spirit", "core-lore", "dwarves-of-durin"]);
+    expect(prebuiltDecks().length).toBe(35);
   });
 
   it("names the product in the detail only when the group and the name do not", () => {
-    const named = (id: string) => prebuiltDetail(prebuiltDecks.find((deck) => deck.id === id)!, () => "H");
+    const named = (id: string) => prebuiltDetail(prebuiltDecks().find((deck) => deck.id === id)!, () => "H");
     expect(named("dunedain")).toBe("Angmar Awakened · H, H, H");
     expect(named("valor-and-vigilance")).toBe("The Return of the King · H, H, H");
     expect(named("over-hill-1")).toBe("H, H, H");
@@ -140,7 +141,7 @@ describe("pre-built decks", () => {
   });
 
   it("puts each group's heading before its decks, once", () => {
-    const rows = prebuiltRows(prebuiltDecks);
+    const rows = prebuiltRows(prebuiltDecks());
     expect(rows.filter((row) => row.kind === "group").map((row) => (row.kind === "group" ? row.title : ""))).toEqual([
       "Core Set",
       "Starter Decks",
@@ -151,5 +152,16 @@ describe("pre-built decks", () => {
       "Community Deck Lists",
     ]);
     expect(rows.filter((row) => row.kind === "deck")).toHaveLength(35);
+  });
+});
+
+describe("the lazy pre-built list", () => {
+  it("parses the decks once and builds the list once, with a heading's index for each group", () => {
+    expect(prebuiltDecks()).toBe(prebuiltDecks());
+    const list = prebuiltList();
+    expect(prebuiltList()).toBe(list);
+    expect(list.rows.length).toBeGreaterThan(prebuiltDecks().length);
+    expect(list.sticky.length).toBeGreaterThan(0);
+    expect(list.sticky.every((at) => list.rows[at]?.kind === "group")).toBe(true);
   });
 });

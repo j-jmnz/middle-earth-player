@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { GLOSSARY, bookPage, glossaryEntry, paragraphs, searchGlossary, seeAlso } from "./rules-glossary.ts";
+import { bookPage, glossary, glossaryEntry, paragraphs, searchGlossary, seeAlso } from "./rules-glossary.ts";
+
+const GLOSSARY = glossary();
 
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
@@ -16,6 +18,22 @@ describe("GLOSSARY", () => {
     expect(ids.indexOf("faq.first-player-elimination")).toBeGreaterThan(ids.indexOf("rr.action"));
     expect(ids.indexOf("rr.step-1-2")).toBeGreaterThan(ids.indexOf("rr.action"));
     expect(GLOSSARY[0]?.title).toMatch(/^A/);
+  });
+});
+
+describe("the lazy glossary", () => {
+  it("is parsed once and the entries are kept", () => {
+    expect(glossary()).toBe(glossary());
+    expect(glossaryEntry("rr.action")).toBe(glossary().find((entry) => entry.id === "rr.action"));
+    expect(glossaryEntry("no.such.rule")).toBeNull();
+  });
+
+  it("finds the same entries when the same query is asked again (the folded fields are kept)", () => {
+    const first = searchGlossary(GLOSSARY, "attachment").map((entry) => entry.id);
+    expect(first.length).toBeGreaterThan(1);
+    expect(searchGlossary(GLOSSARY, "attachment").map((entry) => entry.id)).toEqual(first);
+    // Two letters search titles and terms only; three also reach the text.
+    expect(searchGlossary(GLOSSARY, "at").length).toBeLessThan(searchGlossary(GLOSSARY, "att").length + GLOSSARY.length);
   });
 });
 

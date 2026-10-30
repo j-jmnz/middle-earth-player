@@ -82,3 +82,20 @@ export function ToastView() {
     </View>
   );
 }
+
+/** The room the toast covers at the foot of a list that docks it (ToastDock): the list ends this far above its pinned bar, so its last row is never under the toast. */
+export const TOAST_ROOM = 72;
+
+/**
+ * The toast over the foot of the list above it instead of beside it: the dock takes no height, so a toast coming or going does not
+ * resize the list (each + or − tap in the pool and the deck editor showed and replaced one, and the list was laid out again each time).
+ */
+export function ToastDock() {
+  return (
+    <View pointerEvents="box-none" className="z-10 h-0">
+      <View pointerEvents="box-none" className="absolute bottom-0 left-0 right-0">
+        <ToastView />
+      </View>
+    </View>
+  );
+}

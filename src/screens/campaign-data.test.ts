@@ -4,7 +4,7 @@ import { readdirSync } from "node:fs";
 
 import index from "../../data/campaigns/index.json";
 import entries from "../../data/rules/entries.json";
-import { BOXES, bookletPageOf, bookletParams, boxOf, CAMPAIGN_IDS, campaignOf, campaignOfScenario, scenarioName, scenarioNames, scenarioOf } from "./campaign-data";
+import { BOXES, bookletPageOf, bookletParams, boxOf, campaignIds, campaignOf, campaignOfScenario, scenarioName, scenarioNames, scenarioOf } from "./campaign-data";
 import { dealSeed } from "./e2e";
 
 describe("campaign data on the phone", () => {
@@ -28,7 +28,7 @@ describe("campaign data on the phone", () => {
 describe("the registry", () => {
   it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
     const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
-    expect([...CAMPAIGN_IDS].sort()).toEqual(built);
+    expect([...campaignIds()].sort()).toEqual(built);
     for (const entry of index) {
       const campaign = campaignOf(entry.id);
       if (built.includes(entry.id)) {
@@ -41,11 +41,11 @@ describe("the registry", () => {
   it("holds every scenario file, and each campaign's scenarios are all in it", () => {
     const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
     for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
-    for (const id of CAMPAIGN_IDS) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
+    for (const id of campaignIds()) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
   });
 
   it("answers campaignOf and scenarioNames for any id", () => {
-    for (const id of CAMPAIGN_IDS) {
+    for (const id of campaignIds()) {
       const campaign = campaignOf(id);
       if (!campaign) throw new Error(`${id} is not registered`);
       expect(Object.keys(scenarioNames(campaign)).sort()).toEqual([...campaign.scenarios].sort());
@@ -57,7 +57,7 @@ describe("the registry", () => {
     expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood"]);
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
-    const every = new Set(CAMPAIGN_IDS.flatMap((id) => campaignOf(id)?.scenarios ?? []));
+    const every = new Set(campaignIds().flatMap((id) => campaignOf(id)?.scenarios ?? []));
     expect([...listed].sort()).toEqual([...every].sort());
     for (const box of BOXES) {
       const campaign = campaignOf(box.campaignId);
@@ -127,5 +127,19 @@ describe("dealSeed", () => {
     vi.stubEnv("EXPO_PUBLIC_E2E_SEED", "1");
     expect(dealSeed(() => 0.9)).toBe(1);
     vi.unstubAllEnvs();
+  });
+});
+
+describe("the lazy registry", () => {
+  it("parses a campaign or a scenario when first asked for and keeps it", () => {
+    expect(campaignOf("fellowship-of-the-ring")).toBe(campaignOf("fellowship-of-the-ring"));
+    expect(scenarioOf("a-shadow-of-the-past")).toBe(scenarioOf("a-shadow-of-the-past"));
+    expect(campaignOf("fellowship-of-the-ring")?.starterDecks.length).toBeGreaterThan(0);
+  });
+
+  it("knows only its own ids, not the properties every object has", () => {
+    expect(campaignOf("nope")).toBeNull();
+    expect(scenarioOf("constructor")).toBeNull();
+    expect(campaignOf("__proto__")).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 // The tabs (docs/design-system.md, Navigation): a dock at the foot of a phone and a tablet in portrait, a rail down the left edge of an
 // expanded window. Five hubs: Campaigns, Scenarios, Decks, Cards, Rules. Settings is a pushed screen, opened by the gear at the top
 // right of each hub (`GearButton`) or, beside the rail, by the rail's own Settings at its foot. Re-exported by chrome.tsx.
-import { useEffect, useState, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, type Tabs } from "expo-router";
@@ -10,6 +10,7 @@ import { GearMark } from "./chrome-marks";
 import { IconButton } from "./chrome-buttons";
 import { useTitleShadow } from "./chrome-text";
 import { useDatabases } from "./databases";
+import { deckRevision, subscribeDeckRevision } from "./deck-revision";
 import { deckReadiness } from "./deck-status";
 import { deckFaces, listDecks } from "./deck-store";
 import { usePalette } from "./palette-hook";
@@ -78,11 +79,13 @@ function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][numbe
 }
 
 /**
- * Whether a saved deck is not ready to play: the dot on the Decks tab. Read after the frame whenever the current tab changes, so a deck
- * saved or fixed in the editor shows on the way back, and the tab bar never holds up the first paint of a hub.
+ * Whether a saved deck is not ready to play: the dot on the Decks tab. Read after the frame whenever the saved decks change (the deck
+ * store's revision moves on each write), so a deck saved or fixed in the editor shows at once, a change of tab reads nothing, and the
+ * tab bar never holds up the first paint of a hub.
  */
-function useUnreadyDeck(at: number): boolean {
+function useUnreadyDeck(): boolean {
   const { catalog, user } = useDatabases();
+  const revision = useSyncExternalStore(subscribeDeckRevision, deckRevision, deckRevision);
   const [unready, setUnready] = useState(false);
   useEffect(() => {
     let cancelled = false;
@@ -95,7 +98,7 @@ function useUnreadyDeck(at: number): boolean {
       cancelled = true;
       cancelAnimationFrame(frame);
     };
-  }, [catalog, user, at]);
+  }, [catalog, user, revision]);
   return unready;
 }
 
@@ -123,7 +126,7 @@ function DockTabBar(props: TabBarProps) {
   const palette = usePalette();
   const insets = useSafeAreaInsets();
   const s = useUiScale();
-  const unready = useUnreadyDeck(state.index);
+  const unready = useUnreadyDeck();
   // The words stay at Medium's size at Large, so five fit across a narrow phone.
   const labelScale = Math.min(s, 1);
   const t = useTableTokens();
@@ -188,7 +191,7 @@ function RailTabBar(props: TabBarProps) {
   const router = useRouter();
   const s = useUiScale();
   const insets = useSafeAreaInsets();
-  const unready = useUnreadyDeck(state.index);
+  const unready = useUnreadyDeck();
   const labelScale = Math.min(s, 1);
   const label = (focused: boolean) => ({ fontSize: 12 * labelScale, lineHeight: 15 * labelScale, letterSpacing: 0.4 * labelScale, color: focused ? palette.bone : palette.faint });
   const t = useTableTokens();

@@ -127,8 +127,13 @@ export function droppedSentence(names: readonly string[]): string | null {
   return `Dropped ${names.join(", ")}.`;
 }
 
-/** The pre-built player decks from data/decks/prebuilt.json, in the order the index lists them. */
-export const prebuiltDecks: readonly PrebuiltDeck[] = prebuiltDecksSchema.parse(prebuiltJson);
+let decks: readonly PrebuiltDeck[] | null = null;
+
+/** The pre-built player decks from data/decks/prebuilt.json, in the order the index lists them. Parsed on the first call, then kept. */
+export function prebuiltDecks(): readonly PrebuiltDeck[] {
+  decks ??= prebuiltDecksSchema.parse(prebuiltJson);
+  return decks;
+}
 
 /** A pre-built deck as a decklist body, read like an import. Its sideboard is left out, like RingsDB sideslots. */
 export function prebuiltBody(deck: PrebuiltDeck): DecklistBody {
@@ -181,4 +186,15 @@ export function prebuiltNotApplied(deck: PrebuiltDeck, inactive: ReadonlySet<str
 /** A row's detail with the not-applied count after it. */
 export function withNotApplied(detail: string, notApplied: string | null): string {
   return notApplied ? `${detail} · ${notApplied}` : detail;
+}
+
+let list: { rows: PrebuiltRow[]; sticky: number[] } | null = null;
+
+/** The import screen's list, and the indexes of its group headings (they stay at the top while the decks scroll under them). Built on the first call, then kept. */
+export function prebuiltList(): { rows: readonly PrebuiltRow[]; sticky: readonly number[] } {
+  if (!list) {
+    const rows = prebuiltRows(prebuiltDecks());
+    list = { rows, sticky: rows.flatMap((row, at) => (row.kind === "group" ? [at] : [])) };
+  }
+  return list;
 }

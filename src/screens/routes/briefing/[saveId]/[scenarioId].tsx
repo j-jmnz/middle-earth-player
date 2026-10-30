@@ -62,11 +62,14 @@ export default function Briefing() {
     [seatCount, savedDecks, picked],
   );
 
+  // The world is built from the scenario and these codes (the log's cards, the Ring-bearers, every saved deck's heroes, the picked decks'
+  // cards), as one string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
+  const hasSave = save != null;
+  const codeKey = hasSave ? [...new Set([...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0") : "";
   const world = useMemo(() => {
-    if (!save || !campaign || !scenario) return null;
-    const extra = [...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)];
-    return loadWorld(catalog, campaign, scenario, EFFECTS, extra);
-  }, [catalog, save, campaign, scenario, candidates, savedDecks, seats]);
+    if (!hasSave || !campaign || !scenario) return null;
+    return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
+  }, [catalog, hasSave, campaign, scenario, codeKey]);
 
   const input: BriefingInput | null = useMemo(
     () => (save && world ? { world, log: save.log, seatCount: save.seatCount, seats, ringBearer, difficulty, choices, acceptPenalty: accepted } : null),

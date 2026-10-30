@@ -1,24 +1,23 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
-import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
-import { cards, packs } from "../catalog/schema";
 import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, ToggleChip, sphereWord } from "./chrome";
 import { draftAddRefused, draftCopyCount, useDeckDraft, type TitleLookup } from "./deck-draft";
 import { deckCardCount, deckCountLine, DECK_MINIMUM } from "./deck-status";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useListPreview } from "./list-preview";
-import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
+import { notAppliedWords } from "../play/not-applied";
 import { usePalette } from "./palette-hook";
+import { poolOf } from "./pool-cache";
 import { addingView, browseView } from "./pool-view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./pool-cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./pool-grid";
-import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, sortPool, typeRequestWords, type PoolFilter } from "./pool-filter";
+import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, typeRequestWords, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
-import { ToastView } from "./toast-view";
+import { TOAST_ROOM, ToastDock } from "./toast-view";
 import { gutter } from "../play/size-class";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
@@ -163,6 +162,7 @@ export function CardPoolBody({
   onPreview,
   onOpen,
   selected = null,
+  toastRoom = false,
 }: {
   adding: boolean;
   startType?: string | null;
@@ -172,8 +172,13 @@ export function CardPoolBody({
   onOpen?: (code: string) => void;
   // The card whose detail is open beside the pool: its cell carries the silver ring.
   selected?: string | null;
+  // The screen docks its toast over the foot of this list (ToastDock): the list ends above it.
+  toastRoom?: boolean;
 }) {
-  const draft = useDeckDraft();
+  // Only the heroes and the cards: typing the deck's name in the editor does not render the pool.
+  const heroes = useDeckDraft((current) => current.heroes);
+  const deckCards = useDeckDraft((current) => current.cards);
+  const draft = useMemo(() => ({ heroes, cards: deckCards }), [heroes, deckCards]);
   const { catalog } = useDatabases();
   const router = useRouter();
   // Both views are read on every render (a hook is never chosen at run time); the mode picks which one shows and which one changes.
@@ -195,49 +200,9 @@ export function CardPoolBody({
   // The list view's rows are a reading column outside compact; the grid fills the width.
   const inset = grid ? 0 : gutter(listWidth, size, "readable", scale);
   const recycle = grid ? recyclePool(columns, listHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, listHeight, LIST_ROW_HEIGHT * scale);
-  // Sorted in memory: a printing's tag ("(MotK) Aragorn") files under the name.
-  const [rows] = useState(() =>
-    sortPool(
-      catalog
-        .select({
-          code: cards.code,
-          name: cards.name,
-          typeCode: cards.typeCode,
-          typeName: cards.typeName,
-          sphereCode: cards.sphereCode,
-          sphereName: cards.sphereName,
-          packCode: cards.packCode,
-          packCodes: cards.packCodes,
-          traits: cards.traits,
-          cost: cards.cost,
-          threat: cards.threat,
-          isUnique: cards.isUnique,
-          deckLimit: cards.deckLimit,
-          deckLegal: cards.deckLegal,
-          imagesrc: cards.imagesrc,
-        })
-        .from(cards)
-        .where(eq(cards.deckLegal, true))
-        .all(),
-    ),
-  );
-  const [packRows] = useState(() =>
-    catalog
-      .select({
-        code: packs.code,
-        name: packs.name,
-        position: packs.position,
-        cyclePosition: packs.cyclePosition,
-      })
-      .from(packs)
-      .orderBy(packs.cyclePosition, packs.position)
-      .all(),
-  );
-  // The same "not applied" check as the card screen and the table: a printed line no effect record reads.
-  const [inactiveCodes] = useState(() =>
-    // The text the app shows is the errata when there is one, as on the card screen and in the deck store.
-    notAppliedCodes(catalog.select({ code: cards.code, text: cards.text, errata: cards.errata }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.errata ?? row.text] as const)),
-  );
+  // The sorted pool, its packs and the cards with a line the app does not apply: read once per catalog (pool-cache.ts), shared with the
+  // Cards tab, the pool route, the deck editor's cards pane and the import screen.
+  const { rows, packs: packRows, notApplied: inactiveCodes, byCode } = poolOf(catalog);
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
   // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
@@ -268,10 +233,7 @@ export function CardPoolBody({
     AccessibilityInfo.announceForAccessibility(typeRequestWords(types, typeRequest.type));
   }, [typeRequest, types]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
-  const lookup = useMemo<TitleLookup>(() => {
-    const byCode = new Map(rows.map((row) => [row.code, row]));
-    return (code) => byCode.get(code);
-  }, [rows]);
+  const lookup = useMemo<TitleLookup>(() => (code) => byCode.get(code), [byCode]);
   const filters = activeFilterCount(applied);
   const openCard = useCallback((code: string) => (onOpen ? onOpen(code) : router.push({ pathname: "/card/[code]", params: { code } })), [router, onOpen]);
   const previewCard = onPreview;
@@ -361,7 +323,7 @@ export function CardPoolBody({
             keyboardShouldPersistTaps="handled"
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
-            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
+            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} style={toastRoom ? { height: (adding ? 16 + TOAST_ROOM : TOAST_ROOM) * scale } : undefined} />}
             ListEmptyComponent={
               <BodyText testID="pool-empty" tone="muted" className="mt-6">
                 No cards match.
@@ -416,14 +378,15 @@ export function CardPool({
   startType?: string | null;
   onDone?: () => void;
 }) {
-  const draft = useDeckDraft();
+  const heroes = useDeckDraft((current) => current.heroes);
+  const deckCards = useDeckDraft((current) => current.cards);
   const preview = useListPreview();
   return (
     <Screen scene="calm">
       <View className="min-h-0 flex-1">
         {header}
-        <CardPoolBody adding={adding} startType={startType} onPreview={preview.open} />
-        <ToastView />
+        <CardPoolBody adding={adding} startType={startType} onPreview={preview.open} toastRoom />
+        <ToastDock />
         {adding ? (
           <ActionBar testID="pool-deck-bar">
             <View className="flex-row items-center gap-3.5">
@@ -431,11 +394,11 @@ export function CardPool({
                 <View className="flex-row items-baseline justify-between">
                   <Text className="text-label text-muted">Deck</Text>
                   <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
-                    {deckCountLine(draft)}
+                    {deckCountLine({ heroes, cards: deckCards })}
                   </Text>
                 </View>
                 <View className="mt-1.5">
-                  <ProgressBar value={deckCardCount(draft.cards)} max={DECK_MINIMUM} />
+                  <ProgressBar value={deckCardCount(deckCards)} max={DECK_MINIMUM} />
                 </View>
               </View>
               <PrimaryButton testID="pool-done" label="Done" onPress={() => onDone?.()} />

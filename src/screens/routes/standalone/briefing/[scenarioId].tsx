@@ -52,11 +52,13 @@ export default function StandaloneBriefing() {
     [seatCount, savedDecks, picked],
   );
 
+  // The world is built from the scenario and these codes (the Ring-bearers, every saved deck's heroes, the picked decks' cards), as one
+  // string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
+  const codeKey = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0");
   const world = useMemo(() => {
     if (!campaign || !scenario) return null;
-    const extra = [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)];
-    return loadWorld(catalog, campaign, scenario, EFFECTS, extra);
-  }, [catalog, campaign, scenario, candidates, savedDecks, seats]);
+    return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
+  }, [catalog, campaign, scenario, codeKey]);
 
   const input: StandaloneInput | null = useMemo(() => (world ? { world, seatCount, seats, ringBearer, difficulty } : null), [world, seatCount, seats, ringBearer, difficulty]);
   const result = useMemo(() => (input ? standaloneBriefing(input) : null), [input]);
