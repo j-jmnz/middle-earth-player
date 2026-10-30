@@ -121,11 +121,16 @@ export function BriefingScreen({
   children,
   aside,
   bar,
+  backTestID = "briefing-back",
+  barTestID = "briefing-deal-bar",
 }: {
   testID: string;
   scenarioId: string | null;
   onBack: () => void;
   backLabel?: string;
+  // The Back button's and the bar's test ids: the briefings' own unless a screen on this frame names them.
+  backTestID?: string;
+  barTestID?: string;
   // Left out when there is no book to open (no playthrough or campaign yet): the button is not shown.
   onBooklet?: () => void;
   // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
@@ -161,7 +166,7 @@ export function BriefingScreen({
   );
   const navBar = (
     <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>
-      <NavBar onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
+      <NavBar onBack={onBack} backTestID={backTestID} backLabel={backLabel} right={onBooklet ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
     </View>
   );
 
@@ -191,7 +196,7 @@ export function BriefingScreen({
               </ScrollView>
               {bar ? (
                 <View style={{ paddingRight: trailing }}>
-                  <ActionBar testID="briefing-deal-bar" align="fill">
+                  <ActionBar testID={barTestID} align="fill">
                     {bar}
                   </ActionBar>
                 </View>
@@ -223,7 +228,7 @@ export function BriefingScreen({
       </ScrollView>
       {bar ? (
         <View style={side}>
-          <ActionBar testID="briefing-deal-bar">{bar}</ActionBar>
+          <ActionBar testID={barTestID}>{bar}</ActionBar>
         </View>
       ) : null}
       <FloatingBarShade shown={past} top={insets.top} />
@@ -232,9 +237,8 @@ export function BriefingScreen({
   );
 }
 
-/** Over the scene: an overline with the scenario's number and its campaign, its name large, and its stages in order as chips. */
-export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebrow: string }) {
-  const palette = usePalette();
+// The overline and the name over the scene, shared by the scenario and campaign banners.
+function BannerWords({ eyebrow, name, titleTestID }: { eyebrow: string; name: string; titleTestID: string }) {
   const titleShadow = useTitleShadow();
   const light = useTheme() === "light";
   const { size, s } = useSizeClass();
@@ -246,9 +250,19 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
       <Text className={`font-bold text-eyebrow uppercase ${light ? "text-bone" : "text-moon"}`} style={titleShadow}>
         {eyebrow}
       </Text>
-      <Text accessibilityRole="header" testID="briefing-title" className="mt-1 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.12 * s, ...titleShadow }}>
-        {facts.name}
+      <Text accessibilityRole="header" testID={titleTestID} className="mt-1 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.12 * s, ...titleShadow }}>
+        {name}
       </Text>
+    </>
+  );
+}
+
+/** Over the scene: an overline with the scenario's number and its campaign, its name large, and its stages in order as chips. */
+export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebrow: string }) {
+  const palette = usePalette();
+  return (
+    <>
+      <BannerWords eyebrow={eyebrow} name={facts.name} titleTestID="briefing-title" />
       <View testID="briefing-stages" accessible accessibilityLabel={`Stages: ${facts.stages.join(", ")}`} className="mt-3 flex-row flex-wrap items-center gap-x-1.5 gap-y-1.5">
         {facts.stages.map((stage, index) => (
           <View key={`${stage}:${index}`} className="flex-row items-center gap-1.5">
@@ -260,6 +274,11 @@ export function ScenarioBanner({ facts, eyebrow }: { facts: ScenarioFacts; eyebr
       </View>
     </>
   );
+}
+
+/** Over the campaign setup's scene: the ScenarioBanner's overline and name, without stages. */
+export function CampaignBanner({ eyebrow, name }: { eyebrow: string; name: string }) {
+  return <BannerWords eyebrow={eyebrow} name={name} titleTestID="campaign-setup-title" />;
 }
 
 /**
