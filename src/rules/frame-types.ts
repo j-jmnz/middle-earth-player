@@ -95,6 +95,8 @@ export type EffectData = {
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
   dealt?: number;
   hold?: string;
+  // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare.ts).
+  hideFailed?: boolean;
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action

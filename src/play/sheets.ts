@@ -23,6 +23,7 @@ import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
+import { hideCommitLimit } from "../rules/families/nightmare.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -181,7 +182,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `hideCommit:${frame?.id ?? ""}`,
         step: "Hide test",
         title: source ? `${names.card(source)}: Hide ${hide?.x ?? ""}`.trim() : `Hide ${hide?.x ?? ""}`.trim(),
-        note: "Commit characters to the Hide test. Their willpower is compared with the threat of the cards discarded.",
+        note: hideCommitNote(hideCommitLimit(game)),
         verb: "Commit",
         options: legalTargets(game, { type: "CommitHide" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
         build: { kind: "CommitHide" },
@@ -389,3 +390,10 @@ function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number)
 }
 
 /** The quest commit the bar sends: the characters dragged to the quest stage, or every legal one picked on the sheet. */
+
+// The Hide sheet's note, with the most characters a card lets commit ("players cannot commit more than 2 characters to a Hide test",
+// 906106:A:1).
+function hideCommitNote(limit: number | null): string {
+  const base = "Commit characters to the Hide test. Their willpower is compared with the threat of the cards discarded.";
+  return limit == null ? base : `${base} No more than ${limit} can commit.`;
+}

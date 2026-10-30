@@ -14,6 +14,7 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
+import { nightmareSetup } from "./families/nightmare.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import type { CampaignFacts } from "./campaign-state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
@@ -132,6 +133,9 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const players = pushPlayerSetup(state, ctx, steps);
   if (players !== state) return players;
   let next = searchSetup(state, "encounter", ctx, steps);
+  // The Nightmare setup card's own Setup lines (families/nightmare.ts).
+  next = nightmareSetup(next, ctx, steps);
+  if (next.failure || next.lost) return next;
   for (const instruction of next.setup) {
     next = runInstruction(
       next,

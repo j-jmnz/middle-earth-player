@@ -43,6 +43,7 @@ import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { ENGINE_VERSION } from "../src/rules/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
+import { hideCommitLimit } from "../src/rules/families/nightmare.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
 import { nextIntent } from "./auto-player.ts";
@@ -118,7 +119,7 @@ function varied(state: ScenarioState, ctx: ReduceContext, random: () => number, 
     const other = legalIntents(state, ctx).find((intent) => intent.type === "Choose" && state.cards[intent.optionId]?.code !== FRODO);
     if (other?.type === "Choose") return { type: "Choose", optionId: other.optionId };
   }
-  if (base.type === "CommitHide") return { type: "CommitHide", cardIds: legalTargets(state, { type: "CommitHide" }, ctx) };
+  if (base.type === "CommitHide") return { type: "CommitHide", cardIds: legalTargets(state, { type: "CommitHide" }, ctx).slice(0, hideCommitLimit(state) ?? undefined) };
   // On A Shortcut to Mushrooms each ally adds 1 to every Hide test's threat (141023:B:2), so the search holds allies back.
   const stage = state.cards[state.questStage ?? ""]?.code;
   if (base.type === "PlayCard" && stage === "141023" && ctx.cards.get(state.cards[base.cardId]?.code ?? "")?.type === "ally") return { type: "Pass" };

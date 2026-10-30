@@ -1,3 +1,4 @@
+import { withTwin } from "./families/nightmare.ts";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
 import { currentCause, effectCause, inCause, ruleCause, UNATTRIBUTED, type Cause } from "./cause.ts";
@@ -84,6 +85,11 @@ export function runInstruction(
   steps: EngineStep[],
 ): ScenarioState {
   if (state.failure) return state;
+  return runTwinned(state, withTwin(state, instruction, ctx.cards), focus, ctx, steps);
+}
+
+// runInstruction with a code already read as its Nightmare twin (families/nightmare.ts).
+function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const family = runFamilyVerb(state, instruction, focus, ctx, steps);
   if (family) return family;
   const player = runPlayerVerb(state, instruction, focus, ctx, steps);

@@ -22,6 +22,9 @@ export const phaseNameSchema = z.enum([
 const atomSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
   z.strictObject({ kind: z.literal("hideFailed"), scope: z.enum(["phase", "round"]) }),
+  // The last Hide test the running effect made failed ("Each player who fails this Hide test raises his threat by 5", 906108:A:1; "If the
+  // engaged player fails the hide test", 906102:A:3). False before the effect has made one. Read by src/rules/families/nightmare.ts.
+  z.strictObject({ kind: z.literal("lastHideFailed") }),
   // The actor has an enemy engaged with them, with this trait if one is named.
   z.strictObject({ kind: z.literal("hasEngaged"), trait: z.string().min(1).optional() }),
   // A card with this code is in play and its exhausted state is `is`.

@@ -21,6 +21,7 @@ import { shadowCards } from "./zones.ts";
 import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
+import { lastHideFailed, withTwin } from "./families/nightmare.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -68,7 +69,9 @@ function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "m
   }
 }
 
-export function holds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean {
+export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx: ReduceContext): boolean {
+  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare.ts).
+  const condition = withTwin(state, named, ctx.cards);
   switch (condition.kind) {
     case "hideFailed":
       return state.hideFailures.some(
@@ -77,6 +80,8 @@ export function holds(state: ScenarioState, condition: Condition, scope: Scope, 
           failure.round === state.round &&
           (condition.scope === "round" || failure.phase === state.phase),
       );
+    case "lastHideFailed":
+      return lastHideFailed(state);
     case "hasEngaged": {
       const trait = condition.trait;
       return (state.seats[scope.actor]?.engaged ?? []).some((id) => trait == null || hasTrait(state, id, trait, ctx));

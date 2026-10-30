@@ -1,3 +1,4 @@
+import { withTwin } from "./families/nightmare.ts";
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
@@ -186,9 +187,11 @@ function runItem(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const instruction = item.instruction;
+  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare.ts).
+  const instruction = withTwin(state, item.instruction, ctx.cards);
+  const twinned = instruction === item.instruction ? item : { ...item, instruction };
   if (!holdsNow(state, instruction, { actor: item.seat, sourceId: frame.cardId, returned }, ctx)) return state;
-  return inCause(steps, item.cause, () => runItemNow(state, item, frame, returned, ctx, steps));
+  return inCause(steps, item.cause, () => runItemNow(state, twinned, frame, returned, ctx, steps));
 }
 
 function runItemNow(

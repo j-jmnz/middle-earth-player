@@ -15,6 +15,7 @@ import { offerResponses } from "./responses.ts";
 import { restricted } from "./restrictions.ts";
 import { withMode, type ScenarioState } from "./state.ts";
 import { fireForced } from "./triggers.ts";
+import { announceStageRevealed } from "./families/nightmare.ts";
 
 // Resolving the quest is two passes. The first adds progress, and each stage the quest advanced to has
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends
@@ -55,6 +56,8 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     const code = next.cards[cardId]?.code;
     const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
     next = pushCardEffects(next, "whenRevealed", cardId, next.firstPlayer, false, effects, ctx, steps);
+    // "Forced: When stage 3A is revealed" (906101:A:2) resolves above the stage's own When Revealed effects.
+    next = announceStageRevealed(next, cardId, ctx, steps);
   }
   // "After a quest card is defeated" (Mendor, 01135:A:3) and "When you defeat this stage" (01120:B:1) hear each stage the quest left.
   if (questCardDefeatedHeard(next, ctx)) {

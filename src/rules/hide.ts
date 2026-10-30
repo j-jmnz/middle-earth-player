@@ -12,6 +12,7 @@ import { inPlay, updateCard } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { pruneUses } from "./usage.ts";
 import { fireForced } from "./triggers.ts";
+import { hideCommitLimit, noteEffectHide } from "./families/nightmare.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 
@@ -42,6 +43,9 @@ export function hideCommitReason(
   if (window?.kind !== "hideCommit") return "That intent is not legal in this window";
   if (window.seat !== state.activeSeat) return "Only the revealing seat commits to a Hide test";
   const legal = new Set(hideCommitters(state, window.seat, ctx.cards));
+  // "Players cannot commit more than 2 characters to a Hide test" (906106:A:1).
+  const limit = hideCommitLimit(state);
+  if (limit != null && intent.cardIds.length > limit) return `No more than ${limit} characters can commit to a Hide test`;
   const seen = new Set<string>();
   for (const id of intent.cardIds) {
     if (seen.has(id)) return "That character cannot commit twice";
@@ -163,6 +167,7 @@ function afterTest(state: ScenarioState, frame: Frame, data: HideData, ctx: Redu
 function finish(state: ScenarioState, data: HideData, steps: EngineStep[]): ScenarioState {
   const popped = popFrame(state, steps);
   const parent = topFrame(popped);
+  if (parent?.data.kind === "effect") return noteEffectHide(popped, data.result);
   if (parent?.data.kind !== "reveal") return popped;
   return patchTop(popped, { data: { ...parent.data, hide: data.result } });
 }

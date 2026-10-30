@@ -22,3 +22,7 @@ Order: A Shadow of the Past, A Knife in the Dark, Flight to the Ford, The Ring G
 - Coverage is green for every line of the deck and the setup card.
 - `pnpm test`, `pnpm lint`, `tsc` and `pnpm data:check` are green.
 - Phone check, open: one Nightmare game per scenario on a phone.
+
+## Progress
+
+- **A Shadow of the Past** (2026-10-30): on NIGHTMARE_PLAYABLE. Records in `src/effects/authored/nightmare/a-shadow-of-the-past.ts`; engine in the `nightmare` family (`src/catalog/families/nightmare.ts`, `src/rules/families/nightmare.ts`, tested in `nightmare.test.ts`): the `stageRevealed` trigger that the setup card in zone `nightmare` hears, `AttachToQuest`, `SearchToStaging` (encounter deck, discard pile and victory display), the `hideCommitLimit` flag and the `lastHideFailed` condition. A record that names a card the recipe replaced reads the dealt card of the same title (`twinCode`; `scripts/nightmare-codes.test.ts` checks every scenario on the list), and the setup card's own Setup lines run during Setup, before the quest's. `src/campaign/nightmare-games.test.ts` plays three seeded Nightmare games of each listed scenario.
