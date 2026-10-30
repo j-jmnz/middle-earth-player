@@ -120,12 +120,14 @@ function nameKey(name: string): string {
   return name.replace(/^\([^)]*\)\s*/, "");
 }
 
-/** The pool in name order, a printing's leading tag ignored (the untagged printing first), then by code. */
+/** The pool in name order, a printing's leading tag ignored (the untagged printing first), then by code. Each key is worked out once. */
 export function sortPool<T extends { code: string; name: string }>(cards: readonly T[]): T[] {
-  const tagged = (name: string) => (nameKey(name) === name ? 0 : 1);
-  return [...cards].sort(
-    (left, right) => nameKey(left.name).localeCompare(nameKey(right.name)) || tagged(left.name) - tagged(right.name) || left.code.localeCompare(right.code),
-  );
+  const keyed = cards.map((card) => {
+    const key = nameKey(card.name);
+    return { card, key, tagged: key === card.name ? 0 : 1 };
+  });
+  keyed.sort((left, right) => left.key.localeCompare(right.key) || left.tagged - right.tagged || left.card.code.localeCompare(right.card.code));
+  return keyed.map((entry) => entry.card);
 }
 
 /** The number printed in the row: cost, or threat when the card has no cost. */

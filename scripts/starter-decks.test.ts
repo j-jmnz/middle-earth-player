@@ -96,7 +96,7 @@ describe("starter decks", () => {
         expect(deckSaveRefusal(deck.heroes, deck.cards, facts, [])).toBeNull();
       }
 
-      for (const printed of starterPrints) {
+      for (const printed of starterPrints()) {
         const stored = database
           .prepare("select name, type_code, position, pack_code, pack_codes from cards where code = ?")
           .get(printed.code) as
@@ -130,7 +130,7 @@ describe("starter decks", () => {
         | { position: number }
         | undefined;
       expect(tomb?.position).toBe(53);
-      expect(starterPrints.find((row) => row.code === "01053")?.collector).toBe(63);
+      expect(starterPrints().find((row) => row.code === "01053")?.collector).toBe(63);
     } finally {
       database.close();
     }

@@ -54,8 +54,8 @@ export function peekWords(game: ScenarioState, viewed: number | null): PeekWords
   return { text: out ? `Player ${seat + 1} is out of the game` : `Viewing Player ${seat + 1} · Player ${acting + 1} is acting`, back: `Back to Player ${acting + 1}` };
 }
 
-/** What the canvas marks while peeking: nothing glows, picks nothing and dims nothing (a tap on any card only opens its preview). */
-export const NO_HIGHLIGHT: TableHighlight = { tappable: new Set(), picked: new Map(), share: null, dimOthers: false, marks: new Map(), muted: new Set(), beat: new Set() };
+/** What the canvas marks while peeking: nothing glows, picks nothing and dims nothing (a tap on any card only opens its preview). The canvas also shows no banner beat while peeking (table-canvas.native.tsx). */
+export const NO_HIGHLIGHT: TableHighlight = { tappable: new Set(), picked: new Map(), share: null, dimOthers: false, marks: new Map(), muted: new Set() };
 
 /** The ids the canvas may lift to drag while peeking: none, so drag-to-play is off. */
 export const NO_DRAG: readonly string[] = [];

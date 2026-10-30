@@ -8,6 +8,7 @@ import type { SharedValue } from "react-native-reanimated";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 import type { SpotlightPlan } from "./spotlight-plan.ts";
+import type { Warm } from "./spotlight-warm.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 
 export type Handoff = {
@@ -17,6 +18,8 @@ export type Handoff = {
   // The motion scale the plan plays at (1 Normal, 0.6 Quick).
   k: number;
   playing: boolean;
+  // The pictures of an attack still pending, which the layer decodes at the stage's size before the spotlight plays (spotlight-warm.ts).
+  warm: Warm | null;
   // The table's own decodes, drawn until the layer's stage-size ones are ready.
   tableImages: ReadonlyMap<string, SkImage>;
 };
@@ -26,7 +29,7 @@ export type SpotlightHandoff = StoreApi<Handoff>;
 const EMPTY: ReadonlyMap<string, SkImage> = new Map();
 
 export function createHandoff(): SpotlightHandoff {
-  return createStore<Handoff>()(() => ({ plan: null, progress: null, k: 1, playing: false, tableImages: EMPTY }));
+  return createStore<Handoff>()(() => ({ plan: null, progress: null, k: 1, playing: false, warm: null, tableImages: EMPTY }));
 }
 
 /** What the layer needs from the screen to decode and name the cards (the table canvas's own props). */

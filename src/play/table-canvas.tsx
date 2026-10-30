@@ -7,7 +7,7 @@ import { useStore } from "zustand";
 
 import { NO_HIGHLIGHT } from "./peek.ts";
 import { PILE_WORDS, PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
-import type { TableCanvasProps } from "./table-canvas-types.ts";
+import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -48,9 +48,8 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { i
 
 // What the canvas draws on a card, in words for the web list: an enemy's engagement cost against the threat, a delayed
 // effect to come.
-function marksText(info: TableCanvasProps["info"], cardId: string, zone: ZoneId): string {
-  if (zone === "hand") return "";
-  const slot = info(cardId);
+function marksText(slot: SlotInfo | null): string {
+  if (!slot) return "";
   const engagement = slot.engagement ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
   return `${engagement}${slot.delayed ? " · an effect comes later" : ""}`;
 }
@@ -58,6 +57,8 @@ function marksText(info: TableCanvasProps["info"], cardId: string, zone: ZoneId)
 function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, highlight, t }: RowProps & { zone: ZoneId }) {
   const select = useMemo(() => zoneSelector(zone, seat), [zone, seat]);
   const view = useStore(store, (state) => select(state.game));
+  // The numbers in a card's words come from this state, not the store read in render (the compiler would keep them stale).
+  const game = useStore(store, (state) => state.game);
   if (view.entries.length === 0) return null;
   return (
     <View className="mb-2">
@@ -68,7 +69,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
             key={card.id}
             id={card.id}
             faceDown={hidesFace(card)}
-            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(info, card.id, zone)}`}
+            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(card.code)}${card.exhausted ? " (exhausted)" : ""}${inactive(card.code) ? " · Not applied" : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}

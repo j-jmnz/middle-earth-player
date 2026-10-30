@@ -95,6 +95,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - The combat spotlight's sprite is worked out twice per slot in an active frame.
 - Not built from the Carved Stone handoff: the card screen's "Add to a deck"; the table's encounter row and right-hand piles; the handoff's defend tray.
 - Tablet follow-ups: an Android `appCategory` or large-screen plugin if the table lock must hold on Android 16; pushed routes under the tabs; a Packs list-detail; a Deck import section in `docs/design-system.md`; a "Tap anywhere to close" hint on the preview.
+- Performance pass (`docs/plans/performance-pass.md`): its out-of-scope items (the per-card glow, an ArcRing of Views, particle buffer reuse, a UI-thread lift) wait for on-device profiling.
 - Run `pnpm scans:pack` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
 
 ### Phone and tablet checks
@@ -108,6 +109,7 @@ None ran. Each needs a device.
 - Table canvas: a crowded table at Small, Medium and Large on a phone and a tablet; stacked play rows; picture sharpness and decode memory on a low-end Android; quest scale only in the Quest phase; side B pictures upright; each card shows its own picture after an earlier build.
 - Gestures and motion: drag smoothness; the 150 ms scrub hold, the lifted card's grow and the cancel line; peek and back; card motion at Normal and Quick; reduced motion snaps; haptics on iOS and Android.
 - Combat spotlight (redesign): look at Normal and Quick in Dark and Light; cost on a low-end Android; the burn shader on each GPU; additive Atlas blending; skip on canvas, bar and dock. Handover: `docs/handover/combat-spotlight-open.md`.
+- Performance: frame timing of card pickup, the hand scrub, the spotlight and opening the table (Profiler, Perf Monitor), and the loading frame on a cache miss; screens hidden by React Activity re-shown with their state (tabs, stacked screens, the table's pictures, a tab under a sheet's scrim, iOS swipe-back); the Sent and landing ticks' feel.
 - Scenario sheets: Caught in a Web, Wolf Rider's second attack, The Oath's end-of-round Response and Tokens dial, the Pillar on the attack sheet; a person winning and losing each playable scenario with the log matching.
 - Look and theme: Skia fog and its drift (smooth, cheap, still under reduced motion), grit, `filter` effects, Barlow and Marcellus SC weights, Light's multiply and Dark's screen art blends with no hard edge, Small and Large scales, both themes, keep-awake, `userInterfaceStyle: automatic` after a prebuild.
 - Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge and briefing scene on an iPad in landscape.

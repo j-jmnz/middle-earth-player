@@ -24,7 +24,7 @@ export function CountStepper({
   full,
   onChange,
   minus = true,
-  ids = { dec: `count-dec-${code}`, count: `count-${code}`, inc: `count-inc-${code}` },
+  ids: given,
 }: {
   code: string;
   name: string;
@@ -35,6 +35,7 @@ export function CountStepper({
   minus?: boolean;
   ids?: { dec: string; count: string; inc: string };
 }) {
+  const ids = given ?? { dec: `count-dec-${code}`, count: `count-${code}`, inc: `count-inc-${code}` };
   const palette = usePalette();
   const t = useTableTokens();
   const pressedNight = usePressedNight();

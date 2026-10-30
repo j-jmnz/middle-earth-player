@@ -29,7 +29,7 @@ describe("playing Elven-light from the discard pile", () => {
     const sheet = windowSheet(state, ctx, legal, names);
     expect(discardPlays(state, 0, sheet)).toEqual([light]);
     expect(sheet.note).toContain("Tap your discard pile to play Elven-light from it.");
-    const keys = highlightKeys({ game: state, seat: 0, sheet, choice: { key: sheet.key, ids: [], shares: [] }, panel: false, beatKey: "" });
+    const keys = highlightKeys({ game: state, seat: 0, sheet, choice: { key: sheet.key, ids: [], shares: [] }, panel: false });
     expect(keys.glow.split(",")).toContain("pile:discard");
   });
 

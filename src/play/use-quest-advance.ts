@@ -2,10 +2,12 @@
 // when the new stage asked a question as it was revealed, until that question is answered. Read during the render the moment arrives
 // in, so the table's own answers (use-table-choice.ts, useAutoAnswer) already hold on that render. A combat spotlight plays first.
 // The table opens on it too, at the stage in play (openingLatch).
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useStore } from "zustand";
 
-import { advancedTo, closeLatch, nextLatch, openAdvance, openingLatch, stageAsks, type QuestAdvance } from "./quest-advance.ts";
+import { isOver } from "../rules/undo.ts";
+
+import { advancedTo, askingStage, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "./store.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 
@@ -21,13 +23,17 @@ export type QuestAdvanceState = {
 
 export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const moment = useStore(store, (state) => state.moment);
-  const game = useStore(store, (state) => state.game);
+  // What the screen reads of the game, one value at a time: a state that changes none of them does not render this hook's caller.
+  const questStage = useStore(store, (state) => state.game.questStage);
+  const asking = useStore(store, (state) => askingStage(state.game));
+  const over = useStore(store, (state) => isOver(state.game));
+  const view = useMemo((): QuestView => ({ questStage, asking, over }), [questStage, asking, over]);
   const spotlit = useSpotlightHold(store);
-  const [latch, setLatch] = useState(() => openingLatch(game));
+  const [latch, setLatch] = useState(() => openingLatch(view));
   // Set during render (the derived-state pattern): React renders again before it commits, so no effect sees the old latch.
-  const next = nextLatch(latch, advancedTo(moment, game), game);
+  const next = nextLatch(latch, advancedTo(moment, view), view);
   if (next !== latch) setLatch(next);
-  const open = openAdvance(next, game);
+  const open = openAdvance(next, view);
   const close = useCallback(() => setLatch(closeLatch), []);
-  return { shown: open && !spotlit ? open : null, held: open != null, asks: open != null && stageAsks(game, open.stageId), close };
+  return { shown: open && !spotlit ? open : null, held: open != null, asks: open != null && view.asking === open.stageId, close };
 }

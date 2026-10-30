@@ -12,9 +12,9 @@ export default function DeckPool() {
   const adding = params.adding === "1" || (Array.isArray(params.adding) && params.adding[0] === "1");
   // An empty hero slot opens the pool on heroes; a subsection's Add on its type.
   const startType = typeof params.type === "string" && params.type.length > 0 ? params.type : null;
-  const draft = useDeckDraft();
+  const name = useDeckDraft((current) => current.name);
   const back = () => goBack(router, "/decks");
   // Adding, the bar names the deck the cards go into.
-  const title = adding ? draft.name.trim() || "New deck" : undefined;
+  const title = adding ? name.trim() || "New deck" : undefined;
   return <CardPool adding={adding} startType={startType} onDone={back} header={<NavBar backLabel="Deck" backTestID="pool-back" onBack={back} title={title} subtitle={adding ? "Adding cards" : undefined} />} />;
 }

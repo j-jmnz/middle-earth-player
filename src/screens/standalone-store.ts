@@ -1,8 +1,8 @@
-import { desc, eq, isNotNull, isNull } from "drizzle-orm";
+import { desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseSeatCount } from "../campaign/save";
-import { parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type StandaloneGame } from "../campaign/standalone";
+import { parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../campaign/standalone";
 import { stored } from "./campaign-store";
 import { standaloneGames } from "./user-schema";
 
@@ -24,14 +24,40 @@ function parseRow(row: typeof standaloneGames.$inferSelect): ReadStandalone {
   };
 }
 
+// The columns a list row reads. The open game is read as its engine version and data hash (what tells a stale one), never its intents.
+const listed = {
+  id: standaloneGames.id,
+  campaignId: standaloneGames.campaignId,
+  scenarioId: standaloneGames.scenarioId,
+  seatCount: standaloneGames.seatCount,
+  loadout: standaloneGames.loadout,
+  result: standaloneGames.result,
+  engineVersion: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.engineVersion')`,
+  dataHash: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.dataHash')`,
+};
+
+function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null }): ListedStandalone {
+  const loadout = parseStandaloneLoadout(row.loadout);
+  const open = loadout && typeof row.engineVersion === "number" && typeof row.dataHash === "number";
+  return {
+    id: row.id,
+    campaignId: row.campaignId,
+    scenarioId: row.scenarioId,
+    seatCount: parseSeatCount(row.seatCount),
+    loadout,
+    active: open ? { engineVersion: row.engineVersion as number, dataHash: row.dataHash as number } : null,
+    result: parseStandaloneResult(row.result),
+  };
+}
+
 // The open games, the newest first. An archived game is listed by listArchivedStandalone.
-export function listStandalone<TRun>(user: UserDb<TRun>): StandaloneGame[] {
-  return user.select().from(standaloneGames).where(isNull(standaloneGames.archivedAt)).orderBy(desc(standaloneGames.createdAt)).all().map((row) => parseRow(row).game);
+export function listStandalone<TRun>(user: UserDb<TRun>): ListedStandalone[] {
+  return user.select(listed).from(standaloneGames).where(isNull(standaloneGames.archivedAt)).orderBy(desc(standaloneGames.createdAt)).all().map(listedRow);
 }
 
 // The archived games, the last one put away first.
-export function listArchivedStandalone<TRun>(user: UserDb<TRun>): StandaloneGame[] {
-  return user.select().from(standaloneGames).where(isNotNull(standaloneGames.archivedAt)).orderBy(desc(standaloneGames.archivedAt)).all().map((row) => parseRow(row).game);
+export function listArchivedStandalone<TRun>(user: UserDb<TRun>): ListedStandalone[] {
+  return user.select(listed).from(standaloneGames).where(isNotNull(standaloneGames.archivedAt)).orderBy(desc(standaloneGames.archivedAt)).all().map(listedRow);
 }
 
 export function readStandalone<TRun>(user: UserDb<TRun>, id: string): ReadStandalone | null {
@@ -54,6 +80,16 @@ export function writeStandalone<TRun>(user: UserDb<TRun>, game: StandaloneGame, 
     .insert(standaloneGames)
     .values({ id: game.id, createdAt: now, ...values })
     .onConflictDoUpdate({ target: standaloneGames.id, set: values })
+    .run();
+}
+
+// An intent or an Undo changes only the open game: the loadout and the result are not serialized again, and the row keeps its
+// time and its archive mark, as writeStandalone leaves them.
+export function writeStandaloneActive<TRun>(user: UserDb<TRun>, game: Pick<StandaloneGame, "id" | "active">): void {
+  user
+    .update(standaloneGames)
+    .set({ activeScenario: game.active ? stored(game.active) : null })
+    .where(eq(standaloneGames.id, game.id))
     .run();
 }
 

@@ -1,106 +1,35 @@
-// Opens the scenario a save has in progress for the table: reads the save, drops an open scenario played on another engine
-// version or other card data (the log and decks stay), loads the cards from catalog.db, and replays the intents through the
-// reducer (open-game.ts).
+// The hooks that open the table's session for a screen. The reading, the replay and the store are in table-open.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { useEffect, useMemo } from "react";
 
-import type { Save } from "../campaign/save";
-import { drop, finish, isWon, record, resume, staleReason, unrecord } from "../campaign/session";
-import { logCodes, loadWorld } from "../campaign/world";
-import { CATALOG_VERSION } from "../catalog/version";
-import { EFFECTS } from "../effects";
-import type { TableStore } from "../play/store";
-
-import { campaignOf, scenarioOf } from "./campaign-data";
+import { useOpenedAfterPaint } from "./after-paint";
+import { writeSave } from "./campaign-store";
 import { useDatabases } from "./databases";
-import { readSaveChecked, writeSave } from "./campaign-store";
-import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
-import { recordCampaignRun } from "./run-writers";
+import { cachedTable, openTable, type TableSession } from "./table-open";
 
-type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
+export { loadoutCodes, openTable, recordUnclosedRun, sessionStore, type SessionStore, type TableSession } from "./table-open";
 
-export type TableSession = ({ ok: true; save: Save } & ReplayedGame) | { ok: false; reason: "missing" | "none" | "dropped"; save: Save | null; write: Save | null };
-
-/** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
-export function loadoutCodes(save: Save): string[] {
-  const loadout = save.loadout;
-  if (!loadout) return logCodes(save.log);
-  return [...logCodes(save.log), ...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
+function writeDropped<TUser>(user: BaseSQLiteDatabase<"sync", TUser>, session: TableSession | null): void {
+  if (session && !session.ok && session.write) writeSave(user, session.write);
 }
 
-/**
- * Reads and replays the open scenario. It writes nothing: when the open scenario has to be dropped, the save to write is
- * returned as `write`, and useTableSession writes it in an effect, never during a render.
- */
-export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): TableSession {
-  const read = readSaveChecked(user, saveId);
-  if (!read) return { ok: false, reason: "missing", save: null, write: null };
-  const save = read.save;
-  if (!save.active || !save.loadout) return { ok: false, reason: read.unreadable ? "dropped" : "none", save, write: read.unreadable ? save : null };
-  const campaign = campaignOf(save.campaignId);
-  const scenario = scenarioOf(save.loadout.scenarioId);
-  if (!campaign || !scenario || staleReason(save.active, CATALOG_VERSION)) {
-    const dropped = drop(save);
-    return { ok: false, reason: "dropped", save: dropped, write: dropped };
-  }
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
-  const replayed = replayForTable(catalog, world, (observe) => resume(save, world, CATALOG_VERSION, observe));
-  if (!replayed) {
-    // The reducer refused a stored intent, or the start no longer builds: drop the open scenario and keep the log.
-    const dropped = drop(save);
-    return { ok: false, reason: "dropped", save: dropped, write: dropped };
-  }
-  return { ok: true, save, ...replayed };
-}
-
-/** The open scenario of a save, opened once per save id. A drop it decided on is written after the render. */
+/** The open scenario of a save, opened once per save id, during the render (the Resolution: the table just left it cached). */
 export function useTableSession(saveId: string | null): TableSession | null {
   const { catalog, user } = useDatabases();
   const session = useMemo(() => (saveId ? openTable(catalog, user, saveId) : null), [catalog, user, saveId]);
-  useEffect(() => {
-    if (session && !session.ok && session.write) writeSave(user, session.write);
-  }, [session, user]);
+  useEffect(() => writeDropped(user, session), [session, user]);
   return session;
 }
 
-export type SessionStore = { store: TableStore; save: () => Save };
-
 /**
- * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, and an
- * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written.
+ * The same, opened in an effect after the first paint: null until then, and the table shows its loading
+ * state meanwhile. A replay of a long game no longer holds back the frame the screen opens on. A session already cached (the
+ * Resolution's Back to the table) is held from the first render, with no loading frame.
  */
-export function sessionStore<TRun>(session: Extract<TableSession, { ok: true }>, user: Db<TRun>): SessionStore {
-  let saved: Save = session.save;
-  const store = committingStore(
-    session,
-    (intent, game) => {
-      saved = record(saved, intent);
-      writeSave(user, saved);
-      // A lost game can no longer be undone, and its run id is fixed: write the run now, so closing the Resolution any way (or never)
-      // still leaves it. A win waits for its Resolution choices (the reward).
-      if (game.lost) recordCampaignRun(user, saved, finish(saved, session.world, game), session.world, game);
-    },
-    () => {
-      saved = unrecord(saved);
-      writeSave(user, saved);
-    },
-  );
-  return { store, save: () => saved };
+export function useTableSessionAfterPaint(saveId: string | null): TableSession | null {
+  const { catalog, user } = useDatabases();
+  const session = useOpenedAfterPaint(saveId, () => (saveId ? cachedTable(user, saveId) : null), () => (saveId ? openTable(catalog, user, saveId) : null));
+  useEffect(() => writeDropped(user, session), [session, user]);
+  return session;
 }
 
-/**
- * Writes the run of an open scenario that is over but was never closed, before the save drops or deletes it (a new deal, a
- * deleted playthrough). A win's reward is chosen at the Resolution, so it is left out. A scenario still going, one that
- * cannot be replayed (another engine version) and one that is not open write nothing.
- */
-export function recordUnclosedRun<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): void {
-  try {
-    const session = openTable(catalog, user, saveId);
-    if (!session.ok) return;
-    const state = session.game;
-    if (!state.lost && !isWon(state)) return;
-    recordCampaignRun(user, session.save, session.save, session.world, state);
-  } catch {
-    // The run is a record, not a step: a scenario that will not replay must not stop the deal or the delete.
-  }
-}

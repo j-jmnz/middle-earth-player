@@ -14,7 +14,7 @@ import { modifiedStat, raiseThreat, releaseAttachments } from "./keywords.ts";
 import type { PrintedCard } from "./printed.ts";
 import { printedOf } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
-import { flagged, livingSeats, updateCard, withMode } from "./state.ts";
+import { flagged, livingSeats, updateCard, updateCards, withMode } from "./state.ts";
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 import { placeQuestingProgress } from "./families/defense-damage.ts";
@@ -201,12 +201,7 @@ function clearStage(state: ScenarioState): ScenarioState {
 }
 
 function clearCommitted(state: ScenarioState): ScenarioState {
-  let next = state;
-  for (const instance of Object.values(state.cards)) {
-    if (!instance.committed) continue;
-    next = updateCard(next, instance.id, { committed: false });
-  }
-  return next;
+  return updateCards(state, Object.values(state.cards).filter((instance) => instance.committed).map((instance) => [instance.id, { committed: false }]));
 }
 
 export function travelTo(state: ScenarioState, locationId: string, cards: Cards): ScenarioState | null {

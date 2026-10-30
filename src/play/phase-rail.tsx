@@ -61,7 +61,7 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
       numberOfLines={1}
       importantForAccessibility="no"
       className="text-micro text-faint"
-      style={{ lineHeight: 20 * s, [side === "previous" ? "marginRight" : "marginLeft"]: NEIGHBOR_GAP * s }}
+      style={side === "previous" ? { lineHeight: 20 * s, marginRight: NEIGHBOR_GAP * s } : { lineHeight: 20 * s, marginLeft: NEIGHBOR_GAP * s }}
     >
       {name}
     </Text>

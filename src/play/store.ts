@@ -16,6 +16,8 @@ import { nextUndoable, type Undoable } from "./undo-history.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
 export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+// An effect record by its id (src/screens may not import src/rules).
+export { effectById } from "../rules/listen.ts";
 
 export type TableState = {
   game: ScenarioState;
@@ -44,7 +46,9 @@ export type TableState = {
 };
 
 export type TableActions = {
-  dispatch: (intent: PlayerIntent) => boolean;
+  // `accepted` is called the moment the reducer accepts the intent, before the table's next state is built and the save is written, so a
+  // haptic tick for an accepted intent does not wait for them. It is not called for a refused one.
+  dispatch: (intent: PlayerIntent, accepted?: () => void) => boolean;
   // Goes back to the state before the last intent that can be taken back. False when there is none.
   undo: () => boolean;
   select: (cardId: string | null) => void;
@@ -123,13 +127,14 @@ export function createTableStore(input: TableInput): TableStore {
     history: input.history ?? [],
     spotlight: NO_SPOTLIGHT,
     viewedSeat: null,
-    dispatch: (intent) => {
+    dispatch: (intent, accepted) => {
       const before = get().game;
       const result = reduce(before, intent, ctx);
       if (!result.ok) {
         set({ refusal: result.reason });
         return false;
       }
+      accepted?.();
       // A round ends with its refresh: setup (round 0) ends with no summary.
       const crossed = result.state.round !== before.round && before.round > 0;
       const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...result.steps]) } } : {};

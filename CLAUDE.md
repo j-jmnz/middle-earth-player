@@ -1,6 +1,6 @@
 # Claude Code
 
-The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
+The rules for every session are in `.cursor/rules/authority.mdc`. Read it. Any session or agent that changes code also reads `.cursor/rules/code-standards.mdc` and follows it. The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
 
 ## Data
 
@@ -30,7 +30,7 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 ## Agents
 
-`implementer`, `reviewer`, and `ux` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only.
+`implementer`, `reviewer`, `ux` and `orchestrator` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only. A plan with several sections is run by `orchestrator` (`.cursor/agents/orchestrator.md`): every agent that writes code runs on Sonnet, every review agent (`reviewer`, `ux`) on Opus, and there is one review round only.
 
 ## Cloud sessions
 

@@ -2,11 +2,11 @@
 // animations (FadeIn, SlideInDown, ...), and the hook that reads the speed setting and reduced motion once. Nothing here holds a
 // number: a length comes from a token and the scale (motionScale), and a scale of 0 (reduced motion) snaps.
 import { Easing, ReduceMotion, useReducedMotion, useSharedValue, withTiming, type EasingFunction, type SharedValue } from "react-native-reanimated";
-import { useEffect, useState } from "react";
-import { AccessibilityInfo } from "react-native";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
+import { accessibility, subscribeAccessibility } from "./accessibility.ts";
 import { ARM_BAR_EASING, motionScale, ms, SHAPE, springTune, timed, type EasingName, type Timeable, type Spring, type Tween } from "./motion-tokens.ts";
 import { tableSettings } from "./table-settings.ts";
 
@@ -49,24 +49,16 @@ export function layoutAnim<C extends new () => Builder>(base: C, token: Tween, s
   return sized;
 }
 
+// The phone's Reduce motion, from the app's one accessibility store (accessibility.ts); null until the phone has answered.
+const phoneReduceMotion = () => accessibility().reduceMotion;
+const unknown = () => null;
+
 /** Reduced motion: the phone's setting, or the Reduce motion override set to Always (user request, 2026-10-28). */
 export function useReduceMotion(): boolean {
   const always = useStore(tableSettings, (state) => state.settings.reduceMotion === "always");
   // Reanimated reads the phone's value once; the first frame uses it, then the phone's setting is followed live.
-  const [system, setSystem] = useState(useReducedMotion());
-  useEffect(() => {
-    let current = true;
-    AccessibilityInfo.isReduceMotionEnabled()
-      .then((enabled) => {
-        if (current) setSystem(enabled);
-      })
-      .catch(() => undefined);
-    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setSystem);
-    return () => {
-      current = false;
-      subscription.remove();
-    };
-  }, []);
+  const first = useReducedMotion();
+  const system = useSyncExternalStore(subscribeAccessibility, phoneReduceMotion, unknown) ?? first;
   return system || always;
 }
 

@@ -41,7 +41,7 @@ describe("not applied on the deck screens", () => {
 
   it("counts each pre-built deck: the four core decks are applied in full, and a deck with an unapplied card says how many", () => {
     const inactive = notAppliedCodes(texts());
-    const byId = new Map(prebuiltDecks.map((deck) => [deck.id, deck]));
+    const byId = new Map(prebuiltDecks().map((deck) => [deck.id, deck]));
     for (const id of ["core-leadership", "core-tactics", "core-spirit", "core-lore"]) {
       const deck = byId.get(id);
       expect(deck && prebuiltNotApplied(deck, inactive), id).toBeNull();

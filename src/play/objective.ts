@@ -4,6 +4,7 @@
 // on the stage or on a card in play or in staging (The Ringwraiths Attack, 141027:B:1; Bucklebury Ferry, 141035:A:4). The
 // line is the card's printed text from the ledger, never booklet prose.
 import type { Instruction } from "../catalog/boundary.ts";
+import { effectsOf } from "../rules/listen.ts";
 import { questPointsOf } from "../rules/quest.ts";
 import { restricted } from "../rules/restrictions.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
@@ -28,7 +29,7 @@ export function stagePoints(game: ScenarioState, stage: CardInstance, ctx: Reduc
 export function advanceHold(game: ScenarioState, ctx: ReduceContext, line: (id: string) => string | null): string | null {
   for (const rule of restricted(game, ctx, "advance")) {
     const code = game.cards[rule.sourceId]?.code;
-    const effect = ctx.effects.find((item) => item.cardCode === code && item.timing === "constant" && item.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance"));
+    const effect = (code == null ? [] : effectsOf(ctx, code)).find((item) => item.timing === "constant" && item.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "advance"));
     const text = effect?.lines[0] ? line(effect.lines[0]) : null;
     if (text) return text;
   }
@@ -37,7 +38,7 @@ export function advanceHold(game: ScenarioState, ctx: ReduceContext, line: (id: 
 
 /** A quest stage's printed lines but its When Revealed ones: how it is won or held ("The players must find and defeat Ungoliant's Spawn to win this game", 01121:B:2), or null. */
 export function stageText(ctx: ReduceContext, code: string, line: (id: string) => string | null): string | null {
-  const ids = [...new Set(ctx.effects.filter((effect) => effect.cardCode === code && effect.timing !== "whenRevealed").flatMap((effect) => effect.lines))].sort();
+  const ids = [...new Set(effectsOf(ctx, code).filter((effect) => effect.timing !== "whenRevealed").flatMap((effect) => effect.lines))].sort();
   const text = ids.flatMap((id) => line(id) ?? []).join(" ");
   return text === "" ? null : text;
 }

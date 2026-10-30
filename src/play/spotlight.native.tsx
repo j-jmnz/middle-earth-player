@@ -7,7 +7,6 @@
 // pushes in; the words and numbers (spotlight-hud.native.tsx) push in with it about the same pivot but do not shake. Every number is the engine's: it reads the clash,
 // never works one out. The layer always draws with the dark theme's tokens.
 import { Group, vec, type SkImage, type SkRuntimeEffect } from "@shopify/react-native-skia";
-import { useMemo } from "react";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import type { BackImages, Fonts } from "./canvas-pieces.native.tsx";
@@ -54,7 +53,7 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
   const run = windowOf(index, total, k);
   const local = useDerivedValue(() => now.get() - run.start);
   // Outside its window an attack is at rest: one frame, built once, so a hidden attack works nothing out (its particles included).
-  const rest = useMemo(() => frameAt(shape, -1, k, plan.seed), [shape, k, plan.seed]);
+  const rest = frameAt(shape, -1, k, plan.seed);
   const frame = useDerivedValue((): Frame => {
     const at = local.get();
     return at >= 0 && at < run.length ? frameAt(shape, at, k, plan.seed) : rest;
@@ -73,19 +72,16 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
   const rim = plan.enemyAttack ? t.threat : t.accent;
   const front = stage.attackers[stage.attackers.length - 1] ?? stage.target;
   const burns = shape.destroyed && burn != null;
-  const emitters = useMemo(
-    (): Emitters => ({
-      seed: plan.seed,
-      burnMs: (shape.last ? MOTION.spotlightBurn : MOTION.spotlightSwap).ms,
-      blocked,
-      ember: { x: (front.x + stage.target.x + stage.target.w) / 2, y: stage.target.y + stage.cardH * 0.95, size: stage.cardH },
-      converge: { x: front.x + front.w / 2, y: front.y + front.h / 2, size: stage.cardH },
-      hit: { x: stage.contact.x, y: stage.contact.y, size: stage.cardH, dir: blocked ? Math.PI : SPARK_DIR },
-      ash: { x: stage.target.x + stage.target.w / 2, y: stage.target.y + stage.target.h / 2, size: stage.cardH, w: stage.target.w },
-      rim: rgbOf(rim),
-    }),
-    [plan.seed, shape.last, blocked, front, stage, rim],
-  );
+  const emitters: Emitters = {
+    seed: plan.seed,
+    burnMs: (shape.last ? MOTION.spotlightBurn : MOTION.spotlightSwap).ms,
+    blocked,
+    ember: { x: (front.x + stage.target.x + stage.target.w) / 2, y: stage.target.y + stage.cardH * 0.95, size: stage.cardH },
+    converge: { x: front.x + front.w / 2, y: front.y + front.h / 2, size: stage.cardH },
+    hit: { x: stage.contact.x, y: stage.contact.y, size: stage.cardH, dir: blocked ? Math.PI : SPARK_DIR },
+    ash: { x: stage.target.x + stage.target.w / 2, y: stage.target.y + stage.target.h / 2, size: stage.cardH, w: stage.target.w },
+    rim: rgbOf(rim),
+  };
   const card = (spot: ClashPlan["target"], rect: ClashPlan["stage"]["target"], faceDown = false) => (
     <StageCard spot={spot} rect={rect} image={images.get(spot.code) ?? null} name={nameOf(spot.code)} sphere={sphereOf(spot.code)} fonts={fonts} backs={backs} t={t} s={s} faceDown={faceDown} />
   );
@@ -161,17 +157,20 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
 export function Spotlight({ plan, progress, ...common }: Common & { plan: SpotlightPlan; progress: SharedValue<number> }) {
   const { k, t } = common;
   const { width, height } = plan.area;
-  const total = Math.max(1, spotlightRun(plan.clashes.length, k));
+  const { clashes } = plan;
+  // Not `Math.max(1, …)`: the React Compiler fails to generate a call on a global's method here.
+  const run = spotlightRun(clashes.length, k);
+  const total = run > 1 ? run : 1;
   const now = useDerivedValue(() => progress.get() * total);
-  const dark = useDerivedValue(() => darkAt(now.get(), k, plan.clashes.length));
-  const punch = useDerivedValue(() => punchAt(now.get(), k, plan.clashes.length));
-  const first = plan.clashes[0]?.stage;
+  const dark = useDerivedValue(() => darkAt(now.get(), k, clashes.length));
+  const punch = useDerivedValue(() => punchAt(now.get(), k, clashes.length));
+  const first = clashes[0]?.stage;
   return (
     <Group>
       <Backdrop width={width} height={height} dark={dark} t={t} />
       {first ? <Pool cx={width / 2} cy={first.target.y + first.target.h / 2} cardH={first.cardH} dark={dark} t={t} /> : null}
-      {plan.clashes.map((clash, index) => (
-        <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={plan.clashes.length} now={now} dark={dark} punch={punch} area={plan.area} {...common} />
+      {clashes.map((clash, index) => (
+        <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={clashes.length} now={now} dark={dark} punch={punch} area={plan.area} {...common} />
       ))}
     </Group>
   );

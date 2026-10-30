@@ -146,9 +146,10 @@ export function StepDiamond({ state, size }: { state: "done" | "current" | "ahea
  * the current step as a larger outlined diamond with a glow, then a small dark diamond for each step that remains, on a dashed line.
  * The words beside it say the numbers.
  */
-export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
+export function JourneyBar({ total, done, current: given, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
   const palette = usePalette();
   const ahead = useAheadLine();
+  const current = given ?? done < total;
   const line = (solid: boolean, key: string) => (
     <View key={key} className="flex-1" style={solid ? { height: 2, backgroundColor: palette.accent } : { height: 0, borderTopWidth: 2, borderStyle: "dashed", borderColor: ahead }} />
   );

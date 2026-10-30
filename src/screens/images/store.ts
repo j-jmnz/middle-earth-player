@@ -68,6 +68,15 @@ export function useImageSnapshot(): ImageSnapshotView {
   return useSyncExternalStore(subscribeImageSnapshot, imageSnapshotView, () => emptySnapshotView);
 }
 
+/**
+ * The revision of the image cache while `active`, else 0: a reader that is not showing a picture is not told of the files that land, so it
+ * does not render for them. Turning `active` on reads the revision as it is then.
+ */
+export function useImageRevision(active: boolean): number {
+  const revision = useCallback(() => (active ? snapshotView.revision : 0), [active]);
+  return useSyncExternalStore(subscribeImageSnapshot, revision, () => 0);
+}
+
 function serverImage(): CachedImage | null {
   return null;
 }

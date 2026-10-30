@@ -73,8 +73,17 @@ export function getDeckDraft(): DeckDraft {
   return draft;
 }
 
-export function useDeckDraft(): DeckDraft {
-  return useSyncExternalStore(subscribeDeckDraft, getDeckDraft, getDeckDraft);
+// The whole draft, or what `select` takes from it. The selector must return a value that stays the same while that part does not
+// change (the `heroes` or `cards` array, the name), so a screen that reads only the cards is not rendered for each key of the name:
+// a change replaces only the parts it touches (setDeckName keeps both arrays).
+export function useDeckDraft(): DeckDraft;
+export function useDeckDraft<T>(select: (draft: DeckDraft) => T): T;
+export function useDeckDraft<T>(select?: (draft: DeckDraft) => T): T | DeckDraft {
+  return useSyncExternalStore(
+    subscribeDeckDraft,
+    () => (select ? select(draft) : draft),
+    () => (select ? select(draft) : draft),
+  );
 }
 
 /** Opens a saved deck for editing. */
@@ -122,7 +131,7 @@ export function setDeckName(name: string): void {
   update({ ...draft, name });
 }
 
-export function draftCopyCount(current: DraftContent, code: string, typeCode: string): number {
+export function draftCopyCount(current: DraftPicks, code: string, typeCode: string): number {
   if (typeCode === "hero") return current.heroes.includes(code) ? 1 : 0;
   return current.cards.reduce((sum, card) => sum + (card.code === code ? card.count : 0), 0);
 }
@@ -140,7 +149,7 @@ export type TitleLookup = (code: string) => CardTitle | undefined;
  * Copies of a title across its printings, and the lowest deck limit among them: rr.deckbuilding counts by title, as
  * deckSaveRefusal does. `card` is the printing being changed; the lookup names the deck's other codes.
  */
-export function titleCopies(current: DraftContent, card: { code: string; name: string; deckLimit: number | null }, lookup?: TitleLookup): { count: number; deckLimit: number | null } {
+export function titleCopies(current: DraftPicks, card: { code: string; name: string; deckLimit: number | null }, lookup?: TitleLookup): { count: number; deckLimit: number | null } {
   let count = 0;
   let deckLimit = card.deckLimit;
   for (const held of current.cards) {
@@ -153,12 +162,12 @@ export function titleCopies(current: DraftContent, card: { code: string; name: s
 }
 
 /** The hero in the deck with this hero's title (any printing), or null. A title appears once among the heroes. */
-export function heroWithTitle(current: DraftContent, card: { code: string; name: string }, lookup?: TitleLookup): string | null {
+export function heroWithTitle(current: DraftPicks, card: { code: string; name: string }, lookup?: TitleLookup): string | null {
   return current.heroes.find((code) => code === card.code || lookup?.(code)?.name === card.name) ?? null;
 }
 
 /** Whether + on this card would be refused: its title is at its copy limit, or a hero is taken or the slots are full. */
-export function draftAddRefused(current: DraftContent, card: DraftAdd, lookup?: TitleLookup): boolean {
+export function draftAddRefused(current: DraftPicks, card: DraftAdd, lookup?: TitleLookup): boolean {
   if (card.typeCode === "hero") return heroWithTitle(current, card, lookup) !== null || current.heroes.length >= 3;
   const title = titleCopies(current, card, lookup);
   return copyCapRule(title.count + 1, title.deckLimit) !== null;

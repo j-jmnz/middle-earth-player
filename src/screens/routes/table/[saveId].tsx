@@ -7,18 +7,24 @@ import { bookletParams } from "../../campaign-data";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { routeCode } from "../../route-code";
+import { TableLoading } from "../../table-loading";
 import { TableView, type TableNav } from "../../table-view";
-import { sessionStore, useTableSession } from "../../table-session";
+import { sessionStore, useTableSessionAfterPaint } from "../../table-session";
 
 export default function TableScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string }>();
   const saveId = routeCode(params.saveId);
   const { user } = useDatabases();
-  // Opened once per save: the store holds the game from here on, and each accepted intent is written to user.db.
-  const session = useTableSession(saveId);
+  // Opened once per save, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
+  // written to user.db.
+  const session = useTableSessionAfterPaint(saveId);
   const store = useMemo(() => (session?.ok ? sessionStore(session, user).store : null), [session, user]);
 
+  if (saveId && !session) {
+    // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.
+    return <TableLoading onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backLabel="Path" />;
+  }
   if (!saveId || !session || !session.ok || !store) {
     const sentence =
       session?.ok === false && session.reason === "dropped"

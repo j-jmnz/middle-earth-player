@@ -1,6 +1,6 @@
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import type { CardInstance, ScenarioState } from "./state.ts";
+import type { CardInstance, ScenarioState, UndoLog } from "./state.ts";
 
 export type ReduceFn = (
   state: ScenarioState,
@@ -14,12 +14,17 @@ export function bindReduce(reduce: ReduceFn): void {
   reduceFn = reduce;
 }
 
-export function cloneGame(state: ScenarioState): ScenarioState {
-  return structuredClone({
-    ...state,
-    cards: {},
-    undo: { phase: state.phase, snapshot: null, cards: null, intents: [], steps: [] },
-  });
+// The state at a phase boundary, kept by reference: a state is never changed once the reducer returns it, so there is nothing
+// to copy. The card map is held apart (`undo.cards`) and the snapshot carries none, and its own `undo` is empty, so the
+// snapshots do not chain.
+export function snapshotOf(state: ScenarioState): UndoLog {
+  return {
+    phase: state.phase,
+    snapshot: { ...state, cards: {}, undo: { phase: state.phase, snapshot: null, cards: null, intents: [], steps: [] } },
+    cards: state.cards,
+    intents: [],
+    steps: [],
+  };
 }
 
 export function noteHistory(
@@ -29,16 +34,7 @@ export function noteHistory(
   steps: readonly EngineStep[],
 ): ScenarioState {
   if (after.phase !== before.phase) {
-    return {
-      ...after,
-      undo: {
-        phase: after.phase,
-        snapshot: cloneGame(after),
-        cards: structuredClone(after.cards),
-        intents: [],
-        steps: [],
-      },
-    };
+    return { ...after, undo: snapshotOf(after) };
   }
   return {
     ...after,

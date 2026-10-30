@@ -23,6 +23,15 @@ import { SeatPicker } from "../../../seat-picker";
 import { routeCode } from "../../../route-code";
 import { useSave } from "../../../use-save";
 
+// Runs a deal and returns what went wrong, or null. The try/catch lives here because the React Compiler cannot compile one in a component.
+function attempt(run: () => string | null): string | null {
+  try {
+    return run();
+  } catch (error: unknown) {
+    return error instanceof Error ? error.message : "The scenario could not be dealt.";
+  }
+}
+
 export default function Briefing() {
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string; scenarioId: string }>();
@@ -53,11 +62,14 @@ export default function Briefing() {
     [seatCount, savedDecks, picked],
   );
 
+  // The world is built from the scenario and these codes (the log's cards, the Ring-bearers, every saved deck's heroes, the picked decks'
+  // cards), as one string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
+  const hasSave = save != null;
+  const codeKey = hasSave ? [...new Set([...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0") : "";
   const world = useMemo(() => {
-    if (!save || !campaign || !scenario) return null;
-    const extra = [...logCodes(save.log), ...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)];
-    return loadWorld(catalog, campaign, scenario, EFFECTS, extra);
-  }, [catalog, save, campaign, scenario, candidates, savedDecks, seats]);
+    if (!hasSave || !campaign || !scenario) return null;
+    return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
+  }, [catalog, hasSave, campaign, scenario, codeKey]);
 
   const input: BriefingInput | null = useMemo(
     () => (save && world ? { world, log: save.log, seatCount: save.seatCount, seats, ringBearer, difficulty, choices, acceptPenalty: accepted } : null),
@@ -119,19 +131,16 @@ export default function Briefing() {
       choices: [...choices],
       acceptPenalty: accepted,
     };
-    try {
+    const problem = attempt(() => {
       const dealt = deal(save, world ?? input.world, stored, dealSeed(), CATALOG_VERSION, Date.now());
-      if (!dealt.ok) {
-        setDealError(dealt.briefing.problems.map((problem) => problem.message).join(" "));
-        return;
-      }
+      if (!dealt.ok) return dealt.briefing.problems.map((problem) => problem.message).join(" ");
       // The open scenario this deal drops may be over (lost or won, not yet closed): it keeps its run.
       if (save.active) recordUnclosedRun(catalog, user, save.id);
       writeSave(user, dealt.save);
       router.replace({ pathname: "/table/[saveId]", params: { saveId: save.id } });
-    } catch (error: unknown) {
-      setDealError(error instanceof Error ? error.message : "The scenario could not be dealt.");
-    }
+      return null;
+    });
+    if (problem != null) setDealError(problem);
   }
 
   const changeLines = result.steps.filter((step) => step.n >= 3).flatMap((step) => step.did.map((line, index) => ({ key: `${step.n}-${index}`, line })));

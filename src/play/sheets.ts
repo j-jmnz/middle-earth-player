@@ -7,6 +7,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 import { restrictedLimit } from "../rules/attach.ts";
 import { rejectionReason } from "../rules/legal.ts";
+import { effectById, effectsOf } from "../rules/listen.ts";
 import { printedOf } from "../rules/printed.ts";
 import { hideWillpower } from "../rules/hide.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
@@ -27,7 +28,7 @@ import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
-  return ctx.effects.find((effect) => effect.id === effectId);
+  return effectById(ctx, effectId);
 }
 
 function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
@@ -78,7 +79,7 @@ export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: S
     if (!card || targets.includes(id) || printedOf(ctx.cards, card.code).type !== "location") return [];
     const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
     if (!reason) return [];
-    const travel = ctx.effects.find((effect) => effect.cardCode === card.code && effect.timing === "travel");
+    const travel = effectsOf(ctx, card.code).find((effect) => effect.timing === "travel");
     const line = lineOf(travel, names);
     return [{ id, label: names.card(id), code: card.code, reason: line ? `${reason}. ${line}` : `${reason}.` }];
   });
@@ -328,7 +329,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const points = location ? questPointsOf(game, location, ctx.cards) : null;
           const stats: SheetStat[] = [...statOf(game, ctx, id, "threat"), ...(points == null ? [] : [{ icon: "questPoints" as const, value: points, word: "Quest points" }])];
           // Its Travel line, when it prints one (a cost the travel pays: Great Forest Web's "exhaust 1 hero").
-          const travel = ctx.effects.find((effect) => effect.cardCode === location?.code && effect.timing === "travel");
+          const travel = location ? effectsOf(ctx, location.code).find((effect) => effect.timing === "travel") : undefined;
           const line = lineOf(travel, names);
           const base = option(game, names, id);
           return { ...base, label: line ? `${base.label} · ${line}` : base.label, stats, intent: { type: "Travel", locationId: id } };

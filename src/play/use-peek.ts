@@ -1,7 +1,7 @@
 // The peek's hooks and actions (peek.ts, docs/design-system.md, Table; phase 26). The seat peeked at is the table store's `viewedSeat`;
 // these read it for the screen, route a dial tap, and end the peek when the moment moves on. Nothing here sends an intent or changes
 // who acts: the dock, the picks and the sheets stay the acting seat's.
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useStore } from "zustand";
 
 import { dialTap, peekSeat, peekWords, type PeekWords } from "./peek.ts";
@@ -33,9 +33,12 @@ export type PeekView = {
 };
 
 export function usePeek(store: TableStore): PeekView {
-  const game = useStore(store, (state) => state.game);
-  const stored = useStore(store, (state) => state.viewedSeat);
-  const viewed = peekSeat(game, stored);
+  // Each value is read on its own and is a number, a string or null, so a state that changes none of them does not render the caller.
+  const viewed = useStore(store, (state) => peekSeat(state.game, state.viewedSeat));
+  const acting = useStore(store, (state) => actingSeat(state.game));
+  const text = useStore(store, (state) => peekWords(state.game, state.viewedSeat)?.text ?? null);
+  const backText = useStore(store, (state) => peekWords(state.game, state.viewedSeat)?.back ?? null);
+  const words = useMemo((): PeekWords | null => (text != null && backText != null ? { text, back: backText } : null), [text, backText]);
   const tap = useCallback(
     (seat: number): boolean => {
       const now = store.getState();
@@ -47,7 +50,7 @@ export function usePeek(store: TableStore): PeekView {
     [store],
   );
   const back = useCallback(() => peekTo(store, null), [store]);
-  return { viewed, shown: shownSeat(game, viewed), acting: actingSeat(game), words: peekWords(game, viewed), tap, back };
+  return { viewed, shown: viewed ?? acting, acting, words, tap, back };
 }
 
 /**

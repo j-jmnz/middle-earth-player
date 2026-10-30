@@ -7,7 +7,7 @@ import { useCallback, useState } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
-import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
+import { droppedIfStale, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName, scenarioOf } from "../../campaign-data";
 import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryButton, Screen, ScreenScroll, Section } from "../../chrome";
@@ -21,7 +21,7 @@ import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
 import { seatWord } from "../../seats";
-import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
+import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandaloneActive } from "../../standalone-store";
 import { useSizeClass } from "../../../play/use-size-class";
 import { useUiScale } from "../../../play/ui-scale";
 import { Text } from "../../../play/text";
@@ -36,8 +36,8 @@ export default function Scenarios() {
   const { size } = useSizeClass();
   const router = useRouter();
   const { user } = useDatabases();
-  const [games, setGames] = useState<StandaloneGame[]>([]);
-  const [archived, setArchived] = useState<StandaloneGame[]>([]);
+  const [games, setGames] = useState<ListedStandalone[]>([]);
+  const [archived, setArchived] = useState<ListedStandalone[]>([]);
   // Manage shows Archive and Delete on each game instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
   const folds = useFolds();
@@ -49,11 +49,12 @@ export default function Scenarios() {
   const refresh = useCallback(() => {
     // A game in progress from another engine version or against other card data is dropped on the read, as a campaign
     // save's open scenario is; the row and its loadout stay.
-    for (const game of listStandalone(user)) {
+    const open = listStandalone(user).map((game) => {
       const dropped = droppedIfStale(game, CATALOG_VERSION);
-      if (dropped) writeStandalone(user, dropped);
-    }
-    const open = listStandalone(user);
+      if (!dropped) return game;
+      writeStandaloneActive(user, dropped);
+      return dropped;
+    });
     const away = listArchivedStandalone(user);
     setGames(open);
     setArchived(away);
@@ -75,21 +76,21 @@ export default function Scenarios() {
     router.push({ pathname: "/standalone/briefing/[scenarioId]", params: from ? { scenarioId, from } : { scenarioId } });
   }
 
-  function open(game: StandaloneGame): void {
+  function open(game: ListedStandalone): void {
     if (standaloneStatus(game) === "playing") router.push({ pathname: "/standalone/table/[gameId]", params: { gameId: game.id } });
     else if (game.loadout) brief(game.scenarioId, game.id);
   }
 
-  const label = (game: StandaloneGame) => `${nameOf(game.scenarioId)}, ${gameCaption(game)}`;
+  const label = (game: ListedStandalone) => `${nameOf(game.scenarioId)}, ${gameCaption(game)}`;
 
   // The button a screen reader was on goes away with each of these, so each says what happened.
-  function archive(game: StandaloneGame): void {
+  function archive(game: ListedStandalone): void {
     archiveStandalone(user, game.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Archived ${label(game)}`);
   }
 
-  function restore(game: StandaloneGame): void {
+  function restore(game: ListedStandalone): void {
     restoreStandalone(user, game.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Restored ${label(game)}`);
@@ -100,13 +101,13 @@ export default function Scenarios() {
     AccessibilityInfo.announceForAccessibility(DELETE_SENTENCE);
   }
 
-  function remove(game: StandaloneGame): void {
+  function remove(game: ListedStandalone): void {
     deleteStandalone(user, game.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Deleted ${label(game)}`);
   }
 
-  const actions = (game: StandaloneGame, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
+  const actions = (game: ListedStandalone, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
     <KeepOrDelete
       id={game.id}
       described={label(game)}
@@ -124,7 +125,7 @@ export default function Scenarios() {
 
   // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a framed card with its scene; a
   // finished one a row with its result.
-  function renderGame(game: StandaloneGame, framed = false) {
+  function renderGame(game: ListedStandalone, framed = false) {
     const status = standaloneStatus(game);
     if (managing) {
       return (

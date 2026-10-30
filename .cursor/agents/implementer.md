@@ -34,6 +34,8 @@ dispatch({ type: "Pass" })
 
 ## Changes
 
+Follow `.cursor/rules/code-standards.mdc` (the React Compiler, immutable state and caches, narrow subscriptions, the save, and how to make and check a change).
+
 Match existing names and types. Keep the diff inside the phase. No drive-by refactors, no new dependencies, no `any`. The stack, the databases, the image decoders, and the test layers are in `docs/architecture.md` and `docs/brief.md`. Follow them. Do not copy them into a new document.
 
 If a timing is not on the booklet, the quest card, the Learn to Play, the Rules Reference or the FAQ, leave the test red and name the card. Add the test in the same change as the behavior. The simulator does not close a fling or drag exit.

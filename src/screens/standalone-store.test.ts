@@ -14,6 +14,7 @@ import {
   readStandalone,
   restoreStandalone,
   writeStandalone,
+  writeStandaloneActive,
 } from "./standalone-store";
 import { standaloneGames } from "./user-schema";
 
@@ -39,7 +40,27 @@ function gameOf(id: string, overrides: Partial<StandaloneGame> = {}): Standalone
   };
 }
 
+// The list row: the open game as its version and hash.
+function listing(game: StandaloneGame) {
+  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash } };
+}
+
 describe("standalone store", () => {
+  it("writeStandaloneActive changes only the open game, and a list row carries its version and hash", () => {
+    const user = openUser();
+    const game = gameOf("game-w");
+    writeStandalone(user, game, 1000);
+    archiveStandalone(user, "game-w", 5000);
+    const next = { ...game, active: { ...game.active!, intents: [...game.active!.intents, { type: "Pass" as const }] } };
+    writeStandaloneActive(user, next);
+    expect(readStandalone(user, "game-w")?.game).toEqual(next);
+    const row = user.select().from(standaloneGames).get();
+    expect(row).toMatchObject({ createdAt: 1000, archivedAt: 5000 });
+    expect(listArchivedStandalone(user)).toEqual([listing(game)]);
+    writeStandaloneActive(user, { ...next, active: null });
+    expect(listArchivedStandalone(user)[0]?.active).toBeNull();
+  });
+
   it("keeps a game across a write and a read, and an update keeps its place in the list", () => {
     const user = openUser();
     const game = gameOf("game-a");
@@ -58,12 +79,12 @@ describe("standalone store", () => {
     writeStandalone(user, game, 1000);
     archiveStandalone(user, "game-a", 5000);
     expect(listStandalone(user)).toEqual([]);
-    expect(listArchivedStandalone(user)).toEqual([game]);
+    expect(listArchivedStandalone(user)).toEqual([listing(game)]);
     // A write while archived (an intent recorded elsewhere) keeps the mark.
     writeStandalone(user, game, 6000);
-    expect(listArchivedStandalone(user)).toEqual([game]);
+    expect(listArchivedStandalone(user)).toEqual([listing(game)]);
     restoreStandalone(user, "game-a");
-    expect(listStandalone(user)).toEqual([game]);
+    expect(listStandalone(user)).toEqual([listing(game)]);
     expect(listArchivedStandalone(user)).toEqual([]);
   });
 
