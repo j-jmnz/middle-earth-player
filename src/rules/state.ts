@@ -125,8 +125,14 @@ export type Seat = {
   heroes: readonly string[];
   play: readonly string[];
   engaged: readonly string[];
+  // This seat's own staging area, once stage 2B has created the separate areas (`ScenarioState.separate`): the ids of its encounter cards, a
+  // subset of `ScenarioState.staging`, which keeps every staging card in any area (families/breaking-areas.ts).
   staging: readonly string[];
+  // The seat's player side quest (zone seatQuest), not a stage of the scenario's quest.
   questStage: string | null;
+  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null.
+  // Absent in every other game (families/breaking-areas.ts).
+  stage?: string;
   eliminated: boolean;
   // Encounter cards attached to the top of this seat's deck, oldest first (Iron Shackles, 01105:A:1; families/dungeon.ts). Absent when none.
   deckAttached?: readonly string[];
@@ -174,7 +180,8 @@ export type Window =
   | { kind: "optionalEngage" }
   | { kind: "chooseEnemy"; reason: "engagement" | "attack"; seat: number; options: readonly string[] }
   | { kind: "defense"; enemyId: string; seat: number }
-  | { kind: "archery"; total: number }
+  // `seat`: separate stages total archery per stage, and only that stage's seat assigns it (mec109.multiple-staging-areas).
+  | { kind: "archery"; total: number; seat?: number }
   // `targets`: a card opened the window (OfferAttacks): the seat may attack only these enemies, each once, as extra attacks.
   | { kind: "playerAttack"; targets?: readonly string[] }
   | { kind: "hideCommit"; seat: number }
@@ -245,6 +252,13 @@ export type ScenarioState = {
   revealCursor: { seats: readonly number[]; index: number } | null;
   // True between the two passes that resolve the quest.
   questResolved: boolean;
+  // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking-areas.ts). Absent
+  // in every other game and until then.
+  separate?: true;
+  // Only on a seat's view of the state (families/breaking-areas.ts viewOf): the seat it is the view of. mergeView drops it.
+  viewSeat?: number;
+  // The seats whose stage has dealt its archery this combat phase while stages are separate (machine.ts startCombat).
+  archeryDone?: readonly number[];
   stages: readonly { code: string; branch?: readonly string[] }[];
   // The codes of the stages the quest advanced to, in order. Kept only by a quest that branches (BranchStage), for a Resolution that
   // reads which branch was taken ("If stage 3B was Beorn's Path", 01129:B:1).

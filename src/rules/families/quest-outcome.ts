@@ -10,14 +10,29 @@ import type { ScenarioState } from "../state.ts";
 import { inPlay, livingSeats } from "../state.ts";
 import { queueHeard } from "./quest-events.ts";
 
-export type QuestOutcome = { committed: readonly string[]; result: "success" | "failure" | "tie" };
+type Result = "success" | "failure" | "tie";
+
+// `bySeat`: once stages are separate, how each living seat's own quest resolves (mec109.multiple-staging-areas); `result` is then success when every living seat
+// succeeded, failure when each failed, and a tie otherwise.
+export type QuestOutcome = { committed: readonly string[]; result: Result; bySeat?: Readonly<Record<number, Result>> };
+
+function resultOf(willpower: number, threat: number): Result {
+  return willpower > threat ? "success" : willpower < threat ? "failure" : "tie";
+}
 
 // The characters committed to the quest and how it will resolve, read just before it resolves (rr.step-3-4).
 export function questOutcome(state: ScenarioState, ctx: ReduceContext): QuestOutcome {
   const committed = livingSeats(state).flatMap((seat) => [...(state.seats[seat]?.heroes ?? []), ...(state.seats[seat]?.play ?? [])].filter((id) => state.cards[id]?.committed === true));
+  if (state.separate) {
+    const bySeat: Record<number, Result> = {};
+    for (const seat of livingSeats(state)) bySeat[seat] = resultOf(committedWillpower(state, ctx.cards, seat), stagingThreat(state, ctx.cards, seat));
+    const results = Object.values(bySeat);
+    const result = results.length > 0 && results.every((each) => each === "success") ? "success" : results.length > 0 && results.every((each) => each === "failure") ? "failure" : "tie";
+    return { committed, result, bySeat };
+  }
   const willpower = committedWillpower(state, ctx.cards);
   const threat = stagingThreat(state, ctx.cards);
-  return { committed, result: willpower > threat ? "success" : willpower < threat ? "failure" : "tie" };
+  return { committed, result: resultOf(willpower, threat) };
 }
 
 // After the quest resolved: each character that was committed hears it, and so, when the quest succeeded, does each one that
@@ -28,7 +43,9 @@ export function afterQuestOutcome(state: ScenarioState, outcome: QuestOutcome, c
     const card = next.cards[id];
     if (!card || !inPlay(card.zone)) continue;
     next = queueHeard(next, ctx, { trigger: "committedQuestResolved", seat: card.controller, subject: id });
-    if (outcome.result === "success") next = queueHeard(next, ctx, { trigger: "questedSuccessfully", seat: card.controller, subject: id });
+    // Its own seat's quest, once stages are separate.
+    const own = outcome.bySeat && card.controller != null ? outcome.bySeat[card.controller] : outcome.result;
+    if (own === "success") next = queueHeard(next, ctx, { trigger: "questedSuccessfully", seat: card.controller, subject: id });
   }
   // And those waiting for the players to quest unsuccessfully (900307:A:1).
   const waiting = next.delayed.filter((entry) => entry.until === "questSucceeded" || entry.until === "questFailed");

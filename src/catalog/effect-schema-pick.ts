@@ -21,6 +21,10 @@ export const pickSchema = z.strictObject({
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
+  // Which staging area the staging cards of the filter are in once stages are separate (Breaking of the Fellowship, mec109.multiple-staging-areas):
+  // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
+  // "in any staging area"). Read by src/rules/pick.ts; a game with one staging area ignores it.
+  stagingArea: z.enum(["own", "shared", "any"]).optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.

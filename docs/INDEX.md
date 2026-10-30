@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~45.8K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~46.5K tok)
   - 17–36 Sections (~350)
   - 37–48 Product (~490)
   - 49–62 Non-goals (~550)
@@ -70,38 +70,38 @@ Read the sections your task touches.
     - 151–218 Campaign (~1.6K) ← 1
     - 219–233 Mirkwood campaign cards and carry-over (~870)
     - 234–245 Standalone play (~790)
-    - 246–257 Scenario state (~540)
+    - 246–257 Scenario state (~560)
     - 258–290 The engine plays the game (~2.1K) ← 2
     - 291–298 Engine steps (~180)
     - 299–327 Core round (~1.3K) ← 1
     - 328–356 Keywords implemented once (~1.5K)
-  - 357–500 Fellowship of the Ring (~8.4K)
+  - 357–506 Fellowship of the Ring (~9.1K)
     - 381–395 Scenario 1 resolution (~370)
     - 396–409 A Knife in the Dark (~1.6K) ← 1
     - 410–413 Hide tests (~130)
     - 414–437 Flight to the Ford burden deck and life (~1.6K) ← 1
     - 438–452 The Ring Goes South, stage 4 and the damage on locations (~1.3K) ← 1
     - 453–468 Journey in the Dark, the Doom countdown and the Balrog (~1.6K)
-    - 469–478 Breaking of the Fellowship, stage 2B (~310)
-    - 479–500 Seeded decks (~660)
-  - 501–600 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
-    - 519–532 Passage Through Mirkwood (~1.6K)
-    - 533–546 Journey Along the Anduin (~2.1K)
-    - 547–567 Escape from Dol Guldur (~2.7K)
-    - 568–582 The Oath (~2.3K)
-    - 583–600 The Caves of Nibin-Dûm (~2.3K)
-  - 601–609 Nightmare (~420)
-  - 610–648 Deckbuilding (~1.8K) ← 1
-  - 649–727 Effects (~3.2K)
-    - 651–709 Three layers (~2.4K)
-    - 710–719 Player side quests, contracts and saga cards (~430)
-    - 720–723 Window stack (~100)
-    - 724–727 Coverage test (~270)
-  - 728–748 Data sources (~560)
-  - 749–767 Card images (~1.1K) ← 6
-  - 768–792 Persistence and shipping (~1.5K)
-  - 793–831 Screens (~3.6K) ← 1
-    - 818–831 Table screen (~1.2K) ← 3
+    - 469–484 Breaking of the Fellowship, stage 2B (~970)
+    - 485–506 Seeded decks (~660)
+  - 507–606 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
+    - 525–538 Passage Through Mirkwood (~1.6K)
+    - 539–552 Journey Along the Anduin (~2.1K)
+    - 553–573 Escape from Dol Guldur (~2.7K)
+    - 574–588 The Oath (~2.3K)
+    - 589–606 The Caves of Nibin-Dûm (~2.3K)
+  - 607–615 Nightmare (~420)
+  - 616–654 Deckbuilding (~1.8K) ← 1
+  - 655–733 Effects (~3.2K)
+    - 657–715 Three layers (~2.4K)
+    - 716–725 Player side quests, contracts and saga cards (~430)
+    - 726–729 Window stack (~100)
+    - 730–733 Coverage test (~270)
+  - 734–754 Data sources (~560)
+  - 755–773 Card images (~1.1K) ← 6
+  - 774–798 Persistence and shipping (~1.5K)
+  - 799–837 Screens (~3.6K) ← 1
+    - 824–837 Table screen (~1.2K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~17.4K tok)
   - 5–8 Overview (~150)
   - 9–22 Top bar (~1.4K) ← 1
@@ -238,7 +238,7 @@ Read when a task names the plan.
   - 120–126 Conditions (~110)
   - 127–146 Triggers and stat flags (~440)
   - 147–208 Patterns (~1.4K)
-  - 209–234 Mechanic families: engine and records together (~650) ← 1
+  - 209–234 Mechanic families: engine and records together (~690) ← 1
   - 235–257 Not expressible yet: leave open, report (~470)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)

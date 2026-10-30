@@ -27,6 +27,7 @@ import { offerResponses } from "./responses.ts";
 import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { discardRestricted } from "./families/objectives-claimed.ts";
+import { dealOut } from "./families/breaking-deal.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { chooseAmount } from "./families/defense.ts";
 import { dealAttackShadow } from "./families/defense-listen.ts";
@@ -238,6 +239,9 @@ function runItemNow(
       return pick(state, item, frame, ctx);
     case "ArrangeTop":
       return arrangeTop(state, item);
+    // Stage 2B deals the shared staging area out to the seats (families/breaking-deal.ts).
+    case "DealOutStaging":
+      return dealOut(state, item);
     // The actor chooses the effect's X (defense family).
     case "ChooseAmount":
       return chooseAmount(state, item, frame, ctx);

@@ -12,6 +12,7 @@ import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "
 import { modifiedStat, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
+import { stagingThreat } from "./quest.ts";
 import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -112,6 +113,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.actor === state.firstPlayer;
     case "tokens":
       return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? state.seatCount : 1);
+    case "stagingThreat":
+      return stagingThreat(state, ctx.cards, scope.actor) <= condition.max;
     case "damageHere":
       return (scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0) <= condition.max;
     case "less": {

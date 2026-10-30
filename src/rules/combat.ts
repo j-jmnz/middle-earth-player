@@ -26,21 +26,25 @@ import { offeredTargets, stagingAttackable, withCardTargets } from "./families/a
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
-export function archeryTotal(state: ScenarioState, cards: Cards): number {
+// The archery total. Once stages are separate it is calculated at each stage (mec109.multiple-staging-areas): `seat`'s staging area, its engaged
+// enemies and its stage.
+export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number): number {
+  const stage = seat != null && state.separate ? new Set([...(state.seats[seat]?.staging ?? []), ...(state.seats[seat]?.engaged ?? []), ...(state.seats[seat]?.stage ? [state.seats[seat]?.stage ?? ""] : [])]) : null;
   let total = 0;
   for (const instance of Object.values(state.cards)) {
-    if (!inPlay(instance.zone)) continue;
+    if (!inPlay(instance.zone) || (stage && !stage.has(instance.id))) continue;
     const value = printedOf(cards, instance.code).keywords.archery;
     if (value != null && value > 0) total += value;
   }
   return total;
 }
 
-export function archeryRecipients(state: ScenarioState, cards: Cards): string[] {
+// The characters archery damage may go to; once stages are separate, only the characters of the seat at that stage.
+export function archeryRecipients(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const ids: string[] = [];
   for (let index = 0; index < state.seatCount; index += 1) {
-    const seat = state.seats[index];
-    if (!seat || seat.eliminated) continue;
+    const owner = state.seats[index];
+    if (!owner || owner.eliminated || (seat != null && state.separate && index !== seat)) continue;
     ids.push(...characters(state, index, cards));
   }
   return ids;

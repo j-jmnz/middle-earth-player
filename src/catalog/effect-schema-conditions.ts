@@ -80,6 +80,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // campaign card's Resolution (campaign family, src/rules/families/campaign.ts).
   // With `perPlayer`, `min` is for each player in the game ("X resource tokens on this stage. X is the number of players times 3", 142041:B:2).
   z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0), perPlayer: z.boolean().optional() }),
+  // The total Threat of the encounter cards in the actor's staging area is at most `max` ("if the total Threat of encounter cards in this staging
+  // area is less than 4", 142063:A:1: max 3). Once stages are separate that is the actor's own area (mec109.multiple-staging-areas); read by
+  // src/rules/conditions.ts.
+  z.strictObject({ kind: z.literal("stagingThreat"), max: z.number().int().min(0) }),
   // The source card holds at most `max` damage tokens (0: none, "if there are no damage tokens here", 142043:A:1). Read by the moria family
   // (src/rules/families/moria.ts).
   z.strictObject({ kind: z.literal("damageHere"), max: z.number().int().min(0) }),

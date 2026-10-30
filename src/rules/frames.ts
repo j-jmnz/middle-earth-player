@@ -18,6 +18,7 @@ import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { announceEntered, noteEncounterThreat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
 import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
+import { stagingDest } from "./families/breaking-areas.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -117,7 +118,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
   switch (frame.step) {
     case 0: {
-      let next = moveCard(state, id, { zone: "staging" });
+      // Into the revealing seat's own staging area once stages are separate (mec109.multiple-staging-areas).
+      let next = moveCard(state, id, stagingDest(state, seat));
       next = updateCard(next, id, { face: "up", controller: seat });
       // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
       if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });

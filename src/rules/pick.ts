@@ -18,7 +18,7 @@ import { lookedPool } from "./families/deck-pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "./printed.ts";
-import { stagingLocations } from "./quest.ts";
+import { sharedStaging } from "./families/breaking-areas.ts";
 import type { ScenarioState } from "./state.ts";
 import { heldAmount, inPlay, livingSeats } from "./state.ts";
 import { canDeclareDefender, isDefending } from "./families/defense-defenders.ts";
@@ -43,6 +43,13 @@ function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[]
   if (spec.control === "you") return [asking];
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
+}
+
+// The staging cards a filter reads: the staging area, or once stages are separate the asking seat's own (the default), the shared one, or every
+// seat's (`stagingArea`, families/breaking-areas.ts).
+function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): readonly string[] {
+  if (!state.separate || spec.stagingArea === "any") return state.staging;
+  return spec.stagingArea === "shared" ? sharedStaging(state) : (state.seats[asking]?.staging ?? []);
 }
 
 // The cards a filter starts from: its zone group and whose cards they are.
@@ -81,20 +88,20 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     const engagedSeats = spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
-    if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...state.staging);
+    if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "location") {
-    if (!spec.active) raw.push(...stagingLocations(state, ctx.cards));
+    if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
     if (!spec.stagingOnly) raw.push(...[state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null));
   } else if (spec.type === "objective") {
     // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
-    if (spec.control !== "you") raw.push(...state.staging);
+    if (spec.control !== "you") raw.push(...stagingFor(state, spec, asking));
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   } else if (spec.type === "card" && spec.stagingOnly) {
-    raw.push(...state.staging);
+    raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "card") {
     for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));
-    if (spec.control === "any") raw.push(...state.staging, ...[state.activeLocation].filter((id): id is string => id != null));
+    if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...[state.activeLocation].filter((id): id is string => id != null));
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
   }

@@ -212,7 +212,7 @@ Lines the core vocabulary could not express were worked by mechanic family: enco
 attack, play, deck, sidequests, misc, and for the saga box burden (the burden deck and the Ring-bearer's life, Flight to the
 Ford), south (a second active location, the Ring-bearer facedown under an enemy, an enemy engaged with every player,
 progress gates and caps; The Ring Goes South) and moria (damage tokens counting down on an objective, an enemy engaged with the
-first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark). Whoever takes a family adds the engine support and writes the records. A
+first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark) and breaking (the Ring-bearer removed from the game, the staging area and quest stage each seat has from stage 2B, skipped phases; Breaking of the Fellowship). Whoever takes a family adds the engine support and writes the records. A
 family owns files that are composed by the `index.ts` next to them, so families do not edit the same lists:
 
 - `src/catalog/families/<family>.ts` exports `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each

@@ -25,6 +25,7 @@ import { attachTo, cardsUnder, moveCard } from "./zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "./cause.ts";
 import { noteEncounterThreat } from "./families/encounter-reveal.ts";
 import { moveEncounter } from "./families/encounter-moves.ts";
+import { stagingDest } from "./families/breaking-areas.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -78,7 +79,8 @@ export function runExtraVerb(
       return shuffleEncounterDeck(state);
     case "AddSetAsideToStaging": {
       const id = state.setAside.find((candidate) => state.cards[candidate]?.code === instruction.code);
-      return id ? updateCard(moveCard(state, id, { zone: "staging" }), id, { face: "up" }) : state;
+      // Into the acting seat's own staging area once stages are separate (mec109.multiple-staging-areas).
+      return id ? updateCard(moveCard(state, id, stagingDest(state, focus.seat)), id, { face: "up" }) : state;
     }
     case "ShuffleOutOfPlayIntoEncounterDeck": {
       // Outside an effect frame nobody can be asked, so the first choice goes (effect-frames.ts asks the first player when
@@ -122,7 +124,7 @@ export function runExtraVerb(
     case "EngageAll": {
       const seat = seatFor(state, instruction.who, focus.seat);
       let next = state;
-      for (const id of stagingEnemies(state, ctx.cards)) {
+      for (const id of stagingEnemies(state, ctx.cards, focus.seat)) {
         if (instruction.trait && !hasTrait(state, id, instruction.trait, ctx)) continue;
         next = engageEnemy(next, seat, id, steps);
       }

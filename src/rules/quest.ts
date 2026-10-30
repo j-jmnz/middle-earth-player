@@ -21,6 +21,7 @@ import { placeQuestingProgress } from "./families/defense-damage.ts";
 import { freeSlot, placeOnActive } from "./families/south-locations.ts";
 import { noteQuestPlaced, questRoom } from "./families/caves-progress.ts";
 import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts";
+import { viewOf, withView } from "./families/breaking-areas.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -36,15 +37,17 @@ export function engagementCostOf(state: ScenarioState, instance: CardInstance, c
 
 type Gate = (state: ScenarioState) => boolean;
 
-export function stagingThreat(state: ScenarioState, cards: Cards): number {
+// The total Threat in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking-areas.ts).
+export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number): number {
+  const view = viewOf(state, seat);
   let total = 0;
-  for (const id of state.staging) {
-    const instance = state.cards[id];
+  for (const id of view.staging) {
+    const instance = view.cards[id];
     // "Does not contribute its Threat" (a flag on the card).
-    if (!instance || flagged(state, id, "noThreatContribution")) continue;
-    total += modifiedStat(state, instance, "threat", cards);
+    if (!instance || flagged(view, id, "noThreatContribution")) continue;
+    total += modifiedStat(view, instance, "threat", cards);
   }
-  return withStagingThreat(state, total);
+  return withStagingThreat(view, total);
 }
 
 // Which stat a character counts when it is committed to the current quest: Attack for a quest with Battle (hon.battle), Defense for
@@ -57,16 +60,19 @@ export function questStatOf(state: ScenarioState, id: string, cards: Cards): "wi
   return battle === siege ? "willpower" : battle ? "attack" : "defense";
 }
 
-export function committedWillpower(state: ScenarioState, cards: Cards): number {
+// The Willpower (or Attack or Defense) committed to the quest; with `only`, that seat's alone (stages are separate).
+export function committedWillpower(state: ScenarioState, cards: Cards, only?: number): number {
+  // The quest a seat commits to is its own stage's once stages are separate (Battle and Siege read it).
+  const view = viewOf(state, only);
   let total = 0;
-  for (const seat of state.seats) {
-    if (seat.eliminated) continue;
+  for (const [index, seat] of view.seats.entries()) {
+    if (seat.eliminated || (only != null && index !== only)) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
-      const instance = state.cards[id];
+      const instance = view.cards[id];
       // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests-quest.ts).
       if (!instance?.committed || instance.questTo != null) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
-      total += modifiedStat(state, instance, questStatOf(state, id, cards), cards);
+      total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }
   }
   return total;
@@ -89,23 +95,29 @@ export function resolveQuest(
   canAdvance: Gate = () => true,
   // Raises one seat's threat for the failed quest; the quest family's waives it or waits for the Responses (quest-threat.ts).
   raise?: (state: ScenarioState, seat: number, amount: number) => ScenarioState,
+  // Stages are separate (mec109.multiple-staging-areas): the quest of this seat alone. Its committed Willpower is compared with the Threat in its own staging
+  // area, progress goes on its own stage (or on the active location first) and only its threat rises. The commitments stay until every seat has resolved.
+  only?: number,
 ): ScenarioState {
-  const willpower = committedWillpower(state, cards);
-  const threat = stagingThreat(state, cards);
+  const willpower = committedWillpower(state, cards, only);
+  const threat = stagingThreat(state, cards, only);
   steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
+  // The seats that hear it: the one that quested, or every living seat.
+  const hearing = only == null ? livingSeats(state) : [only];
   let next = state;
   if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
-    next = raise ? livingSeats(state).reduce((current, seat) => raise(current, seat, threat - willpower), next) : failQuest(next, threat - willpower, steps);
+    next = raise ? hearing.reduce((current, seat) => raise(current, seat, threat - willpower), next) : hearing.reduce((current, seat) => raiseThreat(current, seat, threat - willpower, steps, ruleCause("rr.step-3-4")), next);
   } else if (willpower > threat) {
     // Progress may be assigned as damage to an enemy instead (08142).
-    next = placeQuestingProgress(next, willpower - threat, cards, steps, canAdvance);
+    next = withView(next, only, (view) => placeQuestingProgress(view, willpower - threat, cards, steps, canAdvance));
   }
   // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
   if (willpower !== threat) {
-    for (const seat of livingSeats(state)) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat });
+    for (const seat of hearing) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat });
   }
-  return clearCommitted(advanceReady(next, cards, steps, canAdvance));
+  const ready = withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance));
+  return only == null ? clearCommitted(ready) : ready;
 }
 
 // A stage that is full and was held back advances as soon as it is allowed to.
@@ -200,7 +212,7 @@ function clearStage(state: ScenarioState): ScenarioState {
   return { ...state, stageCleared: true };
 }
 
-function clearCommitted(state: ScenarioState): ScenarioState {
+export function clearCommitted(state: ScenarioState): ScenarioState {
   return updateCards(state, Object.values(state.cards).filter((instance) => instance.committed).map((instance) => [instance.id, { committed: false }]));
 }
 
@@ -214,22 +226,28 @@ export function travelTo(state: ScenarioState, locationId: string, cards: Cards)
   return moveCard(state, locationId, { zone: slot });
 }
 
-export function stagingLocations(state: ScenarioState, cards: Cards): string[] {
-  return state.staging.filter((id) => {
-    const instance = state.cards[id];
+// The locations in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking-areas.ts).
+export function stagingLocations(state: ScenarioState, cards: Cards, seat?: number): string[] {
+  const view = viewOf(state, seat);
+  return view.staging.filter((id) => {
+    const instance = view.cards[id];
     return instance != null && printedOf(cards, instance.code).type === "location";
   });
 }
 
 // The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
 // cannot be optionally engaged (141051:A:1, 141052:A:1).
-export function optionalEnemies(state: ScenarioState, cards: Cards): string[] {
-  return stagingEnemies(state, cards).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, state.activeSeat, "engage"));
+// Once stages are separate a seat optionally engages only an enemy in its own staging area (mec109.multiple-staging-areas): the acting seat, or `seat`.
+export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
+  const acting = seat ?? state.activeSeat;
+  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage"));
 }
 
-export function stagingEnemies(state: ScenarioState, cards: Cards): string[] {
-  return state.staging.filter((id) => {
-    const instance = state.cards[id];
+// The enemies in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking-areas.ts).
+export function stagingEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
+  const view = viewOf(state, seat);
+  return view.staging.filter((id) => {
+    const instance = view.cards[id];
     return instance != null && printedOf(cards, instance.code).type === "enemy";
   });
 }
@@ -261,7 +279,8 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
   // The threat the seat is treated as having (families/play-hooks.ts).
   const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
-  for (const id of stagingEnemies(state, cards)) {
+  // Engagement checks use only the seat's own staging area once stages are separate (mec109.multiple-staging-areas).
+  for (const id of stagingEnemies(state, cards, seat)) {
     const instance = state.cards[id];
     // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
     if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks") || engagementBarred(state, id, seat, "checks")) continue;

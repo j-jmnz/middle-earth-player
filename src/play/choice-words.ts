@@ -235,6 +235,9 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${instruction.who === "eachSeat" ? "players do" : "that player does"} not raise threat from questing unsuccessfully ${instruction.until === "endOfRound" ? "this round" : "this phase"}`;
     case "SkipQuestPhase":
       return "skip the quest phase this round";
+    // Stage 2B (142062:B:1): the stage each seat advances to (the staging areas themselves are not a widget until phase 16c draws them).
+    case "StartSeparateStage":
+      return `advance to ${names.code(instruction.code)}`;
     case "RemoveProgressFromQuest":
       return `remove ${amountWords(instruction.amount)} progress from the quest`;
     case "MoveProgress":

@@ -16,6 +16,7 @@ import { attackingHolds } from "./families/attack-strike.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
 import { alliesToHandDestination } from "./families/deck-rules.ts";
 import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
+import { discardArea } from "./families/breaking-areas.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -403,6 +404,9 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     // A Peril card the seat was resolving locks no one now (mec109.peril).
     if (next.perilSeat === index) next = { ...next, perilSeat: null };
   }
+  // Stages that are separate: the stage of an eliminated seat is discarded with the encounter cards at it (mec109.multiple-staging-areas). The
+  // enemies that were engaged with it returned to its staging area above.
+  if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = discardArea(next, index);
   if (next.seats[next.firstPlayer]?.eliminated) {
     for (let step = 1; step <= next.seatCount; step += 1) {
       const candidate = (next.firstPlayer + step) % next.seatCount;
