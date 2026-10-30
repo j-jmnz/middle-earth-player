@@ -85,9 +85,10 @@ describe("effect coverage", () => {
   it("keeps NIGHTMARE_PLAYABLE honest: a playable scenario's Nightmare deck with every line owned is listed, and only a playable scenario is", () => {
     for (const id of NIGHTMARE_PLAYABLE) expect(PLAYABLE, `${id} is on NIGHTMARE_PLAYABLE but not playable`).toContain(id);
     for (const scenario of nightmareUnplayable.filter((item) => PLAYABLE.includes(item.id))) {
-      // A deck with no ledger entry yet has nothing owned; with entries, at least one line must still be open.
-      const read = [...nightmareCodes([scenario])].some((code) => ledger.entries.some((entry) => entry.code === code));
-      if (read) expect(openOf(nightmareCodes([scenario])).length, `${scenario.id} on Nightmare would be playable: add it to NIGHTMARE_PLAYABLE`).toBeGreaterThan(0);
+      // Every card of the deck is read (the printed-text test holds the ledger to its scope), so an unread card cannot hide an open line.
+      const codes = [...nightmareCodes([scenario])];
+      for (const code of codes) expect(ledger.entries.some((entry) => entry.code === code), `${code} is ledgered`).toBe(true);
+      expect(openOf(codes).length, `${scenario.id} on Nightmare would be playable: add it to NIGHTMARE_PLAYABLE`).toBeGreaterThan(0);
     }
   });
 

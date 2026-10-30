@@ -25,7 +25,8 @@ const placementSchema = z
 // taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
 // Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
 // and its lines stay active all game.
-const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached"] as const;
+// In the order a removal takes from them: the encounter deck, then the piles the quest's Setup fills from it.
+export const NIGHTMARE_PILES = ["encounter", "staging", "activeLocation", "setAside", "attached"] as const;
 const nightmareSchema = z.strictObject({
   setupCard: z.string().min(1),
   removed: z.array(z.strictObject({ code: z.string().min(1), copies: z.number().int().positive(), pile: z.enum(NIGHTMARE_PILES) })),
@@ -154,10 +155,6 @@ export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
 // Nightmare plays the scenario's Nightmare deck (docs/plans/nightmare-mode.md), where it has one (`nightmare`).
 export const DIFFICULTIES = ["Easy", "Normal", "Nightmare"] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
-
-export function hasNightmare(data: ScenarioData): boolean {
-  return data.nightmare != null;
-}
 
 // The piles at a difficulty. Easy and Normal read each placement's own count. Nightmare starts from the Normal piles, takes out the
 // copies the setup card removes from the pile each came from, and adds the Nightmare deck's cards to theirs (`nightmare`).

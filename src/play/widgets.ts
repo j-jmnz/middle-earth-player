@@ -69,3 +69,8 @@ export function campaignTokens(game: ScenarioState, effects: readonly Effect[], 
   if (!card || !effects.some((effect) => effect.cardCode === card.code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"))) return null;
   return { name: nameOf(card.code), tokens: card.resources };
 }
+
+/** The Nightmare setup card's instance next to the quest deck (zone `nightmare`), or null on Easy and Normal. */
+export function nightmareCardId(game: ScenarioState): string | null {
+  return Object.values(game.cards).find((card) => card.zone === "nightmare")?.id ?? null;
+}

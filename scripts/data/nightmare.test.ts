@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { encounterCodes, placementsAt, setupInstructions } from "../../src/catalog/scenario-data.ts";
 import { loadCards } from "./load-cards.ts";
 import { loadScenarios } from "./load-scenarios.ts";
-import { NIGHTMARE_DECKS, NIGHTMARE_PACK, nightmareCode } from "./nightmare-defs.ts";
+import { isNightmareCard, NIGHTMARE_DECKS, nightmareCode, nightmareDeckOfCode } from "./nightmare-defs.ts";
 import { removalLines } from "./normalize/nightmare.ts";
 import { RAW_DIR } from "./paths.ts";
 import { namesMatch, type DriveFile } from "./sources/jvzijp.ts";
@@ -15,9 +15,9 @@ import { cardListPath, deckFiles, nightmareFiles, parseCardList, parseNightmareF
 // The Nightmare decks (docs/plans/nightmare-mode.md): every card of the 72 decks is built, each deck's card list on Drive agrees
 // with Hall of Beorn's copies, every side but one has its picture, and the nine built scenarios that have a deck carry it.
 const cards = loadCards();
-const nightmare = cards.filter((card) => card.printings.some((printing) => printing.pack === NIGHTMARE_PACK));
+const nightmare = cards.filter(isNightmareCard);
 const listing = JSON.parse(readFileSync(path.join(RAW_DIR, "nightmare", "drive.json"), "utf8")) as DriveFile[];
-const deckOf = (code: string) => NIGHTMARE_DECKS.find((deck) => code.length === deck.prefix.length + 2 && code.startsWith(deck.prefix));
+const deckOf = nightmareDeckOfCode;
 
 // Where the card list and Hall of Beorn disagree on copies, with what settles it.
 const COPIES_SETTLED: Readonly<Record<string, { copies: number; reason: string }>> = {
@@ -143,6 +143,15 @@ describe("a built scenario's Nightmare deck", () => {
     expect(nightmareRider?.code.startsWith("9063")).toBe(true);
     // The two Riders the players did not take stay in the encounter deck.
     expect(encounterCodes(scenario, "Nightmare", 2).filter((code) => code === nightmareRider?.code)).toHaveLength(2);
+  });
+
+  it("leaves a Setup slot empty when the deck prints no card of the removed title (Journey in the Dark's staged Mines of Moria)", () => {
+    const scenario = byId.get("journey-in-the-dark");
+    if (!scenario?.nightmare) throw new Error("Journey in the Dark has no Nightmare deck");
+    const mines = scenario.cards.find((card) => card.pile === "staging" && name(card.code) === "Mines of Moria");
+    expect(mines).toBeDefined();
+    expect(scenario.nightmare.removed).toContainEqual({ code: mines?.code, copies: 1, pile: "staging" });
+    expect(placementsAt(scenario, "Nightmare").some((card) => card.pile === "staging" && name(card.code) === "Mines of Moria")).toBe(false);
   });
 
   it("leaves Easy and Normal as they were", () => {

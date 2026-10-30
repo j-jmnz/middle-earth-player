@@ -223,14 +223,14 @@ export function flipPathY(d: string): string {
 // The Eye of Sauron that marks Nightmare (user request, 2026-10-30), drawn for the app after the mark FFG prints on every
 // Nightmare card (an almond eye with a slit pupil under a crown of flame): no source carries that mark as a vector. Drawn y down
 // on a 512 grid, nonzero fill: the eye, the iris cut out of it, the pupil, the flames.
-export const EYE_SOURCE = "drawn for the app (scripts/data/icons.ts), after the Nightmare mark FFG prints";
+const EYE_SOURCE = "drawn for the app (scripts/data/icons.ts), after the Nightmare mark FFG prints";
 const EYE_PATH =
   "M40 300C140 170 372 170 472 300C372 430 140 430 40 300Z" +
   "M336 300C336 256 300 220 256 220C212 220 176 256 176 300C176 344 212 380 256 380C300 380 336 344 336 300Z" +
   "M256 232C274 264 274 336 256 368C238 336 238 264 256 232Z" +
   "M128 240L104 118L168 196L184 66L230 184L256 14L282 184L328 66L344 196L408 118L384 240C330 205 182 205 128 240Z";
 
-export function eyeIcon(): Extract<IconRecord, { kind: "vector" }> {
+function eyeIcon(): Extract<IconRecord, { kind: "vector" }> {
   const d = flipPathY(EYE_PATH);
   return { name: "nightmare", kind: "vector", source: EYE_SOURCE, glyph: "eye", viewBox: flippedViewBox(d), d };
 }

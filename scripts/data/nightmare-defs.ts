@@ -96,6 +96,16 @@ export function nightmareDeckOf(scenarioId: string): NightmareDeckDef | undefine
   return NIGHTMARE_DECKS.find((deck) => deck.scenario === scenarioId);
 }
 
+/** The Nightmare deck a code belongs to: its prefix and two more digits. */
+export function nightmareDeckOfCode(code: string): NightmareDeckDef | undefined {
+  return NIGHTMARE_DECKS.find((deck) => code.length === deck.prefix.length + 2 && code.startsWith(deck.prefix));
+}
+
+/** A card printed in a Nightmare deck. */
+export function isNightmareCard(card: { printings: readonly { pack: string }[] }): boolean {
+  return card.printings.some((printing) => printing.pack === NIGHTMARE_PACK);
+}
+
 /** A Nightmare card's code: its deck's prefix and its two-digit collector number. */
 export function nightmareCode(deck: Pick<NightmareDeckDef, "prefix">, number: number): string {
   if (!Number.isInteger(number) || number < 1 || number > 99) throw new Error(`nightmare-defs: collector number ${number} is not 1 to 99`);

@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { loadCards } from "../load-cards.ts";
-import { NIGHTMARE_DECKS, NIGHTMARE_PACK, type NightmareDeckDef } from "../nightmare-defs.ts";
+import { isNightmareCard, NIGHTMARE_DECKS, nightmareDeckOfCode, type NightmareDeckDef } from "../nightmare-defs.ts";
 import { PICTURE_CACHE_DIR } from "../paths.ts";
 import type { ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
@@ -124,14 +124,14 @@ export async function syncNightmare(log: Log = createLog("nightmare")): Promise<
     files.push(writeRaw(cardListPath(deck), driveFileUrl(list.id), new TextDecoder().decode(await fetchWithRetry(driveFileUrl(list.id), log))));
   }
   // Each side of each Nightmare card: side A always, side B of a setup or quest card.
-  const cards = loadCards().filter((card) => card.printings.some((printing) => printing.pack === NIGHTMARE_PACK));
+  const cards = loadCards().filter(isNightmareCard);
   const targets = cards.flatMap((card) => {
-    const deck = NIGHTMARE_DECKS.find((item) => card.code.startsWith(item.prefix) && card.code.length === item.prefix.length + 2);
+    const deck = nightmareDeckOfCode(card.code);
     if (!deck) throw new Error(`${card.code} ${card.name} is in no Nightmare deck`);
     const sides: ScanSide[] = card.back ? ["A", "B"] : ["A"];
     return sides.map((side) => ({ card, deck, side }));
   });
-  const byDeck = new Map(NIGHTMARE_DECKS.map((deck) => [deck.prefix, nightmareFiles(deckFiles(listing, deck), cards.filter((card) => card.code.startsWith(deck.prefix)))]));
+  const byDeck = new Map(NIGHTMARE_DECKS.map((deck) => [deck.prefix, nightmareFiles(deckFiles(listing, deck), cards.filter((card) => nightmareDeckOfCode(card.code) === deck))]));
   mkdirSync(PICTURE_CACHE_DIR, { recursive: true });
   const missing: string[] = [];
   const tick = log.progress(targets.length, "picture");

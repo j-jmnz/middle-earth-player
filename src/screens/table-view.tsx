@@ -45,7 +45,7 @@ import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
-import { campaignTokens, heldDial, widgetReadouts } from "../play/widgets";
+import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
 import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
@@ -241,7 +241,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const widgets = widgetReadouts(game);
   const tokens = campaignTokens(game, ctx.effects, nameOf);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
-  const nightmareId = Object.entries(game.cards).find(([, card]) => card.zone === "nightmare")?.[0] ?? null;
+  const nightmareId = nightmareCardId(game);
   const held = heldDial(game, nameOf);
   const commandWidth = commandWidthOf(screen.width, s);
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and

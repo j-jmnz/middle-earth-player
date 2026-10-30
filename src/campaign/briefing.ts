@@ -203,7 +203,8 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
     const set = world.sets.get(card.code);
     if (set) bySet.set(set, (bySet.get(set) ?? 0) + countOf(card));
   }
-  const sets = scenario.encounterSets.map((set) => ({ name: set.name, count: bySet.get(set.name) ?? set.count }));
+  // A set the catalog has no rows for keeps the booklet's count; on Nightmare a set the recipe empties is 0, not the booklet's.
+  const sets = scenario.encounterSets.map((set) => ({ name: set.name, count: bySet.get(set.name) ?? (difficulty === "Nightmare" ? 0 : set.count) }));
   // On Nightmare the deck's own set follows the booklet's, with the cards it shuffles in (the ones a Setup places are counted where
   // they replace a card, as the booklet's sets count theirs).
   const nightmareSet = difficulty === "Nightmare" ? world.sets.get(scenario.nightmare?.cards[0]?.code ?? "") : undefined;

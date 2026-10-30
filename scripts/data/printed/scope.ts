@@ -1,11 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
+import type { Card } from "../../../src/catalog/card-facts.ts";
 import { PRODUCT_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR } from "../paths.ts";
-import { NIGHTMARE_DECKS, NIGHTMARE_PACK } from "../nightmare-defs.ts";
+import { isNightmareCard, NIGHTMARE_DECKS, NIGHTMARE_PACK, nightmareDeckOfCode } from "../nightmare-defs.ts";
 import { deckFiles, nightmareFiles } from "../sources/nightmare.ts";
 import { driveFileUrl, type DriveFile } from "../sources/jvzijp.ts";
 
@@ -108,33 +109,34 @@ function dragnImages(): ReadonlyMap<string, string> {
 
 const CORE_ORDER = ["Revised Core Set", "Core Set"];
 
-// Hall of Beorn's MEC109 scan first (its TFotR printing), then the other printings, DragnCards last. A card the box
-// does not reprint (the core-set cards of the starter lists) takes the Revised Core Set scan.
-// The Nightmare proxies' picture of each side (sources/nightmare.ts), from the listing `pnpm data:sync nightmare` keeps.
-function nightmarePictures(cards: ReadonlyMap<string, { code: string }>): Map<string, string> {
-  const file = path.join(RAW_DIR, "nightmare", "drive.json");
-  const listing = JSON.parse(readFileSync(file, "utf8")) as DriveFile[];
-  const all = loadCards().filter((card) => cards.has(card.code) && card.printings.some((printing) => printing.pack === NIGHTMARE_PACK));
+// The Nightmare proxies' picture of each side (sources/nightmare.ts), from the listing `pnpm data:sync nightmare` keeps. A deck's
+// files are matched against the whole deck, as the sync matches them, so a fallback match (a near title, a collector number)
+// lands on the same file; then only the codes in scope are kept.
+function nightmarePictures(cards: readonly Card[], scope: ReadonlySet<string>): Map<string, string> {
+  const listing = JSON.parse(readFileSync(path.join(RAW_DIR, "nightmare", "drive.json"), "utf8")) as DriveFile[];
   const out = new Map<string, string>();
   for (const deck of NIGHTMARE_DECKS) {
-    const mine = all.filter((card) => card.code.startsWith(deck.prefix) && card.code.length === deck.prefix.length + 2);
-    if (mine.length === 0) continue;
-    for (const [key, drive] of nightmareFiles(deckFiles(listing, deck), mine)) out.set(key, driveFileUrl(drive.id));
+    const mine = cards.filter((card) => isNightmareCard(card) && nightmareDeckOfCode(card.code) === deck);
+    if (!mine.some((card) => scope.has(card.code))) continue;
+    for (const [key, drive] of nightmareFiles(deckFiles(listing, deck), mine)) if (scope.has(key.split(".")[0] ?? "")) out.set(key, driveFileUrl(drive.id));
   }
   return out;
 }
 
+// Hall of Beorn's MEC109 scan first (its TFotR printing), then the other printings, DragnCards last. A card the box
+// does not reprint (the core-set cards of the starter lists) takes the Revised Core Set scan. A Nightmare card takes its proxy picture.
 export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget[] {
-  const cards = new Map(loadCards().map((card) => [card.code, card]));
+  const all = loadCards();
+  const cards = new Map(all.map((card) => [card.code, card]));
   const hob = hobImages();
   const dragn = dragnImages();
   const out: ScanTarget[] = [];
-  const nightmare = nightmarePictures(new Map(codes.flatMap((code) => (cards.has(code) ? [[code, { code }] as const] : []))));
+  const nightmare = nightmarePictures(all, new Set(codes));
   for (const code of codes) {
     const card = cards.get(code);
     if (!card) throw new Error(`Scan scope names ${code}, which is not in data/cards`);
     // A Nightmare card is read from its proxy picture (about 2348 px), then from Hall of Beorn's scan.
-    if (card.printings.some((printing) => printing.pack === NIGHTMARE_PACK)) {
+    if (isNightmareCard(card)) {
       const hobUrls = card.printings.flatMap((printing) => printing.imageUrls ?? []).filter((url) => !url.includes("dragncards"));
       for (const side of card.back ? (["A", "B"] as const) : (["A"] as const)) {
         const proxy = nightmare.get(`${code}.${side}`);
