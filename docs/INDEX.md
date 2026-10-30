@@ -227,6 +227,18 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
+- `docs/plans/dream-chaser.md` — Plan: Dream-chaser (The Grey Havens and the six Dream-chaser Adventure Packs) (~9.7K tok)
+  - 3–23 Context (~620)
+  - 24–85 Facts found during exploration (~3.2K)
+  - 86–159 Approach: twelve new phases (37-48) (~4.7K)
+    - 90–107 Phase 37 - Dream-chaser data (nothing playable yet) (~1.2K)
+    - 108–120 Phase 38 - Dream-chaser campaign shell and XP (~630)
+    - 121–134 Phase 39 - Sea mechanics family (~740)
+    - 135–159 Phases 40-48 - one scenario each (phase 12 procedure) (~2.0K)
+  - 160–170 Critical files (~310)
+  - 171–184 Verification (~210)
+  - 185–195 Notes for the orchestrator and the implementer agent (~380)
+  - 196–203 Risks (~210)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~5.5K tok)
   - 12–31 Workflow (~430)
   - 32–47 Where records live (~310)
