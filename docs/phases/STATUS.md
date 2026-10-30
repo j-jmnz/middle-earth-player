@@ -88,8 +88,8 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
-- NativeWind drops a function `style` on a `Pressable` that has a `className`: `TextButton`, `FoldHeader`, the count stepper, the setting rows, the peek banner and the web table list show no pressed fill on web. Check on a phone.
-- `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx`, `log/[saveId].tsx` and `phase-carousel.tsx`.
+- Rounded chrome (`docs/plans/done/rounded-chrome.md`), phone checks open: both themes on a phone; the capsule controls' pressed darken (`filter: brightness`); the command column's radial fade and the start block's soft scene; the dock with choice rows open on a short phone; the carousel's seven rows at 667 × 375; Maestro finding the transparent `rail-round` and `rail-current`; `.maestro/table-menu.yaml`.
+- `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
 - Web only: opening Cards, Import or a deck first can raise "error during concurrent rendering" (expo-sqlite "Sync operation timeout"; React recovers). Rows ending in a stepper warn "nested button".
 - The combat spotlight's sprite is worked out twice per slot in an active frame.
