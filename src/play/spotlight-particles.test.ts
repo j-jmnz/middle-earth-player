@@ -161,7 +161,7 @@ describe("the budgets", () => {
     ];
     for (const shape of shapes) {
       let most = 0;
-      for (const t of range(2200, 5)) {
+      for (const t of range(MOTION.spotlight.ms, 5)) {
         const f = frameAt(shape, t, 1, 7);
         const burst: ParticleKind = shape.damage === 0 ? "deflect" : "spark";
         const alive = shown("ember", f.emberT, 7, AT) + shown("converge", f.convergeT, 7, AT) + shown(burst, f.sparkT, 7, AT) + shown("ash", f.ashT, 7, AT);

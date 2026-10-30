@@ -76,13 +76,16 @@ function stopRing(status: PathNode["status"], night: string, accent: string, hig
  * The road: segments under the stops, each stop a round crop of its scenario's scene with its name and tag under it. `onStop` is the
  * tap on a stop (undefined for one that does nothing); `picked` rings the stop whose summary is open.
  */
-export function Road({ stops, height, width, label, onStop, scores }: {
+export function Road({ stops, height, width, label, onStop, scores, go = null }: {
   stops: readonly RoadStop[];
   height: number;
   width: number;
   label: number;
   onStop: (node: PathNode) => (() => void) | undefined;
   scores: ReadonlyMap<string, string>;
+  // The stop a tap begins or resumes the game from (the open scenario, else the next one), and what the tap does: the path has no
+  // Begin or Resume button (user request, 2026-10-29), so this stop is `begin` to the flows and says its action to a screen reader.
+  go?: { id: string; action: string } | null;
 }) {
   const palette = usePalette();
   const s = useUiScale();
@@ -102,9 +105,10 @@ export function Road({ stops, height, width, label, onStop, scores }: {
             <Pressable
               accessibilityRole={press ? "button" : undefined}
               accessibilityLabel={`${node.name}, ${tag}`}
+              accessibilityHint={go?.id === node.id ? go.action : undefined}
               disabled={!press}
               onPress={press}
-              testID={`stop-${node.id}`}
+              testID={go?.id === node.id ? "begin" : `stop-${node.id}`}
             >
               <View style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", backgroundColor: palette.raised, boxShadow: stopRing(node.status, palette.night, palette.accent, palette.accentHigh, palette.accentLine, palette.glow) }}>
                 <SceneArt scenarioId={node.id} width={size} height={size} />

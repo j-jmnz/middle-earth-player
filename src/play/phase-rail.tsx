@@ -170,8 +170,9 @@ export function PhaseRail({
             </View>
           ) : null}
         </View>
-        {/* The round's seven phases: past, current, to come. */}
-        <View testID="rail-ticks" importantForAccessibility="no-hide-descendants" style={{ flexDirection: "row", gap: TICK_GAP * s, marginTop: 3 * s }}>
+        {/* The round's seven phases: past, current, to come. Each line centers itself: the rail's own centering did not reach these on
+            Android (user screenshot, 2026-10-29: the ticks and the round stood at the rail's left under a centered phase). */}
+        <View testID="rail-ticks" importantForAccessibility="no-hide-descendants" style={{ alignSelf: "center", flexDirection: "row", gap: TICK_GAP * s, marginTop: 3 * s }}>
           {ROUND_PHASES.map((phase, index) => {
             const past = at >= 0 ? index < at : rail.phase === "End";
             const current = index === at;
@@ -189,7 +190,7 @@ export function PhaseRail({
             );
           })}
         </View>
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 * s }}>
+        <View style={{ alignSelf: "center", flexDirection: "row", alignItems: "center", marginTop: 2 * s }}>
           {round ? (
             <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: t.faint, lineHeight: 14 * s }}>
               {`${round}${rail.current ? " · " : ""}`}

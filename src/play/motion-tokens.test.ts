@@ -43,23 +43,23 @@ describe("the tokens", () => {
   });
 
   it("let only the sweep, the whole spotlight run and the lives of its embers and ash pass 500 ms", () => {
-    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "sweep"]);
-    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "sweep"]);
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "spotlightHold", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "spotlightHold", "sweep"]);
   });
 
-  it("make a spotlight of 2200 ms at Normal and 1320 at Quick, each beat at most 500 ms", () => {
-    for (const name of SPOTLIGHT_BEATS) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
-    // The seven beats, in order, are the run.
+  it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the hold", () => {
+    for (const name of SPOTLIGHT_BEATS) if (!LONG_TOKENS.includes(name)) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    // The eight beats, in order, are the run.
     expect(SPOTLIGHT_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(MOTION.spotlight.ms);
-    expect(MOTION.spotlight.ms).toBe(2200);
-    expect(ms(MOTION.spotlight, motionScale("normal", false))).toBe(2200);
-    expect(ms(MOTION.spotlight, motionScale("quick", false))).toBe(1320);
+    expect(MOTION.spotlight.ms).toBe(3200);
+    expect(ms(MOTION.spotlight, motionScale("normal", false))).toBe(3200);
+    expect(ms(MOTION.spotlight, motionScale("quick", false))).toBe(1920);
     // Reduced motion plays none.
     expect(ms(MOTION.spotlight, motionScale("normal", true))).toBe(0);
-    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([350, 300, 350, 120, 100, 480, 500]);
-    // A later attack of the same state swaps in (200 ms) instead of entering, reads in 100 and charges in 200: 1200 ms in all.
+    expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([350, 300, 350, 120, 100, 480, 1000, 500]);
+    // A later attack of the same state swaps in (200 ms) instead of entering, reads in 100 and charges in 200, then holds: 2200 ms in all.
     expect(SPOTLIGHT_AGAIN_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(SPOTLIGHT_AGAIN);
-    expect(SPOTLIGHT_AGAIN).toBe(1200);
+    expect(SPOTLIGHT_AGAIN).toBe(2200);
     expect([MOTION.spotlightSwap.ms, MOTION.spotlightReadAgain.ms, MOTION.spotlightChargeAgain.ms]).toEqual([200, 100, 200]);
     // The burn runs inside the return.
     expect(MOTION.spotlightBurn).toEqual({ ms: 450, easing: "inQuad" });
@@ -82,7 +82,7 @@ describe("the tokens", () => {
   });
 
   it("have dropped the tokens the redesign replaced", () => {
-    for (const name of ["spotlightDim", "spotlightDraw", "spotlightHold", "spotlightDrawAgain", "spotlightFall", "spotlightScrim", "spotlightBounceRise", "spotlightBounceSettle"]) expect(name in MOTION, name).toBe(false);
+    for (const name of ["spotlightDim", "spotlightDraw", "spotlightDrawAgain", "spotlightFall", "spotlightScrim", "spotlightBounceRise", "spotlightBounceSettle"]) expect(name in MOTION, name).toBe(false);
   });
 
   it("keep the values the earlier phases named", () => {

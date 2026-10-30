@@ -5,7 +5,7 @@
 import { Image } from "expo-image";
 import { eq } from "drizzle-orm";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { View, type ViewStyle } from "react-native";
+import { PixelRatio, View, type ViewStyle } from "react-native";
 
 import { cards } from "../catalog/schema";
 import { cachePolicyFor } from "../play/image-cache";
@@ -14,11 +14,12 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { FogVeil, LightVeil } from "./backdrop";
 import { heroVeil, rgbOf } from "./backdrop-scenes";
-import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, type Region } from "./art-crop";
+import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, sceneBand, WHOLE, type Region } from "./art-crop";
 import { scenarioOf } from "./campaign-data";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
+import { scanAssets } from "./images/scan-map";
 import { usePalette } from "./palette-hook";
 import { useTheme } from "../play/theme";
 import { useUiScale } from "../play/ui-scale";
@@ -40,6 +41,7 @@ export function CroppedArt({
   height,
   radius = 0,
   dim = false,
+  bare = false,
   children,
 }: {
   card: ArtCard | null;
@@ -50,6 +52,8 @@ export function CroppedArt({
   radius?: number;
   // Desaturate and darken the picture (ART_FILTER): a scene behind words. Never inside a list row.
   dim?: boolean;
+  // No fill under the picture: art on the page's ground, which must never show a hard-edged box while its picture loads or is missing.
+  bare?: boolean;
   // Laid over the picture: a fade, a name, a mark.
   children?: ReactNode;
 }) {
@@ -74,7 +78,7 @@ export function CroppedArt({
           : undefined
       }
       // A solid fill under the picture, never a gradient: a cropped picture is drawn inside list rows (docs/design-system.md, Performance).
-      style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, backgroundColor: palette.raised }}
+      style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, backgroundColor: bare ? "transparent" : palette.raised }}
     >
       {card && source && crop ? (
         <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...(dim ? { filter: ART_FILTER } : {}) }}>
@@ -144,7 +148,26 @@ export function useSceneCard(scenarioId: string | null | undefined): ArtCard | n
 }
 
 /**
- * A scenario's scene, cropped from its first quest card, filling a box. `shade` lays a soft night over its top (for Back and the
+ * A scenario's picture: the scene bundled on its own at its source's size (`<code>.scene`, scripts/pack-scans.ts), drawn whole; else
+ * the first quest card, the scene cropped from it. `sourceWidth` is the bundled scene's, which bounds how large it is drawn sharp.
+ */
+export function useScenePicture(scenarioId: string | null | undefined): { card: ArtCard | null; region: Region; aspect: number; sourceWidth: number | null } {
+  const card = useSceneCard(scenarioId);
+  return useMemo(() => {
+    const scene = card ? scanAssets[`${card.code}.scene`] : undefined;
+    if (!card || !scene) return { card, region: SCENE, aspect: QUEST_CARD_ASPECT, sourceWidth: null };
+    return { card: { code: `${card.code}.scene`, imagesrc: null }, region: WHOLE, aspect: scene.width / scene.height, sourceWidth: scene.width };
+  }, [card]);
+}
+
+/** How tall a scenario's scene is drawn across a box of `width` × `height` (sceneBand): the box's height without a bundled scene. */
+function useSceneBand(scenarioId: string | null | undefined, width: number, height: number): number {
+  const { region, aspect, sourceWidth } = useScenePicture(scenarioId);
+  return sourceWidth != null && width > 0 ? Math.round(sceneBand({ width, height }, (aspect * region.w) / region.h, sourceWidth, PixelRatio.get())) : height;
+}
+
+/**
+ * A scenario's scene, cropped from its first quest card (or its bundled scene), filling a box. `shade` lays a soft night over its top (for Back and the
  * status bar, or chips), `fade` night rising from that fraction of its height to solid at its foot, in `fadeTo` (the surface the
  * words below it sit on).
  */
@@ -157,6 +180,7 @@ export function SceneArt({
   fade,
   fadeTo,
   vivid = false,
+  bare = false,
   children,
 }: {
   scenarioId: string | null | undefined;
@@ -168,12 +192,14 @@ export function SceneArt({
   fadeTo?: string;
   // Keep the scene's full colour: a small thumb in a list row, where no filter is drawn (Performance).
   vivid?: boolean;
+  // On the page's ground (HeroArt, GroundedScene): no fill under the picture (CroppedArt).
+  bare?: boolean;
   children?: ReactNode;
 }) {
-  const card = useSceneCard(scenarioId);
+  const { card, region, aspect } = useScenePicture(scenarioId);
   const t = useTableTokens();
   return (
-    <CroppedArt card={card} region={SCENE} aspect={QUEST_CARD_ASPECT} height={height} width={width} radius={radius} dim={!vivid}>
+    <CroppedArt card={card} region={region} aspect={aspect} height={height} width={width} radius={radius} dim={!vivid} bare={bare}>
       {shade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(shade, t) }} /> : null}
       {fade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(fade, 1, fadeTo, t) }} /> : null}
       {children}
@@ -220,13 +246,40 @@ export function SceneCard({
 }
 
 /**
- * How a picture behind a page meets the ground, which is a gradient, not one colour. Dark fades it to night (the ground is near enough
- * night everywhere). Light multiplies the picture onto the ground and fades it to white, which multiplies to nothing, so it ends on the
- * ground itself and leaves no band where it stops.
+ * How a picture behind a page meets the ground, which is fog and light, not one colour. Dark screens the picture onto the ground and
+ * fades it to black, which screens to nothing; Light multiplies it onto the ground and fades it to white, which multiplies to nothing.
+ * Either way it ends on the ground itself, fog and all, and leaves no band where it stops (user report, 2026-10-30: a fade to night
+ * met the fog under it in a line).
  */
-export function useArtGround(): { ground: string; blend: { mixBlendMode?: "multiply" } } {
-  const palette = usePalette();
-  return useTheme() === "light" ? { ground: "#FFFFFF", blend: { mixBlendMode: "multiply" } } : { ground: palette.night, blend: {} };
+export function useArtGround(): { ground: string; blend: { mixBlendMode: "multiply" | "screen" } } {
+  return useTheme() === "light" ? { ground: "#FFFFFF", blend: { mixBlendMode: "multiply" } } : { ground: "#000000", blend: { mixBlendMode: "screen" } };
+}
+
+/**
+ * A scenario's scene at the head of a page (the briefing), met to the ground (useArtGround) at its foot and, with `edge`, at its right
+ * so it sits in the fog of the pane beside it. `children` are laid over it unblended (the banner's words).
+ */
+export function GroundedScene({ scenarioId, height, shade, fade, edge = false, children }: { scenarioId: string | null | undefined; height: number; shade?: number; fade: number; edge?: boolean; children?: ReactNode }) {
+  const { ground, blend } = useArtGround();
+  const s = useUiScale();
+  const [width, setWidth] = useState(0);
+  // A band at the box's top when the box would blow the scene up (sceneBand); its fade meets the ground, and the words below it sit there.
+  const band = useSceneBand(scenarioId, width, height);
+  return (
+    <View
+      style={{ height }}
+      onLayout={(event) => {
+        const next = Math.round(event.nativeEvent.layout.width);
+        setWidth((current) => (current === next ? current : next));
+      }}
+    >
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...blend }}>
+        <SceneArt scenarioId={scenarioId} height={band} shade={shade} fade={fade} fadeTo={ground} bare />
+        {edge ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 96 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
+      </View>
+      {children}
+    </View>
+  );
 }
 
 /**
@@ -241,6 +294,9 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
   const theme = useTheme();
   const s = useUiScale();
   const shown = right == null ? width : Math.max(0, Math.min(width, right - (left ?? 0)));
+  // The picture is a band at the box's top, as tall as it stays sharp (sceneBand; user report, 2026-10-30: grainy and zoomed in); the
+  // fog and the light still fill the box.
+  const band = useSceneBand(scenarioId, width, height);
   const fill = { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 } as const;
   const box: ViewStyle = { position: "absolute", top: 0, width: shown, height, overflow: "hidden", ...(left == null ? { alignSelf: "center" } : { left }) };
   const edge = (color: string) =>
@@ -250,22 +306,22 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
       {/* The picture in three bands (user request, 2026-10-29): the top falls to the ground under the status bar and the head, the
           middle is the picture alone with nothing over it, and from under the title down it falls to the ground. */}
       <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ ...box, ...blend }}>
-        <View style={{ width, height }}>
-          <SceneArt scenarioId={scenarioId} width={width} height={height} />
+        <View style={{ width, height: band }}>
+          <SceneArt scenarioId={scenarioId} width={width} height={band} bare />
           <View style={{ ...fill, backgroundImage: `linear-gradient(180deg, ${ground} 0%, ${withAlphaHex(ground, 0.85)} 9%, ${withAlphaHex(ground, 0)} 28%)` }} />
           <View style={{ ...fill, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 57%, ${withAlphaHex(ground, 0.55)} 76%, ${ground} 100%)` }} />
         </View>
         {edge(ground)}
       </View>
       {/* The theme's air over the picture, a layer of its own so Light's multiply stays on the picture and its light can brighten. */}
-      {/* Light screens its veil onto the page, so the light brightens on a phone's canvas as on the web. */}
-      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={theme === "dark" ? box : { ...box, mixBlendMode: "screen" }}>
+      {/* Both screen their veil onto the page, so the fog and the light brighten on a phone's canvas as on the web, and black hides them. */}
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ ...box, mixBlendMode: "screen" }}>
         {theme === "dark" ? (
           <>
-            {/* Dark: a bank of fog under the title, falling to the ground at the foot so no edge meets the page below. */}
+            {/* Dark: a bank of fog under the title, falling to black at the foot and the edge so it ends in the page's own fog. */}
             <FogVeil layers={heroVeil.dark} width={width} height={height} />
-            <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(palette.night, 0)} 84%, ${palette.night} 100%)` }} />
-            {edge(palette.night)}
+            <View style={{ position: "absolute", left: 0, top: 0, width, height, backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0) 84%, #000000 100%)` }} />
+            {edge("#000000")}
           </>
         ) : (
           <>

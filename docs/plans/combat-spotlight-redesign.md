@@ -67,7 +67,7 @@ Answers to the clarifying questions:
 - **Decode size:** `use-spotlight-images.native.ts` moves into the layer and decodes at the target size × the 1.06 punch-in.
 
 ### 3. Beats: `src/play/motion-tokens.ts` and `src/play/spotlight-beats.ts`
-- **One attack** (`SPOTLIGHT_BEATS`, 2200 ms; the `spotlight` long token becomes 2200):
+- **One attack** (`SPOTLIGHT_BEATS`, 3200 ms; the `spotlight` long token is 3200). The 1000 ms hold after the impact was added by user request, 2026-10-30, so the result can be read; the beats before it are the redesign's.
 
 | Beat | ms | Easing | What happens |
 | --- | --- | --- | --- |
@@ -77,9 +77,10 @@ Answers to the clarifying questions:
 | `spotlightLunge` | 120 | inCubic | A fast strike with 3 fading afterimages (the same clock read at t − j·16 ms) |
 | `spotlightStop` | 100 | – | Hit-stop with everything frozen; `tickImpact` plays; the flash peaks |
 | `spotlightImpact` | 480 | linear | Shockwave ring, spark burst, trauma shake, knock-back and red tint on the target, damage number pop, tokens flying to the damage corner and its count popping. Blocked: silver deflection sparks, attacker recoil spring, defense medallion bounce, "Blocked" stamp |
+| `spotlightHold` | 1000 | – | The cards, the medallions and the result stay where the impact left them |
 | `spotlightReturn` | 500 | inCubic | Cards back to their slots, glow and embers fade, the dark lifts. A destroyed target instead **burns** (`spotlightBurn` 450, inQuad): a noise-threshold dissolve with an ember rim, ash rising and a "Destroyed" stamp |
 
-- **Later attacks in one moment:** `spotlightSwap` 200 + `spotlightReadAgain` 100 + `spotlightChargeAgain` 200 + Lunge + Stop + Impact = 1200 ms (`SPOTLIGHT_AGAIN`). Only the last attack returns, so three attacks run 4600 ms at Normal and 2760 ms at Quick.
+- **Later attacks in one moment:** `spotlightSwap` 200 + `spotlightReadAgain` 100 + `spotlightChargeAgain` 200 + Lunge + Stop + Impact + Hold = 2200 ms (`SPOTLIGHT_AGAIN`). Only the last attack returns, so three attacks run 7600 ms at Normal and 4560 ms at Quick.
 - **Sub-tokens:**
   - Flash and ring: `spotlightFlash` 160, `spotlightRing` 360.
   - Sparks and shake: `spotlightSparks` 450, `spotlightShake` 420.
@@ -87,7 +88,7 @@ Answers to the clarifying questions:
   - Tokens: `spotlightBurstStep` 90, `spotlightBurstFly` 220.
   - Words and recoil: `spotlightStamp` 160, `spotlightRecoil` spring(320, 0.5).
   - Flip: `spotlightFlip` 300, `spotlightGlint` 260, `spotlightTrailStep` 16.
-- **Removed tokens:** Dim, Draw, Hold, DrawAgain, Fall, Scrim, BounceRise and BounceSettle.
+- **Removed tokens:** Dim, Draw, DrawAgain, Fall, Scrim, BounceRise and BounceSettle. `spotlightHold` is the result's pause, added 2026-10-30.
 - **Timing hooks:** `hitTime` points to `stopAt`, `leaveTime` to `retAt`, and every length goes through `length(token, k)`.
 - **New `Frame` fields:** `dark`, `badgeA`/`badgeD`, `charge`, `punch`, `trail`, `flash`, `ring`, `sparkT`, `shakeX`/`shakeY`/`shakeTurn`, `number {scale, alpha, rise}`, `stamp`, `recoil`, `flipAngle`, `glint`, `dissolve`.
 - **Spatial constants:** these move out of `SHAPE` into a new `spotlight-shape.ts` if `motion-tokens.ts` grows too large. Durations stay in `MOTION`.
@@ -153,7 +154,7 @@ Answers to the clarifying questions:
 ## Verification
 - **Checks:** `pnpm test`, `pnpm lint`, `tsc --noEmit` and `pnpm data:check` (unaffected, but CI runs it).
 - **Rewritten tests:**
-  - `motion-tokens.test.ts`: beats sum to 2200 and 1200, Quick is 1320, every token is ≤ 500 except `spotlight`, the burst fits inside the impact.
+  - `motion-tokens.test.ts`: beats sum to 3200 and 2200, Quick is 1920, every token is ≤ 500 except `spotlight`, `spotlightHold` and the particle lives, the burst fits inside the impact.
   - `spotlight-beats.test.ts`:
     - the hit-stop is frozen for 100 ms;
     - the trauma envelope stays ≤ max·T0², never increases, and reaches 0;

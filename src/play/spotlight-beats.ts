@@ -12,11 +12,12 @@
 //   1000 lunge   a fast strike with three fading afterimages
 //   1120 stop    hit stop: everything holds; the flash peaks and the impact haptic plays
 //   1220 impact  ring, sparks, shake, knock-back and tint, the damage number and the tokens; or deflection, recoil and "Blocked"
-//   1700 return  both go back and the dark lifts; a destroyed target burns instead, with ash and "Destroyed"
-//   2200
+//   1700 hold    the cards, the medallions and the result stay so they can be read
+//   2700 return  both go back and the dark lifts; a destroyed target burns instead, with ash and "Destroyed"
+//   3200
 // A kill holds longer (a boss stop): 160 ms, the extra 60 taken from the impact, so the return and the run keep their times.
 // Several attacks in one state play under one dark: the second and later swap in over 200 ms (no flight from the slots, a read of
-// 100 ms and a charge of 200), the one before them fades out in the same 200 ms, and only the last goes back. Three attacks run 4600 ms.
+// 100 ms and a charge of 200), the one before them fades out in the same 200 ms, and only the last goes back. Three attacks run 7600 ms.
 import { clamp01, ease, length, popScale, springStep, scaledSpring } from "./motion-curves.ts";
 import { MOTION, type Tween } from "./motion-tokens.ts";
 import { cameraPush, flashAt, numberAt, ringAt, shakeAt, traumaStart } from "./spotlight-fx.ts";
@@ -47,7 +48,7 @@ function impactLength(k: number, destroyed: boolean): number {
  * The beats of one attack at a scale: each one's length and where it starts, in ms. `intro` is the first attack's enter or a later
  * one's swap, `ret` is 0 unless it is the last, `end` is the attack's own length, and `exit` is how long it fades out into the next attack.
  */
-export type Beats = { intro: number; read: number; charge: number; lunge: number; stop: number; impact: number; ret: number; readAt: number; chargeAt: number; lungeAt: number; stopAt: number; impactAt: number; retAt: number; end: number; exit: number };
+export type Beats = { intro: number; read: number; charge: number; lunge: number; stop: number; impact: number; hold: number; ret: number; readAt: number; chargeAt: number; lungeAt: number; stopAt: number; impactAt: number; retAt: number; end: number; exit: number };
 
 export function beatsAt(k: number, place: Place = { first: true, last: true }): Beats {
   "worklet";
@@ -57,14 +58,15 @@ export function beatsAt(k: number, place: Place = { first: true, last: true }): 
   const lunge = length(MOTION.spotlightLunge, k);
   const stop = length(place.destroyed ? MOTION.spotlightStopKill : MOTION.spotlightStop, k);
   const impact = impactLength(k, place.destroyed === true);
+  const hold = length(MOTION.spotlightHold, k);
   const ret = place.last ? length(MOTION.spotlightReturn, k) : 0;
   const readAt = intro;
   const chargeAt = readAt + read;
   const lungeAt = chargeAt + charge;
   const stopAt = lungeAt + lunge;
   const impactAt = stopAt + stop;
-  const retAt = impactAt + impact;
-  return { intro, read, charge, lunge, stop, impact, ret, readAt, chargeAt, lungeAt, stopAt, impactAt, retAt, end: retAt + ret, exit: place.last ? 0 : length(MOTION.spotlightSwap, k) };
+  const retAt = impactAt + impact + hold;
+  return { intro, read, charge, lunge, stop, impact, hold, ret, readAt, chargeAt, lungeAt, stopAt, impactAt, retAt, end: retAt + ret, exit: place.last ? 0 : length(MOTION.spotlightSwap, k) };
 }
 
 function placeOf(index: number, count: number): Place {
@@ -80,7 +82,7 @@ export function runStart(index: number, count: number, k: number): number {
   return at;
 }
 
-/** How long `count` attacks run one after another at a scale, in ms: the first 2200 at Normal, each later one 1200, the last going back. */
+/** How long `count` attacks run one after another at a scale, in ms: a lone attack is 3200 at Normal, each later one 2200, and the last of them also goes back. */
 export function spotlightRun(count: number, k: number): number {
   return Math.ceil(runStart(count - 1, count, k) + beatsAt(k, placeOf(count - 1, count)).end);
 }
