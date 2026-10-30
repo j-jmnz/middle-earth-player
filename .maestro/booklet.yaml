@@ -36,6 +36,10 @@ appId: com.middleearth.lcg
 - tapOn:
     id: campaigns-tab
 - tapOn:
+    id: new-fellowship-of-the-ring
+- assertVisible:
+    id: campaign-setup
+- tapOn:
     id: start-fellowship
 - extendedWaitUntil:
     visible:

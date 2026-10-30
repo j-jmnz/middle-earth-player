@@ -7,11 +7,13 @@ appId: com.middleearth.lcg
     clearState: true
 - assertVisible:
     id: campaign-list
-# One start panel with a campaign chooser; the Fellowship's primary keeps its id while it is chosen.
+# New playthrough has one tile for each playable campaign; a tile opens that campaign's setup screen, whose Start is `start-<id>`.
 - assertVisible:
-    id: start-fellowship
+    id: new-fellowship-of-the-ring
 - tapOn:
-    id: campaign-choice-mirkwood-paths
+    id: new-mirkwood-paths
+- assertVisible:
+    id: campaign-setup
 - assertVisible:
     id: start-mirkwood-paths
 - tapOn:

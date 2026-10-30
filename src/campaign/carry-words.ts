@@ -1,5 +1,5 @@
 // How the cards a Resolution keeps for the next campaign read (01131:B:2): one phrase for the Resolution sentence, the Campaign Log's row and
-// the start panel's offer. Pure, so a test reads it.
+// the campaign setup's offer. Pure, so a test reads it.
 
 type Carried = { code: string; perPlayer?: boolean };
 

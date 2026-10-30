@@ -1,4 +1,4 @@
-// How a finished playthrough's carry-over reads in the campaign setup (the words of the cards are campaign/carry-words.ts, shared with the Resolution) (docs/design-system.md, Campaigns (campaign list)). Pure, so a test reads it.
+// How a finished playthrough's carry-over reads in the campaign setup (the words of the cards are campaign/carry-words.ts, shared with the Resolution) (docs/design-system.md, Campaign setup). Pure, so a test reads it.
 
 export { carryWords } from "../campaign/carry-words";
 

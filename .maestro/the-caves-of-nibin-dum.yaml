@@ -72,12 +72,17 @@ tags:
 # Kill and relaunch: the campaign is complete on the log, with the Ranger Sense in the pool and the carry-over written.
 - stopApp
 - launchApp
-# A finished save has no Path button: its one button, `continue`, reads "Open path" (src/screens/save-panels.tsx).
-- assertVisible:
+# A finished playthrough is not on the Campaigns hub: History lists it under Finished, and the sheet its ⋯ opens has Open path.
+- assertNotVisible:
     id: continue-next
-    text: "Every scenario is won"
 - tapOn:
-    id: continue
+    id: history-open
+- assertVisible:
+    id: library-finished
+- tapOn:
+    id: ref-menu-save-e2e-nibin-dum-won
+- tapOn:
+    id: ref-path
 - extendedWaitUntil:
     visible:
       id: campaign-path

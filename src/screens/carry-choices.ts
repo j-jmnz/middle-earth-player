@@ -1,4 +1,4 @@
-// What a finished playthrough hands to a new campaign, as the campaign setup screen offers it (docs/design-system.md, Campaigns (campaign list)).
+// What a finished playthrough hands to a new campaign, as the campaign setup screen offers it (docs/design-system.md, Campaign setup).
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
 

@@ -3,6 +3,11 @@ appId: com.middleearth.lcg
 # Phase 10. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
 - launchApp:
     clearState: true
+# A campaign tile on the hub opens the campaign setup screen; Start there opens the new playthrough's path.
+- tapOn:
+    id: new-fellowship-of-the-ring
+- assertVisible:
+    id: campaign-setup
 - tapOn:
     id: start-fellowship
 - extendedWaitUntil:

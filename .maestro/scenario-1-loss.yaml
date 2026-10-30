@@ -10,7 +10,7 @@ appId: com.middleearth.lcg
     visible:
       id: campaign-path
     timeout: 15000
-# The campaign list's Continue panel resumes the open scenario on the table.
+# The Campaigns hub's hero resumes the open scenario on the table (`continue-next` is read aloud as "On the table: ..."; its eyebrow reads "On the table · Scenario 1 of 6").
 - tapOn:
     id: path-back
 - assertVisible:

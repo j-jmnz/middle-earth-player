@@ -65,7 +65,7 @@ appId: com.middleearth.lcg
 # Kill and relaunch: the log and the chosen cards are still in user.db.
 - stopApp
 - launchApp
-# The last playthrough opens on the list's Continue panel; Path opens its path.
+# The playthrough is the Campaigns hub's hero (a scenario is still to play); its Full path opens its path.
 - tapOn:
     id: continue-path
 - extendedWaitUntil:

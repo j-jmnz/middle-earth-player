@@ -1,4 +1,4 @@
-// The campaign setup screen a campaign tile on the Campaigns hub opens (docs/design-system.md, Campaigns (campaign list)): the briefing's frame
+// The campaign setup screen a campaign tile on the Campaigns hub opens (docs/design-system.md, Campaign setup): the briefing's frame
 // over the campaign's first scene, the seat count, the carry-over of a finished playthrough, and Start.
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";

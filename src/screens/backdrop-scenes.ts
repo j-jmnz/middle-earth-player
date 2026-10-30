@@ -109,7 +109,7 @@ export const scenes: Record<SceneName, Scene> = {
     vignette: darkVignette,
     grit: darkGrit,
   },
-  // Campaigns over its scene (HeroArt draws the fog under the title itself): fog only below the picture, so none meets its foot.
+  // A hub over its scene (HeroArt draws the fog under the title itself): fog only below the picture, so none meets its foot.
   hero: {
     ground: { kind: "solid", color: GROUND },
     fog: banks(MOON, 0.5, { cx: 0.5, cy: 0.86, rx: 0.85, ry: 0.16 }),
@@ -179,7 +179,7 @@ const lit = (extra: Partial<Scene> = {}): Scene => ({ ground: lightGround, fog: 
 
 export const lightScenes: Record<SceneName, Scene> = {
   moon: lit(),
-  // Campaigns over its scene: the art draws the light over itself (HeroArt), so the ground under it stays plain.
+  // A hub over its scene: the art draws the light over itself (HeroArt), so the ground under it stays plain.
   hero: { ground: lightGround, fog: [], vignette: lightVignette, grit: lightGrit },
   path: lit({ wash: { cx: 0.2, cy: 0.82, rx: 0.5, ry: 0.4, rgb: RUST, alpha: 0.3 } }),
   ember: lit({ wash: { cx: 0.3, cy: 0.28, rx: 0.6, ry: 0.5, rgb: RUST, alpha: 0.32 } }),

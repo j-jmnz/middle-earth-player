@@ -14,7 +14,7 @@ tags:
     visible:
       id: campaign-path
     timeout: 15000
-# The campaign list's Continue panel resumes the open scenario on the table, as scenario-1-loss.yaml does.
+# The Campaigns hub's hero resumes the open scenario on the table, as scenario-1-loss.yaml does.
 - tapOn:
     id: path-back
 - assertVisible:

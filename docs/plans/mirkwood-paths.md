@@ -156,7 +156,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - `campaignOf` and `nameOf` work for any id. Remove every `FELLOWSHIP_ID` fallback listed above.
    - `scripts/build-catalog.ts` tags `cards.campaign_id` from a pack→campaign map.
 2. **Screens**
-   - Campaign list: one start panel per playable campaign. `start-fellowship` keeps its testID; the new ones are `start-<id>`. Each save's progress line reads its own campaign.
+   - Campaign list: one New playthrough tile per playable campaign, opening that campaign's setup screen. `start-fellowship` keeps its testID; the new ones are `start-<id>`. Each save's progress line reads its own campaign.
    - Scenarios tab: one section per box (Fellowship, Revised Core, The Dark of Mirkwood).
    - The standalone briefing takes the box from the scenario.
    - Path and log screens use `campaign.bookletId`.

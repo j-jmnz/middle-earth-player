@@ -40,11 +40,14 @@ appId: com.middleearth.lcg
     id: history-open
 - assertVisible:
     id: history
+# The playthrough is still unfinished, so the library lists it under In progress, with its run under its header.
+- assertVisible:
+    id: library-in-progress
 - assertVisible:
     id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
 - assertVisible: "A Shadow of the Past"
 - assertVisible: "Lost"
-# The standalone kind has no run yet.
+# The standalone kind has no game and no run yet.
 - tapOn:
     id: history-standalone
 - assertVisible:
