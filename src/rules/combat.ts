@@ -6,7 +6,7 @@ import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { flagged, livingSeats, updateCard } from "./state.ts";
+import { flagged, heldAmount, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
@@ -30,12 +30,18 @@ type Cards = ReadonlyMap<string, PrintedCard>;
 // enemies and its stage.
 export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number): number {
   const stage = seat != null && state.separate ? new Set([...(state.seats[seat]?.staging ?? []), ...(state.seats[seat]?.engaged ?? []), ...(state.seats[seat]?.stage ? [state.seats[seat]?.stage ?? ""] : [])]) : null;
+  // Archery X with X "the number of players at this stage" (142070:A:1): one player at each separate stage, the players in the game before that.
+  const players = state.separate ? 1 : livingSeats(state).length;
   let total = 0;
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (stage && !stage.has(instance.id))) continue;
     const value = printedOf(cards, instance.code).keywords.archery;
     if (value != null && value > 0) total += value;
+    // Archery a card in play gives itself (142070:A:1, 142078:A:1).
+    if (state.modifiers.length > 0) total += heldAmount(state, instance.id, "archeryBonus") + (flagged(state, instance.id, "archeryPlayers") ? players : 0);
   }
+  // Archery a seat's stage gains until the end of the round (142082:A:1).
+  for (const index of livingSeats(state)) if (seat == null || index === seat) total += heldAmount(state, `seat:${index}`, "archeryBonus");
   return total;
 }
 

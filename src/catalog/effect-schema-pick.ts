@@ -25,6 +25,15 @@ export const pickSchema = z.strictObject({
   // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
   // "in any staging area"). Read by src/rules/pick.ts; a game with one staging area ignores it.
   stagingArea: z.enum(["own", "shared", "any"]).optional(),
+  // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
+  // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/pick.ts.
+  atStage: z.literal(true).optional(),
+  // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
+  // points than the attacking enemy", 142079:A:2). Read by src/rules/families/breaking-attack.ts.
+  fewerHitPointsThan: z.literal("attackingEnemy").optional(),
+  // A burden card (Campaign Mode) in play, in the encounter deck or in the encounter discard pile ("choose a burden card in play, in the encounter deck, or
+  // in the discard pile", 142074:A:2). Read by src/rules/pick.ts.
+  burden: z.literal(true).optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.

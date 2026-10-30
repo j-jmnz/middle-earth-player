@@ -28,6 +28,7 @@ import { holdsNow, seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { discardRestricted } from "./families/objectives-claimed.ts";
 import { dealOut } from "./families/breaking-deal.ts";
+import { stagingDest } from "./families/breaking-areas.ts";
 import { attachTo, moveCard } from "./zones.ts";
 import { chooseAmount } from "./families/defense.ts";
 import { dealAttackShadow } from "./families/defense-listen.ts";
@@ -500,7 +501,8 @@ function applyTargeted(
           next = moveEncounter(next, id, "engaged", item.seat, ctx, steps);
           continue;
         }
-        next = instruction.to === "staging" ? moveCard(next, id, { zone: "staging" }) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
+        // Into the searching seat's own staging area once stages are separate (families/breaking-areas.ts).
+        next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each) next = updateCard(next, id, { face: "up" });
       }
       // A `different` search tells the next one which titles are taken.

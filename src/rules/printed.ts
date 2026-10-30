@@ -133,10 +133,42 @@ const BUILT_IN: ReadonlyMap<string, PrintedCard> = new Map([
   [ORC_GUARD_CODE, definePrinted({ code: ORC_GUARD_CODE, name: "Orc Guard", type: "enemy", threat: 0, engagementCost: 0, attack: 1, defense: 1, health: 1 })],
 ]);
 
+// A hero that Fallen Into Evil (142083) made an enemy keeps its card with the code `<code>~enemy`: "Attached hero loses the hero card type and gains the enemy
+// card type with Threat equal to its Willpower and engagement cost equal to its threat cost". The printed card is made from the hero's; its game text is blank.
+export const FALLEN_SUFFIX = "~enemy";
+const FALLEN = new WeakMap<PrintedCard, PrintedCard>();
+
+// The hero's own code for the code of a fallen hero, or the code itself.
+export function fallenBase(code: string): string {
+  return code.endsWith(FALLEN_SUFFIX) ? code.slice(0, -FALLEN_SUFFIX.length) : code;
+}
+
+function fallenOf(hero: PrintedCard): PrintedCard {
+  let made = FALLEN.get(hero);
+  if (!made) {
+    made = definePrinted({
+      code: hero.code + FALLEN_SUFFIX,
+      name: hero.name,
+      type: "enemy",
+      traits: hero.traits,
+      threat: hero.willpower ?? 0,
+      engagementCost: hero.threat ?? 0,
+      attack: hero.attack,
+      defense: hero.defense,
+      health: hero.health,
+      isUnique: hero.isUnique,
+    });
+    FALLEN.set(hero, made);
+  }
+  return made;
+}
+
 export function printedOf(cards: ReadonlyMap<string, PrintedCard>, code: string): PrintedCard {
   const card = cards.get(code) ?? BUILT_IN.get(code);
-  if (!card) throw new Error(`Missing printed card ${code}`);
-  return card;
+  if (card) return card;
+  const hero = code.endsWith(FALLEN_SUFFIX) ? cards.get(fallenBase(code)) : undefined;
+  if (!hero) throw new Error(`Missing printed card ${code}`);
+  return fallenOf(hero);
 }
 
 export function spherePays(pool: Sphere | null, cost: Sphere | null): boolean {

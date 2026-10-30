@@ -15,6 +15,7 @@ import { offerResponses } from "./responses.ts";
 import { restricted } from "./restrictions.ts";
 import { livingSeats, withMode, type ScenarioState } from "./state.ts";
 import { stageSeat } from "./families/breaking-areas.ts";
+import { payOwed } from "./families/breaking-progress.ts";
 import { fireForced } from "./triggers.ts";
 import { announceStageRevealed } from "./families/nightmare-setup.ts";
 
@@ -55,7 +56,8 @@ function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: Engine
 // effects pushed as frames, and a location the progress explored has its Responses offered first (those that put progress on the quest, under the
 // stage's frames).
 export function afterProgress(state: ScenarioState, before: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
+  // The progress a stage 3B turned into discards from the encounter deck (families/breaking-progress.ts).
+  let next = payOwed(state, ctx, steps);
   const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" ? [step.cardId] : []));
   // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
   const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocation(next, step.targetId, ctx) ? [step.targetId] : []));

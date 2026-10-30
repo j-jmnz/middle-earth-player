@@ -224,6 +224,9 @@ export const simpleVerbs = [
     // With "defend": every ally (not only those with little Willpower) cannot defend the source's attacks ("Allies cannot defend against
     // Orc-chieftain", 142045:A:1).
     allies: z.boolean().optional(),
+    // With "defend": only the allies whose printed hit points are fewer than the source's cannot defend ("Allies with fewer printed hit points than Uruk-hai
+    // Captain cannot defend against Uruk-hai Captain", 142069:A:2).
+    belowSourceHitPoints: z.boolean().optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's

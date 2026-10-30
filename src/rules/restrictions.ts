@@ -9,7 +9,7 @@ import { printedOf } from "./printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number; allies?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -36,6 +36,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
+      ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
     });
   }
   return found;
@@ -64,10 +65,13 @@ export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[]
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
-  return ctx.effects
-    .filter((effect) => effect.cardCode === code && effect.timing === "travel")
-    .flatMap((effect) => effect.instructions)
-    .some((instruction) => {
+  const instructions = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "travel").flatMap((effect) => effect.instructions);
+  return instructions.some((instruction) => {
+      // "A player at this staging area must engage an enemy in any staging area to travel here" (142079:A:1): an enemy to engage must be in some staging area.
+      if (instruction.verb === "Engage" && instruction.target === "picked") {
+        const pick = instructions.find((other) => other.verb === "Pick");
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+      }
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.
@@ -114,7 +118,13 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
   const defender = state.cards[defenderId];
   if (!attack || !defender) return false;
   return restricted(state, ctx, "defend").some(
-    (rule) => rule.sourceId === attack.enemyId && (rule.allies ? printedOf(ctx.cards, defender.code).type === "ally" : modifiedStat(state, defender, "willpower", ctx.cards) <= (rule.maxWillpower ?? 0)),
+    (rule) =>
+      rule.sourceId === attack.enemyId &&
+      (rule.belowSourceHitPoints
+        ? printedOf(ctx.cards, defender.code).type === "ally" && (printedOf(ctx.cards, defender.code).health ?? 0) < (printedOf(ctx.cards, state.cards[rule.sourceId]?.code ?? "").health ?? 0)
+        : rule.allies
+          ? printedOf(ctx.cards, defender.code).type === "ally"
+          : modifiedStat(state, defender, "willpower", ctx.cards) <= (rule.maxWillpower ?? 0)),
   );
 }
 

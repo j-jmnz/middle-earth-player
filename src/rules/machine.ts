@@ -34,7 +34,7 @@ import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
 import { askReadyPayments } from "./families/attachments-ready.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
-import { travelIntent } from "./travel.ts";
+import { travelIntent, travelTaken } from "./travel.ts";
 import { advanceFreed, resolutionStep } from "./stage-reveal.ts";
 import { pushDue } from "./delayed.ts";
 import { crossBoundary } from "./triggers.ts";
@@ -42,7 +42,7 @@ import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
-import { flagged, inPlay, livingSeats, markReached, reached, updateCard, withMode, type ModeName, type ScenarioState } from "./state.ts";
+import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "./state.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
@@ -140,7 +140,7 @@ export function applyIntent(
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
-      return { ...markReached(state, "traveled"), window: null };
+      return { ...travelTaken(state), window: null };
     case "Engage": {
       // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
       const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
@@ -202,12 +202,16 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       if (flagged(state, "table", "skipTravel")) return withMode(state, nextAfterTravel(state));
       // The travel opportunity was taken or declined: the window after it (4.2), still in the Travel phase.
       if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, nextAfterTravel(state));
-      const seat = livingSeats(state)[0];
+      const seat = state.separate ? livingSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
       if (seat == null) {
+        // Stages are separate and every seat has had its opportunity (families/breaking-areas.ts).
+        if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: livingSeats(state) });
         return state.lost
           ? state
           : { ...state, lost: true, lossReason: "No seats remain", window: null };
       }
+      // Each seat in player order may travel to a location of its own staging area, to its own active location (mec109.multiple-staging-areas).
+      if (state.separate) return { ...state, travelDone: [...(state.travelDone ?? []), seat], window: { kind: "travel" }, activeSeat: seat };
       return { ...state, window: { kind: "travel" }, activeSeat: seat };
     }
     case "optionalEngage":
@@ -220,7 +224,8 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       return next.mode === "combatStart" ? (stepWindow(state, ctx, "5.3") ?? next) : next;
     }
     case "combatStart":
-      return startCombat(state, ctx);
+      // "Skip the combat phase" (142075:A:2): the round goes on to the refresh phase.
+      return flagged(state, "table", "skipCombat") ? withMode({ ...state, engagement: null }, "refresh") : startCombat(state, ctx);
     case "combatShadows":
       return withMode(announceShadowsDealt(dealShadows(state, ctx.cards, steps), ctx), "combatActions");
     case "combatActions":

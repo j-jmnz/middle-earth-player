@@ -19,6 +19,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "./keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "./printed.ts";
 import { sharedStaging } from "./families/breaking-areas.ts";
+import { breakingPickMatches } from "./families/breaking-attack.ts";
 import type { ScenarioState } from "./state.ts";
 import { heldAmount, inPlay, livingSeats } from "./state.ts";
 import { canDeclareDefender, isDefending } from "./families/defense-defenders.ts";
@@ -41,6 +42,8 @@ export type PickContext = {
 
 function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
   if (spec.control === "you") return [asking];
+  // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
+  if (spec.atStage && state.separate) return [asking];
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
 }
@@ -56,6 +59,12 @@ function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): reado
 function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext): string[] {
   const seats = seatsOf(state, spec, asking);
   const raw: string[] = [];
+  // A burden card in play or in the encounter deck or its discard pile (142074:A:2).
+  if (spec.burden) {
+    return Object.values(state.cards)
+      .filter((card) => (inPlay(card.zone) || card.zone === "encounterDeck" || card.zone === "encounterDiscard") && printedOf(ctx.cards, card.code).campaignKind === "burden")
+      .map((card) => card.id);
+  }
   const from = spec.from ?? "play";
   // Only the cards the running effect looked at or discarded (families/deck-pick.ts).
   if (spec.looked) return lookedPool(state, spec, seats);
@@ -85,7 +94,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       raw.push(instance.id);
     }
   } else if (spec.type === "enemy") {
-    const engagedSeats = spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
+    const engagedSeats = spec.engaged === "you" || (spec.atStage && state.separate) ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));
@@ -166,6 +175,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.maxWillpower != null && Math.max(0, modifiedStat(state, instance, "willpower", ctx.cards)) > spec.maxWillpower) return false;
   // A copy of it in its controller's discard pile (900309:A:2).
   if (spec.copyInDiscard && !(instance.controller != null && (state.seats[instance.controller]?.discard ?? []).some((other) => other !== id && printedOf(ctx.cards, state.cards[other]?.code ?? "").name === printed.name))) return false;
+  // The breaking family's filter: fewer printed hit points than the attacking enemy (families/breaking-attack.ts).
+  if (!breakingPickMatches(state, id, spec, ctx)) return false;
   // The sidequests family's filters: a Trait or a title shared with another card, the quest a character is committed to
   // (families/sidequests-pick.ts).
   if (!sidequestsPickMatches(state, id, spec, at, ctx)) return false;

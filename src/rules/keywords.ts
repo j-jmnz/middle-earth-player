@@ -73,6 +73,7 @@ export function modifiedStat(
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
+    if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when.maxHitPoints, cards)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack-strike.ts).
@@ -108,6 +109,15 @@ export function versusHighEngagement(
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
+}
+
+// The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).
+export function versusDefender(state: ScenarioState, holder: CardInstance, maxHitPoints: number, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const attack = state.pendingAttack;
+  if (!attack || attack.enemyId !== holder.id || attack.defenderId == null || attack.undefended) return false;
+  const defender = state.cards[attack.defenderId];
+  const health = defender ? printedOf(cards, defender.code).health : null;
+  return health != null && health <= maxHitPoints;
 }
 
 // A character's defense as the defender of the attack in progress, read as if it were declared, so a modifier that holds
@@ -375,7 +385,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     const seat = next.seats[index];
     if (!seat?.eliminated) continue;
     const controlled = Object.values(next.cards).filter(
-      (card) => card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging",
+      (card) => card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
     );
     if (controlled.length === 0 && seat.engaged.length === 0) continue;
     for (const enemyId of seat.engaged) {

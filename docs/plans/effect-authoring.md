@@ -212,7 +212,7 @@ Lines the core vocabulary could not express were worked by mechanic family: enco
 attack, play, deck, sidequests, misc, and for the saga box burden (the burden deck and the Ring-bearer's life, Flight to the
 Ford), south (a second active location, the Ring-bearer facedown under an enemy, an enemy engaged with every player,
 progress gates and caps; The Ring Goes South) and moria (damage tokens counting down on an objective, an enemy engaged with the
-first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark) and breaking (the Ring-bearer removed from the game, the staging area and quest stage each seat has from stage 2B, skipped phases; Breaking of the Fellowship). Whoever takes a family adds the engine support and writes the records. A
+first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark) and breaking (the Ring-bearer removed from the game, the staging area, quest stage and active location each seat has from stage 2B, progress that discards cards, a hero that falls into evil, skipped phases; Breaking of the Fellowship). Whoever takes a family adds the engine support and writes the records. A
 family owns files that are composed by the `index.ts` next to them, so families do not edit the same lists:
 
 - `src/catalog/families/<family>.ts` exports `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each
@@ -235,11 +235,8 @@ verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/version.ts`) 
 ## Not expressible yet: leave open, report
 
 `pnpm effects:open` lists the open lines in `src/effects/open-lines.ts`. Every player-card line is closed except
-two.
+the two below.
 
-- **Scenario 6, pending phase work.** Breaking of the Fellowship (cards 142060 to 142090). It is written by phase 16
-  (`docs/phases/phase-16-breaking-of-the-fellowship.md`) into `src/effects/authored/<scenario-id>.ts`, with whatever vocabulary
-  that scenario needs, and joins `src/campaign/playable.ts` when its lines are closed.
 - **21072:B:1 and 21072:B:2, not expressible (Sméagol's Gollum side).** "Immune to non-Gollum card effects. Gollum engages the
   first player" and "Forced: When Gollum is defeated, flip him to Sméagol and return him to his owner's control, exhausted."
   Side B is an enemy, but its stats appear in no source (`data/cards/ASitE.json` has the hero side only), and the engine has

@@ -35,6 +35,8 @@ function toEncounter(table: BreakingTable, state: ScenarioState): ScenarioState 
   for (let guard = 0; guard < 40 && current.phase !== "Encounter" && !current.lost; guard += 1) {
     if (current.window?.kind === "pass") current = send(table, current, { type: "Pass" });
     else if (current.window?.kind === "travel") current = send(table, current, { type: "DeclineTravel" });
+    // A stage 3B's Response to a successful quest (142063:B:3) is passed.
+    else if (current.window?.kind === "response") current = send(table, current, { type: "Pass" });
     else break;
   }
   return current;
@@ -66,7 +68,8 @@ describe("the quest phase with separate staging", () => {
   });
 
   it("compares each seat's own committed willpower with its own area's threat: progress on its own stage, or only its own threat raised", () => {
-    const table = make(layout);
+    // Frodo's Choice is in play (the area of seat 1), so a stage 3B takes progress (142063:B:1 turns it into discards while it is not).
+    const table = make({ ...layout, areas: [["grunt"], ["brute", "scout", "142068"]] });
     const after = toEncounter(table, commitBoth(table, table.state));
     // Seat 0: willpower 6 against grunt 2 + scout 1: 3 progress on its own stage. Seat 1: willpower 1 against 3 + 1 + 2: its threat rises by 5; seat 0's does not.
     expect(after.cards[after.seats[0].stage ?? ""]?.progress).toBe(3);
@@ -183,7 +186,7 @@ describe("an eliminated seat with separate staging", () => {
 
 describe("an effect's staging area and quest with separate staging", () => {
   it("are the acting seat's own: progress goes on its stage and a card added to the staging area goes to its area", () => {
-    const table = make({ areas: [["grunt"], ["scout"]], setAside: ["142073"] });
+    const table = make({ areas: [["grunt", "142068"], ["scout"]], setAside: ["142073"] });
     const stage1 = table.state.seats[1].stage ?? "";
     const steps: EngineStep[] = [];
     const progressed = runInstruction({ ...table.state, window: null }, { verb: "PlaceQuestProgress", perPlayer: 2 }, { seat: 1, sourceId: stage1 }, table.ctx, steps);
@@ -193,11 +196,11 @@ describe("an effect's staging area and quest with separate staging", () => {
     expect(progressed.questStage).toBeNull();
     const added = runInstruction({ ...table.state, window: null }, { verb: "AddSetAsideToStaging", code: "142073" }, { seat: 1, sourceId: stage1 }, table.ctx, steps);
     expect(codes(added, added.seats[1].staging)).toEqual(["scout", "142073"]);
-    expect(codes(added, added.seats[0].staging)).toEqual(["grunt"]);
-    expect(added.staging).toHaveLength(3);
+    expect(codes(added, added.seats[0].staging)).toEqual(["grunt", "142068"]);
+    expect(added.staging).toHaveLength(4);
     expect(codes(added, added.setAside)).not.toContain("142073");
     const forSeatZero = runInstruction({ ...table.state, window: null }, { verb: "AddSetAsideToStaging", code: "142073" }, { seat: 0, sourceId: stage1 }, table.ctx, steps);
-    expect(codes(forSeatZero, forSeatZero.seats[0].staging)).toEqual(["grunt", "142073"]);
+    expect(codes(forSeatZero, forSeatZero.seats[0].staging)).toEqual(["grunt", "142068", "142073"]);
   });
 });
 

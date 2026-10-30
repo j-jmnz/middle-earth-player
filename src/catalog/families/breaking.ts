@@ -41,6 +41,32 @@ export const VERBS = [
   // "When there are no encounter cards left at this stage, discard it" (142062:B:1): the shared quest stage goes to the discard pile (the set-aside pile,
   // as a defeated stage does), and each living seat in player order hears `stageDiscarded` for its own stage ("After stage 2B is discarded", 142063:A:1).
   z.strictObject({ verb: z.literal("DiscardSharedStage"), ...when }),
+  // Marker constant on Frodo's Choice ("If Frodo's Choice is discarded, reveal it instead", 142068:A:1): when a card effect discards cards from the top of the
+  // encounter deck (the progress a stage 3B turns into discards, FLAGS progressDiscards), this card is revealed by the seat whose stage it is and is not discarded.
+  z.strictObject({ verb: z.literal("RevealIfDiscarded"), ...when }),
+  // Each player at the source's stage raises their threat by `amount` ("each player at this stage raises his threat by 1", 142077:A:1): the seat whose staging
+  // area holds the source once stages are separate, every player before that.
+  z.strictObject({ verb: z.literal("RaiseThreatAtStage"), amount: z.number().int().positive(), ...when }),
+  // The source (a card in a staging area) moves to the staging area to the left, the next living seat's, if able ("River Anduin moves to the staging area to the
+  // left, if able", 142077:A:1). Nothing happens with one staging area or one seat.
+  z.strictObject({ verb: z.literal("MoveToLeftArea"), ...when }),
+  // The source (default) or the last picked enemy, in a staging area or engaged, moves to the first player's staging area ("move 1 enemy engaged with you to
+  // the first player's staging area", 142080:A:2; "move attacking enemy to the first player's staging area", 142080:A:3). With one staging area it goes to it.
+  z.strictObject({ verb: z.literal("MoveToFirstStaging"), target: z.enum(["self", "picked"]).optional(), ...when }),
+  // Fallen Into Evil (142083:A:1), attached to a non-Fellowship hero: the hero moves to the first player's staging area as an enemy (its Threat is its Willpower, its
+  // engagement cost its threat cost) and leaves its player's control. It is the same card with the code `<code>~enemy` (src/rules/printed.ts); its game text is
+  // blank while it is one.
+  z.strictObject({ verb: z.literal("FallIntoEvil"), ...when }),
+  // "If Fallen Into Evil is discarded, return attached hero to its owner's control" (142083:A:1): each fallen hero in play goes back among its owner's heroes with
+  // its own code, one defeated while it was an enemy goes to its owner's discard pile.
+  z.strictObject({ verb: z.literal("ReturnFallenHero"), ...when }),
+  // The last picked card leaves the game, and, in Campaign Mode, the campaign pool ("remove it from the game ... remove that card from the campaign pool", 142074:A:2).
+  z.strictObject({ verb: z.literal("RemoveFromGame"), ...when }),
+  // "For the rest of the game, you cannot lose control of the first player token" (142068:A:2): the table holds `firstPlayerLocked` while the source is in play, so the
+  // token does not pass at the end of the refresh phase.
+  z.strictObject({ verb: z.literal("LockFirstPlayer"), ...when }),
+  // "Take control of ... the Ring-bearer (and each card attached to it)" (142068:A:2): the Ring-bearer, if one is in play, and what is attached to it go to the actor.
+  z.strictObject({ verb: z.literal("TakeRingBearer"), ...when }),
 ] as const;
 
 export const TRIGGERS = [
@@ -51,6 +77,20 @@ export const TRIGGERS = [
 ] as const;
 
 export const FLAGS = [
+  // On a stage: progress that would be placed on the quest discards that many cards from the top of the encounter deck instead (142063:B:1 to 142066:B:1;
+  // rules/families/breaking-progress.ts).
+  "progressDiscards",
+  // On an enemy: Archery X, X the number of players at its stage (142070:A:1), the players in the game before stages are separate, one after. A number on an
+  // enemy or a location in a staging area: archery added to the total at its stage ("gains archery 2", 142078:A:1). On a seat: archery added to the total at
+  // that seat's stage until the modifier ends (142082:A:1). Read by rules/combat.ts archeryTotal.
+  "archeryPlayers",
+  "archeryBonus",
+  // On "table": the player who holds the first player token cannot lose it for the rest of the game (LockFirstPlayer, 142068:A:2); the token does not pass at the end
+  // of the refresh phase (rules/refresh.ts).
+  "firstPlayerLocked",
+  // On "table", while a card holds it: the combat phase is skipped ("While The Argonath is the active location, skip the combat phase", 142075:A:2;
+  // rules/machine.ts).
+  "skipCombat",
   // On "table": the travel phase is skipped (SkipTravelPhase, 142062:A:1; rules/machine.ts).
   "skipTravel",
   // On "table", while a card holds it: the encounter phase is skipped, with its optional engagements and engagement checks ("Skip the encounter phase",

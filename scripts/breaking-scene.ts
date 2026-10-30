@@ -60,6 +60,8 @@ export type BreakingLayout = {
   setAside?: readonly string[];
   // The cards in each seat's own staging area (separate stages).
   areas?: readonly (readonly string[])[];
+  // Each seat's own active location (separate stages), a location code, the stage's progress goes on it first.
+  active?: readonly (string | null)[];
   // Enemies engaged with a seat.
   engaged?: readonly { code: string; seat: number }[];
   // The Ring (on Frodo), and Frodo himself: `frodo: false` leaves him out, as stage 2A did (separate stages).
@@ -116,12 +118,19 @@ export function breakingTable(world: BreakingWorld, layout: BreakingLayout = {})
     for (let seat = 0; seat < seats; seat += 1) {
       const id = state.questDeck.find((candidate) => state.cards[candidate]?.code === codes[seat]);
       if (!id) continue;
-      state = updateCard({ ...state, questDeck: state.questDeck.filter((other) => other !== id) }, id, { zone: "questStage", face: "B", progress: seat === 0 ? (layout.progress ?? 0) : 0 });
+      state = updateCard({ ...state, questDeck: state.questDeck.filter((other) => other !== id) }, id, { zone: "questStage", face: "B", controller: seat, progress: seat === 0 ? (layout.progress ?? 0) : 0 });
       const owner = state.seats[seat];
       if (owner) state = withSeat(state, seat, { ...owner, stage: id });
     }
     for (let seat = 0; seat < seats; seat += 1) {
       for (const code of layout.areas?.[seat] ?? []) state = spawn(state, code, { zone: "staging", area: seat }, "up").state;
+      const active = layout.active?.[seat];
+      if (active) {
+        // The seat's own active location, mirrored into the shared slots (families/breaking-areas.ts).
+        const made = spawn(state, active, { zone: "activeLocation" }, "up");
+        const owner = made.state.seats[seat];
+        state = owner ? withSeat({ ...made.state, activeLocation: seat === 0 ? made.id : state.activeLocation, secondActiveLocation: seat === 1 ? made.id : state.secondActiveLocation }, seat, { ...owner, active: made.id }) : made.state;
+      }
     }
   }
   const phase = layout.phase ?? "Quest";

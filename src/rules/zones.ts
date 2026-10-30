@@ -106,9 +106,8 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return withSeat(state, at, rest);
     }
     case "activeLocation":
-      return state.activeLocation === id ? { ...state, activeLocation: null } : state;
     case "secondActiveLocation":
-      return state.secondActiveLocation === id ? { ...state, secondActiveLocation: null } : state;
+      return leaveActive(state, id);
     case "under":
     case "captive":
       return updateCard(state, id, { host: null });
@@ -121,6 +120,21 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     default:
       return state;
   }
+}
+
+// A location leaves an active slot: the shared ones, and once stages are separate the seat's own (`Seat.active`, families/breaking-areas.ts).
+function leaveActive(state: ScenarioState, id: string): ScenarioState {
+  let next = state;
+  if (next.activeLocation === id) next = { ...next, activeLocation: null };
+  if (next.secondActiveLocation === id) next = { ...next, secondActiveLocation: null };
+  if (!next.separate) return next;
+  for (let index = 0; index < next.seats.length; index += 1) {
+    const seat = next.seats[index];
+    if (seat?.active !== id) continue;
+    const { active: _active, ...rest } = seat;
+    next = withSeat(next, index, rest);
+  }
+  return next;
 }
 
 // The additional shadow cards of an enemy. The field is left off when there are none.

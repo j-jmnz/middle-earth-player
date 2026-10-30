@@ -16,6 +16,7 @@ import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { VERBS } from "../../catalog/families/breaking.ts";
 import { areaOf, mergeView, viewOf } from "./breaking-areas.ts";
+import { runCards } from "./breaking-cards.ts";
 import { ringBearerId } from "./burden-deck.ts";
 
 // The verbs src/catalog/families/breaking.ts adds. Null when the verb is not one of them. `DealOutStaging` is expanded by the effect frame
@@ -43,7 +44,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DiscardSharedStage":
       return discardSharedStage(state);
     default:
-      return null;
+      return runCards(state, instruction, focus, ctx, steps);
   }
 }
 
@@ -67,7 +68,8 @@ function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, 
     next = releaseAttachments(noteHostDefeated(next, currentId), currentId, ctx.cards, steps);
     next = moveCard(next, currentId, { zone: "setAside" });
   }
-  next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B" });
+  // The seat controls its own stage once stages are separate: the Forced effects and Responses of a stage are about its own seat (mec109.multiple-staging-areas).
+  next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
   steps.push({ kind: "advance", cardId: nextId });
   return afterProgress(next, before, ctx, steps);
 }
@@ -113,9 +115,12 @@ function placeDiscardUnderDeck(state: ScenarioState): ScenarioState {
 function startSeparateStage(state: ScenarioState, code: string, seat: number): ScenarioState {
   const id = state.questDeck.find((candidate) => state.cards[candidate]?.code === code);
   if (!id || !state.seats[seat]) return state;
-  const separate: ScenarioState = { ...state, separate: true };
+  // An active location of the shared stages goes back to the staging area, so it is dealt out with the rest (a seat's own slot is empty).
+  let shared = state;
+  for (const location of [state.activeLocation, state.secondActiveLocation]) if (location && !state.separate) shared = moveCard(shared, location, { zone: "staging" });
+  const separate: ScenarioState = { ...shared, separate: true };
   const view = { ...viewOf(separate, seat), questStage: null };
-  return mergeView(separate, seat, updateCard(moveCard(view, id, { zone: "questStage" }), id, { face: "B" }));
+  return mergeView(separate, seat, updateCard(moveCard(view, id, { zone: "questStage" }), id, { face: "B", controller: seat }));
 }
 
 // MovePickedToOwnStaging (142062:B:1): the last picked card, in the shared staging area, goes to the acting seat's staging area.

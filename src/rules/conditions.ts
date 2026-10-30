@@ -9,7 +9,7 @@ import { seatThreat } from "./families/play-hooks.ts";
 import { distinctTraitCount, flaggedTrait } from "./families/misc-traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
-import { modifiedStat, versusHighEngagement } from "./keywords.ts";
+import { modifiedStat, versusDefender, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { stagingThreat } from "./quest.ts";
@@ -150,6 +150,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return (state.stagesReached ?? []).includes(condition.code) === condition.is;
     case "inPlay":
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
+    case "versusDefender": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && versusDefender(state, holder, condition.maxHitPoints, ctx.cards);
+    }
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
@@ -209,6 +213,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const card = id ? state.cards[id] : undefined;
       if (!id || !card) return false;
       if (condition.inPlay != null && inPlay(card.zone) !== condition.inPlay) return false;
+      if (condition.inStaging != null && (card.zone === "staging") !== condition.inStaging) return false;
       // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
       if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
       return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);

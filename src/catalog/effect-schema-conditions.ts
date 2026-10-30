@@ -105,6 +105,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // and the attacking enemy's engagement cost is higher than its controller's threat. `attacking`: the holder is
   // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
+  // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
+  // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/keywords.ts).
+  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0) }),
   // The source card is attached to a card with this name.
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
   // The actor controls a hero or ally in play with this code.
@@ -133,6 +136,8 @@ const atomSchema = z.discriminatedUnion("kind", [
     card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]),
     pick: pickSchema.optional(),
     inPlay: z.boolean().optional(),
+    // The card is in a staging area now (`false`: it is not): "raise your threat by its Threat to engage that enemy" needs the enemy still there (142067:B:2).
+    inStaging: z.boolean().optional(),
   }),
   // At most `max` other copies of the source card were played from the hand this round ("if this is the first time you
   // played a copy of ~ this round"); a card played again counts its earlier play. `you`: only the actor's plays count.
@@ -214,8 +219,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking" || condition?.kind === "versusDefender";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [

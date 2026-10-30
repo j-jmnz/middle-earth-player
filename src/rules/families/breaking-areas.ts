@@ -7,6 +7,10 @@
 //   is true from then on. Every card in an area is still in the zone `staging`, and `ScenarioState.staging` still lists every staging card in any
 //   area plus the cards in no area yet (the shared staging area stage 2B empties), so the code that does not care which area reads it unchanged.
 //   `ScenarioState.questStage`, the shared stage, is null while stages are separate.
+// - Each seat has an active location of its own at its stage (`Seat.active`, the card in the zone activeLocation): the quest only applies to a player's own stage
+//   (mec109.multiple-staging-areas), and the active location takes that quest's progress first (rr.active-location). `ScenarioState.activeLocation` and
+//   `secondActiveLocation` mirror seat 0's and seat 1's active location, so code that reads them outside a seat's view still sees them; in a seat's view
+//   `activeLocation` is that seat's and `secondActiveLocation` is null.
 // - A game that never separates has no `separate`, empty seat lists and no `Seat.stage`, so each function here returns what the shared state holds.
 // - The engine asks per seat through `viewOf`: the state as that seat sees it, with `staging` its own area and `questStage` its own stage, so
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
@@ -63,7 +67,19 @@ export function viewOf(state: ScenarioState, seat: number | undefined): Scenario
   if (!state.separate || seat == null) return state;
   const owner = state.seats[seat];
   if (!owner) return state;
-  return { ...state, staging: owner.staging, questStage: owner.stage ?? null, viewSeat: seat };
+  return { ...state, staging: owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: seat };
+}
+
+// The seat's active location, or the shared one when stages are not separate.
+export function activeOf(state: ScenarioState, seat: number): string | null {
+  return state.separate ? (state.seats[seat]?.active ?? null) : state.activeLocation;
+}
+
+// The shared slots mirror the seats' active locations (see the header).
+function mirrored(state: ScenarioState): ScenarioState {
+  const first = state.seats[0].active ?? null;
+  const second = state.seats[1].active ?? null;
+  return state.activeLocation === first && state.secondActiveLocation === second ? state : { ...state, activeLocation: first, secondActiveLocation: second };
 }
 
 // What a function did to a view of the seat, written back: the seat's own area and stage take the view's, the other seats' areas are the view's
@@ -75,13 +91,13 @@ export function mergeView(state: ScenarioState, seat: number | undefined, view: 
   const now = view.staging;
   const seats: [typeof view.seats[0], typeof view.seats[1]] = [view.seats[0], view.seats[1]];
   const owner = seats[seat];
-  const { stage: _old, ...rest } = owner;
-  seats[seat] = view.questStage != null ? { ...rest, staging: now, stage: view.questStage } : { ...rest, staging: now };
+  const { stage: _old, active: _active, ...rest } = owner;
+  seats[seat] = { ...rest, staging: now, ...(view.questStage != null ? { stage: view.questStage } : {}), ...(view.activeLocation != null ? { active: view.activeLocation } : {}) };
   const kept = state.staging.filter((id) => !was.includes(id) || now.includes(id));
   const added = now.filter((id) => !state.staging.includes(id));
   const { viewSeat: _seat, ...plain } = view;
   const merged: ScenarioState = { ...plain, seats, questStage: state.questStage, staging: [...kept, ...added] };
-  return { ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") };
+  return mirrored({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
 }
 
 // Runs `act` on the seat's view and writes the result back.
@@ -90,13 +106,14 @@ export function withView(state: ScenarioState, seat: number | undefined, act: (v
   return mergeView(state, seat, act(viewOf(state, seat)));
 }
 
-// An eliminated seat's stage and the encounter cards at it are discarded (mec109.multiple-staging-areas): the cards in its staging area go to the
+// An eliminated seat's stage and the encounter cards at it are discarded (mec109.multiple-staging-areas): the cards in its staging area, its active location, go to the
 // encounter discard pile and its stage card to the set-aside pile, as a defeated stage does. Nothing happens when the seat has neither.
 export function discardArea(state: ScenarioState, seat: number): ScenarioState {
   const owner = state.seats[seat];
   if (!state.separate || !owner) return state;
   let next = state;
   for (const id of owner.staging) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  if (owner.active) next = updateCard(moveCard(next, owner.active, { zone: "encounterDiscard" }), owner.active, { face: "up", controller: null });
   if (owner.stage) next = moveCard(next, owner.stage, { zone: "setAside" });
   return next;
 }

@@ -22,6 +22,7 @@ import { freeSlot, placeOnActive } from "./families/south-locations.ts";
 import { noteQuestPlaced, questRoom } from "./families/caves-progress.ts";
 import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts";
 import { viewOf, withView } from "./families/breaking-areas.ts";
+import { oweDiscards } from "./families/breaking-progress.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -146,6 +147,11 @@ export function placeQuestProgress(
   let next = placedOn.state;
   let remaining = placedOn.remaining;
   if (remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps, questing));
+  // Progress a stage turns into discards from the encounter deck (families/breaking-progress.ts).
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressDiscards")) {
+    next = oweDiscards(next, remaining);
+    remaining = 0;
+  }
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];

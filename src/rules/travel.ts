@@ -10,8 +10,17 @@ import { travelTo } from "./quest.ts";
 import { offerResponses } from "./responses.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { markReached } from "./state.ts";
+import { withView } from "./families/breaking-areas.ts";
+import { livingSeats, markReached } from "./state.ts";
 import { fireForced } from "./triggers.ts";
+
+// A seat's travel opportunity is taken or declined. Stages that are separate give each living seat one in player order, so the Travel phase's opportunity is
+// over only when the last has had its own (mec109.multiple-staging-areas); with one staging area it is over at once.
+export function travelTaken(state: ScenarioState): ScenarioState {
+  if (state.separate && livingSeats(state).some((seat) => !(state.travelDone ?? []).includes(seat))) return state;
+  const { travelDone: _done, ...rest } = state;
+  return markReached(rest, "traveled");
+}
 
 const TRAVEL_HERE: Instruction = { verb: "Travel", to: "self" };
 
@@ -23,7 +32,7 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
   const traveled = travelTo(state, locationId, ctx.cards);
   if (!traveled) return null;
   // The travel opportunity is taken; the Travel phase ends after the window that follows it (rr.framework-steps, 4.2).
-  const moved = traveled.mode === "travel" ? markReached(traveled, "traveled") : traveled;
+  const moved = traveled.mode === "travel" ? travelTaken(traveled) : traveled;
   const offered = offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
   // A Forced effect "After travelling to ~" (01107:A:1) resolves before the Responses, as every Forced effect does (rr.forced).
   const forced = fireForced(offered, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
@@ -39,15 +48,22 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
   const effects = textBlank(state, locationId) ? [] : ctx.effects.filter((effect) => effect.cardCode === location.code && effect.timing === "travel");
   const first = effects[0];
   if (!first) {
-    const traveled = travelNow(state, locationId, ctx, steps);
-    return traveled ? { ...traveled, window: null } : state;
+    // Once stages are separate the seat travels to its own active location (families/breaking-areas.ts).
+    let refused = false;
+    const traveled = withView(state, state.separate ? state.activeSeat : undefined, (view) => {
+      const moved = travelNow(view, locationId, ctx, steps);
+      refused = moved == null;
+      return moved ?? view;
+    });
+    return refused ? state : { ...traveled, window: null };
   }
   return pushEffectFrame(
     { ...state, window: null },
     {
       frame: "travel",
       sourceId: locationId,
-      actor: state.firstPlayer,
+      // The seat that travels, once stages are separate; the first player otherwise (rr.first-player).
+      actor: state.separate ? state.activeSeat : state.firstPlayer,
       peril: false,
       effectId: first.id,
       instructions: [...effects.flatMap((effect) => effect.instructions), TRAVEL_HERE],
