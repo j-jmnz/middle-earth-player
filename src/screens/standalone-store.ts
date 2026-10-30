@@ -2,7 +2,8 @@ import { desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseSeatCount } from "../campaign/save";
-import { parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../campaign/standalone";
+import { droppedIfStale, parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../campaign/standalone";
+import { CATALOG_VERSION } from "../catalog/version";
 import { stored } from "./campaign-store";
 import { standaloneGames } from "./user-schema";
 
@@ -53,6 +54,17 @@ function listedRow(row: { id: string; campaignId: string; scenarioId: string; se
 // The open games, the newest first. An archived game is listed by listArchivedStandalone.
 export function listStandalone<TRun>(user: UserDb<TRun>): ListedStandalone[] {
   return user.select(listed).from(standaloneGames).where(isNull(standaloneGames.archivedAt)).orderBy(desc(standaloneGames.createdAt)).all().map(listedRow);
+}
+
+// The open games as a screen shows them: a game in progress from another engine version or against other card data is dropped on the
+// read, as a campaign save's open scenario is, and the drop is written; the row and its loadout stay.
+export function listStandaloneFresh<TRun>(user: UserDb<TRun>): ListedStandalone[] {
+  return listStandalone(user).map((game) => {
+    const dropped = droppedIfStale(game, CATALOG_VERSION);
+    if (!dropped) return game;
+    writeStandaloneActive(user, dropped);
+    return dropped;
+  });
 }
 
 // The archived games, the last one put away first.

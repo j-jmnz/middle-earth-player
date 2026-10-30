@@ -5,11 +5,13 @@ import { describe, expect, it } from "vitest";
 import migrations from "../../drizzle/migrations";
 import { ENGINE_VERSION } from "../campaign/replay";
 import type { StandaloneGame } from "../campaign/standalone";
+import { CATALOG_VERSION } from "../catalog/version";
 import {
   archiveStandalone,
   deleteStandalone,
   listArchivedStandalone,
   listStandalone,
+  listStandaloneFresh,
   newStandaloneId,
   readStandalone,
   restoreStandalone,
@@ -46,6 +48,17 @@ function listing(game: StandaloneGame) {
 }
 
 describe("standalone store", () => {
+  it("listStandaloneFresh drops and writes a game played on other data, and leaves a current one", () => {
+    const user = openUser();
+    writeStandalone(user, gameOf("game-old"), 1000);
+    writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: 3, intents: [] } }), 2000);
+    const listed = listStandaloneFresh(user);
+    expect(listed.find((game) => game.id === "game-old")?.active).toBeNull();
+    expect(listed.find((game) => game.id === "game-new")?.active).not.toBeNull();
+    expect(readStandalone(user, "game-old")?.game).toMatchObject({ active: null, loadout: gameOf("game-old").loadout });
+    expect(readStandalone(user, "game-new")?.game.active).not.toBeNull();
+  });
+
   it("writeStandaloneActive changes only the open game, and a list row carries its version and hash", () => {
     const user = openUser();
     const game = gameOf("game-w");

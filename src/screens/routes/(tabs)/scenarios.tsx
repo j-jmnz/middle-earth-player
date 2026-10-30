@@ -3,26 +3,25 @@ import { useCallback, useState } from "react";
 import { View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
-import { droppedIfStale, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
-import { CATALOG_VERSION } from "../../../catalog/version";
+import { standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { BOXES, boxOf, scenarioName, scenarioOf } from "../../campaign-data";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
-import { Eyebrow, PillButton, PrimaryButton } from "../../chrome";
+import { PillButton, PrimaryButton } from "../../chrome";
 import { deckFaces } from "../../deck-store";
 import { useDatabases } from "../../databases";
 import { FoldSection, useFolds } from "../../fold-section";
 import { heroFace } from "../../hero-tile";
-import { CatalogGrid, CatalogTile, HubPage, LockedTiles, PrimaryPlate, RunHero, RunRow, type PartyHero } from "../../hub-parts";
+import { CatalogGrid, CatalogTile, HubPage, leadFace, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow, type PartyHero } from "../../hub-parts";
 import { comingScenarios, splitRuns } from "../../hub-runs";
 import { usePalette } from "../../palette-hook";
 import { seatWord } from "../../seats";
 import { gameCaption, statusWord } from "../../standalone-words";
-import { listStandalone, writeStandaloneActive } from "../../standalone-store";
-import { SPHERE_TINT } from "../../../play/icon-map";
+import { listStandaloneFresh } from "../../standalone-store";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
 
-// The Scenarios hub (docs/design-system.md, Scenarios): the game in progress dealt last as the hero over its scenario's scene, the
+// Standalone play (mec109.campaign-mode: "players can still play the scenarios as standalone adventures"). The Scenarios hub
+// (docs/design-system.md, Scenarios): the game in progress dealt last as the hero over its scenario's scene, the
 // other games in progress as rows, one fold per box holding the scenarios it can deal, then Coming later. Finished and archived games
 // are in History. Reads the scenario files, user.db and the campaigns and heroes the catalog names.
 export default function Scenarios() {
@@ -37,16 +36,7 @@ export default function Scenarios() {
 
   useFocusEffect(
     useCallback(() => {
-      // A game in progress from another engine version or against other card data is dropped on the read, as a campaign
-      // save's open scenario is; the row and its loadout stay.
-      setGames(
-        listStandalone(user).map((game) => {
-          const dropped = droppedIfStale(game, CATALOG_VERSION);
-          if (!dropped) return game;
-          writeStandaloneActive(user, dropped);
-          return dropped;
-        }),
-      );
+      setGames(listStandaloneFresh(user));
     }, [user]),
   );
 
@@ -61,51 +51,40 @@ export default function Scenarios() {
   const { hero, others } = splitRuns(games, (game) => standaloneStatus(game) === "playing");
   const seatsOf = (game: ListedStandalone) => game.loadout?.seats.map((seat) => seat.heroes) ?? [];
   const faces = deckFaces(catalog, [hero, ...others].flatMap((game) => (game ? seatsOf(game).flat() : [])));
-  const leadOf = (game: ListedStandalone): PartyHero | null => {
-    const code = seatsOf(game)[0]?.[0];
-    const face = code ? faces.get(code) : undefined;
-    if (!code || !face) return null;
-    const tint = SPHERE_TINT[face.sphereCode ?? ""];
-    return { card: { code, imagesrc: face.imagesrc }, name: face.name, tint: tint && tint !== "faint" ? palette[tint] : undefined };
-  };
+  const leadOf = (game: ListedStandalone): PartyHero | null => leadFace(faces, seatsOf(game)[0]?.[0], palette);
   const spoken = (game: ListedStandalone) => `${scenarioName(game.scenarioId)}, ${gameCaption(game)}`;
 
   const heroBlock = hero ? (
-    // Under its words the hero holds the screen's one primary, Resume.
-    <View testID="current-game" style={{ gap: 18 * s }}>
-      <RunHero
-        overline={`In progress · ${seatWord(hero.seatCount)}`}
-        title={scenarioName(hero.scenarioId)}
-        detail={detailOf(hero)}
-        seats={seatsOf(hero).map((seat) => seat.map((code) => heroFace(faces, code)))}
-        testID="continue-game"
-      />
-      <PrimaryPlate>
-        <PrimaryButton label="Resume" testID={`resume-${hero.id}`} accessibilityLabel={`Resume ${spoken(hero)}`} onPress={() => resume(hero)} />
-      </PrimaryPlate>
-    </View>
+    <RunHero
+      overline={`In progress · ${seatWord(hero.seatCount)}`}
+      title={scenarioName(hero.scenarioId)}
+      detail={detailOf(hero)}
+      seats={seatsOf(hero).map((seat) => seat.map((code) => heroFace(faces, code)))}
+      testID="continue-game"
+    />
+  ) : null;
+  // Under its words the hero holds the screen's one primary, Resume.
+  const heroAction = hero ? (
+    <PrimaryPlate>
+      <PrimaryButton label="Resume" testID={`resume-${hero.id}`} accessibilityLabel={`Resume ${spoken(hero)}`} onPress={() => resume(hero)} />
+    </PrimaryPlate>
   ) : null;
 
-  const grid = size === "medium";
   const othersBlock =
     others.length > 0 ? (
-      <View testID="other-games" style={{ gap: 10 * s }}>
-        <Eyebrow>Other games</Eyebrow>
-        <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
-          {others.map((game) => (
-            <View key={game.id} style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>
-              <RunRow
-                testID={`other-game-${game.id}`}
-                title={scenarioName(game.scenarioId)}
-                line={`${seatWord(game.seatCount)} · ${game.loadout?.difficulty ?? ""} · On the table`}
-                lead={leadOf(game)}
-                accessibilityLabel={`Resume ${spoken(game)}`}
-                onPress={() => resume(game)}
-              />
-            </View>
-          ))}
-        </View>
-      </View>
+      <OtherRuns testID="other-games" title="Other games">
+        {others.map((game) => (
+          <RunRow
+            key={game.id}
+            testID={`other-game-${game.id}`}
+            title={scenarioName(game.scenarioId)}
+            line={[seatWord(game.seatCount), game.loadout?.difficulty, "On the table"].filter((part) => part != null).join(" · ")}
+            lead={leadOf(game)}
+            accessibilityLabel={`Resume ${spoken(game)}`}
+            onPress={() => resume(game)}
+          />
+        ))}
+      </OtherRuns>
     ) : null;
 
   // How a scenario stands, from its latest game: won with its score, in progress, or its quest stages.
@@ -117,8 +96,8 @@ export default function Scenarios() {
     const stages = scenarioOf(id)?.stages.length ?? 0;
     return { line: stages > 0 ? `${stages} quest ${stages === 1 ? "stage" : "stages"}` : "", tone: palette.faint };
   };
-  // A tablet shows each box as poster tiles: six across in landscape, three in portrait. A phone lists them as 64 pt rows.
-  const posters = size === "expanded" ? 6 : size === "medium" ? 3 : 0;
+  // A tablet shows each box as poster tiles: six across in landscape, four in portrait. A phone lists them as 64 pt rows.
+  const posters = size === "expanded" ? 6 : size === "medium" ? 4 : 0;
   const boxes = BOXES.flatMap((box) => {
     const playable = box.scenarios.flatMap((id, index) => (isPlayable(id) ? [{ id, number: index + 1 }] : []));
     return playable.length > 0 ? [{ box, playable }] : [];
@@ -155,9 +134,11 @@ export default function Scenarios() {
     <HubPage
       testID="scenarios"
       title="Scenarios"
-      actions={<PillButton label="History" testID="history-open" accessibilityLabel="History of finished games" onPress={() => router.push({ pathname: "/history", params: { kind: "standalone" } })} />}
+      actions={<PillButton label="History" testID="history-open" accessibilityLabel="History: games in progress, finished and archived" onPress={() => router.push({ pathname: "/history", params: { kind: "standalone" } })} />}
       subtitle="Standalone adventures. No campaign log, boons or burdens."
       hero={heroBlock}
+      heroAction={heroAction}
+      heroTestID="current-game"
       sceneId={hero?.scenarioId}
       others={othersBlock}
       catalog={catalogBlock}

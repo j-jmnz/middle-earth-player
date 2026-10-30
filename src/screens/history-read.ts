@@ -3,13 +3,12 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import type { RunRecord } from "../campaign/runs";
-import { droppedIfStale, type ListedStandalone } from "../campaign/standalone";
-import { CATALOG_VERSION } from "../catalog/version";
+import type { ListedStandalone } from "../campaign/standalone";
 import { campaignOf } from "./campaign-data";
 import { listArchivedSaves, listSaves, type ListedSave } from "./campaign-store";
 import { listRuns } from "./run-store";
-import { saveLine, type SaveLine } from "./save-panels";
-import { listArchivedStandalone, listStandalone, writeStandaloneActive } from "./standalone-store";
+import { saveLine, type SaveLine } from "./save-line";
+import { listArchivedStandalone, listStandaloneFresh } from "./standalone-store";
 
 type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
@@ -27,13 +26,7 @@ export function readLibrary<TRun>(user: UserDb<TRun>): Library {
     runs: listRuns(user),
     saves: listSaves(user).map(worded),
     archivedSaves: listArchivedSaves(user).map(worded),
-    // A game in progress from another engine version or against other card data is dropped on the read, as the Scenarios hub does.
-    games: listStandalone(user).map((game) => {
-      const dropped = droppedIfStale(game, CATALOG_VERSION);
-      if (!dropped) return game;
-      writeStandaloneActive(user, dropped);
-      return dropped;
-    }),
+    games: listStandaloneFresh(user),
     archivedGames: listArchivedStandalone(user),
   };
 }

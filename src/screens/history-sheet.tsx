@@ -1,6 +1,7 @@
-// The sheet a playthrough's or a game's ⋯ opens in History (docs/design-system.md, History): where it goes (a playthrough's path and
-// log; a game's table or outcome, and Play again) and what keeps it or ends it (Archive or Restore, and Delete, asked twice in place).
-// Each change is announced, refreshes the list and closes the sheet; a way out closes it and then goes.
+// The sheet a playthrough's or a game's ⋯ opens in History (docs/design-system.md, History): the way out is its one primary (a
+// playthrough's path; a game's table, outcome or Play again), the other ways out and what keeps it or ends it (Archive or Restore, and
+// Delete, asked twice in place) are centred text buttons under it. Each change is announced, refreshes the list and closes the sheet;
+// a way out closes it and then goes.
 import { useRouter, type Href } from "expo-router";
 import { useState } from "react";
 import { AccessibilityInfo, View } from "react-native";
@@ -9,12 +10,12 @@ import type { RunRecord } from "../campaign/runs";
 import { standaloneStatus, type ListedStandalone } from "../campaign/standalone";
 import { scenarioName } from "./campaign-data";
 import { archiveSave, deleteSave, restoreSave } from "./campaign-store";
-import { PaperSheet, TextButton } from "./chrome";
+import { PaperSheet, PrimaryButton, TextButton } from "./chrome";
 import { useDatabases } from "./databases";
 import type { LibrarySave } from "./history-read";
 import { KeepOrDelete } from "./keep-or-delete";
 import { pathHref } from "./scenario-links";
-import { DELETE_SENTENCE, describe } from "./save-panels";
+import { DELETE_SENTENCE, describe } from "./save-line";
 import { SheetModal } from "./sheet-modal";
 import { archiveStandalone, deleteStandalone, restoreStandalone } from "./standalone-store";
 import { gameCaption } from "./standalone-words";
@@ -26,10 +27,13 @@ export type RefTarget = { kind: "campaign"; ref: LibrarySave; archived: boolean 
 const DELETE_GAME = "Delete this game? It is gone for good. Your decks stay.";
 
 export function HistorySheet({ target, onClose, onChanged }: { target: RefTarget | null; onClose: () => void; onChanged: () => void }) {
+  // The last target stays rendered while the sheet closes, so its fade does not show an empty scrim. Each opening is its own sheet, so a
+  // delete that was asked is not carried to the next time.
+  const [shown, setShown] = useState<{ target: RefTarget; opening: number } | null>(null);
+  if (target && shown?.target !== target) setShown({ target, opening: (shown?.opening ?? 0) + 1 });
   return (
     <SheetModal visible={target != null} onRequestClose={onClose} scrimLabel="Close actions">
-      {/* Keyed by what it is for, so a delete that was asked is not carried to another one. */}
-      {target ? <RefSheet key={target.kind === "campaign" ? target.ref.id : target.game.id} target={target} onClose={onClose} onChanged={onChanged} /> : null}
+      {shown ? <RefSheet key={shown.opening} target={shown.target} onClose={onClose} onChanged={onChanged} /> : null}
     </SheetModal>
   );
 }
@@ -78,8 +82,8 @@ function CampaignSheet({ target, onClose, onChanged }: { target: Extract<RefTarg
   }
   return (
     <PaperSheet step={`${line.seats} · ${line.done} of ${line.total} completed`} title={line.name}>
-      <View className="-mx-3 flex-row flex-wrap">
-        <TextButton label="Open path" tone="ink" testID="ref-path" accessibilityLabel={`Path of ${described}`} onPress={() => go(pathHref(id))} />
+      <PrimaryButton label="Open path" surface="paper" testID="ref-path" accessibilityLabel={`Path of ${described}`} onPress={() => go(pathHref(id))} />
+      <View className="mt-2 flex-row justify-center">
         <TextButton label="Campaign log" tone="ink" testID="ref-log" accessibilityLabel={`Log of ${described}`} onPress={() => go({ pathname: "/log/[saveId]", params: { saveId: id } })} />
       </View>
       <KeepOrDelete paper id={id} described={described} sentence={DELETE_SENTENCE} keep={keep} confirming={confirming} onAskDelete={() => askDelete(DELETE_SENTENCE)} onDelete={remove} onKeep={() => setConfirming(false)} />
@@ -97,15 +101,27 @@ function GameSheet({ target, onClose, onChanged }: { target: Extract<RefTarget, 
   const keep = archived
     ? { label: "Restore" as const, onPress: () => change("Restored", () => restoreStandalone(user, game.id)) }
     : { label: "Archive" as const, onPress: () => change("Archived", () => archiveStandalone(user, game.id)) };
+  const table = () => go({ pathname: "/standalone/table/[gameId]", params: { gameId: game.id } });
+  const outcome = () => go({ pathname: "/standalone/outcome/[gameId]", params: { gameId: game.id } });
+  const again = () => go({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: game.scenarioId, from: game.id } });
+  const playAgain = { label: "Play again", testID: "ref-again", accessibilityLabel: `Play ${scenario} again`, onPress: again };
+  // The one primary is the way the game goes on: its table while it is playing, else its outcome, else dealing it again.
+  const primary = playing
+    ? { label: "Resume", testID: "ref-resume", accessibilityLabel: `Resume ${described}`, onPress: table }
+    : run
+      ? { label: "Outcome", testID: "ref-outcome", accessibilityLabel: `Outcome of ${described}`, onPress: outcome }
+      : game.loadout
+        ? playAgain
+        : null;
+  const second = !playing && run && game.loadout ? playAgain : null;
   return (
     <PaperSheet step={gameCaption(game)} title={scenario}>
-      <View className="-mx-3 flex-row flex-wrap">
-        {playing ? <TextButton label="Resume" tone="ink" testID="ref-resume" accessibilityLabel={`Resume ${described}`} onPress={() => go({ pathname: "/standalone/table/[gameId]", params: { gameId: game.id } })} /> : null}
-        {!playing && run ? <TextButton label="Outcome" tone="ink" testID="ref-outcome" accessibilityLabel={`Outcome of ${described}`} onPress={() => go({ pathname: "/standalone/outcome/[gameId]", params: { gameId: game.id } })} /> : null}
-        {!playing && game.loadout ? (
-          <TextButton label="Play again" tone="ink" testID="ref-again" accessibilityLabel={`Play ${scenario} again`} onPress={() => go({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: game.scenarioId, from: game.id } })} />
-        ) : null}
-      </View>
+      {primary ? <PrimaryButton label={primary.label} surface="paper" testID={primary.testID} accessibilityLabel={primary.accessibilityLabel} onPress={primary.onPress} /> : null}
+      {second ? (
+        <View className="mt-2 flex-row justify-center">
+          <TextButton label={second.label} tone="ink" testID={second.testID} accessibilityLabel={second.accessibilityLabel} onPress={second.onPress} />
+        </View>
+      ) : null}
       <KeepOrDelete paper id={game.id} described={described} sentence={DELETE_GAME} keep={keep} confirming={confirming} onAskDelete={() => askDelete(DELETE_GAME)} onDelete={() => change("Deleted", () => deleteStandalone(user, game.id))} onKeep={() => setConfirming(false)} />
     </PaperSheet>
   );

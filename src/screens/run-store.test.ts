@@ -8,7 +8,7 @@ import { newSave } from "../campaign/save";
 import type { RunRecord } from "../campaign/runs";
 import type { StandaloneGame } from "../campaign/standalone";
 import { createSave, deleteSave, writeSave } from "./campaign-store";
-import { backfillRunTable, existingRefs, listRuns, writeRun } from "./run-store";
+import { backfillRunTable, listRuns, writeRun } from "./run-store";
 import { deleteStandalone, writeStandalone } from "./standalone-store";
 
 function openUser() {
@@ -55,20 +55,17 @@ describe("run store", () => {
     expect(listRuns(user)).toEqual([run()]);
   });
 
-  it("keeps a run when its save or game is deleted, and reports that it is gone", () => {
+  it("keeps a run when its save or game is deleted", () => {
     const user = openUser();
     const save = createSave(user, "fellowship-of-the-ring", 1, 1000);
     writeRun(user, run({ refId: save.id, id: `campaign:${save.id}:x:1` }));
-    expect(existingRefs(user).saves.has(save.id)).toBe(true);
     deleteSave(user, save.id);
     expect(listRuns(user)).toHaveLength(1);
-    expect(existingRefs(user).saves.has(save.id)).toBe(false);
     const game: StandaloneGame = { id: "game-1", campaignId: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", seatCount: 1, loadout: null, active: null, result: { outcome: "lost", reason: "Threat reached 50", rounds: 2 } };
     writeStandalone(user, game, 5);
     writeRun(user, run({ id: "standalone:game-1", kind: "standalone", refId: "game-1", campaignId: null }));
     deleteStandalone(user, "game-1");
     expect(listRuns(user)).toHaveLength(2);
-    expect(existingRefs(user).games.has("game-1")).toBe(false);
   });
 
   it("back-fills each won scenario of a save and each finished standalone game, once", () => {

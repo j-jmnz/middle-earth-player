@@ -31,7 +31,7 @@ export function KeepOrDelete({
     return (
       <View className="mt-3 gap-1" testID={`delete-confirm-${id}`}>
         {paper ? <Text className="text-body text-ink">{sentence}</Text> : <BodyText tone="danger">{sentence}</BodyText>}
-        <View className="-mx-3 flex-row">
+        <View className="flex-row justify-center">
           <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone={paper ? "ink" : "danger"} accessibilityLabel={`Delete ${described}, for good`} onPress={onDelete} />
           <TextButton label="Keep" testID={`delete-no-${id}`} tone={paper ? "ink" : "bone"} accessibilityLabel={`Keep ${described}`} onPress={onKeep} />
         </View>
@@ -39,7 +39,7 @@ export function KeepOrDelete({
     );
   }
   return (
-    <View className="-mx-3 mt-2 flex-row">
+    <View className="mt-2 flex-row justify-center">
       <TextButton label={keep.label} testID={`${keep.label.toLowerCase()}-${id}`} tone={paper ? "ink" : "accent"} accessibilityLabel={`${keep.label} ${described}`} onPress={keep.onPress} />
       <TextButton label="Delete" testID={`delete-${id}`} tone={paper ? "ink" : "danger"} accessibilityLabel={`Delete ${described}`} onPress={onAskDelete} />
     </View>

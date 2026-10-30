@@ -264,10 +264,10 @@ Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaign
 
 | Route | Reads | Writes |
 | --- | --- | --- |
-| Campaign list | `saves`, `campaigns`, the campaign file's scenario names | nothing. It reads saves through `campaign-store` and does not query `cards`. The first unfinished save's next step (`nextStep` in `src/campaign/path.ts`) opens the table, the briefing or the path. |
-| Campaign setup | `campaigns`, the campaign file, open and archived `saves` (their logs, for the carry-over offers) | a new save: id, campaign id, seat count, the carry-over taken |
-| Scenarios | `standalone_games`, the scenario files, `PLAYABLE_SCENARIOS` | an open game from another engine version or data hash dropped on the read. It does not query `cards`. |
-| History | `runs`, `saves` and `standalone_games` (open and archived), the campaign files | `saves.archivedAt` and `standalone_games.archivedAt` on Archive and Restore; a deleted save's or game's row (a deleted playthrough's open scenario is recorded as a run first, `recordUnclosedRun`) |
+| Campaign list | `saves`, `campaigns`, the campaign file's scenario names, `cards` (through `deckFaces`: the heroes' names and faces only) | nothing. It reads saves through `campaign-store`. The first unfinished save's next step (`nextStep` in `src/campaign/path.ts`) opens the table, the briefing or the path. |
+| Campaign setup | `campaigns`, the campaign file, open and archived `saves` (their logs, for the carry-over offers), `cards` (through `deckFaces`: names only) | a new save: id, campaign id, seat count, the carry-over taken |
+| Scenarios | `standalone_games`, the scenario files, `PLAYABLE_SCENARIOS`, `campaigns` (the locked boxes), `cards` (through `deckFaces`: the hero's and the other games' heroes' names and faces only) | an open game from another engine version or data hash dropped on the read (`listStandaloneFresh`). |
+| History | `runs`, `saves` and `standalone_games` (open and archived), the campaign files, `cards` (through `deckFaces`: names only) | `saves.archivedAt` and `standalone_games.archivedAt` on Archive and Restore; a deleted save's or game's row (a deleted playthrough's open scenario is recorded as a run first, `recordUnclosedRun`) |
 | Standalone briefing | decks, catalog, scenario definition; a finished game's loadout for Play again | a new `standalone_games` row with its loadout and open game |
 | Standalone table | the same table view (`src/screens/table-view.tsx`) over a game replayed by `src/screens/standalone-session.ts` (the replay and the committing store are shared with the campaign table in `src/screens/open-game.ts`) | each accepted intent, appended to `standalone_games.activeScenario` |
 | Standalone outcome | the replayed game, or the stored result of a game already finished | the result (score or loss reason) as the screen opens; the open game is cleared |

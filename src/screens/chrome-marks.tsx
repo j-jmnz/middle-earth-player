@@ -123,7 +123,7 @@ export function useAheadLine(): string {
   return useTheme() === "light" ? palette.accentLine : palette.hairline;
 }
 
-/** A step's diamond on a journey (the track here, the Campaigns road): filled when done, outlined with a glow for the current one, small and dark ahead. */
+/** A step's diamond on a journey (the path's road): filled when done, outlined with a glow for the current one, small and dark ahead. */
 export function StepDiamond({ state, size }: { state: "done" | "current" | "ahead"; size: number }) {
   const palette = usePalette();
   const s = useUiScale();
@@ -138,33 +138,6 @@ export function StepDiamond({ state, size }: { state: "done" | "current" | "ahea
         ...(state === "current" ? { boxShadow: `0 0 12px ${withAlphaHex(palette.glow, 0.65)}` } : {}),
       }}
     />
-  );
-}
-
-/**
- * A journey of steps as a track (a playthrough being managed or archived): a filled diamond for each step done joined by a solid line,
- * the current step as a larger outlined diamond with a glow, then a small dark diamond for each step that remains, on a dashed line.
- * The words beside it say the numbers.
- */
-export function JourneyBar({ total, done, current: given, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
-  const palette = usePalette();
-  const ahead = useAheadLine();
-  const current = given ?? done < total;
-  const line = (solid: boolean, key: string) => (
-    <View key={key} className="flex-1" style={solid ? { height: 2, backgroundColor: palette.accent } : { height: 0, borderTopWidth: 2, borderStyle: "dashed", borderColor: ahead }} />
-  );
-  const steps: ReactNode[] = [];
-  for (let index = 0; index < total; index++) {
-    const state = index < done ? "done" : index === done && current ? "current" : "locked";
-    if (state === "done") steps.push(<StepDiamond key={`d${index}`} state="done" size={9} />);
-    if (state === "current") steps.push(<StepDiamond key={`c${index}`} state="current" size={12} />);
-    if (state === "locked") steps.push(<StepDiamond key={`k${index}`} state="ahead" size={8} />);
-    if (index < total - 1) steps.push(line(index + 1 <= done, `l${index}`));
-  }
-  return (
-    <View testID={testID} className="min-h-4 flex-row items-center gap-1" importantForAccessibility="no-hide-descendants">
-      {steps}
-    </View>
   );
 }
 

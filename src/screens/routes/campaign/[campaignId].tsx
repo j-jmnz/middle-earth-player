@@ -1,7 +1,7 @@
 // The campaign setup screen a campaign tile on the Campaigns hub opens (docs/design-system.md, Campaign setup): the briefing's frame
 // over the campaign's first scene, the seat count, the carry-over of a finished playthrough, and Start.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "react-native";
 
 import { FELLOWSHIP_ID } from "../../../campaign/save";
@@ -27,6 +27,8 @@ export default function CampaignSetup() {
   // The playthrough whose carry-over this one takes in, or null for a fresh start.
   const [taking, setTaking] = useState<string | null>(null);
   const carry = useCarryChoices(catalog, user);
+  // Set by the first press, so a second tap before the screen is replaced cannot make another save.
+  const started = useRef(false);
 
   const data = campaignId ? campaignOf(campaignId) : null;
   const row = campaignListQueries(catalog).campaigns.all().find((campaign) => campaign.id === campaignId);
@@ -51,6 +53,8 @@ export default function CampaignSetup() {
   const seatId = (n: 1 | 2) => (fellowship ? `seats-${n}` : `seats-${id}-${n}`);
 
   function start(): void {
+    if (started.current) return;
+    started.current = true;
     const save = createSave(user, id, seats, undefined, taken?.cards ?? [], taken?.saveId ?? null);
     router.replace(pathHref(save.id));
   }
@@ -60,7 +64,14 @@ export default function CampaignSetup() {
       {...frame}
       scenarioId={data.scenarios[0] ?? null}
       banner={<CampaignBanner eyebrow={`Campaign · ${words}`} name={name} />}
-      bar={<PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}, ${words}`} testID={fellowship ? "start-fellowship" : `start-${id}`} onPress={start} />}
+      bar={
+        <View className="gap-2">
+          <Label tone="muted" className="text-center">
+            {"Can't be changed later."}
+          </Label>
+          <PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}, ${words}, ${seatWord(seats)}`} testID={fellowship ? "start-fellowship" : `start-${id}`} onPress={start} />
+        </View>
+      }
     >
       <Section title="Players" className="mt-4" />
       <Segmented
@@ -73,10 +84,9 @@ export default function CampaignSetup() {
         accessibilityLabel={`Players for ${name}`}
         stretch
       />
-      <Label className="mt-2">{"Can't be changed later."}</Label>
       {carry.length > 0 ? (
-        <View className="mt-4 gap-2" testID="carry-over">
-          <Label>Carry over from a finished campaign</Label>
+        <View className="gap-2" testID="carry-over">
+          <Section title="Carry over from a finished campaign" className="mt-4" />
           <Text className="text-label text-muted">{"The cards join this campaign's pool at its first scenario."}</Text>
           <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Carry-over for ${name}`}>
             <RadioTile selected={taking == null} testID="carry-none" label={`Fresh start, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-item px-4 py-2">

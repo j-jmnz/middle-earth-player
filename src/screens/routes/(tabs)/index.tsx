@@ -11,11 +11,11 @@ import { campaignOf } from "../../campaign-data";
 import { listSaves, type ListedSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { usePalette } from "../../palette-hook";
-import { NextStop, describe, nextSummary, saveLine, type SaveLine } from "../../save-panels";
-import { CatalogGrid, CatalogTile, HubPage, LockedTiles, RunHero, RunRow, type PartyHero } from "../../hub-parts";
+import { describe, nextSummary, saveLine, type SaveLine } from "../../save-line";
+import { NextStop } from "../../save-panels";
+import { CatalogGrid, CatalogTile, HubPage, leadFace, LockedTiles, OtherRuns, RunHero, RunRow, type PartyHero } from "../../hub-parts";
 import { splitRuns } from "../../hub-runs";
 import { nextStepHref, pathHref } from "../../scenario-links";
-import { SPHERE_TINT } from "../../../play/icon-map";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
 
@@ -53,17 +53,14 @@ export default function CampaignList() {
     const seats = save.log.heroesBySeat.flat().length > 0 ? save.log.heroesBySeat : (save.loadout?.seats.map((seat) => seat.heroes) ?? []);
     return seats.map((seat) => seat.map((code) => heroFace(faces, code)));
   };
-  const leadOf = (save: ListedSave): PartyHero | null => {
-    const code = partyCodes(save)[0];
-    const face = code ? faces.get(code) : undefined;
-    if (!code || !face) return null;
-    const tint = SPHERE_TINT[face.sphereCode ?? ""];
-    return { card: { code, imagesrc: face.imagesrc }, name: face.name, tint: tint && tint !== "faint" ? palette[tint] : undefined };
-  };
+  const leadOf = (save: ListedSave): PartyHero | null => leadFace(faces, partyCodes(save)[0], palette);
 
-  function scrollToNew(): void {
-    scroll.current?.scrollTo({ y: Math.max(0, startAt.current - 8), animated: true });
-  }
+  // Scrolls New playthrough into view once, then spends the param so coming back to Campaigns does not scroll again.
+  const scrollToNew = useCallback(() => {
+    scrollPending.current = false;
+    scroll.current?.scrollTo({ y: Math.max(0, startAt.current), animated: true });
+    router.setParams({ start: undefined });
+  }, [router]);
 
   useFocusEffect(
     useCallback(() => {
@@ -75,7 +72,7 @@ export default function CampaignList() {
       return () => {
         scrollPending.current = false;
       };
-    }, [user, startParam]),
+    }, [user, startParam, scrollToNew]),
   );
 
   function openPath(save: { id: string }): void {
@@ -83,44 +80,37 @@ export default function CampaignList() {
   }
 
   const heroLine = hero ? lineOf(hero) : null;
-  const heroBlock =
+  const heroBlock = hero && heroLine ? <RunHero overline={`In progress · ${heroLine.seats}`} title={heroLine.name} seats={fellowshipOf(hero)} testID="continue-campaign" /> : null;
+  // Under its words the hero holds the screen's one primary (Begin or Resume).
+  const heroAction =
     hero && heroLine ? (
-      // Under its words the hero holds the screen's one primary (Begin or Resume).
-      <View testID="current-playthrough" style={{ gap: 18 * s }}>
-        <RunHero overline={`In progress · ${heroLine.seats}`} title={heroLine.name} seats={fellowshipOf(hero)} testID="continue-campaign" />
-        <NextStop
-          id={hero.id}
-          line={heroLine}
-          onNext={() => router.push(nextStepHref(hero.id, heroLine.next))}
-          onPath={() => openPath(hero)}
-          onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: hero.id } })}
-        />
-      </View>
+      <NextStop
+        id={hero.id}
+        line={heroLine}
+        onNext={() => router.push(nextStepHref(hero.id, heroLine.next))}
+        onPath={() => openPath(hero)}
+        onLog={() => router.push({ pathname: "/log/[saveId]", params: { saveId: hero.id } })}
+      />
     ) : null;
 
-  const grid = size === "medium";
   const othersBlock =
     others.length > 0 ? (
-      <View testID="other-journeys" style={{ gap: 10 * s }}>
-        <Eyebrow>Other journeys</Eyebrow>
-        <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
-          {others.map((save) => {
-            const line = lineOf(save);
-            return (
-              <View key={save.id} style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>
-                <RunRow
-                  testID={`save-${save.id}`}
-                  title={line.name}
-                  line={`${line.seats} · ${nextSummary(line.next)}`}
-                  lead={leadOf(save)}
-                  accessibilityLabel={`Open ${describe(line)}`}
-                  onPress={() => openPath(save)}
-                />
-              </View>
-            );
-          })}
-        </View>
-      </View>
+      <OtherRuns testID="other-journeys" title="Other journeys">
+        {others.map((save) => {
+          const line = lineOf(save);
+          return (
+            <RunRow
+              key={save.id}
+              testID={`save-${save.id}`}
+              title={line.name}
+              line={`${line.seats} · ${nextSummary(line.next)}`}
+              lead={leadOf(save)}
+              accessibilityLabel={`Open ${describe(line)}`}
+              onPress={() => openPath(save)}
+            />
+          );
+        })}
+      </OtherRuns>
     ) : null;
 
   // Every campaign the catalog marks playable starts from its tile: the setup screen takes the seats and the carry-over.
@@ -131,17 +121,7 @@ export default function CampaignList() {
   const posters = size === "compact" ? 0 : 3;
   const newBlock =
     startable.length > 0 ? (
-      <View
-        testID="new-playthrough-tiles"
-        style={{ gap: 10 * s }}
-        onLayout={(event) => {
-          startAt.current = event.nativeEvent.layout.y;
-          if (scrollPending.current) {
-            scrollPending.current = false;
-            scrollToNew();
-          }
-        }}
-      >
+      <View testID="new-playthrough-tiles" style={{ gap: 10 * s }}>
         <Eyebrow>New playthrough</Eyebrow>
         <CatalogGrid posters={posters}>
           {startable.map(({ id, name, data }) => {
@@ -176,14 +156,20 @@ export default function CampaignList() {
     <HubPage
       testID="campaign-list"
       title="Campaigns"
-      actions={<PillButton label="History" testID="history-open" accessibilityLabel="History of finished scenarios" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />}
+      actions={<PillButton label="History" testID="history-open" accessibilityLabel="History: playthroughs in progress, finished and archived" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />}
       subtitle="Play a box's scenarios in order, with its log, boons and burdens."
       hero={heroBlock}
+      heroAction={heroAction}
+      heroTestID="current-playthrough"
       sceneId={heroLine?.next.kind === "finished" || !heroLine ? null : heroLine.next.node.id}
       others={othersBlock}
       catalog={newBlock}
       coming={coming}
       scrollRef={scroll}
+      onCatalogLayout={(y) => {
+        startAt.current = y;
+        if (scrollPending.current) scrollToNew();
+      }}
     />
   );
 }

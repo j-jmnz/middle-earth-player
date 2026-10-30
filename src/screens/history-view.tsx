@@ -113,6 +113,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
             run={item.run}
             nameOf={nameOf}
             onOpen={() => router.push({ pathname: "/standalone/outcome/[gameId]", params: { gameId: item.game.id } })}
+            onResume={() => router.push({ pathname: "/standalone/table/[gameId]", params: { gameId: item.game.id } })}
             onMenu={() => setMenu({ kind: "standalone", game: item.game, run: item.run, archived: item.section === "archived" })}
           />
         );

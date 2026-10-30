@@ -1,45 +1,14 @@
 import { View } from "react-native";
 
-import { campaignPath, nextStep, type NextStep, type PathNode } from "../campaign/path";
 import { useSizeClass } from "../play/use-size-class";
-import { campaignOf, scenarioNames } from "./campaign-data";
-import type { ListedSave } from "./campaign-store";
 import { Eyebrow, PrimaryButton, TextButton } from "./chrome";
 import { PrimaryPlate } from "./hub-parts";
 import { nextLabel } from "./hub-runs";
-import { seatWord } from "./seats";
+import { describe, nextSummary, type SaveLine } from "./save-line";
 import { Text } from "../play/text";
 
-// The campaign hub's pieces for one playthrough (docs/design-system.md, Campaigns (campaign list)): the line that words a save, and
-// the next stop under the hero. The hero over the current scene and the row for each other journey are in hub-parts.tsx.
-
-// One save as the list words it: campaign, seats and progress. Two playthroughs of one campaign differ only here, so every
-// control on a save names it with this line.
-// `path` is the campaign's scenarios as the path screen reads them.
-export type SaveLine = { name: string; seats: string; done: number; total: number; next: NextStep; path: readonly PathNode[] };
-
-/** A save as the lists word it: `name` is its campaign's, and the path is read from its log. */
-export function saveLine(save: ListedSave, name: string): SaveLine {
-  const campaign = campaignOf(save.campaignId);
-  const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : [];
-  return {
-    name,
-    seats: seatWord(save.seatCount),
-    done: path.filter((node) => node.status === "completed").length,
-    total: campaign?.scenarios.length ?? 0,
-    next: nextStep(path, save.loadout?.scenarioId),
-    path,
-  };
-}
-
-export function describe(line: SaveLine): string {
-  return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
-}
-
-/** "Next: A Knife in the Dark", "On the table: ...", or "Every scenario is won": the next step in one phrase (a row, a folded header). */
-export function nextSummary(next: NextStep): string {
-  return next.kind === "finished" ? "Every scenario is won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
-}
+// The next stop under the Campaigns hub's hero (docs/design-system.md, Campaigns (campaign list)). The hero over the current scene and
+// the row for each other journey are in hub-parts.tsx; the line that words a save is in save-line.ts.
 
 /**
  * The stop the next tap plays, under the hero words: Next or On the table with its place in the book over the scenario's name at 24,
@@ -68,5 +37,3 @@ export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line
     </View>
   );
 }
-
-export const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Your decks stay.";

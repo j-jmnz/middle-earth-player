@@ -54,7 +54,7 @@ Read the sections your task touches.
   - 201–233 Scenario definition (~750)
   - 234–254 Persistence (~1.3K)
   - 255–260 Images (~790) ← 5
-  - 261–309 Screens (~3.6K) ← 1
+  - 261–309 Screens (~3.7K) ← 1
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
@@ -131,7 +131,7 @@ Read the sections your task touches.
   - 252–255 Haptics (~250)
   - 256–266 Banner (~580) ← 1
   - 267–270 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~21.0K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~21.2K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -141,32 +141,32 @@ Read the sections your task touches.
   - 120–137 Spacing, radius, border (~560) ← 2
   - 138–159 Backdrops (~870) ← 3
   - 160–167 Navigation (~420) ← 3
-  - 168–206 Components (~1.7K) ← 8
-  - 207–220 Icons (~390) ← 6
-  - 221–240 Card art (~780) ← 2
-  - 241–255 Tablets (~500) ← 14
-  - 256–423 Screens (~10.6K) ← 1
-    - 260–263 Splash (~30)
-    - 264–279 Campaigns (campaign list) (~1.2K) ← 4
-    - 280–293 Scenarios (~680) ← 1
-    - 294–306 History (~1.2K) ← 3
-    - 307–322 Briefing (~1.2K) ← 3
-    - 323–326 Campaign setup (~570) ← 3
-    - 327–332 Campaign path (~390) ← 2
-    - 333–336 Campaign log (~180) ← 1
-    - 337–340 Table — landscape (~130) ← 1
-    - 341–352 Resolution and standalone outcome (~980) ← 1
-    - 353–360 Decks (~510) ← 1
-    - 361–370 Deck builder (deck editor) (~790) ← 3
-    - 371–380 Card pool (the Cards tab) (~700) ← 3
-    - 381–386 Card (~480) ← 2
-    - 387–392 Packs and pack cards (~130)
-    - 393–405 Settings (~580)
-    - 406–411 Rules (~450) ← 1
-    - 412–415 Rule (~220) ← 1
-    - 416–419 Booklet (~100)
-    - 420–423 Database (~20)
-  - 424–442 States (~550)
+  - 168–205 Components (~1.7K) ← 8
+  - 206–219 Icons (~390) ← 6
+  - 220–239 Card art (~780) ← 2
+  - 240–254 Tablets (~510) ← 14
+  - 255–422 Screens (~10.9K) ← 1
+    - 259–262 Splash (~30)
+    - 263–278 Campaigns (campaign list) (~1.3K) ← 5
+    - 279–292 Scenarios (~730) ← 1
+    - 293–305 History (~1.4K) ← 3
+    - 306–321 Briefing (~1.2K) ← 3
+    - 322–325 Campaign setup (~610) ← 3
+    - 326–331 Campaign path (~390) ← 2
+    - 332–335 Campaign log (~180) ← 1
+    - 336–339 Table — landscape (~130) ← 1
+    - 340–351 Resolution and standalone outcome (~980) ← 1
+    - 352–359 Decks (~510) ← 1
+    - 360–369 Deck builder (deck editor) (~790) ← 3
+    - 370–379 Card pool (the Cards tab) (~700) ← 3
+    - 380–385 Card (~480) ← 2
+    - 386–391 Packs and pack cards (~130)
+    - 392–404 Settings (~580)
+    - 405–410 Rules (~450) ← 1
+    - 411–414 Rule (~220) ← 1
+    - 415–418 Booklet (~100)
+    - 419–422 Database (~20)
+  - 423–441 States (~550)
 
 ## Phases
 
@@ -296,5 +296,5 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/play`: design-system-table.md, Spotlight (12); architecture.md, State (6); design-system-table.md, Command column (6); design-system-table.md, Motion (6); architecture.md, Images (5); design-system-table.md, Gestures (4); design-system.md, Components (4); brief.md, Table screen (3); design-system-table.md, Reading panels (3); design-system.md, Tablets (3); design-system.md, Type (3); plans/done/settings-theme-and-ui-scale.md, UI scale engine (3); design-system-table.md, Choice tray (2); design-system-table.md, Spacing and the play area's rows (2); design-system.md, Icons (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Cards (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Top bar (1); design-system-table.md, Two taps (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); design-system.md, Table — landscape (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1)
 - `src/rules`: architecture.md, State (1); brief.md, The engine plays the game (1)
-- `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (4); design-system.md, Components (4); design-system.md, Briefing (3); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, History (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); design-system.md, Campaign log (1); design-system.md, Decks (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Type (1)
+- `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (5); design-system.md, Components (4); design-system.md, Briefing (3); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, History (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); design-system.md, Campaign log (1); design-system.md, Decks (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Type (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

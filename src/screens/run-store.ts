@@ -29,17 +29,6 @@ export function listRuns<TRun>(user: UserDb<TRun>): RunRecord[] {
     .map((row) => ({ ...row, seatCount: parseSeatCount(row.seatCount) }));
 }
 
-/** The ids of the saves and the standalone games that still exist: a run whose id is not here says it was deleted. */
-export function existingRefs<TRun>(user: UserDb<TRun>): { saves: ReadonlySet<string>; archived: ReadonlySet<string>; games: ReadonlySet<string> } {
-  const rows = user.select({ id: saves.id, archivedAt: saves.archivedAt }).from(saves).all();
-  return {
-    saves: new Set(rows.map((row) => row.id)),
-    // A playthrough put away: its runs stay listed.
-    archived: new Set(rows.filter((row) => row.archivedAt != null).map((row) => row.id)),
-    games: new Set(user.select({ id: standaloneGames.id }).from(standaloneGames).all().map((row) => row.id)),
-  };
-}
-
 function knownSaves<TRun>(user: UserDb<TRun>): KnownSave[] {
   return user
     .select()

@@ -1,6 +1,6 @@
 // The parts the two hubs share (docs/design-system.md, Campaigns (campaign list) and Scenarios): the hero over the current run's
 // scene, a row for each other run, a tile for each catalog entry, the locked tiles, and the page frame that sets them in order.
-import { useState, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { Children, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, View, type ScrollView } from "react-native";
 
 import { dropShadowOf, lapShadowOf, rowSurface, tileSurface } from "../play/surfaces";
@@ -11,14 +11,24 @@ import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
 import { HeroArt, Portrait, SceneArt, type ArtCard } from "./art";
 import { COVER } from "./art-crop";
-import { Chevron, Column, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "./chrome";
+import { Chevron, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "./chrome";
 import { HeroTile, type HeroFace } from "./hero-tile";
+import type { Palette } from "./palette.js";
 import { usePalette } from "./palette-hook";
 import { useSplitColumns } from "./use-split-columns";
+import { SPHERE_TINT } from "../play/icon-map";
 import { Text } from "../play/text";
 
 /** A hero of the fellowship as the panels show it: the face, the name, and the sphere colour of its ring (none for a neutral hero). */
 export type PartyHero = { card: ArtCard; name: string; tint?: string };
+
+/** The face a row leads with, from the first hero's code: its picture, its name and its sphere's colour (none for a neutral hero); null when the catalog lacks it. */
+export function leadFace(faces: ReadonlyMap<string, HeroFace>, code: string | undefined, palette: Palette): PartyHero | null {
+  const face = code ? faces.get(code) : undefined;
+  if (!code || !face) return null;
+  const tint = SPHERE_TINT[face.sphereCode ?? ""];
+  return { card: { code, imagesrc: face.imagesrc }, name: face.name, tint: tint && tint !== "faint" ? palette[tint] : undefined };
+}
 
 // How far a fellowship painting laps over the one before it.
 const OVERLAP = 10;
@@ -110,6 +120,23 @@ export function RunRow({ testID, title, line, lead, accessibilityLabel, onPress 
         </View>
       )}
     </Pressable>
+  );
+}
+
+/** The other open runs under their eyebrow: rows on a phone, two across on a medium tablet. `title` is the eyebrow ("Other journeys"). */
+export function OtherRuns({ testID, title, children }: { testID: string; title: string; children: ReactNode }) {
+  const s = useUiScale();
+  const { size } = useSizeClass();
+  const grid = size === "medium";
+  return (
+    <View testID={testID} style={{ gap: 10 * s }}>
+      <Eyebrow>{title}</Eyebrow>
+      <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
+        {Children.map(children, (child) => (
+          <View style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>{child}</View>
+        ))}
+      </View>
+    </View>
   );
 }
 
@@ -267,7 +294,9 @@ const clamp = (value: number, low: number, high: number) => Math.min(high, Math.
  * The hub's page: the head, then the hero over its scene, the other runs, the catalog and Coming later, in that order. On a tablet in
  * landscape with room for two columns (docs/design-system.md, Tablets) and both a hero and other runs, the hero is on the left over
  * its scene and the other runs on the right; the catalog and Coming later go full width below. Else one column. The hero's scene is
- * `sceneId`; with no hero the page takes the moon backdrop and no art.
+ * `sceneId`; with no hero the page takes the moon backdrop and no art. `hero` is the run's words and fellowship, `heroAction` the
+ * primary under them: a tablet keeps the action (and, in one column, the whole hero) to a readable measure. `onCatalogLayout` gives
+ * the y of the catalog in the scroll's content, so a screen can scroll it into view.
  */
 export function HubPage({
   testID,
@@ -275,11 +304,14 @@ export function HubPage({
   actions,
   subtitle,
   hero,
+  heroAction,
+  heroTestID,
   sceneId,
   others,
   catalog,
   coming,
   scrollRef,
+  onCatalogLayout,
 }: {
   testID: string;
   // The head's title and its own controls (History); the gear follows them.
@@ -288,11 +320,15 @@ export function HubPage({
   // Said under the title only while there is no hero.
   subtitle?: string;
   hero?: ReactNode;
+  heroAction?: ReactNode;
+  // The block holding the hero and its action.
+  heroTestID?: string;
   sceneId?: string | null;
   others?: ReactNode;
   catalog: ReactNode;
   coming?: ReactNode;
   scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null>;
+  onCatalogLayout?: (y: number) => void;
 }) {
   const s = useUiScale();
   const { width, height } = useSizeClass();
@@ -311,9 +347,22 @@ export function HubPage({
     </HubHeader>
   );
   // On a tablet the hero keeps a readable measure rather than spanning its column.
-  const heroBlock = hero ? <View style={size === "expanded" ? { maxWidth: 620 * s } : undefined}>{hero}</View> : null;
-  // One column: the hero, the other runs, the catalog and Coming later. A tablet in landscape keeps the hero and the other runs in the
-  // readable column and gives the catalog the wide one.
+  const measure = size === "expanded" ? { maxWidth: 620 * s } : undefined;
+  const action = heroAction ? <View style={measure}>{heroAction}</View> : null;
+  // In two columns the hero spans its column and only its action keeps the measure; in one column the whole hero is capped (below).
+  const heroBlock = hero ? (
+    <View testID={heroTestID} style={{ gap: 18 * s }}>
+      {hero}
+      {action}
+    </View>
+  ) : null;
+  // The catalog and Coming later are the page's last block, a direct child of the scroll's content so its y is the content's.
+  const lower = (
+    <View style={{ gap: 18 * s, paddingTop: hero || others ? 18 * s : 0 }} onLayout={(event) => onCatalogLayout?.(event.nativeEvent.layout.y)}>
+      {catalog}
+      {coming}
+    </View>
+  );
   const page = twoColumns ? (
     <>
       {header}
@@ -324,34 +373,16 @@ export function HubPage({
         </View>
         <View style={{ width: split.side, paddingTop: 24 * s }}>{others}</View>
       </View>
-      <View style={{ gap: 18 * s, paddingTop: 18 * s }}>
-        {catalog}
-        {coming}
-      </View>
-    </>
-  ) : size === "expanded" ? (
-    <>
-      <Column>
-        {header}
-        <View style={{ gap: 18 * s, paddingTop: heroDrop }}>
-          {heroBlock}
-          {others}
-        </View>
-      </Column>
-      <View style={{ gap: 18 * s, paddingTop: heroBlock != null || others != null ? 18 * s : 0 }}>
-        {catalog}
-        {coming}
-      </View>
+      {lower}
     </>
   ) : (
     <>
       {header}
-      <View style={{ gap: 18 * s, paddingTop: heroDrop }}>
+      <View style={{ gap: 18 * s, paddingTop: heroDrop, ...measure }}>
         {heroBlock}
         {others}
-        {catalog}
-        {coming}
       </View>
+      {lower}
     </>
   );
 

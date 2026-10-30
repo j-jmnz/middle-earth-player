@@ -14,10 +14,10 @@ import { startedOf } from "./history-list";
 import { courseWords, deletedWords, playthroughWords, runDate, runLabel, scoreWords, seatsWords } from "./history-words";
 import type { LibrarySave } from "./history-read";
 import { usePalette } from "./palette-hook";
-import { describe } from "./save-panels";
+import { describe } from "./save-line";
 import { seatWord } from "./seats";
 import { gameCaption } from "./standalone-words";
-import type { ListedStandalone } from "../campaign/standalone";
+import { standaloneStatus, type ListedStandalone } from "../campaign/standalone";
 
 // Three dots in a row, drawn as views in the colour the button gives them.
 function DotsMark({ color }: { color: string }) {
@@ -31,11 +31,11 @@ function DotsMark({ color }: { color: string }) {
   );
 }
 
-/** The round glass ⋯ at the end of a playthrough's or game's row; `described` names the one it acts on. */
+/** The round glass ⋯, its dots in the accent as a glass button's icon is, at the end of a playthrough's or game's row; `described` names the one it acts on. */
 export function RefMenuButton({ refId, described, onPress }: { refId: string; described: string; onPress: () => void }) {
   return (
     <View className="ml-2">
-      <IconButton testID={`ref-menu-${refId}`} label={`Actions for ${described}`} tone="bone" mark={({ color }) => <DotsMark color={color} />} onPress={onPress} />
+      <IconButton testID={`ref-menu-${refId}`} label={`Actions for ${described}`} mark={({ color }) => <DotsMark color={color} />} onPress={onPress} />
     </View>
   );
 }
@@ -86,21 +86,35 @@ export function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRec
   );
 }
 
-/** A standalone game: its run (which opens the outcome) when it has one, else its scenario and how it stands; the ⋯ at its end. */
-export function GameRow({ game, run, nameOf, onOpen, onMenu }: { game: ListedStandalone; run: RunRecord | null; nameOf: (code: string) => string; onOpen: () => void; onMenu: () => void }) {
+/**
+ * A standalone game: its run (which opens the outcome) when it has one, else a row for the game itself, with a chevron: a game in
+ * progress resumes, any other opens its sheet. The ⋯ at its end opens the sheet.
+ */
+export function GameRow({ game, run, nameOf, onOpen, onResume, onMenu }: { game: ListedStandalone; run: RunRecord | null; nameOf: (code: string) => string; onOpen: () => void; onResume: () => void; onMenu: () => void }) {
+  const palette = usePalette();
   const t = useTableTokens();
   const scenario = scenarioName(game.scenarioId);
   const caption = gameCaption(game);
+  const playing = standaloneStatus(game) === "playing";
   return (
     <View className="flex-row items-center pb-3">
       <View className="min-w-0 flex-1">
         {run ? (
           <RunRow run={run} deleted={false} showBox nameOf={nameOf} onPress={onOpen} />
         ) : (
-          <View testID={`history-game-${game.id}`} accessible accessibilityLabel={`${scenario}, ${caption}`} className="min-h-14 justify-center rounded-item px-4 py-3.5" style={rowSurface(false, t)}>
-            <Text className="font-display text-heading text-bone">{scenario}</Text>
-            <Label>{caption}</Label>
-          </View>
+          <Pressable testID={`history-game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={`${playing ? "Resume" : "Actions for"} ${scenario}, ${caption}`} onPress={playing ? onResume : onMenu}>
+            {({ pressed }) => (
+              <View className="min-h-14 flex-row items-center rounded-item px-4 py-3.5" style={rowSurface(pressed, t)}>
+                <View className="min-w-0 flex-1">
+                  <Text className="font-display text-heading text-bone">{scenario}</Text>
+                  <Label>{caption}</Label>
+                </View>
+                <View className="ml-2 w-6 items-center">
+                  <Chevron direction="right" color={palette.faint} size={8} />
+                </View>
+              </View>
+            )}
+          </Pressable>
         )}
       </View>
       <RefMenuButton refId={game.id} described={`${scenario}, ${caption}`} onPress={onMenu} />
