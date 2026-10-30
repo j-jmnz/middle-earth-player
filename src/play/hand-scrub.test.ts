@@ -1,4 +1,4 @@
-// The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system.md, Table, Gestures).
+// The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system-table.md, Gestures).
 import { describe, expect, it } from "vitest";
 
 import { cardAt, cancelled, fanTilts, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";

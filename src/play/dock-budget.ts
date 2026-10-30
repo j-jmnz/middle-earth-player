@@ -1,4 +1,4 @@
-// The room for the words above the dock's pinned block (docs/design-system.md, Table, Command column; phase 22): the step, the
+// The room for the words above the dock's pinned block (docs/design-system-table.md, Command column; phase 22): the step, the
 // title and the folded line. On a short phone (under DENSE_BELOW tall) that room is small, and a long title with a long caution
 // armed under it leaves it almost none, so the title is clamped to the lines that fit and the rest of it, with every folded line,
 // waits behind the "i" pill, which opens them in a popover (dock-more.tsx). Where the room cannot hold the step, one title line

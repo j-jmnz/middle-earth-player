@@ -1,6 +1,6 @@
 // The dock beside the table, in reach of the right thumb: what the engine is asking (the step, the moment, a sentence), the
 // engine's numbers for it (willpower against threat, attack against defense), what the player has picked on the table, and
-// the buttons that confirm it (docs/design-system.md, Table). Picking happens on the table; nothing here is sent until a
+// the buttons that confirm it (docs/design-system-table.md). Picking happens on the table; nothing here is sent until a
 // button is pressed (dock-buttons.tsx). The outcome banner over the table says what the last intent did (moment-banner.tsx).
 import { useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";

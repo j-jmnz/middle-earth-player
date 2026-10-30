@@ -1,4 +1,4 @@
-// The strip a tap on the phase rail opens (docs/design-system.md, Table; phase 20): the round's seven phases as cards in a
+// The strip a tap on the phase rail opens (docs/design-system-table.md; phase 20): the round's seven phases as cards in a
 // horizontal snap-scroll, centered on the current one, each with its steps, what the player decides there and the action
 // windows as Stop switches; the round's track and the master Stops switch sit at its head. It is for reading: a lit night panel
 // floating over the canvas with a hairline, not paper. The data is carousel.ts. The only things it changes are the player's Stops settings (table-settings.ts); it sends

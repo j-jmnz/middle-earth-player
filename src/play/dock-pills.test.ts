@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { DockExtra } from "./dock-buttons.tsx";
 import { dockPills, MORE_ID, UNDO_ID } from "./dock-extras.ts";
 
-// The dock's quiet pills (docs/design-system.md, Table, Command column; phase 22): Undo always shows, the others fold into More
+// The dock's quiet pills (docs/design-system-table.md, Command column; phase 22): Undo always shows, the others fold into More
 // when more than two would show.
 const pill = (testID: string): DockExtra => ({ label: testID, testID, onPress: () => undefined });
 const undo = pill(UNDO_ID);

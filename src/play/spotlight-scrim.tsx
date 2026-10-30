@@ -1,4 +1,4 @@
-// The skip catcher over the top bar and the dock while the combat spotlight plays (docs/design-system.md, Table, Spotlight; phase 24,
+// The skip catcher over the top bar and the dock while the combat spotlight plays (docs/design-system-table.md, Spotlight; phase 24,
 // reduced by docs/plans/done/combat-spotlight-redesign.md). The dark is drawn by the spotlight's own layer; these transparent React Native
 // views only catch the skip tap: a touch anywhere on them skips every attack of the moment on press (not on release; a click too
 // quick to report a press skips on release), and reaches nothing under it. They exist only while the gate is open (spotlight-gate.ts),

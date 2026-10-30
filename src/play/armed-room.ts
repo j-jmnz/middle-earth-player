@@ -1,4 +1,4 @@
-// The room above the dock's buttons for the armed line (docs/design-system.md, Table, Command column; phase 22). A caution names
+// The room above the dock's buttons for the armed line (docs/design-system-table.md, Command column; phase 22). A caution names
 // its loss in full, so the room is as many lines as the longest thing the dock's buttons can say when armed, held the same
 // before and after any of them is armed: arming moves nothing. Pure: a character-per-line estimate of the dock's text width.
 

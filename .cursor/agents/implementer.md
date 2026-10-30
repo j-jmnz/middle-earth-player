@@ -6,7 +6,7 @@ description: Implements one phase from docs/phases. Use when the user asks to im
 
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
 
-Do not restyle screens: the design system is `/ux`'s, and `docs/design-system.md` is the visual authority.
+Do not restyle screens: the design system is `/ux`'s, and `docs/design-system.md` with `docs/design-system-table.md` is the visual authority. Find the sections you need in `docs/INDEX.md` and read those, not whole files.
 
 Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.cursor/rules/authority.mdc` gives) beat all three.
 

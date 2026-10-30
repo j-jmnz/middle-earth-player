@@ -1,4 +1,4 @@
-// How the table shares out the room it has left (docs/design-system.md, Table — landscape, Spacing; user request, 2026-10-29).
+// How the table shares out the room it has left (docs/design-system-table.md, Spacing; user request, 2026-10-29).
 // layout.ts lays the rows out at their minimum gaps first; what is left between the play area and the hand is shared here between
 // the gaps down the canvas, and what is left across a table of capped cards between its edges and the gap beside the left
 // column. Each gap takes a share of the room and stops at a cap (a share of the card), so a tall tablet does not float its rows

@@ -93,7 +93,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - The web export at 844×390 and 667×375 shows a choice tray with tiles over the command column, the dock's buttons visible under it, and the encounter deck visible.
-- `docs/design-system.md` (Table, Panels) is rewritten for the tray.
+- `docs/design-system-table.md` (Panels) is rewritten for the tray.
 - STATUS.md lists the phone checks as open:
   - the tray at 667×375 with six options;
   - an outside tap that folds without picking a card.

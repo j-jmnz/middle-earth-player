@@ -1,6 +1,6 @@
 # Phase 24 — Combat spotlight
 
-> **Superseded by the 2026-10-29 redesign (`docs/plans/done/combat-spotlight-redesign.md`).** A user request replaced this phase's look and timing: the spotlight is a full-screen, always-dark layer, a lone attack runs 2200 ms, not 1500, and a destroyed target burns. The gate, skip, Back, banner-wait and engine numbers below still hold. `docs/design-system.md`, Table, Spotlight, is the current description; the sequence and numbers below are history.
+> **Superseded by the 2026-10-29 redesign (`docs/plans/done/combat-spotlight-redesign.md`).** A user request replaced this phase's look and timing: the spotlight is a full-screen, always-dark layer, a lone attack runs 2200 ms, not 1500, and a destroyed target burns. The gate, skip, Back, banner-wait and engine numbers below still hold. `docs/design-system-table.md`, Spotlight, is the current description; the sequence and numbers below are history.
 
 Depends on: phase 23
 Blocks: nothing
@@ -85,7 +85,7 @@ None. The canvas is phone-only. The banner flows still pass, because the banner 
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
-- `docs/design-system.md` (Table) gains a Spotlight paragraph and updates Banner and Haptics.
+- `docs/design-system-table.md` () gains a Spotlight paragraph and updates Banner and Haptics.
 - STATUS.md lists the phone checks as open:
   - the spotlight's length at Normal and Quick;
   - the skip tap;

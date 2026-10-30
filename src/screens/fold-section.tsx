@@ -1,7 +1,7 @@
 // The one fold control (phase 28b): a header that folds and unfolds the section under it. A 44 pt target; a chevron (down while
 // open, right while folded), the title, a rule, and the count of what is inside while folded. A screen reader hears whether it is
 // expanded and an announcement on each toggle. The body stays mounted and is hidden, so what it holds keeps its state; there is
-// no animation (docs/design-system.md, Motion: a fold is a state change, not a motion).
+// no animation (docs/design-system.md, Performance: a fold is a state change, not a motion).
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 

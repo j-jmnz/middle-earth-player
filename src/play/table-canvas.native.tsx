@@ -1,4 +1,4 @@
-// The table: one Skia canvas, not a view per card (docs/architecture.md, Table), played in landscape. Zustand subscribers
+// The table: one Skia canvas, not a view per card (docs/architecture.md, Screens), played in landscape. Zustand subscribers
 // read the zone and pile slices it draws. A drag, a card lift and the return run on the UI thread with Gesture Handler and
 // Reanimated; JavaScript hears about a drag only when a card is picked up (to compute that card's drop targets) and when the
 // finger lifts. A tap picks (the screen decides what), a long press previews; neither sends an intent.

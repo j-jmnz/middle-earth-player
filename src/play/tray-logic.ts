@@ -1,4 +1,4 @@
-// The choice tray's pure half (docs/design-system.md, Table, Choice tray; phase 21): the tiles of a sheet, the muted count at
+// The choice tray's pure half (docs/design-system-table.md, Choice tray; phase 21): the tiles of a sheet, the muted count at
 // the tray's top, where the tray sits against the command column and the dock, and what a tap outside it does. The component is
 // choice-tray.tsx; the hook that holds the fold is use-table-choice.ts.
 import type { Choice } from "./table-choice.ts";

@@ -1,5 +1,5 @@
 // The table chrome's shared pieces: the text and pill buttons, the choice tile, the engine's numbers with their icons, the
-// sentence under a disabled action, and the parchment frame (docs/design-system.md, Table). The dock's buttons, which arm
+// sentence under a disabled action, and the parchment frame (docs/design-system-table.md). The dock's buttons, which arm
 // before they send, are dock-buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number
 // the engine did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";
@@ -102,7 +102,7 @@ export function ChromeButton({
   tone?: "bone" | "accent" | "ink" | "muted";
   variant?: "text" | "plate" | "quiet";
   disabled?: boolean;
-  // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system.md, Table).
+  // On a short phone's dock: a 36 pt pill in a 40 pt row, its 44 pt target kept by a 2 pt hit slop (docs/design-system-table.md).
   tight?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;

@@ -1,4 +1,4 @@
-// The quest scale at the table's left edge (docs/design-system.md, Table): THREAT over the staging area's threat on a red dial, a line
+// The quest scale at the table's left edge (docs/design-system-table.md): THREAT over the staging area's threat on a red dial, a line
 // down to the willpower committed on a silver dial over WILLPOWER, and on the line how far apart they are, "+2 Ahead" in green or
 // "−1 Short" in red. No panel: it floats on a soft dark radial. It moves live as characters are committed (quest-scale.ts); the
 // numbers are the engine's. Outside the Quest phase it rests at 40%, its dials showing a dash and no marker. Its overline says Staging,

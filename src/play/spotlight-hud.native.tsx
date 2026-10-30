@@ -1,4 +1,4 @@
-// The words and numbers of the combat spotlight's layer (spotlight.native.tsx; docs/design-system.md, Table, Spotlight), drawn outside the
+// The words and numbers of the combat spotlight's layer (spotlight.native.tsx; docs/design-system-table.md, Spotlight), drawn outside the
 // shaking, pushed-in stage so they stay still: the attack and defense medallions, the damage number, the "Blocked" and "Destroyed" stamps,
 // the "+n" chip and the note chip. Every number is the engine's (clash.ts); each piece reads the attack's frame (spotlight-beats.ts) through a
 // derived value. The stage is in screen points already times the UI scale (spotlight-stage.ts).

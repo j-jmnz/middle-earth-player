@@ -1,4 +1,4 @@
-// The choice tray (docs/design-system.md, Table, Choice tray; phase 21): a choice whose options are not all whole cards on the
+// The choice tray (docs/design-system-table.md, Choice tray; phase 21): a choice whose options are not all whole cards on the
 // table opens a compact night tray over the command column's upper part, standing on the dock as its upper part in the dock's own
 // fill, so the choice and its answers read as one panel. It shows the options and nothing else: the count as an accent eyebrow at its
 // top, then one tile per row. The step, the readout, the refusal and the buttons are the dock's, once, under it

@@ -1,7 +1,7 @@
 // Rules: rr.threat-elimination-level, rr.player-elimination (data/rules/entries.json).
 //
 // How loud the threat dial is. A player whose threat reaches 50 is eliminated at once, so the dial's meter fills toward 50
-// and the dial warms as it nears it: tinted from 40, solid threat red from 45 (docs/design-system.md, Table). The change
+// and the dial warms as it nears it: tinted from 40, solid threat red from 45 (docs/design-system-table.md). The change
 // badge says what the last intent did to it ("−6" when it fell, "+2" when it rose).
 
 export const ELIMINATION_THREAT = 50;

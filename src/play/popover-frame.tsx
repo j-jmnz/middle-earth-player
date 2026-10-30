@@ -1,4 +1,4 @@
-// The frame of the table's popovers (docs/design-system.md, Table, Table menu): a lit night card (tileSurface) with a deep shadow
+// The frame of the table's popovers (docs/design-system-table.md, Table menu): a lit night card (tileSurface) with a deep shadow
 // and rounded-card corners, its rows inset rounded plates, that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
 // that holds it, and a Pressable scrim that fills the screen under it so a tap outside closes it and does nothing else. Not a
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More

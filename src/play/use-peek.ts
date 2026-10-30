@@ -1,4 +1,4 @@
-// The peek's hooks and actions (peek.ts, docs/design-system.md, Table; phase 26). The seat peeked at is the table store's `viewedSeat`;
+// The peek's hooks and actions (peek.ts, docs/design-system-table.md; phase 26). The seat peeked at is the table store's `viewedSeat`;
 // these read it for the screen, route a dial tap, and end the peek when the moment moves on. Nothing here sends an intent or changes
 // who acts: the dock, the picks and the sheets stay the acting seat's.
 import { useCallback, useEffect, useMemo } from "react";

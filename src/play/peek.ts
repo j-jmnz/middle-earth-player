@@ -1,4 +1,4 @@
-// The peek (docs/design-system.md, Table; phase 26): in two-handed play the player taps the dial of the seat that is not shown to see
+// The peek (docs/design-system-table.md; phase 26): in two-handed play the player taps the dial of the seat that is not shown to see
 // that seat's whole area (hand, play area, engaged enemies, deck and discard pile). Both hands are one player's, so this hides
 // nothing (docs/brief.md, Table). Pure, and not engine state: the store keeps a UI-only `viewedSeat` (store.ts) that is never in the
 // save, and who acts never changes by a peek. Whatever picks, pays or sends reads `actingSeat` (selectors.ts); only what is drawn

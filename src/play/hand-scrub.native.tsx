@@ -1,4 +1,4 @@
-// The hand while the scrub runs (docs/design-system.md, Table, Gestures; phase 25), drawn from the scrub's shared values: no
+// The hand while the scrub runs (docs/design-system-table.md, Gestures; phase 25), drawn from the scrub's shared values: no
 // state, no timer and no loop, only the clocks the gesture sets. Each hand card is posed from its place in the peeking, fanned
 // hand to its place in the risen, spread hand (scrub-pose.ts); the card under the finger is drawn again on top of the others, lifted.
 // The rest of the table dims under the scrub's own night (35%), which never runs under the spotlight's: no scrub runs during one.

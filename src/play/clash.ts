@@ -1,6 +1,6 @@
 // Rules: rr.step-6-4-3, rr.step-6-8b, rr.step-6-8-3, ltp.shadow-discard (data/rules/entries.json).
 //
-// The attacks a new state resolved, for the combat spotlight (docs/design-system.md, Table, Spotlight; phase 24). Pure: it reads
+// The attacks a new state resolved, for the combat spotlight (docs/design-system-table.md, Spotlight; phase 24). Pure: it reads
 // the same engine steps the banner (outcome.ts) and the dock (readout.ts) read, the `strike` the attack's numbers came from and
 // the `damage` and `destroy` steps that follow it, and every number it returns is one of them. The UI never works one out.
 //

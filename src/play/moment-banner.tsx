@@ -1,4 +1,4 @@
-// The outcome banner over the table (docs/design-system.md, Table, Banner): what the last intent did, in beats, for a few
+// The outcome banner over the table (docs/design-system-table.md, Banner): what the last intent did, in beats, for a few
 // seconds. A tap or a swipe sends it away (user request, 2026-10-29); the log keeps every step.
 import { useEffect, useMemo, useState } from "react";
 import { AccessibilityInfo, useWindowDimensions, View } from "react-native";
@@ -28,7 +28,7 @@ const FLICK = 600;
 
 /**
  * The banner's fill (user request, 2026-10-29): dark and slightly see-through on Dark, a dark red for a failure or an attack
- * (docs/design-system.md, Table: the combat banner), with the lit top edge and a 1 pt edge in the tone. Light keeps its lit
+ * (docs/design-system-table.md, Banner), with the lit top edge and a 1 pt edge in the tone. Light keeps its lit
  * panel, a little see-through.
  */
 function bannerFill(t: TableTokens, tone: Moment["tone"], edge: string) {

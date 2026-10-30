@@ -1,5 +1,5 @@
 // The table's top bar pieces: the threat rings, and the mark beside a log line (the phase rail is phase-rail.tsx). These are React Native
-// text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system.md, Table). Phase
+// text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system-table.md). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -23,7 +23,7 @@ import { Text } from "./text.tsx";
 
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
-// The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system.md, Table).
+// The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system-table.md).
 const DIAL = 46;
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.

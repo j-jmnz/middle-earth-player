@@ -1,4 +1,4 @@
-// The table's motion tokens (docs/design-system.md, Table, Motion; phase 23): every duration, easing and spring in src/play is
+// The table's motion tokens (docs/design-system-table.md, Motion; phase 23): every duration, easing and spring in src/play is
 // named here and nowhere else. Pure numbers and names, so a Vitest reads them and the canvas worklets share them
 // (motion-curves.ts draws a curve from a name; motion-run.ts hands the same names to Reanimated).
 //

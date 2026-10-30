@@ -1,4 +1,4 @@
-// The cards of the combat spotlight's layer (spotlight.native.tsx; docs/design-system.md, Table, Spotlight): a card flying between its
+// The cards of the combat spotlight's layer (spotlight.native.tsx; docs/design-system-table.md, Spotlight): a card flying between its
 // slot and the stage with an arc, the shadow card's perspective flip, the afterimages of the lunge, the damage token in the target's
 // corner and a token in flight. Each reads the frame of its attack (spotlight-beats.ts) through a derived value, so the UI thread moves
 // it and the canvas draws again only while it plays. The stage is in screen points already times the UI scale (spotlight-stage.ts).

@@ -1,4 +1,4 @@
-// The frame the choice tray and the reading panels share (docs/design-system.md, Table, Panels): a card-cornered box at the
+// The frame the choice tray and the reading panels share (docs/design-system-table.md, Reading panels): a card-cornered box at the
 // command column's right edge, with no drawn edge (user request, 2026-10-27: fewer borders). The choice tray is the dock's own flat
 // night and stands on the dock as its upper part (`joined`); a reading panel stays on paper. It enters decelerating (16 pt up and a
 // fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced motion.

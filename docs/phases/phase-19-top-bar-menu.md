@@ -69,7 +69,7 @@ Back, Log, Rules and Booklet move into the menu.
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - The web export (`npx expo export --platform web`, opened in headless Chromium at 844×390 and 667×375) shows the dials at the left, the rail centered, the menu button at the right, and the menu open with its five rows.
-- `docs/design-system.md` (Table, top bar) is rewritten for the three zones and the menu.
+- `docs/design-system-table.md` (top bar) is rewritten for the three zones and the menu.
 - STATUS.md lists the phone checks as open:
   - the menu in reach;
   - the bar at 667×375 with two seats, Life and Burden.

@@ -52,7 +52,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
     - Every card keeps its 44 pt slice.
     - The total angle is at most `FAN_MAX`.
   - `scrub-pose.test.ts:16-22`: risen means the final angle equals the target tilt, and lifted means 0.
-- **Docs:** design-system.md, Table, Gestures (the scrub paragraph). Note that this reverses phase 25's "the fan flattens" (`docs/phases/phase-25-hand-scrub.md:29`), as a user request dated 2026-10-28.
+- **Docs:** design-system-table.md, Gestures (the scrub paragraph). Note that this reverses phase 25's "the fan flattens" (`docs/phases/phase-25-hand-scrub.md:29`), as a user request dated 2026-10-28.
 
 ## Part 2: Card preview without Close
 - **`src/play/card-preview.tsx:153`:** remove the `card-preview-close` ChromeButton. Details stays, alone, in both layouts (`:231`, `:235`).

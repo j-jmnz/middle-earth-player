@@ -1,4 +1,4 @@
-// The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): the phase in Marcellus SC over the round's seven
+// The phase rail in the top bar's middle (docs/design-system-table.md; phase 20): the phase in Marcellus SC over the round's seven
 // phases as ticks over the round and the step, with the previous and next phase inline at the phase's sides when there is room. A tap opens the
 // phase carousel (phase-carousel.tsx); the rail itself sends no intent. A phase change flashes the pill's edge, a step change
 // cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
@@ -69,7 +69,7 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
 }
 
 /**
- * The rail (docs/design-system.md, Table): the phase in Marcellus SC, tracked wide with a silver glow; under it the round's seven
+ * The rail (docs/design-system-table.md): the phase in Marcellus SC, tracked wide with a silver glow; under it the round's seven
  * phases as ticks, the past ones dim green, the current one lit and glowing, the ones to come dark; and "Round 3 · Staging" under
  * those. `wide` puts the previous and next phase inline at the phase's sides; `shortRound` (a phone under 760 pt inside the insets)
  * says "R3" for the round. `stopAhead` puts an accent S after the phase. No pill and no edge: a tap anywhere on it calls `onPress`

@@ -35,6 +35,8 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
 | `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
+| `pnpm docs:index` | Rewrites `docs/INDEX.md`, the index of the docs agents read. A test fails while it is stale. |
+| `pnpm docs:section <file> "<heading>"` | Prints one doc section with its subsections. |
 | `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `.cache/booklets/` for Metro. |
 | `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. |
@@ -51,7 +53,8 @@ Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is g
 
 - [docs/brief.md](docs/brief.md): decisions, the stack, the rules the engine implements, and the data rules.
 - [docs/architecture.md](docs/architecture.md): how the code is split, and the test layers.
-- [docs/design-system.md](docs/design-system.md): the screens' look.
+- [docs/INDEX.md](docs/INDEX.md): generated index of every doc agents read, with section line ranges and the sections each code area cites (`pnpm docs:index`; `pnpm docs:section <file> "<heading>"` prints one section).
+- [docs/design-system.md](docs/design-system.md): the screens' look; the table's is in [docs/design-system-table.md](docs/design-system-table.md).
 - [docs/phases/](docs/phases/): one file per phase, and [STATUS.md](docs/phases/STATUS.md).
 - [docs/plans/](docs/plans/): plans, among them [effect-authoring.md](docs/plans/effect-authoring.md), the cookbook for effect records and mechanic families. Plans already carried out are in `docs/plans/done/`.
 - [docs/handover/](docs/handover/): [agent-brief.md](docs/handover/agent-brief.md), the brief a family agent follows, and handovers for work left open.

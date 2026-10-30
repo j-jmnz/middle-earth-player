@@ -1,4 +1,4 @@
-// The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system.md, Table): the threat dials at the left (then
+// The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system-table.md): the threat dials at the left (then
 // Life and the Burden deck), the phase rail centered on the screen, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.

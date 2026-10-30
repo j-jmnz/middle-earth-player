@@ -158,7 +158,7 @@ export default function Decks() {
 
   const faces = useMemo(() => deckFaces(catalog, saved.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)])), [catalog, saved]);
   const readiness = useMemo(() => new Map(saved.map((deck) => [deck.id, deckReadiness(deck, faces)])), [saved, faces]);
-  // The cards whose text the app does not apply: each deck says how many it holds (docs/plans/inactive-text.md).
+  // The cards whose text the app does not apply: each deck says how many it holds (docs/plans/done/inactive-text.md).
   const inactive = useMemo(() => notAppliedIn(faces), [faces]);
   const spheres = useMemo(() => deckListSpheres(saved, faces), [saved, faces]);
   const shown = useMemo(() => filterDecks(saved, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [saved, filter, faces, readiness]);

@@ -62,7 +62,7 @@ None. The gesture is phone-only. The simulator does not close a drag exit (`.cur
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
-- `docs/design-system.md` (Table, Gestures) is rewritten.
+- `docs/design-system-table.md` (Gestures) is rewritten.
 - STATUS.md lists the phone checks as open:
   - hold, slide and release on 3, 6 and 9 cards;
   - a fast drag still plays a card;
