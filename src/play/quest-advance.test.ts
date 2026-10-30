@@ -64,10 +64,9 @@ describe("the quest advance screen", () => {
   it("names the stage by its place and side, and how it is completed", () => {
     const made = make({ seats: 1, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41031"], discard: ["41031"] });
     const words = advanceWords(made.state, made.ctx, made.state.questStage ?? "", "The Dark of Nibin-Dûm", ledgerLine);
-    expect(words.eyebrow).toBe("The quest advances · stage 1 of 4");
-    expect(words.title).toBe("Stage 1B · The Dark of Nibin-Dûm");
+    expect(words.eyebrow).toBe("Stage 1 of 4");
+    expect(words.title).toBe("The Dark of Nibin-Dûm");
     expect(words.detail).toBe("8 quest points to complete it");
-    expect(advanceWords(made.state, made.ctx, made.state.questStage ?? "", "The Dark of Nibin-Dûm", ledgerLine, true).eyebrow).toBe("The quest · stage 1 of 4");
   });
 });
 

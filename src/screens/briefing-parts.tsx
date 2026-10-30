@@ -32,8 +32,8 @@ const DIFFICULTIES = ["Easy", "Normal"] as const;
 
 // What each difficulty changes (ltp.easy-mode, easy-mode.easy-mode), in the briefing under the switch.
 const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
-  Easy: "Easy: each hero starts with 1 resource, and the encounter cards with the gold difficulty border are left out. Good for a first game.",
-  Normal: "Normal: the full encounter deck, and no starting resources.",
+  Easy: "Each hero starts with 1 resource, and the encounter cards with the gold difficulty border are left out. Good for a first game.",
+  Normal: "Full encounter deck, no starting resources.",
 };
 
 const BANNER_HEIGHT = 330;
@@ -300,12 +300,11 @@ export function EncounterDetails({ facts }: { facts: ScenarioFacts }) {
 
 /**
  * The briefing's Deal bar: the validator's sentences in danger (without collector codes), any extra control (the campaign's
- * Accept +1 threat), the sentence naming the difficulty and what Deal does, and DEAL, disabled until the loadout is legal.
+ * Accept +1 threat), what Deal waits for or the warning that it drops an open scenario, and DEAL, disabled until the loadout is legal.
  */
 export function DealBar({
   problems,
   dealError,
-  difficulty,
   dropsOpen = false,
   dealable,
   waiting = null,
@@ -314,7 +313,6 @@ export function DealBar({
 }: {
   problems: readonly Problem[];
   dealError: string | null;
-  difficulty: Difficulty;
   dropsOpen?: boolean;
   dealable: boolean;
   // What the disabled Deal waits for (a choice the campaign card asks above), in a sentence of its own.
@@ -322,6 +320,7 @@ export function DealBar({
   onDeal: () => void;
   children?: ReactNode;
 }) {
+  const note = waiting ?? dealSentence(dropsOpen);
   return (
     <View className="gap-2">
       {problems.map((problem, index) => (
@@ -335,9 +334,11 @@ export function DealBar({
         </Label>
       ) : null}
       {children}
-      <Label tone="muted" testID="briefing-deal-note" className="text-center">
-        {waiting ?? dealSentence(difficulty, dropsOpen)}
-      </Label>
+      {note ? (
+        <Label tone="muted" testID="briefing-deal-note" className="text-center">
+          {note}
+        </Label>
+      ) : null}
       <PrimaryButton label="Deal" testID="deal" disabled={!dealable} onPress={onDeal} />
     </View>
   );

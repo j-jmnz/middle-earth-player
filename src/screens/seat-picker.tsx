@@ -14,7 +14,7 @@ import { BodyText, Chevron, Label, Section, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { emptyDeckListFilter, useDeckListView } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
-import { deckCountLine, notAppliedCards, notAppliedLine } from "./deck-status";
+import { deckCountLine, deckShortLine, notAppliedCards, notAppliedLine } from "./deck-status";
 import { DeckCover, DeckRow, HeroTile, heroFace, type HeroFace } from "./hero-tile";
 import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
 import { useUiScale } from "../play/ui-scale";
@@ -107,7 +107,7 @@ export function SeatPicker({
         </View>
       ) : choosing ? (
         <View>
-          <Label>{pickedDeck ? "Pick another deck for this seat." : "Choose the deck this seat plays."}</Label>
+          {pickedDeck ? <Label>Pick another deck for this seat.</Label> : null}
           <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={savedDecks.length} testIDPrefix={`briefing-decks-${index}`} />
           <View
             className={wide ? "mt-3 flex-row flex-wrap" : "mt-3"}
@@ -122,6 +122,7 @@ export function SeatPicker({
                 name: deck.name,
                 heroes: deck.heroes.map(faceOf),
                 detail: deckCountLine(deck),
+                short: deckShortLine(deck),
                 status: fell.length > 0 ? { ready: false, text: `${heroNames(fell)} fell and cannot be picked` } : ready,
                 note: notAppliedLine(deck, inactive),
                 onPress: () => choose(deck.id),
@@ -204,8 +205,8 @@ export function SeatPicker({
       )}
       {pickedDeck && !choosing && slot && !ringBearer ? (
         <View testID="ringbearer-slot" className="mt-3">
-          <Label>Choose the Ring-bearer</Label>
-          <View className="mt-1.5 gap-2">
+          <Section title="Ring-bearer" />
+          <View className="gap-2">
             {candidates.map((candidate) => (
               <Pressable
                 key={candidate.code}

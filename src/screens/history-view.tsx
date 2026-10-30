@@ -181,11 +181,6 @@ export function HistoryView({ initial }: { initial: RunKind }) {
           ))}
         </View>
       </View>
-      {shown.length > 0 ? (
-        <Label className="mt-2" testID="history-count">
-          {plural(shown.length, "run")}
-        </Label>
-      ) : null}
     </View>
   );
 
@@ -198,6 +193,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
           extraData={{ refs, playthroughs, nameOf }}
           keyExtractor={(item) => (item.type === "group" ? item.id : `run-${item.id}`)}
           getItemType={(item) => (item.type === "group" ? "group" : "run")}
+          accessibilityLabel={shown.length > 0 ? plural(shown.length, "run") : undefined}
           style={{ flex: 1 }}
           contentContainerStyle={list.contentContainerStyle}
           showsVerticalScrollIndicator={false}

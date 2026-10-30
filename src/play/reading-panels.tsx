@@ -61,7 +61,7 @@ export function PileList({
         {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">The pile is empty.</Text> : null}
         {cards.map((card) =>
           playable.includes(card.id) && onPlay ? (
-            <Tile key={card.id} label={card.label} detail="Can be played from here now. Tap to play it." selected testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
+            <Tile key={card.id} label={card.label} detail="Playable now" selected testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
           ) : (
             <Tile key={card.id} label={card.label} selected={false} testID={`pile-card-${card.id}`} onPress={() => onRead(card.id)} />
           ),
@@ -78,8 +78,9 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
   return (
     <View testID="log-sheet" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
-        <Text className="font-display text-eyebrow uppercase text-inkLabel">Log</Text>
-        <Text accessibilityRole="header" className="mt-1 font-display text-title text-ink">{`Round ${round}`}</Text>
+        <Text accessibilityRole="header" accessibilityLabel={`Log, round ${round}`} className="font-display text-title text-ink">
+          Log
+        </Text>
       </View>
       <PanelClose testID="log-close" onPress={onClose} />
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>

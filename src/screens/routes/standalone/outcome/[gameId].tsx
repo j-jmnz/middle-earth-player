@@ -76,7 +76,7 @@ export default function StandaloneOutcome() {
           <StatTile label="Rounds" value={String(result.score.rounds)} />
           <StatTile label="Victory points" value={String(result.score.victoryPoints)} />
         </View>
-        <Label className="mt-2 text-center">Lower is better.</Label>
+        <Label className="mt-2 text-center">Lower score is better.</Label>
       </View>
     ) : (
       <View className="mt-6 gap-1" testID="outcome-lines">
@@ -121,9 +121,6 @@ export default function StandaloneOutcome() {
         </ScreenScroll>
       )}
       <ActionBar>
-        <Label tone="muted" className="mb-3 text-center" testID="outcome-consequence">
-          A standalone game writes nothing to a campaign.
-        </Label>
         <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
         <View className="mt-1 items-center">
           <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={again} />

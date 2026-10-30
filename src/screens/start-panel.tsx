@@ -51,7 +51,7 @@ export type StartOption = { data: CampaignData; name: string };
 
 /**
  * The start block: one for the whole list, so the screen has one primary button. It sits on the ground with no panel round it. At its top the campaign to start (the scene and
- * the scenario count follow the choice), then the seat count, chosen once for the campaign, then the carry-over of a finished
+ * the name follow the choice), then the seat count, chosen once for the campaign, then the carry-over of a finished
  * playthrough when there is one to take in (Fresh start is the default), then Start. Every section stays mounted, so the panel
  * keeps its state when one is hidden.
  */
@@ -73,14 +73,10 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
   const { data, name } = chosen;
   const taken = carry.find((choice) => choice.saveId === taking) ?? null;
   const seatId = (count: Seats) => (isFellowship(data.id) ? `seats-${count}` : `seats-${data.id}-${count}`);
-  const count = `${data.scenarios.length} scenarios`;
   const title = (
-    <>
-      <Text className="font-display text-title text-bone" style={titleShadow}>
-        {name}
-      </Text>
-      <Label>{count}</Label>
-    </>
+    <Text className="font-display text-title text-bone" style={titleShadow}>
+      {name}
+    </Text>
   );
   // In landscape the chooser spans the whole width, so each of three tiles is wide enough for a campaign's name on one line.
   const chooser =
@@ -120,7 +116,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
           stretch
         />
       </View>
-      <Label className="mt-2">Chosen once for this campaign</Label>
+      <Label className="mt-2">{"Can't be changed later."}</Label>
     </>
   );
   const carryOver =
@@ -152,7 +148,7 @@ export function StartPanel({ options, carry, onStart }: { options: readonly Star
         </View>
       </View>
     ) : null;
-  const start = <PrimaryButton label={`Start ${name}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />;
+  const start = <PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}`} testID={isFellowship(data.id) ? "start-fellowship" : `start-${data.id}`} onPress={() => onStart(data.id, seats, taken)} />;
   const startPlate = <View className={landscape ? "mt-3" : "mt-4"}>{start}</View>;
   return compact ? (
     // No scene band and no heading: the selected chip already names the campaign and counts its scenarios, and the primary's

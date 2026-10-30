@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DeckSaveCard } from "../catalog/deck-save";
-import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckReadiness, deckSections, newDeckName, savedDeckName, sphereSplit, startingThreat } from "./deck-status.ts";
+import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckReadiness, deckShortLine, deckSections, newDeckName, savedDeckName, sphereSplit, startingThreat } from "./deck-status.ts";
 
 function fact(name: string, typeCode: string, deckLimit: number | null = 3): DeckSaveCard {
   return { name, typeCode, sphereCode: "lore", deckLimit, deckLegal: true, traits: null };
@@ -43,6 +43,11 @@ describe("deck lines", () => {
     expect(deckCountLine({ heroes: ["h1"], cards: [{ code: "a0", count: 3 }] })).toBe("1 hero · 3 of 50 cards");
     expect(deckCountLine({ heroes: ["h1", "h2"], cards: allies })).toBe("2 heroes · 51 cards");
     expect(deckContentsPhrase({ heroes: ["h1"], cards: [{ code: "a0", count: 1 }] })).toBe("1 hero and 1 card");
+  });
+
+  it("shows the card count on a cover or row only while the deck is short", () => {
+    expect(deckShortLine({ cards: [{ code: "a0", count: 48 }] })).toBe("48 of 50 cards");
+    expect(deckShortLine({ cards: allies })).toBeNull();
   });
 
   it("adds the heroes' threat, and has none while a hero's threat is unknown", () => {

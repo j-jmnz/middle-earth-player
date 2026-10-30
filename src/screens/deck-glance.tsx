@@ -42,7 +42,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
   const lead = shown[Math.floor(middle)] ?? shown[0];
   const glow = lead ? palette[(SPHERE_TINT[lead.sphereCode ?? ""] ?? "accent") as keyof typeof palette] : palette.accent;
   return (
-    <View importantForAccessibility="no-hide-descendants" style={{ height: h + 24 * s, alignItems: "center", justifyContent: "center" }}>
+    <View accessible accessibilityLabel={`Heroes: ${heroes.map((hero) => hero.name).join(", ")}`} style={{ height: h + 24 * s, alignItems: "center", justifyContent: "center" }}>
       <View pointerEvents="none" style={{ position: "absolute", width: w * 3.2, height: h * 1.3, backgroundImage: `radial-gradient(50% 50% at 50% 55%, ${withAlphaHex(glow, 0.32)}, ${withAlphaHex(glow, 0)})` }} />
       {shown.map((hero, index) => {
         const offset = index - middle;
@@ -122,7 +122,7 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
 }
 
 /**
- * The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, its heroes and starting
+ * The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, its starting
  * threat, the analytics, the notes, and the jump chips to its headings. Whether it is ready is said once, beside Save. A view of
  * the draft; the editor owns the state.
  */
@@ -151,6 +151,7 @@ export function DeckGlance({
   onName: (next: string) => void;
   ready: boolean;
   threat: number | null;
+  // "3 heroes · 50 cards": spoken with the threat, not shown (the fan shows the heroes, the analytics the count).
   countLine: string;
   notApplied: string | null;
   droppedNote: string | null;
@@ -166,7 +167,6 @@ export function DeckGlance({
   const palette = usePalette();
   const s = useUiScale();
   const shadow = useTitleShadow();
-  const heroLine = [heroes.map((hero) => hero.name.split(" ")[0]).join(" · "), threat == null ? null : `Threat ${threat}`].filter(Boolean).join(" · ");
   return (
     <View style={{ paddingTop: top + 56 * s }}>
       <View style={side}>
@@ -183,14 +183,15 @@ export function DeckGlance({
           className="mt-3 text-center font-display text-bone"
           style={{ minHeight: touch(s, 44), fontSize: 26 * s, lineHeight: 32 * s, ...shadow }}
         />
-        {heroLine ? <Text className="text-center text-label text-muted">{heroLine}</Text> : null}
+        {threat == null ? null : (
+          <Text accessibilityLabel={`Threat ${threat}, ${countLine}`} className="text-center text-label text-muted">
+            {`Threat ${threat}`}
+          </Text>
+        )}
         {/* A tablet in portrait keeps the analytics to a reading width, so its bars and words stay in proportion. */}
         <View className="mt-3" style={{ width: "100%", maxWidth: 560 * s, alignSelf: "center" }}>
           <DeckAnalytics cards={cards} faces={faces} ready={ready} />
         </View>
-        <Label testID="deck-count" className="mt-3">
-          {countLine}
-        </Label>
         {notApplied ? (
           <Label testID="deck-not-applied" tone="muted" className="mt-1">
             {`${notApplied}. Each card says what the app leaves out.`}

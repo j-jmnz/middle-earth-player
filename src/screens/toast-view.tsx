@@ -41,7 +41,7 @@ export function ToastView() {
         <View
           testID="toast"
           accessibilityLiveRegion="polite"
-          className={`min-h-14 flex-row items-center rounded-container border bg-pressed pl-4 ${toast.tone === "danger" ? "border-danger" : "border-accentLine"}`}
+          className="min-h-14 flex-row items-center rounded-container bg-pressed pl-4"
         >
           <Text testID="toast-text" className={`flex-1 py-3 text-body ${toast.tone === "danger" ? "text-danger" : "text-bone"}`}>
             {toast.text}

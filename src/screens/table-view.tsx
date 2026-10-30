@@ -40,7 +40,7 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { previewCards } from "../play/table-preview";
 import { pictureCode, pictureKey } from "../play/picture-key";
-import { advanceButton, advanceWords, isOpening } from "../play/quest-advance";
+import { advanceButton, advanceWords } from "../play/quest-advance";
 import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
@@ -474,7 +474,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         <QuestAdvanceView
           key={advance.shown.seq}
           card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
-          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine, isOpening(advance.shown))}
+          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine)}
           button={advanceButton(game, ctx, advance.shown, ledgerLine)}
           asks={advance.asks}
           choice={choice}

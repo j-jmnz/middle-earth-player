@@ -71,6 +71,12 @@ export function deckCountLine(deck: Pick<DeckContent, "heroes" | "cards">): stri
   return `${plural(deck.heroes.length, "hero", "heroes")} · ${cards}`;
 }
 
+/** "48 of 50 cards" while the deck is short of its minimum, else null: a cover or row shows the count only then. */
+export function deckShortLine(deck: Pick<DeckContent, "cards">): string | null {
+  const total = deckCardCount(deck.cards);
+  return total < DECK_MINIMUM ? `${total} of ${DECK_MINIMUM} cards` : null;
+}
+
 /** "2 heroes and 4 cards": what a deck holds, for a sentence. */
 export function deckContentsPhrase(deck: Pick<DeckContent, "heroes" | "cards">): string {
   return `${plural(deck.heroes.length, "hero", "heroes")} and ${plural(deckCardCount(deck.cards), "card", "cards")}`;

@@ -134,7 +134,7 @@ export const PoolCardCell = memo(function PoolCardCell({
       >
         {({ pressed }) => (
           <View
-            style={{ width, height, borderRadius: cardCorner(width, height), overflow: "hidden", opacity: pressed ? 0.75 : 1, backgroundColor: palette.raised, ...(selected ? { boxShadow: selectedRingOf(t) } : adding && count > 0 ? { boxShadow: `0 0 0 1.5px ${palette.accent}` } : {}) }}
+            style={{ width, height, borderRadius: cardCorner(width, height), overflow: "hidden", opacity: pressed ? 0.75 : 1, backgroundColor: palette.raised, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
           >
             {picture ? (
               <RowCardImage code={item.code} source={picture} width={width} height={height} />

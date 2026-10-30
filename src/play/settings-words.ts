@@ -9,6 +9,7 @@ export const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", 
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large" };
 
 export const SCALE_LINE = "Resizes the whole app, the table included.";
+// THEME_LINE and REDUCE_MOTION_LINE are spoken with their switches (setting-rows.tsx), not shown.
 export const THEME_LINE = "System follows your phone.";
 export const SPEED_LINE = "Quick shortens every motion and skips the phase title.";
 export const REDUCE_MOTION_LINE = "Follow system uses your phone's setting. Always keeps motion off.";

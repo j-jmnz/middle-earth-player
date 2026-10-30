@@ -113,22 +113,21 @@ export function Portrait({ card, size: base = 40, ring = true, tint, glow = true
         height: size,
         borderRadius: size / 2,
         overflow: "hidden",
-        ...(ring ? { borderWidth: 1.5, borderColor: color, ...(glow && tint ? { boxShadow: `0 0 10px ${withAlphaHex(tint, 0.55)}` } : {}) } : { borderWidth: 1, borderColor: palette.hairline }),
+        ...(ring ? { borderWidth: 1.5, borderColor: color, ...(glow && tint ? { boxShadow: `0 0 10px ${withAlphaHex(tint, 0.55)}` } : {}) } : {}),
       }}
     >
-      <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 2)} height={size - (ring ? 3 : 2)} />
+      <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 0)} height={size - (ring ? 3 : 0)} />
     </View>
   );
 }
 
 /** A row of overlapping portraits: a fellowship at a glance. */
 export function PortraitRow({ heroes, size: base = 40 }: { heroes: readonly ArtCard[]; size?: number }) {
-  const palette = usePalette();
   const size = base * useUiScale();
   return (
     <View className="flex-row" importantForAccessibility="no-hide-descendants">
       {heroes.map((hero, index) => (
-        <View key={`${hero.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -size * 0.3, borderRadius: size / 2, borderWidth: 2, borderColor: palette.night }}>
+        <View key={`${hero.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -size * 0.3 }}>
           <Portrait card={hero} size={base} />
         </View>
       ))}

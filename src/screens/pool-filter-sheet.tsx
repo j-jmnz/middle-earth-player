@@ -68,7 +68,7 @@ export function PoolFilterSheet({
 
   return (
     <SheetModal visible={open} animationType={filterSheetAnimation(reduceMotion)} onRequestClose={dismiss} scrimLabel="Close filter">
-      <PaperSheet step="Filter" title={chooserTitle(chooser)}>
+      <PaperSheet title={chooserTitle(chooser)}>
         {chooser === "pack" ? (
           <OptionList
             rows={packChooserRows(groups)}
@@ -155,7 +155,7 @@ function OptionRow({ label, detail, onPress, icon }: { label: string; detail: st
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      className="min-h-14 flex-row items-center justify-between border-b border-inkLine/25"
+      className="min-h-14 flex-row items-center justify-between"
     >
       <View className="flex-row items-center gap-2">
         {icon ? <GameIcon name={icon} size={16 * s} tint="ink" /> : null}
@@ -172,7 +172,7 @@ function chooserTitle(chooser: "pack" | "trait" | "cost" | null): string {
   if (chooser === "pack") return "Pack or cycle";
   if (chooser === "trait") return "Trait";
   if (chooser === "cost") return "Cost";
-  return "Card pool";
+  return "Filter";
 }
 
 function FilterBody({

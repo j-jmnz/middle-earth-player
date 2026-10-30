@@ -121,7 +121,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
                 <BookCovers cover={cover} />
               </View>
             ) : null}
-            <Section title="Glossary" className="mt-4" right={<Text className="text-label text-faint">{`${visible.length}`}</Text>} />
+            <Section title="Glossary" className="mt-4" />
           </View>
         }
         ListFooterComponent={<View className="pb-safe" />}

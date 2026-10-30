@@ -3,11 +3,9 @@ import { describe, expect, it } from "vitest";
 import { actionLine, dealSentence, needWords, problemWords } from "./briefing-words.ts";
 
 describe("briefing words", () => {
-  it("words a missing Ring-bearer as the slot asks for it", () => {
+  it("words a missing Ring-bearer as the seat that needs one", () => {
     const words = problemWords({ rule: "A Ring-bearer is required", message: "Sam Gamgee (141002): the first seat needs a Fellowship-sphere hero with the Ring-bearer trait" });
-    expect(words).toContain("Ring-bearer");
-    expect(words).not.toContain("Sam Gamgee");
-    expect(words).not.toMatch(/\d/);
+    expect(words).toBe("Seat 1 needs a Ring-bearer.");
   });
 
   it("drops collector codes from other sentences and keeps the rest", () => {
@@ -19,9 +17,9 @@ describe("briefing words", () => {
     expect(problemWords({ rule: "Choose a deck", message: "Choose a saved deck for seat 1." })).toBe("Choose a saved deck for seat 1.");
   });
 
-  it("names the difficulty in the sentence over Deal", () => {
-    expect(dealSentence("Easy", false)).toBe("Easy difficulty. Dealing starts the scenario.");
-    expect(dealSentence("Normal", true)).toBe("Normal difficulty. A scenario is already open. Dealing again drops it.");
+  it("warns over Deal only when an open scenario would be dropped", () => {
+    expect(dealSentence(false)).toBeNull();
+    expect(dealSentence(true)).toBe("A scenario is already open. Dealing again drops it.");
   });
 });
 

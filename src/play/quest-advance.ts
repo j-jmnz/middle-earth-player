@@ -53,8 +53,9 @@ export function stageAsks(game: ScenarioState, stageId: string): boolean {
 }
 
 /**
- * What the screen says over the stage: "The quest advances" ("The quest" on the table's `opening`), "Stage 2B · A Fork in the
- * Road", and how the stage is won (its quest points, or the printed line that wins it), or what holds it back.
+ * What the screen says over the stage, in one stack: the overline "Stage 2 of 3" (none while the stage has no place), the stage's
+ * name ("A Fork in the Road"), and under it how the stage is won (its quest points, or the printed line that wins it), or the rule
+ * that holds it back, in the rule's own words.
  */
 export function advanceWords(
   game: ScenarioState,
@@ -62,17 +63,15 @@ export function advanceWords(
   stageId: string,
   name: string,
   line: (id: string) => string | null,
-  opening = false,
-): { eyebrow: string; title: string; detail: string | null } {
+): { eyebrow: string | null; title: string; detail: string | null } {
   const stage = game.cards[stageId];
   const place = stage ? stagePlace(game, stage.code) : null;
-  const title = place ? `Stage ${place.at}${stage?.face === "B" ? "B" : ""} · ${name}` : name;
   const points = stage ? stagePoints(game, stage, ctx) : null;
   const hold = advanceHold(game, ctx, line);
   const objective = points == null ? questObjective(game, ctx, line) : null;
-  const detail = hold ? `Cannot advance yet: ${hold}` : points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
-  const lead = opening ? "The quest" : "The quest advances";
-  return { eyebrow: place ? `${lead} · stage ${place.at} of ${place.of}` : lead, title, detail };
+  const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
+  const detail = hold ?? won;
+  return { eyebrow: place ? `Stage ${place.at} of ${place.of}` : null, title: name, detail };
 }
 
 /**

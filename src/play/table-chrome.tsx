@@ -79,13 +79,12 @@ export function ThreatRing({
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
-  const t = useTableTokens();
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
   if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
-      <View className="h-12 w-12 items-center justify-center rounded-control" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.accent }}>
+      <View className="h-12 w-12 items-center justify-center rounded-control">
         <Text testID={`${id}-value`} className="font-display text-title text-bone">
           {String(threat.threat)}
         </Text>
@@ -235,7 +234,7 @@ function ThreatDial({
             key={change?.at}
             entering={badge.in}
             exiting={badge.out}
-            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.accent : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
+            style={{ borderRadius: 999, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
             <Text testID={`${id}-delta`} className="font-display text-label text-bone">
               {delta.text}

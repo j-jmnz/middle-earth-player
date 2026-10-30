@@ -6,7 +6,7 @@ import { COVER, PAINTING, type Region } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { cardCorner } from "../play/card-corner";
-import { dropShadowOf, nightFade, rowSurface, selectedRingOf } from "../play/surfaces";
+import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
 import { withAlphaHex } from "../play/tokens";
@@ -174,9 +174,9 @@ export function HeroTile({
 }
 
 export function EmptyHeroSlot({ height, label = "Hero", onPress, testID }: { height: number; label?: string; onPress: () => void; testID?: string }) {
-  const palette = usePalette();
+  const t = useTableTokens();
   const pressedNight = usePressedNight();
-  const frame = { height, borderWidth: 1.5, borderStyle: "dashed" as const, borderColor: withAlphaHex(palette.accentLine, 0.7), backgroundColor: withAlphaHex(palette.night, 0.45) };
+  const frame = { height, ...slateSurface(false, t) };
   return (
     <Pressable
       testID={testID}
@@ -200,8 +200,10 @@ export function EmptyHeroSlot({ height, label = "Hero", onPress, testID }: { hei
 type DeckSummary = {
   name: string;
   heroes: readonly HeroFace[];
-  // "3 heroes · 47 of 50 cards".
+  // "3 heroes · 47 of 50 cards": spoken with the deck.
   detail: string;
+  // "47 of 50 cards" while the deck is short (deck-status.ts, deckShortLine); the cover and row show the count only then.
+  short?: string | null;
   status: { ready: boolean; text: string };
   // "6 cards with text not applied" (deck-status.ts, notAppliedLine), under the status; not a readiness rule.
   note?: string | null;
@@ -247,11 +249,11 @@ function heroNames(heroes: readonly HeroFace[]): string {
   return heroes.length > 0 ? heroes.map((hero) => hero.name).join(", ") : "No heroes yet";
 }
 
-function StatusLine({ testID, detail, status, note }: { testID: string; detail: string; status: DeckSummary["status"]; note?: string | null }) {
+function StatusLine({ testID, short, status, note }: { testID: string; short?: string | null; status: DeckSummary["status"]; note?: string | null }) {
   return (
     <View>
       <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
-        <Text className="text-label text-muted">{detail}</Text>
+        {short ? <Text className="text-label text-muted">{short}</Text> : null}
         <Readiness testID={`${testID}-status`} status={status} />
       </View>
       {note ? (
@@ -265,14 +267,14 @@ function StatusLine({ testID, detail, status, note }: { testID: string; detail: 
 
 /**
  * A saved deck in the deck list's Cards view: its three heroes' paintings side by side, split by 1 pt of the ground and fading into
- * the cover's foot, then the deck's name, and a line with the heroes on the left and whether it is ready on the right. The selected
+ * the cover's foot, then the deck's name, and a line with the heroes on the left and whether it is ready on the right (and "47 of 50 cards" under it while the deck is short). The selected
  * deck (the briefing's picker) carries the silver ring. A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance).
  */
 export function DeckCover(props: DeckSummary & { height: number }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const { name, heroes, detail, status, note, height, testID, children, selected, disabled } = props;
+  const { name, heroes, short, status, note, height, testID, children, selected, disabled } = props;
   const foot = t.depth === "light" ? palette.raised : palette.dusk;
   return (
     <View className="overflow-hidden rounded-item" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
@@ -304,7 +306,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                 </Text>
                 <Readiness testID={`${testID}-status`} status={status} />
               </View>
-              <Text className="text-label text-faint">{detail}</Text>
+              {short ? <Text className="text-label text-faint">{short}</Text> : null}
               {note ? (
                 <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
                   {note}
@@ -341,7 +343,7 @@ export function DeckRow(props: DeckSummary) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const { name, heroes, detail, status, note, testID, children, selected, disabled } = props;
+  const { name, heroes, short, status, note, testID, children, selected, disabled } = props;
   const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
     <View className="mb-1.5 overflow-hidden rounded-item" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
@@ -366,7 +368,7 @@ export function DeckRow(props: DeckSummary) {
               <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
                 {name}
               </Text>
-              <StatusLine testID={testID} detail={detail} status={status} note={note} />
+              <StatusLine testID={testID} short={short} status={status} note={note} />
             </View>
             {selected === undefined ? <Chevron direction="right" color={palette.faint} size={8} /> : <SelectedMark selected={selected} />}
           </View>

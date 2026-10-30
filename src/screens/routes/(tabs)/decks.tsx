@@ -5,7 +5,7 @@ import { AccessibilityInfo, View } from "react-native";
 
 import { BodyText, HubHeader, IconButton, PillButton, Screen, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
-import { copyDeckName, deckCountLine, deckReadiness, newDeckName, notAppliedLine } from "../../deck-status";
+import { copyDeckName, deckCountLine, deckReadiness, deckShortLine, newDeckName, notAppliedLine } from "../../deck-status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
 import { COVER_GAP, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
@@ -228,6 +228,7 @@ export default function Decks() {
       name: deck.name,
       heroes: facesFor(deck),
       detail: deckCountLine(deck),
+      short: deckShortLine(deck),
       status: readiness.get(deck.id) ?? { ready: false, text: "" },
       note: notAppliedLine(deck, inactive),
       onPress: () => openDeck(deck),

@@ -72,8 +72,8 @@ export function SettingsRows({
     <>
       {groups.includes("display") ? (
         <SettingGroup title="Display" testID={id("display")} first={first && top === "display"}>
-          <SettingChoice title="Theme" detail={THEME_LINE} testID={id("theme")}>
-            <Segmented options={THEME_OPTIONS} value={settings.theme} onChange={(theme) => onChange({ theme })} testIDPrefix={id("theme")} accessibilityLabel="Theme" stretch words={THEME_WORDS} />
+          <SettingChoice title="Theme" testID={id("theme")}>
+            <Segmented options={THEME_OPTIONS} value={settings.theme} onChange={(theme) => onChange({ theme })} testIDPrefix={id("theme")} accessibilityLabel={`Theme. ${THEME_LINE}`} stretch words={THEME_WORDS} />
           </SettingChoice>
           <SettingChoice title="UI scale" detail={SCALE_LINE} testID={id("scale")}>
             <Segmented options={UI_SCALE_OPTIONS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testIDPrefix={id("scale")} accessibilityLabel="UI scale" stretch words={SCALE_WORDS} />
@@ -87,8 +87,8 @@ export function SettingsRows({
           <SettingChoice title="Animation speed" detail={SPEED_LINE} testID={id("speed")}>
             <Segmented options={SPEEDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} testIDPrefix={id("speed")} accessibilityLabel="Animation speed" stretch words={SPEED_WORDS} />
           </SettingChoice>
-          <SettingChoice title="Reduce motion" detail={REDUCE_MOTION_LINE} testID={id("reduce-motion")}>
-            <Segmented options={REDUCE_MOTION_OPTIONS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} testIDPrefix={id("reduce-motion")} accessibilityLabel="Reduce motion" stretch words={REDUCE_MOTION_WORDS} />
+          <SettingChoice title="Reduce motion" testID={id("reduce-motion")}>
+            <Segmented options={REDUCE_MOTION_OPTIONS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} testIDPrefix={id("reduce-motion")} accessibilityLabel={`Reduce motion. ${REDUCE_MOTION_LINE}`} stretch words={REDUCE_MOTION_WORDS} />
           </SettingChoice>
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
           <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />

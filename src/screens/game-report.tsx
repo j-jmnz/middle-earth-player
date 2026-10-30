@@ -37,7 +37,6 @@ export function GameReportView({ report, tiles = false, testID = "game-report" }
             {score.map((line, index) => (
               <Row key={line.label} label={line.label} value={line.value} tone={!tiles && index === score.length - 1 ? "bone" : "muted"} testID={`${testID}-score-${index}`} />
             ))}
-            {tiles ? null : <Label className="mt-1">Lower is better.</Label>}
           </View>
         </View>
       ) : null}

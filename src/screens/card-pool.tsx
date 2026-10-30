@@ -63,7 +63,6 @@ function TypeChips({
   // A request from outside the pool: the row scrolls to the chip it chose.
   request: PoolTypeRequest | null;
 }) {
-  const palette = usePalette();
   const row = useRef<ComponentRef<typeof ScrollView>>(null);
   const chipX = useRef(new Map<string, number>());
   useEffect(() => {
@@ -74,7 +73,7 @@ function TypeChips({
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView ref={row} horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
-      {/* A switch, not a type: a chip with a check when on, and a hairline after it before the type chips. */}
+      {/* A switch, not a type: a chip with a check when on, before the type chips. */}
       <ToggleChip
         testID="pool-applied-only"
         asSwitch
@@ -83,7 +82,6 @@ function TypeChips({
         accessibilityLabel="Applied only: cards whose text the app applies"
         onPress={() => onApplied(!applied)}
       />
-      <View className="my-3 w-px" style={{ backgroundColor: withAlphaHex(palette.bone, 0.12) }} />
       {options.map((option) => (
         <ToggleChip
           key={option.code ?? "all"}

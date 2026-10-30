@@ -338,15 +338,15 @@ export function ActionBar({ children, safe = true, testID, align = "auto" }: { c
 }
 
 /** Parchment sheet over the rail or a list, on the table sheets' frame. Repeats the step in an eyebrow. */
-export function PaperSheet({ step, title, children }: { step: string; title: string; children: ReactNode }) {
+export function PaperSheet({ step, title, children }: { step?: string; title: string; children: ReactNode }) {
   // A sheet floating centred (SheetModal outside compact) is not pulled down from its top edge, so it has no grabber.
   const floating = useContext(SheetCornersContext) === "all";
   return (
     <SheetFrame animated={false}>
       {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-control bg-inkLine" />}
       <View className="items-center">
-        <Eyebrow tone="inkLabel">{step}</Eyebrow>
-        <Text className="mt-1 text-center font-display text-title text-ink">{title}</Text>
+        {step ? <Eyebrow tone="inkLabel">{step}</Eyebrow> : null}
+        <Text className={`${step ? "mt-1 " : ""}text-center font-display text-title text-ink`}>{title}</Text>
       </View>
       <View className="mt-5">{children}</View>
     </SheetFrame>
@@ -379,7 +379,7 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
           alignItems: "center",
           justifyContent: "center",
           backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(tone, 0.12)} 0%, ${withAlphaHex(tone, 0.02)} 70%, ${withAlphaHex(tone, 0)} 100%)`,
-          boxShadow: `inset 0 0 0 1.5px ${withAlphaHex(tone, 0.55)}, 0 0 40px ${withAlphaHex(tone, 0.3)}, inset 0 0 30px ${withAlphaHex(tone, 0.2)}`,
+          boxShadow: `0 0 40px ${withAlphaHex(tone, 0.3)}, inset 0 0 30px ${withAlphaHex(tone, 0.2)}`,
         }}
       >
         <View style={{ opacity: 0.12 }}>

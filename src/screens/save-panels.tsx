@@ -92,7 +92,7 @@ export function SaveHero({ line, seats }: { line: SaveLine; seats: readonly (rea
             style={{ position: "absolute", left: -8 * s, right: -8 * s, top: -28 * s, bottom: -24 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(palette.night, 0.78)} 0%, ${withAlphaHex(palette.night, 0.5)} 55%, ${withAlphaHex(palette.night, 0)} 100%)` }}
           />
         ) : null}
-        <Eyebrow rule onArt>{`Campaign · ${line.seats}`}</Eyebrow>
+        <Eyebrow rule onArt>{line.seats}</Eyebrow>
         <Text testID="continue-campaign" accessibilityRole="header" className="mt-2 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
           {line.name}
         </Text>
