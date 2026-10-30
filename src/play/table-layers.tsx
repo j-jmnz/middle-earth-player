@@ -153,8 +153,8 @@ export function TableLayers({
   return (
     <>
       {peek.words ? <PeekBanner words={peek.words} top={barBottom + PEEK_TOP * s} left={insets.left} width={canvas} onBack={peek.back} /> : null}
-      {/* The phase title crosses the canvas center; taps pass through it. */}
-      <PhaseSweep store={store} area={{ left: insets.left, top: barBottom, width: canvas, height: screen.height - barBottom }} />
+      {/* The phase title crosses the middle of the table under the top bar, the canvas and the command column together; taps pass through it. */}
+      <PhaseSweep store={store} area={{ left: insets.left, top: barBottom, width: screen.width - insets.left - insets.right, height: screen.height - barBottom }} />
       {/* A tap outside the open tray, away from the canvas (which folds it itself): the top bar but its menu button and its dials (a dial
           cannot pick: the table view folds the tray on its tap and then peeks), and the empty part of the command column above the dock. A screen reader leaves the tray open. */}
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (

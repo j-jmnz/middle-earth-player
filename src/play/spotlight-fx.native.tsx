@@ -1,24 +1,35 @@
 // The light and the shock of the combat spotlight's layer (spotlight.native.tsx; docs/plans/done/combat-spotlight-redesign.md, §5): the dark
-// with its vignette in one radial gradient, a pool of light under the cards, the attacker's rim glow, the warm-white flash over the
-// target, the shockwave ring and the glint across a turned shadow card. Every glow is a gradient (no blur filter); each piece reads
-// the attack's frame (spotlight-beats.ts) through a derived value. The stage is in screen points already times the UI scale.
-import { Circle, Group, LinearGradient, RadialGradient, Rect as SkRect, RoundedRect, vec } from "@shopify/react-native-skia";
+// with its vignette in one radial gradient, a dim pool of light under the cards, the grain over the whole stage, the attacker's rim glow,
+// the warm-white flash over the target, the shockwave ring and the glint across a turned shadow card. Every glow is a gradient (no blur
+// filter); each piece reads the attack's frame (spotlight-beats.ts) through a derived value. The stage is in screen points already times
+// the UI scale.
+import { Circle, Group, ImageShader, LinearGradient, Path, RadialGradient, Rect as SkRect, RoundedRect, Skia, useTexture, vec, type SkImage, type SkPath } from "@shopify/react-native-skia";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
 import { cardCorner } from "./card-corner.ts";
 import type { Rect } from "./layout.ts";
 import type { Frame } from "./spotlight-beats.ts";
 import { FX } from "./spotlight-fx.ts";
+import { hash } from "./spotlight-particles.ts";
 import { SPOT } from "./spotlight-shape.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 
 // The warm white of the flash and the ring.
 const FLASH = "#FFF1D6";
-// The dark's opacity at the middle of the screen against its edge: the middle stays lit, the edge goes to the full night.
-const MIDDLE = 0.78;
-// The pool of light's peak opacity, and its radius in card heights.
-const POOL = 0.2;
-const POOL_REACH = 1.6;
+// The dark's opacity at the middle of the screen against its edge: the middle stays a little lit, the edge goes to the full night.
+const MIDDLE = 0.9;
+// The pool of light's peak opacity, and its radius in card heights: a dim, cold light, not a stage lamp.
+const POOL = 0.1;
+const POOL_REACH = 1.3;
+// The grain: a tile this many points square of seeded specks, repeated over the screen. Each layer is (how many specks, the night or
+// the bone, their opacity): many dark specks and a few pale ones, one or two points across.
+const GRAIN = 128;
+const GRAIN_LAYERS: readonly (readonly [number, "night" | "bone", number])[] = [
+  [900, "night", 0.3],
+  [450, "night", 0.55],
+  [300, "bone", 0.08],
+  [120, "bone", 0.16],
+];
 // The rim glow: three strokes from the wide faint one to the narrow bright one, as (width in pt, opacity).
 const RIM: readonly (readonly [number, number])[] = [
   [16, 0.12],
@@ -44,6 +55,39 @@ export function Pool({ cx, cy, cardH, dark, t }: { cx: number; cy: number; cardH
     <Circle cx={cx} cy={cy} r={r} blendMode="screen" opacity={dark}>
       <RadialGradient c={vec(cx, cy)} r={r} colors={[withAlphaHex(t.glow, POOL), withAlphaHex(t.glow, 0)]} />
     </Circle>
+  );
+}
+
+// The specks of grain layer `layer`: squares of one point (a fifth of them two) at seeded places in the tile.
+function specks(count: number, layer: number): SkPath {
+  const path = Skia.PathBuilder.Make();
+  for (let i = 0; i < count; i += 1) {
+    const size = hash(i, layer * 3 + 2) < 0.8 ? 1 : 2;
+    path.addRect(Skia.XYWHRect(Math.floor(hash(i, layer * 3) * GRAIN), Math.floor(hash(i, layer * 3 + 1) * GRAIN), size, size));
+  }
+  return path.build();
+}
+
+/** The grain tile, drawn once by the layer into a texture (`GRAIN` points square) from the dark theme's night and bone. */
+export function useGrainTexture(t: TableTokens): SharedValue<SkImage | null> {
+  const paths = GRAIN_LAYERS.map(([count, tone, alpha], layer) => ({ path: specks(count, layer), color: withAlphaHex(tone === "night" ? t.night : t.bone, alpha) }));
+  return useTexture(
+    <Group>
+      {paths.map(({ path, color }, layer) => (
+        <Path key={layer} path={path} color={color} />
+      ))}
+    </Group>,
+    { width: GRAIN, height: GRAIN },
+    [paths, t],
+  );
+}
+
+/** The grit over the whole stage, cards included: the grain tile repeated over the screen, in and out with the dark. */
+export function Grain({ width, height, texture, dark }: { width: number; height: number; texture: SharedValue<SkImage | null>; dark: SharedValue<number> }) {
+  return (
+    <SkRect x={0} y={0} width={width} height={height} opacity={dark}>
+      <ImageShader image={texture} tx="repeat" ty="repeat" />
+    </SkRect>
   );
 }
 

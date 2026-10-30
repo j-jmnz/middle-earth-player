@@ -33,14 +33,13 @@ describe("a particle", () => {
       expect(at(kind, 3, 200, 41, AT)).toEqual(a);
     }
     expect(at("spark", 3, 100, 41, AT)).not.toEqual(at("spark", 3, 100, 42, AT));
-    expect(at("ember", 3, 1000, 41, AT)).not.toEqual(at("ember", 3, 1000, 42, AT));
   });
 
   it("is invisible before the emitter begins, past the end of its life, and for an index the kind does not have", () => {
     for (const kind of KINDS) {
       for (let i = 0; i < PARTICLE_COUNT[kind]; i += 1) {
         expect(at(kind, i, -1, 5, AT).alpha, `${kind} ${i}`).toBe(0);
-        if (kind !== "ember") expect(at(kind, i, particleEnd(kind, BURN_MS), 5, AT).alpha, `${kind} ${i}`).toBe(0);
+        expect(at(kind, i, particleEnd(kind, BURN_MS), 5, AT).alpha, `${kind} ${i}`).toBe(0);
       }
       expect(at(kind, PARTICLE_COUNT[kind], 100, 5, AT).alpha).toBe(0);
     }
@@ -59,8 +58,7 @@ describe("a particle", () => {
     expect(particleEnd("spark", BURN_MS)).toBe(MOTION.spotlightSparks.ms);
     expect(particleEnd("deflect", BURN_MS)).toBe(MOTION.spotlightSparks.ms);
     expect(particleEnd("ash", BURN_MS)).toBe(BURN_MS + MOTION.spotlightAsh.ms);
-    expect(particleEnd("ember", BURN_MS)).toBe(Infinity);
-    for (const kind of ["converge", "spark", "deflect", "ash"] as const) {
+    for (const kind of KINDS) {
       const end = particleEnd(kind, BURN_MS);
       let last = 0;
       for (let i = 0; i < PARTICLE_COUNT[kind]; i += 1) {
@@ -73,8 +71,6 @@ describe("a particle", () => {
       // The slowest sprites do run to about the end.
       expect(last, kind).toBeGreaterThan(end * 0.8);
     }
-    // An ember loops whatever the time; its loop is the ember token's share.
-    expect(at("ember", 0, 10 * MOTION.spotlightEmber.ms, 11, AT).alpha).toBeGreaterThanOrEqual(0);
   });
 
   it("starts the sparks at the point of contact, flying out and streaking along their velocity", () => {
@@ -106,30 +102,6 @@ describe("a particle", () => {
     }
   });
 
-  it("flies the converging embers in from a ring around the attacker until they reach it", () => {
-    for (let i = 0; i < PARTICLE_COUNT.converge; i += 1) {
-      const path = range(700).map((t) => ({ t, ...at("converge", i, t, 9, AT) })).filter((sample) => sample.alpha > 0);
-      expect(path.length, `${i}`).toBeGreaterThan(100);
-      const first = path[0];
-      const last = path[path.length - 1];
-      expect(Math.hypot((first?.x ?? 0) - AT.x, (first?.y ?? 0) - AT.y)).toBeGreaterThan(0.4 * AT.size);
-      expect(Math.hypot((last?.x ?? 0) - AT.x, (last?.y ?? 0) - AT.y)).toBeLessThan(0.05 * AT.size);
-      // It only comes closer.
-      const dists = path.map((sample) => Math.hypot(sample.x - AT.x, sample.y - AT.y));
-      expect(dists).toEqual([...dists].sort((a, b) => b - a));
-    }
-  });
-
-  it("drifts the embers up around the card and loops them", () => {
-    for (let i = 0; i < PARTICLE_COUNT.ember; i += 1) {
-      const a = at("ember", i, 1500, 9, AT);
-      const b = at("ember", i, 1520, 9, AT);
-      expect(b.y).toBeLessThanOrEqual(a.y + 1e-9 + (b.alpha > 0 && a.alpha > 0 ? 0 : 1e9));
-      expect(Math.abs(a.x - AT.x)).toBeLessThan(1.2 * AT.size);
-    }
-    expect(shown("ember", 1500, 9, AT)).toBe(PARTICLE_COUNT.ember);
-  });
-
   it("rises the ash from the card, born where the burn front passes", () => {
     for (let i = 0; i < PARTICLE_COUNT.ash; i += 1) {
       const born = ashBirth(i, 9, 450);
@@ -147,13 +119,13 @@ describe("a particle", () => {
 });
 
 describe("the budgets", () => {
-  it("count 24 embers, 16 converging, 28 sparks, 18 deflecting and 36 ash, in at most four Atlas draws", () => {
-    expect(PARTICLE_COUNT).toEqual({ ember: 24, converge: 16, spark: 28, deflect: 18, ash: 36 });
+  it("count 28 sparks, 18 deflecting and 36 ash, and no embers over the stage, in at most four Atlas draws", () => {
+    expect(PARTICLE_COUNT).toEqual({ spark: 28, deflect: 18, ash: 36 });
     expect(new Set(Object.values(PARTICLE_DRAW)).size).toBeLessThanOrEqual(4);
     expect(ATLAS_DRAWS).toBeLessThanOrEqual(4);
   });
 
-  it("show at most about 90 sprites at once through a whole attack, kill, block or hit", () => {
+  it("show at most 64 sprites at once through a whole attack, kill, block or hit", () => {
     const shapes: ClashShape[] = [
       { damage: 3, destroyed: false, shadow: false, first: true, last: true },
       { damage: 2, destroyed: true, shadow: false, first: true, last: true },
@@ -164,12 +136,12 @@ describe("the budgets", () => {
       for (const t of range(MOTION.spotlight.ms, 5)) {
         const f = frameAt(shape, t, 1, 7);
         const burst: ParticleKind = shape.damage === 0 ? "deflect" : "spark";
-        const alive = shown("ember", f.emberT, 7, AT) + shown("converge", f.convergeT, 7, AT) + shown(burst, f.sparkT, 7, AT) + shown("ash", f.ashT, 7, AT);
+        const alive = shown(burst, f.sparkT, 7, AT) + shown("ash", f.ashT, 7, AT);
         most = Math.max(most, alive);
       }
       expect(most, JSON.stringify(shape)).toBeLessThanOrEqual(PARTICLE_BUDGET);
-      expect(most).toBeGreaterThan(24);
+      expect(most).toBeGreaterThan(12);
     }
-    expect(PARTICLE_BUDGET).toBe(90);
+    expect(PARTICLE_BUDGET).toBe(64);
   });
 });

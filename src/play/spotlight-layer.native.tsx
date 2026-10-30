@@ -1,5 +1,5 @@
 // The combat spotlight's full-screen layer (docs/plans/done/combat-spotlight-redesign.md, §1). It is mounted over the whole table, always,
-// and holds what the spotlight draws with: the fonts, the damage token and the card backs, the particle sprite texture, the burn shader
+// and holds what the spotlight draws with: the fonts, the damage token and the card backs, the particle sprite texture, the grain tile, the burn shader
 // and the stage-size decodes of the plan's cards. It mounts a Skia canvas (not opaque, so a TextureView on Android and stacked correctly
 // over the table) only while a spotlight plays, so with none playing nothing draws and nothing redraws. The plan, the clock and the
 // table's pictures come from the table canvas through the handoff store (spotlight-handoff.ts); the canvas ignores touches, so the tap that
@@ -14,6 +14,7 @@ import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { Spotlight } from "./spotlight.native.tsx";
 import { burnEffect } from "./spotlight-burn.native.tsx";
+import { useGrainTexture } from "./spotlight-fx.native.tsx";
 import type { SpotlightLayerProps } from "./spotlight-handoff.ts";
 import { useSpriteTexture } from "./spotlight-particles.native.tsx";
 import { useSharedImage } from "./table-assets.native.ts";
@@ -38,13 +39,14 @@ export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, p
   const fonts = useTableFonts(s);
   const spotFonts = useSpotFonts(s);
   const texture = useSpriteTexture();
+  const grain = useGrainTexture(tableTokensByTheme.dark);
   const burn = useMemo(() => burnEffect(), []);
   const images = useSpotlightImages(plan, playing, picture, pictureRevision, tableImages, warm);
   const iconOf = useCallback((code: string) => sphereIcon(sphereOf(code)), [sphereOf]);
   if (!playing || !plan || !progress) return null;
   return (
     <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
-      <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={tableTokensByTheme.dark} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} />
+      <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} grain={grain} burn={burn} t={tableTokensByTheme.dark} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} />
     </Canvas>
   );
 });

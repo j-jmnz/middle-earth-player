@@ -12,10 +12,10 @@ import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 import type { BackImages, Fonts } from "./canvas-pieces.native.tsx";
 import type { IconName } from "./icon-map.ts";
 import { MOTION } from "./motion-tokens.ts";
-import { rgbOf, type Emitters } from "./spotlight-atlas.ts";
+import type { Emitters } from "./spotlight-atlas.ts";
 import { darkAt, frameAt, punchAt, spotlightRun, windowOf, type Frame } from "./spotlight-beats.ts";
 import { BurnLayer } from "./spotlight-burn.native.tsx";
-import { Backdrop, Flash, Glint, Pool, RimGlow, Ring } from "./spotlight-fx.native.tsx";
+import { Backdrop, Flash, Glint, Grain, Pool, RimGlow, Ring } from "./spotlight-fx.native.tsx";
 import { Chip, DamageNumber, Medallion, Note, Stamp } from "./spotlight-hud.native.tsx";
 import { Particles } from "./spotlight-particles.native.tsx";
 import { BurstToken, Corner, FlyingCard, StageCard, Tint, Trail, Veil } from "./spotlight-pieces.native.tsx";
@@ -34,8 +34,10 @@ type Common = {
   backs: BackImages;
   fonts: Fonts;
   spotFonts: SpotFonts;
-  // The particle sprite texture (spotlight-particles.native.tsx), and the burn shader, or null when it did not compile.
+  // The particle sprite texture (spotlight-particles.native.tsx), the grain tile (spotlight-fx.native.tsx), and the burn shader, or null
+  // when it did not compile.
   texture: SharedValue<SkImage | null>;
+  grain: SharedValue<SkImage | null>;
   burn: SkRuntimeEffect | null;
   // The dark theme's tokens (the layer always draws with them), and the UI scale (ui-scale.ts).
   t: TableTokens;
@@ -76,11 +78,8 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
     seed: plan.seed,
     burnMs: (shape.last ? MOTION.spotlightBurn : MOTION.spotlightSwap).ms,
     blocked,
-    ember: { x: (front.x + stage.target.x + stage.target.w) / 2, y: stage.target.y + stage.cardH * 0.95, size: stage.cardH },
-    converge: { x: front.x + front.w / 2, y: front.y + front.h / 2, size: stage.cardH },
     hit: { x: stage.contact.x, y: stage.contact.y, size: stage.cardH, dir: blocked ? Math.PI : SPARK_DIR },
     ash: { x: stage.target.x + stage.target.w / 2, y: stage.target.y + stage.target.h / 2, size: stage.cardH, w: stage.target.w },
-    rim: rgbOf(rim),
   };
   const card = (spot: ClashPlan["target"], rect: ClashPlan["stage"]["target"], faceDown = false) => (
     <StageCard spot={spot} rect={rect} image={images.get(spot.code) ?? null} name={nameOf(spot.code)} sphere={sphereOf(spot.code)} fonts={fonts} backs={backs} t={t} s={s} faceDown={faceDown} />
@@ -130,7 +129,7 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
             </FlyingCard>
           );
         })}
-        <Particles texture={texture} frame={frame} dark={dark} emitters={emitters} />
+        <Particles texture={texture} frame={frame} emitters={emitters} />
         {Array.from({ length: shape.damage }, (_, n) => (
           <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={damage} t={t} s={s} />
         ))}
@@ -151,8 +150,8 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
 }
 
 /**
- * The spotlight on the layer's canvas while it plays: the dark with its vignette and a pool of light over the whole screen, then each
- * attack in turn. `progress` is the 0..1 clock over the whole run at the motion scale `k`.
+ * The spotlight on the layer's canvas while it plays: the dark with its vignette and a dim pool of light over the whole screen, then
+ * each attack in turn, and the grain over all of it. `progress` is the 0..1 clock over the whole run at the motion scale `k`.
  */
 export function Spotlight({ plan, progress, ...common }: Common & { plan: SpotlightPlan; progress: SharedValue<number> }) {
   const { k, t } = common;
@@ -172,6 +171,7 @@ export function Spotlight({ plan, progress, ...common }: Common & { plan: Spotli
       {clashes.map((clash, index) => (
         <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={clashes.length} now={now} dark={dark} punch={punch} area={plan.area} {...common} />
       ))}
+      <Grain width={width} height={height} texture={common.grain} dark={dark} />
     </Group>
   );
 }

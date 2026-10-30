@@ -6,29 +6,24 @@
 import { MOTION } from "./motion-tokens.ts";
 import { burnField, burnFront } from "./spotlight-burn.ts";
 
-export type ParticleKind = "ember" | "converge" | "spark" | "deflect" | "ash";
+export type ParticleKind = "spark" | "deflect" | "ash";
 
-/** How many sprites each kind has. Embers run the whole attack; a charge, a strike (sparks or deflection) and a burn come one after another. */
-export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { ember: 24, converge: 16, spark: 28, deflect: 18, ash: 36 };
+/** How many sprites each kind has. A strike (sparks or deflection) and a burn come one after another; nothing drifts over the stage. */
+export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { spark: 28, deflect: 18, ash: 36 };
 
-/** The most sprites visible at once (embers, a strike, and the ash of a kill) and the Atlas draw each kind goes in: glow, sparks, ash. */
-export const PARTICLE_BUDGET = 90;
-export const PARTICLE_DRAW: Readonly<Record<ParticleKind, number>> = { ember: 0, converge: 0, spark: 1, deflect: 1, ash: 2 };
-export const ATLAS_DRAWS = 3;
+/** The most sprites visible at once (a strike and the ash of a kill) and the Atlas draw each kind goes in: sparks, ash. */
+export const PARTICLE_BUDGET = 64;
+export const PARTICLE_DRAW: Readonly<Record<ParticleKind, number>> = { spark: 0, deflect: 0, ash: 1 };
+export const ATLAS_DRAWS = 2;
 
-// How long sprites live, as shares of the tokens that say so (motion-tokens.ts): an ember is born within the first 0.4 of its loop and
-// lives 0.6 to 1 of it; a converging ember is born within the first 0.24 of its flight and lives 0.64 to 1 of it; a spark lives 2/3 to
-// 14/15 of the sparks' token and a deflection 11/15 to 1 of it; an ash lives 7/11 to 1 of the ash token.
-const EMBER = { born: 0.4, life: 0.6, spread: 0.4 };
-const CONVERGE = { born: 0.24, life: 0.64, spread: 0.36 };
+// How long sprites live, as shares of the tokens that say so (motion-tokens.ts): a spark lives 2/3 to 14/15 of the sparks' token and a
+// deflection 11/15 to 1 of it; an ash lives 7/11 to 1 of the ash token.
 const ASH_LIFE = { life: 7 / 11, spread: 4 / 11 };
 const SPARK_LIFE = { spark: 2 / 3, deflect: 11 / 15, spread: 4 / 15 };
 
-/** The ms (at Normal) after which no sprite of a kind shows, for an ash burn of `burnMs`; infinite for embers, which loop the whole attack. */
+/** The ms (at Normal) after which no sprite of a kind shows, for an ash burn of `burnMs`. */
 export function particleEnd(kind: ParticleKind, burnMs: number): number {
   "worklet";
-  if (kind === "ember") return Infinity;
-  if (kind === "converge") return MOTION.spotlightConverge.ms * (1 + CONVERGE.born);
   if (kind === "ash") return burnMs + MOTION.spotlightAsh.ms;
   return MOTION.spotlightSparks.ms;
 }
@@ -73,8 +68,7 @@ export function ashBirth(i: number, seed: number, burnMs: number): number {
 }
 
 /**
- * Sprite `i` of a kind at `t` ms. `ember` drifts up around the point, looping; `converge` flies in from a ring around the point to it;
- * `spark` flies out from the point with drag and gravity, its streak turned along its velocity; `deflect` is a cone of the same
+ * Sprite `i` of a kind at `t` ms. `spark` flies out from the point with drag and gravity, its streak turned along its velocity; `deflect` is a cone of the same
  * back along `at.dir`; `ash` rises from the card cell the burn front has just passed. Alpha is 0 before the sprite is born and after it dies.
  */
 export function particleAt(kind: ParticleKind, i: number, t: number, seed: number, at: Anchor, burnMs: number): Particle {
@@ -82,28 +76,6 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
   if (t < 0 || i < 0 || i >= PARTICLE_COUNT[kind]) return NONE;
   const size = at.size;
   const dir = at.dir ?? 0;
-  if (kind === "ember") {
-    const loop = MOTION.spotlightEmber.ms;
-    const born = rnd(i, 0, seed) * EMBER.born * loop;
-    const life = (EMBER.life + EMBER.spread * rnd(i, 1, seed)) * loop;
-    if (t < born) return NONE;
-    const age = ((t - born) % life) / life;
-    const x0 = (rnd(i, 2, seed) - 0.5) * 1.6 * size;
-    const y0 = (rnd(i, 3, seed) - 0.2) * 0.9 * size;
-    const sway = Math.sin(TAU * (age + rnd(i, 4, seed))) * 0.04 * size;
-    return { x: at.x + x0 + sway, y: at.y + y0 - age * 0.55 * size, turn: 0, scale: 0.35 + 0.35 * rnd(i, 5, seed), alpha: 0.85 * Math.sin(Math.PI * age) };
-  }
-  if (kind === "converge") {
-    const flight = MOTION.spotlightConverge.ms;
-    const born = rnd(i, 0, seed) * CONVERGE.born * flight;
-    const life = (CONVERGE.life + CONVERGE.spread * rnd(i, 1, seed)) * flight;
-    const age = (t - born) / life;
-    if (age < 0 || age >= 1) return NONE;
-    const angle = TAU * rnd(i, 2, seed);
-    const reach = (0.55 + 0.35 * rnd(i, 3, seed)) * size;
-    const pull = age * age;
-    return { x: at.x + Math.cos(angle) * reach * (1 - pull), y: at.y + Math.sin(angle) * reach * (1 - pull) * 1.2, turn: angle, scale: 0.3 + 0.3 * rnd(i, 4, seed), alpha: Math.sin(Math.PI * Math.min(1, age * 0.9 + 0.1)) };
-  }
   if (kind === "ash") {
     const born = ashBirth(i, seed, burnMs);
     const life = (ASH_LIFE.life + ASH_LIFE.spread * rnd(i, 2, seed)) * MOTION.spotlightAsh.ms;

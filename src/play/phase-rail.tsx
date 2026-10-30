@@ -18,6 +18,10 @@ import { ROUND_PHASES, type Rail } from "./rail.ts";
 import { NEIGHBOR_GAP, STOP_MARK, TICK, TICK_GAP } from "./top-bar-layout.ts";
 import { Text } from "./text.tsx";
 
+// The color of the clear text a flow reads. Not "transparent": on Android that is 0, which the new architecture reads as no color
+// (HostPlatformColor's UndefinedColor), so the text drew in the default color on a phone (user report, 2026-10-30). An alpha of 1% is
+// nothing on the screen and still a color.
+const CLEAR = "rgba(0, 0, 0, 0.01)";
 
 // A neighbor phase's name, inline at the phase's side in muted label. Plain text: it neither slides nor fades.
 function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; s: number }) {
@@ -158,12 +162,12 @@ export function PhaseRail({
         {/* The round and the step are not drawn (the carousel names the round); a flow reads them as clear text, which takes no room. */}
         <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 14 * s, flexDirection: "row", justifyContent: "center", overflow: "hidden" }}>
           {round ? (
-            <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: "transparent", lineHeight: 14 * s }}>
+            <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: CLEAR, lineHeight: 14 * s }}>
               {`${round}${rail.current ? " · " : ""}`}
             </Text>
           ) : null}
           {rail.phase ? (
-            <Text testID="rail-current" numberOfLines={1} className="text-micro" style={{ color: "transparent", lineHeight: 14 * s }}>
+            <Text testID="rail-current" numberOfLines={1} className="text-micro" style={{ color: CLEAR, lineHeight: 14 * s }}>
               {rail.current}
             </Text>
           ) : null}

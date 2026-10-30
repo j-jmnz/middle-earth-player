@@ -174,19 +174,7 @@ describe("a frame", () => {
       expect(held.ring.alpha).toBe(0);
       expect(held.number.alpha).toBe(0);
       expect(held.flash).toBeGreaterThan(0);
-      // The embers and the charge's embers stand still with the rest.
-      expect(held.emberT).toBe(base.emberT);
-      expect(held.convergeT).toBe(base.convergeT);
     }
-    // They carry on from where they stood, without the stop.
-    expect(frameAt(HIT, 1220, 1).emberT).toBe(1120);
-    expect(frameAt(HIT, 1220, 1).convergeT).toBe(1120 - 650);
-    expect(frameAt(HIT, 1320, 1).emberT).toBe(1220);
-    expect(frameAt(HIT, 1320, 1).convergeT).toBe(1220 - 650);
-    expect(frameAt(HIT, 1100, 1).emberT).toBe(1100);
-    // At Quick the clocks are still in unscaled ms: 0.6 · 1120 ms of run, held for the 60 ms stop, is 1120 unscaled.
-    expect(frameAt(HIT, 0.6 * 1220, 0.6).emberT).toBeCloseTo(1120, 6);
-    expect(frameAt(HIT, 0.6 * 1130, 0.6).emberT).toBeCloseTo(1120, 6);
   });
 
   it("holds a kill for 160 ms at the hit, the extra 60 coming out of the impact, so a kill still ends with the run", () => {
@@ -214,7 +202,6 @@ describe("a frame", () => {
       const held = frameAt(KILL, t, 1);
       expect(held.sparkT).toBe(-1);
       expect(held.strike).toBe(base.strike);
-      expect(held.emberT).toBe(base.emberT);
     }
     expect(frameAt(KILL, 1280, 1).sparkT).toBe(0);
     expect(burstAt(2, 3, 1280 + 2 * 90 + 220, 1, { first: true, last: true, destroyed: true }).u).toBe(1);
@@ -248,8 +235,6 @@ describe("a frame", () => {
 
   it("starts the effect clocks at their beats, in unscaled ms, and -1 before", () => {
     const f = (t: number) => frameAt(KILL, t, 1);
-    expect([f(0).emberT, f(500).emberT]).toEqual([0, 500]);
-    expect([f(649).convergeT, f(650).convergeT, f(750).convergeT]).toEqual([-1, 0, 100]);
     // The sparks start at the impact: 1220 ms, or 1280 on a kill (its stop is 60 ms longer).
     expect([f(1279).sparkT, f(1280).sparkT, f(1380).sparkT]).toEqual([-1, 0, 100]);
     expect([frameAt(HIT, 1219, 1).sparkT, frameAt(HIT, 1220, 1).sparkT, frameAt(HIT, 1320, 1).sparkT]).toEqual([-1, 0, 100]);

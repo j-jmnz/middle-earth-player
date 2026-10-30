@@ -101,7 +101,7 @@ Read the sections your task touches.
   - 752–776 Persistence and shipping (~1.5K)
   - 777–815 Screens (~3.6K) ← 1
     - 802–815 Table screen (~1.2K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~17.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~17.6K tok)
   - 5–8 Overview (~150)
   - 9–22 Top bar (~1.4K) ← 1
   - 23–26 Table menu (~330) ← 1
@@ -114,7 +114,7 @@ Read the sections your task touches.
   - 65–68 Piles (~170)
   - 69–74 Marks of the open moment (~400) ← 1
   - 75–137 Motion (~2.4K) ← 8
-  - 138–164 Spotlight (~2.1K) ← 16
+  - 138–164 Spotlight (~2.2K) ← 16
   - 165–170 Gestures (~210) ← 5
   - 171–174 Hold, slide and release (~690)
   - 175–180 Peeking at the other seat (~490) ← 1
@@ -172,14 +172,14 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~4.2K tok)
+- `docs/phases/STATUS.md` — Phase status (~4.3K tok)
   - 5–15 Rules (~470)
   - 16–61 Phases (~1.3K)
-  - 62–120 Open items (~2.0K)
+  - 62–120 Open items (~2.1K)
     - 64–74 Fixtures and Maestro (~340)
     - 75–89 Rules and engine (~370)
     - 90–104 Screens and code (~600)
-    - 105–120 Phone and tablet checks (~730)
+    - 105–120 Phone and tablet checks (~780)
   - 121–136 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

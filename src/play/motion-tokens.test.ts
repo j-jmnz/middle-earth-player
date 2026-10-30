@@ -42,9 +42,9 @@ describe("the tokens", () => {
     expect(MOTION.sweep.ms).toBe(900);
   });
 
-  it("let only the sweep, the whole spotlight run and the lives of its embers and ash pass 500 ms", () => {
-    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "spotlightHold", "sweep"]);
-    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "spotlightHold", "sweep"]);
+  it("let only the sweep, the whole spotlight run and the life of its ash pass 500 ms", () => {
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
   });
 
   it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the hold", () => {
@@ -65,11 +65,11 @@ describe("the tokens", () => {
     expect(MOTION.spotlightBurn).toEqual({ ms: 450, easing: "inQuad" });
     expect(MOTION.spotlightBurn.ms).toBeLessThanOrEqual(MOTION.spotlightReturn.ms);
     // The sub-tokens, none past 500 ms.
-    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightNumberRise", "spotlightNumberSettle", "spotlightBurstStep", "spotlightBurstFly", "spotlightStamp", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep", "spotlightConverge", "spotlightStopKill"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
+    for (const name of ["spotlightFlash", "spotlightRing", "spotlightSparks", "spotlightShake", "spotlightNumberRise", "spotlightNumberSettle", "spotlightBurstStep", "spotlightBurstFly", "spotlightStamp", "spotlightRecoil", "spotlightFlip", "spotlightGlint", "spotlightTrailStep", "spotlightStopKill"] as const) expect(MOTION[name].ms, name).toBeLessThanOrEqual(MAX_TOKEN_MS);
     // A kill stops for 160 ms, the extra 60 coming out of the impact.
     expect(MOTION.spotlightStopKill.ms).toBe(160);
     expect(MOTION.spotlightStopKill.ms - MOTION.spotlightStop.ms).toBeLessThan(MOTION.spotlightImpact.ms);
-    expect([MOTION.spotlightEmber.ms, MOTION.spotlightConverge.ms, MOTION.spotlightAsh.ms]).toEqual([2000, 500, 1100]);
+    expect(MOTION.spotlightAsh.ms).toBe(1100);
     expect([MOTION.spotlightFlash.ms, MOTION.spotlightRing.ms, MOTION.spotlightSparks.ms, MOTION.spotlightShake.ms]).toEqual([160, 360, 450, 420]);
     expect(MOTION.spotlightNumberRise.ms).toBe(140);
     expect(MOTION.spotlightNumberSettle).toEqual({ ms: 260, zeta: 0.5 });
