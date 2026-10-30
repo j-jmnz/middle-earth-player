@@ -265,7 +265,7 @@ describe("a peek at the other seat", () => {
     const { game, viewedSeat } = store.getState();
     const sheet = sheetOfDuo(game);
     expect([shownSeat(game, viewedSeat), actingSeat(game)]).toEqual([1, 0]);
-    const keys = (seat: number) => highlightKeys({ game, seat, sheet, choice: choiceFor(sheet, null), panel: false, beatKey: "" });
+    const keys = (seat: number) => highlightKeys({ game, seat, sheet, choice: choiceFor(sheet, null), panel: false });
     // Planning mutes seat 0's hand card no hero can pay for; read for the seat drawn it would mute all of seat 1's hand instead.
     expect(keys(actingSeat(game)).muted).toBe(duo.seats[0].hand.at(-1));
     expect(keys(shownSeat(game, viewedSeat)).muted).toBe(duo.seats[1].hand.join(","));

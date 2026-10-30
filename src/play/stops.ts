@@ -27,11 +27,14 @@ export function passableWindow(game: ScenarioState, sheet: Sheet, legal: readonl
   return windowPoint(game) != null;
 }
 
+/** The settings the table's answers read (table-settings.ts): a caller selects just these, so a change to another setting does not render it. */
+export type StopSettings = Pick<TableSettings, "stopsOn" | "stops" | "alwaysUse">;
+
 export type StopInput = {
   game: ScenarioState;
   sheet: Sheet;
   legal: readonly LegalIntent[];
-  settings: TableSettings;
+  settings: StopSettings;
   // "Pass to next stop" is running: pass every window up to the next stop, new cards or not.
   running: boolean;
   // The player went back to this window with Undo: ask here.
@@ -53,7 +56,7 @@ export function stopDecision(input: StopInput): "pass" | "ask" {
 }
 
 /** Where Pass to stop runs to at the latest, for its armed line: the next stop after this window (rail.ts names it), or planning. */
-export function nextStopTitle(game: ScenarioState, settings: TableSettings, titleOf: (point: string) => string | null): string {
+export function nextStopTitle(game: ScenarioState, settings: StopSettings, titleOf: (point: string) => string | null): string {
   const here = windowPoint(game)?.id ?? null;
   // Planning always asks: from the resource window the run ends there, and later in the round it ends there at the latest,
   // after the next round's resource window.
@@ -82,7 +85,7 @@ export function isFreeResponse(effect: Effect | undefined): boolean {
 }
 
 /** The Trigger the table sends for a Response the player set to Always, when one is offered now; else null. */
-export function alwaysUseIntent(game: ScenarioState, sheet: Sheet, ctx: ReduceContext, settings: TableSettings, held: boolean): PlayerIntent | null {
+export function alwaysUseIntent(game: ScenarioState, sheet: Sheet, ctx: ReduceContext, settings: StopSettings, held: boolean): PlayerIntent | null {
   if (held || game.window?.kind !== "response" || sheet.kind !== "trigger") return null;
   for (const item of sheet.options) {
     if (item.pay || !settings.alwaysUse.includes(item.effectId)) continue;

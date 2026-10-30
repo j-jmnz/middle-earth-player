@@ -7,7 +7,7 @@
 import type { ScenarioState } from "../rules/state.ts";
 
 import { phaseIndex, ROUND_PHASES, windowPoint } from "./rail.ts";
-import { turnReference } from "./reference.ts";
+import { turnReference, type ReferencePhase } from "./reference.ts";
 import type { TableSettings } from "./table-settings.ts";
 
 export type CarouselWindow = {
@@ -55,40 +55,59 @@ export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "s
   const here = phaseIndex(game);
   const reference = turnReference(game, title);
   const phases = ROUND_PHASES.map((name, index): CarouselPhase => {
-    const steps = (reference.find((phase) => phase.phase === name)?.steps ?? []).map((step): CarouselStep => {
-      const windows = step.windows.map((window) => ({
-        ...window,
-        stop: stops.stops.includes(window.id),
-      }));
-      return {
-        id: step.id,
-        words: step.titles.join(" · "),
-        decision: step.decision,
-        current: step.current,
-        window: windows.length > 0,
-        stop: windows.some((window) => window.stop),
-        windows,
-      };
-    });
+    const steps = carouselSteps(reference.find((phase) => phase.phase === name)?.steps ?? [], stops.stops);
     return { id: name.toLowerCase(), name, state: stateOf(index, here), steps };
   });
   return {
     round: game.round,
     phases,
-    stopAhead: stops.stopsOn && stopAhead(game, phases[here], stops.stops),
+    stopAhead: stops.stopsOn && stopAhead(game, phases[here]?.steps, stops.stops),
   };
+}
+
+// A phase's steps for the strip, each window marked a stop where the player's stops say so.
+function carouselSteps(steps: ReferencePhase["steps"], stops: readonly string[]): CarouselStep[] {
+  return steps.map((step): CarouselStep => {
+    const windows = step.windows.map((window) => ({
+      ...window,
+      stop: stops.includes(window.id),
+    }));
+    return {
+      id: step.id,
+      words: step.titles.join(" · "),
+      decision: step.decision,
+      current: step.current,
+      window: windows.length > 0,
+      stop: windows.some((window) => window.stop),
+      windows,
+    };
+  });
+}
+
+// No rule title: the words of a step are not read for the stop that lies ahead.
+const noTitle = () => null;
+
+/**
+ * Whether a stop of the player's lies after the game's place in its phase (the rail's S, `Carousel.stopAhead`), without laying out the
+ * strip: only the game's own phase is built, and no rule title is looked up. The same answer as `phaseCarousel(...).stopAhead`.
+ */
+export function stopAheadOf(game: ScenarioState, stops: Pick<TableSettings, "stopsOn" | "stops">): boolean {
+  if (!stops.stopsOn) return false;
+  const name = ROUND_PHASES[phaseIndex(game)];
+  const phase = name ? turnReference(game, noTitle).find((candidate) => candidate.phase === name) : undefined;
+  return stopAhead(game, phase ? carouselSteps(phase.steps, stops.stops) : undefined, stops.stops);
 }
 
 // Whether a stop of the player's lies after the game's place in its phase: after the window it waits at, else from the step it
 // is in (that step's own windows come after it).
-function stopAhead(game: ScenarioState, phase: CarouselPhase | undefined, stops: readonly string[]): boolean {
-  if (!phase) return false;
-  const flat = phase.steps.flatMap((step, index) => step.windows.map((window) => ({ index, id: window.id })));
+function stopAhead(game: ScenarioState, steps: readonly CarouselStep[] | undefined, stops: readonly string[]): boolean {
+  if (!steps) return false;
+  const flat = steps.flatMap((step, index) => step.windows.map((window) => ({ index, id: window.id })));
   const at = windowPoint(game)?.id;
   const waiting = at ? flat.findIndex((window) => window.id === at) : -1;
   const now = Math.max(
     0,
-    phase.steps.findIndex((step) => step.current),
+    steps.findIndex((step) => step.current),
   );
   const from = waiting >= 0 ? waiting + 1 : flat.findIndex((window) => window.index >= now);
   return from >= 0 && flat.slice(from).some((window) => stops.includes(window.id));

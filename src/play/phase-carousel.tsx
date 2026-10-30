@@ -203,7 +203,8 @@ export function PhaseCarousel({
   onClose,
 }: {
   open: boolean;
-  carousel: Carousel;
+  // The data of the strip; null while there is none to show (it is built only while the strip is open, and held while it leaves).
+  carousel: Carousel | null;
   settings: Pick<TableSettings, "stops" | "stopsOn">;
   top: number;
   left: number;
@@ -219,7 +220,7 @@ export function PhaseCarousel({
     opacity: progress.get(),
     transform: [{ translateY: (progress.get() - 1) * DROP * s }],
   }));
-  if (!open && !leaving) return null;
+  if ((!open && !leaving) || !carousel) return null;
   const inner = width - 2 * INSET * s;
   return (
     <View style={{ position: "absolute", top, left: 0, right: 0, bottom: 0 }} pointerEvents={open ? "auto" : "none"}>

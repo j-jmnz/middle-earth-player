@@ -4,11 +4,12 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 
+import { setBeat, type BeatStore } from "./beat-store.ts";
 import { stageText } from "./objective.ts";
 import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } from "./outcome.ts";
 import { guideLine } from "./reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
-import { alwaysUseIntent, passableWindow, stopDecision, usableIds } from "./stops.ts";
+import { alwaysUseIntent, passableWindow, stopDecision, usableIds, type StopSettings } from "./stops.ts";
 import { effectsOf } from "../rules/listen.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "./store.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
@@ -20,16 +21,15 @@ const MOMENT_MS = 4500;
 
 /**
  * The banner over the table: the last moment worth showing (store.ts, `shown`), line by line, then the round's summary when
- * that moment ended a round. `beatKey` is the cards the banner's current line names, ringed on the table; MomentBanner calls
- * `onBeat` as it reaches each line. While the combat spotlight plays the moment's attacks the banner waits: its beats and its
+ * that moment ended a round. MomentBanner calls `onBeat` as it reaches each line, which rings the cards that line names on the table
+ * (`beats`, beat-store.ts: only the canvas reads it, so a beat draws the canvas and not the table view). While the combat spotlight plays the moment's attacks the banner waits: its beats and its
  * hold start when the spotlight ends or is skipped, so they do not race it.
  */
-export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNames): { banner: Moment | null; bannerKey: string; beatKey: string; onBeat: (cards: readonly string[]) => void; dismiss: () => void } {
+export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNames, beats: BeatStore): { banner: Moment | null; bannerKey: string; onBeat: (cards: readonly string[]) => void; dismiss: () => void } {
   const shown = useStore(store, (state) => state.shown);
   const spotlit = useSpotlightHold(store);
   const [closedMoment, setClosedMoment] = useState(0);
   const [closedSummary, setClosedSummary] = useState(0);
-  const [beatKey, setBeatKey] = useState("");
   // A shadow card's printed shadow line, for the banner.
   const shadow = useCallback(
     (cardId: string) => {
@@ -71,7 +71,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     const timer = setTimeout(() => setClosedSummary(shown.seq), MOMENT_MS);
     return () => clearTimeout(timer);
   }, [shown, summaryOpen]);
-  const onBeat = useCallback((cards: readonly string[]) => setBeatKey(cards.join(",")), []);
+  const onBeat = useCallback((cards: readonly string[]) => setBeat(beats, cards), [beats]);
   // A swipe closes what the banner shows now: the moment (its round summary then follows) or the summary.
   const seq = shown?.seq ?? 0;
   const dismiss = useCallback(() => {
@@ -82,7 +82,6 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     banner: momentOpen ? said : summaryOpen ? summary : null,
     // The moment's number and whether the banner shows it or the round summary: a new one enters the banner afresh.
     bannerKey: `${shown?.seq ?? 0}:${momentOpen ? "moment" : "summary"}`,
-    beatKey,
     onBeat,
     dismiss,
   };
@@ -93,7 +92,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
  * not in a sheet the player opened, and not when the note already says it. A showing is counted when its moment ends, so
  * the line stays up for the whole moment it explains.
  */
-export function useGuide(settings: TableSettings, game: ScenarioState, sheet: Sheet, legal: readonly LegalIntent[], opened: boolean, note: string | null): string | null {
+export function useGuide(settings: Pick<TableSettings, "guide" | "guideSeen">, game: ScenarioState, sheet: Sheet, legal: readonly LegalIntent[], opened: boolean, note: string | null): string | null {
   const line = settings.guide && !opened ? guideLine(game, sheet.kind === "window" && passableWindow(game, sheet, legal)) : null;
   const guide = line && (settings.guideSeen[line.key] ?? 0) < 2 && !(note ?? "").includes(line.text) ? line : null;
   const guideKey = guide ? `${guide.key}:${sheet.key}` : "";
@@ -131,7 +130,7 @@ export function useAutoAnswer({
   game: ScenarioState;
   sheet: Sheet;
   legal: readonly LegalIntent[];
-  settings: TableSettings;
+  settings: StopSettings;
   moment: TableMoment | null;
   // A sheet the player opened from the table is up: the table answers nothing under it.
   opened: boolean;

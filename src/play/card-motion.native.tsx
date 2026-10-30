@@ -7,7 +7,7 @@
 // copies, and its clocks start when the spotlight ends (or are set to the end when a tap skipped it).
 import { Group, vec } from "@shopify/react-native-skia";
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { cancelAnimation, useAnimatedReaction, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
@@ -36,9 +36,9 @@ export type Moves = { motions: ReadonlyMap<string, Motion>; ghosts: readonly Gho
 export type Clock = { progress: SharedValue<number>; epoch: SharedValue<number>; at: number; k: number; span: number };
 
 /**
- * A touch on the canvas finishes the running card motions at once: their progress is set to 1, and the pending landing tick is
- * dropped (`clear`, on the JavaScript thread), so no haptic follows a card that was snapped into place. `clear` also skips a
- * combat spotlight that is playing. The token pops and floating numbers have a clock of their own and keep running.
+ * A touch on the canvas finishes the running card motions at once: their progress is set to 1, which jumps past the landing and so plays
+ * no landing tick (the reaction in `useCardMotion` ticks only as the clock passes the landing, never for a jump to the end), so no haptic
+ * follows a card that was snapped into place. `clear` (on the JavaScript thread) also skips a combat spotlight that is playing. The token pops and floating numbers have a clock of their own and keep running.
  */
 export function finishMotions(progress: SharedValue<number>, clear: () => void): void {
   "worklet";
@@ -102,24 +102,18 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   const epoch = useSharedValue(0);
   const scaled = Math.ceil(span * k);
   const fxScaled = Math.ceil(track.fxSpan * k);
-  const tick = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const dropTick = useCallback(() => {
-    if (tick.current) clearTimeout(tick.current);
-    tick.current = null;
-  }, []);
-  // A touch: no tick follows a snapped card, and a spotlight that is playing is skipped.
+  // A touch: a spotlight that is playing is skipped (the clock jumping to its end drops the landing tick, below).
   const clear = useCallback(() => {
-    dropTick();
     store.getState().endSpotlight("skipped");
-  }, [dropTick, store]);
+  }, [store]);
   // The state a spotlight is holding: its clocks wait at 0, so its cards stand where they were.
   const waiting = useRef<number | null>(null);
-  // The clocks' lengths and the speed, read when a new state starts; a change of either alone does not start the effect.
-  const speed = useEffectEvent(() => ({ scaled, fxScaled, k }));
-  // Once per new state: start its clock, and time the tick of a played card's landing. A change of the speed setting alone does not
+  // The clocks' lengths, read when a new state starts; a change of either alone does not start the effect.
+  const speed = useEffectEvent(() => ({ scaled, fxScaled }));
+  // Once per new state: start its clock. A change of the speed setting alone does not
   // play the last state again. A state held for a spotlight starts when the spotlight ends; a skipped one lands at once.
   useLayoutEffect(() => {
-    const { scaled, fxScaled, k } = speed();
+    const { scaled, fxScaled } = speed();
     log.consume();
     epoch.set(moves.at);
     cancelAnimation(progress);
@@ -145,10 +139,21 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
     }
     progress.set(0);
     progress.set(withTiming(1, { duration: scaled, easing: easingOf("linear") }));
-    const landing = landAt(moves.motions);
-    tick.current = landing == null ? null : setTimeout(tickLand, landing * k);
-    return dropTick;
-  }, [moves, held, progress, fxProgress, epoch, dropTick, log, store]);
+  }, [moves, held, progress, fxProgress, epoch, log, store]);
+  // The tick of a played card's landing, as the clock passes it (the same moment the squash begins): `landing` ms after the state was
+  // drawn at the motion scale, if the state plays and a card played from the hand lands in it. None when the state snaps (reduced motion:
+  // `scaled` is 0), or waits for a spotlight (the clock stays at 0 until it ends), or the clock is set past the landing (a touch's hurry or
+  // a skipped spotlight: it jumps to the end, and a jump is not a pass); a new state replaces this reaction and its landing.
+  const landing = landAt(moves.motions);
+  const landMs = scaled === 0 || landing == null ? null : landing * k;
+  useAnimatedReaction(
+    () => progress.get() * scaled,
+    (now, was) => {
+      if (landMs == null || was == null || now <= was || now >= scaled) return;
+      if (was < landMs && now >= landMs) scheduleOnRN(tickLand);
+    },
+    [landMs, scaled],
+  );
   const clock = useMemo((): Clock => ({ progress, epoch, at: moves.at, k, span: Math.max(1, scaled) }), [progress, epoch, moves.at, k, scaled]);
   const fxClock = useMemo((): Clock => ({ progress: fxProgress, epoch, at: moves.at, k, span: Math.max(1, fxScaled) }), [fxProgress, epoch, moves.at, k, fxScaled]);
   const hurry = useMemo(() => ({ progress, clear }), [progress, clear]);

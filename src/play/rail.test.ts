@@ -8,7 +8,7 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
 import { windowSheet } from "./bar-sheets.ts";
-import { cardWidth, phaseCarousel, startIndex, STOPS_TEXT } from "./carousel.ts";
+import { cardWidth, phaseCarousel, startIndex, STOPS_TEXT, stopAheadOf } from "./carousel.ts";
 import { phaseIndex, railFor, ROUND_PHASES, windowPoint } from "./rail.ts";
 import { turnReference } from "./reference.ts";
 import { isStepWindow, sheetFor } from "./sheets.ts";
@@ -115,6 +115,12 @@ describe("phase carousel", () => {
     expect(phaseCarousel(strikes, on("strike"), noTitle).stopAhead).toBe(true);
     // Stops off: nothing is ahead, whatever is set.
     expect(phaseCarousel(staging, { stopsOn: false, stops: ["3.3"] }, noTitle).stopAhead).toBe(false);
+  });
+
+  it("reads the stop ahead without laying out the strip, with the same answer", async () => {
+    const games = [await parked("Quest", "staging"), await parked("Quest", "resolution"), await parked("Combat", "enemyAttacks"), await parked("Combat", "playerAttacks"), await parked("Beginning of round", "beginRound"), await parked("End of round", "endRound")];
+    const settings = [on("3.3"), on("3.3", "3.4"), on("strike"), on("4.2", "defense"), on(), { stopsOn: false, stops: ["3.3"] }];
+    for (const game of games) for (const stops of settings) expect(stopAheadOf(game, stops), `${game.phase} ${game.mode} ${stops.stops.join(",")}`).toBe(phaseCarousel(game, stops, noTitle).stopAhead);
   });
 });
 

@@ -1,4 +1,5 @@
 import type { ScenarioState } from "../rules/state.ts";
+import type { BeatStore } from "./beat-store.ts";
 import type { SlotNumbers } from "./card-effects.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import type { LayoutOptions } from "./layout.ts";
@@ -20,8 +21,6 @@ export type TableHighlight = {
   marks: ReadonlyMap<string, OptionMark>;
   // Hand cards that cannot be played in this planning window (why.ts says why on a tap): dimmed.
   muted: ReadonlySet<string>;
-  // The cards the banner's current beat names (the shadow card, the card damaged): ringed while the banner is at that line.
-  beat: ReadonlySet<string>;
 };
 
 // The engine's numbers the canvas draws on a card (card-effects.ts, slotNumbers): the effects on it, its willpower while it
@@ -45,6 +44,9 @@ export type TableCanvasProps = {
   // The engine's numbers on a card, read from the state the canvas is handed (so a render never reads the store) and the seat drawn.
   info: (game: ScenarioState, seat: number, cardId: string) => SlotInfo;
   highlight: TableHighlight;
+  // The cards the banner's current line names (the shadow card, the card damaged), ringed while the banner is at that line. The canvas
+  // reads them itself, so a beat draws it and not the screen above it (beat-store.ts).
+  beats: BeatStore;
   // The hand card the player is playing: drawn whole above the bottom edge.
   raised: string | null;
   // A fight picked and not confirmed yet, drawn as if declared.

@@ -6,11 +6,12 @@
 // When the state changes, each card moves from where it was to where it is now, a new card comes in from its deck or grows
 // in, and a card that left goes to its pile (motion.ts, run by card-motion.native.tsx). The motion runs on the UI thread, never
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
-import { Canvas, Group, RadialGradient, Rect as SkRect, RoundedRect, Text, useImage, vec, type SkFont } from "@shopify/react-native-skia";
+import { Canvas, Group, RadialGradient, Rect as SkRect, RoundedRect, Text, vec, type SkFont } from "@shopify/react-native-skia";
 import { memo, useCallback, useEffectEvent, useLayoutEffect, useMemo } from "react";
 import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
 
+import { beatIds } from "./beat-store.ts";
 import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
@@ -26,6 +27,7 @@ import { actingSeat, shownSeat } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
+import { useSharedImage } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
 import { useTableImages } from "./table-images.native.ts";
 import { pictureBoxes } from "./table-pictures.ts";
@@ -35,12 +37,15 @@ import { useSpotlight } from "./use-spotlight.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
+// No card is ringed by a banner beat while the table peeks.
+const NO_BEAT: ReadonlySet<string> = new Set();
+
 // A faint word in an empty zone, so the player knows what the space is for.
 function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: SkFont; t: TableTokens; s: number }) {
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -52,6 +57,10 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const acting = useStore(store, (state) => actingSeat(state.game));
   const peeking = useStore(store, (state) => state.viewedSeat != null);
   const highlight = peeking ? NO_HIGHLIGHT : marked;
+  // The cards the banner's line names are ringed; this canvas alone reads them, so a beat draws it and not the screen (beat-store.ts).
+  const beatKey = useStore(beats, (state) => state.key);
+  const beat = useMemo(() => beatIds(beatKey), [beatKey]);
+  const beating = peeking ? NO_BEAT : beat;
   const { views, piles } = useViews(store, seat);
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
@@ -81,21 +90,21 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)]), [layout, moves]);
   const images = useTableImages(boxes, picture, pictureRevision);
   const tokens: TokenImages = {
-    resource: useImage(ICON_FILES.resource),
-    damage: useImage(ICON_FILES.damage),
-    progress: useImage(ICON_FILES.progress),
-    questPoints: useImage(ICON_FILES.questPoints),
-    engagementCost: useImage(ICON_FILES.engagementCost),
+    resource: useSharedImage(ICON_FILES.resource),
+    damage: useSharedImage(ICON_FILES.damage),
+    progress: useSharedImage(ICON_FILES.progress),
+    questPoints: useSharedImage(ICON_FILES.questPoints),
+    engagementCost: useSharedImage(ICON_FILES.engagementCost),
   };
-  const backs: BackImages = { player: useImage(CARD_BACK_FILES.player), encounter: useImage(CARD_BACK_FILES.encounter) };
+  const backs: BackImages = { player: useSharedImage(CARD_BACK_FILES.player), encounter: useSharedImage(CARD_BACK_FILES.encounter) };
   const fonts = useTableFonts(s);
-  // The plan, the clock and the table's decodes go to the layer when the plan, whether it plays or the motion scale changes; only the
+  // The plan, the clock and the table's decodes go to the layer when the plan, whether it plays, the pictures to decode ahead or the motion scale changes; only the
   // layer listens, so this canvas does not render again for it. The decodes are a fallback until the layer's own are ready.
-  const { plan, progress, playing } = spot;
+  const { plan, progress, playing, warm } = spot;
   const decoded = useEffectEvent(() => images);
   useLayoutEffect(() => {
-    handoff.setState({ plan, progress, k, playing, tableImages: decoded() });
-  }, [handoff, plan, progress, playing, k]);
+    handoff.setState({ plan, progress, k, playing, warm, tableImages: decoded() });
+  }, [handoff, plan, progress, playing, warm, k]);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
   const reader = useScreenReader();
@@ -141,7 +150,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
-    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={highlight.beat.has(slot.id)} t={t} s={s} veiled={peeking && card && slot.zone === "hand"} />;
+    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={beating.has(slot.id)} t={t} s={s} veiled={peeking && card && slot.zone === "hand"} />;
   };
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;

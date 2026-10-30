@@ -26,13 +26,13 @@ import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
 import { alwaysRows } from "./settings-words.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { PILE_WORDS } from "./selectors.ts";
-import type { SheetNames } from "./sheet-types.ts";
+import { PILE_WORDS, type PileId } from "./selectors.ts";
+import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { settingsPanelWidth } from "./settings-panel-width.ts";
-import { tableSettings, type TableSettings } from "./table-settings.ts";
+import { tableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { usePeek } from "./use-peek.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
@@ -48,6 +48,40 @@ import { Text } from "./text.tsx";
 const READING_MIN = 300;
 const EDGE = 8;
 
+// The discard pile list, the log and the threat panel read the game themselves, so the layers above them do not render on every state.
+function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay, onClose }: { store: TableStore; pile: PileId; seat: number; names: SheetNames; sheet: Sheet; peeking: boolean; onRead: (cardId: string) => void; onPlay: (cardId: string) => void; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  return (
+    <PileList
+      title={PILE_WORDS[pile]}
+      cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
+      playable={pile === "discard" && !peeking ? discardPlays(game, seat, sheet) : []}
+      onRead={onRead}
+      onPlay={onPlay}
+      onClose={onClose}
+    />
+  );
+}
+
+function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
+  const round = useStore(store, (state) => state.game.round);
+  const roundSteps = useStore(store, (state) => state.roundSteps);
+  const lines = useMemo(() => logLines(roundSteps, logNames), [roundSteps, logNames]);
+  return <LogPanel round={round} lines={lines} onClose={onClose} />;
+}
+
+function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; seat: number; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  return (
+    <ThreatPanel
+      seatLabel={game.seatCount > 1 ? `Player ${seat + 1}` : "Threat"}
+      threat={game.seats[seat]?.threat ?? 0}
+      rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, seat) }))}
+      onClose={onClose}
+    />
+  );
+}
+
 export function TableLayers({
   store,
   ctx,
@@ -57,7 +91,6 @@ export function TableLayers({
   choice,
   reading,
   onReading,
-  settings,
   carousel,
   logNames,
   screen,
@@ -76,8 +109,8 @@ export function TableLayers({
   choice: TableChoice;
   reading: Reading | null;
   onReading: (next: Reading | null) => void;
-  settings: TableSettings;
-  carousel: Carousel;
+  // The strip's data, built by the screen only while the carousel is open (carousel.ts); null otherwise. It is held here while the strip leaves.
+  carousel: Carousel | null;
   logNames: LogNames;
   screen: { width: number; height: number };
   insets: { left: number; right: number; bottom: number };
@@ -93,8 +126,9 @@ export function TableLayers({
   // The UI scale (ui-scale.ts): the layers' sizes below are Medium's times it.
   const s = useUiScale();
   const menuZone = touch(s, MENU_BUTTON) + BAR_PAD * s;
-  const game = useStore(store, (state) => state.game);
-  const roundSteps = useStore(store, (state) => state.roundSteps);
+  // The settings panel and the strip's Stops switches read the settings themselves; no state of the game renders this view (the panels that
+  // read the game below subscribe to it on their own, and only while they are open).
+  const settings = useStore(tableSettings, (state) => state.settings);
   const reader = useScreenReader();
   // The discard pile list is the shown seat's; the banner over the canvas says when that is not the acting seat's (peek.ts).
   const peek = usePeek(store);
@@ -119,8 +153,7 @@ export function TableLayers({
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
   const open = reading?.kind === "carousel";
-  const logging = held?.kind === "log";
-  const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
+  const strip = useHeld(carousel);
   return (
     <>
       {peek.words ? <PeekBanner words={peek.words} top={barBottom + PEEK_TOP * s} left={insets.left} width={canvas} onBack={peek.back} /> : null}
@@ -138,10 +171,13 @@ export function TableLayers({
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
       <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
         {held?.kind === "pile" ? (
-          <PileList
-            title={PILE_WORDS[held.pile]}
-            cards={[...(held.pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
-            playable={held.pile === "discard" && !peek.words ? discardPlays(game, seat, choice.sheet) : []}
+          <PileReading
+            store={store}
+            pile={held.pile}
+            seat={seat}
+            names={names}
+            sheet={choice.sheet}
+            peeking={peek.words != null}
             onRead={onPreview}
             onPlay={(cardId) => {
               close();
@@ -150,15 +186,8 @@ export function TableLayers({
             onClose={close}
           />
         ) : null}
-        {held?.kind === "log" ? <LogPanel round={game.round} lines={lines} onClose={close} /> : null}
-        {held?.kind === "threat" ? (
-          <ThreatPanel
-            seatLabel={game.seatCount > 1 ? `Player ${held.seat + 1}` : "Threat"}
-            threat={game.seats[held.seat]?.threat ?? 0}
-            rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, held.seat) }))}
-            onClose={close}
-          />
-        ) : null}
+        {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
+        {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "settings" ? (
           <SettingsPanel
             settings={settings}
@@ -178,7 +207,7 @@ export function TableLayers({
       {/* The strip hangs over the canvas only; the tray stays in the command column. */}
       <PhaseCarousel
         open={open}
-        carousel={carousel}
+        carousel={strip}
         settings={settings}
         top={barBottom}
         left={insets.left}

@@ -7,7 +7,7 @@
 //
 // The first touch of the drag pan is the hurry and the spotlight's skip (finishMotions, `swallow`); a touch that skipped a spotlight
 // does nothing else, and its hold never starts a scrub. A scrub sends no intent and picks nothing.
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { Gesture } from "react-native-gesture-handler";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -78,14 +78,16 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   const { width: canvasWidth, height: canvasHeight, bottom: canvasBottom } = canvas;
   const spread = useMemo(() => spreadLayout(layout, { width: canvasWidth, height: canvasHeight, bottom: canvasBottom }), [layout, canvasWidth, canvasHeight, canvasBottom]);
   const draggableSet = useMemo(() => new Set(draggable), [draggable]);
-  useEffect(() => {
+  // Set in a layout effect, which runs before the frame is drawn and before a touch can be handled, so a flick that starts right after a
+  // render already finds its slots, lifts and drop targets (a passive effect could run a frame later).
+  useLayoutEffect(() => {
     slots.set(layout.slots);
     lifts.set(layout.slots.map((slot) => slot.kind === "card" && draggableSet.has(slot.id)));
   }, [layout, draggableSet, slots, lifts]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     drops.set(dropRects(layout, targets));
   }, [layout, targets, drops]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     spreadNow.set(spread);
   }, [spread, spreadNow]);
 

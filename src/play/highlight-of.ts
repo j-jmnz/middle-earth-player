@@ -7,9 +7,9 @@ import type { LayoutOptions } from "./layout.ts";
 import type { OptionMark, Sheet } from "./sheet-types.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 
-export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string; beat: string };
+export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string };
 
-export function highlightKeys({ game, seat, sheet, choice, panel, beatKey }: { game: ScenarioState; seat: number; sheet: Sheet; choice: Choice; panel: boolean; beatKey: string }): HighlightKeys {
+export function highlightKeys({ game, seat, sheet, choice, panel }: { game: ScenarioState; seat: number; sheet: Sheet; choice: Choice; panel: boolean }): HighlightKeys {
   // A card the seat may play from its discard pile is not drawn on the table: the pile glows, and its list plays it. While the
   // table peeks at the other seat's pile nothing glows (the canvas draws NO_HIGHLIGHT, peek.ts).
   const pile = discardPlays(game, seat, sheet).length > 0 ? ["pile:discard"] : [];
@@ -25,7 +25,6 @@ export function highlightKeys({ game, seat, sheet, choice, panel, beatKey }: { g
     dim: !panel && glow !== "" && sheet.kind !== "window",
     marks,
     muted,
-    beat: beatKey,
   };
 }
 
@@ -45,7 +44,6 @@ export function highlightOf(keys: HighlightKeys): TableHighlight {
       }),
     ),
     muted: new Set(ids(keys.muted)),
-    beat: new Set(ids(keys.beat)),
   };
 }
 

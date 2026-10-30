@@ -6,7 +6,7 @@
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
 import { MORE_ID } from "./dock-extras.ts";
@@ -65,11 +65,13 @@ export function DockButtons({
   const left = useSharedValue(1);
   const animates = useMotionScale() > 0;
   const reader = useScreenReader();
+  // The arm timer and the bar running down stop with the dock.
   useEffect(
     () => () => {
       if (timer.current) clearTimeout(timer.current);
+      cancelAnimation(left);
     },
-    [],
+    [left],
   );
   const press = (button: DockButton) => {
     if (timer.current) clearTimeout(timer.current);

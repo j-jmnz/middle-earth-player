@@ -8,6 +8,8 @@ import { cancelAnimation, useAnimatedReaction, useSharedValue, withTiming, type 
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
+import type { ScenarioState } from "../rules/state.ts";
+
 import { tickImpact } from "./haptics.ts";
 import type { TableLayout } from "./layout.ts";
 import { easingOf, useMotionScale } from "./motion-run.ts";
@@ -15,6 +17,7 @@ import { hitTime, leaveTime, spotlightRun } from "./spotlight-beats.ts";
 import { spotlightHolds } from "./spotlight-gate.ts";
 import { buildPlan, type SpotlightPlan } from "./spotlight-plan.ts";
 import { sameArea, type StageArea } from "./spotlight-stage.ts";
+import { warmFor, type Warm } from "./spotlight-warm.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import type { TableStore } from "./store.ts";
 import { tableSettings } from "./table-settings.ts";
@@ -54,7 +57,7 @@ type Track = { layout: TableLayout; area: StageArea; seq: number; plan: Spotligh
  * ("skipped") and the clock is set to the end. `area` is the screen the stage fills (spotlight-stage.ts); a new one ends a spotlight like a new canvas size. With the scale at 0, or a plan it cannot draw, the gate is ended at once, so nothing
  * waits for a spotlight that does not play.
  */
-export function useSpotlight(store: TableStore, layout: TableLayout, area: StageArea, k: number): { plan: SpotlightPlan | null; progress: SharedValue<number>; playing: boolean; live: SharedValue<boolean>; swallow: SharedValue<boolean> } {
+export function useSpotlight(store: TableStore, layout: TableLayout, area: StageArea, k: number): { plan: SpotlightPlan | null; progress: SharedValue<number>; playing: boolean; live: SharedValue<boolean>; swallow: SharedValue<boolean>; warm: Warm | null } {
   const gate = useStore(store, (state) => state.spotlight);
   const gateScale = useSpotlightScale();
   // The moment the gate was opened for, taken from the store here so the compiler sees it as a dependency.
@@ -121,5 +124,21 @@ export function useSpotlight(store: TableStore, layout: TableLayout, area: Stage
   useEffect(() => {
     if (gate.clashes.length > 0 && gate.ended == null && !playing) store.getState().endSpotlight("skipped", gate.seq);
   }, [gate, playing, store]);
-  return { plan, progress, playing, live, swallow };
+  // The pictures of an attack still pending, for the layer to decode at the stage's size before the spotlight starts (spotlight-warm.ts): the
+  // enemy when the attack is declared, its defender when one is chosen. Nothing when no spotlight would play.
+  const enemyCode = useStore(store, (state) => codeOf(state.game, state.game.pendingAttack?.enemyId));
+  const defenderCode = useStore(store, (state) => codeOf(state.game, state.game.pendingAttack?.defenderId));
+  const cardW = layout.card.w;
+  const cardH = layout.card.h;
+  const stageScale = layout.scale ?? 1;
+  const warm = useMemo(
+    () => (gateScale > 0 && CANVAS ? warmFor([enemyCode, defenderCode], area, { w: cardW, h: cardH }, stageScale) : null),
+    [gateScale, enemyCode, defenderCode, area, cardW, cardH, stageScale],
+  );
+  return { plan, progress, playing, live, swallow, warm };
+}
+
+// The code of a card of the game, or null.
+function codeOf(game: ScenarioState, id: string | undefined): string | null {
+  return id ? (game.cards[id]?.code ?? null) : null;
 }

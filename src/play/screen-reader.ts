@@ -2,21 +2,14 @@
 // canvas (a card drawn only on the canvas is not a control a screen reader can reach), and an armed button waits longer.
 // react-native-web always answers yes, so the web build, whose table is already a list of names, lists every choice on
 // paper.
-import { useEffect, useState } from "react";
-import { AccessibilityInfo } from "react-native";
+import { useSyncExternalStore } from "react";
+
+import { accessibility, subscribeAccessibility } from "./accessibility.ts";
+
+// Read from the app's one accessibility store (accessibility.ts), not from a listener of its own.
+const screenReaderOn = () => accessibility().screenReader;
+const off = () => false;
 
 export function useScreenReader(): boolean {
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    let live = true;
-    void AccessibilityInfo.isScreenReaderEnabled().then((value) => {
-      if (live) setOn(value);
-    });
-    const subscription = AccessibilityInfo.addEventListener("screenReaderChanged", setOn);
-    return () => {
-      live = false;
-      subscription.remove();
-    };
-  }, []);
-  return on;
+  return useSyncExternalStore(subscribeAccessibility, screenReaderOn, off);
 }
