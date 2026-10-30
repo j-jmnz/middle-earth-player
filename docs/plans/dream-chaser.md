@@ -17,6 +17,7 @@ User decisions (2026-10-30):
 - The MEC111 rulebook is bundled as the campaign's booklet.
 - The Hard and Expert Mode card (collector 217) is in scope.
 - One Scenarios-tab box, `dream-chaser`, holds all nine scenarios.
+- Ships on the table (phase 39b): the heading shows as a top-bar dial while the Heading card is in play; a row too full at 44 pt steps folds whole groups into a "+n" stack with a list; the Corsair deck and its discard are piles on the board; the Island Map is a chip plus a map panel.
 - The DCCE code rule below is the plan's; the implementer may pick another collision-free rule and record it with its reason.
 
 The standing decisions in `docs/phases/STATUS.md` bind this plan.
@@ -83,9 +84,9 @@ The standing decisions in `docs/phases/STATUS.md` bind this plan.
 - Registry and screens: `src/screens/campaign-data.ts` (`RAW_CAMPAIGNS`, `RAW_SCENARIOS`, `BOXES`), `src/campaign/playable.ts`, `src/screens/booklets/books.ts` (`BOOKLETS`), `scripts/pack-booklets.ts` (`BOOKLET_SOURCES`), `src/screens/rules-glossary.ts` (`DOC_NAMES`, `BOOKS`, the `inGlossary` setup filter), `src/screens/rules-view.tsx` (`BOOK_TEST_IDS`, `BOOK_SCENE`), `src/campaign/save.ts` (`FELLOWSHIP_ID`), the campaign list, scenarios tab, briefing, path and log screens, `src/campaign/loadout.ts` (`saga` gating; add the Na'asiyah rule), `src/campaign/briefing.ts`.
 - Docs: `docs/brief.md` (a "Dream-chaser" section modelled on Mirkwood Paths; the booklet ids and "booklet PDFs" lines), `docs/architecture.md` registry note, `docs/phases/`, `docs/INDEX.md` (`pnpm docs:index`).
 
-## Approach: twelve new phases (37-48)
+## Approach: thirteen new phases (37-48 and 39b)
 
-Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E2E / Exit) and a row in `docs/phases/STATUS.md`. Phase 37 also extends the STATUS rules header: phases 37 to 48 have one review round per phase. Phases 40 to 48 each have an engine half and a phone half (phase 12 describes them). In a cloud session the phone checks and Maestro runs stay open, as `CLAUDE.md` says. The phases run in order, one at a time, because they share `open-lines.ts`, `data/` and the family indexes. `docs/brief.md` changes in the same commit as the rules it states.
+Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E2E / Exit) and a row in `docs/phases/STATUS.md`. Phase 37 also extends the STATUS rules header: phases 37 to 48 and 39b have one review round per phase. Phases 40 to 48 each have an engine half and a phone half (phase 12 describes them). In a cloud session the phone checks and Maestro runs stay open, as `CLAUDE.md` says. The phases run in order (37, 38, 39, 39b, then 40 to 48), one at a time, because they share `open-lines.ts`, `data/` and the family indexes. `docs/brief.md` changes in the same commit as the rules it states.
 
 ### Phase 37 - Dream-chaser data (nothing playable yet)
 
@@ -133,6 +134,20 @@ The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 
 
 **Exit:** the family tests green; `src/catalog/families/index.ts` lists the family; no scenario is playable yet.
 
+### Phase 39b - Ships on the table
+
+How the table holds the sea family in its limited room, from 667 × 375 with two seats to a tablet (user request, 2026-10-30). The design is in `docs/phases/phase-39b-ships-on-the-table.md`. In short:
+- ships stand first in their controller's play-area row;
+- the Heading card adds one top-bar dial;
+- the Corsair deck and its discard pile take a second pile slot under the encounter pair;
+- Boarding reveals into the engagement area;
+- a Sailing test lays its looked-at cards in a strip with their success marks;
+- one crowding rule (`row-fold.ts`) squeezes staging and the engagement area to 44 pt steps, then folds what no moment asks about into a stack with a list.
+
+The phase builds the shared pieces. Phases 41 to 48 build their own areas from its "Scenario areas" section. Phase 40's phone half depends on it; its engine half needs only phase 39.
+
+**Exit:** as the phase file says; no scenario is playable yet.
+
 ### Phases 40-48 - one scenario each (phase 12 procedure)
 
 For each phase:
@@ -142,7 +157,7 @@ For each phase:
 - Golden `src/campaign/golden/<id>.json` with a `golden-<short>.test.ts`, `scripts/<short>-scene.ts` and `<short>-game.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add the id to `src/campaign/playable.ts`, then `pnpm effects:open`.
-- Phone: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
+- Phone: words and widgets only where a line creates them (cite the line in `docs/brief.md`), built from phase 39b's pieces and its "Scenario areas" section, Maestro win and loss flows, fixtures.
 
 | Phase | Scenario (campaign card) | New engine work (cited cards, codes after the DCCE rule) |
 | --- | --- | --- |
@@ -187,7 +202,7 @@ Maestro and phone checks stay open in cloud sessions and are noted in `STATUS.md
 
 The plan is run by `orchestrator` (`.cursor/agents/orchestrator.md`); its Models and Implementer-tasks sections bind: every code-writing agent runs on Sonnet, `reviewer` and `ux` on Opus, one implementer per phase, merge each phase before the next. Do not copy that file into a phase file.
 - **One review round per phase:** `reviewer` (and `ux` when `src/screens` or `src/play` changed) once on the phase's diff, one Sonnet fix pass, then close; an unresolved block goes in the phase's `STATUS.md` note.
-- Order: 37, 38, 39, then 40 to 48 in play order. The data phase must finish before any code phase reads `data/scenarios`.
+- Order: 37, 38, 39, 39b, then 40 to 48 in play order. The data phase must finish before any code phase reads `data/scenarios`.
 - The implementer reads `.cursor/rules/authority.mdc`, `docs/brief.md` and `docs/architecture.md` sections the phase names, the phase file, `docs/handover/agent-brief.md`, and for 40 to 48 the phase 12 "Scenario procedure" and `docs/plans/effect-authoring.md`.
 - Rule wording comes from the pinned MEC111 PDF (`pnpm data:query` over `data/rules`), never from memory. A scan the agent cannot read is a question for the user.
 - Keep the Fellowship and Mirkwood paths byte-identical: existing goldens and tests stay green without edits to their expectations; if one must move, stop and report why.

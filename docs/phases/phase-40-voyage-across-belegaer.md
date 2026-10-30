@@ -1,7 +1,7 @@
 # Phase 40 — Voyage Across Belegaer
 
 Engine half depends on: phase 39
-Phone half depends on: phase 39
+Phone half depends on: phase 39b
 Blocks: phase 41
 
 Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
