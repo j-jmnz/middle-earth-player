@@ -7,6 +7,7 @@ import { committedWillpower, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import type { Readout } from "./readout.ts";
+import { questSeat } from "./selectors.ts";
 
 // `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves.
 // Outside it the scale rests, dimmed, with no numbers: a Planning "−3 Short" before anyone could commit would be a false alarm.
@@ -19,8 +20,10 @@ export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: R
     const threat = readout.stats.find((stat) => stat.icon === "threat")?.value ?? 0;
     return { threat, willpower, delta: willpower - threat, live: true };
   }
-  const threat = stagingThreat(game, ctx.cards);
-  const willpower = committedWillpower(game, ctx.cards);
+  // The acting seat's own staging area and stage once stages are separate.
+  const seat = questSeat(game);
+  const threat = stagingThreat(game, ctx.cards, seat);
+  const willpower = committedWillpower(game, ctx.cards, seat);
   return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" };
 }
 

@@ -19,6 +19,7 @@ import { oathPickWords, oathWords } from "./oath-words.ts";
 import { stageNumber } from "../rules/families/caves-progress.ts";
 import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 import { nightmareWords } from "./nightmare-words.ts";
+import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -235,9 +236,6 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${instruction.who === "eachSeat" ? "players do" : "that player does"} not raise threat from questing unsuccessfully ${instruction.until === "endOfRound" ? "this round" : "this phase"}`;
     case "SkipQuestPhase":
       return "skip the quest phase this round";
-    // Stage 2B (142062:B:1): the stage each seat advances to (the staging areas themselves are not a widget until phase 16c draws them).
-    case "StartSeparateStage":
-      return `advance to ${names.code(instruction.code)}`;
     case "RemoveProgressFromQuest":
       return `remove ${amountWords(instruction.amount)} progress from the quest`;
     case "MoveProgress":
@@ -296,7 +294,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return breakingWords(instruction, names) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -322,7 +320,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
   if (option.instructions.length === 0) return "Do nothing";
-  const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions);
+  const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId);
   if (whole) return whole;
   // A run of "pick a hero, remove it from the quest" is one decision: how many heroes leave the quest.
   const removals = option.instructions.filter((instruction) => instruction.verb === "RemoveFromQuest").length;
@@ -375,7 +373,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
   const play = playPickWords(pick);
   if (play) return play;
-  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names);
+  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next);
   if (burden) return burden;
   if (pick.verb !== "Pick") return cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;

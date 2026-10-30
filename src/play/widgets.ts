@@ -2,6 +2,7 @@
 // deck's count. A piece shows only when the scenario's definition declares it (`widgets`) and the game holds it, so a game of
 // A Shadow of the Past or A Knife in the Dark shows neither. The engine wrote both numbers; nothing here changes one.
 import type { Effect } from "../catalog/boundary.ts";
+import { stageOf } from "../rules/families/breaking-areas.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
 
 export type WidgetReadouts = {
@@ -59,15 +60,21 @@ export function prisonerWords(name: string): string {
 
 export type TokenReadout = { name: string; tokens: number };
 
+// The quest stage of the seat the table shows: the one stage before stages are separate, that seat's own after.
+function stageCard(game: ScenarioState, seat: number) {
+  const id = stageOf(game, seat);
+  return id ? game.cards[id] : undefined;
+}
+
 /**
  * The resource tokens on the campaign card, when it is in the game and one of its records places them (The Oath, 41050:A:3: "place 1 resource token
  * here" at the end of each round, read at its Resolution), or else on the current stage when one of its records does (Journey in the Dark, 142041:B:3:
  * "place 1 resource token on this stage" after an enemy is defeated, which holds the stage back until it has enough); null for a game with neither.
- * The engine wrote the number; nothing here changes it.
+ * The engine wrote the number; nothing here changes it. Once stages are separate, the stage is the shown `seat`'s.
  */
-export function campaignTokens(game: ScenarioState, effects: readonly Effect[], nameOf: (code: string) => string): TokenReadout | null {
+export function campaignTokens(game: ScenarioState, effects: readonly Effect[], nameOf: (code: string) => string, seat = 0): TokenReadout | null {
   const places = (code: string) => effects.some((effect) => effect.cardCode === code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"));
-  const holders = [Object.values(game.cards).find((entry) => entry.zone === "campaign"), game.questStage ? game.cards[game.questStage] : undefined];
+  const holders = [Object.values(game.cards).find((entry) => entry.zone === "campaign"), stageCard(game, seat)];
   const card = holders.find((entry) => entry != null && places(entry.code));
   return card ? { name: nameOf(card.code), tokens: card.resources } : null;
 }

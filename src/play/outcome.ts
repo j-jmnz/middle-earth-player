@@ -142,8 +142,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   });
 
   // Travel leaves no step of its own: the location that became active from staging.
-  const arrived = after.activeLocation;
-  if (arrived && arrived !== before.activeLocation && before.staging.includes(arrived)) {
+  // Once stages are separate each seat has its own active location, and the second seat's is the shared state's second slot.
+  const arrived = after.separate === true && after.activeLocation === before.activeLocation ? after.secondActiveLocation : after.activeLocation;
+  if (arrived && arrived !== before.activeLocation && arrived !== before.secondActiveLocation && before.staging.includes(arrived)) {
     groups.push({ rank: 1, title: `Traveled to ${names.card(arrived)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
 

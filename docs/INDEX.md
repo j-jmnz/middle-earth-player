@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~47.8K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~47.9K tok)
   - 17–36 Sections (~350)
   - 37–48 Product (~490)
   - 49–62 Non-goals (~550)
@@ -100,14 +100,14 @@ Read the sections your task touches.
   - 742–762 Data sources (~560)
   - 763–781 Card images (~1.1K) ← 6
   - 782–806 Persistence and shipping (~1.5K)
-  - 807–845 Screens (~3.6K) ← 1
-    - 832–845 Table screen (~1.2K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~17.4K tok)
+  - 807–845 Screens (~3.7K) ← 1
+    - 832–845 Table screen (~1.3K) ← 3
+- `docs/design-system-table.md` — Design system — Table (landscape) (~17.6K tok)
   - 5–8 Overview (~150)
   - 9–22 Top bar (~1.4K) ← 1
   - 23–26 Table menu (~330) ← 1
-  - 27–32 Quest scale (~250)
-  - 33–36 Canvas (~250)
+  - 27–32 Quest scale (~270)
+  - 33–36 Canvas (~340)
   - 37–44 Spacing and the play area's rows (~850) ← 2
   - 45–50 Pictures on the table (~260)
   - 51–60 Cards (~850) ← 1
@@ -118,7 +118,7 @@ Read the sections your task touches.
   - 138–164 Spotlight (~2.1K) ← 16
   - 165–170 Gestures (~210) ← 5
   - 171–174 Hold, slide and release (~690)
-  - 175–180 Peeking at the other seat (~490) ← 1
+  - 175–180 Peeking at the other seat (~550) ← 1
   - 181–194 Command column (~1.6K) ← 7
   - 195–198 Two taps (~320) ← 2
   - 199–202 One answer, one tap (~240)

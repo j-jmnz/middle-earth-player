@@ -45,6 +45,7 @@ import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
+import { AreaSummary } from "../play/area-summary";
 import { useTableChoice } from "../play/use-table-choice";
 import { trayCount } from "../play/tray-logic";
 import { withAlphaHex } from "../play/tokens";
@@ -170,7 +171,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [store, session],
   );
 
-  const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
+  // A fallen hero (`<code>~enemy`) keeps the hero's name.
+  const nameOf = useCallback((code: string) => (session.world.cards.get(code) ?? session.world.cards.get(pictureCode(code)))?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
   const names: SheetNames = useMemo(
     () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
@@ -276,13 +278,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     setSize((current) => (current && current.width === width && current.height === height && current.x === x ? current : { width, height, x }));
   };
 
-  // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own).
-  const tickOf = useMemo(() => tickKeySelector(ctx), [ctx]);
+  // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own; once stages are separate, the enemies in the staging area the table shows).
+  const tickOf = useMemo(() => tickKeySelector(ctx, peek.shown), [ctx, peek.shown]);
   const tickKey = useStore(store, (state) => tickOf(state.game));
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
   // What the dials and bar read of the game, derived once for each state; the campaign card's tokens are rebuilt only when its name or count changes.
   const widgets = useMemo(() => widgetReadouts(game), [game]);
-  const campaign = useMemo(() => campaignTokens(game, ctx.effects, nameOf), [game, ctx, nameOf]);
+  const campaign = useMemo(() => campaignTokens(game, ctx.effects, nameOf, peek.shown), [game, ctx, nameOf, peek.shown]);
   const tokenName = campaign?.name ?? null;
   const tokenCount = campaign?.tokens ?? null;
   const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
@@ -373,6 +375,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             </View>
           ) : null}
           <View className="min-h-0 flex-1" onLayout={onLayout}>
+            {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (area-words.ts). */}
+            <AreaSummary store={store} nameOf={nameOf} />
             {size ? (
               <PicturedCanvas
                 store={store}

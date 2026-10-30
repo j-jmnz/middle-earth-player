@@ -7,6 +7,7 @@
 // advanced already: the screen holds the moment so the stage is read before the round goes on, and the table answers nothing for
 // the player meanwhile (use-table-choice.ts). The table also opens on it (user request, 2026-10-29): the stage in play when the game is
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
+import { isSeparate } from "../rules/families/breaking-areas.ts";
 import { stagePlace } from "../rules/families/quest-branch.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { isOver } from "../rules/undo.ts";
@@ -25,7 +26,17 @@ const OPENING_SEQ = 0;
  * What the screen reads of the game: the stage in play, the stage whose own effect is asking the player something now (if any), and whether
  * the game is over. The hook reads each on its own, so a state that changes none of them does not render it (use-quest-advance.ts).
  */
-export type QuestView = { questStage: string | null; asking: string | null; over: boolean };
+export type QuestView = { questStage: string | null; asking: string | null; over: boolean; seatStages?: string };
+
+/** The stages the seats are on once stages are separate (Breaking of the Fellowship, 2B on), joined by "|" so a subscriber compares one string; "" before. */
+export function stagesKey(game: ScenarioState): string {
+  return isSeparate(game) ? game.seats.slice(0, game.seatCount).flatMap((seat) => (seat.stage ? [seat.stage] : [])).join("|") : "";
+}
+
+// Whether the card is a stage in play: the shared stage or one of the seats' own.
+function isStage(view: Pick<QuestView, "questStage" | "seatStages">, id: string): boolean {
+  return view.questStage === id || (view.seatStages ?? "").split("|").includes(id);
+}
 
 /** The stage whose own effect (its When Revealed) is resolving and waits on the player, or null. */
 export function askingStage(game: ScenarioState): string | null {
@@ -34,14 +45,14 @@ export function askingStage(game: ScenarioState): string | null {
 
 /** The view of a game. */
 export function questView(game: ScenarioState): QuestView {
-  return { questStage: game.questStage, asking: askingStage(game), over: isOver(game) };
+  return { questStage: game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game) };
 }
 
 /** The stage a sent intent advanced the quest to, while it is still the stage: the moment's last advance step. Null for any other moment. */
-export function advancedTo(moment: TableMoment | null, game: Pick<QuestView, "questStage">): QuestAdvance | null {
+export function advancedTo(moment: TableMoment | null, game: Pick<QuestView, "questStage" | "seatStages">): QuestAdvance | null {
   if (moment?.kind !== "sent") return null;
   const reached = moment.steps.flatMap((step) => (step.kind === "advance" ? [step.cardId] : [])).at(-1);
-  return reached != null && game.questStage === reached ? { seq: moment.seq, stageId: reached } : null;
+  return reached != null && isStage(game, reached) ? { seq: moment.seq, stageId: reached } : null;
 }
 
 // The windows in which an effect asks its question. The action windows and the Responses to the reveal are the table's.
@@ -105,9 +116,9 @@ export function openingLatch(game: QuestView): AdvanceLatch {
 }
 
 /** The advance on screen: the latched one, until the player went back to the table from it or its stage is no longer the stage. */
-export function openAdvance(latch: AdvanceLatch, game: Pick<QuestView, "questStage">): QuestAdvance | null {
+export function openAdvance(latch: AdvanceLatch, game: Pick<QuestView, "questStage" | "seatStages">): QuestAdvance | null {
   const { latched } = latch;
-  return latched && latched.seq > latch.done && game.questStage === latched.stageId ? latched : null;
+  return latched && latched.seq > latch.done && isStage(game, latched.stageId) ? latched : null;
 }
 
 /**

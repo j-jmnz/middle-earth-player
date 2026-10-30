@@ -1,0 +1,66 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# OPEN (2026-10-30): its fixture `breaking-pair` is not committed (see breaking-of-the-fellowship.yaml): a real two-handed game of Breaking of the Fellowship parked
+# in the planning window of the round after stage 2B, Player 1 on Searching the Woods and Player 2 on Orc Hunting, dealt from the log of five scenarios no win has
+# been found for.
+# Phase 16. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
+# Two-handed after stage 2B: two dials and two staging areas with two different stage 3A. The table draws the shown seat's area (the acting seat's, or the seat peeked
+# at); `table-area` says whose area, which stage and how many cards. The peek changes only what is drawn: the dock stays Player 1's.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/breaking-pair"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: path-back
+- assertVisible:
+    id: continue-next
+    text: "On the table: Breaking of the Fellowship"
+- tapOn:
+    id: continue
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertVisible:
+    id: threat-0
+- assertVisible:
+    id: threat-1
+# Player 1's area, on Searching the Woods.
+- assertVisible:
+    id: table-area
+    text: "Player 1's staging area · Searching the Woods · [0-9]+ cards? · .*"
+# The peek at Player 2 draws Player 2's area, on a different stage 3A.
+- tapOn:
+    id: threat-1
+- extendedWaitUntil:
+    visible:
+      id: peek-text
+    timeout: 5000
+- assertVisible:
+    id: table-area
+    text: "Player 2's staging area · Orc Hunting · [0-9]+ cards? · .*"
+- assertNotVisible:
+    id: table-area
+    text: ".*Searching the Woods.*"
+# The dock is still Player 1's, and the banner keeps the way back.
+- assertVisible:
+    id: dock
+- assertVisible:
+    id: peek-back
+- tapOn:
+    id: peek-back
+- extendedWaitUntil:
+    notVisible:
+      id: peek-text
+    timeout: 5000
+- assertVisible:
+    id: table-area
+    text: "Player 1's staging area · Searching the Woods · .*"
