@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../../effects/authored/nightmare/a-shadow-of-the-past.ts";
+import { AUTHORED_EFFECTS as FORD_EFFECTS } from "../../effects/authored/nightmare/flight-to-the-ford.ts";
 import { AUTHORED_EFFECTS as KNIFE_EFFECTS } from "../../effects/authored/nightmare/a-knife-in-the-dark.ts";
 
 import { syncConstants } from "../constants.ts";
@@ -21,7 +22,7 @@ import { reduce } from "../reduce.ts";
 import { flagged, updateCard, type ScenarioState } from "../state.ts";
 import { spawn } from "../zones.ts";
 import { finishSetup } from "../setup.ts";
-import { cancelNotAllowed, hideCommitLimit, run as runNightmare, twinCode } from "./nightmare.ts";
+import { announceCanceled, cancelNotAllowed, hideCommitLimit, run as runNightmare, twinCode } from "./nightmare.ts";
 
 const SETUP = "906101";
 const KHAMUL = "906102";
@@ -333,5 +334,36 @@ describe("A Knife in the Dark Nightmare's vocabulary (906201:A:2, 906203:A:1, 90
     expect(hit.cards[tip.id]?.host).toBe(defender);
     expect(hit.cards[enemy.id]?.shadowId).toBeNull();
     expect(atEnd(0).cards[tip.id]?.zone).toBe("shadow");
+  });
+});
+
+describe("Flight to the Ford Nightmare's vocabulary (906301:A:2, 906304:A:1; rr.cancel, rr.winning-the-game)", () => {
+  const fordCards = cardMap([
+    ...cards.values(),
+    definePrinted({ code: "906301", name: "Flight to the Ford Nightmare", type: "nightmare" }),
+    definePrinted({ code: "906303", name: "Ford of Bruinen", type: "location", threat: 3, questPoints: 3, isUnique: true }),
+    definePrinted({ code: "906304", name: "Trollshaw Forest", type: "location", threat: 3, questPoints: 4 }),
+    definePrinted({ code: "141029", name: "Race to Rivendell", type: "quest", questPoints: 6 }),
+  ]);
+  const fordCtx: ReduceContext = { effects: FORD_EFFECTS, cards: fordCards };
+
+  it("announces a canceled when revealed effect, and Trollshaw Forest in the staging area reduces the Ring-bearer's life", () => {
+    const { state: base } = table();
+    const forest = spawn({ ...base, life: 10 }, "906304", { zone: "staging" }).state;
+    const canceled = { ...forest, round: forest.round };
+    const announced = announceCanceled({ ...canceled }, forest, fordCtx);
+    expect(announced.pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled" });
+    expect(announceCanceled(forest, forest, fordCtx)).toBe(forest);
+    const resolved = settle(announced, fordCtx, []);
+    expect(resolved.life).toBe(9);
+  });
+
+  it("holds the last stage back while Ford of Bruinen is in play: the players cannot win (the setup card's constant, zone nightmare)", () => {
+    let state: ScenarioState = { ...idleScenario(1), stages: [{ code: "141029" }] };
+    const placed = spawn(state, "141029", { zone: "questStage" });
+    state = updateCard(spawn(placed.state, "906301", { zone: "nightmare" }).state, placed.id, { face: "B", progress: 6 });
+    const held = settle(spawn(state, "906303", { zone: "staging" }).state, fordCtx, []);
+    expect(held.stageCleared).toBe(false);
+    expect(settle(state, fordCtx, []).stageCleared).toBe(true);
   });
 });

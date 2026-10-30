@@ -32,6 +32,9 @@ export const TRIGGERS = [
   // A quest card became the current stage ("When stage 3A is revealed", 906101:A:2). The event names the stage as its subject, so a record with
   // no `subject` hears it from any card in play (the Nightmare setup card, zone `nightmare`); a `matches` condition on `subject` says which stage.
   "stageRevealed",
+  // The "when revealed" effects of an encounter card were canceled (a cancel Response to a card just revealed, or to its When Revealed effect;
+  // rr.cancel). About no card: every card in play hears it ("After a 'when revealed' effect is canceled", 906304:A:1, 906406:A:1).
+  "whenRevealedCanceled",
 ] as const;
 
 export const FLAGS = [

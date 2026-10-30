@@ -87,4 +87,18 @@ describe("the quest's records on Nightmare", () => {
     expect(after.staging.map((id) => after.cards[id]?.code)).toContain("906204");
     expect(after.setAside.map((id) => after.cards[id]?.code)).not.toContain("906204");
   });
+
+  it("add Nightmare Ford of Bruinen when Race to Rivendell is revealed (141029:B:1)", () => {
+    const campaign = loadCampaign();
+    const seat = seatFor("fellowship-of-the-ring");
+    const world = loadWorld(catalog, campaign, loadScenario("flight-to-the-ford"), EFFECTS, [...seat.heroes, ...seat.deck]);
+    const ctx = contextOf(world);
+    const start = buildStart({ campaign, scenario: world.scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: seat.heroes, deck: seat.deck }], difficulty: "Nightmare", effects: world.effects, mode: "standalone" });
+    let state = startScenario(start, ctx);
+    while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+    expect(state.setAside.map((id) => state.cards[id]?.code)).toContain("906303");
+    const revealed = EFFECTS.filter((effect) => effect.id === "141029:whenRevealed:1");
+    const after = settle(pushCardEffects({ ...state, window: null }, "whenRevealed", state.questStage ?? "", 0, false, revealed, ctx, []), ctx, []);
+    expect(after.staging.map((id) => after.cards[id]?.code)).toContain("906303");
+  });
 });

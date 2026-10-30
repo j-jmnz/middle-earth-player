@@ -15,6 +15,7 @@ import { printedOf } from "../printed.ts";
 import type { GameEvent, HideResult, ResponseOffer, ScenarioState } from "../state.ts";
 import { inPlay, modifierActive, updateCard } from "../state.ts";
 import { fireForced } from "../triggers.ts";
+import { queueEvent } from "../queue.ts";
 import { patchTop, topFrame, withFrame } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
@@ -174,4 +175,13 @@ export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, eff
     .filter((record) => record.timing === "whenRevealed")
     .flatMap((record) => record.instructions.flatMap((instruction) => (instruction.verb === "NotCanceledBy" ? [instruction.trait] : [])));
   return traits.some((trait) => hasTrait(state, offer.cardId, trait, ctx));
+}
+
+// A Response canceled the "when revealed" effects of an encounter card being revealed (cancelAnswered, rules/player-verbs.ts): a card that
+// listens hears it ("Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1", 906304:A:1; rr.cancel). `before`
+// is the state the cancel was made in: the event is announced only when the cancel changed it, and only when some record listens.
+export function announceCanceled(state: ScenarioState, before: ScenarioState, ctx: ReduceContext): ScenarioState {
+  if (state === before || !ctx.effects.some((effect) => effect.trigger === "whenRevealedCanceled")) return state;
+  if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;
+  return queueEvent(state, { trigger: "whenRevealedCanceled", seat: null });
 }

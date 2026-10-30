@@ -197,6 +197,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return instruction.target?.kind === "byCode" ? `exhaust ${names.code(instruction.target.code)}` : "exhaust the chosen card";
     case "HideTest":
       return `make a Hide ${instruction.x} test`;
+    case "ConsiderUndefended":
+      return "this attack is considered undefended";
     case "ReturnToStaging":
       return instruction.target.kind === "engagedEnemies" ? `return an engaged ${instruction.target.trait ?? ""} enemy to the staging area`.replace("  ", " ") : "return it to the staging area";
     case "ReadyHero":

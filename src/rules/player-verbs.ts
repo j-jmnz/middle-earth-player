@@ -24,6 +24,7 @@ import { afterCancel } from "./families/defense-damage.ts";
 import { healBlocked } from "./families/burden-life.ts";
 import { mayGainResources } from "./families/misc-guards.ts";
 import { addToVictory } from "./families/sidequests-victory.ts";
+import { announceCanceled } from "./families/nightmare.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -214,7 +215,7 @@ export function runPlayerVerb(
       return enemy?.shadowId ? moveCard(state, enemy.shadowId, { zone: "encounterDiscard" }) : state;
     }
     case "CancelEffect":
-      return cancelAnswered(state);
+      return announceCanceled(cancelAnswered(state), state, ctx);
     case "LookAtEncounterTop": {
       const top = state.encounterDeck[0];
       return top ? { ...state, window: { kind: "look", seat: focus.seat, cardIds: [top] }, activeSeat: focus.seat, passed: [] } : state;
