@@ -116,7 +116,7 @@ None ran. Each needs a device.
 - Performance: frame timing of card pickup, the hand scrub, the spotlight and opening the table (Profiler, Perf Monitor), and the loading frame on a cache miss; screens hidden by React Activity re-shown with their state (tabs, stacked screens, the table's pictures, a tab under a sheet's scrim, iOS swipe-back); the Sent and landing ticks' feel.
 - Scenario sheets: Caught in a Web, Wolf Rider's second attack, The Oath's end-of-round Response and Tokens dial, the Pillar on the attack sheet; a person winning and losing each playable scenario with the log matching.
 - Look and theme: Skia fog and its drift (smooth, cheap, still under reduced motion), grit, `filter` effects, Barlow and Marcellus SC weights, Light's multiply and Dark's screen art blends with no hard edge, Small and Large scales, both themes, keep-awake, `userInterfaceStyle: automatic` after a prebuild.
-- Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge and briefing scene on an iPad in landscape.
+- Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge on an iPad in landscape; the briefing scene's Skia fade (`SceneCanvas`) on an iPad in landscape in Dark and Light: no line under the picture, no band at the pane's right edge, the dim matching the browser's.
 
 ## Standing decisions
 
