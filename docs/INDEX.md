@@ -144,8 +144,8 @@ Read the sections your task touches.
   - 168–205 Components (~1.7K) ← 8
   - 206–219 Icons (~390) ← 6
   - 220–239 Card art (~780) ← 2
-  - 240–254 Tablets (~510) ← 14
-  - 255–422 Screens (~10.9K) ← 1
+  - 240–254 Tablets (~510) ← 13
+  - 255–422 Screens (~10.9K)
     - 259–262 Splash (~30)
     - 263–278 Campaigns (campaign list) (~1.3K) ← 5
     - 279–292 Scenarios (~730) ← 1
@@ -172,15 +172,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~4.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~4.2K tok)
   - 5–15 Rules (~470)
   - 16–61 Phases (~1.3K)
-  - 62–119 Open items (~1.9K)
+  - 62–120 Open items (~2.0K)
     - 64–74 Fixtures and Maestro (~340)
     - 75–89 Rules and engine (~370)
-    - 90–103 Screens and code (~520)
-    - 104–119 Phone and tablet checks (~700)
-  - 120–135 Standing decisions (~380)
+    - 90–104 Screens and code (~600)
+    - 105–120 Phone and tablet checks (~680)
+  - 121–136 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)
@@ -239,18 +239,6 @@ Read when a task names the plan.
   - 147–208 Patterns (~1.4K)
   - 209–233 Mechanic families: engine and records together (~600) ← 1
   - 234–257 Not expressible yet: leave open, report (~510)
-- `docs/plans/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
-  - 7–28 Settled decisions (user instruction, 2026-10-30) (~360)
-  - 29–162 Tasks, in order (~3.2K)
-    - 33–54 1. Shared hub parts (~500)
-    - 55–79 2. Campaigns hub (`(tabs)/index.tsx`) (~440)
-    - 80–95 3. Campaign setup screen (new `routes/campaign/[campaignId].tsx`) (~390)
-    - 96–115 4. Scenarios hub (`(tabs)/scenarios.tsx`) (~470)
-    - 116–146 5. History becomes the library (`history-view.tsx`, `history-list.ts`, `history-words.ts`) (~620)
-    - 147–162 6. Docs, flows, tests (~730)
-  - 163–204 Notes for the implementer (~1.1K)
-  - 205–214 Out of scope (~80)
-  - 215–229 Exit (~230)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
@@ -279,6 +267,7 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/board-ux.md` — Board UX: motion, focus and a quieter table (~3.4K tok)
 - `docs/plans/done/combat-spotlight-redesign.md` — Combat spotlight redesign (~3.9K tok)
 - `docs/plans/done/data-store-refactor.md` — Plan: a local game-data store, fetched once, generated wherever possible (~5.1K tok)
+- `docs/plans/done/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
 - `docs/plans/done/inactive-text.md` — Inactive text: a rethink (~2.4K tok)
 - `docs/plans/done/performance-pass.md` — Performance pass: snappy taps, animations and screens (user request, 2026-10-29) (~4.3K tok)
 - `docs/plans/done/rounded-chrome.md` — Rounded chrome: round controls, fewer boxes, fewer words (~3.7K tok)

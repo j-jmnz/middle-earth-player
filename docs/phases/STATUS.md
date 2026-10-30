@@ -92,6 +92,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
 - Rounded chrome (`docs/plans/done/rounded-chrome.md`), phone checks open: both themes on a phone; the capsule controls' pressed darken (`filter: brightness`); the command column's radial fade and the start block's soft scene; the dock with choice rows open on a short phone; the carousel's seven rows at 667 × 375; Maestro finding the transparent `rail-round` and `rail-current`; `.maestro/table-menu.yaml`.
+- Hub layout (`docs/plans/done/hub-layout.md`), phone checks open: both hubs, the campaign setup (carry-over rows) and History's ⋯ sheet on a phone and an iPad in both orientations, both themes; `start=1` from a finished path; flows `briefing`, `booklet`, `mirkwood-start`, `the-caves-of-nibin-dum`, `history` not run.
 - `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
 - Web only: opening Cards, Import or a deck first can raise "error during concurrent rendering" (expo-sqlite "Sync operation timeout"; React recovers). Rows ending in a stepper warn "nested button".
@@ -107,7 +108,7 @@ None ran. Each needs a device.
 
 - Booklets: import, open, last page after a kill, Back; first open from the APK; Android pinch, double tap, pan and the sharper redraw.
 - Data: airplane-mode play after a kill with images cached; `user.db` keeps the deck and log after a catalog version bump; a changed engine version drops the open scenario.
-- Campaign screens: the Campaigns road, the path (stops resume or begin, Campaign log, the foot clear of three-button and gesture navigation), the briefing, the log rows (Prisoner, carry-over, Used this campaign), the start panel's carry-over chips, the four-cover Books grid, the Resolution and outcome reports.
+- Campaign screens: the path (stops resume or begin, Campaign log, the foot clear of three-button and gesture navigation), the briefing, the log rows (Prisoner, carry-over, Used this campaign), the four-cover Books grid, the Resolution and outcome reports.
 - Table chrome: the top bar at 667x375 with two seats; the rail and its three lines on the screen's middle; the dial and its pop under the top edge; the banner centered and its swipe; the menu, carousel, tray and dock at 667x375 and 844x390; the opening quest screen (Begin, Continue, Progress).
 - Table canvas: a crowded table at Small, Medium and Large on a phone and a tablet; stacked play rows; picture sharpness and decode memory on a low-end Android; quest scale only in the Quest phase; side B pictures upright; each card shows its own picture after an earlier build.
 - Gestures and motion: drag smoothness; the 150 ms scrub hold, the lifted card's grow and the cancel line; peek and back; card motion at Normal and Quick; reduced motion snaps; haptics on iOS and Android.
