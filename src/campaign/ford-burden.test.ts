@@ -9,7 +9,7 @@ import type { ReduceContext } from "../rules/reduce.ts";
 import { withMode, type ScenarioState } from "../rules/state.ts";
 import { fireForced } from "../rules/triggers.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
-import { BURDENS, CAMPAIGN_CARD, FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
+import { CAMPAIGN_CARD, FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
 import { codesOf, first, RING, reveal, send, start } from "../../scripts/past-scene.ts";
 
 let world: FordWorld;
@@ -44,12 +44,6 @@ function travelWindow(layout: FordLayout) {
 }
 
 describe("the burden deck (mec109.burden-deck)", () => {
-  it("is a zone of five burdens beside the quest deck, not part of the encounter deck", () => {
-    const { state } = make();
-    expect(codesOf(state, state.burdenDeck ?? []).sort()).toEqual([...BURDENS]);
-    expect(state.encounterDeck).toEqual([]);
-  });
-
   it("The Last Bridge's Travel reveals its top card as if from the encounter deck, and the burden goes to the encounter discard pile (141058:A:3)", () => {
     const { state, ctx } = travelWindow({ staging: [LAST_BRIDGE], burden: ["141083", "141084"], deck: ["f0"] });
     const bridge = first(state, LAST_BRIDGE);

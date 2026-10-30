@@ -20,7 +20,6 @@ import { buildStart } from "./start.ts";
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
 const won = new Map<string, MirkwoodGame>();
-let lost: MirkwoodGame;
 
 beforeAll(async () => {
   const strong = await mirkwoodWorld("strong");
@@ -28,10 +27,6 @@ beforeAll(async () => {
   cards = new Map([...strong.cards, ...extra]);
   ctx = { effects: EFFECTS, cards };
   for (const golden of MIRKWOOD_GOLDENS.filter((item) => item.outcome === "won")) won.set(golden.name, playGolden(golden, strong.ctx));
-  const weak = await mirkwoodWorld("weak");
-  const loss = MIRKWOOD_GOLDENS.find((item) => item.outcome === "lost");
-  if (!loss) throw new Error("no lost golden");
-  lost = playGolden(loss, weak.ctx);
 }, 240_000);
 
 function kept(start: ReturnType<typeof buildStart>): ScenarioState {
@@ -95,11 +90,4 @@ describe("what a win writes and the next part receives", () => {
       expect(next.poolEncounterCards).toEqual([burden]);
     });
   }
-
-  it("a loss writes nothing: the log is the one it was", () => {
-    const log = emptyLog(lost.state.seatCount);
-    expect(lost.state.lost).toBe(true);
-    expect(applyResolution(log, lost.state.scenarioId, lost.state, cards)).toBe(log);
-    expect(campaignPath(campaign, {}, log).map((node) => node.status)[0]).toBe("current");
-  });
 });

@@ -42,7 +42,7 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.0K)
     - 157–160 Maestro (~120)
-- `docs/architecture.md` — Architecture (~14.9K tok)
+- `docs/architecture.md` — Architecture (~15.0K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
   - 78–120 Modules (~970) ← 1
@@ -56,7 +56,7 @@ Read the sections your task touches.
   - 255–260 Images (~790) ← 5
   - 261–307 Screens (~3.5K) ← 1
   - 308–313 Catalog build (~410)
-  - 314–327 Tests (~790) ← 2
+  - 314–327 Tests (~860) ← 2
   - 328–341 Performance (~1.0K)
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~43.0K tok)
   - 17–36 Sections (~350)

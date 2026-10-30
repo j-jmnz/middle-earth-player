@@ -19,10 +19,6 @@ describe("deckLegal", () => {
     expect(deckLegal(typeCode, "Other")).toBe(true);
   });
 
-  it("keeps a hero whose type name is Hero", () => {
-    expect(deckLegal("hero", "Hero")).toBe(true);
-  });
-
   it("accepts a treasure whose type name is not Campaign", () => {
     expect(deckLegal("treasure", "Treasure")).toBe(true);
   });

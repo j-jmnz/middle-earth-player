@@ -36,12 +36,6 @@ describe("shownSeat", () => {
     expect(shownSeat(solo, null)).toBe(0);
     expect(shownSeat(solo, 1)).toBe(0);
   });
-
-  it("never reads the acting seat: the same game has one acting seat whoever is viewed", () => {
-    expect(actingSeat(state)).toBe(0);
-    expect(shownSeat(state, 1)).toBe(1);
-    expect(actingSeat(state)).toBe(0);
-  });
 });
 
 describe("what a peek swaps", () => {

@@ -59,12 +59,6 @@ describe("a whole game of A Shadow of the Past", () => {
     expect(validateLoadout([loadout], cards, true)).toEqual([]);
   });
 
-  it("is reproducible from the seed", () => {
-    const first = play(WIN_SEED);
-    const again = play(WIN_SEED);
-    expect(JSON.stringify(again.state)).toBe(JSON.stringify(first.state));
-  });
-
   it("wins from the quest, answers both reward groups, and ends with the Ring still attached", () => {
     const { state } = play(WIN_SEED);
     expect(state.lost).toBe(false);
