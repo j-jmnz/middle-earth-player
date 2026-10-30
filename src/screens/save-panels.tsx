@@ -1,10 +1,13 @@
 import { View } from "react-native";
 
-import type { NextStep, PathNode } from "../campaign/path";
+import { campaignPath, nextStep, type NextStep, type PathNode } from "../campaign/path";
 import { useSizeClass } from "../play/use-size-class";
+import { campaignOf, scenarioNames } from "./campaign-data";
+import type { ListedSave } from "./campaign-store";
 import { Eyebrow, PrimaryButton, TextButton } from "./chrome";
 import { PrimaryPlate } from "./hub-parts";
 import { nextLabel } from "./hub-runs";
+import { seatWord } from "./seats";
 import { Text } from "../play/text";
 
 // The campaign hub's pieces for one playthrough (docs/design-system.md, Campaigns (campaign list)): the line that words a save, and
@@ -14,6 +17,20 @@ import { Text } from "../play/text";
 // control on a save names it with this line.
 // `path` is the campaign's scenarios as the path screen reads them.
 export type SaveLine = { name: string; seats: string; done: number; total: number; next: NextStep; path: readonly PathNode[] };
+
+/** A save as the lists word it: `name` is its campaign's, and the path is read from its log. */
+export function saveLine(save: ListedSave, name: string): SaveLine {
+  const campaign = campaignOf(save.campaignId);
+  const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : [];
+  return {
+    name,
+    seats: seatWord(save.seatCount),
+    done: path.filter((node) => node.status === "completed").length,
+    total: campaign?.scenarios.length ?? 0,
+    next: nextStep(path, save.loadout?.scenarioId),
+    path,
+  };
+}
 
 export function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;

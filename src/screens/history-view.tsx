@@ -1,124 +1,74 @@
-// History (phase 28b): every finished run, campaign or standalone. A switch picks the kind, filters narrow it by campaign or
-// box and by result, newest first; campaign runs group under their playthrough in a foldable header (a FlashList of header and run items; a folded group emits no rows). A run opens its
-// playthrough's log or, for a standalone game, its outcome while the game exists; the run of a deleted playthrough or game
-// says so and does not open. Nothing here edits or deletes a run.
+// History (docs/design-system.md, History): the library of one kind, the playthroughs or the standalone games, with the runs they wrote.
+// A switch picks the kind and filters narrow it by campaign or box and by result. Sections hold In progress, Finished, Archived and
+// Deleted; a playthrough is a foldable header over its runs, a game one row, each with a ⋯ that opens its sheet (history-sheet.tsx).
+// The list is a FlashList of flat items, and a folded playthrough emits no run items. A run opens its playthrough's log or its game's
+// outcome while that exists; the run of a deleted one says so and does not open.
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
-import { Pressable, View } from "react-native";
+import { useCallback, useState } from "react";
+import { View } from "react-native";
 
 import type { RunKind, RunRecord, RunResult } from "../campaign/runs";
-import { BodyText, Chevron, Chip, Label, NavBar, Screen, Segmented, ToggleChip } from "./chrome";
-import { BOXES, campaignOf, scenarioName } from "./campaign-data";
-import { listArchivedSaves, listSaves } from "./campaign-store";
+import { standaloneStatus } from "../campaign/standalone";
+import { BodyText, Eyebrow, NavBar, Screen, Segmented, ToggleChip } from "./chrome";
+import { BOXES, campaignOf } from "./campaign-data";
 import { deckFaces } from "./deck-store";
 import { useDatabases } from "./databases";
-import { FoldHeader } from "./fold-section";
 import { goBack } from "./go-back";
+import { GameRow, GoneHeader, RunRow, SaveHeader } from "./history-rows";
+import { EMPTY_LIBRARY, readLibrary, type Library, type LibrarySave } from "./history-read";
+import { HistorySheet, type RefTarget } from "./history-sheet";
 import { useListGutter } from "./list-gutter";
-import { filterRuns, groupRuns, historyItems, scopesOf, startedOf, type HistoryItem, type RunFilter } from "./history-list";
-import { courseWords, deletedWords, emptyWords, playthroughWords, plural, runDate, runLabel, scoreWords, seatsWords } from "./history-words";
-import { usePalette } from "./palette-hook";
-import { existingRefs, listRuns } from "./run-store";
-import { seatWord } from "./seats";
-import { rowSurface } from "../play/surfaces";
-import { Text } from "../play/text";
-import { useTableTokens } from "../play/use-table-tokens";
+import { filterRuns, libraryItems, scopesOf, type LibraryItem, type LibrarySection, type RunFilter } from "./history-list";
+import { emptyWords, plural } from "./history-words";
 
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
 
+const SECTION_TITLES: Record<LibrarySection, string> = { "in-progress": "In progress", finished: "Finished", archived: "Archived", deleted: "Deleted" };
+
 const scopeName = (kind: RunKind, scope: string): string => (kind === "campaign" ? (campaignOf(scope)?.name ?? scope) : (BOXES.find((box) => box.id === scope)?.name ?? scope));
 
-type Playthroughs = { current: string | null; progress: ReadonlyMap<string, { done: number; total: number }> };
-
-// A FlashList row: one pressable on a solid fill, no light and no shadow (docs/design-system.md, Performance).
-function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; deleted: boolean; showBox: boolean; nameOf: (code: string) => string; onPress: (() => void) | null }) {
-  const palette = usePalette();
-  const t = useTableTokens();
-  const scenario = scenarioName(run.scenarioId);
-  const date = runDate(run);
-  const course = courseWords(run);
-  const score = scoreWords(run, nameOf);
-  const box = showBox ? (BOXES.find((item) => item.id === run.box)?.name ?? run.box) : null;
-  return (
-    <View className="pb-3">
-      <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
-        {({ pressed }) => (
-          <View className="min-h-14 flex-row items-center rounded-item px-4 py-3.5" style={rowSurface(pressed, t)}>
-            <View className="flex-1">
-              <View className="flex-row items-start justify-between gap-2">
-                <View className="flex-1">
-                  <Text className="font-display text-heading text-bone">{scenario}</Text>
-                  {box || date ? <Label>{[box, date].filter((part) => part != null).join(" · ")}</Label> : null}
-                </View>
-                <Chip label={run.result === "won" ? "Won" : "Lost"} tone={run.result === "won" ? "accent" : "danger"} />
-              </View>
-              {run.result === "lost" && run.lossCause ? (
-                <Text className="mt-1 text-label text-danger" testID={`run-${run.id}-cause`}>
-                  {run.lossCause}
-                </Text>
-              ) : null}
-              <Text className="mt-2 text-label text-muted">{seatsWords(run, nameOf)}</Text>
-              {course ? <Text className="text-label text-muted">{course}</Text> : null}
-              {score ? <Text className="mt-1 text-label font-semibold text-accentHigh">{score}</Text> : null}
-              {deleted ? (
-                <Text className="mt-1 text-label text-faint" testID={`run-${run.id}-deleted`}>
-                  {deletedWords(run.kind)}
-                </Text>
-              ) : null}
-            </View>
-            {onPress ? (
-              <View className="ml-2 w-6 items-center">
-                <Chevron direction="right" color={palette.faint} size={8} />
-              </View>
-            ) : null}
-          </View>
-        )}
-      </Pressable>
-    </View>
-  );
-}
+type Item = LibraryItem<LibrarySave, Library["games"][number]>;
 
 /** The History screen for one starting kind (the tab that opened it). */
 export function HistoryView({ initial }: { initial: RunKind }) {
   const router = useRouter();
   const list = useListGutter();
   const { catalog, user } = useDatabases();
-  // Which playthrough groups are folded: for this viewing only (a gone playthrough would leave its id in `settings` for good).
+  // Which playthroughs are folded: for this viewing only (a gone playthrough would leave its id in `settings` for good).
   const [foldedGroups, setFoldedGroups] = useState<ReadonlySet<string>>(new Set());
   const [kindWord, setKindWord] = useState<KindWord>(initial === "standalone" ? "Standalone" : "Campaign");
   const kind: RunKind = kindWord === "Standalone" ? "standalone" : "campaign";
   const [filter, setFilter] = useState<RunFilter>({ scope: null, result: null });
-  const [runs, setRuns] = useState<RunRecord[]>([]);
-  const [refs, setRefs] = useState<ReturnType<typeof existingRefs>>({ saves: new Set(), archived: new Set(), games: new Set() });
-  const [playthroughs, setPlaythroughs] = useState<Playthroughs>({ current: null, progress: new Map() });
+  const [library, setLibrary] = useState<Library>(EMPTY_LIBRARY);
+  const [menu, setMenu] = useState<RefTarget | null>(null);
+  const { runs } = library;
 
-  useFocusEffect(
-    useCallback(() => {
-      setRuns(listRuns(user));
-      setRefs(existingRefs(user));
-      const open = listSaves(user);
-      setPlaythroughs({
-        current: open[0]?.id ?? null,
-        progress: new Map([...open, ...listArchivedSaves(user)].map((save) => [save.id, { done: save.log.completed.length, total: campaignOf(save.campaignId)?.scenarios.length ?? 0 }])),
-      });
-    }, [user]),
-  );
+  const refresh = useCallback(() => setLibrary(readLibrary(user)), [user]);
+  useFocusEffect(refresh);
 
-  const faces = useMemo(() => deckFaces(catalog, runs.flatMap((run) => [...run.heroes.flat(), ...(run.reward ?? [])])), [catalog, runs]);
-  const nameOf = useCallback((code: string) => faces.get(code)?.name ?? code, [faces]);
-  const shown = useMemo(() => filterRuns(runs, kind, filter), [runs, kind, filter]);
-  const scopes = useMemo(() => scopesOf(runs, kind), [runs, kind]);
-  const filtered = filter.scope != null || filter.result != null;
-  const groupId = (refId: string) => `history-${refId}`;
-  const items = useMemo<HistoryItem[]>(
-    () => (kind === "standalone" ? shown.map((run): HistoryItem => ({ type: "run", id: run.id, run })) : historyItems(groupRuns(shown), (id) => foldedGroups.has(id), groupId)),
-    [kind, shown, foldedGroups],
-  );
+  const faces = deckFaces(catalog, runs.flatMap((run) => [...run.heroes.flat(), ...(run.reward ?? [])]));
+  const nameOf = (code: string) => faces.get(code)?.name ?? code;
+  const shownRuns = filterRuns(runs, kind, filter).length;
+  const scopes = scopesOf(runs, kind);
+  const items = libraryItems({
+    kind,
+    saves: library.saves,
+    archivedSaves: library.archivedSaves,
+    games: library.games,
+    archivedGames: library.archivedGames,
+    runs,
+    filter,
+    folded: (id) => foldedGroups.has(id),
+    finished: (item) => item.line.next.kind === "finished",
+    playing: (game) => standaloneStatus(game) === "playing",
+  });
+  // The filter is why a list is empty only when there was something to filter.
+  const anything = kind === "campaign" ? library.saves.length + library.archivedSaves.length > 0 : library.games.length + library.archivedGames.length > 0;
+  const filtered = (filter.scope != null || filter.result != null) && (anything || runs.some((run) => run.kind === kind));
 
-  const exists = (run: RunRecord) => (run.kind === "campaign" ? refs.saves.has(run.refId) : refs.games.has(run.refId));
-  const open = (run: RunRecord) => (): void => {
+  const openRun = (run: RunRecord) => (): void => {
     if (run.kind === "campaign") router.push({ pathname: "/log/[saveId]", params: { saveId: run.refId } });
     else router.push({ pathname: "/standalone/outcome/[gameId]", params: { gameId: run.refId } });
   };
@@ -136,31 +86,52 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     setFilter((current) => ({ ...current, scope: null }));
   };
 
-  const renderItem = ({ item }: { item: HistoryItem }) => {
-    if (item.type === "run") {
-      const { run } = item;
-      // The box line says something only when it is not the campaign the group already names.
-      return <RunRow run={run} deleted={!exists(run)} showBox={run.kind === "standalone" || run.box !== run.campaignId} nameOf={nameOf} onPress={exists(run) ? open(run) : null} />;
+  const renderItem = ({ item }: { item: Item }) => {
+    switch (item.type) {
+      case "section":
+        return (
+          <View className="pb-2 pt-3" accessibilityRole="header" testID={item.id}>
+            <Eyebrow>{SECTION_TITLES[item.section]}</Eyebrow>
+          </View>
+        );
+      case "save":
+        return (
+          <SaveHeader
+            foldId={item.id}
+            item={item.save}
+            started={item.started}
+            count={item.runs.length}
+            folded={item.folded}
+            onFold={(next) => toggleGroup(item.id, next)}
+            onMenu={() => setMenu({ kind: "campaign", ref: item.save, archived: item.section === "archived" })}
+          />
+        );
+      case "game":
+        return (
+          <GameRow
+            game={item.game}
+            run={item.run}
+            nameOf={nameOf}
+            onOpen={() => router.push({ pathname: "/standalone/outcome/[gameId]", params: { gameId: item.game.id } })}
+            onMenu={() => setMenu({ kind: "standalone", game: item.game, run: item.run, archived: item.section === "archived" })}
+          />
+        );
+      case "gone":
+        return <GoneHeader foldId={item.id} runs={item.group.runs} folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />;
+      case "run":
+        // The box line says something only when it is not the campaign the playthrough's header already names.
+        return (
+          <View className="pb-3">
+            <RunRow run={item.run} deleted={item.deleted} showBox={item.run.kind === "standalone" || item.run.box !== item.run.campaignId} nameOf={nameOf} onPress={item.deleted ? null : openRun(item.run)} />
+          </View>
+        );
     }
-    const first = item.group.runs[0];
-    if (!first) return null;
-    const { refId } = item.group;
-    const gone = !refs.saves.has(refId);
-    const archived = refs.archived.has(refId);
-    const title = campaignOf(first.campaignId ?? "")?.name ?? first.campaignId ?? "";
-    const detail = playthroughWords(seatWord(first.seatCount), startedOf(item.group.runs), gone ? null : (playthroughs.progress.get(refId) ?? null));
-    const badge = gone ? "Deleted" : archived ? "Archived" : playthroughs.current === refId ? "Current" : undefined;
-    return (
-      <View className="pb-3 pt-1">
-        <FoldHeader id={item.id} title={title} detail={detail} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
-      </View>
-    );
   };
 
   const listHead = (
     <View className="pb-2">
-      {/* The run count is the first group's label: a scroll container may never announce its own. */}
-      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" accessibilityLabel={shown.length > 0 ? `History, ${plural(shown.length, "run")}` : "History"} />
+      {/* The run count is the switch's label: a scroll container may never announce its own. */}
+      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" accessibilityLabel={shownRuns > 0 ? `History, ${plural(shownRuns, "run")}` : "History"} />
       <View className="mt-3 gap-1" testID="history-filters">
         {scopes.length > 1 ? (
           <View className="flex-row flex-wrap gap-x-2" accessibilityRole="radiogroup" accessibilityLabel={kind === "campaign" ? "Filter by campaign" : "Filter by box"}>
@@ -191,9 +162,9 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       <View className="min-h-0 flex-1" testID="history-list" onLayout={list.onLayout}>
         <FlashList
           data={items}
-          extraData={{ refs, playthroughs, nameOf }}
-          keyExtractor={(item) => (item.type === "group" ? item.id : `run-${item.id}`)}
-          getItemType={(item) => (item.type === "group" ? "group" : "run")}
+          extraData={{ library, nameOf }}
+          keyExtractor={(item) => item.id}
+          getItemType={(item) => item.type}
           style={{ flex: 1 }}
           contentContainerStyle={list.contentContainerStyle}
           showsVerticalScrollIndicator={false}
@@ -201,12 +172,13 @@ export function HistoryView({ initial }: { initial: RunKind }) {
           ListFooterComponent={<View className="pb-safe" />}
           ListEmptyComponent={
             <BodyText tone="muted" className="mt-2" testID="history-empty">
-              {emptyWords(kind, filtered && runs.some((run) => run.kind === kind))}
+              {emptyWords(kind, filtered)}
             </BodyText>
           }
           renderItem={renderItem}
         />
       </View>
+      <HistorySheet target={menu} onClose={() => setMenu(null)} onChanged={refresh} />
     </Screen>
   );
 }

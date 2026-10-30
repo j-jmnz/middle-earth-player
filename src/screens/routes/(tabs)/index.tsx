@@ -2,21 +2,19 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useRef, useState, type ComponentRef } from "react";
 import { ScrollView, View } from "react-native";
 
-import { campaignPath, nextStep } from "../../../campaign/path";
 import { Eyebrow, PillButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { heroFace } from "../../hero-tile";
 import { deckFaces } from "../../deck-store";
 import { campaignListQueries, lockedTiles } from "../../campaign-list";
-import { campaignOf, scenarioNames } from "../../campaign-data";
+import { campaignOf } from "../../campaign-data";
 import { listSaves, type ListedSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { usePalette } from "../../palette-hook";
-import { NextStop, describe, nextSummary, type SaveLine } from "../../save-panels";
+import { NextStop, describe, nextSummary, saveLine, type SaveLine } from "../../save-panels";
 import { CatalogGrid, CatalogTile, HubPage, LockedTiles, RunHero, RunRow, type PartyHero } from "../../hub-parts";
 import { splitRuns } from "../../hub-runs";
 import { nextStepHref, pathHref } from "../../scenario-links";
-import { seatWord } from "../../seats";
 import { SPHERE_TINT } from "../../../play/icon-map";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
@@ -47,18 +45,7 @@ export default function CampaignList() {
   const locked = lockedTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
   // Each save's progress line reads its own campaign.
-  const lineOf = (save: ListedSave): SaveLine => {
-    const campaign = campaignOf(save.campaignId);
-    const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : [];
-    return {
-      name: nameOf(save.campaignId),
-      seats: seatWord(save.seatCount),
-      done: path.filter((node) => node.status === "completed").length,
-      total: campaign?.scenarios.length ?? 0,
-      next: nextStep(path, save.loadout?.scenarioId),
-      path,
-    };
-  };
+  const lineOf = (save: ListedSave): SaveLine => saveLine(save, nameOf(save.campaignId));
   const { hero, others } = splitRuns(saves, (save) => lineOf(save).next.kind !== "finished");
   const faces = deckFaces(catalog, saves.flatMap(partyCodes));
   // The fellowship as the hero words show it, seat by seat: each hero's painting, name and sphere.

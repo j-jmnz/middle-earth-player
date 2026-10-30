@@ -51,15 +51,15 @@ export function deletedWords(kind: RunRecord["kind"]): string {
   return kind === "campaign" ? "Its playthrough was deleted" : "This game was deleted";
 }
 
-/** The one line an empty list says. */
+/** The one line an empty list says: no playthrough or game at all, or a filter that leaves none. */
 export function emptyWords(kind: RunRecord["kind"], filtered: boolean): string {
   if (filtered) return "No runs match these filters.";
-  return kind === "campaign" ? "No campaign run yet. A scenario you win or lose in a playthrough is listed here." : "No standalone run yet. A game you win or lose is listed here.";
+  return kind === "campaign" ? "No playthrough yet. Start one from Campaigns." : "No game yet. Pick a scenario on Scenarios to deal one.";
 }
 
 /**
  * What tells two playthroughs of one campaign apart in History: "Two-handed · started 24 Oct · 3 of 6 completed" (the wording of the
- * start panel's carry-over row). The start is the earliest time any of its runs knows; progress only while the playthrough exists.
+ * campaign setup's carry-over row). The start is the earliest time any of its runs knows; progress only while the playthrough exists.
  */
 export function playthroughWords(seats: string, startedAt: number | null, progress: { done: number; total: number } | null): string {
   const date = startedAt == null ? null : new Date(startedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" });

@@ -38,8 +38,8 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
 }
 
 /**
- * A foldable section. The header's testID is `section-<id>` (`testID` overrides it: the archived lists keep `archived-toggle`) and
- * the body's is `section-<id>-body`. `right` is one optional control at the header's end while the section is open.
+ * A foldable section. The header's testID is `section-<id>` (`testID` overrides it) and the body's is `section-<id>-body`. `right` is
+ * one optional control at the header's end while the section is open; `trailing` stays while it is folded.
  */
 export function FoldSection({ children, id, ...header }: FoldHeaderProps & { children: ReactNode }) {
   const { folded } = header;
@@ -69,10 +69,12 @@ export type FoldHeaderProps = {
   badge?: string;
   testID?: string;
   right?: ReactNode;
+  // A control at the header's end that stays while the section is folded (History's ⋯ on a playthrough).
+  trailing?: ReactNode;
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right }: FoldHeaderProps) {
+export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right, trailing }: FoldHeaderProps) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
@@ -115,6 +117,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
         )}
       </Pressable>
       {folded ? null : right}
+      {trailing}
     </View>
   );
 }
