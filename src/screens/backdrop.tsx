@@ -1,11 +1,13 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { useTheme } from "../play/theme";
+import { useDriftRunning } from "./backdrop-drift";
 import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
 
 // Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS: each fog texture is an SVG feTurbulence tile
 // (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask; the morning light is gradients,
-// each beam a clipped gradient inside a blurred box. react-native-web forwards these CSS properties to the DOM.
+// each beam a clipped gradient inside a blurred box. react-native-web forwards these CSS properties to the DOM. The drift is a CSS
+// animation of each tile's position, one tile's width per loop, so it repeats without a jump.
 type WebStyle = Record<string, string | number>;
 
 const tiles = new Map<FogTexture, string>();
@@ -28,8 +30,24 @@ function tileUrl(texture: FogTexture): string {
 
 const pct = (value: number) => `${Math.round(value * 100)}%`;
 
-/** One fog layer as CSS: its tile repeated (moved by its offset), faded out by its elliptical mask (fractions of the box it fills). */
-function fogStyle(layer: FogLayer): WebStyle {
+const drifts = new Map<FogTexture, string>();
+
+/** A texture's drift as a keyframes rule, added to the page once per texture: from its offset to one tile's width along. */
+function driftName(texture: FogTexture): string {
+  const cached = drifts.get(texture);
+  if (cached) return cached;
+  const name = `fog-drift-${drifts.size}`;
+  const [dx, dy] = texture.offset ?? [0, 0];
+  const to = dx + Math.sign(texture.drift) * texture.tile[0];
+  const style = document.createElement("style");
+  style.textContent = `@keyframes ${name} { from { background-position: ${dx}px ${dy}px; } to { background-position: ${to}px ${dy}px; } }`;
+  document.head.appendChild(style);
+  drifts.set(texture, name);
+  return name;
+}
+
+/** One fog layer as CSS: its tile repeated (moved by its offset and drifting at `rate`), faded out by its elliptical mask (fractions of the box it fills). */
+function fogStyle(layer: FogLayer, rate: number, running: boolean): WebStyle {
   const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, #000 10%, rgba(0,0,0,0) 85%)` : undefined;
   const [dx, dy] = layer.texture.offset ?? [0, 0];
   return {
@@ -40,6 +58,15 @@ function fogStyle(layer: FogLayer): WebStyle {
     opacity: layer.opacity,
     ...(layer.blend ? { mixBlendMode: layer.blend } : {}),
     ...(mask ? { maskImage: mask, WebkitMaskImage: mask } : {}),
+    ...(layer.texture.drift !== 0 && rate > 0
+      ? {
+          animationName: driftName(layer.texture),
+          animationDuration: `${layer.texture.tile[0] / Math.abs(layer.texture.drift) / rate}s`,
+          animationTimingFunction: "linear",
+          animationIterationCount: "infinite",
+          animationPlayState: running ? "running" : "paused",
+        }
+      : {}),
   };
 }
 
@@ -85,6 +112,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
   const { width } = useWindowDimensions();
   const s = scenesByTheme[useTheme()][scene];
   const { ground, vignette, grit } = s;
+  const running = useDriftRunning();
   const groundStyle: WebStyle =
     ground.kind === "solid"
       ? { backgroundColor: ground.color }
@@ -94,7 +122,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
       <View style={[StyleSheet.absoluteFill, groundStyle as object]} />
       {s.wash ? <View style={[StyleSheet.absoluteFill, washStyle(s.wash) as object]} /> : null}
       {s.fog.map((layer, index) => (
-        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
+        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer, s.drift ?? 1, running) as object]} />
       ))}
       {s.light ? <Light light={s.light} width={width} /> : null}
       <View style={[StyleSheet.absoluteFill, { backgroundImage: `radial-gradient(120% 100% at 50% 45%, rgba(${vignette.rgb},0) ${pct(vignette.from)}, rgba(${vignette.rgb},${vignette.alpha}) 100%)` } as object]} />
@@ -110,10 +138,11 @@ export function Backdrop({ scene }: { scene: SceneName }) {
 
 /** Fog layers in a box of their own, over a picture (HeroArt), as the native canvas draws them. */
 export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]; width: number; height: number }) {
+  const running = useDriftRunning();
   return (
     <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
       {layers.map((layer, index) => (
-        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer) as object]} />
+        <View key={index} style={[StyleSheet.absoluteFill, fogStyle(layer, 1, running) as object]} />
       ))}
     </View>
   );

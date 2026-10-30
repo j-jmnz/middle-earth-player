@@ -10,6 +10,10 @@
  * steeper alpha and nudged up). The banks keep to three octaves, since their steep alpha turns finer octaves into grain (user
  * request, 2026-10-29). Each layer is faded out at its edges by an elliptical mask. Ember fog, the red one, goes only where the enemy
  * lives.
+ *
+ * Fog drifts sideways, very slowly, like a bank in a light wind (user request, 2026-10-30): each texture moves at its own speed (the
+ * haze slower than the banks, so they part a little; the ember the other way), its mask stays put, and a scene can slow it all
+ * (`drift`). Reduced motion holds it still.
  */
 export type SceneName = "moon" | "hero" | "path" | "ember" | "calm" | "victory" | "table";
 
@@ -26,6 +30,10 @@ export type FogTexture = {
   tile: readonly [w: number, h: number];
   // Points the noise is moved by: a crest sits a little above the bank it lights.
   offset?: readonly [dx: number, dy: number];
+  // Points a second it drifts across (negative is leftward); 0 holds it still.
+  drift: number;
+  // Pixels per point the phone draws its tile at once, before it drifts: the haze is soft enough for half.
+  bake?: number;
 };
 
 export type Ellipse = { cx: number; cy: number; rx: number; ry: number };
@@ -60,19 +68,21 @@ export type Scene = {
   vignette: { rgb: string; alpha: number; from: number };
   // Fine noise over everything, overlaid on Dark and multiplied on Light.
   grit: { opacity: number; blend: "overlay" | "multiply" };
+  // How fast the fog drifts, a share of each texture's own speed (1 when left out).
+  drift?: number;
 };
 
 const GROUND = "#030405";
 
 // Dark: Ringwraiths. Moonlight gone pale and sickly green, as Minas Morgul's corrupted moonlight is told ("paler indeed than the moon
 // ailing in some slow eclipse"), only a shade off its old teal; and a deep red ember where the enemy is.
-const moonHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 5, rgb: [102, 143, 125], gain: 1.4, bias: -0.3, tile: [1200, 900] };
-const moonBank: FogTexture = { freq: [0.009, 0.012], octaves: 3, seed: 7, rgb: [102, 143, 125], gain: 3, bias: -1.12, tile: [900, 900] };
+const moonHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 5, rgb: [102, 143, 125], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: 1.2, bake: 0.5 };
+const moonBank: FogTexture = { freq: [0.009, 0.012], octaves: 3, seed: 7, rgb: [102, 143, 125], gain: 3, bias: -1.12, tile: [900, 900], drift: 3 };
 const moonCrest: FogTexture = { ...moonBank, rgb: [201, 222, 204], gain: 6, bias: -3.75, offset: [0, -3] };
-const emberHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 9, rgb: [150, 38, 22], gain: 1.4, bias: -0.3, tile: [1200, 900] };
-const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 3, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700] };
+const emberHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 9, rgb: [150, 38, 22], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: -1, bake: 0.5 };
+const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 3, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700], drift: -2.4 };
 const emberCrest: FogTexture = { ...emberBank, rgb: [219, 107, 77], gain: 6, bias: -3.8, offset: [0, -3] };
-export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260] };
+export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260], drift: 0 };
 
 const MOON = { haze: moonHaze, bank: moonBank, crest: moonCrest };
 const EMBER = { haze: emberHaze, bank: emberBank, crest: emberCrest };
@@ -134,12 +144,14 @@ export const scenes: Record<SceneName, Scene> = {
     vignette: darkVignette,
     grit: darkGrit,
   },
-  // The table: ember over the encounter row at the top, moonlight from the fellowship's row down. No zone boxes.
+  // The table: ember over the encounter row at the top, moonlight from the fellowship's row down. No zone boxes. Its fog drifts at
+  // half speed, so it never competes with the cards moving over it.
   table: {
     ground: { kind: "solid", color: GROUND },
     fog: [...banks(EMBER, 0.8, { cx: 0.45, cy: 0.05, rx: 0.75, ry: 0.55 }), ...banks(MOON, 0.8, { cx: 0.5, cy: 0.95, rx: 0.85, ry: 0.6 })],
     vignette: darkVignette,
     grit: darkGrit,
+    drift: 0.5,
   },
 };
 
