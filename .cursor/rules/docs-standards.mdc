@@ -1,0 +1,34 @@
+---
+description: How to keep the docs agents read short, current and free of history
+alwaysApply: true
+---
+
+# Docs standards
+
+Agents read `CLAUDE.md`, the rules, the agent files, `docs/phases/STATUS.md`, the active phase file and the sections of `docs/brief.md`, `docs/architecture.md` and `docs/design-system.md` their task touches before they work. Every line there costs context on every run. These docs say what is true now. History is in git: a commit message says what changed and why, and `git log -- <file>` finds it. A reviewer reports a breach as a finding.
+
+## Current state, not history
+
+- When a change supersedes a rule, a design or a plan step, rewrite the passage so it states the new rule. Do not append "was / now", "replaces phase N", "previously", or a dated note under the old text.
+- No dated "built" tags on headings ("— built (2026-10-27)"). A thing that is not built says "Not built." in one line.
+- Keep an authority stamp on a rule the user set, short: "(user instruction, 2026-10-27)". It cites who decided, not how it was reached.
+- Say each rule once, in the doc that owns it (`.cursor/rules/authority.mdc` gives the owners), and point to it from elsewhere. Do not copy a rule into an agent file, a phase file or a plan.
+
+## Facts the code owns
+
+- Do not write down a number or a list the code holds: the engine version, how many scenarios are playable, how many lines are open, the families, branch names, test counts. Point to the file (`src/rules/version.ts`, `src/campaign/playable.ts`, `src/effects/open-lines.ts`, `src/catalog/families/index.ts`).
+- Cite a doc by file and section heading, never by line number: lines move with every edit.
+
+## `docs/phases/STATUS.md`
+
+- The rules header, then one row per phase. A note is at most about 200 characters: the date, and only what is still open (`engine done`, a review not run, phone checks, an unrun flow, deferred work).
+- **Open items**: one line per thing still to do, grouped by area. Delete the line when it is done. Do not move it to a "done" list.
+- **Standing decisions**: one line per user decision that still constrains later work, with its date. Delete it when the work it constrained is finished and nothing later depends on it.
+- No dated sections, no "Built / Decided / Checked" blocks, no fixed review findings, test counts, timings or commit hashes. Those go in the commit message and the final report to the user.
+
+## Plans, phases and handovers
+
+- A plan under `docs/plans/` is live while its work is open. When the work is done, move it to `docs/plans/done/` and update the paths that cite it. Agents do not read `done/` unless a task names it.
+- A phase file is its spec and exit. When the phase is completed, remove the sections written only for the agent that built it: implementer notes, "Handover from phase N", a "Built" log.
+- A handover in `docs/handover/` exists while work is in flight or open. The final commit of that work deletes it, or cuts it to the points still open.
+- A paste-once prompt for a new session is not committed. Give it to the user in the report, or put it in the scratchpad.

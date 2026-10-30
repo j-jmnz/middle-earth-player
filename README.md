@@ -58,7 +58,7 @@ Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is g
 
 ## Agents
 
-`/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. `effect-author` turns a `pnpm effects:draft` bundle into effect records. The instructions of the first three are in `.cursor/agents`, with thin wrappers in `.claude/agents`; `effect-author` is in `.claude/agents` only.
+`/orchestrator` runs a plan with several sections, `/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. Every agent follows `.cursor/rules/code-standards.mdc` for code and `.cursor/rules/docs-standards.mdc` for docs. `effect-author` turns a `pnpm effects:draft` bundle into effect records. The instructions of the first four are in `.cursor/agents`, with thin wrappers in `.claude/agents`; `effect-author` is in `.claude/agents` only.
 
 ## Run it locally
 

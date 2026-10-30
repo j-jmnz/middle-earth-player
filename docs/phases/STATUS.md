@@ -1,6 +1,6 @@
 # Phase status
 
-Status is `not started`, `active`, or `completed`. Git keeps the history; this file keeps only what is current.
+Status is `not started`, `active`, or `completed`. Git keeps the history; this file keeps only what is current (`.cursor/rules/docs-standards.mdc`: a note is one line of what is open, a done item is deleted, no dated sections).
 
 ## Rules
 
@@ -95,7 +95,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - The combat spotlight's sprite is worked out twice per slot in an active frame.
 - Not built from the Carved Stone handoff: the card screen's "Add to a deck"; the table's encounter row and right-hand piles; the handoff's defend tray.
 - Tablet follow-ups: an Android `appCategory` or large-screen plugin if the table lock must hold on Android 16; pushed routes under the tabs; a Packs list-detail; a Deck import section in `docs/design-system.md`; a "Tap anywhere to close" hint on the preview.
-- Performance pass (`docs/plans/performance-pass.md`): its out-of-scope items (the per-card glow, an ArcRing of Views, particle buffer reuse, a UI-thread lift) wait for on-device profiling.
+- Performance pass (`docs/plans/done/performance-pass.md`): its out-of-scope items (the per-card glow, an ArcRing of Views, particle buffer reuse, a UI-thread lift) wait for on-device profiling.
 - Run `pnpm scans:pack` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
 
 ### Phone and tablet checks

@@ -34,7 +34,7 @@ dispatch({ type: "Pass" })
 
 ## Changes
 
-Follow `.cursor/rules/code-standards.mdc` (the React Compiler, immutable state and caches, narrow subscriptions, the save, and how to make and check a change).
+Follow `.cursor/rules/code-standards.mdc` (the React Compiler, immutable state and caches, narrow subscriptions, the save, and how to make and check a change) and `.cursor/rules/docs-standards.mdc` for every doc you touch. Your phase note in `docs/phases/STATUS.md` is one line of what is still open; what you built, test counts and review rounds go in the commit message. When the phase is completed, remove the agent-only sections from its phase file.
 
 Match existing names and types. Keep the diff inside the phase. No drive-by refactors, no new dependencies, no `any`. The stack, the databases, the image decoders, and the test layers are in `docs/architecture.md` and `docs/brief.md`. Follow them. Do not copy them into a new document.
 

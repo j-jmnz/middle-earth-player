@@ -1,11 +1,11 @@
 ---
-description: Code standards for every change to src (from the performance pass, user request 2026-10-29)
+description: Code standards for every change to src
 alwaysApply: true
 ---
 
 # Code standards
 
-Every agent that changes code follows these. `docs/architecture.md` (State, Persistence, Screens, Performance) says why and where each one is used; this file is the checklist. A reviewer reports a breach as a finding against the code. They were set by the performance pass (`docs/plans/performance-pass.md`, `docs/phases/STATUS.md`).
+Every agent that changes code follows these. `docs/architecture.md` (State, Persistence, Screens, Performance) says why and where each one is used; this file is the checklist. A reviewer reports a breach as a finding against the code.
 
 ## The React Compiler
 
@@ -33,7 +33,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 - Hidden screens are held by React Activity (`activityEnabled`). Their effects are torn down and run again on show, so an effect must be safe to run again. It must not reopen a session, rebuild a store or reset state the player had.
 - A committed state never references a released native resource (`SkImage.dispose`). Clear the state, or fall back to the live drawing, before releasing it.
 - Every timer, listener, animation (`cancelAnimation`) and frame request is cancelled on unmount. A platform listener many components read (AccessibilityInfo) is one module store read through `useSyncExternalStore`.
-- An optimization must not move, cover or resize a control the player taps. A toast that covered the row just tapped was reverted.
+- An optimization must not move, cover or resize a control the player taps.
 
 ## Saving
 
@@ -46,6 +46,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 - Keep the behaviour the user sees exactly: the spotlight gate, skip, Back, the haptics, the banner wait, Undo and relaunch replay. If a speed-up cannot be had without changing one, stop and ask the user. Do not work around it silently.
 - Measure a speed-up before and after with a scratch script in the session scratchpad, and report both numbers. The script is not committed.
 - `src/screens` imports nothing from `src/rules`. The lint zones (`pnpm lint`) decide where a new helper lives.
-- Match the surrounding code: dense `//` comments that say what, sentence case, rule ids and docs cited, the same naming. Update `docs/architecture.md` (and `docs/design-system.md` for anything visible) wherever the change touches what they say.
+- Match the surrounding code: dense `//` comments that say what the code does now, sentence case, rule ids and docs cited, the same naming. A comment cites a doc by file and section heading, never by line number, and does not narrate what the code used to do. Update `docs/architecture.md` (and `docs/design-system.md` for anything visible) wherever the change touches what they say, following `.cursor/rules/docs-standards.mdc`.
+- A hook or script an agent runs prints only what the agent needs to act on. Progress bars, banners and success chatter go behind `--verbose` (scripts log through `scripts/log.ts`); a failure prints its full output.
 - `pnpm test`, `pnpm lint` and `npx tsc --noEmit` are green before a commit; `pnpm data:check` too when the engine or `data/` could move.
 - A cloud session has no phone, simulator or Maestro. On-device checks (frame timing, the look in both themes, hidden-screen behaviour, haptic feel) are never marked done there. List them under Open in `docs/phases/STATUS.md`.
