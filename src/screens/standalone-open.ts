@@ -31,6 +31,13 @@ export function standaloneCodes(game: StandaloneGame): string[] {
 
 type Opened = Extract<StandaloneSession, { ok: true }>;
 
+/** The session already opened for this game as it now stands (session-cache.ts), or null: nothing is replayed. */
+export function cachedStandalone<TUser>(user: Db<TUser>, gameId: string): Opened | null {
+  const stored = readStandalone(user, gameId)?.game;
+  if (!stored?.active || !stored.loadout) return null;
+  return sessionCacheOf<Opened>(user, "standalone").get(stored.id, fingerprintOf(stored, CATALOG_VERSION));
+}
+
 /** Reads and replays the open game. It writes nothing: a drop it decides on is returned as `write`. A game already opened as it now stands (session-cache.ts) is not replayed again. */
 export function openStandalone<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, gameId: string): StandaloneSession {
   const read = readStandalone(user, gameId);

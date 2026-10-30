@@ -141,7 +141,8 @@ function scaled(element: ReactElement, ratio: number): ReactElement {
 
 /**
  * The image of `element` (a box of `width` × `height` points) for `key`, once it is rendered: null until then, and when it could not be
- * rendered. The image is shared by every screen that asks for the same key and released with the last of them (backdrop-image.ts).
+ * rendered. The image is shared by every screen that asks for the same key and released with the last of them (backdrop-image.ts);
+ * it is returned only while this screen holds its lease.
  */
 function useSceneImage(cache: typeof backdrops, key: string, group: string, width: number, height: number, element: ReactElement): SkImage | null {
   const [ready, setReady] = useState<{ key: string; image: SkImage } | null>(null);
@@ -162,6 +163,9 @@ function useSceneImage(cache: typeof backdrops, key: string, group: string, widt
     });
     return () => {
       live = false;
+      // The lease is let go, so the cache may release the image while the screen is hidden (Activity): drawn again, the live layers
+      // stand in until the lease below resolves.
+      setReady(null);
       lease.release();
     };
   }, [cache, key, group, width, height]);

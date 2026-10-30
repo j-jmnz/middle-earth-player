@@ -90,12 +90,12 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   const held = useSpotlightHold(store);
   // The state and the attacks a new layout is drawn from, taken from the store here so the compiler sees them as dependencies.
   const game = useStore(store, (state) => state.game);
-  const gate = useStore(store, (state) => state.spotlight);
+  const clashes = useStore(store, (state) => state.spotlight.clashes);
   const [track, setTrack] = useState<Track>(() => ({ layout, actingLayout: layout, seat, acting, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0 }));
   // What moved this layout: each update of the store is used by the first new layout after it (update-log.ts).
   const [log] = useState(() => new UpdateLog(store.getState().game));
   useEffect(() => store.subscribe((state, before) => log.note(state, before)), [store, log]);
-  if (track.layout !== layout) setTrack(nextTrack(track, layout, seat, acting, k, held, game, gate.clashes, log));
+  if (track.layout !== layout) setTrack(nextTrack(track, layout, seat, acting, k, held, game, clashes, log));
   const { moves, span } = track;
   const progress = useSharedValue(1);
   const fxProgress = useSharedValue(1);

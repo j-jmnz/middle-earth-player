@@ -4,6 +4,7 @@
 // lowered (the engine's value against the printed one), each "cannot" an effect put on it, and the effects themselves in
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
+import { memoOf, type StateMemo } from "../rules/constant-records.ts";
 import { heldBy, modifiedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
@@ -87,14 +88,11 @@ export function badgeSplit(total: number, room: number): { shown: number; hidden
 
 // What the table reads for a card, worked out once per state object (the state is never changed in place), so a canvas that
 // redraws on every game change asks the engine once for each card shown. `key` is the card, and the seat for numbers drawn against one.
-const EFFECTS = new WeakMap<ScenarioState, WeakMap<ReduceContext, Map<string, CardEffects>>>();
-const SLOTS = new WeakMap<ScenarioState, WeakMap<ReduceContext, Map<string, SlotNumbers>>>();
+const EFFECTS: StateMemo<Map<string, CardEffects>> = new WeakMap();
+const SLOTS: StateMemo<Map<string, SlotNumbers>> = new WeakMap();
 
-function cached<T>(memo: WeakMap<ScenarioState, WeakMap<ReduceContext, Map<string, T>>>, game: ScenarioState, ctx: ReduceContext, key: string, build: () => T): T {
-  let byCtx = memo.get(game);
-  if (!byCtx) memo.set(game, (byCtx = new WeakMap()));
-  let known = byCtx.get(ctx);
-  if (!known) byCtx.set(ctx, (known = new Map()));
+function cached<T>(memo: StateMemo<Map<string, T>>, game: ScenarioState, ctx: ReduceContext, key: string, build: () => T): T {
+  const known = memoOf(memo, game, ctx, () => new Map<string, T>());
   if (known.has(key)) return known.get(key) as T;
   const built = build();
   known.set(key, built);

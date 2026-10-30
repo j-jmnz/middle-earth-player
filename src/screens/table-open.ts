@@ -15,6 +15,7 @@ import { afterPaint } from "./after-paint";
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { readSaveChecked, writeActive, type ReadSave } from "./campaign-store";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
+import { flushRunsOnLeave } from "./flush-runs-on-leave";
 import { flushRuns, queueRun } from "./pending-runs";
 import { recordCampaignRun } from "./run-writers";
 import { fingerprintOf, sessionCacheOf } from "./session-cache";
@@ -39,6 +40,13 @@ type Opened = Extract<TableSession, { ok: true }>;
  */
 export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): TableSession {
   return openRead(catalog, user, readSaveChecked(user, saveId));
+}
+
+/** The session already opened for this save as it now stands (session-cache.ts), or null: nothing is replayed. */
+export function cachedTable<TUser>(user: Db<TUser>, saveId: string): Opened | null {
+  const save = readSaveChecked(user, saveId)?.save;
+  if (!save?.active || !save.loadout) return null;
+  return sessionCacheOf<Opened>(user, "save").get(save.id, fingerprintOf(save, CATALOG_VERSION));
 }
 
 function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read: ReadSave | null): TableSession {
@@ -107,7 +115,7 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
  * cannot be replayed (another engine version) and one that is not open write nothing.
  *
  * The save is read now, since the caller is about to overwrite or delete it; the run is written after the next paint (or when
- * History next reads the runs), once, and its replay is the one the table left in the session cache when it can be. `endedAt` is
+ * History next reads the runs, or the app leaves the foreground), once, and its replay is the one the table left in the session cache when it can be. `endedAt` is
  * the time of the call.
  */
 export function recordUnclosedRun<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string, later: (work: () => void) => void = afterPaint): void {
@@ -115,6 +123,8 @@ export function recordUnclosedRun<TCatalog, TUser>(catalog: Db<TCatalog>, user: 
   if (!read) return;
   const now = Date.now();
   queueRun(() => writeUnclosedRun(catalog, user, read, now));
+  // Written after the next paint, or at once when the app leaves the foreground first (it may be killed there); the queue runs a job once.
+  flushRunsOnLeave();
   later(flushRuns);
 }
 

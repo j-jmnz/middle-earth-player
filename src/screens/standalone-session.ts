@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 
 import { useOpenedAfterPaint } from "./after-paint";
 import { useDatabases } from "./databases";
-import { openStandalone, type StandaloneSession } from "./standalone-open";
+import { cachedStandalone, openStandalone, type StandaloneSession } from "./standalone-open";
 import { writeStandalone } from "./standalone-store";
 
 export { openStandalone, standaloneCodes, standaloneStore, type StandaloneSession } from "./standalone-open";
@@ -21,11 +21,10 @@ export function useStandaloneSession(gameId: string | null): StandaloneSession |
   return session;
 }
 
-/** The same, opened in an effect after the first paint and the push animation: null until then (the table shows its loading state). */
+/** The same, opened in an effect after the first paint and the push animation: null until then (the table shows its loading state). A cached game is held from the first render. */
 export function useStandaloneSessionAfterPaint(gameId: string | null): StandaloneSession | null {
   const { catalog, user } = useDatabases();
-  const session = useOpenedAfterPaint(gameId, () => (gameId ? openStandalone(catalog, user, gameId) : null));
+  const session = useOpenedAfterPaint(gameId, () => (gameId ? cachedStandalone(user, gameId) : null), () => (gameId ? openStandalone(catalog, user, gameId) : null));
   useEffect(() => writeDropped(user, session), [session, user]);
   return session;
 }
-

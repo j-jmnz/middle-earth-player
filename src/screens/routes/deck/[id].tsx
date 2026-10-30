@@ -20,7 +20,7 @@ import { routeCode } from "../../route-code";
 import { EmptyHeroSlot, HeroTile, heroFace, Readiness, type HeroFace } from "../../hero-tile";
 import { SheetModal } from "../../sheet-modal";
 import { showToast } from "../../toast";
-import { TOAST_ROOM, ToastDock, ToastView } from "../../toast-view";
+import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
 import { MEDIUM_ACTION_GROUP } from "../../../play/size-class";
 import { useUiScale } from "../../../play/ui-scale";
@@ -150,8 +150,6 @@ export default function DeckEditor() {
 
   if (!id) throw new Error("Missing route code");
 
-  // On a phone and in portrait the toast floats over the list's foot (ToastDock), so the list ends above it; beside the deck it has its own room.
-  const toastRoom = expanded ? 0 : TOAST_ROOM;
   // The grid's cells share the list's width: the screen's on a phone and in portrait, the cards pane's beside the deck in landscape.
   const cellGap = (size === "compact" ? 10 : 14) * s;
   const listWidth = expanded ? gridWidth : windowWidth - (24 * s + insets.left) - (24 * s + insets.right) - 2 * (size === "medium" ? 8 * s : 0);
@@ -250,7 +248,7 @@ export default function DeckEditor() {
       keyExtractor={(item) => item.key}
       getItemType={(item) => item.kind}
       style={{ flex: 1 }}
-      contentContainerStyle={{ paddingBottom: (24 + toastRoom) * s }}
+      contentContainerStyle={{ paddingBottom: 24 * s }}
       extraData={{ cards: draft.cards, heroes: draft.heroes, refused, cellWidth }}
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
@@ -343,7 +341,7 @@ export default function DeckEditor() {
           <View style={base}>
             {/* Medium: the toast lines up with the bar's 480 group. */}
             <View style={size === "medium" ? { width: "100%", maxWidth: MEDIUM_ACTION_GROUP * s, alignSelf: "center" } : undefined}>
-              <ToastDock />
+              <ToastView />
             </View>
             {actionBar("auto")}
           </View>

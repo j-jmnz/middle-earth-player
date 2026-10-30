@@ -7,6 +7,7 @@ import { bookletParams } from "../../campaign-data";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { routeCode } from "../../route-code";
+import { TableLoading } from "../../table-loading";
 import { TableView, type TableNav } from "../../table-view";
 import { sessionStore, useTableSessionAfterPaint } from "../../table-session";
 
@@ -21,13 +22,8 @@ export default function TableScreen() {
   const store = useMemo(() => (session?.ok ? sessionStore(session, user).store : null), [session, user]);
 
   if (saveId && !session) {
-    // The replay has not run yet: its own testID, so a flow waiting for the table waits for the real one.
-    return (
-      <Screen testID="table-loading" scene="calm">
-        <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="table-back" backLabel="Path" />
-        <BodyText tone="muted">Loading</BodyText>
-      </Screen>
-    );
+    // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.
+    return <TableLoading onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backLabel="Path" />;
   }
   if (!saveId || !session || !session.ok || !store) {
     const sentence =

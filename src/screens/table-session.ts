@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import { useOpenedAfterPaint } from "./after-paint";
 import { writeSave } from "./campaign-store";
 import { useDatabases } from "./databases";
-import { openTable, type TableSession } from "./table-open";
+import { cachedTable, openTable, type TableSession } from "./table-open";
 
 export { loadoutCodes, openTable, recordUnclosedRun, sessionStore, type SessionStore, type TableSession } from "./table-open";
 
@@ -23,11 +23,12 @@ export function useTableSession(saveId: string | null): TableSession | null {
 
 /**
  * The same, opened in an effect after the first paint: null until then, and the table shows its loading
- * state meanwhile. A replay of a long game no longer holds back the frame the screen opens on.
+ * state meanwhile. A replay of a long game no longer holds back the frame the screen opens on. A session already cached (the
+ * Resolution's Back to the table) is held from the first render, with no loading frame.
  */
 export function useTableSessionAfterPaint(saveId: string | null): TableSession | null {
   const { catalog, user } = useDatabases();
-  const session = useOpenedAfterPaint(saveId, () => (saveId ? openTable(catalog, user, saveId) : null));
+  const session = useOpenedAfterPaint(saveId, () => (saveId ? cachedTable(user, saveId) : null), () => (saveId ? openTable(catalog, user, saveId) : null));
   useEffect(() => writeDropped(user, session), [session, user]);
   return session;
 }

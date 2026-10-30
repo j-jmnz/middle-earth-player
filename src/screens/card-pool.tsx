@@ -17,7 +17,7 @@ import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./pool-cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./pool-grid";
 import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, typeRequestWords, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
-import { TOAST_ROOM, ToastDock } from "./toast-view";
+import { ToastView } from "./toast-view";
 import { gutter } from "../play/size-class";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
@@ -162,7 +162,6 @@ export function CardPoolBody({
   onPreview,
   onOpen,
   selected = null,
-  toastRoom = false,
 }: {
   adding: boolean;
   startType?: string | null;
@@ -172,8 +171,6 @@ export function CardPoolBody({
   onOpen?: (code: string) => void;
   // The card whose detail is open beside the pool: its cell carries the silver ring.
   selected?: string | null;
-  // The screen docks its toast over the foot of this list (ToastDock): the list ends above it.
-  toastRoom?: boolean;
 }) {
   // Only the heroes and the cards: typing the deck's name in the editor does not render the pool.
   const heroes = useDeckDraft((current) => current.heroes);
@@ -323,7 +320,7 @@ export function CardPoolBody({
             keyboardShouldPersistTaps="handled"
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
-            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} style={toastRoom ? { height: (adding ? 16 + TOAST_ROOM : TOAST_ROOM) * scale } : undefined} />}
+            ListFooterComponent={<View className={adding ? "h-4" : "pb-safe"} />}
             ListEmptyComponent={
               <BodyText testID="pool-empty" tone="muted" className="mt-6">
                 No cards match.
@@ -385,8 +382,8 @@ export function CardPool({
     <Screen scene="calm">
       <View className="min-h-0 flex-1">
         {header}
-        <CardPoolBody adding={adding} startType={startType} onPreview={preview.open} toastRoom />
-        <ToastDock />
+        <CardPoolBody adding={adding} startType={startType} onPreview={preview.open} />
+        <ToastView />
         {adding ? (
           <ActionBar testID="pool-deck-bar">
             <View className="flex-row items-center gap-3.5">
