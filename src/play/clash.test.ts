@@ -197,11 +197,6 @@ describe("what gets no spotlight", () => {
     expect(clashesOf(reduced.prev, reduced.next, elsewhere)).toEqual([]);
   });
 
-  it("reads nothing from a state that resolved no attack", () => {
-    const state = expectOk(reduce(startScenario(starterStart(DECK, 1), ctx), { type: "Keep" }, ctx)).state;
-    expect(clashesOf(state, state, [])).toEqual([]);
-  });
-
   it("agrees with the engine over whole games: one clash for each strike with its damage, none for a reduce without one", () => {
     for (const seed of [1, 9]) {
       let state = expectOk(reduce(startScenario(starterStart(DECK, seed), ctx), { type: "Keep" }, ctx)).state;

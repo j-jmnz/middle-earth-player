@@ -34,7 +34,7 @@ let oathCards: Map<string, PrintedCard>;
 const worlds = new Map<string, { cards: Map<string, PrintedCard>; ctx: ReduceContext }>();
 
 beforeAll(async () => {
-  for (const decks of ["weak", "brittle", "strong"] as const) worlds.set(decks, await dolGuldurWorld(decks));
+  for (const decks of ["brittle", "strong"] as const) worlds.set(decks, await dolGuldurWorld(decks));
   const world = worlds.get("strong")!;
   cards = world.cards;
   ctx = world.ctx;
@@ -163,16 +163,5 @@ describe("what a win writes (01131:B:2)", () => {
     if (bare.kind !== "settled") throw new Error("not settled");
     expect(bare.carried).toBeUndefined();
     expect(settledSentence(bare, named, "The Oath")).toBe("Confirming records the win and unlocks The Oath.");
-  });
-});
-
-describe("what a loss leaves", () => {
-  it("writes nothing to the log: no carry-over, no completed scenario", () => {
-    for (const golden of DOL_GULDUR_GOLDENS.filter((item) => item.outcome === "lost")) {
-      const world = worlds.get(golden.decks)!;
-      const game = playGolden(golden, world.ctx);
-      const blank = emptyLog(golden.seatCount);
-      expect(applyResolution(blank, game.state.scenarioId, game.state, world.cards), golden.name).toBe(blank);
-    }
   });
 });

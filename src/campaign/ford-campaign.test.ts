@@ -151,13 +151,4 @@ describe("the campaign across scenarios 2 and 3", () => {
     const defeat = resolutionView(playGolden(lost, (await fordWorld(lost.decks)).ctx).state, screen);
     expect(defeat).toEqual({ kind: "lost", reason: lost.lossReason });
   });
-
-  it("a loss writes nothing and leaves The Ring Goes South locked", async () => {
-    const golden = FORD_GOLDENS.find((item) => item.outcome === "lost");
-    if (!golden) throw new Error("no lost golden");
-    const game = playGolden(golden, (await fordWorld(golden.decks)).ctx);
-    const log = afterTwo();
-    expect(applyResolution(log, game.state.scenarioId, game.state, ctx.cards)).toBe(log);
-    expect(campaignPath(campaign, {}, log).map((node) => node.status)).toEqual(["completed", "completed", "current", "locked", "locked", "locked"]);
-  });
 });

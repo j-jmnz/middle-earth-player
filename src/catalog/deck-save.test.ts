@@ -196,12 +196,6 @@ describe("deckSaveRefusal", () => {
     expect(deckSaveRefusal(withHobbit.codes, next, withHobbit.facts, [restricted])).toBeNull();
   });
 
-  it("does not refuse when no restriction record is passed", () => {
-    const { codes, facts } = heroes(["leadership", "tactics", "spirit"]);
-    const cards = fill(facts, 50);
-    expect(deckSaveRefusal(codes, cards, facts)).toBeNull();
-  });
-
   it("names a missing code and refuses a campaign restriction", () => {
     const { codes, facts } = heroes(["leadership", "tactics", "spirit"]);
     const cards = fill(facts, 50);

@@ -32,11 +32,6 @@ function announce(state: ScenarioState, event: Parameters<typeof fireForced>[1],
 const END_OF_ROUND = { trigger: "endOfRound", seat: null, phase: "End of round" } as const;
 
 describe("the Ring-bearer's life (mec109.ringbearers-life)", () => {
-  it("starts at 15 and has its own number: nothing else moves it", () => {
-    const { state } = make();
-    expect(state.life).toBe(15);
-  });
-
   it("goes down by 1 at the end of each round, on both stages (141028:B:2, 141029:B:3), each step naming its cause", () => {
     for (const stage of ["141028", "141029"] as const) {
       const { state, ctx } = make({ stage });

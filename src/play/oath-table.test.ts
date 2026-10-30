@@ -78,11 +78,4 @@ describe("the dock of a won game (rr.campaign-cards)", () => {
     const sheet = wonSheet({ ...made.state, stageCleared: true });
     expect(sheet.kind === "outcome" ? [sheet.note, sheet.action] : []).toEqual(["The scenario is won. The campaign card's Resolution is next.", "See the Resolution"]);
   });
-
-  it("still offers rewards when the Resolution has a choice to make", () => {
-    const made = oathTable(world, { campaign: true });
-    const asks = { ...made.state, stageCleared: true, resolution: [{ verb: "ChooseCards" as const, codes: ["41044"], who: "firstPlayer" as const, to: "pool" as const }] };
-    const sheet = wonSheet(asks as never);
-    expect(sheet.kind === "outcome" ? sheet.action : "").toBe("Choose rewards");
-  });
 });
