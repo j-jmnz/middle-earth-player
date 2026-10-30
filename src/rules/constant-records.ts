@@ -15,9 +15,32 @@ function fromVictory(effect: Effect): boolean {
   return effect.condition?.kind === "sourceIn" && effect.condition.zone === "victory";
 }
 
+// A value that depends only on a state and the context it is read with, kept for as long as that state lives. A state is
+// never changed once the reducer returns it (docs/architecture.md, State), so the same state always gives the same value.
+export type StateMemo<T> = WeakMap<ScenarioState, WeakMap<ReduceContext, T>>;
+
+export function memoOf<T>(memo: StateMemo<T>, state: ScenarioState, ctx: ReduceContext, build: () => T): T {
+  let byCtx = memo.get(state);
+  if (!byCtx) {
+    byCtx = new WeakMap();
+    memo.set(state, byCtx);
+  }
+  if (byCtx.has(ctx)) return byCtx.get(ctx) as T;
+  const built = build();
+  byCtx.set(ctx, built);
+  return built;
+}
+
+const CONSTANTS: StateMemo<readonly ConstantInstruction[]> = new WeakMap();
+
 // Every instruction of a constant effect whose card is in play and whose effect and instruction
 // conditions hold, oldest card in play first. A stat condition (read when the stat is read) is left on the instruction. Restrictions and modifier records both read this.
-export function* constantInstructions(state: ScenarioState, ctx: ReduceContext): Generator<ConstantInstruction> {
+// The list is built once for each state: `settle` and every legality check ask the same question of the same state many times.
+export function constantInstructions(state: ScenarioState, ctx: ReduceContext): readonly ConstantInstruction[] {
+  return memoOf(CONSTANTS, state, ctx, () => Array.from(scanConstants(state, ctx)));
+}
+
+function* scanConstants(state: ScenarioState, ctx: ReduceContext): Generator<ConstantInstruction> {
   const sources = Object.values(state.cards)
     .filter((instance) => inPlay(instance.zone) || instance.zone === "victory")
     .sort((left, right) => left.enteredPlay - right.enteredPlay || left.id.localeCompare(right.id, undefined, { numeric: true }));

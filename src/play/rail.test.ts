@@ -8,7 +8,7 @@ import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
 import { windowSheet } from "./bar-sheets.ts";
-import { cardWidth, phaseCarousel, startIndex, STOPS_TEXT } from "./carousel.ts";
+import { phaseCarousel, startIndex, STOPS_TEXT, stopAheadOf } from "./carousel.ts";
 import { phaseIndex, railFor, ROUND_PHASES, windowPoint } from "./rail.ts";
 import { turnReference } from "./reference.ts";
 import { isStepWindow, sheetFor } from "./sheets.ts";
@@ -116,6 +116,12 @@ describe("phase carousel", () => {
     // Stops off: nothing is ahead, whatever is set.
     expect(phaseCarousel(staging, { stopsOn: false, stops: ["3.3"] }, noTitle).stopAhead).toBe(false);
   });
+
+  it("reads the stop ahead without laying out the strip, with the same answer", async () => {
+    const games = [await parked("Quest", "staging"), await parked("Quest", "resolution"), await parked("Combat", "enemyAttacks"), await parked("Combat", "playerAttacks"), await parked("Beginning of round", "beginRound"), await parked("End of round", "endRound")];
+    const settings = [on("3.3"), on("3.3", "3.4"), on("strike"), on("4.2", "defense"), on(), { stopsOn: false, stops: ["3.3"] }];
+    for (const game of games) for (const stops of settings) expect(stopAheadOf(game, stops), `${game.phase} ${game.mode} ${stops.stops.join(",")}`).toBe(phaseCarousel(game, stops, noTitle).stopAhead);
+  });
 });
 
 describe("the rail's words", () => {
@@ -136,21 +142,13 @@ describe("the rail's words", () => {
   });
 });
 
-describe("the strip's placement", () => {
+describe("the carousel's placement", () => {
   it("starts on the current phase, the first before Resource and the last after Refresh", async () => {
     expect(startIndex(phaseCarousel(await parked("Quest", "staging"), on(), noTitle))).toBe(2);
     expect(startIndex(phaseCarousel(await parked("Combat", "enemyAttacks"), on(), noTitle))).toBe(5);
     expect(startIndex(phaseCarousel(await parked("Beginning of round", "beginRound"), on(), noTitle))).toBe(0);
     expect(startIndex(phaseCarousel(await parked("Setup", "afterOpening", 0), on(), noTitle))).toBe(0);
     expect(startIndex(phaseCarousel(await parked("End of round", "endRound"), on(), noTitle))).toBe(6);
-  });
-
-  it("sizes a card at about 58% of the strip, between 230 and 340 pt", () => {
-    expect(cardWidth(200)).toBe(230);
-    expect(cardWidth(363)).toBe(230);
-    expect(cardWidth(497)).toBe(288);
-    expect(cardWidth(560)).toBe(325);
-    expect(cardWidth(2000)).toBe(340);
   });
 
   it("keeps the Stops sentence in one place", () => {

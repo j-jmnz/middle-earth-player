@@ -1,4 +1,4 @@
-// The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system.md, Table): the threat dials at the left (then
+// The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system-table.md): the threat dials at the left (then
 // Life and the Burden deck), the phase rail centered on the screen, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
@@ -141,7 +141,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
         ) : null}
       </View>
       <View testID="top-bar-middle" collapsable={false} style={{ width: zones?.rail ?? "40%", opacity: zones ? 1 : 0 }} pointerEvents={zones ? "auto" : "none"} importantForAccessibility={zones ? "auto" : "no-hide-descendants"}>
-        <PhaseRail rail={rail} wide={zones != null && railWide(zones.rail, narrow, s)} shortRound={narrow} stopAhead={stopAhead} open={carouselOpen} onPress={onRail} />
+        <PhaseRail rail={rail} wide={zones != null && railWide(zones.rail, narrow, s)} stopAhead={stopAhead} open={carouselOpen} onPress={onRail} />
       </View>
       <View testID="top-bar-right" style={{ width: zones?.right ?? "30%", alignItems: "flex-end" }}>
         <MenuButton open={menuOpen} onPress={onMenu} />

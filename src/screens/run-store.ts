@@ -4,6 +4,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { backfillRuns, type KnownGame, type KnownSave, type RunRecord } from "../campaign/runs";
 import { parseLog, parseSeatCount } from "../campaign/save";
 import { parseStandaloneLoadout, parseStandaloneResult } from "../campaign/standalone";
+import { flushRuns } from "./pending-runs";
 import { runs, saves, settings, standaloneGames } from "./user-schema";
 
 // user.db `runs`: written when a scenario ends, read by History. The rules stay in src/campaign/runs.ts.
@@ -16,8 +17,10 @@ export function writeRun<TRun>(user: UserDb<TRun>, run: RunRecord): void {
   user.insert(runs).values(run).onConflictDoNothing().run();
 }
 
-/** Every run in the order it was written; History sorts and filters them (history-list.ts). */
+/** Every run in the order it was written (the queued ones flushed first); History sorts and filters them (history-list.ts). */
 export function listRuns<TRun>(user: UserDb<TRun>): RunRecord[] {
+  // A run queued by a tap that has not been written yet (table-session.ts, recordUnclosedRun) is written first.
+  flushRuns();
   return user
     .select()
     .from(runs)

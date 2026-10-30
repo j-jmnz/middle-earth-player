@@ -4,7 +4,7 @@ import { queueEvent } from "./queue.ts";
 import { leaveWith } from "./families/play-zones.ts";
 import { releaseOrcGuard } from "./families/dungeon-guard.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
-import { inPlay, updateCard, withSeat } from "./state.ts";
+import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
@@ -133,10 +133,12 @@ export function unhost(state: ScenarioState, id: string): ScenarioState {
   const current = state.cards[id];
   if (!current?.host) return state;
   const host = state.cards[current.host];
-  let next = updateCard(state, id, current.guard ? { host: null, guard: undefined } : { host: null });
-  if (!host) return next;
-  next = updateCard(next, host.id, { attachments: host.attachments.filter((attachment) => attachment !== id) });
-  return next;
+  const freed: Partial<CardInstance> = current.guard ? { host: null, guard: undefined } : { host: null };
+  if (!host) return updateCards(state, [[id, freed]]);
+  return updateCards(state, [
+    [id, freed],
+    [host.id, { attachments: host.attachments.filter((attachment) => attachment !== id) }],
+  ]);
 }
 
 function attach(state: ScenarioState, id: string, dest: Destination): ScenarioState {
@@ -255,9 +257,11 @@ export function attachTo(state: ScenarioState, id: string, hostId: string): Scen
   if (!host || !card) return state;
   // A card moves from the card it was attached to (an encounter card that guarded an objective, then attached itself to a hero).
   const was = card.guard === true && card.host != null && card.host !== hostId ? state.cards[card.host] : undefined;
-  const released = was ? updateCard(state, was.id, { attachments: was.attachments.filter((other) => other !== id) }) : state;
-  const linked = updateCard(released, id, was ? { host: hostId, guard: undefined } : { host: hostId });
-  return updateCard(linked, hostId, { attachments: append(host.attachments, id) });
+  return updateCards(state, [
+    ...(was ? [[was.id, { attachments: was.attachments.filter((other) => other !== id) }] as const] : []),
+    [id, was ? { host: hostId, guard: undefined } : { host: hostId }],
+    [hostId, { attachments: append(host.attachments, id) }],
+  ]);
 }
 
 export function spawn(

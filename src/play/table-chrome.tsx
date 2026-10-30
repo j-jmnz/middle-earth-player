@@ -1,5 +1,5 @@
 // The table's top bar pieces: the threat rings, and the mark beside a log line (the phase rail is phase-rail.tsx). These are React Native
-// text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system.md, Table). Phase
+// text with testIDs, so Maestro can read them; card pictures stay on the canvas (docs/design-system-table.md). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -23,7 +23,7 @@ import { Text } from "./text.tsx";
 
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
-// The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system.md, Table).
+// The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system-table.md).
 const DIAL = 46;
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
@@ -34,7 +34,7 @@ const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: strin
 });
 
 /**
- * The threat dial of the top bar (`compact`): a round dial, the number in Marcellus SC over the word THREAT on a dark disc, ringed by
+ * The threat dial of the top bar (`compact`): a round dial, the number alone in Marcellus SC on a dark disc, ringed by
  * an arc of threat red that fills toward 50, the elimination level, with a tick at each staging enemy's engagement cost. It warms near elimination,
  * pops when the number changes, and shows the change ("−6" in accent when it fell, "+2" in threat red when it rose) for three
  * seconds; reduced motion keeps it still. `elimination` false (Life) drops the meter and the levels. Elsewhere, a ring with
@@ -79,13 +79,12 @@ export function ThreatRing({
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
-  const t = useTableTokens();
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
   if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
-      <View className="h-12 w-12 items-center justify-center rounded-pill" style={{ borderWidth: 2 * s, borderColor: threat.eliminated ? t.hairline : t.accent }}>
+      <View className="h-12 w-12 items-center justify-center rounded-control">
         <Text testID={`${id}-value`} className="font-display text-title text-bone">
           {String(threat.threat)}
         </Text>
@@ -190,16 +189,10 @@ function ThreatDial({
                 backgroundImage: critical ? undefined : `radial-gradient(circle, ${withAlphaHex(t.threat, 0.28)}, ${withAlphaHex(t.night, 0.92)})`,
               }}
             >
-              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: 18 * s, lineHeight: 20 * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
+              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: 20 * s, lineHeight: 24 * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
                 {String(threat.threat)}
               </Text>
-              {icon === "threat" ? (
-                <Text className="font-bold uppercase" style={{ fontSize: 7 * s, lineHeight: 8 * s, letterSpacing: 0.8 * s, color: critical ? t.onThreat : t.danger }}>
-                  Threat
-                </Text>
-              ) : icon ? (
-                <GameIcon name={icon} size={9 * s} tint="danger" />
-              ) : null}
+              {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint="danger" /> : null}
             </View>
           </ArcRing>
           {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
@@ -228,7 +221,7 @@ function ThreatDial({
       </Animated.View>
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
-          {/* The dial says THREAT itself; a seat's label (P1) and Life or Burden stand beside theirs. */}
+          {/* A seat's label (P1) and Life or Burden stand beside their dials; the lone threat dial is a number and is named "Threat" to a screen reader. */}
           {label === "Threat" && icon === "threat" ? null : <Text className={`text-label ${role === "acting" ? "text-accent" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>}
           {ring ? (
             <View testID={`${id}-ring`}>
@@ -241,7 +234,7 @@ function ThreatDial({
             key={change?.at}
             entering={badge.in}
             exiting={badge.out}
-            style={{ borderRadius: 999, paddingHorizontal: 6 * s, borderWidth: 1, borderColor: delta.lowered ? t.accent : t.danger, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
+            style={{ borderRadius: 999, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
             <Text testID={`${id}-delta`} className="font-display text-label text-bone">
               {delta.text}

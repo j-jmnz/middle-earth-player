@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import migrations from "../../drizzle/migrations";
+import { deckRevision } from "./deck-revision.ts";
 import { deleteDeck, duplicateDeck, isStarterDeck, listDecks, newDeckId, readDeck, resetStarterDeck, writeDeck } from "./deck-store.ts";
 import { insertStarterDecks, starterDeck, STEALTH_ID, WISDOM_ID } from "./starter-decks.ts";
 
@@ -16,6 +17,20 @@ function openUser() {
 }
 
 describe("deck store", () => {
+  it("moves the deck revision on each write, for the tab bar's dot", () => {
+    const user = openUser();
+    insertStarterDecks(user);
+    const start = deckRevision();
+    const id = writeDeck(user, { id: null, name: "Hobbits", heroes: [], cards: [] }, 1000);
+    writeDeck(user, { id, name: "Halflings", heroes: [], cards: [] }, 2000);
+    expect(deckRevision()).toBe(start + 2);
+    resetStarterDeck(user, STEALTH_ID);
+    deleteDeck(user, id);
+    expect(deckRevision()).toBe(start + 4);
+    listDecks(user);
+    expect(deckRevision()).toBe(start + 4);
+  });
+
   it("saves a deck that is not ready to play, and rewrites it under the same id", () => {
     const user = openUser();
     const id = writeDeck(user, { id: null, name: "  Hobbits ", heroes: ["141002"], cards: [{ code: "01073", count: 1 }] }, 1000);

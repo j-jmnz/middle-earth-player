@@ -1,19 +1,19 @@
 // The buttons that answer the open moment, in the dock (docs/design-system.md,
-// Table, Two taps). One filled pill always sits in the same place: the confirm of what is picked, or Pass when nothing is.
+// Table, Two taps). One filled capsule always sits in the same place: the confirm of what is picked, or Pass when nothing is.
 // A button that sends an intent with nothing picked arms on its first tap: the line above the buttons says what the second
 // tap does and a bar runs down under it; the second tap sends, and the bar running out, another button, or a new pick puts
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { AccessibilityInfo, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
 import { MORE_ID } from "./dock-extras.ts";
 import { tickArmed } from "./haptics.ts";
 import { armBarEasing, useMotionScale } from "./motion-run.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { ChromeButton, ChromePrimary } from "./sheet-paper.tsx";
+import { PrimaryButton, SecondaryButton, TextButton } from "./buttons.tsx";
 import { primaryReady, type Dock, type DockButton } from "./table-choice.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -65,11 +65,13 @@ export function DockButtons({
   const left = useSharedValue(1);
   const animates = useMotionScale() > 0;
   const reader = useScreenReader();
+  // The arm timer and the bar running down stop with the dock.
   useEffect(
     () => () => {
       if (timer.current) clearTimeout(timer.current);
+      cancelAnimation(left);
     },
-    [],
+    [left],
   );
   const press = (button: DockButton) => {
     if (timer.current) clearTimeout(timer.current);
@@ -100,6 +102,8 @@ export function DockButtons({
   };
   const bar = useAnimatedStyle(() => ({ width: `${Math.round(left.get() * 100)}%` }));
   const primary = dock.primary;
+  const hints = [picked ? `Picked: ${picked}` : null, primary?.arm ? HINT : dock.single ? ONLY_HINT : null].filter(Boolean).join(". ");
+  const primaryHint = hints === "" ? undefined : hints;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
   const said = (button: DockButton) => armedWords(button.armed ?? `Tap again: ${button.label}`, dense, chars);
   const line = armedButton ? said(armedButton) : (dock.why ?? (dock.single ? ONLY : null));
@@ -108,7 +112,7 @@ export function DockButtons({
   return (
     <View className={dense ? "gap-0" : "gap-0.5"}>
       {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
-          primary waits for; the bar that runs down has its own 4 pt under the text. Arming moves nothing. */}
+          primary waits for; the bar that runs down has its own 4 pt under the text (the bar at the top of it, 2 pt clear above the primary). Arming moves nothing. */}
       <View style={{ height: armedRoom(lines, dense, s) }}>
         <View style={{ height: lines * LINE_PX * s, justifyContent: "flex-end" }}>
           {line ? (
@@ -118,44 +122,44 @@ export function DockButtons({
           ) : null}
         </View>
         {armedButton ? (
-          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "center", alignItems: "center" }}>
+          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "flex-start", alignItems: "center" }}>
             <Animated.View style={[{ height: 2 * s, backgroundColor: t.accent }, bar]} />
           </View>
         ) : null}
       </View>
       {primary ? (
-        <ChromePrimary
+        <PrimaryButton
           label={primary.label}
           testID={primary.testID}
-          compact
-          tight={dense}
+          dock
+          compact={dense}
           disabled={!primaryReady(dock)}
-          accessibilityHint={[picked ? `Picked: ${picked}` : null, primary.arm ? HINT : dock.single ? ONLY_HINT : null].filter(Boolean).join(". ") || undefined}
+          accessibilityHint={primaryHint}
           onPress={() => press(primary)}
         />
       ) : null}
-      {/* The other answers are slate plates in Cinzel capitals on a row of their own; the reading aids are faint plates with small
-          muted words on one row under it (Undo, Read), which wraps if a third shows. No plate draws an edge. */}
+      {/* The other answers are secondary capsules on a row of their own; the reading aids are text buttons with small muted words on
+          one row under it (Undo, Read), which wraps if a third shows. */}
       {dock.secondary.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1.5">
           {dock.secondary.map((button) => (
-            <ChromeButton key={button.testID} label={button.label} testID={button.testID} variant="plate" tight={dense} tone={armed === button.testID ? "accent" : "bone"} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
+            <SecondaryButton key={button.testID} label={button.label} testID={button.testID} tight={dense} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
         </View>
       ) : null}
       {extras.length > 0 || more.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1">
           {extras.map((item) => (
-            <ChromeButton key={item.testID} label={item.label} testID={item.testID} variant="quiet" tight={dense} tone="bone" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
+            <TextButton key={item.testID} label={item.label} testID={item.testID} small tight={dense} tone="muted" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
           ))}
           {more.length > 0 ? (
             <View ref={moreRef} collapsable={false}>
-              <ChromeButton
+              <TextButton
                 label="More"
                 testID={MORE_ID}
-                variant="quiet"
+                small
                 tight={dense}
-                tone="bone"
+                tone="muted"
                 accessibilityHint={`Lists ${more.map((item) => item.accessibilityLabel ?? item.label).join(", ")}`}
                 onPress={pressMore}
               />

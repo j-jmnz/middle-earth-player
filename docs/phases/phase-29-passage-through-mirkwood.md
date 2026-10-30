@@ -38,10 +38,6 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `passage-through-mirkwood`:
 
 `.maestro/passage-through-mirkwood.yaml` (a win runs the resolution and unlocks `journey-along-the-anduin`) and `.maestro/passage-through-mirkwood-loss.yaml` (a loss writes nothing), with their fixtures.
 
-## Built (2026-10-28)
-
-See the phase 29 row in `STATUS.md`: records for every line, `BranchStage` and `questCardDefeated` in the quest family, Mendor and the boons and burdens in `pool/RevCore.ts`, the golden, the campaign test, the Maestro flows and the `mirkwood-won` and `mirkwood-lost` fixtures.
-
 ## Exit
 
 **Engine half:** coverage and the goldens green in Node. A win runs the resolution and unlocks the next part in Mirkwood Paths; a loss writes nothing. The plan's Verification list is green (`data:build`, `data:check`, `--verbose`, `tsc`, `lint`, `test`, `effects:open` with no line for this scenario, `card-smoke.ts` on the new codes, `catalog:build`, `booklets:pack`, the golden). Every Fellowship golden and test passes without edits to its expectations.

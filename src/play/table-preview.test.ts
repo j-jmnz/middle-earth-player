@@ -27,7 +27,7 @@ describe("the quest card's preview title", () => {
     expect(questTitle(moved, table.ctx, stage, "Flight", ledgerLine)?.title).toMatch(/^Flight · 3 \/ \d+$/);
     // Bag End is not in the victory display yet: the stage says what holds it back (141022:B:2), so progress past its quest
     // points reads as the rule (faq.progress-without-advancing).
-    expect(first?.detail).toBe("Cannot advance yet: The players cannot advance unless Bag End is in the victory display.");
+    expect(first?.detail).toBe("The players cannot advance unless Bag End is in the victory display.");
   });
 
   it("says nothing holds a stage that nothing holds back", () => {

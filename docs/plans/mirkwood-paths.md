@@ -134,7 +134,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
      - `easy-mode` spans for the core removals
    - Update `scripts/data/rules.test.ts`.
 7. **Ledger**
-   - Add `data/printed/mirkwood-paths.json`, read by an agent from the pinned scans (`docs/plans/authoritative-data.md` §A): every dealt, campaign, boon and burden card of both boxes, plus the three core player cards not yet ledgered (01013, 01017, 01030).
+   - Add `data/printed/mirkwood-paths.json`, read by an agent from the pinned scans (`docs/plans/done/authoritative-data.md` §A): every dealt, campaign, boon and burden card of both boxes, plus the three core player cards not yet ledgered (01013, 01017, 01030).
    - `loadLedger` merges every `data/printed/*.json` and fails on a duplicate key.
    - `src/catalog/printed-ledger.ts` imports both files.
    - `scope.ts` takes scope from every campaign.

@@ -1,6 +1,6 @@
 // Rules: rr.step-3-4, ltp.quest-resolution (data/rules/entries.json).
 //
-// The table's quest scale (docs/design-system.md, Table): the threat in the staging area against the willpower committed to the
+// The table's quest scale (docs/design-system-table.md): the threat in the staging area against the willpower committed to the
 // quest, and how far apart they are. While the players commit, the dock's readout already adds the picked characters' willpower
 // (readout.ts), so the scale moves as each one is picked; otherwise it reads the engine's own totals. Pure, so a test reads it.
 import { committedWillpower, stagingThreat } from "../rules/quest.ts";

@@ -4,7 +4,7 @@ Depends on: phase 21
 Blocks: nothing
 Can run beside: phases 14, 15, 16, 20 and 23
 
-Plan: `docs/plans/board-ux.md` (user list item 5). Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list item 5). Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -54,60 +54,10 @@ Also built, to keep the two-tap rule true: the armed line's room is sized to the
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - The web export at 844×390 and 667×375 shows the command column with the dock only, and the More pill on a window with Actions.
-- `docs/design-system.md` (Table, Command column and Cards) is rewritten.
+- `docs/design-system-table.md` (Command column and Cards) is rewritten.
 - STATUS.md lists the phone checks as open:
   - the dock at 667×375 with the guide on and an armed line;
   - the quest progress readable on the quest card at about 51 pt cards.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- `readout.ts`, `outcome.ts` and the sheets do not change. Only what the screen shows changes.
-- A screen reader keeps every sentence: a folded line is still in the accessibility label or the hint.
-- The Maestro flows that assert the quest band's testIDs move to the quest card's preview, or are dropped with a note in STATUS.md if nothing else reads them.
-- Do not remove the threat dials' ticks or the engagement pills. They are the engagement foresight the table-experience plan built.
-
-## Handover from phase 21
-
-Phase 21 is merged. What phase 22 builds on:
-
-- The tray is short on a short phone. Its foot sits on the top of the dock's readout block (`TableDock` `onBlock`, measured with `measureInWindow`), and the dock's step, title and note sit above that block. At 667x375 the tray is 123 pt tall with an 83 pt list (about 1.5 tiles); at 844x390, 138 pt (about 2). Every line this phase folds out of the dock gives the tray its height back, which is the main payoff of this phase on a choice. Keep the anchor at the readout: the readout and the armed line are never covered. Re-measure the tray in the exit shots.
-- The picked-cards line (`dock-picked`) already hides while the tray is open; this phase removes it for good (the audit row). The tray's count ("Defend · 1 of 6 picked") carries it.
-- The dock's quiet pills are built by `dockExtras` in `src/play/dock-extras.ts` (not `use-table-choice.ts` any more): Undo, then "Read" (accessibility label "Read the card", `sheet-inspect`), List, Actions (n), Choose (`sheet-expand`). They sit on one wrapping row under the secondary. `dockPills` and the More fold go there.
-- The dock is a `ScrollView` guard so its foot never clips; it re-measures the anchor on scroll end. Once the dock fits, the guard should never scroll; keep it.
-- The quest band still draws in the command column's upper part, under the open tray. Removing it changes nothing in the tray.
-- The reading panels and the carousel are one `Reading` layer (`src/play/reading.ts`, drawn by `table-layers.tsx`). The More popover is a menu-frame popover, not a reading panel; Back should close it the way it closes the table menu (`back.ts`).
-- `table-view.tsx` is 329 lines and `use-table-choice.ts` 315: do not grow either.
-
 
 ## Layout fix (after the merge)
 

@@ -1,20 +1,21 @@
-// One seat's fellowship on a briefing (docs/design-system.md, Briefing): the saved decks to choose from, then the picked deck as a
-// framed party card with the Ring-bearer slot. Shared by the campaign briefing and the standalone briefing.
+// One seat's fellowship on a briefing (docs/design-system.md, Briefing): the saved decks to choose from, then the picked deck as its
+// name and Change over its heroes, on the ground, with the Ring-bearer's rows when it needs one. Shared by the campaign briefing and the standalone briefing.
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../play/not-applied";
-import { panelSurface, rowSurface } from "../play/surfaces";
+import { rowSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { Portrait } from "./art";
+import { usePalette } from "./palette-hook";
 import type { BriefingDecks } from "./briefing-parts";
-import { BodyText, Label, Section, SecondaryButton, TextButton } from "./chrome";
+import { BodyText, Chevron, Label, Section, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { emptyDeckListFilter, useDeckListView } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
-import { deckCountLine, notAppliedCards, notAppliedLine } from "./deck-status";
-import { DeckCover, DeckRow, EmptyHeroSlot, HeroTile, heroFace, type HeroFace } from "./hero-tile";
+import { deckCountLine, deckShortLine, notAppliedCards, notAppliedLine } from "./deck-status";
+import { DeckCover, DeckRow, HeroTile, heroFace, type HeroFace } from "./hero-tile";
 import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
@@ -26,8 +27,8 @@ const TOOL_HEIGHT = 128;
 /**
  * One seat's fellowship. Until a deck is picked, and while it is being changed, the seat lists the saved decks with the Decks
  * tab's search and chips, each a radio (a deck with a fallen hero, or one not ready to play, is shown and cannot be picked; the
- * seat's picked deck stays listed whatever the filter). Picked, it folds to a framed party card: the deck, its heroes as
- * pictures, the Ring-bearer, and Change. For the first seat the Ring-bearer slot shows when the deck brings none.
+ * seat's picked deck stays listed whatever the filter). Picked, it folds to the deck's name with Change, its heroes as pictures
+ * under them and, once picked, the Ring-bearer as one more. For the first seat the Ring-bearer's rows show when the deck brings none.
  */
 export function SeatPicker({
   index,
@@ -60,6 +61,7 @@ export function SeatPicker({
 }) {
   const s = useUiScale();
   const t = useTableTokens();
+  const palette = usePalette();
   const router = useRouter();
   const view = useDeckListView();
   const [changing, setChanging] = useState(false);
@@ -75,6 +77,7 @@ export function SeatPicker({
   const heroNames = (codes: readonly string[]) => codes.map(nameOf).join(", ");
   const slot = index === 0 && needsRingBearer;
   const choosing = !pickedDeck || changing;
+  const short = pickedDeck ? deckShortLine(pickedDeck) : null;
   const title = seatCount === 1 ? (saga ? "Your fellowship" : "Your party") : `Seat ${index + 1}`;
   // A Ring-bearer the deck brings itself is one of the candidates (a Fellowship hero with the Ring-bearer trait).
   const carries = (code: string) => candidates.some((candidate) => candidate.code === code);
@@ -105,7 +108,7 @@ export function SeatPicker({
         </View>
       ) : choosing ? (
         <View>
-          <Label>{pickedDeck ? "Pick another deck for this seat." : "Choose the deck this seat plays."}</Label>
+          {pickedDeck ? <Label>Pick another deck for this seat.</Label> : null}
           <DeckListBar filter={filter} onFilter={setFilter} spheres={spheres} shown={shown.length} total={savedDecks.length} testIDPrefix={`briefing-decks-${index}`} />
           <View
             className={wide ? "mt-3 flex-row flex-wrap" : "mt-3"}
@@ -120,6 +123,7 @@ export function SeatPicker({
                 name: deck.name,
                 heroes: deck.heroes.map(faceOf),
                 detail: deckCountLine(deck),
+                short: deckShortLine(deck),
                 status: fell.length > 0 ? { ready: false, text: `${heroNames(fell)} fell and cannot be picked` } : ready,
                 note: notAppliedLine(deck, inactive),
                 onPress: () => choose(deck.id),
@@ -167,13 +171,16 @@ export function SeatPicker({
           </View>
         </View>
       ) : (
-        <View testID={`briefing-party-${index}`} className="rounded-card p-4" style={panelSurface(false, t)}>
-          {/* The name gets the card's whole width (a long one never breaks inside a word); Change sits beside the counts, under it. */}
-          <Text className="font-display text-title text-bone">{pickedDeck.name}</Text>
-          <View className="mt-1 flex-row items-center justify-between gap-3">
-            <Label className="flex-1">{deckCountLine(pickedDeck)}</Label>
-            <SecondaryButton label="Change" testID={`deck-change-${index}`} compact accessibilityLabel={`Change the deck of ${title.toLowerCase()}, now ${pickedDeck.name}`} onPress={() => setChanging(true)} />
+        <View testID={`briefing-party-${index}`}>
+          {/* The name gets the row's width less Change (a long one never breaks inside a word). The hero tiles show the heroes, so the count
+              shows only when the deck is short; a screen reader hears the full count with the name. */}
+          <View className="flex-row items-center justify-between gap-3">
+            <Text accessibilityLabel={`${pickedDeck.name}, ${deckCountLine(pickedDeck)}`} className="min-w-0 flex-1 font-display text-title text-bone">
+              {pickedDeck.name}
+            </Text>
+            <TextButton label="Change" testID={`deck-change-${index}`} tone="accent" accessibilityLabel={`Change the deck of ${title.toLowerCase()}, now ${pickedDeck.name}`} onPress={() => setChanging(true)} />
           </View>
+          {short ? <Label>{short}</Label> : null}
           <View className="mt-3.5 flex-row gap-2">
             {heroes.map((code) => (
               <HeroTile key={code} hero={faceOf(code)} height={TOOL_HEIGHT * s} dense ringBearer={!slot && carries(code)} />
@@ -182,9 +189,8 @@ export function SeatPicker({
               ringBearer ? (
                 <HeroTile hero={faceOf(ringBearer)} height={TOOL_HEIGHT * s} dense ringBearer onRemove={() => onRingBearer(null)} />
               ) : (
-                <View testID="ringbearer-slot" className="flex-1">
-                  <EmptyHeroSlot height={TOOL_HEIGHT * s} label="Ring-bearer" />
-                </View>
+                // The fourth place stays as room, so the tiles keep their width when the Ring-bearer is picked.
+                <View className="flex-1" />
               )
             ) : null}
           </View>
@@ -202,26 +208,26 @@ export function SeatPicker({
         </View>
       )}
       {pickedDeck && !choosing && slot && !ringBearer ? (
-        <View className="mt-3">
-          <Label>Choose the Ring-bearer</Label>
-          <View className="mt-1.5 gap-2">
+        <View testID="ringbearer-slot" className="mt-3">
+          <Section title="Ring-bearer" />
+          <View className="gap-2">
             {candidates.map((candidate) => (
               <Pressable
                 key={candidate.code}
                 testID={`ringbearer-${candidate.code}`}
                 collapsable={false}
                 accessibilityRole="button"
-                accessibilityLabel={`Choose ${candidate.name}${candidate.packName ? ` (${candidate.packName})` : ""} as Ring-bearer`}
+                accessibilityLabel={`Choose ${candidate.name}${candidate.packName ? `, ${candidate.packName}` : ""}`}
                 onPress={() => onRingBearer(candidate.code)}
               >
                 {({ pressed }) => (
-                  <View className="min-h-14 flex-row items-center gap-3 rounded-tile px-3 py-2" style={rowSurface(pressed, t)}>
+                  <View className="min-h-14 flex-row items-center gap-3 rounded-item px-3 py-2" style={rowSurface(pressed, t)}>
                     <Portrait card={faceOf(candidate.code)} size={36} />
                     <View className="flex-1">
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>
                       {candidate.packName ? <Text className="text-label text-muted">{candidate.packName}</Text> : null}
                     </View>
-                    <Text className="font-display text-label text-accent">Choose</Text>
+                    <Chevron direction="right" color={palette.faint} size={8} />
                   </View>
                 )}
               </Pressable>

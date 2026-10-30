@@ -10,8 +10,8 @@ export type MenuItemId = "leave" | "log" | "rules" | "booklet" | "settings";
 
 export type MenuItem = {
   id: MenuItemId;
-  // The row opens a screen or a panel (a chevron); Leave the table goes, and stands apart at the foot.
-  opens: boolean;
+  // Leave the table goes rather than opens something, so its word is danger and it stands apart at the foot.
+  tone?: "danger";
   testID: string;
   label: string;
   accessibilityLabel: string;
@@ -28,10 +28,10 @@ export type MenuItem = {
  */
 export function menuItems(nav: MenuNav): readonly MenuItem[] {
   return [
-    { id: "log", testID: "log-open", label: "Log", accessibilityLabel: "This round's log", icon: null, opens: true },
-    { id: "rules", testID: "rules-open", label: "Rules", accessibilityLabel: "Look up a rule", icon: null, opens: true },
-    { id: "booklet", testID: "booklet-open", label: "Booklet", accessibilityLabel: "Open the booklet", icon: null, opens: true },
-    { id: "settings", testID: "settings-open", label: "Table settings", accessibilityLabel: "Table settings", accessibilityHint: "Opens the table settings", icon: null, opens: true },
+    { id: "log", testID: "log-open", label: "Log", accessibilityLabel: "This round's log", icon: null },
+    { id: "rules", testID: "rules-open", label: "Rules", accessibilityLabel: "Look up a rule", icon: null },
+    { id: "booklet", testID: "booklet-open", label: "Booklet", accessibilityLabel: "Open the booklet", icon: null },
+    { id: "settings", testID: "settings-open", label: "Table settings", accessibilityLabel: "Table settings", accessibilityHint: "Opens the table settings", icon: null },
     {
       id: "leave",
       testID: "table-back",
@@ -40,7 +40,7 @@ export function menuItems(nav: MenuNav): readonly MenuItem[] {
       accessibilityHint: "The game is saved",
       icon: null,
       glyph: "leave",
-      opens: false,
+      tone: "danger",
     },
   ];
 }

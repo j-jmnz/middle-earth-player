@@ -14,7 +14,7 @@ import { EFFECTS } from "../../../../effects";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";
 import { bookletParams, campaignOfScenario, scenarioOf } from "../../../campaign-data";
-import { BodyText, Label, Section, Segmented } from "../../../chrome";
+import { BodyText, Section, Segmented } from "../../../chrome";
 import { useDatabases } from "../../../databases";
 import { dealSeed } from "../../../e2e";
 import { goBack } from "../../../go-back";
@@ -53,11 +53,13 @@ export default function StandaloneBriefing() {
     [seatCount, savedDecks, picked],
   );
 
+  // The world is built from the scenario and these codes (the Ring-bearers, every saved deck's heroes, the picked decks' cards), as one
+  // string: a deck list read again on focus, or a pick of the same cards, keeps the world instead of loading it again.
+  const codeKey = [...new Set([...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)])].sort().join("\0");
   const world = useMemo(() => {
     if (!campaign || !scenario) return null;
-    const extra = [...candidates.map((card) => card.code), ...savedDecks.flatMap((deck) => deck.heroes), ...seats.flatMap((seat) => seat.deck)];
-    return loadWorld(catalog, campaign, scenario, EFFECTS, extra);
-  }, [catalog, campaign, scenario, candidates, savedDecks, seats]);
+    return loadWorld(catalog, campaign, scenario, EFFECTS, codeKey === "" ? [] : codeKey.split("\0"));
+  }, [catalog, campaign, scenario, codeKey]);
 
   const input: StandaloneInput | null = useMemo(() => (world ? { world, seatCount, seats, ringBearer, difficulty } : null), [world, seatCount, seats, ringBearer, difficulty]);
   const result = useMemo(() => (input ? standaloneBriefing(input) : null), [input]);
@@ -112,14 +114,11 @@ export default function StandaloneBriefing() {
     <BriefingScreen
       {...frame}
       banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
-      bar={<DealBar problems={result.problems} dealError={dealError} difficulty={difficulty} dealable={result.dealable} onDeal={onDeal} />}
+      bar={<DealBar problems={result.problems} dealError={dealError} dealable={result.dealable} onDeal={onDeal} />}
       aside={<EncounterDetails facts={facts} />}
     >
       <Section title="Players" className="mt-4" />
       <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch />
-      <Label tone="muted" className="mt-2">
-        No campaign card, boons or burdens. A win is scored; nothing is written to a campaign.
-      </Label>
       <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} nightmare={isNightmarePlayable(world.scenario.id)} />
       {seats.map((seat, index) => (
         <SeatPicker

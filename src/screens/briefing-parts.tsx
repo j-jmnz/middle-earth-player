@@ -30,9 +30,9 @@ export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { c
 
 // What each difficulty changes (ltp.easy-mode, easy-mode.easy-mode, and the Nightmare setup card), in the briefing under the switch.
 const DIFFICULTY_NOTES: Readonly<Record<Difficulty, string>> = {
-  Easy: "Easy: each hero starts with 1 resource, and the encounter cards with the gold difficulty border are left out. Good for a first game.",
-  Normal: "Normal: the full encounter deck, and no starting resources.",
-  Nightmare: "Nightmare: the setup card swaps cards of the encounter deck for its Nightmare deck and stays next to the quest deck, its rules active all game. For seasoned players.",
+  Easy: "Each hero starts with 1 resource, and the encounter cards with the gold difficulty border are left out. Good for a first game.",
+  Normal: "Full encounter deck, no starting resources.",
+  Nightmare: "The setup card swaps cards of the encounter deck for its Nightmare deck and stays next to the quest deck, its rules active all game. For seasoned players.",
 };
 
 // The Eye of Sauron marks Nightmare on the switch (the Scenarios list's game line and the table's top bar carry it too).
@@ -161,7 +161,7 @@ export function BriefingScreen({
   );
   const navBar = (
     <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, paddingLeft: 16 * s + insets.left, paddingRight: expanded ? 16 * s : 16 * s + insets.right }}>
-      <NavBar overlay onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton overlay icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
+      <NavBar onBack={onBack} backTestID="briefing-back" backLabel={backLabel} right={onBooklet ? <IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={onBooklet} /> : undefined} />
     </View>
   );
 
@@ -316,12 +316,11 @@ export function EncounterDetails({ facts }: { facts: ScenarioFacts }) {
 
 /**
  * The briefing's Deal bar: the validator's sentences in danger (without collector codes), any extra control (the campaign's
- * Accept +1 threat), the sentence naming the difficulty and what Deal does, and DEAL, disabled until the loadout is legal.
+ * Accept +1 threat), what Deal waits for or the warning that it drops an open scenario, and DEAL, disabled until the loadout is legal.
  */
 export function DealBar({
   problems,
   dealError,
-  difficulty,
   dropsOpen = false,
   dealable,
   waiting = null,
@@ -330,7 +329,6 @@ export function DealBar({
 }: {
   problems: readonly Problem[];
   dealError: string | null;
-  difficulty: Difficulty;
   dropsOpen?: boolean;
   dealable: boolean;
   // What the disabled Deal waits for (a choice the campaign card asks above), in a sentence of its own.
@@ -338,6 +336,7 @@ export function DealBar({
   onDeal: () => void;
   children?: ReactNode;
 }) {
+  const note = waiting ?? dealSentence(dropsOpen);
   return (
     <View className="gap-2">
       {problems.map((problem, index) => (
@@ -351,9 +350,11 @@ export function DealBar({
         </Label>
       ) : null}
       {children}
-      <Label tone="muted" testID="briefing-deal-note" className="text-center">
-        {waiting ?? dealSentence(difficulty, dropsOpen)}
-      </Label>
+      {note ? (
+        <Label tone="muted" testID="briefing-deal-note" className="text-center">
+          {note}
+        </Label>
+      ) : null}
       <PrimaryButton label="Deal" testID="deal" disabled={!dealable} onPress={onDeal} />
     </View>
   );

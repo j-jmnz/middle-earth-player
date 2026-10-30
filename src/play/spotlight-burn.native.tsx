@@ -1,4 +1,4 @@
-// The burn of a destroyed target (docs/plans/combat-spotlight-redesign.md, §5; the field and the shader are spotlight-burn.ts): the target's
+// The burn of a destroyed target (docs/plans/done/combat-spotlight-redesign.md, §5; the field and the shader are spotlight-burn.ts): the target's
 // layer runs through a noise-threshold dissolve with an ember rim (a runtime shader used as an image filter). If the SkSL does not
 // compile (`Skia.RuntimeEffect.Make` returns null) there is no burn layer, and the target fades, drops and darkens instead
 // (spotlight-pieces.native.tsx, FlyingCard and Veil).

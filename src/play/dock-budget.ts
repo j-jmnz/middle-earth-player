@@ -1,15 +1,13 @@
-// The room for the words above the dock's pinned block (docs/design-system.md, Table, Command column; phase 22): the step, the
-// title and the folded line. On a short phone (under DENSE_BELOW tall) that room is small, and a long title with a long caution
-// armed under it leaves it almost none, so the title is clamped to the lines that fit and the rest of it, with every folded line,
-// waits behind the "i" pill, which opens them in a popover (dock-more.tsx). Where the room cannot hold the step, one title line
-// and one label line, the folded line is dropped and the pill sits on the title row: a control is never half visible. Pure
+// The room for the words above the dock's pinned block (docs/design-system-table.md, Command column; phase 22): the title and the
+// folded line. On a short phone (under DENSE_BELOW tall) that room is small, and a long title with a long caution armed under it
+// leaves it almost none, so the title is clamped to the lines that fit and the rest of it, with every folded line, waits behind the
+// "i" button, which opens them in a popover (dock-more.tsx). Where the room cannot hold one title line and one label line, the
+// folded line is dropped and the button sits on the title row: a control is never half visible. Pure
 // arithmetic; the dock measures the room and draws what this says. At a UI `scale` (ui-scale.ts) a measured length comes in as
 // screen points and goes out as screen points; the arithmetic is the Medium one, in logical points (the screen over the scale).
 import { lineCount } from "./armed-room.ts";
 
-// Line heights of the type the words use (tailwind.config.js): the eyebrow step, the title (Marcellus SC at the heading size on
-// its 22 pt line), label type.
-export const STEP_PX = 16;
+// Line heights of the type the words use (tailwind.config.js): the title (Marcellus SC at the heading size on its 22 pt line), label type.
 export const TITLE_PX = 22;
 export const LABEL_PX = 18;
 // The dock's padding around its two blocks (it draws no border): 10 above the words, 8 under them and 8 under the buttons, or
@@ -20,8 +18,11 @@ export const DOCK_PAD_DENSE_PX = 10;
 // LABEL_CHAR_PT.
 export const TITLE_CHAR_PT = 10.6;
 export const LABEL_CHAR_PT = 6.6;
-// The "i" pill's width and its gap beside a line or a title.
-export const PILL_PT = 30;
+// The "i" button's width (26 pt) and its gap beside a line or a title.
+export const PILL_PT = 32;
+// The room kept for one row of the choice, under the title, when it is open in the dock (a row is 48 pt, with its gap): the words are
+// budgeted against it whatever the screen's height.
+export const TRAY_ROOM_PX = 52;
 // A short phone's screen height under which the dock is dense; the choice tray's dense tiles use the same line.
 export const DENSE_BELOW = 400;
 
@@ -51,31 +52,32 @@ export type WordsPlan = {
   cut: boolean;
   // The folded line shows under the title; false when there is none or the room cannot hold it.
   showLine: boolean;
-  // The "i" pill is needed: lines wait behind it, the title is cut, or the folded line was dropped.
+  // The "i" button is needed: lines wait behind it, the title is cut, or the folded line was dropped.
   pill: boolean;
-  // The pill sits on the title row (to the right of the title) rather than beside the folded line.
+  // The button sits on the title row (to the right of the title) rather than beside the folded line.
   pillOnTitle: boolean;
 };
 
 /**
  * What the dock draws in its words window. Off a dense screen the title keeps its own lines and the folded line shows. On a dense
- * one the title is clamped to the lines that fit under the step and the folded line, never fewer than one; with room for less
- * than the step, one title line and one label line, the folded line goes and the pill moves to the title row, where the title is
- * counted against the width the pill leaves. `foldable` is `DockLines.foldable` (lines wait behind the pill).
+ * one the title is clamped to the lines that fit above the folded line, never fewer than one; with room for less than one title
+ * line and one label line, the folded line goes and the button moves to the title row, where the title is counted against the
+ * width the button leaves. `foldable` is `DockLines.foldable` (lines wait behind the pill). `clamp` is the choice's rows being open:
+ * the words are budgeted by their room on a taller screen too, because the rows keep their own minimum and the words cannot shrink.
  */
-export function planWords(a: { space: number; dense: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean }, scale = 1): WordsPlan {
+export function planWords(a: { space: number; dense: boolean; clamp?: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean }, scale = 1): WordsPlan {
   // The room and the width come in as screen points; the budget is counted in logical ones.
   const space = a.space / scale;
   const textWidth = a.textWidth / scale;
-  if (!a.dense) {
+  if (!a.dense && !a.clamp) {
     const natural = titleLinesOf(a.title, textWidth);
     return { titleLines: natural, cut: false, showLine: a.hasLine, pill: a.foldable, pillOnTitle: !a.hasLine && a.foldable };
   }
-  const showLine = a.hasLine && space >= STEP_PX + TITLE_PX + LABEL_PX;
-  const room = space - STEP_PX - (showLine ? LABEL_PX : 0);
+  const showLine = a.hasLine && space >= TITLE_PX + LABEL_PX;
+  const room = space - (showLine ? LABEL_PX : 0);
   const fits = Math.max(1, Math.floor(room / TITLE_PX));
   const onTitle = !showLine;
-  // The pill takes the title row's right end when it sits there; count against what it leaves.
+  // The button takes the title row's right end when it sits there; count against what it leaves.
   const count = (pillThere: boolean) => titleLinesOf(a.title, textWidth - (pillThere ? PILL_PT : 0));
   let natural = count(onTitle && (a.foldable || a.hasLine));
   if (onTitle && !(a.foldable || a.hasLine) && natural > fits) natural = count(true);
@@ -85,15 +87,15 @@ export function planWords(a: { space: number; dense: boolean; title: string; tex
   return { titleLines, cut, showLine, pill, pillOnTitle: pill && (onTitle || !a.hasLine) };
 }
 
-// The "i" popover (dock-lines-popover.tsx): its widest, its gap from the screen's edge and its Close row.
+// The "i" popover (dock-lines-popover.tsx): its widest, its gap from the screen's edge and the least room it keeps.
 const POPOVER_MAX_WIDTH = 280;
 const POPOVER_GAP = 6;
 const POPOVER_EDGE = 8;
-export const CLOSE_ROW = 48;
+const POPOVER_MIN_ROOM = 88;
 
 /** The popover's width and its room under `top`: as wide as the canvas beside the command column allows, down to the screen's foot. */
 export function linesPlace(a: { screenWidth: number; screenHeight: number; commandWidth: number; insetLeft: number; insetRight: number; top: number }, scale = 1): { width: number; maxHeight: number } {
   const canvas = (a.screenWidth - a.insetLeft - a.insetRight - a.commandWidth) / scale - POPOVER_GAP - POPOVER_EDGE;
-  return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)) * scale, maxHeight: Math.max(CLOSE_ROW + 40, (a.screenHeight - a.top) / scale - POPOVER_EDGE) * scale };
+  return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)) * scale, maxHeight: Math.max(POPOVER_MIN_ROOM, (a.screenHeight - a.top) / scale - POPOVER_EDGE) * scale };
 }
 

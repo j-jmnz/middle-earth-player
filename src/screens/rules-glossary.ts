@@ -39,13 +39,37 @@ function sortKey(title: string): string {
 }
 
 export function glossaryOf(rows: readonly RuleEntry[]): GlossaryEntry[] {
+  // Each title's sort key is folded once, not once per comparison.
   return rows
     .filter(inGlossary)
-    .map((entry) => ({ ...entry, source: `${DOC_NAMES[entry.doc]} · page ${entry.page}` }))
-    .sort((a, b) => sortKey(a.title).localeCompare(sortKey(b.title)) || a.id.localeCompare(b.id));
+    .map((entry) => ({ entry: { ...entry, source: `${DOC_NAMES[entry.doc]} · page ${entry.page}` }, key: sortKey(entry.title) }))
+    .sort((a, b) => a.key.localeCompare(b.key) || a.entry.id.localeCompare(b.entry.id))
+    .map((row) => row.entry);
 }
 
-export const GLOSSARY: readonly GlossaryEntry[] = glossaryOf(parseRuleEntries(entries));
+// The rule spans are parsed (zod) on the first look-up, not when the module loads: the Rules tab and the table's Rules are the only readers.
+type Glossary = { rows: readonly GlossaryEntry[]; byId: ReadonlyMap<string, GlossaryEntry> };
+let parsed: readonly RuleEntry[] | null = null;
+let book: Glossary | null = null;
+let all: ReadonlyMap<string, RuleEntry> | null = null;
+
+function parsedEntries(): readonly RuleEntry[] {
+  parsed ??= parseRuleEntries(entries);
+  return parsed;
+}
+
+function glossaryBook(): Glossary {
+  if (!book) {
+    const rows = glossaryOf(parsedEntries());
+    book = { rows, byId: new Map(rows.map((row) => [row.id, row])) };
+  }
+  return book;
+}
+
+/** The glossary's entries in title order, parsed on the first call and kept. */
+export function glossary(): readonly GlossaryEntry[] {
+  return glossaryBook().rows;
+}
 
 // The rule books the app carries (src/screens/booklets/books.ts); a rule from one opens the reader on its page.
 const BOOKS: Readonly<Partial<Record<string, BookletId>>> = {
@@ -61,18 +85,31 @@ export function bookPage(entry: Pick<RuleEntry, "doc" | "page">): { id: BookletI
   return id ? { id, name: bookletName(id), page: entry.page } : null;
 }
 
-const ALL_ENTRIES: ReadonlyMap<string, RuleEntry> = new Map(parseRuleEntries(entries).map((entry) => [entry.id, entry]));
-
 /** Where a rule span is printed, as a player reads it: "Fellowship of the Ring rulebook, page 4" (the book the app carries, else the document's name). */
 export function ruleSource(id: string): string | null {
-  const entry = ALL_ENTRIES.get(id);
+  all ??= new Map(parsedEntries().map((entry) => [entry.id, entry]));
+  const entry = all.get(id);
   if (!entry) return null;
   const book = bookPage(entry);
   return book ? `${book.name}, page ${book.page}` : `${DOC_NAMES[entry.doc] ?? entry.doc}, page ${entry.page}`;
 }
 
 export function glossaryEntry(id: string): GlossaryEntry | null {
-  return GLOSSARY.find((entry) => entry.id === id) ?? null;
+  return glossaryBook().byId.get(id) ?? null;
+}
+
+// What a search and a "See also" compare an entry by, folded once per entry: its title's sort key, its terms, and (the first time a
+// search reaches the text rule) its text.
+type Folded = { title: string; terms: readonly string[]; text: string | null };
+const foldedEntries = new WeakMap<GlossaryEntry, Folded>();
+
+function foldedOf(entry: GlossaryEntry): Folded {
+  let found = foldedEntries.get(entry);
+  if (!found) {
+    found = { title: sortKey(entry.title), terms: entry.terms.map(fold), text: null };
+    foldedEntries.set(entry, found);
+  }
+  return found;
 }
 
 /** The entries whose title or term holds the query, title starts first; from three letters, the text is searched too. */
@@ -89,11 +126,12 @@ export function searchGlossary(rows: readonly GlossaryEntry[], query: string): G
 
 // 0: the title starts with the query; 1: the title or a term holds it; 2: the text holds it; null: no match.
 function rankOf(entry: GlossaryEntry, needle: string): number | null {
-  const title = sortKey(entry.title);
-  if (title.startsWith(needle)) return 0;
-  if (title.includes(needle) || entry.terms.some((term) => fold(term).includes(needle))) return 1;
-  if (needle.length >= 3 && fold(entry.text).includes(needle)) return 2;
-  return null;
+  const folded = foldedOf(entry);
+  if (folded.title.startsWith(needle)) return 0;
+  if (folded.title.includes(needle) || folded.terms.some((term) => term.includes(needle))) return 1;
+  if (needle.length < 3) return null;
+  folded.text ??= fold(entry.text);
+  return folded.text.includes(needle) ? 2 : null;
 }
 
 // A line that opens its own paragraph: a bullet, a numbered step ("1. Shuffle Decks", "6.3 Resolve"), or See also.
@@ -142,8 +180,23 @@ export function seeAlso(entry: GlossaryEntry, rows: readonly GlossaryEntry[]): {
     .map((name) => name.trim().replace(/\.$/, "").replace(/^“(.*?),?”$/, "$1"))
     .filter((name) => name.length > 0)
     .map((name) => {
-      const key = fold(name);
-      const matches = rows.filter((row) => row.id !== entry.id && (sortKey(row.title) === key || row.terms.some((term) => fold(term) === key)));
+      const matches = namedBy(rows).get(fold(name))?.filter((row) => row.id !== entry.id) ?? [];
       return { name, entry: matches.find((row) => row.doc === entry.doc) ?? matches[0] ?? null };
     });
+}
+
+// The entries by their folded title and by each folded term, in the rows' order, built once per list of rows.
+const names = new WeakMap<readonly GlossaryEntry[], Map<string, GlossaryEntry[]>>();
+
+function namedBy(rows: readonly GlossaryEntry[]): Map<string, GlossaryEntry[]> {
+  let found = names.get(rows);
+  if (!found) {
+    found = new Map();
+    for (const row of rows) {
+      const folded = foldedOf(row);
+      for (const key of new Set([folded.title, ...folded.terms])) found.set(key, [...(found.get(key) ?? []), row]);
+    }
+    names.set(rows, found);
+  }
+  return found;
 }

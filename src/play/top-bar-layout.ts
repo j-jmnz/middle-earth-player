@@ -1,11 +1,12 @@
-// The top bar's three zones (docs/design-system.md, Table): the dials at the left, the phase rail centered on the screen (user request,
-// 2026-10-29; it sat between the dials and the menu before, right of the middle), one menu button at the right. The rail never truncates its words: its floor is the widest it can be, counted from its own words
-// (the phase, "Round 99 · Optional engagement") at their type sizes and its seven ticks. Pure, so a test reads it.
+// The top bar's three zones (docs/design-system-table.md): the dials at the left, the phase rail centered on the screen (user request,
+// 2026-10-29; it sat between the dials and the menu before, right of the middle), one menu button at the right. The rail never truncates
+// its words: its floor is the widest it can be, counted from its own words (the widest phase) at their type size and its seven ticks.
+// Pure, so a test reads it.
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { touch } from "./ui-scale.ts";
 
 // The bar's height: the 46 pt threat dial with 3 pt above and below; its pop (1.22) and the peek's bone ring may reach past the bar
-// over the canvas's own top gutter. The rail's three lines (phase, ticks, round and step) fit in it.
+// over the canvas's own top gutter. The rail's two lines (phase, ticks) fit in it.
 export const TOP_BAR = 52;
 // The room above the bar when the screen gives none (the table hides the status bar, so the top inset is 0 in landscape): the dial
 // stands 3 pt under the bar's top edge and its pop (1.22) reaches 5 pt above the dial, off the screen and into a phone's rounded
@@ -18,14 +19,15 @@ const GAP = 8;
 // Wide enough for the widest pill with both neighbor phases inline (RAIL_WIDE), with room over.
 export const RAIL_MAX = 460;
 
-// The rail is three lines (phase-rail.tsx): the phase, the round's seven phases as ticks under it, and "Round 3 · Staging" under
-// those. Its floor comes from those words and marks, never from a guess about the bar:
+// The rail is two lines (phase-rail.tsx): the phase, and the round's seven phases as ticks under it. Its floor comes from those words
+// and marks, never from a guess about the bar:
 // - the phase is Marcellus SC at 17 pt tracked 4 pt, its lower case drawn as small capitals. A letter of the phase words averages
 //   up to 0.61 em ("Combat"; "Encounter" 0.54); 0.62 leaves a margin, plus the tracking;
+// - Setup and the mulligan have no phase, so their step takes the phase's place, in the same type;
 // - the ticks are seven 22 pt bars 5 pt apart;
-// - "Round 99 · " and the step are label size (11 pt) in Barlow Semi Condensed, which averages under 0.48 em a letter; 0.55 leaves
+// - the neighbor phases' names are label size (11 pt) in Barlow Semi Condensed, which averages under 0.48 em a letter; 0.55 leaves
 //   a margin;
-// - neither counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
+// - none counts shrinking (PhaseRail may shrink the phase to 85%), which is more margin, nor the glow;
 // - the rail adds 4 pt each side, and the phase line keeps the room of the accent S that marks a stop ahead (STOP_MARK, counted
 //   whether or not it shows) on both sides of the phase, so the phase stays on the rail's middle (user request, 2026-10-29).
 const PHASE_SIZE = 17;
@@ -38,46 +40,27 @@ const RAIL_CHROME = 8;
 export const TICK = 22;
 export const TICK_GAP = 5;
 const TICKS = 7 * TICK + 6 * TICK_GAP;
-// The dot between "Round 3" and the step, with its spaces.
-const DOT = " · ";
-// A chevron drawn as views (phase-rail.tsx), and the accent S that marks a stop ahead at the end of the phase's line.
-export const CHEVRON = 14;
+// The accent S that marks a stop ahead at the end of the phase's line.
 export const STOP_MARK = 14;
 /** The gap on each side of the phase between it and a neighbor phase's name, inline on the phase's line (rail wide). */
 export const NEIGHBOR_GAP = 8;
-// Words the rail shows beside the engine's steps.
-const EXTRA_STEPS = ["Victory", "Defeat"] as const;
 // The widest neighbor phase's name at label size.
 const PHASE_SLOT = Math.max(...ROUND_PHASES.map((name) => Math.ceil(name.length * LABEL_EM * LABEL_SIZE)));
-// The rounds the rail can name: two digits.
-const ROUND_WORDS = "Round 99";
-// The phase words the rail shows (rail.ts: the seven phases, "Beginning" and "End").
-const PILL_PHASES = [...ROUND_PHASES, "Beginning", "End"];
+// The headlines the rail shows: the seven phases, "Beginning" and "End" (rail.ts), and the two steps that have no phase.
+const HEADLINES = [...ROUND_PHASES, "Beginning", "End", STEP_WORDS.afterOpening, STEP_WORDS.mulligan];
 
-const labelWidth = (word: string) => Math.ceil(word.length * LABEL_EM * LABEL_SIZE);
 const phaseLine = (word: string) => Math.ceil(word.length * (PHASE_EM * PHASE_SIZE + PHASE_TRACK)) + 2 * STOP_MARK;
 
-/** The width the rail needs for the phase over the ticks over "Round 3 · step": the widest of its three lines, plus its chrome. */
-export function pillWidth(round: string, phase: string, step: string): number {
-  const foot = labelWidth(step ? `${round}${DOT}${step}` : round);
-  return Math.max(phase ? phaseLine(phase) : 0, TICKS, foot) + RAIL_CHROME;
+/** The width the rail needs to show a headline (a phase, or a step with no phase) whole over the ticks, plus its chrome. */
+export function headlineWidth(word: string): number {
+  return Math.max(phaseLine(word), TICKS) + RAIL_CHROME;
 }
 
-/** The width the rail needs to show a step name whole, under its widest top line. */
-export function stepWidth(word: string): number {
-  return pillWidth(ROUND_WORDS, "", word);
-}
-
-/** The width the rail needs to show a phase name whole, over its widest step. */
-export function phaseWidth(phase: string): number {
-  return pillWidth(ROUND_WORDS, phase, "");
-}
-
-/** The rail's floor: the widest it can be, by its own words and ticks (a step name, a phase, the seven ticks). */
-export const RAIL_FLOOR = Math.max(...[...Object.values(STEP_WORDS), ...EXTRA_STEPS].map(stepWidth), ...PILL_PHASES.map(phaseWidth));
+/** The rail's floor: the widest it can be, by its own words and ticks (the widest headline, the seven ticks). */
+export const RAIL_FLOOR = Math.max(...HEADLINES.map(headlineWidth));
 
 // The rail shows the neighbor phases, inline on the phase's line, when it can hold the widest phase with both of them.
-export const RAIL_WIDE = Math.max(RAIL_FLOOR, Math.max(...PILL_PHASES.map(phaseLine)) + 2 * (PHASE_SLOT + NEIGHBOR_GAP) + RAIL_CHROME);
+export const RAIL_WIDE = Math.max(RAIL_FLOOR, Math.max(...HEADLINES.map(phaseLine)) + 2 * (PHASE_SLOT + NEIGHBOR_GAP) + RAIL_CHROME);
 
 export type BarZones = {
   left: number;

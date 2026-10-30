@@ -71,6 +71,12 @@ export function deckCountLine(deck: Pick<DeckContent, "heroes" | "cards">): stri
   return `${plural(deck.heroes.length, "hero", "heroes")} · ${cards}`;
 }
 
+/** "48 of 50 cards" while the deck is short of its minimum, else null: a cover or row shows the count only then. */
+export function deckShortLine(deck: Pick<DeckContent, "cards">): string | null {
+  const total = deckCardCount(deck.cards);
+  return total < DECK_MINIMUM ? `${total} of ${DECK_MINIMUM} cards` : null;
+}
+
 /** "2 heroes and 4 cards": what a deck holds, for a sentence. */
 export function deckContentsPhrase(deck: Pick<DeckContent, "heroes" | "cards">): string {
   return `${plural(deck.heroes.length, "hero", "heroes")} and ${plural(deckCardCount(deck.cards), "card", "cards")}`;
@@ -171,7 +177,7 @@ export function notAppliedCards(deck: Pick<DeckContent, "heroes" | "cards">, ina
 
 /**
  * "6 cards with text not applied": the copies in the deck (heroes included) with a printed line the app does not apply, for
- * the deck list, the editor and the briefing (docs/plans/inactive-text.md). Null when the app applies every card. It is
+ * the deck list, the editor and the briefing (docs/plans/done/inactive-text.md). Null when the app applies every card. It is
  * not a readiness rule: such a deck stays ready to play.
  */
 export function notAppliedLine(deck: Pick<DeckContent, "heroes" | "cards">, inactive: ReadonlySet<string>): string | null {

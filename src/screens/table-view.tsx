@@ -3,46 +3,53 @@
 // intent in user.db, and this view hands the canvas the pictures in the image cache and lays the pieces out. The reducer is
 // the only writer of the game; how a tap becomes an intent is src/play/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
 import { backStep, playLayers, runBackStep } from "../play/back-steps";
+import { createBeats } from "../play/beat-store";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import { standInText } from "../play/dungeon-preview";
 import type { LogNames } from "../play/log";
 import { prefetchCodes, resolutionCodes } from "../play/prefetch";
 import { dockPills } from "../play/dock-extras";
+import { ChoiceTray } from "../play/choice-tray";
+import { isDense } from "../play/dock-budget";
 import { MorePopoverView, useMorePopover } from "../play/dock-more";
 import { railFor } from "../play/rail";
-import { shownSeat, threatSelector } from "../play/selectors";
+import { shownSeat, threatSelector, tickKeySelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
-import type { ReduceContext, TableStore } from "../play/store";
+import { effectById, type ReduceContext, type TableStore } from "../play/store";
 import { createHandoff } from "../play/spotlight-handoff";
 import { SpotlightLayer } from "../play/spotlight-layer";
+import type { SpotlightLayerProps } from "../play/spotlight-handoff";
 import type { StageArea } from "../play/spotlight-stage";
 import { TableCanvas } from "../play/table-canvas";
-import type { PictureSource, SlotInfo } from "../play/table-canvas-types";
+import type { PictureSource, TableCanvasProps } from "../play/table-canvas-types";
 import { MomentBanner } from "../play/moment-banner";
 import { TableDock } from "../play/table-dock";
 import { TableLayers } from "../play/table-layers";
 import { openReading, type Reading } from "../play/reading";
-import { phaseCarousel } from "../play/carousel";
+import { phaseCarousel, stopAheadOf } from "../play/carousel";
 import { tableSettings } from "../play/table-settings";
 import { useKeepAwake } from "../play/use-keep-awake";
 import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
-import { threatRows } from "../play/foresight";
 import { previewCards } from "../play/table-preview";
 import { pictureCode, pictureKey } from "../play/picture-key";
-import { advanceButton, advanceWords, isOpening } from "../play/quest-advance";
+import { advanceButton, advanceWords } from "../play/quest-advance";
 import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
 import { PEEK_ROOM } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { useTableChoice } from "../play/use-table-choice";
+import { trayCount } from "../play/tray-logic";
+import { withAlphaHex } from "../play/tokens";
+import { useTableTokens } from "../play/use-table-tokens";
+import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
@@ -54,7 +61,7 @@ import { BAR_TOP } from "../play/top-bar-layout";
 import { goBack } from "./go-back";
 import { enqueueImageDownloads } from "./images/queue";
 import { scanAssets } from "./images/scan-map";
-import { cachedImage, useImageSnapshot } from "./images/store";
+import { cachedImage, useImageRevision, useImageSnapshot } from "./images/store";
 import type { World } from "../campaign/world";
 import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
@@ -67,6 +74,28 @@ function picture(key: string): PictureSource | null {
   const cached = cachedImage(pictureCode(key));
   return cached ? { uri: cached.uri } : null;
 }
+
+// The lookups made since the image cache last changed (`revision`, images/store.ts). A card shown large (the preview, the advanced stage) is
+// described during the render and its description is kept while its inputs are the same, so the picture it shows has to be an input: this
+// reads `picture` for a revision and is read again only when the revision moves, which re-describes the card when its file lands.
+let looked: { revision: number; sources: Map<string, PictureSource | null> } = { revision: -1, sources: new Map() };
+function pictureAt(key: string, revision: number): PictureSource | null {
+  if (looked.revision !== revision) looked = { revision, sources: new Map() };
+  if (!looked.sources.has(key)) looked.sources.set(key, picture(key));
+  return looked.sources.get(key) ?? null;
+}
+
+// The canvas and the spotlight's layer read the image cache's revision themselves, so a picture that lands draws them and not the view above
+// (the table view, its hooks and its panels).
+const PicturedCanvas = memo(function PicturedCanvas(props: Omit<TableCanvasProps, "pictureRevision">) {
+  const { revision } = useImageSnapshot();
+  return <TableCanvas {...props} pictureRevision={revision} />;
+});
+
+const PicturedSpotlight = memo(function PicturedSpotlight(props: Omit<SpotlightLayerProps, "pictureRevision">) {
+  const { revision } = useImageSnapshot();
+  return <SpotlightLayer {...props} pictureRevision={revision} />;
+});
 
 /** Where the table's chrome leads: back to the screen the game belongs to, the outcome screen, and the booklet. */
 export type TableNav = {
@@ -85,17 +114,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();
   const s = useUiScale();
+  const t = useTableTokens();
   // The canvas wrapper's size, and its left edge in the row (the quest scale's width, when it shows).
   const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
   // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight-handoff.ts).
   const [handoff] = useState(createHandoff);
-  const images = useImageSnapshot();
+  // The pieces that draw pictures read the image cache's revision themselves (PicturedCanvas), so this view does not render for a file landing.
   const game = useStore(store, (state) => state.game);
   const refusal = useStore(store, (state) => state.refusal);
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
-  const selected = useStore(store, (state) => state.selected);
   const peek = usePeek(store);
+  // The banner's beat rings cards on the canvas, which reads it from here (beat-store.ts).
+  const [beats] = useState(createBeats);
   const ctx = session.ctx;
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -104,20 +135,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The one reading layer over the table (reading.ts): a dial's threat panel, the phase carousel (the rail), the table settings,
   // the log (the menu's rows), a discard pile's list. Opening one replaces the last.
   const [reading, setReading] = useState<Reading | null>(null);
-  // The screen y of the top of the dock's buttons block, which the choice tray stays above.
+  // The screen y of the top of the dock's content: the tap layer that folds the choice's rows covers the column above it.
   const [anchor, setAnchor] = useState<number | null>(null);
-  const settings = useStore(tableSettings, (state) => state.settings);
+  // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
+  const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
+  const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
+  const stops = useStore(tableSettings, (state) => state.settings.stops);
   useKeepAwake();
-  const look = useMemo(() => ({ contrast: settings.highContrast }), [settings.highContrast]);
+  const look = useMemo(() => ({ contrast: highContrast }), [highContrast]);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
 
   // Prefetch the hand, the cards on the table and the screen about to open; never the whole cache. The canvas draws names
   // until a file lands. The codes are joined into one string so the effect runs when the set changes, not on every intent.
-  const wanted = useMemo(() => {
-    const next = [...resolutionCodes(game), ...(selected ? [game.cards[selected]?.code ?? ""] : [])];
-    return prefetchCodes(game, peek.shown, next).join(",");
-  }, [game, peek.shown, selected]);
+  const wanted = useMemo(() => prefetchCodes(game, peek.shown, resolutionCodes(game)).join(","), [game, peek.shown]);
   useEffect(() => {
     const jobs = wanted.split(",").flatMap((code) => {
       const imagesrc = session.facts.get(code)?.imagesrc;
@@ -125,6 +156,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     });
     if (jobs.length > 0) enqueueImageDownloads(jobs);
   }, [session, wanted]);
+  // A card picked up (a drag begins, the canvas selects it) is fetched at once if its picture is missing. The pickup is the store's `selected`,
+  // read here from a listener instead of a subscription, so picking a card up does not render this view or the hooks and panels under it.
+  useEffect(
+    () =>
+      store.subscribe((state, before) => {
+        const id = state.selected;
+        if (id == null || id === before.selected) return;
+        const code = state.game.cards[id]?.code;
+        const imagesrc = code ? session.facts.get(code)?.imagesrc : undefined;
+        if (code && imagesrc) enqueueImageDownloads([{ code, imagesrc, first: true }]);
+      }),
+    [store, session],
+  );
 
   const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
@@ -135,15 +179,15 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
   const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
-  // Read from the latest state: the canvas draws again when the cards, the effects in play or the attack change.
-  const info = useCallback((cardId: string): SlotInfo => {
-    const { game: now, viewedSeat } = store.getState();
-    return slotNumbers(now, ctx, cardId, shownSeat(now, viewedSeat));
-  }, [store, ctx]);
+  // Read from the state the canvas holds and the seat it draws, never from the store in a render.
+  const info = useCallback<TableCanvasProps["info"]>((now, seat, cardId) => slotNumbers(now, ctx, cardId, seat), [ctx]);
   const rail = useMemo(() => railFor(game), [game]);
-  const carousel = useMemo(() => phaseCarousel(game, { stopsOn: settings.stopsOn, stops: settings.stops }, ruleTitle), [game, settings.stopsOn, settings.stops]);
+  // The strip is laid out only while it is open; the rail's S (a stop of the player's lies ahead) is read without laying it out.
+  const carouselOpen = reading?.kind === "carousel";
+  const carousel = useMemo(() => (carouselOpen ? phaseCarousel(game, { stopsOn, stops }, ruleTitle) : null), [carouselOpen, game, stopsOn, stops]);
+  const stopAhead = useMemo(() => stopAheadOf(game, { stopsOn, stops }), [game, stopsOn, stops]);
   const logNames: LogNames = useMemo(
-    () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => ctx.effects.find((effect) => effect.id === effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
+    () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => effectById(ctx, effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
     [names, nameOf, ctx],
   );
 
@@ -189,7 +233,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
   // The stage the quest just advanced to, shown large until Progress (src/play/quest-advance.ts); the table answers nothing meanwhile.
   const advance = useQuestAdvance(store);
-  const choice = useTableChoice({ store, ctx, names, onPreview, onPile, onOutcome, hold: advance.held });
+  const choice = useTableChoice({ store, ctx, names, beats, onPreview, onPile, onOutcome, hold: advance.held });
+  // A card shown large reads its picture from the cache, so it is described again when a file lands (pictureAt) while it is up.
+  const revision = useImageRevision(preview != null || advance.shown != null);
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
@@ -231,18 +277,18 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   };
 
   // The staging enemies' engagement costs, marked on each dial's meter (the same for every seat; each dial reads its own).
-  const tickKey = useStore(store, (state) =>
-    threatRows(state.game, ctx)
-      .filter((row) => !row.blocked)
-      .map((row) => row.cost)
-      .join(","),
-  );
+  const tickOf = useMemo(() => tickKeySelector(ctx), [ctx]);
+  const tickKey = useStore(store, (state) => tickOf(state.game));
   const ticks = useMemo(() => (tickKey === "" ? [] : tickKey.split(",").map(Number)), [tickKey]);
-  const widgets = widgetReadouts(game);
-  const tokens = campaignTokens(game, ctx.effects, nameOf);
+  // What the dials and bar read of the game, derived once for each state; the campaign card's tokens are rebuilt only when its name or count changes.
+  const widgets = useMemo(() => widgetReadouts(game), [game]);
+  const campaign = useMemo(() => campaignTokens(game, ctx.effects, nameOf), [game, ctx, nameOf]);
+  const tokenName = campaign?.name ?? null;
+  const tokenCount = campaign?.tokens ?? null;
+  const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
+  const held = useMemo(() => heldDial(game, nameOf), [game, nameOf]);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
-  const nightmareId = nightmareCardId(game);
-  const held = heldDial(game, nameOf);
+  const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
   // the quest scale) and the safe insets (spotlight-stage.ts).
@@ -258,7 +304,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
     name: nameOf(code),
-    source: picture(key),
+    source: pictureAt(key, revision),
     landscape: session.world.cards.get(code)?.type === "quest",
     // A revealed quest stage reads its B side.
     text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
@@ -306,8 +352,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           tokens={tokens}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           rail={rail}
-          stopAhead={carousel.stopAhead}
-          carouselOpen={reading?.kind === "carousel"}
+          stopAhead={stopAhead}
+          carouselOpen={carouselOpen}
           narrow={narrow}
           ticks={ticks}
           ringSeat={held?.seat}
@@ -328,17 +374,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           ) : null}
           <View className="min-h-0 flex-1" onLayout={onLayout}>
             {size ? (
-              <TableCanvas
+              <PicturedCanvas
                 store={store}
                 width={size.width}
                 height={size.height}
                 picture={picture}
-                pictureRevision={images.revision}
                 nameOf={nameOf}
                 sphereOf={sphereOf}
                 inactive={inactive}
                 info={info}
                 highlight={choice.highlight}
+                beats={beats}
                 raised={choice.raised}
                 fight={choice.fight}
                 bottomInset={insets.bottom}
@@ -351,14 +397,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               />
             ) : null}
           </View>
-          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s) }}>
+          {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
+          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s), backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
             <TableDock
               step={choice.header.step}
+              lead={choice.header.lead}
               title={choice.header.title}
               note={choice.header.note}
               picked={choice.picked}
               unavailable={choice.unavailable}
-              readout={choice.readout}
+              // The quest scale shows the willpower against the threat in the Quest phase, so the dock keeps only the readout's result line.
+              readout={dockReadout(choice.readout, scale.live)}
               refusal={refusal}
               dock={choice.dock}
               onButton={choice.onButton}
@@ -366,8 +415,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               more={pills.more}
               onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey}
-              guide={choice.guide} trayOpen={choice.panelOpen}
-              onBlock={setAnchor}
+              guide={choice.guide}
+              trayOpen={choice.panelOpen}
+              count={trayCount(choice.sheet, choice.choice)}
+              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
+              onTop={setAnchor}
             />
           </View>
         </View>
@@ -377,11 +429,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         ctx={ctx}
         names={names}
         nameOf={nameOf}
-        picture={picture}
         choice={choice}
         reading={reading}
         onReading={setReading}
-        settings={settings}
         carousel={carousel}
         logNames={logNames}
         screen={screen}
@@ -398,7 +448,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       />
       {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
           (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
-      <SpotlightLayer handoff={handoff} picture={picture} pictureRevision={images.revision} nameOf={nameOf} sphereOf={sphereOf} />
+      <PicturedSpotlight handoff={handoff} picture={picture} nameOf={nameOf} sphereOf={sphereOf} />
       {/* Over the top bar, the table and any open panel, centered on the screen at its top edge (user request, 2026-10-29), and
           narrowed so it never covers the command column's tray (banner-span.ts). While the table peeks it hangs under the peek pill, so
           Back to Player 1 stays in reach. */}
@@ -428,7 +478,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         <QuestAdvanceView
           key={advance.shown.seq}
           card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey(advancedCard)) }}
-          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine, isOpening(advance.shown))}
+          words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine)}
           button={advanceButton(game, ctx, advance.shown, ledgerLine)}
           asks={advance.asks}
           choice={choice}
@@ -438,7 +488,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
       <TableMenu open={menuOpen} nav={nav} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
-      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
+      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
 }

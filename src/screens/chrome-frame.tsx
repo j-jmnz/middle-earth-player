@@ -128,7 +128,6 @@ export function NavBar({
   title,
   subtitle,
   right,
-  overlay = false,
 }: {
   onBack: () => void;
   backTestID: string;
@@ -136,14 +135,12 @@ export function NavBar({
   title?: string;
   subtitle?: string;
   right?: ReactNode;
-  // Over a picture: the buttons take a night disc.
-  overlay?: boolean;
 }) {
   const s = useUiScale();
   return (
     // box-none: floating over a scrolling page, the bar takes only its buttons' touches, so the rows under its empty middle stay live.
     <View pointerEvents="box-none" className="min-h-14 flex-row items-center justify-between gap-3 py-1">
-      <IconButton chevron overlay={overlay} testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
+      <IconButton chevron testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
       {title ? (
         <View className="flex-1 items-center">
           <Text accessibilityRole="header" numberOfLines={1} className="font-display text-title text-bone">
@@ -208,7 +205,7 @@ export function ListRow({
     >
       {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
       {({ pressed }) => (
-        <View className="min-h-14 flex-row items-center overflow-hidden rounded-tile py-2" style={{ paddingLeft: 14 * s, paddingRight: 10 * s, ...(selected ? selectedWash(t) : rowSurface(pressed, t)) }}>
+        <View className="min-h-14 flex-row items-center overflow-hidden rounded-item py-2" style={{ paddingLeft: 14 * s, paddingRight: 10 * s, ...(selected ? selectedWash(t) : rowSurface(pressed, t)) }}>
           {selected ? <View pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3 * s, backgroundColor: palette.accentHigh }} /> : null}
           {leading ? <View className="mr-3">{leading}</View> : null}
           <View className="flex-1">
@@ -253,7 +250,7 @@ export function Panel({
   const look = panelSurface(pressed, t);
   return (
     <View
-      className={`rounded-card ${padded ? "p-4" : "overflow-hidden"}${className ? ` ${className}` : ""}`}
+      className={`rounded-container ${padded ? "p-4" : "overflow-hidden"}${className ? ` ${className}` : ""}`}
       style={unfilled ? { backgroundColor: withAlphaHex(t.raised, 0.35) } : look}
     >
       {children}
@@ -287,7 +284,7 @@ export function StatTile({
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 items-center rounded-tile px-2 py-2.5" style={tileSurface(false, t)}>
+    <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 items-center rounded-item px-2 py-2.5" style={tileSurface(false, t)}>
       <Text className="font-bold uppercase text-faint" style={{ fontSize: 10 * s, lineHeight: 13 * s, letterSpacing: 1.4 * s }} numberOfLines={1}>
         {label}
       </Text>
@@ -338,15 +335,15 @@ export function ActionBar({ children, safe = true, testID, align = "auto" }: { c
 }
 
 /** Parchment sheet over the rail or a list, on the table sheets' frame. Repeats the step in an eyebrow. */
-export function PaperSheet({ step, title, children }: { step: string; title: string; children: ReactNode }) {
+export function PaperSheet({ step, title, children }: { step?: string; title: string; children: ReactNode }) {
   // A sheet floating centred (SheetModal outside compact) is not pulled down from its top edge, so it has no grabber.
   const floating = useContext(SheetCornersContext) === "all";
   return (
     <SheetFrame animated={false}>
-      {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-pill bg-inkLine" />}
+      {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-control bg-inkLine" />}
       <View className="items-center">
-        <Eyebrow tone="inkLabel">{step}</Eyebrow>
-        <Text className="mt-1 text-center font-display text-title text-ink">{title}</Text>
+        {step ? <Eyebrow tone="inkLabel">{step}</Eyebrow> : null}
+        <Text className={`${step ? "mt-1 " : ""}text-center font-display text-title text-ink`}>{title}</Text>
       </View>
       <View className="mt-5">{children}</View>
     </SheetFrame>
@@ -379,7 +376,7 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
           alignItems: "center",
           justifyContent: "center",
           backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(tone, 0.12)} 0%, ${withAlphaHex(tone, 0.02)} 70%, ${withAlphaHex(tone, 0)} 100%)`,
-          boxShadow: `inset 0 0 0 1.5px ${withAlphaHex(tone, 0.55)}, 0 0 40px ${withAlphaHex(tone, 0.3)}, inset 0 0 30px ${withAlphaHex(tone, 0.2)}`,
+          boxShadow: `0 0 40px ${withAlphaHex(tone, 0.3)}, inset 0 0 30px ${withAlphaHex(tone, 0.2)}`,
         }}
       >
         <View style={{ opacity: 0.12 }}>

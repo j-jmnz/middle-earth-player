@@ -22,6 +22,7 @@ import {
   withDownloadRetry,
   type DownloadPauseEntry,
   type ImageDownloadRequest,
+  type ImageMedia,
   type ImageQueueStatus,
   type ImageRecord,
 } from "./policy";
@@ -303,11 +304,28 @@ async function runResume(entry: DownloadPauseEntry): Promise<void> {
   });
 }
 
+// The first bytes hold the format and the dimensions of a PNG, and a JPEG's frame header follows its metadata segments. A picture is
+// 100 KB or more, so reading the head instead of the whole file saves a copy of it into JS memory for every download. A JPEG whose
+// frame header lies past the head (a large color profile) is read whole, so nothing that was accepted before is refused now.
+const HEADER_BYTES = 64 * 1024;
+
+async function sniffFile(file: File): Promise<ImageMedia | null> {
+  const handle = file.open();
+  let head: Uint8Array;
+  try {
+    head = await handle.readBytes(HEADER_BYTES);
+  } finally {
+    handle.close();
+  }
+  const media = sniffImage(head);
+  if (media || file.size <= head.length) return media;
+  return sniffImage(await file.bytes());
+}
+
 async function finishDownload(code: string, file: File): Promise<void> {
   const images = imageDirectory;
   if (!images) return;
-  const bytes = await file.bytes();
-  const media = sniffImage(bytes);
+  const media = await sniffFile(file);
   if (!media) {
     if (file.exists) file.delete();
     forgetPauseEntry(code);
@@ -322,7 +340,7 @@ async function finishDownload(code: string, file: File): Promise<void> {
     path: finalFile.uri,
     width: media.width,
     height: media.height,
-    byteSize: bytes.length,
+    byteSize: file.size,
     mediaType: media.mediaType,
     sha256,
   };

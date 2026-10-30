@@ -4,7 +4,7 @@ Depends on: phase 23
 Blocks: nothing
 Can run beside: phases 14, 15, 16, 24 and 26
 
-Plan: `docs/plans/board-ux.md` (user list item 8). User decision, 2026-10-26: this is the hand. The player deck stays hidden (`docs/brief.md`). Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list item 8). User decision, 2026-10-26: this is the hand. The player deck stays hidden (`docs/brief.md`). Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -62,65 +62,10 @@ None. The gesture is phone-only. The simulator does not close a drag exit (`.cur
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
-- `docs/design-system.md` (Table, Gestures) is rewritten.
+- `docs/design-system-table.md` (Gestures) is rewritten.
 - STATUS.md lists the phone checks as open:
   - hold, slide and release on 3, 6 and 9 cards;
   - a fast drag still plays a card;
   - a tap still picks;
   - the ticks on each card change;
   - the scrub in planning with glowing cards.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior. Put the gesture wiring in `src/play/hand-gestures.native.ts`, and keep the canvas file under 300 lines.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- Gesture Handler 3: compose a `LongPress` (minDuration 250, maxDist 8) followed by a `Pan`. Use `Gesture.Exclusive` with the drag pan, or a pan with `activateAfterLongPress(250)` for the scrub and a separate pan for the drag. Keep the drag-to-play path exactly as it behaves now for a fast move.
-- The finger position is read on the UI thread. Only the index change crosses to JS (for the haptic). The canvas draws from shared values.
-- The 350 ms long press on table cards (not the hand) is unchanged.
-
-## Handover from phase 23
-
-Phase 23 is merged. What phase 25 builds on:
-
-- Every duration, curve and spring is a token in `src/play/motion-tokens.ts` (`MOTION`; distances and scales in `SHAPE`). Add the scrub's tokens there: `scrubRise` and `scrubSpread` (220 ms each, ease-out cubic is the house curve for an entrance, `tween(220, "outCubic")`), the 35% dim if it fades, and the 1.5 scale and the 250 ms hold as shapes and gates. The 250 ms long-press `minDuration` and the 8 pt `maxDist` are gesture thresholds, not motion: they stay out of `motionScale` (as the top bar's 400 ms fallback and the dock's `ARM_MS` do). Every token stays at or under 500 ms (`motion-tokens.test.ts`).
-- Every duration passes through `motionScale(speed, reduced)` (1 Normal, 0.6 Quick, 0 under reduced motion), read once with `useMotionScale()` (`motion-run.ts`); hand Reanimated `timing(token, scale)` or `springConfig(token, scale)`. Under reduced motion (scale 0) the rise and spread snap.
-- The hurry tap: a touch on the canvas calls `finishMotions(progress, clear)` in the canvas pan's `onBegin`, which sets the running card clock to 1 and drops the pending `tickLand`; the touch is then handled as usual. A scrub starts on a press held still, so it begins with a hurry: the hand is at rest under the finger by the time the scrub's 250 ms hold elapses. Keep `finishMotions` in `onBegin` when you compose the long press and the pan, and keep it from delaying or swallowing the drag-to-play path.
-- Haptics live in `src/play/haptics.ts`: `tickLand()` (a played card landing, at most one per new state) is beside `tickArmed`. A card played from a scrub's drag lands with `tickLand` as any play does; do not add a second tick for it.
-- `tokenDeltas(prev, next)` (`token-deltas.ts`) drives the token pops and floating numbers; the scrub sends no intent, so it changes no count and pops nothing.
-- A card drawn into the hand arrives on an arc with a flip, staggered 90 ms (`stagger`, `SHAPE.maxStagger`); the scrub's flattened fan reads the same slots from `layout.ts`, so a scrub that starts mid-draw sees the cards at rest after the hurry.
-
-## Handover from phase 24
-
-Phase 24 is merged. Where the scrub meets the combat spotlight:
-
-- The skip tap rides the hurry. While a spotlight plays, the canvas pan's `onBegin` calls `finishMotions(progress, clear)` (whose `clear` ends the spotlight) and then sets the `swallow` shared value from `live` (`spot.playing`, from `useSpotlight`). `tap.onEnd`, `hold.onStart` and `pan.onStart` return early while `swallow` is set, so the skipping touch does nothing else; the next touch without a spotlight clears it. When you compose the scrub's `LongPress` and pan, keep `finishMotions` and the `swallow` copy in the first `onBegin`, and make the scrub's start return early on `swallow` too: a press that skips a spotlight must not start a scrub.
-- `tickImpact()` (`src/play/haptics.ts`, a medium impact at a strike's hit stop, at most one per strike) sits beside `tickLand` and `tickArmed`. A scrub cannot run during a spotlight, so its selection ticks never overlap it.
-- The spotlight's RN scrim (`spotlight-scrim.tsx`, mounted from `table-layers.tsx`) covers the top bar and the dock column, not the canvas or the hand. The scrub's 35% night is its own layer; it never runs under the spotlight's 65% night.

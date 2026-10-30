@@ -3,9 +3,11 @@
 // filtering in halving steps so a 1200 px scan becomes a small card without aliasing; the full decode is released at once. A copy
 // is decoded again only when it is too small for where its card now is, or far larger than it needs. An image whose card leaves the
 // table is released too (docs/architecture.md, Images). Nothing here downloads: a missing file stays missing and the canvas draws
-// the name.
+// the name. The decodes run one at a time, as many in a frame as fit in about FRAME_BUDGET ms (one at least), and the canvas is told of
+// the finished ones once a frame, so a draw of several cards does not stall the frames after it, a table of twenty cards fills in a few
+// frames, and the canvas does not record its scene once for each picture.
 import { FilterMode, MipmapMode, Skia, type SkImage } from "@shopify/react-native-skia";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { Image as RNImage, PixelRatio } from "react-native";
 
 import type { PictureSource } from "./table-canvas-types.ts";
@@ -57,73 +59,185 @@ async function decode(source: PictureSource, box: Box): Promise<SkImage | null> 
 
 const keyOf = (boxes: ReadonlyMap<string, Box>) => [...boxes].map(([code, box]) => `${code}:${Math.round(box.w)}x${Math.round(box.h)}`).join(",");
 
+// How long a frame may spend decoding before the rest wait for the next frame (ms): the work that blocks the JS thread is the
+// decode and the downscale, and a 60 Hz frame is 16 ms.
+const FRAME_BUDGET = 6;
+
+// The copies a closed or new table holds: one object, so a state set to it again is no change.
+const NONE: ReadonlyMap<string, SkImage> = new Map();
+
+// A picture waiting for its turn to decode.
+type Job = { source: PictureSource; box: Box };
+
 /**
- * The images for the codes on the table, each decoded to cover its box (points). `revision` changes when the image cache gains a
- * file, so a code that had no picture is tried again. Codes that leave the map are released; a code whose box outgrows its copy
- * (or shrinks far under it) is decoded again, and its old copy drawn until the new one is ready.
+ * The decoded copies of the table's pictures, and the queue that makes them. Plain state outside React: the hook below owns one, tells
+ * it what the table wants, and hands the canvas the copies it announces.
+ *
+ * The decodes run one at a time, and the next starts at once while the frame has used under FRAME_BUDGET ms (one decode at least),
+ * else a frame later, so a draw of several cards does not stall the frames after it.
+ * A code with no copy yet goes before one that has a copy and wants a new size (the first is drawn as its name, the second already shows
+ * a picture); within each the order is the table's own (the map's: the quest, staging, the engaged enemies, the play area, the piles,
+ * then the hand, and cards that are leaving last). Finished copies are announced once a frame, however many finished in it.
  */
-export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null, revision: number): ReadonlyMap<string, SkImage> {
-  const held = useRef(new Map<string, { image: SkImage; box: Box }>());
-  const loading = useRef(new Map<string, Box>());
-  const wantedNow = useRef<ReadonlyMap<string, Box>>(new Map());
-  const [images, setImages] = useState<ReadonlyMap<string, SkImage>>(() => new Map());
+class Pictures {
+  private held = new Map<string, { image: SkImage; box: Box }>();
+  private loading = new Map<string, Box>();
+  private queue = new Map<string, Job>();
+  private wanted: ReadonlyMap<string, Box> = new Map();
+  private busy = false;
   // Copies replaced or released, disposed only once the map without them is drawn: until then the canvas may still draw them.
-  const retired = useRef<SkImage[]>([]);
-  const key = keyOf(boxes);
+  private retired: SkImage[] = [];
+  // The frames waiting: one to announce what has finished, one to start the next decode.
+  private announcing: number | null = null;
+  private pumping: number | null = null;
 
-  useEffect(() => {
-    const done = retired.current;
-    retired.current = [];
-    for (const image of done) image.dispose();
-  }, [images]);
+  private readonly announce: (images: ReadonlyMap<string, SkImage>) => void;
 
-  useEffect(() => {
-    wantedNow.current = boxes;
-    const publish = () => setImages(new Map([...held.current].map(([code, copy]) => [code, copy.image])));
+  constructor(announce: (images: ReadonlyMap<string, SkImage>) => void) {
+    this.announce = announce;
+  }
+
+  /** Decodes what the table wants now, and releases what it no longer shows. */
+  want(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null): void {
+    this.wanted = boxes;
     let changed = false;
-    for (const [code, copy] of held.current) {
+    for (const [code, copy] of this.held) {
       if (boxes.has(code)) continue;
-      retired.current.push(copy.image);
-      held.current.delete(code);
+      this.retired.push(copy.image);
+      this.held.delete(code);
       changed = true;
     }
-    if (changed) publish();
+    for (const code of this.queue.keys()) {
+      if (boxes.has(code)) continue;
+      this.queue.delete(code);
+      this.loading.delete(code);
+    }
+    if (changed) this.announceSoon();
     for (const [code, box] of boxes) {
-      if (!redecode(held.current.get(code)?.box, box)) continue;
-      const pending = loading.current.get(code);
+      if (!redecode(this.held.get(code)?.box, box)) continue;
+      const pending = this.loading.get(code);
       if (pending && !redecode(pending, box)) continue;
       const source = picture(code);
       if (!source) continue;
-      loading.current.set(code, box);
-      void decode(source, box).then((image) => {
-        if (loading.current.get(code) === box) loading.current.delete(code);
-        if (!image) return;
-        const wanted = wantedNow.current.get(code);
-        // Released when its card left the table, or when a later decode for a larger box is on its way.
-        if (!wanted || redecode(box, wanted) || (loading.current.has(code) && loading.current.get(code) !== box)) {
-          image.dispose();
-          return;
-        }
-        const old = held.current.get(code)?.image;
-        if (old) retired.current.push(old);
-        held.current.set(code, { image, box });
-        publish();
-      });
+      this.loading.set(code, box);
+      this.queue.set(code, { source, box });
     }
-    // `boxes` is read through `key`; `picture` is read again when the cache revision moves.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, revision]);
+    this.pump();
+  }
+
+  /** Disposes the copies the canvas has stopped drawing: called once the map without them is committed. */
+  disposeRetired(): void {
+    const done = this.retired;
+    this.retired = [];
+    for (const image of done) image.dispose();
+  }
+
+  /**
+   * Stops the frames, drops the queue and releases every copy; a decode still running is released when it ends. It announces the
+   * empty map before it disposes, so a state set from the announcements never holds a disposed copy (a screen hidden by Activity runs
+   * this cleanup, and shown again it draws only what it decodes again).
+   */
+  close(): void {
+    this.wanted = new Map();
+    this.queue.clear();
+    this.loading.clear();
+    if (this.announcing != null) cancelAnimationFrame(this.announcing);
+    if (this.pumping != null) cancelAnimationFrame(this.pumping);
+    this.announcing = null;
+    this.pumping = null;
+    this.announce(NONE);
+    for (const copy of this.held.values()) copy.image.dispose();
+    this.held.clear();
+    this.disposeRetired();
+  }
+
+  private announceSoon(): void {
+    if (this.announcing != null) return;
+    this.announcing = requestAnimationFrame(() => {
+      this.announcing = null;
+      this.announce(new Map([...this.held].map(([code, copy]) => [code, copy.image])));
+    });
+  }
+
+  // The next job: a code with no copy first, else the first queued.
+  private next(): [string, Job] | null {
+    let first: [string, Job] | null = null;
+    for (const entry of this.queue) {
+      if (!this.held.has(entry[0])) return entry;
+      first ??= entry;
+    }
+    return first;
+  }
+
+  // Decodes the next job, then the one after it while the frame (begun at `began`, ms) has budget left, else a frame later.
+  private pump(began: number = performance.now()): void {
+    if (this.busy) return;
+    const next = this.next();
+    if (!next) return;
+    const [code, job] = next;
+    this.queue.delete(code);
+    // The box the code wants now, not the one it was queued for; a code that left the table is not decoded.
+    const wanted = this.wanted.get(code);
+    if (!wanted) {
+      this.loading.delete(code);
+      this.pump(began);
+      return;
+    }
+    const box = redecode(job.box, wanted) ? wanted : job.box;
+    this.busy = true;
+    void decode(job.source, box).then((image) => {
+      this.busy = false;
+      if (this.loading.get(code) === job.box) this.loading.delete(code);
+      this.keep(code, box, image);
+      if (performance.now() - began < FRAME_BUDGET) {
+        this.pump(began);
+        return;
+      }
+      this.pumping = requestAnimationFrame(() => {
+        this.pumping = null;
+        this.pump();
+      });
+    });
+  }
+
+  // A decoded copy: kept for its code, or released when its card left the table or a later decode for a larger box is on its way.
+  private keep(code: string, box: Box, image: SkImage | null): void {
+    if (!image) return;
+    const wanted = this.wanted.get(code);
+    if (!wanted || redecode(box, wanted) || this.loading.has(code) || this.queue.has(code)) {
+      image.dispose();
+      return;
+    }
+    const old = this.held.get(code)?.image;
+    if (old) this.retired.push(old);
+    this.held.set(code, { image, box });
+    this.announceSoon();
+  }
+}
+
+/**
+ * The images for the codes on the table, each decoded to cover its box (points). `revision` changes when the image cache gains a
+ * file, so a code that had no picture is tried again. Codes that leave the map are released; a code whose box outgrows its copy
+ * (or shrinks far under it) is decoded again, and its old copy drawn until the new one is ready. The decodes are queued, as many in a
+ * frame as fit its budget, and the canvas gets the finished ones once a frame (`Pictures`).
+ */
+export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null, revision: number): ReadonlyMap<string, SkImage> {
+  const [images, setImages] = useState<ReadonlyMap<string, SkImage>>(NONE);
+  const [pictures] = useState(() => new Pictures((next) => setImages(next)));
+  const key = keyOf(boxes);
 
   useEffect(() => {
-    const owned = held.current;
-    return () => {
-      wantedNow.current = new Map();
-      for (const copy of owned.values()) copy.image.dispose();
-      owned.clear();
-      for (const image of retired.current) image.dispose();
-      retired.current = [];
-    };
-  }, []);
+    pictures.disposeRetired();
+  }, [images, pictures]);
+
+  // Tells the pictures what the table wants now. It runs when the boxes' key or the cache revision changes, and reads the latest `boxes` and `picture`.
+  const decodeWanted = useEffectEvent(() => pictures.want(boxes, picture));
+  useEffect(() => {
+    decodeWanted();
+  }, [key, revision]);
+
+  // The cleanup of a screen hidden by Activity runs this too: `close` announces the empty map before it disposes the copies.
+  useEffect(() => () => pictures.close(), [pictures]);
 
   return images;
 }

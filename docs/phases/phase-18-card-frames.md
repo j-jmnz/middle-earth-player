@@ -4,7 +4,7 @@ Depends on: nothing
 Blocks: nothing
 Can run beside: phases 14, 15, 16 and 19
 
-Plan: `docs/plans/board-ux.md` (user list item 9). Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list item 9). Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -58,42 +58,5 @@ None. The canvas is phone-only.
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
-- `docs/design-system.md` (Table, Marks of the open moment) says the edge, veil and beat ring follow the card's turn.
+- `docs/design-system-table.md` (Marks of the open moment) says the edge, veil and beat ring follow the card's turn.
 - STATUS.md lists the phone check as open: a five-card fanned hand in planning, with glowing and picked cards, the end cards' frames on the picture, and no blur on the neighbors.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior. `canvas-pieces.native.tsx` is 487 lines: if you add to it, split it (marks into `card-marks.native.tsx`).
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- This is the smallest phase.
-- Do not change the fan's tilt amounts (`layout.ts:321`) or the halo's sigmas.
-- Do not move tokens into the turned group: an exhausted card's tokens stay upright (design system, Cards).
-- The dragged card is drawn untilted (`table-canvas.native.tsx:314-319`). Its gold stroke is already straight; leave it.

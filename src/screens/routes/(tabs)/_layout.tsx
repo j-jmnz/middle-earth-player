@@ -18,6 +18,8 @@ export default function TabLayout() {
   const beside = useMemo(() => ({ ...insets, left: 0 }), [insets]);
   return (
     <Tabs
+      // A tab not on screen is hidden (React Activity: its effects stop and its renders wait, its state stays). This is expo-router 58's freezeOnBlur, which it ignores.
+      activityEnabled
       tabBar={(props) => <AppTabBar {...props} />}
       // The rail takes the left safe inset, so a screen beside it must not pad for it again. Only while the rail shows: a phone keeps its tree.
       screenLayout={rail ? ({ children }: { children: ReactNode }) => <SafeAreaInsetsContext.Provider value={beside}>{children}</SafeAreaInsetsContext.Provider> : undefined}

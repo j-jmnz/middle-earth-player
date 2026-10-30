@@ -1,12 +1,14 @@
 # Claude Code
 
-The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
+The rules for every session are in `.cursor/rules/authority.mdc`. Read it. Any session or agent that changes code also reads `.cursor/rules/code-standards.mdc` and follows it; one that changes a doc, `docs/phases/STATUS.md` or an agent file follows `.cursor/rules/docs-standards.mdc` (current state only, no history logs). The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
+
+Find docs through `docs/INDEX.md`: every file an agent reads, its size, the heading tree of the long ones with line ranges, and the sections each code area cites. Read a section, not a whole file: `pnpm docs:section <file> "<heading>"` (for example `pnpm docs:section brief "Core round"`). After changing a doc's headings or a doc citation in code, run `pnpm docs:index`; a test fails while the index is stale or a citation names no heading.
 
 ## Data
 
 `data/` is committed and is the only thing tests and agents read for cards, scenarios and rules text. Sources are listed in `data/sources.json`.
 
-- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|icons]` is the only command that uses the network. It refreshes `data/raw/`, `.cache/pdf/`, `.cache/scans/` (card scans, never committed; the ledger pins each by sha256) and `.cache/pictures/` (every card's picture, which `pnpm scans:pack` scales and bundles so the app needs no network: JvZijp's enhanced proxies on Google Drive first, else FFG's campaign-card PDFs rendered by `pdftoppm`, else lotr.cardgame.tools' 600 dpi scans, else RingsDB or Hall of Beorn; shown only, never read for text). `scans` and `pictures` read `data/cards`, so a bare `data:sync` skips them: run `pnpm data:build`, then `pnpm data:sync scans pictures`. `icons` fetches the game icons into `data/raw/icons`. `rules` also packs the two booklet PDFs the app bundles into `.cache/booklets/` (`pnpm booklets:pack` does only that).
+- `pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|icons]` is the only command that uses the network. It refreshes `data/raw/` and the uncommitted caches under `.cache/`: PDFs, card scans (pinned by sha256 in the ledger) and every card's picture, which `pnpm scans:pack` bundles so the app needs no network (picture sources, in order, are in `scripts/data/sources/pictures.ts`; shown only, never read for text). `scans` and `pictures` read `data/cards`, so a bare `data:sync` skips them: run `pnpm data:build`, then `pnpm data:sync scans pictures`. `rules` also packs the two booklet PDFs into `.cache/booklets/` (`pnpm booklets:pack` does only that).
 - `data/printed/<campaign>.json` is the printed-text ledger: the lines on each card side, read from its scan. The build uses it in place of Hall of Beorn text. An effect record names the ledger lines it implements (`lines`).
 - `data/rules/index.json` is the hand-checked list of rule spans (exact `from` and `to` quotes per page column); `data/rules/columns.json` holds the per-document column boxes. `data/rules/entries.json` is built from them.
 - `data/prebuilt-decks.json` names the pre-built player decks: the Learn to Play's four core decks (`ltp.starter-decks`) and every decklist an official product prints (`decklist.*` spans, read from the product PDFs that `data:sync rules` pins). The build resolves each row through Hall of Beorn and writes `data/decks/prebuilt.json`; a printed misspelling is an alias with its reason, a wrong heading total a recorded misprint.
@@ -30,7 +32,7 @@ The rules for every session are in `.cursor/rules/authority.mdc`. Read it. The R
 
 ## Agents
 
-`implementer`, `reviewer`, and `ux` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only.
+`implementer`, `reviewer`, `ux` and `orchestrator` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only. A plan with several sections is run by `orchestrator` (`.cursor/agents/orchestrator.md`): every agent that writes code runs on Sonnet, every review agent (`reviewer`, `ux`) on Opus, and there is one review round only.
 
 ## Cloud sessions
 

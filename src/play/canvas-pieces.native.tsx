@@ -1,7 +1,7 @@
 // The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its printed back), a pile, the
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
-import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Path, RoundedRect, Text, type SamplingOptions, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
+import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Path, RoundedRect, Skia, Text, type SamplingOptions, type SkFont, type SkImage, type SkPath, vec } from "@shopify/react-native-skia";
 import type { ReactElement } from "react";
 
 import { cardCorner } from "./card-corner.ts";
@@ -42,6 +42,19 @@ function BadgeIcon({ name, x, y, size, color, images }: { name: IconName; x: num
   return <CanvasIcon name={name} x={x} y={y} size={size} color={color} />;
 }
 
+// Each vector glyph parsed into a Skia path once, on first use. The canvas records its whole scene on every render, and a path given as its
+// SVG string is parsed again each time; a parsed path is just drawn. A glyph the parser refuses stays a string (Path takes either).
+const GLYPHS = new Map<IconName, SkPath>();
+
+function glyphOf(name: IconName, d: string): SkPath | string {
+  const held = GLYPHS.get(name);
+  if (held) return held;
+  const made = Skia.Path.MakeFromSVGString(d);
+  if (!made) return d;
+  GLYPHS.set(name, made);
+  return made;
+}
+
 // A game icon on the canvas: the vector glyph from ./icons/generated.ts, drawn as a Skia path, flipped from the font's
 // y-up units into the box (x, y, size) and filled with one colour. A raster icon (quest points) is drawn by its caller.
 export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: number; y: number; size: number; color: string }) {
@@ -51,18 +64,18 @@ export function CanvasIcon({ name, x, y, size, color }: { name: IconName; x: num
   const scale = size / Math.max(vw, vh);
   return (
     <Group transform={[{ translateX: x - vx * scale }, { translateY: y - vy * scale }, { scaleX: scale }, { scaleY: -scale }]}>
-      <Path path={icon.d} color={color} />
+      <Path path={glyphOf(name, icon.d)} color={color} />
     </Group>
   );
 }
 
 // A number that stays readable on any token art or picture: a night outline under a bone fill.
-export function Outlined({ x, y, text, font, t, s, color = t.bone, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; s: number; color?: string; heavy?: boolean }) {
+export function Outlined({ x, y, text, font, t, s, color, heavy = false }: { x: number; y: number; text: string; font: SkFont; t: TableTokens; s: number; color?: string; heavy?: boolean }) {
   const width = font.getTextWidth(text);
   return (
     <Group>
       <Text x={x - width / 2} y={y} text={text} font={font} color={t.night} style="stroke" strokeWidth={(heavy ? 4.5 : 3) * s} />
-      <Text x={x - width / 2} y={y} text={text} font={font} color={color} />
+      <Text x={x - width / 2} y={y} text={text} font={font} color={color ?? t.bone} />
     </Group>
   );
 }
@@ -70,7 +83,7 @@ export function Outlined({ x, y, text, font, t, s, color = t.bone, heavy = false
 /**
  * A card with printed text the app does not apply (src/catalog/active-text.ts): a small faint mark at its right edge, upright
  * like the tokens, on a corner no token, effect pill or other mark uses: a ring struck through. Never a band over the picture
- * and never a word on the canvas; the preview lists the lines (docs/plans/inactive-text.md). Not accent, which marks the one
+ * and never a word on the canvas; the preview lists the lines (docs/plans/done/inactive-text.md). Not accent, which marks the one
  * action, and not danger, which marks a refusal.
  */
 export function NotAppliedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {

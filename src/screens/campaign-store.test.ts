@@ -8,7 +8,7 @@ import { emptyLog } from "../campaign/log";
 import { newSave } from "../campaign/save";
 import { ENGINE_VERSION } from "../campaign/replay";
 import { drop } from "../campaign/session";
-import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, readBooklet, restoreSave, readSave, readSaveChecked, writeBooklet, writeLastPage, writeSave } from "./campaign-store";
+import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, readBooklet, restoreSave, readSave, readSaveChecked, writeActive, writeBooklet, writeLastPage, writeSave } from "./campaign-store";
 import { saves } from "./user-schema";
 
 function openUser() {
@@ -30,6 +30,39 @@ describe("campaign store", () => {
     expect(readSave(user, first.id)?.seatCount).toBe(2);
     expect(readSave(user, first.id)?.log.heroesBySeat).toHaveLength(2);
     expect(listSaves(user).map((save) => save.id).sort()).toEqual([first.id, second.id].sort());
+  });
+
+  it("writeActive writes the open scenario and the time like writeSave and leaves the rest of the row", () => {
+    const user = openUser();
+    const save = {
+      ...newSave("save-w", "fellowship-of-the-ring", 1),
+      log: { ...emptyLog(1), notes: "kept" },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] },
+      loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
+    };
+    writeSave(user, save, 1000);
+    const next = { ...save, active: { ...save.active, intents: [...save.active.intents, { type: "Pass" as const }] } };
+    writeActive(user, next, 2000);
+    const whole = openUser();
+    writeSave(whole, next, 2000);
+    const row = (db: typeof user) => db.select().from(saves).where(inArray(saves.id, ["save-w"])).get();
+    expect(row(user)).toEqual(row(whole));
+    expect(readSave(user, "save-w")).toEqual(next);
+    writeActive(user, { ...next, active: null }, 3000);
+    expect(readSave(user, "save-w")?.active).toBeNull();
+    expect(row(user)?.loadout).toEqual(save.loadout);
+    expect(listSaves(user)[0]).toMatchObject({ id: "save-w", active: false });
+  });
+
+  it("a list row says whether a scenario is open without reading its intents", () => {
+    const user = openUser();
+    const save = {
+      ...newSave("save-l1", "fellowship-of-the-ring", 1),
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] },
+      loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
+    };
+    writeSave(user, save);
+    expect(listSaves(user)).toEqual([{ id: "save-l1", campaignId: save.campaignId, seatCount: 1, log: save.log, loadout: save.loadout, active: true }]);
   });
 
   it("a new playthrough stores the carry-over it took in, and an older stored log reads with the facts' defaults", () => {

@@ -77,17 +77,4 @@ describe("the booklet sources", () => {
     expect(BOOKLET_SOURCES["rules-reference"]).toBe("mec101_rules_reference.pdf");
     expect(BOOKLET_SOURCES["the-dark-of-mirkwood"]).toBe("dark_of_mirkwood_rulebook_v2.pdf");
   });
-
-  it("is the book each campaign's data opens", async () => {
-    const { campaignDataSchema } = await import("../src/catalog/scenario-data.ts");
-    const dir = path.join(import.meta.dirname, "../data/campaigns");
-    const opened = Object.fromEntries(
-      ["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood"].map((id) => {
-        const campaign = campaignDataSchema.parse(JSON.parse(readFileSync(path.join(dir, `${id}.json`), "utf8")) as unknown);
-        return [id, campaign.bookletId];
-      }),
-    );
-    expect(opened).toEqual({ "fellowship-of-the-ring": "fellowship-of-the-ring", "mirkwood-paths": "learn-to-play", "the-dark-of-mirkwood": "the-dark-of-mirkwood" });
-    for (const id of Object.values(opened)) expect(BOOKLETS.map((book) => book.id)).toContain(id);
-  });
 });

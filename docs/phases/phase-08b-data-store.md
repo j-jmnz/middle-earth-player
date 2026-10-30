@@ -1,6 +1,6 @@
 # Phase 8b: Data store
 
-Plan: [docs/plans/data-store-refactor.md](../plans/data-store-refactor.md).
+Plan: [docs/plans/done/data-store-refactor.md](../plans/done/data-store-refactor.md).
 
 ## What it changed
 

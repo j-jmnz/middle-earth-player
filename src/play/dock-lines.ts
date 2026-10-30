@@ -1,4 +1,4 @@
-// The dock's lines under the moment's title (docs/design-system.md, Table, Command column; phase 22): the first-game guide, the
+// The dock's lines under the moment's title (docs/design-system-table.md, Command column; phase 22): the first-game guide, the
 // moment's note and what the rules refuse now. One line shows; the rest wait behind the "i" pill (dock-more), which opens them in
 // place. A screen reader hears every sentence either way (`spoken`). Pure; the dock draws it.
 import type { Unavailable } from "./sheet-types.ts";

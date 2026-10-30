@@ -3,7 +3,7 @@
 Depends on: phase 8b
 Blocks: phases 8d and 9
 
-Plan: [docs/plans/authoritative-data.md](../plans/authoritative-data.md), changes A, B and E.
+Plan: [docs/plans/done/authoritative-data.md](../plans/done/authoritative-data.md), changes A, B and E.
 
 ## Goal
 

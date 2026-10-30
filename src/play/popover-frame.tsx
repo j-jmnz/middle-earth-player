@@ -1,5 +1,5 @@
-// The frame of the table's popovers (docs/design-system.md, Table, Table menu): a lit night card (tileSurface) with a deep shadow
-// and rounded-card corners, its rows inset rounded plates, that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
+// The frame of the table's popovers (docs/design-system-table.md, Table menu): a lit night card (floatingSurface, opaque) with a deep shadow
+// and container corners, its rows inset item-cornered plates (no chevron, no divider between groups), that scales in from the corner it hangs from (MOTION.menuEnter ease-out from 0.96, MOTION.menuLeave ease-in), the layer
 // that holds it, and a Pressable scrim that fills the screen under it so a tap outside closes it and does nothing else. Not a
 // Modal: a Modal takes over the orientation lock and the status bar. The table menu (table-menu.tsx) and the dock's More
 // popover (dock-more.tsx) both draw in it; Android Back closes either first (back.ts).
@@ -11,8 +11,8 @@ import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
-import { Chevron } from "./phase-rail.tsx";
-import { raisedEdgeOf, tileSurface } from "./surfaces.ts";
+import { CONTAINER_RADIUS, ITEM_RADIUS } from "./radius.ts";
+import { floatingSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -33,8 +33,8 @@ export type PopoverRowItem = {
   icon?: IconName | null;
   // A mark drawn as views when no printed icon fits: the door of Leave the table.
   glyph?: "leave";
-  // The row opens a screen or a panel: a chevron at its right says so.
-  opens?: boolean;
+  // Leave the table: the word and its mark in danger.
+  tone?: "danger";
 };
 
 /** One 48 pt row of a popover: a rounded plate inside the frame's padding that fills when pressed. */
@@ -61,16 +61,15 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
             alignItems: "center",
             gap: 10 * s,
             paddingHorizontal: 10 * s,
-            borderRadius: 10 * s,
+            borderRadius: ITEM_RADIUS * s,
             backgroundColor: pressed ? t.pressed : "transparent",
           }}
         >
           {item.icon ? <GameIcon name={item.icon} size={18 * s} tint="bone" /> : null}
-          {item.glyph === "leave" ? <LeaveMark color={t.muted} s={s} /> : null}
-          <Text className="flex-1 text-body font-medium" style={{ color: t.bone, minWidth: 0 }} numberOfLines={1}>
+          {item.glyph === "leave" ? <LeaveMark color={item.tone === "danger" ? t.danger : t.muted} s={s} /> : null}
+          <Text className="flex-1 text-body font-medium" style={{ color: item.tone === "danger" ? t.danger : t.bone, minWidth: 0 }} numberOfLines={1}>
             {item.label}
           </Text>
-          {item.opens ? <Chevron direction="next" color={t.faint} /> : null}
         </View>
       )}
     </Pressable>
@@ -88,11 +87,14 @@ function LeaveMark({ color, s }: { color: string; s: number }) {
   );
 }
 
-/** A hairline between groups of rows. */
-export function PopoverDivider() {
-  const t = useTableTokens();
-  const s = useUiScale();
-  return <View style={{ height: 1, marginVertical: 4 * s, marginHorizontal: 10 * s, backgroundColor: t.hairline }} />;
+// Moves the screen reader's focus to the first row. A module-level function: the React Compiler cannot compile a try/catch inside a component.
+function focusRow(row: RefObject<PressableRef | null>): void {
+  try {
+    const node = row.current ? findNodeHandle(row.current) : null;
+    if (node != null) AccessibilityInfo.setAccessibilityFocus(node);
+  } catch {
+    // A platform without accessibility focus has nothing to move.
+  }
 }
 
 /**
@@ -129,14 +131,7 @@ export function PopoverFrame({
   const s = useUiScale();
   useEffect(() => {
     if (!open) return;
-    const timer = setTimeout(() => {
-      try {
-        const node = first.current ? findNodeHandle(first.current) : null;
-        if (node != null) AccessibilityInfo.setAccessibilityFocus(node);
-      } catch {
-        // A platform without accessibility focus has nothing to move.
-      }
-    }, ms(MOTION.menuEnter, scale));
+    const timer = setTimeout(() => focusRow(first), ms(MOTION.menuEnter, scale));
     return () => clearTimeout(timer);
   }, [open, first, scale]);
 
@@ -159,8 +154,8 @@ export function PopoverFrame({
             ...place,
             width,
             padding: PAD * s,
-            borderRadius: 16 * s, // rounded-card
-            ...tileSurface(false, t),
+            borderRadius: CONTAINER_RADIUS * s,
+            ...floatingSurface(t),
             boxShadow: `${raisedEdgeOf(t)}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
             transformOrigin: origin,
           },

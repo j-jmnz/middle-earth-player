@@ -6,6 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
+import type { BeatStore } from "./beat-store.ts";
 import { tickRefused, tickSent } from "./haptics.ts";
 import { pointTitle } from "./rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "./stops.ts";
@@ -23,6 +24,7 @@ import { useStable } from "./use-stable.ts";
 import { fightOf, highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
 import { listsResponses, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
+import { effectById } from "../rules/listen.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
@@ -37,7 +39,7 @@ export type TableChoice = {
   sheet: Sheet;
   choice: Choice;
   dock: Dock;
-  header: { step: string; title: string; note: string | null };
+  header: { step: string; lead: string; title: string; note: string | null };
   picked: string | null;
   unavailable: readonly Unavailable[];
   readout: Readout | null;
@@ -77,6 +79,7 @@ export function useTableChoice({
   store,
   ctx,
   names,
+  beats,
   onPreview,
   onPile,
   onOutcome,
@@ -85,6 +88,8 @@ export function useTableChoice({
   store: TableStore;
   ctx: ReduceContext;
   names: SheetNames;
+  // Where the banner rings the cards its current line names (beat-store.ts); only the canvas reads them.
+  beats: BeatStore;
   // A tap on a card the moment does not ask about shows it large; `extra` are cards to list with it (the Look window's).
   onPreview: (cardId: string, extra?: readonly string[]) => void;
   // A tap on a pile: the screen opens a discard pile's list.
@@ -106,9 +111,15 @@ export function useTableChoice({
   const [listed, setListed] = useState<string | null>(null);
   // Everything here picks, pays or answers for the acting seat; a peek at the other seat (peek.ts) changes only what is drawn.
   const acting = actingSeat(game);
-  const settings = useStore(tableSettings, (state) => state.settings);
+  // The settings this hook reads, one by one: a change to another (the theme, the scale, a haptics switch) does not render the table.
+  const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
+  const stops = useStore(tableSettings, (state) => state.settings.stops);
+  const alwaysUse = useStore(tableSettings, (state) => state.settings.alwaysUse);
+  const guideOn = useStore(tableSettings, (state) => state.settings.guide);
+  const guideSeen = useStore(tableSettings, (state) => state.settings.guideSeen);
+  const settings = useMemo(() => ({ stopsOn, stops, alwaysUse, guide: guideOn, guideSeen }), [stopsOn, stops, alwaysUse, guideOn, guideSeen]);
   // The outcome banner of the last moment worth showing, and the round's summary after it (table-hooks.ts).
-  const { banner, bannerKey, beatKey, onBeat, dismiss: dismissBanner } = useBanner(store, ctx, names);
+  const { banner, bannerKey, onBeat, dismiss: dismissBanner } = useBanner(store, ctx, names, beats);
 
   const base = useMemo(() => sheetFor(game, ctx, legal, names) ?? windowSheet(game, ctx, legal, names), [game, ctx, legal, names]);
   const live = overlay && overlay.game === game ? overlay : null;
@@ -132,16 +143,13 @@ export function useTableChoice({
   // "Pass to next stop" on a step window the table could pass, named by the stop it runs to (stops.ts).
   // Pass to stop is offered while stops are on, naming where the run ends at the latest (a choice on the way ends it sooner).
   const stopPass = settings.stopsOn && !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass until ${nextStopTitle(game, settings, pointTitle)}` : null;
-  const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(ctx.effects.find((effect) => effect.id === item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
-  const dock = useMemo(
-    () => dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free }),
-    [sheet, choice, table, live, passLegal, panelOpen, single, stopPass, free],
-  );
+  const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(effectById(ctx, item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
+  const dock = dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free });
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)), beatKey });
-  const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, beat: beatNow }), [glow, pickedKey, share, dim, markKey, mutedKey, beatNow]);
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)) });
+  const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey }), [glow, pickedKey, share, dim, markKey, mutedKey]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
   const fight = useMemo(() => fightOf(fightKey), [fightKey]);
@@ -161,10 +169,10 @@ export function useTableChoice({
   const settled = useSettle(store, `${sheet.key}:${moment?.seq ?? 0}`);
   const dispatch = useCallback(
     (intent: PlayerIntent) => {
-      if (store.getState().dispatch(intent)) {
-        tickSent();
-        reset();
-      } else tickRefused();
+      // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
+      // gets the Refused tick, never both.
+      if (store.getState().dispatch(intent, tickSent)) reset();
+      else tickRefused();
     },
     [store, reset],
   );
@@ -178,8 +186,10 @@ export function useTableChoice({
       setHeld(null);
       return;
     }
-    if (!store.getState().undo()) return;
+    // Undo goes back exactly when there is an intent to take back, so the tick can play before it does the work.
+    if (store.getState().history.length === 0) return;
     tickSent();
+    store.getState().undo();
     reset();
   }, [picking, store, reset]);
   const open = useCallback(

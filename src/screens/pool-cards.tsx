@@ -8,6 +8,7 @@ import { ListRow, SphereMark, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, takeDraftCard, type TitleLookup } from "./deck-draft";
 import { CardThumbFrame, RowCardImage, useCardPreview } from "./images/picture";
+import { cardCorner } from "../play/card-corner";
 import type { PictureSource } from "../play/table-canvas-types";
 import { dropShadowOf, selectedRingOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
@@ -133,8 +134,7 @@ export const PoolCardCell = memo(function PoolCardCell({
       >
         {({ pressed }) => (
           <View
-            className="rounded-card"
-            style={{ width, height, overflow: "hidden", opacity: pressed ? 0.75 : 1, backgroundColor: palette.raised, ...(selected ? { boxShadow: selectedRingOf(t) } : adding && count > 0 ? { boxShadow: `0 0 0 1.5px ${palette.accent}` } : {}) }}
+            style={{ width, height, borderRadius: cardCorner(width, height), overflow: "hidden", opacity: pressed ? 0.75 : 1, backgroundColor: palette.raised, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
           >
             {picture ? (
               <RowCardImage code={item.code} source={picture} width={width} height={height} />
@@ -152,7 +152,7 @@ export const PoolCardCell = memo(function PoolCardCell({
               </View>
             )}
             {loss ? (
-              <View className="absolute bottom-1 left-1 right-1 rounded px-1 py-0.5" style={{ backgroundColor: withAlphaHex(palette.night, 0.82) }}>
+              <View className="absolute bottom-1 left-1 right-1 rounded-control px-1 py-0.5" style={{ backgroundColor: withAlphaHex(palette.night, 0.82) }}>
                 <Text className="text-center text-micro text-muted" numberOfLines={1}>
                   {loss}
                 </Text>
@@ -165,7 +165,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         {item.name}
       </Text>
       {adding && count > 0 ? (
-        <View pointerEvents="none" className="absolute h-6 min-w-6 items-center justify-center rounded-pill px-1.5" style={{ right: -6 * s, top: -6 * s, backgroundColor: palette.night, boxShadow: `0 0 0 1.5px ${palette.accentHigh}, ${dropShadowOf(t, 2, 6, 0.9)}` }}>
+        <View pointerEvents="none" className="absolute h-6 min-w-6 items-center justify-center rounded-control px-1.5" style={{ right: -6 * s, top: -6 * s, backgroundColor: palette.night, boxShadow: `0 0 0 1.5px ${palette.accentHigh}, ${dropShadowOf(t, 2, 6, 0.9)}` }}>
           <Text className="font-display text-label text-bone">{String(count)}</Text>
         </View>
       ) : null}

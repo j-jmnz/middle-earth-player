@@ -27,6 +27,16 @@ const THREAT = (value: number): SheetStat => ({ icon: "threat", value, word: "Th
 const ATTACK = (value: number): SheetStat => ({ icon: "attack", value, word: "Attack" });
 const DEFENSE = (value: number): SheetStat => ({ icon: "defense", value, word: "Defense" });
 
+/**
+ * The readout the dock draws. While the quest scale shows (the Quest phase), the scale draws the willpower against the threat, so the
+ * dock drops its numbers row and keeps the result line: the loss warning and the commit aids ("Threat +3 if nothing changes; threat
+ * reaches 50: ...", "Staging reveals 1 card next. Ready after this: 2") are said once, there. Another readout is unchanged.
+ */
+export function dockReadout(readout: Readout | null, scaleLive: boolean): Readout | null {
+  if (!readout || !scaleLive || readout.kind !== "quest") return readout;
+  return readout.result ? { ...readout, stats: [] } : null;
+}
+
 /** What a quest resolved now would do: "2 progress", "Threat +1", or neither. */
 export function questResult(willpower: number, threat: number): string {
   if (willpower > threat) return `${willpower - threat} progress if nothing changes`;

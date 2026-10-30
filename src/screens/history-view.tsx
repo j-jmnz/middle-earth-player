@@ -45,7 +45,7 @@ function RunRow({ run, deleted, showBox, nameOf, onPress }: { run: RunRecord; de
     <View className="pb-3">
       <Pressable testID={`run-${run.id}`} collapsable={false} accessibilityRole={onPress ? "button" : "text"} accessibilityLabel={runLabel(run, scenario, nameOf, deleted)} disabled={onPress == null} onPress={onPress ?? undefined}>
         {({ pressed }) => (
-          <View className="min-h-14 flex-row items-center rounded-card px-4 py-3.5" style={rowSurface(pressed, t)}>
+          <View className="min-h-14 flex-row items-center rounded-item px-4 py-3.5" style={rowSurface(pressed, t)}>
             <View className="flex-1">
               <View className="flex-row items-start justify-between gap-2">
                 <View className="flex-1">
@@ -152,14 +152,15 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     const badge = gone ? "Deleted" : archived ? "Archived" : playthroughs.current === refId ? "Current" : undefined;
     return (
       <View className="pb-3 pt-1">
-        <FoldHeader id={item.id} title={title} detail={detail} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" solid folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
+        <FoldHeader id={item.id} title={title} detail={detail} {...(badge ? { badge } : {})} count={item.group.runs.length} unit="run" folded={item.folded} onFold={(next) => toggleGroup(item.id, next)} />
       </View>
     );
   };
 
   const listHead = (
     <View className="pb-2">
-      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" />
+      {/* The run count is the first group's label: a scroll container may never announce its own. */}
+      <Segmented options={KINDS} value={kindWord} onChange={chooseKind} testIDPrefix="history" accessibilityLabel={shown.length > 0 ? `History, ${plural(shown.length, "run")}` : "History"} />
       <View className="mt-3 gap-1" testID="history-filters">
         {scopes.length > 1 ? (
           <View className="flex-row flex-wrap gap-x-2" accessibilityRole="radiogroup" accessibilityLabel={kind === "campaign" ? "Filter by campaign" : "Filter by box"}>
@@ -181,11 +182,6 @@ export function HistoryView({ initial }: { initial: RunKind }) {
           ))}
         </View>
       </View>
-      {shown.length > 0 ? (
-        <Label className="mt-2" testID="history-count">
-          {plural(shown.length, "run")}
-        </Label>
-      ) : null}
     </View>
   );
 

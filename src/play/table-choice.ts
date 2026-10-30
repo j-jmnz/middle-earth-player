@@ -4,7 +4,7 @@
 // How the player answers the open moment on the table. A sheet (sheets.ts, bar-sheets.ts) says what the rules allow; this
 // file says what a tap on a card does with it and which buttons confirm it. A tap only picks: it never sends an intent.
 // Every intent goes out from a button, and a button that sends one without anything picked first (Pass, Keep, Leave
-// undefended, Do not travel) must be tapped twice: once to arm it, once to confirm (docs/design-system.md, Table). The one
+// undefended, Do not travel) must be tapped twice: once to arm it, once to confirm (docs/design-system-table.md). The one
 // exception is a moment with a single answer (`onlyAnswer`): there is no decision to take back, so its answer is picked
 // already and one tap, on the card or the button, sends it.
 //
@@ -395,20 +395,25 @@ export function onTheTable(sheet: Sheet, onTable: (cardId: string) => boolean): 
  * The words over a sheet, in the dock or on a panel: the step (with the timing of a Response or an Action, and the seat in
  * two-handed play), the moment, a sentence, and the engine's numbers for it.
  */
-export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; title: string; note: string | null; stats: readonly SheetStat[] } {
+export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; lead: string; title: string; note: string | null; stats: readonly SheetStat[] } {
+  // What leads the dock's title: the seat that is asked in two-handed play ("Player 1 · "), and for a Response or an Action the timing, since the
+  // step overline is not drawn ("Response · Pathless Country"). The step names both for a screen reader too.
   const seat = game.seatCount > 1 ? `Player ${game.activeSeat + 1} · ` : "";
   switch (sheet.kind) {
     case "pick":
     case "multi":
-      return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
     case "distribute":
-      return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
-    case "trigger":
-      return { step: `${seat}${sheet.timing} · ${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: [] };
+    case "trigger": {
+      // A title that already says the timing ("Response") is not led by it twice.
+      const timing = sheet.title.startsWith(sheet.timing) ? "" : `${sheet.timing} · `;
+      return { step: `${seat}${sheet.timing} · ${sheet.step}`, lead: seat + timing, title: sheet.title, note: sheet.note, stats: [] };
+    }
     case "window":
-      return { step: `${seat}${sheet.step}`, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: [] };
     case "outcome":
-      return { step: sheet.step, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: sheet.step, lead: "", title: sheet.title, note: sheet.note, stats: [] };
   }
 }
 

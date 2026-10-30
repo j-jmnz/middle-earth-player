@@ -1,56 +1,23 @@
-// The phase rail in the top bar's middle (docs/design-system.md, Table; phase 20): the phase in Marcellus SC over the round's seven
-// phases as ticks over the round and the step, with the previous and next phase inline at the phase's sides when there is room. A tap opens the
-// phase carousel (phase-carousel.tsx); the rail itself sends no intent. A phase change flashes the pill's edge, a step change
-// cross-fades the step (MOTION.railFlash, railStep); both snap under reduced motion and never gate a rule. The neighbor names do not
-// move: they change in place.
-import { useEffect, useMemo, useRef } from "react";
+// The phase rail in the top bar's middle (docs/design-system-table.md; phase 20): the phase in Marcellus SC over the round's seven
+// phases as ticks, with the previous and next phase inline at the phase's sides when there is room. A tap opens the phase carousel
+// (phase-carousel.tsx), which names the round; the rail itself sends no intent. A phase change brightens the phase's glow
+// (MOTION.railFlash), which snaps under reduced motion and never gates a rule. The neighbor names do not move: they change in place.
+// The round and the step are not drawn; they stay in the rail's tree as clear text (`rail-round`, `rail-current`) for a flow to read.
+import { useEffect, useRef } from "react";
 import { Platform, Pressable, View } from "react-native";
-import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import Animated, { LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
 
 import { STOP_AHEAD_WORDS } from "./carousel.ts";
-import { layoutAnim, timing, useMotionScale } from "./motion-run.ts";
+import { timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { withAlphaHex } from "./tokens.ts";
+import { CONTROL_RADIUS } from "./radius.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { ROUND_PHASES, type Rail } from "./rail.ts";
-import { CHEVRON, NEIGHBOR_GAP, STOP_MARK, TICK, TICK_GAP } from "./top-bar-layout.ts";
+import { NEIGHBOR_GAP, STOP_MARK, TICK, TICK_GAP } from "./top-bar-layout.ts";
 import { Text } from "./text.tsx";
 
-
-/** A chevron drawn as two edges of a rotated square: no printed icon fits, and a glyph depends on the font. */
-export function Chevron({ direction, color }: { direction: "previous" | "next" | "up" | "down"; color?: string }) {
-  const t = useTableTokens();
-  const s = useUiScale();
-  const turn = {
-    next: "45deg",
-    previous: "225deg",
-    down: "135deg",
-    up: "315deg",
-  }[direction];
-  return (
-    <View
-      style={{
-        width: CHEVRON * s,
-        height: CHEVRON * s,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-      importantForAccessibility="no-hide-descendants"
-    >
-      <View
-        style={{
-          width: 8 * s,
-          height: 8 * s,
-          borderTopWidth: 1.5 * s,
-          borderRightWidth: 1.5 * s,
-          borderColor: color ?? t.muted,
-          transform: [{ rotate: turn }],
-        }}
-      />
-    </View>
-  );
-}
 
 // A neighbor phase's name, inline at the phase's side in muted label. Plain text: it neither slides nor fades.
 function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; s: number }) {
@@ -61,7 +28,7 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
       numberOfLines={1}
       importantForAccessibility="no"
       className="text-micro text-faint"
-      style={{ lineHeight: 20 * s, [side === "previous" ? "marginRight" : "marginLeft"]: NEIGHBOR_GAP * s }}
+      style={side === "previous" ? { lineHeight: 20 * s, marginRight: NEIGHBOR_GAP * s } : { lineHeight: 20 * s, marginLeft: NEIGHBOR_GAP * s }}
     >
       {name}
     </Text>
@@ -69,23 +36,20 @@ function Neighbor({ side, name, s }: { side: "previous" | "next"; name: string; 
 }
 
 /**
- * The rail (docs/design-system.md, Table): the phase in Marcellus SC, tracked wide with a silver glow; under it the round's seven
- * phases as ticks, the past ones dim green, the current one lit and glowing, the ones to come dark; and "Round 3 · Staging" under
- * those. `wide` puts the previous and next phase inline at the phase's sides; `shortRound` (a phone under 760 pt inside the insets)
- * says "R3" for the round. `stopAhead` puts an accent S after the phase. No pill and no edge: a tap anywhere on it calls `onPress`
- * (the carousel opens or closes), and a phase change flashes the phase's glow.
+ * The rail (docs/design-system-table.md): the phase in Marcellus SC, tracked wide with a silver glow; under it the round's seven
+ * phases as ticks, the past ones dim green, the current one lit and glowing, the ones to come dark. Setup and the mulligan have no
+ * phase, so the step stands in its place. `wide` puts the previous and next phase inline at the phase's sides. `stopAhead` puts an
+ * accent S after the phase. No pill and no edge: a tap anywhere on it calls `onPress` (the carousel opens or closes), and a phase change flashes the phase's glow.
  */
 export function PhaseRail({
   rail,
   wide,
-  shortRound,
   stopAhead = false,
   open = false,
   onPress,
 }: {
   rail: Rail;
   wide: boolean;
-  shortRound: boolean;
   stopAhead?: boolean;
   open?: boolean;
   onPress?: () => void;
@@ -93,7 +57,6 @@ export function PhaseRail({
   const scale = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
-  const step = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.railStep, scale), out: layoutAnim(FadeOut, MOTION.railStep, scale) }), [scale]);
   const flash = useSharedValue(0);
   const lastPhase = useRef(rail.phase);
   useEffect(() => {
@@ -102,9 +65,11 @@ export function PhaseRail({
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
   const glow = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * flash.get() }));
-  const round = rail.round > 0 ? (shortRound ? `R${rail.round}` : `Round ${rail.round}`) : "";
+  const round = rail.round > 0 ? `Round ${rail.round}` : "";
+  // The headline is the phase; Setup and the mulligan have none, so their step takes its place.
+  const head = rail.phase || rail.current;
   const at = ROUND_PHASES.findIndex((phase) => phase.toLowerCase() === rail.phase.toLowerCase());
-  const label = [rail.round > 0 ? `Round ${rail.round}` : "", rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
+  const label = [round, rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
   return (
     <Pressable
       testID="rail"
@@ -121,7 +86,7 @@ export function PhaseRail({
         alignItems: "center",
         justifyContent: "center",
         minHeight: touch(s, 44),
-        borderRadius: 10 * s,
+        borderRadius: CONTROL_RADIUS,
         backgroundColor: pressed || open ? withAlphaHex(t.bone, 0.08) : "transparent",
       })}
     >
@@ -135,12 +100,12 @@ export function PhaseRail({
               <Neighbor side="previous" name={rail.previousPhase} s={s} />
             </View>
           ) : null}
-          {rail.phase ? (
+          {head ? (
             // iOS tracks after the last letter too; Android splits the tracking round each letter.
             <View style={{ paddingLeft: (STOP_MARK + (Platform.OS === "ios" ? 4 : 0)) * s, paddingRight: STOP_MARK * s }}>
-              <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: 12 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
+              <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: CONTROL_RADIUS, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
               <Text
-                testID="rail-phase"
+                testID={rail.phase ? "rail-phase" : "rail-current"}
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.85}
@@ -154,7 +119,7 @@ export function PhaseRail({
                   ...(t.depth === "light" ? {} : { textShadowColor: withAlphaHex(t.glow, 0.8), textShadowRadius: 10 * s, textShadowOffset: { width: 0, height: 0 } }),
                 }}
               >
-                {rail.phase}
+                {head}
               </Text>
               {/* The S stands after the phase, in the room the floor keeps. */}
               {stopAhead ? (
@@ -190,17 +155,18 @@ export function PhaseRail({
             );
           })}
         </View>
-        <View style={{ alignSelf: "center", flexDirection: "row", alignItems: "center", marginTop: 2 * s }}>
+        {/* The round and the step are not drawn (the carousel names the round); a flow reads them as clear text, which takes no room. */}
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 14 * s, flexDirection: "row", justifyContent: "center", overflow: "hidden" }}>
           {round ? (
-            <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: t.faint, lineHeight: 14 * s }}>
+            <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: "transparent", lineHeight: 14 * s }}>
               {`${round}${rail.current ? " · " : ""}`}
             </Text>
           ) : null}
-          <Animated.View key={rail.current} entering={step.in} exiting={step.out}>
-            <Text testID="rail-current" numberOfLines={1} className="text-micro" style={{ color: t.muted, lineHeight: 14 * s }}>
+          {rail.phase ? (
+            <Text testID="rail-current" numberOfLines={1} className="text-micro" style={{ color: "transparent", lineHeight: 14 * s }}>
               {rail.current}
             </Text>
-          </Animated.View>
+          ) : null}
         </View>
       </LayoutAnimationConfig>
     </Pressable>

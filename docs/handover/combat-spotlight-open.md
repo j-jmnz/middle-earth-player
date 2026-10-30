@@ -2,7 +2,7 @@
 
 The combat spotlight redesign (user request, 2026-10-29) is built, reviewed and merged to `main`. Every check a cloud session can run is green: `pnpm test`, `pnpm lint`, `tsc --noEmit` and `pnpm data:check`. Nothing native has been seen: a cloud session has no phone, simulator or Maestro, and the web build has no canvas. What is left needs a device. This file says what to look at, where the code is, and what to change if a check fails.
 
-Read first: `docs/plans/combat-spotlight-redesign.md` (the plan), `docs/design-system.md` (Table, **Spotlight**, and the Motion table), and `docs/phases/STATUS.md`, section "Combat spotlight redesign, 2026-10-29 (user request)" (Built, Decided, Checked, Open). The plan's decisions are settled and are not reopened by a device check: a lone attack runs about 2.2 s at Normal, the stage is always dark (Light theme too), a destroyed target burns away, and the cards are centered on the whole screen at 60% of its height.
+Read first: `docs/plans/done/combat-spotlight-redesign.md` (the plan), `docs/design-system-table.md` (Spotlight and Motion). The plan's decisions are settled and are not reopened by a device check: a lone attack runs about 2.2 s at Normal, the stage is always dark (Light theme too), a destroyed target burns away, and the cards are centered on the whole screen at 60% of its height.
 
 ## Setting up
 
@@ -20,7 +20,7 @@ The cases to play, each at Normal and at Quick, in Dark and in Light:
 
 ## The open points
 
-Each point: what to check, where the code is, and the likely fix if it fails. Record the result in STATUS.md's section (move a point out of Open only when it was seen on a device; say which phone).
+Each point: what to check, where the code is, and the likely fix if it fails. Delete a point from this file only when it was seen on a device, and say which phone in the commit message. Delete the file, and its line in `docs/phases/STATUS.md` (Open items), when no point is left.
 
 ### 1. The look on Android and iOS
 - Check: the cards fill the middle of the screen, the medallions straddle the card feet, the damage number pops at the target's center, the stamps and the note chip read, nothing runs under the notch or the home indicator, and the top bar and the dock column show dimmed under the stage.
@@ -75,5 +75,5 @@ These are not defects; raise them with the user only if the device look supports
 Paste into a Claude Code session on a machine with a phone attached (not a cloud session):
 
 ```text
-Work through docs/handover/combat-spotlight-open.md on a device. Read it, CLAUDE.md and .cursor/rules/authority.mdc first. Play each case it lists on Android and iOS, at Normal and Quick, in Dark and Light, and go through open points 1 to 10 in order. Do not reopen the plan's settled decisions. For each point, record what was seen and on which phone in docs/phases/STATUS.md (section "Combat spotlight redesign, 2026-10-29 (user request)"), moving it out of Open only when seen. Fix what fails with the smallest change the point names; durations live only in MOTION, every number on screen comes from the engine, src/play never imports src/screens. Ask before dropping or weakening any effect. pnpm test, pnpm lint, tsc --noEmit and pnpm data:check stay green; commit and push on a new branch, and do not open a pull request unless asked.
+Work through docs/handover/combat-spotlight-open.md on a device. Read it, CLAUDE.md and .cursor/rules/authority.mdc first. Play each case it lists on Android and iOS, at Normal and Quick, in Dark and Light, and go through open points 1 to 10 in order. Do not reopen the plan's settled decisions. For each point, delete it from this file only when seen, naming the phone in the commit message. Fix what fails with the smallest change the point names; durations live only in MOTION, every number on screen comes from the engine, src/play never imports src/screens. Ask before dropping or weakening any effect. pnpm test, pnpm lint, tsc --noEmit and pnpm data:check stay green; commit and push on a new branch, and do not open a pull request unless asked.
 ```

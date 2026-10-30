@@ -1,4 +1,4 @@
-// The combat spotlight's particles laid out for Skia's Atlas (docs/plans/combat-spotlight-redesign.md, §4 and §5). Three draws, each
+// The combat spotlight's particles laid out for Skia's Atlas (docs/plans/done/combat-spotlight-redesign.md, §4 and §5). Three draws, each
 // one buffer of sprites (spotlight-particles.ts, PARTICLE_DRAW): the glow (embers, then the charge's converging embers), the streaks
 // (sparks, or the silver deflection of a block) and the ash. `spriteAt` works one slot's transform and color out from a time alone, so the
 // UI thread fills the buffers (useRSXformBuffer, useColorBuffer) from the frame; a slot with nothing alive has alpha 0. Pure and worklet-safe.

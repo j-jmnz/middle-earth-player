@@ -1,7 +1,7 @@
 // The marks of the open moment on a card. The ones in the card's shape (the halo, the accent edge, the picked edge, the veil,
 // the beat ring) are drawn on its unturned rectangle inside its turned group, so they follow its quarter turn or fan tilt
 // (`Moving`'s `frame`, `cardFrame`). The picked card's check ring is upright, at the center of the card's bounds, clear of the
-// tokens (docs/design-system.md, Table).
+// tokens (docs/design-system-table.md).
 import { BlurMask, Circle, Group, Line, RoundedRect, Text, vec } from "@shopify/react-native-skia";
 
 import { type Fonts } from "./canvas-pieces.native.tsx";

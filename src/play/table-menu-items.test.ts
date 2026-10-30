@@ -8,7 +8,7 @@ describe("table menu rows", () => {
     expect(rows.map((row) => row.id)).toEqual(["log", "rules", "booklet", "settings", "leave"]);
     expect(rows.map((row) => row.testID)).toEqual(["log-open", "rules-open", "booklet-open", "settings-open", "table-back"]);
     expect(rows.map((row) => row.label)).toEqual(["Log", "Rules", "Booklet", "Table settings", "Leave the table"]);
-    expect(rows.map((row) => row.opens)).toEqual([true, true, true, true, false]);
+    expect(rows.map((row) => row.tone)).toEqual([undefined, undefined, undefined, undefined, "danger"]);
   });
 
   it("shows Leave the table with its door mark alone, and says where it goes and that the game is saved to a screen reader", () => {

@@ -1,4 +1,4 @@
-// The play area's rows (docs/design-system.md, Table — landscape, Spacing and the play area's rows; user request, 2026-10-29): the
+// The play area's rows (docs/design-system-table.md, Spacing and the play area's rows; user request, 2026-10-29): the
 // player's cards in play wrap onto more rows when they fit, shrink when they do not, and squeeze one row under the floor. Pure.
 import type { CardSlot, Rect } from "./layout.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";

@@ -1,4 +1,4 @@
-// Whether the combat spotlight is running for the table's last moment (docs/design-system.md, Table, Spotlight; phase 24). Pure: the
+// Whether the combat spotlight is running for the table's last moment (docs/design-system-table.md, Spotlight; phase 24). Pure: the
 // store (store.ts) opens a gate for each accepted intent with the attacks it resolved, the canvas plays them and closes it (done, or
 // skipped by a tap), and everything that waits for the spotlight reads it: the scrim over the bar and the dock, the banner, the
 // 350 ms settle after a new moment, the card motions of the state and the token pops of its damage. The gate never gates an intent:

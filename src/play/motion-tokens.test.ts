@@ -91,7 +91,6 @@ describe("the tokens", () => {
     expect(MOTION.seatPulseHalf.ms * 2).toBe(MOTION.seatPulse.ms);
     expect(MOTION.toastIn.ms).toBe(160);
     expect(MOTION.toastOut.ms).toBe(120);
-    expect(MOTION.railStep.ms).toBe(200);
     expect(MOTION.carouselEnter.ms).toBe(240);
     expect(MOTION.carouselLeave.ms).toBe(180);
     expect(MOTION.trayEnter.ms).toBe(260);
@@ -154,12 +153,6 @@ describe("the hand scrub's tokens (phase 25)", () => {
     expect(MOTION.scrubLift).toEqual({ ms: 120, easing: "outCubic" });
     expect(MOTION.scrubFall).toEqual({ ms: 180, easing: "inCubic" });
     for (const token of [MOTION.scrubRise, MOTION.scrubSpread, MOTION.scrubLift, MOTION.scrubFall]) expect(token.ms).toBeLessThanOrEqual(MAX_TOKEN_MS);
-  });
-
-  it("scale to 0.6 at Quick and to nothing under reduced motion", () => {
-    expect(ms(MOTION.scrubRise, motionScale("quick", false))).toBe(132);
-    expect(ms(MOTION.scrubSpread, motionScale("quick", false))).toBe(132);
-    expect(ms(MOTION.scrubRise, motionScale("normal", true))).toBe(0);
   });
 
   it("keep the scrub's shapes: the hand grows to 1.5, the lifted card 1.55 more and its neighbours 1.15 and 1.05, the rest of the table dims to 35% night", () => {

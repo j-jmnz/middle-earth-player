@@ -3,6 +3,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { cards } from "../catalog/schema";
 import { notAppliedCodes } from "../play/not-applied";
+import { bumpDeckRevision } from "./deck-revision";
 import type { DeckFace } from "./deck-status";
 import { STEALTH_ID, WISDOM_ID, starterDeck } from "./starter-decks";
 import { decks, type DeckCard } from "./user-schema";
@@ -59,10 +60,12 @@ export function writeDeck<TRun>(user: Db<TRun>, deck: DeckWrite, now: number = D
   const body = { name: deck.name.trim(), ...copied(deck), updatedAt: now };
   if (deck.id && readDeck(user, deck.id)) {
     user.update(decks).set(body).where(eq(decks.id, deck.id)).run();
+    bumpDeckRevision();
     return deck.id;
   }
   const id = newDeckId(now);
   user.insert(decks).values({ id, ...body }).run();
+  bumpDeckRevision();
   return id;
 }
 
@@ -77,12 +80,14 @@ export function duplicateDeck<TRun>(user: Db<TRun>, id: string, name: string, no
 export function deleteDeck<TRun>(user: Db<TRun>, id: string): void {
   if (isStarterDeck(id)) throw new Error(`${id} is a starter deck. Reset it instead.`);
   user.delete(decks).where(eq(decks.id, id)).run();
+  bumpDeckRevision();
 }
 
 /** Puts a starter deck back to the printed list (MEC109) under its printed name. */
 export function resetStarterDeck<TRun>(user: Db<TRun>, id: string): void {
   const printed = starterDeck(id);
   user.update(decks).set({ name: printed.name, ...copied(printed), updatedAt: null }).where(eq(decks.id, id)).run();
+  bumpDeckRevision();
 }
 
 /** The catalog facts the deck screens show and the deckbuilding rules read, for these codes. */

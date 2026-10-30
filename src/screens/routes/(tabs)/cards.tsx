@@ -4,7 +4,7 @@ import { ScrollView, View } from "react-native";
 
 import { CardDetailPane } from "../../card-detail";
 import { CardPool, CardPoolBody } from "../../card-pool";
-import { BodyText, HubHeader, Screen, SecondaryButton } from "../../chrome";
+import { BodyText, HubHeader, PillButton, Screen } from "../../chrome";
 import { useListPreview } from "../../list-preview";
 import { ToastView } from "../../toast-view";
 import { useSizeClass } from "../../../play/use-size-class";
@@ -22,7 +22,7 @@ export default function Cards() {
   const preview = useListPreview();
   const header = (
     <HubHeader title="Cards">
-      <SecondaryButton label="Packs" icon="unique" testID="packs-open" compact accessibilityLabel="Browse cards by pack" onPress={() => router.push("/packs")} />
+      <PillButton label="Packs" testID="packs-open" accessibilityLabel="Browse cards by pack" onPress={() => router.push("/packs")} />
     </HubHeader>
   );
   if (size !== "expanded") return <CardPool adding={false} header={header} />;

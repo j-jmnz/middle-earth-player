@@ -13,7 +13,7 @@ import type { ScenarioState } from "../rules/state.ts";
 import { cavesTable, loadCavesWorld, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
-import { advancedTo, advanceWords, closeLatch, nextLatch, NO_ADVANCE, openAdvance, openingLatch, stageAsks } from "./quest-advance.ts";
+import { advancedTo, advanceWords, closeLatch, nextLatch, NO_ADVANCE, openAdvance, openingLatch, questView, stageAsks } from "./quest-advance.ts";
 import type { TableMoment } from "./store.ts";
 
 let world: CavesWorld;
@@ -64,10 +64,9 @@ describe("the quest advance screen", () => {
   it("names the stage by its place and side, and how it is completed", () => {
     const made = make({ seats: 1, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41031"], discard: ["41031"] });
     const words = advanceWords(made.state, made.ctx, made.state.questStage ?? "", "The Dark of Nibin-Dûm", ledgerLine);
-    expect(words.eyebrow).toBe("The quest advances · stage 1 of 4");
-    expect(words.title).toBe("Stage 1B · The Dark of Nibin-Dûm");
+    expect(words.eyebrow).toBe("Stage 1 of 4");
+    expect(words.title).toBe("The Dark of Nibin-Dûm");
     expect(words.detail).toBe("8 quest points to complete it");
-    expect(advanceWords(made.state, made.ctx, made.state.questStage ?? "", "The Dark of Nibin-Dûm", ledgerLine, true).eyebrow).toBe("The quest · stage 1 of 4");
   });
 });
 
@@ -77,39 +76,39 @@ describe("the quest advance screen's latch", () => {
     const game = made.state;
     const stageId = game.questStage ?? "";
     const reached = { seq: 3, stageId };
-    const held = nextLatch(NO_ADVANCE, reached, game);
+    const held = nextLatch(NO_ADVANCE, reached, questView(game));
     expect(openAdvance(held, game)).toEqual(reached);
     // The same moment read again changes nothing.
-    expect(nextLatch(held, reached, game)).toBe(held);
+    expect(nextLatch(held, reached, questView(game))).toBe(held);
     const closed = closeLatch(held);
-    expect(openAdvance(nextLatch(closed, reached, game), game)).toBeNull();
-    expect(openAdvance(nextLatch(closed, { seq: 5, stageId }, game), game)).toEqual({ seq: 5, stageId });
+    expect(openAdvance(nextLatch(closed, reached, questView(game)), game)).toBeNull();
+    expect(openAdvance(nextLatch(closed, { seq: 5, stageId }, questView(game)), game)).toEqual({ seq: 5, stageId });
   });
 
   it("opens the table on the stage in play until Progress, and a later advance opens it again", () => {
     const made = make({ seats: 1, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41031"], discard: ["41031"] });
     const game = made.state;
     const stageId = game.questStage ?? "";
-    const opening = openingLatch(game);
+    const opening = openingLatch(questView(game));
     expect(openAdvance(opening, game)).toEqual({ seq: 0, stageId });
-    expect(nextLatch(opening, null, game)).toBe(opening);
+    expect(nextLatch(opening, null, questView(game))).toBe(opening);
     const closed = closeLatch(opening);
     expect(openAdvance(closed, game)).toBeNull();
-    expect(openAdvance(nextLatch(closed, { seq: 1, stageId }, game), game)).toEqual({ seq: 1, stageId });
+    expect(openAdvance(nextLatch(closed, { seq: 1, stageId }, questView(game)), game)).toEqual({ seq: 1, stageId });
     // A game that is over opens on the table.
-    expect(openAdvance(openingLatch({ ...game, lost: true }), game)).toBeNull();
+    expect(openAdvance(openingLatch(questView({ ...game, lost: true })), game)).toBeNull();
   });
 
   it("goes back to the table by itself once the stage's question is answered (41005:A:1)", () => {
     const made = make({ seats: 2, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41031"], discard: ["41031"] });
     const full = progress(made.state, 8, made.ctx);
     const reached = advancedTo(sent(made.state, full.state, full.steps, 2), full.state);
-    let latch = nextLatch(NO_ADVANCE, reached, full.state);
+    let latch = nextLatch(NO_ADVANCE, reached, questView(full.state));
     expect(openAdvance(latch, full.state)).toEqual(reached);
     let current = full.state;
     for (let guard = 0; guard < 12 && current.window?.kind === "choose"; guard += 1) {
       current = expectOk(reduce(current, { type: "Choose", optionId: current.window.options[0] ?? "" }, made.ctx)).state;
-      latch = nextLatch(latch, null, current);
+      latch = nextLatch(latch, null, questView(current));
     }
     expect(openAdvance(latch, current)).toBeNull();
   });

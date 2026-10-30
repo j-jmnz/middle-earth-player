@@ -1,5 +1,5 @@
 // Rules: rr.triggered-ability (data/rules/entries.json). A card the app does not fully apply says so before it is paid for:
-// an attachment with no record attaches and does nothing, so its confirm arms first (docs/plans/inactive-text.md).
+// an attachment with no record attaches and does nothing, so its confirm arms first (docs/plans/done/inactive-text.md).
 import { describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";

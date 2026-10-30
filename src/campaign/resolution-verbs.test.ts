@@ -4,7 +4,7 @@ import { EFFECTS } from "../effects/index.ts";
 import { recordInstructions } from "../catalog/scenario-data.ts";
 import { holds } from "../rules/conditions.ts";
 import { legalIntents, reduce } from "../rules/reduce.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
+import type { PrintedCard } from "../rules/printed.ts";
 import { openResolution, resolutionResult } from "../rules/resolution.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { attachTo, moveCard, spawn } from "../rules/zones.ts";
@@ -207,10 +207,27 @@ describe("NameCaptives (142060 Resolution)", () => {
     ]);
   });
 
-  it("starts with the first player and skips a seat that has no hero left to name", () => {
-    const { state } = won("142060", 2);
-    expect(state.window).toMatchObject({ kind: "resolution", seat: 0 });
-    expect(printedOf(cards, FRODO).traits).toContain("Ring-bearer");
+  it("starts with the first player", () => {
+    const { state, ctx } = won("142060", 2, (s) => ({ ...s, firstPlayer: 1 }));
+    let run = send(start(state), { type: "ChooseResolution", optionId: "142089" }, ctx);
+    expect(run.state.window).toMatchObject({ kind: "resolution", seat: 1 });
+    run = send(run, { type: "ChooseResolution", optionId: first(state, MERRY) }, ctx);
+    expect(run.state.window).toMatchObject({ kind: "resolution", seat: 0 });
+    run = send(run, { type: "ChooseResolution", optionId: first(state, SAM) }, ctx);
+    expect(resolutionResult(run.state)?.captives).toEqual([
+      { seat: 1, hero: MERRY },
+      { seat: 0, hero: SAM },
+    ]);
+  });
+
+  it("skips a seat that has no hero left to name: the Ring-bearer is never named", () => {
+    const { state, ctx } = won("142060", 2, (s) => moveCard(s, first(s, SAM), { zone: "discard", seat: 0 }));
+    const run = send(start(state), { type: "ChooseResolution", optionId: "142089" }, ctx);
+    // Seat 0 holds only Frodo: its turn is passed over and seat 1 names Merry.
+    expect(run.state.window).toMatchObject({ kind: "resolution", seat: 1 });
+    expect(options(run.state, ctx)).toEqual([first(state, MERRY)]);
+    const done = send(run, { type: "ChooseResolution", optionId: first(state, MERRY) }, ctx);
+    expect(resolutionResult(done.state)?.captives).toEqual([{ seat: 1, hero: MERRY }]);
   });
 });
 

@@ -5,7 +5,7 @@
 import { Image } from "expo-image";
 import { eq } from "drizzle-orm";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { PixelRatio, View, type ViewStyle } from "react-native";
+import { PixelRatio, Platform, View, type ViewStyle } from "react-native";
 
 import { cards } from "../catalog/schema";
 import { cachePolicyFor } from "../play/image-cache";
@@ -21,6 +21,7 @@ import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
 import { scanAssets } from "./images/scan-map";
 import { usePalette } from "./palette-hook";
+import { ITEM_RADIUS } from "../play/radius";
 import { useTheme } from "../play/theme";
 import { useUiScale } from "../play/ui-scale";
 
@@ -113,22 +114,21 @@ export function Portrait({ card, size: base = 40, ring = true, tint, glow = true
         height: size,
         borderRadius: size / 2,
         overflow: "hidden",
-        ...(ring ? { borderWidth: 1.5, borderColor: color, ...(glow && tint ? { boxShadow: `0 0 10px ${withAlphaHex(tint, 0.55)}` } : {}) } : { borderWidth: 1, borderColor: palette.hairline }),
+        ...(ring ? { borderWidth: 1.5, borderColor: color, ...(glow && tint ? { boxShadow: `0 0 10px ${withAlphaHex(tint, 0.55)}` } : {}) } : {}),
       }}
     >
-      <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 2)} height={size - (ring ? 3 : 2)} />
+      <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 0)} height={size - (ring ? 3 : 0)} />
     </View>
   );
 }
 
 /** A row of overlapping portraits: a fellowship at a glance. */
 export function PortraitRow({ heroes, size: base = 40 }: { heroes: readonly ArtCard[]; size?: number }) {
-  const palette = usePalette();
   const size = base * useUiScale();
   return (
     <View className="flex-row" importantForAccessibility="no-hide-descendants">
       {heroes.map((hero, index) => (
-        <View key={`${hero.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -size * 0.3, borderRadius: size / 2, borderWidth: 2, borderColor: palette.night }}>
+        <View key={`${hero.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -size * 0.3 }}>
           <Portrait card={hero} size={base} />
         </View>
       ))}
@@ -215,7 +215,6 @@ export function SceneCard({
   scenarioId,
   sceneHeight,
   pullUp,
-  hero = false,
   pressed = false,
   over,
   children,
@@ -224,8 +223,6 @@ export function SceneCard({
   sceneHeight: number;
   // How far the words rise into the scene's fade.
   pullUp: number;
-  // The Continue card's larger corners (rounded-hero).
-  hero?: boolean;
   pressed?: boolean;
   over?: ReactNode;
   children: ReactNode;
@@ -234,8 +231,8 @@ export function SceneCard({
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View className={hero ? "rounded-hero" : "rounded-card"} style={panelSurface(pressed, t)}>
-      <View className={`overflow-hidden ${hero ? "rounded-t-hero" : "rounded-t-card"}`}>
+    <View className="rounded-container" style={panelSurface(pressed, t)}>
+      <View className="overflow-hidden rounded-t-container">
         <SceneArt scenarioId={scenarioId} height={sceneHeight * s} shade={0.4} fade={0.35} fadeTo={palette.dusk}>
           {over}
         </SceneArt>
@@ -257,14 +254,35 @@ export function useArtGround(): { ground: string; blend: { mixBlendMode: "multip
 
 /**
  * A scenario's scene at the head of a page (the briefing), met to the ground (useArtGround) at its foot and, with `edge`, at its right
- * so it sits in the fog of the pane beside it. `children` are laid over it unblended (the banner's words).
+ * so it sits in the fog of the pane beside it. `children` are laid over it unblended (the banner's words). `soft` is a picture that
+ * stands inside a page's content (the Campaigns start block): 12 pt corners and every edge feathered into the page, so no rectangle
+ * shows. The feather is a real alpha mask where the platform draws one (the browser); elsewhere the same gradients run to the ground,
+ * which the blend turns to nothing.
  */
-export function GroundedScene({ scenarioId, height, shade, fade, edge = false, children }: { scenarioId: string | null | undefined; height: number; shade?: number; fade: number; edge?: boolean; children?: ReactNode }) {
+export function GroundedScene({
+  scenarioId,
+  height,
+  shade,
+  fade,
+  edge = false,
+  soft = false,
+  children,
+}: {
+  scenarioId: string | null | undefined;
+  height: number;
+  shade?: number;
+  fade: number;
+  edge?: boolean;
+  soft?: boolean;
+  children?: ReactNode;
+}) {
   const { ground, blend } = useArtGround();
   const s = useUiScale();
   const [width, setWidth] = useState(0);
   // A band at the box's top when the box would blow the scene up (sceneBand); its fade meets the ground, and the words below it sit there.
   const band = useSceneBand(scenarioId, width, height);
+  const fill = { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 } as const;
+  const side = (angle: number, size: number) => ({ position: "absolute" as const, ...(angle === 90 ? { top: 0, bottom: 0, left: 0, width: size } : angle === 270 ? { top: 0, bottom: 0, right: 0, width: size } : { top: 0, left: 0, right: 0, height: size }), backgroundImage: `linear-gradient(${angle}deg, ${ground}, ${withAlphaHex(ground, 0)})` });
   return (
     <View
       style={{ height }}
@@ -273,14 +291,29 @@ export function GroundedScene({ scenarioId, height, shade, fade, edge = false, c
         setWidth((current) => (current === next ? current : next));
       }}
     >
-      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...blend }}>
+      <View
+        pointerEvents="none"
+        importantForAccessibility="no-hide-descendants"
+        style={{ ...fill, ...blend, ...(soft ? { borderRadius: ITEM_RADIUS * s, overflow: "hidden" as const, ...featherMask } : {}) }}
+      >
         <SceneArt scenarioId={scenarioId} height={band} shade={shade} fade={fade} fadeTo={ground} bare />
         {edge ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 96 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
+        {soft ? (
+          <>
+            <View style={side(180, 28 * s)} />
+            <View style={side(90, 32 * s)} />
+            <View style={side(270, 32 * s)} />
+          </>
+        ) : null}
       </View>
       {children}
     </View>
   );
 }
+
+// The browser's feather for a soft scene: transparent at the top, the left and the right edge and at the foot, solid between.
+const FEATHER = "linear-gradient(180deg, transparent 0%, #000 16%, #000 52%, transparent 100%), linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%)";
+const featherMask = Platform.OS === "web" ? ({ maskImage: FEATHER, WebkitMaskImage: FEATHER, maskComposite: "intersect", WebkitMaskComposite: "source-in" } as object) : {};
 
 /**
  * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its

@@ -1,6 +1,6 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useDeferredValue, useEffect, useEffectEvent, useMemo, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
 import { BodyText, ListRow, Screen, SearchField, Section, TwoPane } from "./chrome";
@@ -12,7 +12,7 @@ import { withAlphaHex } from "../play/tokens";
 import { SceneArt } from "./art";
 import { usePalette } from "./palette-hook";
 import { RuleBody } from "./rule-detail";
-import { GLOSSARY, glossaryEntry, searchGlossary } from "./rules-glossary";
+import { glossary, glossaryEntry, searchGlossary } from "./rules-glossary";
 import { capWidth } from "../play/size-class";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
@@ -48,7 +48,7 @@ function BookCovers({ cover }: { cover: string }) {
           className={cover}
         >
           {({ pressed }) => (
-            <View className="overflow-hidden rounded-card" style={{ height: 150 * s, ...tileSurface(pressed, t) }}>
+            <View className="overflow-hidden rounded-item" style={{ height: 150 * s, ...tileSurface(pressed, t) }}>
               {BOOK_SCENE[book.id] ? <SceneArt scenarioId={BOOK_SCENE[book.id]} height={150 * s} fade={0.25} fadeTo={palette.dusk} /> : null}
               <View className="absolute bottom-0 left-0 right-0 top-0 justify-between p-3">
                 <View style={{ filter: `drop-shadow(0 0 6px ${withAlphaHex(palette.glow, 0.7)})` }}>
@@ -77,20 +77,25 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
-  const visible = useMemo(() => searchGlossary(GLOSSARY, search), [search]);
+  // The field shows each keystroke at once; the results catch up when React has time, so typing never waits on the search.
+  const query = useDeferredValue(search);
+  const visible = useMemo(() => searchGlossary(glossary(), query), [query]);
   const expanded = size === "expanded";
   const cover = size === "medium" ? "min-w-[22%] flex-1" : "min-w-[45%] flex-1";
   const entry = picked ? glossaryEntry(picked) : null;
   const listRef = useRef<FlashListRef<(typeof visible)[number]>>(null);
   // A pick made in the pane (See also) brings its row into view in the list, when the search leaves it there, and is announced.
   // Only a new pick moves the list; typing in the search does not.
+  const reveal = useEffectEvent((id: string) => {
+    const at = visible.findIndex((item) => item.id === id);
+    if (at >= 0) void listRef.current?.scrollToIndex({ index: at, animated: true });
+    const title = glossaryEntry(id)?.title;
+    if (title) AccessibilityInfo.announceForAccessibility(title);
+  });
   useEffect(() => {
     if (!expanded || !picked) return;
-    const at = visible.findIndex((item) => item.id === picked);
-    if (at >= 0) void listRef.current?.scrollToIndex({ index: at, animated: true });
-    const title = glossaryEntry(picked)?.title;
-    if (title) AccessibilityInfo.announceForAccessibility(title);
-  }, [picked, expanded]); // eslint-disable-line react-hooks/exhaustive-deps
+    reveal(picked);
+  }, [picked, expanded]);
 
   const searchRow = (
     <View className="mt-1 flex-row">
@@ -116,7 +121,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
                 <BookCovers cover={cover} />
               </View>
             ) : null}
-            <Section title="Glossary" className="mt-4" right={<Text className="text-label text-faint">{`${visible.length}`}</Text>} />
+            <Section title="Glossary" className="mt-4" />
           </View>
         }
         ListFooterComponent={<View className="pb-safe" />}
@@ -152,7 +157,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
           }
           end={
             <ScrollView key={picked ?? "none"} testID="rules-detail" className="min-h-0 flex-1" contentContainerStyle={{ paddingTop: 16 * s }} showsVerticalScrollIndicator={false}>
-              {/* The text keeps a reading column's width, at the pane's start edge beside the list, on a floating panel. */}
+              {/* The text keeps a reading column's width, at the pane's start edge beside the list. */}
               <View style={{ width: "100%", maxWidth: capWidth(size, "readable", s) ?? undefined }}>
                 {entry ? (
                   <RuleBody entry={entry} onSeeAlso={setPicked} reading />

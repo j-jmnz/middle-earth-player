@@ -4,7 +4,7 @@ Depends on: phase 19
 Blocks: phase 22
 Can run beside: phases 14, 15, 16, 18 and 20
 
-Plan: `docs/plans/board-ux.md` (user list items 7 and 10). User decision, 2026-10-26: a night tray over the dock. Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list items 7 and 10). User decision, 2026-10-26: a night tray over the dock. Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -93,44 +93,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - The web export at 844×390 and 667×375 shows a choice tray with tiles over the command column, the dock's buttons visible under it, and the encounter deck visible.
-- `docs/design-system.md` (Table, Panels) is rewritten for the tray.
+- `docs/design-system-table.md` (Panels) is rewritten for the tray.
 - STATUS.md lists the phone checks as open:
   - the tray at 667×375 with six options;
   - an outside tap that folds without picking a card.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior. `table-panel.tsx` (350 lines) splits into `choice-tray.tsx` and `reading-panels.tsx`.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- The two-tap rule holds. The armed line and the gold pill stay where they are; the tray never moves or covers them.
-- A tile's tap is the same pick the table's tap is (`table-choice.ts`). Do not add a second pick path.
-- The ranged attackers of another seat appear as tiles (`combat-sheets.ts:61`). Keep that.
-- Measure the tray against the command column width `clamp(0.3 × width, 210, 280)` (`table-view.tsx:167`).

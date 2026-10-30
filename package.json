@@ -36,8 +36,10 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@babel/core": "7.29.7",
     "@types/better-sqlite3": "^9.6.0",
     "@types/react": "~19.3.0",
+    "babel-plugin-react-compiler": "1.0.0",
     "better-sqlite3": "^13.0.3",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~58.0.4",
@@ -66,7 +68,9 @@
     "effects:draft": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/effects/draft.ts",
     "effects:open": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/effects/open.ts",
     "data:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/check.ts",
-    "data:query": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/query.ts"
+    "data:query": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/data/query.ts",
+    "docs:index": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs-index.ts",
+    "docs:section": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs-index.ts section"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"

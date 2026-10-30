@@ -37,5 +37,10 @@ export default defineConfig({
       "scripts/**/*.test.ts",
     ],
     passWithNoTests: true,
+    // Most files import the effect list and data/; one module cache per worker loads them once instead of once per file.
+    // A test that changes module state or the environment puts it back (vi.unstubAllEnvs, afterEach).
+    isolate: false,
+    // The main process only collects results, so every core runs a worker (the card smoke sweep is split for them).
+    maxWorkers: "100%",
   },
 });

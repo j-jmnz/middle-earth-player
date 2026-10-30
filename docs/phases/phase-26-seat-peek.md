@@ -4,7 +4,7 @@ Depends on: phases 19 and 23
 Blocks: nothing
 Can run beside: phases 14, 15, 16, 24 and 25
 
-Plan: `docs/plans/board-ux.md` (user list item 4). User decision, 2026-10-26: the peek shows the whole seat. Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list item 4). User decision, 2026-10-26: the peek shows the whole seat. Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -75,79 +75,8 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - `docs/brief.md` says in the table section that two-handed play may view the other seat's hand, because both hands are the one player's. It is a product rule, so it goes in the brief in the same change.
-- `docs/design-system.md` (Table, top bar and Cards) is updated.
+- `docs/design-system-table.md` (top bar and Cards) is updated.
 - STATUS.md lists the phone checks as open:
   - the peek and back in planning and in combat;
   - the slide;
   - the dials' viewing and acting marks at 667×375.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- True solo has one dial and no peek. Nothing changes there.
-- Staging and the quest are shared until Breaking of the Fellowship stage 2B (phase 16). The peek swaps only the seat zones (`zoneIds` and `pileIds`, `selectors.ts:61-87`, `147-158`). When phase 16 adds per-seat staging, it follows the same `shownSeat`.
-- An eliminated seat can still be viewed. Its zones are empty, and the banner says "Player 2 is out of the game".
-
-## Handover from phase 22
-
-- A seat's dial can carry a small gold Ring mark (`threat-<seat>-ring`) on its label while the Ring-bearer is facedown under a location; it sits on the first player's dial (the seat that gets the hero back, `heldBy` in `src/play/widgets.ts`), and the dial's accessibility label says so (`ringWords`). The peek's eye mark and bone ring must not crowd it at 667x375.
-
-## Handover from phase 23
-
-Phase 23 is merged. What phase 26 builds on:
-
-- Every duration, curve and spring is a token in `src/play/motion-tokens.ts` (`MOTION`; distances and scales in `SHAPE`). Add the peek's slide there (`peekSlide`, `tween(250, "outCubic")` in, and an ease-in `tween` for the way back if it differs). Every token stays at or under 500 ms (`motion-tokens.test.ts`), and `rg -n "duration\(|withTiming\(.*[0-9]{3}" src/play` finds nothing outside `motion-tokens.ts`.
-- Every duration passes through `motionScale(speed, reduced)` (1 Normal, 0.6 Quick, 0 under reduced motion), read once with `useMotionScale()` (`motion-run.ts`); hand Reanimated `timing(token, scale)`. Scale 0 is the reduced-motion snap the phase asks for.
-- The seat handoff (two-handed play), which a peek must not play:
-  - The dial pulse: `src/play/table-chrome.tsx`, a gold ring on the acting seat's dial, 1 to `SHAPE.seatPulse` (1.12) and back, two halves of `MOTION.seatPulseHalf` (150 ms; `seatPulse` 300 ms is the whole). It fires only when the dial's `active` goes false to true, never on mount. A peek changes the shown seat, not `activeSeat`, so keep the dial's `active` on `activeSeat`.
-  - The hand slide and the cross-fade: `motionsBetween(prev, next, zone, { handoff })` (`src/play/motion.ts`) slides the new seat's hand up from `SHAPE.seatHandRise` (0.6 of the card height) and fades its other slots in, both over `MOTION.seatHand` (300 ms), while the old seat's cards fade out as ghosts. `card-motion.native.tsx` passes `handoff: seat !== track.seat`, where the seat is the shown one. A peek also changes the shown seat, so pass the handoff flag from `activeSeat` changing (not the shown seat) and run the peek's own slide instead.
-- The hurry tap: a touch on the canvas calls `finishMotions(progress, clear)` in the canvas pan's `onBegin` (card clock to 1, pending `tickLand` dropped) and is then handled as usual. The peek's swipe starts with it; the slide must finish on a hurry too, and never delay or swallow an intent.
-- `tickLand()` (`src/play/haptics.ts`) is one light impact per new state when a played card lands; a peek is not a new state and plays none.
-- `tokenDeltas(prev, next)` (`token-deltas.ts`) pops tokens and floats numbers from the reducer's counts between two states. A peek shows the same state from another seat, so it must not read as a delta: key the pops by state, not by the shown seat.
-
-## Handover from phase 24
-
-Phase 24 is merged. Where the peek meets the combat spotlight:
-
-- The spotlight's RN scrim (`spotlight-scrim.tsx`, mounted from `table-layers.tsx`) covers the top bar and the dock column while a spotlight plays. A press on it only skips (on press-in) and reaches nothing under it, so a dial tap during a spotlight skips it and does not peek; the next tap peeks. The scrim stops catching touches the moment the gate ends. Keep `peek-banner` and `peek-back` on the canvas side, not under the scrim's area.
-- Android Back: `backStep` (`src/play/back.ts`) now opens with `skipSpotlight` while a spotlight plays. "Back ends the peek before anything else" means right after that step: put `endPeek` second, not first.
-- The skip tap rides the hurry: the canvas pan's `onBegin` calls `finishMotions(progress, clear)` (which ends the spotlight) and sets `swallow` from `live` (`useSpotlight`), and `tap.onEnd`, `hold.onStart` and `pan.onStart` return early while it is set. The peek's swipe must check `swallow` the same way, so the touch that skips a spotlight does not also start a peek.
-- `tickImpact()` (`src/play/haptics.ts`) plays at a strike's hit stop. A peek is not a new state, plays no spotlight and no `tickImpact`. A spotlight replays the state from the shown (acting) seat's layout (`spotlight-plan.ts` reads the two layouts), and the peek resets on a new moment, so a spotlight never plays while peeking.
-
-## Handover from phase 25
-
-Phase 25 is merged. Where the peek meets the hand scrub:
-
-- The canvas's gestures no longer live in `table-canvas.native.tsx`: the drag pan, the tap, the 350 ms hold and the scrub are in `src/play/hand-gestures.native.ts`, composed as `Gesture.Race(drag, scrub, hold, tap)`. The scrub is a `Pan().activateAfterLongPress(250)` that fails at once (`onTouchesDown`, `manager.fail()`) for a press off the hand. Compose the peek's swipe there, beside them, not in the canvas file. A horizontal swipe from the hand before 250 ms already wins as the drag pan (from 6 pt), so decide where the peek's swipe starts and how it differs from a drag (`plans/board-ux.md`).
-- The drag pan's first `onBegin` still holds the hurry and the spotlight's skip: `finishMotions(progress, clear)` and the `swallow` copy from `live`. The scrub's `onStart` returns early on `swallow`, as `tap.onEnd`, `hold.onStart` and `pan.onStart` do. The peek's swipe does the same.
-- Android Back (`backStep`, `src/play/back.ts`) is now `skipSpotlight`, then `cancelScrub`, then the rest. Put `endPeek` third, after `cancelScrub`. A scrub's open flag and its cancel reach `table-view.tsx` through `src/play/scrub-open.ts`, not `back.ts`.
-- The scrub's 35% night is its own layer in `hand-scrub.native.tsx`. It is drawn right after the table's cards and before `TokenFx` and the combat marks, over the table and under the hand, and only while a scrub runs. A peek that swaps the shown seat while a scrub is open should cancel the scrub first, because the spread reads the shown seat's hand slots.

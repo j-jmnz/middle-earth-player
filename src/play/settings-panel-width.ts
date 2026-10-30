@@ -1,4 +1,4 @@
-// The table settings panel's width (docs/design-system.md, Table, Reading panels): 40% of the canvas, kept between 360 and 460 pt at
+// The table settings panel's width (docs/design-system-table.md, Reading panels): 40% of the canvas, kept between 360 and 460 pt at
 // the UI scale, so a three-word Segmented (Small, Medium, Large) fits at Large, and never wider than the room the screen leaves.
 // Pure, so a test reads it.
 export const SETTINGS_PANEL_MIN = 360;

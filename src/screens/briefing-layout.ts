@@ -1,4 +1,4 @@
-// The briefing's expanded layout numbers (docs/design-system.md, Briefing; docs/plans/tablets-and-hand-fan.md, Part 4b). Pure, so a
+// The briefing's expanded layout numbers (docs/design-system.md, Briefing; docs/plans/done/tablets-and-hand-fan.md, Part 4b). Pure, so a
 // test reads them. The scene pane at the left is 360 to 480 points (Medium's); the seats at the right pick from two covers a row once
 // that pane is 600 wide.
 

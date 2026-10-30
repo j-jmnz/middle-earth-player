@@ -3,7 +3,7 @@
 // when the table passes the whole phase for the player (sweep.ts).
 import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
@@ -17,17 +17,17 @@ import { Text } from "./text.tsx";
 
 /** `area` is the canvas on the screen: the title crosses its center. */
 export function PhaseSweep({ store, area }: { store: TableStore; area: { left: number; top: number; width: number; height: number } }) {
-  // Every state renders this, so the effect that keeps the game before reads the one just before this.
-  const game = useStore(store, (state) => state.game);
-  const { phase, round } = game;
+  // Only a change of phase or round renders this (not every state).
+  const phase = useStore(store, (state) => state.game.phase);
+  const round = useStore(store, (state) => state.game.round);
   const scale = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
   const before = useRef(store.getState().game);
   const [shown, setShown] = useState<string | null>(null);
   const progress = useSharedValue(0);
-  // On a change of phase (or round): sweep unless the state moves cards, changes a count, or took the phase back. The game before
-  // is kept by the effect below, which runs after this one.
+  // On a change of phase (or round): sweep unless the state moves cards, changes a count, or took the phase back. The game before is
+  // the one just before that change (kept by the listener below, which runs when the store sets, before this renders).
   useEffect(() => {
     const was = before.current;
     const now = store.getState().game;
@@ -44,9 +44,15 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
     }, SETTLE_MS);
     return () => clearTimeout(timer);
   }, [phase, round, scale, store, progress]);
-  useEffect(() => {
-    before.current = store.getState().game;
-  });
+  useEffect(
+    () =>
+      store.subscribe((state, previous) => {
+        if (state.game.phase !== previous.game.phase || state.game.round !== previous.game.round) before.current = previous.game;
+      }),
+    [store],
+  );
+  // The sweep's animation stops with the view.
+  useEffect(() => () => cancelAnimation(progress), [progress]);
   const style = useAnimatedStyle(() => {
     const frame = sweepFrame(progress.get(), SHAPE.sweepSlide * s);
     return { opacity: frame.opacity, transform: [{ translateX: frame.offset }] };

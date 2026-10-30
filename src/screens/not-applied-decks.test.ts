@@ -1,4 +1,4 @@
-// The deck screens say how much of a deck the app does not apply (docs/plans/inactive-text.md): a count on the deck list,
+// The deck screens say how much of a deck the app does not apply (docs/plans/done/inactive-text.md): a count on the deck list,
 // the editor and the briefing, each card's loss in its row, and a count on each pre-built deck the import screen offers.
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -41,7 +41,7 @@ describe("not applied on the deck screens", () => {
 
   it("counts each pre-built deck: the four core decks are applied in full, and a deck with an unapplied card says how many", () => {
     const inactive = notAppliedCodes(texts());
-    const byId = new Map(prebuiltDecks.map((deck) => [deck.id, deck]));
+    const byId = new Map(prebuiltDecks().map((deck) => [deck.id, deck]));
     for (const id of ["core-leadership", "core-tactics", "core-spirit", "core-lore"]) {
       const deck = byId.get(id);
       expect(deck && prebuiltNotApplied(deck, inactive), id).toBeNull();

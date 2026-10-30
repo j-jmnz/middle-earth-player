@@ -27,7 +27,7 @@ export function questTitle(game: ScenarioState, ctx: ReduceContext, cardId: stri
   const points = stagePoints(game, stage, ctx);
   // A stage held back says what holds it, so progress past its quest points reads as the rule and not a fault (13 / 8).
   const hold = points != null ? advanceHold(game, ctx, line) : null;
-  if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(hold ? { detail: `Cannot advance yet: ${hold}` } : {}) };
+  if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(hold ? { detail: hold } : {}) };
   const objective = questObjective(game, ctx, line);
   return { title: name, detail: objective ? `To win: ${objective}` : "No quest points" };
 }

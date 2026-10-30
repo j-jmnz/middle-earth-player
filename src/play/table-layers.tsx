@@ -1,43 +1,41 @@
-// The layers over the table that read or answer (phase 21): the choice tray (choice-tray.tsx), the one reading panel (a discard
-// pile, the log, the threat panel, the table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close
-// them on a tap outside. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
+// The layers over the table that read or answer (phase 21): the one reading panel (a discard pile, the log, the threat panel, the
+// table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close them on a tap outside, and the hit
+// layers that fold the choice's rows (choice-tray.tsx), which stand in the dock. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
 // a new one replaces the last.
-//   - The tray folds on a tap on the canvas (use-table-choice.ts, onTap), on the top bar except its menu button and its dials, or on the empty
+//   - The choice folds on a tap on the canvas (use-table-choice.ts, onTap), on the top bar except its menu button and its dials, or on the empty
 //     part of the command column above the dock. That tap is swallowed.
 //   - A reading panel and the carousel have a scrim from the top bar's foot down: a tap anywhere else closes it and does nothing
 //     more. The top bar stays live, so a dial or the rail replaces the layer.
-//   - The carousel hangs over the canvas only, and the tray stays in the command column; neither covers the dock's armed line or buttons.
+//   - The carousel hangs over the canvas only, and the choice stays in the command column; neither covers the dock's armed line or buttons.
 //   - While the combat spotlight plays, its scrim (spotlight-scrim.tsx) is over the top bar and the dock, above all of these.
 //   - The peek banner (peek-banner.tsx) is the lowest of them, over the canvas only: the scrims and panels sit above it, and the spotlight's
 //     scrim (the bar and the dock column) never covers it.
-import { useEffect, useMemo } from "react";
+import { useEffect, useEffectEvent, useMemo } from "react";
 import { Pressable } from "react-native";
 import { useStore } from "zustand";
 
-import { ChoiceTray } from "./choice-tray.tsx";
 import type { Carousel } from "./carousel.ts";
 import { threatRows, threatVerdict } from "./foresight.ts";
 import { logLines, type LogNames } from "./log.ts";
 import { useDialsEdge } from "./bar-edge.ts";
 import { PEEK_TOP, PeekBanner } from "./peek-banner.tsx";
+import { carouselHeight } from "./carousel-size.ts";
 import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
 import { alwaysRows } from "./settings-words.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { PILE_WORDS } from "./selectors.ts";
-import type { SheetNames } from "./sheet-types.ts";
+import { PILE_WORDS, type PileId } from "./selectors.ts";
+import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
-import type { PictureSource } from "./table-canvas-types.ts";
 import { settingsPanelWidth } from "./settings-panel-width.ts";
-import { tableSettings, type TableSettings } from "./table-settings.ts";
+import { tableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
 import { usePeek } from "./use-peek.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 import { BAR_PAD, MENU_BUTTON } from "./top-bar-layout.ts";
-import { isDense } from "./dock-budget.ts";
 import { outsideLayers, trayBox } from "./tray-logic.ts";
 import { discardPlays } from "./table-choice.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
@@ -48,16 +46,48 @@ import { Text } from "./text.tsx";
 const READING_MIN = 300;
 const EDGE = 8;
 
+// The discard pile list, the log and the threat panel read the game themselves, so the layers above them do not render on every state.
+function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay, onClose }: { store: TableStore; pile: PileId; seat: number; names: SheetNames; sheet: Sheet; peeking: boolean; onRead: (cardId: string) => void; onPlay: (cardId: string) => void; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  return (
+    <PileList
+      title={PILE_WORDS[pile]}
+      cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
+      playable={pile === "discard" && !peeking ? discardPlays(game, seat, sheet) : []}
+      onRead={onRead}
+      onPlay={onPlay}
+      onClose={onClose}
+    />
+  );
+}
+
+function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
+  const round = useStore(store, (state) => state.game.round);
+  const roundSteps = useStore(store, (state) => state.roundSteps);
+  const lines = useMemo(() => logLines(roundSteps, logNames), [roundSteps, logNames]);
+  return <LogPanel round={round} lines={lines} onClose={onClose} />;
+}
+
+function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; seat: number; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  return (
+    <ThreatPanel
+      seatLabel={game.seatCount > 1 ? `Player ${seat + 1}` : null}
+      threat={game.seats[seat]?.threat ?? 0}
+      rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, seat) }))}
+      onClose={onClose}
+    />
+  );
+}
+
 export function TableLayers({
   store,
   ctx,
   names,
   nameOf,
-  picture,
   choice,
   reading,
   onReading,
-  settings,
   carousel,
   logNames,
   screen,
@@ -72,19 +102,18 @@ export function TableLayers({
   ctx: ReduceContext;
   names: SheetNames;
   nameOf: (code: string) => string;
-  picture: (code: string) => PictureSource | null;
   choice: TableChoice;
   reading: Reading | null;
   onReading: (next: Reading | null) => void;
-  settings: TableSettings;
-  carousel: Carousel;
+  // The strip's data, built by the screen only while the carousel is open (carousel.ts); null otherwise. It is held here while the strip leaves.
+  carousel: Carousel | null;
   logNames: LogNames;
   screen: { width: number; height: number };
   insets: { left: number; right: number; bottom: number };
   // The screen y under the top bar.
   barBottom: number;
   commandWidth: number;
-  // The screen y of the top of the dock's block of readout, armed line and buttons, or null until it is measured.
+  // The screen y of the top of the dock's content (its words, the choice's rows and its buttons), or null until it is measured.
   anchorTop: number | null;
   onPreview: (cardId: string) => void;
   // The settings panel's All settings: leave the table for the Settings tab (the game is saved), as the menu's Rules does.
@@ -93,8 +122,9 @@ export function TableLayers({
   // The UI scale (ui-scale.ts): the layers' sizes below are Medium's times it.
   const s = useUiScale();
   const menuZone = touch(s, MENU_BUTTON) + BAR_PAD * s;
-  const game = useStore(store, (state) => state.game);
-  const roundSteps = useStore(store, (state) => state.roundSteps);
+  // The settings panel and the strip's Stops switches read the settings themselves; no state of the game renders this view (the panels that
+  // read the game below subscribe to it on their own, and only while they are open).
+  const settings = useStore(tableSettings, (state) => state.settings);
   const reader = useScreenReader();
   // The discard pile list is the shown seat's; the banner over the canvas says when that is not the acting seat's (peek.ts).
   const peek = usePeek(store);
@@ -103,9 +133,9 @@ export function TableLayers({
   const close = () => onReading(null);
   // A spotlight plays over the table, so a reading layer (the carousel, a panel) closes as one begins instead of hiding it.
   const spotlit = useSpotlightHold(store);
+  const closeReading = useEffectEvent(() => onReading(null));
   useEffect(() => {
-    if (spotlit) onReading(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when a spotlight begins.
+    if (spotlit) closeReading();
   }, [spotlit]);
   const anchor = anchorTop ?? Math.round(screen.height * 0.55);
   const canvas = screen.width - insets.left - insets.right - commandWidth;
@@ -119,8 +149,7 @@ export function TableLayers({
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
   const open = reading?.kind === "carousel";
-  const logging = held?.kind === "log";
-  const lines = useMemo(() => (logging ? logLines(roundSteps, logNames) : []), [logging, roundSteps, logNames]);
+  const strip = useHeld(carousel);
   return (
     <>
       {peek.words ? <PeekBanner words={peek.words} top={barBottom + PEEK_TOP * s} left={insets.left} width={canvas} onBack={peek.back} /> : null}
@@ -131,17 +160,19 @@ export function TableLayers({
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (
         <>
           <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: insets.left + dialsEdge, right: insets.right + menuZone, height: barBottom }} />
-          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: anchor - barBottom }} />
+          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: Math.max(0, anchor - barBottom) }} />
         </>
       ) : null}
-      <ChoiceTray open={trayShown} place={box} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
       <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
         {held?.kind === "pile" ? (
-          <PileList
-            title={PILE_WORDS[held.pile]}
-            cards={[...(held.pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
-            playable={held.pile === "discard" && !peek.words ? discardPlays(game, seat, choice.sheet) : []}
+          <PileReading
+            store={store}
+            pile={held.pile}
+            seat={seat}
+            names={names}
+            sheet={choice.sheet}
+            peeking={peek.words != null}
             onRead={onPreview}
             onPlay={(cardId) => {
               close();
@@ -150,15 +181,8 @@ export function TableLayers({
             onClose={close}
           />
         ) : null}
-        {held?.kind === "log" ? <LogPanel round={game.round} lines={lines} onClose={close} /> : null}
-        {held?.kind === "threat" ? (
-          <ThreatPanel
-            seatLabel={game.seatCount > 1 ? `Player ${held.seat + 1}` : "Threat"}
-            threat={game.seats[held.seat]?.threat ?? 0}
-            rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, held.seat) }))}
-            onClose={close}
-          />
-        ) : null}
+        {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
+        {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "settings" ? (
           <SettingsPanel
             settings={settings}
@@ -178,12 +202,12 @@ export function TableLayers({
       {/* The strip hangs over the canvas only; the tray stays in the command column. */}
       <PhaseCarousel
         open={open}
-        carousel={carousel}
+        carousel={strip}
         settings={settings}
         top={barBottom}
         left={insets.left}
         width={canvas}
-        height={Math.round(Math.min(340 * s, (screen.height - barBottom) * 0.92))}
+        height={carouselHeight({ screenHeight: screen.height, barBottom, insetBottom: insets.bottom }, s)}
         onChange={(change) => tableSettings.getState().update(change)}
         onClose={close}
       />

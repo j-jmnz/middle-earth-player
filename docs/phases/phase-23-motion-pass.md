@@ -4,7 +4,7 @@ Depends on: phase 20
 Blocks: phases 24, 25 and 26
 Can run beside: phases 14, 15, 16 and 22
 
-Plan: `docs/plans/board-ux.md` (user list items 1 and 2). Implementer: `implementer` on Sonnet 5.5.
+Plan: `docs/plans/done/board-ux.md` (user list items 1 and 2). Implementer: `implementer` on Sonnet 5.5.
 
 ## Goal
 
@@ -12,7 +12,7 @@ The table moves like a game, not a form. Motion is slower than today but stays s
 
 ## Now
 
-There are no motion tokens: every duration is a local literal. The list is in `docs/plans/board-ux.md` (What the table does now).
+There are no motion tokens: every duration is a local literal. The list is in `docs/plans/done/board-ux.md` (What the table does now).
 - Cards move in 320 ms ease-out cubic (`MOVE_MS`, `src/play/table-canvas.native.tsx:29,108`). Their paths are worked out in `src/play/motion.ts`.
 - Nothing flips, staggers, overshoots or pops.
 - Token counts change in place.
@@ -87,73 +87,10 @@ None. The canvas is phone-only. The settings flow, if one exists, asserts the An
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
 - `rg -n "duration\\(|withTiming\\(.*[0-9]{3}" src/play` finds no duration literal outside `motion-tokens.ts`.
-- `docs/design-system.md` (Table, Motion; Performance) is rewritten with the tokens.
+- `docs/design-system-table.md` (Motion; Performance) is rewritten with the tokens.
 - STATUS.md lists the phone checks as open:
   - draws, reveals, plays and token pops at Normal and Quick;
   - the hurry tap;
   - the sweep not hiding a moment;
   - no dropped frames with a full table;
   - reduced motion snapping everything.
-
-## Implementer notes (Sonnet 5.5)
-
-**Before you start**
-- Read `.cursor/agents/implementer.md` first and follow it. Ignore its `model` line.
-- Then read:
-  - this file;
-  - `docs/plans/board-ux.md`;
-  - `docs/design-system.md` (Table);
-  - `docs/architecture.md` (Play).
-- Implement this phase only.
-
-**What you may change**
-- This phase may edit `docs/design-system.md` (Table) for what it changes. That is the exception to "do not restyle screens". `/ux` reviews it.
-- No new dependency. Motion is Reanimated, drawing is Skia, gestures are Gesture Handler, haptics are `src/play/haptics.ts`. No `any`.
-- Colors come from `tableTokens` (`src/play/tokens.ts`). A hex in a component is a miss.
-
-**Boundaries**
-- `src/play` never imports `src/screens`.
-- `src/screens` never imports `src/rules`.
-- The reducer is the only writer of numbers.
-
-**Code and tests**
-- Logic goes in pure `.ts` files with a Vitest next to them. There are no component tests: Vitest runs in node on `*.test.ts`.
-- Keep files under about 300 lines and split by behavior. Put the canvas motion wiring in its own file (`card-motion.native.tsx`) if `table-canvas.native.tsx` would pass 300 lines.
-- Keep every testID. If one moves behind a new control, update the `.maestro/*.yaml` flows that use it.
-
-**When you finish**
-- Exit gate: `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm data:check`.
-- A cloud session has no phone. List the phone checks as open in `docs/phases/STATUS.md`; do not mark them done.
-- Report back when the exit is green. The main session runs `reviewer` and `ux`.
-
-**Phase-specific**
-- "Don't overdo it" is the user's words. Every motion here is at most 500 ms, and the table must never feel like it waits on an animation.
-- The canvas still draws only when what it shows changes:
-  - no idle loop;
-  - no breathing glow;
-  - no timer that redraws while nothing moves.
-- A flip shows the printed back the canvas already has (the One Ring for player cards, the Eye for encounter cards). It never shows a face the player may not see: a shadow card stays down.
-- Read the reduced-motion state once with `useReducedMotion()`, as the table does now. Pass `ReduceMotion.System` to layout animations.
-
-## Handover from phase 20
-
-Phase 20 is merged. What phase 23 builds on:
-
-- The rail's motion values are constants at the top of `src/play/phase-rail.tsx` (`SLIDE_MS` 280 ease-out for the neighbor names, `FLASH_MS` 300 for the pill's gold edge, `STEP_MS` 200 for the step cross-fade); the carousel's are at the top of `src/play/phase-carousel.tsx` (`ENTER_MS` 240 ease-out, translateY −12 to 0 with a fade; `LEAVE_MS` 180). Move them to `motion-tokens.ts`; each file's comment names them. All of them snap under reduced motion today, and the rail does not animate on its first render.
-- Nothing animates while the strip scrolls; keep it that way.
-- The middle zone of the top bar fades from opacity 0 once the bar and dials are measured (`src/screens/table-top-bar.tsx`, 400 ms fallback when the dials never report). That is a gate, not a motion token; leave it out of the scale.
-- Open phone checks phase 23 can fold into its own: the slide on a phase change, the strip's swipe (also starting on a Switch), and the 667x375 two-seat bar.
-
-## Handover from phase 21
-
-- The choice tray's motion is at the top of `src/play/tray-frame.tsx`: `ENTER_MS` 260 decelerate (`Easing.out(Easing.cubic)`, translateY 16 to 0 with a fade), `LEAVE_MS` 180 accelerate (`Easing.in(Easing.cubic)`); the frame stays mounted until the exit finishes. Both snap under reduced motion. Move them to `motion-tokens.ts`.
-- The reading panels (`src/play/reading-panels.tsx`) sit in one paper `TrayFrame` (`src/play/table-layers.tsx`), so they have the same enter and exit. A new reading layer replaces the last one in the same open frame (`reading.ts`), so swapping one panel for another does not animate today.
-- Open phone check phase 23 can fold into its own: the 260 and 180 ms motion on a phone.
-
-
-## Handover from phase 22
-
-- The table menu, the dock's More popover (`dock-more-actions`) and the dock's "i" popover (`dock-more-lines`, `dock-lines-popover.tsx`) share one frame, `src/play/popover-frame.tsx`: it scales in from the corner it hangs from (`ENTER_MS` 200 ease-out from 0.96, `LEAVE_MS` 150 ease-in) with its scrim. Moving those to `motion-tokens.ts` moves all three popovers at once.
-- The armed bar under the dock's armed line (`src/play/dock-buttons.tsx`) runs down in its own 4 pt under the text; it does not animate under reduced motion (the text carries the meaning). Its room is sized by `armed-room.ts` and never changes on arming, so any motion added there must not move the buttons.
-- The "i" pill (`dock-more`) opens the folded dock lines in that shared popover; the dock itself never reflows when it opens.
-- The quest band is gone, so it has no motion to tune.

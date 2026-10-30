@@ -1,4 +1,4 @@
-// The table canvas's gestures (docs/design-system.md, Table, Gestures; phase 25), moved out of table-canvas.native.tsx with the hand
+// The table canvas's gestures (docs/design-system-table.md, Gestures; phase 25), moved out of table-canvas.native.tsx with the hand
 // scrub. They race: a drag (a pan from 6 pt) plays a card, a tap picks, a long press (350 ms) previews a card on the table, and a
 // pan that activates after a 150 ms hold on the hand scrubs through it. A move before the 150 ms is a drag, so the drag-to-play path
 // is never delayed; the scrub is a gesture of its own that fails at once for a press that is not on the hand. All of it runs on the
@@ -7,7 +7,7 @@
 //
 // The first touch of the drag pan is the hurry and the spotlight's skip (finishMotions, `swallow`); a touch that skipped a spotlight
 // does nothing else, and its hold never starts a scrub. A scrub sends no intent and picks nothing.
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { Gesture } from "react-native-gesture-handler";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -74,16 +74,20 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   // A scrub started and JavaScript has not yet been told it closed.
   const begun = useSharedValue(false);
 
-  const spread = useMemo(() => spreadLayout(layout, canvas), [layout, canvas.width, canvas.height, canvas.bottom]); // eslint-disable-line react-hooks/exhaustive-deps -- the canvas is its three numbers.
+  // The canvas is its three numbers, so a caller's fresh object with the same ones does not spread the hand again.
+  const { width: canvasWidth, height: canvasHeight, bottom: canvasBottom } = canvas;
+  const spread = useMemo(() => spreadLayout(layout, { width: canvasWidth, height: canvasHeight, bottom: canvasBottom }), [layout, canvasWidth, canvasHeight, canvasBottom]);
   const draggableSet = useMemo(() => new Set(draggable), [draggable]);
-  useEffect(() => {
+  // Set in a layout effect, which runs before the frame is drawn and before a touch can be handled, so a flick that starts right after a
+  // render already finds its slots, lifts and drop targets (a passive effect could run a frame later).
+  useLayoutEffect(() => {
     slots.set(layout.slots);
     lifts.set(layout.slots.map((slot) => slot.kind === "card" && draggableSet.has(slot.id)));
   }, [layout, draggableSet, slots, lifts]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     drops.set(dropRects(layout, targets));
   }, [layout, targets, drops]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     spreadNow.set(spread);
   }, [spread, spreadNow]);
 

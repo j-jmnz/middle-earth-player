@@ -112,7 +112,7 @@ export default function Log() {
       <ScrollView className="min-h-0 flex-1" contentContainerClassName="pb-safe" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <Column>
         {/* Weathered parchment on the ember fog (docs/design-system.md, Campaign log): the same sheet on both themes. */}
-        <View className="mb-6 mt-2 rounded-chip px-5 py-5" style={parchmentSurface(t)}>
+        <View className="mb-6 mt-2 rounded-container px-5 py-5" style={parchmentSurface(t)}>
           <View>
             <Eyebrow tone="inkLabel">{`${campaign.name} · ${seatWord(save.seatCount)}`}</Eyebrow>
             <Text accessibilityRole="header" className="mt-1 font-display text-ink" style={{ fontSize: (size === "compact" ? 30 : 38) * s, lineHeight: (size === "compact" ? 36 : 46) * s }}>

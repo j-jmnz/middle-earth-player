@@ -1,7 +1,6 @@
 import { Pressable, View } from "react-native";
 
 import { copyCapRule } from "../catalog/deck-save";
-import { usePressedNight } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { dropShadowOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
@@ -24,7 +23,7 @@ export function CountStepper({
   full,
   onChange,
   minus = true,
-  ids = { dec: `count-dec-${code}`, count: `count-${code}`, inc: `count-inc-${code}` },
+  ids: given,
 }: {
   code: string;
   name: string;
@@ -35,11 +34,11 @@ export function CountStepper({
   minus?: boolean;
   ids?: { dec: string; count: string; inc: string };
 }) {
+  const ids = given ?? { dec: `count-dec-${code}`, count: `count-${code}`, inc: `count-inc-${code}` };
   const palette = usePalette();
   const t = useTableTokens();
-  const pressedNight = usePressedNight();
   return (
-    <View className="flex-row items-center rounded-tile" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: dropShadowOf(t, 6, 14, 0.85) }}>
+    <View className="flex-row items-center rounded-control" style={{ backgroundColor: withAlphaHex(palette.night, 0.92), boxShadow: dropShadowOf(t, 6, 14, 0.85) }}>
       {minus ? (
         <Pressable
           testID={ids.dec}
@@ -47,10 +46,13 @@ export function CountStepper({
           accessibilityRole="button"
           accessibilityLabel={count <= 1 ? `Remove ${name}` : `Remove a copy of ${name}`}
           onPress={() => onChange(-1)}
-          className="min-h-touch min-w-touch items-center justify-center rounded-tile"
-          style={({ pressed }) => (pressed ? pressedNight : undefined)}
         >
-          <Text className="text-title text-muted">−</Text>
+          {/* The pressed fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+          {({ pressed }) => (
+            <View className="min-h-touch min-w-touch items-center justify-center rounded-control" style={pressed ? { backgroundColor: t.pressed } : undefined}>
+              <Text className="text-title text-muted">−</Text>
+            </View>
+          )}
         </Pressable>
       ) : null}
       {count > 0 || minus ? (
@@ -69,10 +71,12 @@ export function CountStepper({
         accessibilityLabel={`Add ${count > 0 ? "a copy of " : ""}${name}`}
         accessibilityState={{ disabled: full }}
         onPress={() => onChange(1)}
-        className="min-h-touch min-w-touch items-center justify-center rounded-tile"
-        style={({ pressed }) => (pressed ? pressedNight : undefined)}
       >
-        <Text className={`text-title ${full ? "text-faint" : "text-bone"}`}>+</Text>
+        {({ pressed }) => (
+          <View className="min-h-touch min-w-touch items-center justify-center rounded-control" style={pressed ? { backgroundColor: t.pressed } : undefined}>
+            <Text className={`text-title ${full ? "text-faint" : "text-bone"}`}>+</Text>
+          </View>
+        )}
       </Pressable>
     </View>
   );

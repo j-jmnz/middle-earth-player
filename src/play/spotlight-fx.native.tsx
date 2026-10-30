@@ -1,4 +1,4 @@
-// The light and the shock of the combat spotlight's layer (spotlight.native.tsx; docs/plans/combat-spotlight-redesign.md, §5): the dark
+// The light and the shock of the combat spotlight's layer (spotlight.native.tsx; docs/plans/done/combat-spotlight-redesign.md, §5): the dark
 // with its vignette in one radial gradient, a pool of light under the cards, the attacker's rim glow, the warm-white flash over the
 // target, the shockwave ring and the glint across a turned shadow card. Every glow is a gradient (no blur filter); each piece reads
 // the attack's frame (spotlight-beats.ts) through a derived value. The stage is in screen points already times the UI scale.

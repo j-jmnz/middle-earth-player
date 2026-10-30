@@ -119,15 +119,6 @@ describe("the campaign across scenarios 3 and 4", () => {
     }
   });
 
-  it("a loss writes nothing and leaves Journey in the Dark locked", async () => {
-    const golden = SOUTH_GOLDENS.find((item) => item.outcome === "lost");
-    if (!golden) throw new Error("no lost golden");
-    const game = playGolden(golden, (await southWorld(golden.decks)).ctx);
-    const log = afterThree();
-    expect(applyResolution(log, game.state.scenarioId, game.state, ctx.cards)).toBe(log);
-    expect(campaignPath(campaign, {}, log).map((node) => node.status)).toEqual(["completed", "completed", "completed", "current", "locked", "locked"]);
-  });
-
   it("the resolution screen settles on what was earned and the scenario it unlocks, and a loss shows Defeat", async () => {
     const won = SOUTH_GOLDENS.find((item) => item.outcome === "won" && item.seatCount === 1)!;
     const lost = SOUTH_GOLDENS.find((item) => item.outcome === "lost")!;

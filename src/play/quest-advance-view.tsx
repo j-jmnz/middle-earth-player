@@ -14,9 +14,11 @@ import { DockButtons } from "./dock-buttons.tsx";
 import { springConfig, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
-import { ChromePrimary, Tile } from "./sheet-paper.tsx";
+import { PrimaryButton } from "./buttons.tsx";
+import { Tile } from "./sheet-paper.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { trayTiles } from "./tray-logic.ts";
+import { cardCorner } from "./card-corner.ts";
 import { useUiScale } from "./ui-scale.ts";
 import type { TableChoice } from "./use-table-choice.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -34,7 +36,7 @@ export function QuestAdvanceView({
   onProgress,
 }: {
   card: PreviewCard;
-  words: { eyebrow: string; title: string; detail: string | null };
+  words: { eyebrow: string | null; title: string; detail: string | null };
   // The button back to the table (advanceButton): Begin, Continue or Progress.
   button: { label: string; hint: string };
   // The stage's When Revealed is asking: its question stands in place of Progress.
@@ -74,13 +76,15 @@ export function QuestAdvanceView({
           { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left + 16 * s, paddingRight: insets.right + 16 * s },
         ]}
       >
-        <Animated.View style={[{ width: size.width, height: size.height, borderRadius: card.source ? 0 : 16 * s, overflow: "hidden", backgroundColor: card.source ? "transparent" : t.paper }, cardStyle]}>
+        <Animated.View style={[{ width: size.width, height: size.height, borderRadius: card.source ? 0 : cardCorner(size.width, size.height), overflow: "hidden", backgroundColor: card.source ? "transparent" : t.paper }, cardStyle]}>
           <PreviewPicture card={card} width={size.width} height={size.height} />
         </Animated.View>
         <View style={wide ? { flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: roomH - 16 * s } : { width: size.width, marginTop: 16 * s, flexShrink: 1 }}>
-          <Text testID="quest-advance-eyebrow" className="font-display text-eyebrow uppercase text-accent">
-            {words.eyebrow}
-          </Text>
+          {words.eyebrow ? (
+            <Text testID="quest-advance-eyebrow" className="font-display text-eyebrow uppercase text-accent">
+              {words.eyebrow}
+            </Text>
+          ) : null}
           <Text testID="quest-advance-title" accessibilityRole="header" className="mt-1 font-display text-title text-bone">
             {words.title}
           </Text>
@@ -118,7 +122,7 @@ export function QuestAdvanceView({
             </View>
           ) : (
             <View className="mt-4">
-              <ChromePrimary label={button.label} testID="quest-advance-progress" accessibilityHint={button.hint} onPress={onProgress} />
+              <PrimaryButton label={button.label} testID="quest-advance-progress" accessibilityHint={button.hint} onPress={onProgress} />
             </View>
           )}
         </View>

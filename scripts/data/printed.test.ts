@@ -10,7 +10,7 @@ const ledger = loadLedger();
 describe("ledger scope", () => {
   it("reads every starter code that src/screens/starter-decks.ts lists", () => {
     // starterCodes() reads the file as text, because Node cannot load its Drizzle import. This keeps the two in step.
-    expect(starterCodes()).toEqual([...new Set(starterPrints.map((row) => row.code))].sort());
+    expect(starterCodes()).toEqual([...new Set(starterPrints().map((row) => row.code))].sort());
   });
 });
 

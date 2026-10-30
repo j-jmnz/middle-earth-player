@@ -1,12 +1,14 @@
 // The one fold control (phase 28b): a header that folds and unfolds the section under it. A 44 pt target; a chevron (down while
-// open, right while folded), the title, a rule, and the count of what is inside while folded. A screen reader hears whether it is
+// open, right while folded), the title, and the count of what is inside while folded. A screen reader hears whether it is
 // expanded and an announcement on each toggle. The body stays mounted and is hidden, so what it holds keeps its state; there is
-// no animation (docs/design-system.md, Motion: a fold is a state change, not a motion).
-import { useCallback, useState, type ReactNode } from "react";
+// no animation (docs/design-system.md, Performance: a fold is a state change, not a motion).
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
-import { SectionRule, sectionTitleStyle } from "../play/section-heading";
+import { sectionTitleStyle } from "../play/section-heading";
+import { textSurface } from "../play/surfaces";
 import { useUiScale } from "../play/ui-scale";
+import { useTableTokens } from "../play/use-table-tokens";
 import { Chevron, Chip } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
@@ -31,7 +33,8 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
     },
     [user],
   );
-  return { folded, setFolded };
+  // One object while neither function changes, so a caller can depend on it (or on `setFolded`, which only a new user changes).
+  return useMemo(() => ({ folded, setFolded }), [folded, setFolded]);
 }
 
 /**
@@ -66,13 +69,12 @@ export type FoldHeaderProps = {
   badge?: string;
   testID?: string;
   right?: ReactNode;
-  // A row of a FlashList draws no gradient (docs/design-system.md, Performance): the rule is a solid hairline.
-  solid?: boolean;
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right, solid = false }: FoldHeaderProps) {
+export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right }: FoldHeaderProps) {
   const palette = usePalette();
+  const t = useTableTokens();
   const s = useUiScale();
   const counted = count == null ? null : unit ? plural(count, unit) : String(count);
   const second = folded && summary ? summary : (detail ?? null);
@@ -92,21 +94,25 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
           onFold(!folded);
           AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
         }}
-        className="min-h-touch flex-1 justify-center rounded-tile"
-        style={({ pressed }) => (pressed ? { backgroundColor: palette.pressed } : undefined)}
+        className="flex-1"
       >
-        <View className="flex-row items-center gap-3">
-          <View className="w-3 items-center">
-            <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+        {/* The pressed fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+        {({ pressed }) => (
+          <View className="min-h-touch justify-center rounded-item" style={textSurface(pressed, t)}>
+            <View className="flex-row items-center gap-3">
+              <View className="w-3 items-center">
+                <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+              </View>
+              <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
+                {title}
+              </Text>
+              {badge ? <Chip label={badge} tone="faint" /> : null}
+              <View className="min-w-3 flex-1" />
+              {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
+            </View>
+            {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}
           </View>
-          <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
-            {title}
-          </Text>
-          {badge ? <Chip label={badge} tone="faint" /> : null}
-          <SectionRule solid={solid} />
-          {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
-        </View>
-        {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}
+        )}
       </Pressable>
       {folded ? null : right}
     </View>

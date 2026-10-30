@@ -6,7 +6,8 @@ import { syncConstants } from "../rules/constants.ts";
 import { runInstruction } from "../rules/interpret.ts";
 import { destroyCard } from "../rules/keywords.ts";
 import { settle } from "../rules/machine.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { updateCard, type ScenarioState } from "../rules/state.ts";
+import { attachTo, spawn } from "../rules/zones.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 
@@ -51,18 +52,30 @@ describe("The Necromancer's Tower, stage 1B (01123:B:3)", () => {
 describe("Through the Caverns, stage 2B (01124:B:3)", () => {
   const prisoner = (made: Table): ScenarioState => settle(syncConstants(runInstruction({ ...made.state, window: null }, { verb: "TakePrisoner" }, { seat: 0, sourceId: made.state.questStage }, made.ctx, []), made.ctx), made.ctx, []);
 
-  it("cannot advance while a hero is the prisoner, or with fewer than all 3 objective cards", () => {
-    const held = make({ stage: "01124", claimed: ["01108", "01109"], guarded: [["01110", ""]] });
-    // 3 objectives, but the prisoner is not rescued.
-    const three = make({ stage: "01124" });
-    const threeClaimed = make({ stage: "01124", claimed: ["01108", "01109"] });
-    void held;
-    void three;
-    void threeClaimed;
+  // The 3 objectives claimed by a hero still in play: a prisoner's attachments are no longer claimed, so they go on another hero.
+  const claimAll = (state: ScenarioState, hero: string, ctx: Table["ctx"]): ScenarioState => {
+    let next = state;
+    for (const code of ["01108", "01109", "01110"]) {
+      const objective = spawn(next, code, { zone: "attached" });
+      next = updateCard(attachTo(objective.state, objective.id, hero), objective.id, { controller: 0, claimed: true });
+    }
+    return syncConstants(next, ctx);
+  };
+
+  it("cannot advance while a hero is the prisoner, even with all 3 objective cards held", () => {
     const base = make({ stage: "01124", seats: 2 });
     const taken = prisoner(base);
-    expect(progress(taken, 15, base.ctx).cards[taken.questStage ?? ""]?.progress).toBe(15);
-    expect(stageOf(progress(taken, 15, base.ctx))).toBe("01124");
+    const free = [base.hero, base.hero2].find((id) => taken.cards[id]?.zone === "heroes") ?? "";
+    expect(stageOf(progress(claimAll(base.state, free, base.ctx), 15, base.ctx))).toBe("01125");
+    const full = progress(claimAll(taken, free, base.ctx), 15, base.ctx);
+    expect(stageOf(full)).toBe("01124");
+    expect(full.cards[full.questStage ?? ""]?.progress).toBe(15);
+  });
+
+  it("cannot advance while an objective card is still in the staging area", () => {
+    const held = make({ stage: "01124", claimed: ["01108", "01109"], guarded: [["01110", ""]] });
+    expect(held.state.cards[first(held.state, "01110")]?.zone).toBe("staging");
+    expect(stageOf(progress(held.state, 15, held.ctx))).toBe("01124");
   });
 
   it("advances once the prisoner is rescued and the players hold all 3 objective cards", () => {

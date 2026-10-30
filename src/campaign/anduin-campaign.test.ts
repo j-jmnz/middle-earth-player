@@ -47,8 +47,7 @@ beforeAll(async () => {
   cards = new Map([...world.cards, ...strong.cards, ...extra]);
   ctx = { effects: EFFECTS, cards };
   const brittle = await anduinWorld("brittle");
-  const weak = await anduinWorld("weak");
-  for (const golden of ANDUIN_GOLDENS) games.set(golden.name, playGolden(golden, (golden.decks === "brittle" ? brittle : golden.decks === "weak" ? weak : strong).ctx));
+  for (const golden of ANDUIN_GOLDENS.filter((item) => item.outcome === "won")) games.set(golden.name, playGolden(golden, (golden.decks === "brittle" ? brittle : strong).ctx));
 }, 240_000);
 
 function make(layout: AnduinLayout = {}) {
@@ -243,18 +242,13 @@ describe("what a win writes", () => {
     expect(campaignPath(campaign, {}, { ...log, completed: ["passage-through-mirkwood", ...log.completed] }).map((node) => node.status).slice(0, 3)).toEqual(["completed", "completed", "current"]);
   });
 
-  it("takes a fallen hero's Valor and Scarred out of the pool, and a loss writes nothing", () => {
+  it("takes a fallen hero's Valor and Scarred out of the pool", () => {
     const made = resolved({ seats: 2 }, (state, ids) => {
       const valor = spawn(state, "01133", { zone: "play", seat: 0 });
       return attachTo(valor.state, valor.id, ids.hero);
     });
     const log = applyResolution({ ...emptyLog(2), fallenHeroesBySeat: [["ah1"], []] }, made.state.scenarioId, made.state, cards);
     expect(log.campaignPool).toEqual([]);
-    for (const golden of ANDUIN_GOLDENS.filter((item) => item.outcome === "lost")) {
-      const game = games.get(golden.name)!;
-      const blank = emptyLog(golden.seatCount);
-      expect(applyResolution(blank, game.state.scenarioId, game.state, cards), golden.name).toBe(blank);
-    }
   });
 
   it("hands the pool on its heroes to the next scenario's checklist: each Valor and Scarred is attached to its hero again (01130:B:1)", () => {

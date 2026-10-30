@@ -21,7 +21,7 @@ A Zustand subscriber reads the slice it draws. Reducer updates keep the same obj
 
 The phase rail names the step the engine is in, in words. It does not skip steps. Zones on screen: pinned quest stage, staging, active location, engaged, play area, hand. Hide sheet, life number, burden deck, second active location, and second staging area render only when the script declares them. The second active-location slot is shared scenario state. Scenario 1 declares Hide. It does not declare the life tracker, the burden deck, or a second staging area.
 
-A tap on a table card opens the inspect route. (Superseded 2026-10-25 by the landscape table: a tap picks for the open moment, a long press shows the card large, and Details there opens the card route; `docs/design-system.md`, Table.) The picture stays on the canvas. The inspect screen is the React Native view. The table opens the phase 10 `booklets` route and closes back to the table. A missing booklet does not block the scenario.
+A tap on a table card opens the inspect route. (Superseded 2026-10-25 by the landscape table: a tap picks for the open moment, a long press shows the card large, and Details there opens the card route; `docs/design-system-table.md`.) The picture stays on the canvas. The inspect screen is the React Native view. The table opens the phase 10 `booklets` route and closes back to the table. A missing booklet does not block the scenario.
 
 A trigger shows the card, the timing, and the legal choices. Shadow cards stay face down until that attack. Resource, damage, threat, and progress change only when the engine changes them. There is no stepper, dial, or phase scrubber.
 

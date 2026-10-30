@@ -1,21 +1,22 @@
-// The token pop and the floating number (docs/design-system.md, Table, Motion; phase 23): when a damage, resource or progress count
+// The token pop and the floating number (docs/design-system-table.md, Motion; phase 23): when a damage, resource or progress count
 // changes, its token pops (1 to 1.4 and back on a spring) and a number rises 20 pt from it and fades ("+2" in accent for a gain,
 // "-1" in danger red for damage or a loss, Cinzel Bold 13 pt with a night outline). Progress placed on a quest card or a location
 // pops its strip's count the same way. The numbers are the reducer's (token-deltas.ts); this only draws them, from the clock of
 // card-motion.native.tsx, on a layer over the cards. The pop is a copy of the token drawn over the real one, shown only while it
 // pops, so the table has nothing extra to redraw when it is over.
-import { Circle, Group, Image, useFont, vec, type SkFont, type SkImage } from "@shopify/react-native-skia";
+import { Circle, Group, Image, vec, type SkFont, type SkImage } from "@shopify/react-native-skia";
 import { useDerivedValue } from "react-native-reanimated";
 
 import { Outlined, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import type { Clock } from "./card-motion.native.tsx";
 import { slotBounds, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
+import { useSharedFont } from "./table-assets.native.ts";
+import { MARCELLUS } from "./table-fonts.native.ts";
 import { floatWords, type TokenKind } from "./token-deltas.ts";
 import { FLOAT_MS, floatAt, POP_MS, popShows, tokenPopScale, type Fx } from "./token-fx.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import type { TableTokens } from "./tokens.ts";
 
-const MARCELLUS = require("../../assets/fonts/MarcellusSC-Regular.ttf") as number;
 // Medium's size of the floating number, in points; drawn times the UI scale.
 const FLOAT_SIZE = 13;
 
@@ -101,7 +102,7 @@ export function TokenFx({
   stripOf: (slot: CardSlot) => string | null;
   contrast: boolean;
 }) {
-  const font = useFont(MARCELLUS, FLOAT_SIZE * s);
+  const font = useSharedFont(MARCELLUS, FLOAT_SIZE * s);
   if (fx.length === 0) return null;
   return (
     <Group>

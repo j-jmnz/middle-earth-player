@@ -1,26 +1,30 @@
 // Rules: rr.refresh-phase, rr.step-7-3, ltp.phase-7-refresh (data/rules/entries.json).
 import { ruleCause } from "./cause.ts";
+import type { GameEvent } from "./frame-types.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { raiseThreat } from "./keywords.ts";
 import { gameReads } from "./game-reads.ts";
 import { queueEvent } from "./queue.ts";
 import { fireForced } from "./triggers.ts";
-import { flagged, livingSeats, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { flagged, livingSeats, updateCards, withMode, type CardInstance, type ScenarioState } from "./state.ts";
 import { inPlay } from "./zones.ts";
 
 export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
   // A Response to "After a character readies during the refresh phase" (02102:A:1) hears each card that readies here.
   const heard = gameReads(state, ctx, '"trigger":"readied"');
+  const patches: [string, Partial<CardInstance>][] = [];
+  const readied: GameEvent[] = [];
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (!instance.exhausted && !instance.committed)) continue;
     // "Does not ready during the refresh phase" (a flag) leaves the card exhausted.
     // So does "cannot ready" (cannotReady, 900103:A:1).
     const stays = instance.exhausted && (flagged(state, instance.id, "doesNotReady") || flagged(state, instance.id, "cannotReady"));
-    next = updateCard(next, instance.id, { exhausted: stays, committed: false });
-    if (heard && instance.exhausted && !stays) next = queueEvent(next, { trigger: "readied", seat: instance.controller, cardId: instance.id, phase: "Refresh" });
+    patches.push([instance.id, { exhausted: stays, committed: false }]);
+    if (heard && instance.exhausted && !stays) readied.push({ trigger: "readied", seat: instance.controller, cardId: instance.id, phase: "Refresh" });
   }
+  let next = updateCards(state, patches);
+  for (const event of readied) next = queueEvent(next, event);
   for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");
 }

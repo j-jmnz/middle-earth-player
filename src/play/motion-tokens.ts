@@ -1,4 +1,4 @@
-// The table's motion tokens (docs/design-system.md, Table, Motion; phase 23): every duration, easing and spring in src/play is
+// The table's motion tokens (docs/design-system-table.md, Motion; phase 23): every duration, easing and spring in src/play is
 // named here and nowhere else. Pure numbers and names, so a Vitest reads them and the canvas worklets share them
 // (motion-curves.ts draws a curve from a name; motion-run.ts hands the same names to Reanimated).
 //
@@ -89,7 +89,6 @@ export const MOTION = {
   railFlashIn: tween(60, null),
   railFlashOut: tween(240, null),
   railFlash: tween(300, null),
-  railStep: tween(200, null),
   previewIn: spring(280, 0.74),
   previewOut: tween(150, "inQuad"),
   dragLift: tween(90, null),
@@ -100,7 +99,7 @@ export const MOTION = {
   threatBadgeOut: tween(400, null),
   toastIn: tween(160, null),
   toastOut: tween(120, null),
-  // The combat spotlight, one attack (docs/plans/combat-spotlight-redesign.md): the dark comes in and the cards arc to the center
+  // The combat spotlight, one attack (docs/plans/done/combat-spotlight-redesign.md): the dark comes in and the cards arc to the center
   // (enter), the medallions pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
   // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it), the cards and the
   // result stay (hold) and both go back (return). A destroyed target burns inside the return (burn). The eight beats add up to `spotlight`.

@@ -1,5 +1,5 @@
 // Where each zone, pile and card sits on the one table canvas, which is always wider than it is tall: the table is played
-// in landscape (docs/design-system.md, Table). Pure geometry: the canvas draws these rectangles, and the drag worklets
+// in landscape (docs/design-system-table.md). Pure geometry: the canvas draws these rectangles, and the drag worklets
 // hit-test them on the UI thread (the functions marked "worklet" run there; in Node the directive is an unused string).
 //
 // The quest stage, the active location and the player's deck and discard pile make a column at the left. To its right, top

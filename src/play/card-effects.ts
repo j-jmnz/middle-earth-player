@@ -4,6 +4,7 @@
 // lowered (the engine's value against the printed one), each "cannot" an effect put on it, and the effects themselves in
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
+import { memoOf, type StateMemo } from "../rules/constant-records.ts";
 import { heldBy, modifiedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
@@ -85,8 +86,25 @@ export function badgeSplit(total: number, room: number): { shown: number; hidden
   return { shown, hidden: total - shown };
 }
 
+// What the table reads for a card, worked out once per state object (the state is never changed in place), so a canvas that
+// redraws on every game change asks the engine once for each card shown. `key` is the card, and the seat for numbers drawn against one.
+const EFFECTS: StateMemo<Map<string, CardEffects>> = new WeakMap();
+const SLOTS: StateMemo<Map<string, SlotNumbers>> = new WeakMap();
+
+function cached<T>(memo: StateMemo<Map<string, T>>, game: ScenarioState, ctx: ReduceContext, key: string, build: () => T): T {
+  const known = memoOf(memo, game, ctx, () => new Map<string, T>());
+  if (known.has(key)) return known.get(key) as T;
+  const built = build();
+  known.set(key, built);
+  return built;
+}
+
 /** The effects on one card in play now: changed numbers and "cannot"s. Empty for a card out of play or face down. */
 export function cardEffects(game: ScenarioState, ctx: ReduceContext, cardId: string): CardEffects {
+  return cached(EFFECTS, game, ctx, cardId, () => effectsOnCard(game, ctx, cardId));
+}
+
+function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string): CardEffects {
   const card = game.cards[cardId];
   if (!card || !inPlay(card.zone) || card.face === "down") return { stats: [], flags: [] };
   const printed = printedOf(ctx.cards, card.code);
@@ -182,6 +200,10 @@ export function delayedLines(game: ScenarioState, cardId: string, cardName: (id:
  * delayed effect will act on it.
  */
 export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: string, seat = 0): SlotNumbers {
+  return cached(SLOTS, game, ctx, `${seat}:${cardId}`, () => numbersOnSlot(game, ctx, cardId, seat));
+}
+
+function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, seat: number): SlotNumbers {
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
   const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest");

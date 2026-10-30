@@ -87,8 +87,8 @@ describe("the banner words", () => {
 });
 
 describe("while peeking the canvas marks nothing", () => {
-  it("has no glow, no pick, no mark, no dim and no beat, nothing to drag and no drop target", () => {
-    expect(NO_HIGHLIGHT.tappable.size + NO_HIGHLIGHT.picked.size + NO_HIGHLIGHT.marks.size + NO_HIGHLIGHT.muted.size + NO_HIGHLIGHT.beat.size).toBe(0);
+  it("has no glow, no pick, no mark and no dim, nothing to drag and no drop target", () => {
+    expect(NO_HIGHLIGHT.tappable.size + NO_HIGHLIGHT.picked.size + NO_HIGHLIGHT.marks.size + NO_HIGHLIGHT.muted.size).toBe(0);
     expect(NO_HIGHLIGHT.dimOthers).toBe(false);
     expect(NO_HIGHLIGHT.share).toBeNull();
     expect(NO_DRAG).toEqual([]);

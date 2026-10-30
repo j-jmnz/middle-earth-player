@@ -1,31 +1,14 @@
 import { useFocusEffect, useIsFocused } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { AccessibilityInfo, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "../play/motion-run";
 import { MOTION } from "../play/motion-tokens";
+import { useScreenReader } from "../play/screen-reader";
 import { TextButton } from "./chrome";
 import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
 import { Text } from "../play/text";
-
-function useScreenReader(): boolean {
-  const [enabled, setEnabled] = useState(false);
-  useEffect(() => {
-    let live = true;
-    void AccessibilityInfo.isScreenReaderEnabled()
-      .then((next) => {
-        if (live) setEnabled(next);
-      })
-      .catch(() => undefined);
-    const subscription = AccessibilityInfo.addEventListener("screenReaderChanged", setEnabled);
-    return () => {
-      live = false;
-      subscription.remove();
-    };
-  }, []);
-  return enabled;
-}
 
 /**
  * The toast of src/screens/toast.ts, docked at the foot of the screen's content, above its pinned bar. It takes its own
@@ -58,7 +41,7 @@ export function ToastView() {
         <View
           testID="toast"
           accessibilityLiveRegion="polite"
-          className={`min-h-14 flex-row items-center rounded-tile border bg-pressed pl-4 ${toast.tone === "danger" ? "border-danger" : "border-accentLine"}`}
+          className="min-h-14 flex-row items-center rounded-container bg-pressed pl-4"
         >
           <Text testID="toast-text" className={`flex-1 py-3 text-body ${toast.tone === "danger" ? "text-danger" : "text-bone"}`}>
             {toast.text}

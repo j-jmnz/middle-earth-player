@@ -1,4 +1,4 @@
-// Where the combat spotlight's cards stand (docs/plans/combat-spotlight-redesign.md, §2; docs/design-system.md, Table, Spotlight). Pure
+// Where the combat spotlight's cards stand (docs/plans/done/combat-spotlight-redesign.md, §2; docs/design-system-table.md, Spotlight). Pure
 // geometry, like layout.ts, for the whole screen: the attacker (or a fan of up to three attackers, then "+n") at the left and the
 // target at the right, centered on the screen at 60% of its height (at most 340 pt), a medallion straddling each card's foot, a
 // turned shadow card beside the enemy, and a note chip above the bottom safe inset. The beats that move them are in

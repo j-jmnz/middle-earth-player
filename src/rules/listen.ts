@@ -22,6 +22,21 @@ export function effectsOf(ctx: { effects: readonly Effect[] }, code: string): re
   return index.get(code) ?? [];
 }
 
+// Effect records by id, built once per effect list: a Response offer, a sheet or a log line names its record by id.
+const BY_ID = new WeakMap<readonly Effect[], ReadonlyMap<string, Effect>>();
+
+export function effectById(ctx: { effects: readonly Effect[] }, id: string): Effect | undefined {
+  let index = BY_ID.get(ctx.effects);
+  if (!index) {
+    const built = new Map<string, Effect>();
+    // The first record wins, as `find` did.
+    for (const effect of ctx.effects) if (!built.has(effect.id)) built.set(effect.id, effect);
+    index = built;
+    BY_ID.set(ctx.effects, index);
+  }
+  return index.get(id);
+}
+
 // The card an event is about: the one it is limited to, or the one it names.
 export function aboutCard(event: GameEvent): string | undefined {
   return event.cardId ?? event.subject;

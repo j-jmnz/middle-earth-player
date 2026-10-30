@@ -108,7 +108,7 @@ export function Chip({ label, tone = "neutral", leading, testID, onArt = false }
   const look = chipTonesFor(palette)[tone];
   // Over a picture the tag sits on the ground first, so its words read over a bright sky.
   return (
-    <View className="h-6 flex-row items-center gap-1.5 rounded-chip px-2" style={{ backgroundColor: onArt ? withAlphaHex(palette.night, 0.72) : look.fill }}>
+    <View className="h-6 flex-row items-center gap-1.5 rounded-control px-2" style={{ backgroundColor: onArt ? withAlphaHex(palette.night, 0.72) : look.fill }}>
       {leading}
       <Text testID={testID} numberOfLines={1} className="text-label" style={{ color: look.text }}>
         {label}
@@ -146,9 +146,10 @@ export function StepDiamond({ state, size }: { state: "done" | "current" | "ahea
  * the current step as a larger outlined diamond with a glow, then a small dark diamond for each step that remains, on a dashed line.
  * The words beside it say the numbers.
  */
-export function JourneyBar({ total, done, current = done < total, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
+export function JourneyBar({ total, done, current: given, testID }: { total: number; done: number; current?: boolean; testID?: string }) {
   const palette = usePalette();
   const ahead = useAheadLine();
+  const current = given ?? done < total;
   const line = (solid: boolean, key: string) => (
     <View key={key} className="flex-1" style={solid ? { height: 2, backgroundColor: palette.accent } : { height: 0, borderTopWidth: 2, borderStyle: "dashed", borderColor: ahead }} />
   );
@@ -172,8 +173,8 @@ export function ProgressBar({ value, max, tone = "accent" }: { value: number; ma
   const palette = usePalette();
   const share = max <= 0 ? 0 : Math.max(0, Math.min(1, value / max));
   return (
-    <View className="overflow-hidden rounded-pill" style={{ height: 3, backgroundColor: withAlphaHex(palette.bone, 0.08) }} importantForAccessibility="no-hide-descendants">
-      <View className="rounded-pill" style={{ height: 3, width: `${Math.round(share * 100)}%`, backgroundColor: tone === "accent" ? palette.accent : palette.danger }} />
+    <View className="overflow-hidden rounded-control" style={{ height: 3, backgroundColor: withAlphaHex(palette.bone, 0.08) }} importantForAccessibility="no-hide-descendants">
+      <View className="rounded-control" style={{ height: 3, width: `${Math.round(share * 100)}%`, backgroundColor: tone === "accent" ? palette.accent : palette.danger }} />
     </View>
   );
 }

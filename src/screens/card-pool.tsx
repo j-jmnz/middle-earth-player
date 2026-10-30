@@ -1,28 +1,27 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
-import { eq } from "drizzle-orm";
 import { useRouter } from "expo-router";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
-import { cards, packs } from "../catalog/schema";
-import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, ToggleChip, sphereWord } from "./chrome";
+import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip, sphereWord } from "./chrome";
 import { draftAddRefused, draftCopyCount, useDeckDraft, type TitleLookup } from "./deck-draft";
 import { deckCardCount, deckCountLine, DECK_MINIMUM } from "./deck-status";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useListPreview } from "./list-preview";
-import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
+import { notAppliedWords } from "../play/not-applied";
 import { usePalette } from "./palette-hook";
+import { poolOf } from "./pool-cache";
 import { addingView, browseView } from "./pool-view";
 import { PoolCardCell, PoolCardRow, type PoolRowCard } from "./pool-cards";
 import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns, recyclePool } from "./pool-grid";
-import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, sortPool, typeRequestWords, type PoolFilter } from "./pool-filter";
+import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, typeRequestWords, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
 import { gutter } from "../play/size-class";
 import { GameIcon } from "../play/game-icon";
 import { SPHERE_TINT } from "../play/icon-map";
-import { rowSurface, segmentSurface, slateSurface } from "../play/surfaces";
+import { chipSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
@@ -64,8 +63,6 @@ function TypeChips({
   // A request from outside the pool: the row scrolls to the chip it chose.
   request: PoolTypeRequest | null;
 }) {
-  const palette = usePalette();
-  const t = useTableTokens();
   const row = useRef<ComponentRef<typeof ScrollView>>(null);
   const chipX = useRef(new Map<string, number>());
   useEffect(() => {
@@ -76,20 +73,15 @@ function TypeChips({
   const options = [{ code: null, name: "All" }, ...types];
   return (
     <ScrollView ref={row} horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-1 grow-0" contentContainerClassName="gap-1.5 px-6">
-      {/* A switch, not a type: an outlined plate with a check when on, and a hairline after it before the type chips. */}
-      <Pressable
+      {/* A switch, not a type: a chip with a check when on, before the type chips. */}
+      <ToggleChip
         testID="pool-applied-only"
-        accessibilityRole="switch"
-        accessibilityState={{ checked: applied }}
+        asSwitch
+        selected={applied}
+        label={applied ? "✓ Applied only" : "Applied only"}
         accessibilityLabel="Applied only: cards whose text the app applies"
         onPress={() => onApplied(!applied)}
-        className="min-h-touch justify-center"
-      >
-        <View className="h-9 justify-center rounded-tile px-3" style={applied ? { ...segmentSurface(t), boxShadow: `inset 0 -2px 0 ${palette.accentHigh}` } : rowSurface(false, t)}>
-          <Text className={applied ? "text-label font-semibold text-accent" : "text-label text-muted"}>{applied ? "✓ Applied only" : "Applied only"}</Text>
-        </View>
-      </Pressable>
-      <View className="my-3 w-px" style={{ backgroundColor: withAlphaHex(palette.bone, 0.12) }} />
+      />
       {options.map((option) => (
         <ToggleChip
           key={option.code ?? "all"}
@@ -104,8 +96,8 @@ function TypeChips({
   );
 }
 
-// The five sphere toggles under the search: a 44 pt plate each, the sphere's printed icon in its colour with a glow and a bar along
-// the plate's foot when on, grey when off. A second tap turns a sphere off again.
+// The five sphere toggles under the search: a 44 pt capsule each, the sphere's printed icon in its colour with a glow on a wash of that
+// colour when on, grey on the tonal fill when off. A second tap turns a sphere off again.
 const SPHERES = ["leadership", "tactics", "spirit", "lore", "neutral"] as const;
 
 function SphereToggles({ value, onChange }: { value: string | null; onChange: (next: string | null) => void }) {
@@ -130,8 +122,8 @@ function SphereToggles({ value, onChange }: { value: string | null; onChange: (n
           >
             {({ pressed }) => (
               <View
-                className="items-center justify-center rounded-tile"
-                style={{ width: box, height: box, ...(on ? { ...segmentSurface(t), boxShadow: `inset 0 -2px 0 ${color}, 0 0 14px ${withAlphaHex(color, 0.35)}` } : rowSurface(pressed, t)) }}
+                className="items-center justify-center rounded-control"
+                style={{ width: box, height: box, ...(on ? { backgroundColor: withAlphaHex(color, 0.22) } : chipSurface(false, pressed, t)) }}
               >
                 <View style={on ? { filter: `drop-shadow(0 0 5px ${withAlphaHex(color, 0.8)})` } : undefined}>
                   <GameIcon name={sphere} size={20 * s} tint={on ? tint : "faint"} />
@@ -173,7 +165,10 @@ export function CardPoolBody({
   // The card whose detail is open beside the pool: its cell carries the silver ring.
   selected?: string | null;
 }) {
-  const draft = useDeckDraft();
+  // Only the heroes and the cards: typing the deck's name in the editor does not render the pool.
+  const heroes = useDeckDraft((current) => current.heroes);
+  const deckCards = useDeckDraft((current) => current.cards);
+  const draft = useMemo(() => ({ heroes, cards: deckCards }), [heroes, deckCards]);
   const { catalog } = useDatabases();
   const router = useRouter();
   // Both views are read on every render (a hook is never chosen at run time); the mode picks which one shows and which one changes.
@@ -195,49 +190,9 @@ export function CardPoolBody({
   // The list view's rows are a reading column outside compact; the grid fills the width.
   const inset = grid ? 0 : gutter(listWidth, size, "readable", scale);
   const recycle = grid ? recyclePool(columns, listHeight, poolCellHeight(cellWidth, adding, scale)) : recyclePool(1, listHeight, LIST_ROW_HEIGHT * scale);
-  // Sorted in memory: a printing's tag ("(MotK) Aragorn") files under the name.
-  const [rows] = useState(() =>
-    sortPool(
-      catalog
-        .select({
-          code: cards.code,
-          name: cards.name,
-          typeCode: cards.typeCode,
-          typeName: cards.typeName,
-          sphereCode: cards.sphereCode,
-          sphereName: cards.sphereName,
-          packCode: cards.packCode,
-          packCodes: cards.packCodes,
-          traits: cards.traits,
-          cost: cards.cost,
-          threat: cards.threat,
-          isUnique: cards.isUnique,
-          deckLimit: cards.deckLimit,
-          deckLegal: cards.deckLegal,
-          imagesrc: cards.imagesrc,
-        })
-        .from(cards)
-        .where(eq(cards.deckLegal, true))
-        .all(),
-    ),
-  );
-  const [packRows] = useState(() =>
-    catalog
-      .select({
-        code: packs.code,
-        name: packs.name,
-        position: packs.position,
-        cyclePosition: packs.cyclePosition,
-      })
-      .from(packs)
-      .orderBy(packs.cyclePosition, packs.position)
-      .all(),
-  );
-  // The same "not applied" check as the card screen and the table: a printed line no effect record reads.
-  const [inactiveCodes] = useState(() =>
-    // The text the app shows is the errata when there is one, as on the card screen and in the deck store.
-    notAppliedCodes(catalog.select({ code: cards.code, text: cards.text, errata: cards.errata }).from(cards).where(eq(cards.deckLegal, true)).all().map((row) => [row.code, row.errata ?? row.text] as const)),
-  );
+  // The sorted pool, its packs and the cards with a line the app does not apply: read once per catalog (pool-cache.ts), shared with the
+  // Cards tab, the pool route, the deck editor's cards pane and the import screen.
+  const { rows, packs: packRows, notApplied: inactiveCodes, byCode } = poolOf(catalog);
   const groups = useMemo(() => cycleGroups(packRows), [packRows]);
   const [search, setSearch] = useState("");
   // The field shows each keystroke at once; the list catches up when React has time, so typing never waits on the grid.
@@ -268,10 +223,7 @@ export function CardPoolBody({
     AccessibilityInfo.announceForAccessibility(typeRequestWords(types, typeRequest.type));
   }, [typeRequest, types]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
-  const lookup = useMemo<TitleLookup>(() => {
-    const byCode = new Map(rows.map((row) => [row.code, row]));
-    return (code) => byCode.get(code);
-  }, [rows]);
+  const lookup = useMemo<TitleLookup>(() => (code) => byCode.get(code), [byCode]);
   const filters = activeFilterCount(applied);
   const openCard = useCallback((code: string) => (onOpen ? onOpen(code) : router.push({ pathname: "/card/[code]", params: { code } })), [router, onOpen]);
   const previewCard = onPreview;
@@ -380,26 +332,16 @@ export function CardPoolBody({
 /** Filter, with a round count of the filters on beside the word. */
 function FilterButton({ count, onPress }: { count: number; onPress: () => void }) {
   const palette = usePalette();
-  const t = useTableTokens();
   const s = useUiScale();
-  return (
-    <Pressable testID="pool-filter" collapsable={false} accessibilityRole="button" accessibilityLabel={count > 0 ? `Filter, ${count} on` : "Filter"} onPress={onPress}>
-      {({ pressed }) => (
-        <View className="flex-row items-center rounded-tile px-3.5" style={{ minHeight: touch(s, 44), gap: 8 * s, ...slateSurface(pressed, t) }}>
-          <Text className="text-body" style={{ color: palette.muted }}>
-            Filter
-          </Text>
-          {count > 0 ? (
-            <View className="items-center justify-center rounded-pill" style={{ minWidth: 20 * s, height: 20 * s, paddingHorizontal: 5 * s, backgroundColor: palette.accent }}>
-              <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.onAccent }}>
-                {String(count)}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      )}
-    </Pressable>
-  );
+  const badge =
+    count > 0 ? (
+      <View className="items-center justify-center rounded-control" style={{ minWidth: 20 * s, height: 20 * s, paddingHorizontal: 5 * s, backgroundColor: palette.accent }}>
+        <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.onAccent }}>
+          {String(count)}
+        </Text>
+      </View>
+    ) : null;
+  return <SecondaryButton testID="pool-filter" label="Filter" accessibilityLabel={count > 0 ? `Filter, ${count} on` : "Filter"} trailing={badge} onPress={onPress} />;
 }
 
 // The pool on its own route: the Cards tab, or the pool the deck editor pushes on a phone. `header` is the screen's top: the tab's
@@ -416,7 +358,8 @@ export function CardPool({
   startType?: string | null;
   onDone?: () => void;
 }) {
-  const draft = useDeckDraft();
+  const heroes = useDeckDraft((current) => current.heroes);
+  const deckCards = useDeckDraft((current) => current.cards);
   const preview = useListPreview();
   return (
     <Screen scene="calm">
@@ -431,11 +374,11 @@ export function CardPool({
                 <View className="flex-row items-baseline justify-between">
                   <Text className="text-label text-muted">Deck</Text>
                   <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
-                    {deckCountLine(draft)}
+                    {deckCountLine({ heroes, cards: deckCards })}
                   </Text>
                 </View>
                 <View className="mt-1.5">
-                  <ProgressBar value={deckCardCount(draft.cards)} max={DECK_MINIMUM} />
+                  <ProgressBar value={deckCardCount(deckCards)} max={DECK_MINIMUM} />
                 </View>
               </View>
               <PrimaryButton testID="pool-done" label="Done" onPress={() => onDone?.()} />

@@ -6,13 +6,11 @@ description: Implements one phase from docs/phases. Use when the user asks to im
 
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
 
-Phase 17 (the design system) is completed and belongs to `/ux`; `docs/design-system.md` is the visual authority. Do not restyle screens while doing another phase.
+Do not restyle screens: the design system is `/ux`'s, and `docs/design-system.md` with `docs/design-system-table.md` is the visual authority. Find the sections you need in `docs/INDEX.md` and read those, not whole files.
 
 Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.cursor/rules/authority.mdc` gives) beat all three.
 
-If no phase is active, start the lowest-numbered phase whose dependencies are completed. Do not start a later phase while an earlier dependency is open. Phases 12 to 16 have an engine half and a phone half (`docs/phases/STATUS.md`, phase 12); write `engine done` in the note when the engine half's exit is green and leave the phone half's checks open.
-
-When you start, mark that phase `active` and leave a one-line note. When its exit is green, ask `/reviewer` to review the diff. If the phase changes `src/screens` or `src/play`, ask `/ux` as well. Mark the phase `completed` and write the date only when the exit is green and those reviews report no blocks. Do not mark the next phase active.
+Which phase you may start, how to mark it, the engine and phone halves, and when it is `completed` are in the header of `docs/phases/STATUS.md`. Follow it. When the exit is green, ask `/reviewer` to review the diff, and `/ux` as well if the phase changes `src/screens` or `src/play`.
 
 ## Scope
 
@@ -35,6 +33,8 @@ dispatch({ type: "Pass" })
 ```
 
 ## Changes
+
+Follow `.cursor/rules/code-standards.mdc` (the React Compiler, immutable state and caches, narrow subscriptions, the save, and how to make and check a change) and `.cursor/rules/docs-standards.mdc` for every doc you touch. Your phase note in `docs/phases/STATUS.md` is one line of what is still open; what you built, test counts and review rounds go in the commit message. When the phase is completed, remove the agent-only sections from its phase file.
 
 Match existing names and types. Keep the diff inside the phase. No drive-by refactors, no new dependencies, no `any`. The stack, the databases, the image decoders, and the test layers are in `docs/architecture.md` and `docs/brief.md`. Follow them. Do not copy them into a new document.
 

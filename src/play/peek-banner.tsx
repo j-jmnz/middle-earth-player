@@ -1,4 +1,4 @@
-// The banner over the canvas while the player peeks at the other seat (docs/design-system.md, Table, Peeking; phase 26): a raised night
+// The banner over the canvas while the player peeks at the other seat (docs/design-system-table.md, Peeking; phase 26): a raised night
 // pill across the top of the canvas that says whose area this is and who is acting, with an accent text button back to the acting seat.
 // It sits on the canvas side, under the top bar and clear of the dock column, so the combat spotlight's scrim (over those two) never
 // covers it. It is 36 pt tall and takes no touch of its own: only `peek-back` does (a 36 pt button with 4 pt of slop above and below,
@@ -6,12 +6,13 @@
 // words are one line, at most 1.3 times the system font scale, so the pill never grows past the room the table keeps for it. It fades
 // in and out over the banner tokens and snaps under reduced motion. It holds no state and sends nothing.
 import { useEffect, useMemo } from "react";
-import { AccessibilityInfo, Pressable, StyleSheet, View } from "react-native";
+import { AccessibilityInfo, Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import type { PeekWords } from "./peek.ts";
+import { textSurface } from "./surfaces.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -51,15 +52,17 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
             accessibilityLabel={words.back}
             hitSlop={{ top: slop, bottom: slop }}
             onPress={onBack}
-            className="h-9 shrink-0 items-center justify-center rounded-pill px-3"
-            style={({ pressed }) => (pressed ? { backgroundColor: t.pressed } : undefined)}
+            className="shrink-0 justify-center"
           >
-            <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">
-              {words.back}
-            </Text>
+            {/* The fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+            {({ pressed }) => (
+              <View className="items-center justify-center rounded-control px-3" style={{ height: 36 * s, ...textSurface(pressed, t) }}>
+                <Text numberOfLines={1} maxFontSizeMultiplier={SCALE} className="text-label font-medium text-accent">
+                  {words.back}
+                </Text>
+              </View>
+            )}
           </Pressable>
-          {/* The hairline edge is drawn over the pill, so it takes no room and no touch. */}
-          <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: pill / 2, borderWidth: 1, borderColor: t.hairline }]} />
         </View>
       </View>
     </Animated.View>

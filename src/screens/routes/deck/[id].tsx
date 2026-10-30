@@ -7,8 +7,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionBar, Chip, FloatingBarShade, NavBar, PaperSheet, PrimaryButton, Screen, SecondaryButton, TextButton, TwoPane } from "../../chrome";
 import { CardPoolBody, type PoolTypeRequest } from "../../card-pool";
 import { BANNER_HEIGHT, DeckGlance } from "../../deck-glance";
-import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck-grid";
-import { announceDraftChange, discardDraftChanges, draftAddRefused, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
+import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, refusedCodes, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck-grid";
+import { announceDraftChange, discardDraftChanges, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
 import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat } from "../../deck-status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck-store";
 import { notAppliedWords } from "../../../play/not-applied";
@@ -76,22 +76,28 @@ export default function DeckEditor() {
   const faces = useMemo(() => deckFaces(catalog, codeKey.length === 0 ? [] : codeKey.split("\0")), [catalog, codeKey]);
   const lookup = useCallback<TitleLookup>((code) => faces.get(code), [faces]);
 
-  const sections = deckSections<EditorCard>(
-    draft.cards.map((card) => {
-      const face = faces.get(card.code);
-      return {
-        code: card.code,
-        count: card.count,
-        cost: face?.cost ?? null,
-        name: face?.name ?? card.code,
-        typeCode: face?.typeCode ?? null,
-        imagesrc: face?.imagesrc ?? null,
-        deckLimit: face?.deckLimit ?? null,
-        sphereCode: face?.sphereCode ?? null,
-        sphereName: face?.sphereName ?? null,
-      };
-    }),
+  // The deck's cards with what the catalog says of each, rebuilt only when the cards or the faces change (not for each key of the name).
+  const editorCards = useMemo<EditorCard[]>(
+    () =>
+      draft.cards.map((card) => {
+        const face = faces.get(card.code);
+        return {
+          code: card.code,
+          count: card.count,
+          cost: face?.cost ?? null,
+          name: face?.name ?? card.code,
+          typeCode: face?.typeCode ?? null,
+          imagesrc: face?.imagesrc ?? null,
+          deckLimit: face?.deckLimit ?? null,
+          sphereCode: face?.sphereCode ?? null,
+          sphereName: face?.sphereName ?? null,
+        };
+      }),
+    [draft.cards, faces],
   );
+  const sections = deckSections<EditorCard>(editorCards);
+  // Which cards' + is refused, once per change of the heroes or the cards: the grid's cells are not asked one by one on each render.
+  const refused = useMemo(() => refusedCodes({ heroes: draft.heroes, cards: draft.cards }, editorCards, lookup), [draft.heroes, draft.cards, editorCards, lookup]);
   // A phone holds three cards a row (each wide enough for its stepper), a tablet in portrait six, the deck's pane in landscape five.
   const cols = size === "compact" ? 3 : size === "medium" ? 6 : 5;
   const rows: EditorRow[] = [
@@ -222,7 +228,7 @@ export default function DeckEditor() {
             key={card.code}
             card={card}
             width={cellWidth}
-            full={draftAddRefused(draft, { code: card.code, name: card.name, typeCode: card.typeCode ?? "", deckLimit: card.deckLimit }, lookup)}
+            full={refused.has(card.code)}
             lookup={lookup}
             onPreview={preview.open}
             loss={inactive.has(card.code) ? notAppliedWords(card.code, card.typeCode) : null}
@@ -243,7 +249,7 @@ export default function DeckEditor() {
       getItemType={(item) => item.kind}
       style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: 24 * s }}
-      extraData={{ draft, cellWidth }}
+      extraData={{ cards: draft.cards, heroes: draft.heroes, refused, cellWidth }}
       onViewableItemsChanged={onViewableItemsChanged}
       viewabilityConfig={viewabilityConfig}
       keyboardShouldPersistTaps="handled"
@@ -262,19 +268,27 @@ export default function DeckEditor() {
   // The bar: Add cards (opens the pool) on a phone and in portrait, whether the deck is ready, and Save deck, the one primary.
   const actionBar = (align: "auto" | "fill") => (
     <ActionBar align={align}>
-      <View className="flex-row items-center gap-2.5" style={align === "fill" ? { paddingLeft: insets.left } : undefined}>
-        {align === "fill" ? (
+      {align === "fill" ? (
+        <View className="flex-row items-center gap-2.5" style={{ paddingLeft: insets.left }}>
           <View className="flex-1">{status}</View>
-        ) : (
-          <View className="flex-1 gap-1.5">
-            {status}
-            <SecondaryButton testID="deck-add" label="Add cards" compact onPress={() => addOfType(null)} />
+          <View className="flex-1">
+            <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
           </View>
-        )}
-        <View className="flex-1">
-          <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
         </View>
-      </View>
+      ) : (
+        // Whether it is ready over both buttons, which stand on one centre line (Add cards 44 pt, Save deck 52 pt).
+        <View className="gap-1.5">
+          {status}
+          <View className="flex-row items-center gap-2.5">
+            <View className="flex-1">
+              <SecondaryButton testID="deck-add" label="Add cards" onPress={() => addOfType(null)} />
+            </View>
+            <View className="flex-1">
+              <PrimaryButton testID="deck-save" label="Save deck" onPress={onSave} />
+            </View>
+          </View>
+        </View>
+      )}
     </ActionBar>
   );
   // Back floats over the fan and stays in reach as the list scrolls; its shade and padding belong to its pane.
@@ -282,7 +296,7 @@ export default function DeckEditor() {
     <>
       <FloatingBarShade shown={past} top={insets.top} />
       <View pointerEvents="box-none" className="absolute left-0 right-0" style={{ top: insets.top, ...sidePad }}>
-        <NavBar overlay backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
+        <NavBar backLabel="Decks" backTestID="deck-back" onBack={() => goBack(router, "/decks")} right={dirty ? <Chip testID="deck-unsaved" label="Unsaved changes" onArt /> : null} />
       </View>
     </>
   );
@@ -315,7 +329,7 @@ export default function DeckEditor() {
                 <View className="min-w-0 flex-1 flex-row flex-wrap" style={{ columnGap: 6 * s }}>
                   {adding ? null : <JumpChips jumps={jumps} onJump={jumpTo} />}
                 </View>
-                <SecondaryButton testID="deck-add" label={adding ? "Done" : "+ Add cards"} compact onPress={() => (adding ? setAdding(false) : addOfType(null))} />
+                <SecondaryButton testID="deck-add" label={adding ? "Done" : "+ Add cards"} onPress={() => (adding ? setAdding(false) : addOfType(null))} />
               </View>
               <View
                 className="mt-2 min-h-0 flex-1"

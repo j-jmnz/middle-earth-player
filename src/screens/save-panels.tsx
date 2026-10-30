@@ -92,7 +92,7 @@ export function SaveHero({ line, seats }: { line: SaveLine; seats: readonly (rea
             style={{ position: "absolute", left: -8 * s, right: -8 * s, top: -28 * s, bottom: -24 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(palette.night, 0.78)} 0%, ${withAlphaHex(palette.night, 0.5)} 55%, ${withAlphaHex(palette.night, 0)} 100%)` }}
           />
         ) : null}
-        <Eyebrow rule onArt>{`Campaign · ${line.seats}`}</Eyebrow>
+        <Eyebrow rule onArt>{line.seats}</Eyebrow>
         <Text testID="continue-campaign" accessibilityRole="header" className="mt-2 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
           {line.name}
         </Text>
@@ -107,7 +107,7 @@ export function SaveHero({ line, seats }: { line: SaveLine; seats: readonly (rea
                 <View key={`${hero.code}:${at}`} className="flex-1 flex-row" style={{ marginLeft: at === 0 ? 0 : -OVERLAP * s }}>
                   <HeroTile hero={hero} height={tile} crop={COVER} dense={two} shadow={at === 0 ? dropShadowOf(t, 10, 22, 0.8) : lapShadowOf(t)} />
                   {/* The lapping edge is lit, the way a panel's top is, so the stack reads apart over two dark paintings. */}
-                  {at === 0 ? null : <View pointerEvents="none" className="absolute bottom-0 left-0 top-0 rounded-l-tile" style={{ width: 1.5 * s, backgroundColor: withAlphaHex(t.lit, 0.55) }} />}
+                  {at === 0 ? null : <View pointerEvents="none" className="absolute bottom-0 left-0 top-0 rounded-l-item" style={{ width: 1.5 * s, backgroundColor: withAlphaHex(t.lit, 0.55) }} />}
                 </View>
               ))}
               {/* A short row keeps its tiles the width of a full one. */}
@@ -230,7 +230,7 @@ export function SaveRow({ id, line, lead, onPress }: { id: string; line: SaveLin
   return (
     <Pressable testID={`save-${id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={`Open ${describe(line)}`} onPress={onPress}>
       {({ pressed }) => (
-        <View className="flex-row items-center gap-3 rounded-tile px-3" style={{ minHeight: 62 * s, ...rowSurface(pressed, t) }}>
+        <View className="flex-row items-center gap-3 rounded-item px-3" style={{ minHeight: 62 * s, ...rowSurface(pressed, t) }}>
           {lead ? <Portrait card={lead.card} size={36} tint={lead.tint} glow={false} /> : null}
           <View className="min-w-0 flex-1">
             <Text className="font-display text-heading text-bone" numberOfLines={1}>

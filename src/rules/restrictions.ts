@@ -1,7 +1,7 @@
 // Rules: rr.constant-ability, rr.step-6-4-1, rr.travel, rr.first-player (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
-import { constantInstructions } from "./constant-records.ts";
+import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
@@ -13,7 +13,20 @@ export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrai
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
-export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): Restriction[] {
+// Kept for each state and question, so a caller must not change the list.
+const RESTRICTED: StateMemo<Map<Restrict["what"], readonly Restriction[]>> = new WeakMap();
+
+export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): readonly Restriction[] {
+  const asked = memoOf(RESTRICTED, state, ctx, () => new Map());
+  let found = asked.get(what);
+  if (!found) {
+    found = scanRestricted(state, ctx, what);
+    asked.set(what, found);
+  }
+  return found;
+}
+
+function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): Restriction[] {
   const found: Restriction[] = [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "Restrict" || instruction.what !== what) continue;

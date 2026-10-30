@@ -9,8 +9,9 @@ import { BookletPdf } from "../../booklets/reader-view";
 import { bookletUri, hasBundledBooklet, importBooklet, installBundledBooklet } from "../../booklets/store";
 import { readBooklet, writeLastPage, type BookletRow } from "../../campaign-store";
 import { useDatabases } from "../../databases";
-import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
+import { slateSurface } from "../../../play/surfaces";
+import { useTableTokens } from "../../../play/use-table-tokens";
 import { useSizeClass } from "../../../play/use-size-class";
 import { Text } from "../../../play/text";
 
@@ -25,7 +26,7 @@ function CloseBar({ onClose }: { onClose: () => void }) {
 }
 
 export default function Booklet() {
-  const palette = usePalette();
+  const t = useTableTokens();
   const { size, s } = useSizeClass();
   // The empty and installing states sit in a 480 pt column outside compact; the PDF stays full bleed.
   const column = size === "compact" ? undefined : { width: "100%" as const, maxWidth: 480 * s, alignSelf: "center" as const };
@@ -133,7 +134,7 @@ export default function Booklet() {
   return (
     <Screen testID="booklet" scene="calm">
       <View testID="booklet-empty" className="flex-1 items-center justify-center gap-4 px-2" style={column}>
-        <View className="h-32 w-24 items-center justify-center rounded-tile" style={{ borderWidth: 1.5, borderStyle: "dashed", borderColor: palette.accent }}>
+        <View className="h-32 w-24 items-center justify-center rounded-item" style={slateSurface(false, t)}>
           <RingMark size={28} state="current" />
         </View>
         <Text accessibilityRole="header" testID="booklet-name" className="text-center font-display text-title text-bone">

@@ -1,7 +1,7 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import campaignJson from "../../data/campaigns/fellowship-of-the-ring.json";
-import { campaignDataSchema } from "../catalog/scenario-data";
+import { campaignOf } from "./campaign-data";
+import { bumpDeckRevision } from "./deck-revision";
 import { decks } from "./user-schema";
 
 export const STEALTH_ID = "stealth-and-steadfastness";
@@ -38,16 +38,24 @@ export type StarterDeck = {
   cards: { code: string; count: number }[];
 };
 
-const STARTER_DECKS = campaignDataSchema.parse(campaignJson).starterDecks;
+// The printed starter decks, from the Fellowship campaign campaign-data.ts already parses (once, when first asked).
+function starterDecks() {
+  return campaignOf("fellowship-of-the-ring")?.starterDecks ?? [];
+}
+
+let prints: readonly StarterPrint[] | null = null;
 
 /**
  * The printed lists, from data/campaigns/fellowship-of-the-ring.json (data/starter-decks.json, checked against the
  * MEC109 span each deck names). Codes were resolved against assets/catalog.db.
  * Dwarven Tomb's booklet collector is 63. The only catalog row is 01053 at position 53.
  */
-export const starterPrints: readonly StarterPrint[] = STARTER_DECKS.flatMap((deck) =>
-  deck.rows.map((row) => ({ deckId: deck.id, name: row.name, collector: row.collector, typeCode: row.type, count: row.count, code: row.code })),
-);
+export function starterPrints(): readonly StarterPrint[] {
+  prints ??= starterDecks().flatMap((deck) =>
+    deck.rows.map((row) => ({ deckId: deck.id, name: row.name, collector: row.collector, typeCode: row.type, count: row.count, code: row.code })),
+  );
+  return prints;
+}
 
 function packHits(card: StarterCandidate, packs: ReadonlySet<string>): boolean {
   if (packs.has(card.packCode)) return true;
@@ -90,8 +98,8 @@ export function resolveStarterCode(
 }
 
 export function starterDeck(id: string): StarterDeck {
-  const rows = starterPrints.filter((row) => row.deckId === id);
-  const name = STARTER_DECKS.find((deck) => deck.id === id)?.name;
+  const rows = starterPrints().filter((row) => row.deckId === id);
+  const name = starterDecks().find((deck) => deck.id === id)?.name;
   if (!name) throw new Error(`Unknown starter ${id}`);
   return {
     id,
@@ -165,7 +173,8 @@ export function insertStarterDecks<TRun>(user: BaseSQLiteDatabase<"sync", TRun>)
     .from(decks)
     .all()
     .map((row) => row.id);
-  for (const deck of startersToInsert(existing)) {
+  const missing = startersToInsert(existing);
+  for (const deck of missing) {
     user.insert(decks).values({
       id: deck.id,
       name: deck.name,
@@ -173,4 +182,5 @@ export function insertStarterDecks<TRun>(user: BaseSQLiteDatabase<"sync", TRun>)
       cards: deck.cards.map((card) => ({ code: card.code, count: card.count })),
     }).run();
   }
+  if (missing.length > 0) bumpDeckRevision();
 }

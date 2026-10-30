@@ -2,17 +2,20 @@
 // the same objects, so a Zustand subscriber of one zone does not render when another zone changes: a threat change leaves
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
+import type { ReduceContext } from "../rules/reduce.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
 import { captiveUnder } from "../rules/families/south-captive.ts";
 import { prisonersOfSeat } from "../rules/families/prisoner.ts";
 import { declaredDefenders } from "../rules/families/defense-defenders.ts";
 
+import { threatRows } from "./foresight.ts";
+
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
 
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
-// The four piles the table shows. Only the two discard piles open a list (docs/design-system.md, Table).
+// The four piles the table shows. Only the two discard piles open a list (docs/design-system-table.md).
 export type PileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
 
 export const PILES: readonly PileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
@@ -165,7 +168,12 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
  */
 export function zoneSelector(zone: ZoneId, seat: number): (game: ScenarioState) => ZoneView {
   let previous: ZoneView | null = null;
+  let lastGame: ScenarioState | null = null;
   return (game) => {
+    // The same game object is the same view (a state is never changed once the reducer returns it): the store runs every selector on each
+    // `set`, also one that changed no game (a card picked, a peek), so the zone is not walked again.
+    if (previous && game === lastGame) return previous;
+    lastGame = game;
     const pairs = zone === "engaged" ? combatPairs(game, seat) : new Map<string, { ids: readonly string[]; kind: FightKind }>();
     const entries = entriesOf(game, zoneIds(game, zone, seat), pairs);
     if (previous && sameEntries(previous.entries, entries)) return previous;
@@ -194,7 +202,10 @@ function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly stri
 /** A memoized selector for one pile: the same view while the pile's list and its top card are the same objects. */
 export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) => PileView {
   let previous: PileView | null = null;
+  let lastGame: ScenarioState | null = null;
   return (game) => {
+    if (previous && game === lastGame) return previous;
+    lastGame = game;
     const ids = pileIds(game, pile, seat);
     const faceUp = pile === "discard" || pile === "encounterDiscard";
     const last = ids[ids.length - 1];
@@ -211,12 +222,34 @@ export type SeatThreat = { seat: number; threat: number; eliminated: boolean };
 /** Threat of every seat in the save, the numbers the threat overlay draws. Same array while no threat changed. */
 export function threatSelector(): (game: ScenarioState) => readonly SeatThreat[] {
   let previous: readonly SeatThreat[] = [];
+  let lastGame: ScenarioState | null = null;
   return (game) => {
+    if (game === lastGame) return previous;
+    lastGame = game;
     const next = game.seats.slice(0, game.seatCount).map((seat, index) => ({ seat: index, threat: seat.threat, eliminated: seat.eliminated }));
     const same = next.length === previous.length && next.every((row, index) => row.threat === previous[index]?.threat && row.eliminated === previous[index]?.eliminated);
     if (same) return previous;
     previous = next;
     return next;
+  };
+}
+
+/**
+ * The engagement costs of the enemies in staging that can be engaged, lowest first, as one string ("2,4"; "" for none): the ticks marked on each
+ * dial's meter. A string compares by value, so a subscriber renders only when a cost changes. It is made for one context (`ctx`), and the same game
+ * object gives the previous string without asking the engine again.
+ */
+export function tickKeySelector(ctx: ReduceContext): (game: ScenarioState) => string {
+  let previous = "";
+  let lastGame: ScenarioState | null = null;
+  return (game) => {
+    if (game === lastGame) return previous;
+    lastGame = game;
+    previous = threatRows(game, ctx)
+      .filter((row) => !row.blocked)
+      .map((row) => row.cost)
+      .join(",");
+    return previous;
   };
 }
 

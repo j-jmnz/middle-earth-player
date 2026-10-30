@@ -7,13 +7,14 @@ import { useCallback, useState } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
-import { droppedIfStale, standaloneStatus, type StandaloneGame } from "../../../campaign/standalone";
+import { droppedIfStale, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { CATALOG_VERSION } from "../../../catalog/version";
 import { BOXES, scenarioName, scenarioOf } from "../../campaign-data";
-import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryButton, Screen, ScreenScroll, Section } from "../../chrome";
+import { BodyText, Chevron, Chip, Eyebrow, HubHeader, useTitleShadow, Label, Panel, PillButton, PrimaryFace, Screen, ScreenScroll, Section } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { SceneArt } from "../../art";
 import { usePalette } from "../../palette-hook";
+import { ITEM_RADIUS } from "../../../play/radius";
 import { dropShadowOf, rowSurface, tileSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { withAlphaHex } from "../../../play/tokens";
@@ -21,7 +22,7 @@ import { useDatabases } from "../../databases";
 import { KeepOrDelete } from "../../keep-or-delete";
 import { gameCaption, statusWord, STANDALONE_DROPPED } from "../../standalone-words";
 import { seatWord } from "../../seats";
-import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandalone } from "../../standalone-store";
+import { archiveStandalone, deleteStandalone, listArchivedStandalone, listStandalone, restoreStandalone, writeStandaloneActive } from "../../standalone-store";
 import { useSizeClass } from "../../../play/use-size-class";
 import { useUiScale } from "../../../play/ui-scale";
 import { Text } from "../../../play/text";
@@ -37,8 +38,8 @@ export default function Scenarios() {
   const { size } = useSizeClass();
   const router = useRouter();
   const { user } = useDatabases();
-  const [games, setGames] = useState<StandaloneGame[]>([]);
-  const [archived, setArchived] = useState<StandaloneGame[]>([]);
+  const [games, setGames] = useState<ListedStandalone[]>([]);
+  const [archived, setArchived] = useState<ListedStandalone[]>([]);
   // Manage shows Archive and Delete on each game instead of opening it. It ends when the list loses focus.
   const [managing, setManaging] = useState(false);
   const folds = useFolds();
@@ -50,11 +51,12 @@ export default function Scenarios() {
   const refresh = useCallback(() => {
     // A game in progress from another engine version or against other card data is dropped on the read, as a campaign
     // save's open scenario is; the row and its loadout stay.
-    for (const game of listStandalone(user)) {
+    const open = listStandalone(user).map((game) => {
       const dropped = droppedIfStale(game, CATALOG_VERSION);
-      if (dropped) writeStandalone(user, dropped);
-    }
-    const open = listStandalone(user);
+      if (!dropped) return game;
+      writeStandaloneActive(user, dropped);
+      return dropped;
+    });
     const away = listArchivedStandalone(user);
     setGames(open);
     setArchived(away);
@@ -76,21 +78,21 @@ export default function Scenarios() {
     router.push({ pathname: "/standalone/briefing/[scenarioId]", params: from ? { scenarioId, from } : { scenarioId } });
   }
 
-  function open(game: StandaloneGame): void {
+  function open(game: ListedStandalone): void {
     if (standaloneStatus(game) === "playing") router.push({ pathname: "/standalone/table/[gameId]", params: { gameId: game.id } });
     else if (game.loadout) brief(game.scenarioId, game.id);
   }
 
-  const label = (game: StandaloneGame) => `${nameOf(game.scenarioId)}, ${gameCaption(game)}`;
+  const label = (game: ListedStandalone) => `${nameOf(game.scenarioId)}, ${gameCaption(game)}`;
 
   // The button a screen reader was on goes away with each of these, so each says what happened.
-  function archive(game: StandaloneGame): void {
+  function archive(game: ListedStandalone): void {
     archiveStandalone(user, game.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Archived ${label(game)}`);
   }
 
-  function restore(game: StandaloneGame): void {
+  function restore(game: ListedStandalone): void {
     restoreStandalone(user, game.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Restored ${label(game)}`);
@@ -101,13 +103,13 @@ export default function Scenarios() {
     AccessibilityInfo.announceForAccessibility(DELETE_SENTENCE);
   }
 
-  function remove(game: StandaloneGame): void {
+  function remove(game: ListedStandalone): void {
     deleteStandalone(user, game.id);
     refresh();
     AccessibilityInfo.announceForAccessibility(`Deleted ${label(game)}`);
   }
 
-  const actions = (game: StandaloneGame, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
+  const actions = (game: ListedStandalone, keep: { label: "Archive" | "Restore"; onPress: () => void }) => (
     <KeepOrDelete
       id={game.id}
       described={label(game)}
@@ -123,9 +125,9 @@ export default function Scenarios() {
   const playing = games.filter((game) => standaloneStatus(game) === "playing");
   const finished = games.filter((game) => standaloneStatus(game) !== "playing");
 
-  // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a framed card with its scene; a
+  // A game: Resume or Play again, or under Manage, Archive and Delete. A game in progress is a banner on its scene; a
   // finished one a row with its result.
-  function renderGame(game: StandaloneGame, framed = false) {
+  function renderGame(game: ListedStandalone, framed = false) {
     const status = standaloneStatus(game);
     if (managing) {
       return (
@@ -143,24 +145,27 @@ export default function Scenarios() {
     // The latest game in progress is a banner on its scene with the one primary, Resume; an older one is a row (below).
     if (status === "playing" && framed) {
       const height = (size === "compact" ? 150 : 220) * s;
+      // The scene is the button (one control with its spoken label and `resume-<id>`); "Resume" is drawn in the primary's look inside it.
       return (
         <View key={game.id} testID={`game-${game.id}`}>
-          <Panel padded={false}>
-            <SceneArt scenarioId={game.scenarioId} height={height} fade={0.2} fadeTo={palette.night}>
-              <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between gap-3" style={{ padding: (size === "compact" ? 12 : 24) * s }}>
-                <View className="min-w-0 flex-1">
-                  <Eyebrow tone="accent">In progress</Eyebrow>
-                  <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
-                    {nameOf(game.scenarioId)}
-                  </Text>
-                  <GameLine game={game} />
+          <Pressable testID={`resume-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} onPress={() => open(game)}>
+            {({ pressed }) => (
+              <SceneArt scenarioId={game.scenarioId} height={height} radius={ITEM_RADIUS * s} fade={0.2} fadeTo={palette.night}>
+                <View className="absolute bottom-0 left-0 right-0 flex-row items-end justify-between gap-3" style={{ padding: (size === "compact" ? 12 : 24) * s }}>
+                  <View className="min-w-0 flex-1" importantForAccessibility="no-hide-descendants">
+                    <Eyebrow tone="accent">In progress</Eyebrow>
+                    <Text className="mt-1 font-display text-bone" style={{ fontSize: (size === "compact" ? 24 : 32) * s, lineHeight: (size === "compact" ? 28 : 38) * s, ...titleShadow }} numberOfLines={2}>
+                      {nameOf(game.scenarioId)}
+                    </Text>
+                    <GameLine game={game} />
+                  </View>
+                  <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
+                    <PrimaryFace label="Resume" pressed={pressed} />
+                  </View>
                 </View>
-                <View style={{ minWidth: (size === "compact" ? 110 : 200) * s }}>
-                  <PrimaryButton label="Resume" testID={`resume-${game.id}`} accessibilityLabel={spoken} onPress={() => open(game)} />
-                </View>
-              </View>
-            </SceneArt>
-          </Panel>
+              </SceneArt>
+            )}
+          </Pressable>
         </View>
       );
     }
@@ -168,7 +173,7 @@ export default function Scenarios() {
     return (
       <Pressable key={game.id} testID={`game-${game.id}`} collapsable={false} accessibilityRole="button" accessibilityLabel={spoken} disabled={action == null} onPress={() => open(game)}>
         {({ pressed }) => (
-          <View className="rounded-tile px-4 py-3" style={tileSurface(pressed, t)}>
+          <View className="rounded-item px-4 py-3" style={tileSurface(pressed, t)}>
             <View className="flex-row items-start justify-between gap-2">
               <View className="flex-1">
                 <Text className="font-display text-heading text-bone">{nameOf(game.scenarioId)}</Text>
@@ -237,7 +242,7 @@ export default function Scenarios() {
             >
               {({ pressed }) =>
                 posters ? (
-                  <View className="overflow-hidden rounded-card" style={{ ...tileSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
+                  <View className="overflow-hidden rounded-item" style={{ ...tileSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
                     <SceneArt scenarioId={id} height={(size === "expanded" ? 270 : 300) * s} fade={0.55} fadeTo={palette.dusk}>
                       {playable ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.55) }} />}
                       <View className="absolute" style={{ left: 12 * s, top: 12 * s }}>
@@ -256,7 +261,7 @@ export default function Scenarios() {
                     </SceneArt>
                   </View>
                 ) : (
-                  <View className="flex-row items-center gap-3.5 overflow-hidden rounded-tile pr-3" style={{ ...rowSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
+                  <View className="flex-row items-center gap-3.5 overflow-hidden rounded-item pr-3" style={{ ...rowSurface(pressed, t), opacity: playable ? 1 : 0.78 }}>
                     <View style={{ width: 86 * s, height: 64 * s }}>
                       <SceneArt scenarioId={id} width={86 * s} height={64 * s} vivid>
                         {/* A scenario not playable yet keeps its faint words at full strength; only its scene is veiled. */}
@@ -358,7 +363,7 @@ export default function Scenarios() {
 }
 
 /** A game's seats and difficulty under its name, the Eye of Sauron before them on Nightmare. */
-function GameLine({ game }: { game: StandaloneGame }) {
+function GameLine({ game }: { game: ListedStandalone }) {
   const s = useUiScale();
   const nightmare = game.loadout?.difficulty === "Nightmare";
   return (

@@ -18,7 +18,7 @@ import { nightmareDuringSetup, nightmareSetup } from "./families/nightmare-setup
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import type { CampaignFacts } from "./campaign-state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
-import { cloneGame } from "./undo.ts";
+import { snapshotOf } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
 
 export type StartSeat = {
@@ -118,13 +118,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   };
   return {
     ...state,
-    undo: {
-      phase: state.phase,
-      snapshot: cloneGame(state),
-      cards: structuredClone(state.cards),
-      intents: [],
-      steps: [],
-    },
+    undo: snapshotOf(state),
   };
 }
 

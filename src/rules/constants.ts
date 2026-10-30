@@ -113,11 +113,33 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   return found;
 }
 
+// Field by field, as the records are plain data. A `when` condition comes from the effect record, so the same record gives the
+// same object; only a different one is compared in depth.
+function sameModifiers(left: readonly Modifier[], right: readonly Modifier[]): boolean {
+  if (left.length !== right.length) return false;
+  return left.every((a, index) => {
+    const b = right[index]!;
+    return (
+      a.instanceId === b.instanceId &&
+      a.sourceId === b.sourceId &&
+      a.stat === b.stat &&
+      a.amount === b.amount &&
+      a.until === b.until &&
+      a.origin === b.origin &&
+      a.per === b.per &&
+      a.seat === b.seat &&
+      a.against === b.against &&
+      a.set === b.set &&
+      (a.when === b.when || JSON.stringify(a.when) === JSON.stringify(b.when))
+    );
+  });
+}
+
 export function syncConstants(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const current = state.modifiers.filter((modifier) => modifier.origin != null);
   if (current.length === 0 && !ctx.effects.some((effect) => effect.timing === "constant")) return state;
   const desired = wanted(state, ctx);
-  if (JSON.stringify(current) === JSON.stringify(desired)) return state;
+  if (sameModifiers(current, desired)) return state;
   return { ...state, modifiers: [...state.modifiers.filter((modifier) => modifier.origin == null), ...desired] };
 }
 

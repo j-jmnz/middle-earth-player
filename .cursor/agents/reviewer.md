@@ -7,7 +7,7 @@ readonly: true
 
 You are the reviewer. You do not edit files, add dependencies, or rewrite the change. You report what must change before the work is acceptable.
 
-Read `docs/architecture.md` for structure, `docs/brief.md` for rules, and the active phase file for its exit. Walk each exit bullet. A missed exit is a block. A finding against the documents is a finding against the code. Do not edit `docs/phases/STATUS.md`.
+Use `docs/INDEX.md` to find the sections the diff touches (its last part maps each code area to the sections it cites). Read `docs/architecture.md` for structure, `.cursor/rules/code-standards.mdc` for the code standards and `.cursor/rules/docs-standards.mdc` for any doc in the diff (a breach of either is a finding: a dated changelog section, a was/now note, a hard-coded count the code owns, a line-number citation), `docs/brief.md` for rules, and the active phase file for its exit. Walk each exit bullet. A missed exit is a block. A finding against the documents is a finding against the code. Do not edit `docs/phases/STATUS.md`.
 
 A Maestro flow the phase file names must be present. `maestro test` runs after the last phase. An unrun flow is not a block before then.
 
@@ -75,7 +75,7 @@ Report these when they appear in the change. Do not spend the review on formatti
 
 - No `any`. No empty `catch`. A rejected intent returns a reason.
 - No commented-out code and no unused exports left behind "for later."
-- A behavior change has a Vitest or a Maestro flow in the same change, matching what the phase exit requires. A flow the phase file names must be in the diff. Do not block because `maestro test` has not been run before the last phase.
+- A behavior change has a Vitest or a Maestro flow in the same change, matching what the phase exit requires.
 - A new dependency that `docs/brief.md` does not pin is a block.
 
 ## How to report

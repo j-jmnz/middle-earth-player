@@ -1,8 +1,9 @@
 // The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, the
-// deck at a glance (the sphere donut and count, the cost curve, the counts by type), its notes and the jump chips to its headings.
+// deck at a glance (the sphere donut and count, the cost curve), its notes and the jump chips to its headings, which carry the counts by type.
 import { View } from "react-native";
 
-import { dropShadowOf, panelSurface } from "../play/surfaces";
+import { cardCorner } from "../play/card-corner";
+import { dropShadowOf } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { SPHERE_TINT } from "../play/icon-map";
@@ -41,7 +42,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
   const lead = shown[Math.floor(middle)] ?? shown[0];
   const glow = lead ? palette[(SPHERE_TINT[lead.sphereCode ?? ""] ?? "accent") as keyof typeof palette] : palette.accent;
   return (
-    <View importantForAccessibility="no-hide-descendants" style={{ height: h + 24 * s, alignItems: "center", justifyContent: "center" }}>
+    <View accessible accessibilityLabel={`Heroes: ${heroes.map((hero) => hero.name).join(", ")}`} style={{ height: h + 24 * s, alignItems: "center", justifyContent: "center" }}>
       <View pointerEvents="none" style={{ position: "absolute", width: w * 3.2, height: h * 1.3, backgroundImage: `radial-gradient(50% 50% at 50% 55%, ${withAlphaHex(glow, 0.32)}, ${withAlphaHex(glow, 0)})` }} />
       {shown.map((hero, index) => {
         const offset = index - middle;
@@ -53,7 +54,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
               position: "absolute",
               width: w,
               height: h,
-              borderRadius: 6 * s,
+              borderRadius: cardCorner(w, h),
               overflow: "hidden",
               backgroundColor: palette.raised,
               zIndex: centre ? 2 : 1,
@@ -70,12 +71,22 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
 }
 
 /**
- * The deck at a glance on one floating panel: a donut of the spheres' shares with the card count in it (green once the deck is legal),
- * the cost curve as silver bars over the costs, and the counts of allies, attachments and events.
+ * The deck at a glance, on the ground: a donut of the spheres' shares with the card count in it (green once the deck is legal) and
+ * the cost curve as silver bars over the costs. The counts by type are on the jump chips.
  */
-export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code: string; count: number }[]; faces: ReadonlyMap<string, Pick<DeckFace, "cost" | "sphereCode" | "sphereName" | "typeCode">>; ready: boolean }) {
+export function DeckAnalytics({
+  cards,
+  faces,
+  ready,
+  countLine,
+}: {
+  cards: readonly { code: string; count: number }[];
+  faces: ReadonlyMap<string, Pick<DeckFace, "cost" | "sphereCode" | "sphereName" | "typeCode">>;
+  ready: boolean;
+  // "3 heroes · 50 cards": spoken with the ring, which shows the count alone.
+  countLine: string;
+}) {
   const palette = usePalette();
-  const t = useTableTokens();
   const s = useUiScale();
   const cardCount = deckCardCount(cards);
   const curve = costCurve(cards, faces);
@@ -84,18 +95,16 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
   const splitTotal = split.reduce((sum, entry) => sum + entry.count, 0);
   const tint = (code: string) => palette[(SPHERE_TINT[code] ?? "faint") as keyof typeof palette];
   const parts = split.map((entry) => ({ key: entry.code, share: entry.count / Math.max(1, splitTotal), color: tint(entry.code) }));
-  const typeCount = (type: string) => cards.reduce((sum, card) => sum + (faces.get(card.code)?.typeCode === type ? card.count : 0), 0);
-  const types = [
-    { word: "Allies", count: typeCount("ally") },
-    { word: "Attachments", count: typeCount("attachment") },
-    { word: "Events", count: typeCount("event") },
-  ];
   return (
-    <View className="flex-row items-center rounded-card" style={{ ...panelSurface(false, t), padding: 14 * s, gap: 14 * s }}>
-      <View accessible accessibilityLabel={`${cardCount} of ${DECK_MINIMUM} cards. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
-        <ArcRing size={64 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
-          <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 26 * s, color: ready ? palette.ok : palette.bone }}>
+    <View className="flex-row items-center" style={{ gap: 14 * s }}>
+      <View accessible accessibilityLabel={`${countLine}. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
+        <ArcRing size={68 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
+          <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 24 * s, color: ready ? palette.ok : palette.bone }}>
             {String(cardCount)}
+          </Text>
+          {/* "cards" under the number; "of 50" instead while the deck is short of its minimum. */}
+          <Text testID="deck-card-count-word" className="text-micro text-muted" style={{ lineHeight: 12 * s }}>
+            {cardCount < DECK_MINIMUM ? `of ${DECK_MINIMUM}` : "cards"}
           </Text>
         </ArcRing>
       </View>
@@ -122,19 +131,14 @@ export function DeckAnalytics({ cards, faces, ready }: { cards: readonly { code:
             </View>
           ))}
         </View>
-        <View className="mt-1.5 flex-row flex-wrap" style={{ columnGap: 12 * s }}>
-          {types.map((type) => (
-            <Text key={type.word} className="text-label text-muted">{`${type.word} ${type.count}`}</Text>
-          ))}
-        </View>
       </View>
     </View>
   );
 }
 
 /**
- * The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, its heroes and starting
- * threat, the analytics panel, the notes, and the jump chips to its headings. Whether it is ready is said once, beside Save. A view of
+ * The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, its starting
+ * threat, the analytics, the notes, and the jump chips to its headings. Whether it is ready is said once, beside Save. A view of
  * the draft; the editor owns the state.
  */
 export function DeckGlance({
@@ -162,6 +166,7 @@ export function DeckGlance({
   onName: (next: string) => void;
   ready: boolean;
   threat: number | null;
+  // "3 heroes · 50 cards": spoken with the analytics' ring, not shown (the fan shows the heroes, the ring the count).
   countLine: string;
   notApplied: string | null;
   droppedNote: string | null;
@@ -177,7 +182,6 @@ export function DeckGlance({
   const palette = usePalette();
   const s = useUiScale();
   const shadow = useTitleShadow();
-  const heroLine = [heroes.map((hero) => hero.name.split(" ")[0]).join(" · "), threat == null ? null : `Threat ${threat}`].filter(Boolean).join(" · ");
   return (
     <View style={{ paddingTop: top + 56 * s }}>
       <View style={side}>
@@ -194,14 +198,15 @@ export function DeckGlance({
           className="mt-3 text-center font-display text-bone"
           style={{ minHeight: touch(s, 44), fontSize: 26 * s, lineHeight: 32 * s, ...shadow }}
         />
-        {heroLine ? <Text className="text-center text-label text-muted">{heroLine}</Text> : null}
-        {/* A tablet in portrait keeps the panel to a reading width, so its bars and words stay in proportion. */}
+        {threat == null ? null : (
+          <Text className="text-center text-label text-muted">
+            {`Threat ${threat}`}
+          </Text>
+        )}
+        {/* A tablet in portrait keeps the analytics to a reading width, so its bars and words stay in proportion. */}
         <View className="mt-3" style={{ width: "100%", maxWidth: 560 * s, alignSelf: "center" }}>
-          <DeckAnalytics cards={cards} faces={faces} ready={ready} />
+          <DeckAnalytics cards={cards} faces={faces} ready={ready} countLine={countLine} />
         </View>
-        <Label testID="deck-count" className="mt-3">
-          {countLine}
-        </Label>
         {notApplied ? (
           <Label testID="deck-not-applied" tone="muted" className="mt-1">
             {`${notApplied}. Each card says what the app leaves out.`}
@@ -230,7 +235,7 @@ export function DeckGlance({
 export function CostCoin({ cost }: { cost: string | null }) {
   const palette = usePalette();
   return (
-    <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-pill" style={{ backgroundColor: palette.raised }}>
+    <View accessible={false} importantForAccessibility="no" className="h-7 w-7 items-center justify-center rounded-control" style={{ backgroundColor: palette.raised }}>
       <Text className="font-display text-label text-bone">{cost ?? "–"}</Text>
     </View>
   );

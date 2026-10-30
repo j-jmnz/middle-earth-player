@@ -21,8 +21,24 @@ export type QuestAdvance = { seq: number; stageId: string };
 // The seq of the table's opening: below every moment's (store.ts counts them from 1).
 const OPENING_SEQ = 0;
 
+/**
+ * What the screen reads of the game: the stage in play, the stage whose own effect is asking the player something now (if any), and whether
+ * the game is over. The hook reads each on its own, so a state that changes none of them does not render it (use-quest-advance.ts).
+ */
+export type QuestView = { questStage: string | null; asking: string | null; over: boolean };
+
+/** The stage whose own effect (its When Revealed) is resolving and waits on the player, or null. */
+export function askingStage(game: ScenarioState): string | null {
+  return game.window != null && ASKING.has(game.window.kind) ? (topFrame(game)?.cardId ?? null) : null;
+}
+
+/** The view of a game. */
+export function questView(game: ScenarioState): QuestView {
+  return { questStage: game.questStage, asking: askingStage(game), over: isOver(game) };
+}
+
 /** The stage a sent intent advanced the quest to, while it is still the stage: the moment's last advance step. Null for any other moment. */
-export function advancedTo(moment: TableMoment | null, game: ScenarioState): QuestAdvance | null {
+export function advancedTo(moment: TableMoment | null, game: Pick<QuestView, "questStage">): QuestAdvance | null {
   if (moment?.kind !== "sent") return null;
   const reached = moment.steps.flatMap((step) => (step.kind === "advance" ? [step.cardId] : [])).at(-1);
   return reached != null && game.questStage === reached ? { seq: moment.seq, stageId: reached } : null;
@@ -33,12 +49,13 @@ const ASKING = new Set(["choose", "look", "frameAction", "chooseEnemy"]);
 
 /** Whether the open moment is the stage asking: its own effect (its When Revealed) is resolving and waits on the player. */
 export function stageAsks(game: ScenarioState, stageId: string): boolean {
-  return game.window != null && ASKING.has(game.window.kind) && topFrame(game)?.cardId === stageId;
+  return askingStage(game) === stageId;
 }
 
 /**
- * What the screen says over the stage: "The quest advances" ("The quest" on the table's `opening`), "Stage 2B · A Fork in the
- * Road", and how the stage is won (its quest points, or the printed line that wins it), or what holds it back.
+ * What the screen says over the stage, in one stack: the overline "Stage 2 of 3" (none while the stage has no place), the stage's
+ * name ("A Fork in the Road"), and under it how the stage is won (its quest points, or the printed line that wins it), or the rule
+ * that holds it back, in the rule's own words.
  */
 export function advanceWords(
   game: ScenarioState,
@@ -46,17 +63,15 @@ export function advanceWords(
   stageId: string,
   name: string,
   line: (id: string) => string | null,
-  opening = false,
-): { eyebrow: string; title: string; detail: string | null } {
+): { eyebrow: string | null; title: string; detail: string | null } {
   const stage = game.cards[stageId];
   const place = stage ? stagePlace(game, stage.code) : null;
-  const title = place ? `Stage ${place.at}${stage?.face === "B" ? "B" : ""} · ${name}` : name;
   const points = stage ? stagePoints(game, stage, ctx) : null;
   const hold = advanceHold(game, ctx, line);
   const objective = points == null ? questObjective(game, ctx, line) : null;
-  const detail = hold ? `Cannot advance yet: ${hold}` : points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
-  const lead = opening ? "The quest" : "The quest advances";
-  return { eyebrow: place ? `${lead} · stage ${place.at} of ${place.of}` : lead, title, detail };
+  const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
+  const detail = hold ?? won;
+  return { eyebrow: place ? `Stage ${place.at} of ${place.of}` : null, title: name, detail };
 }
 
 /**
@@ -79,18 +94,18 @@ export type AdvanceLatch = { latched: QuestAdvance | null; done: number; asked: 
 export const NO_ADVANCE: AdvanceLatch = { latched: null, done: 0, asked: 0 };
 
 /** Whether the advance on screen is the table's opening, not an advance. */
-export function isOpening(advance: QuestAdvance): boolean {
+function isOpening(advance: QuestAdvance): boolean {
   return advance.seq === OPENING_SEQ;
 }
 
 /** The latch the table opens with: the stage in play, unless the game is over or has no stage. */
-export function openingLatch(game: ScenarioState): AdvanceLatch {
-  if (game.questStage == null || isOver(game)) return NO_ADVANCE;
+export function openingLatch(game: QuestView): AdvanceLatch {
+  if (game.questStage == null || game.over) return NO_ADVANCE;
   return { latched: { seq: OPENING_SEQ, stageId: game.questStage }, done: OPENING_SEQ - 1, asked: OPENING_SEQ - 1 };
 }
 
 /** The advance on screen: the latched one, until the player went back to the table from it or its stage is no longer the stage. */
-export function openAdvance(latch: AdvanceLatch, game: ScenarioState): QuestAdvance | null {
+export function openAdvance(latch: AdvanceLatch, game: Pick<QuestView, "questStage">): QuestAdvance | null {
   const { latched } = latch;
   return latched && latched.seq > latch.done && game.questStage === latched.stageId ? latched : null;
 }
@@ -100,12 +115,12 @@ export function openAdvance(latch: AdvanceLatch, game: ScenarioState): QuestAdva
  * one on screen, and once the stage's question that the screen showed is answered, the screen goes back to the table. The same latch
  * when nothing changes.
  */
-export function nextLatch(latch: AdvanceLatch, reached: QuestAdvance | null, game: ScenarioState): AdvanceLatch {
+export function nextLatch(latch: AdvanceLatch, reached: QuestAdvance | null, game: QuestView): AdvanceLatch {
   let next = latch;
   if (reached && reached.seq !== latch.latched?.seq && reached.seq > latch.done) next = { ...next, latched: reached };
   const open = openAdvance(next, game);
   if (!open) return next;
-  const asks = stageAsks(game, open.stageId);
+  const asks = game.asking === open.stageId;
   if (asks && next.asked !== open.seq) return { ...next, asked: open.seq };
   if (!asks && next.asked === open.seq) return { ...next, done: open.seq };
   return next;

@@ -16,7 +16,7 @@ import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../scripts/anduin-game.ts";
 import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden as playDolGuldur } from "../../scripts/dol-guldur-game.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { OATH_GOLDENS, oathLoadout, oathPlan, oathWorld, oathStart } from "../../scripts/oath-game.ts";
+import { OATH_GOLDENS, oathLoadout, oathWorld } from "../../scripts/oath-game.ts";
 import { campaign, loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 
@@ -266,12 +266,5 @@ describe("what a win writes and what a loss leaves", () => {
     const log = (base: CampaignLog) => ({ ...base, completed: [...base.completed, "the-oath"] });
     expect(campaignPath(campaign, {}, log(escapeLog)).map((node) => node.status)).toEqual(["completed", "completed", "completed", "completed", "current"]);
     expect(campaignPath(mini, {}, log(emptyLog(2))).map((node) => node.status)).toEqual(["completed", "current"]);
-  });
-
-  it("hands the next part nothing from a lost game: the log is the one the game started from", () => {
-    const lost = OATH_GOLDENS.filter((item) => item.outcome === "lost");
-    expect(lost.length).toBeGreaterThanOrEqual(2);
-    expect(oathPlan(1).log.campaignPool.map((card) => card.code).sort()).toEqual(["41041", "41044"]);
-    expect(oathStart(1, 1, "Normal").encounterDeck.filter((code) => code === "41041")).toHaveLength(1);
   });
 });

@@ -8,7 +8,7 @@ import { modifiedStat } from "./keywords.ts";
 import { openFrameActions } from "./pass.ts";
 import { isAllyLike, printedOf, type PrintedCard } from "./printed.ts";
 import type { Frame, HideData, HideResult, ScenarioState } from "./state.ts";
-import { inPlay, updateCard } from "./state.ts";
+import { inPlay, updateCards } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { pruneUses } from "./usage.ts";
 import { fireForced } from "./triggers.ts";
@@ -58,11 +58,8 @@ export function hideCommitReason(
 export function commitHide(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
   const top = topFrame(state);
   if (top?.data.kind !== "hide") return state;
-  let next = state;
-  for (const id of cardIds) {
-    next = updateCard(next, id, { exhausted: true });
-    steps.push({ kind: "hideCommit", cardId: id });
-  }
+  for (const id of cardIds) steps.push({ kind: "hideCommit", cardId: id });
+  const next = updateCards(state, cardIds.map((id) => [id, { exhausted: true }]));
   const recorded = patchTop(next, { data: { ...top.data, committedIds: [...cardIds] } });
   return { ...recorded, window: null };
 }

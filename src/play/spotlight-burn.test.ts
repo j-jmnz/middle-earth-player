@@ -1,4 +1,4 @@
-// The burn of a destroyed target (docs/plans/combat-spotlight-redesign.md, §4): the field, the shader built from the same constants,
+// The burn of a destroyed target (docs/plans/done/combat-spotlight-redesign.md, §4): the field, the shader built from the same constants,
 // and the ash born in the order the front passes. The shader is compiled and run by CanvasKit (Skia's own SkSL), which the app uses on the web.
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
