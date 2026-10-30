@@ -1,5 +1,5 @@
 // The combat spotlight's beats (docs/plans/combat-spotlight-redesign.md, §3 and §4): the seven beats add up to the run, the run is
-// 2200 ms at Normal and 0.6 of it at Quick, and a frame at any moment is the pose the table of beats describes.
+// 3200 ms at Normal and 0.6 of it at Quick, and a frame at any moment is the pose the table of beats describes.
 import { describe, expect, it } from "vitest";
 
 import { MOTION, SPOTLIGHT_AGAIN, SPOTLIGHT_BEATS } from "./motion-tokens.ts";
@@ -23,50 +23,50 @@ function flat(value: unknown, path = ""): [string, number | boolean][] {
 }
 
 describe("the beats of one attack", () => {
-  it("run enter, read, charge, lunge, stop, impact and return in order, 2200 ms in all at Normal", () => {
+  it("run enter, read, charge, lunge, stop, impact, hold and return in order, 3200 ms in all at Normal", () => {
     const b = beatsAt(1);
-    expect([b.readAt, b.chargeAt, b.lungeAt, b.stopAt, b.impactAt, b.retAt, b.end]).toEqual([350, 650, 1000, 1120, 1220, 1700, 2200]);
+    expect([b.readAt, b.chargeAt, b.lungeAt, b.stopAt, b.impactAt, b.retAt, b.end]).toEqual([350, 650, 1000, 1120, 1220, 2700, 3200]);
     expect(SPOTLIGHT_BEATS.reduce((sum, name) => sum + MOTION[name].ms, 0)).toBe(MOTION.spotlight.ms);
     expect(b.end).toBe(MOTION.spotlight.ms);
   });
 
-  it("run at 0.6 under Quick, 1320 ms, and every beat scales with it", () => {
+  it("run at 0.6 under Quick, 1920 ms, and every beat scales with it", () => {
     const quick = beatsAt(0.6);
-    expect(quick.end).toBeCloseTo(1320, 6);
+    expect(quick.end).toBeCloseTo(1920, 6);
     const normal = beatsAt(1);
-    for (const key of ["intro", "read", "charge", "lunge", "stop", "impact", "ret"] as const) expect(quick[key], key).toBeCloseTo(normal[key] * 0.6, 6);
+    for (const key of ["intro", "read", "charge", "lunge", "stop", "impact", "hold", "ret"] as const) expect(quick[key], key).toBeCloseTo(normal[key] * 0.6, 6);
   });
 
-  it("add up for several attacks one after another: the first 1700, a later one 1200, the last going back 500 more", () => {
-    expect(spotlightSpan(1)).toBe(2200);
-    expect(spotlightRun(1, 0.6)).toBe(1320);
-    expect(beatsAt(1, { first: true, last: false }).end).toBe(1700);
+  it("add up for several attacks one after another: the first 2700, a later one 2200, the last going back 500 more", () => {
+    expect(spotlightSpan(1)).toBe(3200);
+    expect(spotlightRun(1, 0.6)).toBe(1920);
+    expect(beatsAt(1, { first: true, last: false }).end).toBe(2700);
     expect(beatsAt(1, { first: false, last: false }).end).toBe(SPOTLIGHT_AGAIN);
     expect(beatsAt(1, { first: false, last: true }).end).toBe(SPOTLIGHT_AGAIN + 500);
-    expect(spotlightSpan(2)).toBe(1700 + 1700);
-    expect(spotlightSpan(3)).toBe(1700 + 1200 + 1700);
-    expect(spotlightSpan(3)).toBe(4600);
-    expect(spotlightRun(3, 0.6)).toBe(2760);
-    expect(runStart(2, 3, 1)).toBe(1700 + 1200);
+    expect(spotlightSpan(2)).toBe(2700 + 2700);
+    expect(spotlightSpan(3)).toBe(2700 + 2200 + 2700);
+    expect(spotlightSpan(3)).toBe(7600);
+    expect(spotlightRun(3, 0.6)).toBe(4560);
+    expect(runStart(2, 3, 1)).toBe(2700 + 2200);
   });
 
   it("name when each strike lands and when the last attack begins to go back", () => {
     expect(hitTime(0, 1, 1)).toBe(1120);
     expect(hitTime(0, 3, 1)).toBe(1120);
     // A later attack swaps in over 200 ms, reads over 100 and charges over 200, so its hit stop is 620 ms after it begins.
-    expect(hitTime(1, 3, 1)).toBe(1700 + 620);
-    expect(hitTime(2, 3, 1)).toBe(1700 + 1200 + 620);
-    expect(hitTime(1, 3, 0.6)).toBeCloseTo((1700 + 620) * 0.6, 6);
-    expect(leaveTime(1, 1)).toBe(1700);
-    expect(leaveTime(2, 1)).toBe(1700 + 1200);
-    expect(windowOf(0, 3, 1)).toEqual({ start: 0, length: 1700 + 200 });
-    expect(windowOf(2, 3, 1)).toEqual({ start: 2900, length: 1700 });
+    expect(hitTime(1, 3, 1)).toBe(2700 + 620);
+    expect(hitTime(2, 3, 1)).toBe(2700 + 2200 + 620);
+    expect(hitTime(1, 3, 0.6)).toBeCloseTo((2700 + 620) * 0.6, 6);
+    expect(leaveTime(1, 1)).toBe(2700);
+    expect(leaveTime(2, 1)).toBe(2700 + 2200);
+    expect(windowOf(0, 3, 1)).toEqual({ start: 0, length: 2700 + 200 });
+    expect(windowOf(2, 3, 1)).toEqual({ start: 4900, length: 2700 });
   });
 
   it("is one frame at any speed: Quick at 0.6 of a moment is Normal at that moment, field by field", () => {
     const shapes: ClashShape[] = [HIT, BLOCKED, KILL, SHADOW, { damage: 2, destroyed: true, shadow: false, first: false, last: false }, { damage: 0, destroyed: false, shadow: true, first: false, last: true }];
     for (const shape of shapes) {
-      for (const t of range(2199, 77)) {
+      for (const t of range(MOTION.spotlight.ms - 1, 77)) {
         const normal = flat(frameAt(shape, t, 1, 91));
         const quick = flat(frameAt(shape, t * 0.6, 0.6, 91));
         expect(quick.map(([path]) => path)).toEqual(normal.map(([path]) => path));
@@ -84,8 +84,8 @@ describe("a frame", () => {
   it("starts with nothing flown out and ends with everything back in its slot and the dark lifted", () => {
     const start = frameAt(HIT, 0, 1);
     expect([start.flyAttackers, start.flyTarget, darkAt(0, 1, 1), start.badgeA, start.back, start.strike, Math.abs(start.tilt), punchAt(0, 1, 1)]).toEqual([0, 0, 0, 0, 0, 0, 0, 1]);
-    const end = frameAt(HIT, 2200, 1);
-    expect([end.flyAttackers, end.flyTarget, darkAt(2200, 1, 1), end.badgeA, end.back, end.strike, punchAt(2200, 1, 1)]).toEqual([0, 0, 0, 0, 0, 0, 1]);
+    const end = frameAt(HIT, 3200, 1);
+    expect([end.flyAttackers, end.flyTarget, darkAt(3200, 1, 1), end.badgeA, end.back, end.strike, punchAt(3200, 1, 1)]).toEqual([0, 0, 0, 0, 0, 0, 1]);
     const there = frameAt(HIT, 350, 1);
     expect([there.flyAttackers, there.flyTarget, darkAt(350, 1, 1)]).toEqual([1, 1, 1]);
   });
@@ -133,17 +133,17 @@ describe("a frame", () => {
     expect(punchAt(650, 1, 1)).toBe(1);
     expect(punchAt(1000, 1, 1)).toBeCloseTo(FX.push, 9);
     expect(punchAt(1500, 1, 1)).toBeCloseTo(FX.push, 9);
-    expect(punchAt(1950, 1, 1)).toBeCloseTo(1 + (FX.push - 1) / 2, 6);
-    expect(punchAt(2200, 1, 1)).toBe(1);
+    expect(punchAt(2950, 1, 1)).toBeCloseTo(1 + (FX.push - 1) / 2, 6);
+    expect(punchAt(3200, 1, 1)).toBe(1);
     expect(punchAt(0, 1, 1)).toBe(1);
     expect(punchAt(1000, 1, 2)).toBeCloseTo(FX.push, 9);
-    expect(punchAt(1700 + 1700, 1, 2)).toBe(1);
+    expect(punchAt(2700 + 2700, 1, 2)).toBe(1);
     expect(cameraPush(0)).toBe(1);
     expect(cameraPush(1)).toBeCloseTo(1.06, 9);
   });
 
   it("shows the afterimages only during the lunge, three of them, fainter the older", () => {
-    for (const t of range(2200, 10)) {
+    for (const t of range(3200, 10)) {
       const lunging = t >= 1000 && t < 1120;
       expect(frameAt(HIT, t, 1).trail, `${t}`).toBe(lunging ? 1 : 0);
       for (const j of [1, 2, 3]) expect(trailAt(HIT, t, 1, j).alpha > 0, `${t} ${j}`).toBe(lunging);
@@ -154,6 +154,15 @@ describe("a frame", () => {
     // Each afterimage is the same clock a step earlier, so it lags the card.
     expect(one?.strike).toBeLessThan(frameAt(HIT, 1100, 1).strike);
     expect(three?.strike).toBeLessThan(one?.strike ?? 0);
+  });
+
+  it("keeps the cards and the damage number up for a second after the impact, then goes back", () => {
+    const shown = frameAt(HIT, 1700, 1);
+    const held = frameAt(HIT, 2699, 1);
+    expect(held).toMatchObject({ flyAttackers: 1, flyTarget: 1, strike: 1, badgeA: 1 });
+    expect(held.number.alpha).toBe(shown.number.alpha);
+    expect(held.number.alpha).toBe(1);
+    expect(frameAt(HIT, 2700, 1).flyAttackers).toBe(1);
   });
 
   it("holds everything for the hit stop: nothing but the flash moves between 1120 and 1220 ms", () => {
@@ -186,19 +195,19 @@ describe("a frame", () => {
     expect([hit.stop, hit.impact]).toEqual([100, 480]);
     expect([kill.stop, kill.impact]).toEqual([160, 420]);
     // The strike lands (and the haptic ticks) at the same moment, and the return and the end are where they were.
-    expect([kill.stopAt, kill.impactAt, kill.retAt, kill.end]).toEqual([1120, 1280, 1700, 2200]);
+    expect([kill.stopAt, kill.impactAt, kill.retAt, kill.end]).toEqual([1120, 1280, 2700, 3200]);
     expect([hit.stopAt, hit.retAt, hit.end]).toEqual([kill.stopAt, kill.retAt, kill.end]);
     expect(hitTime(0, 1, 1)).toBe(kill.stopAt);
-    // A lone kill is 2200 ms and a later one 1200 ms, like the rest.
+    // A lone kill is 3200 ms and a later one 2200 ms, like the rest.
     expect(kill.stop + kill.impact).toBe(hit.stop + hit.impact);
-    expect(spotlightRun(1, 1)).toBe(2200);
+    expect(spotlightRun(1, 1)).toBe(3200);
     const again = beatsAt(1, { first: false, last: false, destroyed: true });
-    expect(again.end).toBe(1200);
+    expect(again.end).toBe(2200);
     expect([again.stop, again.impact]).toEqual([160, 420 - 0]);
     // Quick scales both the same.
     const quick = beatsAt(0.6, KILL);
     expect(quick.stop).toBeCloseTo(0.6 * 160, 9);
-    expect(quick.end).toBeCloseTo(0.6 * 2200, 6);
+    expect(quick.end).toBeCloseTo(0.6 * 3200, 6);
     // The stop holds the picture for the whole 160 ms, and the impact begins after it; the tokens still land inside the shorter impact.
     const base = frameAt(KILL, 1120, 1);
     for (const t of [1150, 1200, 1279]) {
@@ -214,7 +223,7 @@ describe("a frame", () => {
 
   it("flashes once per attack, warm white at a peak of 0.7, from the first frame of the stop", () => {
     for (const shape of [HIT, BLOCKED, KILL, { ...HIT, first: false, last: false }, { ...HIT, first: false, last: true }]) {
-      const flash = range(2200).map((t) => frameAt(shape, t, 1).flash);
+      const flash = range(3200).map((t) => frameAt(shape, t, 1).flash);
       const peaks = flash.filter((value, index) => value > 0 && value >= (flash[index - 1] ?? 0) && value > (flash[index + 1] ?? 0));
       expect(peaks, `${JSON.stringify(shape)}`).toHaveLength(1);
       expect(Math.max(...flash)).toBeLessThanOrEqual(0.7);
@@ -222,7 +231,7 @@ describe("a frame", () => {
       expect(flash.findIndex((value) => value > 0)).toBe(start + 1);
       expect(flash[beatsAt(1, shape).stopAt + 160] ?? 0).toBe(0);
     }
-    expect(Math.max(...range(2200).map((t) => frameAt(HIT, t, 1).flash))).toBeGreaterThan(0.65);
+    expect(Math.max(...range(3200).map((t) => frameAt(HIT, t, 1).flash))).toBeGreaterThan(0.65);
     expect(flashAt(FX.flashRise, false)).toBeCloseTo(FX.flashPeak, 9);
     expect(flashAt(FX.flashRise, true)).toBeLessThan(FX.flashPeak);
     expect(FX.flashRadius).toBe(0.55);
@@ -244,7 +253,7 @@ describe("a frame", () => {
     // The sparks start at the impact: 1220 ms, or 1280 on a kill (its stop is 60 ms longer).
     expect([f(1279).sparkT, f(1280).sparkT, f(1380).sparkT]).toEqual([-1, 0, 100]);
     expect([frameAt(HIT, 1219, 1).sparkT, frameAt(HIT, 1220, 1).sparkT, frameAt(HIT, 1320, 1).sparkT]).toEqual([-1, 0, 100]);
-    expect([f(1699).ashT, f(1700).ashT, f(1800).ashT]).toEqual([-1, 0, 100]);
+    expect([f(2699).ashT, f(2700).ashT, f(2800).ashT]).toEqual([-1, 0, 100]);
     expect(frameAt(HIT, 1800, 1).ashT).toBe(-1);
   });
 });
@@ -326,9 +335,9 @@ describe("the hit", () => {
     expect(numberAt(0, 1).alpha).toBe(0);
     expect(frameAt(HIT, 1220 + 200, 1).number.alpha).toBe(1);
     expect(frameAt(HIT, 1220 + 200, 1).number.rise).toBeGreaterThan(0);
-    expect(range(2200, 20).every((t) => frameAt(BLOCKED, t, 1).number.alpha === 0)).toBe(true);
+    expect(range(3200, 20).every((t) => frameAt(BLOCKED, t, 1).number.alpha === 0)).toBe(true);
     // It fades out as the cards go back.
-    expect(frameAt(HIT, 1700 + 250, 1).number.alpha).toBe(0);
+    expect(frameAt(HIT, 2700 + 250, 1).number.alpha).toBe(0);
   });
 
   it("bounces the defense medallion of a blocked attack once, to 1.25, and stamps Blocked", () => {
@@ -341,7 +350,7 @@ describe("the hit", () => {
     expect(frameAt(BLOCKED, 1220 + 100, 1).stamp).toBeGreaterThan(0);
     // An attack that dealt damage bounces nothing and stamps nothing.
     expect(frameAt(HIT, 1500, 1).badgeD).toBe(frameAt(HIT, 1500, 1).badgeA);
-    expect(range(2200, 20).every((t) => frameAt(HIT, t, 1).stamp === 0)).toBe(true);
+    expect(range(3200, 20).every((t) => frameAt(HIT, t, 1).stamp === 0)).toBe(true);
     expect(stampLook(1)).toEqual({ scale: 1, alpha: 1 });
     expect(stampLook(0.2).scale).toBeGreaterThan(1.15);
   });
@@ -360,30 +369,30 @@ describe("the hit", () => {
 
 describe("a destroyed target", () => {
   it("burns only when it is destroyed: the dissolve runs over the burn token from the return and no other attack has one", () => {
-    for (const shape of [HIT, BLOCKED, SHADOW]) expect(range(2200, 10).every((t) => frameAt(shape, t, 1).dissolve === 0)).toBe(true);
-    expect(frameAt(KILL, 1699, 1)).toMatchObject({ dissolve: 0, flyTarget: 1 });
-    const burn = range(450, 10).map((at) => frameAt(KILL, 1700 + at, 1).dissolve);
+    for (const shape of [HIT, BLOCKED, SHADOW]) expect(range(3200, 10).every((t) => frameAt(shape, t, 1).dissolve === 0)).toBe(true);
+    expect(frameAt(KILL, 2699, 1)).toMatchObject({ dissolve: 0, flyTarget: 1 });
+    const burn = range(450, 10).map((at) => frameAt(KILL, 2700 + at, 1).dissolve);
     expect(burn).toEqual([...burn].sort((a, b) => a - b));
     expect(burn[0]).toBe(0);
     expect(burn[burn.length - 1]).toBeCloseTo(1, 9);
     // In quad: a quarter of the way through is a sixteenth of the burn.
-    expect(frameAt(KILL, 1700 + 112.5, 1).dissolve).toBeCloseTo(1 / 16, 6);
+    expect(frameAt(KILL, 2700 + 112.5, 1).dissolve).toBeCloseTo(1 / 16, 6);
     // The target stays while the attackers go back.
-    expect(frameAt(KILL, 1950, 1).flyTarget).toBe(1);
-    expect(frameAt(KILL, 1950, 1).flyAttackers).toBeLessThan(1);
-    expect(frameAt(HIT, 1950, 1).flyTarget).toBeLessThan(1);
+    expect(frameAt(KILL, 2950, 1).flyTarget).toBe(1);
+    expect(frameAt(KILL, 2950, 1).flyAttackers).toBeLessThan(1);
+    expect(frameAt(HIT, 2950, 1).flyTarget).toBeLessThan(1);
   });
 
   it("stamps Destroyed as the burn begins, and lets it go at the end of the return", () => {
     expect(frameAt(KILL, 1699, 1).stamp).toBe(0);
-    expect(frameAt(KILL, 1700 + 160, 1).stamp).toBe(1);
-    expect(frameAt(KILL, 2200, 1).stamp).toBeCloseTo(0, 6);
+    expect(frameAt(KILL, 2700 + 160, 1).stamp).toBe(1);
+    expect(frameAt(KILL, 3200, 1).stamp).toBeCloseTo(0, 6);
   });
 
   it("burns as fast as the next attack swaps in when it is not the last", () => {
     const middle: ClashShape = { damage: 2, destroyed: true, shadow: false, first: true, last: false };
-    expect(frameAt(middle, 1700 + 100, 1).dissolve).toBeCloseTo(0.25, 6);
-    expect(frameAt(middle, 1700 + 200, 1).dissolve).toBe(1);
+    expect(frameAt(middle, 2700 + 100, 1).dissolve).toBeCloseTo(0.25, 6);
+    expect(frameAt(middle, 2700 + 200, 1).dissolve).toBe(1);
   });
 });
 
@@ -398,7 +407,7 @@ describe("the shadow card", () => {
     expect(glint.some((value) => value > 0 && value < 1)).toBe(true);
     const swept = glint.filter((value) => value > 0);
     expect(swept).toEqual([...swept].sort((a, b) => a - b));
-    expect(range(2200, 10).every((t) => frameAt(HIT, t, 1).flipAngle === 0 && frameAt(HIT, t, 1).glint === 0)).toBe(true);
+    expect(range(3200, 10).every((t) => frameAt(HIT, t, 1).flipAngle === 0 && frameAt(HIT, t, 1).glint === 0)).toBe(true);
   });
 });
 
@@ -431,11 +440,11 @@ describe("the dark", () => {
     expect(darkAt(0, 1, 1)).toBe(0);
     expect(darkAt(350, 1, 1)).toBe(1);
     expect(darkAt(1699, 1, 1)).toBe(1);
-    expect(darkAt(1950, 1, 1)).toBeCloseTo(0.5, 6);
-    expect(darkAt(2200, 1, 1)).toBe(0);
-    expect(darkAt(1700, 1, 2)).toBe(1);
-    expect(darkAt(1700 + 1200, 1, 2)).toBe(1);
-    expect(darkAt(1700 + 1200 + 250, 1, 2)).toBeCloseTo(0.5, 6);
+    expect(darkAt(2950, 1, 1)).toBeCloseTo(0.5, 6);
+    expect(darkAt(3200, 1, 1)).toBe(0);
+    expect(darkAt(2700, 1, 2)).toBe(1);
+    expect(darkAt(2700 + 2200, 1, 2)).toBe(1);
+    expect(darkAt(2700 + 2200 + 250, 1, 2)).toBeCloseTo(0.5, 6);
     expect(darkAt(spotlightSpan(2), 1, 2)).toBe(0);
     expect(SPOT.dark).toBeLessThan(1);
   });
@@ -448,22 +457,22 @@ describe("several attacks in one state", () => {
 
   it("fly out and enter only for the first, and go back only for the last", () => {
     expect(frameAt(first, 0, 1).flyAttackers).toBe(0);
-    expect(frameAt(first, 1700, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1 });
-    expect(darkAt(1700, 1, 2)).toBe(1);
+    expect(frameAt(first, 2700, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1 });
+    expect(darkAt(2700, 1, 2)).toBe(1);
     // Past its end the first one is still in the middle, fading out into the next.
-    expect(frameAt(first, 1700 + 200, 1).fade).toBe(0);
-    expect(frameAt(first, 1700 + 100, 1).fade).toBeCloseTo(0.5, 6);
+    expect(frameAt(first, 2700 + 200, 1).fade).toBe(0);
+    expect(frameAt(first, 2700 + 100, 1).fade).toBeCloseTo(0.5, 6);
     // A later one is in the middle from its first moment, fading in over the swap.
     expect(frameAt(middle, 0, 1)).toMatchObject({ flyAttackers: 1, flyTarget: 1, fade: 0 });
     expect(frameAt(middle, 200, 1).fade).toBe(1);
-    expect(frameAt(middle, 1200, 1).flyAttackers).toBe(1);
-    expect(frameAt(last, 1200 + 250, 1).flyAttackers).toBeLessThan(1);
-    expect(frameAt(last, 1700, 1).flyAttackers).toBe(0);
+    expect(frameAt(middle, 2200, 1).flyAttackers).toBe(1);
+    expect(frameAt(last, 2200 + 250, 1).flyAttackers).toBeLessThan(1);
+    expect(frameAt(last, 2700, 1).flyAttackers).toBe(0);
   });
 
   it("read in 100 ms, charge in 200 and still touch the target and hold for the hit stop", () => {
     const b = beatsAt(1, { first: false, last: false });
-    expect([b.readAt, b.chargeAt, b.lungeAt, b.stopAt, b.impactAt, b.retAt]).toEqual([200, 300, 500, 620, 720, 1200]);
+    expect([b.readAt, b.chargeAt, b.lungeAt, b.stopAt, b.impactAt, b.retAt]).toEqual([200, 300, 500, 620, 720, 2200]);
     expect(frameAt(middle, b.lungeAt, 1)).toMatchObject({ back: 1, strike: 0 });
     expect(frameAt(middle, b.stopAt, 1).strike).toBe(1);
     expect(frameAt(middle, b.impactAt + 30, 1).shakeX).not.toBe(0);
@@ -471,7 +480,7 @@ describe("several attacks in one state", () => {
 
   it("scale with Quick like the first does", () => {
     const quick = beatsAt(0.6, { first: false, last: true });
-    expect(quick.end).toBeCloseTo(1700 * 0.6, 6);
+    expect(quick.end).toBeCloseTo(2700 * 0.6, 6);
     expect(burstAt(0, 1, 720 * 0.6, 0.6, { first: false, last: false }).flying).toBe(true);
   });
 });
