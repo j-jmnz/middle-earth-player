@@ -1,0 +1,196 @@
+{
+  "id": "temple-of-the-deceived",
+  "name": "Temple of the Deceived",
+  "number": 3,
+  "stages": [
+    "12067"
+  ],
+  "encounterSets": [
+    {
+      "name": "Temple of the Deceived",
+      "count": 28
+    },
+    {
+      "name": "Ruins of Númenor",
+      "count": 9
+    },
+    {
+      "name": "Drowned Dead",
+      "count": 9
+    },
+    {
+      "name": "The Stormcaller Elite",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "12075",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "12076",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12077",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12078",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "12079",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12080",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "12081",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11075",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11068",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11069",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11070",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11071",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "12071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11077",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11079",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "12068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "islandMap"
+    },
+    {
+      "code": "12069",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    },
+    {
+      "code": "12072",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    },
+    {
+      "code": "12073",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    },
+    {
+      "code": "12074",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    },
+    {
+      "code": "11072",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    },
+    {
+      "code": "11073",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    },
+    {
+      "code": "11074",
+      "normal": 2,
+      "easy": 2,
+      "pile": "islandMap"
+    }
+  ],
+  "campaignCard": "11197",
+  "campaignPlaced": [
+    "11180",
+    "11181",
+    "11183",
+    "11198",
+    "11199"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.6",
+    "dragnEasy": "E06.6",
+    "hobSlug": "Temple-of-the-Deceived"
+  }
+}

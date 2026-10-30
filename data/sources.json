@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "d5d7318b441ce756bad5c878b65e3c9b4933909bf7c86286e50c7fdcf216f3ed"
+        "value": "fb6da079b1be2f6a03ad93f0045588b238896953d7e48ad678155520436ce638"
       },
-      "fetchedAt": "2026-10-27T15:09:42.078Z",
+      "fetchedAt": "2026-10-30T20:50:31.645Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -181,6 +181,60 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Breaking-of-the-Fellowship",
           "sha256": "5d494d99831bd35a148ab17cfb7cbaa9e19c49dff6ec5afd998a507a60884cbd",
           "bytes": 22872
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Voyage-Across-Belegaer.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Voyage-Across-Belegaer",
+          "sha256": "babbb69277e59f34ff356095efe49c90458a84cdbc22bac7a0c0a7ca33fe4884",
+          "bytes": 26181
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Fate-of-Númenor.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Fate-of-Númenor",
+          "sha256": "c22d6b596637f5c51e31fc04b5ef5041c1f263f7d5003eb827a6f6d76fd7415c",
+          "bytes": 11567
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Raid-on-the-Grey-Havens.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Raid-on-the-Grey-Havens",
+          "sha256": "5a9aef3eb96b7e978ab56d9e6b0cf82f02a71bdd3a12cec7fcbb7adf41f29edb",
+          "bytes": 13958
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Flight-of-the-Stormcaller.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Flight-of-the-Stormcaller",
+          "sha256": "5a7f8778a9b7bcfee78d1f84052aee6af45c6919e05c0752d33dddad969a3e98",
+          "bytes": 23086
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Thing-in-the-Depths.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Thing-in-the-Depths",
+          "sha256": "30c72e1de44d4c4ab25ec5027e9bf5f7d72cdcb35ea17914173be69e0a32073c",
+          "bytes": 14070
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Temple-of-the-Deceived.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Temple-of-the-Deceived",
+          "sha256": "caecca25948f50b2e7c24365c7d0608210b6d982041bf45b76948fce6e1fd295",
+          "bytes": 10748
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Drowned-Ruins.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Drowned-Ruins",
+          "sha256": "523b1f177f3bcd263914a15d583cadb172dd8300320d0e3ca0168655604e9402",
+          "bytes": 12416
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/A-Storm-on-Cobas-Haven.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/A-Storm-on-Cobas-Haven",
+          "sha256": "bc70801b2f3465cc4f044a06d39680abcf94eb13dec644eeef6726ba0f2f7d98",
+          "bytes": 16694
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-City-of-Corsairs.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-City-of-Corsairs",
+          "sha256": "98fbb755c66532ade717c951175426fa8ee62c4b288a4285d5cbfba124027e4b",
+          "bytes": 19064
         }
       ]
     },
@@ -13757,9 +13811,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "7c114a2a21ccd410ed1fcb433729151e1cf37336a8463d6c1eb2cc96244768a6"
+        "value": "f48f2d60b4750e33e7b76b60b14cb4afe410cf0eefdd064ccbd58a7a6ec04c07"
       },
-      "fetchedAt": "2026-10-27T15:02:24.923Z",
+      "fetchedAt": "2026-10-30T20:50:45.164Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -13784,6 +13838,12 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/dark_of_mirkwood_rulebook_v2.pdf",
           "sha256": "b0763922ba321588ba0b50885d82c28ddb3a8e7a1cfe77ba3395e0403f7d4b7a",
           "bytes": 12791907
+        },
+        {
+          "path": "pdf/mec111_dream-chaser_campaign_expansion.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC111.pdf",
+          "sha256": "2a4093f7ee5b64fe4a78d9720fcebcf15a954989222500eafdb05f77ccebb6d2",
+          "bytes": 31064590
         },
         {
           "path": "pdf/lotr_faq_19.pdf",
@@ -13942,9 +14002,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "7622935ca45f66ffee380b321ec0981735c8008feacd2b9ae1a6b91d7325ed4f"
+        "value": "9953242e6d8785c55c8221e5a57027db0311d80b2a4f343523987f5aa2fbde84"
       },
-      "fetchedAt": "2026-10-30T02:18:58.191Z",
+      "fetchedAt": "2026-10-30T21:28:40.934Z",
       "files": [
         {
           "path": "scans/01001.A.jpg",
@@ -14851,6 +14911,1830 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Revised-Core-Set/Scarred.jpg",
           "sha256": "0474fb62907e57f013c2002353729843953ab8a558cf5bc03c7a515077f97ee7",
           "bytes": 47608
+        },
+        {
+          "path": "scans/110013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Calphon.jpg",
+          "sha256": "663cd272487c5d24a1f737cff1255d5d376379d198860012591ae7239f9ed200",
+          "bytes": 269511
+        },
+        {
+          "path": "scans/110042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Stormcaller.jpg",
+          "sha256": "5f9b05cb819fae141404a0add7b12de2b28c17a3a52f6263c445b397e9872bd7",
+          "bytes": 265723
+        },
+        {
+          "path": "scans/110042.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Stormcaller-Campaign.jpg",
+          "sha256": "6acf1e2c4b34f0f97cf1f3aa8fbcf55fc6eee24a2a99f4d9df167f21efcea903",
+          "bytes": 272430
+        },
+        {
+          "path": "scans/110063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Thing-in-the-Depths-Enemy.jpg",
+          "sha256": "f10452f4a7ad031b0b2a906d1ad2e589eaa2ab0531a8998ff5009c61b8d93a33",
+          "bytes": 311572
+        },
+        {
+          "path": "scans/110063.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Thing-in-the-Depths-Enemy-Campaign.jpg",
+          "sha256": "c6b8564d3584865903659e46d4686e0b04709d21499f980b7c51763668c16d53",
+          "bytes": 310824
+        },
+        {
+          "path": "scans/110077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Temple-Guardian.jpg",
+          "sha256": "c00e4c4f5749848ee19d782bc89ecc6172cfb9bc7e48bb410f3e1fbfa0ae884d",
+          "bytes": 296754
+        },
+        {
+          "path": "scans/110077.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Temple-Guardian-Campaign.jpg",
+          "sha256": "988e6d263b64abdfd8438d8b66a4c91166047b41f278a3de8c167d12d96be625",
+          "bytes": 297085
+        },
+        {
+          "path": "scans/110078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Gate-Key.jpg",
+          "sha256": "5670c65c99a52d7325a1c162a98783b3acd8329b41d91a43cb78fa5a9943df28",
+          "bytes": 285982
+        },
+        {
+          "path": "scans/110078.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Gate-Key-Upgraded.jpg",
+          "sha256": "b9d03c9af8c1719f26da7a1662ade9f573342909465e490e2fe9631b37893a29",
+          "bytes": 285600
+        },
+        {
+          "path": "scans/110102.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Dol-Amroth-Warship.jpg",
+          "sha256": "0155837ded4e1771bad9bc622b423bee63a502db52286bf9ae0ab84492377660",
+          "bytes": 300345
+        },
+        {
+          "path": "scans/110136.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Dream-chaser.jpg",
+          "sha256": "5bb96ea28a728504cd307af5ec9fc95aac9e671242e7170c74ae9ab5cae3e709",
+          "bytes": 46077
+        },
+        {
+          "path": "scans/110136.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Dream-chaser-Upgraded.jpg",
+          "sha256": "ac05ab04be54135412ae3b4017d145d1cf1d1b083adb22703a70cb7d44df73ff",
+          "bytes": 250248
+        },
+        {
+          "path": "scans/110137.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Dawn-Star.jpg",
+          "sha256": "dd73a3be55d71312793dca92ecdc5eca0882d6598fa52b92ff4bb60c40817a64",
+          "bytes": 279895
+        },
+        {
+          "path": "scans/110137.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Dawn-Star-Upgraded.jpg",
+          "sha256": "4e7542c2e848befcce332270f929d981d8d3bfafb79e0aea7d6aced262c633b6",
+          "bytes": 245450
+        },
+        {
+          "path": "scans/110138.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Duskbringer.jpg",
+          "sha256": "399165ff0d7e2a241b5e502dd01d08ff2f388a5448b670dd77cfd07bb250b914",
+          "bytes": 281098
+        },
+        {
+          "path": "scans/110139.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Glorinaith.jpg",
+          "sha256": "c2de47471c6dcf9d5a1c5039e86d87c431a9a743a5e6a4c5be9b9379ad99562f",
+          "bytes": 300641
+        },
+        {
+          "path": "scans/110140.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Narelenya.jpg",
+          "sha256": "f2a6423c6f65c9f7a16363908672da07822273ed12e32d70cbc506b47301b8ed",
+          "bytes": 284930
+        },
+        {
+          "path": "scans/110140.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Narelenya-Upgraded.jpg",
+          "sha256": "00e6c51ffd5fe78ed4d723ac4e0b5bc3d233e14a474f40a7ab14ba03600d2456",
+          "bytes": 254634
+        },
+        {
+          "path": "scans/110141.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Silver-Wing.jpg",
+          "sha256": "0484460a564585523466399d5eadfe323a18443299601a099868aa9d1b8da3c6",
+          "bytes": 270862
+        },
+        {
+          "path": "scans/110141.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Silver-Wing-Upgraded.jpg",
+          "sha256": "17eca3c0ded4d28002ee09751e4723877cf916693063f16eca46be1d84045d82",
+          "bytes": 240674
+        },
+        {
+          "path": "scans/11016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Departure-from-the-Havens-1A.jpg",
+          "sha256": "33fa334469f2bcbbf03f799241bcbb8211b8900d027c328cd87ec938103f45ef",
+          "bytes": 157016
+        },
+        {
+          "path": "scans/11016.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Departure-from-the-Havens-1B.jpg",
+          "sha256": "aaebff8f5e50267447dab7de8b3b8d9b9fd55fcbb98d02811c84476c09c7f8c8",
+          "bytes": 145911
+        },
+        {
+          "path": "scans/11017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Into-the-Storm-2A.jpg",
+          "sha256": "744e7ac03cd6e8d1b88c7114c7441293786b2ddafaecf52c49ecdc5a7134812f",
+          "bytes": 154930
+        },
+        {
+          "path": "scans/11017.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Into-the-Storm-2B.jpg",
+          "sha256": "85ff57afd2e712dfa7f21800b9536efe3fea8dfe854ad51ed902b8d4d938bbf0",
+          "bytes": 155340
+        },
+        {
+          "path": "scans/11018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Cursed-Mists-2A.jpg",
+          "sha256": "1ec5a21c1caaa67d6d7fd77421788c0d2a536e408d7372f0ccce76ca54294cd1",
+          "bytes": 144975
+        },
+        {
+          "path": "scans/11018.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Cursed-Mists-2B.jpg",
+          "sha256": "515191bef4cab4b77135577c2b338bf3979f6134221b919a72751792ebb923c1",
+          "bytes": 136394
+        },
+        {
+          "path": "scans/11019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Calphon's-Divination-2A.jpg",
+          "sha256": "40cb871cd1f99d0c3c2dec6815a2851eca8d206bdcacefada296821c6edb1b30",
+          "bytes": 145545
+        },
+        {
+          "path": "scans/11019.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Calphon's-Divination-2B.jpg",
+          "sha256": "25ee96adef26ab3f1c786d003acc5975b9c25af44147a4ed4ac800c8771915e2",
+          "bytes": 144124
+        },
+        {
+          "path": "scans/11020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/The-Star's-Guidance-2A.jpg",
+          "sha256": "803b51c436f7c2337748cf04eb96caedee73d7216ac15571b3b8870961227de5",
+          "bytes": 142085
+        },
+        {
+          "path": "scans/11020.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/The-Star's-Guidance-2B.jpg",
+          "sha256": "303952a3ea9c36554535c81cd8c34ddbff5f70e466435c533b786080c2cabb9d",
+          "bytes": 139989
+        },
+        {
+          "path": "scans/11021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Corsair-Pursuit-3A.jpg",
+          "sha256": "038a69be71290ebc46a924a1c7d286a7bd811bca1fb80239f4da857168c97288",
+          "bytes": 155530
+        },
+        {
+          "path": "scans/11021.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Corsair-Pursuit-3B.jpg",
+          "sha256": "05209ecd4d88d2c46f709db9fbe2c135609fc65e2d2afd8160824625f49ed655",
+          "bytes": 145598
+        },
+        {
+          "path": "scans/11022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Scouting-Ship.jpg",
+          "sha256": "635983ec5cecbb049dffadb775625867894c69ea7ac31b214032d564a2780557",
+          "bytes": 148409
+        },
+        {
+          "path": "scans/11023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Starlit-Sea.jpg",
+          "sha256": "e580f5137f520605c0d84ace9e9871dd46b30f7ed93ce493030f2e01219abd1a",
+          "bytes": 142089
+        },
+        {
+          "path": "scans/11024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Fog-Bank.jpg",
+          "sha256": "847cbabcff1c232d9f043dc4c36ab7208c0fb884858b43f8670da2f64cb9300b",
+          "bytes": 141250
+        },
+        {
+          "path": "scans/11025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Explore-the-Island-1A.jpg",
+          "sha256": "6410bde8b383823888081cc25da594d1849f4fd85104166687b41b6b9aa03ed2",
+          "bytes": 166138
+        },
+        {
+          "path": "scans/11025.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Explore-the-Island-1B.jpg",
+          "sha256": "03219fbffa4f52e19ac9d498a091060be6725206444a335aa04433a90f1ab101",
+          "bytes": 162527
+        },
+        {
+          "path": "scans/11026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/A-Fateful-Discovery-2A.jpg",
+          "sha256": "0208d95ac02ef6babc29e7971ce7f4962052b12c00032d6580a74d98b27fa3cc",
+          "bytes": 162233
+        },
+        {
+          "path": "scans/11026.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/A-Fateful-Discovery-2B.jpg",
+          "sha256": "a332aa24b099c21740bb663d3f5e2d6e43ae1f79770eecefc25231b0e96618b7",
+          "bytes": 158014
+        },
+        {
+          "path": "scans/11027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Shrine-to-Morgoth-Lost-Island.jpg",
+          "sha256": "61f24a9ff4397c5daeda0932fb69ba12e6942fe600a7d1e322938b8a2279e37a",
+          "bytes": 159909
+        },
+        {
+          "path": "scans/11027.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/26642db7-c3a2-47f3-989d-27396e586d06.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/11028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Calphon.jpg",
+          "sha256": "f29fea35f661b225fa1eaebb9ee78bb10b1548b9cb9e3785a812917d199c2930",
+          "bytes": 154693
+        },
+        {
+          "path": "scans/11029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Servant-of-the-Deceiver.jpg",
+          "sha256": "af391a50ce1cd7cad6806af96b8f2d3fda53257f27d968597c56bf957c1e6abd",
+          "bytes": 162722
+        },
+        {
+          "path": "scans/11030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Lush-Jungle-Lost-Island.jpg",
+          "sha256": "02c153e7139648a6473a1721403fc6e1120694cee6dfe919631f418ce8e83a97",
+          "bytes": 162823
+        },
+        {
+          "path": "scans/11030.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c7bb88f6-a6b7-44f3-8bc2-8c4be788e7da.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/11031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Forbidden-Coast-Lost-Island.jpg",
+          "sha256": "d146c8afd3726a4bf125bfc54069cbc8f3d3bcf4e97b52d2a6c3bbc4449b152e",
+          "bytes": 146158
+        },
+        {
+          "path": "scans/11031.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b1f8c611-99a3-4bab-9805-832853d52d4d.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/11032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Steep-Plateau.jpg",
+          "sha256": "1345f82ffadd2e53c3a791d74ff6cbd3f0fbf01ed5ea46ae1371b6838deb2825",
+          "bytes": 150778
+        },
+        {
+          "path": "scans/11033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Mysterious-Fog.jpg",
+          "sha256": "c9c4d95c73c96f63282f22fdc4bc298be903b9b47652419b9ed2ae3436e52817",
+          "bytes": 134783
+        },
+        {
+          "path": "scans/11034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Lingering-Malevolence.jpg",
+          "sha256": "153f94616e281602de16dffda58930b1f27ec813ded01792de2dc3d69491dc42",
+          "bytes": 148401
+        },
+        {
+          "path": "scans/11035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Ruins-of-Ages-Past.jpg",
+          "sha256": "53a2ee7a32928c298ddea2c1b24835a12e4ca391d4993d0174d6f4323451fefb",
+          "bytes": 153011
+        },
+        {
+          "path": "scans/11036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/The-Corsairs'-Assault-1A.jpg",
+          "sha256": "302a04c7c3d3d52cc4061b9d8b58c64365fa4a2c12ed62184a59873882f914be",
+          "bytes": 165818
+        },
+        {
+          "path": "scans/11036.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/The-Corsairs'-Assault-1B.jpg",
+          "sha256": "8da11cc098ebcd080bd42102d0af0189710a5178d5511b20940e08de8b184d49",
+          "bytes": 155001
+        },
+        {
+          "path": "scans/11037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Sahír's-Advance-2A.jpg",
+          "sha256": "340f22d9dac0a88da7b3e0f479f7d249e59b795a971b5c62395d0f909dd5cc1d",
+          "bytes": 153774
+        },
+        {
+          "path": "scans/11037.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Sahír's-Advance-2B.jpg",
+          "sha256": "2c433635f9b569c8c3c377466a07a5025cf91d2fca81ea11b7972153834c2c41",
+          "bytes": 145513
+        },
+        {
+          "path": "scans/11038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/The-Havens-Burn.jpg",
+          "sha256": "193ff464023cc947fa90669cf7439312a50aaf9c92078a09075d493c058ed7bd",
+          "bytes": 152976
+        },
+        {
+          "path": "scans/11039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Dream-chaser-Location.jpg",
+          "sha256": "ed6f59b0865ea67261eb8b2c495892ae537cc8e5c4cde170944b3c6e74fb9fe1",
+          "bytes": 156779
+        },
+        {
+          "path": "scans/11040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Corsair-Arsonist.jpg",
+          "sha256": "89777fe1c8336f5af3f2dd1557f5ab15be05ff585284ee151661fdf5442d3db3",
+          "bytes": 151707
+        },
+        {
+          "path": "scans/11041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Sahír's-Ravager.jpg",
+          "sha256": "8edecf0ebdd10a5a0418ae2a7de145d58cf45ec0ffaa7e2c5fb4f001d514c13d",
+          "bytes": 153072
+        },
+        {
+          "path": "scans/11042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Mithlond-Harbor.jpg",
+          "sha256": "bf98b73c234033a3f4461903491be677801d98c95fdfd1e67da79f147eedf006",
+          "bytes": 149177
+        },
+        {
+          "path": "scans/11043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Burning-Piers.jpg",
+          "sha256": "2869aa1f60c36cee5acfa51abac59fe111f7c68d4ab23bbaf4d89feea495dba8",
+          "bytes": 160148
+        },
+        {
+          "path": "scans/11044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Pillaged-Ship.jpg",
+          "sha256": "759da83316fd60edefcb21da9539a8a86385d472677789030c1f5739f27fea4f",
+          "bytes": 163302
+        },
+        {
+          "path": "scans/11045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/White-Ship.jpg",
+          "sha256": "cc5b1f4a519fef800ed5bbfac80840a320a5fce3fe36135eb6fcec78a933e01d",
+          "bytes": 148429
+        },
+        {
+          "path": "scans/11046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Elven-Wave-runner.jpg",
+          "sha256": "fdf42f9670d1185634cb73699987081230843cc2dda9aa6ff5e686286d578f92",
+          "bytes": 169450
+        },
+        {
+          "path": "scans/11047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Elven-Caravel.jpg",
+          "sha256": "ddb1054f96a059bc43504f162f7b6de2461f382b349ea7afbc770cdb0585b526",
+          "bytes": 157949
+        },
+        {
+          "path": "scans/11048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Put-to-the-Torch.jpg",
+          "sha256": "39326fcfa1b3447a35929d2d6991777c24424a102904fd670121cce832ca7f95",
+          "bytes": 139665
+        },
+        {
+          "path": "scans/11049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/The-Fires-Spread.jpg",
+          "sha256": "837be9ca170974c17de2efae514578917325db3085a52d8092ace538114a3bca",
+          "bytes": 138423
+        },
+        {
+          "path": "scans/11050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Calm-Waters.jpg",
+          "sha256": "58360c7f202ab1cb253e6198441fc3dd0e50fbcd32c722f6728fdea26db9e74e",
+          "bytes": 149465
+        },
+        {
+          "path": "scans/11051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Rolling-Seas.jpg",
+          "sha256": "ab165d51d6b3f2863d8e604c9c7d6b3536f5472fe40cb87154f0f913d740006e",
+          "bytes": 143544
+        },
+        {
+          "path": "scans/11052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Thrown-Off-Course.jpg",
+          "sha256": "e2df8e1dbde590bb88cd2c7f822eddeaf73b2878fd92f66b6543033c17f18e00",
+          "bytes": 153507
+        },
+        {
+          "path": "scans/11053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Rough-Waters.jpg",
+          "sha256": "ee24b499b143a582b90adcacbf1355133de367bc032f9c216bcd5867a4bc612d",
+          "bytes": 138742
+        },
+        {
+          "path": "scans/11054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Waterspout.jpg",
+          "sha256": "990f35d0b35d062cedbf213b7400a54daf3112991872f079d3f513d45bc8479e",
+          "bytes": 143520
+        },
+        {
+          "path": "scans/11055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Sudden-Storms.jpg",
+          "sha256": "36a951a20c1f950a8ebb161092259c8d24beaf0b07f21263717b39115c9acc18",
+          "bytes": 146187
+        },
+        {
+          "path": "scans/11056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Winds-of-Wrath.jpg",
+          "sha256": "ea843e6b5ad596a06106da48576535341c10cd30ebfc0fe78fbca9008c55166d",
+          "bytes": 172834
+        },
+        {
+          "path": "scans/11057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Light-Cruiser.jpg",
+          "sha256": "1808771f08012d951f940ee4bc635e2f044385982e536609b5b9346b196fa655",
+          "bytes": 150266
+        },
+        {
+          "path": "scans/11058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Corsair-Warship.jpg",
+          "sha256": "beb4af615acf4ead7a0098fd8406e196d5d862484167bf0b8e9ad11f82374407",
+          "bytes": 155001
+        },
+        {
+          "path": "scans/11059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Boarding-Party.jpg",
+          "sha256": "e827f2aa940d087c2d26c2af051948ae60c4004afb368384ab215d8c4bc83479",
+          "bytes": 151538
+        },
+        {
+          "path": "scans/11060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Southron-Sailor.jpg",
+          "sha256": "54176d7afc5a5c4030a018a68c5e88020a17672cf666ce936b4220e862bf9059",
+          "bytes": 151806
+        },
+        {
+          "path": "scans/11061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Cunning-Pirate.jpg",
+          "sha256": "63721f282da2b91acd882298d3309c45ae6b37f22dbed3f064dd9268b228a485",
+          "bytes": 160056
+        },
+        {
+          "path": "scans/11062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Vicious-Marauder.jpg",
+          "sha256": "5cf98bf5fdf0f84ed1067dfed0b64128377022a8ecfe4163b3cf0062eb7c5809",
+          "bytes": 155162
+        },
+        {
+          "path": "scans/11063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Umbar-Captain.jpg",
+          "sha256": "9133d1f1f5cf5480fc8c98357f969b0c89f1a4b6b33e294da95f572fd02c2fa8",
+          "bytes": 155049
+        },
+        {
+          "path": "scans/11064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Umbar-Raider.jpg",
+          "sha256": "4632d4dd2f7b4e2fa8a9324d2a81cf13fb719f9eed57a4f510c6d4650ad4810d",
+          "bytes": 157940
+        },
+        {
+          "path": "scans/11065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Corsair-Infiltrator.jpg",
+          "sha256": "0e3bd7e7bbee6c79b5841b8bbe5d88b66f423d8df321ce7189700ebbde97e60b",
+          "bytes": 149255
+        },
+        {
+          "path": "scans/11066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Raid-Leader.jpg",
+          "sha256": "6fefba99424c05fb87c64f7724a6fc196b81495bdd6240683fc266b76a801d5b",
+          "bytes": 154115
+        },
+        {
+          "path": "scans/11067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Battle-Hardened.jpg",
+          "sha256": "57e84b2f3c68e45aa15bd6b438ab8faebe74b9ed1d6b7f9bd0233591b23c33e0",
+          "bytes": 166246
+        },
+        {
+          "path": "scans/11068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Drowned-Dead.jpg",
+          "sha256": "9e6dbfff07bf0decb826a1d7128f001a331555c320be776e4828bc799997cd85",
+          "bytes": 158850
+        },
+        {
+          "path": "scans/11069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Soulless-Cadaver.jpg",
+          "sha256": "5304e02dc93dc0395120503e7cd7bf5bea0fc83fc0578bda10d6e97c3324e4b2",
+          "bytes": 149748
+        },
+        {
+          "path": "scans/11070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Throngs-of-Unfaithful.jpg",
+          "sha256": "6f9ef6655cc72b9f683f59e6527de65a4721c5eeb6466932bbb2724192a22511",
+          "bytes": 146658
+        },
+        {
+          "path": "scans/11071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Curse-of-the-Downfallen.jpg",
+          "sha256": "cf7199e67eb049343e3f00f046868147f626091b48e508540ab1adccc8a2e11a",
+          "bytes": 161490
+        },
+        {
+          "path": "scans/11072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Flooded-Ruins-Lost-Island.jpg",
+          "sha256": "ddea6d6c71d253a591f537b7973dbc18a413c7dbe624e7e9a77d430fa741493a",
+          "bytes": 144297
+        },
+        {
+          "path": "scans/11072.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/fb5e0cb9-914f-49ee-8e21-534e89bc5533.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/11073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Drowned-Graves-Lost-Island.jpg",
+          "sha256": "7f41da95651e491b14c96df2be6187e55dba8ca2f41f6e466bece402af81f5ba",
+          "bytes": 152528
+        },
+        {
+          "path": "scans/11073.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/d7ef4ad0-93f1-4c03-a04b-cdfe6339eb41.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/11074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Cursed-Temple-Lost-Island.jpg",
+          "sha256": "02cb8fb5986b178017fafafdcdd40ce3c91fdea59cd65e9404b6fd61e2eb7d2a",
+          "bytes": 141247
+        },
+        {
+          "path": "scans/11074.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/201569b2-d203-4a2a-b3e4-5dd396b8341a.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/11075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Aimless-Wandering.jpg",
+          "sha256": "f2a8cbf45efc5879278c88e3042ab7e617298212beaf687e2bf0002d8cd0df4c",
+          "bytes": 161546
+        },
+        {
+          "path": "scans/11076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Captain-Sahír-Enemy.jpg",
+          "sha256": "24323b3151109993157b1af7a74e51ccf8d19ab6727ac5954b6a4dba05c0a653",
+          "bytes": 152481
+        },
+        {
+          "path": "scans/11077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Captain-Sahír-Objective-Ally.jpg",
+          "sha256": "b79185ecb694790afa839c831317d193cae7cd70ce0eacd1a34ca0da12d99b10",
+          "bytes": 150564
+        },
+        {
+          "path": "scans/11078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Na'asiyah-Enemy.jpg",
+          "sha256": "2d1d063ebc24beea77acf3d36a8066f82349fbaa482b2c5a1f581f59e1c68334",
+          "bytes": 164434
+        },
+        {
+          "path": "scans/11079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Na'asiyah-Objective-Ally.jpg",
+          "sha256": "a0ff5fe730110ac3a63180598a1b3a00abd1aefed873e86cfdab6c2aea2e582f",
+          "bytes": 159608
+        },
+        {
+          "path": "scans/11080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Dream-chaser-Ship-Objective.jpg",
+          "sha256": "d386b2d058a7d907456da64d5881fbce4c3db63fb55e7dea8b5980577ac527c1",
+          "bytes": 149069
+        },
+        {
+          "path": "scans/11081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Dawn-Star.jpg",
+          "sha256": "17bd78d0c8c563fa6d825593cf7b64c9569c1f9896c102f2fcbe2aae6bca1ee8",
+          "bytes": 143493
+        },
+        {
+          "path": "scans/11082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Nárelenya.jpg",
+          "sha256": "3d9e45848f0741fddc77c18e28057c90bafbcd12ff17f544c8464f4534e7cb5b",
+          "bytes": 147384
+        },
+        {
+          "path": "scans/11083.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Silver-Wing.jpg",
+          "sha256": "2945507c9769d333c9fb31e1b44a1667e44326dbb91feb319b4919b2deff87be",
+          "bytes": 144430
+        },
+        {
+          "path": "scans/11084.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Navigation.jpg",
+          "sha256": "e7c3df5e769546739f67fbc059747a769ed3c6ecfacd7a1ca4b921ae6183220f",
+          "bytes": 161620
+        },
+        {
+          "path": "scans/11171.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Voyage-Across-Belegaer-SetupA.jpg",
+          "sha256": "9d5463df6fc6b2105f5f43e9347f1ce99d4c8a0020e9e7249b90eee90da48cb6",
+          "bytes": 214871
+        },
+        {
+          "path": "scans/11171.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Voyage-Across-Belegaer-SetupB.jpg",
+          "sha256": "20eed31f05e64b81e2bb3a3539cb6a9a6a20328453be9af78299891e60e54990",
+          "bytes": 186249
+        },
+        {
+          "path": "scans/11172.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Armor-Plating.jpg",
+          "sha256": "518db57b8f89f50b32d2c66a48436cd8729bf1c4b9461938f0a5da25e445b46d",
+          "bytes": 294009
+        },
+        {
+          "path": "scans/11172.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Armor-Plating-Upgraded.jpg",
+          "sha256": "d6170c0c6d484160d39cd3ccca6910c715fc7dae5ba467b7bcac0642f7db922d",
+          "bytes": 305861
+        },
+        {
+          "path": "scans/11173.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Ballista.jpg",
+          "sha256": "d0faf0e8bf2ecc2b99deea85dece3ace09925b0a21e8fa67c359e1e49b1b43d4",
+          "bytes": 316409
+        },
+        {
+          "path": "scans/11173.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Ballista-Upgraded.jpg",
+          "sha256": "95a3d2921ae4de5e40b6d09922e7ada16487c115e677c11d7c182c75b51e247c",
+          "bytes": 330974
+        },
+        {
+          "path": "scans/11174.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Enlarged-Quarters.jpg",
+          "sha256": "df562fff3c5c4f5da92119a3b75488beefd10b6458adc5710f4859f7260ae5c0",
+          "bytes": 345896
+        },
+        {
+          "path": "scans/11174.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Enlarged-Quarters-Upgraded.jpg",
+          "sha256": "03150167d62f501faf526f80918863a88a34993570d511d17741c62e5504a822",
+          "bytes": 354365
+        },
+        {
+          "path": "scans/11175.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Extra-Sails.jpg",
+          "sha256": "6dc1c1f264c072cb0e2510a08b5e015514767b2c5cde2f9288a3edda9b2868fe",
+          "bytes": 300533
+        },
+        {
+          "path": "scans/11175.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Extra-Sails-Upgraded.jpg",
+          "sha256": "62908296edea4688dd07ffd9c5e75423e3355d3cc0262f0845a762fe0336a76b",
+          "bytes": 316464
+        },
+        {
+          "path": "scans/11176.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Ominous-Fate.jpg",
+          "sha256": "abdeac978c92ecfec6f6a692b5baf480d7eff41a66d160f0d4851ea5cfc821fd",
+          "bytes": 48351
+        },
+        {
+          "path": "scans/11177.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Thunderstruck.jpg",
+          "sha256": "74fea368edde705f10efb97a9eab9e1ca6d4ded73d01c14418a0230e1fac1825",
+          "bytes": 377758
+        },
+        {
+          "path": "scans/11178.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Crowley.jpg",
+          "sha256": "efc786c0a75f907f4e13c09c85b3d1d0b4fbc46b7eb1c0e8c6faf05c05c2d720",
+          "bytes": 52918
+        },
+        {
+          "path": "scans/11179.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Fate-of-Númenor-SetupA.jpg",
+          "sha256": "604531ebddcb8b60214438b05241ed3bed4c9ab716ce797d9b9e83274de429d7",
+          "bytes": 238747
+        },
+        {
+          "path": "scans/11179.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Fate-of-Númenor-SetupB.jpg",
+          "sha256": "a9a20dc45e67ef43879482d04a5417396858614f81bdb30a9e58be5528cf1f0f",
+          "bytes": 168259
+        },
+        {
+          "path": "scans/11180.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Spyglass.jpg",
+          "sha256": "da69046f41a0d901298fc3a4188914abac15467bed5df06cb30d746664b2f7f1",
+          "bytes": 343928
+        },
+        {
+          "path": "scans/11180.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Spyglass-Upgraded.jpg",
+          "sha256": "890a7f25a3a8cb7f843c9f00c06bb45ff01cfbce87a4be4f40f570924fd298bf",
+          "bytes": 347433
+        },
+        {
+          "path": "scans/11181.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Revenant.jpg",
+          "sha256": "fdfe6fc7d41536d649836ad83d0d711f55cbf78d39247bd5bf226a388c56915a",
+          "bytes": 367653
+        },
+        {
+          "path": "scans/11182.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Raid-on-the-Grey-Havens-SetupA.jpg",
+          "sha256": "0fbad787bcf05199ec7b82d44d3e2d74b4357571d7520e62e410f0b7b503f7cb",
+          "bytes": 232378
+        },
+        {
+          "path": "scans/11182.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Raid-on-the-Grey-Havens-SetupB.jpg",
+          "sha256": "41af240d05b92188d34c2ee1261b9a46396a0854ee289db5e5d769dc7581d2cb",
+          "bytes": 186853
+        },
+        {
+          "path": "scans/11183.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Black-Key-Attachment.jpg",
+          "sha256": "b6a68636f22ca37896fbcfbaa741848b4e43ed1b7219c2bb60e642c89dfcbc76",
+          "bytes": 280281
+        },
+        {
+          "path": "scans/11183.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Black-Key-Attachment-Upgraded.jpg",
+          "sha256": "b08bc207550e8c8f0756efc15773c9ff9e2bda3fce6eee8ff7da859f1d7e3ca2",
+          "bytes": 299883
+        },
+        {
+          "path": "scans/11184.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Galdor's-Counsel-Leadership.jpg",
+          "sha256": "38e50c2a6b386d9a5f95e15b0e56ed5e8522c3171c4c862ecf515c30fe2ce8f3",
+          "bytes": 288792
+        },
+        {
+          "path": "scans/11185.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Galdor's-Counsel-Tactics.jpg",
+          "sha256": "a8b1c000af9c28a15778ad9ac33c9ce175e30410e7c1ffbf48eaf6551a7f0c4c",
+          "bytes": 301638
+        },
+        {
+          "path": "scans/11186.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Galdor's-Counsel-Spirit.jpg",
+          "sha256": "a1084422afbb4b0e936a924f7bddb1b26d8cbd604ed5d361143a1f3f19fa5479",
+          "bytes": 294079
+        },
+        {
+          "path": "scans/11187.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Galdor's-Counsel-Lore.jpg",
+          "sha256": "8ce3212556b8b71df86e497d6b887dbb29d736ca7ed4ab5e12dd5ba4351b0e46",
+          "bytes": 308544
+        },
+        {
+          "path": "scans/11188.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Graxar.jpg",
+          "sha256": "565a9e6f84aa07902b95238d641d335adfe575faf8dcd42172df828406d106d2",
+          "bytes": 367077
+        },
+        {
+          "path": "scans/11189.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Parrying-Cutlass.jpg",
+          "sha256": "0953330fd40ae0dc4b87c64cbe1fbfc476ac147e8cee897a7969287b3c58c951",
+          "bytes": 292471
+        },
+        {
+          "path": "scans/11189.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Parrying-Cutlass-Upgraded.jpg",
+          "sha256": "f7823865c88cc3eaefd99c41a7d8cf15f23d6730dde4ff35822396b8e7e03faf",
+          "bytes": 309144
+        },
+        {
+          "path": "scans/11190.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Throwing-Axe.jpg",
+          "sha256": "7cfd4788284c038b42e2c658dec5ffd89db73009ebfb28154afd7412e8447a18",
+          "bytes": 298418
+        },
+        {
+          "path": "scans/11190.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Throwing-Axe-Upgraded.jpg",
+          "sha256": "b6df16aca3cbae9e51b0946cfc1fc6c4356be101bba67ce35d1a7728d2476adb",
+          "bytes": 321725
+        },
+        {
+          "path": "scans/11191.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Flight-of-the-Stormcaller-SetupA.jpg",
+          "sha256": "003afd5b11aacc82f0021c31e7f48e36cabd2f28858ae6569d7a4cc087853801",
+          "bytes": 249918
+        },
+        {
+          "path": "scans/11191.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Flight-of-the-Stormcaller-SetupB.jpg",
+          "sha256": "13f060f084f82111b09dd96aa8b5c054dd07bd8024b72f4679175d4de1157760",
+          "bytes": 175409
+        },
+        {
+          "path": "scans/11192.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Black-Key-Objective.jpg",
+          "sha256": "0138da35ad2f254fd17efd4b365c2d599fbb7f7af317ad6697658533429fd498",
+          "bytes": 352635
+        },
+        {
+          "path": "scans/11192.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Black-Key-Objective-Upgraded.jpg",
+          "sha256": "69b19cf6d491ae26804b27f6c02c6fc2bd4532a69e93166c1bc53779e5c41618",
+          "bytes": 346114
+        },
+        {
+          "path": "scans/11193.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Calaerion.jpg",
+          "sha256": "9e57ade682c7c145c344c58cac75f88b92bfcb5045f36050bdfe736840d5fc10",
+          "bytes": 292424
+        },
+        {
+          "path": "scans/11193.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Calaerion-Upgraded.jpg",
+          "sha256": "d627bbb9163643eaeac76b947c138701d0bdae10bc2e3997de81301e16e386c4",
+          "bytes": 301604
+        },
+        {
+          "path": "scans/11194.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Thing-in-the-Depths-SetupA.jpg",
+          "sha256": "64796d8d310f730d4555af8b653c590de0cee22544007698653dc659d0e6bc33",
+          "bytes": 273699
+        },
+        {
+          "path": "scans/11194.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Thing-in-the-Depths-SetupB.jpg",
+          "sha256": "1196e280cfbcae879d0ead53a4f59aa167ddcdedbc81b78f9a74c394f7e17fa2",
+          "bytes": 190343
+        },
+        {
+          "path": "scans/11195.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Come-Together.jpg",
+          "sha256": "df3e3c5010f8bef2d2fe43a78157585b679283b26fe0b1bdb61b3f00f75a6bc2",
+          "bytes": 302229
+        },
+        {
+          "path": "scans/11196.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Sea-Serpent-Menacing.jpg",
+          "sha256": "39542fdfa20539ff948428eb02b7812ee5d75a2f3906496348f0db24257736fd",
+          "bytes": 390431
+        },
+        {
+          "path": "scans/11196.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Sea-Serpent-Enraged.jpg",
+          "sha256": "11ed9fdcf759b9ae0f67be86d940af67f4527e4771d4353bf738a0459813d368",
+          "bytes": 389894
+        },
+        {
+          "path": "scans/11197.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Temple-of-the-Deceived-SetupA.jpg",
+          "sha256": "961cb81e7cb685659c1148c0c8e05309b6a877b2c6bb51e84b070ec8a69b5aa7",
+          "bytes": 265714
+        },
+        {
+          "path": "scans/11197.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Temple-of-the-Deceived-SetupB.jpg",
+          "sha256": "ea7452ff5597e1faed8e0b4d1a73c33f35e97b262e60211873ccde161e71adbf",
+          "bytes": 191241
+        },
+        {
+          "path": "scans/11198.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Starla.jpg",
+          "sha256": "b94afe55ffc9100fc76e7b6a2319ec3e67fff3c37899c4ab1b9c5195f2bbc2d9",
+          "bytes": 329478
+        },
+        {
+          "path": "scans/11199.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Recurring-Nightmare.jpg",
+          "sha256": "a2d363a1c41cc58848f6399b7cf2e38743a4de2442d261f535c127aa19795c33",
+          "bytes": 396494
+        },
+        {
+          "path": "scans/11200.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Drowned-Ruins-SetupA.jpg",
+          "sha256": "66df57f887167238353fe5246a90bcf681f4ecb7edd6d6692f9f964368a873ba",
+          "bytes": 260857
+        },
+        {
+          "path": "scans/11200.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Drowned-Ruins-SetupB.jpg",
+          "sha256": "239dbe5baec0e9fe61a942751dae2098782b8edab720aba8d2407751af487b87",
+          "bytes": 192285
+        },
+        {
+          "path": "scans/11201.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Command-Leadership.jpg",
+          "sha256": "30aee3313533f50734ee26234cf6b524bd819f4935c3414f03ee73440646e336",
+          "bytes": 321781
+        },
+        {
+          "path": "scans/11202.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Command-Lore.jpg",
+          "sha256": "7272258e49e58b11205afb4cf88c944f5b2961c1f14a96719fc7d247264a4136",
+          "bytes": 326558
+        },
+        {
+          "path": "scans/11203.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Command-Spirit.jpg",
+          "sha256": "00d0f23561c92888a9802174fc825dc43857c4e683d721ae6c017316845f1db0",
+          "bytes": 326736
+        },
+        {
+          "path": "scans/11204.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Command-Tactics.jpg",
+          "sha256": "38224ad43d4975683aba22a407645686f99bff43b8be3b4dbe4dbee2cd69d3b4",
+          "bytes": 339121
+        },
+        {
+          "path": "scans/11205.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Cirdan's-Blessing-Leadership.jpg",
+          "sha256": "d961b12cb36663207a97ea412c0adada2ac381e61fd8c696cdce79cca4f27556",
+          "bytes": 315021
+        },
+        {
+          "path": "scans/11206.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Cirdan's-Blessing-Tactics.jpg",
+          "sha256": "bcf1ea661acc851fbb784a011809715471e6acd371737fd42370254f85ffece1",
+          "bytes": 330742
+        },
+        {
+          "path": "scans/11207.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Cirdan's-Blessing-Spirit.jpg",
+          "sha256": "cc64ac9912df9df2b6cff58c24ff7c7306cbd63d1389f421511fcc47c1309a67",
+          "bytes": 322693
+        },
+        {
+          "path": "scans/11208.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Cirdan's-Blessing-Lore.jpg",
+          "sha256": "43b668d2c7d9a17c5eb233a183380cf5291486c28843d3b27eb051f8d9005f7c",
+          "bytes": 331462
+        },
+        {
+          "path": "scans/11209.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/A-Storm-on-Cobas-Haven-SetupA.jpg",
+          "sha256": "5a9f5bea8baeaa52430c2390e5aea6ef9d9d20713a6c701e234c2e10a9b40c04",
+          "bytes": 240778
+        },
+        {
+          "path": "scans/11209.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/A-Storm-on-Cobas-Haven-SetupB.jpg",
+          "sha256": "515b42e5b94c1d41087e90e8df1631fb0dc64cce8f637e3032786d659bbb1046",
+          "bytes": 192066
+        },
+        {
+          "path": "scans/11210.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Gavin.jpg",
+          "sha256": "003b3b412d857bc9ecc5adbad41d19721a784f9b11763381c35bd1e13aeacad9",
+          "bytes": 267642
+        },
+        {
+          "path": "scans/11211.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Send-for-Help-Leadership.jpg",
+          "sha256": "b6e0f8027b9bc7b06f4ec6c95d0671f7c3b322de2aecc1dfab974c9d424590d0",
+          "bytes": 282488
+        },
+        {
+          "path": "scans/11212.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Send-for-Help-Tactics.jpg",
+          "sha256": "756a6f61f91ef2eb27013e63b4bf0b116bc98fe09a13b0df99f2b796819d9738",
+          "bytes": 310856
+        },
+        {
+          "path": "scans/11213.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Send-for-Help-Spirit.jpg",
+          "sha256": "dff03ec0cb40d35ef0e9be7c4704f26fc928254d62c7a0f637b8c24c989e5f55",
+          "bytes": 295023
+        },
+        {
+          "path": "scans/11214.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Send-for-Help-Lore.jpg",
+          "sha256": "357e0b9a4d42f300ef71d2049eb80f69792735748b973cb93f0bf7c961b7fa35",
+          "bytes": 294168
+        },
+        {
+          "path": "scans/11215.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-City-of-Corsairs-SetupA.jpg",
+          "sha256": "7ef109dacd6cea6e053533b3eb0eb41ad636ea1695adb1bfbd2187d3a1db7443",
+          "bytes": 272453
+        },
+        {
+          "path": "scans/11215.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-City-of-Corsairs-SetupB.jpg",
+          "sha256": "bcdf1edf912c318d2513266ff6e3afeab53d9e0f4177a74d6f6a011d242100e5",
+          "bytes": 204417
+        },
+        {
+          "path": "scans/11216.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/The-Black-Sword.jpg",
+          "sha256": "5599db6a09c25f7e7e6c8c67a61b3c8259a84bc90aa245dca091a08888842568",
+          "bytes": 362985
+        },
+        {
+          "path": "scans/11216.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/5819e6dc-da71-48a0-a0d8-607e67fc8fbd.B.jpg",
+          "sha256": "647ba89cf9e1ece0410ecea71382fd4274e42de0b19adc63dc2c52e85575cde3",
+          "bytes": 131554
+        },
+        {
+          "path": "scans/11217.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Hard-Mode.jpg",
+          "sha256": "bf1e3b8b23e998a6c8c170c9b3fe9324d18c919f46eb09d5a4d1d70709769bf6",
+          "bytes": 236044
+        },
+        {
+          "path": "scans/11217.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion/Expert-Mode.jpg",
+          "sha256": "0ef06d39173ee70a962392e399375a31920ac770ad0df9b2add73809c123d54b",
+          "bytes": 240243
+        },
+        {
+          "path": "scans/12012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Swift-Departure-1A.jpg",
+          "sha256": "2f6e129c7267eaec80aa6ac49fae200299267258e899cc1de75b487024eec785",
+          "bytes": 158163
+        },
+        {
+          "path": "scans/12012.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Swift-Departure-1B.jpg",
+          "sha256": "35ed2f97059ca426a5d3fc95803a7dc8c5ca77c23658b3a9e2658b3cc87000a0",
+          "bytes": 145408
+        },
+        {
+          "path": "scans/12013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Full-Sail-Ahead-AB-2A.jpg",
+          "sha256": "9d8b04635c66e65fd037a4b105df42626c8e314fcb59079c29b671392271f731",
+          "bytes": 135376
+        },
+        {
+          "path": "scans/12013.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Full-Sail-Ahead-AB-2B.jpg",
+          "sha256": "2e3e9251b8ae89d6a0bdcf0525a601271f348a991379bbc0e78073a7e1473996",
+          "bytes": 132570
+        },
+        {
+          "path": "scans/12014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Weather-Turns-Foul-AB-3A.jpg",
+          "sha256": "666ae812fa6edca4b255d7ceffc8f564ec96524f1cd8022af2eb0ecf0fca7c87",
+          "bytes": 136510
+        },
+        {
+          "path": "scans/12014.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Weather-Turns-Foul-AB-3B.jpg",
+          "sha256": "31a23d7905d2847dbc6419a0a0b5a0233db4ca3ccf70ee637e8d144d948636a0",
+          "bytes": 151559
+        },
+        {
+          "path": "scans/12015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Cape-of-Andrast-AB-4A.jpg",
+          "sha256": "c5a120af9455f7a39c41376c5532ac87738205645510a70a80cd76b12c537b78",
+          "bytes": 134067
+        },
+        {
+          "path": "scans/12015.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Cape-of-Andrast-AB-4B.jpg",
+          "sha256": "1c79354bbf9b48f6a359349efd1a7921cf01a1c7f756f0b2b67be14b4a8353e7",
+          "bytes": 130545
+        },
+        {
+          "path": "scans/12016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Full-Sail-Ahead-CD-2C.jpg",
+          "sha256": "7e1c29cf4b6e691b2aa0691a9373b0ee714628e4065243729dcadea171f3e084",
+          "bytes": 134211
+        },
+        {
+          "path": "scans/12016.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Full-Sail-Ahead-CD-2D.jpg",
+          "sha256": "3510f3f2bbaeb95675bcc19981704b4e18385b6e225f39471bd5d78e1da06d35",
+          "bytes": 139210
+        },
+        {
+          "path": "scans/12017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Weather-Turns-Foul-CD-3C.jpg",
+          "sha256": "a00f96b6294766e45b7b68872da04c3a493f79e4a59eaae7417526410a9eca84",
+          "bytes": 133112
+        },
+        {
+          "path": "scans/12017.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Weather-Turns-Foul-CD-3D.jpg",
+          "sha256": "eba1368dbb6e0a343a857cbde166e0c0e7c79b4e4ef42000ae6d30f15becc300",
+          "bytes": 142831
+        },
+        {
+          "path": "scans/12018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Cape-of-Andrast-CD-4C.jpg",
+          "sha256": "bdd06d8c7ba3a0c3c2d143cc487c970929e21ead4d38fde030f19405fdde5dd9",
+          "bytes": 117868
+        },
+        {
+          "path": "scans/12018.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/The-Cape-of-Andrast-CD-4D.jpg",
+          "sha256": "425f1957d16c0fe1255f5c92b4272788cf5414d35d3ae7b7533a1795589587be",
+          "bytes": 140303
+        },
+        {
+          "path": "scans/12019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Stormcaller.jpg",
+          "sha256": "ace150d2ba948dd32301f3e6eba3294d2d8fbe24a305549ebf6934340de2936d",
+          "bytes": 150126
+        },
+        {
+          "path": "scans/12020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Sahír's-Escort.jpg",
+          "sha256": "381c0826255fd470058dc94c992ea13d37da4d07089a20a8255f17f5ef152469",
+          "bytes": 147164
+        },
+        {
+          "path": "scans/12021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Swift-Raider.jpg",
+          "sha256": "8ad1bf2d72367f2be902d1651dce89f546f420195c23e9a03cbbb39e18275dd5",
+          "bytes": 142732
+        },
+        {
+          "path": "scans/12022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Corsair-Skiff.jpg",
+          "sha256": "71c7df03faaecc9e57e77711e43aa38e66843f25361647aa311aab13011ba2f0",
+          "bytes": 144047
+        },
+        {
+          "path": "scans/12023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Corsair-Seafarer.jpg",
+          "sha256": "8c2e1d7b9f97849e89fb1e11d54dd57e3125da661fdf42151436020da4311130",
+          "bytes": 148010
+        },
+        {
+          "path": "scans/12024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Serpent's-Blade.jpg",
+          "sha256": "77e0e803167187553d9b37fbe07828292162b26fb0c4a57820b222dc8068f2e8",
+          "bytes": 146915
+        },
+        {
+          "path": "scans/12025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Jagged-Reef.jpg",
+          "sha256": "2d3cc819606568a61e4f9d4eda49f3fe0f9d3312ffd72c698f08221d68adfd54",
+          "bytes": 143331
+        },
+        {
+          "path": "scans/12026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Hidden-Cove.jpg",
+          "sha256": "e825a78e0450193d91fb60ce5ce7b45b1c882660911f97328f4971eedcac8110",
+          "bytes": 140567
+        },
+        {
+          "path": "scans/12027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Vast-Coastland.jpg",
+          "sha256": "5613eafe56232236a19a92f06867674029a8aa21c770c8e243e52c6511c85abc",
+          "bytes": 154647
+        },
+        {
+          "path": "scans/12028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Man-Overboard.jpg",
+          "sha256": "467d67a3dfc642b9253013ced25594404d25ca5d7fec0f1622c6ec5b1db3e7e9",
+          "bytes": 145449
+        },
+        {
+          "path": "scans/12029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Flight-of-the-Stormcaller/Raging-Squall.jpg",
+          "sha256": "f32d0d1bce4e036cdbece8777e73eb922c34d4ea9d88f77e67736016a2ce9866",
+          "bytes": 143221
+        },
+        {
+          "path": "scans/12039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Take-the-Ship-1A.jpg",
+          "sha256": "031a608eb5f2963f22f5c906e9263ad94da65c576cbedb0349eeff52e4253efa",
+          "bytes": 1030713
+        },
+        {
+          "path": "scans/12039.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Take-the-Ship-1B.jpg",
+          "sha256": "111f12ab83a54c5e6a41764d4173ca5bb320c4f207d012a7f2f796744fdb51f7",
+          "bytes": 1150365
+        },
+        {
+          "path": "scans/12040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Change-of-Plans-2A.jpg",
+          "sha256": "d715fb2d986db6aed7ac1d76b87e97ec2d5a31d2aa6c7eda74301ca64bfedadc",
+          "bytes": 1054045
+        },
+        {
+          "path": "scans/12040.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Change-of-Plans-2B.jpg",
+          "sha256": "79e24113e6d16f46923afa1987d091f3306b5a56d52de8cc3fb10c88c8d8968e",
+          "bytes": 1178006
+        },
+        {
+          "path": "scans/12041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Defend-the-Ship-3A.jpg",
+          "sha256": "d3ccd825f87609a5c4e2a91b5356c29982551b5a8759eecdb2c7b526725d8314",
+          "bytes": 1064048
+        },
+        {
+          "path": "scans/12041.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Defend-the-Ship-3B.jpg",
+          "sha256": "4f5aab408465e31be5755c77fd8bf4f1ceb73faf733163c6c57d445638132fd0",
+          "bytes": 1177438
+        },
+        {
+          "path": "scans/12042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Helm-of-the-Stormcaller.jpg",
+          "sha256": "e8672a8535c7b23f31155ef1bc8005292239d7dc9d7b3f3d02852b520a8e7733",
+          "bytes": 1182983
+        },
+        {
+          "path": "scans/12043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Forecastle-Deck.jpg",
+          "sha256": "1b40b0f350647e347796fe40f16e970bd08d569985bcf20efe03caea4feba5a5",
+          "bytes": 1204885
+        },
+        {
+          "path": "scans/12044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Weather-Deck.jpg",
+          "sha256": "301d255dd880948cecfcdae655d8b930b66dcb3d383b9e51b674ed6b06397a21",
+          "bytes": 1146985
+        },
+        {
+          "path": "scans/12045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Cargo-Hold.jpg",
+          "sha256": "e9a97772dc5ca9221495effc0552f9f3668f5ad4b94ba63f64b1c2727eac43d8",
+          "bytes": 1147558
+        },
+        {
+          "path": "scans/12046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Crew-Quarters.jpg",
+          "sha256": "95f630a5b75b8e1eea9f6a4b89b308e9848bf2457eaf7c4ac34e18fda2bc4dcb",
+          "bytes": 1145833
+        },
+        {
+          "path": "scans/12047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Quarter-Deck.jpg",
+          "sha256": "8f766417c4b9a3e3d4ee0ad96036df94457f7f787297ec41afb3a37bf696f1f2",
+          "bytes": 1146143
+        },
+        {
+          "path": "scans/12048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Hold-Steady.jpg",
+          "sha256": "6e5662b239cdd5c8897fdf3abecb718fd99a450e61ae04ca44bb43017bdce1ed",
+          "bytes": 1174061
+        },
+        {
+          "path": "scans/12049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/The-Thing-in-the-Depths.jpg",
+          "sha256": "6384b272f8dcd68b5743dc902fc20765efcd6be903bfa5e8124b6d690547d305",
+          "bytes": 1127972
+        },
+        {
+          "path": "scans/12050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Eye-of-the-Beast.jpg",
+          "sha256": "6cd4e9d9efb18c3712f5ac636bcbf2062caf835b1a1353e70dc749fcabe1d36e",
+          "bytes": 1142747
+        },
+        {
+          "path": "scans/12051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Thrashing-Arm.jpg",
+          "sha256": "aa235a7c0040207b7b45c1cfd2c012135440b2f42289cbcf9fbec8eac57c0875",
+          "bytes": 1161256
+        },
+        {
+          "path": "scans/12052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Crushing-Arm.jpg",
+          "sha256": "674e0a6dbcba7447fc55db4ad7f58ee8415c7deae9b8f07319764ce0ad7c4e85",
+          "bytes": 1138993
+        },
+        {
+          "path": "scans/12053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Grasping-Arm.jpg",
+          "sha256": "b1ee090a69988a336f3e4cff5f5421584141221841354e620a7bf028eeffb65a",
+          "bytes": 1148579
+        },
+        {
+          "path": "scans/12054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Giant-Arm.jpg",
+          "sha256": "08c60e12ab6fbc124df4aeaa7fd866f1976b82ff88b478191cda0c5711732bca",
+          "bytes": 1030654
+        },
+        {
+          "path": "scans/12055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/From-the-Depths.jpg",
+          "sha256": "eb6bfdc8a0486b474166cf6ba4c9d85f6a5908c7eb890b3c8a59c542ec58d657",
+          "bytes": 1019894
+        },
+        {
+          "path": "scans/12056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Thing-in-the-Depths/Lashing-Tentacles.jpg",
+          "sha256": "10d7996d4382fdfa26a1d79ca24730cbaba0cbf493d54da975febf29fc134e89",
+          "bytes": 991082
+        },
+        {
+          "path": "scans/12067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Searching-the-Island-1A.jpg",
+          "sha256": "5ecb587fe800bee5c355bbdd1cf3b56e5df57c398089346178b01a18e6617eaf",
+          "bytes": 1099835
+        },
+        {
+          "path": "scans/12067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Searching-the-Island-1B.jpg",
+          "sha256": "a6f277a0e3cb24957ba5d8ce19a8fc8637c85af32bc260297cf85334ab736423",
+          "bytes": 1062969
+        },
+        {
+          "path": "scans/12068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/The-Grotto's-Entrance-Temple-of-the-Deceived.jpg",
+          "sha256": "1fc10a181777158cbc927689f58b5670074531a2f3a7ecfea5b7c06276ab9640",
+          "bytes": 1079902
+        },
+        {
+          "path": "scans/12068.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/f3bc3759-1f94-4983-bebb-66c7d9e3e0b3.jpg",
+          "sha256": "221549e98f888849cf5f7488f427b7364d13e2a09fff7fb95e0aabd74804cdc2",
+          "bytes": 142433
+        },
+        {
+          "path": "scans/12069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Temple-Halls-Temple-of-the-Deceived.jpg",
+          "sha256": "3ccd67d96995ee6a382b7fd5b08ffe5e75eecdf1b54e0cf20937b06c4d003cfa",
+          "bytes": 1061869
+        },
+        {
+          "path": "scans/12069.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/3371c102-4aab-4b15-a738-a4b3483a6004.jpg",
+          "sha256": "221549e98f888849cf5f7488f427b7364d13e2a09fff7fb95e0aabd74804cdc2",
+          "bytes": 142433
+        },
+        {
+          "path": "scans/12070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Temple-Guardian.jpg",
+          "sha256": "403acafcabe3de3799bf3a9aa0877728c3003385b1569209023beae97a6cca98",
+          "bytes": 1024288
+        },
+        {
+          "path": "scans/12071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Gate-Key.jpg",
+          "sha256": "bf46aeb242cb1a440196d91fc6a8c1ab2fa0ee7a8128c66f2623746fd15c72dd",
+          "bytes": 1018777
+        },
+        {
+          "path": "scans/12072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Jagged-Cliffs-Lost-Island.jpg",
+          "sha256": "fc060b8d43cd9cf2ee53616cd5910581f2d6e6bc4e928f810d100e13421a92f9",
+          "bytes": 1106815
+        },
+        {
+          "path": "scans/12072.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/1877b069-7015-4172-b5df-bbfd235b976f.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/12073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Winding-Caverns-Lost-Island.jpg",
+          "sha256": "5aa81da98bf23ccd3a965c0a1c249a8cdf068b4f23f5cb74bb095ca17fabecee",
+          "bytes": 1153660
+        },
+        {
+          "path": "scans/12073.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/4c7d7a31-250d-4e48-a97a-2aebb3b2b47d.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/12074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Jungle-Path-Lost-Island.jpg",
+          "sha256": "edfd04177cabb2e88a76513a85641874a72b683f27ef488ff0d09f1e7b9f4500",
+          "bytes": 1167424
+        },
+        {
+          "path": "scans/12074.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/dc8f31b6-73af-4aec-be26-8d297909d14d.jpg",
+          "sha256": "e7698c5f8b946e000f66102207d8d85062ba27970d7cb3a25e2453d274a7edae",
+          "bytes": 157108
+        },
+        {
+          "path": "scans/12075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Faithless-Desecrator.jpg",
+          "sha256": "f35c3052dd3fc12df8f3ee0c9e9d1f49891c4badce19668d3132bc1ff3f4fb4a",
+          "bytes": 1041326
+        },
+        {
+          "path": "scans/12076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Island-Watcher.jpg",
+          "sha256": "ed0b7761c38b1b906f2706f2d69e6d63fb6b93fbd1525c3a31e5e4980ac87093",
+          "bytes": 1027859
+        },
+        {
+          "path": "scans/12077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Profane-Dead.jpg",
+          "sha256": "195546aff63f4ee5e7c7e3a5ea802bcb22326c0c42eaa6f43c41bd5e9f2c3a6b",
+          "bytes": 1029944
+        },
+        {
+          "path": "scans/12078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Deeper-into-the-Ruins.jpg",
+          "sha256": "0d053b0acd7cf9b091bfc64aa3dbc5bb2e57d8e51dbcfd636a544798ec92dadc",
+          "bytes": 999199
+        },
+        {
+          "path": "scans/12079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Furious-Rainstorm.jpg",
+          "sha256": "c08312a50dd305ab1de20933f0f47c0fef25048d6bdf89510d4d8ca60d67699f",
+          "bytes": 1020114
+        },
+        {
+          "path": "scans/12080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Dwindling-Supplies.jpg",
+          "sha256": "b2640a2a3340410d6a2041147b407378463228977342a49c930079dbc35c4d27",
+          "bytes": 1084417
+        },
+        {
+          "path": "scans/12081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Sunken-Ruins.jpg",
+          "sha256": "441a561e59b2f625973f437f931ba7cc60c182937f320f3ba2ec361380a0f5a6",
+          "bytes": 1015535
+        },
+        {
+          "path": "scans/12092.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/The-Grotto-1A.jpg",
+          "sha256": "ecf646318215d0af67c4a446312fee021943516ece9049440008b4ad1041528a",
+          "bytes": 1248066
+        },
+        {
+          "path": "scans/12092.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/The-Grotto-1B.jpg",
+          "sha256": "79625def6211e0a1a6f9afcd3da8ecbd7c09ba1d4222e5021c4b8c36466a77ad",
+          "bytes": 1225944
+        },
+        {
+          "path": "scans/12093.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Sahír's-Betrayal-2A.jpg",
+          "sha256": "9d65a2ac8649a26a2479048439bb7764ab7dbd524f7fcaed1d9f3be39d078862",
+          "bytes": 1245985
+        },
+        {
+          "path": "scans/12093.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Sahír's-Betrayal-2B.jpg",
+          "sha256": "f7ae3717988195c85c171d5ea8230cd5066065c370ab5f0d65a6356a582d903b",
+          "bytes": 1213233
+        },
+        {
+          "path": "scans/12094.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Shrine-to-Morgoth-Grotto.jpg",
+          "sha256": "9d73d9d745175c15de5d032ea17d4c38aa5fd1f197c5865479ef4621a761fdc3",
+          "bytes": 1226573
+        },
+        {
+          "path": "scans/12095.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Shrine-to-Morgoth-Underwater.jpg",
+          "sha256": "68308dd0f5331c652ac9759cd28d0fae6d0084055c7da223bc4ad5bae97bf24b",
+          "bytes": 1249040
+        },
+        {
+          "path": "scans/12096.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Sea-scorpion.jpg",
+          "sha256": "879934c130a7a259c0360d68f3a2ad349668ad38668ff07d8342a9d1c2433a3b",
+          "bytes": 1226437
+        },
+        {
+          "path": "scans/12097.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Cave-Eel.jpg",
+          "sha256": "de1625841181fb07f44aef0a95bd779aa629e09a2010c014f6dd0014be9022c7",
+          "bytes": 1228114
+        },
+        {
+          "path": "scans/12098.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Undersea-Grotto.jpg",
+          "sha256": "53a1613d6f15fccc9359c578ebe2fb30bd5e0f65523d338c214564b352aae673",
+          "bytes": 1186153
+        },
+        {
+          "path": "scans/12099.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Cursed-Caverns.jpg",
+          "sha256": "768423bd3fa336f440c45420267360c1bd060358ca39a7b40eaddc09bb1c005e",
+          "bytes": 1206318
+        },
+        {
+          "path": "scans/12100.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Watter-logged-Halls.jpg",
+          "sha256": "6c6a33b38b1d8583a0316cea048449c291262bd72c084d395ed13acdf7ad3dfc",
+          "bytes": 1166567
+        },
+        {
+          "path": "scans/12101.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Dark-Abyss.jpg",
+          "sha256": "562279ad9d33c56b97d715eb7f595db53df2a4654648867a0871ca33aa446c01",
+          "bytes": 1253372
+        },
+        {
+          "path": "scans/12102.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Twisting-Hollow.jpg",
+          "sha256": "659e4bd36ff8167964f90a8afd20e6369030bc5ce8c4b35bbac73376745e3295",
+          "bytes": 1253647
+        },
+        {
+          "path": "scans/12103.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Sunken-Temple.jpg",
+          "sha256": "524e17b58e82181748087368d2a0f967b70701c5be454ff143f7b1f7ef2a6b29",
+          "bytes": 1211531
+        },
+        {
+          "path": "scans/12104.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Drowned-Cave.jpg",
+          "sha256": "c42f87d31e025512437c257211534c4764075b3c5ddb52ae4c251600b953ffb4",
+          "bytes": 1252211
+        },
+        {
+          "path": "scans/12105.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Powerful-Undertow.jpg",
+          "sha256": "9bf2b39778e3d1eaa41033b4cc4722d0c2b5025acf95575ea8f7b190b6d36d2f",
+          "bytes": 1266873
+        },
+        {
+          "path": "scans/12106.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Into-the-Abyss.jpg",
+          "sha256": "9b9ced1c8b1c7be6f7b1553589bfd2d4109a05eebddcb6fba36b1752be341d4e",
+          "bytes": 1315469
+        },
+        {
+          "path": "scans/12107.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Tangling-and-Grasping.jpg",
+          "sha256": "9b28b17abb1a8114f6721ad158cdfb9ea6427dcfcb4b21b6cf15b17d1f017762",
+          "bytes": 1316560
+        },
+        {
+          "path": "scans/12108.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Drowned-Ruins/Ancient-Depths.jpg",
+          "sha256": "0a2bde042d64033cefa2add12b9bdda7ce63e818aa16594cf000867a729ead49",
+          "bytes": 1271017
+        },
+        {
+          "path": "scans/12120.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Outmaneuver-the-Enemy-1A.jpg",
+          "sha256": "20422cf023694e4ace795415f7ed5f90feb8e23d2d23e084b7cd96892456a68f",
+          "bytes": 153020
+        },
+        {
+          "path": "scans/12120.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Outmaneuver-the-Enemy-1B.jpg",
+          "sha256": "0384e850dcd7995655709e1d195aea9d29ce145d15e5279b56af3395f00e8220",
+          "bytes": 138640
+        },
+        {
+          "path": "scans/12121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Battle-in-the-Bay-2A.jpg",
+          "sha256": "487877a75684da8f1d88f2ba02ae0046bb05fc2123eb5dbdc9ca95013a24f678",
+          "bytes": 154601
+        },
+        {
+          "path": "scans/12121.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Battle-in-the-Bay-2B.jpg",
+          "sha256": "b8262deee0c50c56aa6cc9c8fc0c415b52834c450c6f12f68e5617c97b20344e",
+          "bytes": 139592
+        },
+        {
+          "path": "scans/12122.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Break-Through-the-Fleet-3A.jpg",
+          "sha256": "222c094ebc4cf5309e04af057dfa40551f64ac7535a758d493a25139ad11f646",
+          "bytes": 136986
+        },
+        {
+          "path": "scans/12122.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Break-Through-the-Fleet-3B.jpg",
+          "sha256": "fbdd6ee5e2ea1a7b6b136ab39d5c5b6340cc309585e72867b763d7db652fbec6",
+          "bytes": 138885
+        },
+        {
+          "path": "scans/12123.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Dol-Amroth-Warship.jpg",
+          "sha256": "ca1bc7057202bd32f64beed92f062acdc2c2dda0d5ce5501c20988afffd59e62",
+          "bytes": 147050
+        },
+        {
+          "path": "scans/12124.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Raider-Flagship.jpg",
+          "sha256": "367254ddfdcd76b87cc4cee5a55b58930e156dcf613f633583836bf88f3c3570",
+          "bytes": 145311
+        },
+        {
+          "path": "scans/12125.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Corsair-Skirmisher.jpg",
+          "sha256": "bcd51b3ee02f6e6ccbaa11e73bbb31543609287447363ac6ce088863201f1b25",
+          "bytes": 154552
+        },
+        {
+          "path": "scans/12126.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Siege-Ship.jpg",
+          "sha256": "ead649a32a8109cecc3b5f1f0a397cf26ed9dac340f32d7cc3fbcc9f6926fc5a",
+          "bytes": 149350
+        },
+        {
+          "path": "scans/12127.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Heavy-Cruiser.jpg",
+          "sha256": "fa67afdbe7f7a416cc1b8d8061dbbdae8a8f5929366a58f23fb5bb7ec7f27a96",
+          "bytes": 153527
+        },
+        {
+          "path": "scans/12128.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Coast-of-Anfalas.jpg",
+          "sha256": "c4d190a6b0d52bc1905dec5dda93cdf591cfcc9e1fd3c21b6b0214de1779920e",
+          "bytes": 145850
+        },
+        {
+          "path": "scans/12129.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Belfalas-Islet.jpg",
+          "sha256": "2f8864f0626e0f9707399ae42d9ba1c324ccf253d206afe118eed7421bab4e3c",
+          "bytes": 142270
+        },
+        {
+          "path": "scans/12130.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Cobas-Haven.jpg",
+          "sha256": "a1b9bb7fc3ccf011d963aeb43ef879382d1a8e5b3e8635744245ce92e8c6f95d",
+          "bytes": 142304
+        },
+        {
+          "path": "scans/12131.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Ramming-Speed.jpg",
+          "sha256": "ae26001d864f44d7f225696fdd66a9cbd8c5cf171360a3f82ac692f9b5d05528",
+          "bytes": 153660
+        },
+        {
+          "path": "scans/12132.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Taking-on-Water.jpg",
+          "sha256": "e659af9a8766f9dcaccf8660583724b3be21dea00133fbe1914cc83826ea126f",
+          "bytes": 157141
+        },
+        {
+          "path": "scans/12133.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/The-Raiders'-Assault.jpg",
+          "sha256": "ea22e088a2b992c5a2ef69376d71e7a9686ae6f54b9ade2d5f56c445a2b61a60",
+          "bytes": 147732
+        },
+        {
+          "path": "scans/12134.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Sea-ward-Tower.jpg",
+          "sha256": "43760b1b829ea5c7ddcbae5a5bc664c1f919e318a2e5783f55cab31462847927",
+          "bytes": 128516
+        },
+        {
+          "path": "scans/12135.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Tower-of-the-Gull.jpg",
+          "sha256": "16fde5cf837761d83019ceaba20d14db703430c178c4c9d94ba57e7a08f72762",
+          "bytes": 128338
+        },
+        {
+          "path": "scans/12136.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/The-Beacon.jpg",
+          "sha256": "219fe9a3c6beb4a97e52ceee487572800e1676d8b66067b8ffa236ed3d3897a2",
+          "bytes": 128053
+        },
+        {
+          "path": "scans/12137.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Tower-of-the-Heron.jpg",
+          "sha256": "97b99dde4615c4e98d5d5be7122b9a529d60278288d830e48611a606fb5bed77",
+          "bytes": 127557
+        },
+        {
+          "path": "scans/12147.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/The-Coast-of-Umbar-1A.jpg",
+          "sha256": "9bc792763ef79cdfe542921f0938994ce96ee83d975bbc3fc68970202f1219dd",
+          "bytes": 146245
+        },
+        {
+          "path": "scans/12147.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/The-Coast-of-Umbar-1B.jpg",
+          "sha256": "03ced01a59371091cac769c8bd656f2052c14323b146fb1d97c06f62de518bc5",
+          "bytes": 141425
+        },
+        {
+          "path": "scans/12148.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Fate-of-the-Dream-chaser-2A.jpg",
+          "sha256": "a467434bf1e5e3488553459283961e0f772cbaa3fb97df3f77851de89b289da4",
+          "bytes": 146056
+        },
+        {
+          "path": "scans/12148.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Fate-of-the-Dream-chaser-2B.jpg",
+          "sha256": "ee9cc4a97387165158e135c144dd52aba3fe8e7c511a70dbc668cb5f14a274ea",
+          "bytes": 149334
+        },
+        {
+          "path": "scans/12149.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/The-Haven-of-Umbar-3A.jpg",
+          "sha256": "7ed13aa7755d050df37b54100036a5e48087af24e7b9c89388eeb3b2e8d3503c",
+          "bytes": 147293
+        },
+        {
+          "path": "scans/12149.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/The-Haven-of-Umbar-3B.jpg",
+          "sha256": "b78c7e01fc4136df75a3d4de09949163129cb2f5e38650090a865ff36f154f3a",
+          "bytes": 134404
+        },
+        {
+          "path": "scans/12150.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Final-Confrontation-4A.jpg",
+          "sha256": "4a425548575839ce6a8a0f4626734631d7e75e805506e51453ce929d79b0e009",
+          "bytes": 150779
+        },
+        {
+          "path": "scans/12150.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Final-Confrontation-4B.jpg",
+          "sha256": "81325d75ea1cbc55e68cfa07776a6da443f64d12917d4f69a3d0dff8873d5e3d",
+          "bytes": 143161
+        },
+        {
+          "path": "scans/12151.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Stormcaller.jpg",
+          "sha256": "4172a1a77fc6258a8f0043594086388c50524eec5f90c5c67034172fbcf528d7",
+          "bytes": 148094
+        },
+        {
+          "path": "scans/12152.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Slave-Ship.jpg",
+          "sha256": "2cce6cf3f4895da75b3d26a00521a05beb6b0812cfba09d542fd007144a59622",
+          "bytes": 158368
+        },
+        {
+          "path": "scans/12153.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Umbar-Slaver.jpg",
+          "sha256": "481fa9374331797537898072ad4ac003d73c73873da31666e8e756195eb625e5",
+          "bytes": 142852
+        },
+        {
+          "path": "scans/12154.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Southern-Belfalas.jpg",
+          "sha256": "1af85dcca9e25491b9b85a201f0cad749a9e1b1e7684c882d43538dd6b898ca5",
+          "bytes": 144087
+        },
+        {
+          "path": "scans/12155.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Corsair-Waters.jpg",
+          "sha256": "3094cf5df4df44166e338da7fb3329e3d5704ae26f2d3b4184ec80cb75c8fa37",
+          "bytes": 144039
+        },
+        {
+          "path": "scans/12156.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Watch-Tower.jpg",
+          "sha256": "e128fe6e9f438d95f2a2b5ff2e526811f72fdfd7978fbc8e28e1faf769422729",
+          "bytes": 144797
+        },
+        {
+          "path": "scans/12157.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Serpent's-Tail.jpg",
+          "sha256": "11db7240e7f94f45525dca0965baa8729625ba608bde0329bb498f5244436bca",
+          "bytes": 131869
+        },
+        {
+          "path": "scans/12158.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Captain-Sahír.jpg",
+          "sha256": "b50e2a81bae3d092fda43ce107ab329addbc3b6a67bc7c365471112bc070a0ea",
+          "bytes": 146529
+        },
+        {
+          "path": "scans/12159.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/The-Shattered-Monument.jpg",
+          "sha256": "c92e3acfe60e721186b4b848021a61eb35785273b7748c84c6135ec17128b4ac",
+          "bytes": 152883
+        },
+        {
+          "path": "scans/12160.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Streets-of-Umbar.jpg",
+          "sha256": "16beae27ba7a7fa99fcc518a65c940dc161e19a9651ea27971d8d2339006a43a",
+          "bytes": 157912
+        },
+        {
+          "path": "scans/12161.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/City-of-Corsairs.jpg",
+          "sha256": "56ea8eeb1245bd06933887b79087d3b5c3dee60a2f3237af05bd768570958e7b",
+          "bytes": 146885
+        },
+        {
+          "path": "scans/12162.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Umbar-Harbor.jpg",
+          "sha256": "52041c98043477f08113c8cde6566cdb818fa9c53bcd2f3e8b34807654efa9db",
+          "bytes": 143812
+        },
+        {
+          "path": "scans/12163.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Foes-of-Ecthelion.jpg",
+          "sha256": "76f2f03f6605256302588fbbfb9c609d570df7fe36b12c85231be0c67080625b",
+          "bytes": 149664
+        },
+        {
+          "path": "scans/12164.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Umbar-Patrol.jpg",
+          "sha256": "692b317cc6379cbbdf24aa70b39518dcc72029c94f4fa4c6fd9b9f65255f4aa0",
+          "bytes": 149636
+        },
+        {
+          "path": "scans/12165.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Corsairs/Fury-and-Malice.jpg",
+          "sha256": "833209571560edd091095d8e3ad6e2c5c737c80e99a4189f2b7c18c69fce008e",
+          "bytes": 157261
         },
         {
           "path": "scans/141001.A.jpg",

@@ -3,12 +3,13 @@ import { z } from "zod";
 import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
 import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
 import { deckLegal } from "../../../src/catalog/deck-legal.ts";
+import { PILES } from "../../../src/catalog/scenario-data.ts";
 import { CAMPAIGN_SUFFIX, PRODUCTS } from "../campaign-defs.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
 import { titleKey } from "./names.ts";
-import { addNightmareCards, addProductCards, productCodeOf } from "./product-cards.ts";
+import { addNightmareCards, addProductCards, foldTwoSided, productCodeOf } from "./product-cards.ts";
 import { timingLabels } from "./timings.ts";
 
 const TFOTR = "The Fellowship of the Ring";
@@ -33,13 +34,15 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   // Types only Nightmare decks of later cycles print (the encounter side quests of The Lost Realm on, Dream-chaser's ships).
   Encounter_Side_Quest: { type: "encounter-side-quest", typeName: "Encounter Side Quest" },
   Ship_Enemy: { type: "ship-enemy", typeName: "Ship-enemy" },
+  // Dream-chaser's player ships (dcce.ship-objectives): an objective ally that attacks and defends against ship-enemies only.
+  Ship_Objective: { type: "ship-objective", typeName: "Ship-objective" },
 };
 
 const overridesSchema = z.object({
   cards: z.array(
     z.object({
       match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
-      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), name: z.string().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), encounterSet: z.string().optional(), name: z.string().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
       reason: z.string().min(1),
       source: z.string().min(1),
     }),
@@ -50,7 +53,7 @@ const overridesSchema = z.object({
       z.object({
         scenario: z.string().min(1),
         code: z.string().min(1),
-        pile: z.enum(["encounter", "staging", "activeLocation", "setAside", "attached", "burden", "campaign"]),
+        pile: z.enum([...PILES, "campaign"]),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),
@@ -60,10 +63,20 @@ const overridesSchema = z.object({
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
-  // A product whose Hall of Beorn codes collide with another product's: the code is `prefix` and the two-digit collector
-  // number, which is the code RingsDB gives the same cards where it lists them.
+  // A product whose Hall of Beorn codes collide with another product's: the code is `prefix` and the collector number padded to
+  // `width` digits (two by default), which is the code RingsDB gives the same cards where it lists them. A set may have several
+  // entries, each for the collector numbers from `from` up (0 by default); the entry with the highest `from` the card reaches wins.
   productCodes: z
-    .array(z.object({ set: z.string().min(1), prefix: z.string().regex(/^\d{3}$/), reason: z.string().min(1), source: z.string().min(1) }))
+    .array(
+      z.object({
+        set: z.string().min(1),
+        prefix: z.string().regex(/^\d{2,3}$/),
+        width: z.number().int().min(2).max(3).default(2),
+        from: z.number().int().nonnegative().default(0),
+        reason: z.string().min(1),
+        source: z.string().min(1),
+      }),
+    )
     .default([]),
   // A name a booklet prints for an encounter set that the cards print otherwise (the Learn to Play's "Journey Down the Anduin").
   encounterSetAliases: z
@@ -148,19 +161,24 @@ function keywordOnly(card: HobCard): (line: string) => boolean {
 }
 
 const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
-const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective", "encounter-side-quest", "ship-enemy"]);
+const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective", "encounter-side-quest", "ship-enemy", "ship-objective"]);
 
 // The type bar says Boon or Burden. A burden's burden set is printed where an encounter set icon would be, and
 // Hall of Beorn lists it as the card's encounter set.
 function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | null; burdenSet: string | null } {
   const kind = card.CardSubType === "Boon" ? "boon" : card.CardSubType === "Burden" ? "burden" : null;
-  return { campaignKind: kind, burdenSet: kind === "burden" ? setName(card.EncounterInfo?.EncounterSet) : null };
+  return { campaignKind: kind, burdenSet: kind === "burden" ? setName(card.EncounterInfo?.EncounterSet, card.CardSet) : null };
 }
 
 // Hall of Beorn names the encounter sets of the campaign editions "Spiders of Mirkwood (Campaign)". The suffix is not part
 // of the set's name.
-function setName(name: string | null | undefined): string | null {
-  return name == null ? null : name.replace(CAMPAIGN_SUFFIX, "");
+// The Dream-chaser Campaign Expansion's sets read "The Fate of Númenor Campaign" (no parentheses) and belong to the scenario's set.
+const BUILT_PRODUCT_NAMES: ReadonlySet<string> = new Set(PRODUCTS.map((product) => product.name));
+function setName(name: string | null | undefined, cardSet?: string): string | null {
+  if (name == null) return null;
+  const plain = name.replace(CAMPAIGN_SUFFIX, "");
+  if (cardSet === undefined || !BUILT_PRODUCT_NAMES.has(cardSet)) return plain;
+  return plain.replace(/ Campaign$/, "");
 }
 
 // RingsDB types every boon and burden "treasure" and gives it the type name Campaign. The type bar prints the real
@@ -205,7 +223,7 @@ function hobFacts(card: HobCard, dragn: DragnRow, report: BuildReport): HobFacts
     isUnique: card.IsUnique,
     quantity: card.Quantity,
     easyQuantity: card.EncounterInfo?.EasyModeQuantity ?? null,
-    encounterSet: setName(card.EncounterInfo?.EncounterSet),
+    encounterSet: setName(card.EncounterInfo?.EncounterSet, card.CardSet),
     hasErrata: card.HasErrata,
     ...campaignFacts(card),
   };
@@ -323,13 +341,34 @@ function outOfScope(overrides: Overrides, card: Pick<Card, "code" | "printings">
   return overrides.outOfScope.some((entry) => entry.code === card.code || (entry.pack != null && card.printings.some((printing) => printing.pack === entry.pack)));
 }
 
+// Hall of Beorn gives the Dream-chaser ships no encounter info, but its scenario files list each ship under its set ("Umbar Fleet", "The
+// Dream-chaser's Fleet"). A ship takes the set its slug is listed under; a 2023 reprint (Dream-chaser Campaign Expansion) takes its original's.
+const DREAM_CHASER_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => product.packs));
+function fillShipSets(raw: RawData, byCode: Map<string, Card>): void {
+  const bySlug = new Map<string, string>();
+  for (const scenario of raw.scenarios) {
+    for (const item of scenario.ScenarioCards) if (item.EncounterSet && !/Nightmare$/.test(item.EncounterSet)) bySlug.set(item.Slug, setName(item.EncounterSet) ?? item.EncounterSet);
+  }
+  const ships = [...byCode.values()].filter((card) => (card.type === "ship-enemy" || card.type === "ship-objective") && card.campaignKind == null && card.printings.some((printing) => DREAM_CHASER_PACKS.has(printing.pack)));
+  const named = new Map<string, string>();
+  for (const card of ships) {
+    const set = card.printings.map((printing) => (printing.hobSlug ? bySlug.get(printing.hobSlug) : undefined)).find((name) => name !== undefined);
+    if (set) named.set(`${card.name}\u0000${card.type}`, set);
+  }
+  for (const card of ships) {
+    const set = named.get(`${card.name}\u0000${card.type}`);
+    if (card.encounterSet == null && set) byCode.set(card.code, { ...card, encounterSet: set });
+  }
+}
+
 export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[]; report: BuildReport } {
   const report: BuildReport = { unknownKeywords: {}, twinless: [] };
 
   const hobCode = productCodeOf(overrides);
+  const hobCards = foldTwoSided(raw.hob).cards;
   const hobByCode = new Map<string, HobCard[]>();
   const hobByTitle = new Map<string, HobCard[]>();
-  for (const card of raw.hob) {
+  for (const card of hobCards) {
     hobByTitle.set(titleKey(card.Title), [...(hobByTitle.get(titleKey(card.Title)) ?? []), card]);
     const code = hobCode(card);
     if (UNCODED_SETS.has(card.CardSet) || !code) continue;
@@ -385,8 +424,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   }
 
   // Fellowship cards: the TFotR printing wins over the twin it was paired with.
-  const tfotr = raw.hob.filter((card) => card.CardSet === TFOTR);
-  const twins = raw.hob.filter((card) => TWIN_SETS.has(card.CardSet));
+  const tfotr = hobCards.filter((card) => card.CardSet === TFOTR);
+  const twins = hobCards.filter((card) => TWIN_SETS.has(card.CardSet));
   const pairs = pairTwins(tfotr, twins);
   const claimed = new Set<HobCard>();
 
@@ -467,15 +506,17 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     byCode.set(code, merge(code, twin, twin));
   }
 
-  addProductCards(raw.hob, byCode, hobCode, merge);
-  addNightmareCards(raw.hob, byCode, merge);
+  addProductCards(hobCards, byCode, hobCode, merge);
+  addNightmareCards(hobCards, byCode, merge);
+  fillShipSets(raw, byCode);
 
   const cards: Card[] = [];
   for (const card of byCode.values()) {
     const set = overrideFor(overrides, { code: card.code, name: card.name });
     const withKeywords = set?.keywords ? { ...card, keywords: { ...(card.keywords ?? {}), ...set.keywords } as PrintedKeywords } : card;
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
-    const named = set?.name ? { ...withBurden, name: set.name } : withBurden;
+    const inSet = set?.encounterSet ? { ...withBurden, encounterSet: set.encounterSet } : withBurden;
+    const named = set?.name ? { ...inSet, name: set.name } : inSet;
     // A printed Threat or engagement cost a source leaves out (a burden enemy: Hall of Beorn files its Threat icon as Willpower).
     const stated = { ...named, ...pickDefined(set, ["threat", "engagementCost"]) };
     const next = outOfScope(overrides, stated) ? { ...stated, deckLegal: false } : stated;

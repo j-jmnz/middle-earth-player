@@ -18,7 +18,7 @@ describe("data/campaigns/index.json", () => {
     // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29, The Dark of Mirkwood since phase 32: both hold The Oath); the two later sagas
     // have no scenario files at all.
     const locked = index.filter((entry) => !entry.playable);
-    expect(locked.map((entry) => entry.name)).toEqual(["The Two Towers", "The Return of the King"]);
+    expect(locked.map((entry) => entry.name)).toEqual(["Dream-chaser", "The Two Towers", "The Return of the King"]);
     expect(locked.filter((entry) => ["The Two Towers", "The Return of the King"].includes(entry.name)).every((entry) => entry.scenarioCount === 6)).toBe(true);
   });
 
@@ -27,6 +27,49 @@ describe("data/campaigns/index.json", () => {
     expect(index.find((entry) => entry.id === "the-dark-of-mirkwood")).toMatchObject({ scenarioCount: 2, playable: true });
     expect(loadCampaign("mirkwood-paths").scenarios).toHaveLength(5);
     expect(loadCampaign("the-dark-of-mirkwood").scenarios).toHaveLength(2);
+  });
+
+  it("lists Dream-chaser with its nine scenarios, locked until one of them is in PLAYABLE_SCENARIOS", () => {
+    expect(index.find((entry) => entry.id === "dream-chaser")).toMatchObject({ name: "Dream-chaser", scenarioCount: 9, playable: false });
+    const campaign = loadCampaign("dream-chaser");
+    expect(campaign.scenarios).toEqual([
+      "voyage-across-belegaer",
+      "the-fate-of-numenor",
+      "raid-on-the-grey-havens",
+      "flight-of-the-stormcaller",
+      "the-thing-in-the-depths",
+      "temple-of-the-deceived",
+      "the-drowned-ruins",
+      "a-storm-on-cobas-haven",
+      "the-city-of-corsairs",
+    ]);
+    expect(campaign.saga).toBe(false);
+    expect(campaign.bookletId).toBe("dream-chaser");
+    expect(campaign.prelude).toEqual([]);
+    expect(campaign.starterDecks).toEqual([]);
+    expect(campaign.campaignCards).toEqual({
+      "voyage-across-belegaer": "11171",
+      "the-fate-of-numenor": "11179",
+      "raid-on-the-grey-havens": "11182",
+      "flight-of-the-stormcaller": "11191",
+      "the-thing-in-the-depths": "11194",
+      "temple-of-the-deceived": "11197",
+      "the-drowned-ruins": "11200",
+      "a-storm-on-cobas-haven": "11209",
+      "the-city-of-corsairs": "11215",
+    });
+    // MEC111 is the campaign's booklet (data/rules/dcce.md); its setup paragraphs sit on these pages.
+    expect(campaign.bookletPages).toEqual({
+      "voyage-across-belegaer": 6,
+      "the-fate-of-numenor": 7,
+      "raid-on-the-grey-havens": 9,
+      "flight-of-the-stormcaller": 12,
+      "the-thing-in-the-depths": 14,
+      "temple-of-the-deceived": 17,
+      "the-drowned-ruins": 20,
+      "a-storm-on-cobas-haven": 23,
+      "the-city-of-corsairs": 24,
+    });
   });
 
   it("marks a campaign playable when at least one of its scenarios is", () => {

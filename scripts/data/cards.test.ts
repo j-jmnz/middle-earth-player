@@ -155,4 +155,48 @@ describe("Mirkwood Paths cards", () => {
     expect(cards.get("01074")?.encounterSet).toBe("Spiders of Mirkwood");
     expect(cards.get("41008")?.encounterSet).toBe("The Oath");
   });
+
+  // Dream-chaser (phase 37).
+  it("codes the Dream-chaser Campaign Expansion 11 and the collector number from 171 on, 110 and the collector number below it", () => {
+    // RingsDB's own codes for the boons and burdens, and the same pattern for the campaign cards it does not list.
+    expect(cards.get("11171")).toMatchObject({ name: "Voyage Across Belegaer", type: "campaign" });
+    expect(cards.get("11172")).toMatchObject({ name: "Armor Plating", campaignKind: "boon", type: "attachment" });
+    expect(cards.get("11215")).toMatchObject({ name: "The City of Corsairs", type: "campaign" });
+    expect(cards.get("11217")).toMatchObject({ name: "Hard Mode", type: "objective" });
+    // The 2023 reprints of Adventure Pack cards take 110 and their number: the packs keep 12019 (the Stormcaller) and 11080 (the Dream-chaser).
+    expect(cards.get("110042")).toMatchObject({ name: "Stormcaller", type: "ship-enemy" });
+    expect(cards.get("110042")?.printings[0]).toMatchObject({ pack: "DCCE", number: 42 });
+    expect(cards.get("12019")).toMatchObject({ name: "Stormcaller", type: "ship-enemy" });
+    expect(cards.get("12019")?.printings[0]).toMatchObject({ pack: "FotS" });
+    expect(cards.get("110136")?.name).toBe("Dream-chaser");
+    expect(cards.get("11080")).toMatchObject({ name: "Dream-chaser", type: "ship-objective", typeName: "Ship-objective", encounterSet: "The Dream-chaser's Fleet" });
+    // Ered Mithrin keeps 12166 to 12204: the Expansion's Hall of Beorn codes (12171 and the rest) are not built.
+    expect(cards.get("12171")?.printings[0]?.pack).toBe("EMCE");
+    expect(cards.get("12166")?.printings[0]?.pack).toBe("EMCE");
+  });
+
+  it("folds the two Hall of Beorn rows of a two-sided Expansion card into one card with a back", () => {
+    expect(cards.get("110042")?.text).toContain("Boarding 2");
+    expect(cards.get("110042")?.back?.text).toContain("Campaign Mode only.");
+    expect(cards.get("110136")?.back?.text).toContain("counts as 3 characters");
+    expect(cards.get("11172")?.back?.text).toContain("discard 1 shadow card from another enemy");
+    expect(cards.get("11196")?.back?.text).toContain("makes an attack against the first player");
+    expect(cards.get("11217")?.back?.text).toContain("Gain 2 XP");
+    expect(all.filter((card) => /^Dream-chaser Campaign Expansion$/.test(card.printings[0]?.pack ?? "") && card.printings.length > 1)).toEqual([]);
+  });
+
+  it("types the boons and burdens by their type bar, and merges them with RingsDB's treasure rows", () => {
+    expect(cards.get("11177")).toMatchObject({ campaignKind: "burden", type: "ship-enemy", deckLegal: false });
+    expect(cards.get("11176")).toMatchObject({ campaignKind: "burden", type: "treachery", burdenSet: "Voyage Across Belegaer" });
+    expect(cards.get("11193")).toMatchObject({ campaignKind: "boon", type: "objective", typeName: "Objective Ally" });
+    expect(cards.get("11184")).toMatchObject({ campaignKind: "boon", type: "event", deckLegal: false });
+    expect(all.filter((card) => card.printings.some((printing) => printing.pack === "DCCE") && card.type === "treasure")).toEqual([]);
+    expect(all.filter((card) => card.printings.some((printing) => printing.pack === "DCCE") && card.campaignKind != null)).toHaveLength(37);
+  });
+
+  it("names the Expansion's encounter sets without the Campaign suffix", () => {
+    const dream = all.filter((card) => card.printings.some((printing) => printing.pack === "DCCE"));
+    expect(dream.filter((card) => / Campaign$/.test(`${card.encounterSet ?? ""}${card.burdenSet ?? ""}`)).map((card) => card.code)).toEqual([]);
+    expect(cards.get("11188")).toMatchObject({ burdenSet: "Raid on the Grey Havens", encounterSet: "Raid on the Grey Havens" });
+  });
 });

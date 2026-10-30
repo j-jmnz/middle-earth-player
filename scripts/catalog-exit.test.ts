@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { normalCopiesByCode, scenarioCards } from "../src/catalog/scenario-data.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { cardImageUrl } from "../src/screens/images/policy.ts";
-import { loadScenario } from "./data/load-scenarios.ts";
+import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { buildCatalog } from "./build-catalog.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -90,6 +90,20 @@ describe("built catalog", () => {
       expect(missing).toEqual([]);
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("mirkwood-paths")).toMatchObject({ name: "Mirkwood Paths", scenario_count: 5, playable: 1 });
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("the-dark-of-mirkwood")).toMatchObject({ name: "The Dark of Mirkwood", scenario_count: 2, playable: 1 });
+      // Dream-chaser: every card its nine scenarios deal has a picture, the campaign is listed locked, and its cards are tagged with it.
+      const dreamChaser = loadCampaign("dream-chaser");
+      const unpictured: string[] = [];
+      for (const id of dreamChaser.scenarios) {
+        const scenario = loadScenario(id);
+        for (const code of new Set([...scenarioCards(scenario).map((card) => card.code), scenario.campaignCard, ...scenario.campaignPlaced])) {
+          const row = database.prepare("select imagesrc from cards where code = ?").get(code);
+          if (typeof row?.imagesrc !== "string" || cardImageUrl(row.imagesrc) === null) unpictured.push(`${id} ${code}`);
+        }
+      }
+      expect(unpictured).toEqual([]);
+      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("dream-chaser")).toMatchObject({ name: "Dream-chaser", scenario_count: 9, playable: 0 });
+      expect(database.prepare("select campaign_id from cards where code = ?").get("11171")?.campaign_id).toBe("dream-chaser");
+      expect(database.prepare("select campaign_id from cards where code = ?").get("12019")?.campaign_id).toBe("dream-chaser");
       expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(
         "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
       );

@@ -1,0 +1,299 @@
+{
+  "id": "the-city-of-corsairs",
+  "name": "The City of Corsairs",
+  "number": 6,
+  "stages": [
+    "12147",
+    "12148",
+    "12149",
+    "12150"
+  ],
+  "encounterSets": [
+    {
+      "name": "The City of Corsairs",
+      "count": 17
+    },
+    {
+      "name": "Coast of Umbar",
+      "count": 11
+    },
+    {
+      "name": "Stormy Weather",
+      "count": 9
+    },
+    {
+      "name": "Umbar Fleet",
+      "count": 6
+    },
+    {
+      "name": "Voyage Across Belegaer",
+      "count": 7
+    },
+    {
+      "name": "Corsair Raiders",
+      "count": 9
+    },
+    {
+      "name": "The Dream-chaser's Fleet",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "12152",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12155",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12156",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12157",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11053",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11054",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11055",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11058",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11059",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11022",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11023",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11024",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11067",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12147",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12148",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12149",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12150",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12151",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "12154",
+      "normal": 2,
+      "easy": 2,
+      "pile": "staging",
+      "byPlayers": {
+        "few": 1,
+        "many": 2,
+        "from": 3
+      }
+    },
+    {
+      "code": "11080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11082",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "12153",
+      "normal": 3,
+      "easy": 1,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11064",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11065",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11066",
+      "normal": 2,
+      "easy": 0,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "12158",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12159",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12160",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12161",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12162",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12163",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12164",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12165",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounterDeck2"
+    }
+  ],
+  "campaignCard": "11215",
+  "campaignPlaced": [
+    "11172",
+    "11173",
+    "11174",
+    "11175",
+    "11177",
+    "11178",
+    "11192",
+    "11216",
+    "12151",
+    "12158"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.9",
+    "dragnEasy": "E06.9",
+    "hobSlug": "The-City-of-Corsairs"
+  }
+}

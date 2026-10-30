@@ -222,6 +222,18 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.1K tok)
+- `docs/phases/phase-37-dream-chaser-data.md` — Phase 37 — Dream-chaser data (~800 tok)
+- `docs/phases/phase-38-dream-chaser-campaign-shell.md` — Phase 38 — Dream-chaser campaign shell and XP (~700 tok)
+- `docs/phases/phase-39-sea-mechanics-family.md` — Phase 39 — Sea mechanics family (~550 tok)
+- `docs/phases/phase-40-voyage-across-belegaer.md` — Phase 40 — Voyage Across Belegaer (~1.0K tok)
+- `docs/phases/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~950 tok)
+- `docs/phases/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~960 tok)
+- `docs/phases/phase-43-flight-of-the-stormcaller.md` — Phase 43 — Flight of the Stormcaller (~960 tok)
+- `docs/phases/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~970 tok)
+- `docs/phases/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~980 tok)
+- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~950 tok)
+- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~950 tok)
+- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~960 tok)
 
 ## Live plans
 
@@ -249,7 +261,7 @@ Read when a task names the plan.
   - 120–126 Conditions (~110)
   - 127–146 Triggers and stat flags (~440)
   - 147–208 Patterns (~1.4K)
-  - 209–233 Mechanic families: engine and records together (~600) ← 1
+  - 209–233 Mechanic families: engine and records together (~600) ← 2
   - 234–257 Not expressible yet: leave open, report (~510)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)

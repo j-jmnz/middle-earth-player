@@ -134,3 +134,76 @@ describe("Mirkwood campaigns", () => {
     expect(loadScenario("the-caves-of-nibin-dum").campaignPlaced).toEqual(["41042", "41048", "41049"]);
   });
 });
+
+// Dream-chaser (docs/plans/dream-chaser.md, phase 37): built from the seven original sets and the Dream-chaser Campaign Expansion. The
+// DragnCards Q06 load lists lead the piles; the booklet's paragraph and the printed Setup are the checks.
+describe("Dream-chaser campaign", () => {
+  const campaign = loadCampaign("dream-chaser");
+  const DECK = {
+    "voyage-across-belegaer": { normal: 27, easy: 19, corsair: 9, staging: ["11022", "11051", "11084"], setAside: ["11080", "11081", "11082", "11083"] },
+    "the-fate-of-numenor": { normal: 24, easy: 17, unchartedDeck: 10, staging: [], setAside: ["11027", "11028"] },
+    "raid-on-the-grey-havens": { normal: 28, easy: 21, staging: ["11038", "11039", "11041"], setAside: ["11077", "11079"] },
+    "flight-of-the-stormcaller": { normal: 31, easy: 23, corsair: 13, stormcallerQuests: 3, staging: ["11051"], setAside: ["11080", "11081", "11082", "11083", "11084", "12019"] },
+    "the-thing-in-the-depths": { normal: 20, easy: 13, encounterDeck2: 18, staging: ["11064", "12042"], setAside: ["11077", "11079", "12049"] },
+    "temple-of-the-deceived": { normal: 31, easy: 24, islandMap: 15, staging: ["12070"], setAside: ["11077", "11079", "12071"] },
+    "the-drowned-ruins": { normal: 30, easy: 21, grottoDeck: 8, staging: [], setAside: ["11077", "11079", "12094"] },
+    "a-storm-on-cobas-haven": { normal: 37, easy: 32, corsair: 16, staging: ["11022", "12124"], setAside: ["11080", "11081", "11082", "11083", "11084", "12123"] },
+    "the-city-of-corsairs": { normal: 32, easy: 22, corsair: 10, encounterDeck2: 17, staging: ["12151", "12154"], setAside: ["11080", "11081", "11082", "11083", "11084"] },
+  } as const;
+  const copies = (id: string, pile: string): number => loadScenario(id).cards.filter((card) => card.pile === pile).reduce((sum, card) => sum + card.normal, 0);
+
+  it("builds all nine scenarios in play order, each with its campaign card, and deals only cards data/cards has", () => {
+    expect(campaign.scenarios).toEqual(Object.keys(DECK));
+    expect(() => loadScenarioDefinitions(new URL("../../data/", import.meta.url).pathname, byCode, [], "dream-chaser")).not.toThrow();
+    for (const id of campaign.scenarios) {
+      const scenario = loadScenario(id);
+      expect(campaign.campaignCards[id], id).toBe(scenario.campaignCard);
+      expect(byCode.get(scenario.campaignCard)?.type, id).toBe("campaign");
+      expect(scenario.source.dragnNormal, id).toMatch(/^Q06\.\d$/);
+      expect(scenario.source.dragnEasy, id).toMatch(/^E06\.\d$/);
+      expect(scenario.cards.some((card) => byCode.get(card.code)?.printings.some((printing) => printing.pack === "Nightmare")), `${id} deals no Nightmare card`).toBe(false);
+    }
+    expect(campaign.scenarios.map((id) => loadScenario(id).number)).toEqual([1, 2, 3, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it.each(Object.entries(DECK))("%s deals the encounter deck, the extra decks and the Setup piles the load list and the printed Setup leave", (id, pin) => {
+    const scenario = loadScenario(id);
+    expect(encounterCodes(scenario)).toHaveLength(pin.normal);
+    expect(encounterCodes(scenario, "Easy")).toHaveLength(pin.easy);
+    expect(scenario.cards.filter((card) => card.pile === "staging").map((card) => card.code).sort()).toEqual([...pin.staging]);
+    expect(scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code).sort()).toEqual([...pin.setAside]);
+    expect(copies(id, "corsairDeck")).toBe("corsair" in pin ? pin.corsair : 0);
+    expect(copies(id, "encounterDeck2")).toBe("encounterDeck2" in pin ? pin.encounterDeck2 : 0);
+    expect(copies(id, "unchartedDeck")).toBe("unchartedDeck" in pin ? pin.unchartedDeck : 0);
+    expect(copies(id, "islandMap")).toBe("islandMap" in pin ? pin.islandMap : 0);
+    expect(copies(id, "grottoDeck")).toBe("grottoDeck" in pin ? pin.grottoDeck : 0);
+    expect(copies(id, "stormcallerQuests")).toBe("stormcallerQuests" in pin ? pin.stormcallerQuests : 0);
+  });
+
+  it("keeps the Stormcaller's stages 2C to 4C out of the quest deck, and Nightmare quest cards out of every scenario", () => {
+    expect(loadScenario("flight-of-the-stormcaller").stages).toEqual(["12012", "12013", "12014", "12015"]);
+    expect(loadScenario("flight-of-the-stormcaller").cards.filter((card) => card.pile === "stormcallerQuests").map((card) => card.code)).toEqual(["12016", "12017", "12018"]);
+    expect(loadScenario("voyage-across-belegaer").stages).toEqual(["11016", "11017", "11018", "11019", "11020", "11021"]);
+    expect(loadScenario("raid-on-the-grey-havens").stages).toEqual(["11036", "11037"]);
+  });
+
+  it("names the encounter sets the booklet's paragraph names, in its order", () => {
+    expect(loadScenario("voyage-across-belegaer").encounterSets.map((set) => set.name)).toEqual(["Voyage Across Belegaer", "Vast Oceans", "Stormy Weather", "Umbar Fleet", "Corsair Pirates", "The Dream-chaser's Fleet"]);
+    expect(loadScenario("the-city-of-corsairs").encounterSets.map((set) => set.name)).toEqual(["The City of Corsairs", "Coast of Umbar", "Stormy Weather", "Umbar Fleet", "Voyage Across Belegaer", "Corsair Raiders", "The Dream-chaser's Fleet"]);
+    expect(loadScenario("the-thing-in-the-depths").encounterSets.map((set) => set.name)).toEqual(["The Thing in the Depths", "The Stormcaller", "Corsair Raiders", "The Stormcaller Elite"]);
+  });
+
+  it("stages the copies a Setup says by player count (Rolling Seas in Flight of the Stormcaller, Southern Belfalas in The City of Corsairs)", () => {
+    expect(loadScenario("flight-of-the-stormcaller").cards.find((card) => card.code === "11051" && card.pile === "staging")?.byPlayers).toEqual({ few: 1, many: 2, from: 3 });
+    expect(loadScenario("the-city-of-corsairs").cards.find((card) => card.code === "12154")?.byPlayers).toEqual({ few: 1, many: 2, from: 3 });
+    const flight = loadScenario("flight-of-the-stormcaller");
+    expect(encounterCodes(flight, "Normal", 1).filter((code) => code === "11051")).toHaveLength(1 + 1);
+    expect(encounterCodes(flight, "Normal", 3).filter((code) => code === "11051")).toHaveLength(1);
+  });
+
+  it("deals the campaign cards' boons and burdens through the campaign, not the encounter deck", () => {
+    expect(loadScenario("voyage-across-belegaer").campaignPlaced).toEqual(expect.arrayContaining(["11172", "11173", "11174", "11175", "11176", "11177", "11178"]));
+    expect(loadScenario("the-fate-of-numenor").campaignPlaced).toEqual(expect.arrayContaining(["11180", "11181"]));
+    expect(loadScenario("raid-on-the-grey-havens").campaignPlaced).toEqual(expect.arrayContaining(["11183", "11184", "11185", "11186", "11187", "11188", "11189", "11190"]));
+  });
+});

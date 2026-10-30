@@ -1,0 +1,41 @@
+{
+  "id": "dream-chaser",
+  "name": "Dream-chaser",
+  "scenarios": [
+    "voyage-across-belegaer",
+    "the-fate-of-numenor",
+    "raid-on-the-grey-havens",
+    "flight-of-the-stormcaller",
+    "the-thing-in-the-depths",
+    "temple-of-the-deceived",
+    "the-drowned-ruins",
+    "a-storm-on-cobas-haven",
+    "the-city-of-corsairs"
+  ],
+  "campaignCards": {
+    "voyage-across-belegaer": "11171",
+    "the-fate-of-numenor": "11179",
+    "raid-on-the-grey-havens": "11182",
+    "flight-of-the-stormcaller": "11191",
+    "the-thing-in-the-depths": "11194",
+    "temple-of-the-deceived": "11197",
+    "the-drowned-ruins": "11200",
+    "a-storm-on-cobas-haven": "11209",
+    "the-city-of-corsairs": "11215"
+  },
+  "prelude": [],
+  "starterDecks": [],
+  "bookletPages": {
+    "voyage-across-belegaer": 6,
+    "the-fate-of-numenor": 7,
+    "raid-on-the-grey-havens": 9,
+    "flight-of-the-stormcaller": 12,
+    "the-thing-in-the-depths": 14,
+    "temple-of-the-deceived": 17,
+    "the-drowned-ruins": 20,
+    "a-storm-on-cobas-haven": 23,
+    "the-city-of-corsairs": 24
+  },
+  "bookletId": "dream-chaser",
+  "saga": false
+}

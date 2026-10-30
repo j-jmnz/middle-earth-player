@@ -18,6 +18,7 @@ const NON_PLAYER_TYPE_CODES = new Set([
   "objective",
   "encounter-side-quest",
   "ship-enemy",
+  "ship-objective",
 ]);
 
 export function deckLegal(typeCode: string, typeName: string): boolean {

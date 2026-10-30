@@ -129,6 +129,16 @@
       },
       "reason": "Hall of Beorn gives the burden enemy Ungoliant's Swarm no Threat and no engagement cost, and files its Threat icon (3) as Willpower. The scan prints engagement cost 33 (the number at the top of the card), Threat 3, Attack 2, Defense 2 and 5 hit points, so the engagement check can engage it and it counts in the staging area.",
       "source": "scan 01136.A, data/printed/mirkwood-paths.json"
+    },
+    {
+      "match": {
+        "code": "110077"
+      },
+      "set": {
+        "encounterSet": "Temple of the Deceived"
+      },
+      "reason": "Hall of Beorn files the Dream-chaser Campaign Expansion's Temple Guardian reprint under 'The Fate of Númenor Campaign'. The card is the reprint of Temple Guardian 12070, a Temple of the Deceived card (the scenario 6 Setup attaches it to the staging area; dcce.setup-temple-of-the-deceived names Temple of the Deceived as the set), and its Campaign Mode only side is used in that scenario (dcce.setup-temple-of-the-deceived, Campaign Setup).",
+      "source": "hallofbeorn.com/Export/EncounterCards (Temple-Guardian-DCC); scan 12070.A; dcce.campaign-setup-temple-of-the-deceived"
     }
   ],
   "scenarioPiles": [
@@ -159,6 +169,90 @@
       "pile": "attached",
       "reason": "DragnCards stages An Evil Wound. Stage 1A prints 'Attach An Evil Wound to the Ring-bearer.'",
       "source": "scan 141028.A"
+    },
+    {
+      "scenario": "raid-on-the-grey-havens",
+      "code": "11038",
+      "pile": "staging",
+      "reason": "DragnCards sets The Havens Burn aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.'",
+      "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
+    },
+    {
+      "scenario": "raid-on-the-grey-havens",
+      "code": "11039",
+      "pile": "staging",
+      "reason": "DragnCards sets the Dream-chaser location aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.'",
+      "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
+    },
+    {
+      "scenario": "raid-on-the-grey-havens",
+      "code": "11041",
+      "pile": "staging",
+      "reason": "DragnCards sets 1 copy of Sahír's Ravager aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.' The other copies are in the encounter deck.",
+      "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
+    },
+    {
+      "scenario": "flight-of-the-stormcaller",
+      "code": "12016",
+      "pile": "stormcallerQuests",
+      "reason": "DragnCards sets stage 2C (Full Sail Ahead!) aside, and puts 3C and 4C in a second quest deck. Stage 1A prints 'Prepare the Stormcaller's area with a second quest deck consisting of only stages 2C, 3C, and 4C', so the three are one deck.",
+      "source": "scan 12012.A; dcce.stormcallers-area"
+    },
+    {
+      "scenario": "temple-of-the-deceived",
+      "code": "12070",
+      "pile": "staging",
+      "reason": "DragnCards sets Temple Guardian aside. Stage 1A prints 'Add Temple Guardian to the staging area and attach Gate Key to it, guarded.'",
+      "source": "scan 12067.A; dcce.setup-temple-of-the-deceived"
+    },
+    {
+      "scenario": "the-drowned-ruins",
+      "code": "11079",
+      "pile": "setAside",
+      "reason": "DragnCards stages Na'asiyah. Stage 1A prints 'the last player takes control of Na'asiyah (objective-ally sides faceup)', so she starts out of play and the Setup puts her under a player's control.",
+      "source": "scan 12092.A; dcce.setup-the-drowned-ruins"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12134",
+      "pile": "encounter",
+      "reason": "DragnCards stages Sea-ward Tower. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12135",
+      "pile": "encounter",
+      "reason": "DragnCards stages Tower of the Gull. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12136",
+      "pile": "encounter",
+      "reason": "DragnCards stages The Beacon. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12137",
+      "pile": "encounter",
+      "reason": "DragnCards stages Tower of the Heron. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "the-city-of-corsairs",
+      "code": "12158",
+      "pile": "encounterDeck2",
+      "reason": "DragnCards sets Captain Sahír aside. Stage 1A sets The City of Corsairs encounter set aside as an inactive second encounter deck, and stage 3A prints 'Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play', so both are in that second deck until stage 3A.",
+      "source": "scan 12147.A; scan 12149.A; dcce.from-sea-to-land"
+    },
+    {
+      "scenario": "the-city-of-corsairs",
+      "code": "12159",
+      "pile": "encounterDeck2",
+      "reason": "DragnCards sets The Shattered Monument aside. Stage 1A sets The City of Corsairs encounter set aside as an inactive second encounter deck, and stage 3A prints 'Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play', so both are in that second deck until stage 3A.",
+      "source": "scan 12147.A; scan 12149.A; dcce.from-sea-to-land"
     }
   ],
   "scenarioEasy": [
@@ -217,6 +311,22 @@
       "prefix": "410",
       "reason": "Hall of Beorn numbers The Dark of Mirkwood's cards 02001 to 02051, which are the codes RingsDB gives The Hunt for Gollum (02004 is Winged Guardian and also Surprise Attack). RingsDB lists the nine burden, boon and adaptation cards of the box as 41041 to 41049 (Stalking Goblin is 02041 in Hall of Beorn and 41041 in RingsDB). The code is therefore 410 and the two-digit collector number, for every card of the box, so the quest, encounter and campaign cards RingsDB does not list take the same pattern (After the Raid 41001, The Oath 41050).",
       "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet The Dark of Mirkwood, Number); ringsdb.com pack TDoM (41041 to 41049)"
+    },
+    {
+      "set": "Dream-chaser Campaign Expansion",
+      "prefix": "11",
+      "width": 3,
+      "from": 171,
+      "reason": "Hall of Beorn codes the Dream-chaser Campaign Expansion '12' and the collector number (13 to 217), which are the codes of the six Adventure Packs' own cards (12013 Full Sail Ahead, 12063 Scouting Party, 12138 Prince Imrahil) and of Ered Mithrin (12166 to 12204). RingsDB codes the box's boons and burdens 11172 to 11216, one gap per campaign card. A card with collector number 171 or more (the nine campaign cards, the 37 boons and burdens, the Hard and Expert Mode card) is therefore '11' and its number, which is RingsDB's code where RingsDB lists it and the same pattern where it does not (campaign cards 11171, 11179, 11182, 11191, 11194, 11197, 11200, 11209, 11215; Hard and Expert Mode 11217).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Dream-chaser Campaign Expansion, Number); ringsdb.com pack DCCE (11172 to 11216); Dream-chaser Campaign Expansion rulebook MEC111"
+    },
+    {
+      "set": "Dream-chaser Campaign Expansion",
+      "prefix": "110",
+      "width": 3,
+      "from": 0,
+      "reason": "A Dream-chaser Campaign Expansion card with a collector number below 171 is a 2023 reprint of a card the Adventure Packs print (Calphon 13, the Stormcaller 42, The Thing in the Depths 63, Temple Guardian 77, Gate Key 78, Dol Amroth Warship 102, the Shattered Monument 129, the six ships 136 to 141) with a Campaign Mode only or Upgraded side. Its Hall of Beorn code ('12' and the number) is the original's, so it is '110' and its three-digit number (110042 is the Stormcaller reprint; 12019 is the pack's). The six-digit prefix 110 is unused; the other six-digit prefixes are 131-132, 140-148 and 900-907. The two sides of one reprint share the code.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Dream-chaser Campaign Expansion, Number); ringsdb.com pack DCCE (11172 to 11216); Dream-chaser Campaign Expansion rulebook MEC111"
     }
   ],
   "encounterSetAliases": [

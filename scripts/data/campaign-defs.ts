@@ -4,6 +4,8 @@
 // A scenario file belongs to the scenario, not to a campaign: The Oath and The Caves of Nibin-Dûm are in both
 // `mirkwood-paths` (parts 4 and 5, tdom.mirkwood-paths) and `the-dark-of-mirkwood` (parts 1 and 2, tdom.mini-campaign).
 
+import type { Pile } from "../../src/catalog/scenario-data.ts";
+
 export type ScenarioDef = {
   // The file name: data/scenarios/<id>.json.
   id: string;
@@ -14,6 +16,15 @@ export type ScenarioDef = {
   // DragnCards' 2011 core decks and Limited Collector's Edition decks (`Q01.1`, `E01.1`), where a deck of the same cards exists
   // for a box that has no load list of its own: the cross-check compares the built piles with them, copy counts only.
   crossCheck?: { normal: string; easy: string };
+  // The DragnCards decks that load the scenario (`Q06.1`, `E06.1`), for a `load: "dragncards"` box whose decks are not the numbered
+  // `Q0C` list of the Fellowship boxes. The deck's label must be the scenario's title.
+  deck?: { normal: string; easy: string };
+  // The product whose campaign card, boons and burdens the scenario deals when it is not `product` (the Dream-chaser Campaign Expansion
+  // reprints the nine scenarios of seven boxes and holds every campaign card).
+  campaignProduct?: string;
+  // The piles of the DragnCards load groups this scenario's deck uses beyond the common ones (sharedQuestDeck, sharedEncounterDeck,
+  // sharedStagingArea, sharedActiveLocation, sharedSetAside): `sharedEncounterDeck2` is a different deck in each Dream-chaser scenario.
+  groups?: Readonly<Record<string, Pile>>;
 };
 
 // A Hall of Beorn product (a box) the pipeline builds cards or scenarios from: the one table every other site derives from.
@@ -35,11 +46,22 @@ export type ProductDef = {
   twinPack: string | null;
 };
 
+const DCCE = "Dream-chaser Campaign Expansion";
+
 export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Black Riders", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TBR" },
   { name: "The Road Darkens", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TRD" },
   { name: "Revised Core Set", packs: ["RevCore"], home: "mirkwood-paths", load: "setup", easySheet: true, twinPack: null },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
+  // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
+  { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Flight of the Stormcaller", packs: ["FotS"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Thing in the Depths", packs: ["TitD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Temple of the Deceived", packs: ["TotD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Drowned Ruins", packs: ["DR"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "A Storm on Cobas Haven", packs: ["SoCH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The City of Corsairs", packs: ["CoC"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: DCCE, packs: ["DCCE"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
 ];
 
 // The catalog's `cards.campaign_id`: the campaign a pack's cards belong to. A product with a twin pack (the Fellowship boxes, whose
@@ -76,6 +98,11 @@ export type CampaignDef = {
 
 const OATH: ScenarioDef = { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath", crossCheck: { normal: "Q00.01B", easy: "E00.01B" } };
 const CAVES: ScenarioDef = { id: "the-caves-of-nibin-dum", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-caves-of-nibin-dum", crossCheck: { normal: "Q00.02B", easy: "E00.02B" } };
+
+// A Dream-chaser scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q06.n / E06.n).
+function dreamChaser(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
+  return { id, product, campaignProduct: DCCE, setupSpan: `dcce.setup-${id}`, deck: { normal: `Q06.${n}`, easy: `E06.${n}` }, groups };
+}
 
 export const CAMPAIGNS: readonly CampaignDef[] = [
   {
@@ -123,6 +150,26 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     bookletDoc: "tdom",
     saga: false,
     ledger: "mirkwood-paths",
+  },
+  {
+    id: "dream-chaser",
+    name: "Dream-chaser",
+    products: ["The Grey Havens", "Flight of the Stormcaller", "The Thing in the Depths", "Temple of the Deceived", "The Drowned Ruins", "A Storm on Cobas Haven", "The City of Corsairs", DCCE],
+    scenarios: [
+      dreamChaser(1, "voyage-across-belegaer", "The Grey Havens", { sharedEncounterDeck2: "corsairDeck" }),
+      dreamChaser(2, "the-fate-of-numenor", "The Grey Havens", { sharedEncounterDeck2: "unchartedDeck" }),
+      dreamChaser(3, "raid-on-the-grey-havens", "The Grey Havens"),
+      dreamChaser(4, "flight-of-the-stormcaller", "Flight of the Stormcaller", { sharedEncounterDeck2: "corsairDeck", sharedQuestDeck2: "stormcallerQuests" }),
+      dreamChaser(5, "the-thing-in-the-depths", "The Thing in the Depths", { sharedEncounterDeck2: "encounterDeck2" }),
+      dreamChaser(6, "temple-of-the-deceived", "Temple of the Deceived", { sharedEncounterDeck2: "islandMap" }),
+      dreamChaser(7, "the-drowned-ruins", "The Drowned Ruins", { sharedEncounterDeck2: "grottoDeck", player1Play1: "setAside" }),
+      dreamChaser(8, "a-storm-on-cobas-haven", "A Storm on Cobas Haven", { sharedEncounterDeck2: "corsairDeck" }),
+      dreamChaser(9, "the-city-of-corsairs", "The City of Corsairs", { sharedEncounterDeck2: "corsairDeck", sharedEncounterDeck3: "encounterDeck2" }),
+    ],
+    bookletId: "dream-chaser",
+    bookletDoc: "dcce",
+    saga: false,
+    ledger: "dream-chaser",
   },
 ];
 

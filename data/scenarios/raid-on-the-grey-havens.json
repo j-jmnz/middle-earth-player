@@ -1,0 +1,167 @@
+{
+  "id": "raid-on-the-grey-havens",
+  "name": "Raid on the Grey Havens",
+  "number": 3,
+  "stages": [
+    "11036",
+    "11037"
+  ],
+  "encounterSets": [
+    {
+      "name": "Raid on the Grey Havens",
+      "count": 19
+    },
+    {
+      "name": "Corsair Raiders",
+      "count": 9
+    },
+    {
+      "name": "The Stormcaller Elite",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "11040",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11042",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11043",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11044",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11045",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11046",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11047",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11048",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11049",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11064",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11065",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11066",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11067",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11036",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11037",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11038",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11041",
+      "normal": 3,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11077",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11079",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignCard": "11182",
+  "campaignPlaced": [
+    "11180",
+    "11183",
+    "11184",
+    "11185",
+    "11186",
+    "11187",
+    "11188",
+    "11189",
+    "11190"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.3",
+    "dragnEasy": "E06.3",
+    "hobSlug": "Raid-on-the-Grey-Havens"
+  }
+}

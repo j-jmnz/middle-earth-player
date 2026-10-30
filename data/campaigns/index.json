@@ -18,6 +18,12 @@
     "playable": true
   },
   {
+    "id": "dream-chaser",
+    "name": "Dream-chaser",
+    "scenarioCount": 9,
+    "playable": false
+  },
+  {
     "id": "the-two-towers",
     "name": "The Two Towers",
     "scenarioCount": 6,
