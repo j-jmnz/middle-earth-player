@@ -41,6 +41,7 @@ export function CroppedArt({
   height,
   radius = 0,
   dim = false,
+  bare = false,
   children,
 }: {
   card: ArtCard | null;
@@ -51,6 +52,8 @@ export function CroppedArt({
   radius?: number;
   // Desaturate and darken the picture (ART_FILTER): a scene behind words. Never inside a list row.
   dim?: boolean;
+  // No fill under the picture: art on the page's ground, which must never show a hard-edged box while its picture loads or is missing.
+  bare?: boolean;
   // Laid over the picture: a fade, a name, a mark.
   children?: ReactNode;
 }) {
@@ -75,7 +78,7 @@ export function CroppedArt({
           : undefined
       }
       // A solid fill under the picture, never a gradient: a cropped picture is drawn inside list rows (docs/design-system.md, Performance).
-      style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, backgroundColor: palette.raised }}
+      style={{ width: width ?? "100%", height, overflow: "hidden", borderRadius: radius, backgroundColor: bare ? "transparent" : palette.raised }}
     >
       {card && source && crop ? (
         <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...(dim ? { filter: ART_FILTER } : {}) }}>
@@ -177,6 +180,7 @@ export function SceneArt({
   fade,
   fadeTo,
   vivid = false,
+  bare = false,
   children,
 }: {
   scenarioId: string | null | undefined;
@@ -188,12 +192,14 @@ export function SceneArt({
   fadeTo?: string;
   // Keep the scene's full colour: a small thumb in a list row, where no filter is drawn (Performance).
   vivid?: boolean;
+  // On the page's ground (HeroArt, GroundedScene): no fill under the picture (CroppedArt).
+  bare?: boolean;
   children?: ReactNode;
 }) {
   const { card, region, aspect } = useScenePicture(scenarioId);
   const t = useTableTokens();
   return (
-    <CroppedArt card={card} region={region} aspect={aspect} height={height} width={width} radius={radius} dim={!vivid}>
+    <CroppedArt card={card} region={region} aspect={aspect} height={height} width={width} radius={radius} dim={!vivid} bare={bare}>
       {shade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...topShade(shade, t) }} /> : null}
       {fade != null ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(fade, 1, fadeTo, t) }} /> : null}
       {children}
@@ -268,7 +274,7 @@ export function GroundedScene({ scenarioId, height, shade, fade, edge = false, c
       }}
     >
       <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...blend }}>
-        <SceneArt scenarioId={scenarioId} height={band} shade={shade} fade={fade} fadeTo={ground} />
+        <SceneArt scenarioId={scenarioId} height={band} shade={shade} fade={fade} fadeTo={ground} bare />
         {edge ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 96 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
       </View>
       {children}
@@ -301,7 +307,7 @@ export function HeroArt({ scenarioId, width, height, left, right }: { scenarioId
           middle is the picture alone with nothing over it, and from under the title down it falls to the ground. */}
       <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={{ ...box, ...blend }}>
         <View style={{ width, height: band }}>
-          <SceneArt scenarioId={scenarioId} width={width} height={band} />
+          <SceneArt scenarioId={scenarioId} width={width} height={band} bare />
           <View style={{ ...fill, backgroundImage: `linear-gradient(180deg, ${ground} 0%, ${withAlphaHex(ground, 0.85)} 9%, ${withAlphaHex(ground, 0)} 28%)` }} />
           <View style={{ ...fill, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(ground, 0)} 57%, ${withAlphaHex(ground, 0.55)} 76%, ${ground} 100%)` }} />
         </View>

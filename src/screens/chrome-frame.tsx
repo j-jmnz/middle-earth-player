@@ -14,7 +14,7 @@ import { usePalette } from "./palette-hook";
 import { GameIcon } from "../play/game-icon";
 import type { IconName } from "../play/icon-map";
 import { SheetCornersContext, SheetFrame } from "../play/sheet-paper";
-import { dropShadowOf, nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../play/surfaces";
+import { nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../play/size-class";
@@ -103,10 +103,17 @@ export function ScreenScroll({
  */
 export function FloatingBarShade({ shown, top }: { shown: boolean; top: number }) {
   const palette = usePalette();
-  const t = useTableTokens();
   const s = useUiScale();
   if (!shown) return null;
-  return <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, height: top + 60 * s, backgroundColor: withAlphaHex(palette.night, 0.94), boxShadow: dropShadowOf(t, 12, 24, 0.9) }} />;
+  // Solid behind the buttons, then falling to nothing below them: no hard edge where the shade stops (user request, 2026-10-30).
+  const height = top + 104 * s;
+  const solid = Math.round(((top + 56 * s) / height) * 100);
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: "absolute", left: 0, right: 0, top: 0, height, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(palette.night, 0.94)} ${solid}%, ${withAlphaHex(palette.night, 0)} 100%)` }}
+    />
+  );
 }
 
 /**
