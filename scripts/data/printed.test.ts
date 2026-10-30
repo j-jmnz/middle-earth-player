@@ -21,9 +21,10 @@ describe("printed-text ledger", () => {
     expect(scopeCodes().length).toBeGreaterThan(80);
   });
 
+  // With the scans cached it hashes each one, the Nightmare proxies' about 4 MB apiece: seconds under a full suite's load.
   it("names exactly the scans data/sources.json pins", () => {
     expect(verifyScans(ledger)).toEqual([]);
-  });
+  }, 60_000);
 
   it("writes apostrophes and plain quotes, one reading per line", () => {
     for (const entry of ledger.entries) {
