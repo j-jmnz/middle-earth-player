@@ -9,6 +9,7 @@ import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/fixture.ts";
 import { pushCardEffects } from "../rules/effect-frames.ts";
 import { settle } from "../rules/machine.ts";
+import { announceStageRevealed } from "../rules/families/nightmare.ts";
 import { reduce, startScenario } from "../rules/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { playOut } from "../../scripts/auto-player.ts";
@@ -100,5 +101,25 @@ describe("the quest's records on Nightmare", () => {
     const revealed = EFFECTS.filter((effect) => effect.id === "141029:whenRevealed:1");
     const after = settle(pushCardEffects({ ...state, window: null }, "whenRevealed", state.questStage ?? "", 0, false, revealed, ctx, []), ctx, []);
     expect(after.staging.map((id) => after.cards[id]?.code)).toContain("906303");
+  });
+
+  it("set the Pale-green Tentacles aside at Setup, and engage one with each player when the players advance to The Gates of Moria (906401:A:2, 906401:A:3)", () => {
+    const campaign = loadCampaign();
+    const seat = seatFor("fellowship-of-the-ring");
+    const world = loadWorld(catalog, campaign, loadScenario("the-ring-goes-south"), EFFECTS, [...seat.heroes, ...seat.deck]);
+    const ctx = contextOf(world);
+    const start = buildStart({ campaign, scenario: world.scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: seat.heroes, deck: seat.deck }], difficulty: "Nightmare", effects: world.effects, mode: "standalone" });
+    let state = startScenario(start, ctx);
+    while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+    const tentacles = (zone: string) => Object.values(state.cards).filter((card) => card.code === "906402" && card.zone === zone).length;
+    expect(tentacles("setAside")).toBe(4);
+    expect(tentacles("encounterDeck")).toBe(0);
+    const gates = state.questDeck.find((id) => state.cards[id]?.code === "142023") ?? "";
+    state = settle(announceStageRevealed({ ...state, window: null }, gates, ctx, []), ctx, []);
+    // The engagement may offer Responses: they are passed.
+    for (let guard = 0; guard < 10 && state.window?.kind === "response"; guard += 1) state = expectOk(reduce(state, { type: "Pass" }, ctx)).state;
+    expect(tentacles("engaged")).toBe(1);
+    expect(tentacles("encounterDeck")).toBe(3);
+    expect(state.encounterDiscard).toEqual([]);
   });
 });

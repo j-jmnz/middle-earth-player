@@ -26,6 +26,15 @@ export const VERBS = [
   // A marker on a When Revealed record, which does nothing when it runs: a Response on a card with this trait cannot cancel the card's effects
   // ("This effect cannot be canceled by the Ring-bearer's effect", 906208:A:1; rr.cancel). Read by the response window (rules/responses.ts).
   z.strictObject({ verb: z.literal("NotCanceledBy"), trait: z.string().min(1), ...when }),
+  // Every copy of the card with this code in the encounter deck and its discard pile is set aside, facedown, out of play ("Setup: Set each copy
+  // of Pale-green Tentacle aside, out of play", 906401:A:2).
+  z.strictObject({ verb: z.literal("SetAsideFromDeck"), code: z.string().min(1), ...when }),
+  // One set-aside copy of the card with this code is put into play engaged with the actor ("each player puts 1 copy of Pale-green Tentacle into
+  // play engaged with him", 906401:A:3; rr.engaged). Nothing happens with no copy set aside.
+  z.strictObject({ verb: z.literal("EngageSetAside"), code: z.string().min(1), ...when }),
+  // The enemy in the staging area with the lowest engagement cost becomes the picked card; the first player chooses among a tie
+  // (rr.first-player). Nothing is picked when there is none ("engage the lowest engagement cost enemy in the staging area", 906407:A:2).
+  z.strictObject({ verb: z.literal("PickLowestEngagement"), ...when }),
 ] as const;
 
 export const TRIGGERS = [

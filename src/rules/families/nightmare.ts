@@ -9,6 +9,10 @@ import { attackBarred } from "../constants.ts";
 import { effectsOf } from "../listen.ts";
 import { dealAttackShadow } from "./defense-listen.ts";
 import { dealForAttack } from "./south-watcher.ts";
+import { moveEncounter } from "./encounter-moves.ts";
+import { markPicked } from "./play-refs.ts";
+import { askTarget } from "../choices.ts";
+import { modifiedStat } from "../keywords.ts";
 import type { EngineStep } from "../intents.ts";
 import { runEffect, type ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
@@ -35,6 +39,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return instruction.card && instruction.to ? attachIfDamaged(state, instruction.card, instruction.to) : leaveForEnd(state, focus, steps);
     case "NotCanceledBy":
       return state;
+    case "SetAsideFromDeck":
+      return setAsideFromDeck(state, instruction.code);
+    case "EngageSetAside":
+      return engageSetAside(state, instruction.code, focus, ctx, steps);
+    case "PickLowestEngagement":
+      return pickLowestEngagement(state, focus, ctx, steps);
     default:
       return null;
   }
@@ -184,4 +194,35 @@ export function announceCanceled(state: ScenarioState, before: ScenarioState, ct
   if (state === before || !ctx.effects.some((effect) => effect.trigger === "whenRevealedCanceled")) return state;
   if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;
   return queueEvent(state, { trigger: "whenRevealedCanceled", seat: null });
+}
+
+// SetAsideFromDeck: each copy in the encounter deck or its discard pile goes out of play, set aside facedown (906401:A:2).
+function setAsideFromDeck(state: ScenarioState, code: string): ScenarioState {
+  let next = state;
+  for (const id of [...state.encounterDeck, ...state.encounterDiscard]) {
+    if (state.cards[id]?.code !== code) continue;
+    next = updateCard(moveCard(next, id, { zone: "setAside" }), id, { face: "down", controller: null });
+  }
+  return next;
+}
+
+// EngageSetAside: one set-aside copy enters play engaged with the actor, as an encounter card put into play (906401:A:3).
+function engageSetAside(state: ScenarioState, code: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = state.setAside.find((entry) => state.cards[entry]?.code === code);
+  if (!id || state.seats[focus.seat]?.eliminated) return state;
+  return moveEncounter(updateCard(state, id, { face: "up" }), id, "engaged", focus.seat, ctx, steps);
+}
+
+// PickLowestEngagement: the enemy in the staging area with the lowest engagement cost is picked; the first player chooses among a tie.
+function pickLowestEngagement(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const enemies = state.staging.filter((id) => ctx.cards.get(state.cards[id]?.code ?? "")?.type === "enemy");
+  const cost = (id: string): number => {
+    const card = state.cards[id];
+    return card ? modifiedStat(state, card, "engagementCost", ctx.cards) : Number.POSITIVE_INFINITY;
+  };
+  const low = Math.min(...enemies.map(cost), Number.POSITIVE_INFINITY);
+  const tied = enemies.filter((id) => cost(id) === low);
+  const chosen = focus.chosen && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
+  if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: "PickLowestEngagement" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
+  return markPicked(state, chosen ?? "");
 }

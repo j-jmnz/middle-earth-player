@@ -367,3 +367,23 @@ describe("Flight to the Ford Nightmare's vocabulary (906301:A:2, 906304:A:1; rr.
     expect(settle(state, fordCtx, []).stageCleared).toBe(true);
   });
 });
+
+describe("The Ring Goes South Nightmare's vocabulary (906401:A:2, 906407:A:2; rr.engaged, rr.first-player)", () => {
+  it("picks the enemy in the staging area with the lowest engagement cost, which the actor then engages", () => {
+    const { state: base } = table();
+    const far = spawn(base, "rider", { zone: "staging" });
+    const near = spawn(far.state, HORSEMAN, { zone: "staging" });
+    const engaged = settle(pushEffectFrame(near.state, { frame: "whenRevealed", sourceId: null, actor: 0, peril: false, effectId: "hunted", instructions: [{ verb: "PickLowestEngagement" }, { verb: "Engage", target: "picked" }], cancel: null, blockCancel: null }, []), ctx, []);
+    expect(engaged.cards[near.id]?.zone).toBe("engaged");
+    expect(engaged.cards[far.id]?.zone).toBe("staging");
+  });
+
+  it("sets every copy in the encounter deck and its discard pile aside, facedown", () => {
+    const { state: base } = table();
+    let state = deck(base, ["rider", "mist", "rider"]);
+    state = spawn(state, "rider", { zone: "encounterDiscard" }).state;
+    const set = runNightmare(state, { verb: "SetAsideFromDeck", code: "rider" }, { seat: 0, sourceId: null }, ctx, []);
+    expect(set?.setAside.map((id) => set.cards[id]?.code)).toEqual(["rider", "rider", "rider"]);
+    expect(set?.encounterDeck.map((id) => set.cards[id]?.code)).toEqual(["mist"]);
+  });
+});
