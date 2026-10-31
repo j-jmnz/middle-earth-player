@@ -176,15 +176,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~5.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~5.7K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~1.9K)
-  - 76–150 Open items (~2.7K)
+  - 76–151 Open items (~2.8K)
     - 78–90 Fixtures and Maestro (~490)
     - 91–117 Rules and engine (~770)
-    - 118–132 Screens and code (~590)
-    - 133–150 Phone and tablet checks (~850)
-  - 151–166 Standing decisions (~380)
+    - 118–133 Screens and code (~710)
+    - 134–151 Phone and tablet checks (~850)
+  - 152–167 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)
@@ -297,7 +297,6 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
-- `docs/plans/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.4K tok)
 
 ## Handovers
 
@@ -320,6 +319,7 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/rounded-chrome.md` — Rounded chrome: round controls, fewer boxes, fewer words (~3.7K tok)
 - `docs/plans/done/settings-theme-and-ui-scale.md` — Settings tab, UI scale, and Dark/Light theme (~5.2K tok)
 - `docs/plans/done/table-experience.md` — Table experience: next improvements (~4.4K tok)
+- `docs/plans/done/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.4K tok)
 - `docs/plans/done/tablets-and-hand-fan.md` — Tablet landscape, fanned hand scrub, no preview Close, table settings panel (~6.2K tok)
 
 ## Code to docs
