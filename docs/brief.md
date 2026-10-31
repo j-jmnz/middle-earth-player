@@ -353,6 +353,7 @@ Decisions this file owns:
 - Archery X: the engine totals X across every archery card as the combat phase begins, before the shadow cards are dealt, and the player distributes that total across legal characters; the first seat decides disputes; defense does not block it.
 - Indestructible and toughness X are defined here for enemies only. Extend them to another card type only when a card prints the keyword there, and cite that card.
 - A Permanent boon or burden is attached to one hero when earned and recorded on the log; it cannot be discarded while that hero is in play, and it leaves the game with the hero.
+- A "cannot attack" effect (Feint, Mr. Underhill 141017:A:3, every `BarAttack` record) used on an enemy already declared as an attacker against that player, before the attack deals its damage, ends that attack as a canceled one does (user decision, 2026-10-31): Mr. Underhill's only window against a Black Rider is after a failed Hide test has made it attack. An attack against another player goes on, and once the damage is dealt the attack ends normally.
 
 ## Fellowship of the Ring
 
@@ -366,7 +367,6 @@ Every scenario in the box starts the same way. The engine does it. Do not ask th
 - Only one Fellowship-sphere hero may be in play. No other version of Frodo may be a starting hero or in the deck.
 - Fellowship-sphere heroes cannot be used outside saga scenarios. The deck may still be saved. The briefing refuses them.
 - Two-handed: when the first-player token passes in refresh, the new first seat gains control of the attached Ring-bearer, the resources in that hero's pool, and every card attached to that hero. If that transfer leaves a seat with no heroes, that seat is eliminated immediately.
-- A "cannot attack you" effect used on an enemy already declared as an attacker against that player ends that attack, as a canceled one does (Mr. Underhill, 141017:A:3, used after a failed Hide test has made a Black Rider attack; user decision, 2026-10-31). An attack against another player goes on.
 
 | # | Scenario id | Difficulty | Encounter sets and extra rules, from the booklet |
 | --- | --- | --- | --- |

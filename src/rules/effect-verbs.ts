@@ -91,10 +91,11 @@ export function applyTargetVerb(
       const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
       if (!sourceId) return state;
       const next: ScenarioState = { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: instruction.until ?? "endOfRound", seat: barred }] };
-      // Used once the enemy is declared as an attacker against that player (Mr. Underhill after a failed Hide test, 141017:A:3), the
-      // attack it is making ends there, as a canceled one does (user decision, 2026-10-31; brief, Fellowship of the Ring).
+      // Every "cannot attack" bar (Mr. Underhill after a failed Hide test, 141017:A:3; Feint): used once the enemy is declared as an attacker
+      // against that player and before its damage is dealt, the attack ends there, as a canceled one does (user decision, 2026-10-31; brief,
+      // Keywords implemented once). After the damage the attack has happened, and its end (readies, "after ~ defends") goes on.
       const attack = state.pendingAttack;
-      return attack?.enemyId === id && attack.seat === barred ? cancelAttack(next) : next;
+      return attack?.enemyId === id && attack.seat === barred && !attack.damaged ? cancelAttack(next) : next;
     }
     case "PlaceProgressOnLocation":
       return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps);

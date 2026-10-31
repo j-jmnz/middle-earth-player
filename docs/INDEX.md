@@ -53,7 +53,7 @@ Read the sections your task touches.
   - 195–200 Effects (~520)
   - 201–233 Scenario definition (~750)
   - 234–254 Persistence (~1.3K)
-  - 255–260 Images (~850) ← 6
+  - 255–260 Images (~860) ← 6
   - 261–309 Screens (~3.7K) ← 1
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
@@ -66,7 +66,7 @@ Read the sections your task touches.
   - 84–112 Stack (~810)
   - 113–130 Performance and feel (~750)
   - 131–148 Repository layout (~440)
-  - 149–356 Domain (~8.9K)
+  - 149–357 Domain (~9.0K)
     - 151–218 Campaign (~1.6K) ← 1
     - 219–233 Mirkwood campaign cards and carry-over (~870)
     - 234–245 Standalone play (~790)
@@ -74,8 +74,8 @@ Read the sections your task touches.
     - 258–290 The engine plays the game (~2.1K) ← 2
     - 291–298 Engine steps (~180)
     - 299–327 Core round (~1.3K) ← 1
-    - 328–356 Keywords implemented once (~1.5K)
-  - 357–515 Fellowship of the Ring (~10.5K)
+    - 328–357 Keywords implemented once (~1.6K)
+  - 358–515 Fellowship of the Ring (~10.4K)
     - 382–396 Scenario 1 resolution (~370)
     - 397–410 A Knife in the Dark (~1.6K) ← 1
     - 411–414 Hide tests (~130)
@@ -109,7 +109,7 @@ Read the sections your task touches.
   - 27–32 Quest scale (~320)
   - 33–36 Canvas (~480)
   - 37–44 Spacing and the play area's rows (~850) ← 2
-  - 45–50 Pictures on the table (~290)
+  - 45–50 Pictures on the table (~300)
   - 51–60 Cards (~850) ← 1
   - 61–64 Tokens and effects (~320)
   - 65–68 Piles (~170)
@@ -173,15 +173,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~4.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~4.6K tok)
   - 5–15 Rules (~470)
   - 16–61 Phases (~1.3K)
-  - 62–125 Open items (~2.3K)
+  - 62–126 Open items (~2.3K)
     - 64–74 Fixtures and Maestro (~360)
     - 75–93 Rules and engine (~540)
     - 94–108 Screens and code (~600)
-    - 109–125 Phone and tablet checks (~780)
-  - 126–141 Standing decisions (~380)
+    - 109–126 Phone and tablet checks (~820)
+  - 127–142 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)

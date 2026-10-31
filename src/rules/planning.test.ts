@@ -334,4 +334,17 @@ describe("planning turns and passing", () => {
     run = expectOk(reduce(run.state, { type: "PlayCard", cardId: mine.id, payments: [{ heroId: a.id, amount: 2 }] }, local));
     expect(run.state.cards[mine.id]?.zone).toBe("play");
   });
+
+  it("ends the phase when the last seat in player order is eliminated in its own planning window (rr.step-2-3)", () => {
+    const gimli = hero("gimli", "leadership");
+    const local = { effects: [], cards: cardMap([leadership, gimli]) };
+    let state = blankScenario({ seatCount: 2, seed: 3, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    state = spawn(a.state, "gimli", { zone: "heroes", seat: 1 }).state;
+    const seats: ScenarioState["seats"] = [state.seats[0], { ...state.seats[1], eliminated: true }];
+    state = { ...state, seats, phase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0, planningSeat: 1, passed: [] };
+    const run = expectOk(reduce(state, { type: "Pass" }, local));
+    expect(run.state.mode).not.toBe("planning");
+    expect(run.state.planningSeat).toBeNull();
+  });
 });

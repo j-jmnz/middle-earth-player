@@ -65,9 +65,10 @@ const keyOf = (boxes: ReadonlyMap<string, Box>) => [...boxes].map(([code, box]) 
 const FRAME_BUDGET = 6;
 
 // How many copies of codes the table no longer draws are kept, the ones it drew last: in two-handed play the table turns to the other
-// seat on every pass, and turned back its cards are drawn at once instead of as their names while they decode again. A hand card's copy
-// at 3x is about 1 MB, so this keeps a few MB more than the table shows.
-const PARKED = 10;
+// seat on every pass, and turned back its cards are drawn at once instead of as their names while they decode again. Enough for one seat's
+// zones (three heroes with their attachments and allies, a full hand). A hand card's copy at 3x is under 1 MB and a play-area card's a
+// fifth of that, so this holds up to about 10 MB more than the table shows (the 16 MB test counts only what it shows).
+export const PARKED = 20;
 
 // The copies a closed or new table holds: one object, so a state set to it again is no change.
 const NONE: ReadonlyMap<string, SkImage> = new Map();
