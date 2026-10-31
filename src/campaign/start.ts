@@ -45,7 +45,7 @@ export type StartInput = {
 // encounter deck shuffle, which the piles cannot express.
 const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer"]);
 // The campaign card's Setup verbs that name the ships the quest card's Setup prepares: they resolve in a frame after it (ScenarioDefinition.afterSetup).
-const AFTER_SETUP_VERBS: ReadonlySet<string> = new Set(["FitShips", "TradeShipDamage", "AttachSetAsideTo", "TradeDamageForThreat", "FlipStormcaller", "PutSetAsideInPlay"]);
+const AFTER_SETUP_VERBS: ReadonlySet<string> = new Set(["FitShips", "TradeShipDamage", "AttachSetAsideTo", "TradeDamageForThreat", "FlipStormcaller", "FlipSetAside", "PutSetAsideInPlay"]);
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;

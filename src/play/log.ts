@@ -1,5 +1,6 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
+import { grappleLine } from "./grapple-words.ts";
 import type { Cause } from "../rules/cause.ts";
 import type { EngineStep } from "../rules/intents.ts";
 
@@ -109,6 +110,9 @@ function words(step: EngineStep, names: LogNames): string | null {
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
       return `${names.card(step.cardId)} is canceled`;
+    // The enemy is facedown now: the line names the location, never the enemy (dcce.grapple).
+    case "grapple":
+      return grappleLine(names.card(step.locationId));
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
   }

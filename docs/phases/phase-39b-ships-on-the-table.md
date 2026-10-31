@@ -123,7 +123,6 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 | Phase | Element | Shared (39b) | The scenario phase adds |
 | --- | --- | --- | --- |
 | 40 | Ships, Heading, Corsair deck, Boarding, Sailing | everything above | the setup picks: Modification per ship, "deal 2 damage to a ship for 1 resource"; its cards' words |
-| 44 | Grapple | staging stacks: one peek with a count | the facedown arms under their location, the location's threat pill (+2 per arm, from the engine), "Grappled: 2 facedown enemies" in the preview, the detach flip into staging |
 | 45 | Island Map | the second slot; reading panels | see below |
 | 46 | Grotto deck | the second slot, one deck alone | `grottoDeck` showing its top card's Grotto face, since players may look at it (`dcce.grotto-deck`); a long press previews that face only; explored Grotto locations glide back to the deck, and Underwater ones go to the victory display |
 | 47 | Raider Flagship, four towers, Dol Amroth Warships | ship-enemies; Guarded pairs (Cards); fold order; ships first | the towers' words; freed towers as cards the players control in staging, whose Actions reach the action window's tray when folded; Send for Help set aside and not drawn |

@@ -18,7 +18,8 @@ import { flagged, livingSeats, updateCard, updateCards, withMode } from "./state
 import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 import { placeQuestingProgress } from "./families/defense-damage.ts";
-import { freeSlot, placeOnActive } from "./families/south-locations.ts";
+import { travelsOverActive } from "./families/grapple-travel.ts";
+import { freeSlot, makeActiveIn, placeOnActive } from "./families/south-locations.ts";
 import { noteQuestPlaced, questRoom } from "./families/caves-progress.ts";
 import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts";
 import { viewOf, withView } from "./families/breaking-areas.ts";
@@ -271,11 +272,12 @@ export function clearCommitted(state: ScenarioState): ScenarioState {
 export function travelTo(state: ScenarioState, locationId: string, cards: Cards): ScenarioState | null {
   // A second active location slot may be free (families/south-locations.ts).
   const slot = freeSlot(state);
-  if (!slot) return null;
+  // With no slot free the active location returns to the staging area when a stage lets the players travel anyway (12041:B:1).
+  if (!slot && !travelsOverActive(state)) return null;
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
   if (printedOf(cards, instance.code).type !== "location") return null;
-  return moveCard(state, locationId, { zone: slot });
+  return slot ? moveCard(state, locationId, { zone: slot }) : makeActiveIn(state, locationId);
 }
 
 // The locations in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking-areas.ts).

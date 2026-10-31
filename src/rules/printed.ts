@@ -60,6 +60,8 @@ export type Keywords = {
   uncharted: boolean;
   // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
   aflame: number | null;
+  // Grapple (dcce.grapple): the location in the staging area the enemy attaches to, facedown, when it is revealed; null when the card prints none.
+  grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -120,12 +122,13 @@ const EMPTY_KEYWORDS: Keywords = {
   sailingSuccess: null,
   uncharted: false,
   aflame: null,
+  grapple: null,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable).
 function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
   if (back?.attack == null || back.defense == null || back.health == null) return null;
-  return { ...(back.willpower != null ? { willpower: back.willpower } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
+  return { ...(back.willpower != null ? { willpower: back.willpower } : {}), ...(back.threat != null ? { threat: back.threat } : {}), ...(back.engagementCost != null ? { engagementCost: back.engagementCost } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
 }
 
 // The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
@@ -298,6 +301,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       sailingSuccess: keywords.sailingSuccess ?? null,
       uncharted: keywords.uncharted === true,
       aflame: keywords.aflame ?? null,
+      grapple: keywords.grapple ?? null,
     },
   });
 }

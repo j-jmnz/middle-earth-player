@@ -3,6 +3,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { grantedTravel } from "./families/grapple-travel.ts";
 import { modifiedStat } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -65,7 +66,7 @@ export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[]
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
-  const instructions = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "travel").flatMap((effect) => effect.instructions);
+  const instructions = [...ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
   return instructions.some((instruction) => {
       // "A player at this staging area must engage an enemy in any staging area to travel here" (142079:A:1): an enemy to engage must be in some staging area.
       if (instruction.verb === "Engage" && instruction.target === "picked") {

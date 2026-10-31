@@ -19,6 +19,7 @@ import { attachTo, moveCard } from "./zones.ts";
 import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
 import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
 import { stagingDest } from "./families/breaking-areas.ts";
+import { grapplesOnReveal, pushGrapple } from "./families/grapple-attach.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -130,6 +131,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // The lasting effects that watch the reveals act on the card; one may discard it, ending its staging.
       next = watchReveal(next, frame, ctx, steps);
       if (next.stack.length < state.stack.length) return next;
+      // An enemy with Grapple attaches to a location in the staging area as it is revealed, and is not added to the staging area (dcce.grapple).
+      if (grapplesOnReveal(next, id, ctx)) return pushGrapple(patchTop(next, { step: 1 }), id, seat, steps);
       // "After an enemy is added to the staging area" hears the card arrive.
       next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });

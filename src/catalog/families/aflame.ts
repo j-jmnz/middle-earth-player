@@ -21,7 +21,8 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("EarnDealt"), codes: z.array(z.string().min(1)).min(1), ...when }),
   // "Add Na'asiyah and Captain Sahír to the staging area, enemy side faceup" (11037:A:1): the set-aside card with this code joins the staging area, announced as added to it (its Forced effects hear that,
   // "Captain Sahír engages the first player"), and enters play. It is not revealed (rr.staging).
-  z.strictObject({ verb: z.literal("StageSetAside"), code: z.string().min(1), ...when }),
+  // `name` in place of `code`: the set-aside card with this title, for a card a campaign game deals as its reprint (The Thing in the Depths 12049, 110063; 12040:B:1).
+  z.strictObject({ verb: z.literal("StageSetAside"), code: z.string().min(1).optional(), name: z.string().min(1).optional(), ...when }),
   // "Remove Calphon and each attachment on him from the game, ignoring his 'leaves play' ability" (11182:A:3): the card in play with this title and the cards attached to it leave the game, and none of them
   // is announced as leaving play, so no "If ~ leaves play" ability triggers. The campaign pool is left alone.
   z.strictObject({ verb: z.literal("RemoveNamedFromGame"), name: z.string().min(1), ...when }),

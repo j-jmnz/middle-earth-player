@@ -41,7 +41,11 @@ function instructionCodes(effects: readonly Effect[], card: string): string[] {
 export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
   const codes = new Set<string>(campaign.prelude.map((card) => card.code));
   codes.add(scenario.campaignCard);
-  for (const card of scenarioCards(scenario)) codes.add(card.code);
+  // A card with two catalog codes (the Stormcaller Elite) is dealt as its first side; the other side is in the world for the flip.
+  for (const card of scenarioCards(scenario)) {
+    codes.add(card.code);
+    if (card.back != null) codes.add(card.back);
+  }
   for (const code of scenario.campaignPlaced) codes.add(code);
   // The reprints a campaign game deals in place of the originals, and the Hard/Expert Mode card (campaignGameCodes).
   for (const code of campaignGameCodes(campaign, scenario)) codes.add(code);

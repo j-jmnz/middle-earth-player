@@ -67,7 +67,9 @@ export type ZoneName =
   | "modeCard"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
   // nobody. The card's host is the Watcher.
-  | "captive";
+  | "captive"
+  // An enemy attached facedown to a location in the staging area by Grapple (dcce.grapple): in play, not in the staging area, controlled by nobody. The card's host is the location.
+  | "grappled";
 
 export type CardFace = "up" | "down" | "A" | "B";
 
@@ -326,7 +328,7 @@ export type ScenarioState = {
   // The Hard/Expert Mode card to put next to the quest deck at the end of setup (dcce.hard-expert); finishSetup places it.
   modeCard?: { code: string; side: "A" | "B" };
   // The cards the campaign card's Setup let each seat choose and the Resolution earns (Galdor's Counsel, 11182:A:2): the code and the seat that chose it, whether the copy is now in a hand, in play, in a
-  // discard pile or in the victory display. Their number is the "for each of those copies" an amount reads (`plusChosen`); absent in a game with none.
+  // discard pile or in the victory display, and the cards a Forced effect of the campaign card gave (11194:A:3). Their number is the "for each of those copies" an amount reads (`plusChosen`); absent in a game with none.
   chosenAtSetup?: readonly { code: string; seat: number }[];
   // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
   // dropped when the opening hands are final.
@@ -537,7 +539,8 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "campaign" ||
     zone === "nightmare" ||
     zone === "modeCard" ||
-    zone === "captive"
+    zone === "captive" ||
+    zone === "grappled"
   );
 }
 

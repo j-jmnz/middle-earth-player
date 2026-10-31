@@ -16,6 +16,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { grappleAsk, grappleOptionLabel } from "./grapple-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
 import { branchNow, dealtNow } from "./aflame-words.ts";
@@ -270,7 +271,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const tradeAsk = trade && traded ? { verb: "Trade", prompt: tradeWords(game, ctx.cards, trade, names.card(traded.id), effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"))) } : null;
       // What the instruction after the pick deals or places, read now (the damage, progress or resources a prompt and a row state).
       const amountNow = wait?.kind === "target" ? dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source) : undefined;
-      const asked = wait?.kind === "target" ? (tradeAsk ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow)) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? (tradeAsk ?? (wait.item.instruction ? grappleAsk(wait.item.instruction, source, words) : null) ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow)) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
@@ -283,7 +284,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? unchartedOptionLabel(wait.item.instruction, id, game, words)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? unchartedOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;

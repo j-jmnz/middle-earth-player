@@ -66,6 +66,9 @@ export const cardSchema = z.strictObject({
       attack: z.number().int().optional(),
       defense: z.number().int().optional(),
       health: z.number().int().optional(),
+      // The Threat and engagement cost the other side prints when they differ from the front's (the Thing in the Depths' Campaign Mode only side, Sea Serpent's Enraged side).
+      threat: z.number().int().optional(),
+      engagementCost: z.number().int().optional(),
       // The Victory the Campaign Mode only side of the Stormcaller prints (15; side A prints 10): the score counts the side the card was on (dcce.campaign-mode).
       victory: z.number().int().optional(),
     })

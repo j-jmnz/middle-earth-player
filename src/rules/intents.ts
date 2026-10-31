@@ -31,6 +31,8 @@ export type EngineStep =
   // after it.
   | { kind: "strike"; side: "enemy" | "player"; enemyId: string; targetId: string; attack: number; defense: number; undefended: boolean; cause: Cause }
   | { kind: "cancel"; cardId: string }
+  // An enemy attached itself facedown to a location in the staging area (dcce.grapple): the enemy is not named, it is facedown now.
+  | { kind: "grapple"; enemyId: string; locationId: string }
   | { kind: "resetEncounterDeck"; count: number; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };

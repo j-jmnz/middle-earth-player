@@ -30,7 +30,7 @@ export type StormcallerFixture = { campaignId: string; seatCount: 2; loadout: St
 export type StormcallerFixtureName = "stormcaller-won" | "stormcaller-lost";
 
 // The log of a playthrough whose first three parts were won: the Voyage and Fate goldens' wins (scripts/e2e-raid.ts), then the Raid golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
-async function raidWonLog(): Promise<CampaignLog> {
+export async function raidWonLog(): Promise<CampaignLog> {
   const before = await fateWonLog();
   const raid = RAID_GOLDENS.find((item) => item.name === "two-handed, won");
   if (!raid) throw new Error("The Raid golden \"two-handed, won\" is gone");

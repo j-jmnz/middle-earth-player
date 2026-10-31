@@ -58,7 +58,7 @@ export function chooseEach(state: ScenarioState, item: QueueItem, frame: Pick<Fr
   const data = topFrame(state)?.data;
   if (instruction.verb !== "Each" || instruction.upTo == null || data?.kind !== "effect") return state;
   const taken = item.chosen && item.chosen !== DONE ? [...(instruction.taken ?? []), item.chosen] : [...(instruction.taken ?? [])];
-  const limit = instruction.upTo === "any" ? Number.POSITIVE_INFINITY : instruction.upTo;
+  const limit = instruction.upTo === "any" ? Number.POSITIVE_INFINITY : typeof instruction.upTo === "number" ? instruction.upTo : resolveAmount(state, instruction.upTo, frameScope(state, item.seat, frame.cardId), ctx);
   const options = item.chosen === DONE || taken.length >= limit ? [] : remaining(state, instruction, taken, item.seat, frame.cardId, ctx);
   if (options.length > 0) return askTarget(state, { ...item, instruction: { ...instruction, taken }, chosen: null }, [...distinctByCode(state, options), DONE]);
   const cause = item.cause ? { cause: item.cause } : {};

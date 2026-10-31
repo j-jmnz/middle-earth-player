@@ -264,6 +264,61 @@
     },
     {
       "match": {
+        "code": "12040"
+      },
+      "set": {
+        "questPoints": null
+      },
+      "reason": "Hall of Beorn prints 0 quest points for Change of Plans. The stage has none: its When Revealed advances the players to stage 3, and a stage with 0 quest points would be completed as it is revealed.",
+      "source": "12040:B in data/printed/dream-chaser.json; HoB QuestCards.json lists 0 where Sahír's Advance lists '-'"
+    },
+    {
+      "match": {
+        "code": "12041"
+      },
+      "set": {
+        "questPoints": null
+      },
+      "reason": "Hall of Beorn prints 0 quest points for Defend the Ship!. It is the last stage and has none: the players win only when The Thing in the Depths is destroyed (12041:B:3), and a final stage with 0 quest points would be won as it is revealed.",
+      "source": "12041:B in data/printed/dream-chaser.json; HoB QuestCards.json lists 0 where Sahír's Advance lists '-'"
+    },
+    {
+      "match": {
+        "code": "110063"
+      },
+      "set": {
+        "back": {
+          "threat": 3,
+          "engagementCost": 50,
+          "attack": 6,
+          "defense": 0,
+          "health": 4,
+          "victory": 15
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for the Campaign Mode only side of The Thing in the Depths. The scan prints Engagement cost 50, Threat 3, Attack 6, no Defense (0), 4 hit points and Victory 15 on it (the ledger notes of 110063.B record the reading), against Threat 2, Attack 5, 8 hit points and Victory 10 on side A; the score counts the Victory of the side the card was on.",
+      "source": "scan 110063.B, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11196"
+      },
+      "set": {
+        "engagementCost": 40,
+        "back": {
+          "threat": 0,
+          "engagementCost": 0,
+          "attack": 8,
+          "defense": 0,
+          "health": 8,
+          "victory": 8
+        }
+      },
+      "reason": "Hall of Beorn has no engagement cost for Sea Serpent and none of the Enraged side's stats. The scan prints Engagement cost 40, Threat X, Attack 6, Defense X and 6 hit points on the Menacing side, and Engagement cost 0, Threat X, Attack 8, Defense X, 8 hit points and Victory 8 on the Enraged side (the ledger notes record the reading). X is the number of players (twice that on side B), which the card's text adds to the printed 0 of Threat and Defense.",
+      "source": "scan 11196.A and 11196.B, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
         "code": "11076"
       },
       "set": {

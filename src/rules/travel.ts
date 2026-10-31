@@ -1,9 +1,10 @@
 // Rules: rr.travel, rr.active-location, rr.step-4-2, ltp.phase-4-travel, ltp.traveling-to-locations (data/rules/entries.json).
 import type { Instruction } from "../catalog/boundary.ts";
 
-import { effectCause } from "./cause.ts";
+import { effectCause, ruleCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import { textBlank } from "./families/attachments-hold.ts";
+import { grantedTravel } from "./families/grapple-travel.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { travelTo } from "./quest.ts";
@@ -49,7 +50,9 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
   // A location whose printed text box is blank has no Travel effect (rr.blank).
   const effects = textBlank(state, locationId) ? [] : ctx.effects.filter((effect) => effect.cardCode === location.code && effect.timing === "travel");
   const first = effects[0];
-  if (!first) {
+  // A Travel cost another card gave the location comes after its own (families/grapple-travel.ts).
+  const granted = grantedTravel(state, locationId);
+  if (!first && granted.length === 0) {
     // Once stages are separate the seat travels to its own active location (families/breaking-areas.ts).
     let refused = false;
     const traveled = withView(state, state.separate ? state.activeSeat : undefined, (view) => {
@@ -67,9 +70,9 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
       // The seat that travels, once stages are separate; the first player otherwise (rr.first-player).
       actor: state.separate ? state.activeSeat : state.firstPlayer,
       peril: false,
-      effectId: first.id,
-      instructions: [...effects.flatMap((effect) => effect.instructions), TRAVEL_HERE],
-      causes: effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
+      effectId: first?.id ?? `${location.code}:travel`,
+      instructions: [...effects.flatMap((effect) => effect.instructions), ...granted, TRAVEL_HERE],
+      causes: [...effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))), ...granted.map(() => ruleCause("rr.travel"))],
       cancel: null,
       blockCancel: null,
     },

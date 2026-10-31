@@ -23,6 +23,7 @@ import { useTableGestures } from "./hand-gestures.native.ts";
 import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
 import { pictureKey } from "./picture-key.ts";
 import { areaFacts, areaSpeech } from "./stormcaller-table.ts";
+import { grappleDetail } from "./grapple-words.ts";
 import { stagePill } from "./stormcaller-words.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "./selectors.ts";
@@ -140,7 +141,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const numbers = info(game, seat, slot.id);
     // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
     if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
-    return numbers.under ? `${nameOf(slot.picture ?? slot.code)}, ${numbers.under.speech}` : null;
+    const grappled = grappleDetail(game, slot.id);
+    return numbers.under ? `${nameOf(slot.picture ?? slot.code)}, ${numbers.under.speech}` : grappled ? `${nameOf(slot.picture ?? slot.code)}, ${grappled}` : null;
   };
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.
   const stageFacts = areaFacts(game);

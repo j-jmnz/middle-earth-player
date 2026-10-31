@@ -1,4 +1,5 @@
 import { BURN_CODE, encounterHolds, underBurnHolds } from "./families/aflame-values.ts";
+import { locationThreatHolds } from "./families/grapple-values.ts";
 import type { Condition } from "../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
@@ -172,7 +173,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
     case "versusDefender": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
-      return holder != null && versusDefender(state, holder, condition.maxHitPoints, ctx.cards);
+      return holder != null && versusDefender(state, holder, condition, ctx.cards);
     }
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
@@ -307,6 +308,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return underBurnHolds(state, condition, ctx);
     case "corsairHas":
       return corsairHolds(state);
+    case "locationThreat":
+      return locationThreatHolds(state, condition, ctx);
     case "revealing":
       return state.stack.some((frame) => frame.frame === "whenRevealed" && frame.cardId === scope.sourceId);
     case "not":

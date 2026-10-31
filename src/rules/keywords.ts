@@ -18,47 +18,14 @@ import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hoo
 import { alliesToHandDestination } from "./families/deck-rules.ts";
 import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
 import { placedLimit } from "./families/uncharted-limit.ts";
-import { LOST_ISLAND_THREAT } from "./families/uncharted-pick.ts";
 import { discardArea } from "./families/breaking-areas.ts";
+import { grappleThreat } from "./families/grapple-values.ts";
+import { printedStat, victoryOf } from "./printed-stat.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
 
-type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
-
-// The printed value of a stat, on the side the card shows: a ship-objective dealt on its Upgraded side prints that side's stats (dcce.scalable-upgradable).
-export function printedStat(printed: PrintedCard, stat: ModifierStat, face?: CardInstance["face"]): number {
-  // The Lost Island side of a double-sided location prints a Threat and no quest points (dcce.uncharted).
-  if (face === "B" && printed.keywords.uncharted && (stat === "threat" || stat === "questPoints")) return stat === "threat" ? LOST_ISLAND_THREAT : 0;
-  const upgraded = face === "B" ? printed.upgraded : null;
-  if (upgraded) {
-    switch (stat) {
-      case "willpower":
-        if (upgraded.willpower != null) return upgraded.willpower;
-        break;
-      case "attack":
-      case "defense":
-        return upgraded[stat];
-      case "hitPoints":
-        return upgraded.health;
-      default:
-        break;
-    }
-  }
-  switch (stat) {
-    case "willpower":
-    case "attack":
-    case "defense":
-    case "threat":
-    case "questPoints":
-    case "engagementCost":
-      return printed[stat satisfies CardStat] ?? 0;
-    case "hitPoints":
-      return printed.health ?? 0;
-    default:
-      return 0;
-  }
-}
+export { printedStat };
 
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
@@ -86,7 +53,8 @@ export function modifiedStat(
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);
-  let total = printedStat(printed, stat, instance.face);
+  // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
+  let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2).
   let floor = total;
@@ -94,7 +62,7 @@ export function modifiedStat(
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
-    if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when.maxHitPoints, cards)) continue;
+    if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack-strike.ts).
@@ -133,12 +101,14 @@ export function versusHighEngagement(
 }
 
 // The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).
-export function versusDefender(state: ScenarioState, holder: CardInstance, maxHitPoints: number, cards: ReadonlyMap<string, PrintedCard>): boolean {
+// With `ally`, the defender is an ally (12054:A:2).
+export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const attack = state.pendingAttack;
   if (!attack || attack.enemyId !== holder.id || attack.defenderId == null || attack.undefended) return false;
   const defender = state.cards[attack.defenderId];
-  const health = defender ? printedOf(cards, defender.code).health : null;
-  return health != null && health <= maxHitPoints;
+  const printed = defender ? printedOf(cards, defender.code) : null;
+  if (printed == null || (versus.ally === true && cardTypeOf(defender!, printed) !== "ally")) return false;
+  return versus.maxHitPoints == null || (printed.health != null && printed.health <= versus.maxHitPoints);
 }
 
 // A character's defense as the defender of the attack in progress, read as if it were declared, so a modifier that holds
@@ -215,7 +185,7 @@ export function playerCardEffectCanChoose(printed: PrintedCard, state?: Scenario
 
 // An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).
 function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
-  return printed.type === "enemy" && printed.keywords.indestructible && !flagged(state, id, "losesKeywords");
+  return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords");
 }
 
 export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause): ScenarioState {
@@ -257,7 +227,8 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
     next = destroyCard(next, id, cards, steps, false, true);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
-    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
+    // The event's amount is the Threat the enemy had as it was destroyed, which a Forced effect reads as its X ("equal to that enemy's Threat", 12049:A:4).
+    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id, amount: modifiedStat(state, instance, "threat", cards) });
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
@@ -312,7 +283,7 @@ export function defeatedDestination(
   instance: CardInstance,
   printed: PrintedCard,
 ): Destination {
-  if ((printed.type === "enemy" || printed.type === "location") && printed.victory != null) {
+  if ((printed.type === "enemy" || printed.type === "location") && victoryOf(instance, printed) != null) {
     return { zone: "victory" };
   }
   // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives-claimed.ts).

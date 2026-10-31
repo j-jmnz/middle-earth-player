@@ -22,7 +22,7 @@ import { markDefender, moreDefenders } from "./families/defense-defenders.ts";
 import { holdAttack, queueHeard } from "./families/defense-listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/attack-flow.ts";
 import { countsDefense, struck } from "./families/attack-strike.ts";
-import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations } from "./families/south-watcher.ts";
+import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "./families/south-watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
 import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong } from "./families/sea-ships.ts";
 
@@ -111,10 +111,11 @@ export function beginEnemyAttack(
   fromStaging = false,
 ): ScenarioState {
   const attacker = state.cards[enemyId];
-  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || (fromStaging && attacker.zone === "staging"));
+  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && attacker.zone === "staging"));
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  const dealt = engagedWithAll(state, enemyId) ? dealForAttack(state, enemyId, steps) : state;
+  // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
+  const dealt = engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging) ? dealForAttack(state, enemyId, steps) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {

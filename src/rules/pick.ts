@@ -26,6 +26,7 @@ import { canDeclareDefender, isDefending } from "./families/defense-defenders.ts
 import { facedownShadow } from "./families/defense-shadow.ts";
 import { deckPool, unchartedPickMatches } from "./families/uncharted-pick.ts";
 import { aflamePickMatches, lowestAflame } from "./families/aflame-pick.ts";
+import { sidePickMatches } from "./families/grapple-values.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -166,7 +167,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
   // The uncharted family's filters: a Lost Island, progress enough (families/uncharted-pick.ts).
-  if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx)) return false;
+  if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx) || !sidePickMatches(state, id, spec)) return false;
   if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
   // event's card, printed hit points, the top of a discard pile (families/attack-pick.ts).

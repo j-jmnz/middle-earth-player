@@ -27,6 +27,9 @@ const healedOrReadied = (id: number, trigger: "healed" | "readied"): Effect => (
   instructions: [{ verb: "RaiseThreat", amount: 1 }],
 });
 
+// "If you control a <sphere> hero" (11195:A:2 to A:5).
+const controlsHero = (sphere: "leadership" | "tactics" | "spirit" | "lore") => ({ kind: "count", pick: { type: "hero", control: "you", sphere }, min: 1 }) as const;
+
 // A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one; as in families/sidequests.ts).
 const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
 
@@ -328,6 +331,59 @@ export const RECORDS: readonly Effect[] = [
   {"id":"11178:constant:2","cardCode":"11178","lines":["11178:A:1"],"timing":"constant","condition":{"kind":"all","conditions":[{"kind":"sourceIn","zone":"victory"},{"kind":"matches","card":"self","pick":{"type":"card","control":"any","minResources":3,"from":"victory"}}]},"instructions":[{"verb":"ModifyStat","stat":"gainsVictory","amount":3,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"11178:forced:1","cardCode":"11178","lines":["11178:A:2"],"timing":"forced","trigger":"engaged","subject":"self","eventSeat":"you","instructions":[{"verb":"AddResources","amount":1,"to":"self"}]},
   {"id":"11178:forced:2","cardCode":"11178","lines":["11178:A:2"],"timing":"forced","trigger":"endOfPhase","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Combat"},{"kind":"sourceIn","zone":"engaged"}]},"instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]},
+
+  // 11195 Come Together (event the campaign card of The Thing in the Depths adds to a hand; Scalable): Action, X is its level (plus 1 when the campaign card gave it this game): choose up to X characters; it joins
+  // the victory display; until the end of the round each of them gets +2 Defense with a Leadership hero, +2 Attack with a Tactics hero, +2 Willpower with a Spirit hero, and with a Lore hero gains a Trait of the
+  // player's choice and heals 2 damage.
+  {
+    id: "11195:action:1",
+    cardCode: "11195",
+    lines: ["11195:A:1", "11195:A:2", "11195:A:3", "11195:A:4", "11195:A:5"],
+    timing: "action",
+    cost: { kind: "playEvent" },
+    instructions: [
+      {
+        verb: "Each",
+        pick: { type: "character", control: "any" },
+        upTo: { level: true, plusChosen: true },
+        instructions: [
+          { verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfRound", target: "picked", when: controlsHero("leadership") },
+          { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfRound", target: "picked", when: controlsHero("tactics") },
+          { verb: "ModifyStat", stat: "willpower", amount: 2, until: "endOfRound", target: "picked", when: controlsHero("spirit") },
+          { verb: "GainChosenTrait", when: controlsHero("lore") },
+          { verb: "Heal", amount: 2, target: "picked", when: controlsHero("lore") },
+        ],
+      },
+      { verb: "AddSourceToVictory" },
+    ],
+  },
+
+  // 11196 Sea Serpent (burden the campaign card of The Thing in the Depths adds to the staging area; Immune to player card effects is a keyword). Both sides: its Threat and Defense are X, the number of players
+  // (twice that on the Enraged side B); after it attacks and destroys an ally the defending player deals X damage divided among the characters they control. Side A: after it is destroyed it returns to the staging area on its side B (the move comes first because a move to the staging area resets a card to side A, so the flip after it sticks). Side B: at the end of the round it makes an attack against the first player.
+  ...(["A", "B"] as const).flatMap((side): Effect[] => {
+    const x = { players: true, ...(side === "B" ? { times: 2 } : {}) } as const;
+    return [
+      {
+        id: `11196:constant:${side === "A" ? 1 : 2}`,
+        cardCode: "11196",
+        lines: [`11196:${side}:2`],
+        timing: "constant",
+        instructions: [{ verb: "ModifyStat", stat: "threat", amount: x, until: "whileSourceInPlay" }, { verb: "ModifyStat", stat: "defense", amount: x, until: "whileSourceInPlay" }],
+      },
+      {
+        id: `11196:forced:${side === "A" ? 1 : 2}`,
+        cardCode: "11196",
+        lines: [`11196:${side}:3`],
+        timing: "forced",
+        trigger: "characterDestroyedByAttack",
+        subject: { type: "ally", control: "any" },
+        condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", names: ["Sea Serpent"] } },
+        instructions: [{ verb: "AssignDamage", amount: x, pick: { type: "character", control: "you" } }],
+      },
+    ];
+  }),
+  { id: "11196:forced:3", cardCode: "11196", lines: ["11196:A:4"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }, { verb: "FlipCard" }] },
+  { id: "11196:forced:4", cardCode: "11196", lines: ["11196:B:4"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "AttackFirstPlayer" }] },
 ];
 
 export const REPLACES: readonly string[] = [];

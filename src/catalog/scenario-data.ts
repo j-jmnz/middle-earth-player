@@ -217,6 +217,8 @@ const SETUP_VERB = {
   setAside: "SetAside",
   // The Stormcaller's quest stages wait set aside until the Setup prepares the Stormcaller's area (dcce.stormcallers-area).
   stormcallerQuests: "SetAside",
+  // The encounter set a quest stage swaps into the encounter deck waits set aside, out of play (dcce.stormcaller-and-the-thing).
+  encounterDeck2: "SetAside",
   staging: "AddToStaging",
   activeLocation: "MakeActiveLocation",
   attached: "AttachToRingBearer",
@@ -228,7 +230,7 @@ const SETUP_VERB = {
 export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): Instruction[] {
   const instructions: Instruction[] = [];
   const cards = placementsAt(data, difficulty);
-  for (const pile of ["setAside", "stormcallerQuests", "staging", "activeLocation", "attached"] as const) {
+  for (const pile of ["setAside", "stormcallerQuests", "encounterDeck2", "staging", "activeLocation", "attached"] as const) {
     for (const card of cards) {
       if (card.pile !== pile || card.searched) continue;
       for (let copy = 0; copy < placedCopies(card, difficulty, seatCount); copy += 1) instructions.push({ verb: SETUP_VERB[pile], code: card.code });

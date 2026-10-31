@@ -107,6 +107,21 @@ describe("parseKeywordTokens", () => {
     });
   });
 
+  // Rules: dcce.grapple. Hall of Beorn spaces the parentheses: "Grapple ( highest printed Threat )."
+  it("reads Grapple (highest or lowest printed Threat or quest points), also with the spaces Hall of Beorn prints", () => {
+    expect(parseKeywordTokens(["Grapple ( highest printed Threat )."]).keywords).toEqual({ grapple: "highestThreat" });
+    expect(parseKeywordTokens(["Grapple (lowest printed Threat)."]).keywords).toEqual({ grapple: "lowestThreat" });
+    expect(parseKeywordTokens(["Surge. Grapple ( highest printed quest points )"]).keywords).toEqual({ surge: true, grapple: "highestQuestPoints" });
+    expect(parseKeywordTokens(["Grapple ( lowest printed quest points )."]).keywords).toEqual({ grapple: "lowestQuestPoints" });
+    // The Nightmare arm's criterion is not a printed Threat or quest points: it stays unread.
+    expect(parseKeywordTokens(["Grapple (fewest enemies grappled)."])).toEqual({ keywords: {}, unknown: ["Grapple (fewest enemies grappled)"] });
+  });
+
+  it("the arms of The Thing in the Depths carry the keyword, and no other card of the scenario does", () => {
+    const grapples = [...cards.values()].filter((card) => card.keywords?.grapple != null).map((card) => [card.code, card.keywords?.grapple]);
+    expect(grapples).toEqual([["12051", "lowestThreat"], ["12052", "highestQuestPoints"], ["12053", "highestThreat"], ["12054", "lowestQuestPoints"]]);
+  });
+
   it("splits two keywords joined in one entry", () => {
     expect(parseKeywordTokens(["Peril. Toughness 1"]).keywords).toEqual({ peril: true, toughness: 1 });
   });

@@ -42,6 +42,8 @@ export type Ghost = { slot: CardSlot; dx: number; dy: number; scale: number; rot
 export type MotionOptions = {
   // Where a card was in the state before (null when it was nowhere): a card that came from the Corsair deck comes off that pile, not the encounter deck (Boarding, dcce.boarding).
   zoneWas?: (cardId: string) => ZoneName | null;
+  // The location a card was grappled with in the state before, or null: a detached enemy starts under that location, facedown, and turns over as it lands in the staging area (dcce.grapple).
+  grappledFrom?: (cardId: string) => string | null;
 };
 
 /** The turn a slot is drawn at: an exhausted card lies sideways, a hand card keeps its slight fan. */
@@ -110,7 +112,16 @@ export function motionsBetween(
     if (was) {
       // A card that was in the hand and is not any more is played: it lifts, glides and lands with a squash.
       const played = was.zone === "hand" && slot.zone !== "hand";
-      motions.set(slot.id, { ...from(slot, was, slotRotation(was), 1), land: played ? "squash" : null });
+      // The one enemy of a grappled stack that showed under its location turns over as it is detached.
+      const turned = was.kind === "attachment" && was.faceDown && !slot.faceDown && slot.kind === "card";
+      motions.set(slot.id, { ...from(slot, was, slotRotation(was), 1), flip: turned, land: played ? "squash" : turned ? "pop" : null });
+      continue;
+    }
+    // A detached enemy comes out from under the location it was grappled with and turns over.
+    const holder = options.grappledFrom?.(slot.id);
+    const under = holder ? before.get(holder) : undefined;
+    if (under && slot.zone === "staging") {
+      motions.set(slot.id, { ...from(slot, under, 0, 1), flip: slot.kind === "card" && !slot.faceDown, land: "pop" });
       continue;
     }
     // A card that left the fold stack (the moment now asks about it) starts at the stack, as it was, and is not revealed again.

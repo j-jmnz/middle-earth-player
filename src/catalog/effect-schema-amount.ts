@@ -58,6 +58,10 @@ export const amountExprSchema = z.strictObject({
   // Plus the number of cards the campaign card's Setup let the players choose ("X is plus 1 for each of those copies", 11182:A:2): 0 in a game whose Setup chose none.
   plusChosen: z.literal(true).optional(),
   limit: z.number().int().min(0).optional(),
+  // The number of enemies grappled with locations in the staging area ("equal to the number of enemies grappled with locations in the staging area", 12055:A:2; src/rules/families/grapple-values.ts).
+  grappled: z.literal(true).optional(),
+  // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
+  resourcesOn: pickSchema.optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

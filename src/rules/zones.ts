@@ -5,6 +5,7 @@ import { leaveWith } from "./families/play-zones.ts";
 import { releaseOrcGuard } from "./families/dungeon-guard.ts";
 import { dealtFace } from "./families/dreamchaser-facts.ts";
 import { routeDestination } from "./families/sea-routes.ts";
+import { grappledWith } from "./families/grapple-values.ts";
 import { discardedFromDeck, joinStormcallerArea } from "./families/stormcaller-zone.ts";
 import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "./families/uncharted-zone.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
@@ -26,7 +27,9 @@ export type Destination =
   | { zone: "modeCard" }
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
-  | { zone: "captive"; hostId: string | null };
+  | { zone: "captive"; hostId: string | null }
+  // Attached facedown to a location in the staging area by Grapple (families/grapple-attach.ts).
+  | { zone: "grappled"; locationId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
 
@@ -123,6 +126,7 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return leaveActive(state, id);
     case "under":
     case "captive":
+    case "grappled":
       return updateCard(state, id, { host: null });
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
@@ -216,6 +220,10 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   if (dest.zone === "captive") {
     return updateCard(state, id, { zone: "captive", host: dest.hostId, controller: null, face: "down" });
   }
+  // Facedown on a location in the staging area, in play, not in the staging area (dcce.grapple).
+  if (dest.zone === "grappled") {
+    return updateCard(state, id, { zone: "grappled", host: dest.locationId, controller: null, face: "down" });
+  }
   if (dest.zone === "shadow") {
     const enemy = state.cards[dest.enemyId];
     if (!enemy) return state;
@@ -277,6 +285,15 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   }
 }
 
+// The enemies grappled with the location leave it: each is added to the staging area faceup and hears that it was detached (dcce.grapple, 12052:A:3).
+function releaseGrappled(state: ScenarioState, locationId: string): ScenarioState {
+  let next = state;
+  for (const arm of grappledWith(state, locationId)) {
+    next = queueEvent(updateCard(moveCard(next, arm, { zone: "staging" }), arm, { face: "up" }), { trigger: "grappleDetached", seat: null, cardId: arm, subject: arm });
+  }
+  return next;
+}
+
 // An encounter card attached to a guarded objective (rr.guarded) stays in the staging area, engaged or active while it is dealt with;
 // it is unlinked from the objective when it leaves play (defeated, explored, discarded).
 function guardLeaves(current: CardInstance, dest: Destination): boolean {
@@ -290,7 +307,8 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   const now = state.cards[id];
   if (!now || inPlay(from) || !inPlay(now.zone)) return state;
   const clock = state.clock + 1;
-  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: 0, progress: 0, resources: 0, exhausted: false });
+  // Tokens placed on a card while it was set aside stay on it as it enters play ("add 1 resource to each of them", 12039:B:2).
+  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false });
 }
 
 // `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
@@ -308,6 +326,8 @@ export function moveCard(state: ScenarioState, id: string, wanted: Destination, 
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted-zone.ts).
   if (dest.zone === "unchartedDeck") moved = shuffleUnchartedDeck(moved);
+  // The enemies grappled with a location that leaves the staging area are detached, flipped faceup and added to the staging area (dcce.grapple).
+  if (current.zone === "staging" && dest.zone !== "staging") moved = releaseGrappled(moved, id);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon-guard.ts).

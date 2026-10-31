@@ -108,7 +108,7 @@ describe("Maestro fixtures", () => {
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
       // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's, the Fate of Númenor ones from the log Voyage Across Belegaer's golden win writes.
-      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : name.startsWith("raid-") ? ["voyage-across-belegaer", "the-fate-of-numenor"] : name.startsWith("stormcaller-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"] : []);
+      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : name.startsWith("raid-") ? ["voyage-across-belegaer", "the-fate-of-numenor"] : name.startsWith("stormcaller-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"] : name.startsWith("depths-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller"] : []);
     }
   });
 
@@ -583,6 +583,56 @@ describe("Flight of the Stormcaller (Dream-chaser part 4, phase 43)", () => {
       expect(resumed.ok, name).toBe(true);
       if (!resumed.ok) continue;
       if (name === "stormcaller-lost") {
+        expect(resumed.state.lost).toBe(true);
+        const after = finish(save, world, resumed.state);
+        expect(after.log).toEqual(save.log);
+        expect(after.active).toBeNull();
+      } else {
+        expect(resumed.state.stageCleared).toBe(true);
+        expect(resumed.state.lost).toBe(false);
+      }
+    }
+  });
+});
+
+describe("The Thing in the Depths (Dream-chaser part 5, phase 44)", () => {
+  // The fixtures are games of two decklists from the log the Voyage, Fate, Raid and Flight goldens' wins write (voyage-won, fate-won, raid-won and stormcaller-won, wins of real decklists, are open): parts 1 to 4 are
+  // completed, so the playthrough's open scenario is The Thing in the Depths and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
+  const names = (["depths-won", "depths-lost"] as const).filter((name) => hasFixture(name));
+
+  it("are games of two decklists dealt on the scenario, the Campaign Setup asking nothing", () => {
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("dream-chaser");
+      expect(found.loadout.scenarioId, name).toBe("the-thing-in-the-depths");
+      expect(found.loadout.choices, name).toEqual([]);
+      expect(found.seatCount, name).toBe(2);
+      expect(found.past, name).toBeNull();
+      expect(found.loadout.ringBearer, name).toBeNull();
+    }
+  });
+
+  it("start from a log with parts 1 to 4 recorded as won, so the node the path opens is The Thing in the Depths, not an earlier part", () => {
+    const dreamChaser = loadCampaign("dream-chaser");
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller"]);
+      expect(found.log.xpGained["flight-of-the-stormcaller"], name).toBeGreaterThan(0);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const path = campaignPath(dreamChaser, {}, save.log);
+      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("the-thing-in-the-depths");
+      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "the-thing-in-the-depths" } });
+    }
+  });
+
+  it("depths-won replays to a win, and depths-lost to a loss that writes nothing", () => {
+    for (const name of names) {
+      const world = worldFor(name);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const resumed = resume(save, world, CATALOG_VERSION);
+      expect(resumed.ok, name).toBe(true);
+      if (!resumed.ok) continue;
+      if (name === "depths-lost") {
         expect(resumed.state.lost).toBe(true);
         const after = finish(save, world, resumed.state);
         expect(after.log).toEqual(save.log);

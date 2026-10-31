@@ -54,9 +54,9 @@ function uncharted(entry: LedgerEntry): PrintedKeywords {
 
 // Cards whose text came from Hall of Beorn take the ledger text. The core-set cards of the starter lists keep
 // RingsDB's marked-up text (the card screen renders it); their ledger entries are still compared.
-function pickBackStats(back: Card["back"]): Partial<Record<"willpower" | "attack" | "defense" | "health" | "victory", number>> {
-  const stats: Partial<Record<"willpower" | "attack" | "defense" | "health" | "victory", number>> = {};
-  for (const stat of ["willpower", "attack", "defense", "health", "victory"] as const) if (back?.[stat] != null) stats[stat] = back[stat];
+function pickBackStats(back: Card["back"]): Partial<Record<"willpower" | "threat" | "engagementCost" | "attack" | "defense" | "health" | "victory", number>> {
+  const stats: Partial<Record<"willpower" | "threat" | "engagementCost" | "attack" | "defense" | "health" | "victory", number>> = {};
+  for (const stat of ["willpower", "threat", "engagementCost", "attack", "defense", "health", "victory"] as const) if (back?.[stat] != null) stats[stat] = back[stat];
   return stats;
 }
 

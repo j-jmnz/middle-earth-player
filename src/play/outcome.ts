@@ -10,6 +10,7 @@ import type { EngineStep, PlayerIntent } from "../rules/intents.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
 import type { LogMark } from "./log.ts";
+import { detachLine, grappleLine } from "./grapple-words.ts";
 import { boardingWords } from "./sea-words.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -156,6 +157,11 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (!current || current.rank !== 3) open(3, "Staging", "plain");
         line(`Revealed ${names.card(step.cardId)}`);
         return;
+      // The enemy is facedown now: the line names the location, never the enemy (dcce.grapple).
+      case "grapple":
+        if (!current || current.rank !== 3) open(3, "Staging", "plain");
+        line(grappleLine(names.card(step.locationId)), null, [step.locationId]);
+        return;
       case "engage": {
         if (joined.has(index)) return;
         open(4, `${names.card(step.enemyId)} engages`, "bad");
@@ -200,6 +206,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   } else if (after.activeLocation && after.activeLocation !== before.activeLocation && after.activeLocation !== before.secondActiveLocation && before.staging.includes(after.activeLocation)) {
     groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
+
+  // The enemies grappled with a location that became the active location or was explored are detached, faceup, in the staging area (dcce.grapple).
+  const detached = Object.values(after.cards).filter((card) => card.zone === "staging" && before.cards[card.id]?.zone === "grappled");
+  if (detached.length > 0) groups.push({ rank: 2, title: "", tone: "plain", lines: detached.map((card) => ({ text: detachLine(names.card(card.id), names.card(before.cards[card.id]?.host ?? "")), mark: null })) });
 
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");
   if (shown.length === 0) return null;

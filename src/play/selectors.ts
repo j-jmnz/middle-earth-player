@@ -7,6 +7,7 @@ import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
 import { lookedIds } from "../rules/families/sea-sailing.ts";
 import { captiveUnder } from "../rules/families/south-captive.ts";
+import { grappledWith } from "../rules/families/grapple-values.ts";
 import { prisonersOfSeat } from "../rules/families/prisoner.ts";
 import { declaredDefenders } from "../rules/families/defense-defenders.ts";
 import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../rules/families/breaking-areas.ts";
@@ -226,7 +227,8 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // Mendor, captured with the prisoner, is drawn under it (01131:A:3). An encounter card guarding an objective is a card of the staging area
     // beside it, not a card drawn under it.
     const captive = card.zone === "staging" || card.zone === "captive" ? captiveUnder(game, id) : null;
-    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...(captive ? [captive] : [])]);
+    // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...(captive ? [captive] : []), ...(card.zone === "staging" ? grappledWith(game, id) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;

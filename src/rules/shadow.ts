@@ -36,9 +36,9 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
 // \"When Revealed\" effect of Iron Shackles", 01105:A:2), assigns damage a point at a time ("Assign X damage among characters you control", 142057:A:2),
 // runs on each card that matches ("exhaust all characters you control", 900103:A:2), or
-// reveals an encounter card ("Reveal an encounter card", 11176:A:4), or discards the bottom card of a deck and reads its printed cost (11032:A:2), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
+// reveals an encounter card ("Reveal an encounter card", 11176:A:4), or discards the bottom card of a deck and reads its printed cost (11032:A:2), or grapples (the first player chooses among tied locations, 12053:A:3, 12054:A:3), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
 function runsInFrame(effects: readonly Effect[]): boolean {
-  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "AssignDamage" || instruction.verb === "ResolveWhenRevealed" || instruction.verb === "RevealEncounter" || instruction.verb === "DiscardBottom"));
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "AssignDamage" || instruction.verb === "ResolveWhenRevealed" || instruction.verb === "RevealEncounter" || instruction.verb === "DiscardBottom" || instruction.verb === "ResolveGrapple" || instruction.verb === "EngageOrGrapple"));
 }
 
 function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

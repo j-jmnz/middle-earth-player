@@ -127,7 +127,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
   // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/keywords.ts).
-  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0) }),
+  // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2).
+  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
   // The source card is attached to a card with this name.
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
   // The actor controls a hero or ally in play with this code.
@@ -233,6 +234,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
   z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional() }),
+  // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
+  // src/rules/families/grapple-values.ts).
+  z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
   // The Corsair deck or its discard pile holds a card: Boarding has an enemy to reveal. The either/or of a card that gives a choice between a cost and Boarding ("raise your threat by 3 or it gains Boarding 1",
   // 12022:A:3) offers the Boarding branch only then (rr.effects: an option that cannot change the game state is not offered). Read by the stormcaller family.
   z.strictObject({ kind: z.literal("corsairHas") }),

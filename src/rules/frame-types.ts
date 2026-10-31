@@ -26,6 +26,8 @@ export type Modifier = {
   against?: string;
   // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
   set?: boolean;
+  // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5).
+  trait?: string;
 };
 
 export type FrameName =

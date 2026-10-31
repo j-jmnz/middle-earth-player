@@ -24,6 +24,7 @@ import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable } from
 import { flagged, perilLock, type ScenarioState } from "./state.ts";
 import { attackRuleReason } from "./families/attack-targets.ts";
 import { sideQuestReason } from "./families/sidequests-quest.ts";
+import { travelsOverActive } from "./families/grapple-travel.ts";
 import { freeSlot, mustTravel } from "./families/south-locations.ts";
 import { viewOf } from "./families/breaking-areas.ts";
 import { shipAttackReason, shipDefenseReason } from "./families/sea-ships.ts";
@@ -190,7 +191,7 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 
 // A slot is free for the traveling seat: its own active location once stages are separate (families/breaking-areas.ts).
 function canTravel(state: ScenarioState): boolean {
-  return freeSlot(viewOf(state, state.activeSeat)) != null;
+  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state);
 }
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {

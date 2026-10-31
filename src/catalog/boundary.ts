@@ -70,6 +70,8 @@ export const printedKeywordsSchema = z.strictObject({
   uncharted: z.boolean().optional(),
   // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame*.ts). A numbered keyword with a value of 0 does not exist.
   aflame: z.number().int().positive().optional(),
+  // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple*.ts).
+  grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),

@@ -1,0 +1,60 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 44. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `depths-won` (scripts/e2e-depths.ts): a real two-handed
+# game of The Thing in the Depths, parked on its win (The Thing in the Depths is destroyed). The fixture is OPEN when scripts/e2e-fixtures.ts found no win of the two starter decklists in its seeds
+# (docs/phases/STATUS.md). The Resolution first asks whether Come Together joins the Campaign Pool (the first player's choice, "Choose a boon"); confirming writes the XP from the campaign card (1 for each surviving
+# player, Captain Sahír and Na'asiyah with 5 resources, Sea Serpent, no damage on a hero, threat 40 or less, Ominous Fate) and, with parts 1 to 4 won in the log, unlocks Temple of the Deceived
+# (src/campaign/golden-depths.test.ts pins the path). The fixture's log has parts 1 to 4 recorded as won (the logs the Voyage, Fate, Raid and Flight goldens' wins write), so the path opens on The Thing in the Depths
+# and resumes it; its node reads Won.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/depths-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+# The campaign card's Resolution asks one choice: Come Together may join the Campaign Pool.
+- assertVisible: "Choose a boon"
+- assertVisible:
+    id: resolution-choice-11195
+- tapOn:
+    id: resolution-choice-11195
+- assertVisible:
+    id: resolution-consequence
+    text: ".*Come Together.*"
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-thing-in-the-depths-status
+    text: "Won.*"
+# The XP the Resolution gave is written: the line reads it and there is XP to spend.
+- assertVisible:
+    id: xp-line
+- assertVisible:
+    id: xp-open

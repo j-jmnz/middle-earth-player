@@ -29,6 +29,7 @@ import voyageFixtures from "./fixtures/voyage-across-belegaer.json";
 import fateFixtures from "./fixtures/the-fate-of-numenor.json";
 import raidFixtures from "./fixtures/raid-on-the-grey-havens.json";
 import stormcallerFixtures from "./fixtures/flight-of-the-stormcaller.json";
+import depthsFixtures from "./fixtures/the-thing-in-the-depths.json";
 import fixtures from "./fixtures/scenario-1.json";
 
 import type { PlayerIntent } from "../rules/intents.ts";
@@ -37,14 +38,14 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
-export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost" | "anduin-won" | "anduin-lost" | "dol-guldur-won" | "dol-guldur-lost" | "oath-won" | "oath-lost" | "nibin-dum-won" | "nibin-dum-lost" | "sea-solo" | "sea-duo" | "voyage-won" | "voyage-lost" | "fate-won" | "fate-lost" | "raid-won" | "raid-lost" | "stormcaller-won" | "stormcaller-lost";
+export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost" | "anduin-won" | "anduin-lost" | "dol-guldur-won" | "dol-guldur-lost" | "oath-won" | "oath-lost" | "nibin-dum-won" | "nibin-dum-lost" | "sea-solo" | "sea-duo" | "voyage-won" | "voyage-lost" | "fate-won" | "fate-lost" | "raid-won" | "raid-lost" | "stormcaller-won" | "stormcaller-lost" | "depths-won" | "depths-lost";
 
 // `past`: the scenario 1 fixture and the Resolution answers whose log this fixture starts from.
 export type Fixture = { campaignId: string; seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
 
 type StoredFixture = { campaignId?: string; seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
 
-export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost", "anduin-won", "anduin-lost", "dol-guldur-won", "dol-guldur-lost", "oath-won", "oath-lost", "nibin-dum-won", "nibin-dum-lost", "sea-solo", "sea-duo", "voyage-won", "voyage-lost", "fate-won", "fate-lost", "raid-won", "raid-lost", "stormcaller-won", "stormcaller-lost"];
+export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost", "anduin-won", "anduin-lost", "dol-guldur-won", "dol-guldur-lost", "oath-won", "oath-lost", "nibin-dum-won", "nibin-dum-lost", "sea-solo", "sea-duo", "voyage-won", "voyage-lost", "fate-won", "fate-lost", "raid-won", "raid-lost", "stormcaller-won", "stormcaller-lost", "depths-won", "depths-lost"];
 
 export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
@@ -62,6 +63,7 @@ const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = {
   ...(fateFixtures as Partial<Record<"fate-won" | "fate-lost", StoredFixture>>),
   ...(raidFixtures as Partial<Record<"raid-won" | "raid-lost", StoredFixture>>),
   ...(stormcallerFixtures as Partial<Record<"stormcaller-won" | "stormcaller-lost", StoredFixture>>),
+  ...(depthsFixtures as Partial<Record<"depths-won" | "depths-lost", StoredFixture>>),
 };
 
 // The fixture is committed. The e2e route opens only these.

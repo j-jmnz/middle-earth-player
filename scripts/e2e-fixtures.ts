@@ -58,6 +58,7 @@ import { voyageFixtures } from "./e2e-voyage.ts";
 import { fateFixtures } from "./e2e-fate.ts";
 import { raidFixtures } from "./e2e-raid.ts";
 import { stormcallerFixtures } from "./e2e-stormcaller.ts";
+import { depthsFixtures } from "./e2e-depths.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -405,6 +406,12 @@ void runScript("e2e-fixtures", async () => {
   const stormcallerFile = path.join(dir, "flight-of-the-stormcaller.json");
   writeFileSync(stormcallerFile, `${JSON.stringify(stormcaller)}\n`);
   say.info(`wrote ${stormcallerFile} (${Object.keys(stormcaller).join(", ")})`);
+
+  // The Thing in the Depths (Dream-chaser part 5): from the log the first four parts' wins write, so the path resumes it. A game not found in the seeds is left out.
+  const depths = await say.stepAsync("play The Thing in the Depths' win and loss", () => depthsFixtures());
+  const depthsFile = path.join(dir, "the-thing-in-the-depths.json");
+  writeFileSync(depthsFile, `${JSON.stringify(depths)}\n`);
+  say.info(`wrote ${depthsFile} (${Object.keys(depths).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

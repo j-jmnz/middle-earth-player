@@ -26,10 +26,20 @@ export function engagedWithAll(state: ScenarioState, id: string): boolean {
   return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst"));
 }
 
-// Whether the enemy in the staging area is considered engaged with this seat: every seat for the Watcher, the first player for the Balrog.
+// An enemy in the staging area that attacks, in the combat phase, each player who has an enemy engaged that relays its attack (`attacksViaRelay` on the Thing in the Depths, `relaysAttack` on Eye of the
+// Beast, 12050:A:3): it attacks from the staging area, once for each such player, and is dealt a shadow card for each attack.
+export function viaRelay(state: ScenarioState, id: string): boolean {
+  return state.cards[id]?.zone === "staging" && flagged(state, id, "attacksViaRelay");
+}
+
+function relayedTo(state: ScenarioState, seat: number): boolean {
+  return (state.seats[seat]?.engaged ?? []).some((enemy) => flagged(state, enemy, "relaysAttack"));
+}
+
+// Whether the enemy in the staging area is considered engaged with this seat: every seat for the Watcher, the first player for the Balrog, the seats with a relaying enemy engaged for the Thing.
 function engagedWithSeat(state: ScenarioState, id: string, seat: number): boolean {
   if (state.cards[id]?.zone !== "staging") return false;
-  return flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer);
+  return flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || (viaRelay(state, id) && relayedTo(state, seat));
 }
 
 // The enemy is where it can attack from: engaged, in the staging area but considered engaged with every player, or in the staging area
@@ -38,12 +48,12 @@ export function attackHere(state: ScenarioState, enemyId: string): boolean {
   const enemy = state.cards[enemyId];
   if (!enemy) return false;
   if (enemy.zone === "engaged") return true;
-  return enemy.zone === "staging" && (engagedWithAll(state, enemyId) || (state.pendingAttack?.enemyId === enemyId && state.pendingAttack.fromStaging === true));
+  return enemy.zone === "staging" && (engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (state.pendingAttack?.enemyId === enemyId && state.pendingAttack.fromStaging === true));
 }
 
 // The key under which an attack is counted as made this combat phase: one per player for an enemy engaged with all of them.
 export function attackKey(state: ScenarioState, enemyId: string, seat: number): string {
-  return engagedWithAll(state, enemyId) ? `${enemyId}@${seat}` : enemyId;
+  return engagedWithAll(state, enemyId) || viaRelay(state, enemyId) ? `${enemyId}@${seat}` : enemyId;
 }
 
 // The enemies in the staging area that still attack this seat in this combat phase.

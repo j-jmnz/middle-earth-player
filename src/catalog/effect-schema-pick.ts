@@ -210,6 +210,8 @@ export const pickSchema = z.strictObject({
   // A card a player controls with a copy (a card of the same title) in that player's discard pile ("Discard each card you control that has at
   // least 1 copy of itself in your discard pile", 900309:A:2).
   copyInDiscard: z.literal(true).optional(),
+  // The grapple family's filter (src/rules/families/grapple-values.ts): a card that shows this side ("if Sea Serpent (Enraged side) is in play", side B, 11194:B:6).
+  side: z.enum(["A", "B"]).optional(),
   // The aflame family's filters (src/rules/families/aflame-pick.ts). `aflame`: a location that prints the Aflame keyword (`false`: any other card). `lowestAflame`: of the cards that match, only
   // those whose Aflame value is the lowest ("the Aflame location in play with the lowest Aflame value", 11036:B:1); every one of them when tied, and then the chooser decides.
   aflame: z.boolean().optional(),

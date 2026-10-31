@@ -58,6 +58,10 @@ function openOf(codes: Iterable<string>): string[] {
   );
 }
 
+// The Campaign Setup of a Dream-chaser campaign card whose box prints no Setup line (The Thing in the Depths, 11194): the cards to set aside are the scenario's Campaign Setup rule (dcce.campaign-setup-*), and the
+// record cites the card's "You are playing Campaign Mode." marker line, which has no other game effect.
+const isCampaignMarker = (effect: { timing: string }, line: string): boolean => effect.timing === "campaignSetup" && line === "You are playing Campaign Mode.";
+
 describe("effect coverage", () => {
   for (const code of [...dealt].sort()) {
     const card = byCode.get(code);
@@ -110,7 +114,7 @@ describe("effect coverage", () => {
         // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
         const timings = lineTimings(line ?? "");
         const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
-        if (!alongside) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        if (!alongside && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });
@@ -128,7 +132,7 @@ describe("effect coverage", () => {
     for (const entry of ledger.entries) {
       for (const mark of entry.inert) {
         const id = lineId(entry.code, entry.side, mark.line);
-        expect(EFFECTS.some((effect) => effect.lines.includes(id)), `${id} is inert and implemented`).toBe(false);
+        expect(EFFECTS.some((effect) => effect.lines.includes(id) && !isCampaignMarker(effect, entry.lines[mark.line - 1] ?? "")), `${id} is inert and implemented`).toBe(false);
       }
     }
   });

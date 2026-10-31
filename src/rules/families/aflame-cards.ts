@@ -79,8 +79,12 @@ export function dealtCopies(state: ScenarioState, codes: readonly string[], step
 
 /** StageSetAside: the set-aside card with this code joins the staging area, announced as added to it and as entering play (its Forced effects hear that). */
 export function stageSetAside(state: ScenarioState, instruction: Verb<"StageSetAside">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = state.setAside.find((other) => state.cards[other]?.code === instruction.code);
-  return id ? moveEncounter(state, id, "staging", focus.seat, ctx, steps) : state;
+  const id = state.setAside.find((other) => (instruction.code != null ? state.cards[other]?.code === instruction.code : printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name));
+  if (!id) return state;
+  // A card set aside on its Campaign Mode only side (The Thing in the Depths, FlipSetAside) keeps that side as it joins the staging area.
+  const side = state.cards[id]?.face === "B" ? "B" : null;
+  const staged = moveEncounter(state, id, "staging", focus.seat, ctx, steps);
+  return side ? updateCard(staged, id, { face: side }) : staged;
 }
 
 /** RemoveNamedFromGame: the card in play with this title and each card attached to it leave the game, and nothing is announced as leaving play ("ignoring his 'leaves play' ability"). */

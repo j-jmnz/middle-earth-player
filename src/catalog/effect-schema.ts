@@ -166,11 +166,11 @@ const eachSchema = z.strictObject({
   pick: pickSchema,
   // A Delay here is made once for each card ("If any of those allies are still in play at the end of the round, discard them").
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema])),
-  // The actor chooses up to this many (`any`: any number) of the matching cards, one at a time, and may stop ("search the top
+  // The actor chooses up to this many (`any`: any number, an amount: the number it reads, "Choose up to X characters", 11195:A:1) of the matching cards, one at a time, and may stop ("search the top
   // 10 cards for up to 4 Rohan allies"); the instructions then run for each chosen card, and the effect's X becomes how many
   // were chosen. `totalCost`: the chosen cards' printed costs add up to at most this. `taken` is engine use: the cards chosen
   // so far (src/rules/families/deck-each.ts).
-  upTo: z.union([z.number().int().positive(), z.literal("any")]).optional(),
+  upTo: z.union([z.number().int().positive(), z.literal("any"), amountExprSchema]).optional(),
   totalCost: amountSchema.optional(),
   taken: z.array(z.string()).optional(),
   ...when,

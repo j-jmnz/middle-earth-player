@@ -8,10 +8,11 @@ import { grantedTraits } from "../conditions.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
-import { flagged } from "../state.ts";
+import { flagged, modifierActive } from "../state.ts";
 
 export function flaggedTrait(state: ScenarioState, id: string, trait: string): boolean {
   if (state.modifiers.length === 0) return false;
+  if (state.modifiers.some((modifier) => modifier.stat === "traitGained" && modifier.trait === trait && modifier.instanceId === id && modifierActive(state, modifier))) return true;
   if (trait === "Rohan") return flagged(state, id, "traitRohan");
   if (trait === "Gondor") return flagged(state, id, "traitGondor");
   if (trait === "Mount") return flagged(state, id, "traitMount");

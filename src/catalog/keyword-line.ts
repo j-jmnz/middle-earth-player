@@ -34,7 +34,7 @@ const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
 
 // Hall of Beorn lists one keyword per entry, with the trailing period: "Hide 2.", "Surge.".
 export function parseKeywordTokens(tokens: readonly string[]): KeywordResult {
-  const keywords: Record<string, boolean | number> = {};
+  const keywords: Record<string, boolean | number | string> = {};
   const unknown: string[] = [];
   // Hall of Beorn sometimes joins two on one entry: "Peril. Toughness 1".
   for (const raw of tokens.flatMap((entry) => entry.split(/\.\s+/))) {
@@ -43,6 +43,12 @@ export function parseKeywordTokens(tokens: readonly string[]): KeywordResult {
     const flag = FLAGS[lower];
     if (flag) {
       keywords[flag] = true;
+      continue;
+    }
+    // "Grapple (highest printed Threat)" (dcce.grapple); Hall of Beorn spaces the parentheses.
+    const grapple = /^grapple \(\s*(highest|lowest) printed (threat|quest points)\s*\)$/.exec(lower);
+    if (grapple?.[1] && grapple[2]) {
+      keywords.grapple = `${grapple[1]}${grapple[2] === "threat" ? "Threat" : "QuestPoints"}`;
       continue;
     }
     const numbered = /^([a-z]+) (\d+)$/.exec(lower);
