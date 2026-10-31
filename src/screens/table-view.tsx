@@ -52,7 +52,10 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
-import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
+import { campaignTokens, headingReadout, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
+import { zoneFactsOf } from "../play/zone-facts";
+import { whyNotChosen } from "../play/why";
+import { successOf } from "../play/look-strip";
 import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
@@ -181,6 +184,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
   // Read from the state the canvas holds and the seat it draws, never from the store in a render.
   const info = useCallback<TableCanvasProps["info"]>((now, seat, cardId) => slotNumbers(now, ctx, cardId, seat), [ctx]);
+  // What the zone selectors read of a printing (ships first, the fold order of staging) and the success symbols a look marks (the engine reads the same printed card).
+  const facts = useMemo(() => zoneFactsOf(ctx.cards), [ctx]);
+  const success = useCallback((code: string) => successOf(ctx.cards, code), [ctx]);
   const rail = useMemo(() => railFor(game), [game]);
   // The strip is laid out only while it is open; the rail's S (a stop of the player's lies ahead) is read without laying it out.
   const carouselOpen = reading?.kind === "carousel";
@@ -223,7 +229,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // A discard pile opens its list; a deck with an encounter card attached to it (Iron Shackles, 01105:A:1) opens that card, whose preview says what it does.
   const onPile = useCallback(
     (id: string) => {
-      if (id === "discard" || id === "encounterDiscard") return setReading({ kind: "pile", pile: id });
+      if (id === "discard" || id === "encounterDiscard" || id === "corsairDiscard") return setReading({ kind: "pile", pile: id });
+      // A fold stack (row-fold.ts) says which row it folds: its list opens on a tap or a long press.
+      if (id === "staging" || id === "engaged") return setReading({ kind: "row", row: id });
       const { game: now, viewedSeat } = store.getState();
       const shackles = id === "deck" ? now.seats[shownSeat(now, viewedSeat)]?.deckAttached?.[0] : undefined;
       if (shackles) setPreview({ id: shackles, extra: [] });
@@ -287,6 +295,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const tokenCount = campaign?.tokens ?? null;
   const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
   const held = useMemo(() => heldDial(game, nameOf), [game, nameOf]);
+  // The Heading dial, after the seat dials, while the Heading card is in play: a tap opens the card's preview (it never changes the dial).
+  const headingNow = useMemo(() => headingReadout(game), [game]);
+  const headingStep = headingNow?.step ?? null;
+  const headingCard = headingNow?.cardId ?? null;
+  const headingDial = useMemo(() => (headingStep ? { step: headingStep, onPress: () => (headingCard ? onPreview(headingCard) : undefined) } : null), [headingStep, headingCard, onPreview]);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
@@ -320,6 +333,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         names.card,
         preview.extra,
         ledgerLine,
+        (cardId) => whyNotChosen(game, ctx, cardId, choice.sheet),
       )
     : null;
   const shown = previewed?.cards[previewed.start];
@@ -350,6 +364,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           tokens={tokens}
+          heading={headingDial}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           rail={rail}
           stopAhead={stopAhead}
@@ -382,6 +397,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 nameOf={nameOf}
                 sphereOf={sphereOf}
                 inactive={inactive}
+                facts={facts}
+                success={success}
                 info={info}
                 highlight={choice.highlight}
                 beats={beats}

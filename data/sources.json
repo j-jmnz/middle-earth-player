@@ -240,12 +240,12 @@
     },
     "icons": {
       "id": "icons",
-      "site": "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com",
+      "site": "https://ringsdb.com, https://dragncards-lotrlcg.s3.amazonaws.com and the MEC111 rulebook",
       "pin": {
         "kind": "sha256",
-        "value": "703dcfb24198b173922f4863103a73ac6179b14e46deb8b02023af117653429c"
+        "value": "0a1692daf5e8b6ac7b6a8e56fea6436d3470867d2564ee8500a18316c63a95ae"
       },
-      "fetchedAt": "2026-10-25T22:29:48.327Z",
+      "fetchedAt": "2026-10-31T08:50:34.005Z",
       "files": [
         {
           "path": "raw/icons/ringsdb.svg",
@@ -300,6 +300,18 @@
           "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks/encounter.jpg",
           "sha256": "264316b5ba0d63d81aaaf8c90dfdae2c9f60c37cff017356047dfd8256bc519d",
           "bytes": 133469
+        },
+        {
+          "path": "raw/icons/mec111-icons.ttf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC111.pdf",
+          "sha256": "bc50ea307a55ab9fa39db28fecf654c4d500cd2564b60d34a59c1fcd7f162432",
+          "bytes": 6068
+        },
+        {
+          "path": "raw/icons/mec111-icons.unicode.txt",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC111.pdf",
+          "sha256": "bc19e0bad90ce4d8cd2da59e088e3b0606c52d640eeb96cc0ed2408ebdfe9281",
+          "bytes": 414
         }
       ]
     },

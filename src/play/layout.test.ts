@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { CardInstance } from "../rules/state.ts";
 
 import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
-import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
+import { PILES, TABLE_ZONES, type PileId, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
 import { HAND_TUCK } from "./play-area.ts";
 import { ACROSS, DOWN, SLACK, shareOut, wrapRows } from "./table-spacing.ts";
 import { touch, UI_SCALES } from "./ui-scale.ts";
@@ -393,6 +393,96 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
       expect(layout.card.w).toBeLessThan(Math.floor(120 * scale));
       expect(layout.zones.questStage.x).toBeCloseTo(8 * scale, 9);
       expect(layout.zones.staging.x).toBeCloseTo(8 * scale + Math.round(layout.card.w * 1.5) + 8 * scale, 9);
+    }
+  });
+});
+
+describe("the second pile slot, ships and staging stacks (phase 39b)", () => {
+  const second = (piles: PileViews, ids: readonly PileId[]): PileViews => ({ ...piles, ...Object.fromEntries(ids.map((pile) => [pile, { pile, seat: 0, ids: ["x", "y"], top: null } satisfies PileView])) }) as unknown as PileViews;
+
+  it("puts the second slot under the encounter pair at the right end of the engagement area, as wide as the pair, and narrows the engagement area by it and a gap", () => {
+    for (const scale of SCALES) {
+      for (const canvas of CANVASES) {
+        const { views: v, piles } = views(5);
+        const plain = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+        const slot = tableLayout(canvas.width, canvas.height, v, second(piles, ["corsairDeck", "corsairDiscard"]), { scale });
+        const at = `${scale} ${canvas.width}`;
+        const deck = slot.piles.corsairDeck as Rect;
+        const discard = slot.piles.corsairDiscard as Rect;
+        expect(deck.x, at).toBe(slot.piles.encounterDeck.x);
+        expect(discard.x, at).toBe(slot.piles.encounterDiscard.x);
+        expect(discard.x + discard.w, at).toBe(slot.piles.encounterDiscard.x + slot.piles.encounterDiscard.w);
+        // Level with the engagement row, not with staging.
+        expect(deck.y, at).toBeGreaterThan(slot.zones.engaged.y - 1);
+        expect(deck.y + deck.h, at).toBeLessThanOrEqual(slot.zones.engaged.y + slot.zones.engaged.h + 1);
+        const pair = slot.piles.encounterDiscard.x + slot.piles.encounterDiscard.w - slot.piles.encounterDeck.x;
+        expect(slot.zones.engaged.w, at).toBeCloseTo(plain.zones.engaged.w - pair - 6 * scale, 5);
+        // Nothing else moves: staging, play, and the left column are as they were.
+        expect(slot.zones.staging).toEqual(plain.zones.staging);
+        expect(slot.zones.play).toEqual(plain.zones.play);
+        expect(slot.piles.deck).toEqual(plain.piles.deck);
+      }
+    }
+  });
+
+  it("leaves the engagement area whole while the slot is not declared, and a deck alone takes the left place", () => {
+    const { views: v, piles } = views(5);
+    const plain = tableLayout(591, 338, v, piles, {});
+    expect(plain.piles.corsairDeck).toBeUndefined();
+    expect(plain.zones.engaged.w).toBe(plain.zones.play.w);
+    const alone = tableLayout(591, 338, v, second(piles, ["corsairDeck"]), {});
+    expect(alone.piles.corsairDeck?.x).toBe(alone.piles.encounterDeck.x);
+    expect(alone.piles.corsairDiscard).toBeUndefined();
+    expect(alone.zones.engaged.w).toBeLessThan(plain.zones.engaged.w);
+  });
+
+  it("stands a seat's ships after its side quest and before its heroes, the Dream-chaser leftmost, with one more gap after them", () => {
+    const { views: v, piles } = views(0);
+    const ship = (id: string, rank: 0 | 1) => entry(card(id, "play"), { ship: rank });
+    const play = [entry(card("q1", "play")), ship("dc", 0), ship("ds", 1), entry(card("h1", "play")), entry(card("h2", "play"))];
+    const layout = tableLayout(700, 400, { ...v, play: { zone: "play", seat: 0, entries: play } }, piles, {});
+    const row = layout.slots.filter((slot) => slot.zone === "play" && slot.kind === "card").sort((a, b) => a.x - b.x);
+    expect(row.map((slot) => slot.id)).toEqual(["q1", "dc", "ds", "h1", "h2"]);
+    expect((row[2]?.x ?? 0) - ((row[1]?.x ?? 0) + (row[1]?.w ?? 0))).toBeCloseTo(6, 5);
+    expect((row[3]?.x ?? 0) - ((row[2]?.x ?? 0) + (row[2]?.w ?? 0))).toBeCloseTo(12, 5);
+    expect(row[1]?.w).toBe(layout.card.w);
+  });
+
+  it("sends the ships to the front row's left end when the play area stacks", () => {
+    const { views: v, piles } = views(0);
+    const ids12 = ids("p", 12);
+    const play = ids12.map((id, at) => entry(card(id, "play"), at === 4 || at === 6 ? { ship: at === 4 ? 0 : 1 } : {}));
+    const layout = tableLayout(457, 323, { ...v, play: { zone: "play", seat: 0, entries: play } }, piles, {});
+    const row = layout.slots.filter((slot) => slot.zone === "play" && slot.kind === "card");
+    const frontY = Math.max(...row.map((slot) => slot.y));
+    if (new Set(row.map((slot) => slot.y)).size < 2) return;
+    const front = row.filter((slot) => slot.y === frontY).sort((a, b) => a.x - b.x);
+    expect(front.slice(0, 2).map((slot) => slot.id)).toEqual(["p4", "p6"]);
+  });
+
+  it("shows one peek with a count under a staging card that holds more than one card, and every peek of a card with one", () => {
+    const { views: v, piles } = views(0);
+    const host = card("s0", "staging");
+    const under = [card("u1", "staging", { host: "s0", controller: null }), card("u2", "staging", { host: "s0", controller: null }), card("u3", "staging", { host: "s0", controller: null })];
+    const layout = tableLayout(591, 338, { ...v, staging: { zone: "staging", seat: 0, entries: [entry(host, { attached: under }), entry(card("s1", "staging"), { attached: [card("u4", "staging", { host: "s1" })] })] } }, piles, {});
+    const stacked = layout.slots.filter((slot) => slot.kind === "attachment" && slot.zone === "staging");
+    expect(stacked.filter((slot) => slot.stack != null)).toHaveLength(1);
+    expect(stacked.find((slot) => slot.stack != null)?.stack).toBe(3);
+    // One peek for the stack and one for the card with a single attachment.
+    expect(stacked).toHaveLength(2);
+    expect(stacked.find((slot) => slot.id === "u4")?.stack).toBeUndefined();
+  });
+
+  it("leaves a Fellowship and a Mirkwood table as it was: no fold stack, no second slot, the pairs where they were", () => {
+    for (const canvas of CANVASES) {
+      for (const scale of SCALES) {
+        const { views: v, piles } = views(7);
+        const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+        expect(layout.folds).toEqual([]);
+        expect(layout.piles.corsairDeck).toBeUndefined();
+        expect(layout.slots.every((slot) => slot.stack == null && slot.fold == null)).toBe(true);
+        expect(Object.keys(layout.piles).sort()).toEqual(["deck", "discard", "encounterDeck", "encounterDiscard"]);
+      }
     }
   });
 });

@@ -9,6 +9,7 @@ import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
 import { pictureKey } from "./picture-key.ts";
+import { headingLook, headingPreviewSteps, headingPreviewTitle, headingStepOf } from "./heading.ts";
 import { inspectTargets } from "./selectors.ts";
 import { whyNotPlayable } from "./why.ts";
 
@@ -44,6 +45,8 @@ export function previewCards(
   cardName: (cardId: string) => string,
   extra: readonly string[] = [],
   line: (id: string) => string | null = () => null,
+  // Why the card the player pressed cannot be chosen in the pick that is open (why.ts, whyNotChosen), or null.
+  chosen: (cardId: string) => string | null = () => null,
 ): { cards: PreviewCard[]; start: number } {
   const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId)];
   const cards = ids.flatMap((id, index): PreviewCard[] => {
@@ -53,10 +56,15 @@ export function previewCards(
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
-    const note = id === cardId ? whyNotPlayable(game, ctx, id, cardName) : null;
+    const refusal = id === cardId ? chosen(id) : null;
+    const note = id === cardId ? (whyNotPlayable(game, ctx, id, cardName) ?? refusal) : null;
     const described = describe(card.code, pictureKey(card));
     const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id);
-    return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), effects, ...(role ? { role } : {}), ...(note ? { note } : {}) }];
+    // The Heading card: titled by its step and its course, listing the four steps with the current one marked, and drawn turned a quarter turn per step (dcce.heading). A peek never changes the dial.
+    const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
+    const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
+    const steps = heading ? headingPreviewSteps(heading).map((row) => (row.current ? `Now · ${row.line}` : row.line)) : [];
+    return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, effects: [...steps, ...effects], ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
   });
   return { cards, start: Math.max(0, ids.indexOf(cardId)) };
 }

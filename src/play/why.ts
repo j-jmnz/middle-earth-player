@@ -5,9 +5,10 @@
 // what is legal (the reducer does).
 import { attachmentTargets, playWindowReason } from "../rules/planning.ts";
 import { printedOf } from "../rules/printed.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { reduce, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
 import { playRequest } from "./pay.ts";
+import type { Sheet } from "./sheet-types.ts";
 
 const SPHERE_WORD: Readonly<Record<string, string>> = { leadership: "Leadership", tactics: "Tactics", spirit: "Spirit", lore: "Lore", fellowship: "Fellowship", baggins: "Baggins", neutral: "Neutral" };
 
@@ -59,4 +60,26 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
     }
   }
   return null;
+}
+
+/**
+ * Why a character the open pick veils cannot be chosen, in the engine's own refusal (dcce.ship-enemies, dcce.ship-objectives): only a ship defends against a ship-enemy's attack, a ship attacks
+ * only a ship-enemy. Null when the card is one of the pick's options, is not a character of the acting seat, or the engine would take it. The table adds no words of its own.
+ */
+export function whyNotChosen(game: ScenarioState, ctx: ReduceContext, cardId: string, sheet: Sheet | null): string | null {
+  const card = game.cards[cardId];
+  if (!card || !sheet || card.controller !== game.activeSeat || game.lost || game.stageCleared) return null;
+  if (sheet.kind !== "pick" && sheet.kind !== "multi") return null;
+  if (sheet.options.some((item) => item.id === cardId)) return null;
+  const type = printedOf(ctx.cards, card.code).type;
+  if (type !== "hero" && type !== "ally" && type !== "objective") return null;
+  const attempt =
+    sheet.kind === "multi" && sheet.build.kind === "attack"
+      ? ({ type: "DeclareAttackers", enemyId: sheet.build.enemyId, attackerIds: [cardId] } as const)
+      : sheet.kind === "pick" && game.window?.kind === "defense"
+        ? ({ type: "DeclareDefender", defenderId: cardId } as const)
+        : null;
+  if (!attempt) return null;
+  const refused = reduce(game, attempt, ctx);
+  return refused.ok ? null : `${refused.reason}.`;
 }

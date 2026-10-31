@@ -25,6 +25,7 @@ import { STEP_WORDS } from "./rail.ts";
 import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
 import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
+import { sailingSheet } from "./sea-sheets.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -155,6 +156,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     return { kind: "outcome", key: "lost", result: "lost", step: "Scenario", title: "Defeat", note: game.lossReason ? `${game.lossReason}.` : "The scenario is lost.", action: "Continue" };
   }
   if (game.stageCleared) return wonSheet(game);
+  // A Sailing test being asked: the first player's commit, then one shift-or-keep for each success symbol (sea-sheets.ts).
+  const sailing = sailingSheet(game, ctx, names);
+  if (sailing) return sailing;
   const window = game.window;
   if (!window) return null;
   const frame = topFrame(game);

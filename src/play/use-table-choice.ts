@@ -15,7 +15,7 @@ import { tableSettings, toggleAlways } from "./table-settings.ts";
 import type { Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { hidesFace, actingSeat, onTableFor } from "./selectors.ts";
+import { hidesFace, actingSeat, isLooked, onTableFor } from "./selectors.ts";
 import { dropOutcome, targetFromKey } from "./selection.ts";
 import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock-extras.ts";
@@ -92,7 +92,7 @@ export function useTableChoice({
   beats: BeatStore;
   // A tap on a card the moment does not ask about shows it large; `extra` are cards to list with it (the Look window's).
   onPreview: (cardId: string, extra?: readonly string[]) => void;
-  // A tap on a pile: the screen opens a discard pile's list.
+  // A tap on a pile: the screen opens a discard pile's list; a tap on a fold stack names its row ("staging", "engaged") and opens the row's list.
   onPile: (pile: string) => void;
   // The scenario is over and the player goes to its resolution.
   onOutcome: () => void;
@@ -125,14 +125,17 @@ export function useTableChoice({
   const live = overlay && overlay.game === game ? overlay : null;
   const sheet = live?.sheet ?? base;
   const table: TapContext = useMemo(() => ({ game, ctx, legal, names }), [game, ctx, legal, names]);
-  const onTable = useMemo(() => onTableFor(game, acting), [game, acting]);
+  // A card folded into a row's stack is not drawn whole: a pick that reaches one opens as the choice tray (row-fold.ts).
+  const foldedIds = useStore(store, (state) => state.folded);
+  const foldedSet = useMemo(() => new Set([...foldedIds.staging, ...foldedIds.engaged]), [foldedIds]);
+  const onTable = useMemo(() => onTableFor(game, acting, foldedSet), [game, acting, foldedSet]);
   // A moment that is not this one (a new sheet key) ends a peek; while it lasts a tap on a card only previews it.
   const peeking = usePeeking(store, sheet.key);
   // On paper: when the player asked, when a screen reader is on (a card drawn only on the canvas is no control for it), or
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   // A Response the player may use opens listed, beside the dock's Pass (user request, 2026-10-29).
   const responses = listsResponses(sheet, game.window?.kind);
-  const asked = (live?.panel ?? false) || listed === sheet.key || responses || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0);
+  const asked = (live?.panel ?? false) || listed === sheet.key || responses || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0) || (reader && sheet.kind === "pick" && sheet.look != null);
   const panel = asked || !onTheTable(sheet, onTable);
   const panelOpen = trayOpen(panel, folded, sheet.key);
   const passLegal = legal.some((intent) => intent.type === "Pass");
@@ -248,7 +251,7 @@ export function useTableChoice({
     (cardId: string) => {
       // A Response listed only so it shows beside Pass still glows on the table, and a tap on its card picks it.
       const answers = responses && tappable(sheet).has(cardId);
-      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]), answers }, pick);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isLooked(game, cardId), answers }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
       else if (action === "preview") onPreview(cardId);

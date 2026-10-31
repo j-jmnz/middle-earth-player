@@ -7,7 +7,11 @@ import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceCont
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
+import { enemy as seaEnemy, hero as seaHero, seaTable, send, ship as seaShip, shipEnemy, until } from "../rules/families/sea-table.ts";
+
 import { actionsSheet, commitSheet, windowSheet } from "./bar-sheets.ts";
+import { sailingTable } from "./sea-fixture.ts";
+import { whyNotChosen } from "./why.ts";
 import { highlightKeys } from "./highlight-of.ts";
 import { momentOf } from "./outcome.ts";
 import { tableLayout } from "./layout.ts";
@@ -17,7 +21,7 @@ import { twoHanded } from "./seat-fixture.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
 import { createTableStore } from "./store.ts";
-import { tapAction } from "./tray-logic.ts";
+import { tapAction, trayTiles } from "./tray-logic.ts";
 import { choiceFor, dockFor, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
@@ -298,3 +302,122 @@ describe("a peek at the other seat", () => {
     expect(store.getState().viewedSeat).toBeNull();
   });
 });
+
+// Rules: dcce.ship-enemies, dcce.ship-objectives, dcce.sailing-tests (data/rules/entries.json). How the table answers the sea family's moments: a defender pick that glows the
+// ships and veils the rest with the engine's own refusal, the Sailing commit with its readout, a pick that reaches a folded card, and no sheet that asks for a number.
+describe("the sea family's moments on the table", () => {
+  const SEA_NAMES: SheetNames = { card: (id) => id, line: () => null };
+  const sea = (seed: Parameters<typeof seaTable>[0]) => seaTable(seed);
+
+  function underShipAttack() {
+    const built = sea({ cards: [seaHero("aragorn"), seaShip("dc", "Dream-chaser"), seaShip("ds", "Dawn Star"), shipEnemy("corsair")], effects: [], heroes: [{ code: "aragorn" }], allies: [{ code: "dc" }, { code: "ds" }], enemies: [{ code: "corsair" }] });
+    return { ...built, state: until(send(built.state, { type: "DeclineEngage" }, built.ctx), built.ctx, (state) => state.window?.kind === "defense") };
+  }
+
+  it("glows the ships and veils every other character in a ship-enemy's defender pick, with the engine's reason on the veiled card", () => {
+    const { state, ids, ctx: seaCtx } = underShipAttack();
+    const legal = legalIntents(state, seaCtx);
+    const sheet = sheetFor(state, seaCtx, legal, SEA_NAMES);
+    expect(sheet?.kind).toBe("pick");
+    const glow = tappable(sheet as Sheet);
+    expect([...glow].sort()).toEqual([ids.dc, ids.ds].sort());
+    const keys = highlightKeys({ game: state, seat: 0, sheet: sheet as Sheet, choice: { key: (sheet as Sheet).key, ids: [], shares: [] }, panel: false });
+    expect(keys.dim).toBe(true);
+    expect(whyNotChosen(state, seaCtx, ids.aragorn!, sheet)).toBe("Only a ship-objective can defend against a ship-enemy's attack.");
+    // A ship that can be chosen carries no refusal.
+    expect(whyNotChosen(state, seaCtx, ids.dc!, sheet)).toBeNull();
+  });
+
+  it("veils the ships when the attack is not a ship-enemy's, and an attack on a non-ship enemy refuses the ships with the engine's words", () => {
+    const built = sea({ cards: [seaHero("aragorn"), seaShip("dc", "Dream-chaser"), seaEnemy("raider")], effects: [], heroes: [{ code: "aragorn" }], allies: [{ code: "dc" }], enemies: [{ code: "raider" }] });
+    const state = { ...built.state, phase: "Combat" as const, mode: "playerAttacks" as const, window: { kind: "playerAttack" as const }, boundaryPhase: "Combat" as const };
+    const picking: Sheet = { kind: "multi", key: "attack", step: "Combat", title: "Attack", note: null, verb: "Attack", options: [{ id: built.ids.aragorn!, label: "aragorn", code: "aragorn" }], build: { kind: "attack", enemyId: built.ids.raider! }, allowEmpty: false, preselected: [], alternative: null };
+    expect(whyNotChosen(state, built.ctx, built.ids.dc!, picking)).toBe("A ship-objective can only attack a ship-enemy.");
+    expect(whyNotChosen(state, built.ctx, built.ids.aragorn!, picking)).toBeNull();
+  });
+
+  it("refuses a character that cannot attack with the engine's reason, the path Raider Flagship's own line takes (phase 47)", () => {
+    const built = sea({ cards: [seaHero("aragorn"), seaHero("boromir"), shipEnemy("flagship")], effects: [], heroes: [{ code: "aragorn" }, { code: "boromir" }], enemies: [{ code: "flagship" }] });
+    const bar = { ...built.state, modifiers: [...built.state.modifiers, { instanceId: built.ids.boromir!, stat: "cannotAttack" as const, amount: 1, until: "endOfPhase" as const, sourceId: built.ids.flagship! }] };
+    const state = { ...bar, phase: "Combat" as const, mode: "playerAttacks" as const, window: { kind: "playerAttack" as const }, boundaryPhase: "Combat" as const };
+    const picking: Sheet = { kind: "multi", key: "attack", step: "Combat", title: "Attack", note: null, verb: "Attack", options: [{ id: built.ids.aragorn!, label: "aragorn", code: "aragorn" }], build: { kind: "attack", enemyId: built.ids.flagship! }, allowEmpty: false, preselected: [], alternative: null };
+    expect(whyNotChosen(state, built.ctx, built.ids.boromir!, picking)).toMatch(/^.+\.$/);
+  });
+
+  it("opens a pick that reaches a folded card as the choice tray, and as the table when the card is drawn whole", () => {
+    const { state, ids, ctx: seaCtx } = underShipAttack();
+    const sheet = sheetFor(state, seaCtx, legalIntents(state, seaCtx), SEA_NAMES) as Sheet;
+    expect(onTheTable(sheet, onTableFor(state, 0))).toBe(true);
+    expect(onTheTable(sheet, onTableFor(state, 0, new Set([ids.dc!])))).toBe(false);
+    expect(onTableFor(state, 0, new Set([ids.ds!]))(ids.ds!)).toBe(false);
+    expect(onTableFor(state, 0, new Set([ids.ds!]))(ids.dc!)).toBe(true);
+  });
+
+  function atSailing() {
+    const f = sailingTable();
+    return { ...f, sheet: sheetFor(f.state, f.ctx, legalIntents(f.state, f.ctx), SEA_NAMES) as Sheet };
+  }
+
+  it("asks the Sailing commit as a pick of characters with no willpower pill, and counts the Dream-chaser as 2 from the engine", () => {
+    const { state, ids, ctx: seaCtx, sheet } = atSailing();
+    expect(sheet.kind).toBe("multi");
+    if (sheet.kind !== "multi") return;
+    expect(sheet.title).toBe("Commit to the Sailing test");
+    expect(sheet.options.map((item) => item.id).sort()).toEqual([ids.aragorn, ids.dc].sort());
+    for (const item of sheet.options) expect(item.stats).toBeUndefined();
+    const picked = (list: readonly string[]) => readoutFor(state, seaCtx, sheet, { key: sheet.key, ids: list, shares: [] }, (id) => (id === ids.dc ? "Dream-chaser" : id));
+    expect(picked([ids.aragorn!])?.result).toBe("Looks at 1 card");
+    expect(picked([ids.aragorn!, ids.dc!])?.result).toBe("Looks at 3 cards · the Dream-chaser counts as 2");
+    expect(picked([])?.kind).toBe("sailing");
+    // The primary counts the picks and is the quest commit's intent, which the engine reads as the test's.
+    const table: TapContext = { game: state, ctx: seaCtx, legal: legalIntents(state, seaCtx), names: SEA_NAMES };
+    const dock = dockFor(sheet, { key: sheet.key, ids: [ids.aragorn!, ids.dc!], shares: [] }, table, { overlay: false, passLegal: true, surface: "table" });
+    expect(dock.primary?.label).toBe("Commit 2");
+    expect(dock.primary?.action).toEqual({ kind: "intent", intent: { type: "Commit", cardIds: [ids.aragorn, ids.dc] } });
+    expect(accepted2(state, seaCtx, dock.primary?.action)).toBe(true);
+  });
+
+  it("answers each symbol found with a shift or a keep, lists the cards looked at, and reads the heading change the engine would make", () => {
+    const { state, ids, ctx: seaCtx } = atSailing();
+    const asked = send(state, { type: "Commit", cardIds: [ids.aragorn!, ids.dc!] }, seaCtx);
+    const sheet = sheetFor(asked, seaCtx, legalIntents(asked, seaCtx), SEA_NAMES) as Sheet;
+    expect(sheet.kind).toBe("pick");
+    if (sheet.kind !== "pick") return;
+    expect(sheet.title).toBe("Sailing test · 3 successes");
+    expect(sheet.look?.map((row) => row.success)).toEqual([1, 0, 2]);
+    expect(sheet.primary?.intent).toEqual({ type: "Choose", optionId: "shift" });
+    expect(sheet.alternative && "intent" in sheet.alternative && sheet.alternative.intent).toEqual({ type: "Choose", optionId: "keep" });
+    const readout = readoutFor(asked, seaCtx, sheet, null, (id) => id);
+    // The commit shifted the heading off-course to Cloud; three symbols could bring it back to Sun, and no further.
+    expect(readout?.result).toBe("Cloud to Sun");
+    expect(readout?.stats).toEqual([{ icon: "sailingSuccess", value: 3, word: "Success" }]);
+    expect(accepted2(asked, seaCtx, { kind: "intent", intent: { type: "Choose", optionId: "shift" } })).toBe(true);
+    // The rows the dock's List opens, read-only, each with its symbols.
+    const tiles = trayTiles(sheet);
+    expect(tiles.map((tile) => tile.look)).toEqual([1, 0, 2]);
+    expect(tiles.map((tile) => tile.detail)).toEqual(["Success", null, "Success ×2"]);
+  });
+
+  it("offers every sea sheet's options as cards or answers, never a number to type", () => {
+    const sheets: Sheet[] = [];
+    const commit = atSailing();
+    sheets.push(commit.sheet);
+    const asked = send(commit.state, { type: "Commit", cardIds: [commit.ids.aragorn!] }, commit.ctx);
+    sheets.push(sheetFor(asked, commit.ctx, legalIntents(asked, commit.ctx), SEA_NAMES) as Sheet);
+    const under = underShipAttack();
+    sheets.push(sheetFor(under.state, under.ctx, legalIntents(under.state, under.ctx), SEA_NAMES) as Sheet);
+    for (const sheet of sheets) {
+      expect(sheet.kind === "distribute", sheet.key).toBe(false);
+      if (sheet.kind === "multi" || sheet.kind === "pick") {
+        // Each option is a card of the table or an answer the engine lists; nothing is a count to enter.
+        for (const item of sheet.options) expect(Number.isNaN(Number(item.id)), `${sheet.key} ${item.id}`).toBe(true);
+      }
+      const intents = [sheet.kind === "pick" ? sheet.primary?.intent : null, sheet.kind === "pick" && sheet.alternative && "intent" in sheet.alternative ? sheet.alternative.intent : null].filter((intent) => intent != null);
+      for (const intent of intents) expect(JSON.stringify(intent)).not.toMatch(/"amount"|"threat"|"damage"|"progress"|"resources"|"life"/);
+    }
+  });
+});
+
+function accepted2(state: ScenarioState, seaCtx: ReduceContext, action: Dock["primary"] extends infer P ? (P extends { action: infer A } ? A : never) | undefined : never): boolean {
+  return action?.kind === "intent" && reduce(state, action.intent, seaCtx).ok;
+}

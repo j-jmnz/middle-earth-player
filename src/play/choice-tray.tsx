@@ -105,7 +105,7 @@ export function ChoiceTray({
               detail={tile.detail}
               stats={tile.stats}
               selected={shown.kind === "distribute" ? share > 0 : marks.has(tile.id)}
-              testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : `sheet-option-${tile.id}`}
+              testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : tile.look != null ? `sheet-look-${tile.id}` : `sheet-option-${tile.id}`}
               leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:tray`} {...cardBox(dense, s)} /> : null}
               trailing={mark ? <DamagePill mark={mark} /> : null}
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}

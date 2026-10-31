@@ -13,6 +13,7 @@ import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
 import { layoutAnim, springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
+import { HEADING_HINT, headingArcs, headingDelta, headingDeltaWords, headingLook, headingWords, type HeadingStep } from "./heading.ts";
 import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
@@ -237,6 +238,75 @@ function ThreatDial({
             style={{ borderRadius: 999, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
             <Text testID={`${id}-delta`} className="font-display text-label text-bone">
+              {delta.text}
+            </Text>
+          </Animated.View>
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
+/**
+ * The Heading dial of the top bar (dcce.heading), while the Heading card is in play: the Life dial's frame (46 pt, no number), the current step's icon in the disc, and a ring of four
+ * quarter arcs lit clockwise from the top (Sun four, Cloud three, Rain two, Storm one). Sun is the accent, Cloud and Rain bone, Storm threat red on a filled disc; the icon's shape and the
+ * arcs carry the step without the colour. A shift pops the dial as the threat dial pops and says the change for three seconds ("On-course", "Off-course"); reduced motion keeps it still and
+ * shows the badge. A tap opens the Heading card's preview and never changes the dial. The engine owns the step.
+ */
+export function HeadingDial({ step, onPress }: { step: HeadingStep; onPress?: () => void }) {
+  const speed = useMotionScale();
+  const t = useTableTokens();
+  const s = useUiScale();
+  const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
+  const look = headingLook(step);
+  const color = t[look.tone];
+  const seen = useRef(step);
+  const [change, setChange] = useState<{ before: HeadingStep; after: HeadingStep; at: number } | null>(null);
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    const before = seen.current;
+    seen.current = step;
+    if (before === step) return;
+    setChange({ before, after: step, at: Date.now() });
+    if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
+  }, [step, speed, scale]);
+  useEffect(() => {
+    if (!change) return;
+    const timer = setTimeout(() => setChange(null), DELTA_MS);
+    return () => clearTimeout(timer);
+  }, [change]);
+  const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
+  const delta = change ? headingDelta(change.before, change.after) : null;
+  const deltaWords = change ? headingDeltaWords(change.before, change.after) : null;
+  const words = `${headingWords(step)}${deltaWords ? `. ${deltaWords}` : ""}`;
+  return (
+    <Pressable
+      disabled={!onPress}
+      onPress={onPress}
+      accessible
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={words}
+      accessibilityHint={onPress ? HEADING_HINT : undefined}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+    >
+      <Animated.View style={pop}>
+        <View testID="heading" style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s }}>
+          <ArcRing size={DIAL * s} stroke={4 * s} parts={headingArcs(step, color)} track={withAlphaHex(t.bone, 0.16)}>
+            <View className="items-center justify-center" style={{ width: (DIAL - 8) * s, height: (DIAL - 8) * s, borderRadius: ((DIAL - 8) / 2) * s, backgroundColor: look.filled ? t.threat : t.night }}>
+              <GameIcon name={look.icon} size={22 * s} tint={look.filled ? "onThreat" : look.tone} />
+            </View>
+          </ArcRing>
+        </View>
+        {/* The step's word, clear text a flow reads (as rail-current is); the icon and the arcs are what the player sees. */}
+        <Text testID="heading-value" numberOfLines={1} pointerEvents="none" className="text-micro" style={{ position: "absolute", color: "transparent", lineHeight: 14 * s }}>
+          {look.word}
+        </Text>
+      </Animated.View>
+      <View className="items-start gap-0.5">
+        <Text className="text-label text-muted">{look.label}</Text>
+        {delta ? (
+          <Animated.View key={change?.at} entering={badge.in} exiting={badge.out} style={{ borderRadius: 999, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(delta.towardSun ? t.accent : t.threat, 0.22) }}>
+            <Text testID="heading-delta" className="font-display text-label text-bone">
               {delta.text}
             </Text>
           </Animated.View>

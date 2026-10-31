@@ -9,6 +9,9 @@ import { badgeSplit, type CardEffects } from "./card-effects.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
+import { medallionAt } from "./look-strip.ts";
+import { FOLD_WORD, foldCount } from "./row-fold.ts";
+import { medallionCount } from "./sea-words.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
@@ -184,15 +187,19 @@ export function CardBody({
   );
 }
 
-const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard" };
+const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard" };
+
+// The piles that show the printed encounter back (the Eye): the encounter pair and the Corsair pair.
+const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard"]);
 
 /** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
 export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const strip = 15 * s;
-  const encounter = slot.zone === "encounterDeck" || slot.zone === "encounterDiscard";
-  const word = PILE_WORD[slot.zone] ?? "";
+  const encounter = ENCOUNTER_PILES.has(slot.zone);
+  // A row's fold stack shows its first folded card, "+n" on the count strip and the word More (row-fold.ts).
+  const word = slot.fold ? FOLD_WORD : (PILE_WORD[slot.zone] ?? "");
   if (slot.count === 0) {
     return (
       <Group>
@@ -227,7 +234,7 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
         </Group>
       )}
       <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-      <Outlined x={x + w / 2} y={y + h - 3 * s} text={String(slot.count)} font={fonts.numbers} t={t} s={s} />
+      <Outlined x={x + w / 2} y={y + h - 3 * s} text={slot.fold ? foldCount(slot.count) : String(slot.count)} font={fonts.numbers} t={t} s={s} />
       {/* Iron Shackles is attached to this deck (01105:A:1): two linked rings at the strip's left end. */}
       {slot.chained ? (
         <Group>
@@ -236,6 +243,35 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
         </Group>
       ) : null}
       {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h + 11 * s} text={word} font={fonts.small} color={t.muted} /> : null}
+    </Group>
+  );
+}
+
+/** The Sailing test's success mark on a looked-at card (dcce.sailing-tests): a 22 pt night medallion straddling its foot with the symbol in the accent, upright; "×2" beside it with two symbols. */
+export function SuccessMedallion({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
+  const at = medallionAt(slot, s);
+  const count = medallionCount(slot.success ?? 0);
+  return (
+    <Group>
+      <Circle cx={at.cx} cy={at.cy} r={at.r} color={t.night} />
+      <Circle cx={at.cx} cy={at.cy} r={at.r} color={t.accent} style="stroke" strokeWidth={1 * s} />
+      <CanvasIcon name="sailingSuccess" x={at.cx - at.r * 0.62} y={at.cy - at.r * 0.62} size={at.r * 1.24} color={t.accent} />
+      {count ? <Text x={at.cx + at.r + 2 * s} y={at.cy + 4 * s} text={count} font={fonts.small} color={t.bone} /> : null}
+    </Group>
+  );
+}
+
+/** The count on a staging card's one peek when more than one card is under it ("×2"): a small night pill at the right end of the visible strip. */
+export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
+  const text = `×${slot.stack ?? 0}`;
+  const width = fonts.small.getTextWidth(text) + 6 * s;
+  const height = 10 * s;
+  const x = slot.x + slot.w - width - 3 * s;
+  const y = slot.y + slot.h - height;
+  return (
+    <Group>
+      <RoundedRect x={x} y={y} width={width} height={height} r={height / 2} color={withAlphaHex(t.night, 0.9)} />
+      <Text x={x + 3 * s} y={y + height - 1.5 * s} text={text} font={fonts.small} color={t.bone} />
     </Group>
   );
 }

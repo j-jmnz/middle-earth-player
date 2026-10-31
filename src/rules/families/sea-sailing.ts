@@ -42,8 +42,8 @@ export function sailingStep(state: ScenarioState, ctx: ReduceContext): ScenarioS
   return null;
 }
 
-// How many characters a committed card counts as: itself and what it counts as beyond one ("counts as 2 characters": 1 extra).
-function weight(state: ScenarioState, id: string): number {
+// How many characters a committed card counts as: itself and what it counts as beyond one ("counts as 2 characters": 1 extra). The table reads it for the commit's readout.
+export function committedWeight(state: ScenarioState, id: string): number {
   return 1 + Math.max(0, heldAmount(state, id, "sailingExtra"));
 }
 
@@ -62,7 +62,7 @@ export function performSailing(state: ScenarioState, ids: readonly string[], ctx
   // 2. The characters are exhausted, committed to the test.
   let count = 0;
   for (const id of ids) {
-    count += weight(next, id);
+    count += committedWeight(next, id);
     next = updateCard(next, id, { exhausted: true });
   }
   // 3. As many cards from the top of the encounter deck as characters; a deck too short is first shuffled with its discard pile.

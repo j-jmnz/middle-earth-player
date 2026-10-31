@@ -61,7 +61,7 @@ function nextTrack(track: Track, layout: TableLayout, seat: number, acting: numb
   const from = kind === "ordinary" && track.seat !== seat ? track.actingLayout : track.layout;
   const sameSize = from.width === layout.width && from.height === layout.height;
   const animate = k > 0 && sameSize && kindMoves(kind);
-  const between = animate ? motionsBetween(from, layout, zoneNow, { handoff: kind === "handoff" }) : motionsBetween(null, layout, zoneNow);
+  const between = animate ? motionsBetween(from, layout, zoneNow, { handoff: kind === "handoff", zoneWas: (cardId) => prevGame.cards[cardId]?.zone ?? null }) : motionsBetween(null, layout, zoneNow);
   // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
   // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
   // the same card keeps its pop and its number).

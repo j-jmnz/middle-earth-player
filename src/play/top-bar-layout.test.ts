@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
+import { UI_SCALES } from "./ui-scale.ts";
 import { barZones, headlineWidth, MENU_BUTTON, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, TICK, TICK_GAP } from "./top-bar-layout.ts";
 
 // The rail names a phase over its ticks and nothing longer, so it never needs more than this.
@@ -75,5 +76,44 @@ describe("top bar zones", () => {
     expect(railWide(RAIL_MAX, false)).toBe(true);
     expect(railWide(400, true)).toBe(false);
     expect(railWide(200, false)).toBe(false);
+  });
+});
+
+// Rules: dcce.heading (data/rules/entries.json). The Heading dial joins the dials at the left, after the seat dials (docs/design-system-table.md, Top bar). The bar measures its dials, so its zones
+// take their natural width: a dial is its 46 pt frame, 4 pt of padding each side, a 6 pt gap and its label or badge (label size 11 pt, 0.55 em a letter), the dials 10 pt apart.
+describe("the Heading dial in the top bar (phase 39b)", () => {
+  const dial = (word: string, scale: number) => (8 + 46 + 6 + Math.ceil(word.length * 0.55 * 11)) * scale;
+  const dials = (seats: number, scale: number) => Array.from({ length: seats }, () => dial("P1", scale)).reduce((sum, w) => sum + w, 0) + dial("Off-course", scale) + seats * 10 * scale;
+
+  it("keeps the rail on the screen's middle at 667 x 375 with two seats and the Heading dial, scrolling the dials rather than moving it", () => {
+    for (const [width, inset] of [[667, 0], [844, 47]] as const) {
+      const bar = width - 2 * inset - 2 * 8;
+      const center = bar / 2;
+      const zones = barZones(bar, dials(2, 1), 1, center);
+      expect(Math.abs(zones.left + zones.rail / 2 - center)).toBeLessThanOrEqual(0.5);
+      expect(zones.rail).toBeGreaterThanOrEqual(RAIL_FLOOR);
+      expect(zones.right).toBeGreaterThanOrEqual(MENU_BUTTON);
+      expect(Math.abs(bar - zones.left - zones.rail - zones.right)).toBeLessThan(1);
+    }
+    // On a 667 pt phone the dials are wider than the room the rail leaves them: they scroll, none cut.
+    const phone = 667 - 16;
+    expect(barZones(phone, dials(2, 1), 1, phone / 2).scroll).toBe(true);
+  });
+
+  it("scrolls the dials at Large and cuts none, the rail still on the middle, and leaves room when one seat has the room", () => {
+    const L = UI_SCALES.large;
+    const phone = (667 - 16) * 1;
+    const large = barZones(phone, dials(2, L), L, phone / 2);
+    expect(large.scroll).toBe(true);
+    expect(Math.abs(large.left + large.rail / 2 - phone / 2)).toBeLessThanOrEqual(0.5);
+    expect(large.left).toBeLessThan(dials(2, L));
+    // A tablet holds them all.
+    const tablet = 1024 - 16;
+    const wide = barZones(tablet, dials(2, 1), 1, tablet / 2);
+    expect(wide.scroll).toBe(false);
+    expect(wide.left).toBeGreaterThanOrEqual(dials(2, 1));
+    // A solo player's one seat and the Heading dial fit beside the centred rail at 844 x 390.
+    const solo = 844 - 2 * 47 - 16;
+    expect(barZones(solo, dials(1, 1), 1, solo / 2).scroll).toBe(false);
   });
 });

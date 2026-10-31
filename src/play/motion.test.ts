@@ -279,3 +279,72 @@ describe("landAt", () => {
     expect(landAt(motionsBetween(base, base, nowhere).motions)).toBeNull();
   });
 });
+
+// Rules: dcce.boarding, dcce.corsair-deck, dcce.sailing-tests (data/rules/entries.json). Boarding's reveal, the Corsair pair and a Sailing test's look move as the other encounter cards do.
+describe("motionsBetween: Boarding, the Corsair pair and the look strip", () => {
+  const second = { ...piles, corsairDeck: { x: 400, y: 120, w: 50, h: 70 }, corsairDiscard: { x: 460, y: 120, w: 50, h: 70 } };
+  const withPair = (slots: readonly CardSlot[]): TableLayout => ({ ...layout(slots), piles: second });
+  const pileSlot = (id: string, count: number, rect: Rect) => slot(`pile:${id}`, id as SlotZone, rect, { count }, "pile");
+
+  it("brings each Corsair card off the Corsair deck, flipped and popping, the cards 90 ms apart", () => {
+    const before = withPair([slot("ship", "engaged", at(120, 100))]);
+    const after = withPair([slot("ship", "engaged", at(120, 100)), slot("c1", "engaged", at(180, 100)), slot("c2", "engaged", at(240, 100))]);
+    const { motions } = motionsBetween(before, after, nowhere, { zoneWas: (id) => (id.startsWith("c") ? "corsairDeck" : "engaged") });
+    for (const [id, delay] of [["c1", 0], ["c2", 90]] as const) {
+      const motion = motions.get(id);
+      expect(motion?.flip, id).toBe(true);
+      expect(motion?.land, id).toBe("pop");
+      expect(motion?.delay, id).toBe(delay);
+      // It starts at the Corsair deck: the deck's centre from its own slot's.
+      const slotAt = after.slots.find((candidate) => candidate.id === id) as CardSlot;
+      expect(motion?.dx, id).toBe(425 - (slotAt.x + 25));
+      expect(motion?.dy, id).toBe(155 - (slotAt.y + 35));
+    }
+    expect(motions.get("ship")?.flip).toBe(false);
+  });
+
+  it("brings a card revealed from the encounter deck off the encounter deck, whichever pair the table has", () => {
+    const before = withPair([]);
+    const after = withPair([slot("e", "engaged", at(180, 100))]);
+    const { motions } = motionsBetween(before, after, nowhere, { zoneWas: () => "encounterDeck" });
+    expect(motions.get("e")?.dx).toBe(425 - 205);
+    expect(motions.get("e")?.dy).toBe(45 - 135);
+  });
+
+  it("sends a non-ship enemy that is discarded toward the Corsair discard pile", () => {
+    const before = withPair([slot("c", "engaged", at(180, 100), { damage: 3 })]);
+    const after = withPair([]);
+    const { ghosts } = motionsBetween(before, after, (id) => (id === "c" ? "corsairDiscard" : null));
+    expect(ghosts).toHaveLength(1);
+    expect(ghosts[0]?.leave).toBe("shake");
+    expect(ghosts[0]?.dx).toBe(485 - 205);
+    expect(ghosts[0]?.dy).toBe(155 - 135);
+  });
+
+  it("glides the discard pile's cards to the deck when the Corsair deck is shuffled back, and keeps both piles still", () => {
+    const before = withPair([pileSlot("corsairDeck", 0, second.corsairDeck), pileSlot("corsairDiscard", 4, second.corsairDiscard)]);
+    const after = withPair([pileSlot("corsairDeck", 4, second.corsairDeck), pileSlot("corsairDiscard", 0, second.corsairDiscard)]);
+    const { ghosts, motions } = motionsBetween(before, after, nowhere);
+    expect(ghosts).toHaveLength(1);
+    expect(ghosts[0]?.leave).toBe("glide");
+    expect(ghosts[0]?.dx).toBe(-60);
+    expect(still(motions.get("pile:corsairDeck") as NonNullable<ReturnType<typeof motions.get>>)).toBe(true);
+    // No reshuffle, no glide.
+    expect(motionsBetween(before, before, nowhere).ghosts).toEqual([]);
+  });
+
+  it("brings the looked-at cards off the encounter deck face up, one after another, and glides them to the discard pile without a shake", () => {
+    const before = layout([]);
+    const looked = [slot("a", "encounterDeck", at(100, 20), { success: 1 }), slot("b", "encounterDeck", at(160, 20), { success: 0 }), slot("c", "encounterDeck", at(220, 20), { success: 2 })];
+    const strip = layout(looked);
+    const { motions } = motionsBetween(before, strip, nowhere);
+    expect(["a", "b", "c"].map((id) => motions.get(id)?.delay)).toEqual([0, 90, 180]);
+    for (const id of ["a", "b", "c"]) {
+      expect(motions.get(id)?.flip, id).toBe(true);
+      expect(motions.get(id)?.land, id).toBe("pop");
+    }
+    const { ghosts } = motionsBetween(strip, layout([]), (id) => (looked.some((card) => card.id === id) ? "encounterDiscard" : null));
+    expect(ghosts.map((ghost) => ghost.leave)).toEqual(["glide", "glide", "glide"]);
+    expect(ghosts[0]?.dx).toBe(485 - 125);
+  });
+});

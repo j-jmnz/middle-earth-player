@@ -15,10 +15,23 @@ export type TrayTile = {
   stats: readonly SheetStat[];
   // The damage a defender would take, as a pill.
   mark: OptionMark | null;
+  // A card a Sailing test looked at, listed read-only (`sheet-look-<id>`): the symbols it prints. Absent on an option that can be picked.
+  look?: number;
 };
 
 /** The tiles of a sheet: each option; a trigger by its ability, with its timing and printed line. */
 export function trayTiles(sheet: Sheet): TrayTile[] {
+  // A Sailing test's answer lists the cards it looked at, none of them a choice (sea-sheets.ts).
+  if (sheet.kind === "pick" && sheet.look != null) return sheet.look.map((row) => ({
+      id: row.id,
+      label: row.name,
+      code: row.code,
+      readId: row.id,
+      detail: row.success > 0 ? (row.success === 1 ? "Success" : `Success ×${row.success}`) : null,
+      stats: row.success > 0 ? [{ icon: "sailingSuccess" as const, value: row.success, word: "Success" }] : [],
+      mark: null,
+      look: row.success,
+    }));
   switch (sheet.kind) {
     case "pick":
     case "multi":
@@ -53,6 +66,7 @@ export function trayCount(sheet: Sheet, choice: Choice): string {
       return `${given} of ${sheet.total} given`;
     }
     case "pick":
+      if (sheet.look != null) return `${sheet.look.length} ${sheet.look.length === 1 ? "card" : "cards"} looked at`;
       return `${wordOf(sheet.verb)} · ${choice.ids.length > 0 ? `1 of ${sheet.options.length} picked` : `pick 1 of ${sheet.options.length}`}`;
     case "trigger":
       return `${sheet.timing} · ${choice.ids.length > 0 ? `1 of ${sheet.options.length} picked` : `pick 1 of ${sheet.options.length}`}`;
@@ -84,7 +98,7 @@ export function trayOpen(onPaper: boolean, foldedKey: string | null, sheetKey: s
  */
 export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking?: boolean; answers?: boolean }): "fold" | "pile" | "preview" | "pick" {
   if (state.panelOpen && !state.reader && !(state.answers && !state.peeking)) return "fold";
-  if (state.cardId.startsWith("pile:")) return "pile";
+  if (state.cardId.startsWith("pile:") || state.cardId.startsWith("fold:")) return "pile";
   return state.peeking ? "preview" : "pick";
 }
 

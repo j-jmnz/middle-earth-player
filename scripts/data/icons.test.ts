@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { CARD_BACKS as BACK_RECORDS, ICONS } from "../../src/play/icons/generated.ts";
 import { SPHERE_TINT, sphereIcon, typeIcon } from "../../src/play/icon-map.ts";
 import { tableTokens } from "../../src/play/tokens.ts";
-import { backAsset, buildIcons, CARD_BACK_BAR, cardBackRecords, flipPathY, flippedViewBox, iconRecords, parseIconCss, RASTER_ICONS, VECTOR_ICONS } from "./icons.ts";
+import { backAsset, buildIcons, CARD_BACK_BAR, cardBackRecords, flipPathY, flippedViewBox, iconRecords, MEC111_ICONS, parseIconCss, RASTER_ICONS, VECTOR_ICONS } from "./icons.ts";
 import { ROOT } from "./paths.ts";
 
 // The game icons and the printed card backs (docs/design-system.md, Icons): every icon and back the app names is a committed
@@ -22,7 +22,7 @@ function files(dir: string): Map<string, Buffer> {
 describe("icons", () => {
   it("are committed, one file per icon the generated map names, and nothing else", () => {
     const names = Object.keys(ICONS).sort();
-    expect(names).toEqual([...VECTOR_ICONS.map((icon) => icon.name), "nightmare", ...RASTER_ICONS.map((icon) => icon.name)].sort());
+    expect(names).toEqual([...VECTOR_ICONS.map((icon) => icon.name), ...MEC111_ICONS.map((icon) => icon.name), "nightmare", ...RASTER_ICONS.map((icon) => icon.name)].sort());
     const committed = readdirSync(ASSETS).sort();
     const backs = Object.values(BACK_RECORDS).map((back) => backAsset(back.name));
     expect(committed).toEqual([...names.map((name) => `${name}.${ICONS[name as keyof typeof ICONS].kind === "vector" ? "svg" : "png"}`), ...backs].sort());

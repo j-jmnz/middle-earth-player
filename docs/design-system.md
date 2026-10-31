@@ -210,6 +210,7 @@ The game's printed icons. `pnpm data:sync icons` fetches the sources into `data/
 | Icons | Source | Format |
 | --- | --- | --- |
 | willpower, attack, defense, hit points, threat, shadow, unique, cost; Leadership, Tactics, Spirit, Lore, Fellowship, Baggins, Neutral; hero, ally, attachment, event, treasure, player side quest, contract; the One Ring | RingsDB icon font `ringsdb.svg` | Vector, one SVG per glyph |
+| the Heading's four steps (Sun, Cloud, Rain, Storm) and the Sailing success symbol (the ship's wheel) | The Dream-chaser rulebook's (MEC111) embedded `LOTRLCGIcons` font, U+F2091 to U+F2094 and U+F2090: no web icon font carries them, so the sync keeps the font program and its ToUnicode map (`scripts/data/sources/mec111-font.ts`) | Vector, one SVG per glyph (`scripts/data/ttf-glyphs.ts`) |
 | quest points, engagement cost | DragnCards token art | PNG, 256×256 |
 | resource, damage, progress tokens | DragnCards token art | PNG, 146×146 |
 | player and encounter card backs | DragnCards card backs | JPEG, 429×600 |

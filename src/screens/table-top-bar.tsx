@@ -12,7 +12,8 @@ import { seatDial } from "../play/peek";
 import type { Rail } from "../play/rail";
 import type { SeatThreat } from "../play/selectors";
 import { PhaseRail } from "../play/phase-rail";
-import { ThreatRing } from "../play/table-chrome";
+import { HeadingDial, ThreatRing } from "../play/table-chrome";
+import type { HeadingStep } from "../play/heading";
 import { MenuButton } from "../play/table-menu";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
@@ -35,6 +36,8 @@ export type TopBarProps = {
   burdenDeck: number | null;
   // The resource tokens on the campaign card (The Oath, 41050:A:3) and the card's name, or null when its scenario has none.
   tokens?: { name: string; tokens: number } | null;
+  // The Heading dial, after the seat dials, while the Heading card is in play (dcce.heading): the current step, and what a tap does (the Heading card's preview). Absent: no dial.
+  heading?: { step: HeadingStep; onPress: () => void } | null;
   // On Nightmare: opens the setup card next to the quest deck (the Eye of Sauron after the dials). Absent on Easy and Normal.
   onNightmare?: (() => void) | null;
   rail: Rail;
@@ -56,7 +59,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, onNightmare = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, onNightmare = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -111,6 +114,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                 />
               );
             })}
+            {heading ? <HeadingDial step={heading.step} onPress={heading.onPress} /> : null}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

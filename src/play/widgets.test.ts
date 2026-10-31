@@ -13,7 +13,7 @@ import { loadWorld, table, type World } from "../../scripts/past-scene.ts";
 
 import { ledgerLine, ruleTitle } from "./ledger.ts";
 import { logLines, type LogNames } from "./log.ts";
-import { nightmareCardId, widgetReadouts } from "./widgets.ts";
+import { headingReadout, nightmareCardId, widgetReadouts } from "./widgets.ts";
 
 let ford: FordWorld;
 let past: World;
@@ -79,5 +79,24 @@ describe("the Nightmare Eye", () => {
     expect(nightmareCardId(mode.state)).toBeNull();
     const setup = spawn(mode.state, "900101", { zone: "nightmare" }, "A");
     expect(nightmareCardId(setup.state)).toBe(setup.id);
+  });
+});
+
+describe("the Heading dial (dcce.heading)", () => {
+  it("shows while the sea family holds a heading, with the Heading card a tap opens, and not before the fleet is prepared", () => {
+    const { state } = table(past);
+    expect(headingReadout(state)).toBeNull();
+    const sea = { heading: "Cloud" as const, headingCard: null, routes: {} };
+    expect(headingReadout({ ...state, sea })).toEqual({ step: "Cloud", cardId: null });
+    expect(headingReadout({ ...state, sea: { ...sea, heading: null } })).toBeNull();
+    const heading = spawn(state, "11084", { zone: "play", seat: 0 }, "A");
+    expect(headingReadout({ ...heading.state, sea: { ...sea, headingCard: heading.id } })).toEqual({ step: "Cloud", cardId: heading.id });
+  });
+
+  it("ignores the Hard/Expert Mode card's zone, as the Eye does", () => {
+    const { state } = table(past);
+    const mode = spawn(state, "11217", { zone: "modeCard" }, "A");
+    expect(headingReadout(mode.state)).toBeNull();
+    expect(nightmareCardId(mode.state)).toBeNull();
   });
 });

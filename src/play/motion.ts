@@ -41,7 +41,11 @@ export type Ghost = { slot: CardSlot; dx: number; dy: number; scale: number; rot
  * What `motionsBetween` can be told: the acting seat changed (`handoff`), so the hand that appears slides up and nothing is dealt. A
  * peek at the other seat has no motion: card-motion.native.tsx draws its layout at rest.
  */
-export type MotionOptions = { handoff?: boolean };
+export type MotionOptions = {
+  handoff?: boolean;
+  // Where a card was in the state before (null when it was nowhere): a card that came from the Corsair deck comes off that pile, not the encounter deck (Boarding, dcce.boarding).
+  zoneWas?: (cardId: string) => ZoneName | null;
+};
 
 /** The turn a slot is drawn at: an exhausted card lies sideways, a hand card keeps its slight fan. */
 export function slotRotation(slot: CardSlot): number {
@@ -88,6 +92,9 @@ export function motionsBetween(
   const handoff = options.handoff === true;
   // The cards that come off the deck this state, in hand order: each leaves MOTION.stagger after the one before.
   let drawn = 0;
+  // The cards that come off the Corsair deck (Boarding) or are looked at in a Sailing test, each MOTION.stagger after the one before (docs/design-system-table.md, Motion).
+  let boarded = 0;
+  let looked = 0;
   for (const slot of next.slots) {
     const was = before.get(slot.id);
     if (slot.kind === "pile") {
@@ -114,9 +121,18 @@ export function motionsBetween(
       motions.set(slot.id, { ...from(slot, next.piles.deck, 0, 0.4), flip: !slot.faceDown, delay, arc: SHAPE.arc });
     } else if (slot.kind === "shadow") {
       motions.set(slot.id, from(slot, next.piles.encounterDeck, 0, 0.4));
+    } else if (slot.success != null) {
+      // A card of a Sailing test's look comes off the encounter deck face up, one after another: the Eye, the turn, the pop.
+      const delay = Math.min(looked, SHAPE.maxStagger) * MOTION.stagger.ms;
+      looked += 1;
+      motions.set(slot.id, { ...from(slot, next.piles.encounterDeck, 0, 0.4), flip: true, land: "pop", delay });
     } else if (slot.zone === "staging" || slot.zone === "engaged") {
       const reveal = slot.kind === "card" && !slot.faceDown;
-      motions.set(slot.id, { ...from(slot, next.piles.encounterDeck, 0, 0.4), flip: reveal, land: reveal ? "pop" : null });
+      const corsair = options.zoneWas?.(slot.id) === "corsairDeck" && next.piles.corsairDeck != null;
+      // Boarding: each Corsair card comes off the Corsair deck as a reveal does, then moves into the engagement row, the cards 90 ms apart.
+      const delay = corsair ? Math.min(boarded, SHAPE.maxStagger) * MOTION.stagger.ms : 0;
+      if (corsair) boarded += 1;
+      motions.set(slot.id, { ...from(slot, (corsair ? next.piles.corsairDeck : null) ?? next.piles.encounterDeck, 0, 0.4), flip: reveal, land: reveal ? "pop" : null, delay });
     } else motions.set(slot.id, { ...STILL(slot), scale: 0.82, fromOpacity: 0 });
   }
   const present = new Set(next.slots.map((slot) => slot.id));
@@ -126,17 +142,37 @@ export function motionsBetween(
     if (slot.faceDown) continue;
     const zone = zoneNow(slot.id);
     const pile =
-      zone === "discard" ? next.piles.discard : zone === "encounterDiscard" ? next.piles.encounterDiscard : zone === "deck" ? next.piles.deck : zone === "encounterDeck" ? next.piles.encounterDeck : null;
+      zone === "discard"
+        ? next.piles.discard
+        : zone === "encounterDiscard"
+          ? next.piles.encounterDiscard
+          : zone === "deck"
+            ? next.piles.deck
+            : zone === "encounterDeck"
+              ? next.piles.encounterDeck
+              : zone === "corsairDiscard"
+                ? (next.piles.corsairDiscard ?? null)
+                : null;
     if (pile) {
       const a = center(slot);
       const b = center(pile);
       // Destroyed or discarded from the table shakes first; from the hand (an event played, a discard) or back to a deck it just glides.
-      const discarded = (zone === "discard" || zone === "encounterDiscard") && slot.zone !== "hand";
+      // A card of a Sailing test's look glides to the encounter discard pile; it was never played, so it does not shake.
+      const discarded = (zone === "discard" || zone === "encounterDiscard" || zone === "corsairDiscard") && slot.zone !== "hand" && slot.success == null;
       ghosts.push({ slot, dx: b.x - a.x, dy: b.y - a.y, scale: pile.w / Math.max(1, slot.w), rot: 0, leave: discarded ? "shake" : "glide" });
     } else {
       // The victory display, set aside, out of play: it fades where it stood.
       ghosts.push({ slot, dx: 0, dy: 0, scale: 0.85, rot: slotRotation(slot), leave: "fade" });
     }
+  }
+  // The Corsair deck ran out and its discard pile was shuffled back into it: the discard pile's cards glide to the deck, and the deck's count pops (cardDepart).
+  const wasDiscard = prev.slots.find((slot) => slot.id === "pile:corsairDiscard");
+  const wasDeck = prev.slots.find((slot) => slot.id === "pile:corsairDeck");
+  const nowDeck = next.slots.find((slot) => slot.id === "pile:corsairDeck");
+  if (wasDiscard && wasDeck && nowDeck && wasDiscard.count > 0 && nowDeck.count > wasDeck.count && next.piles.corsairDiscard && next.slots.find((slot) => slot.id === "pile:corsairDiscard")?.count === 0) {
+    const a = center(wasDiscard);
+    const b = center(nowDeck);
+    ghosts.push({ slot: wasDiscard, dx: b.x - a.x, dy: b.y - a.y, scale: 1, rot: 0, leave: "glide" });
   }
   return { motions, ghosts };
 }

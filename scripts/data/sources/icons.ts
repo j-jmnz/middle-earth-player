@@ -6,8 +6,13 @@
 // - DragnCards' card backs, the ones its plugin names in jsons/cardBacks.json: the player back (the One Ring) and the
 //   encounter back (the Eye), 429x600 JPEGs, which the table draws on the decks and on face-down cards (user request,
 //   2026-10-25: the printed backs, not drawn ones).
+// - The Dream-chaser Campaign Expansion's rulebook (MEC111): the Heading's four steps and the Sailing success symbol are glyphs
+//   of its embedded LOTRLCGIcons font, which no web icon font carries (mec111-font.ts). The TrueType program and its ToUnicode map
+//   are kept, 6 KB; the PDF itself stays out of git.
 // Every file is kept verbatim under data/raw/icons and pinned by sha256; `pnpm data:build` cuts the icons out offline.
 import { bytes, createLog, type Log } from "../../log.ts";
+import { mec111Font } from "./mec111-font.ts";
+import { RULE_PDFS } from "./rules.ts";
 import { combinedPin, fetchBytes, writeRaw, writeRawBytes, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 export const RINGSDB_FONT_URL = "https://ringsdb.com/bundles/app/fonts/ringsdb.svg?h6hjpma";
@@ -35,5 +40,10 @@ export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRe
     const url = `${DRAGNCARDS_CARDBACKS}/${name}.jpg`;
     keep(writeRawBytes(`icons/dragncards/cardbacks/${name}.jpg`, url, await fetchBytes(url, undefined, log)));
   }
-  return { id: "icons", site: "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
+  const mec111 = RULE_PDFS.find((pdf) => pdf.doc === "dcce");
+  if (!mec111) throw new Error("RULE_PDFS has no dcce");
+  const font = mec111Font(await fetchBytes(mec111.url, 300_000, log));
+  keep(writeRawBytes("icons/mec111-icons.ttf", mec111.url, font.ttf));
+  keep(writeRaw("icons/mec111-icons.unicode.txt", mec111.url, font.unicode));
+  return { id: "icons", site: "https://ringsdb.com, https://dragncards-lotrlcg.s3.amazonaws.com and the MEC111 rulebook", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }

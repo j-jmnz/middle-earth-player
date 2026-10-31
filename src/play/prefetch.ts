@@ -19,7 +19,7 @@ export function prefetchCodes(game: ScenarioState, seat: number, next: readonly 
   // A shadow card is not in play, but the table draws it beside its enemy once it is turned face up.
   const table = Object.values(game.cards).flatMap((card) => ((inPlay(card.zone) || card.zone === "shadow") && card.face !== "down" ? [card.code] : []));
   // The top of each discard pile is drawn face up: a treachery goes there straight from its reveal.
-  const tops = [game.seats[seat]?.discard ?? [], game.encounterDiscard].flatMap((pile) => faceUp(game, pile.slice(-1)));
+  const tops = [game.seats[seat]?.discard ?? [], game.encounterDiscard, game.corsairDiscard ?? []].flatMap((pile) => faceUp(game, pile.slice(-1)));
   return [...new Set([...faceUp(game, game.seats[seat]?.hand ?? []), ...table, ...tops, ...next])];
 }
 

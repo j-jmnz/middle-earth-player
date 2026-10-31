@@ -9,6 +9,7 @@ import type { EngineStep, PlayerIntent } from "../rules/intents.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
 import type { LogMark } from "./log.ts";
+import { boardingWords } from "./sea-words.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -47,6 +48,19 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const line = (text: string, mark: LogMark = null, cards: readonly string[] = []) => {
     (current ?? open(9, "", "plain")).lines.push({ text, mark, ...(cards.length > 0 ? { cards } : {}) });
   };
+
+  // Boarding (dcce.boarding): the Corsair cards a ship-enemy's engagement revealed engage after it in the same steps. They are one beat of the ship's own, "Boarding 2 · Corsair
+  // Warship: 2 Corsairs engage Player 1", not a beat each; an engagement with no ship before it is told as any other.
+  const fromCorsair = (enemyId: string) => before.cards[enemyId]?.zone === "corsairDeck" || before.cards[enemyId]?.zone === "corsairDiscard";
+  const boarded = new Map<number, number>();
+  const joined = new Set<number>();
+  steps.forEach((step, index) => {
+    if (step.kind !== "engage" || !fromCorsair(step.enemyId)) return;
+    const shipAt = steps.findLastIndex((earlier, at) => at < index && earlier.kind === "engage" && !fromCorsair(earlier.enemyId));
+    if (shipAt < 0) return;
+    joined.add(index);
+    boarded.set(shipAt, (boarded.get(shipAt) ?? 0) + 1);
+  });
 
   steps.forEach((step, index) => {
     switch (step.kind) {
@@ -122,10 +136,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (!current || current.rank !== 3) open(3, "Staging", "plain");
         line(`Revealed ${names.card(step.cardId)}`);
         return;
-      case "engage":
+      case "engage": {
+        if (joined.has(index)) return;
         open(4, `${names.card(step.enemyId)} engages`, "bad");
         line(after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`);
+        const count = boarded.get(index);
+        // The ship's ring follows this beat.
+        if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);
         return;
+      }
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against threat ${step.threat}`, "willpower");

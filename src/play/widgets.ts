@@ -4,6 +4,8 @@
 import type { Effect } from "../catalog/boundary.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
 
+import { headingStepOf, type HeadingStep } from "./heading.ts";
+
 export type WidgetReadouts = {
   // The Ring-bearer's life (mec109.ringbearers-life), or null when the scenario has no life tracker.
   life: number | null;
@@ -73,4 +75,15 @@ export function campaignTokens(game: ScenarioState, effects: readonly Effect[], 
 /** The Nightmare setup card's instance next to the quest deck (zone `nightmare`), or null on Easy and Normal. */
 export function nightmareCardId(game: ScenarioState): string | null {
   return Object.values(game.cards).find((card) => card.zone === "nightmare")?.id ?? null;
+}
+
+// The Heading dial of the top bar (dcce.heading): the current step, and the Heading card whose preview a tap opens. Shown only while the Heading card is in play,
+// which is while the sea family holds a heading; the engine owns the step.
+export type HeadingReadout = { step: HeadingStep; cardId: string | null };
+
+export function headingReadout(game: ScenarioState): HeadingReadout | null {
+  const step = headingStepOf(game.sea?.heading);
+  if (!step) return null;
+  const id = game.sea?.headingCard ?? null;
+  return { step, cardId: id != null && game.cards[id] != null ? id : null };
 }

@@ -23,7 +23,8 @@ import { carouselHeight } from "./carousel-size.ts";
 import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
-import { LogPanel, PileList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
+import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
+import { foldTitle } from "./row-fold.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { PILE_WORDS, type PileId } from "./selectors.ts";
@@ -52,13 +53,19 @@ function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay,
   return (
     <PileList
       title={PILE_WORDS[pile]}
-      cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
+      cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : pile === "corsairDiscard" ? (game.corsairDiscard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
       playable={pile === "discard" && !peeking ? discardPlays(game, seat, sheet) : []}
       onRead={onRead}
       onPlay={onPlay}
       onClose={onClose}
     />
   );
+}
+
+// The cards a row folded away, as the canvas last laid the table out (store.ts, `folded`): a tile shows one large.
+function RowReading({ store, row, names, onRead, onClose }: { store: TableStore; row: "staging" | "engaged"; names: SheetNames; onRead: (cardId: string) => void; onClose: () => void }) {
+  const ids = useStore(store, (state) => state.folded[row]);
+  return <RowList title={foldTitle(row)} cards={ids.map((id) => ({ id, label: names.card(id) }))} onRead={onRead} onClose={onClose} />;
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
@@ -181,6 +188,7 @@ export function TableLayers({
             onClose={close}
           />
         ) : null}
+        {held?.kind === "row" ? <RowReading store={store} row={held.row} names={names} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "settings" ? (

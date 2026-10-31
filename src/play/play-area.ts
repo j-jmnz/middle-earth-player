@@ -6,6 +6,9 @@ import type { ZoneEntry } from "./selectors.ts";
 import { wrapRows } from "./table-spacing.ts";
 import { touch } from "./ui-scale.ts";
 
+// After a seat's last ship the row keeps one more gap, so the ships read as a group without a box (dcce.ship-objectives; `SHIP_GAP` is one `GAP`).
+export const SHIP_GAP = 1;
+
 // The play area's cards shrink to this share of the table's card at the least so their rows fit (never under a 44 pt target);
 // under it they squeeze into one row as the other rows do.
 export const PLAY_FLOOR = 0.7;
@@ -14,9 +17,14 @@ const SLIGHT_SQUEEZE = 0.2;
 // Two stacked rows may tuck this far (Medium's points, times the UI scale) under the top of the hand's strip, which is drawn over them.
 export const HAND_TUCK = 10;
 
+// The room each entry takes in a row: its footprint, and the extra gap after the last ship while another card follows it.
+export function playWidths(entries: readonly ZoneEntry[], size: { w: number; h: number }, m: Metrics): number[] {
+  return entries.map((entry, at) => footprint(entry.card, size) + (entry.ship != null && entries[at + 1] != null && entries[at + 1]?.ship == null ? SHIP_GAP * m.gap : 0));
+}
+
 // The play area's rows, each card at `size`: a row takes cards left to right a gap apart and wraps when the next would not fit.
 function playRows(entries: readonly ZoneEntry[], size: { w: number; h: number }, width: number, m: Metrics): ZoneEntry[][] {
-  return wrapRows(entries.map((entry) => footprint(entry.card, size)), width, m.gap).map((row) => row.map((at) => entries[at] as ZoneEntry));
+  return wrapRows(playWidths(entries, size, m), width, m.gap).map((row) => row.map((at) => entries[at] as ZoneEntry));
 }
 
 // How deep a play row is: its card and the attachments peeking out under it.
@@ -34,8 +42,19 @@ export type PlayPlan = { size: { w: number; h: number }; rows: readonly (readonl
 // The smallest step between neighbours when `row` is laid out across `width` at `size` (squeezed when it does not fit).
 function rowStep(row: readonly ZoneEntry[], size: { w: number; h: number }, width: number, m: Metrics): number {
   if (row.length <= 1) return Infinity;
-  const natural = row.reduce((sum, entry) => sum + footprint(entry.card, size), 0) + m.gap * (row.length - 1);
+  const natural = playWidths(row, size, m).reduce((sum, w) => sum + w, 0) + m.gap * (row.length - 1);
   return size.w + m.gap - Math.max(0, natural - width) / (row.length - 1);
+}
+
+// The two rows of a stack, back then front: the ships go to the front row's left end (their attachments still peek and their damage stays in reach),
+// the front row as long as the back row would leave it; the rest keep their order. Without a ship it is the plain halves.
+function stackedRows(entries: readonly ZoneEntry[]): ZoneEntry[][] {
+  const half = Math.ceil(entries.length / 2);
+  const ships = entries.filter((entry) => entry.ship != null);
+  if (ships.length === 0) return [entries.slice(0, half), entries.slice(half)];
+  const rest = entries.filter((entry) => entry.ship == null);
+  const need = Math.max(0, entries.length - half - ships.length);
+  return [rest.slice(0, rest.length - need), [...ships, ...rest.slice(rest.length - need)]];
 }
 
 /**
@@ -46,8 +65,7 @@ function rowStep(row: readonly ZoneEntry[], size: { w: number; h: number }, widt
  */
 function stacked(entries: readonly ZoneEntry[], width: number, card: { w: number; h: number }, band: number, m: Metrics): PlayPlan | null {
   const target = touch(m.scale, MIN_TARGET);
-  const half = Math.ceil(entries.length / 2);
-  const rows = [entries.slice(0, half), entries.slice(half)];
+  const rows = stackedRows(entries);
   const front = rows[1] as ZoneEntry[];
   const room = band + m.gap + HAND_TUCK * m.scale - target - m.peek * deepestUnder(front);
   const w = Math.min(card.w, Math.floor(room / ASPECT));
@@ -69,7 +87,7 @@ export function playPlan(entries: readonly ZoneEntry[], width: number, card: { w
   if (rowsHeight(full, card, m) <= band) return { size: card, rows: full, h: Math.max(oneRow, rowsHeight(full, card, m)) };
   // A slight squeeze (each card overlapping its neighbour by a fifth of a card at most, every step still a target) keeps the table's
   // card: a play area that changes size for a point or two each time a card exhausts reads as a mistake.
-  const natural = entries.reduce((sum, entry) => sum + footprint(entry.card, card), 0) + m.gap * (entries.length - 1);
+  const natural = playWidths(entries, card, m).reduce((sum, w) => sum + w, 0) + m.gap * (entries.length - 1);
   const overlap = (natural - width) / (entries.length - 1);
   if (overlap <= card.w * SLIGHT_SQUEEZE && card.w + m.gap - overlap >= touch(m.scale, MIN_TARGET)) return squeezed;
   const floor = Math.max(Math.round(card.w * PLAY_FLOOR), touch(m.scale, MIN_TARGET));
@@ -93,7 +111,7 @@ export function playPlan(entries: readonly ZoneEntry[], width: number, card: { w
 export function placePlay(plan: PlayPlan, area: Rect, out: CardSlot[], m: Metrics): void {
   let y = area.y;
   for (const row of plan.rows) {
-    const xs = rowXs(row.map((entry) => footprint(entry.card, plan.size)), area.x, area.w, m.gap);
+    const xs = rowXs(playWidths(row, plan.size, m), area.x, area.w, m.gap);
     row.forEach((entry, at) => {
       const rect = cardRect(entry.card, xs[at] ?? area.x, y, plan.size);
       placeUnder(entry, "play", rect, out, [], m.peek);

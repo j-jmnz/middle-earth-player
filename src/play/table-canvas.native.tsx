@@ -15,7 +15,7 @@ import { beatIds } from "./beat-store.ts";
 import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
-import { AttackerMark, Badges, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, Tokens, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
@@ -23,7 +23,7 @@ import { useTableGestures } from "./hand-gestures.native.ts";
 import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
 import { AT_REST } from "./motion.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
-import { actingSeat, shownSeat } from "./selectors.ts";
+import { actingSeat, lookedOf, shownSeat } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
@@ -45,7 +45,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -61,7 +61,11 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const beatKey = useStore(beats, (state) => state.key);
   const beat = useMemo(() => beatIds(beatKey), [beatKey]);
   const beating = peeking ? NO_BEAT : beat;
-  const { views, piles } = useViews(store, seat);
+  const { views, piles } = useViews(store, seat, facts);
+  // The cards a Sailing test looked at stand in a strip over the table (look-strip.ts); the rest of the table carries the night veil meanwhile.
+  const lookedCards = useStore(store, (state) => lookedOf(state.game));
+  const strip = useMemo(() => lookedCards.map((card) => ({ card, success: success(card.code) })), [lookedCards, success]);
+  const looking = strip.length > 0;
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
   const draggable = useStore(store, (state) => (state.viewedSeat != null ? NO_DRAG : state.draggable));
@@ -74,10 +78,20 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
 
   // The top of the deck is a card when the rules let it be played from there (Gandalf, 142002).
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
+  const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
+  // What a row's fold must keep on the table: the cards the open moment asks about, the picked ones, a card being dragged and the banner's beat (row-fold.ts).
+  const keep = useMemo(() => new Set([...highlight.tappable, ...targetIds, ...highlight.picked.keys(), ...beating, ...(selected ? [selected] : [])]), [highlight, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip],
   );
+  // The cards the rows folded away are told to the table's pick (a folded card is not on the table) and to the row list (row-fold.ts).
+  const foldedKey = (layout.folds ?? []).map((fold) => `${fold.zone}:${fold.cards.join(",")}`).join("|");
+  useLayoutEffect(() => {
+    const folded = { staging: [] as string[], engaged: [] as string[] };
+    for (const fold of layout.folds ?? []) folded[fold.zone].push(...fold.cards);
+    store.getState().setFolded(folded);
+  }, [store, foldedKey, layout]);
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
   const { moves, clock, fxClock, k, hurry } = useCardMotion(store, layout, seat, acting);
@@ -112,12 +126,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
 
-  const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
 
   const isTappable = (slot: CardSlot) => highlight.tappable.has(slot.id) || targetIds.has(slot.id);
   const pickedCount = (slot: CardSlot) => highlight.picked.get(slot.id) ?? 0;
-  const dimmed = (slot: CardSlot) => (highlight.dimOthers && !isTappable(slot) && pickedCount(slot) === 0) || highlight.muted.has(slot.id);
+  // A Sailing test's look veils staging, the engagement area and the play area under the strip (docs/design-system-table.md, The Sailing test).
+  const veiledByLook = (slot: CardSlot) => looking && slot.success == null && slot.kind !== "pile" && (slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "play");
+  const dimmed = (slot: CardSlot) => (highlight.dimOthers && !isTappable(slot) && pickedCount(slot) === 0) || highlight.muted.has(slot.id) || veiledByLook(slot);
 
   // The card itself (it turns when exhausted), with the glow of the open moment under it, and what is drawn upright on it:
   // tokens, effects, the open moment's marks.
@@ -155,6 +170,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const rect = slotBounds(slot);
+    // A staging card with more than one card under it shows one peek and how many: "×2" (layout.ts, placeStaging).
     const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(game, seat, slot.id) : null;
     const optionMark = highlight.marks.get(slot.id);
     // The veil is drawn in the card's turned group, under this upright layer, so a veiled card's tokens and marks are faded
@@ -169,7 +185,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
           {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
           {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}
+          {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
         </Group>
+        {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}
         {slot.kind === "card" ? <PickRing rect={rect} picked={pickedCount(slot)} share={highlight.share} dimmed={veiled} fonts={fonts} t={t} s={s} /> : null}
         {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} t={t} s={s} /> : null}
       </Group>
