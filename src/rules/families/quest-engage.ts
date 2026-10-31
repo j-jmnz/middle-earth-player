@@ -43,5 +43,5 @@ export function optionallyEngaged(state: ScenarioState, seat: number, enemyId: s
 export function engagesAgain(state: ScenarioState, seat: number, ctx: ReduceContext): boolean {
   const extra = heldAmount(state, `seat:${seat}`, "extraOptionalEngage");
   if (extra <= 0 || state.window?.kind !== "optionalEngage") return false;
-  return heldAmount(state, `seat:${seat}`, "optionalEngagements") < 1 + extra && optionalEnemies(state, ctx.cards).length > 0;
+  return heldAmount(state, `seat:${seat}`, "optionalEngagements") < 1 + extra && optionalEnemies(state, ctx.cards, seat).length > 0;
 }

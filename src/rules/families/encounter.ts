@@ -108,6 +108,6 @@ function shielded(state: ScenarioState, id: string, sourceId: string | null, ctx
 }
 
 // A lasting effect held by the table (every seat), set by the source card.
-function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, "instanceId" | "sourceId">, focus: Focus): ScenarioState {
+export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, "instanceId" | "sourceId">, focus: Focus): ScenarioState {
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }

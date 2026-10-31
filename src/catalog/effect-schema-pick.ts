@@ -21,6 +21,19 @@ export const pickSchema = z.strictObject({
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
+  // Which staging area the staging cards of the filter are in once stages are separate (Breaking of the Fellowship, mec109.multiple-staging-areas):
+  // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
+  // "in any staging area"). Read by src/rules/pick.ts; a game with one staging area ignores it.
+  stagingArea: z.enum(["own", "shared", "any"]).optional(),
+  // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
+  // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/pick.ts.
+  atStage: z.literal(true).optional(),
+  // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
+  // points than the attacking enemy", 142079:A:2). Read by src/rules/families/breaking-attack.ts.
+  fewerHitPointsThan: z.literal("attackingEnemy").optional(),
+  // A burden card (Campaign Mode) in play, in the encounter deck or in the encounter discard pile ("choose a burden card in play, in the encounter deck, or
+  // in the discard pile", 142074:A:2). Read by src/rules/pick.ts.
+  burden: z.literal(true).optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
@@ -163,8 +176,12 @@ export const pickSchema = z.strictObject({
   // The misc family's filters (src/rules/families/misc-pick.ts). A card controlled by the player the effect last picked ("each hero
   // controlled by that player"); an attachment attached to the last picked card; a player card (not an encounter card); a
   // character whose current Defense is at most this ("an enemy with 0 Defense"); a card in the hand that was drawn by the
-  // resource phase's draw step this round ("choose and discard 1 of those cards").
-  controlledBy: z.literal("picked").optional(),
+  // resource phase's draw step this round ("choose and discard 1 of those cards"). `controlledBy: host`: a card controlled by the player who
+  // controls the source's host ("a character you control", on a Condition attached to a hero by an encounter card that no player controls,
+  // 142087:A:2). `nonObjective`: not a card whose printed type is objective ("a non-objective attachment", 142052:A:2: the burden objectives that
+  // count as attachments are left out).
+  controlledBy: z.enum(["picked", "host"]).optional(),
+  nonObjective: z.literal(true).optional(),
   onPicked: z.boolean().optional(),
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),

@@ -17,6 +17,7 @@ import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hoo
 import { alliesToHandDestination } from "./families/deck-rules.ts";
 import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
 import { LOST_ISLAND_THREAT } from "./families/uncharted-pick.ts";
+import { discardArea } from "./families/breaking-areas.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -89,6 +90,7 @@ export function modifiedStat(
     if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
+    if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when.maxHitPoints, cards)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack-strike.ts).
@@ -124,6 +126,15 @@ export function versusHighEngagement(
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
+}
+
+// The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).
+export function versusDefender(state: ScenarioState, holder: CardInstance, maxHitPoints: number, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const attack = state.pendingAttack;
+  if (!attack || attack.enemyId !== holder.id || attack.defenderId == null || attack.undefended) return false;
+  const defender = state.cards[attack.defenderId];
+  const health = defender ? printedOf(cards, defender.code).health : null;
+  return health != null && health <= maxHitPoints;
 }
 
 // A character's defense as the defender of the attack in progress, read as if it were declared, so a modifier that holds
@@ -199,6 +210,11 @@ export function playerCardEffectCanChoose(printed: PrintedCard, state?: Scenario
   return !printed.keywords.immuneToPlayerCardEffects;
 }
 
+// An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).
+function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
+  return printed.type === "enemy" && printed.keywords.indestructible && !flagged(state, id, "losesKeywords");
+}
+
 export function placeDamage(
   state: ScenarioState,
   assigned: string,
@@ -235,7 +251,7 @@ export function placeDamage(
   let next = updateCard(cap > 0 ? { ...state, roundDamage: { ...state.roundDamage, [id]: taken + dealt } } : state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
   // An indestructible enemy keeps its damage but is never destroyed; it hears that it took damage (the Watcher in the Water, 142024:A:3).
-  if (printed.type === "enemy" && printed.keywords.indestructible) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
+  if (indestructible(state, id, printed)) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
   const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
   // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
   // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
@@ -265,7 +281,7 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
   for (const instance of Object.values(state.cards)) {
     if (instance.damage <= 0 || !inPlay(instance.zone)) continue;
     const printed = printedOf(cards, instance.code);
-    if (printed.health == null || (printed.type === "enemy" && printed.keywords.indestructible)) continue;
+    if (printed.health == null || indestructible(state, instance.id, printed)) continue;
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
     if (held(next, instance.id)) continue;
@@ -395,7 +411,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     const seat = next.seats[index];
     if (!seat?.eliminated) continue;
     const controlled = Object.values(next.cards).filter(
-      (card) => card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging",
+      (card) => card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
     );
     if (controlled.length === 0 && seat.engaged.length === 0) continue;
     for (const enemyId of seat.engaged) {
@@ -424,6 +440,9 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     // A Peril card the seat was resolving locks no one now (mec109.peril).
     if (next.perilSeat === index) next = { ...next, perilSeat: null };
   }
+  // Stages that are separate: the stage of an eliminated seat is discarded with the encounter cards at it (mec109.multiple-staging-areas). The
+  // enemies that were engaged with it returned to its staging area above.
+  if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = discardArea(next, index);
   if (next.seats[next.firstPlayer]?.eliminated) {
     for (let step = 1; step <= next.seatCount; step += 1) {
       const candidate = (next.firstPlayer + step) % next.seatCount;

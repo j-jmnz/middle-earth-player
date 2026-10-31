@@ -24,6 +24,7 @@ export { TOP_BAR };
 // The scroll fade: this many bands of this width (EDGE_FADE in all), rising to nearly the felt.
 const FADE_BANDS = 7;
 const FADE_BAND = EDGE_FADE / FADE_BANDS;
+const NO_TICKS: readonly number[] = [];
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
@@ -33,7 +34,8 @@ export type TopBarProps = {
   viewed: number | null;
   life: number | null;
   burdenDeck: number | null;
-  // The resource tokens on the campaign card (The Oath, 41050:A:3) and the card's name, or null when its scenario has none.
+  // The resource tokens on the campaign card (The Oath, 41050:A:3) or on the current stage (Journey in the Dark, 142041:B:3) and the card's name, or null
+  // when its scenario has none.
   tokens?: { name: string; tokens: number } | null;
   // The Heading dial, after the seat dials, while the Heading card is in play (dcce.heading): the current step, and what a tap does (the Heading card's preview). Absent: no dial.
   heading?: { step: HeadingStep; onPress: () => void } | null;
@@ -46,7 +48,10 @@ export type TopBarProps = {
   carouselOpen: boolean;
   // A small phone in landscape (under 760 pt inside the insets).
   narrow: boolean;
-  ticks: readonly number[];
+  // Stage 2B has split the table: a peek shows the other seat's staging area and stage as well as its cards.
+  areas?: boolean;
+  // The engagement costs marked on each dial, by seat.
+  ticks: readonly (readonly number[])[];
   // The seat holding the Ring-bearer facedown and what to say of it (a Ring mark on its dial), or null.
   ringSeat?: number | null;
   ringWords?: string | null;
@@ -58,7 +63,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, onNightmare = null, rail, stopAhead, carouselOpen, narrow, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -110,7 +115,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
           {/* A gap between the dials, so a seat's label (P1) never runs into the next seat's dial. */}
           <View style={{ flexDirection: "row", flexShrink: 0, gap: DIAL_GAP * s }} onLayout={onDials}>
             {threats.map((threat) => {
-              const dial = seatDial(threats.length, acting, viewed, threat.seat);
+              const dial = seatDial(threats.length, acting, viewed, threat.seat, areas);
               return (
                 <ThreatRing
                   key={threat.seat}
@@ -120,7 +125,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                   role={dial.role}
                   hint={dial.hint}
                   compact
-                  ticks={ticks}
+                  ticks={ticks[threat.seat] ?? NO_TICKS}
                   ring={ringSeat === threat.seat ? ringWords : null}
                   ringMark={ringMark}
                   onPress={() => onThreat(threat.seat)}

@@ -9,6 +9,7 @@
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { effectById } from "../rules/listen.ts";
 import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import type { TableStore } from "./store.ts";
 
 import { windowPoint } from "./rail.ts";
 import type { Sheet } from "./sheet-types.ts";
@@ -93,4 +94,26 @@ export function alwaysUseIntent(game: ScenarioState, sheet: Sheet, ctx: ReduceCo
     return { type: "Trigger", cardId: item.cardId, effectId: item.effectId };
   }
   return null;
+}
+
+// The most answers `follow` sends after one send; a run longer than this goes on from the effect, a moment later.
+const FOLLOW_LIMIT = 60;
+
+// What the table answers a moment with, or null when it asks (stops.ts).
+export function tableAnswer(game: ScenarioState, sheet: Sheet, legal: readonly LegalIntent[], ctx: ReduceContext, settings: StopSettings, running: boolean, held: boolean, seen: ReadonlySet<string>): PlayerIntent | null {
+  const always = alwaysUseIntent(game, sheet, ctx, settings, held);
+  if (always) return always;
+  return stopDecision({ game, sheet, legal, settings, running, held, seen }) === "pass" ? { type: "Pass" } : null;
+}
+
+/**
+ * Sends the table's answers to the moments in the store, one after another, until a moment asks (table-hooks.ts, `follow`). An intent the reducer
+ * refuses ends it, as asking does.
+ */
+export function followAnswers(store: TableStore, ctx: ReduceContext, sheetOf: (game: ScenarioState, legal: readonly LegalIntent[]) => Sheet, settings: StopSettings, running: boolean, seen: ReadonlySet<string>): void {
+  for (let sent = 0; sent < FOLLOW_LIMIT; sent += 1) {
+    const now = store.getState();
+    const intent = tableAnswer(now.game, sheetOf(now.game, now.legal), now.legal, ctx, settings, running, false, seen);
+    if (!intent || !now.dispatch(intent)) return;
+  }
 }

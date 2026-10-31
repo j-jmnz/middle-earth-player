@@ -29,13 +29,13 @@ export type DialRole = "acting" | "viewing" | null;
 
 /**
  * How a dial reads in two-handed play: the acting seat's is "acting" (its label stays accent), the seat peeked at is "viewing" (a bone
- * ring and an eye mark), any other none. A dial that is not shown says what a tap does ("Shows Player 2's cards"); the shown one,
- * and a solo dial, keep their own hint (null).
+ * ring and an eye mark), any other none. A dial that is not shown says what a tap does ("Shows Player 2's cards", "Shows Player 2's area" once stage 2B
+ * has split the table); the shown one, and a solo dial, keep their own hint (null).
  */
-export function seatDial(count: number, acting: number, viewed: number | null, seat: number): { role: DialRole; hint: string | null } {
+export function seatDial(count: number, acting: number, viewed: number | null, seat: number, areas?: boolean): { role: DialRole; hint: string | null } {
   if (count < 2) return { role: null, hint: null };
   const shown = viewed ?? acting;
-  return { role: seat === acting ? "acting" : seat === viewed ? "viewing" : null, hint: seat === shown ? null : `Shows Player ${seat + 1}'s cards` };
+  return { role: seat === acting ? "acting" : seat === viewed ? "viewing" : null, hint: seat === shown ? null : `Shows Player ${seat + 1}'s ${areas ? "area" : "cards"}` };
 }
 
 /** A dial's screen reader name with its role: "Player 1 threat, acting", "Player 2 threat, viewing". */

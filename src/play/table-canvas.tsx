@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
+import { stagingWord } from "./area-words.ts";
 import { lookedIds } from "../rules/families/sea-sailing.ts";
 
 import { NO_HIGHLIGHT } from "./peek.ts";
@@ -73,7 +74,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
   if (view.entries.length === 0) return null;
   return (
     <View className="mb-2">
-      <Text className="text-label text-muted">{ZONE_WORD[zone]}</Text>
+      <Text className="text-label text-muted">{zone === "staging" ? stagingWord(game, seat) : ZONE_WORD[zone]}</Text>
       <View className="flex-row flex-wrap gap-1">
         {view.entries.flatMap(({ card, attached, paired }) => [card, ...attached, ...paired]).map((card) => (
           <CardButton

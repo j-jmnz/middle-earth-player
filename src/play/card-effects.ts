@@ -131,6 +131,7 @@ const UNTIL: Readonly<Record<ModifierUntil, string>> = {
   endOfAttack: "until the end of the attack",
   whileSourceInPlay: "while it is in play",
   whileSourceInVictory: "while it is in the victory display",
+  endOfGame: "for the rest of the game",
 };
 
 const NUMBER_WORD: Partial<Record<ModifierStat, string>> = { ...STAT_WORD };

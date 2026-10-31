@@ -23,6 +23,7 @@ import { patchTop, topFrame } from "../windows.ts";
 import { moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { addedToStaging, announceEntered } from "./encounter-reveal.ts";
+import { stagingDest } from "./breaking-areas.ts";
 import { freeSlot, makeActiveIn } from "./south-locations.ts";
 
 type MoveInstruction = Extract<Instruction, { verb: "MoveEncounterCard" }>;
@@ -101,7 +102,7 @@ export function moveEncounter(
     case "removed":
       return moveCard(leavePlay(next, id, ctx, steps), id, { zone: "removed" });
     case "staging": {
-      const staged = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: "up", controller: null });
+      const staged = updateCard(moveCard(next, id, stagingDest(next, seat)), id, { face: "up", controller: null });
       if (wasInPlay) return staged;
       // Put into the staging area from out of play: it is added to the staging area and enters play.
       return announceEntered(addedToStaging(queueEvent(staged, { trigger: "addedToStaging", seat, cardId: id }), id, ctx), id, seat, ctx);

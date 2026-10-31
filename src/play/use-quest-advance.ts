@@ -7,7 +7,7 @@ import { useStore } from "zustand";
 
 import { isOver } from "../rules/undo.ts";
 
-import { advancedTo, askingStage, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
+import { advancedTo, askingStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "./store.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 
@@ -27,7 +27,9 @@ export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const questStage = useStore(store, (state) => state.game.questStage);
   const asking = useStore(store, (state) => askingStage(state.game));
   const over = useStore(store, (state) => isOver(state.game));
-  const view = useMemo((): QuestView => ({ questStage, asking, over }), [questStage, asking, over]);
+  // The stages the seats are on once stages are separate: an advance of any seat's stage holds the screen.
+  const seatStages = useStore(store, (state) => stagesKey(state.game));
+  const view = useMemo((): QuestView => ({ questStage, asking, over, seatStages }), [questStage, asking, over, seatStages]);
   const spotlit = useSpotlightHold(store);
   const [latch, setLatch] = useState(() => openingLatch(view));
   // Set during render (the derived-state pattern): React renders again before it commits, so no effect sees the old latch.

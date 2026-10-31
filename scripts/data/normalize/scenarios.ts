@@ -319,10 +319,12 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         continue;
       }
       const perPlayer = clausesOf(quest, "stage").find((clause) => clause.perPlayer != null && clause.codes.includes(code))?.perPlayer;
+      // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record.
+      const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0;
       // "(2 copies instead if there are 3 or more players in the game)": the copies of this card the Setup stages.
       const staged = pile === "staging" ? clausesOf(quest, "stage").find((clause) => clause.many != null && clause.codes.includes(code)) : undefined;
       const byPlayers = staged?.many ? { few: staged.count, many: staged.many.count, from: staged.many.from } : undefined;
-      placed.push({ code, pile: pile as Pile, normal: count, easy: Math.min(easy.placements.get(key) ?? 0, count), ...(back ? { back } : {}), ...(perPlayer != null ? { perPlayer } : {}), ...(byPlayers ? { byPlayers } : {}) });
+      placed.push({ code, pile: pile as Pile, normal: count, easy: Math.min(easy.placements.get(key) ?? 0, count), ...(back ? { back } : {}), ...(perPlayer != null ? { perPlayer } : {}), ...(byPlayers ? { byPlayers } : {}), ...(searched ? { searched: true as const } : {}) });
     }
     // A printed count the sources disagree on: the card's own set size or Setup text settles it (overrides.scenarioCounts).
     for (const rule of overrides.scenarioCounts.filter((item) => item.scenario === id)) {

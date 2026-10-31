@@ -137,4 +137,25 @@ describe("the Watcher in the Water attacks every player in the combat phase (142
     expect(run.state.cards[watcher]?.zone).toBe("staging");
     void modifiedStat;
   });
+
+  // "Shadow: Attacking enemy makes an additional attack after this one." (142037:A:2, data/printed/fellowship-of-the-ring.json)
+  it("makes the additional attack a shadow card grants it, dealt a shadow card of its own", () => {
+    const made = southTable(world, { stage: "142023", captive: true, active: DOORS, phase: "Combat", heroes: ["strong"], deck: ["142037", "f0", "f0", "f0"] });
+    const state = syncConstants(made.state, made.ctx);
+    const watcher = state.staging.find((id) => state.cards[id]?.code === WATCHER) ?? "";
+    let run: Run = start(state);
+    for (let guard = 0; guard < 80 && run.state.phase === "Combat"; guard += 1) {
+      if (run.state.window?.kind === "defense") {
+        run = send(run, { type: "Undefended", heroId: first(run.state, "strong") }, made.ctx);
+        continue;
+      }
+      const intent = legalIntents(run.state, made.ctx).find((item) => item.type === "Pass" || item.type === "DeclineAttack");
+      if (!intent) break;
+      run = send(run, intent as PlayerIntent, made.ctx);
+    }
+    const strikes = run.steps.filter((step) => step.kind === "strike" && step.side === "enemy" && step.enemyId === watcher);
+    // One attack in the combat phase, and the additional one.
+    expect(strikes).toHaveLength(2);
+    expect(run.state.cards[watcher]?.zone).toBe("staging");
+  });
 });

@@ -5,19 +5,20 @@
 // scenario is won and the card the player picked up). A quest stage or a hero never passes through the hand or staging, so
 // the table asks for it where it lies. Never the whole cache (docs/architecture.md, Images). Text is drawn while a file is
 // still downloading.
+import { fallenBase } from "../rules/printed.ts";
 import { inPlay, type ScenarioState } from "../rules/state.ts";
 
 function faceUp(game: ScenarioState, ids: readonly string[]): string[] {
   return ids.flatMap((id) => {
     const card = game.cards[id];
-    return card && card.face !== "down" ? [card.code] : [];
+    return card && card.face !== "down" ? [fallenBase(card.code)] : [];
   });
 }
 
 /** The codes whose files the table wants now: the seat's hand, the face-up cards on the table, and `next` (the screen about to open). */
 export function prefetchCodes(game: ScenarioState, seat: number, next: readonly string[] = []): string[] {
   // A shadow card is not in play, but the table draws it beside its enemy once it is turned face up.
-  const table = Object.values(game.cards).flatMap((card) => ((inPlay(card.zone) || card.zone === "shadow") && card.face !== "down" ? [card.code] : []));
+  const table = Object.values(game.cards).flatMap((card) => ((inPlay(card.zone) || card.zone === "shadow") && card.face !== "down" ? [fallenBase(card.code)] : []));
   // The top of each discard pile is drawn face up: a treachery goes there straight from its reveal.
   const tops = [game.seats[seat]?.discard ?? [], game.encounterDiscard, game.corsairDiscard ?? []].flatMap((pile) => faceUp(game, pile.slice(-1)));
   return [...new Set([...faceUp(game, game.seats[seat]?.hand ?? []), ...table, ...tops, ...next])];

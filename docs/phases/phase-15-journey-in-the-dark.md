@@ -4,7 +4,7 @@ Engine half depends on: phase 14's engine half
 Phone half depends on: phase 14
 Blocks: phase 16
 
-**State (2026-10-26):** not started. `journey-in-the-dark` is not in `src/campaign/playable.ts`; its printed lines are among those listed in `src/effects/open-lines.ts`. Records go in a scenario file in `src/effects/authored/` and new vocabulary in a family, as phases 13 and 14 did.
+**State (2026-10-30):** engine half done (the `moria` family; records in `src/effects/authored/journey-in-the-dark.ts`; `journey-in-the-dark` is in `src/campaign/playable.ts`, not in `NIGHTMARE_PLAYABLE`). Review round done. The phone half is built and unit-tested (the stage's tokens on the top bar, the choice words); the phone checks, the three Maestro runs (`.maestro/journey-in-the-dark.yaml`, `-pairs`, `-loss`) and their fixtures are open, since no chained win of scenarios 1 to 5 exists to deal them from.
 
 ## Goal
 

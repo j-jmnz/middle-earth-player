@@ -6,6 +6,7 @@
 // included), whether that loses the game (The One Ring leaves play with its bearer; no seat remains) or eliminates a seat,
 // and how much more damage the card can take. Nothing here changes the game: the copy is dropped.
 import { ruleCause } from "../rules/cause.ts";
+import { stagingOf } from "../rules/families/breaking-areas.ts";
 import { declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense-defenders.ts";
 import { modifiedStat, placeDamage } from "../rules/keywords.ts";
 import { engagementCostOf, engagementForecast } from "../rules/quest.ts";
@@ -110,10 +111,12 @@ export function enemiesToFace(game: ScenarioState, ctx: ReduceContext, seat: num
  */
 export type ThreatRow = { id: string; cost: number; engagesSeat: number | null; blocked: boolean };
 
-/** The enemies in staging with an engagement cost, lowest first, and what the checks would do with each now (rr.engagement-check). */
-export function threatRows(game: ScenarioState, ctx: ReduceContext): ThreatRow[] {
+/** The enemies in staging (with `seat`, once stages are separate, those in that seat's staging area) with an engagement cost, lowest first, and what the checks would do with each now (rr.engagement-check). */
+export function threatRows(game: ScenarioState, ctx: ReduceContext, seat?: number): ThreatRow[] {
   const forecast = engagesAt(game, ctx);
-  return game.staging
+  // Once stages are separate a seat reads its own staging area, not the union (mec109.multiple-staging-areas).
+  const area = seat == null ? game.staging : stagingOf(game, seat);
+  return area
     .flatMap((id): ThreatRow[] => {
       const card = game.cards[id];
       if (!card || card.face === "down" || ctx.cards.get(card.code)?.type !== "enemy") return [];

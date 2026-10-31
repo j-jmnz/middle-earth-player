@@ -6,6 +6,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { effectCause, ruleCause } from "../cause.ts";
+import { stageOf } from "./breaking-areas.ts";
 import { pushEffectFrame } from "../effect-frames.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
@@ -16,12 +17,14 @@ import { committedWillpower, stagingThreat } from "../quest.ts";
 import type { Modifier, ScenarioState } from "../state.ts";
 import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../state.ts";
 
-// The quest cards in play an attachment may go on: the current quest card, and any other quest card in play (a side quest).
-export function questHosts(state: ScenarioState, ctx: ReduceContext): string[] {
+// The quest cards in play an attachment may go on: the playing seat's current quest card (its own stage once stages are separate), and any other
+// quest card in play (a side quest).
+export function questHosts(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  const stage = stageOf(state, seat);
   const others = Object.values(state.cards)
-    .filter((card) => card.id !== state.questStage && inPlay(card.zone) && card.zone !== "questStage" && printedOf(ctx.cards, card.code).type === "quest")
+    .filter((card) => card.id !== stage && inPlay(card.zone) && card.zone !== "questStage" && printedOf(ctx.cards, card.code).type === "quest")
     .map((card) => card.id);
-  return [...(state.questStage ? [state.questStage] : []), ...others];
+  return [...(stage ? [stage] : []), ...others];
 }
 
 // The players' answer this quest phase: progress goes on the locations that may take it first.
@@ -31,13 +34,15 @@ function placingFirst(state: ScenarioState): boolean {
 
 // Progress from questing successfully, after the active location took its share: each location in the staging area that may
 // take it (takesProgressFirst) takes what it needs, when the players said so, and a full one is explored (rr.explored).
-export function progressFirstLocations(state: ScenarioState, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): { state: ScenarioState; remaining: number } {
-  if (!placingFirst(state)) return { state, remaining: amount };
+// A location that must take it (`progressFirstRequired`: "progress must be placed on Mines of Moria before it can be placed on the current quest",
+// 142052:A:1) takes it from every placement; one that may (`takesProgressFirst`) takes what the players said, from questing only.
+export function progressFirstLocations(state: ScenarioState, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], questing = true): { state: ScenarioState; remaining: number } {
+  const chosen = questing && placingFirst(state);
   let next = state;
   let remaining = amount;
   for (const id of state.staging) {
     const location = next.cards[id];
-    if (remaining <= 0 || !location || !flagged(next, id, "takesProgressFirst") || printedOf(cards, location.code).questPoints == null) continue;
+    if (remaining <= 0 || !location || !(flagged(next, id, "progressFirstRequired") || (chosen && flagged(next, id, "takesProgressFirst"))) || printedOf(cards, location.code).questPoints == null) continue;
     const points = modifiedStat(next, location, "questPoints", cards);
     const placed = Math.min(remaining, Math.max(0, points - location.progress));
     if (placed <= 0) continue;

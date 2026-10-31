@@ -40,7 +40,7 @@ describe("Normal deck sizes", () => {
   // the quest stages, the campaign cards and the boons and burdens the campaign deals (they have no encounter row), and the copies the load list sets
   // aside, stages or makes active at Setup. The load list (DragnCards) decides which pile a copy sits in; Hall of
   // Beorn decides how many copies there are, so the two sources have to agree on the total.
-  const DECK = { "a-shadow-of-the-past": 40, "a-knife-in-the-dark": 35, "flight-to-the-ford": 38, "the-ring-goes-south": 30, "journey-in-the-dark": 30, "breaking-of-the-fellowship": 30 } as const;
+  const DECK = { "a-shadow-of-the-past": 40, "a-knife-in-the-dark": 35, "flight-to-the-ford": 38, "the-ring-goes-south": 30, "journey-in-the-dark": 34, "breaking-of-the-fellowship": 30 } as const;
   type Listed = { Title: string; Slug: string; EncounterSet?: string; NormalQuantity: number };
   const bySlug = new Map(cards.flatMap((card) => card.printings.flatMap((printing) => (printing.hobSlug ? [[printing.hobSlug, card.code] as const] : []))));
 
@@ -58,8 +58,9 @@ describe("Normal deck sizes", () => {
       const card = byCode.get(code);
       const rows = scenario.cards.filter((item) => item.code === code);
       if (!card || card.type === "quest" || card.campaignKind != null || !rows.some((row) => row.pile === "encounter")) continue;
-      // What the load list puts anywhere but the deck (set aside, staging, active location) is not in the deck.
-      derived += quantity - rows.filter((row) => row.pile !== "encounter").reduce((sum, row) => sum + row.normal, 0);
+      // What the load list puts anywhere but the deck (set aside, staging, active location) is not in the deck; the locations the Setup has each
+      // player find (`searched`) are in it until then.
+      derived += quantity - rows.filter((row) => row.pile !== "encounter" && !row.searched).reduce((sum, row) => sum + row.normal, 0);
     }
     expect(derived).toBe(size);
     expect(encounterCodes(scenario)).toHaveLength(size);

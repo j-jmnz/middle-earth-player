@@ -160,10 +160,25 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     }
   });
 
-  // Travel leaves no step of its own: the location that became active from staging.
-  const arrived = after.activeLocation;
-  if (arrived && arrived !== before.activeLocation && before.staging.includes(arrived)) {
-    groups.push({ rank: 1, title: `Traveled to ${names.card(arrived)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
+  // Travel leaves no step of its own: the location that became active from staging. Once stages are separate each seat has an active location of its
+  // own (`Seat.active`), and in two-handed play the line names the seat that traveled.
+  if (after.separate === true && before.separate === true) {
+    for (let seat = 0; seat < after.seatCount; seat += 1) {
+      const arrived = after.seats[seat]?.active;
+      if (!arrived || arrived === before.seats[seat]?.active || !before.staging.includes(arrived)) continue;
+      const who = after.seatCount > 1 ? `Player ${seat + 1} traveled` : "Traveled";
+      groups.push({ rank: 1, title: `${who} to ${names.card(arrived)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
+    }
+    // An enemy sent to another seat's staging area out of an engagement area (Growing Threat's choice, its Shadow effect): where it went.
+    for (let seat = 0; seat < after.seatCount; seat += 1) {
+      for (const id of after.seats[seat]?.staging ?? []) {
+        const was = before.cards[id];
+        if (was?.zone !== "engaged" || was.controller == null || was.controller === seat) continue;
+        groups.push({ rank: 5, title: `${names.card(id)} leaves Player ${was.controller + 1}`, tone: "plain", lines: [{ text: after.seatCount > 1 ? `It is in Player ${seat + 1}'s staging area now` : "It is in the staging area now", mark: null }] });
+      }
+    }
+  } else if (after.activeLocation && after.activeLocation !== before.activeLocation && after.activeLocation !== before.secondActiveLocation && before.staging.includes(after.activeLocation)) {
+    groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
 
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");

@@ -2,7 +2,7 @@
 // phases as ticks, with the previous and next phase inline at the phase's sides when there is room. A tap opens the phase carousel
 // (phase-carousel.tsx), which names the round; the rail itself sends no intent. A phase change brightens the phase's glow
 // (MOTION.railFlash), which snaps under reduced motion and never gates a rule. The neighbor names do not move: they change in place.
-// The round and the step are not drawn; they stay in the rail's tree as clear text (`rail-round`, `rail-current`) for a flow to read.
+// The round and the step are not drawn: the rail's screen reader label names them, and the carousel names the round (user request, 2026-10-31).
 import { useEffect, useRef } from "react";
 import { Platform, Pressable, View } from "react-native";
 import Animated, { LayoutAnimationConfig, useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
@@ -154,19 +154,6 @@ export function PhaseRail({
               />
             );
           })}
-        </View>
-        {/* The round and the step are not drawn (the carousel names the round); a flow reads them as clear text, which takes no room. */}
-        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 14 * s, flexDirection: "row", justifyContent: "center", overflow: "hidden" }}>
-          {round ? (
-            <Text testID="rail-round" numberOfLines={1} className="text-micro" style={{ color: "transparent", lineHeight: 14 * s }}>
-              {`${round}${rail.current ? " · " : ""}`}
-            </Text>
-          ) : null}
-          {rail.phase ? (
-            <Text testID="rail-current" numberOfLines={1} className="text-micro" style={{ color: "transparent", lineHeight: 14 * s }}>
-              {rail.current}
-            </Text>
-          ) : null}
         </View>
       </LayoutAnimationConfig>
     </Pressable>

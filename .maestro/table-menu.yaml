@@ -35,9 +35,7 @@ tags:
 - assertNotVisible:
     id: table-back
 # A tap on the rail opens the panel of the round's phases, on the current one (the fixture is parked on its loss in the Combat phase, round 4); a
-# tap outside closes it and sends nothing. The rail draws the phase and its ticks; the step stays in the tree under its id, as clear text.
-- assertVisible:
-    id: rail-current
+# tap outside closes it and sends nothing. The rail draws the phase and its ticks.
 - assertVisible:
     id: rail-phase
     text: "Combat"

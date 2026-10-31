@@ -2,8 +2,9 @@
 // draws that card (table-pictures.ts: a hand card at the scrub's lifted size, any other at its slot's), downscaled with linear
 // filtering in halving steps so a 1200 px scan becomes a small card without aliasing; the full decode is released at once. A copy
 // is decoded again only when it is too small for where its card now is, or far larger than it needs. An image whose card leaves the
-// table is released too (docs/architecture.md, Images). Nothing here downloads: a missing file stays missing and the canvas draws
-// the name. The decodes run one at a time, as many in a frame as fit in about FRAME_BUDGET ms (one at least), and the canvas is told of
+// table is released too, except the PARKED codes it stopped drawing last, so a seat the table turns back to (two-handed play, a peek)
+// is drawn at once (docs/architecture.md, Images). Nothing here downloads: a missing file stays missing and the canvas draws the name.
+// The decodes run one at a time, as many in a frame as fit in about FRAME_BUDGET ms (one at least), and the canvas is told of
 // the finished ones once a frame, so a draw of several cards does not stall the frames after it, a table of twenty cards fills in a few
 // frames, and the canvas does not record its scene once for each picture.
 import { FilterMode, MipmapMode, Skia, type SkImage } from "@shopify/react-native-skia";
@@ -63,6 +64,12 @@ const keyOf = (boxes: ReadonlyMap<string, Box>) => [...boxes].map(([code, box]) 
 // decode and the downscale, and a 60 Hz frame is 16 ms.
 const FRAME_BUDGET = 6;
 
+// How many copies of codes the table no longer draws are kept, the ones it drew last: in two-handed play the table turns to the other
+// seat on every pass, and turned back its cards are drawn at once instead of as their names while they decode again. Enough for one seat's
+// zones (three heroes with their attachments and allies, a full hand). A hand card's copy at 3x is under 1 MB and a play-area card's a
+// fifth of that, so this holds up to about 10 MB more than the table shows (the 16 MB test counts only what it shows).
+export const PARKED = 20;
+
 // The copies a closed or new table holds: one object, so a state set to it again is no change.
 const NONE: ReadonlyMap<string, SkImage> = new Map();
 
@@ -97,14 +104,24 @@ class Pictures {
     this.announce = announce;
   }
 
-  /** Decodes what the table wants now, and releases what it no longer shows. */
+  /** Decodes what the table wants now, and releases what it no longer shows beyond the PARKED it showed last. */
   want(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null): void {
     this.wanted = boxes;
     let changed = false;
+    // The held codes are in the order they were last wanted, oldest first: one wanted now moves to the end.
+    for (const code of boxes.keys()) {
+      const copy = this.held.get(code);
+      if (!copy) continue;
+      this.held.delete(code);
+      this.held.set(code, copy);
+    }
+    let parked = [...this.held.keys()].filter((code) => !boxes.has(code)).length;
     for (const [code, copy] of this.held) {
+      if (parked <= PARKED) break;
       if (boxes.has(code)) continue;
       this.retired.push(copy.image);
       this.held.delete(code);
+      parked -= 1;
       changed = true;
     }
     for (const code of this.queue.keys()) {

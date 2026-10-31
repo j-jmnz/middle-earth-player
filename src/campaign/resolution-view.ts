@@ -180,8 +180,11 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
   const names = (view.used ?? []).map((code) => nameOf(world, code));
   const sentence = names.length > 0 ? `${unlocked} ${andList(names)} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;
+  // The heroes a Resolution lists as fallen (Fallen Into Evil still on its hero, 142060:B:1) and the captives the players named are written to the log too.
+  const fallen = view.fallen.length > 0 ? `${sentence} ${andList(view.fallen.map((code) => nameOf(world, code)))} ${view.fallen.length === 1 ? "is" : "are"} recorded as fallen.` : sentence;
+  const captives = view.captives.length > 0 ? `${fallen} ${andList(view.captives.map((code) => nameOf(world, code)))} ${view.captives.length === 1 ? "is" : "are"} recorded as captive.` : fallen;
   // The hero a Resolution takes prisoner is written to the log too (01130:B:1): a sentence of its own, with the reason.
-  const prisoner = view.prisoner ? `${sentence} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : sentence;
+  const prisoner = view.prisoner ? `${captives} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : captives;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
   if (!view.carried || view.carried.length === 0) return prisoner;
   const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));

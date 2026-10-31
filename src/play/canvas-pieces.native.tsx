@@ -320,6 +320,7 @@ export function Badges({
   effects,
   willpower,
   questPoints,
+  owner,
   fonts,
   images,
   t,
@@ -331,6 +332,8 @@ export function Badges({
   effects: CardEffects;
   willpower: number | null;
   questPoints: number | null;
+  // Whose stage this is ("P2") once stages are separate between players: told on the progress strip.
+  owner?: string | null;
   fonts: Fonts;
   images: TokenImages;
   t: TableTokens;
@@ -399,7 +402,7 @@ export function Badges({
       {questPoints != null ? (
         <Group>
           <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-          <Outlined x={x + w / 2} y={y + h - 3 * s} text={`${slot.progress} / ${questPoints}`} font={fonts.numbers} t={t} s={s} />
+          <Outlined x={x + w / 2} y={y + h - 3 * s} text={`${owner ? `${owner} · ` : ""}${slot.progress} / ${questPoints}`} font={fonts.numbers} t={t} s={s} />
         </Group>
       ) : null}
     </Group>
@@ -480,6 +483,19 @@ export function CombatMarkView({ mark, t, s }: { mark: CombatMark; t: TableToken
       <Circle cx={mark.x} cy={mark.y} r={8 * s} color={t.night} />
       <Circle cx={mark.x} cy={mark.y} r={8 * s} color={color} style="stroke" strokeWidth={1.5 * s} />
       <CanvasIcon name={icon} x={mark.x - 5 * s} y={mark.y - 5 * s} size={10 * s} color={color} />
+    </Group>
+  );
+}
+
+/**
+ * Whose staging area the row is, once the table is split between players: a small caps tag standing in the gutter at the row's left end, reading upward,
+ * clear of the cards.
+ */
+export function StagingTag({ rect, text, font, t, s }: { rect: Rect; text: string; font: SkFont; t: TableTokens; s: number }) {
+  const scale = 0.7;
+  return (
+    <Group transform={[{ translateX: rect.x - 0.5 * s }, { translateY: rect.y + rect.h - 2 * s }, { rotate: -Math.PI / 2 }, { scale }]}>
+      <Text x={0} y={0} text={text.toUpperCase()} font={font} color={t.faint} />
     </Group>
   );
 }

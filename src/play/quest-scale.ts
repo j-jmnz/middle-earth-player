@@ -7,21 +7,26 @@ import { committedWillpower, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import type { Readout } from "./readout.ts";
+import { questSeat } from "./selectors.ts";
 
 // `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves.
 // Outside it the scale rests, dimmed, with no numbers: a Planning "−3 Short" before anyone could commit would be a false alarm.
-export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean };
+// `seat`: the seat whose staging area and willpower these are once stages are separate between players (the acting seat's, whichever seat a peek draws), else null.
+export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean; seat: number | null };
 
 /** The scale now: the quest readout's numbers when the dock shows one, else the engine's staging threat and committed willpower. */
 export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: Readout | null): QuestScale {
+  // The acting seat's own staging area and stage once stages are separate.
+  const seat = questSeat(game);
+  const owner = seat != null && game.seatCount > 1 ? seat : null;
   if (readout?.kind === "quest") {
     const willpower = readout.stats.find((stat) => stat.icon === "willpower")?.value ?? 0;
     const threat = readout.stats.find((stat) => stat.icon === "threat")?.value ?? 0;
-    return { threat, willpower, delta: willpower - threat, live: true };
+    return { threat, willpower, delta: willpower - threat, live: true, seat: owner };
   }
-  const threat = stagingThreat(game, ctx.cards);
-  const willpower = committedWillpower(game, ctx.cards);
-  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" };
+  const threat = stagingThreat(game, ctx.cards, seat);
+  const willpower = committedWillpower(game, ctx.cards, seat);
+  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest", seat: owner };
 }
 
 /** The marker between the dials: "+2" Ahead, "−1" Short, or Even, and the words a screen reader hears. */

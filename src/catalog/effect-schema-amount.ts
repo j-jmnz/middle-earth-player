@@ -8,7 +8,8 @@ import { pickSchema } from "./effect-schema-pick.ts";
 // the enemy and the defender of the attack in progress.
 // `other` is the second card the answered event names: the enemy a character defends against or attacks, the enemy an
 // attack destroyed, the defender of an attack that resolved.
-export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation"]);
+// `previous` is the card picked before the last, `discardTop` the top card of the encounter discard pile (the last card put there).
+export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").

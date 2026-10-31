@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/fixture.ts";
-import { legalIntents, reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
+import { legalIntents, reduce, startScenario, type LegalIntent, type ScenarioState } from "../rules/reduce.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
@@ -13,8 +13,10 @@ import { windowSheet } from "./bar-sheets.ts";
 import { pointTitle, windowPoint } from "./rail.ts";
 import { turnReference } from "./reference.ts";
 import type { SheetNames } from "./sheet-types.ts";
+import { twoHanded } from "./seat-fixture.ts";
 import { sheetFor } from "./sheets.ts";
-import { isFreeResponse, nextStopTitle, passableWindow, stopDecision } from "./stops.ts";
+import { createTableStore } from "./store.ts";
+import { followAnswers, isFreeResponse, nextStopTitle, passableWindow, stopDecision } from "./stops.ts";
 import { DEFAULT_SETTINGS, parseSettings, STOP_POINTS, toggleAlways, toggleStop } from "./table-settings.ts";
 
 const names: SheetNames = { card: (id) => id, line: () => null };
@@ -134,5 +136,37 @@ describe("the turn reference", () => {
     const windows = phases.flatMap((phase) => phase.steps.flatMap((step) => step.windows.map((window) => window.id)));
     expect([...windows].sort()).toEqual([...STOP_POINTS].sort());
     expect(phases.flatMap((phase) => phase.steps).filter((step) => step.current)).toHaveLength(1);
+  });
+});
+
+describe("the table's answers after a send", () => {
+  it("passes the other seat's step window in the same send, so the table never draws it (two-handed)", () => {
+    const { state, ctx } = twoHanded();
+    const game: ScenarioState = { ...state, phase: "Resource", mode: "resourceActions", window: { kind: "pass" }, activeSeat: 0, passed: [] };
+    const store = createTableStore({ ctx, game });
+    const sheetOf = (at: ScenarioState, legal: readonly LegalIntent[]) => sheetFor(at, ctx, legal, names) ?? windowSheet(at, ctx, legal, names);
+    const settings = { stopsOn: true, stops: [], alwaysUse: [] };
+    const seen = new Set<string>();
+    expect(store.getState().dispatch({ type: "Pass" })).toBe(true);
+    expect(store.getState().game.activeSeat).toBe(1);
+    followAnswers(store, ctx, sheetOf, settings, false, seen);
+    // Seat 1's resource window was passed for it, and planning, which always asks, is seat 0's.
+    expect(store.getState().game.mode).toBe("planning");
+    expect(store.getState().game.activeSeat).toBe(0);
+    // Planning asks: nothing more is sent.
+    const at = store.getState().game;
+    followAnswers(store, ctx, sheetOf, settings, false, seen);
+    expect(store.getState().game).toBe(at);
+  });
+
+  it("sends nothing while stops are off", () => {
+    const { state, ctx } = twoHanded();
+    const game: ScenarioState = { ...state, phase: "Resource", mode: "resourceActions", window: { kind: "pass" }, activeSeat: 0, passed: [] };
+    const store = createTableStore({ ctx, game });
+    const sheetOf = (at: ScenarioState, legal: readonly LegalIntent[]) => sheetFor(at, ctx, legal, names) ?? windowSheet(at, ctx, legal, names);
+    store.getState().dispatch({ type: "Pass" });
+    const at = store.getState().game;
+    followAnswers(store, ctx, sheetOf, { stopsOn: false, stops: [], alwaysUse: [] }, false, new Set());
+    expect(store.getState().game).toBe(at);
   });
 });

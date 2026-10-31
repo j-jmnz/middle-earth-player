@@ -210,8 +210,9 @@ and `mustTravel` flags on `table` (`142023:whenRevealed:1`, `142023:constant:1`)
 
 Lines the core vocabulary could not express were worked by mechanic family: encounter, costs, quest, defense, attachments,
 attack, play, deck, sidequests, misc, and for the saga box burden (the burden deck and the Ring-bearer's life, Flight to the
-Ford) and south (a second active location, the Ring-bearer facedown under an enemy, an enemy engaged with every player,
-progress gates and caps; The Ring Goes South). Whoever takes a family adds the engine support and writes the records. A
+Ford), south (a second active location, the Ring-bearer facedown under an enemy, an enemy engaged with every player,
+progress gates and caps; The Ring Goes South) and moria (damage tokens counting down on an objective, an enemy engaged with the
+first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark) and breaking (the Ring-bearer removed from the game, the staging area, quest stage and active location each seat has from stage 2B, progress that discards cards, a hero that falls into evil, skipped phases; Breaking of the Fellowship). Whoever takes a family adds the engine support and writes the records. A
 family owns files that are composed by the `index.ts` next to them, so families do not edit the same lists:
 
 - `src/catalog/families/<family>.ts` exports `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each
@@ -225,7 +226,7 @@ family owns files that are composed by the `index.ts` next to them, so families 
   switch. Bigger families split into `<family>-<part>.ts` files. Tests go next to them (`<family>.test.ts`) and name the
   rule ids they implement.
 - `src/effects/authored/families/<family>.ts` exports `RECORDS` and `REPLACES`, composed by that folder's `index.ts` (burden and
-  south have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
+  south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
 
 Adding a family is therefore: the three files, its entries in the three `index.ts` files (catalog, rules, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run`, and a test. Adding a
@@ -233,13 +234,9 @@ verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/version.ts`) 
 
 ## Not expressible yet: leave open, report
 
-`pnpm effects:open` lists 100 open lines on 50 cards in `src/effects/open-lines.ts`. Every player-card line is closed except
-two.
+`pnpm effects:open` lists the open lines in `src/effects/open-lines.ts`. Every player-card line is closed except
+the two below.
 
-- **Scenarios 5 and 6, pending phase work (98 lines).** Journey in the Dark and Breaking of the Fellowship (cards 142040
-  to 142090). They are written by phases 15 and 16 (`docs/phases/phase-15-journey-in-the-dark.md`, `phase-16-breaking-of-the-fellowship.md`)
-  into `src/effects/authored/<scenario-id>.ts`, with whatever vocabulary those scenarios need; each joins
-  `src/campaign/playable.ts` when its lines are closed. Journey in the Dark's Setup is among them (`docs/phases/STATUS.md`).
 - **21072:B:1 and 21072:B:2, not expressible (Sméagol's Gollum side).** "Immune to non-Gollum card effects. Gollum engages the
   first player" and "Forced: When Gollum is defeated, flip him to Sméagol and return him to his owner's control, exhausted."
   Side B is an enemy, but its stats appear in no source (`data/cards/ASitE.json` has the hero side only), and the engine has

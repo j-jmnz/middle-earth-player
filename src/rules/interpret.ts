@@ -23,6 +23,8 @@ import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { shadowFace } from "./families/defense-shadow.ts";
 import { drawCards } from "./families/dungeon-deck.ts";
+import { withView } from "./families/breaking-areas.ts";
+import { isBreakingVerb } from "./families/breaking.ts";
 import { announceDraw } from "./families/dreamchaser.ts";
 import { playerSource } from "./families/quest-threat.ts";
 
@@ -87,7 +89,12 @@ export function runInstruction(
   steps: EngineStep[],
 ): ScenarioState {
   if (state.failure) return state;
-  return runTwinned(state, withTwin(state, instruction, ctx.cards), focus, ctx, steps);
+  const twin = withTwin(state, instruction, ctx.cards);
+  // Once stages are separate "the staging area", "this stage" and "the quest" of an instruction are the acting seat's (mec109.multiple-staging-areas): the
+  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking-areas.ts). The verbs of the
+  // breaking family are about the areas themselves and run on the whole state.
+  if (state.separate && !isBreakingVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
+  return runTwinned(state, twin, focus, ctx, steps);
 }
 
 // runInstruction with a code already read as its Nightmare twin (families/nightmare-guards.ts).
@@ -110,13 +117,13 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DealDamage":
       return dealInstructionDamage(state, focus, ctx, steps);
     case "Travel": {
-      const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards)[0];
+      const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards, focus.seat)[0];
       if (!locationId) return state;
       const traveled = travelNow(state, locationId, ctx, steps);
       return traveled ?? { ...state, failure: "Travel was refused" };
     }
     case "Engage": {
-      const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards)[0];
+      const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards, focus.seat)[0];
       const enemy = enemyId ? state.cards[enemyId] : undefined;
       if (!enemyId || !enemy || (enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
       // An enemy engaged with another player moves to the actor (01015:A:1, rr.engaged).

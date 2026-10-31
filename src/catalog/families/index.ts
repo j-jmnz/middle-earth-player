@@ -16,11 +16,13 @@ import * as prisoner from "./prisoner.ts";
 import * as dungeon from "./dungeon.ts";
 import * as caves from "./caves.ts";
 import * as nightmare from "./nightmare.ts";
+import * as moria from "./moria.ts";
+import * as breaking from "./breaking.ts";
 import * as dreamchaser from "./dreamchaser.ts";
 import * as sea from "./sea.ts";
 import * as uncharted from "./uncharted.ts";
 
 // Each mechanic family's verbs, triggers and flags, in one list each (docs/plans/effect-authoring.md).
-export const FAMILY_VERBS = [...attack.VERBS, ...defense.VERBS, ...encounter.VERBS, ...quest.VERBS, ...play.VERBS, ...costs.VERBS, ...deck.VERBS, ...attachments.VERBS, ...sidequests.VERBS, ...misc.VERBS, ...burden.VERBS, ...south.VERBS, ...campaign.VERBS, ...objectives.VERBS, ...prisoner.VERBS, ...dungeon.VERBS, ...caves.VERBS, ...nightmare.VERBS, ...dreamchaser.VERBS, ...sea.VERBS, ...uncharted.VERBS] as const;
-export const FAMILY_TRIGGERS = [...attack.TRIGGERS, ...defense.TRIGGERS, ...encounter.TRIGGERS, ...quest.TRIGGERS, ...play.TRIGGERS, ...costs.TRIGGERS, ...deck.TRIGGERS, ...attachments.TRIGGERS, ...sidequests.TRIGGERS, ...misc.TRIGGERS, ...burden.TRIGGERS, ...south.TRIGGERS, ...campaign.TRIGGERS, ...objectives.TRIGGERS, ...prisoner.TRIGGERS, ...dungeon.TRIGGERS, ...caves.TRIGGERS, ...nightmare.TRIGGERS, ...dreamchaser.TRIGGERS, ...sea.TRIGGERS, ...uncharted.TRIGGERS] as const;
-export const FAMILY_FLAGS = [...attack.FLAGS, ...defense.FLAGS, ...encounter.FLAGS, ...quest.FLAGS, ...play.FLAGS, ...costs.FLAGS, ...deck.FLAGS, ...attachments.FLAGS, ...sidequests.FLAGS, ...misc.FLAGS, ...burden.FLAGS, ...south.FLAGS, ...campaign.FLAGS, ...objectives.FLAGS, ...prisoner.FLAGS, ...dungeon.FLAGS, ...caves.FLAGS, ...nightmare.FLAGS, ...dreamchaser.FLAGS, ...sea.FLAGS, ...uncharted.FLAGS] as const;
+export const FAMILY_VERBS = [...attack.VERBS, ...defense.VERBS, ...encounter.VERBS, ...quest.VERBS, ...play.VERBS, ...costs.VERBS, ...deck.VERBS, ...attachments.VERBS, ...sidequests.VERBS, ...misc.VERBS, ...burden.VERBS, ...south.VERBS, ...campaign.VERBS, ...objectives.VERBS, ...prisoner.VERBS, ...dungeon.VERBS, ...caves.VERBS, ...nightmare.VERBS, ...moria.VERBS, ...breaking.VERBS, ...dreamchaser.VERBS, ...sea.VERBS, ...uncharted.VERBS] as const;
+export const FAMILY_TRIGGERS = [...attack.TRIGGERS, ...defense.TRIGGERS, ...encounter.TRIGGERS, ...quest.TRIGGERS, ...play.TRIGGERS, ...costs.TRIGGERS, ...deck.TRIGGERS, ...attachments.TRIGGERS, ...sidequests.TRIGGERS, ...misc.TRIGGERS, ...burden.TRIGGERS, ...south.TRIGGERS, ...campaign.TRIGGERS, ...objectives.TRIGGERS, ...prisoner.TRIGGERS, ...dungeon.TRIGGERS, ...caves.TRIGGERS, ...nightmare.TRIGGERS, ...moria.TRIGGERS, ...breaking.TRIGGERS, ...dreamchaser.TRIGGERS, ...sea.TRIGGERS, ...uncharted.TRIGGERS] as const;
+export const FAMILY_FLAGS = [...attack.FLAGS, ...defense.FLAGS, ...encounter.FLAGS, ...quest.FLAGS, ...play.FLAGS, ...costs.FLAGS, ...deck.FLAGS, ...attachments.FLAGS, ...sidequests.FLAGS, ...misc.FLAGS, ...burden.FLAGS, ...south.FLAGS, ...campaign.FLAGS, ...objectives.FLAGS, ...prisoner.FLAGS, ...dungeon.FLAGS, ...caves.FLAGS, ...nightmare.FLAGS, ...moria.FLAGS, ...breaking.FLAGS, ...dreamchaser.FLAGS, ...sea.FLAGS, ...uncharted.FLAGS] as const;

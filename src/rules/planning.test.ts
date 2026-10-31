@@ -311,4 +311,40 @@ describe("planning turns and passing", () => {
     expect(run.state.mode).not.toBe("planning");
     expect(run.state.planningSeat).toBeNull();
   });
+
+  it("starts at the first player when that is seat 1, and seat 0 still has its planning window after (rr.step-2-3)", () => {
+    const gimli = hero("gimli", "leadership");
+    const local = { effects: [], cards: cardMap([leadership, gimli, ally]) };
+    let state = blankScenario({ seatCount: 2, seed: 3, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    const g = spawn(a.state, "gimli", { zone: "heroes", seat: 1 });
+    state = updateCard(updateCard(g.state, a.id, { resources: 5 }), g.id, { resources: 5 });
+    const mine = spawn(state, "ally", { zone: "hand", seat: 0 });
+    state = { ...mine.state, phase: "Resource", mode: "resourceActions", window: { kind: "pass" }, activeSeat: 1, firstPlayer: 1, passed: [] };
+    let run = expectOk(reduce(state, { type: "Pass" }, local));
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.planningSeat).toBe(1);
+    expect(run.state.activeSeat).toBe(1);
+    // Both pass in seat 1's window: seat 0's own window opens, and its ally can be played there.
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    run = expectOk(reduce(run.state, { type: "Pass" }, local));
+    expect(run.state.mode).toBe("planning");
+    expect(run.state.planningSeat).toBe(0);
+    expect(run.state.activeSeat).toBe(0);
+    run = expectOk(reduce(run.state, { type: "PlayCard", cardId: mine.id, payments: [{ heroId: a.id, amount: 2 }] }, local));
+    expect(run.state.cards[mine.id]?.zone).toBe("play");
+  });
+
+  it("ends the phase when the last seat in player order is eliminated in its own planning window (rr.step-2-3)", () => {
+    const gimli = hero("gimli", "leadership");
+    const local = { effects: [], cards: cardMap([leadership, gimli]) };
+    let state = blankScenario({ seatCount: 2, seed: 3, definition: fixtureDefinition(["stage"]) });
+    const a = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    state = spawn(a.state, "gimli", { zone: "heroes", seat: 1 }).state;
+    const seats: ScenarioState["seats"] = [state.seats[0], { ...state.seats[1], eliminated: true }];
+    state = { ...state, seats, phase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0, planningSeat: 1, passed: [] };
+    const run = expectOk(reduce(state, { type: "Pass" }, local));
+    expect(run.state.mode).not.toBe("planning");
+    expect(run.state.planningSeat).toBeNull();
+  });
 });

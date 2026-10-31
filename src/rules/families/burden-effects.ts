@@ -12,7 +12,7 @@ import type { ReduceContext } from "../interpret.ts";
 import { pickCandidates } from "../pick.ts";
 import { queueEvent } from "../queue.ts";
 import type { ScenarioState } from "../state.ts";
-import { inPlay, updateCard, withMode } from "../state.ts";
+import { flagged, inPlay, updateCard, withMode } from "../state.ts";
 import type { Focus } from "./index.ts";
 import { listens } from "./encounter-reveal.ts";
 
@@ -29,6 +29,7 @@ export function endQuestPhase(state: ScenarioState): ScenarioState {
 // The first player token goes to the next player in the game (rr.first-player); with no other player it stays. The token passing
 // is announced as at the end of the refresh phase.
 export function passFirstPlayer(state: ScenarioState): ScenarioState {
+  if (flagged(state, "table", "firstPlayerLocked") && !state.seats[state.firstPlayer]?.eliminated) return state;
   for (let step = 1; step <= state.seatCount; step += 1) {
     const index = (state.firstPlayer + step) % state.seatCount;
     if (state.seats[index]?.eliminated) continue;

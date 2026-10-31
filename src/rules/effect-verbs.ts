@@ -6,6 +6,8 @@ import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
 import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
+import { activeOf, stagingOf } from "./families/breaking-areas.ts";
+import { cancelAttack } from "./families/defense-defenders.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
 import { notePlaced, progressRoom } from "./families/south-locations.ts";
@@ -61,7 +63,9 @@ export function targetCandidates(state: ScenarioState, instruction: TargetVerb, 
         .filter((id) => instruction.scope !== "any" || playerCardEffectCanChoose(printedOf(ctx.cards, state.cards[id]?.code ?? ""), state, id));
     }
     case "PlaceProgressOnLocation": {
-      const open = [...(state.activeLocation ? [state.activeLocation] : []), ...state.staging];
+      // The seat's own active location and staging area once stages are separate.
+      const active = activeOf(state, seat);
+      const open = [...(active ? [active] : []), ...stagingOf(state, seat)];
       return open.filter((id) => {
         const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
         return printed.type === "location" && !printed.isUnique;
@@ -85,9 +89,13 @@ export function applyTargetVerb(
       return flagged(state, id, "cannotReady") ? state : updateCard(state, id, { exhausted: false });
     case "BarAttack": {
       const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
-      return sourceId
-        ? { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: instruction.until ?? "endOfRound", seat: barred }] }
-        : state;
+      if (!sourceId) return state;
+      const next: ScenarioState = { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: instruction.until ?? "endOfRound", seat: barred }] };
+      // Every "cannot attack" bar (Mr. Underhill after a failed Hide test, 141017:A:3; Feint): used once the enemy is declared as an attacker
+      // against that player and before its damage is dealt, the attack ends there, as a canceled one does (user decision, 2026-10-31; brief,
+      // Keywords implemented once). After the damage the attack has happened, and its end (readies, "after ~ defends") goes on.
+      const attack = state.pendingAttack;
+      return attack?.enemyId === id && attack.seat === barred && !attack.damaged ? cancelAttack(next) : next;
     }
     case "PlaceProgressOnLocation":
       return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps);

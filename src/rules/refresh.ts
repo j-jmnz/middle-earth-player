@@ -33,6 +33,8 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
 // Only this function announces it.
 function passToken(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.seatCount === 1) return state;
+  // "For the rest of the game, you cannot lose control of the first player token" (142068:A:2): the token stays, unless its holder is eliminated.
+  if (flagged(state, "table", "firstPlayerLocked") && !state.seats[state.firstPlayer]?.eliminated) return state;
   for (let step = 1; step <= state.seatCount; step += 1) {
     const index = (state.firstPlayer + step) % state.seatCount;
     if (state.seats[index]?.eliminated) continue;

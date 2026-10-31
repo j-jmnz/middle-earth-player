@@ -39,10 +39,12 @@ export function applyPass(state: ScenarioState): ScenarioState {
   if (nextSeat != null) return { ...state, passed, activeSeat: nextSeat };
   // A frame's action window closes in place. The frame continues, and the phase does not move.
   if (state.window?.kind === "frameAction") return { ...state, passed: [], window: null };
-  // The planning window closes for this active player; the next player in player order takes theirs (rr.step-2-3).
+  // The planning window closes for this active player; the next player in player order takes theirs (rr.step-2-3). Player order
+  // counts from the first player, and a seat eliminated in its own window still holds its place in it.
   if (state.mode === "planning") {
-    const turn = planningTurn(state);
-    const following = livingSeats(state).find((seat) => seat > turn);
+    const place = (seat: number) => (seat - state.firstPlayer + state.seatCount) % state.seatCount;
+    const turn = place(planningTurn(state));
+    const following = livingSeats(state).find((seat) => place(seat) > turn);
     if (following != null) return { ...state, planningSeat: following, passed: [], activeSeat: following };
   }
   return { ...withMode({ ...state, planningSeat: null }, skipQuestPhase(state, modeAfterPass(state.mode))), window: null };
