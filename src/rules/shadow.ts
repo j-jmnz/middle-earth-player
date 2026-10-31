@@ -257,6 +257,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (held) return held;
   // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
   const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
+  const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
     attack.immediate || done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
@@ -285,8 +286,9 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       instructions: waiting.length > 0 ? [...after, { verb: "StartShadowAttack", attackers: [...waiting] }] : after,
       cancel: null,
       blockCancel: null,
-      // An attack that sends its excess damage on (excessToShip) leaves that damage as the X of its effect; any other leaves the characters it destroyed.
-      ...(attack.defense?.excess ? { x: attack.defense.excess } : destroyed > 0 ? { x: destroyed } : {}),
+      // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.
+      ...(sendsExcess ? { excess: attack.defense?.excess ?? 0 } : {}),
+      ...(destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
       ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),

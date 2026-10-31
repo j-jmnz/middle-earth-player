@@ -14,4 +14,8 @@
 // reaches a card that is immune to player card effects (DamageCard), a shadow effect that reveals an encounter card runs in a frame, a quest stage that prints
 // Victory goes to the victory display in a game with ships, and a quest ordered by its quest deck advances in that order: a replayed Sailing or Boarding game
 // takes a different path.
-export const ENGINE_VERSION = 15;
+// 16 (phase 40 fix pass): naming a card (NameCard) offers the title of every card of the game, not the titles in the decks; the excess damage of Sudden Storms'
+// attack is its own number (0 with none, no longer the characters destroyed); Ballista's Response is heard after its Ship has attacked; the Hard and Expert Mode
+// card hold against every effect, and the Expert card raises threat only for a heal or ready a player card made: a replayed Voyage Across Belegaer game can offer
+// a different choice or take a different path.
+export const ENGINE_VERSION = 16;

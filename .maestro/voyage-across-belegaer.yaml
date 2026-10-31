@@ -42,5 +42,12 @@ tags:
 - assertVisible:
     id: node-voyage-across-belegaer-status
     text: "Won.*"
+# The XP the Resolution gave is written: the line reads it and there is XP to spend.
 - assertVisible:
     id: xp-line
+- assertVisible:
+    id: xp-open
+# The Fate of Númenor is the next scenario of the path.
+- assertVisible:
+    id: node-the-fate-of-numenor-status
+    text: "Next"

@@ -6,7 +6,7 @@ import { askTarget } from "../choices.ts";
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
-import { printedOf } from "../printed.ts";
+import { isPlayerType, printedOf, type PrintedCard } from "../printed.ts";
 import { queueEvent } from "../queue.ts";
 import { nextUint } from "../seed.ts";
 import type { ScenarioState } from "../state.ts";
@@ -54,9 +54,21 @@ export function namedCard(state: ScenarioState): string | null {
   return entry ? entry.slice(NAMED.length) : null;
 }
 
-/** NameCard: the titles of the cards in the decks, each once, are the choices; a title is recorded among the effect's picks. */
+/** Which deck a title belongs to by its printed card: the order of the titles and their labels on the table read this word, which says nothing of where the card is now. */
+export function titleDeck(printed: PrintedCard): "Player card" | "Encounter card" {
+  return isPlayerType(printed) ? "Player card" : "Encounter card";
+}
+
+/** NameCard: the title of any card of the game, each once, is a choice, whatever zone the card is in: offering only the titles the decks hold would show the player
+ * what is in them. A title is recorded among the effect's picks. */
 export function nameCard(state: ScenarioState, instruction: Extract<Instruction, { verb: "NameCard" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const titles = [...new Set(decks(state).flatMap((deck) => cardsOf(state, deck).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)))].sort((left, right) => left.localeCompare(right));
+  // Every card of the game is offered whatever its zone, the encounter cards first and each deck's titles in order.
+  const deckOf = new Map<string, string>();
+  for (const card of Object.values(state.cards)) {
+    const printed = printedOf(ctx.cards, card.code);
+    if (!deckOf.has(printed.name)) deckOf.set(printed.name, titleDeck(printed));
+  }
+  const titles = [...deckOf.keys()].sort((left, right) => (deckOf.get(left) ?? "").localeCompare(deckOf.get(right) ?? "") || left.localeCompare(right));
   if (titles.length === 0) return state;
   const data = effectData(state);
   if (!data) return state;
@@ -76,7 +88,8 @@ export function discardFromAnyDeck(state: ScenarioState, instruction: Extract<In
   const named = namedCard(state);
   let next = state;
   let hit = false;
-  const seat = /^seat:(\d+)$/.exec(deck) ? Number(/^seat:(\d+)$/.exec(deck)?.[1]) : null;
+  const owner = /^seat:(\d+)$/.exec(deck)?.[1];
+  const seat = owner != null ? Number(owner) : null;
   for (const id of cardsOf(state, deck).slice(0, instruction.count)) {
     const card = next.cards[id];
     if (!card) continue;

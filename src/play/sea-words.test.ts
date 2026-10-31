@@ -93,6 +93,7 @@ describe("the Sailing test's words", () => {
     expect(sailingLookWords(3, [{ name: "Dream-chaser", weight: 2, sources: [] }])).toBe("Looks at 3 cards · the Dream-chaser counts as 2");
     expect(sailingLookWords(4, [{ name: "Dream-chaser", weight: 3, sources: ["Enlarged Quarters"] }])).toBe("Looks at 4 cards · the Dream-chaser counts as 3 (Enlarged Quarters)");
     expect(sailingLookWords(5, [{ name: "Dream-chaser", weight: 3, sources: ["Enlarged Quarters", "Sea-ward Tower"] }])).toContain("(Enlarged Quarters, Sea-ward Tower)");
+    expect(sailingLookWords(5, [{ name: "Dream-chaser", weight: 2, sources: [] }], { amount: 2, sources: ["Calm Waters"] })).toBe("Looks at 5 cards · the Dream-chaser counts as 2 · Calm Waters +2");
   });
 
   it("reads the heading change and the count on a medallion", () => {
@@ -117,6 +118,10 @@ describe("the piles and the web list's words", () => {
 
   it("keep the words of the verbs inside a choice (phase 39)", () => {
     expect(seaWords({ verb: "ShiftHeading", direction: "offCourse" })).toBe("shift your heading off-course");
+    expect(seaWords({ verb: "DamageShip", amount: 3 })).toBe("deal 3 damage to a Ship objective you control");
+    expect(seaWords({ verb: "DamageShip", amount: { excess: true } })).toBe("deal the excess damage to a Ship objective you control");
+    expect(seaWords({ verb: "SearchShips", count: 1 })).toBe("add the Ship enemy with the highest Threat to the staging area");
+    expect(seaWords({ verb: "SearchShips", count: 2 })).toBe("add the 2 Ship enemies with the highest Threat to the staging area");
   });
 });
 

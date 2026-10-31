@@ -193,6 +193,13 @@ describe("Sudden Storms (11055:A:1, 11055:A:2)", () => {
     const none = voyageFight(world, SUDDEN_STORMS, "raider");
     expect(none.run.state.cards[none.made.ships[0] ?? ""]?.damage).toBe(0);
   });
+
+  it("deals no ship damage when its attack deals exactly the defender's remaining hit points, though the defender is destroyed (11055:A:2)", () => {
+    // The bruiser deals 6 damage to a hero with 6 hit points: the hero is destroyed, no damage is beyond its hit points, and X is 0 (not the one character destroyed).
+    const hit = voyageFight(world, SUDDEN_STORMS, "bruiser");
+    expect(hit.run.state.cards[hit.made.hero]?.zone).not.toBe("play");
+    expect(hit.run.state.cards[hit.made.ships[0] ?? ""]?.damage).toBe(0);
+  });
 });
 
 describe("Winds of Wrath (11056:A:1, 11056:A:2)", () => {

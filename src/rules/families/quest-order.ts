@@ -6,7 +6,7 @@
 // holds a `look`, and a quest that holds one never branches.
 import { shuffleIds } from "../seed.ts";
 import type { ScenarioState } from "../state.ts";
-import { printedOf } from "../printed.ts";
+import { printedOf, type PrintedCard } from "../printed.ts";
 import { moveCard } from "../zones.ts";
 import { headingIs } from "./sea-heading.ts";
 
@@ -51,7 +51,8 @@ export function keepStage(state: ScenarioState, looked: readonly string[], chose
 }
 
 /** A quest stage that prints Victory (11016, 11017 to 11020) goes to the victory display when it is defeated, in a game with ships: the campaign card
- * counts "stage 2B quest cards in the victory display" (11171:B:4; ltp.victory-display). */
-export function stageToVictory(state: ScenarioState, cards: ReadonlyMap<string, import("../printed.ts").PrintedCard>, code: string): boolean {
+ * counts "stage 2B quest cards in the victory display" (11171:B:4; ltp.victory-display). The gate is `sea`, the state of a game with a Heading card: a stage that prints Victory in any other game
+ * goes where it always went, and no other quest in a game with ships is told apart. */
+export function stageToVictory(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, code: string): boolean {
   return state.sea != null && printedOf(cards, code).victory != null;
 }

@@ -36,6 +36,8 @@ export type Scope = {
   against?: string;
   subject?: string;
   explored?: boolean;
+  // The event a Forced effect answers was made by a player card's effect (a heal or a ready).
+  byPlayerCard?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
   // What the running effect has picked, and the other card the answered event names.
@@ -45,6 +47,8 @@ export type Scope = {
   x?: number;
   // The damage the answered event placed.
   dealt?: number;
+  // The damage the attack sent on past its defender (excessToShip).
+  excess?: number;
 };
 
 // The card a `matches` condition reads.
@@ -242,6 +246,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "x":
       return (scope.x ?? 0) >= condition.min;
+    case "byPlayerCard":
+      return scope.byPlayerCard === true;
+    case "excess":
+      return (scope.excess ?? 0) >= condition.min;
     case "dealt":
       return (scope.dealt ?? 0) >= (condition.min ?? 1);
     case "distinctTraits":

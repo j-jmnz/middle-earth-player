@@ -1,6 +1,11 @@
 // The words of the sea family's verbs (src/catalog/families/sea.ts) inside a choice: what a branch of a Choose does ("Either shift your heading
 // off-course or deal 1 damage to each exhausted character", 11055:A:1).
 import type { Instruction } from "../catalog/boundary.ts";
+import { frameScope, resolveAmount } from "../rules/amounts.ts";
+import { controlledShips } from "../rules/families/sea-campaign.ts";
+import { titleDeck } from "../rules/families/sea-cards.ts";
+import type { ReduceContext } from "../rules/interpret.ts";
+import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
@@ -17,29 +22,32 @@ export function seaWords(instruction: Instruction): string | null {
     case "EngageLastPlayer":
       return "it engages the last player";
     case "DamageShip":
-      return "deal damage to a Ship objective you control";
+      return typeof instruction.amount === "number" ? `deal ${instruction.amount} damage to a Ship objective you control` : instruction.amount.excess ? "deal the excess damage to a Ship objective you control" : "deal damage to a Ship objective you control";
     case "SearchShips":
-      return "add the Ship enemy with the highest Threat to the staging area";
+      return typeof instruction.count === "number" && instruction.count > 1 ? `add the ${instruction.count} Ship enemies with the highest Threat to the staging area` : "add the Ship enemy with the highest Threat to the staging area";
     default:
       return null;
   }
 }
 
-/** What a sea verb that asks a player for a card or an option says to ask (dcce.prepare-your-fleet, 11171:A:2, 11016:B:3, 11021:A:1, 110139:A:4, 110139:B:5). Null for any other verb. */
-export function seaPickWords(instruction: Instruction, names: ChoiceNames): PickWords | null {
+const resources = (count: number): string => `${count} ${count === 1 ? "resource" : "resources"}`;
+
+/** What a sea verb that asks a player for a card or an option says to ask (dcce.prepare-your-fleet, 11171:A:2, 11016:B:3, 11021:A:1, 110139:A:4, 110139:B:5). Null for any other verb.
+ * Each prompt leads with the decision, so it reads first on a short screen. The ship a question is about is named by `seaAsk`, which reads the game. */
+export function seaPickWords(instruction: Instruction): PickWords | null {
   switch (instruction.verb) {
     case "PrepareFleet":
-      return { verb: "Take", prompt: "Choose a ship-objective to take control of. One player must take the Dream-chaser." };
+      return { verb: "Take", prompt: "Choose a Ship objective to take control of. One player must take the Dream-chaser." };
     case "FitShips":
-      return { verb: "Fit", prompt: `Choose a Modification boon (${instruction.codes.map((code) => names.code(code)).join(", ")}) to attach to your ship-objective.` };
+      return { verb: "Fit", prompt: "Choose a Modification boon to attach to a Ship objective." };
     case "TradeShipDamage":
-      return { verb: "Choose", prompt: `You may deal ${instruction.damage} damage to your ship-objective to add ${instruction.resources} resource to a hero's pool.` };
+      return { verb: "Trade", prompt: `Deal ${instruction.damage} damage to a Ship objective to add ${resources(instruction.resources)} to a hero's pool?` };
     case "LookAtStages":
-      return { verb: "Advance", prompt: "Look at the top stages of the quest deck and choose the one the quest advances to. The other goes to the bottom of the quest deck." };
+      return { verb: "Advance", prompt: "Choose the stage to advance to. The other goes to the bottom." };
     case "SearchShips":
       return { verb: "Add", prompt: "Choose which Ship enemy with the highest Threat is added to the staging area." };
     case "NameCard":
-      return { verb: "Name", prompt: "Name a card in a deck." };
+      return { verb: "Name", prompt: "Name a card. If you discard it from the deck you choose next, the damage is 2 instead of 1." };
     case "DiscardFromAnyDeck":
       return { verb: "Discard", prompt: `Choose the deck whose top ${instruction.count === 1 ? "card is" : `${instruction.count} cards are`} discarded.` };
     default:
@@ -47,17 +55,52 @@ export function seaPickWords(instruction: Instruction, names: ChoiceNames): Pick
   }
 }
 
+/** The questions that need the game to be worded: the ship a Campaign Setup choice is for (the fitting's ship is the first without a Modification boon, the trade's is
+ * `instruction.ship`), the hero a trade pays, the second ship of a lone player, and the excess damage a Ship objective takes. Null for any other pick. `options` are the ids
+ * the sheet offers. */
+export function seaAsk(pick: Instruction, next: Instruction | undefined, options: readonly string[], game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, sourceId: string | null): PickWords | null {
+  if (pick.verb === "FitShips") {
+    const ship = controlledShips(game, ctx).find((id) => !(game.cards[id]?.attachments ?? []).some((attached) => pick.codes.includes(game.cards[attached]?.code ?? "")));
+    return { verb: "Fit", prompt: ship ? `${names.card(ship)}: choose a Modification boon to attach.` : "Choose a Modification boon to attach." };
+  }
+  if (pick.verb === "TradeShipDamage") {
+    if (pick.hero === "?") return { verb: "Add", prompt: `Choose the hero who gets ${resources(pick.resources)}.` };
+    const ship = pick.ship ? `${names.card(pick.ship)}: ` : "";
+    return { verb: "Trade", prompt: `${ship}${ship ? "deal" : "Deal"} ${pick.damage} damage to it to add ${resources(pick.resources)} to a hero's pool?` };
+  }
+  if (pick.verb === "PrepareFleet") {
+    // A lone player takes the Dream-chaser and then one other ship: the second choice names itself. The Dream-chaser is mentioned only while it can still be taken.
+    if (game.seatCount === 1 && options.length > 0 && !options.some((id) => names.card(id) === DREAM_CHASER)) return { verb: "Take", prompt: "Choose your second ship." };
+    const open = options.some((id) => names.card(id) === DREAM_CHASER);
+    return { verb: "Take", prompt: open ? "Choose a Ship objective to take control of. One player must take the Dream-chaser." : "Choose a Ship objective to take control of." };
+  }
+  if (pick.verb === "Pick" && next?.verb === "DamageShip") {
+    const amount = resolveAmount(game, next.amount, frameScope(game, game.activeSeat, sourceId), ctx);
+    return { verb: "Assign", prompt: amount > 0 ? `Choose the Ship objective you control that takes ${amount} excess damage.` : "Choose the Ship objective you control that takes the excess damage." };
+  }
+  return null;
+}
+
+const DREAM_CHASER = "Dream-chaser";
+
 /** The label of an option a sea verb offers that is not a card: trade or keep the damage, a deck to discard from, a title to name. Null for a card (the sheet names it). */
-export function seaOptionLabel(instruction: Instruction, id: string, game: ScenarioState, _names: ChoiceNames): string | null {
+export function seaOptionLabel(instruction: Instruction, id: string, game: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): string | null {
   if (instruction.verb === "TradeShipDamage" && (id === "trade" || id === "keep")) {
-    return id === "trade" ? `Trade: ${instruction.damage} damage to the ship for ${instruction.resources} resource` : "Keep the ship as it is";
+    return id === "trade" ? `Trade: ${instruction.damage} damage to the ship for ${resources(instruction.resources)}` : "Keep the ship as it is";
   }
   if (instruction.verb === "DiscardFromAnyDeck") {
     if (id === "encounter") return "The encounter deck";
     if (id === "corsair") return "The Corsair deck";
-    if (id.startsWith("seat:")) return game.seatCount > 1 ? `Player ${Number(id.slice(5)) + 1}'s deck` : "Your deck";
+    if (id.startsWith("seat:")) {
+      const seat = Number(id.slice(5));
+      return game.seatCount > 1 ? (seat === game.activeSeat ? `Your deck (Player ${seat + 1})` : `Player ${seat + 1}'s deck`) : "Your deck";
+    }
   }
-  if (instruction.verb === "NameCard" && id.startsWith("name:")) return id.slice("name:".length);
+  if (instruction.verb === "NameCard" && id.startsWith("name:")) {
+    const title = id.slice("name:".length);
+    const card = Object.values(game.cards).find((item) => printedOf(cards, item.code).name === title);
+    return card ? `${title} · ${titleDeck(printedOf(cards, card.code))}` : title;
+  }
   return null;
 }
 
@@ -101,11 +144,13 @@ export const SAILING_COMMIT_NOTE = "Tap characters to commit them to the test. T
 /** The armed line of the commit's Pass (dcce.sailing-tests): nobody is committed, so nobody looks, and the heading stays shifted. */
 export const SAILING_PASS_ARMED = "Tap again: nobody looks, and the heading stays shifted";
 
-/** The commit's readout: "Looks at 3 cards · the Dream-chaser counts as 2". `counts` are the picked characters that count as more than one, with what gives it. */
-export function sailingLookWords(total: number, counts: readonly { name: string; weight: number; sources: readonly string[] }[]): string {
+/** The commit's readout: "Looks at 5 cards · the Dream-chaser counts as 2 · Calm Waters +2". `total` is every card the test looks at; `counts` are the picked characters that
+ * count as more than one, with what gives it; `extra` the additional cards a card in play says to look at, with the cards that say so. */
+export function sailingLookWords(total: number, counts: readonly { name: string; weight: number; sources: readonly string[] }[], extra?: { amount: number; sources: readonly string[] }): string {
   const base = `Looks at ${total} ${total === 1 ? "card" : "cards"}`;
   const extras = counts.map((row) => `the ${row.name} counts as ${row.weight}${row.sources.length > 0 ? ` (${row.sources.join(", ")})` : ""}`);
-  return [base, ...extras].join(" · ");
+  const more = extra && extra.amount > 0 ? [`${extra.sources.join(", ")} +${extra.amount}`] : [];
+  return [base, ...extras, ...more].join(" · ");
 }
 
 /** The heading change in words ("Rain to Sun", or "Sun, no change"). */

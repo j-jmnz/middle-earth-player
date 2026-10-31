@@ -25,11 +25,11 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RevealCorsair"), count: positiveAmountSchema.optional(), who: z.enum(["actor", "eachSeat"]).optional(), ...when }),
   // "Engages the last player" (dcce.last-player): the source enemy, in the staging area, engages the player to the right of the first player.
   z.strictObject({ verb: z.literal("EngageLastPlayer"), ...when }),
+  // Engine use: "Boarding X" resolves for the ship-enemy that engaged the actor from the staging area (dcce.boarding), in a frame under the Responses to the engagement.
+  z.strictObject({ verb: z.literal("Board"), ...when }),
   // "Search the encounter deck and discard pile for the Ship enemy with the highest Threat and add it to the staging area" (11021:A:1): the `count`
   // Ship enemies with the highest Threat found there are added to the staging area, without being revealed. Of cards tied on Threat that are not
   // copies of one card the first player chooses. The encounter deck is not shuffled by this verb.
-  // Engine use: "Boarding X" resolves for the ship-enemy that engaged the actor from the staging area (dcce.boarding), in a frame under the Responses to the engagement.
-  z.strictObject({ verb: z.literal("Board"), ...when }),
   z.strictObject({ verb: z.literal("SearchShips"), count: positiveAmountSchema, ...when }),
   // Campaign Setup: "Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective" (11171:A:2).
   // Of the cards with these codes set aside, each player in player order takes one for each ship-objective they control, in the order the ships
@@ -46,8 +46,8 @@ export const VERBS = [
   // "Discard a random card from your hand and place resources on ~ equal to that card's printed cost" (11062:A:1): the actor's hand, a card chosen by the
   // seed, discarded as any random discard is; the source enemy gets that many resources (a card printing no cost, or X, none).
   z.strictObject({ verb: z.literal("PlunderHand"), ...when }),
-  // "Name a card" (110139:B:5): the actor chooses the title of a card in a deck (a player's deck, the encounter deck or the Corsair deck), written into the
-  // effect as its named card for DiscardFromAnyDeck to read. The actor may name only a title that is in a deck now: any other could never matter.
+  // "Name a card" (110139:B:5): the actor chooses the title of any card of the game, wherever it is (every card the game holds is offered, so the choices say
+  // nothing about what the decks hold), written into the effect as its named card for DiscardFromAnyDeck to read.
   z.strictObject({ verb: z.literal("NameCard"), ...when }),
   // "Discard the top N cards of any deck" (110139:A:4, B:5): the actor chooses a deck (each player's deck that holds a card, the encounter deck, the Corsair deck)
   // and its top `count` cards are discarded to its discard pile. When a card was named, the effect's X is 1 if one of the cards discarded bears that title, else 0.

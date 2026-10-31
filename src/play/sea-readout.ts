@@ -17,13 +17,20 @@ function givers(game: ScenarioState, id: string, cardName: (cardId: string) => s
   return [...new Set(names)];
 }
 
+// The additional cards a card in play says to look at ("look at 2 additional cards", 11050:A:1), with the cards that say so: the engine adds the flag `sailingLook` to the count.
+function extraLooks(game: ScenarioState, cardName: (cardId: string) => string): { amount: number; sources: string[] } {
+  const held = game.modifiers.filter((modifier) => modifier.stat === "sailingLook" && modifier.instanceId === "table" && modifierActive(game, modifier));
+  return { amount: Math.max(0, held.reduce((sum, modifier) => sum + modifier.amount, 0)), sources: [...new Set(held.map((modifier) => cardName(modifier.sourceId)))] };
+}
+
 /** The readout of a Sailing test being asked, or null when none is. `picked` are the characters the first player has picked to commit. */
 export function sailingReadout(game: ScenarioState, ctx: ReduceContext, picked: readonly string[], names: SheetNames): Readout | null {
   if (askingToCommit(game)) {
     const rows = picked.map((id) => ({ id, weight: committedWeight(game, id) }));
-    const total = rows.reduce((sum, row) => sum + row.weight, 0);
+    const extra = extraLooks(game, names.card);
+    const total = rows.reduce((sum, row) => sum + row.weight, 0) + extra.amount;
     const counts = rows.filter((row) => row.weight > 1).map((row) => ({ name: names.card(row.id), weight: row.weight, sources: givers(game, row.id, names.card) }));
-    return { kind: "sailing", stats: [], result: sailingLookWords(total, counts) };
+    return { kind: "sailing", stats: [], result: sailingLookWords(total, counts, extra.amount > 0 ? extra : undefined) };
   }
   const test = game.sea?.sailing;
   const heading = game.sea?.heading ?? null;

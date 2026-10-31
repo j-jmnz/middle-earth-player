@@ -54,3 +54,12 @@ tags:
     text: "Next"
 - assertNotVisible:
     id: xp-open
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-voyage-across-belegaer
+    text: ".*Not completed.*"

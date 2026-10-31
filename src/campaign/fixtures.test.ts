@@ -418,7 +418,7 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
     expect(resumed.ok).toBe(true);
     if (!resumed.ok) return;
     expect(askingToCommit(resumed.state)).toBe(true);
-    expect(resumed.state.sea?.heading).not.toBe("Sun");
+    expect(resumed.state.sea?.heading).toBe("Cloud");
     const cards = contextOf(world).cards;
     const ships = Object.values(resumed.state.cards).filter((card) => cards.get(card.code)?.ship === "objective" && card.zone === "play");
     expect(ships.length).toBe(2);

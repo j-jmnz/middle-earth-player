@@ -94,7 +94,7 @@
       "inert": [
         {
           "line": 1,
-          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+          "reason": "Side B is Campaign Mode only (dcce.campaign-mode): a campaign card's Setup flips the card to it, not an upgrade, and a standalone game keeps side A. No game effect."
         }
       ],
       "misprints": [],
@@ -141,7 +141,7 @@
       "inert": [
         {
           "line": 1,
-          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+          "reason": "Side B is Campaign Mode only (dcce.campaign-mode): a campaign card's Setup flips the card to it, not an upgrade, and a standalone game keeps side A. No game effect."
         }
       ],
       "misprints": [],
@@ -188,7 +188,7 @@
       "inert": [
         {
           "line": 1,
-          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+          "reason": "Side B is Campaign Mode only (dcce.campaign-mode): a campaign card's Setup flips the card to it, not an upgrade, and a standalone game keeps side A. No game effect."
         }
       ],
       "misprints": [],

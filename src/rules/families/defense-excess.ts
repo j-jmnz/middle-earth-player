@@ -14,7 +14,7 @@ import { effectCause, ruleCause } from "../cause.ts";
 import { isCharacterType, printedOf } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay } from "../state.ts";
-import { readsAmount } from "../amounts.ts";
+import { readsAmount, readsCondition } from "../amounts.ts";
 import { removeQuestProgress } from "./caves-progress.ts";
 import { damageGoesTo } from "./defense-damage.ts";
 
@@ -23,7 +23,7 @@ import { damageGoesTo } from "./defense-damage.ts";
 function noteLanded(state: ScenarioState, landed: number): ScenarioState {
   const attack = state.pendingAttack;
   // Only an attack whose after-instructions read the damage it dealt keeps the number: every other attack's state is as it was.
-  if (!attack?.after || !(readsAmount(attack.after, "dealt") || JSON.stringify(attack.after).includes('"kind":"dealt"'))) return state;
+  if (!attack?.after || !(readsAmount(attack.after, "dealt") || readsCondition(attack.after, "dealt"))) return state;
   return landed > 0 ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: (attack.defense?.landed ?? 0) + landed } } } : state;
 }
 

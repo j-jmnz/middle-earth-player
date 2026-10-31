@@ -13,13 +13,15 @@ import { committedWeight } from "../rules/families/sea-sailing.ts";
 import { sailingCommitters } from "../rules/families/sea-sailing-legal.ts";
 import { heldAmount, updateCard, type ScenarioState } from "../rules/state.ts";
 import { lowerThreatByEffect } from "../rules/families/quest-threat.ts";
-import { pruneRoundRecords } from "../rules/hide.ts";
+import { readyCard } from "../rules/player-verbs.ts";
+import { doRefresh } from "../rules/refresh.ts";
+import { pruneRoundCaps } from "../rules/families/dreamchaser.ts";
 import { expectOk } from "../rules/fixture.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 import { voyageStart, voyageWorld } from "../../scripts/voyage-game.ts";
 import {
-  ARMOR_PLATING, BALLISTA, CROWLEY, ENLARGED_QUARTERS, EXTRA_SAILS, HARD_MODE, OMINOUS_FATE, SCOUTING_SHIP, SHIPS, THUNDERSTRUCK, codesIn, loadVoyageWorld, resolveReveal, voyageFight, voyageTable,
+  ARMOR_PLATING, BALLISTA, CROWLEY, CUNNING_PIRATE, ENLARGED_QUARTERS, EXTRA_SAILS, HARD_MODE, OMINOUS_FATE, SCOUTING_SHIP, SHIPS, THUNDERSTRUCK, codesIn, loadVoyageWorld, resolveReveal, voyageFight, voyageTable,
   type VoyageLayout, type VoyageWorld,
 } from "../../scripts/voyage-scene.ts";
 
@@ -183,6 +185,24 @@ describe("the Glórinaith's Action (110139:A:4, 110139:B:5)", () => {
   });
 });
 
+describe("Naming a card (110139:B:5)", () => {
+  it("offers the title of every card in the game, wherever it is, so the choices say nothing of what the decks hold", () => {
+    const named = (deckOf: readonly string[]) => {
+      const made = make({ ships: [{ code: SHIPS.glorinaith, seat: 0, face: "B" }], engaged: [{ code: "raider", seat: 0 }], deck: ["f0", "f0"], deckOf, phase: "Combat" });
+      const effect = made.ctx.effects.find((record) => record.cardCode === SHIPS.glorinaith && record.timing === "action" && record.lines.some((line) => line.includes(":B:")));
+      const run = send(start(made.state), { type: "Trigger", cardId: shipOf(made), effectId: effect?.id ?? "" }, made.ctx);
+      return run.state.window?.kind === "choose" ? run.state.window.options : [];
+    };
+    const options = named(["filler", "filler"]);
+    // The engaged raider, a hero and the ship itself are offered, none of them in a deck.
+    expect(options).toEqual(expect.arrayContaining(["name:raider", "name:f0", "name:filler", "name:dh1"]));
+    expect(options).toContain("name:Glórinaith");
+    // The same game with other cards in the player's deck offers the same titles it does not hold: what is in a deck does not decide what is offered.
+    expect(named(["filler", "odd"])).toEqual(expect.arrayContaining(options.filter((option) => option !== "name:odd")));
+    expect(new Set(options).size).toBe(options.length);
+  });
+});
+
 describe("the Modification boons (11172 to 11175)", () => {
   const boon = (code: string, face: "up" | "B") => {
     const made = make({ ships: [{ code: SHIPS.dreamChaser, seat: 0 }], hand: [] });
@@ -248,6 +268,27 @@ describe("the Modification boons (11172 to 11175)", () => {
     run = send(run, trigger as PlayerIntent, made.ctx);
     for (let guard = 0; guard < 6 && run.state.window?.kind === "choose"; guard += 1) run = send(run, { type: "Choose", optionId: run.state.window.options[0] ?? "" }, made.ctx);
     expect(run.state.cards[shadowOfRaider ?? ""]?.zone).toBe("encounterDiscard");
+  });
+
+  it("Upgraded Ballista: after the ship has attacked, not when it is declared, deals 1 damage to a non-unique enemy and removes 1 resource from it (11173:B:3)", () => {
+    // The ship (a ship-objective attacks only a Ship enemy) attacks the Scouting Ship while a Cunning Pirate holding 2 resources (defending at +2) is the enemy the Response can hit.
+    const made = make({ phase: "Combat", fitted: [BALLISTA], fittedFace: "B", engaged: [{ code: SCOUTING_SHIP, seat: 0 }, { code: CUNNING_PIRATE, seat: 0 }] });
+    const target = first(made.state, SCOUTING_SHIP);
+    const pirate = first(made.state, CUNNING_PIRATE);
+    const loaded = syncConstants(updateCard(made.state, pirate, { resources: 2 }), made.ctx);
+    let run = send(start({ ...loaded, mode: "playerAttacks", window: { kind: "playerAttack" } }), { type: "DeclareAttackers", enemyId: target, attackerIds: [shipOf(made)] }, made.ctx);
+    const fired = (state: ScenarioState) => legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "11173:response:1");
+    for (let guard = 0; guard < 30 && run.state.pendingStrike && !fired(run.state); guard += 1) run = send(run, { type: "Pass" }, made.ctx);
+    const trigger = fired(run.state);
+    expect(trigger).toBeDefined();
+    // The Response is offered once the attack has dealt its damage, and has not touched the pirate yet.
+    expect(run.state.cards[target]?.damage).toBeGreaterThan(0);
+    expect(run.state.cards[pirate]?.damage).toBe(0);
+    expect(run.state.cards[pirate]?.resources).toBe(2);
+    run = send(run, trigger as PlayerIntent, made.ctx);
+    run = send(run, { type: "Choose", optionId: pirate }, made.ctx);
+    expect(run.state.cards[pirate]?.damage).toBe(1);
+    expect(run.state.cards[pirate]?.resources).toBe(1);
   });
 
   it("Upgraded Extra Sails: spends a resource and exhausts to reduce a non-unique Ship enemy's Boarding by 1 as it engages you, before the keyword resolves (11175:B:3)", () => {
@@ -361,17 +402,19 @@ describe("Crowley (11178:A:1, 11178:A:2)", () => {
 });
 
 describe("the Hard/Expert Mode card (11217:A:1, 11217:A:2, 11217:B:1, 11217:B:2, 11217:B:3)", () => {
-  it("Hard: a player's threat cannot be reduced by more than 1 each round by player card effects (11217:A:1)", () => {
-    const made = make({ mode: "A", threat: [30, 30], hand: ["filler"] });
+  it("Hard: a player's threat cannot be reduced by more than 1 each round, by any effect (11217:A:1)", () => {
+    const made = make({ mode: "A", threat: [30, 30], hand: ["filler"], staging: [SCOUTING_SHIP] });
     const source = first(made.state, "filler");
-    const lower = (state: ScenarioState) => lowerThreatByEffect(state, 0, 3, source, made.ctx, [], { rule: "rr.effects" });
+    const lower = (state: ScenarioState, from: string = source) => lowerThreatByEffect(state, 0, 3, from, made.ctx, [], { rule: "rr.effects" });
     expect(heldAmount(made.state, "seat:0", "threatReductionCap")).toBe(1);
     const once = lower(made.state);
     expect(once.seats[0]?.threat).toBe(29);
     // The same round: nothing more can be taken off; the round's end gives the allowance back.
     expect(lower(once).seats[0]?.threat).toBe(29);
-    const next = pruneRoundRecords(once);
+    const next = pruneRoundCaps(once);
     expect(lower(next).seats[0]?.threat).toBe(28);
+    // The line names no source: an encounter card's reduction is held to 1 too.
+    expect(lower(made.state, first(made.state, SCOUTING_SHIP)).seats[0]?.threat).toBe(29);
     // Without the card the player card lowers by 3.
     const plain = make({ threat: [30, 30], hand: ["filler"] });
     expect(lowerThreatByEffect(plain.state, 0, 3, first(plain.state, "filler"), plain.ctx, [], { rule: "rr.effects" }).seats[0]?.threat).toBe(27);
@@ -390,20 +433,36 @@ describe("the Hard/Expert Mode card (11217:A:1, 11217:A:2, 11217:B:1, 11217:B:2,
     expect(settle(runInstruction({ ...plain.state, window: null }, { verb: "Draw", amount: 2 }, { seat: 0, sourceId: null }, plain.ctx, []), plain.ctx, []).seats[0]?.threat).toBe(30);
   });
 
-  it("Expert: a player's threat cannot be reduced by player card effects at all (11217:B:1)", () => {
-    expect(heldAmount(make({ mode: "B" }).state, "seat:0", "noThreatReduction")).toBe(1);
-    expect(heldAmount(make({ mode: "A" }).state, "seat:0", "noThreatReduction")).toBe(0);
+  it("Expert: a player's threat cannot be reduced at all, by a player card or any other effect (11217:B:1)", () => {
+    const made = make({ mode: "B", threat: [30, 30], hand: ["filler"], staging: [SCOUTING_SHIP] });
+    expect(heldAmount(made.state, "seat:0", "threatReductionBarred")).toBe(1);
+    expect(heldAmount(make({ mode: "A" }).state, "seat:0", "threatReductionBarred")).toBe(0);
+    for (const source of [first(made.state, "filler"), first(made.state, SCOUTING_SHIP)]) {
+      expect(lowerThreatByEffect(made.state, 0, 3, source, made.ctx, [], { rule: "rr.effects" }).seats[0]?.threat).toBe(30);
+    }
   });
 
-  it("Expert: after a character is healed or readied by a player card effect its controller raises their threat by 1, not when the refresh phase readies it (11217:B:3)", () => {
-    const made = make({ mode: "B", threat: [30, 30], damage: [["dh1", 2]] });
-    const raised = (state: ScenarioState) => state.seats[0]?.threat ?? 0;
-    const healed = settle(runInstruction({ ...made.state, window: null }, { verb: "Heal", amount: 1, target: "self" }, { seat: 0, sourceId: made.hero }, made.ctx, []), made.ctx, []);
-    expect(raised(healed) - raised(made.state)).toBeGreaterThanOrEqual(1);
+  it("Expert: after a character is healed or readied by a player card effect its controller raises their threat by 1, and by nothing else (11217:B:3)", () => {
+    const made = make({ mode: "B", threat: [30, 30], damage: [["dh1", 2]], staging: [SCOUTING_SHIP], phase: "Combat" });
+    const threat = (state: ScenarioState) => state.seats[0]?.threat ?? 0;
+    const run = (table: Table, instruction: Parameters<typeof runInstruction>[1], sourceId: string) =>
+      settle(runInstruction(table.state, instruction, { seat: 0, sourceId }, table.ctx, []), table.ctx, []);
+    // A hero's own effect heals itself: a player card effect.
+    expect(threat(run(made, { verb: "Heal", amount: 1, target: "self" }, made.hero)) - threat(made.state)).toBe(1);
+    // Readying: a player card effect raises it; a ready no player card made (an encounter card's, a rule's) and the refresh phase do not.
+    const tired = updateCard(made.state, made.hero, { exhausted: true });
+    expect(threat(settle(readyCard(tired, made.hero, false), made.ctx, []))).toBe(threat(made.state));
+    const readied = settle(runInstruction(tired, { verb: "Ready" }, { seat: 0, sourceId: made.hero }, made.ctx, []), made.ctx, []);
+    expect(readied.cards[made.hero]?.exhausted).toBe(false);
+    expect(threat(readied) - threat(made.state)).toBe(1);
+    const refreshed = settle(doRefresh({ ...tired, phase: "Refresh", window: null }, made.ctx, []), made.ctx, []);
+    expect(refreshed.cards[made.hero]?.exhausted).toBe(false);
+    // The refresh phase's own +1 threat is all it raises.
+    expect(threat(refreshed)).toBe(threat(made.state) + 1);
     // Hard raises nothing for healing.
-    const hard = make({ mode: "A", threat: [30, 30], damage: [["dh1", 2]] });
-    const healedHard = settle(runInstruction({ ...hard.state, window: null }, { verb: "Heal", amount: 1, target: "self" }, { seat: 0, sourceId: hard.hero }, hard.ctx, []), hard.ctx, []);
-    expect(raised(healedHard) - raised(hard.state)).toBeLessThan(raised(healed) - raised(made.state));
+    const hard = make({ mode: "A", threat: [30, 30], damage: [["dh1", 2]], phase: "Combat" });
+    const healedHard = settle(runInstruction(hard.state, { verb: "Heal", amount: 1, target: "self" }, { seat: 0, sourceId: hard.hero }, hard.ctx, []), hard.ctx, []);
+    expect(threat(healedHard)).toBe(threat(hard.state));
     expect(HARD_MODE).toBe("11217");
   });
 });

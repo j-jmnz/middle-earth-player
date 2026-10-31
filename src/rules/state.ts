@@ -264,7 +264,7 @@ export type ScenarioState = {
   part?: number;
   afterSetup?: { card: string; instructions: readonly Instruction[] };
   // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
-  // player card effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
+  // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
   roundDamage?: Readonly<Record<string, number>>;
   threatLoweredBy?: Readonly<Record<number, number>>;
   // The codes of the stages the quest advanced to, in order. Kept only by a quest that branches (BranchStage), for a Resolution that

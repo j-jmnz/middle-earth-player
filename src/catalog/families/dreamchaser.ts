@@ -30,7 +30,9 @@ export const TRIGGERS = [
   "cardsDrawn",
 ] as const;
 export const FLAGS = [
-  // On a seat: its threat is lowered by player card effects by at most this much each round ("cannot be reduced by more than 1 each round", 11217:A:1;
+  // On a seat: its threat is lowered by effects by at most this much each round ("cannot be reduced by more than 1 each round", 11217:A:1;
   // dcce.hard-expert). The reductions made this round are kept in the state (`threatLoweredBy`) until the round ends.
   "threatReductionCap",
+  // On a seat: its threat cannot be reduced by any effect ("Each player's threat cannot be reduced", 11217:B:1; dcce.hard-expert).
+  "threatReductionBarred",
 ] as const;

@@ -16,7 +16,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { seaOptionLabel } from "./sea-words.ts";
+import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
@@ -254,7 +254,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? (seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2)) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
@@ -265,7 +265,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         options: window.options.map((id): PickOption => {
           const card = option(game, names, id);
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? seaOptionLabel(wait.item.instruction, id, game, words) : null;
+          const sea = wait?.kind === "target" ? seaOptionLabel(wait.item.instruction, id, game, ctx.cards) : null;
           // Copies of one card in different zones are told apart by where each one is.
           const label = sea ?? (outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).

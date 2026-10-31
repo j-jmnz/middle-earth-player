@@ -34,6 +34,14 @@ export function successAmong(state: Pick<ScenarioState, "cards">, ids: readonly 
   return ids.reduce((sum, id) => sum + successSymbols(cards, state.cards[id]?.code ?? ""), 0);
 }
 
+/** The success symbols among some cards (by id) as step 4 counts them: the symbols printed, how many a card in play cancels ("Cancel the first Sailing success symbol
+ * found during each Sailing test", 11053:A:1; the flag `sailingCancel`, never more than are printed) and what is left, which is how many shifts the test allows. */
+export function sailingSymbols(state: ScenarioState, ids: readonly string[], cards: ReadonlyMap<string, PrintedCard>): { printed: number; cancelled: number; counted: number } {
+  const printed = successAmong(state, ids, cards);
+  const cancelled = Math.min(printed, Math.max(0, heldAmount(state, "table", "sailingCancel")));
+  return { printed, cancelled, counted: printed - cancelled };
+}
+
 /** The cards a Sailing test looked at, still on top of the encounter deck, while the test waits on the symbols or on the Done; empty otherwise. */
 export function lookedIds(state: Pick<ScenarioState, "sea">): readonly string[] {
   const test = state.sea?.sailing;
@@ -92,8 +100,7 @@ export function performSailing(state: ScenarioState, ids: readonly string[], ctx
   }
   const looked = next.encounterDeck.slice(0, count);
   // 4. Each Sailing success symbol allows one shift on-course.
-  // "Cancel the first Sailing success symbol found during each Sailing test" (11053:A:1): each such card cancels one.
-  const symbols = Math.max(0, successAmong(next, looked, ctx.cards) - Math.max(0, heldAmount(next, "table", "sailingCancel")));
+  const symbols = sailingSymbols(next, looked, ctx.cards).counted;
   if (looked.length === 0) return finish(next, looked);
   if (symbols === 0 || headingIs(next, "onCourse") || next.sea?.heading == null) return askLookDone(next, looked);
   return askShift(next, looked, symbols);

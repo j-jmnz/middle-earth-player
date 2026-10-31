@@ -1,8 +1,9 @@
 // Rules: dcce.sailing-tests (data/rules/entries.json). The two questions of a Sailing test, as the table answers them (docs/design-system-table.md, The Sailing test):
 // the first player's commit (a pick of characters on the play area, no willpower pill: this is not the quest commit) and, for each success symbol among the cards looked at,
 // shift the heading on-course or keep it. Every card, symbol and number comes from the engine; the sheets only name them.
-import { lookedIds, sailingTest, successAmong, successSymbols } from "../rules/families/sea-sailing.ts";
+import { lookedIds, sailingSymbols, sailingTest, successSymbols } from "../rules/families/sea-sailing.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { modifierActive } from "../rules/state.ts";
 import { legalTargets } from "../rules/reduce.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../rules/families/sea-sailing-legal.ts";
 
@@ -21,9 +22,21 @@ export function lookRows(game: ScenarioState, ctx: ReduceContext, names: SheetNa
   });
 }
 
-/** How many success symbols the looked-at cards hold in all (the sum the engine counts for step 4). */
+/** How many success symbols the looked-at cards count in all: the symbols printed less the ones a card in play cancels (Rough Waters), the number the engine counts for step 4. */
 export function successesOf(game: ScenarioState, ctx: ReduceContext): number {
-  return successAmong(game, lookedIds(game), ctx.cards);
+  return sailingSymbols(game, lookedIds(game), ctx.cards).counted;
+}
+
+/** The cards in play that cancel Sailing success symbols, by name ("Rough Waters"), or none. */
+function cancelers(game: ScenarioState, names: SheetNames): string {
+  const ids = game.modifiers.filter((modifier) => modifier.stat === "sailingCancel" && modifier.instanceId === "table" && modifierActive(game, modifier)).map((modifier) => modifier.sourceId);
+  return [...new Set(ids.map((id) => names.card(id)))].join(", ");
+}
+
+/** "Rough Waters cancels 1." when a card cancelled symbols of the cards looked at, else nothing. */
+export function cancelNote(game: ScenarioState, ctx: ReduceContext, names: SheetNames): string | null {
+  const { cancelled } = sailingSymbols(game, lookedIds(game), ctx.cards);
+  return cancelled > 0 ? `${cancelers(game, names)} cancels ${cancelled}.` : null;
 }
 
 /** The Sailing commit: a multi pick of the characters the engine lets commit, confirmed with a Commit (the intent is the quest commit's, and the engine reads it as the test's). */
@@ -56,7 +69,7 @@ export function sailingShiftSheet(game: ScenarioState, ctx: ReduceContext, names
     key: `sailing-shift:${game.round}:${test.left}:${test.looked.join(",")}`,
     step: step(game),
     title: sailingTitle(total),
-    note: `${test.left} ${test.left === 1 ? "symbol" : "symbols"} left to answer. Shift the heading on-course for each, or keep it as it is.`,
+    note: [cancelNote(game, ctx, names), `${test.left} ${test.left === 1 ? "symbol" : "symbols"} left to answer. Shift the heading on-course for each, or keep it as it is.`].filter(Boolean).join(" "),
     verb: "",
     options: [],
     look: rows,
@@ -77,7 +90,7 @@ export function sailingLookSheet(game: ScenarioState, ctx: ReduceContext, names:
     key: `sailing-look:${game.round}:${test.looked.join(",")}`,
     step: step(game),
     title: sailingTitle(total),
-    note: total === 0 ? "No Sailing success symbol among them. The cards looked at are discarded when you are done." : "The heading is on-course, so no shift is left to make. The cards looked at are discarded when you are done.",
+    note: [cancelNote(game, ctx, names), total === 0 ? "No Sailing success symbol counts. The cards looked at are discarded when you are done." : "The heading is on-course, so no shift is left to make. The cards looked at are discarded when you are done."].filter(Boolean).join(" "),
     verb: "",
     options: [],
     look: lookRows(game, ctx, names),

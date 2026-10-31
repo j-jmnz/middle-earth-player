@@ -51,6 +51,7 @@ import { eventWaits } from "./families/defense-listen.ts";
 import { announceShadowsDealt } from "./families/defense-shadow.ts";
 import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
 import { strikeResumes } from "./families/attack-flow.ts";
+import { pruneRoundCaps } from "./families/dreamchaser.ts";
 import { announceProgress } from "./families/burden-effects.ts";
 import { damageLoss } from "./families/south-locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
@@ -247,7 +248,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
 }
 
 function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const bumped = pruneRoundRecords({ ...state, round: state.round + 1 });
+  const bumped = pruneRoundCaps(pruneRoundRecords({ ...state, round: state.round + 1 }));
   if (hasTiming(bumped, ctx, "beginningOfPhase")) return openPass(bumped);
   return withMode(bumped, "resourceGrant");
 }

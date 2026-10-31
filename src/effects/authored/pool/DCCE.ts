@@ -15,7 +15,7 @@ const hostGets = (code: string, line: string, id: number, stat: "defense" | "att
   instructions: [{ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "host" }],
 });
 
-// A threat raise the Hard/Expert Mode card makes when a player's card is healed or readied by a player card effect.
+// A threat raise the Hard/Expert Mode card makes when a character is healed or readied by a player card effect (the refresh phase and a rule's ready are not one).
 const healedOrReadied = (id: number, trigger: "healed" | "readied"): Effect => ({
   id: `11217:forced:${id}`,
   cardCode: "11217",
@@ -23,22 +23,24 @@ const healedOrReadied = (id: number, trigger: "healed" | "readied"): Effect => (
   timing: "forced",
   trigger,
   subject: { type: "character", control: "any" },
-  ...(trigger === "readied" ? { condition: { kind: "not" as const, condition: { kind: "phase" as const, is: "Refresh" as const } } } : {}),
+  condition: { kind: "byPlayerCard" },
   instructions: [{ verb: "RaiseThreat", amount: 1 }],
 });
 
+// A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one; as in families/sidequests.ts).
+const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
+
 export const RECORDS: readonly Effect[] = [
-  // 11217 Hard/Expert Mode card: "If you win the game, resolve this card's resolution." Hard (side A) gains 1 XP, Expert (side B) gains 2 XP. The other
-  // lines (threat cannot be reduced, the Forced draws) are not applied yet.
+  // 11217 Hard/Expert Mode card: "If you win the game, resolve this card's resolution." Hard (side A) gains 1 XP, Expert (side B) gains 2 XP.
   {"id":"11217:resolution:1","cardCode":"11217","lines":["11217:A:3"],"timing":"resolution","instructions":[{"verb":"GainXp","amount":1}]},
   {"id":"11217:resolution:2","cardCode":"11217","lines":["11217:B:4"],"timing":"resolution","instructions":[{"verb":"GainXp","amount":2}]},
   // 11217 Hard/Expert Mode card (dcce.hard-expert), in play next to the quest deck all game on the side the players chose. Hard: a player's threat cannot be reduced by more
-  // than 1 each round; Expert: it cannot be reduced by player card effects at all. Both: after a player draws any number of cards that player raises their threat by that
+  // than 1 each round; Expert: it cannot be reduced at all (both name no source: any effect). Both: after a player draws any number of cards that player raises their threat by that
   // number (the event cardsDrawn, whose amount is the effect's X); Expert: after a character is healed or readied by a player card effect (not by the refresh phase), its
   // controller raises their threat by 1.
   {"id":"11217:constant:1","cardCode":"11217","lines":["11217:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threatReductionCap","amount":1,"until":"whileSourceInPlay","target":"eachSeat"}]},
   {"id":"11217:forced:1","cardCode":"11217","lines":["11217:A:2"],"timing":"forced","trigger":"cardsDrawn","instructions":[{"verb":"RaiseThreat","amount":{"x":true}}]},
-  {"id":"11217:constant:2","cardCode":"11217","lines":["11217:B:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noThreatReduction","amount":1,"until":"whileSourceInPlay","target":"eachSeat"}]},
+  {"id":"11217:constant:2","cardCode":"11217","lines":["11217:B:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threatReductionBarred","amount":1,"until":"whileSourceInPlay","target":"eachSeat"}]},
   {"id":"11217:forced:2","cardCode":"11217","lines":["11217:B:2"],"timing":"forced","trigger":"cardsDrawn","instructions":[{"verb":"RaiseThreat","amount":{"x":true}}]},
   healedOrReadied(3, "healed"),
   healedOrReadied(4, "readied"),
@@ -55,7 +57,7 @@ export const RECORDS: readonly Effect[] = [
   removedWhenLeaving("11173", "11173:B:1", 2),
   hostGets("11173", "11173:B:2", 2, "attack", 1),
   {"id":"11173:constant:3","cardCode":"11173","lines":["11173:B:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  {"id":"11173:response:1","cardCode":"11173","lines":["11173:B:3"],"timing":"response","trigger":"declaredAttacker","subject":"host","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},{"verb":"DamageCard","amount":1},{"verb":"DiscardResources","amount":1,"target":"picked"}]},
+  {"id":"11173:response:1","cardCode":"11173","lines":["11173:B:3"],"timing":"response","trigger":"attacked","subject":"host","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},{"verb":"DamageCard","amount":1},{"verb":"DiscardResources","amount":1,"target":"picked"}]},
   removedWhenLeaving("11174", "11174:A:1", 1),
   hostGets("11174", "11174:A:2", 1, "hitPoints", 3),
   {"id":"11174:constant:2","cardCode":"11174","lines":["11174:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"sailsAnyTest","amount":1,"until":"whileSourceInPlay","target":"host"}]},
@@ -76,7 +78,7 @@ export const RECORDS: readonly Effect[] = [
     "cardCode": "11176",
     "lines": ["11176:A:2", "11176:A:3"],
     "timing": "whenRevealed",
-    "uncancelable": {"kind":"not","condition":{"kind":"phase","is":"Setup"}},
+    "uncancelable": ALWAYS,
     "instructions": [
       {"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Choose","who":"actor","options":[
         {"id":"reveal","instructions":[{"verb":"RevealEncounter"}]},
@@ -86,7 +88,7 @@ export const RECORDS: readonly Effect[] = [
       {"verb":"Choose","who":"firstPlayer","options":[{"id":"victory","instructions":[{"verb":"AddToVictory","target":"self"}]},{"id":"discard","instructions":[]}]}
     ]
   },
-  {"id":"11176:shadow:1","cardCode":"11176","lines":["11176:A:4"],"timing":"shadow","uncancelable":{"kind":"not","condition":{"kind":"phase","is":"Setup"}},"instructions":[{"verb":"RevealEncounter"}]},
+  {"id":"11176:shadow:1","cardCode":"11176","lines":["11176:A:4"],"timing":"shadow","uncancelable":ALWAYS,"instructions":[{"verb":"RevealEncounter"}]},
 
   // 11177 Thunderstruck (burden): +2 hit points per player, no more than 4 damage each round. Shadow: it joins the staging area, or 2 damage to the defending character.
   {"id":"11177:constant:1","cardCode":"11177","lines":["11177:A:4"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"hitPoints","amount":{"players":true,"times":2},"until":"whileSourceInPlay","target":"self"},{"verb":"ModifyStat","stat":"damageCap","amount":4,"until":"whileSourceInPlay","target":"self"}]},

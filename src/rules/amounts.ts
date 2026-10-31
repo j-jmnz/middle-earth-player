@@ -1,6 +1,6 @@
 // The numbers an effect record asks the engine to read: "X is the number of enemies engaged with you", "for each Hobbit hero
 // you control", "equal to that enemy's printed Threat". A player never supplies one (brief, Effects).
-import type { Amount, CardRef, Instruction } from "../catalog/boundary.ts";
+import type { Amount, CardRef, Condition, Instruction } from "../catalog/boundary.ts";
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
@@ -23,6 +23,7 @@ export type AmountScope = {
   other?: string | null;
   x?: number;
   dealt?: number;
+  excess?: number;
 };
 
 // The running effect frame's picks, subject and X, for an amount or a card reference read inside it.
@@ -37,6 +38,7 @@ export function frameScope(state: ScenarioState, actor: number, sourceId: string
     ...(data.other ? { other: data.other } : {}),
     ...(data.x != null ? { x: data.x } : {}),
     ...(data.dealt != null ? { dealt: data.dealt } : {}),
+    ...(data.excess != null ? { excess: data.excess } : {}),
   };
 }
 
@@ -101,6 +103,17 @@ export function readsAmount(instructions: readonly Instruction[], key: keyof Exc
   return walk(instructions);
 }
 
+// Whether any instruction, at any depth, holds a condition of this kind (`{"kind": "dealt"}`), found the same way as `readsAmount`.
+export function readsCondition(instructions: readonly Instruction[], kind: Condition["kind"]): boolean {
+  const walk = (node: unknown): boolean => {
+    if (Array.isArray(node)) return node.some(walk);
+    if (node === null || typeof node !== "object") return false;
+    const record = node as Record<string, unknown>;
+    return record.kind === kind || Object.values(record).some(walk);
+  };
+  return walk(instructions);
+}
+
 export function resolveAmount(state: ScenarioState, amount: Amount, scope: AmountScope, ctx: ReduceContext): number {
   if (typeof amount === "number") return amount;
   let value = 0;
@@ -116,6 +129,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
     value = amount.threat === "tens" ? Math.floor(threat / 10) : threat;
   } else if (amount.hand) value = (state.seats[scope.actor]?.hand ?? []).length;
   else if (amount.dealt) value = scope.dealt ?? 0;
+  else if (amount.excess) value = scope.excess ?? 0;
   else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
   value = value * (amount.times ?? 1) + (amount.plus ?? 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);

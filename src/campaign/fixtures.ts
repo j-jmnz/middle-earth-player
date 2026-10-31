@@ -18,7 +18,7 @@
 // Nibin-Dûm from the log a real `oath-won` writes when it is confirmed (the e2e-nibin-dum script), parked on the win and on the loss. `nibin-dum-won` is open: the two decklists
 // start at threat 37 and 25 and the auto-player found no win in 120 seeds, so only `nibin-dum-lost` is committed.
 // `sea-solo` and `sea-duo` are games of Voyage Across Belegaer (Dream-chaser part 1) from the blank log of a new Dream-chaser playthrough (the e2e-voyage script): `sea-solo` true solo, parked on the first Sailing test's commit; `sea-duo`
-// two-handed, parked on the first player's planning window. `voyage-lost` is parked on the loss. `voyage-won` is open: no win of the two starter decklists was found in 300 seeds, so it is not committed.
+// two-handed, parked on the first player's planning window. `voyage-lost` is parked on the loss. `voyage-won` is open: no auto-played win with real decks was found (docs/phases/STATUS.md), so it is not committed.
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import dolGuldurFixtures from "./fixtures/escape-from-dol-guldur.json";
 import anduinFixtures from "./fixtures/journey-along-the-anduin.json";

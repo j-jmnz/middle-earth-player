@@ -370,7 +370,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
-  const sea = seaPickWords(pick, names);
+  const sea = seaPickWords(pick);
   if (sea) return sea;
   const play = playPickWords(pick);
   if (play) return play;
@@ -416,7 +416,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Discard", prompt: `Choose ${one} that has a shadow card. Its shadow card is discarded.` };
     // Resources added to the picked hero (110138:A:3), or an attachment discarded for the resources it gives the enemy (11061:A:2).
     case "AddResources":
-      return pick.pick.type === "attachment" ? { verb: "Discard", prompt: `Choose ${one} you control to discard. The enemy gets resources equal to its printed cost.` } : { verb: "Add", prompt: `Choose ${one} to add resources to.` };
+      return pick.pick.type === "attachment" ? { verb: "Discard", prompt: `Choose ${one} you control to discard. The enemy gets resources equal to its printed cost.` } : { verb: "Add", prompt: `Choose ${one} to add ${typeof next.amount === "number" ? `${next.amount} ${next.amount === 1 ? "resource" : "resources"}` : "resources"} to.` };
     // The sea family (Voyage Across Belegaer): the Ship objective that takes the excess damage of a shadow attack (11055:A:2).
     case "DamageShip":
       return { verb: "Assign", prompt: "Choose the Ship objective you control that takes the excess damage." };

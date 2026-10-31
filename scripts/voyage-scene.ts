@@ -78,6 +78,8 @@ export async function loadVoyageWorld(): Promise<VoyageWorld> {
   cards.set("f0", enemy("f0", { threat: 0, attack: 1, defense: 1, health: 3 }));
   cards.set("f3", enemy("f3", { threat: 3, attack: 1, defense: 1, health: 3 }));
   cards.set("brute", enemy("brute", { threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
+  // 8 Attack against a hero's 2 Defense is 6 damage: exactly the hit points of a hero with none lost.
+  cards.set("bruiser", enemy("bruiser", { threat: 1, engagementCost: 10, attack: 8, defense: 1, health: 20 }));
   cards.set("raider", enemy("raider", { traits: ["Raider"], threat: 1, engagementCost: 10, attack: 2, defense: 1, health: 3 }));
   for (const code of [HERO, HERO2, HERO3]) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 }));
   cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));

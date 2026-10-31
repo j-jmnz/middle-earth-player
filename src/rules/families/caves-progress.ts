@@ -9,7 +9,8 @@ import type { EngineStep } from "../intents.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, modifierActive, updateCard } from "../state.ts";
 
-// The stage number of the current quest card: its place in the quest deck, counting from 1 (0 with no quest card).
+// The stage number of the current quest card: its place in the quest deck, counting from 1 (0 with no quest card). It is the position in the quest definition's
+// `stages`, not the number printed on the card: a quest whose stages come in another order (Voyage Across Belegaer's stage 2 cards) is counted by its definition.
 export function stageNumber(state: ScenarioState): number {
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
   return stage ? state.stages.findIndex((entry) => entry.code === stage.code) + 1 : 0;

@@ -30,6 +30,7 @@ const stageSearch = (code: string, find: string): Effect => ({
 
 // "When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the
 // bottom of the quest deck. Otherwise, advance to the top stage of the quest deck." (rules/families/quest-order.ts reads it from the stage's definition)
+// The record has the `constant` timing only because every record needs one: nothing runs it, the stage definition carries the verb.
 const lookAtStages = (code: string, line: string, id = 1): Effect => ({ id: `${code}:constant:${id}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "LookAtStages", count: 2 }] });
 
 // "Cannot have attachments." of a ship-enemy.
@@ -226,7 +227,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "shadow",
     instructions: [
       { verb: "ModifyStat", stat: "excessToShip", amount: 1, until: "endOfAttack", target: "attacker" },
-      { verb: "AfterAttack", instructions: [{ verb: "Pick", pick: YOUR_SHIP, when: { kind: "x", min: 1 } }, { verb: "DamageShip", amount: { x: true }, when: { kind: "x", min: 1 } }] },
+      { verb: "AfterAttack", instructions: [{ verb: "Pick", pick: YOUR_SHIP, when: { kind: "excess", min: 1 } }, { verb: "DamageShip", amount: { excess: true }, when: { kind: "excess", min: 1 } }] },
     ],
   },
 

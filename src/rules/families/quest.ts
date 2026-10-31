@@ -4,7 +4,7 @@ import type { Instruction, SimpleInstruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
-import { openBranch , askTarget } from "../choices.ts";
+import { openBranch, askTarget } from "../choices.ts";
 import { characters } from "../combat.ts";
 import { hasTrait } from "../conditions.ts";
 import type { EngineStep } from "../intents.ts";
@@ -20,7 +20,7 @@ import { topFrame } from "../windows.ts";
 import { attachTo, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { lowerCardThreat, makeActive, moveProgress, removeProgressFromQuest } from "./quest-places.ts";
-import { raiseQuestThreat, resetThreat } from "./quest-threat.ts";
+import { playerSource, raiseQuestThreat, resetThreat } from "./quest-threat.ts";
 import { advanceStage } from "../quest.ts";
 import { keepStage, lookedStages, shuffleStages } from "./quest-order.ts";
 import { restricted } from "../restrictions.ts";
@@ -48,7 +48,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "ReadyAll": {
       let next = state;
-      for (const id of characters(state, focus.seat, ctx.cards)) if (!instruction.trait || hasTrait(state, id, instruction.trait, ctx)) next = readyCard(next, id);
+      for (const id of characters(state, focus.seat, ctx.cards)) if (!instruction.trait || hasTrait(state, id, instruction.trait, ctx)) next = readyCard(next, id, playerSource(state, focus.sourceId, ctx));
       return next;
     }
     case "BarEngagement": {

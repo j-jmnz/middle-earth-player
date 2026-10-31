@@ -37,6 +37,8 @@ export const amountExprSchema = z.strictObject({
   hand: z.literal(true).optional(),
   // The damage the answered event dealt ("cancel that damage", "place that damage on ~ instead").
   dealt: z.literal(true).optional(),
+  // The damage an attack sent on past its defender (excessToShip), read by the effect the attack leaves for its end ("deal that much damage", 11055:A:2).
+  excess: z.literal(true).optional(),
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc-amounts.ts.
   facedown: z.literal(true).optional(),

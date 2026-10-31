@@ -2,6 +2,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { XpCount } from "../../catalog/families/dreamchaser.ts";
 
+import { queueEvent } from "../queue.ts";
 import { livingSeats, type ScenarioState } from "../state.ts";
 import { tokensOn } from "./campaign.ts";
 
@@ -22,4 +23,19 @@ function countOf(state: ScenarioState, each: XpCount): number {
 export function xpOf(state: ScenarioState, instruction: Extract<Instruction, { verb: "GainXp" }>): number {
   const total = instruction.amount * (instruction.each ? countOf(state, instruction.each) : 1);
   return instruction.max != null ? Math.min(total, instruction.max) : total;
+}
+
+// The Hard/Expert Mode card hears "a player draws any number of cards" (dcce.hard-expert): the draw from `before` to `after` is announced with the
+// number of cards drawn as its amount, only while a mode card is in the game (no other game announces it).
+export function announceDraw(before: ScenarioState, after: ScenarioState, seat: number): ScenarioState {
+  if (!Object.values(after.cards).some((card) => card.zone === "modeCard")) return after;
+  const got = (after.seats[seat]?.hand.length ?? 0) - (before.seats[seat]?.hand.length ?? 0);
+  return got > 0 ? queueEvent(after, { trigger: "cardsDrawn", seat, amount: got }) : after;
+}
+
+// What a card was dealt and a seat was relieved of this round (the flags damageCap and threatReductionCap) lasts one round: the new round clears it.
+export function pruneRoundCaps(state: ScenarioState): ScenarioState {
+  if (state.roundDamage == null && state.threatLoweredBy == null) return state;
+  const { roundDamage: _damage, threatLoweredBy: _lowered, ...rest } = state;
+  return rest;
 }

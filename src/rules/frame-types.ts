@@ -94,6 +94,8 @@ export type EffectData = {
   other?: string;
   // The damage the answered event dealt, and the card whose destruction waits while this effect resolves.
   dealt?: number;
+  // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
+  excess?: number;
   hold?: string;
   // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare-guards.ts).
   hideFailed?: boolean;
@@ -121,7 +123,7 @@ export type HideData = {
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
 // a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
 // "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea-boarding.ts).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromStaging?: boolean };
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromStaging?: boolean };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.
