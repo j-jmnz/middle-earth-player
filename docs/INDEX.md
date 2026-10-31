@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~1.6K tok)
+- `CLAUDE.md` — Claude Code (~1.7K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
 - `.cursor/rules/code-standards.mdc` — Code standards (~1.5K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.0K tok)
@@ -288,7 +288,7 @@ Read when a task names the plan.
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
-  - 84–221 Approach: seven new phases (27–33) (~3.1K)
+  - 84–221 Approach: seven new phases (27–33) (~3.2K)
     - 92–151 Phase 27 — Multi-campaign data (data only, nothing playable yet) (~1.1K)
     - 152–200 Phase 28 — Campaign registry, saga gating, log, booklets (~980)
     - 201–221 Phases 29–33 — one scenario each (phase 12 procedure) (~830)
