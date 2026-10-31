@@ -88,8 +88,6 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Ledger readings 41050.A, 41012.A and 01090.A were re-checked against the scans, not user-confirmed.
 - Frodo's Choice (142068:A:2): its Ring-bearer clauses find nothing, since stage 2A removed the Ring-bearer from the game; the revealer takes the first player token for the game. Not user-confirmed.
 - One active location per separate stage (phase 16) is read from `rr.active-location` and `mec109.multiple-staging-areas`, not stated by a card. Not user-confirmed.
-- The Balrog's additional attack from the staging area is gated on `engagedWithFirst`; the general rule for any staging attacker would move two Ring Goes South goldens. "After this attack" shadows on an unflagged staging attacker do not run.
-- Lost in the Dark (41039)'s lasting `noQuestProgress` targets `table`, which a lasting `ModifyStat` does not support, so the "no progress" choice does nothing; fixing it moves the Nibin-Dûm golden.
 - Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
 - Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
 

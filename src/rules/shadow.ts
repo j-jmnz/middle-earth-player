@@ -274,7 +274,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const waiting = attack.shadowAttackers ?? [];
   if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
   if (after.length === 0) return ended;
-  if (!attackHere(ended, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
+  if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   return pushEffectFrame(
     ended,
     {

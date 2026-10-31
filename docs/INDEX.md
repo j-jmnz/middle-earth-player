@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~47.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~48.0K tok)
   - 17–36 Sections (~350)
   - 37–48 Product (~490)
   - 49–62 Non-goals (~550)
@@ -75,13 +75,13 @@ Read the sections your task touches.
     - 291–298 Engine steps (~180)
     - 299–327 Core round (~1.3K) ← 1
     - 328–356 Keywords implemented once (~1.5K)
-  - 357–514 Fellowship of the Ring (~10.3K)
+  - 357–514 Fellowship of the Ring (~10.4K)
     - 381–395 Scenario 1 resolution (~370)
     - 396–409 A Knife in the Dark (~1.6K) ← 1
     - 410–413 Hide tests (~130)
     - 414–437 Flight to the Ford burden deck and life (~1.6K) ← 1
     - 438–452 The Ring Goes South, stage 4 and the damage on locations (~1.3K) ← 1
-    - 453–468 Journey in the Dark, the Doom countdown and the Balrog (~1.6K)
+    - 453–468 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
     - 469–492 Breaking of the Fellowship, stage 2B (~2.2K) ← 1
     - 493–514 Seeded decks (~660)
   - 515–614 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
@@ -173,15 +173,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~4.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~4.5K tok)
   - 5–15 Rules (~470)
   - 16–61 Phases (~1.3K)
-  - 62–127 Open items (~2.4K)
+  - 62–125 Open items (~2.2K)
     - 64–74 Fixtures and Maestro (~360)
-    - 75–95 Rules and engine (~650)
-    - 96–110 Screens and code (~600)
-    - 111–127 Phone and tablet checks (~740)
-  - 128–143 Standing decisions (~380)
+    - 75–93 Rules and engine (~540)
+    - 94–108 Screens and code (~600)
+    - 109–125 Phone and tablet checks (~740)
+  - 126–141 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)

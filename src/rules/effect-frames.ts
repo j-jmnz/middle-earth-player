@@ -17,7 +17,7 @@ import { chooseEach } from "./families/deck-each.ts";
 import { lookedDeckSeat } from "./families/deck-rules.ts";
 import { pickCandidates } from "./pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
-import { flagged, livingSeats, withSeat } from "./state.ts";
+import { livingSeats, withSeat } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { holdsNow } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
@@ -305,8 +305,10 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.
 function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
-  // The Balrog, considered engaged with the first player from the staging area, makes its additional attack against the same player (142047:A:2).
-  if (sourceId && enemy?.zone === "staging" && flagged(state, sourceId, "engagedWithFirst")) {
+  // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
+  // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
+  // after this one", data/printed/fellowship-of-the-ring.json 142047:A:2, 141072:A:2).
+  if (sourceId && enemy?.zone === "staging") {
     if (attackBarred(state, sourceId, seat) || state.seats[seat]?.eliminated) return state;
     const stagedBegun = beginEnemyAttack(dealForAttack(state, sourceId, steps), seat, sourceId, ctx, steps, true);
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;

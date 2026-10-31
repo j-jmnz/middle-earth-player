@@ -103,6 +103,10 @@ export function modifyStat(
       targets = seat == null ? [] : [`seat:${seat}`];
       break;
     }
+    // A lasting effect held by the table, every seat (Lost in the Dark's `noQuestProgress`, 41039:A:1): read as the holder "table".
+    case "table":
+      targets = ["table"];
+      break;
     default:
       targets = [sourceId];
   }
@@ -118,7 +122,8 @@ export function modifyStat(
   const trait = instruction.trait;
   for (const id of targets) {
     if (trait != null && !id.startsWith("seat:") && !hasTrait(next, id, trait, ctx)) continue;
-    if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
+    if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
+    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else next = id === ALLIES_CLASS
       ? addClassModifier(next, ALLIES_CLASS, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);

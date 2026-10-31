@@ -7,8 +7,10 @@ import { defenseBlocked } from "../rules/restrictions.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { flagged } from "../rules/state.ts";
+import { legalIntents, legalTargets } from "../rules/legal.ts";
+import type { PlayerIntent } from "../rules/reduce.ts";
 import { BALROG, CHAMBER, CHIEFTAIN, DOOM, fire, loadMoriaWorld, makeTable, runOne, settled, type MoriaLayout, type MoriaWorld } from "../../scripts/moria-scene.ts";
-import { codesOf, first } from "../../scripts/past-scene.ts";
+import { codesOf, first, send, start, type Run } from "../../scripts/past-scene.ts";
 import { spawn } from "../rules/zones.ts";
 
 let world: MoriaWorld;
@@ -68,6 +70,50 @@ describe("Uruk from Mordor (142047:A:1)", () => {
     expect(after.pendingAttack?.enemyId).toBe(first(after, "142047"));
     expect(after.pendingAttack?.seat).toBe(1);
     expect(after.cards[first(after, "142047")]?.zone).toBe("staging");
+  });
+});
+
+// Plays the attack in progress to its end, the first hero the rules offer taking an undefended attack.
+function finishAttack(table: ReturnType<typeof make>, state: ScenarioState, ...heroes: string[]): Run {
+  let run: Run = { ...start(state), state };
+  for (let guard = 0; guard < 40 && (run.state.pendingAttack != null || run.state.stack.length > 0); guard += 1) {
+    if (run.state.window?.kind === "defense") {
+      run = send(run, { type: "Undefended", heroId: heroes.find((id) => run.state.cards[id]?.zone === "heroes") ?? legalTargets(run.state, { type: "Undefended" }, table.ctx)[0] }, table.ctx);
+      continue;
+    }
+    const pass = legalIntents(run.state, table.ctx).find((intent) => intent.type === "Pass");
+    if (!pass) break;
+    run = send(run, pass as PlayerIntent, table.ctx);
+  }
+  return run;
+}
+
+const enemyStrikes = (run: Run) => run.steps.filter((step) => step.kind === "strike" && step.side === "enemy");
+
+describe("an enemy that attacks from the staging area without being flagged (142047:A:1, 142038:A:2)", () => {
+  // "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, attacking enemy makes an additional attack." (142047:A:2)
+  it("makes the additional attack its shadow grants, with a shadow card of its own", () => {
+    const table = make({ staging: ["142047"], heroes: ["strong"], deck: ["142047", "f0", "f0", "f0"] });
+    const uruk = table.state.staging.find((id) => table.state.cards[id]?.code === "142047") ?? "";
+    expect(flagged(table.state, uruk, "engagedWithFirst")).toBe(false);
+    const fired = fire(table, table.state, uruk, "142047:whenRevealed:1");
+    const run = finishAttack(table, fired, first(fired, "141002"), first(fired, "strong"));
+    // Uruk is dealt a copy of itself: +1 Attack destroys Sam, so a second attack follows.
+    expect(enemyStrikes(run)).toHaveLength(2);
+    expect(run.state.cards[uruk]?.zone).toBe("staging");
+    expect(run.state.pendingAttack).toBeNull();
+  });
+
+  // "Shadow: ... If this attack destroys a character, the first player reveals..." runs "after this attack" for a staging attacker too (142059:A:3).
+  it("runs a shadow card's \"after this attack\" effect", () => {
+    const table = make({ seats: 2, staging: ["142047"], heroes: ["strong"], deck: ["142059", "grunt", "grunt"] });
+    const uruk = first(table.state, "142047");
+    const fired = fire(table, table.state, uruk, "142047:whenRevealed:1");
+    const run = finishAttack(table, fired, first(fired, "141002"), first(fired, "strong"));
+    const destroyed = Object.values(run.state.cards).some((card) => card.zone === "discard" && (card.code === "141002"));
+    const revealed = run.state.staging.some((id) => run.state.cards[id]?.code === "grunt");
+    expect(destroyed).toBe(true);
+    expect(revealed).toBe(true);
   });
 });
 
