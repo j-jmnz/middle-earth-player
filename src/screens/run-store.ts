@@ -17,7 +17,7 @@ export function writeRun<TRun>(user: UserDb<TRun>, run: RunRecord): void {
   user.insert(runs).values(run).onConflictDoNothing().run();
 }
 
-/** Every run in the order it was written (the queued ones flushed first); History sorts and filters them (history-list.ts). */
+/** Every run in the order it was written (the queued ones flushed first); History sorts and groups them (history-list.ts). */
 export function listRuns<TRun>(user: UserDb<TRun>): RunRecord[] {
   // A run queued by a tap that has not been written yet (table-session.ts, recordUnclosedRun) is written first.
   flushRuns();

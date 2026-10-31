@@ -43,4 +43,7 @@ export function nextSummary(next: NextStep): string {
   return next.kind === "finished" ? "Every scenario is won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
 }
 
-export const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Its runs stay in History; your decks stay.";
+/** What Delete asks, naming the playthrough by `describe`, since two of one campaign differ only there. */
+export function deleteSentence(described: string): string {
+  return `Delete ${described}? Its log, pool and any open scenario are gone for good. Its runs stay in History; your decks stay.`;
+}

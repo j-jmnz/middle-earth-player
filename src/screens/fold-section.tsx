@@ -9,7 +9,7 @@ import { sectionTitleStyle } from "../play/section-heading";
 import { textSurface } from "../play/surfaces";
 import { useUiScale } from "../play/ui-scale";
 import { useTableTokens } from "../play/use-table-tokens";
-import { Chevron, Chip } from "./chrome-marks";
+import { Chevron } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
 import { plural } from "./history-words";
@@ -37,10 +37,7 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
   return useMemo(() => ({ folded, setFolded }), [folded, setFolded]);
 }
 
-/**
- * A foldable section. The header's testID is `section-<id>` (`testID` overrides it) and the body's is `section-<id>-body`. `right` is
- * one optional control at the header's end while the section is open.
- */
+/** A foldable section. The header's testID is `section-<id>` (`testID` overrides it) and the body's is `section-<id>-body`. */
 export function FoldSection({ children, id, ...header }: FoldHeaderProps & { children: ReactNode }) {
   const { folded } = header;
   return (
@@ -61,26 +58,15 @@ export type FoldHeaderProps = {
   // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
   count?: number;
   unit?: string;
-  // Replaces the count while folded, on a second line: what the viewer would otherwise lose sight of ("Next: A Knife in the Dark").
-  summary?: string;
-  // A second line under the title, always: what tells two sections with one title apart.
-  detail?: string;
-  // A word in a chip after the title (Archived, Deleted): the state is a word, not only a colour.
-  badge?: string;
   testID?: string;
-  right?: ReactNode;
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, summary, detail, badge, testID, right }: FoldHeaderProps) {
+export function FoldHeader({ id, title, folded, onFold, count, unit, testID }: FoldHeaderProps) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
   const counted = count == null ? null : unit ? plural(count, unit) : String(count);
-  const second = folded && summary ? summary : (detail ?? null);
-  // The count says what is inside while folded, unless the summary says it better.
-  const note = folded && !summary ? counted : null;
-  const spoken = folded ? (summary ?? counted) : counted;
   return (
     // The heading is the row, so screen-reader heading navigation lands on it and the button stays inside.
     <View accessibilityRole="header" className="flex-row items-center">
@@ -89,7 +75,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
         collapsable={false}
         accessibilityRole="button"
         accessibilityState={{ expanded: !folded }}
-        accessibilityLabel={foldWords([title, detail, badge].filter((part) => part != null).join(", "), folded, spoken)}
+        accessibilityLabel={foldWords(title, folded, counted)}
         onPress={() => {
           onFold(!folded);
           AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
@@ -106,15 +92,12 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, de
               <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
                 {title}
               </Text>
-              {badge ? <Chip label={badge} tone="faint" /> : null}
               <View className="min-w-3 flex-1" />
-              {note != null ? <Text className="pr-1 text-label text-muted">{note}</Text> : null}
+              {folded && counted != null ? <Text className="pr-1 text-label text-muted">{counted}</Text> : null}
             </View>
-            {second ? <Text className="pb-1.5 pl-6 text-label text-muted">{second}</Text> : null}
           </View>
         )}
       </Pressable>
-      {folded ? null : right}
     </View>
   );
 }

@@ -1,23 +1,23 @@
 // History (docs/design-system.md, History): the library of one kind, the playthroughs or the standalone games, each one card with the
 // runs it wrote. A switch picks the kind. In progress and Finished are open; Archived and Deleted fold, folded until the player opens
 // them. A card opens what it is (a playthrough's path; a game's table, outcome or a new deal). Manage, in the bar (or a long press on
-// a card), puts Archive or Restore and Delete under each card: Archive and Restore act at once with Undo in a toast, Delete asks in
-// place. The list is a FlashList of flat items (history-list.ts).
+// a card), folds each card to its head and puts Archive or Restore and Delete in a band at its foot: Archive and Restore act at once
+// with Undo in a toast, Delete asks in place. The list is a FlashList of flat items (history-list.ts).
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter, type Href } from "expo-router";
-import { useCallback, useState } from "react";
-import { View } from "react-native";
+import { useCallback, useState, type ReactNode } from "react";
+import { AccessibilityInfo, View } from "react-native";
 
 import type { RunKind, RunRecord } from "../campaign/runs";
 import { standaloneStatus, type ListedStandalone } from "../campaign/standalone";
 import { scenarioName } from "./campaign-data";
 import { archiveSave, deleteSave, restoreSave } from "./campaign-store";
-import { BodyText, Eyebrow, NavBar, PillButton, Screen, Segmented } from "./chrome";
+import { BodyText, NavBar, PillButton, Screen, Section, Segmented } from "./chrome";
 import { deckFaces } from "./deck-store";
 import { useDatabases } from "./databases";
 import { FoldHeader, useFolds } from "./fold-section";
 import { goBack } from "./go-back";
-import { gameWords, goneWords, saveWords, type CardWords } from "./history-entries";
+import { deleteGameSentence, gameDestination, gameWords, goneWords, saveWords, type CardState, type CardWords, type GameDestination } from "./history-entries";
 import { libraryItems, type FoldedSection, type LibraryItem, type OpenSection } from "./history-list";
 import { EMPTY_LIBRARY, readLibrary, type Library, type LibrarySave } from "./history-read";
 import { CardActions, HistoryCard } from "./history-rows";
@@ -26,19 +26,19 @@ import { leadFace } from "./hub-parts";
 import { useListGutter } from "./list-gutter";
 import { usePalette } from "./palette-hook";
 import { pathHref } from "./scenario-links";
-import { DELETE_SENTENCE, describe, partyCodes } from "./save-line";
+import { deleteSentence, describe, partyCodes } from "./save-line";
 import { archiveStandalone, deleteStandalone, restoreStandalone } from "./standalone-store";
 import { gameCaption } from "./standalone-words";
 import { recordUnclosedRun } from "./table-session";
 import { showToast } from "./toast";
 import { ToastView } from "./toast-view";
+import { useBottomInset } from "./use-bottom-inset";
 
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
 
 const SECTION_TITLES: Record<OpenSection | FoldedSection, string> = { "in-progress": "In progress", finished: "Finished", archived: "Archived", deleted: "Deleted" };
 
-const DELETE_GAME = "Delete this game? It is gone for good. Its run stays in History; your decks stay.";
 
 type Item = LibraryItem<LibrarySave, ListedStandalone>;
 
@@ -53,6 +53,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
   const router = useRouter();
   const palette = usePalette();
   const list = useListGutter();
+  const bottom = useBottomInset();
   const { catalog, user } = useDatabases();
   const folds = useFolds();
   const [kindWord, setKindWord] = useState<KindWord>(initial === "standalone" ? "Standalone" : "Campaign");
@@ -109,10 +110,12 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     setAsking(null);
   };
 
-  // Archive and Restore act at once and can be taken back from the toast; Delete cannot, so it asked first.
+  // Archive and Restore act at once and can be taken back from the toast; Delete cannot, so it is asked first.
   function putAway(entry: Managed, archived: boolean): void {
     if (archived) entry.restore();
     else entry.archive();
+    // The Archived fold opens, so the card is seen landing there and Restore is in reach.
+    if (!archived) folds.setFolded(foldId("archived"), false, true);
     refresh();
     showToast(`${archived ? "Restored" : "Archived"} ${entry.name}`, {
       undo: () => {
@@ -132,7 +135,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     id: ref.id,
     name: ref.line.name,
     described: describe(ref.line),
-    sentence: DELETE_SENTENCE,
+    sentence: deleteSentence(describe(ref.line)),
     archive: () => archiveSave(user, ref.id),
     restore: () => restoreSave(user, ref.id),
     remove: () => {
@@ -141,37 +144,38 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       deleteSave(user, ref.id);
     },
   });
-  const managedGame = (game: ListedStandalone): Managed => ({
+  const managedGame = (game: ListedStandalone, hasRun: boolean): Managed => ({
     id: game.id,
     name: scenarioName(game.scenarioId),
     described: `${scenarioName(game.scenarioId)}, ${gameCaption(game)}`,
-    sentence: DELETE_GAME,
+    sentence: deleteGameSentence(`${scenarioName(game.scenarioId)}, ${gameCaption(game)}`, hasRun),
     archive: () => archiveStandalone(user, game.id),
     restore: () => restoreStandalone(user, game.id),
     remove: () => deleteStandalone(user, game.id),
   });
 
-  // Where a game's card leads: its table while it is playing, its outcome once it has a run, else a new deal of the same game.
-  const gameOpen = (game: ListedStandalone, hasRun: boolean): { href: Href; verb: string } | null => {
-    if (standaloneStatus(game) === "playing") return { href: { pathname: "/standalone/table/[gameId]", params: { gameId: game.id } }, verb: "Resume" };
-    if (hasRun) return { href: { pathname: "/standalone/outcome/[gameId]", params: { gameId: game.id } }, verb: "Outcome of" };
-    if (game.loadout) return { href: { pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: game.scenarioId, from: game.id } }, verb: "Play again" };
-    return null;
+  // The route of where a game's card leads (gameDestination).
+  const gameHref = (game: ListedStandalone, to: GameDestination["to"]): Href => {
+    if (to === "table") return { pathname: "/standalone/table/[gameId]", params: { gameId: game.id } };
+    if (to === "outcome") return { pathname: "/standalone/outcome/[gameId]", params: { gameId: game.id } };
+    return { pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: game.scenarioId, from: game.id } };
   };
 
-  // A card that can be managed starts Manage on a long press, as a deck does.
-  const card = (testID: string, words: CardWords, listed: readonly RunRecord[], open: { onPress: () => void; verb: string } | null, manageable: boolean) => (
+  // A live or archived card starts Manage on a long press, as a deck does; while managing it shows its head alone, so the list scans.
+  const card = (testID: string, state: CardState, words: CardWords, listed: readonly RunRecord[], open: { onPress: () => void; verb: string } | null, footer: ReactNode) => (
     <HistoryCard
       testID={testID}
+      state={state}
       title={words.title}
       lines={words.lines}
       chip={words.chip}
       lead={leadFace(faces, words.firstHero, palette)}
-      runs={listed}
+      runs={managing ? [] : listed}
       nameOf={nameOf}
       accessibilityLabel={open ? `${open.verb} ${words.spoken}` : words.spoken}
       onPress={open?.onPress ?? null}
-      onLongPress={manageable ? startManaging : null}
+      onLongPress={state === "gone" ? null : startManaging}
+      footer={footer}
     />
   );
 
@@ -184,7 +188,10 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         asking={asking === entry.id}
         sentence={entry.sentence}
         onArchive={() => putAway(entry, archived)}
-        onAsk={() => setAsking(entry.id)}
+        onAsk={() => {
+          setAsking(entry.id);
+          AccessibilityInfo.announceForAccessibility(`${entry.sentence} Tap Delete for good to confirm.`);
+        }}
         onDelete={() => remove(entry)}
         onKeep={() => setAsking(null)}
       />
@@ -194,8 +201,9 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     switch (item.type) {
       case "heading":
         return (
-          <View className="pb-2 pt-4" accessibilityRole="header" testID={item.id}>
-            <Eyebrow>{SECTION_TITLES[item.section]}</Eyebrow>
+          // The title lines up with a fold's, past where its chevron sits.
+          <View className="pt-2">
+            <Section title={SECTION_TITLES[item.section]} testID={item.id} className="pl-6" />
           </View>
         );
       case "fold":
@@ -216,18 +224,23 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         const entry = managedSave(item.save);
         return (
           <View className="pb-3">
-            {card(`entry-${item.save.id}`, saveWords(item.save, item.runs, item.started, nameOf), item.runs, { onPress: go(pathHref(item.save.id)), verb: "Open" }, true)}
-            {actions(entry, item.archived)}
+            {card(`entry-${item.save.id}`, item.archived ? "archived" : "live", saveWords(item.save, item.runs, item.started, item.archived, nameOf), item.runs, { onPress: go(pathHref(item.save.id)), verb: "Open" }, actions(entry, item.archived))}
           </View>
         );
       }
       case "game": {
-        const entry = managedGame(item.game);
-        const open = gameOpen(item.game, item.run != null);
+        const entry = managedGame(item.game, item.run != null);
+        const open = gameDestination(item.game, item.run != null);
         return (
           <View className="pb-3">
-            {card(`entry-${item.game.id}`, gameWords(item.game, item.run, nameOf), [], open ? { onPress: go(open.href), verb: open.verb } : null, true)}
-            {actions(entry, item.archived)}
+            {card(
+              `entry-${item.game.id}`,
+              item.archived ? "archived" : "live",
+              gameWords(item.game, managing ? null : item.run, open?.word ?? null, item.archived, nameOf),
+              [],
+              open ? { onPress: go(gameHref(item.game, open.to)), verb: open.verb } : null,
+              actions(entry, item.archived),
+            )}
           </View>
         );
       }
@@ -236,7 +249,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         if (!words) return null;
         // A game's one run is worded in its card's lines; a playthrough's runs are listed under its name.
         const listed = item.runs[0]?.kind === "campaign" ? item.runs : [];
-        return <View className="pb-3">{card(item.id, words, listed, null, false)}</View>;
+        return <View className="pb-3">{card(item.id, "gone", words, listed, null, null)}</View>;
       }
     }
   };
@@ -271,7 +284,10 @@ export function HistoryView({ initial }: { initial: RunKind }) {
           renderItem={renderItem}
         />
       </View>
-      <ToastView />
+      {/* A pushed screen has no dock or bar under the toast: it keeps clear of the home indicator itself, and sits in the list's column. */}
+      <View style={{ paddingBottom: bottom, paddingHorizontal: list.inset }}>
+        <ToastView />
+      </View>
     </Screen>
   );
 }

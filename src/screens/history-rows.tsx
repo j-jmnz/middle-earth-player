@@ -1,33 +1,34 @@
 // The rows of History's library list (docs/design-system.md, History): one card per playthrough or game, its runs listed inside it,
-// and, while History manages, the row of actions under it (Archive or Restore, and Delete, asked in place). Each card is one FlashList
-// item on a solid fill: no light and no shadow.
+// and, while History manages, its actions in a band at the card's foot (Archive or Restore, and Delete, asked in place). Each card is
+// one FlashList item on a solid fill: no light and no shadow.
+import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import type { RunRecord } from "../campaign/runs";
 import { rowSurface } from "../play/surfaces";
+import { withAlphaHex } from "../play/tokens";
 import { Text } from "../play/text";
 import { useTableTokens } from "../play/use-table-tokens";
 import { Portrait } from "./art";
 import { scenarioName } from "./campaign-data";
-import { BodyText, Chevron, Chip, Label, TextButton } from "./chrome";
+import { AskInPlace } from "./ask-in-place";
+import { Chevron, Chip, Label, TextButton } from "./chrome";
+import type { CardChip, CardLine, CardState } from "./history-entries";
 import type { PartyHero } from "./hub-parts";
 import { runDate, runDetail } from "./history-words";
 import { usePalette } from "./palette-hook";
 
-/** A line under a card's title: what it is (muted), where it stands (accent), why it was lost (danger), or that it is gone (faint). */
-export type CardLine = { text: string; tone: "muted" | "accent" | "danger" | "faint" };
-
-export type CardChip = { label: string; tone: "accent" | "danger" | "neutral" | "faint" };
-
 const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger", faint: "text-faint" };
 
 /**
- * One playthrough or game: the fellowship's first face, the title, its lines, a status chip, and its runs under them. The whole card
- * opens while `onPress` is given (with a chevron) and is one sentence to a screen reader; a long press starts managing. A game's
- * one run is the game, so its card words the run in its lines and lists no runs.
+ * One playthrough or game: the fellowship's first face, the title, its lines, a status chip, and its runs under them. The head and
+ * the runs open while `onPress` is given (with a chevron) and are one sentence to a screen reader; a long press starts managing. A
+ * game's one run is the game, so its card words the run in its lines and lists no runs. `footer` is the managing band, inside the
+ * card's corners so it reads as the card's own.
  */
 export function HistoryCard({
   testID,
+  state,
   title,
   lines,
   chip,
@@ -37,8 +38,10 @@ export function HistoryCard({
   accessibilityLabel,
   onPress,
   onLongPress,
+  footer,
 }: {
   testID: string;
+  state: CardState;
   title: string;
   lines: readonly CardLine[];
   chip: CardChip | null;
@@ -48,50 +51,63 @@ export function HistoryCard({
   accessibilityLabel: string;
   onPress: (() => void) | null;
   onLongPress: (() => void) | null;
+  footer?: ReactNode;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const gone = state === "gone";
   return (
-    <Pressable
-      testID={testID}
-      collapsable={false}
-      accessibilityRole={onPress ? "button" : "text"}
-      accessibilityLabel={accessibilityLabel}
-      disabled={onPress == null && onLongPress == null}
-      onPress={onPress ?? undefined}
-      onLongPress={onLongPress ?? undefined}
-      delayLongPress={350}
-    >
-      {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
-      {({ pressed }) => (
-        <View className="rounded-item px-4 py-3.5" style={rowSurface(pressed && onPress != null, t)}>
-          <View className="flex-row items-center gap-3">
-            {lead ? <Portrait card={lead.card} size={36} tint={lead.tint} glow={false} /> : null}
-            <View className="min-w-0 flex-1">
-              <View className="flex-row items-center gap-2">
-                <Text className="shrink font-display text-heading text-bone" numberOfLines={2}>
-                  {title}
-                </Text>
-                {chip ? <Chip label={chip.label} tone={chip.tone} /> : null}
+    <View className="overflow-hidden rounded-item">
+      <Pressable
+        testID={testID}
+        collapsable={false}
+        accessibilityRole={onPress ? "button" : "text"}
+        accessibilityLabel={accessibilityLabel}
+        disabled={onPress == null && onLongPress == null}
+        onPress={onPress ?? undefined}
+        onLongPress={onLongPress ?? undefined}
+        delayLongPress={350}
+      >
+        {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
+        {({ pressed }) => (
+          <View className="px-4 py-3.5" style={gone ? undefined : rowSurface(pressed && onPress != null, t)}>
+            <View className="flex-row items-center gap-3">
+              {lead ? <Portrait card={lead.card} size={36} tint={lead.tint} glow={false} /> : null}
+              <View className="min-w-0 flex-1">
+                <View className="flex-row flex-wrap items-center gap-2">
+                  <Text className={`shrink font-display text-heading ${gone ? "text-muted" : "text-bone"}`} numberOfLines={2}>
+                    {title}
+                  </Text>
+                  {chip ? <Chip label={chip.label} tone={chip.tone} /> : null}
+                  {state === "archived" ? <Chip label="Archived" tone="faint" /> : null}
+                </View>
+                {lines.map((line, at) => (
+                  <Text key={at} className={`text-label ${LINE_CLASS[line.tone]}`}>
+                    {line.text}
+                  </Text>
+                ))}
               </View>
-              {lines.map((line, at) => (
-                <Text key={at} className={`text-label ${LINE_CLASS[line.tone]}`}>
-                  {line.text}
-                </Text>
-              ))}
+              {onPress ? (
+                <View className="w-6 items-center">
+                  <Chevron direction="right" color={palette.faint} size={8} />
+                </View>
+              ) : null}
             </View>
-            {onPress ? (
-              <View className="w-6 items-center">
-                <Chevron direction="right" color={palette.faint} size={8} />
-              </View>
-            ) : null}
+            {runs.map((run) => (
+              <RunLine key={run.id} run={run} nameOf={nameOf} />
+            ))}
           </View>
-          {runs.map((run) => (
-            <RunLine key={run.id} run={run} nameOf={nameOf} />
-          ))}
+        )}
+      </Pressable>
+      {/* The band darkens the card's fill, as a deck cover's managing row does. */}
+      {footer ? (
+        <View style={rowSurface(false, t)}>
+          <View className="px-4" style={{ backgroundColor: withAlphaHex(palette.night, 0.3) }}>
+            {footer}
+          </View>
         </View>
-      )}
-    </Pressable>
+      ) : null}
+    </View>
   );
 }
 
@@ -124,7 +140,7 @@ function RunLine({ run, nameOf }: { run: RunRecord; nameOf: (code: string) => st
 }
 
 /**
- * What managing adds under a card: Archive (or Restore) and Delete. Delete asks in place: a danger sentence naming what is lost, then
+ * What managing adds at a card's foot: Archive (or Restore) and Delete. Delete asks in place: a danger sentence naming what is lost, then
  * Delete for good beside Keep. `described` names the playthrough or game to a screen reader, since two can differ only in that line.
  */
 export function CardActions({
@@ -150,18 +166,18 @@ export function CardActions({
 }) {
   if (asking) {
     return (
-      <View className="gap-1 px-1 pt-2" testID={`delete-confirm-${id}`}>
-        <BodyText tone="danger">{sentence}</BodyText>
-        <View className="-mx-3 flex-row">
-          <TextButton label="Delete for good" testID={`delete-yes-${id}`} tone="danger" accessibilityLabel={`Delete ${described}, for good`} onPress={onDelete} />
-          <TextButton label="Keep" testID={`delete-no-${id}`} accessibilityLabel={`Keep ${described}`} onPress={onKeep} />
-        </View>
-      </View>
+      <AskInPlace
+        testID={`delete-confirm-${id}`}
+        className="pt-2.5"
+        sentence={sentence}
+        confirm={{ label: "Delete for good", testID: `delete-yes-${id}`, accessibilityLabel: `Delete ${described}, for good`, onPress: onDelete }}
+        keep={{ testID: `delete-no-${id}`, accessibilityLabel: `Keep ${described}`, onPress: onKeep }}
+      />
     );
   }
   const keep = archived ? "Restore" : "Archive";
   return (
-    <View className="-mx-2 flex-row pt-1">
+    <View className="-mx-3 flex-row">
       <TextButton label={keep} testID={`${keep.toLowerCase()}-${id}`} tone="accent" accessibilityLabel={`${keep} ${described}`} onPress={onArchive} />
       <TextButton label="Delete" testID={`delete-${id}`} tone="danger" accessibilityLabel={`Delete ${described}`} onPress={onAsk} />
     </View>
