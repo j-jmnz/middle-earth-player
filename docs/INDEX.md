@@ -176,15 +176,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~5.3K tok)
+- `docs/phases/STATUS.md` — Phase status (~5.4K tok)
   - 5–16 Rules (~540)
-  - 17–75 Phases (~1.7K)
-  - 76–148 Open items (~2.6K)
-    - 78–90 Fixtures and Maestro (~460)
-    - 91–115 Rules and engine (~690)
-    - 116–130 Screens and code (~590)
-    - 131–148 Phone and tablet checks (~850)
-  - 149–164 Standing decisions (~380)
+  - 17–75 Phases (~1.8K)
+  - 76–149 Open items (~2.6K)
+    - 78–90 Fixtures and Maestro (~480)
+    - 91–116 Rules and engine (~710)
+    - 117–131 Screens and code (~590)
+    - 132–149 Phone and tablet checks (~850)
+  - 150–165 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)
