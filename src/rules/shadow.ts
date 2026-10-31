@@ -35,9 +35,9 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 // A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), repeats an
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
 // \"When Revealed\" effect of Iron Shackles", 01105:A:2), or runs on each card that matches ("exhaust all characters you control", 900103:A:2),
-// runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
+// reveals an encounter card ("Reveal an encounter card", 11176:A:4), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
 function runsInFrame(effects: readonly Effect[]): boolean {
-  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "ResolveWhenRevealed"));
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "ResolveWhenRevealed" || instruction.verb === "RevealEncounter"));
 }
 
 function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -285,7 +285,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       instructions: waiting.length > 0 ? [...after, { verb: "StartShadowAttack", attackers: [...waiting] }] : after,
       cancel: null,
       blockCancel: null,
-      ...(destroyed > 0 ? { x: destroyed } : {}),
+      // An attack that sends its excess damage on (excessToShip) leaves that damage as the X of its effect; any other leaves the characters it destroyed.
+      ...(attack.defense?.excess ? { x: attack.defense.excess } : destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
       ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),

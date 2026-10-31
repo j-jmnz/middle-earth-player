@@ -44,7 +44,12 @@
         "Action: Exhaust Calphon to look at the bottom 5 cards of your deck. Then, you may switch one of them with a card in your hand.",
         "If Calphon leaves play, the players lose the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -86,7 +91,12 @@
         "When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.",
         "If the Stormcaller leaves play, the players win the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -128,7 +138,12 @@
         "The Thing in the Depths gets +3 hit points per player.",
         "Forced: When a Creature enemy is destroyed, deal 2 damage to The Thing in the Depths."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -170,7 +185,12 @@
         "Cannot be optionally engaged.",
         "Temple Guardian gets -50 engagement cost while Cursed Temple is the active location."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -208,7 +228,12 @@
         "If unattached, return Gate Key to the staging area and it gains: \"Action: Exhaust a hero to claim Gate Key and attach it to that hero.\"",
         "Action: Exhaust Gate Key and attached hero to look at the facedown side of a Temple of the Deceived location or secret."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -248,7 +273,12 @@
         "If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.",
         "Forced: When Dol Amroth Warship is destroyed, set it aside, out of play."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -285,7 +315,12 @@
         "Campaign Mode only.",
         "Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -326,7 +361,12 @@
         "The Dream-chaser can be committed to any Sailing test and counts as 3 characters when committed to a Sailing test.",
         "If the Dream-chaser is destroyed, the players lose the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -368,7 +408,12 @@
         "Draw 1 additional card during the resource phase.",
         "If the Dawn Star is destroyed, its controller is eliminated from the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -409,7 +454,12 @@
         "Response: After you play a card with an odd printed cost, add 1 resource to a hero's resource pool. (Limit twice per round.)",
         "If the Duskbringer is destroyed, its controller is eliminated from the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -452,7 +502,12 @@
         "Action: Name a card. Discard the top 3 cards of any deck to deal 1 damage to a non-unique enemy (2 damage instead if the named card is discarded this way). (Limit once per round.)",
         "If the Glórinaith is destroyed, its controller is eliminated from the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -493,7 +548,12 @@
         "Reduce the cost of the first card you play each round by 1.",
         "If the Nárelenya is destroyed, its controller is eliminated from the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
@@ -538,7 +598,12 @@
         "Each hero you control gets +1 Attack.",
         "If the Silver Wing is destroyed, its controller is eliminated from the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "The Upgraded side is used only in Campaign Mode (dcce.campaign-mode): a campaign game deals it once the card is upgraded, and a standalone game deals the original side. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,

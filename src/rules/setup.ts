@@ -7,6 +7,7 @@ import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { recordStartingThreat } from "./families/quest-threat.ts";
 import { questStageStart } from "./families/quest-setup.ts";
+import { pushCardEffects } from "./effect-frames.ts";
 import { placeContracts } from "./families/sidequests-contract.ts";
 import { setAsideEncounterCards } from "./families/sidequests-encounter.ts";
 import { pushPlayerSetup } from "./families/sidequests-setup.ts";
@@ -152,6 +153,8 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     if (next.failure || next.lost) return next;
   }
   if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
+  // The campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup) goes down first, so it resolves after it.
+  next = campaignAfterSetup(next, ctx, steps);
   // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest-setup.ts).
   next = questStageStart(next, ctx, steps);
   // The Nightmare setup card's Forced effects "During setup" (families/nightmare-setup.ts), on top: they resolve first.
@@ -159,6 +162,17 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
   if (next.modeCard) next = spawn(next, next.modeCard.code, { zone: "modeCard" }, next.modeCard.side).state;
   return withMode(next, "beginRound");
+}
+
+// The campaign card's Setup instructions that name what the quest card's Setup prepares (the ship-objectives of the Dream-chaser's fleet): one frame, whose
+// cause is the campaign card's Setup record.
+function campaignAfterSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const after = state.afterSetup;
+  const stage = state.questStage;
+  if (!after || !stage) return state;
+  const record = ctx.effects.find((effect) => effect.cardCode === after.card && effect.timing === "campaignSetup");
+  if (!record) return state;
+  return pushCardEffects(state, "setup", stage, state.firstPlayer, false, [{ ...record, instructions: [...after.instructions] }], ctx, steps);
 }
 
 export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {

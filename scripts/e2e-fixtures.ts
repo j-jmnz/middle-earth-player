@@ -22,7 +22,8 @@
 // src/campaign/fixtures/passage-through-mirkwood.json. `anduin-won` and `anduin-lost`: Journey Along the Anduin (scripts/e2e-anduin.ts), written to
 // src/campaign/fixtures/journey-along-the-anduin.json. `dol-guldur-won` and `dol-guldur-lost`: Escape from Dol Guldur (scripts/e2e-dol-guldur.ts), written to
 // src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e-oath.ts), written to
-// src/campaign/fixtures/the-oath.json. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e-nibin-dum.ts), written to
+// src/campaign/fixtures/the-oath.json. `sea-solo`, `sea-duo`, `voyage-won` and `voyage-lost`: Voyage Across Belegaer on a blank Dream-chaser log (scripts/e2e-voyage.ts), written to
+// src/campaign/fixtures/voyage-across-belegaer.json; `voyage-won` is written only when a seed wins. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e-nibin-dum.ts), written to
 // src/campaign/fixtures/the-caves-of-nibin-dum.json.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
@@ -53,6 +54,7 @@ import { dolGuldurFixtures } from "./e2e-dol-guldur.ts";
 import { mirkwoodFixtures } from "./e2e-mirkwood.ts";
 import { nibinDumFixtures } from "./e2e-nibin-dum.ts";
 import { oathFixtures } from "./e2e-oath.ts";
+import { voyageFixtures } from "./e2e-voyage.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -376,6 +378,12 @@ void runScript("e2e-fixtures", () => {
   const nibinDumFile = path.join(dir, "the-caves-of-nibin-dum.json");
   writeFileSync(nibinDumFile, `${JSON.stringify(nibinDum)}\n`);
   say.info(`wrote ${nibinDumFile} (${Object.keys(nibinDum).join(", ")})`);
+
+  // Voyage Across Belegaer (Dream-chaser part 1): from the blank log a new Dream-chaser playthrough starts on. A game not found in the seeds is left out (`voyage-won` is open).
+  const voyage = say.step("play Voyage Across Belegaer's parked games and loss", () => voyageFixtures());
+  const voyageFile = path.join(dir, "voyage-across-belegaer.json");
+  writeFileSync(voyageFile, `${JSON.stringify(voyage)}\n`);
+  say.info(`wrote ${voyageFile} (${Object.keys(voyage).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

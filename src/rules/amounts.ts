@@ -110,6 +110,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.x) value = scope.x ?? 0;
   else if (amount.stage) value = stageNumber(state);
   else if (amount.players) value = livingSeats(state).length;
+  else if (amount.part) value = state.part ?? 0;
   else if (amount.threat) {
     const threat = seatThreat(state, scope.actor);
     value = amount.threat === "tens" ? Math.floor(threat / 10) : threat;

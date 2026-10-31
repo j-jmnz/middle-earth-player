@@ -216,6 +216,9 @@ export function canAttack(
   if (!isCharacterType(printed) || attacker.host != null) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives).
   if (!shipMayAttack(printed, printedOf(cards, enemy.code))) return false;
+  // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
+  if (flagged(state, enemyId, "cannotBeAttacked")) return false;
+  if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there

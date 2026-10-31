@@ -44,6 +44,8 @@ export type StartInput = {
 // campaign checklist (src/campaign/checklist.ts) before the scenario starts. The quest card's last Setup step is the
 // encounter deck shuffle, which the piles cannot express.
 const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer"]);
+// The campaign card's Setup verbs that name the ships the quest card's Setup prepares: they resolve in a frame after it (ScenarioDefinition.afterSetup).
+const AFTER_SETUP_VERBS: ReadonlySet<string> = new Set(["FitShips", "TradeShipDamage"]);
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;
@@ -79,8 +81,10 @@ export function buildStart(start: StartInput): StartScenario {
   const named = new Set(dealt.flatMap((instruction) => (instruction.verb === "PutObjectiveAllyIntoPlay" ? [instruction.code] : [])));
   const poolInPlay = standalone ? [] : (input.poolIntoPlay ?? []).filter((code) => !named.has(code));
   const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" ? [instruction.code] : []));
+  const afterSetup = campaignSetup.filter((instruction) => AFTER_SETUP_VERBS.has(instruction.verb));
   const burden = burdenCodes(input.scenario);
-  const corsair = corsairCodes(input.scenario, input.difficulty);
+  // The Corsair deck the scenario deals, and the cards the campaign card shuffles into it ("Shuffle Crowley into the Corsair deck"); the quest card's Setup shuffles it.
+  const corsair = [...corsairCodes(input.scenario, input.difficulty), ...campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoCorsairDeck" ? [instruction.code] : []))];
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
@@ -89,6 +93,7 @@ export function buildStart(start: StartInput): StartScenario {
     threatModifier: input.threatModifier,
     definition: {
       ...definition,
+      ...(afterSetup.length > 0 ? { afterSetup } : {}),
       setup: [
         ...input.campaign.prelude.map((card) => ({ verb: "AttachToRingBearer" as const, code: card.code })),
         ...dealt,

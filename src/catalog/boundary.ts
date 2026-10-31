@@ -125,6 +125,8 @@ const stageSchema = z.strictObject({
   code: z.string(),
   // The stages defeating this one proceeds to, one of them at random, the rest removed from the game (BranchStage, 01120:B:1).
   branch: z.array(z.string()).min(2).optional(),
+  // The number of stages the first player looks at when this stage is defeated on-course (LookAtStages, 11016:B:3).
+  look: z.number().int().min(2).optional(),
 });
 
 const widgetsSchema = z.strictObject({
@@ -155,6 +157,11 @@ export const scenarioDefinitionSchema = z.strictObject({
   // it takes the place the Nightmare setup card has. Its Resolution records are appended to `resolution`.
   modeCard: z.strictObject({ code: z.string().min(1), side: z.enum(["A", "B"]) }).optional(),
   bookletPage: z.number().int().optional(),
+  // The part number of the scenario's campaign card (its place in a campaign with XP, counting from 1): "X is the campaign card's part number".
+  part: z.number().int().positive().optional(),
+  // The campaign card's Setup instructions that need the quest card's Setup done first (a Dream-chaser Setup that names the ship-objectives the quest
+  // card's Setup prepares): they resolve in a frame after it (rules/setup.ts).
+  afterSetup: z.array(instructionSchema).optional(),
 });
 
 export type RingsDbPack = z.infer<typeof ringsDbPackSchema>;

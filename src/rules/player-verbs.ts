@@ -157,7 +157,8 @@ export function runPlayerVerb(
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       if (!state.cards[id] || amount <= 0) return state;
       if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps);
-      return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
+      // An encounter or campaign card's damage is no player card effect, so a Ship objective's immunity to those does not stop it (dcce.ship-objectives).
+      return placeDamage(state, id, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
     }
     case "PlaceProgressOn": {
       const scope = frameScope(state, focus.seat, focus.sourceId);

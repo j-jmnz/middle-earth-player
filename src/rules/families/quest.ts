@@ -4,7 +4,7 @@ import type { Instruction, SimpleInstruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../cause.ts";
-import { openBranch } from "../choices.ts";
+import { openBranch , askTarget } from "../choices.ts";
 import { characters } from "../combat.ts";
 import { hasTrait } from "../conditions.ts";
 import type { EngineStep } from "../intents.ts";
@@ -22,6 +22,7 @@ import type { Focus } from "./index.ts";
 import { lowerCardThreat, makeActive, moveProgress, removeProgressFromQuest } from "./quest-places.ts";
 import { raiseQuestThreat, resetThreat } from "./quest-threat.ts";
 import { advanceStage } from "../quest.ts";
+import { keepStage, lookedStages, shuffleStages } from "./quest-order.ts";
 import { restricted } from "../restrictions.ts";
 import { afterProgress } from "../stage-reveal.ts";
 
@@ -77,11 +78,29 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     // Read when the scenario's definition is built (BranchStage, rules/families/quest-branch.ts); nothing to do when it runs.
     case "BranchStage":
       return state;
+    case "ShuffleStages":
+      return shuffleStages(state, instruction.codes);
+    case "LookAtStages":
+      return lookAtStages(state, instruction, focus, ctx, steps);
     case "RemoveProgressFromQuest":
       return removeProgressFromQuest(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
+}
+
+// LookAtStages (families/quest-order.ts): the first player looks at the top stages of the quest deck and chooses the one the quest advances to; the
+// others go to the bottom of the deck. A deck of one stage goes without asking. Null outside the frame the defeated stage pushed.
+function lookAtStages(state: ScenarioState, instruction: Verb<"LookAtStages">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (state.stageChoice !== "asking") return state;
+  const looked = lookedStages(state, instruction.count);
+  const chosen = focus.chosen ?? (looked.length === 1 ? looked[0] : undefined);
+  if (!chosen || !looked.includes(chosen)) {
+    const cause = currentCause(steps, UNATTRIBUTED);
+    return askTarget(state, { instruction, seat: focus.seat, chosen: null, cause }, looked);
+  }
+  const before = steps.length;
+  return afterProgress(advanceStage(keepStage(state, looked, chosen), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
 }
 
 function withModifier(state: ScenarioState, modifier: Modifier): ScenarioState {

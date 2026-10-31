@@ -23,5 +23,14 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("GainXp"), amount: z.number().int().refine((value) => value !== 0, { message: "amount is 0" }), each: xpCountSchema.optional(), max: z.number().int().positive().optional(), ...when }),
 ] as const;
 
-export const TRIGGERS = [] as const;
-export const FLAGS = [] as const;
+export const TRIGGERS = [
+  // About a seat: it drew cards (the event's amount, the effect's X, is how many) by the resource phase or a card effect, once the draw is done: "After a
+  // player draws any number of cards, that player raises their threat by that number" (11217:A:2). Announced only in a game that has the Hard/Expert
+  // Mode card (dcce.hard-expert), so no other game's events change.
+  "cardsDrawn",
+] as const;
+export const FLAGS = [
+  // On a seat: its threat is lowered by player card effects by at most this much each round ("cannot be reduced by more than 1 each round", 11217:A:1;
+  // dcce.hard-expert). The reductions made this round are kept in the state (`threatLoweredBy`) until the round ends.
+  "threatReductionCap",
+] as const;

@@ -272,12 +272,14 @@ export function campaignScenario(data: ScenarioData): ScenarioData {
 }
 
 // A quest card whose Forced effect names the stages its defeat proceeds to (BranchStage, 01120:B:1) carries them as its `branch`.
-function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[] } {
+// A stage that names LookAtStages (11016:B:3) carries the number of stages it looks at as its `look`.
+function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
-  return branch?.verb === "BranchStage" ? { code, branch: branch.codes } : { code };
+  const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
+  return { code, ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}) };
 }
 
-export function scenarioDefinition(data: ScenarioData, _campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
+export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
   const burden = burdenCodes(data);
   return scenarioDefinitionSchema.parse({
     id: data.id,
@@ -295,5 +297,6 @@ export function scenarioDefinition(data: ScenarioData, _campaign: CampaignData, 
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(data.life != null ? { life: data.life } : {}),
     campaignCard: data.campaignCard,
+    ...(campaign.xp ? { part: data.number } : {}),
   });
 }

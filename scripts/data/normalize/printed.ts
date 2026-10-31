@@ -49,6 +49,12 @@ function ledgerKeywords(entry: LedgerEntry): PrintedKeywords {
 
 // Cards whose text came from Hall of Beorn take the ledger text. The core-set cards of the starter lists keep
 // RingsDB's marked-up text (the card screen renders it); their ledger entries are still compared.
+function pickBackStats(back: Card["back"]): Partial<Record<"willpower" | "attack" | "defense" | "health", number>> {
+  const stats: Partial<Record<"willpower" | "attack" | "defense" | "health", number>> = {};
+  for (const stat of ["willpower", "attack", "defense", "health"] as const) if (back?.[stat] != null) stats[stat] = back[stat];
+  return stats;
+}
+
 export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: Card[]; differences: Difference[] } {
   const differences: Difference[] = [];
   const out = cards.map((card) => {
@@ -70,7 +76,8 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
     // every campaign, quest, encounter, boon and burden card). A deck-legal player card keeps its RingsDB text.
     if (card.deckLegal && !card.printings.some((printing) => printing.pack === "TFotR")) return card;
     const backText = b ? (b.lines.length > 0 ? b.lines.join("\n") : null) : (card.back?.text ?? null);
-    const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null } : null;
+    // The stats an override read from the scan of the Upgraded side stay on it (dcce.scalable-upgradable).
+    const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null, ...pickBackStats(card.back) } : null;
     // A quest stage is played on its side B, so its keywords (Sailing) are read from that side too.
     const sea = a && LEDGER_KEYWORD_PACKS.has(a.printing) ? { keywords: { ...(card.keywords ?? {}), ...ledgerKeywords(a), ...(card.type === "quest" && b ? ledgerKeywords(b) : {}) } } : {};
     return {

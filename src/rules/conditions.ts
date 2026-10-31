@@ -242,6 +242,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "x":
       return (scope.x ?? 0) >= condition.min;
+    case "dealt":
+      return (scope.dealt ?? 0) >= (condition.min ?? 1);
     case "distinctTraits":
       return distinctTraitCount(state, scope.actor, ctx) >= condition.min;
     case "damageReached": {

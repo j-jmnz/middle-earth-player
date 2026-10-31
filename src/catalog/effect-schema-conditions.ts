@@ -81,6 +81,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Each surviving player's threat is at most `max` ("1 XP if each surviving player's threat is 40 or less", dcce.gaining-xp): read at a campaign
   // card's Resolution, true with no surviving player.
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
+  // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
+  // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
+  z.strictObject({ kind: z.literal("dealt"), min: z.number().int().positive().optional() }),
   // The Heading card's setting (dcce.heading): on-course (Sun, the only on-course setting), off-course (Cloud, Rain or Storm), or at the worst
   // setting (Storm). False when the game has no Heading card. Read by the sea family (src/rules/families/sea-heading.ts).
   z.strictObject({ kind: z.literal("heading"), is: z.enum(["onCourse", "offCourse", "worst"]) }),

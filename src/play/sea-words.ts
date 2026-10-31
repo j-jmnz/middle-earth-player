@@ -1,6 +1,9 @@
 // The words of the sea family's verbs (src/catalog/families/sea.ts) inside a choice: what a branch of a Choose does ("Either shift your heading
 // off-course or deal 1 damage to each exhausted character", 11055:A:1).
 import type { Instruction } from "../catalog/boundary.ts";
+import type { ScenarioState } from "../rules/state.ts";
+
+import type { ChoiceNames, PickWords } from "./choice-words.ts";
 
 /** One sea instruction in words, or null when it is not one of them. */
 export function seaWords(instruction: Instruction): string | null {
@@ -13,9 +16,49 @@ export function seaWords(instruction: Instruction): string | null {
     }
     case "EngageLastPlayer":
       return "it engages the last player";
+    case "DamageShip":
+      return "deal damage to a Ship objective you control";
+    case "SearchShips":
+      return "add the Ship enemy with the highest Threat to the staging area";
     default:
       return null;
   }
+}
+
+/** What a sea verb that asks a player for a card or an option says to ask (dcce.prepare-your-fleet, 11171:A:2, 11016:B:3, 11021:A:1, 110139:A:4, 110139:B:5). Null for any other verb. */
+export function seaPickWords(instruction: Instruction, names: ChoiceNames): PickWords | null {
+  switch (instruction.verb) {
+    case "PrepareFleet":
+      return { verb: "Take", prompt: "Choose a ship-objective to take control of. One player must take the Dream-chaser." };
+    case "FitShips":
+      return { verb: "Fit", prompt: `Choose a Modification boon (${instruction.codes.map((code) => names.code(code)).join(", ")}) to attach to your ship-objective.` };
+    case "TradeShipDamage":
+      return { verb: "Choose", prompt: `You may deal ${instruction.damage} damage to your ship-objective to add ${instruction.resources} resource to a hero's pool.` };
+    case "LookAtStages":
+      return { verb: "Advance", prompt: "Look at the top stages of the quest deck and choose the one the quest advances to. The other goes to the bottom of the quest deck." };
+    case "SearchShips":
+      return { verb: "Add", prompt: "Choose which Ship enemy with the highest Threat is added to the staging area." };
+    case "NameCard":
+      return { verb: "Name", prompt: "Name a card in a deck." };
+    case "DiscardFromAnyDeck":
+      return { verb: "Discard", prompt: `Choose the deck whose top ${instruction.count === 1 ? "card is" : `${instruction.count} cards are`} discarded.` };
+    default:
+      return null;
+  }
+}
+
+/** The label of an option a sea verb offers that is not a card: trade or keep the damage, a deck to discard from, a title to name. Null for a card (the sheet names it). */
+export function seaOptionLabel(instruction: Instruction, id: string, game: ScenarioState, _names: ChoiceNames): string | null {
+  if (instruction.verb === "TradeShipDamage" && (id === "trade" || id === "keep")) {
+    return id === "trade" ? `Trade: ${instruction.damage} damage to the ship for ${instruction.resources} resource` : "Keep the ship as it is";
+  }
+  if (instruction.verb === "DiscardFromAnyDeck") {
+    if (id === "encounter") return "The encounter deck";
+    if (id === "corsair") return "The Corsair deck";
+    if (id.startsWith("seat:")) return game.seatCount > 1 ? `Player ${Number(id.slice(5)) + 1}'s deck` : "Your deck";
+  }
+  if (instruction.verb === "NameCard" && id.startsWith("name:")) return id.slice("name:".length);
+  return null;
 }
 
 // ---- What the table says of the sea family's pieces (phase 39b; docs/design-system-table.md). Pure, so a test reads every sentence. ----

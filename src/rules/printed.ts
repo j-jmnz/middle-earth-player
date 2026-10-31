@@ -1,11 +1,16 @@
 import type { Card } from "../catalog/card-facts.ts";
+import type { UpgradedStats } from "../catalog/schema.ts";
 
 // The part of a data/cards record the engine reads. A catalog row maps onto it (src/campaign/cards.ts).
 export type PrintedSource = Pick<
   Card,
   | "code" | "name" | "type" | "traits" | "sphere" | "cost" | "threat" | "willpower" | "attack" | "defense" | "health"
   | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType" | "encounterSet"
->;
+> & {
+  // The stats of the Upgraded side, side B (a catalog row carries them as `upgraded`, a data/cards record as `back`).
+  upgraded?: UpgradedStats | null;
+  back?: Card["back"];
+};
 
 export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral" | "fellowship" | "baggins";
 
@@ -85,6 +90,8 @@ export type PrintedCard = {
   ship: ShipKind | null;
   // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).
   encounterSet: string | null;
+  // The stats a card dealt on its Upgraded side, side B, has in place of the printed ones (dcce.scalable-upgradable). Null for a card without.
+  upgraded: UpgradedStats | null;
 };
 
 const EMPTY_KEYWORDS: Keywords = {
@@ -108,6 +115,12 @@ const EMPTY_KEYWORDS: Keywords = {
   boarding: null,
   sailingSuccess: null,
 };
+
+// The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable).
+function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
+  if (back?.willpower == null || back.attack == null || back.defense == null || back.health == null) return null;
+  return { willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health };
+}
 
 // The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
 // the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
@@ -139,6 +152,7 @@ export function definePrinted(
     backType: null,
     ship: null,
     encounterSet: null,
+    upgraded: null,
     ...card,
     keywords: { ...EMPTY_KEYWORDS, ...card.keywords },
   };
@@ -224,6 +238,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     backType: card.backType,
     ship,
     encounterSet: card.encounterSet,
+    upgraded: card.upgraded ?? upgradedOfBack(card.back),
     keywords: {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,

@@ -14,6 +14,10 @@ import { endCorsairDeck, prepareCorsairDeck, revealCorsair } from "./sea-corsair
 import { prepareFleet } from "./sea-fleet.ts";
 import { shiftHeading } from "./sea-heading.ts";
 import { lastPlayer } from "./sea-players.ts";
+import { damageShip, fitShips, tradeShipDamage } from "./sea-campaign.ts";
+import { boardNow } from "./sea-boarding.ts";
+import { searchShips } from "./sea-search.ts";
+import { discardFromAnyDeck, nameCard, plunderHand } from "./sea-cards.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -34,6 +38,25 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "EngageLastPlayer":
       return focus.sourceId ? engageEnemy(state, lastPlayer(state), focus.sourceId, steps) : state;
+    case "Board":
+      return boardNow(state, focus.sourceId, focus.seat, ctx, steps);
+    case "SearchShips":
+      return searchShips(state, instruction, focus, ctx, steps);
+    case "FitShips":
+      return fitShips(state, instruction, focus, ctx, steps);
+    case "TradeShipDamage":
+      return tradeShipDamage(state, instruction, focus, ctx, steps);
+    case "PlunderHand":
+      return plunderHand(state, focus, ctx);
+    case "NameCard":
+      return nameCard(state, instruction, focus, ctx, steps);
+    case "DiscardFromAnyDeck":
+      return discardFromAnyDeck(state, instruction, focus, ctx, steps);
+    case "DamageShip":
+      return damageShip(state, instruction, focus, ctx, steps);
+    // Dealt when the game starts (src/campaign/start.ts): the card joins the Corsair deck the quest card's Setup shuffles.
+    case "ShuffleIntoCorsairDeck":
+      return state;
     default:
       return null;
   }

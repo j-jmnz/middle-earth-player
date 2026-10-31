@@ -5,7 +5,7 @@ import { reduce } from "../reduce.ts";
 import { engageWith } from "../quest.ts";
 import type { ScenarioState } from "../state.ts";
 import { moveCard, spawn } from "../zones.ts";
-import { board, boardingOf } from "./sea-boarding.ts";
+import { board, boardNow, boardingOf } from "./sea-boarding.ts";
 import { enemy, hero, seaTable, send, shipEnemy, until, type Table } from "./sea-table.ts";
 
 // Rules: dcce.boarding, dcce.ship-enemies (data/rules/entries.json). When a ship-enemy with Boarding X engages a player from the staging area, the top
@@ -82,6 +82,10 @@ describe("Boarding X (dcce.boarding)", () => {
     const moved = { ...state, cards: { ...state.cards, [ids.corsair!]: { ...state.cards[ids.corsair!]!, zone: "engaged" as const, controller: 0 } } };
     expect(board(moved, { trigger: "engaged", seat: 0, subject: ids.corsair! }, ctx, [])).toBe(moved);
     expect(board(moved, { trigger: "revealed", seat: 0, subject: ids.corsair!, fromStaging: true }, ctx, [])).toBe(moved);
-    expect(engagedCodes(board(moved, { trigger: "engaged", seat: 0, subject: ids.corsair!, fromStaging: true }, ctx, []))).toEqual(["pirate", "pirate"]);
+    // The engagement from the staging area pushes the keyword as a frame, under the Responses to the engagement; the frame reveals the cards when it resolves.
+    const framed = board(moved, { trigger: "engaged", seat: 0, subject: ids.corsair!, fromStaging: true }, ctx, []);
+    expect(framed.stack).toHaveLength(1);
+    expect(engagedCodes(framed)).toEqual([]);
+    expect(engagedCodes(boardNow(moved, ids.corsair!, 0, ctx, []))).toEqual(["pirate", "pirate"]);
   });
 });

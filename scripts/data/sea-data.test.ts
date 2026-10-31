@@ -57,6 +57,21 @@ describe("the Dream-chaser ships", () => {
   });
 });
 
+describe("the Upgraded sides of the ships (dcce.scalable-upgradable)", () => {
+  it("carry the stats their side B scan prints, as the ledger notes of side B record them", () => {
+    let compared = 0;
+    for (const entry of entries.filter((candidate) => candidate.side === "B" && /Ship-objective stats/.test(candidate.notes ?? ""))) {
+      const card = cards.get(entry.code) as Card;
+      const read = noted(entry.notes);
+      for (const stat of ["willpower", "attack", "defense", "health"] as const) {
+        expect(card.back?.[stat], `${entry.code} ${card.name} side B ${stat}`).toBe(read[stat]);
+        compared += 1;
+      }
+    }
+    expect(compared).toBeGreaterThanOrEqual(24);
+  });
+});
+
 describe("the keywords the ledger reads", () => {
   it("are on every card whose lines open with them", () => {
     for (const entry of entries.filter((candidate) => candidate.side === "A")) {

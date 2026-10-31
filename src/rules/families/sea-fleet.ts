@@ -13,6 +13,9 @@ import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { printedOf } from "../printed.ts";
 import { dealtFace } from "./dreamchaser-facts.ts";
+import { recordsOfFace } from "./dreamchaser-faces.ts";
+import { pushCardEffects } from "../effect-frames.ts";
+import { effectsOf } from "../listen.ts";
 import type { ScenarioState } from "../state.ts";
 import { inPlay, livingSeats, updateCard } from "../state.ts";
 import { attachTo, moveCard } from "../zones.ts";
@@ -78,6 +81,19 @@ function attachHeading(state: ScenarioState, ctx: ReduceContext): ScenarioState 
   return { ...updateCard(moved, heading.id, { face: "up" }), sea: { ...sea, heading: "Sun", headingCard: heading.id } };
 }
 
+// A ship's Setup lines ("Raise your starting threat by 3", "Reduce your starting threat by 6") resolve for the player who took it, on the side it shows, once the
+// whole fleet is prepared.
+function fleetSetups(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const id of ships(state, ctx).taken) {
+    const ship = next.cards[id];
+    if (!ship || ship.controller == null) continue;
+    const records = recordsOfFace(ship, effectsOf(ctx, ship.code)).filter((effect) => effect.timing === "setup");
+    if (records.length > 0) next = pushCardEffects(next, "setup", id, ship.controller, false, records, ctx, steps);
+  }
+  return next;
+}
+
 /** PrepareFleet (dcce.prepare-your-fleet): each seat takes its ship in turn (a seat with a choice is asked, one with a single legal ship takes it);
  * then the unused ships leave the game and the Heading card goes on the Dream-chaser, on-course. */
 export function prepareFleet(state: ScenarioState, instruction: Extract<Instruction, { verb: "PrepareFleet" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -88,7 +104,7 @@ export function prepareFleet(state: ScenarioState, instruction: Extract<Instruct
     const choice = fleetChoice(next, ctx);
     if (!choice) {
       for (const id of ships(next, ctx).free) next = moveCard(next, id, { zone: "removed" });
-      return attachHeading(next, ctx);
+      return fleetSetups(attachHeading(next, ctx), ctx, steps);
     }
     const { seat, options } = choice;
     if (options.length === 0) return { ...next, failure: "The fleet has no ship left to take" };

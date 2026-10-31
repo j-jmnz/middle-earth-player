@@ -434,7 +434,9 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const stated = { ...named, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health", "victory"]) };
     // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY).
     const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : stated;
-    const next = outOfScope(overrides, typed) ? { ...typed, deckLegal: false } : typed;
+    // The stats of the Upgraded side, side B, which Hall of Beorn has no fields for either (dcce.scalable-upgradable).
+    const backed = set?.back && typed.back ? { ...typed, back: { ...typed.back, ...set.back } } : typed;
+    const next = outOfScope(overrides, backed) ? { ...backed, deckLegal: false } : backed;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

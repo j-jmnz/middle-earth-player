@@ -177,7 +177,11 @@ function pruneHideFailures(state: ScenarioState): ScenarioState {
 
 // Records that only matter during one round: Hide failures and uses of limited effects.
 export function pruneRoundRecords(state: ScenarioState): ScenarioState {
-  return pruneUses(pruneHideFailures(state));
+  const pruned = pruneUses(pruneHideFailures(state));
+  // What a card was dealt and a seat was relieved of this round (the flags damageCap and threatReductionCap) lasts one round.
+  if (pruned.roundDamage == null && pruned.threatLoweredBy == null) return pruned;
+  const { roundDamage: _damage, threatLoweredBy: _lowered, ...rest } = pruned;
+  return rest;
 }
 
 // A Hide test passes when the committed willpower is at least the threat of the cards discarded (mec109.hide-tests).

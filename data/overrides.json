@@ -159,10 +159,16 @@
         "willpower": 3,
         "attack": 4,
         "defense": 3,
-        "health": 16
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 5,
+          "defense": 4,
+          "health": 17
+        }
       },
       "reason": "Duskbringer is one of the six ship-objectives of The Dream-chaser's Fleet encounter set (dcce.ship-objectives, dcce.prepare-your-fleet). Hall of Beorn gives the ships no encounter info and lists only the four of the original box in its scenario files, so the new ship has no set from the sources. The scan prints Willpower 3, Attack 4, Defense 3 and 16 hit points (the ledger notes record the reading); Hall of Beorn has no stat fields for a ship-objective, so the engine would otherwise have none.",
-      "source": "dcce.ship-objectives; dcce.prepare-your-fleet; scan 110138.A, data/printed/dream-chaser.json"
+      "source": "dcce.ship-objectives; dcce.prepare-your-fleet; scan 110138.A, data/printed/dream-chaser.json, scan 110138.B"
     },
     {
       "match": {
@@ -173,10 +179,16 @@
         "willpower": 4,
         "attack": 4,
         "defense": 3,
-        "health": 17
+        "health": 17,
+        "back": {
+          "willpower": 5,
+          "attack": 5,
+          "defense": 4,
+          "health": 18
+        }
       },
       "reason": "Glórinaith is one of the six ship-objectives of The Dream-chaser's Fleet encounter set (dcce.ship-objectives, dcce.prepare-your-fleet). Hall of Beorn gives the ships no encounter info and lists only the four of the original box in its scenario files, so the new ship has no set from the sources. The scan prints Willpower 4, Attack 4, Defense 3 and 17 hit points (the ledger notes record the reading); Hall of Beorn has no stat fields for a ship-objective, so the engine would otherwise have none.",
-      "source": "dcce.ship-objectives; dcce.prepare-your-fleet; scan 110139.A, data/printed/dream-chaser.json"
+      "source": "dcce.ship-objectives; dcce.prepare-your-fleet; scan 110139.A, data/printed/dream-chaser.json, scan 110139.B"
     },
     {
       "match": {
@@ -238,10 +250,16 @@
         "willpower": 5,
         "attack": 4,
         "defense": 4,
-        "health": 18
+        "health": 18,
+        "back": {
+          "willpower": 6,
+          "attack": 5,
+          "defense": 5,
+          "health": 19
+        }
       },
-      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 5, Attack 4, Defense 4 and 18 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
-      "source": "scan 110136.A, data/printed/dream-chaser.json"
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 5, Attack 4, Defense 4 and 18 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110136.A, data/printed/dream-chaser.json, scan 110136.B"
     },
     {
       "match": {
@@ -251,10 +269,16 @@
         "willpower": 3,
         "attack": 3,
         "defense": 4,
-        "health": 16
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 4,
+          "defense": 5,
+          "health": 18
+        }
       },
-      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 4 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
-      "source": "scan 110137.A, data/printed/dream-chaser.json"
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 4 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110137.A, data/printed/dream-chaser.json, scan 110137.B"
     },
     {
       "match": {
@@ -264,10 +288,16 @@
         "willpower": 3,
         "attack": 3,
         "defense": 5,
-        "health": 16
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 4,
+          "defense": 6,
+          "health": 17
+        }
       },
-      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 5 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
-      "source": "scan 110140.A, data/printed/dream-chaser.json"
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 5 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110140.A, data/printed/dream-chaser.json, scan 110140.B"
     },
     {
       "match": {
@@ -277,10 +307,16 @@
         "willpower": 2,
         "attack": 4,
         "defense": 2,
-        "health": 14
+        "health": 14,
+        "back": {
+          "willpower": 3,
+          "attack": 6,
+          "defense": 3,
+          "health": 16
+        }
       },
-      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 4, Defense 2 and 14 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
-      "source": "scan 110141.A, data/printed/dream-chaser.json"
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 4, Defense 2 and 14 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110141.A, data/printed/dream-chaser.json, scan 110141.B"
     },
     {
       "match": {
@@ -303,10 +339,16 @@
         "willpower": 2,
         "attack": 2,
         "defense": 2,
-        "health": 8
+        "health": 8,
+        "back": {
+          "willpower": 3,
+          "attack": 3,
+          "defense": 3,
+          "health": 10
+        }
       },
       "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 2, Defense 2 and 8 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
-      "source": "scan 110102.A, data/printed/dream-chaser.json"
+      "source": "scan 110102.A, data/printed/dream-chaser.json, scan 110102.B"
     },
     {
       "match": {

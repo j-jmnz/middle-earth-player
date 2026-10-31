@@ -21,6 +21,7 @@ import { placeQuestingProgress } from "./families/defense-damage.ts";
 import { freeSlot, placeOnActive } from "./families/south-locations.ts";
 import { noteQuestPlaced, questRoom } from "./families/caves-progress.ts";
 import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts";
+import { orderedNext, stageToVictory } from "./families/quest-order.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -43,6 +44,15 @@ export function stagingThreat(state: ScenarioState, cards: Cards): number {
     // "Does not contribute its Threat" (a flag on the card).
     if (!instance || flagged(state, id, "noThreatContribution")) continue;
     total += modifiedStat(state, instance, "threat", cards);
+  }
+  // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1).
+  if (state.sea) {
+    for (const seat of state.seats) {
+      for (const id of seat.engaged) {
+        const instance = state.cards[id];
+        if (instance && flagged(state, id, "engagedThreat") && !flagged(state, id, "noThreatContribution")) total += modifiedStat(state, instance, "threat", cards);
+      }
+    }
   }
   return withStagingThreat(state, total);
 }
@@ -173,18 +183,28 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (!currentId) return { ...next, stageCleared: true };
     const current = next.cards[currentId];
     if (!current) return { ...next, stageCleared: true };
+    // A defeated stage that waits for the first player to choose the next one (LookAtStages) stays where it is until the choice is made.
+    if (next.stageChoice === "due") return next;
     const index = next.stages.findIndex((stage) => stage.code === current.code);
+    // A quest that is ordered by its quest deck (ShuffleStages, LookAtStages, families/quest-order.ts) goes to the top stage of the deck, or asks.
+    const ordered = orderedNext(next, current.code);
+    if (ordered?.kind === "ask") return { ...next, stageChoice: "due" };
+    if (ordered?.kind === "end") return clearStage(next);
     // A quest that branches (BranchStage, 01120:B:1) chooses the next stage at random and ends at a stage it led to.
-    const branched = branchFrom(next, current.code);
+    const branched = ordered ? null : branchFrom(next, current.code);
     if (branched) next = branched.state;
-    const nextCode = branched ? branched.code : index < 0 ? undefined : next.stages[index + 1]?.code;
-    const nextId = nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
+    const nextId = ordered ? ordered.id : (() => {
+      const nextCode = branched ? branched.code : index < 0 ? undefined : next.stages[index + 1]?.code;
+      return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
+    })();
     if (!nextId) return clearStage(next);
+    const nextCode = next.cards[nextId]?.code;
     // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
     next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
-    next = moveCard(next, currentId, { zone: "setAside" });
+    next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : "setAside" });
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: "B" });
+    if (next.stageChoice) next = withoutStageChoice(next);
     if (nextCode) next = reachedStage(next, nextCode);
     steps.push({ kind: "advance", cardId: nextId });
     const arrived = next.cards[nextId];
@@ -194,6 +214,11 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (points == null || points === 0 || (arrived?.progress ?? 0) < points || !canAdvance(next)) return next;
   }
   return { ...next, stageCleared: true };
+}
+
+function withoutStageChoice(state: ScenarioState): ScenarioState {
+  const { stageChoice: _asked, ...rest } = state;
+  return rest;
 }
 
 function clearStage(state: ScenarioState): ScenarioState {

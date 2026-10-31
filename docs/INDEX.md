@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~48.2K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~48.9K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -89,19 +89,19 @@ Read the sections your task touches.
     - 537–557 Escape from Dol Guldur (~2.7K)
     - 558–572 The Oath (~2.3K)
     - 573–590 The Caves of Nibin-Dûm (~2.3K)
-  - 591–612 Dream-chaser (~3.2K)
-  - 613–621 Nightmare (~420)
-  - 622–660 Deckbuilding (~1.8K) ← 1
-  - 661–739 Effects (~3.2K)
-    - 663–721 Three layers (~2.4K)
-    - 722–731 Player side quests, contracts and saga cards (~430)
-    - 732–735 Window stack (~100)
-    - 736–739 Coverage test (~270)
-  - 740–760 Data sources (~560)
-  - 761–779 Card images (~1.1K) ← 6
-  - 780–804 Persistence and shipping (~1.5K)
-  - 805–845 Screens (~4.1K) ← 1
-    - 831–845 Table screen (~1.5K) ← 4
+  - 591–618 Dream-chaser (~3.8K)
+  - 619–627 Nightmare (~420)
+  - 628–666 Deckbuilding (~1.8K) ← 1
+  - 667–745 Effects (~3.2K)
+    - 669–727 Three layers (~2.4K)
+    - 728–737 Player side quests, contracts and saga cards (~430)
+    - 738–741 Window stack (~100)
+    - 742–745 Coverage test (~270)
+  - 746–766 Data sources (~560)
+  - 767–785 Card images (~1.1K) ← 6
+  - 786–810 Persistence and shipping (~1.5K)
+  - 811–851 Screens (~4.1K) ← 1
+    - 837–851 Table screen (~1.5K) ← 4
 - `docs/design-system-table.md` — Design system — Table (landscape) (~20.4K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~1.9K) ← 4

@@ -61,6 +61,11 @@ export const cardSchema = z.strictObject({
       text: z.string().nullable(),
       questPoints: z.number().int().nullable(),
       stage: z.string().nullable(),
+      // The stats the Upgraded side of a ship-objective prints (dcce.scalable-upgradable); absent on any other side.
+      willpower: z.number().int().optional(),
+      attack: z.number().int().optional(),
+      defense: z.number().int().optional(),
+      health: z.number().int().optional(),
     })
     .nullable(),
   printings: z.array(printingSchema).min(1),

@@ -20,6 +20,7 @@ import type { ScenarioState } from "./state.ts";
 import { flagged, heldAmount, inPlay, updateCard } from "./state.ts";
 import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { withFrame } from "./windows.ts";
+import { queueEvent } from "./queue.ts";
 import { moveCard } from "./zones.ts";
 import { shadowFace } from "./families/defense-shadow.ts";
 import { drawCards } from "./families/dungeon-deck.ts";
@@ -166,7 +167,11 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 // An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either.
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
-  return drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
+  const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
+  // The Hard/Expert Mode card hears "a player draws any number of cards" (dcce.hard-expert); no other game announces it.
+  if (!Object.values(drawn.cards).some((card) => card.zone === "modeCard")) return drawn;
+  const got = (drawn.seats[seat]?.hand.length ?? 0) - (state.seats[seat]?.hand.length ?? 0);
+  return got > 0 ? queueEvent(drawn, { trigger: "cardsDrawn", seat, amount: got }) : drawn;
 }
 
 function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {

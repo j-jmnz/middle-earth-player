@@ -28,6 +28,9 @@ export const amountExprSchema = z.strictObject({
   stage: z.literal(true).optional(),
   // The number of players in the game.
   players: z.literal(true).optional(),
+  // The part number of the campaign card of the scenario being played: its place in its campaign, counting from 1 ("X is the campaign card's part
+  // number", 11176:A:3).
+  part: z.literal(true).optional(),
   // The actor's threat, and its tens digit (17084:A:1).
   threat: z.enum(["actor", "tens"]).optional(),
   // Cards in the actor's hand.

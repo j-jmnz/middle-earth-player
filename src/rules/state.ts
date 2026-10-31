@@ -258,10 +258,20 @@ export type ScenarioState = {
   revealCursor: { seats: readonly number[]; index: number } | null;
   // True between the two passes that resolve the quest.
   questResolved: boolean;
-  stages: readonly { code: string; branch?: readonly string[] }[];
+  stages: readonly { code: string; branch?: readonly string[]; look?: number }[];
+  // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
+  // quest card's Setup is done (ScenarioDefinition.afterSetup).
+  part?: number;
+  afterSetup?: { card: string; instructions: readonly Instruction[] };
+  // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
+  // player card effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
+  roundDamage?: Readonly<Record<string, number>>;
+  threatLoweredBy?: Readonly<Record<number, number>>;
   // The codes of the stages the quest advanced to, in order. Kept only by a quest that branches (BranchStage), for a Resolution that
   // reads which branch was taken ("If stage 3B was Beorn's Path", 01129:B:1).
   stagesReached?: readonly string[];
+  // The defeated stage waits for the first player to choose the next one (LookAtStages): "due" until its record is pushed, "asking" while it runs.
+  stageChoice?: "due" | "asking";
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
   resolution: ScenarioDefinition["resolution"];
@@ -435,6 +445,8 @@ export function blankScenario(input: {
     setup: input.definition.setup,
     widgets: input.definition.widgets,
     resolution: input.definition.resolution,
+    ...(input.definition.part != null ? { part: input.definition.part } : {}),
+    ...(input.definition.afterSetup && input.definition.afterSetup.length > 0 && input.definition.campaignCard ? { afterSetup: { card: input.definition.campaignCard, instructions: input.definition.afterSetup } } : {}),
     resolutionAt: 0,
     resolutionSeat: 0,
     resolutionLog: { earned: [], fallen: [], captives: [] },

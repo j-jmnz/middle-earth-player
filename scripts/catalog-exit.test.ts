@@ -101,7 +101,7 @@ describe("built catalog", () => {
         }
       }
       expect(unpictured).toEqual([]);
-      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("dream-chaser")).toMatchObject({ name: "Dream-chaser", scenario_count: 9, playable: 0 });
+      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("dream-chaser")).toMatchObject({ name: "Dream-chaser", scenario_count: 9, playable: 1 });
       expect(database.prepare("select campaign_id from cards where code = ?").get("11171")?.campaign_id).toBe("dream-chaser");
       expect(database.prepare("select campaign_id from cards where code = ?").get("12019")?.campaign_id).toBe("dream-chaser");
       expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(

@@ -2,9 +2,9 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# Phase 39b. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `sea-solo`
-# (scripts/e2e-fixtures.ts): a real dealt game of Voyage Across Belegaer, true solo, the Dream-chaser and one other ship, parked on the first Sailing test's commit. No Dream-chaser
-# scenario deals before phase 40, so the fixture and the run move to phase 40's phone half (docs/phases/phase-39b-ships-on-the-table.md, E2E).
+# Phases 39b and 40. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `sea-solo`
+# (scripts/e2e-voyage.ts, written by scripts/e2e-fixtures.ts): a real dealt game of Voyage Across Belegaer, true solo, from the blank log of a new Dream-chaser playthrough, parked on the first
+# Sailing test's commit.
 # The engine shifts the heading off-course as the test opens, before the commit (dcce.sailing-tests, step 1), so the dial reads Cloud at the commit. Which symbols the looked-at cards
 # show depends on the deal, so the flow keeps the heading for every symbol and ends on the Done every look has; its assertions hold whatever the cards are.
 - launchApp:

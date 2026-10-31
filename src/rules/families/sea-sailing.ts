@@ -83,14 +83,17 @@ export function performSailing(state: ScenarioState, ids: readonly string[], ctx
     count += committedWeight(next, id);
     next = updateCard(next, id, { exhausted: true });
   }
-  // 3. As many cards from the top of the encounter deck as characters; a deck too short is first shuffled with its discard pile.
+  // 3. As many cards from the top of the encounter deck as characters, and the additional cards a card in play says to look at ("look at 2 additional cards",
+  // 11050:A:1); a deck too short is first shuffled with its discard pile.
+  count += Math.max(0, heldAmount(next, "table", "sailingLook"));
   if (count > next.encounterDeck.length && next.encounterDiscard.length > 0) {
     steps.push({ kind: "resetEncounterDeck", count: next.encounterDiscard.length, cause: ruleCause("dcce.sailing-tests") });
     next = shuffleDiscardIn(next);
   }
   const looked = next.encounterDeck.slice(0, count);
   // 4. Each Sailing success symbol allows one shift on-course.
-  const symbols = successAmong(next, looked, ctx.cards);
+  // "Cancel the first Sailing success symbol found during each Sailing test" (11053:A:1): each such card cancels one.
+  const symbols = Math.max(0, successAmong(next, looked, ctx.cards) - Math.max(0, heldAmount(next, "table", "sailingCancel")));
   if (looked.length === 0) return finish(next, looked);
   if (symbols === 0 || headingIs(next, "onCourse") || next.sea?.heading == null) return askLookDone(next, looked);
   return askShift(next, looked, symbols);

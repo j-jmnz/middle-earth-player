@@ -187,6 +187,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.costIsX && at.x != null && printed.cost !== at.x) return false;
   if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
   if (spec.minCost != null && (printed.cost == null || printed.cost < spec.minCost)) return false;
+  if (spec.oddCost && (printed.cost == null || printed.cost % 2 !== 1)) return false;
   if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
   if (spec.noVictory && (printed.victory ?? 0) > 0) return false;
   if (spec.state === "ready" && instance.exhausted) return false;

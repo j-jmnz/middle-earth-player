@@ -23,8 +23,14 @@ import { damageGoesTo } from "./defense-damage.ts";
 function noteLanded(state: ScenarioState, landed: number): ScenarioState {
   const attack = state.pendingAttack;
   // Only an attack whose after-instructions read the damage it dealt keeps the number: every other attack's state is as it was.
-  if (!attack?.after || !readsAmount(attack.after, "dealt")) return state;
+  if (!attack?.after || !(readsAmount(attack.after, "dealt") || JSON.stringify(attack.after).includes('"kind":"dealt"'))) return state;
   return landed > 0 ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: (attack.defense?.landed ?? 0) + landed } } } : state;
+}
+
+// The excess damage of the attack in progress, kept for the effect it leaves for its end (excessToShip).
+function noteExcess(state: ScenarioState, excess: number): ScenarioState {
+  const attack = state.pendingAttack;
+  return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, excess: (attack.defense?.excess ?? 0) + excess } } } : state;
 }
 
 // The enemy's combat damage `raw` is placed on `assigned`; the excess goes to threat when the enemy says so. Every place an enemy
@@ -47,7 +53,8 @@ export function combatDamage(
   const placed = noteLanded(damaged, landed);
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
-  if (!toThreat && !toQuest) return placed;
+  const toShip = flagged(state, enemyId, "excessToShip");
+  if (!toThreat && !toQuest && !toShip) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -55,6 +62,8 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
+  // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
+  if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);
   const flag = toThreat ? "excessToThreat" : "excessToQuestProgress";
   const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
   const excessCause = record ? effectCause(record) : ruleCause("rr.damage");

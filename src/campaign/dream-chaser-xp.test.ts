@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { effectSchema } from "../catalog/boundary.ts";
 import { cards as cardTable } from "../catalog/schema.ts";
-import { campaignGameCodes, campaignScenario, sideInstructions } from "../catalog/scenario-data.ts";
+import { campaignGameCodes, campaignScenario, recordInstructions, sideInstructions } from "../catalog/scenario-data.ts";
 import { EFFECTS } from "../effects/index.ts";
 import { holds } from "../rules/conditions.ts";
 import type { PrintedCard } from "../rules/printed.ts";
@@ -245,7 +245,8 @@ describe("the deal in Campaign Mode", () => {
   it("without the card the game has none, and nothing is written for a campaign that has no marks", () => {
     const start = startFor(inputOf(world), 1);
     expect(start.definition.modeCard).toBeUndefined();
-    expect(start.definition.resolution).toEqual([]);
+    // Only the campaign card's own Resolution (11171:B): no Hard/Expert line follows it.
+    expect(start.definition.resolution).toEqual(recordInstructions(EFFECTS, loadScenario(VOYAGE).campaignCard, "resolution"));
     expect(start.facts).toBeUndefined();
   });
 
@@ -259,8 +260,8 @@ describe("the deal in Campaign Mode", () => {
     expect(scenario.reprints).toEqual({ "11080": "110136", "11081": "110137", "11082": "110140", "11083": "110141" });
     const setAside = (mode: "campaign" | "standalone") =>
       buildStart({ campaign, scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: [HERO_A], deck }], effects: EFFECTS, mode }).definition.setup.flatMap((instruction) => (instruction.verb === "SetAside" ? [instruction.code] : []));
-    // The two new ships (110138, 110139) are in both; the four originals become their reprints.
-    expect(setAside("campaign")).toEqual(["110138", "110139", "110136", "110137", "110140", "110141"]);
+    // The two new ships (110138, 110139) are in both; the four originals become their reprints. The campaign card sets the four Modification boons aside first.
+    expect(setAside("campaign")).toEqual(["11172", "11173", "11174", "11175", "110138", "110139", "110136", "110137", "110140", "110141"]);
     expect(setAside("standalone")).toEqual(["110138", "110139", "11080", "11081", "11082", "11083"]);
     expect(worldCodes(campaign, scenario, EFFECTS)).toEqual(expect.arrayContaining(["110136", "110141", MODE_CARD_CODE]));
   });
@@ -319,7 +320,9 @@ describe("Na'asiyah (dcce.naasiyah)", () => {
 describe("the effects that name the Hard/Expert card", () => {
   it("each record's lines are lines of its own side", () => {
     const records = EFFECTS.filter((effect) => effect.cardCode === MODE_CARD_CODE);
-    expect(records.map((effect) => effect.lines)).toEqual([["11217:A:3"], ["11217:B:4"]]);
+    // Every record names lines of one side only, and each side has its own (A: Hard, B: Expert).
+    expect(records.every((effect) => new Set(effect.lines.map((line) => line.split(":")[1])).size === 1)).toBe(true);
+    expect(records.map((effect) => effect.lines.join()).sort()).toEqual(["11217:A:1", "11217:A:2", "11217:A:3", "11217:B:1", "11217:B:2", "11217:B:3", "11217:B:3", "11217:B:4"]);
     expect(() => effectSchema.parse(records[0])).not.toThrow();
   });
 });
