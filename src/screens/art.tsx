@@ -16,6 +16,8 @@ import { FogVeil, LightVeil } from "./backdrop";
 import { heroVeil, rgbOf } from "./backdrop-scenes";
 import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, sceneBand, WHOLE, type Region } from "./art-crop";
 import { scenarioOf } from "./campaign-data";
+import { SceneCanvas } from "./scene-canvas";
+import { cssMask, filterMatrix, sceneMask, type MaskRamp } from "./scene-mask";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
@@ -29,6 +31,8 @@ export type ArtCard = { code: string; imagesrc: string | null };
 
 /** How Carved Stone dims a scene behind words: less colour, a little more contrast, darker. Not drawn inside a list row. */
 export const ART_FILTER = "saturate(0.62) contrast(1.12) brightness(0.8)";
+// ART_FILTER as a colour matrix, for a scene drawn on a canvas (GroundedScene on a phone).
+const ART_MATRIX = filterMatrix(0.62, 1.12, 0.8);
 
 /**
  * One region of a card picture covering a box. `width` and `height` fix the box; without a width the box fills its parent and
@@ -253,11 +257,12 @@ export function useArtGround(): { ground: string; blend: { mixBlendMode: "multip
 }
 
 /**
- * A scenario's scene at the head of a page (the briefing), met to the ground (useArtGround) at its foot and, with `edge`, at its right
- * so it sits in the fog of the pane beside it. `children` are laid over it unblended (the banner's words). `soft` is a picture that
- * stands inside a page's content (the Campaigns start block): 12 pt corners and every edge feathered into the page, so no rectangle
- * shows. The feather is a real alpha mask where the platform draws one (the browser); elsewhere the same gradients run to the ground,
- * which the blend turns to nothing.
+ * A scenario's scene at the head of a page (the briefing), faded out at its foot and, with `edge`, at its right so it sits in the fog
+ * of the pane beside it. `children` are laid over it unfaded (the banner's words). `soft` is a picture that stands inside a page's
+ * content (the Campaigns start block): 12 pt corners and every edge feathered into the page, so no rectangle shows. The fades are
+ * the picture's own alpha (sceneMask), not a colour laid over it, so they end in whatever fog is behind: a CSS mask in the browser
+ * (which still meets the ground with useArtGround's blend), a Skia canvas on a phone, where a view's blend does not reach the
+ * backdrop's canvas and a fade to the ground drew as a line.
  */
 export function GroundedScene({
   scenarioId,
@@ -276,13 +281,15 @@ export function GroundedScene({
   soft?: boolean;
   children?: ReactNode;
 }) {
-  const { ground, blend } = useArtGround();
+  const { blend } = useArtGround();
+  const t = useTableTokens();
   const s = useUiScale();
   const [width, setWidth] = useState(0);
-  // A band at the box's top when the box would blow the scene up (sceneBand); its fade meets the ground, and the words below it sit there.
+  // A band at the box's top when the box would blow the scene up (sceneBand); it fades out, and the words below it sit in the fog.
   const band = useSceneBand(scenarioId, width, height);
+  const ramps = sceneMask({ width, height, band, fade, edge, edgeWidth: 96 * s, soft });
   const fill = { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 } as const;
-  const side = (angle: number, size: number) => ({ position: "absolute" as const, ...(angle === 90 ? { top: 0, bottom: 0, left: 0, width: size } : angle === 270 ? { top: 0, bottom: 0, right: 0, width: size } : { top: 0, left: 0, right: 0, height: size }), backgroundImage: `linear-gradient(${angle}deg, ${ground}, ${withAlphaHex(ground, 0)})` });
+  const corners = soft ? { borderRadius: ITEM_RADIUS * s, overflow: "hidden" as const } : {};
   return (
     <View
       style={{ height }}
@@ -291,29 +298,33 @@ export function GroundedScene({
         setWidth((current) => (current === next ? current : next));
       }}
     >
-      <View
-        pointerEvents="none"
-        importantForAccessibility="no-hide-descendants"
-        style={{ ...fill, ...blend, ...(soft ? { borderRadius: ITEM_RADIUS * s, overflow: "hidden" as const, ...featherMask } : {}) }}
-      >
-        <SceneArt scenarioId={scenarioId} height={band} shade={shade} fade={fade} fadeTo={ground} bare />
-        {edge ? <View style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: 96 * s, backgroundImage: `linear-gradient(90deg, ${withAlphaHex(ground, 0)}, ${ground})` }} /> : null}
-        {soft ? (
-          <>
-            <View style={side(180, 28 * s)} />
-            <View style={side(90, 32 * s)} />
-            <View style={side(270, 32 * s)} />
-          </>
-        ) : null}
+      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" style={Platform.OS === "web" ? { ...fill, ...blend, ...corners, ...webMask(cssMask(ramps)) } : { ...fill, ...corners }}>
+        {Platform.OS === "web" ? (
+          <SceneArt scenarioId={scenarioId} height={band} shade={shade} bare />
+        ) : (
+          <NativeScene scenarioId={scenarioId} width={width} height={height} band={band} shade={shade == null ? null : { colors: [withAlphaHex(t.night, 0.55), withAlphaHex(t.night, 0)], to: shade * band }} ramps={ramps} />
+        )}
       </View>
       {children}
     </View>
   );
 }
 
-// The browser's feather for a soft scene: transparent at the top, the left and the right edge and at the foot, solid between.
-const FEATHER = "linear-gradient(180deg, transparent 0%, #000 16%, #000 52%, transparent 100%), linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%)";
-const featherMask = Platform.OS === "web" ? ({ maskImage: FEATHER, WebkitMaskImage: FEATHER, maskComposite: "intersect", WebkitMaskComposite: "source-in" } as object) : {};
+// The browser's mask for a scene: the ramps intersected, so each multiplies the picture's alpha.
+const webMask = (mask: string) => ({ maskImage: mask, WebkitMaskImage: mask, maskComposite: "intersect", WebkitMaskComposite: "source-in" }) as object;
+
+// A phone's scene: the picture GroundedScene fades, drawn on a canvas (SceneCanvas) once its file and the box's width are known.
+function NativeScene({ scenarioId, width, height, band, shade, ramps }: { scenarioId: string | null | undefined; width: number; height: number; band: number; shade: { colors: [string, string]; to: number } | null; ramps: MaskRamp[] }) {
+  const { card, region, aspect } = useScenePicture(scenarioId);
+  const source = useCardPreview(card?.code ?? "", card?.imagesrc ?? null);
+  useEffect(() => {
+    if (!card?.imagesrc) return;
+    enqueueImageDownloads([{ code: card.code, imagesrc: card.imagesrc }]);
+  }, [card?.code, card?.imagesrc]);
+  if (!card || !source || width <= 0 || band <= 0) return null;
+  const crop = cropFrame({ width, height: band }, aspect, region);
+  return <SceneCanvas source={source} crop={crop} width={width} height={height} band={band} matrix={ART_MATRIX} shade={shade} ramps={ramps} />;
+}
 
 /**
  * A scenario's scene as the art layer of a page (the Campaigns hub): drawn large and dimmed behind the hero words, faded out at its

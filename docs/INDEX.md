@@ -132,7 +132,7 @@ Read the sections your task touches.
   - 252–255 Haptics (~250)
   - 256–266 Banner (~580) ← 1
   - 267–270 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~21.2K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~21.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -140,7 +140,7 @@ Read the sections your task touches.
   - 80–101 Surfaces (~690) ← 1
   - 102–119 Type (~670) ← 5
   - 120–137 Spacing, radius, border (~560) ← 2
-  - 138–159 Backdrops (~870) ← 3
+  - 138–159 Backdrops (~930) ← 3
   - 160–167 Navigation (~420) ← 3
   - 168–205 Components (~1.7K) ← 8
   - 206–219 Icons (~390) ← 6
@@ -176,11 +176,11 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~4.5K tok)
   - 5–15 Rules (~470)
   - 16–61 Phases (~1.3K)
-  - 62–125 Open items (~2.2K)
+  - 62–125 Open items (~2.3K)
     - 64–74 Fixtures and Maestro (~360)
     - 75–93 Rules and engine (~540)
     - 94–108 Screens and code (~600)
-    - 109–125 Phone and tablet checks (~740)
+    - 109–125 Phone and tablet checks (~780)
   - 126–141 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

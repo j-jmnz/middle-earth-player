@@ -157,7 +157,7 @@ export function BriefingScreen({
   const cap = capWidth(size, "readable", s);
   const column = cap == null || expanded ? undefined : ({ width: "100%", maxWidth: cap, alignSelf: "center" } as const);
   const scene = (
-    // Met to the ground at its foot, and in two panes at its right edge too, so it ends in the fog with no line (GroundedScene).
+    // Faded out at its foot, and in two panes at its right edge too, so it ends in the fog with no line (GroundedScene).
     <GroundedScene scenarioId={scenarioId} height={(expanded ? 560 : BANNER_HEIGHT) * s + insets.top} shade={0.4} fade={0.25} edge={expanded}>
       <View className="absolute bottom-0 left-0 right-0 pb-2" style={expanded ? { ...side, paddingRight: 24 * s } : side}>
         {column ? <View style={column}>{banner}</View> : banner}
