@@ -1,5 +1,12 @@
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
+import { scenarioCards } from "../../../src/catalog/scenario-data.ts";
+import { loadScenario } from "../load-scenarios.ts";
+import { DATA_DIR } from "../paths.ts";
+import { MEC109_CHANGED } from "../printed/scope.ts";
 import { cardgameToolsFile, fallbackUrls, lettersOf, PDF_PAGES, productsOfPacks } from "./pictures.ts";
 
 describe("pictures", () => {
@@ -57,5 +64,23 @@ describe("pictures", () => {
     expect(new Set(keys).size).toBe(keys.length);
     expect(new Set(PDF_PAGES.map((entry) => entry.code)).size).toBe(21);
     expect(keys.filter((key) => key.endsWith(".B")).sort()).toEqual(["01129.B", "01130.B", "01131.B", "41050.B", "41051.B"]);
+  });
+
+  // A card added to data/cards after the last `pnpm data:sync pictures` has no picture pin, and the app bundles its small scan instead (the
+  // Dream-chaser cards did, user report 2026-10-31). Every card a built scenario deals has a side A picture, except the cards no source pictures.
+  it("pins a picture for every card a built scenario deals", () => {
+    const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string }[] } | undefined> };
+    const pinned = new Set([...(sources.pictures?.files ?? []), ...(sources.nightmare?.files ?? [])].map((file) => /^pictures\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
+    // The MEC109 printings whose wording differs keep their scan (MEC109_CHANGED). Navigation (11084) is a rules card of The Grey Havens that
+    // neither JvZijp nor cardgame.tools carries.
+    const unpictured = new Set([...MEC109_CHANGED, "11084"]);
+    const missing: string[] = [];
+    for (const id of readdirSync(path.join(DATA_DIR, "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
+      const scenario = loadScenario(id);
+      for (const code of new Set([...scenario.stages, ...scenarioCards(scenario).map((card) => card.code), ...(scenario.campaignCard ? [scenario.campaignCard] : []), ...scenario.campaignPlaced])) {
+        if (!pinned.has(code) && !unpictured.has(code)) missing.push(`${id} ${code}`);
+      }
+    }
+    expect(missing, "Run pnpm data:sync pictures").toEqual([]);
   });
 });

@@ -21,7 +21,7 @@ describe("prefetch", () => {
     // The quest stage and the heroes never pass through the hand or staging: they are asked for where they lie.
     const stage = Object.values(game.cards).find((card) => card.zone === "questStage");
     const hero = Object.values(game.cards).find((card) => card.zone === "heroes");
-    expect(codes).toContain(stage?.code);
+    expect(codes).toContain(`${stage?.code}.B`);
     expect(codes).toContain(hero?.code);
     // Not the deck or the encounter deck.
     const shown = new Set(Object.values(game.cards).filter((card) => card.zone !== "deck" && card.zone !== "encounterDeck").map((card) => card.code));
@@ -47,6 +47,16 @@ describe("prefetch", () => {
     expect(prefetchCodes(updateCard(dealt, first, { face: "up" }), 0)).toContain(firstCode);
     const discarded = { ...updateCard(game, second, { zone: "encounterDiscard" }), encounterDiscard: [second] };
     expect(prefetchCodes(discarded, 0)).toContain(secondCode);
+  });
+
+  it("asks for side B's picture of a card lying on its B side: the quest stage after setup", async () => {
+    const { ctx } = await starterWorld("stealth-and-steadfastness");
+    const game = expectOk(reduce(startScenario(starterStart("stealth-and-steadfastness", 1), ctx), { type: "Keep" }, ctx)).state;
+    const stage = game.cards[game.questStage ?? ""];
+    expect(stage?.face).toBe("B");
+    const codes = prefetchCodes(game, 0);
+    expect(codes).toContain(`${stage?.code}.B`);
+    expect(codes).not.toContain(stage?.code);
   });
 
   it("names the resolution's cards only once the scenario is won", async () => {

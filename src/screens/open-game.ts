@@ -14,13 +14,14 @@ import type { Undoable } from "../play/undo-history";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
-export type CardFacts = { imagesrc: string | null; text: string | null };
+// `imagesrc` is side A's picture to download, `backImagesrc` side B's (a card the table shows on its B side, src/play/picture-key.ts).
+export type CardFacts = { imagesrc: string | null; backImagesrc: string | null; text: string | null };
 
 export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<string, CardFacts> {
   const wanted = [...new Set(codes)];
   if (wanted.length === 0) return new Map();
-  const rows = catalog.select({ code: cards.code, imagesrc: cards.imagesrc, text: cards.text }).from(cards).where(inArray(cards.code, wanted)).all();
-  return new Map(rows.map((row) => [row.code, { imagesrc: row.imagesrc, text: row.text }]));
+  const rows = catalog.select({ code: cards.code, imagesrc: cards.imagesrc, backImagesrc: cards.backImagesrc, text: cards.text }).from(cards).where(inArray(cards.code, wanted)).all();
+  return new Map(rows.map((row) => [row.code, { imagesrc: row.imagesrc, backImagesrc: row.backImagesrc, text: row.text }]));
 }
 
 export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts> };

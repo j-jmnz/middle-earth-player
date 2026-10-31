@@ -139,7 +139,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - `src/catalog/printed-ledger.ts` imports both files.
    - `scope.ts` takes scope from every campaign.
    - Drop the TFotR gate in `applyPrinted`.
-   - Order: `pnpm data:build`, then `pnpm data:sync scans`, then read.
+   - Order: `pnpm data:build`, then `pnpm data:sync scans pictures` (CLAUDE.md, Data), then read.
    - A scan the agent cannot read is a question for the user.
 8. **Tests**: generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/catalog-exit.test.ts` and `scripts/build-catalog.test.ts` per campaign. The existing Fellowship assertions stay.
 9. **Effects tooling**
