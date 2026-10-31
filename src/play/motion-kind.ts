@@ -1,12 +1,13 @@
-// Which motion a new layout plays when the seat the canvas draws changed (phase 26): the peek's own slide, the seat handoff, or the
+// Which motion a new layout plays when the seat the canvas draws changed (phase 26): the peek, the seat handoff, or the
 // ordinary motions of the state. Pure, so a Vitest reads it; card-motion.native.tsx calls it once per new layout.
 //   peek: the same state seen from another seat (the player tapped a dial), or a peek that ends. The table is redrawn at rest: no card
 //     moves, nothing is dealt, no token pops and nothing lands.
-//   handoff: the engine turned to another seat, and the table follows it (the new hand slides up, nothing is dealt).
+//   handoff: the engine turned to another seat, and the table follows it. It is drawn at rest too, a clean cut to the other seat: no card
+//     moves and nothing fades, so the two seats' cards are never drawn over each other (user request, 2026-10-31).
 //   ordinary: the state's own motions (a draw, a played card's squash, a token pop, ghosts), diffed from the layout the acting seat had
 //     before. A peek that ends with a new state is this: the player confirmed something on the dock while looking at the other seat,
 //     and the state's motions must play as they would have. The same holds when the seat shown did not change, even if the engine
-//     turned to the seat the table was already showing (that hand is on screen already and must not slide up again).
+//     turned to the seat the table was already showing (its cards are on screen already, and its own motions play).
 export type MotionKind = "peek" | "handoff" | "ordinary";
 
 /**
@@ -20,7 +21,7 @@ export function motionKind(prev: unknown, next: unknown, prevShown: number, next
   return prevActing !== nextActing ? "handoff" : "ordinary";
 }
 
-/** Whether a layout of this kind moves its cards: a peek and its way back are drawn at rest (user request, 2026-10-27). */
+/** Whether a layout of this kind moves its cards: a peek, its way back (user request, 2026-10-27) and a seat handoff are drawn at rest. */
 export function kindMoves(kind: MotionKind): boolean {
-  return kind !== "peek";
+  return kind === "ordinary";
 }

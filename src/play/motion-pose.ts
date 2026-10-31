@@ -28,7 +28,7 @@ function tilt(m: Motion, away: number): number {
 /** Whether a motion is the quarter turn of exhausting or readying alone: the card stays where it is. */
 function turnOnly(m: Motion): boolean {
   "worklet";
-  return m.dx === 0 && m.dy === 0 && m.scale === 1 && m.fromRot !== m.toRot && !m.flip && m.land == null && !m.slide;
+  return m.dx === 0 && m.dy === 0 && m.scale === 1 && m.fromRot !== m.toRot && !m.flip && m.land == null;
 }
 
 /** The pose of a slot `now` ms after the state was drawn. At or past the end of its motion it is the rest pose. */
@@ -59,13 +59,6 @@ export function poseAt(m: Motion, now: number, k: number): Pose {
     // Exhaust and ready: the quarter turn is a spring with a light overshoot.
     const s = springStep(t, scaledSpring(MOTION.exhaust, k));
     return { dx: 0, dy: 0, scale: 1, rot: tilt(m, 1 - s), opacity: 1, flipX: 1, back: false };
-  }
-
-  if (m.slide) {
-    // The hand of the acting seat slides up into place.
-    const x = clamp01(t / length(MOTION.seatHand, k));
-    const q = 1 - ease("outCubic", x);
-    return { dx: m.dx * q, dy: m.dy * q, scale: 1, rot: m.toRot, opacity: m.fromOpacity + (1 - m.fromOpacity) * x, flipX: 1, back: false };
   }
 
   // An arrival: eases out past its slot a little and settles. A drawn or revealed card also rises on an arc, shows its back,
@@ -130,7 +123,6 @@ export function motionEnd(m: Motion): number {
   const wait = m.delay;
   if (m.land === "squash") return wait + MOTION.lift.ms + MOTION.glide.ms + MOTION.land.ms;
   if (turnOnly(m)) return wait + MOTION.exhaust.ms;
-  if (m.slide) return wait + MOTION.seatHand.ms;
   const arrive = MOTION.cardArrive.ms;
   if (m.land === "pop") {
     const popStart = (arrive - MOTION.cardFlip.ms) / 2 + MOTION.cardFlip.ms;

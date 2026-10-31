@@ -26,7 +26,7 @@ describe("motionKind", () => {
   it("is the state's own motions when the seat drawn did not change, whoever acts now", () => {
     expect(motionKind(before, after, 0, 0, 0, 0)).toBe("ordinary");
     expect(motionKind(before, before, 0, 0, 0, 0)).toBe("ordinary");
-    // Peeking at seat 1, the engine turns to seat 1: that hand is on screen already and must not slide up again.
+    // Peeking at seat 1, the engine turns to seat 1: that hand is on screen already, so the state plays its own motions.
     expect(motionKind(before, after, 1, 1, 0, 1)).toBe("ordinary");
     // A pass that moves the acting seat while the table stays on the seat it showed.
     expect(motionKind(before, after, 0, 0, 0, 1)).toBe("ordinary");
@@ -38,9 +38,9 @@ describe("motionKind", () => {
 });
 
 describe("kindMoves", () => {
-  it("draws a peek and its way back at rest, and moves the cards of a handoff or a new state", () => {
+  it("draws a peek, its way back and a seat handoff at rest, and moves the cards of a new state", () => {
     expect(kindMoves("peek")).toBe(false);
-    expect(kindMoves("handoff")).toBe(true);
+    expect(kindMoves("handoff")).toBe(false);
     expect(kindMoves("ordinary")).toBe(true);
   });
 });
