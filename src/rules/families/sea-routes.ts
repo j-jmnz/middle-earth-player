@@ -39,11 +39,12 @@ export function stampRoutes(state: ScenarioState, cards: ReadonlyMap<string, Pri
   return { ...state, sea: stamped };
 }
 
-/** Where a card that is moving to `dest` really goes (dcce.corsair-deck, dcce.stormcaller-elite). */
-export function routeDestination(state: ScenarioState, current: Pick<CardInstance, "code" | "zone">, dest: Destination): Destination {
+/** Where a card that is moving to `dest` really goes (dcce.corsair-deck, dcce.stormcaller-elite), or null when the move does not happen: an Elite card
+ * has no encounter card back, so it can never be added to or shuffled into the encounter deck or discard pile, and a copy that is out of play stays
+ * where it is. One that leaves play goes to the victory display (an enemy) or out of the game (an objective ally). */
+export function routeDestination(state: ScenarioState, current: Pick<CardInstance, "code" | "zone">, dest: Destination): Destination | null {
   const route = state.sea?.routes[current.code];
   if (!route || (dest.zone !== "encounterDiscard" && dest.zone !== "encounterDeck")) return dest;
   if (route === "corsair") return dest.zone === "encounterDiscard" && state.corsairDeck !== undefined ? { zone: "corsairDiscard" } : dest;
-  // An Elite card is out of play when it is set aside or being searched for: only one that leaves play goes to the victory display or the void.
-  return inPlay(current.zone) ? { zone: route } : dest;
+  return inPlay(current.zone) ? { zone: route } : null;
 }

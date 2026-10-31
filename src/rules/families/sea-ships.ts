@@ -5,7 +5,6 @@
 // pickers) and legal.ts (the legal-intent check and its refusal) ask these.
 import { printedOf, type PrintedCard } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
-import { characters } from "../combat.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -40,9 +39,15 @@ export function shipAttackReason(attacker: PrintedCard, target: PrintedCard): st
   return shipMayAttack(attacker, target) ? null : "A ship-objective can only attack a ship-enemy";
 }
 
-/** The ship-objectives the damage of an undefended ship-enemy attack may be assigned to (dcce.ship-enemies), or null when the attack in progress is
- * not a ship-enemy's and the hero rules stand. */
-export function shipUndefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] | null {
-  if (attackerOf(state, cards)?.ship !== "enemy") return null;
-  return characters(state, seat, cards).filter((id) => printedOf(cards, state.cards[id]?.code ?? "").ship === "objective");
+/** The attack in progress is a ship-enemy's: its undefended damage goes to a ship-objective, not a hero (dcce.ship-enemies). */
+export function shipEnemyAttacking(state: ScenarioState, cards: Cards): boolean {
+  return attackerOf(state, cards)?.ship === "enemy";
+}
+
+/** The ship-objectives among a player's characters: where the damage of an undefended ship-enemy attack may go (dcce.ship-enemies). Empty when the
+ * player controls none. A destroyed ship eliminates its controller (the ships' own lines), so a player still in the game has one once the fleet is
+ * prepared; before that, or in a game that never prepared a fleet, no rule says where the damage goes, so the caller falls back to the hero rules
+ * rather than leave the attack with nowhere to land. */
+export function shipObjectivesAmong(ids: readonly string[], state: ScenarioState, cards: Cards): string[] {
+  return ids.filter((id) => printedOf(cards, state.cards[id]?.code ?? "").ship === "objective");
 }

@@ -61,7 +61,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 36 | Nightmare effects | active | 2026-10-30. Engine done: all seven playable scenarios on `NIGHTMARE_PLAYABLE`; review round done (known limits in the phase file). Open: one Nightmare game per scenario on a phone. |
 | 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
 | 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. Phone checks open: Spend XP, Hard/Expert pickers, path and log XP rows, MEC111 reader; flows `dream-chaser-start`, `booklet-dream-chaser` not run. |
-| 39 | Sea mechanics family | not started | |
+| 39 | Sea mechanics family | completed | 2026-10-31. Engine only; review round done. Open: the fleet choice on the seat picker and briefing (phase 39b); Upgraded-side ship stats; face-aware records; Sailing events. |
 | 39b | Ships on the table | not started | |
 | 40 | Voyage Across Belegaer | not started | |
 | 41 | The Fate of Númenor | not started | |
@@ -89,7 +89,8 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ### Rules and engine
 
 - Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
-- Dream-chaser ship stats are not in `data/cards` (ledger notes only); phase 39 needs them. The sea keywords (Sailing, Boarding, Aflame, Grapple, Uncharted) parse as unknown tokens until phase 39.
+- Dream-chaser: Aflame, Grapple, Uncharted and Exploration stay unparsed until their scenario phases; an upgraded ship plays with side A stats (`Card.back` carries no stats).
+- Nightmare 904605 Sahír's Pursuer and 905402 Patrol Ship print ENEMY (Ship trait), so they stay non-ship enemies.
 
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).
 - Simultaneous Forced and delayed effects resolve in a fixed order, not the first player's choice (FAQ 1.02).

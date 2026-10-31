@@ -530,6 +530,54 @@
       },
       "reason": "Hall of Beorn gives the burden enemy Graxar no engagement cost (as it gives Stalking Goblin none). The scan prints engagement cost 47 (the number at the top of the card), so the engagement check can engage it and it counts in the staging area.",
       "source": "scan 11188.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12151"
+      },
+      "set": {
+        "type": "ship-enemy"
+      },
+      "reason": "Hall of Beorn files The City of Corsairs' Stormcaller as an Enemy. The scan prints the type line SHIP-ENEMY (Corsair. Ship., Boarding 1), the same card as the Stormcaller of the Dream-chaser box and Flight of the Stormcaller, so heroes cannot defend it, ship-objectives can attack it and its Boarding resolves (dcce.ship-enemies, dcce.boarding). Its printed stats (engagement cost 20, Threat 2, Attack 6, Defense 6, 18 hit points, Victory 10) are unchanged.",
+      "source": "scan 12151.A; dcce.ship-enemies"
+    },
+    {
+      "match": {
+        "code": "905304"
+      },
+      "set": {
+        "type": "ship-enemy"
+      },
+      "reason": "The Nightmare picture of Ramming Ship (Nightmare The Grey Havens & Dream-chaser / A Storm on Cobas Haven, 004) prints the type line SHIP-ENEMY; the source files it as an Enemy. Its stats (engagement cost 28, Threat 4, Attack 4, Defense 3, 8 hit points) agree with the picture.",
+      "source": "nightmare picture 004 - Ramming Ship (data/raw/nightmare/drive.json); dcce.ship-enemies"
+    },
+    {
+      "match": {
+        "code": "904903"
+      },
+      "set": {
+        "engagementCost": 44,
+        "threat": 4,
+        "attack": 4,
+        "defense": 2,
+        "health": 9
+      },
+      "reason": "The source has the Nightmare ship-enemy Tide-runner with no stats. The picture (Nightmare Dream-chaser / Flight of the Stormcaller, 003) prints engagement cost 44, Threat 4, Attack 4, Defense 2 and 9 hit points, type line SHIP-ENEMY.",
+      "source": "nightmare picture 003 - Tide-Runner (data/raw/nightmare/drive.json)"
+    },
+    {
+      "match": {
+        "code": "904904"
+      },
+      "set": {
+        "engagementCost": 34,
+        "threat": 5,
+        "attack": 8,
+        "defense": 5,
+        "health": 14
+      },
+      "reason": "The source has the Nightmare ship-enemy Venom's Bite with no stats. The picture (Nightmare Dream-chaser / Flight of the Stormcaller, 004) prints engagement cost 34, Threat 5, Attack 8, Defense 5, 14 hit points and Victory 5, type line SHIP-ENEMY.",
+      "source": "nightmare picture 004 - Venom's Bite (data/raw/nightmare/drive.json)"
     }
   ],
   "scenarioPiles": [

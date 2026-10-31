@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~47.7K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~47.9K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -89,7 +89,7 @@ Read the sections your task touches.
     - 537–557 Escape from Dol Guldur (~2.7K)
     - 558–572 The Oath (~2.3K)
     - 573–590 The Caves of Nibin-Dûm (~2.3K)
-  - 591–612 Dream-chaser (~2.9K)
+  - 591–612 Dream-chaser (~3.1K)
   - 613–621 Nightmare (~420)
   - 622–660 Deckbuilding (~1.8K) ← 1
   - 661–739 Effects (~3.2K)

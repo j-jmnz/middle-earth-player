@@ -6,6 +6,7 @@ import { legalIntents, legalTargets, reduce } from "../reduce.ts";
 import type { ScenarioState } from "../state.ts";
 import { spawn } from "../zones.ts";
 import { headingOf } from "./sea-heading.ts";
+import { askingToCommit, sailingBlocks } from "./sea-sailing-legal.ts";
 import { RECORDS as SEA_RECORDS } from "../../effects/authored/families/sea.ts";
 import { hero, seaTable, send, ship, type Table } from "./sea-table.ts";
 
@@ -111,6 +112,20 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     expect(discarded(done)).toEqual(["s1"]);
   });
 
+  it("asks once for each symbol: keeping the heading for one symbol still asks for the next", () => {
+    const built = table({ heading: "Rain", deck: ["s1", "s1", "s0"] });
+    const asked = send(toQuest(built), { type: "Commit", cardIds: [built.ids.dc!] }, built.ctx);
+    expect(headingOf(asked)).toBe("Storm");
+    expect(asked.sea?.sailing).toMatchObject({ step: "shift", left: 2 });
+    const kept = send(asked, { type: "Choose", optionId: "keep" }, built.ctx);
+    expect(headingOf(kept)).toBe("Storm");
+    expect(kept.sea?.sailing).toMatchObject({ step: "shift", left: 1 });
+    const shifted = send(kept, { type: "Choose", optionId: "shift" }, built.ctx);
+    expect(headingOf(shifted)).toBe("Rain");
+    expect(shifted.sea?.sailing).toBeUndefined();
+    expect(discarded(shifted)).toEqual(["s1", "s1"]);
+  });
+
   it("allows one shift on-course for each symbol and no more, stopping at Sun", () => {
     const built = table({ heading: "Rain", deck: ["s2", "s2", "s0"] });
     const asked = send(toQuest(built), { type: "Commit", cardIds: [built.ids.dc!] }, built.ctx);
@@ -134,9 +149,11 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     expect(discarded(done)).toEqual(["s0"]);
   });
 
-  it("shuffles the encounter discard pile into the deck first when the deck is too short", () => {
+  it("shuffles the encounter discard pile into the deck first when the deck is too short, and logs it as the other reshuffles are", () => {
     const built = table({ deck: ["s0"], discard: ["s2", "s0"] });
-    const done = send(toQuest(built), { type: "Commit", cardIds: [built.ids.dc!] }, built.ctx);
+    const result = reduce(toQuest(built), { type: "Commit", cardIds: [built.ids.dc!] }, built.ctx);
+    expect(result.ok && result.steps).toContainEqual(expect.objectContaining({ kind: "resetEncounterDeck", count: 2 }));
+    const done = result.state;
     // Two cards to look at, one in the deck: the discard pile joins it, so the deck of three was shuffled and two looked at.
     expect(done.seedCursor).toBeGreaterThan(built.state.seedCursor);
     expect(done.encounterDeck.length + done.encounterDiscard.length).toBe(3);
@@ -160,6 +177,9 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     const before = toQuest(built);
     expect(before.window?.kind).toBe("frameAction");
     expect(before.sea?.sailing).toBeUndefined();
+    // The quest commitment is not open yet: only the pass window of the commitment lists Commit.
+    expect(legalIntents(before, built.ctx)).not.toContainEqual({ type: "Commit" });
+    expect(reduce(before, { type: "Commit", cardIds: [built.ids.aragorn!] }, built.ctx).ok).toBe(false);
     const ask = send(before, { type: "Pass" }, built.ctx);
     expect(ask.sea?.sailing).toEqual({ step: "ask" });
     // During: no card is played.
@@ -168,6 +188,7 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     // After: an action window again, then the quest commitment.
     const after = send(ask, { type: "Pass" }, built.ctx);
     expect(after.window?.kind).toBe("frameAction");
+    expect(legalIntents(after, built.ctx)).not.toContainEqual({ type: "Commit" });
     expect(headingOf(after)).toBe("Cloud");
     const commitment = send(after, { type: "Pass" }, built.ctx);
     expect(commitment.window).toEqual({ kind: "pass" });
@@ -191,5 +212,21 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     const staged = send(done, { type: "Pass" }, built.ctx);
     expect(headingOf(staged)).toBe("Cloud");
     expect(staged.sea?.sailing).toBeUndefined();
+  });
+});
+
+describe("what the table may do during the test (dcce.sailing-tests)", () => {
+  it("bars Actions but not Responses, and answers only the Pass of the question it asks", () => {
+    const built = table();
+    const ask = toQuest(built);
+    expect(askingToCommit(ask)).toBe(true);
+    expect(sailingBlocks(ask, "Trigger")).toBe("Actions cannot be used during a Sailing test");
+    expect(sailingBlocks(ask, "PlayCard")).toBe("Actions cannot be used during a Sailing test");
+    // A Response window opened over the question: a Trigger is a Response there, and a Pass declines it rather than answering the question.
+    const response = { ...ask, window: { kind: "response" as const, seat: 0, event: { trigger: "engaged" as const }, options: [] } } as unknown as ScenarioState;
+    expect(askingToCommit(response)).toBe(false);
+    expect(sailingBlocks(response, "Trigger")).toBeNull();
+    expect(sailingBlocks({ ...ask, window: { kind: "cancelOffer" } as unknown as ScenarioState["window"] }, "Trigger")).toBeNull();
+    expect(sailingBlocks({ ...ask, sea: { ...ask.sea!, sailing: undefined } }, "Trigger")).toBeNull();
   });
 });

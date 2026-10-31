@@ -56,6 +56,7 @@ import { damageLoss } from "./families/south-locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
 import { refillCorsairDeck } from "./families/sea-corsair.ts";
 import { chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
+import { askingToCommit, askingToShift } from "./families/sea-sailing-legal.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -123,7 +124,7 @@ export function applyIntent(
       return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps), true);
     case "Pass":
       // A Pass while the first player is asked what to commit to the Sailing test commits no one (dcce.sailing-tests).
-      return state.sea?.sailing?.step === "ask" ? performSailing(state, [], ctx) : applyPass(state);
+      return askingToCommit(state) ? performSailing(state, [], ctx, steps) : applyPass(state);
     case "PlayCard": {
       // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).
       // What the play adds beyond moving the card (families/costs-play.ts): its discount's riders, its additional costs.
@@ -133,13 +134,13 @@ export function applyIntent(
     }
     case "Commit":
       // The first player commits characters to the Sailing test, not to the quest (families/sea-sailing.ts).
-      return state.sea?.sailing?.step === "ask" ? performSailing(state, intent.cardIds, ctx) : commit(state, intent.cardIds, steps, intent.sideQuestId);
+      return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
     case "Trigger":
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":
-      return state.sea?.sailing?.step === "shift" ? chooseShift(state, intent.optionId) : applyChoice(state, intent.optionId);
+      return askingToShift(state) ? chooseShift(state, intent.optionId) : applyChoice(state, intent.optionId);
     case "ChooseResolution":
       return applyResolution(state, intent.optionId);
     case "Travel":

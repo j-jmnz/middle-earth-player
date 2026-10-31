@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { parseKeywordTokens } from "../../src/catalog/keyword-line.ts";
 import type { Card } from "../../src/catalog/card-facts.ts";
 import { loadCards } from "./load-cards.ts";
+import { LEDGER_KEYWORD_PACKS } from "./normalize/printed.ts";
 import { loadLedger } from "./printed/ledger.ts";
 
 // Rules: dcce.ships, dcce.ship-enemies, dcce.ship-objectives, dcce.sailing, dcce.sailing-tests, dcce.boarding (data/rules/entries.json). The Dream-chaser
@@ -11,7 +12,9 @@ import { loadLedger } from "./printed/ledger.ts";
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const ledger = loadLedger();
 const entries = ledger.entries.filter((entry) => cards.has(entry.code) && entry.printing !== "Nightmare");
-const ships = [...cards.values()].filter((card) => card.type === "ship-enemy" || card.type === "ship-objective").filter((card) => !card.code.startsWith("9"));
+// A ship is a card with the Ship trait that is not a location (a ship location is a place, not a ship card); its type line, read from its scan, is
+// ship-enemy, ship-objective or (the two Nightmare enemies whose scans print ENEMY) enemy.
+const ships = [...cards.values()].filter((card) => card.traits.includes("Ship") && card.type !== "location");
 
 // "Stats: Engagement cost 35, Threat 2, Attack 5, Defense 2, Hit points 7; Victory 6." as the numbers it gives.
 function noted(notes: string | undefined): Partial<Record<"engagementCost" | "threat" | "attack" | "defense" | "health" | "willpower" | "victory", number>> {
@@ -26,16 +29,22 @@ describe("the Dream-chaser ships", () => {
   it("print their stats: a ship-enemy as an enemy has, a ship-objective as an ally has", () => {
     expect(ships.length).toBeGreaterThan(20);
     for (const card of ships) {
-      const wanted = card.type === "ship-enemy" ? (["attack", "defense", "health", "threat", "engagementCost"] as const) : (["willpower", "attack", "defense", "health"] as const);
+      const wanted = card.type === "ship-objective" ? (["willpower", "attack", "defense", "health"] as const) : (["attack", "defense", "health", "threat", "engagementCost"] as const);
       for (const stat of wanted) expect(card[stat], `${card.code} ${card.name} ${stat}`).not.toBeNull();
     }
+  });
+
+  it("have the type their scan prints", () => {
+    for (const code of ["12151", "905304", "904903", "904904"]) expect(cards.get(code)?.type, code).toBe("ship-enemy");
+    for (const code of ["904605", "905402"]) expect(cards.get(code)?.type, code).toBe("enemy");
+    for (const code of ["110136", "11080", "12123"]) expect(cards.get(code)?.type, code).toBe("ship-objective");
   });
 
   it("agree with the stats their scan reading records in the ledger notes", () => {
     let compared = 0;
     for (const entry of entries.filter((candidate) => candidate.side === "A")) {
       const card = cards.get(entry.code) as Card;
-      if (card.type !== "ship-enemy" && card.type !== "ship-objective") continue;
+      if (!ships.includes(card)) continue;
       const read = noted(entry.notes);
       expect(Object.values(read).some((value) => value != null), `${entry.code} notes carry its stats`).toBe(true);
       for (const [stat, value] of Object.entries(read)) {
@@ -61,7 +70,7 @@ describe("the keywords the ledger reads", () => {
           sentences.push(sentence);
         }
       }
-      if (!entry.printing || !["TGH", "FotS", "TitD", "TotD", "DR", "SoCH", "CoC", "DCCE"].includes(entry.printing)) continue;
+      if (!entry.printing || !LEDGER_KEYWORD_PACKS.has(entry.printing)) continue;
       expect(card.keywords, `${entry.code} ${card.name}`).toMatchObject(parseKeywordTokens(sentences).keywords);
     }
   });

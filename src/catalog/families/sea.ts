@@ -10,6 +10,9 @@ export const VERBS = [
   // Setup: "Prepare the Corsair deck" (dcce.corsair-deck). Every non-ship enemy still in the encounter deck goes to the Corsair deck, which is
   // then shuffled; from now on a non-ship enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it.
   z.strictObject({ verb: z.literal("PrepareCorsairDeck"), ...when }),
+  // "Shuffle the Corsair deck and Corsair discard pile into the encounter deck" (dcce.from-sea-to-land, The City of Corsairs stage 2B): the Corsair
+  // deck is gone from then on, so a non-ship enemy is discarded to the encounter discard pile as in any other game.
+  z.strictObject({ verb: z.literal("EndCorsairDeck"), ...when }),
   // Setup: "Players prepare their fleet" (dcce.prepare-your-fleet). Each player in turn takes one of the six ship-objectives set aside (the
   // Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the
   // game, and the Heading card is attached to the Dream-chaser, set to on-course. A seat with a choice asks it as a choice of cards.

@@ -238,8 +238,9 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
 export function moveCard(state: ScenarioState, id: string, wanted: Destination, released: readonly string[] = []): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
-  // A card with a route of its own never reaches the encounter deck or discard pile (families/sea-routes.ts).
+  // A card with a route of its own never reaches the encounter deck or discard pile (families/sea-routes.ts); one that has no place there stays put.
   const dest = routeDestination(state, current, wanted);
+  if (!dest) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);

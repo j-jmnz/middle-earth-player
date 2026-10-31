@@ -48,15 +48,22 @@ describe("the Stormcaller Elite (dcce.stormcaller-elite)", () => {
     expect(next.encounterDiscard).toEqual([]);
   });
 
-  it("sends an Elite card in play that would go to the encounter deck or discard pile to its own place, and leaves a card out of play alone", () => {
+  it("sends an Elite card in play that would go to the encounter deck or discard pile to its own place, and keeps one out of play where it is", () => {
     const { state, ids } = table();
     for (const zone of ["encounterDiscard", "encounterDeck"] as const) {
       const moved = moveCard(state, ids.sahir!, { zone });
       expect(moved.cards[ids.sahir!]?.zone).toBe("victory");
     }
-    // A card that is not in play is not "leaving play": a set-aside copy keeps the move it was given.
-    const aside = spawn(state, "sahir", { zone: "setAside" });
-    expect(routeDestination(aside.state, aside.state.cards[aside.id]!, { zone: "encounterDeck" })).toEqual({ zone: "encounterDeck" });
+    // A card that is not in play is not "leaving play", and no card of the set can be added to the encounter deck or discard pile: the move does not happen.
+    for (const code of ["sahir", "sahir-ally"]) {
+      const aside = spawn(state, code, { zone: "setAside" });
+      for (const zone of ["encounterDeck", "encounterDiscard"] as const) {
+        expect(routeDestination(aside.state, aside.state.cards[aside.id]!, { zone })).toBeNull();
+        const moved = moveCard(aside.state, aside.id, { zone });
+        expect(moved.cards[aside.id]?.zone).toBe("setAside");
+        expect(moved.encounterDeck).toEqual(aside.state.encounterDeck);
+      }
+    }
   });
 
   it("leaves every other enemy to the encounter discard pile, and a game with no ship or Elite card to its own state", () => {

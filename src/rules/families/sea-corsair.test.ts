@@ -4,7 +4,7 @@ import type { Effect, Instruction } from "../../catalog/boundary.ts";
 import { definePrinted } from "../printed.ts";
 import type { ScenarioState } from "../state.ts";
 import { spawn } from "../zones.ts";
-import { refillCorsairDeck } from "./sea-corsair.ts";
+import { endCorsairDeck, refillCorsairDeck } from "./sea-corsair.ts";
 import { deckOf, enemy, hero, seaTable, send, shipEnemy, until, type Table } from "./sea-table.ts";
 
 // Rules: dcce.corsair-deck, dcce.boarding (data/rules/entries.json). The Corsair deck holds only non-ship enemies and has its own discard pile; a
@@ -16,10 +16,10 @@ const card = (code: string) => definePrinted({ code, name: code, type: "event", 
 function table(effects: readonly Effect[], seatCount: 1 | 2 = 1, encounter: readonly string[] = ["corsair", "pirate1", "pirate2"]): Table {
   const built = seaTable({
     seatCount,
-    cards: [hero("aragorn"), hero("boromir"), shipEnemy("corsair"), enemy("pirate1", { health: 1, defense: 0 }), enemy("pirate2", { health: 1, defense: 0 }), card("prep"), card("reveal"), card("revealAll")],
+    cards: [hero("aragorn"), hero("boromir"), shipEnemy("corsair"), enemy("pirate1", { health: 1, defense: 0 }), enemy("pirate2", { health: 1, defense: 0 }), card("prep"), card("reveal"), card("revealAll"), card("end")],
     effects,
     heroes: seatCount === 2 ? [{ code: "aragorn" }, { code: "boromir", seat: 1 }] : [{ code: "aragorn" }],
-    hand: [{ code: "prep" }, { code: "reveal" }, { code: "revealAll" }],
+    hand: [{ code: "prep" }, { code: "reveal" }, { code: "revealAll" }, { code: "end" }],
     encounter,
   });
   return { ...built, state: { ...built.state, mode: "combatActions", phase: "Combat", boundaryPhase: "Combat", window: { kind: "pass" }, passed: [] } };
@@ -31,7 +31,9 @@ const strike = (state: ScenarioState, ctx: Table["ctx"], enemyId: string, attack
   until(send(state, { type: "DeclareAttackers", enemyId, attackerIds: [attacker] }, ctx), ctx, (current) => current.cards[enemyId]?.zone !== "engaged");
 const codesIn = (state: ScenarioState, ids: readonly string[]): string[] => ids.map((id) => state.cards[id]?.code ?? "?").sort();
 
-const RECORDS = [event("prep", { verb: "PrepareCorsairDeck" }), event("reveal", { verb: "RevealCorsair", count: 2 }), event("revealAll", { verb: "RevealCorsair", who: "eachSeat" })];
+const RECORDS = [event("prep", { verb: "PrepareCorsairDeck" }), event("reveal", { verb: "RevealCorsair", count: 2 }), event("revealAll", { verb: "RevealCorsair", who: "eachSeat" }), event("end", { verb: "EndCorsairDeck" })];
+// A card that hears itself enter play (the revealed enemy "put into play" is an encounter card entering play).
+const ENTERS: Effect = { id: "pirate1:triggered:1", cardCode: "pirate1", lines: ["pirate1:A:1"], timing: "triggered", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "PlaceToken", amount: 3 }] };
 
 describe("preparing the Corsair deck (dcce.corsair-deck)", () => {
   it("takes every non-ship enemy out of the encounter deck and keeps the ship-enemies there", () => {
@@ -135,5 +137,43 @@ describe("revealing from the Corsair deck (dcce.boarding)", () => {
     const next = play(play(state, ctx, ids.prep!), ctx, ids.revealAll!);
     expect(codesIn(next, next.seats[0]?.engaged ?? [])).toHaveLength(1);
     expect(codesIn(next, next.seats[1]?.engaged ?? [])).toHaveLength(1);
+  });
+});
+
+describe("a revealed enemy entering play (dcce.boarding)", () => {
+  it("is announced as entering play, as every encounter card put into play is", () => {
+    const { state, ids, ctx } = table([...RECORDS, ENTERS], 1, ["corsair", "pirate1"]);
+    const next = play(play(state, ctx, ids.prep!), ctx, ids.reveal!);
+    const pirate = next.seats[0]?.engaged.find((id) => next.cards[id]?.code === "pirate1");
+    expect(pirate).toBeDefined();
+    expect(next.cards[pirate!]?.resources).toBe(3);
+  });
+});
+
+describe("ending the Corsair deck (dcce.from-sea-to-land)", () => {
+  it("shuffles the Corsair deck and its discard pile into the encounter deck and leaves no Corsair deck", () => {
+    const { state, ids, ctx } = table(RECORDS, 1, ["corsair", "pirate1", "pirate2"]);
+    const prepared = play(state, ctx, ids.prep!);
+    const spare = spawn(prepared, "pirate1", { zone: "corsairDiscard" });
+    const next = play(spare.state, ctx, ids.end!);
+    expect(next.corsairDeck).toBeUndefined();
+    expect(next.corsairDiscard).toBeUndefined();
+    expect(codesIn(next, next.encounterDeck)).toEqual(["corsair", "pirate1", "pirate1", "pirate2"]);
+    expect(next.cards[spare.id]?.zone).toBe("encounterDeck");
+    expect(next.seedCursor).toBeGreaterThan(spare.state.seedCursor);
+  });
+
+  it("sends a non-ship enemy that is discarded afterwards to the encounter discard pile, and Boarding reveals nothing", () => {
+    const { state, ids, ctx } = table(RECORDS, 1, ["corsair", "pirate1"]);
+    const ended = endCorsairDeck(play(state, ctx, ids.prep!));
+    const pirate = spawn(ended, "pirate2", { zone: "engaged", seat: 0 });
+    const gone = strike({ ...pirate.state, phase: "Combat", mode: "playerAttacks", window: { kind: "playerAttack" }, passed: [] }, ctx, pirate.id, ids.aragorn!);
+    expect(gone.cards[pirate.id]?.zone).toBe("encounterDiscard");
+    expect(play(gone, ctx, ids.reveal!).seats[0]?.engaged).toEqual([]);
+  });
+
+  it("changes nothing in a game that never prepared a Corsair deck", () => {
+    const { state } = table(RECORDS);
+    expect(endCorsairDeck(state)).toBe(state);
   });
 });

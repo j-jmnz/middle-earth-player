@@ -144,8 +144,8 @@ describe("attack family records", () => {
     const helper = spawn(start, "spirit", { zone: "heroes", seat: 0 });
     const state = { ...updateCard(helper.state, helper.id, { resources: 1, exhausted: true }), phase: "Quest" as const, boundaryPhase: "Quest" as const, mode: "questCommit" as const };
     const opened = expectOk(reduce(state, { type: "PlayCard", cardId: ids["12086"]!, payments: [] }, { effects: RECORDS, cards })).state;
-    // The quest commit window offers committing in the attack's action windows (6.8.1, 6.8.3): each closes with a pass.
-    expect(opened.window?.kind).toBe("frameAction");
+    // The attack's action windows (6.8.1, 6.8.3) open only for a seat that has an Action; the quest commitment is not one, so none opens here.
+    expect(opened.window?.kind).toBe("choose");
     let played = opened;
     while (played.window?.kind === "frameAction") played = expectOk(reduce(played, { type: "Pass" }, { effects: RECORDS, cards })).state;
     expect(played.cards[ids.orc!]?.damage).toBe(1);

@@ -23,5 +23,5 @@ export function board(state: ScenarioState, event: GameEvent, ctx: ReduceContext
   const enemy = state.cards[event.subject];
   if (!enemy || enemy.zone !== "engaged" || printedOf(ctx.cards, enemy.code).ship !== "enemy") return state;
   const count = boardingOf(state, event.subject, ctx);
-  return count > 0 ? revealCorsair(state, event.seat, count, steps) : state;
+  return count > 0 ? revealCorsair(state, event.seat, count, ctx, steps) : state;
 }

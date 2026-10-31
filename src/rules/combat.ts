@@ -23,7 +23,7 @@ import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/att
 import { countsDefense, struck } from "./families/attack-strike.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations } from "./families/south-watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
-import { shipMayAttack, shipMayDefend, shipUndefendedTargets } from "./families/sea-ships.ts";
+import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong } from "./families/sea-ships.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -365,8 +365,8 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   const locations = undefendedLocations(state);
   if (locations.length > 0) return locations;
   // A ship-enemy's undefended attack damages a ship-objective its player controls, not a hero (dcce.ship-enemies).
-  const ships = shipUndefendedTargets(state, seat, cards);
-  if (ships) return ships;
+  const ships = shipEnemyAttacking(state, cards) ? shipObjectivesAmong(characters(state, seat, cards), state, cards) : [];
+  if (ships.length > 0) return ships;
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.

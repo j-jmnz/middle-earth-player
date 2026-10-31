@@ -26,7 +26,7 @@ import { attackRuleReason } from "./families/attack-targets.ts";
 import { sideQuestReason } from "./families/sidequests-quest.ts";
 import { freeSlot, mustTravel } from "./families/south-locations.ts";
 import { shipAttackReason, shipDefenseReason } from "./families/sea-ships.ts";
-import { sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "./families/sea-sailing.ts";
+import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "./families/sea-sailing-legal.ts";
 import { printedOf } from "./printed.ts";
 
 const NUMBER = "The engine computes that number";
@@ -81,7 +81,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "PlayCard":
       return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
     case "Commit":
-      return state.sea?.sailing?.step === "ask" ? sailingCommitters(state, ctx) : committers(state, state.activeSeat, ctx);
+      return askingToCommit(state) ? sailingCommitters(state, ctx) : committers(state, state.activeSeat, ctx);
     case "CommitHide":
       return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "Travel":
@@ -132,7 +132,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     case "PlayCard":
       return playReason(state, intent, ctx);
     case "Commit":
-      return state.sea?.sailing?.step === "ask" ? sailingCommitReason(state, intent.cardIds, ctx) : commitReason(state, intent, ctx);
+      return askingToCommit(state) ? sailingCommitReason(state, intent.cardIds, ctx) : commitReason(state, intent, ctx);
     case "CommitHide":
       return hideCommitReason(state, intent, ctx);
     case "Trigger":
@@ -181,7 +181,8 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   for (const cardId of [...(state.seats[state.activeSeat]?.hand ?? []), ...(top ? [top] : []), ...discardPlayable(state, state.activeSeat, ctx)]) {
     if (playWindowReason(state, cardId, ctx) === null) intents.push({ type: "PlayCard", cardId });
   }
-  if (state.mode === "questCommit") intents.push({ type: "Commit" });
+  // The quest commitment is open in the pass window only, not in an action window between steps (a Sailing window before it, say).
+  if (state.mode === "questCommit" && state.window?.kind === "pass") intents.push({ type: "Commit" });
   intents.push(...triggerIntents(state, ctx));
   return intents;
 }
@@ -283,7 +284,7 @@ function defenderReason(
 function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>, ctx: ReduceContext): string | null {
   if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
   const heroes = undefendedTargets(state, state.pendingAttack.seat, ctx.cards);
-  if (heroes.length === 0) return printedOf(ctx.cards, state.cards[state.pendingAttack.enemyId]?.code ?? "").ship === "enemy" ? "No ship-objective can take the attack" : "No hero can take the attack";
+  if (heroes.length === 0) return "No hero can take the attack";
   if (heroes.length === 1) {
     const only = heroes[0];
     if (intent.heroId != null && intent.heroId !== only) return "Choose a hero";

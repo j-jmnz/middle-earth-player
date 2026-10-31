@@ -6,4 +6,6 @@
 // advanced reveals, and The Eaves of Mirkwood bars only the Responses that cancel: both can move a replayed game of The Oath.
 // 12: a full quest stage that was held back advances as soon as nothing holds it (To the River... once no Hill Troll is in play),
 // not at the next quest resolution (stage-reveal.ts, advanceFreed): a replayed game can reach the next stage sooner.
-export const ENGINE_VERSION = 12;
+// 13 (phase 39 review): the quest phase lists Commit only in its pass window, so an attack window with no usable Action
+// skips instead of opening (Battle-fury played in the quest phase): a replayed game can take a different path.
+export const ENGINE_VERSION = 13;

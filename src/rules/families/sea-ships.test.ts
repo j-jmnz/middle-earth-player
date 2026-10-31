@@ -46,12 +46,13 @@ describe("a ship-enemy's attack (dcce.ship-enemies)", () => {
     expect(hit.cards[ids.aragorn!]?.damage).toBe(0);
   });
 
-  it("is refused when no ship-objective is left to take it", () => {
+  it("falls on a hero when its player controls no ship-objective (no rule covers it, and the attack must land)", () => {
     const built = seaTable({ cards: [hero("aragorn"), shipEnemy("corsair")], effects: [], heroes: [{ code: "aragorn" }], enemies: [{ code: "corsair" }] });
     const at = until(send(built.state, { type: "DeclineEngage" }, built.ctx), built.ctx, defenseWindow);
     expect(at.window?.kind).toBe("defense");
-    const refused = reduce(at, { type: "Undefended", heroId: built.ids.aragorn! }, built.ctx);
-    expect(!refused.ok && refused.reason).toBe("No ship-objective can take the attack");
+    expect(legalTargets(at, { type: "Undefended" }, built.ctx)).toEqual([built.ids.aragorn]);
+    const hit = send(at, { type: "Undefended", heroId: built.ids.aragorn! }, built.ctx);
+    expect(hit.cards[built.ids.aragorn!]?.damage).toBeGreaterThan(0);
   });
 });
 

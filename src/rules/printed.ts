@@ -191,7 +191,8 @@ const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "
 export function printedFromCard(card: PrintedSource): PrintedCard {
   // A ship is an enemy or an objective ally that carries a mark (dcce.ships): the catalog types ship-enemy and ship-objective.
   const ship: ShipKind | null = card.type === "ship-enemy" ? "enemy" : card.type === "ship-objective" ? "objective" : null;
-  const type = CARD_TYPES.find((candidate) => candidate === (ship === "enemy" ? "enemy" : ship === "objective" ? "objective" : card.type));
+  const engineType = ship === "enemy" ? "enemy" : ship === "objective" ? "objective" : card.type;
+  const type = CARD_TYPES.find((candidate) => candidate === engineType);
   if (!type) throw new Error(`Card ${card.code} ${card.name} has unsupported type ${card.type}`);
   let sphere: Sphere | null = null;
   if (card.sphere != null) {

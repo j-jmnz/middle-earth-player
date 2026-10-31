@@ -432,7 +432,9 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     // A printed stat a source leaves out: Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
     // the stats and Victory of a ship, which Hall of Beorn has no field for.
     const stated = { ...named, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health", "victory"]) };
-    const next = outOfScope(overrides, stated) ? { ...stated, deckLegal: false } : stated;
+    // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY).
+    const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : stated;
+    const next = outOfScope(overrides, typed) ? { ...typed, deckLegal: false } : typed;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));

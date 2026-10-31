@@ -10,7 +10,7 @@ import { engageEnemy } from "../quest.ts";
 import type { ScenarioState } from "../state.ts";
 import { livingSeats } from "../state.ts";
 import type { Focus } from "./index.ts";
-import { prepareCorsairDeck, revealCorsair } from "./sea-corsair.ts";
+import { endCorsairDeck, prepareCorsairDeck, revealCorsair } from "./sea-corsair.ts";
 import { prepareFleet } from "./sea-fleet.ts";
 import { shiftHeading } from "./sea-heading.ts";
 import { lastPlayer } from "./sea-players.ts";
@@ -19,6 +19,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "PrepareCorsairDeck":
       return prepareCorsairDeck(state, ctx);
+    case "EndCorsairDeck":
+      return endCorsairDeck(state);
     case "PrepareFleet":
       return prepareFleet(state, instruction, focus, ctx, steps);
     case "ShiftHeading":
@@ -27,7 +29,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const count = instruction.count == null ? 1 : resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
       const seats = instruction.who === "eachSeat" ? livingSeats(state) : [focus.seat];
       let next = state;
-      for (const seat of seats) next = revealCorsair(next, seat, count, steps);
+      for (const seat of seats) next = revealCorsair(next, seat, count, ctx, steps);
       return next;
     }
     case "EngageLastPlayer":
