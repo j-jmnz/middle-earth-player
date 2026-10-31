@@ -114,6 +114,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "card") {
     for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));
+    if (spec.engagedEnemies) for (const index of livingSeats(state)) raw.push(...(state.seats[index]?.engaged ?? []));
     if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...(state.separate ? activeFor(state, asking, spec.stagingArea === "any").slice(0, 1) : [state.activeLocation].filter((id): id is string => id != null)));
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));

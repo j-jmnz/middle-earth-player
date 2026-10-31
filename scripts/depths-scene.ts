@@ -59,6 +59,8 @@ export const CODES = {
   seaSerpent: "11196",
   ominousFate: "11176",
   hardMode: "11217",
+  // Core Set ally (Response: after it commits to a quest, 1 progress on each location in the staging area): explores Helm of the Stormcaller from the staging area.
+  northernTracker: "01045",
 } as const;
 export const HERO = "dh1";
 export const HERO2 = "dh2";
@@ -71,7 +73,7 @@ export type DepthsWorld = { definition: ReturnType<typeof scenarioDefinition>; c
 
 export async function loadDepthsWorld(): Promise<DepthsWorld> {
   const definition = scenarioDefinition(dealt, campaign, EFFECTS);
-  const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, depths), CODES.ominousFate, CODES.hardMode, CODES.sahirAlly, CODES.naasiyahAlly, CODES.thingOriginal, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent])];
+  const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, depths), CODES.ominousFate, CODES.hardMode, CODES.sahirAlly, CODES.naasiyahAlly, CODES.thingOriginal, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent, CODES.northernTracker])];
   const cards = new Map(await loadPrinted(codes));
   const enemy = (code: string, stats: Partial<Parameters<typeof definePrinted>[0]>): PrintedCard => definePrinted({ code, name: code, type: "enemy", engagementCost: 50, ...stats });
   cards.set("f0", enemy("f0", { threat: 0, attack: 1, defense: 1, health: 3 }));

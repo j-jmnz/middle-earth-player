@@ -6,7 +6,7 @@ import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 
 import { dungeonDetail } from "./dungeon-preview.ts";
-import { grappleDetail } from "./grapple-words.ts";
+import { grappleDetail, shipLoss } from "./grapple-words.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
@@ -68,7 +68,7 @@ export function previewCards(
     const looked = game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id);
     const described = describe(card.code, looked ? card.code : pictureKey(card));
     const lostIsland = !looked && isLostIsland(card, ctx);
-    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id) ?? grappleDetail(game, id);
+    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id) ?? ([grappleDetail(game, id), shipLoss(game, ctx, id)?.speech].filter((part) => part != null).join(". ") || null);
     // The Heading card: titled by its step and its course, listing the four steps with the current one marked, and drawn turned a quarter turn per step (dcce.heading). A peek never changes the dial.
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};

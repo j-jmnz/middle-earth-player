@@ -36,6 +36,11 @@ function sameOccurrence(event: GameEvent, queued: readonly GameEvent[]): GameEve
   return queued.slice(0, end < 0 ? queued.length : end);
 }
 
+// An enemy that came out from under its location is told in the log before the Forced effects that hear it (Crushing Arm's attack, 12052:A:3); the event's `other` is the location (dcce.grapple).
+function noteDetached(event: GameEvent, steps: EngineStep[]): void {
+  if (event.trigger === "grappleDetached" && event.subject != null && event.other != null) steps.push({ kind: "detach", enemyId: event.subject, locationId: event.other });
+}
+
 // Announces the oldest queued event (queue.ts): Responses are offered once the Forced effects have resolved, so the
 // response frame goes down first and the Forced frames on top of it (rr.timing-of-ability-resolution). An open action
 // window waits under a resume frame and comes back when everything above it is done, with the same seat and passes.
@@ -47,6 +52,7 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const together = sameOccurrence(event, queued);
   const rest = queued.slice(together.length);
   const { pendingEvents: _queued, ...without } = state;
+  for (const each of [event, ...together]) noteDetached(each, steps);
   // An engagement is remembered for the round (families/attack-events.ts).
   const cleared: ScenarioState = [event, ...together].reduce(
     (current, each) => board(noteEngaged(noteEvent(current, each, ctx), each, ctx), each, ctx, steps),

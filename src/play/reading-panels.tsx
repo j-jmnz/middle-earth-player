@@ -75,7 +75,7 @@ export function PileList({
  * A row's folded cards (row-fold.ts): the cards that left staging or the engagement area for the fold stack, left to right. A tile shows the card large and sends nothing. It stands in the
  * reading panels' frame, like a discard pile's list.
  */
-export function RowList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string }[]; onRead: (cardId: string) => void; onClose: () => void }) {
+export function RowList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string; detail?: string | null }[]; onRead: (cardId: string) => void; onClose: () => void }) {
   const s = useUiScale();
   return (
     <View testID="row-list" collapsable={false} style={{ flexShrink: 1 }}>
@@ -89,7 +89,7 @@ export function RowList({ title, cards, onRead, onClose }: { title: string; card
       <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
         {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing is folded away.</Text> : null}
         {cards.map((card) => (
-          <Tile key={card.id} label={card.label} selected={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
+          <Tile key={card.id} label={card.label} detail={card.detail} selected={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
         ))}
       </ScrollView>
     </View>

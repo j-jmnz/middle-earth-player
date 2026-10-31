@@ -38,6 +38,8 @@ export const pickSchema = z.strictObject({
   burden: z.literal(true).optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
+  // With `type: card`, the enemies engaged with a player count too ("each Raider card in play", 12046:A:1): the cards in play of every kind, an enemy in an engagement area included.
+  engagedEnemies: z.literal(true).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
   sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
   // A card of any of these spheres ("a Leadership or Lore character"), its printed sphere.

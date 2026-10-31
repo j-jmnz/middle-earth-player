@@ -9,6 +9,17 @@ import type { ReduceContext } from "../interpret.ts";
 import { shownSide } from "./dreamchaser-faces.ts";
 import type { ScenarioState } from "../state.ts";
 import { modifiedStat } from "../keywords.ts";
+import { isElite } from "./sea-routes.ts";
+
+const CHANGE_OF_PLANS = "12040";
+
+/** An enemy whose damage the stage that just left held back (rr.destroy; ledger lines 12039:B:1, 12040:B:1): Captain Sahír and Na'asiyah were indestructible under Take the Ship!, so the damage
+ * on them waits, lethal, for the When Revealed of Change of Plans that turns them into allies; no other enemy in any stage's When Revealed is held. */
+export function heldByLapsedStage(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
+  if (printed.type !== "enemy" || !isElite(printed)) return false;
+  return state.stack.some((frame) => frame.frame === "whenRevealed" && frame.cardId != null && state.cards[frame.cardId]?.zone === "questStage" && state.cards[frame.cardId]?.code === CHANGE_OF_PLANS);
+}
 
 /** The Threat a grappled enemy adds to the location it is grappled with (dcce.grapple: "it adds 2 Threat to the Threat of the location"). */
 export const GRAPPLE_THREAT = 2;

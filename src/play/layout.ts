@@ -323,15 +323,17 @@ export function tableLayout(
   // face-down shadow cards peeks out two steps under it.
   const engagedH = card.h + peek * Math.max(1, deepestUnder(views.engaged.entries));
   const oneRow = card.h + 2 * peek;
+  // The peek of a staging card with cards under it (a grappled enemy: one peek and its count) hangs below the card by a peek, deeper than the gap: the engagement row starts under it.
+  const stagingDrop = options.stacks ? Math.max(gap, peek * Math.min(1, deepestUnder(views.staging.entries))) : gap;
   const shown = Math.max(m.handMin, Math.round(card.h * HAND_SHOW));
   const restY = height - bottom - shown;
   // The room under the play area's one row, down to a gap above the hand: the play area's extra rows take it first, and the gaps
   // share what is left (table-spacing.ts).
-  const spare = restY - gap - (gutter + card.h + gap + engagedH + gap + oneRow);
+  const spare = restY - gap - (gutter + card.h + stagingDrop + engagedH + gap + oneRow);
   const plan = playPlan(views.play.entries, centerW, card, oneRow, oneRow + Math.max(0, spare), m);
   const grow = downGaps(spare, card.h, scale, plan.h - oneRow);
   const stagingY = gutter + grow.top;
-  const engagedY = stagingY + card.h + gap + grow.stagingEngaged;
+  const engagedY = stagingY + card.h + stagingDrop + grow.stagingEngaged;
   const playY = engagedY + engagedH + gap + grow.engagedPlay;
   const playH = plan.h;
   // Ground no gap can take (a tall tablet) raises the hand, up to its whole card: a tablet player reads the hand without the scrub.

@@ -33,6 +33,13 @@ export type EngineStep =
   | { kind: "cancel"; cardId: string }
   // An enemy attached itself facedown to a location in the staging area (dcce.grapple): the enemy is not named, it is facedown now.
   | { kind: "grapple"; enemyId: string; locationId: string }
+  // A grappled enemy came out from under its location, faceup, into the staging area (dcce.grapple): named, it was seen faceup when it was revealed.
+  | { kind: "detach"; enemyId: string; locationId: string }
+  // A Stormcaller Elite card turned to its objective ally side and a player took it (dcce.stormcaller-elite); the card is the same instance.
+  | { kind: "flip"; cardId: string; seat: number }
+  // The cards of an encounter set left the game (RemoveEncounterSet), or the set-aside cards of one were shuffled into the encounter deck (ShuffleSetAsideSet): how many (dcce.stormcaller-and-the-thing).
+  | { kind: "removeSet"; set: string; count: number }
+  | { kind: "shuffleSet"; set: string; count: number }
   | { kind: "resetEncounterDeck"; count: number; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };

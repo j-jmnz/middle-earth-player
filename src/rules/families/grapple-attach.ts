@@ -1,7 +1,7 @@
 // Rules: dcce.grapple (data/rules/entries.json); ledger lines 12051:A:1, 12052:A:2, 12053:A:1, 12054:A:1. Grapple (highest or lowest printed Threat or quest points): an enemy with the keyword that is revealed,
 // or whose keyword an effect resolves, attaches facedown to the location in the staging area the keyword names. While grappled with a location an enemy is in play, not in the staging area: it cannot
 // be engaged, no player card effect can choose it (it is immune: no filter looks at its zone) and it adds 2 Threat to its location (grapple-values.ts). When the location becomes the active location, or is
-// explored from the staging area, the enemies grappled with it are detached, flipped faceup and added to the staging area (zones.ts moveCard releases them when the location leaves it).
+// explored from the staging area, the enemies grappled with it are detached, flipped faceup and added to the staging area (zones.ts releaseGrappled); any other exit discards them with it (discardGrappled).
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { askTarget } from "../choices.ts";
@@ -58,7 +58,8 @@ export function resolveGrapple(state: ScenarioState, instruction: Verb<"ResolveG
   if (targets.length === 0) return enemy.zone === "staging" ? state : moveEncounter(state, id, "staging", state.firstPlayer, ctx, steps);
   const chosen = focus.chosen && targets.includes(focus.chosen) ? focus.chosen : targets.length === 1 ? targets[0] : undefined;
   if (!chosen) {
-    if (!effectData(state)) return updateCard(moveCard(state, id, { zone: "grappled", locationId: targets[0] ?? "" }), id, { face: "down", controller: null });
+    // The first player chooses among tied locations (dcce.grapple): with no effect frame there is nobody to ask, and no location is picked for them.
+    if (!effectData(state)) throw new Error(`Grapple of ${enemy.code} ties ${targets.length} locations with no effect open to ask the first player`);
     return askTarget(state, { instruction: { ...instruction, card: id }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, targets);
   }
   steps.push({ kind: "grapple", enemyId: id, locationId: chosen });

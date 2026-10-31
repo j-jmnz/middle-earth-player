@@ -1,6 +1,6 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
-import { grappleLine } from "./grapple-words.ts";
+import { detachLine, grappleLine } from "./grapple-words.ts";
 import type { Cause } from "../rules/cause.ts";
 import type { EngineStep } from "../rules/intents.ts";
 
@@ -110,9 +110,17 @@ function words(step: EngineStep, names: LogNames): string | null {
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
       return `${names.card(step.cardId)} is canceled`;
-    // The enemy is facedown now: the line names the location, never the enemy (dcce.grapple).
+    // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
     case "grapple":
-      return grappleLine(names.card(step.locationId));
+      return grappleLine(names.card(step.enemyId), names.card(step.locationId));
+    case "detach":
+      return detachLine(names.card(step.enemyId), names.card(step.locationId));
+    case "flip":
+      return `${names.card(step.cardId)} flips to its objective side, and ${player(step.seat)} takes it`;
+    case "removeSet":
+      return step.count === 0 ? null : `${step.count} ${step.count === 1 ? "card" : "cards"} of ${step.set} ${step.count === 1 ? "leaves" : "leave"} the game`;
+    case "shuffleSet":
+      return step.count === 0 ? null : `${step.count} ${step.count === 1 ? "card" : "cards"} of ${step.set} ${step.count === 1 ? "is" : "are"} shuffled into the encounter deck`;
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
   }

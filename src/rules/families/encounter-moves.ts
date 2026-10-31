@@ -41,6 +41,11 @@ export function pushPicked(state: ScenarioState, id: string | null | undefined):
   return data ? patchTop(state, { data: { ...data, picked: [...(data.picked ?? []), id ?? ""] } }) : state;
 }
 
+// The set-aside card with this title (the first in set-aside order).
+export function setAsideNamed(state: ScenarioState, name: string, ctx: ReduceContext): string | undefined {
+  return state.setAside.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === name);
+}
+
 export function typeOf(state: ScenarioState, id: string | null | undefined, ctx: ReduceContext): CardType | null {
   const card = id ? state.cards[id] : undefined;
   return card ? printedOf(ctx.cards, card.code).type : null;

@@ -6,7 +6,7 @@ import { memo } from "react";
 
 import { Moving } from "./card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { Badges, CardBody, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, StackMark, StageMarks, SuccessMedallion, Tokens, UnderMarkView } from "./canvas-pieces.native.tsx";
+import { Badges, CardBody, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, StackMark, ShipLossView, StageMarks, SuccessMedallion, Tokens, UnderMarkView } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { shownBounds, type CardSlot } from "./layout.ts";
 import { sphereRing } from "./table-canvas-views.ts";
@@ -65,6 +65,7 @@ function drawOverlay(p: PieceProps) {
         {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} questPoints={info.questPoints} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
+        {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.under ? <UnderMarkView rect={rect} mark={info.under} fonts={fonts} t={t} s={s} /> : null}
         {info?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}

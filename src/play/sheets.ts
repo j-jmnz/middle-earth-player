@@ -16,7 +16,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { grappleAsk, grappleOptionLabel } from "./grapple-words.ts";
+import { grantedTravelWords, grappleAsk, grappleFactsOf, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "./grapple-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
 import { branchNow, dealtNow } from "./aflame-words.ts";
@@ -93,7 +93,7 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
     const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
     if (!reason) return [];
     const travel = effectsOf(ctx, card.code).find((effect) => effect.timing === "travel");
-    const line = lineOf(travel, names);
+    const line = lineOf(travel, names) ?? grantedTravelWords(game, id);
     return [{ id, label: cardLabel(game, names, id), code: pictureKey(card), reason: line ? `${reason}. ${line}` : `${reason}.` }];
   });
 }
@@ -271,7 +271,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const tradeAsk = trade && traded ? { verb: "Trade", prompt: tradeWords(game, ctx.cards, trade, names.card(traded.id), effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"))) } : null;
       // What the instruction after the pick deals or places, read now (the damage, progress or resources a prompt and a row state).
       const amountNow = wait?.kind === "target" ? dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source) : undefined;
-      const asked = wait?.kind === "target" ? (tradeAsk ?? (wait.item.instruction ? grappleAsk(wait.item.instruction, source, words) : null) ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow)) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? (tradeAsk ?? (wait.item.instruction ? grappleAsk(wait.item.instruction, source, words, grappleFactsOf(game, ctx, wait.item.instruction, data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null)) : null) ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow)) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
@@ -349,7 +349,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: targets.length > 0 ? "Travel to a location" : blocked && active ? `Explore ${names.card(active.id)} first` : "No location to travel to",
         note:
           targets.length > 0
-            ? "The location becomes active and leaves staging: its threat stops counting, and progress goes on it before the quest."
+            ? [travelNote(game, targets), returnsNote(game, ctx, names.card)].filter((part) => part != null).join(" ")
             : blocked && active && activePoints != null
               ? `${Math.max(0, activePoints - active.progress)} more progress explores it. Only one location can be active.`
               : null,
@@ -364,8 +364,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const base = option(game, names, id);
           // A Travel line that moves progress onto the Stormcaller's stage states what it leaves there, and arms the confirm when it advances the Stormcaller or loses the game.
           const caller = stormcallerTravel(game, ctx, id);
-          const label = [base.label, line, caller?.words].filter((part) => part != null && part !== "").join(" · ");
-          return { ...base, label, stats, ...(caller?.caution ? { caution: caller.caution } : {}), intent: { type: "Travel", locationId: id } };
+          // A Travel cost another card gave it (Weather Deck, 12044:A:1), and the enemies grappled with it that come out and join the staging area (dcce.grapple): the confirm is armed with what they do.
+          const granted = grantedTravelWords(game, id);
+          const grapple = grappleTravel(game, ctx, id);
+          const label = [base.label, line, granted, caller?.words, grapple?.words].filter((part) => part != null && part !== "").join(" · ");
+          const caution = caller?.caution ?? grapple?.caution;
+          return { ...base, label, stats, ...(caution ? { caution } : {}), intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,

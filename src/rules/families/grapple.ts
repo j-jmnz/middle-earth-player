@@ -19,7 +19,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "FlipSetAside":
       return flipSetAside(state, instruction, ctx);
     case "FlipElite":
-      return flipElite(state, instruction, ctx);
+      return flipElite(state, instruction, ctx, steps);
     case "RemoveEncounterSet":
       return removeEncounterSet(state, instruction, ctx, steps);
     case "ShuffleSetAsideSet":

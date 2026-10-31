@@ -7,6 +7,8 @@ import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 // dcce.scalable-upgradable, dcce.encounter-cards, rr.travel, rr.search (data/rules/entries.json).
 const THING: PickSpec = { type: "enemy", control: "any", staging: true, names: ["The Thing in the Depths"] };
 const RAIDER: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Raider" };
+// "Each Raider card in play": an enemy, or the objective ally side Captain Sahír and Na'asiyah show after stage 2 (Raider, 11077, 11079).
+const RAIDER_CARD: PickSpec = { type: "card", control: "any", engagedEnemies: true, trait: "Raider" };
 const SAHIR_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Captain Sahír"] };
 const ELITE_ENEMIES: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Captain Sahír", "Na'asiyah"] };
 const MY_CHARACTER: PickSpec = { type: "character", control: "you" };
@@ -20,7 +22,7 @@ const exhaustOne: Effect["instructions"] = [{ verb: "Pick", pick: READY_CHARACTE
 
 
 // The Thing in the Depths (12049, and 110063 with its Campaign Mode only side B): it cannot be engaged, it gets +3 hit points for each player, and when a Creature enemy is destroyed it takes damage (the
-// destroyed enemy's Threat on side A, the X the event carries; 2 on side B). `side` names the ledger side of each line; side B's first line is "Campaign Mode only", which has no effect (dcce.campaign-mode).
+// destroyed enemy's printed Threat on side A; 2 on side B). `side` names the ledger side of each line; side B's first line is "Campaign Mode only", which has no effect (dcce.campaign-mode).
 const thing = (code: string, side: "A" | "B", cannot: number, hitPoints: number, forced: number, damage: Effect["instructions"][number]): Effect[] => [
   { id: `${code}:constant:${side === "A" ? 1 : 4}`, cardCode: code, lines: [`${code}:${side}:${cannot}`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay" }] },
   { id: `${code}:constant:${side === "A" ? 2 : 5}`, cardCode: code, lines: [`${code}:${side}:${hitPoints}`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "hitPoints", amount: { players: true, times: 3 }, until: "whileSourceInPlay" }] },
@@ -136,7 +138,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "12045:shadow:1", cardCode: "12045", lines: ["12045:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfPhase", target: "attacker" }] },
 
   // 12046 Crew Quarters. Travel: 1 resource on each Raider card in play. Shadow: the attacking enemy gets +2 Attack.
-  { id: "12046:travel:1", cardCode: "12046", lines: ["12046:A:1"], timing: "travel", instructions: [{ verb: "Each", pick: RAIDER, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "picked" }] }] },
+  { id: "12046:travel:1", cardCode: "12046", lines: ["12046:A:1"], timing: "travel", instructions: [{ verb: "Each", pick: RAIDER_CARD, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "picked" }] }] },
   { id: "12046:shadow:1", cardCode: "12046", lines: ["12046:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker" }] },
 
   // 12047 Quarter Deck. While it is the active location each enemy is dealt an additional shadow card in the combat phase: once the shadow cards are dealt each of the seat's engaged enemies gets one more
@@ -147,7 +149,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["12047:A:1"],
     timing: "forced",
     trigger: "shadowsDealt",
-    condition: { kind: "sourceIn", zone: "activeLocation" },
+    condition: { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "sourceIn", zone: "activeLocation" }] },
     instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", engaged: "you" }, instructions: [{ verb: "DealShadowTo", target: "picked" }] }],
   },
   {
@@ -173,8 +175,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 12049 The Thing in the Depths (Immune to player card effects is a keyword), and 110063 on both sides.
-  ...thing("12049", "A", 2, 3, 4, { verb: "DamageCard", amount: { x: true }, target: "self" }),
-  ...thing("110063", "A", 2, 3, 4, { verb: "DamageCard", amount: { x: true }, target: "self" }),
+  ...thing("12049", "A", 2, 3, 4, { verb: "DamageCard", amount: { stat: "threat", of: "subject", printed: true }, target: "self" }),
+  ...thing("110063", "A", 2, 3, 4, { verb: "DamageCard", amount: { stat: "threat", of: "subject", printed: true }, target: "self" }),
   ...thing("110063", "B", 3, 4, 5, { verb: "DamageCard", amount: 2, target: "self" }),
 
   // 12050 Eye of the Beast (Surge is a keyword). It cannot attack. While it is engaged with a player the Thing attacks that player in the combat phase, from the staging area, dealt a shadow card for each attack.

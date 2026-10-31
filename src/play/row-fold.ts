@@ -122,8 +122,8 @@ export function foldTitle(where: "staging" | "engaged"): string {
 }
 
 // The fold order of a staging group, lowest first (docs/design-system-table.md): the Stormcaller's area while it is not at the players' stage (0), then cards the players control (`claimed`, the engine's marker for an objective a player took; a freed tower is one), then guarded
-// pairs, then locations, then enemies; any other card goes last. A revealed card has a `controller` (the seat that revealed it), so that says nothing here.
-export const STAGING_RANK = { area: 0, controlled: 1, guarded: 2, location: 3, enemy: 4, other: 5 } as const;
+// pairs, then locations, then enemies, then any other card; a location with enemies grappled under it folds last of all (the count and the Threat they add are on it, and a fold list reads them, dcce.grapple). A revealed card has a `controller` (the seat that revealed it), so that says nothing here.
+export const STAGING_RANK = { area: 0, controlled: 1, guarded: 2, location: 3, enemy: 4, other: 5, grappled: 6 } as const;
 
 /** The fold rank of a staging group, from its lead entry and how many cards it holds. */
 export function stagingRank(group: readonly ZoneEntry[]): number {
@@ -133,7 +133,7 @@ export function stagingRank(group: readonly ZoneEntry[]): number {
   if (lead.area === "stage") return group.some((entry) => entry.area === "together") ? STAGING_RANK.guarded : STAGING_RANK.area;
   if (lead.card.claimed === true) return STAGING_RANK.controlled;
   if (group.length > 1) return STAGING_RANK.guarded;
-  if (lead.kind === "location") return STAGING_RANK.location;
+  if (lead.kind === "location") return lead.attached.some((card) => card.zone === "grappled") ? STAGING_RANK.grappled : STAGING_RANK.location;
   if (lead.kind === "enemy" || lead.kind == null) return STAGING_RANK.enemy;
   return STAGING_RANK.other;
 }

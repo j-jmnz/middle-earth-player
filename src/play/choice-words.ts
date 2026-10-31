@@ -9,7 +9,7 @@ import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { deckPickWords, deckWords } from "./deck-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";
 import { attackWords } from "./attack-words.ts";
-import { southWords } from "./south-words.ts";
+import { assignDamageWords, southWords } from "./south-words.ts";
 import { moriaBranchWords, moriaPickWords, moriaWords } from "./moria-words.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden-words.ts";
 import { miscPickWords, miscWords } from "./misc-words.ts";
@@ -377,6 +377,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
+  if (pick.verb === "AssignDamage") return assignDamageWords(pick, sourceId ? names.card(sourceId) : null);
   const sea = seaPickWords(pick);
   if (sea) return sea;
   const play = playPickWords(pick);
@@ -447,6 +448,9 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       const kind = pick.pick.trait ? `${pick.pick.trait} ${noun}` : noun;
       return { verb: "Place", prompt: `Choose ${article(kind)} to place ${amountNow != null ? amountNow : amountWords(next.amount)} progress on.` };
     }
+    // A set-aside card a Forced effect gives to a hand (Come Together, 11194:A:3): the player whose hand it joins.
+    case "AddSetAsideToHand":
+      return { verb: "Choose", prompt: `Choose the player who adds ${names.code(next.code)} to their hand.` };
     case "PutIntoPlay":
       return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };
     default:

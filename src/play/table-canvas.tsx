@@ -67,7 +67,8 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { i
 function marksText(slot: SlotInfo | null): string {
   if (!slot) return "";
   const engagement = slot.engagement ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
-  return `${engagement}${slot.delayed ? " · an effect comes later" : ""}`;
+  const loss = slot.loss ? ` · ${slot.loss.speech}` : "";
+  return `${engagement}${loss}${slot.delayed ? " · an effect comes later" : ""}`;
 }
 
 function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, highlight, t }: RowProps & { zone: ZoneId }) {

@@ -37,4 +37,9 @@
 // 19 (Dream-chaser, phase 43): a Pick from an objective ally that has an encounter card back (a ship-objective, Calaerion, Calphon) is not a player card effect (dcce.encounter-cards), so it can target
 // cards that are immune to player card effects, and the Corsair Skiff offers its Boarding branch only while the Corsair deck or its discard pile holds a card: a replayed Voyage Across Belegaer,
 // Fate of Númenor or Raid on the Grey Havens game can take a different path.
-export const ENGINE_VERSION = 19;
+// 20 (Dream-chaser, phase 44): an enemy grappled with a location is in the zone `grappled` (in play, not in the staging area, adding Threat to its location); the enemies grappled with a location
+// are detached to the staging area only when it becomes the active location or is explored from the staging area, and discarded with it when it leaves the staging area any other way (dcce.grapple, rr.attachment-cards);
+// tokens placed on a set-aside card stay on it as it enters play (Captain Sahír and Na'asiyah, 12039:B:2); an enemy a stage made indestructible waits for the When Revealed that flips it, and no other enemy is held;
+// Crew Quarters adds its resource to each Raider card, the objective sides of Sahír and Na'asiyah included, and Quarter Deck deals its extra shadow card only in the combat phase: a replayed Thing in the Depths game
+// takes a different path.
+export const ENGINE_VERSION = 20;

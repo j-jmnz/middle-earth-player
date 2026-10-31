@@ -7,6 +7,7 @@
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
+import { attackSource } from "./grapple-words.ts";
 import { damageOutcome, defenseDamage, undefendedDamage } from "./foresight.ts";
 import { has, option, statOf } from "./sheet-parts.ts";
 import type { Alternative, MultiSheet, OptionMark, Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
@@ -83,7 +84,9 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   const numbers = attackNumbers(game, ctx);
   const title = numbers ? `${names.card(numbers.enemyId)} attacks` : "An enemy attacks";
   // An attack a shadow card makes says where it comes from, as a pick says its card's line (sheets.ts).
-  const source = numbers && game.pendingAttack?.shadowAttack ? ` ${names.card(numbers.enemyId)}'s shadow effect: it attacks you now, and goes back to the top of the encounter deck after combat.` : "";
+  const shadowSource = numbers && game.pendingAttack?.shadowAttack ? ` ${names.card(numbers.enemyId)}'s shadow effect: it attacks you now, and goes back to the top of the encounter deck after combat.` : "";
+  // An attack the Thing makes from the staging area while Eye of the Beast is engaged with the defender, or a detached arm's (dcce.grapple, 12050:A:3, 12052:A:3).
+  const source = shadowSource || attackSource(game, ctx, names.card);
   const note = numbers ? `Attack ${numbers.attack}.${source}` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
   const undefended = undefendedSheet(game, ctx, names, title, note);

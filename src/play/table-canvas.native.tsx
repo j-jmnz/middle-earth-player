@@ -141,8 +141,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const numbers = info(game, seat, slot.id);
     // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
     if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
-    const grappled = grappleDetail(game, slot.id);
-    return numbers.under ? `${nameOf(slot.picture ?? slot.code)}, ${numbers.under.speech}` : grappled ? `${nameOf(slot.picture ?? slot.code)}, ${grappled}` : null;
+    // The Havens Burn's count, the enemies grappled under a location, and a Ship location's Threat against the total that loses (each is a sentence of its own; none drops another).
+    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech].filter((part): part is string => part != null);
+    return said.length > 0 ? `${nameOf(slot.picture ?? slot.code)}, ${said.join(". ")}` : null;
   };
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.
   const stageFacts = areaFacts(game);

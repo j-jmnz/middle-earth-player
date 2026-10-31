@@ -81,7 +81,8 @@ function checkChoose(state: ScenarioState, sheet: PickSheet, seen: Seen): void {
     seen.branches.set(source, labels);
   } else if (data?.wait?.kind === "target") {
     seen.targets.add(`${data.wait.item.instruction.verb}`);
-    expect(sheet.note ?? "").toMatch(/^Choose /);
+    // A pick of Redhorn Pass's damage names the card and the damage still to place ("Redhorn Pass: assign 1 damage to a character you control (2 of 3 left).").
+    expect(sheet.note ?? "").toMatch(/^(Choose |[^:]+: assign 1 damage )/);
     for (const option of sheet.options) expect(option.label).not.toBe(option.id);
   }
   if (state.seatCount > 1) expect(sheet.note ?? "").toContain(`Player ${window.seat + 1} chooses.`);

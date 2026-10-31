@@ -28,7 +28,7 @@ export function assignDamage(state: ScenarioState, instruction: Assign, focus: F
     const total = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
     if (total <= 0) return state;
     const seats = instruction.who === "eachSeat" ? livingSeats(state) : [focus.seat];
-    return queueFront(state, seats.map((seat) => ({ instruction: { ...instruction, who: undefined, left: total }, seat, chosen: null, cause })));
+    return queueFront(state, seats.map((seat) => ({ instruction: { ...instruction, who: undefined, left: total, of: total }, seat, chosen: null, cause })));
   }
   if (instruction.left <= 0) return state;
   const options = pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx).filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));

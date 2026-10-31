@@ -14,7 +14,7 @@ import type { ScenarioState } from "../state.ts";
 import { inPlay, livingSeats, updateCard } from "../state.ts";
 import { printedOf } from "../printed.ts";
 import { moveCard } from "../zones.ts";
-import { effectData, moveEncounter } from "./encounter-moves.ts";
+import { effectData, moveEncounter, setAsideNamed } from "./encounter-moves.ts";
 import { healBlocked } from "./burden-life.ts";
 import type { Focus } from "./index.ts";
 import { queueFront } from "./play-refs.ts";
@@ -79,7 +79,7 @@ export function dealtCopies(state: ScenarioState, codes: readonly string[], step
 
 /** StageSetAside: the set-aside card with this code joins the staging area, announced as added to it and as entering play (its Forced effects hear that). */
 export function stageSetAside(state: ScenarioState, instruction: Verb<"StageSetAside">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = state.setAside.find((other) => (instruction.code != null ? state.cards[other]?.code === instruction.code : printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name));
+  const id = instruction.code != null ? state.setAside.find((other) => state.cards[other]?.code === instruction.code) : setAsideNamed(state, instruction.name ?? "", ctx);
   if (!id) return state;
   // A card set aside on its Campaign Mode only side (The Thing in the Depths, FlipSetAside) keeps that side as it joins the staging area.
   const side = state.cards[id]?.face === "B" ? "B" : null;

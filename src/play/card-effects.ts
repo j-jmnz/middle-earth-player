@@ -10,6 +10,7 @@ import { aflameTally, burnTally } from "../rules/families/aflame-values.ts";
 import { aflameLine, aflameMark, burnLine, burnMark } from "./aflame-words.ts";
 import { areaRoleOf, stageFactsOf } from "./stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "./stormcaller-words.ts";
+import { shipLoss, type ShipLoss } from "./grapple-words.ts";
 import { areaStanding } from "../rules/families/stormcaller-values.ts";
 import { placedLimit } from "../rules/families/uncharted-limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
@@ -248,6 +249,8 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     under: card != null && inPlay(card.zone) ? underMark(burnTally(game, cardId, ctx)) : null,
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
+    // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
+    loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
   };
 }
 
@@ -273,4 +276,5 @@ export type SlotNumbers = {
   delayed: boolean;
   under: UnderMark | null;
   fire: FireMark | null;
+  loss: ShipLoss | null;
 };

@@ -466,6 +466,11 @@ export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; 
   return <FootPill rect={rect} image={images.damage} icon="damage" value={mark.text} danger={mark.danger} lift={false} fonts={fonts} t={t} s={s} />;
 }
 
+/** A Ship location's Threat against the total that loses the game at stage 3 ("8/9"): the Threat icon and the count on a pill at the card's foot, threat red at the total (12041:B:2). */
+export function ShipLossView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; danger: boolean }; fonts: Fonts; t: TableTokens; s: number }) {
+  return <FootPill rect={rect} image={null} icon="threat" value={mark.text} danger={mark.danger} lift={false} fonts={fonts} t={t} s={s} />;
+}
+
 /** An enemy's engagement cost in staging: threat red when the shown seat's threat engages it at the checks (rr.engagement-check). */
 export function EngagementMark({ rect, cost, engages, fonts, images, t, s }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages; t: TableTokens; s: number }) {
   return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} t={t} s={s} />;

@@ -12,7 +12,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { settle } from "../rules/machine.ts";
 import { attachTo, spawn } from "../rules/zones.ts";
 import { UPGRADED_CODES, afterFlight, depthsLoadout, depthsPlan, depthsStart, depthsWorld } from "../../scripts/depths-game.ts";
-import { CODES, campaign, depths, depthsTable, finish, idOf, loadDepthsWorld, resolveRecords, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { CODES, campaign, depths, depthsTable, finish, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsWorld } from "../../scripts/depths-scene.ts";
 
 import { buildStart } from "./start.ts";
 import { EFFECTS } from "../effects/index.ts";
@@ -103,6 +103,24 @@ describe("The Thing in the Depths in the Dream-chaser campaign", () => {
       expect(hand, `${seats} players`).toHaveLength(1);
       expect(after.state.chosenAtSetup).toEqual([{ code: CODES.comeTogether, seat: hand[0] }]);
     }
+  });
+
+  it("never flips Captain Sahír when Helm is explored from the staging area before he enters play: the flip finds nothing, and Sea Serpent and Come Together do not join (11194:A:3, open in docs/brief.md)", () => {
+    // Northern Tracker commits, and its Response places 1 progress on Helm of the Stormcaller (1 quest point) in the staging area: Helm is explored without becoming the active location, so Sahír and Na'asiyah never enter play.
+    const made = depthsTable(scene, { campaign: true, stage: "12039", progress: 1, staging: [CODES.helm], play: [CODES.northernTracker], setAside: [CODES.sahir, CODES.naasiyah, CODES.blackKey, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent, CODES.thing] });
+    const tracker = idOf(made.state, CODES.northernTracker);
+    let run = send(start(made.state), { type: "Commit", cardIds: [made.hero, tracker] }, made.ctx);
+    run = finish(send(run, { type: "Trigger", cardId: tracker, effectId: "01045:response:1" }, made.ctx), made.ctx);
+    expect(where(run.state, CODES.helm)[0]?.zone).toBe("victory");
+    // Stage 1 has room once Helm is in the victory display: the quest fills it (1 progress and 3 Willpower for its 4 quest points), and stage 2's When Revealed flips what it can and advances to stage 3.
+    for (let guard = 0; guard < 12 && run.state.cards[run.state.questStage ?? ""]?.code !== "12041" && run.state.window != null; guard += 1) run = finish(send(run, { type: "Pass" }, made.ctx), made.ctx);
+    expect(run.state.cards[run.state.questStage ?? ""]?.code).toBe("12041");
+    // Neither Elite card ever entered play, so nothing flipped: they stay out of play, the Black Keys stay set aside, nothing joined the staging area or a hand.
+    for (const code of [CODES.sahir, CODES.naasiyah, CODES.blackKey, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent]) expect(where(run.state, code)[0]?.zone, code).toBe("setAside");
+    expect(where(run.state, CODES.sahirAlly)).toEqual([]);
+    expect(where(run.state, CODES.naasiyahAlly)).toEqual([]);
+    expect(where(run.state, CODES.thing)[0]?.zone).toBe("staging");
+    expect(run.state.chosenAtSetup ?? []).toEqual([]);
   });
 
   it("hands the previous parts to this one: the pool (Ominous Fate) is shuffled into the encounter deck, and the log's marks reach the game as a scalable card's level and the Upgraded sides", () => {

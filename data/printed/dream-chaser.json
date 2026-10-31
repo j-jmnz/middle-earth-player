@@ -4087,7 +4087,8 @@
       "inert": [],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
-      "confirmedBy": null
+      "confirmedBy": null,
+      "notes": "Quest points: the scan prints a dash (none) in the quest points box at the bottom left of side B, not a number, and side A prints no box; Hall of Beorn lists 0."
     },
     {
       "code": "12041",
@@ -4121,7 +4122,8 @@
       "inert": [],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
-      "confirmedBy": null
+      "confirmedBy": null,
+      "notes": "Quest points: the scan prints a dash (none) in the quest points box at the bottom left of side B, not a number, and side A prints no box; Hall of Beorn lists 0."
     },
     {
       "code": "12042",

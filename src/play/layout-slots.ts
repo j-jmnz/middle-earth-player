@@ -21,7 +21,8 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
   return {
     ...rect,
     id: card.id,
-    code: card.code,
+    // An enemy grappled with a location is facedown and unnamed: its slot is a back and carries no code (a card's code names it and draws its picture).
+    code: card.zone === "grappled" ? "" : card.code,
     ...(card.face === "B" ? { picture: pictureKey(card) } : {}),
     zone,
     kind,

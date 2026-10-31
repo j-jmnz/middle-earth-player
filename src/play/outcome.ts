@@ -105,6 +105,11 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         }
         if (!current) open(1, "The quest advances", "good");
         line(`The quest advances to ${names.card(step.cardId)}`);
+        // A stage whose When Revealed swaps the encounter sets (Change of Plans, 12040:B:1) reads its printed words as the beat: its flips, the set that leaves and the set shuffled in are in the log.
+        if (steps.slice(index + 1).some((later) => later.kind === "removeSet")) {
+          const text = names.revealed?.(step.cardId);
+          if (text) line(text, null, [step.cardId]);
+        }
         // A stage a branch led to ("proceed to one of the 2 A Chosen Path stages, at random", 01120:B:1): the stages share a
         // name, so the banner says the pick was the shuffle's and what the stage asks of the players.
         const code = after.cards[step.cardId]?.code;
@@ -157,10 +162,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (!current || current.rank !== 3) open(3, "Staging", "plain");
         line(`Revealed ${names.card(step.cardId)}`);
         return;
-      // The enemy is facedown now: the line names the location, never the enemy (dcce.grapple).
+      // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
       case "grapple":
         if (!current || current.rank !== 3) open(3, "Staging", "plain");
-        line(grappleLine(names.card(step.locationId)), null, [step.locationId]);
+        line(grappleLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.locationId]);
+        return;
+      // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
+      case "detach":
+        if (!current || current.rank !== 2) open(2, "", "plain");
+        line(detachLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.enemyId]);
         return;
       case "engage": {
         if (joined.has(index)) return;
@@ -206,10 +216,6 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   } else if (after.activeLocation && after.activeLocation !== before.activeLocation && after.activeLocation !== before.secondActiveLocation && before.staging.includes(after.activeLocation)) {
     groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
-
-  // The enemies grappled with a location that became the active location or was explored are detached, faceup, in the staging area (dcce.grapple).
-  const detached = Object.values(after.cards).filter((card) => card.zone === "staging" && before.cards[card.id]?.zone === "grappled");
-  if (detached.length > 0) groups.push({ rank: 2, title: "", tone: "plain", lines: detached.map((card) => ({ text: detachLine(names.card(card.id), names.card(before.cards[card.id]?.host ?? "")), mark: null })) });
 
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");
   if (shown.length === 0) return null;

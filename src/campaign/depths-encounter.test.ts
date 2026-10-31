@@ -107,6 +107,15 @@ describe("Crew Quarters (12046)", () => {
     expect(run.state.activeLocation).toBe(idOf(run.state, CODES.crewQuarters));
   });
 
+  it("adds a resource to Captain Sahír and Na'asiyah on their objective ally sides too: they are Raider cards, not Raider enemies (A:1)", () => {
+    const made = make({ phase: "Travel", stage: "12041", allies: true, staging: [CODES.crewQuarters, "raider"], engaged: [{ code: "raider", seat: 0, resources: 1 }, "creature"] });
+    const run = finish(send(start(made.state), { type: "Travel", locationId: idOf(made.state, CODES.crewQuarters) }, made.ctx), made.ctx);
+    expect(cardOf(run.state, CODES.sahirAlly)).toMatchObject({ zone: "play", resources: 1 });
+    expect(cardOf(run.state, CODES.naasiyahAlly)).toMatchObject({ zone: "play", resources: 1 });
+    expect(idsOf(run.state, "raider").map((id) => run.state.cards[id]?.resources).sort()).toEqual([1, 2]);
+    expect(cardOf(run.state, "creature")?.resources).toBe(0);
+  });
+
   it("can be traveled to with no Raider in play: there is nothing to add a resource to", () => {
     const made = make({ phase: "Travel", staging: [CODES.crewQuarters] });
     expect(legalIntents(made.state, made.ctx).some((intent) => intent.type === "Travel")).toBe(true);
@@ -125,6 +134,23 @@ describe("Quarter Deck (12047)", () => {
     expect(shadowsOf(active.during, "mild")).toBe(2);
     const idle = depthsFight(world, "f0", "mild", { staging: [CODES.quarterDeck], deck: ["f0", "f0", "f0", "f0", "f0", "f0"] }, { undefended: true });
     expect(shadowsOf(idle.during, "mild")).toBe(1);
+  });
+
+  it("deals nothing extra to an attack made outside the combat phase: Sea Serpent's attack at the end of the round is dealt its one shadow card (A:1, \"at the beginning of the combat phase\")", () => {
+    const shadowsOf = (state: ScenarioState): number => Object.values(state.cards).filter((card) => card.zone === "shadow" && state.cards[card.host ?? ""]?.code === CODES.seaSerpent).length;
+    const serpentAttack = (active: boolean): ScenarioState => {
+      const table = make({ ...(active ? { active: CODES.quarterDeck } : {}), engaged: [CODES.seaSerpent], deck: ["f0", "f0", "f0", "f0"] });
+      const id = idOf(table.state, CODES.seaSerpent);
+      const enraged = { ...table.state, cards: { ...table.state.cards, [id]: { ...table.state.cards[id]!, face: "B" as const } } };
+      // Only the end of the round's Forced effect of Sea Serpent (11196:B:4) runs, so its Forced effect after it is destroyed does not move it.
+      const ctx = { ...table.ctx, effects: table.ctx.effects.filter((effect) => effect.cardCode !== CODES.seaSerpent || effect.id === "11196:forced:4") };
+      return resolveRecords(enraged, ctx, CODES.seaSerpent, "forced", id).state;
+    };
+    const quarter = serpentAttack(true);
+    expect(quarter.pendingAttack).toMatchObject({ seat: 0 });
+    expect(quarter.phase).not.toBe("Combat");
+    expect(shadowsOf(quarter)).toBe(1);
+    expect(shadowsOf(serpentAttack(false))).toBe(1);
   });
 
   it("discards an attachment the defending player controls (Shadow)", () => {

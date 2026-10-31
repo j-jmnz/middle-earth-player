@@ -81,8 +81,37 @@ describe("a location with enemies grappled with it", () => {
   });
 });
 
+describe("the count under a location in front of an engaged enemy", () => {
+  const FIGHT: DepthsLayout = { ...TWO, engaged: ["mild"] };
+
+  it("hangs above the engagement row at Large on 667 x 375 and 844 x 390, and every card stays on the canvas", () => {
+    const fight = table(FIGHT);
+    for (const [width, height] of [[667, 375], [844, 390]] as const) {
+      for (const scale of Object.values(UI_SCALES)) {
+        const layout = tableLayout(width, height, fight.views, fight.piles, { stacks: true, scale });
+        const peek = layout.slots.find((slot) => slot.kind === "attachment" && slot.zone === "staging");
+        const enemies = layout.slots.filter((slot) => slot.kind === "card" && slot.zone === "engaged");
+        expect(peek, `${width}x${height}@${scale}`).toBeDefined();
+        expect(enemies.length, `${width}x${height}@${scale}`).toBeGreaterThan(0);
+        // The count pill is drawn at the peek's foot (StackMark): the peek ends where the engagement row begins, never under an enemy.
+        for (const enemy of enemies) expect((peek?.y ?? 0) + (peek?.h ?? 0), `${width}x${height}@${scale}`).toBeLessThanOrEqual(enemy.y + 0.01);
+        for (const slot of layout.slots) expect(slot.y + slot.h, `${slot.zone} ${width}x${height}@${scale}`).toBeLessThanOrEqual(height + 0.01);
+      }
+    }
+  });
+
+  it("carries no real code on the facedown peek: the canvas draws a back and the card's name is nowhere in the slot", () => {
+    const fight = table(FIGHT);
+    const layout = tableLayout(667, 375, fight.views, fight.piles, { stacks: true });
+    const peek = layout.slots.find((slot) => slot.kind === "attachment" && slot.zone === "staging");
+    expect(peek).toMatchObject({ faceDown: true, code: "" });
+    expect(JSON.stringify(layout.slots)).not.toContain(CODES.thrashing);
+    expect(JSON.stringify(layout.slots)).not.toContain(CODES.crushing);
+  });
+});
+
 describe("what the table tells of a grapple", () => {
-  it("names the location and never the enemy as it is attached, in the log and in the round summary", () => {
+  it("names the enemy, which was faceup as it was revealed, and the location it goes under, in the log and in the round summary", () => {
     const made = depthsTable(world, { staging: [CODES.cargoHold], deck: [CODES.thrashing, "f0"] });
     const run = send(send(start(made.state), { type: "Commit", cardIds: [made.hero] }, made.ctx), { type: "Pass" }, made.ctx);
     const steps = run.steps as readonly EngineStep[];
@@ -90,9 +119,9 @@ describe("what the table tells of a grapple", () => {
     expect(grapples).toHaveLength(1);
     const label = { card: (id: string) => names(run.state.cards[id]?.code ?? ""), code: names, effectCard: () => null, line: () => null, rule: () => null } as never;
     const lines = logLines(steps, label).map((line) => line.text);
-    expect(lines).toContain("An enemy grapples with Cargo Hold");
+    expect(lines).toContain("Thrashing Arm grapples with Cargo Hold");
     const moment = momentOf(made.state, run.state, steps, { card: (id: string) => names((run.state.cards[id] ?? made.state.cards[id])?.code ?? "") } as never);
-    expect(JSON.stringify(moment)).toContain("An enemy grapples with Cargo Hold");
+    expect(JSON.stringify(moment)).toContain("Thrashing Arm grapples with Cargo Hold");
   });
 
   it("tells a detached enemy by name once it is faceup, in the round summary of the travel", () => {
@@ -103,7 +132,7 @@ describe("what the table tells of a grapple", () => {
     expect(["staging", "engaged"]).toContain(run.state.cards[arm]?.zone);
     expect(run.state.cards[arm]?.face).toBe("up");
     const named = { card: (id: string) => names((run.state.cards[id] ?? made.state.cards[id])?.code ?? "") } as never;
-    expect(JSON.stringify(momentOf(made.state, run.state, run.steps, named))).toContain("Thrashing Arm is detached from Cargo Hold");
+    expect(JSON.stringify(momentOf(made.state, run.state, run.steps, named))).toContain("Thrashing Arm comes out from under Cargo Hold");
   });
 
   it("moves a detached enemy from under its location, turning over", () => {

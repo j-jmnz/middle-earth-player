@@ -15,6 +15,7 @@ import { Pressable } from "react-native";
 import { useStore } from "zustand";
 
 import type { Carousel } from "./carousel.ts";
+import { grappleDetail } from "./grapple-words.ts";
 import { threatRows, threatVerdict } from "./foresight.ts";
 import { logLines, type LogNames } from "./log.ts";
 import { useDialsEdge } from "./bar-edge.ts";
@@ -72,9 +73,12 @@ function RowReading({ store, row, names, onRead, onClose }: { store: TableStore;
   // A card the table hides the face of (facedown) is not named, as it is not on the canvas (selectors.ts, hidesFace).
   const hiddenKey = useStore(store, (state) => state.rowFolds[row].filter((id) => hidesFace(state.game.cards[id])).join(","));
   const hidden = hiddenKey === "" ? NO_IDS : hiddenKey.split(",");
+  // What a folded location says of the enemies grappled under it: the count and the Threat they add, one line a card ("" for a card with none).
+  const detailKey = useStore(store, (state) => state.rowFolds[row].map((id) => grappleDetail(state.game, id) ?? "").join("\n"));
+  const details = detailKey.split("\n");
   // A stack that holds only the Stormcaller's area's cards is titled for it (stormcaller-table.ts); its stage never folds.
   const areaOnly = useStore(store, (state) => row === "staging" && ids.length > 0 && ids.every((id) => areaRoleOf(state.game, id) != null));
-  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={ids.map((id) => ({ id, label: hidden.includes(id) ? "Facedown card" : names.card(id) }))} onRead={onRead} onClose={onClose} />;
+  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={ids.map((id, at) => ({ id, label: hidden.includes(id) ? "Facedown card" : names.card(id), detail: details[at] || null }))} onRead={onRead} onClose={onClose} />;
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {

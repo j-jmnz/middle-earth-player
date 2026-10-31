@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–345 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~57.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~58.1K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -90,7 +90,7 @@ Read the sections your task touches.
     - 568–588 Escape from Dol Guldur (~2.7K)
     - 589–603 The Oath (~2.3K)
     - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–665 Dream-chaser (~8.9K)
+  - 622–665 Dream-chaser (~9.1K)
   - 666–674 Nightmare (~420)
   - 675–713 Deckbuilding (~1.8K) ← 1
   - 714–792 Effects (~3.2K)
@@ -103,15 +103,15 @@ Read the sections your task touches.
   - 833–857 Persistence and shipping (~1.6K)
   - 858–898 Screens (~4.3K) ← 1
     - 884–898 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~23.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~23.5K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
   - 28–33 Quest scale (~320)
   - 34–37 Canvas (~510) ← 1
-  - 38–49 Spacing and the play area's rows (~1.5K) ← 7
+  - 38–49 Spacing and the play area's rows (~1.6K) ← 7
   - 50–55 Pictures on the table (~320)
-  - 56–77 Cards (~2.9K) ← 9
+  - 56–77 Cards (~3.2K) ← 9
   - 78–83 The Sailing test (~690) ← 5
   - 84–87 Tokens and effects (~320)
   - 88–96 Piles (~850) ← 2
@@ -176,15 +176,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~5.7K tok)
+- `docs/phases/STATUS.md` — Phase status (~5.9K tok)
   - 5–16 Rules (~540)
-  - 17–75 Phases (~1.9K)
-  - 76–151 Open items (~2.8K)
+  - 17–75 Phases (~2.0K)
+  - 76–152 Open items (~2.9K)
     - 78–90 Fixtures and Maestro (~490)
-    - 91–117 Rules and engine (~770)
-    - 118–133 Screens and code (~710)
-    - 134–151 Phone and tablet checks (~850)
-  - 152–167 Standing decisions (~380)
+    - 91–118 Rules and engine (~850)
+    - 119–134 Screens and code (~710)
+    - 135–152 Phone and tablet checks (~850)
+  - 153–168 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)

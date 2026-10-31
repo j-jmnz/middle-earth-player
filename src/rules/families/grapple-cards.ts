@@ -19,7 +19,7 @@ import type { ScenarioState, ZoneName } from "../state.ts";
 import { inPlay, updateCard } from "../state.ts";
 import { moveCard } from "../zones.ts";
 import { dealAttackShadow } from "./defense-listen.ts";
-import { effectData, moveEncounter } from "./encounter-moves.ts";
+import { effectData, moveEncounter, setAsideNamed } from "./encounter-moves.ts";
 import { resolveGrapple } from "./grapple-attach.ts";
 import type { Focus } from "./index.ts";
 import { queueFront } from "./play-refs.ts";
@@ -53,38 +53,46 @@ export function discardAndGrapple(state: ScenarioState, instruction: Verb<"Disca
 
 /** FlipSetAside: the set-aside card with this title shows its side B. */
 export function flipSetAside(state: ScenarioState, instruction: Verb<"FlipSetAside">, ctx: ReduceContext): ScenarioState {
-  const id = state.setAside.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name);
+  const id = setAsideNamed(state, instruction.name, ctx);
   return id ? updateCard(state, id, { face: "B" }) : state;
 }
 
 /** FlipElite: the Stormcaller Elite card in play with this title (its enemy side) becomes the objective ally side, without tokens, in the play area of the first or the last player. It hears that it flipped. */
-export function flipElite(state: ScenarioState, instruction: Verb<"FlipElite">, ctx: ReduceContext): ScenarioState {
+export function flipElite(state: ScenarioState, instruction: Verb<"FlipElite">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = Object.values(state.cards).find((other) => inPlay(other.zone) && isElite(printedOf(ctx.cards, other.code)) && printedOf(ctx.cards, other.code).type === "enemy" && printedOf(ctx.cards, other.code).name === instruction.name);
   const side = [...ctx.cards.values()].find((printed) => isElite(printed) && printed.type === "objective" && printed.name === instruction.name);
   if (!card || !side) return state;
   const seat = instruction.to === "lastPlayer" ? lastPlayer(state) : state.firstPlayer;
   const moved = moveCard(state, card.id, { zone: "play", seat });
   const flipped = updateCard(moved, card.id, { code: side.code, face: "up", damage: 0, progress: 0, resources: 0, exhausted: false, controller: seat });
+  steps.push({ kind: "flip", cardId: card.id, seat });
   return queueEvent(flipped, { trigger: "flipped", seat, cardId: card.id, subject: card.id });
 }
 
 /** RemoveEncounterSet: every card of the encounter set in a deck, the discard pile or a play area (and the shadow cards it dealt) leaves the game; the cards attached to those in play are discarded. */
 export function removeEncounterSet(state: ScenarioState, instruction: Verb<"RemoveEncounterSet">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
+  let count = 0;
   for (const card of Object.values(state.cards)) {
     if (!SET_ZONES.has(card.zone) || printedOf(ctx.cards, card.code).encounterSet !== instruction.set) continue;
+    count += 1;
     next = inPlay(card.zone) ? moveEncounter(next, card.id, "removed", state.firstPlayer, ctx, steps) : moveCard(next, card.id, { zone: "removed" });
   }
+  steps.push({ kind: "removeSet", set: instruction.set, count });
   return next;
 }
 
 /** ShuffleSetAsideSet: every set-aside card of the encounter set joins the encounter deck (the deck is shuffled by the step after it). A boon or burden of the set (Sea Serpent) is a card of the campaign, not of the set the scenario sets aside. */
 export function shuffleSetAsideSet(state: ScenarioState, instruction: Verb<"ShuffleSetAsideSet">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
+  let count = 0;
   for (const id of state.setAside) {
     const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
-    if (printed.encounterSet === instruction.set && printed.campaignKind == null) next = moveEncounter(next, id, "shuffle", state.firstPlayer, ctx, steps);
+    if (printed.encounterSet !== instruction.set || printed.campaignKind != null) continue;
+    count += 1;
+    next = moveEncounter(next, id, "shuffle", state.firstPlayer, ctx, steps);
   }
+  steps.push({ kind: "shuffleSet", set: instruction.set, count });
   return next;
 }
 

@@ -1,12 +1,14 @@
 // Rules: dcce.grapple (data/rules/entries.json); ledger lines 12051:A:1, 12052:A:2, 12052:A:3, 12053:A:1, 12054:A:1. Grapple X: a revealed enemy with the keyword attaches facedown to the location in the staging area the keyword names.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat, printedStat } from "../keywords.ts";
+import { destroyCard, modifiedStat, printedStat } from "../keywords.ts";
 import { legalIntents } from "../legal.ts";
 import type { ScenarioState } from "../state.ts";
 import { grappledWith } from "./grapple-values.ts";
+import { resolveGrapple } from "./grapple-attach.ts";
 import { holds } from "../conditions.ts";
 import { moveCard, spawn } from "../zones.ts";
+import { moveEncounter } from "./encounter-moves.ts";
 import { pushCardEffects } from "../effect-frames.ts";
 import type { EngineStep } from "../intents.ts";
 import { settle } from "../machine.ts";
@@ -78,7 +80,7 @@ describe("detaching", () => {
     const cargo = idOf(made.state, CODES.cargoHold);
     const arms = grappledWith(made.state, cargo);
     expect(arms).toHaveLength(2);
-    const explored = moveCard(made.state, cargo, { zone: "victory" });
+    const explored = destroyCard(made.state, cargo, made.ctx.cards, [], true);
     for (const arm of arms) expect(explored.cards[arm]).toMatchObject({ zone: "staging", face: "up", host: null, controller: null });
     expect(explored.staging).toEqual(expect.arrayContaining([...arms]));
     // The other location keeps its enemy, and a detached enemy is announced to the Forced effects that hear it.
@@ -96,12 +98,28 @@ describe("detaching", () => {
     expect(grappledWith(run.state, idOf(run.state, CODES.weatherDeck))).toHaveLength(1);
   });
 
-  it("detaches them to the staging area when the location leaves the staging area in any other way", () => {
+  it("discards them with the location when it leaves the staging area in any other way: they are attached to it, and none is detached (rr.attachment-cards)", () => {
+    for (const dest of [{ zone: "encounterDiscard" }, { zone: "encounterDeck" }, { zone: "removed" }] as const) {
+      const made = withArms();
+      const cargo = idOf(made.state, CODES.cargoHold);
+      const arms = [...grappledWith(made.state, cargo)];
+      const left = moveCard(made.state, cargo, dest);
+      expect(grappledWith(left, cargo), dest.zone).toEqual([]);
+      for (const arm of arms) expect(left.cards[arm], dest.zone).toMatchObject({ zone: "encounterDiscard", face: "up", host: null });
+      expect(left.staging.filter((id) => arms.includes(id)), dest.zone).toEqual([]);
+      expect((left.pendingEvents ?? []).filter((event) => event.trigger === "grappleDetached"), dest.zone).toEqual([]);
+      // The other location keeps its enemy.
+      expect(grappledWith(left, idOf(left, CODES.weatherDeck))).toHaveLength(1);
+    }
+  });
+
+  it("discards them as the location is shuffled back into the encounter deck by an effect", () => {
     const made = withArms();
     const cargo = idOf(made.state, CODES.cargoHold);
-    const left = moveCard(made.state, cargo, { zone: "encounterDiscard" });
-    expect(grappledWith(left, cargo)).toEqual([]);
-    expect(idsOf(left, CODES.thrashing).map((id) => left.cards[id]?.zone)).toEqual(["staging"]);
+    const arms = [...grappledWith(made.state, cargo)];
+    const back = moveEncounter(made.state, cargo, "shuffle", 0, made.ctx, []);
+    for (const arm of arms) expect(back.cards[arm]?.zone).toBe("encounterDiscard");
+    expect(back.encounterDeck).toContain(cargo);
   });
 });
 
@@ -115,6 +133,12 @@ describe("the first player chooses among tied locations", () => {
     const pushed = pushCardEffects(spawned.state, "whenRevealed", spawned.id, 0, false, effects, made.ctx, steps);
     const run = settle({ ...pushed, window: null, mode: "stopped" }, made.ctx, steps);
     expect(run.window).toMatchObject({ kind: "choose", seat: 1 });
+  });
+
+  it("refuses a tie with no effect open to ask the first player: no location is chosen for them", () => {
+    const made = make({ staging: [CODES.weatherDeck, CODES.cargoHold], discard: [CODES.thrashing] });
+    const arm = idOf(made.state, CODES.thrashing);
+    expect(() => resolveGrapple(made.state, { verb: "ResolveGrapple", card: arm }, { seat: 0, sourceId: null }, made.ctx, [])).toThrow(/ties 2 locations/);
   });
 
   it("prints the lowest of the printed numbers, not the current ones: a location with progress or a modifier is still its printed self", () => {

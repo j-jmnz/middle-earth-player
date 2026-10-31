@@ -43,7 +43,7 @@ import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "./state.ts";
-import { printedOf } from "./printed.ts";
+import { heldByLapsedStage } from "./families/grapple-values.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
@@ -96,9 +96,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // A cancel already resolving holds the damage too, even when paying for it discarded the last card that could answer
     // (Loyal Hound, 19148).
     const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
-    // An enemy whose damage a stage lapsing left lethal (indestructible, 12039:B:1) waits for the When Revealed of the stage the quest advanced to (12040:B:1 flips it): advancing is immediate.
-    const revealing = current.stack.some((frame) => frame.frame === "whenRevealed" && current.cards[frame.cardId ?? ""]?.zone === "questStage");
-    const held = answerable || resolving || revealing ? (candidate: ScenarioState, id: string) => ((answerable || resolving) && damageHeld(candidate, id)) || (revealing && printedOf(ctx.cards, candidate.cards[id]?.code ?? "").type === "enemy") : undefined;
+    // The Stormcaller Elite whose indestructible lapsed with the stage (12039:B:1) wait, lethal, for the When Revealed that flips them (12040:B:1): advancing is immediate.
+    const held = (candidate: ScenarioState, id: string): boolean => ((answerable || resolving) && damageHeld(candidate, id)) || heldByLapsedStage(candidate, id, ctx);
     // The play family's constants (families/play-sweep.ts): hero card type, first player control, discard at a stat.
     const swept = current.lost || current.failure ? current : aflameSweep(destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {

@@ -285,12 +285,20 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   }
 }
 
-// The enemies grappled with the location leave it: each is added to the staging area faceup and hears that it was detached (dcce.grapple, 12052:A:3).
-function releaseGrappled(state: ScenarioState, locationId: string): ScenarioState {
+// The enemies grappled with the location are detached, flipped faceup and added to the staging area, each hearing that it was detached (dcce.grapple, 12052:A:3).
+export function releaseGrappled(state: ScenarioState, locationId: string): ScenarioState {
   let next = state;
   for (const arm of grappledWith(state, locationId)) {
-    next = queueEvent(updateCard(moveCard(next, arm, { zone: "staging" }), arm, { face: "up" }), { trigger: "grappleDetached", seat: null, cardId: arm, subject: arm });
+    next = queueEvent(updateCard(moveCard(next, arm, { zone: "staging" }), arm, { face: "up" }), { trigger: "grappleDetached", seat: null, cardId: arm, subject: arm, other: locationId });
   }
+  return next;
+}
+
+// The enemies grappled with a location that leaves the staging area any other way than becoming the active location or being explored are attached to it, so they are discarded with it, all at
+// once, faceup, and are never detached (rr.attachment-cards; Mariner's Compass 11008, Saruman 07003 and Heirs of Eärendil 17115 are the ways a location leaves the staging area).
+function discardGrappled(state: ScenarioState, locationId: string): ScenarioState {
+  let next = state;
+  for (const arm of grappledWith(state, locationId)) next = updateCard(moveCard(next, arm, { zone: "encounterDiscard" }), arm, { face: "up", controller: null });
   return next;
 }
 
@@ -326,8 +334,8 @@ export function moveCard(state: ScenarioState, id: string, wanted: Destination, 
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted-zone.ts).
   if (dest.zone === "unchartedDeck") moved = shuffleUnchartedDeck(moved);
-  // The enemies grappled with a location that leaves the staging area are detached, flipped faceup and added to the staging area (dcce.grapple).
-  if (current.zone === "staging" && dest.zone !== "staging") moved = releaseGrappled(moved, id);
+  // The enemies grappled with a location that leaves the staging area: detached as it becomes the active location, discarded with it on every other exit (an explored location released them first, destroyCard).
+  if (current.zone === "staging" && dest.zone !== "staging") moved = dest.zone === "activeLocation" || dest.zone === "secondActiveLocation" ? releaseGrappled(moved, id) : discardGrappled(moved, id);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon-guard.ts).

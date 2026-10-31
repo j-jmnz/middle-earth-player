@@ -4,8 +4,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds } from "../rules/conditions.ts";
 import { settle } from "../rules/machine.ts";
+import { pushCardEffects } from "../rules/effect-frames.ts";
 import { legalIntents } from "../rules/legal.ts";
-import { grappledWith } from "../rules/families/grapple-values.ts";
+import { grappledWith, heldByLapsedStage } from "../rules/families/grapple-values.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { questRoom } from "../rules/families/caves-progress.ts";
 import type { ScenarioState } from "../rules/state.ts";
@@ -107,6 +108,22 @@ describe("Change of Plans (12040)", () => {
   it("keeps an Elite enemy that stage 1B made indestructible alive until it flips, though the stage left play with damage on it equal to its hit points (12039:B:1, 12040:B:1)", () => {
     const made = make({ stage: "12040", setAside: [CODES.thing], engaged: [{ code: CODES.naasiyah, seat: 0, damage: 4 }] });
     const run = resolveRecords(made.state, made.ctx, "12040", "whenRevealed", idOf(made.state, "12040"));
+    expect(cardOf(run.state, CODES.naasiyahAlly)).toMatchObject({ zone: "play", damage: 0 });
+  });
+
+  it("holds only the Stormcaller Elite enemies the lapsed stage made indestructible: an ordinary enemy at lethal damage during a stage's When Revealed is destroyed at once (rr.destroy)", () => {
+    const made = make({ stage: "12040", setAside: [CODES.thing], engaged: [{ code: CODES.naasiyah, seat: 0, damage: 4 }, { code: "creature", seat: 0, damage: 3 }] });
+    const stage = idOf(made.state, "12040");
+    const effects = made.ctx.effects.filter((effect) => effect.cardCode === "12040" && effect.timing === "whenRevealed");
+    const pushed = pushCardEffects(made.state, "whenRevealed", stage, 0, false, effects, made.ctx, []);
+    expect(heldByLapsedStage(pushed, idOf(pushed, CODES.naasiyah), made.ctx)).toBe(true);
+    expect(heldByLapsedStage(pushed, idOf(pushed, "creature"), made.ctx)).toBe(false);
+    // The same two enemies with another stage's When Revealed open: nothing is held.
+    const other = make({ stage: "12041", engaged: [{ code: CODES.naasiyah, seat: 0, damage: 4 }] });
+    const otherPushed = pushCardEffects(other.state, "whenRevealed", idOf(other.state, "12041"), 0, false, other.ctx.effects.filter((effect) => effect.cardCode === "12041" && effect.timing === "whenRevealed"), other.ctx, []);
+    expect(heldByLapsedStage(otherPushed, idOf(otherPushed, CODES.naasiyah), other.ctx)).toBe(false);
+    const run = resolveRecords(made.state, made.ctx, "12040", "whenRevealed", stage);
+    expect(cardOf(run.state, "creature")?.zone).toBe("encounterDiscard");
     expect(cardOf(run.state, CODES.naasiyahAlly)).toMatchObject({ zone: "play", damage: 0 });
   });
 

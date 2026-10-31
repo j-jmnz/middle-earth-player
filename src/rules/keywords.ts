@@ -10,7 +10,7 @@ import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
 import { claimedDestination } from "./families/objectives-claimed.ts";
-import { inPlay, moveCard, type Destination } from "./zones.ts";
+import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
 import { resourceShield } from "./families/aflame-attack.ts";
@@ -227,8 +227,7 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
     next = destroyCard(next, id, cards, steps, false, true);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
-    // The event's amount is the Threat the enemy had as it was destroyed, which a Forced effect reads as its X ("equal to that enemy's Threat", 12049:A:4).
-    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id, amount: modifiedStat(state, instance, "threat", cards) });
+    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
@@ -350,6 +349,8 @@ export function destroyCard(
   }
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
   if (explored && printed.type === "location" && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
+  if (explored && printed.type === "location" && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).

@@ -65,11 +65,9 @@ export type ZoneName =
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.
   | "modeCard"
-  // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
-  // nobody. The card's host is the Watcher.
+  // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"
-  // An enemy attached facedown to a location in the staging area by Grapple (dcce.grapple): in play, not in the staging area, controlled by nobody. The card's host is the location.
-  | "grappled";
+  | "grappled"; // Facedown on a location in the staging area by Grapple (dcce.grapple): in play, not in it, controlled by nobody; the host is the location.
 
 export type CardFace = "up" | "down" | "A" | "B";
 
@@ -539,8 +537,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "campaign" ||
     zone === "nightmare" ||
     zone === "modeCard" ||
-    zone === "captive" ||
-    zone === "grappled"
+    zone === "captive" || zone === "grappled"
   );
 }
 

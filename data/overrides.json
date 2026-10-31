@@ -269,7 +269,7 @@
       "set": {
         "questPoints": null
       },
-      "reason": "Hall of Beorn prints 0 quest points for Change of Plans. The stage has none: its When Revealed advances the players to stage 3, and a stage with 0 quest points would be completed as it is revealed.",
+      "reason": "Hall of Beorn lists 0 quest points for Change of Plans, but the scan of side B prints a dash (none) in its quest points box and side A prints no box (ledger notes of 12040:B). The stage has none: its When Revealed advances the players to stage 3, and a stage with 0 quest points would be completed as it is revealed.",
       "source": "12040:B in data/printed/dream-chaser.json; HoB QuestCards.json lists 0 where Sahír's Advance lists '-'"
     },
     {
@@ -279,7 +279,7 @@
       "set": {
         "questPoints": null
       },
-      "reason": "Hall of Beorn prints 0 quest points for Defend the Ship!. It is the last stage and has none: the players win only when The Thing in the Depths is destroyed (12041:B:3), and a final stage with 0 quest points would be won as it is revealed.",
+      "reason": "Hall of Beorn lists 0 quest points for Defend the Ship!, but the scan of side B prints a dash (none) in its quest points box and side A prints no box (ledger notes of 12041:B). It is the last stage and has none: the players win only when The Thing in the Depths is destroyed (12041:B:3), and a final stage with 0 quest points would be won as it is revealed.",
       "source": "12041:B in data/printed/dream-chaser.json; HoB QuestCards.json lists 0 where Sahír's Advance lists '-'"
     },
     {
