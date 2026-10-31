@@ -19,6 +19,7 @@ import {
 } from "../../starter-decks";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
+import { AskInPlace } from "../../ask-in-place";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
 
@@ -74,23 +75,18 @@ function DeckActions({
   if (asking?.id === deck.id) {
     const reset = asking.action === "reset";
     return (
-      <View className="gap-1 px-3 py-2" testID={`deck-confirm-${deck.id}`}>
-        <BodyText tone="danger">
-          {reset
-            ? `Put ${deck.name} back to the printed list? Your changes to it are lost.`
-            : `Delete ${deck.name}? It is gone for good. Playthroughs that used it keep their cards.`}
-        </BodyText>
-        <View className="-mx-3 flex-row">
-          <TextButton
-            label={reset ? "Reset" : "Delete for good"}
-            testID={`deck-confirm-yes-${deck.id}`}
-            tone="danger"
-            accessibilityLabel={reset ? `Reset ${deck.name} to the printed list` : `Delete ${deck.name}, for good`}
-            onPress={reset ? onReset : onDelete}
-          />
-          <TextButton label="Keep" testID={`deck-confirm-no-${deck.id}`} accessibilityLabel={`Keep ${deck.name}`} onPress={onCancel} />
-        </View>
-      </View>
+      <AskInPlace
+        testID={`deck-confirm-${deck.id}`}
+        className="px-3 py-2"
+        sentence={reset ? `Put ${deck.name} back to the printed list? Your changes to it are lost.` : `Delete ${deck.name}? It is gone for good. Playthroughs that used it keep their cards.`}
+        confirm={{
+          label: reset ? "Reset" : "Delete for good",
+          testID: `deck-confirm-yes-${deck.id}`,
+          accessibilityLabel: reset ? `Reset ${deck.name} to the printed list` : `Delete ${deck.name}, for good`,
+          onPress: reset ? onReset : onDelete,
+        }}
+        keep={{ testID: `deck-confirm-no-${deck.id}`, accessibilityLabel: `Keep ${deck.name}`, onPress: onCancel }}
+      />
     );
   }
   return (

@@ -1,6 +1,6 @@
 appId: com.middleearth.lcg
 ---
-# Phase 28b. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The `lost`
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The `lost`
 # fixture is a real solo game of A Shadow of the Past parked on its loss; closing the loss on the Resolution screen writes the run.
 - launchApp:
     clearState: true
@@ -40,9 +40,11 @@ appId: com.middleearth.lcg
     id: history-open
 - assertVisible:
     id: history
-# The playthrough is still unfinished, so the library lists it under In progress, with its run under its header.
+# The playthrough is still unfinished, so the library lists it under In progress, with its run in its card.
 - assertVisible:
     id: library-in-progress
+- assertVisible:
+    id: entry-save-e2e-lost
 - assertVisible:
     id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
 - assertVisible: "A Shadow of the Past"
@@ -56,15 +58,37 @@ appId: com.middleearth.lcg
     id: history-campaign
 - assertVisible:
     id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
-# A tap on a campaign run opens that playthrough's log.
+# A tap on a playthrough's card opens its path.
 - tapOn:
-    id: "run-campaign:save-e2e-lost:a-shadow-of-the-past:.*"
+    id: entry-save-e2e-lost
 - extendedWaitUntil:
     visible:
-      id: log
+      id: campaign-path
     timeout: 15000
 - tapOn:
-    id: log-back
+    id: path-back
+# Manage archives it at once, with Undo in the toast; Undo puts it back under In progress.
+- tapOn:
+    id: history-manage
+- tapOn:
+    id: archive-save-e2e-lost
+- assertVisible:
+    id: library-archived
+- assertNotVisible:
+    id: entry-save-e2e-lost
+- tapOn:
+    id: toast-undo
+- assertVisible:
+    id: entry-save-e2e-lost
+# Delete asks in place; Keep leaves it.
+- tapOn:
+    id: delete-save-e2e-lost
+- assertVisible:
+    id: delete-confirm-save-e2e-lost
+- tapOn:
+    id: delete-no-save-e2e-lost
+- tapOn:
+    id: history-manage
 - tapOn:
     id: history-back
 # The Scenarios tab opens History on the standalone kind.
