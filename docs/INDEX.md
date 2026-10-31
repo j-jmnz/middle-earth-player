@@ -179,7 +179,7 @@ STATUS.md, then the active phase file.
   - 62–126 Open items (~2.3K)
     - 64–74 Fixtures and Maestro (~360)
     - 75–93 Rules and engine (~540)
-    - 94–108 Screens and code (~610)
+    - 94–108 Screens and code (~590)
     - 109–126 Phone and tablet checks (~820)
   - 127–142 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
