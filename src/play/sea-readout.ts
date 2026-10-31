@@ -7,8 +7,8 @@ import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { modifierActive } from "../rules/state.ts";
 
 import type { Readout } from "./readout.ts";
-import { headingChangeWords, sailingLookWords } from "./sea-words.ts";
-import { lookRows, successesOf } from "./sea-sheets.ts";
+import { headingChangeWords, sailingLookWords, shiftReadoutWords } from "./sea-words.ts";
+import { successesOf } from "./sea-sheets.ts";
 import type { SheetNames } from "./sheet-types.ts";
 
 // The cards other than the character itself that give it "counts as 2" (Enlarged Quarters, 11174:B; Sea-ward Tower, 12134): named in the readout.
@@ -26,13 +26,14 @@ export function sailingReadout(game: ScenarioState, ctx: ReduceContext, picked: 
     return { kind: "sailing", stats: [], result: sailingLookWords(total, counts) };
   }
   const test = game.sea?.sailing;
-  if (test?.step !== "shift") return null;
   const heading = game.sea?.heading ?? null;
   if (heading == null) return null;
-  // The shift the engine makes for each symbol still to answer, one step on-course at a time, never past Sun.
-  let after = game;
-  for (let left = 0; left < test.left; left += 1) after = shiftHeading(after, "onCourse");
-  const found = successesOf(lookRows(game, ctx, names));
-  return { kind: "sailing", stats: found > 0 ? [{ icon: "sailingSuccess", value: test.left, word: "Success" }] : [], result: headingChangeWords(heading, after.sea?.heading ?? heading) };
+  // Cards looked at with no shift left to make: the heading stays where it is.
+  if (test?.step === "look") return { kind: "sailing", stats: [], result: headingChangeWords(heading, heading) };
+  if (test?.step !== "shift") return null;
+  // What one tap on "Shift on-course" does: one step, never past Sun, and the symbols that would still be asked after it (none once the heading is back on Sun).
+  const after = shiftHeading(game, "onCourse").sea?.heading ?? heading;
+  const more = after === "Sun" ? 0 : test.left - 1;
+  return { kind: "sailing", stats: successesOf(game, ctx) > 0 ? [{ icon: "sailingSuccess", value: test.left, word: "Success" }] : [], result: shiftReadoutWords(heading, after, more) };
 }
 

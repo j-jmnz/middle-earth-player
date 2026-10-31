@@ -23,5 +23,13 @@ export function board(state: ScenarioState, event: GameEvent, ctx: ReduceContext
   const enemy = state.cards[event.subject];
   if (!enemy || enemy.zone !== "engaged" || printedOf(ctx.cards, enemy.code).ship !== "enemy") return state;
   const count = boardingOf(state, event.subject, ctx);
-  return count > 0 ? revealCorsair(state, event.seat, count, ctx, steps) : state;
+  if (count <= 0) return state;
+  // The engagements this reveal makes are the keyword's own: the step names the ship, so the table tells them as its Boarding and not as engagements of their own.
+  const from = steps.length;
+  const revealed = revealCorsair(state, event.seat, count, ctx, steps);
+  for (let at = from; at < steps.length; at += 1) {
+    const step = steps[at];
+    if (step?.kind === "engage") steps[at] = { ...step, boarding: event.subject };
+  }
+  return revealed;
 }

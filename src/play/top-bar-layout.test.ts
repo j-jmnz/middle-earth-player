@@ -2,7 +2,29 @@ import { describe, expect, it } from "vitest";
 
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { UI_SCALES } from "./ui-scale.ts";
-import { barZones, headlineWidth, MENU_BUTTON, RAIL_FLOOR, RAIL_MAX, RAIL_WIDE, railWide, TICK, TICK_GAP } from "./top-bar-layout.ts";
+import {
+  barZones,
+  DIAL_GAP,
+  DIAL_LABEL_GAP,
+  DIAL_PAD,
+  DIAL_SIZE,
+  EDGE_FADE,
+  HEADING_BADGE_OVER,
+  HEADING_BADGE_W,
+  HEADING_LABEL_W,
+  headingCompact,
+  headingDialWidth,
+  headingOffset,
+  headlineWidth,
+  MENU_BUTTON,
+  RAIL_FLOOR,
+  RAIL_MAX,
+  RAIL_WIDE,
+  railWide,
+  SEAT_DIAL,
+  TICK,
+  TICK_GAP,
+} from "./top-bar-layout.ts";
 
 // The rail names a phase over its ticks and nothing longer, so it never needs more than this.
 const RAIL_CEILING = 232;
@@ -80,40 +102,87 @@ describe("top bar zones", () => {
 });
 
 // Rules: dcce.heading (data/rules/entries.json). The Heading dial joins the dials at the left, after the seat dials (docs/design-system-table.md, Top bar). The bar measures its dials, so its zones
-// take their natural width: a dial is its 46 pt frame, 4 pt of padding each side, a 6 pt gap and its label or badge (label size 11 pt, 0.55 em a letter), the dials 10 pt apart.
+// take their natural width: a dial is its 46 pt frame with 4 pt of padding each side, and the Heading dial a label column as wide as its widest word. While the bar scrolls the dial drops its
+// word and lays its badge under the disc, and the row scrolls to it.
 describe("the Heading dial in the top bar (phase 39b)", () => {
-  const dial = (word: string, scale: number) => (8 + 46 + 6 + Math.ceil(word.length * 0.55 * 11)) * scale;
-  const dials = (seats: number, scale: number) => Array.from({ length: seats }, () => dial("P1", scale)).reduce((sum, w) => sum + w, 0) + dial("Off-course", scale) + seats * 10 * scale;
+  const SCREENS = [{ width: 667, inset: 0 }, { width: 844, inset: 47 }, { width: 1024, inset: 0 }] as const;
+  const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large] as const;
 
-  it("keeps the rail on the screen's middle at 667 x 375 with two seats and the Heading dial, scrolling the dials rather than moving it", () => {
-    for (const [width, inset] of [[667, 0], [844, 47]] as const) {
-      const bar = width - 2 * inset - 2 * 8;
-      const center = bar / 2;
-      const zones = barZones(bar, dials(2, 1), 1, center);
-      expect(Math.abs(zones.left + zones.rail / 2 - center)).toBeLessThanOrEqual(0.5);
-      expect(zones.rail).toBeGreaterThanOrEqual(RAIL_FLOOR);
-      expect(zones.right).toBeGreaterThanOrEqual(MENU_BUTTON);
-      expect(Math.abs(bar - zones.left - zones.rail - zones.right)).toBeLessThan(1);
-    }
-    // On a 667 pt phone the dials are wider than the room the rail leaves them: they scroll, none cut.
-    const phone = 667 - 16;
-    expect(barZones(phone, dials(2, 1), 1, phone / 2).scroll).toBe(true);
+  // The dials row of a two-handed game with the Heading dial, as the bar lays it out: the seat dials, a gap, the Heading dial (compact or not).
+  function barOf(screen: (typeof SCREENS)[number], scale: number, seats: number) {
+    const bar = screen.width - 2 * screen.inset - 2 * 8;
+    const center = bar / 2;
+    const before = (seats * SEAT_DIAL + seats * DIAL_GAP) * scale;
+    const compact = headingCompact(bar, before - DIAL_GAP * scale, scale, center);
+    const w = headingDialWidth(compact) * scale;
+    // The dial's place in the row includes the room its compact badge reaches into after it.
+    const placed = w + (compact ? HEADING_BADGE_OVER * scale : 0);
+    const content = before + placed;
+    const zones = barZones(bar, content, scale, center);
+    const offset = headingOffset(zones, { x: before, w: placed }, content, scale);
+    return { bar, center, compact, zones, content, x: before, w, offset };
+  }
+
+  it("keeps the label column as wide as the widest of Heading, Toward Sun and Toward Storm, so the width does not move with the badge", () => {
+    for (const word of ["Heading", "Toward Sun", "Toward Storm"]) expect(HEADING_LABEL_W, word).toBeGreaterThanOrEqual(Math.ceil(word.length * 0.55 * 11));
+    expect(headingDialWidth(false)).toBe(2 * DIAL_PAD + DIAL_SIZE + DIAL_LABEL_GAP + HEADING_LABEL_W);
+    expect(headingDialWidth(true)).toBe(2 * DIAL_PAD + DIAL_SIZE);
+    expect(HEADING_BADGE_W).toBeGreaterThanOrEqual(Math.ceil("Toward Storm".length * 0.55 * 11));
+    // The badge reaches no further past the dial than the gap and padding before the next dial's disc.
+    expect(HEADING_BADGE_OVER).toBeLessThanOrEqual(DIAL_GAP + DIAL_PAD);
   });
 
-  it("scrolls the dials at Large and cuts none, the rail still on the middle, and leaves room when one seat has the room", () => {
-    const L = UI_SCALES.large;
-    const phone = (667 - 16) * 1;
-    const large = barZones(phone, dials(2, L), L, phone / 2);
-    expect(large.scroll).toBe(true);
-    expect(Math.abs(large.left + large.rail / 2 - phone / 2)).toBeLessThanOrEqual(0.5);
-    expect(large.left).toBeLessThan(dials(2, L));
-    // A tablet holds them all.
-    const tablet = 1024 - 16;
-    const wide = barZones(tablet, dials(2, 1), 1, tablet / 2);
-    expect(wide.scroll).toBe(false);
-    expect(wide.left).toBeGreaterThanOrEqual(dials(2, 1));
-    // A solo player's one seat and the Heading dial fit beside the centred rail at 844 x 390.
-    const solo = 844 - 2 * 47 - 16;
-    expect(barZones(solo, dials(1, 1), 1, solo / 2).scroll).toBe(false);
+  it("keeps the rail on the screen's middle at 667 x 375 and 844 x 390 with two seats and the Heading dial, at every scale", () => {
+    for (const screen of SCREENS) {
+      for (const scale of SCALES) {
+        const { zones, center, bar } = barOf(screen, scale, 2);
+        const at = `${screen.width} at ${scale}`;
+        expect(Math.abs(zones.left + zones.rail / 2 - center), at).toBeLessThanOrEqual(0.5);
+        expect(zones.rail, at).toBeGreaterThanOrEqual(RAIL_FLOOR * scale - 0.5);
+        expect(zones.right, at).toBeGreaterThanOrEqual(MENU_BUTTON);
+        expect(Math.abs(bar - zones.left - zones.rail - zones.right), at).toBeLessThan(1);
+      }
+    }
+  });
+
+  it("shows the Heading dial's disc and its badge whole inside the dials zone, clear of the fade, at Small, Medium and Large", () => {
+    for (const screen of SCREENS) {
+      for (const scale of SCALES) {
+        const { zones, compact, x, w, offset, content } = barOf(screen, scale, 2);
+        const at = `${screen.width} at ${scale}`;
+        const fade = zones.scroll ? EDGE_FADE * scale : 0;
+        const window = { from: offset, to: offset + zones.left - fade };
+        const disc = { from: x + DIAL_PAD * scale, to: x + (DIAL_PAD + DIAL_SIZE) * scale };
+        // The badge: under the disc when compact (centred, reaching past the dial each side), in the label column otherwise.
+        const badge = compact ? { from: x + w / 2 - (HEADING_BADGE_W / 2) * scale, to: x + w / 2 + (HEADING_BADGE_W / 2) * scale } : { from: x + (2 * DIAL_PAD + DIAL_SIZE + DIAL_LABEL_GAP) * scale, to: x + w };
+        for (const part of [disc, badge]) {
+          expect(part.from, at).toBeGreaterThanOrEqual(window.from - 0.5);
+          expect(part.to, at).toBeLessThanOrEqual(window.to + 0.5);
+        }
+        // The row never scrolls past its end, and not at all while it fits.
+        expect(offset, at).toBeLessThanOrEqual(Math.max(0, content + fade - zones.left) + 0.5);
+        if (!zones.scroll) expect(offset, at).toBe(0);
+      }
+    }
+  });
+
+  it("drops the word and lays the badge under the disc where the full dial would make the bar scroll, and keeps the word where it fits", () => {
+    expect(barOf(SCREENS[0], UI_SCALES.medium, 2).compact).toBe(true);
+    expect(barOf(SCREENS[0], UI_SCALES.large, 2).compact).toBe(true);
+    // A tablet holds a solo player's seat and the full dial; a two-seat tablet may or may not, but its rail never narrows with the badge.
+    expect(barOf(SCREENS[2], UI_SCALES.medium, 1).compact).toBe(false);
+  });
+
+  it("keeps a tablet's rail wide enough for the neighbor phases whether or not the badge shows", () => {
+    // 1024 x 768 at Large with two seats: the badge cannot widen the dials, so the rail stays where it was (it had dropped below RAIL_WIDE with a word-wide badge).
+    const { zones } = barOf(SCREENS[2], UI_SCALES.large, 2);
+    expect(railWide(zones.rail, false, UI_SCALES.large)).toBe(true);
+  });
+
+  it("scrolls the dials at Large on a 667 pt phone and cuts none of the Heading dial, the rail still on the middle", () => {
+    const large = barOf(SCREENS[0], UI_SCALES.large, 2);
+    expect(large.zones.scroll).toBe(true);
+    expect(large.offset).toBeGreaterThan(0);
+    expect(Math.abs(large.zones.left + large.zones.rail / 2 - large.center)).toBeLessThanOrEqual(0.5);
   });
 });

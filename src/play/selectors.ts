@@ -5,6 +5,7 @@
 import type { ReduceContext } from "../rules/reduce.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
+import { lookedIds } from "../rules/families/sea-sailing.ts";
 import { captiveUnder } from "../rules/families/south-captive.ts";
 import { prisonersOfSeat } from "../rules/families/prisoner.ts";
 import { declaredDefenders } from "../rules/families/defense-defenders.ts";
@@ -38,13 +39,10 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck">): readonl
   return game.corsairDeck !== undefined ? SECOND_PILES : NONE_PILES;
 }
 
-/** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). */
+/** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). A tap on one opens its list; a deck's does not (docs/design-system-table.md, Piles). */
 export function isDiscardPile(pile: PileId): boolean {
   return pile === "discard" || pile === "encounterDiscard" || pile === "corsairDiscard";
 }
-
-/** Whether a tap on the pile opens its list: a discard pile does, a deck does not (docs/design-system-table.md, Piles). */
-export const opensList = isDiscardPile;
 
 // How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
 export type FightKind = "defense" | "undefended" | "attack";
@@ -230,7 +228,8 @@ export function zoneSelector(zone: ZoneId, seat: number, facts?: ZoneFacts): (ga
 // A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it.
 export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[] };
 
-function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
+/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the Corsair pair. */
+export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
   switch (pile) {
     case "deck":
       return game.seats[seat]?.deck ?? NONE;
@@ -375,7 +374,7 @@ const NO_LOOKED: readonly CardInstance[] = [];
  */
 export function lookedOf(game: ScenarioState): readonly CardInstance[] {
   const test = game.sea?.sailing;
-  if (test?.step !== "shift") return NO_LOOKED;
+  if (test?.step !== "shift" && test?.step !== "look") return NO_LOOKED;
   const held = LOOKED.get(test);
   if (held) return held;
   const cards = cardsOf(game, test.looked);
@@ -385,6 +384,5 @@ export function lookedOf(game: ScenarioState): readonly CardInstance[] {
 
 /** Whether a card is one of those a Sailing test looked at: its face is shown to every player, though the card is still on the deck. */
 export function isLooked(game: ScenarioState, cardId: string): boolean {
-  const test = game.sea?.sailing;
-  return test?.step === "shift" && test.looked.includes(cardId);
+  return lookedIds(game).includes(cardId);
 }

@@ -7,17 +7,17 @@ import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../
 import { enemy, hero, seaTable, shipEnemy } from "../rules/families/sea-table.ts";
 import { spawn } from "../rules/zones.ts";
 
-import { momentOf } from "./outcome.ts";
+import { intentWords, momentOf } from "./outcome.ts";
+import { sailingTable } from "./sea-fixture.ts";
+import { pileSpeech } from "./pile-speech.ts";
 import {
   boardingWords,
   headingChangeWords,
   headingLine,
-  lookRowWords,
   medallionCount,
   pileCountWords,
   SAILING_COMMIT_NOTE,
   SAILING_COMMIT_TITLE,
-  SAILING_NO_ACTIONS,
   sailingLookWords,
   sailingTitle,
   secondSlotLine,
@@ -60,6 +60,18 @@ describe("Boarding's beat", () => {
     expect(moment?.lines.find((line) => line.text.startsWith("Boarding"))?.cards).toEqual([built.ids.galley]);
   });
 
+  it("tells a Corsair card another effect revealed as its own engagement, even with a ship's engagement before it", () => {
+    const built = seaTable({ cards: [hero("aragorn"), shipEnemy("galley"), enemy("pirate")], effects: [], heroes: [{ code: "aragorn" }], enemies: [{ code: "galley" }, { code: "pirate" }] });
+    const names = { card: (id: string) => (id === built.ids.galley ? "Galley" : "Pirate") };
+    const state = { ...built.state, corsairDeck: [], corsairDiscard: [] };
+    // Only the engine's own mark (`boarding`, the ship whose keyword revealed it) joins an engagement to a ship's beat.
+    const other = momentOf(state, state, [{ kind: "engage", seat: 0, enemyId: built.ids.galley! }, { kind: "engage", seat: 0, enemyId: built.ids.pirate! }], names);
+    expect(other?.lines.map((line) => line.text)).toEqual(["Galley engages you", "Pirate engages", "Pirate engages you"]);
+    expect(other?.lines.some((line) => line.text.startsWith("Boarding"))).toBe(false);
+    const boarded = momentOf(state, state, [{ kind: "engage", seat: 0, enemyId: built.ids.galley! }, { kind: "engage", seat: 0, enemyId: built.ids.pirate!, boarding: built.ids.galley! }], names);
+    expect(boarded?.lines.map((line) => line.text)).toContain("Boarding 1 · Galley: 1 Corsair engages you");
+  });
+
   it("tells an engagement with no ship before it as any other", () => {
     const built = seaTable({ cards: [hero("aragorn"), enemy("pirate")], effects: [], heroes: [{ code: "aragorn" }], enemies: [{ code: "pirate" }] });
     const moment = momentOf(built.state, built.state, [{ kind: "engage", seat: 0, enemyId: built.ids.pirate! }], { card: () => "Pirate" });
@@ -74,7 +86,6 @@ describe("the Sailing test's words", () => {
     expect(sailingTitle(0)).toBe("Sailing test · 0 successes");
     expect(SAILING_COMMIT_TITLE).toBe("Commit to the Sailing test");
     expect(SAILING_COMMIT_NOTE).toContain("add no willpower");
-    expect(SAILING_NO_ACTIONS).toBe("Actions are not used during a Sailing test.");
   });
 
   it("reads how many cards the commit looks at, and what counts as more than one", () => {
@@ -84,12 +95,9 @@ describe("the Sailing test's words", () => {
     expect(sailingLookWords(5, [{ name: "Dream-chaser", weight: 3, sources: ["Enlarged Quarters", "Sea-ward Tower"] }])).toContain("(Enlarged Quarters, Sea-ward Tower)");
   });
 
-  it("reads the heading change and the rows of the look", () => {
+  it("reads the heading change and the count on a medallion", () => {
     expect(headingChangeWords("Rain", "Sun")).toBe("Rain to Sun");
     expect(headingChangeWords("Sun", "Sun")).toBe("Sun, no change");
-    expect(lookRowWords("Calm Seas", 0)).toBe("Calm Seas");
-    expect(lookRowWords("Fair Wind", 1)).toBe("Fair Wind · Success");
-    expect(lookRowWords("Fair Wind", 2)).toBe("Fair Wind · Success ×2");
     expect(medallionCount(2)).toBe("×2");
     expect(medallionCount(1)).toBeNull();
     expect(medallionCount(0)).toBeNull();
@@ -109,5 +117,25 @@ describe("the piles and the web list's words", () => {
 
   it("keep the words of the verbs inside a choice (phase 39)", () => {
     expect(seaWords({ verb: "ShiftHeading", direction: "offCourse" })).toBe("shift your heading off-course");
+  });
+});
+
+describe("what a screen reader hears of a pile and a fold stack", () => {
+  it("names a pile by its count, a fold stack by the row it folds, and says which open a list", () => {
+    expect(pileSpeech({ zone: "corsairDeck", count: 9 })).toEqual({ label: "Corsair deck, 9 cards", hint: null });
+    expect(pileSpeech({ zone: "corsairDiscard", count: 1 })).toEqual({ label: "Corsair discard pile, 1 card", hint: "Opens the list of cards" });
+    expect(pileSpeech({ zone: "staging", count: 3, fold: "staging" }).label).toBe("3 more cards in staging");
+    expect(pileSpeech({ zone: "engaged", count: 1, fold: "engaged" })).toEqual({ label: "1 more card in the engagement area", hint: "Opens the list of these cards" });
+  });
+});
+
+describe("the banner after Undo", () => {
+  it("says a Commit sent while the first player was asked for the Sailing test committed to the test, not the quest", () => {
+    const f = sailingTable();
+    const commit = { type: "Commit" as const, cardIds: [f.ids.aragorn!] };
+    const names = (id: string) => (id === f.ids.aragorn ? "Aragorn" : id);
+    expect(intentWords(commit, names, f.state)).toBe("Aragorn committed to the Sailing test");
+    expect(intentWords(commit, names)).toBe("Aragorn committed to the quest");
+    expect(intentWords(commit, names, { ...f.state, sea: undefined })).toBe("Aragorn committed to the quest");
   });
 });

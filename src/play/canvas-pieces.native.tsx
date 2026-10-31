@@ -256,14 +256,13 @@ export function SuccessMedallion({ slot, fonts, t, s }: { slot: CardSlot; fonts:
       <Circle cx={at.cx} cy={at.cy} r={at.r} color={t.night} />
       <Circle cx={at.cx} cy={at.cy} r={at.r} color={t.accent} style="stroke" strokeWidth={1 * s} />
       <CanvasIcon name="sailingSuccess" x={at.cx - at.r * 0.62} y={at.cy - at.r * 0.62} size={at.r * 1.24} color={t.accent} />
-      {count ? <Text x={at.cx + at.r + 2 * s} y={at.cy + 4 * s} text={count} font={fonts.small} color={t.bone} /> : null}
+      {count ? <CountPill slot={slot} text={count} fonts={fonts} t={t} s={s} /> : null}
     </Group>
   );
 }
 
-/** The count on a staging card's one peek when more than one card is under it ("×2"): a small night pill at the right end of the visible strip. */
-export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
-  const text = `×${slot.stack ?? 0}`;
+// A small night pill with a count, whole on the card at its foot's right end (the stack mark's pill): never half on the card and half on the felt.
+function CountPill({ slot, text, fonts, t, s }: { slot: CardSlot; text: string; fonts: Fonts; t: TableTokens; s: number }) {
   const width = fonts.small.getTextWidth(text) + 6 * s;
   const height = 10 * s;
   const x = slot.x + slot.w - width - 3 * s;
@@ -274,6 +273,11 @@ export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts;
       <Text x={x + 3 * s} y={y + height - 1.5 * s} text={text} font={fonts.small} color={t.bone} />
     </Group>
   );
+}
+
+/** The count on a staging card's one peek when more than one card is under it ("×2"): a small night pill at the right end of the visible strip. */
+export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
+  return <CountPill slot={slot} text={`×${slot.stack ?? 0}`} fonts={fonts} t={t} s={s} />;
 }
 
 /**

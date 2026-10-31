@@ -8,4 +8,6 @@
 // not at the next quest resolution (stage-reveal.ts, advanceFreed): a replayed game can reach the next stage sooner.
 // 13 (phase 39 review): the quest phase lists Commit only in its pass window, so an attack window with no usable Action
 // skips instead of opening (Battle-fury played in the quest phase): a replayed game can take a different path.
-export const ENGINE_VERSION = 13;
+// 14 (phase 39b review): a Sailing test shifts the heading off-course as it opens, before the commit (dcce.sailing-tests, step 1), and holds the
+// cards looked at for a Done when no symbol is left to answer, so a replayed Sailing game has one more window and a different heading while it commits.
+export const ENGINE_VERSION = 14;

@@ -6,8 +6,9 @@
 // at a moment from motion-tokens.ts, and the UI never computes a number of its own.
 import type { ZoneName } from "../rules/state.ts";
 
-import type { CardSlot, TableLayout } from "./layout.ts";
+import type { CardSlot, Rect, TableLayout } from "./layout.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
+import { isDiscardPile, type PileId } from "./selectors.ts";
 
 // A card's way into its slot: where it starts relative to the slot (its center offset and size), the turn it starts at, and
 // how visible it starts. The identity motion is no motion.
@@ -53,6 +54,13 @@ export function slotRotation(slot: CardSlot): number {
   return slot.exhausted ? Math.PI / 2 : slot.tilt;
 }
 
+// Where each card a row folded into its stack stands: the stack's rectangle (row-fold.ts).
+function foldedAt(layout: TableLayout): ReadonlyMap<string, Rect> {
+  const at = new Map<string, Rect>();
+  for (const fold of layout.folds ?? []) for (const id of fold.cards) at.set(id, fold.rect);
+  return at;
+}
+
 function center(rect: { x: number; y: number; w: number; h: number }): { x: number; y: number } {
   return { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 };
 }
@@ -90,6 +98,9 @@ export function motionsBetween(
   }
   const before = new Map(prev.slots.map((slot) => [slot.id, slot]));
   const handoff = options.handoff === true;
+  // A card that left a fold stack comes out of it; a card that folded glides into it (row-fold.ts).
+  const stackedBefore = foldedAt(prev);
+  const stackedNow = foldedAt(next);
   // The cards that come off the deck this state, in hand order: each leaves MOTION.stagger after the one before.
   let drawn = 0;
   // The cards that come off the Corsair deck (Boarding) or are looked at in a Sailing test, each MOTION.stagger after the one before (docs/design-system-table.md, Motion).
@@ -111,6 +122,12 @@ export function motionsBetween(
       // The acting seat changed: nothing is dealt. Its hand slides up into place and the rest fades in over the same time, so the two
       // seats cross-fade (the old seat's cards leave as ghosts).
       motions.set(slot.id, { ...STILL(slot), dy: slot.zone === "hand" ? slot.h * SHAPE.seatHandRise : 0, fromOpacity: 0, slide: true });
+      continue;
+    }
+    // A card that left the fold stack (the moment now asks about it) starts at the stack, as it was, and is not revealed again.
+    const stack = stackedBefore.get(slot.id);
+    if (stack) {
+      motions.set(slot.id, from(slot, stack, 0, 1));
       continue;
     }
     // New on the table: a hand card comes off the deck, an encounter card off the encounter deck, anything else grows in.
@@ -139,26 +156,24 @@ export function motionsBetween(
   const ghosts: Ghost[] = [];
   for (const slot of prev.slots) {
     if (slot.kind === "pile" || present.has(slot.id)) continue;
+    // A card that folded into the stack glides into it.
+    const stacked = stackedNow.get(slot.id);
+    if (stacked && !slot.faceDown) {
+      const a = center(slot);
+      const b = center(stacked);
+      ghosts.push({ slot, dx: b.x - a.x, dy: b.y - a.y, scale: stacked.w / Math.max(1, slot.w), rot: 0, leave: "glide" });
+      continue;
+    }
     if (slot.faceDown) continue;
     const zone = zoneNow(slot.id);
-    const pile =
-      zone === "discard"
-        ? next.piles.discard
-        : zone === "encounterDiscard"
-          ? next.piles.encounterDiscard
-          : zone === "deck"
-            ? next.piles.deck
-            : zone === "encounterDeck"
-              ? next.piles.encounterDeck
-              : zone === "corsairDiscard"
-                ? (next.piles.corsairDiscard ?? null)
-                : null;
+    // The pile of that name, when the card went to one (a discard pile, a deck).
+    const pile = zone != null && zone in next.piles ? (next.piles[zone as PileId] ?? null) : null;
     if (pile) {
       const a = center(slot);
       const b = center(pile);
       // Destroyed or discarded from the table shakes first; from the hand (an event played, a discard) or back to a deck it just glides.
       // A card of a Sailing test's look glides to the encounter discard pile; it was never played, so it does not shake.
-      const discarded = (zone === "discard" || zone === "encounterDiscard" || zone === "corsairDiscard") && slot.zone !== "hand" && slot.success == null;
+      const discarded = zone != null && isDiscardPile(zone as PileId) && slot.zone !== "hand" && slot.success == null;
       ghosts.push({ slot, dx: b.x - a.x, dy: b.y - a.y, scale: pile.w / Math.max(1, slot.w), rot: 0, leave: discarded ? "shake" : "glide" });
     } else {
       // The victory display, set aside, out of play: it fades where it stood.

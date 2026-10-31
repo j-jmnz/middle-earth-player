@@ -62,7 +62,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
 | 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. Phone checks open: Spend XP, Hard/Expert pickers, path and log XP rows, MEC111 reader; flows `dream-chaser-start`, `booklet-dream-chaser` not run. |
 | 39 | Sea mechanics family | completed | 2026-10-31. Engine only; review round done. Open: the fleet choice on the seat picker and briefing (phase 39b); Upgraded-side ship stats; face-aware records; Sailing events. |
-| 39b | Ships on the table | not started | |
+| 39b | Ships on the table | completed | 2026-10-31. Review round done. Phone checks open: compact Heading dial and its scroll at 667 × 375, Sailing strip and Done, Boarding into a full row, fold stack and list, Corsair piles at Large, reader buttons. |
 | 40 | Voyage Across Belegaer | not started | |
 | 41 | The Fate of Númenor | not started | |
 | 42 | Raid on the Grey Havens | not started | |
@@ -85,11 +85,14 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `.maestro/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
 - `.maestro/deck.yaml` and `.maestro/rules.yaml` are phone flows; they cannot run on an expanded tablet.
 - No Maestro flow plays an attack through the redesigned combat spotlight.
+- `.maestro/sea-table.yaml` and `sea-duo.yaml` need fixtures (`sea-solo`, `sea-duo`) dealt from Voyage Across Belegaer (phase 40).
 
 ### Rules and engine
 
 - Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
 - Dream-chaser: Aflame, Grapple, Uncharted and Exploration stay unparsed until their scenario phases; an upgraded ship plays with side A stats (`Card.back` carries no stats).
+- Staging folds rank "controlled" by `claimed`; a freed tower (phase 47) must set it.
+- The Corsair reshuffle glides the discard to the deck without a count pop.
 - Nightmare 904605 Sahír's Pursuer and 905402 Patrol Ship print ENEMY (Ship trait), so they stay non-ship enemies.
 
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).

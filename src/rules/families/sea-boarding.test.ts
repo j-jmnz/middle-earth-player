@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { expectOk } from "../fixture.ts";
+import { reduce } from "../reduce.ts";
 import { engageWith } from "../quest.ts";
 import type { ScenarioState } from "../state.ts";
 import { moveCard, spawn } from "../zones.ts";
@@ -31,6 +33,15 @@ describe("Boarding X (dcce.boarding)", () => {
     expect(engagedCodes(next)).toEqual(["corsair", "pirate", "pirate"]);
     expect(next.cards[ids.corsair!]?.zone).toBe("engaged");
     expect(next.corsairDeck).toHaveLength(1);
+  });
+
+  it("names the ship on the engage step of each Corsair card its keyword revealed, and on no other", () => {
+    const { state, ids, ctx } = table();
+    const result = expectOk(reduce(state, { type: "DeclineEngage" }, ctx));
+    const engages = result.steps.flatMap((step) => (step.kind === "engage" ? [step] : []));
+    expect(engages).toHaveLength(3);
+    expect(engages.filter((step) => step.boarding === ids.corsair).map((step) => step.enemyId)).toHaveLength(2);
+    expect(engages.find((step) => step.enemyId === ids.corsair)?.boarding).toBeUndefined();
   });
 
   it("resolves when the player engages the ship optionally", () => {

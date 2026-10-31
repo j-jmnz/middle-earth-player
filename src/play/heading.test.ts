@@ -13,7 +13,6 @@ import {
   headingDeltaWords,
   headingLook,
   headingPreviewSteps,
-  headingPreviewText,
   headingPreviewTitle,
   headingStepOf,
   headingWords,
@@ -63,8 +62,8 @@ describe("the Heading dial's steps", () => {
   });
 
   it("say a shift in a badge and in words, and nothing when the step did not move", () => {
-    expect(headingDelta("Sun", "Cloud")).toEqual({ text: "Off-course", towardSun: false });
-    expect(headingDelta("Rain", "Cloud")).toEqual({ text: "On-course", towardSun: true });
+    expect(headingDelta("Sun", "Cloud")).toEqual({ text: "Toward Storm", towardSun: false });
+    expect(headingDelta("Rain", "Cloud")).toEqual({ text: "Toward Sun", towardSun: true });
     expect(headingDelta("Rain", "Rain")).toBeNull();
     expect(headingDeltaWords("Cloud", "Rain")).toBe("Heading shifted off-course, now Rain");
     expect(headingDeltaWords("Rain", "Cloud")).toBe("Heading shifted on-course, now Cloud");
@@ -77,8 +76,6 @@ describe("the Heading dial's steps", () => {
     const steps = headingPreviewSteps("Rain");
     expect(steps.map((row) => row.step)).toEqual([...HEADING_STEPS]);
     expect(steps.filter((row) => row.current).map((row) => row.step)).toEqual(["Rain"]);
-    expect(headingPreviewText("Rain").split("\n")).toHaveLength(4);
-    expect(headingPreviewText("Rain")).toContain("▶ Rain");
   });
 
   it("read a step from the engine's word", () => {

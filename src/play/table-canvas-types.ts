@@ -22,6 +22,8 @@ export type TableHighlight = {
   marks: ReadonlyMap<string, OptionMark>;
   // Hand cards that cannot be played in this planning window (why.ts says why on a tap): dimmed.
   muted: ReadonlySet<string>;
+  // The cards the open moment asks about or has picked, whether or not they glow now (the tray is open, or the table peeks): a row's fold never takes one (row-fold.ts).
+  keep: ReadonlySet<string>;
 };
 
 // The engine's numbers the canvas draws on a card (card-effects.ts, slotNumbers): the effects on it, its willpower while it

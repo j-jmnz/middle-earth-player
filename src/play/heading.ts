@@ -58,11 +58,11 @@ export function headingWords(step: HeadingStep): string {
 /** The dial's hint: a tap opens the card. */
 export const HEADING_HINT = "Shows the Heading card";
 
-/** The change badge beside the dial for three seconds: "On-course" on an accent wash, "Off-course" on a threat-red wash; null when it did not move. */
+/** The change badge beside the dial for three seconds, worded by the direction of the shift and not the state it leaves ("Toward Sun" on an accent wash, "Toward Storm" on a threat-red wash; a Storm-to-Rain shift is still off-course); null when it did not move. */
 export function headingDelta(before: HeadingStep, after: HeadingStep): { text: string; towardSun: boolean } | null {
   if (before === after) return null;
   const towardSun = HEADING_STEPS.indexOf(after) < HEADING_STEPS.indexOf(before);
-  return { text: towardSun ? "On-course" : "Off-course", towardSun };
+  return { text: towardSun ? "Toward Sun" : "Toward Storm", towardSun };
 }
 
 /** What a screen reader hears of a shift: "Heading shifted off-course, now Rain". */
@@ -79,13 +79,6 @@ export function headingPreviewTitle(step: HeadingStep): string {
 /** The preview's four steps, the current one marked, each with where it stands. */
 export function headingPreviewSteps(step: HeadingStep): readonly { step: HeadingStep; line: string; current: boolean }[] {
   return HEADING_STEPS.map((each) => ({ step: each, line: `${each}: ${each === "Sun" ? "on-course" : each === "Storm" ? "off-course, the worst" : "off-course"}`, current: each === step }));
-}
-
-/** The text the preview shows under the title: the steps in order, the current one named. */
-export function headingPreviewText(step: HeadingStep): string {
-  return headingPreviewSteps(step)
-    .map((row) => `${row.current ? "▶ " : "  "}${row.line}`)
-    .join("\n");
 }
 
 /** The step a state's sea record holds, narrowed; null with no Heading card. */

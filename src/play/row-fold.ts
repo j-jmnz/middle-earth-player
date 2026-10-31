@@ -100,14 +100,15 @@ export function foldTitle(where: "staging" | "engaged"): string {
 }
 
 // The fold order of a staging group, lowest first (docs/design-system-table.md): the Stormcaller's area while it is not at the players' stage (0, built by
-// its scenario phase), then cards the players control (a freed tower), then guarded pairs, then locations, then enemies; any other card goes last.
+// its scenario phase), then cards the players control (`claimed`, the engine's marker for an objective a player took; a freed tower is one), then guarded
+// pairs, then locations, then enemies; any other card goes last. A revealed card has a `controller` (the seat that revealed it), so that says nothing here.
 export const STAGING_RANK = { area: 0, controlled: 1, guarded: 2, location: 3, enemy: 4, other: 5 } as const;
 
 /** The fold rank of a staging group, from its lead entry and how many cards it holds. */
 export function stagingRank(group: readonly ZoneEntry[]): number {
   const lead = group[0];
   if (!lead) return STAGING_RANK.other;
-  if (lead.card.controller != null) return STAGING_RANK.controlled;
+  if (lead.card.claimed === true) return STAGING_RANK.controlled;
   if (group.length > 1) return STAGING_RANK.guarded;
   if (lead.kind === "location") return STAGING_RANK.location;
   if (lead.kind === "enemy" || lead.kind == null) return STAGING_RANK.enemy;

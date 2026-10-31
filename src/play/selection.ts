@@ -4,6 +4,7 @@
 // in this window (from legalIntents, computed once per window), and when the player lifts one it asks legalTargets for that
 // card only. A drop names a zone id or a card id that list returned. A drop is a pick, like a tap: it never sends an intent.
 // The dock asks to confirm what it picked (table-choice.ts), and the card moves only when the reducer accepts that.
+import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
 import { printedOf } from "../rules/printed.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
@@ -29,11 +30,16 @@ function playable(legal: readonly LegalIntent[], cardId: string): boolean {
   return legal.some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 }
 
+// A character is dragged onto the quest to commit it, except while the first player is asked what to commit to a Sailing test: that Commit is the test's, picked on the table, not the quest's.
+function questCommitDrag(game: ScenarioState, legal: readonly LegalIntent[]): boolean {
+  return game.mode === "questCommit" && has(legal, "Commit") && !askingToCommit(game);
+}
+
 /** The cards the player can pick up in this window. Computed once per window, not per pixel. */
 export function draggableIds(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[]): readonly string[] {
   const ids = new Set<string>();
   for (const intent of legal) if (intent.type === "PlayCard") ids.add(intent.cardId);
-  if (game.mode === "questCommit" && has(legal, "Commit")) for (const id of legalTargets(game, { type: "Commit" }, ctx)) ids.add(id);
+  if (questCommitDrag(game, legal)) for (const id of legalTargets(game, { type: "Commit" }, ctx)) ids.add(id);
   if (has(legal, "Travel")) for (const id of legalTargets(game, { type: "Travel" }, ctx)) ids.add(id);
   if (game.window?.kind === "optionalEngage" && has(legal, "Engage")) for (const id of legalTargets(game, { type: "Engage" }, ctx)) ids.add(id);
   return [...ids];
@@ -49,7 +55,7 @@ export function dropTargets(game: ScenarioState, ctx: ReduceContext, legal: read
     if (printed.type === "attachment") return legalTargets(game, { type: "PlayCard", cardId }, ctx).map((id): DropTarget => (id === "staging" ? { kind: "zone", zone: "staging" } : { kind: "card", cardId: id }));
     return [{ kind: "zone", zone: "play" }];
   }
-  if (game.mode === "questCommit" && has(legal, "Commit") && legalTargets(game, { type: "Commit" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "questStage" }];
+  if (questCommitDrag(game, legal) && legalTargets(game, { type: "Commit" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "questStage" }];
   if (has(legal, "Travel") && legalTargets(game, { type: "Travel" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "activeLocation" }];
   if (game.window?.kind === "optionalEngage" && legalTargets(game, { type: "Engage" }, ctx).includes(cardId)) return [{ kind: "zone", zone: "engaged" }];
   return [];

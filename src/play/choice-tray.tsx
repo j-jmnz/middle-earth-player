@@ -17,7 +17,7 @@ import type { Sheet, Unavailable } from "./sheet-types.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { shareFor, type Choice } from "./table-choice.ts";
 import { useHeld } from "./tray-frame.tsx";
-import { trayTiles, type TrayTile } from "./tray-logic.ts";
+import { tileAction, trayTiles, type TrayTile } from "./tray-logic.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -109,7 +109,10 @@ export function ChoiceTray({
               leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:tray`} {...cardBox(dense, s)} /> : null}
               trailing={mark ? <DamagePill mark={mark} /> : null}
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
-              onPress={() => onTile(tile.id)}
+              // A card the Sailing test looked at is no choice: a tap opens it large, as a long press does.
+              onPress={() => (tileAction(tile) === "read" ? (onRead && readId ? onRead(readId) : undefined) : onTile(tile.id))}
+              hint={tile.look != null ? "Shows the card" : undefined}
+              detailSpoken={tile.look == null}
               onLongPress={onRead && readId ? () => onRead(readId) : null}
             />
           );

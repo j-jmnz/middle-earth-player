@@ -118,11 +118,13 @@ describe("what folds first", () => {
   });
 
   it("ranks a staging group: cards the players control, then guarded pairs, then locations, then enemies", () => {
-    const controlled = [entry(instance("t", "staging", { controller: 0 }), { kind: "location" })];
-    const pair = [entry(instance("o", "staging"), { kind: "other" }), entry(instance("g", "staging", { guard: true, host: "o" }), { kind: "enemy" })];
-    const location = [entry(instance("l", "staging"), { kind: "location" })];
-    const foe = [entry(instance("e", "staging"), { kind: "enemy" })];
-    const bare = [entry(instance("u", "staging"))];
+    // A reveal leaves every staging card with the revealing seat as its controller (frames.ts): only the claimed marker puts a card first.
+    const revealed = { controller: 0 };
+    const controlled = [entry(instance("t", "staging", { ...revealed, claimed: true }), { kind: "other" })];
+    const pair = [entry(instance("o", "staging", revealed), { kind: "other" }), entry(instance("g", "staging", { ...revealed, guard: true, host: "o" }), { kind: "enemy" })];
+    const location = [entry(instance("l", "staging", revealed), { kind: "location" })];
+    const foe = [entry(instance("e", "staging", revealed), { kind: "enemy" })];
+    const bare = [entry(instance("u", "staging", revealed))];
     expect([controlled, pair, location, foe].map(stagingRank)).toEqual([1, 2, 3, 4]);
     expect(stagingRank(bare)).toBe(4);
     expect(stagingRank([])).toBe(5);

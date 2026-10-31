@@ -126,9 +126,9 @@ export function useTableChoice({
   const sheet = live?.sheet ?? base;
   const table: TapContext = useMemo(() => ({ game, ctx, legal, names }), [game, ctx, legal, names]);
   // A card folded into a row's stack is not drawn whole: a pick that reaches one opens as the choice tray (row-fold.ts).
-  const foldedIds = useStore(store, (state) => state.folded);
-  const foldedSet = useMemo(() => new Set([...foldedIds.staging, ...foldedIds.engaged]), [foldedIds]);
-  const onTable = useMemo(() => onTableFor(game, acting, foldedSet), [game, acting, foldedSet]);
+  const rowFolds = useStore(store, (state) => state.rowFolds);
+  const rowFolded = useMemo(() => new Set([...rowFolds.staging, ...rowFolds.engaged]), [rowFolds]);
+  const onTable = useMemo(() => onTableFor(game, acting, rowFolded), [game, acting, rowFolded]);
   // A moment that is not this one (a new sheet key) ends a peek; while it lasts a tap on a card only previews it.
   const peeking = usePeeking(store, sheet.key);
   // On paper: when the player asked, when a screen reader is on (a card drawn only on the canvas is no control for it), or
@@ -151,8 +151,8 @@ export function useTableChoice({
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)) });
-  const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey }), [glow, pickedKey, share, dim, markKey, mutedKey]);
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)) });
+  const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey }), [glow, pickedKey, share, dim, markKey, mutedKey, keepKey]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
   const fight = useMemo(() => fightOf(fightKey), [fightKey]);

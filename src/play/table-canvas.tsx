@@ -5,10 +5,12 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
+import { lookedIds } from "../rules/families/sea-sailing.ts";
+
 import { NO_HIGHLIGHT } from "./peek.ts";
 import { headingStepOf, headingLook } from "./heading.ts";
-import { headingLine, secondSlotLine, shipsLine } from "./sea-words.ts";
-import { PILE_WORDS, PILES, SECOND_PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
+import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "./sea-words.ts";
+import { PILE_WORDS, PILES, hidesFace, isPrisoner, pileIds, secondPilesOf, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
@@ -95,7 +97,7 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight, t }: 
   const top = view.top ? ` · ${nameOf(view.top.code)} on top` : "";
   // An encounter card attached to the deck (Iron Shackles, 01105:A:1): the list says so, as the canvas draws a chain.
   const held = (view.attached ?? []).length > 0 ? ` · ${(view.attached ?? []).map((card) => nameOf(card.code)).join(", ")} attached` : "";
-  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} t={t} />;
+  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${pileCountWords(PILE_WORDS[pile], view.ids.length)}${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} t={t} />;
 }
 
 // The sea family's pieces in words (docs/design-system-table.md, Cards): the heading, the seat's ships with their damage, and the Corsair pair on one line. The web list does not fold.
@@ -104,8 +106,8 @@ function SeaLines({ store, seat, nameOf, facts, t }: Pick<TableCanvasProps, "sto
   const step = headingStepOf(game.sea?.heading);
   const owner = game.seats[seat];
   const ships = owner ? [...owner.heroes, ...owner.play].flatMap((id) => (game.cards[id] && facts.shipRank(game.cards[id]?.code ?? "") != null ? [game.cards[id]] : [])) : [];
-  const pair = game.corsairDeck !== undefined ? [{ name: PILE_WORDS.corsairDeck, count: game.corsairDeck.length }, { name: PILE_WORDS.corsairDiscard, count: (game.corsairDiscard ?? []).length }] : [];
-  const looked = game.sea?.sailing?.step === "shift" ? game.sea.sailing.looked.length : 0;
+  const pair = secondPilesOf(game).map((pile) => ({ name: PILE_WORDS[pile], count: pileIds(game, pile, seat).length }));
+  const looked = lookedIds(game).length;
   if (!step && ships.length === 0 && pair.length === 0 && looked === 0) return null;
   return (
     <View className="mb-2">
@@ -124,7 +126,7 @@ export function TableCanvas({ store, width, height, nameOf, inactive, facts, inf
   // Peeking at the other seat: nothing is outlined or filled, and a tap only previews (use-table-choice.ts).
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
-  const hasCorsair = useStore(store, (state) => state.game.corsairDeck !== undefined);
+  const second = useStore(store, (state) => secondPilesOf(state.game));
   return (
     <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
       <SeaLines store={store} seat={seat} nameOf={nameOf} facts={facts} t={t} />
@@ -132,7 +134,7 @@ export function TableCanvas({ store, width, height, nameOf, inactive, facts, inf
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}
       <View className="flex-row flex-wrap gap-1">
-        {[...PILES, ...(hasCorsair ? SECOND_PILES : [])].map((pile) => (
+        {[...PILES, ...second].map((pile) => (
           <PileRow key={pile} pile={pile} {...rowProps} />
         ))}
       </View>

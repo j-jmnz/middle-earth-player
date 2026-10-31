@@ -6,10 +6,11 @@ import { loadCards } from "../../scripts/data/load-cards.ts";
 import { loadLedger } from "../../scripts/data/printed/ledger.ts";
 
 import { cardSize, tableLayout } from "./layout.ts";
-import { LOOK_STAGGER_MS, lookBands, lookStrip, marksOf, MEDALLION, medallionAt, naturalCapacity, squeezedCapacity, successOf, totalSuccess } from "./look-strip.ts";
+import { successSymbols } from "../rules/families/sea-sailing.ts";
+
+import { lookBands, lookStrip, MEDALLION, medallionAt, squeezedCapacity } from "./look-strip.ts";
 import { seaFixture, seaViews } from "./sea-fixture.ts";
 import { medallionCount } from "./sea-words.ts";
-import { MOTION } from "./motion-tokens.ts";
 import { touch, UI_SCALES } from "./ui-scale.ts";
 
 type Screen = { width: number; height: number; inset: number; scales: readonly number[] };
@@ -27,10 +28,9 @@ function canvasOf(screen: Screen, scale: number, quest: boolean) {
 }
 
 describe("the look strip's room", () => {
-  it("holds as many cards a gap apart as the band's width allows, then squeezes to 44 pt steps", () => {
-    expect(naturalCapacity(300, 50, 6)).toBe(5);
+  it("holds as many cards squeezed to 44 pt steps as the band's width allows", () => {
     expect(squeezedCapacity(300, 50, 44)).toBe(6);
-    expect(naturalCapacity(10, 50, 6)).toBe(1);
+    expect(squeezedCapacity(10, 50, 44)).toBe(1);
   });
 
   it("places 1 to 12 cards at each screen, with and without the quest scale: a gap apart, then squeezed to a target, then over more bands", () => {
@@ -82,9 +82,8 @@ describe("the look strip's room", () => {
     expect(past.step).toBeLessThan(44);
   });
 
-  it("is empty with no cards, and the cards come 90 ms apart", () => {
+  it("is empty with no cards", () => {
     expect(lookStrip(0, [{ x: 0, y: 0, w: 100 }], { w: 40, h: 56 }, 6, 44).places).toEqual([]);
-    expect(LOOK_STAGGER_MS).toBe(MOTION.stagger.ms);
   });
 
   it("straddles the card's foot with a 22 pt medallion, and says two symbols as ×2", () => {
@@ -105,17 +104,17 @@ describe("the success marks come from the ledger", () => {
   it("marks every ledger side that prints the symbol with its count, and no other card", () => {
     const marked = entries.filter((entry) => entry.side === "A" && (entry.sailingSuccess ?? 0) > 0);
     expect(marked.length).toBeGreaterThan(10);
-    for (const entry of marked) expect(successOf(printed, entry.code), `${entry.code} ${cards.get(entry.code)?.name}`).toBe(entry.sailingSuccess);
+    for (const entry of marked) expect(successSymbols(printed, entry.code), `${entry.code} ${cards.get(entry.code)?.name}`).toBe(entry.sailingSuccess);
     const codes = entries.filter((entry) => entry.side === "A").map((entry) => entry.code);
-    const withMarks = codes.filter((code, at) => marksOf(printed, codes)[at] !== 0);
+    const withMarks = codes.filter((code) => successSymbols(printed, code) !== 0);
     expect(new Set(withMarks)).toEqual(new Set(marked.map((entry) => entry.code)));
-    expect(totalSuccess(printed, codes)).toBe(marked.reduce((sum, entry) => sum + (entry.sailingSuccess ?? 0), 0));
+    expect(codes.reduce((sum, code) => sum + successSymbols(printed, code), 0)).toBe(marked.reduce((sum, entry) => sum + (entry.sailingSuccess ?? 0), 0));
   });
 
   it("knows a card with two symbols (11050) and a card with none", () => {
-    expect(successOf(printed, "11050")).toBe(2);
-    expect(successOf(printed, "11080")).toBe(0);
-    expect(successOf(printed, "nothing")).toBe(0);
+    expect(successSymbols(printed, "11050")).toBe(2);
+    expect(successSymbols(printed, "11080")).toBe(0);
+    expect(successSymbols(printed, "nothing")).toBe(0);
   });
 
   it("sizes the strip at the table's card", () => {

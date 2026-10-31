@@ -6,7 +6,7 @@ import { useStore } from "zustand";
 
 import { SPHERE_TINT } from "./icon-map.ts";
 import type { CardSlot, LayoutViews, PileViews } from "./layout.ts";
-import { PILES, TABLE_ZONES, pileSelector, zoneSelector, type BasePileId, type PileView, type ZoneFacts, type ZoneId } from "./selectors.ts";
+import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector, type BasePileId, type PileView, type ZoneFacts, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens, type TableTokens } from "./tokens.ts";
 
@@ -26,8 +26,8 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const discard = useStore(store, (state) => pileOf.discard(state.game));
   const encounterDeck = useStore(store, (state) => pileOf.encounterDeck(state.game));
   const encounterDiscard = useStore(store, (state) => pileOf.encounterDiscard(state.game));
-  const corsairDeck = useStore(store, (state): PileView | null => (state.game.corsairDeck !== undefined ? corsair.deck(state.game) : null));
-  const corsairDiscard = useStore(store, (state): PileView | null => (state.game.corsairDeck !== undefined ? corsair.discard(state.game) : null));
+  const corsairDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDeck") ? corsair.deck(state.game) : null));
+  const corsairDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDiscard") ? corsair.discard(state.game) : null));
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },

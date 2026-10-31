@@ -5,7 +5,8 @@ tags:
 # Phase 39b. Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `sea-solo`
 # (scripts/e2e-fixtures.ts): a real dealt game of Voyage Across Belegaer, true solo, the Dream-chaser and one other ship, parked on the first Sailing test's commit. No Dream-chaser
 # scenario deals before phase 40, so the fixture and the run move to phase 40's phone half (docs/phases/phase-39b-ships-on-the-table.md, E2E).
-# The engine shifts the heading when it performs the test, after the commit, so the dial reads Sun at the commit and shows the off-course badge once the look is up.
+# The engine shifts the heading off-course as the test opens, before the commit (dcce.sailing-tests, step 1), so the dial reads Cloud at the commit. Which symbols the looked-at cards
+# show depends on the deal, so the flow keeps the heading for every symbol and ends on the Done every look has; its assertions hold whatever the cards are.
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/sea-solo"
@@ -24,12 +25,12 @@ tags:
 - tapOn:
     id: quest-advance-progress
     optional: true
-# The Heading dial is in the top bar, on-course until the test runs; its word is clear text.
+# The Heading dial is in the top bar, already shifted off-course by the test; its word is clear text.
 - assertVisible:
     id: heading
 - assertVisible:
     id: heading-value
-    text: "Sun"
+    text: "Cloud"
 # The commit is a pick on the play area: the dock's List holds the characters that can be committed, the Dream-chaser among them.
 - tapOn:
     id: sheet-list
@@ -42,30 +43,27 @@ tags:
     text: ".*Looks at .* cards?.*"
 - tapOn:
     id: sheet-primary
-# The test has shifted the heading off-course and looked at the cards: each is a read-only row, with its symbols.
-- extendedWaitUntil:
-    visible:
-      id: heading-delta
-      text: "Off-course"
-    timeout: 5000
-- assertVisible:
-    id: heading-value
-    text: "Cloud"
+# The cards looked at stand in the strip, each a read-only row in the dock's List with its symbols.
 - tapOn:
     id: sheet-list
 - assertVisible:
     id: "sheet-look-.*"
+# Keep the heading for each symbol found (a Keep arms on its first tap). A look with no symbol, or one the heading cannot use, has no Keep: it asks only for Done.
+- repeat:
+    while:
+      visible:
+        id: sheet-alternative
+    commands:
+      - tapOn:
+          id: sheet-alternative
 - assertVisible:
-    id: readout-result
-    text: ".* to .*"
-# Answer the moment: shift on-course for the symbol found. The dial pops and its badge says so.
-- tapOn:
     id: sheet-primary
-- extendedWaitUntil:
-    visible:
-      id: heading-delta
-      text: "On-course"
-    timeout: 5000
+    text: "Done"
 - assertVisible:
     id: heading-value
-    text: "Sun"
+    text: "Cloud"
+# Done discards the cards looked at; the quest commitment follows.
+- tapOn:
+    id: sheet-primary
+- assertNotVisible:
+    id: "sheet-look-.*"

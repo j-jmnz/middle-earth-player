@@ -18,6 +18,7 @@ import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -25,7 +26,7 @@ import { Text } from "./text.tsx";
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
 // The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system-table.md).
-const DIAL = 46;
+const DIAL = DIAL_SIZE;
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
 const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: string; meter: string }> => ({
@@ -250,10 +251,11 @@ function ThreatDial({
 /**
  * The Heading dial of the top bar (dcce.heading), while the Heading card is in play: the Life dial's frame (46 pt, no number), the current step's icon in the disc, and a ring of four
  * quarter arcs lit clockwise from the top (Sun four, Cloud three, Rain two, Storm one). Sun is the accent, Cloud and Rain bone, Storm threat red on a filled disc; the icon's shape and the
- * arcs carry the step without the colour. A shift pops the dial as the threat dial pops and says the change for three seconds ("On-course", "Off-course"); reduced motion keeps it still and
- * shows the badge. A tap opens the Heading card's preview and never changes the dial. The engine owns the step.
+ * arcs carry the step without the colour. A shift pops the dial as the threat dial pops and says the change for three seconds ("Toward Sun", "Toward Storm"); reduced motion keeps it still and
+ * shows the badge. A tap opens the Heading card's preview and never changes the dial. The engine owns the step. `compact` (the bar scrolls) drops the "Heading" word, which the spoken label keeps,
+ * and lays the badge under the disc; otherwise the label column is as wide as its widest word, so the dial's width never moves.
  */
-export function HeadingDial({ step, onPress }: { step: HeadingStep; onPress?: () => void }) {
+export function HeadingDial({ step, compact = false, onPress }: { step: HeadingStep; compact?: boolean; onPress?: () => void }) {
   const speed = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
@@ -279,6 +281,13 @@ export function HeadingDial({ step, onPress }: { step: HeadingStep; onPress?: ()
   const delta = change ? headingDelta(change.before, change.after) : null;
   const deltaWords = change ? headingDeltaWords(change.before, change.after) : null;
   const words = `${headingWords(step)}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const badgeOf = delta ? (
+    <Animated.View key={change?.at} entering={badge.in} exiting={badge.out} style={{ borderRadius: 999, paddingHorizontal: (compact ? 4 : 6) * s, backgroundColor: withAlphaHex(delta.towardSun ? t.accent : t.threat, 0.22) }}>
+      <Text testID="heading-delta" numberOfLines={1} className="font-display text-label text-bone">
+        {delta.text}
+      </Text>
+    </Animated.View>
+  ) : null;
   return (
     <Pressable
       disabled={!onPress}
@@ -302,16 +311,19 @@ export function HeadingDial({ step, onPress }: { step: HeadingStep; onPress?: ()
           {look.word}
         </Text>
       </Animated.View>
-      <View className="items-start gap-0.5">
-        <Text className="text-label text-muted">{look.label}</Text>
-        {delta ? (
-          <Animated.View key={change?.at} entering={badge.in} exiting={badge.out} style={{ borderRadius: 999, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(delta.towardSun ? t.accent : t.threat, 0.22) }}>
-            <Text testID="heading-delta" className="font-display text-label text-bone">
-              {delta.text}
-            </Text>
-          </Animated.View>
-        ) : null}
-      </View>
+      {compact ? (
+        // The badge lies over the disc's foot, centred, and reaches into the gap either side (HEADING_BADGE_OVER); it takes no touch.
+        delta ? (
+          <View pointerEvents="none" style={{ position: "absolute", top: (DIAL - 8) * s, left: -HEADING_BADGE_OVER * s, right: -HEADING_BADGE_OVER * s, alignItems: "center" }}>
+            {badgeOf}
+          </View>
+        ) : null
+      ) : (
+        <View className="items-start gap-0.5" style={{ minWidth: HEADING_LABEL_W * s }}>
+          <Text className="text-label text-muted">{look.label}</Text>
+          {badgeOf}
+        </View>
+      )}
     </Pressable>
   );
 }

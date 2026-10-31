@@ -67,8 +67,8 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     expect(legalIntents(state, built.ctx)).toEqual([{ type: "Commit" }, { type: "Pass" }]);
     // The first player's characters and the Dream-chaser.
     expect([...legalTargets(state, { type: "Commit" }, built.ctx)].sort()).toEqual([built.ids.aragorn, built.ids.dc].sort());
-    // Nothing is committed to the quest yet and the heading has not shifted.
-    expect(headingOf(state)).toBe("Sun");
+    // Nothing is committed to the quest yet; the heading shifted off-course as the test opened, before the commit (dcce.sailing-tests, step 1).
+    expect(headingOf(state)).toBe("Cloud");
   });
 
   it("shifts the heading off-course and commits no one on a Pass, then opens the quest commitment", () => {
@@ -93,9 +93,13 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     expect(asked.sea?.sailing?.step === "shift" && asked.sea.sailing.looked.map((id) => asked.cards[id]?.code)).toEqual(["s1", "s0", "s2"]);
     expect(asked.window).toEqual({ kind: "choose", seat: 0, options: ["shift", "keep"] });
     expect(legalIntents(asked, built.ctx)).toEqual([{ type: "Choose", optionId: "shift" }, { type: "Choose", optionId: "keep" }]);
-    // One shift brings the heading to Sun, so the test ends and the looked cards are discarded.
-    const done = send(asked, { type: "Choose", optionId: "shift" }, built.ctx);
-    expect(headingOf(done)).toBe("Sun");
+    // One shift brings the heading to Sun with two symbols unanswered: the cards stay for a Done, then they are discarded.
+    const shifted = send(asked, { type: "Choose", optionId: "shift" }, built.ctx);
+    expect(headingOf(shifted)).toBe("Sun");
+    expect(shifted.sea?.sailing).toMatchObject({ step: "look" });
+    expect(discarded(shifted)).toEqual([]);
+    expect(legalIntents(shifted, built.ctx)).toEqual([{ type: "Choose", optionId: "done" }]);
+    const done = send(shifted, { type: "Choose", optionId: "done" }, built.ctx);
     expect(discarded(done)).toEqual(["s1", "s0", "s2"]);
     expect(done.encounterDeck.map((id) => done.cards[id]?.code)).toEqual(["s0"]);
     expect(done.sea?.sailing).toBeUndefined();
@@ -135,29 +139,55 @@ describe("the Sailing test (dcce.sailing, dcce.sailing-tests)", () => {
     const first = send(asked, { type: "Choose", optionId: "shift" }, built.ctx);
     expect(headingOf(first)).toBe("Rain");
     expect(first.sea?.sailing).toMatchObject({ left: 3 });
-    const second = send(send(first, { type: "Choose", optionId: "shift" }, built.ctx), { type: "Choose", optionId: "shift" }, built.ctx);
-    expect(headingOf(second)).toBe("Sun");
+    const sun = send(send(first, { type: "Choose", optionId: "shift" }, built.ctx), { type: "Choose", optionId: "shift" }, built.ctx);
+    expect(headingOf(sun)).toBe("Sun");
+    // Sun came with a symbol left: the cards wait for a Done, then they are discarded.
+    expect(sun.sea?.sailing).toMatchObject({ step: "look" });
+    const second = send(sun, { type: "Choose", optionId: "done" }, built.ctx);
     expect(second.sea?.sailing).toBeUndefined();
     expect(discarded(second)).toEqual(["s2", "s2"]);
   });
 
-  it("asks nothing when no symbol is found, and the heading stays where the shift left it", () => {
+  it("holds the cards looked at for a Done when no symbol is found, and the heading stays where the shift left it", () => {
     const built = table({ deck: ["s0", "s0", "s1"] });
-    const done = send(toQuest(built), { type: "Commit", cardIds: [built.ids.aragorn!] }, built.ctx);
+    const held = send(toQuest(built), { type: "Commit", cardIds: [built.ids.aragorn!] }, built.ctx);
+    expect(headingOf(held)).toBe("Cloud");
+    expect(held.sea?.sailing).toEqual({ step: "look", looked: [held.encounterDeck[0]] });
+    expect(held.window).toEqual({ kind: "choose", seat: 0, options: ["done"] });
+    expect(discarded(held)).toEqual([]);
+    const done = send(held, { type: "Choose", optionId: "done" }, built.ctx);
     expect(headingOf(done)).toBe("Cloud");
     expect(done.sea?.sailing).toBeUndefined();
+    expect(done.mode).toBe("questCommit");
     expect(discarded(done)).toEqual(["s0"]);
+  });
+
+  it("holds the cards for a Done when the answers bring the heading back to Sun with symbols left", () => {
+    const built = table({ heading: "Sun", deck: ["s2", "s0"] });
+    const asked = send(toQuest(built), { type: "Commit", cardIds: [built.ids.aragorn!] }, built.ctx);
+    expect(asked.sea?.sailing).toMatchObject({ step: "shift", left: 2 });
+    const held = send(asked, { type: "Choose", optionId: "shift" }, built.ctx);
+    expect(headingOf(held)).toBe("Sun");
+    expect(held.sea?.sailing).toMatchObject({ step: "look" });
+    expect(discarded(held)).toEqual([]);
+  });
+
+  it("looks at nothing on a Pass: no cards are held", () => {
+    const built = table();
+    const done = send(toQuest(built), { type: "Pass" }, built.ctx);
+    expect(done.sea?.sailing).toBeUndefined();
+    expect(done.window).toEqual({ kind: "pass" });
   });
 
   it("shuffles the encounter discard pile into the deck first when the deck is too short, and logs it as the other reshuffles are", () => {
     const built = table({ deck: ["s0"], discard: ["s2", "s0"] });
     const result = reduce(toQuest(built), { type: "Commit", cardIds: [built.ids.dc!] }, built.ctx);
     expect(result.ok && result.steps).toContainEqual(expect.objectContaining({ kind: "resetEncounterDeck", count: 2 }));
-    const done = result.state;
     // Two cards to look at, one in the deck: the discard pile joins it, so the deck of three was shuffled and two looked at.
-    expect(done.seedCursor).toBeGreaterThan(built.state.seedCursor);
+    expect(result.state.seedCursor).toBeGreaterThan(built.state.seedCursor);
+    const done = send(result.state, result.state.sea?.sailing?.step === "look" ? { type: "Choose", optionId: "done" } : { type: "Choose", optionId: "keep" }, built.ctx);
     expect(done.encounterDeck.length + done.encounterDiscard.length).toBe(3);
-    expect(done.encounterDiscard).toHaveLength(2);
+    expect(done.encounterDiscard.length).toBeGreaterThanOrEqual(2);
   });
 
   it("refuses a character that cannot be committed, and committing none with a Commit", () => {

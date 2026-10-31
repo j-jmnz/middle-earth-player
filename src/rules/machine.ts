@@ -55,8 +55,8 @@ import { announceProgress } from "./families/burden-effects.ts";
 import { damageLoss } from "./families/south-locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
 import { refillCorsairDeck } from "./families/sea-corsair.ts";
-import { chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
-import { askingToCommit, askingToShift } from "./families/sea-sailing-legal.ts";
+import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
+import { askingToCommit, askingToLook, askingToShift } from "./families/sea-sailing-legal.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -140,6 +140,7 @@ export function applyIntent(
     case "Trigger":
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":
+      if (askingToLook(state)) return chooseLookDone(state);
       return askingToShift(state) ? chooseShift(state, intent.optionId) : applyChoice(state, intent.optionId);
     case "ChooseResolution":
       return applyResolution(state, intent.optionId);

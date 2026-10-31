@@ -11,11 +11,12 @@ export type Heading = (typeof HEADINGS)[number];
 // as an enemy and out of the game as an objective ally (dcce.stormcaller-elite).
 export type SeaRoute = "corsair" | "victory" | "removed";
 
-// A Sailing test the first player is performing (dcce.sailing-tests). "ask": the first player chooses the characters to commit (a Commit intent, or
-// a Pass for none); the test resolves at once, and when its looked-at cards show Sailing success symbols and the heading can still shift on-course
-// it waits at "shift": `looked` are the cards looked at (still on top of the encounter deck, for the table to show), `left` the symbols not yet
-// answered, each answered by choosing "shift" or "keep".
-export type SailingTest = { step: "ask" } | { step: "shift"; looked: readonly string[]; left: number };
+// A Sailing test the first player is performing (dcce.sailing-tests). "ask": the heading has shifted off-course and the first player chooses the
+// characters to commit (a Commit intent, or a Pass for none, which looks at nothing); the cards are looked at at once, and when they show Sailing
+// success symbols and the heading can still shift on-course the test waits at "shift": `looked` are the cards looked at (still on top of the
+// encounter deck, for the table to show), `left` the symbols not yet answered, each answered by choosing "shift" or "keep". With no symbol to
+// answer, or once the heading is back on Sun, it waits at "look": the same cards, one answer ("done") before they are discarded.
+export type SailingTest = { step: "ask" } | { step: "shift"; looked: readonly string[]; left: number } | { step: "look"; looked: readonly string[] };
 
 export type SeaState = {
   // The Heading card's setting, or null before the fleet is prepared (no Heading card yet).

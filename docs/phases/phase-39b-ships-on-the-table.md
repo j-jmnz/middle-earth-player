@@ -36,7 +36,7 @@ The setup attaches the Heading card to the Dream-chaser and sets it on-course (`
   - Colour: Sun in the accent, Cloud and Rain in bone, Storm in threat red with the disc filled. The icon's shape and the arcs carry the step without colour.
   - `heading-value` is clear text with the step's word ("Rain"), as `rail-current` is.
   - It is heard as "Heading, Rain, off-course, two steps from on-course". Its hint is "Shows the Heading card".
-- **A shift.** The dial pops as the threat dial does (`dialPopRise`, `dialPopSettle`). A badge (`heading-delta`) says the change for three seconds: "On-course" on an accent wash, or "Off-course" on a threat-red wash. It is heard as "Heading shifted off-course, now Rain". A Sailing test that shifts twice pops twice, once per engine step. Reduced motion keeps the dial still and shows the badge.
+- **A shift.** The dial pops as the threat dial does (`dialPopRise`, `dialPopSettle`). A badge (`heading-delta`) says the direction of the change for three seconds: "Toward Sun" on an accent wash, or "Toward Storm" on a threat-red wash. It is heard as "Heading shifted off-course, now Rain". A Sailing test that shifts twice pops twice, once per engine step. Reduced motion keeps the dial still and shows the badge.
 - **A tap** opens the Heading card's preview, as the Eye opens the Nightmare card. The preview is titled "Heading · Rain (off-course)", lists the four steps with the current one marked, and draws the card turned a quarter turn per step, as the rule turns it. A peek never changes the dial.
 - **On the card.** The Heading card peeks under the Dream-chaser (Ships in the play area). The dial is what the player reads at a glance.
 
@@ -73,15 +73,15 @@ When a ship-enemy with Boarding X engages from staging, the engine reveals X Cor
 
 The test comes at the start of the quest phase, before the commit, and the quest scale is up (`dcce.sailing`, `dcce.sailing-tests`).
 
-1. **Shift off-course.** The Heading dial pops and shows its badge.
+1. **Shift off-course.** The engine shifts the heading as the test opens, before the commit. The Heading dial pops and shows its badge, and the commit already reads the shifted step.
 2. **Commit to the test.** This is a multi pick on the play area. Picked characters wear the picked mark and exhaust once confirmed. They get no willpower pill, because this is not the quest commit.
    - The primary counts the picks ("Commit 2").
    - The readout gives the engine's count: "Looks at 3 cards · the Dream-chaser counts as 2". With Enlarged Quarters (11174:B) or Sea-ward Tower (12134) the readout names them.
 3. **The look strip** (`look-strip.ts`). The looked-at cards come off the encounter deck face up and stand in a strip laid over staging, at the table's card size, 90 ms apart. Staging, the engagement area and the play area under the strip carry the 45% night veil.
    - **Success marks.** A card whose ledger side prints the success symbol (`sailingSuccess`) wears a 22 pt night medallion with that icon in the accent, straddling its foot, upright. It pops in after the card turns (`popRise`, `popSettle`). With two symbols it reads "×2". A card with none wears nothing.
-   - **Dock.** The title reads "Sailing test · 2 successes". The readout shows the heading change the engine would make: "Rain to Sun". The answer is whatever the family's moment asks: Done, or a shift and its alternative when the rule's "may" is a choice.
+   - **Dock.** The title reads "Sailing test · 2 successes". The readout shows what one tap on Shift on-course does and the symbols still to ask after it: "Rain to Cloud · 1 more symbol". The answer is whatever the family's moment asks: a shift and its alternative while a symbol is left to answer, or Done alone when none is (none found, or the heading is back on Sun), so the strip never goes without its answer.
    - **Room.** One band holds as many cards as its width allows a gap apart, then squeezed to 44 pt steps. Past one band the strip uses the engagement band, then the play band. Past three bands the cards overlap closer than 44 pt; a tap in a look only previews, and nothing is picked.
-   - **List.** List on the dock (`sheet-list`) opens the looked-at cards as read-only tray rows (`sheet-look-<id>`). Each row has the success icon and the word "Success" when the card has one. This is also the screen-reader path, and the default while a screen reader is on.
+   - **List.** List on the dock (`sheet-list`) opens the looked-at cards as read-only tray rows (`sheet-look-<id>`). Each row has the success icon and the word "Success" when the card has one, and a tap on it opens the card large. This is also the screen-reader path, and the default while a screen reader is on.
    - **Discard.** On the answer the strip glides to the encounter discard pile (`cardDepart`). A short deck reshuffles first, and the banner says so.
    - Reduced motion shows the strip, the medallions and the discard at once.
 4. Actions are open before and after the test, not during it (`dcce.sailing-tests`). The table offers none while the strip is up.

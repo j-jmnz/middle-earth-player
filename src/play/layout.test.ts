@@ -1,11 +1,14 @@
 // The table's geometry at each UI scale (docs/plans/done/settings-theme-and-ui-scale.md, UI scale engine; user request, 2026-10-28): at Medium it is
 // the table as it was; at Small and Large every card still fits the canvas, the hand keeps its 44 pt strip and its target, and the
 // gutters and gaps are Medium's times the factor.
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import type { CardInstance } from "../rules/state.ts";
 
 import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
+import { CROWDED_CANVASES, CROWDED_SCALES, crowdedTable, slotRows } from "./crowded-table.ts";
 import { PILES, TABLE_ZONES, type PileId, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
 import { HAND_TUCK } from "./play-area.ts";
 import { ACROSS, DOWN, SLACK, shareOut, wrapRows } from "./table-spacing.ts";
@@ -464,13 +467,40 @@ describe("the second pile slot, ships and staging stacks (phase 39b)", () => {
     const { views: v, piles } = views(0);
     const host = card("s0", "staging");
     const under = [card("u1", "staging", { host: "s0", controller: null }), card("u2", "staging", { host: "s0", controller: null }), card("u3", "staging", { host: "s0", controller: null })];
-    const layout = tableLayout(591, 338, { ...v, staging: { zone: "staging", seat: 0, entries: [entry(host, { attached: under }), entry(card("s1", "staging"), { attached: [card("u4", "staging", { host: "s1" })] })] } }, piles, {});
+    const layout = tableLayout(591, 338, { ...v, staging: { zone: "staging", seat: 0, entries: [entry(host, { attached: under }), entry(card("s1", "staging"), { attached: [card("u4", "staging", { host: "s1" })] })] } }, piles, { stacks: true });
+    // Outside the sea family every attachment peeks, as it did.
+    const plain = tableLayout(591, 338, { ...v, staging: { zone: "staging", seat: 0, entries: [entry(host, { attached: under })] } }, piles, {});
+    expect(plain.slots.filter((slot) => slot.kind === "attachment" && slot.zone === "staging")).toHaveLength(3);
+    expect(plain.slots.every((slot) => slot.stack == null)).toBe(true);
     const stacked = layout.slots.filter((slot) => slot.kind === "attachment" && slot.zone === "staging");
     expect(stacked.filter((slot) => slot.stack != null)).toHaveLength(1);
     expect(stacked.find((slot) => slot.stack != null)?.stack).toBe(3);
     // One peek for the stack and one for the card with a single attachment.
     expect(stacked).toHaveLength(2);
     expect(stacked.find((slot) => slot.id === "u4")?.stack).toBeUndefined();
+  });
+
+  it("draws a fold stack whose top card is face down as its back, not its face", () => {
+    const { views: v, piles } = views(0);
+    const crowd = ids("f", 14).map((id, at) => entry(card(id, "staging", at === 0 ? { face: "down" } : {}), { kind: "enemy" }));
+    const layout = tableLayout(457, 323, { ...v, staging: { zone: "staging", seat: 0, entries: crowd } }, piles, {});
+    const fold = layout.slots.find((slot) => slot.id === "fold:staging");
+    expect(fold).toBeDefined();
+    expect(layout.folds?.[0]?.top).toBe("f0");
+    expect(fold?.faceDown).toBe(true);
+    expect(fold?.code).toBe("");
+  });
+
+  it("lays a crowded Fellowship or Mirkwood table out slot for slot as the layout before phase 39b did (src/play/crowded-table.baseline.json)", () => {
+    const baseline = JSON.parse(readFileSync(new URL("./crowded-table.baseline.json", import.meta.url), "utf8")) as Record<string, string[]>;
+    for (const canvas of CROWDED_CANVASES) {
+      for (const scale of CROWDED_SCALES) {
+        const { views: v, piles } = crowdedTable();
+        const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
+        expect(slotRows(layout.slots), `${canvas.width}x${canvas.height} at ${scale}`).toEqual(baseline[`${canvas.width}x${canvas.height}@${scale}`]);
+        expect(layout.folds).toEqual([]);
+      }
+    }
   });
 
   it("leaves a Fellowship and a Mirkwood table as it was: no fold stack, no second slot, the pairs where they were", () => {

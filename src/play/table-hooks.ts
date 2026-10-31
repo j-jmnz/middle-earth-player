@@ -49,7 +49,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage }));
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage }));
     return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage });
   }, [shown, names, shadow, stage]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).

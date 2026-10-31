@@ -2,7 +2,7 @@
 // Life and the Burden deck), the phase rail centered on the screen, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 
 import { setDialsEdge } from "../play/bar-edge";
@@ -17,14 +17,13 @@ import type { HeadingStep } from "../play/heading";
 import { MenuButton } from "../play/table-menu";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
-import { BAR_PAD, barZones, railWide, TOP_BAR } from "../play/top-bar-layout";
+import { BAR_PAD, barZones, DIAL_GAP, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../play/top-bar-layout";
 import { useUiScale } from "../play/ui-scale";
 
 export { TOP_BAR };
-// The scroll fade: this many bands of this width, rising to nearly the felt.
+// The scroll fade: this many bands of this width (EDGE_FADE in all), rising to nearly the felt.
 const FADE_BANDS = 7;
-const FADE_BAND = 4;
-const DIAL_GAP = 10;
+const FADE_BAND = EDGE_FADE / FADE_BANDS;
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
@@ -66,6 +65,10 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   // The bar's width and its left edge on the screen: the table lays it out from the screen's left edge, after the left inset.
   const [bar, setBar] = useState({ width: 0, x: 0 });
   const [dials, setDials] = useState(0);
+  // The Heading dial's place in the dials row, measured, so the row can scroll to it and the other dials' width can be told from it.
+  const [headingBox, setHeadingBox] = useState({ x: 0, w: 0 });
+  const onHeading = (event: LayoutChangeEvent) => setHeadingBox({ x: Math.round(event.nativeEvent.layout.x), w: Math.round(event.nativeEvent.layout.width) });
+  const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const onBar = (event: LayoutChangeEvent) => setBar({ width: Math.round(event.nativeEvent.layout.width), x: Math.round(event.nativeEvent.layout.x) });
   const onDials = (event: LayoutChangeEvent) => setDials(Math.round(event.nativeEvent.layout.width));
   // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
@@ -77,7 +80,16 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
     return () => clearTimeout(timer);
   }, []);
   // The zones are worked out inside the bar's side padding (px-2, 8 pt at every scale), so the screen's middle is counted from there.
-  const zones = bar.width > 0 && (dials > 0 || waited) ? barZones(bar.width - 2 * BAR_PAD, dials, s, screen.width / 2 - bar.x - BAR_PAD) : null;
+  const center = screen.width / 2 - bar.x - BAR_PAD;
+  const zones = bar.width > 0 && (dials > 0 || waited) ? barZones(bar.width - 2 * BAR_PAD, dials, s, center) : null;
+  // The Heading dial drops its word and lays its badge under the disc when the dial at its full width would make the dials scroll; that is told from the other dials' width, not the dial's own.
+  const others = heading ? dials - headingBox.w - DIAL_GAP * s : dials;
+  const compact = heading != null && bar.width > 0 && dials > 0 && headingCompact(bar.width - 2 * BAR_PAD, others, s, center, narrow);
+  // While the dials scroll, the row keeps the Heading dial whole in the zone, clear of the fade (headingOffset).
+  const offset = zones && heading ? headingOffset(zones, { x: headingBox.x, w: headingBox.w }, dials, s) : 0;
+  useEffect(() => {
+    scroller.current?.scrollTo({ x: offset, animated: false });
+  }, [offset]);
   // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/bar-edge.ts).
   const edge = zones ? BAR_PAD + Math.min(dials, zones.left) : 0;
   useEffect(() => setDialsEdge(edge), [edge]);
@@ -87,12 +99,13 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
         {/* The scroll view is taller than the bar so a dial's pop (scale 1.22) is not clipped; it scrolls only when the dials
             are wider than the room the rail leaves, so none is cut. */}
         <ScrollView
+          ref={scroller}
           testID="top-bar-scroll"
           horizontal
           scrollEnabled={zones?.scroll ?? false}
           showsHorizontalScrollIndicator={false}
           style={{ height: (TOP_BAR + 20) * s, marginVertical: -10 * s }}
-          contentContainerStyle={{ alignItems: "center", paddingVertical: 10 * s }}
+          contentContainerStyle={{ alignItems: "center", paddingVertical: 10 * s, paddingRight: zones?.scroll ? EDGE_FADE * s : 0 }}
         >
           {/* A gap between the dials, so a seat's label (P1) never runs into the next seat's dial. */}
           <View style={{ flexDirection: "row", flexShrink: 0, gap: DIAL_GAP * s }} onLayout={onDials}>
@@ -114,7 +127,12 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                 />
               );
             })}
-            {heading ? <HeadingDial step={heading.step} onPress={heading.onPress} /> : null}
+            {heading ? (
+              // The compact dial's badge reaches past it; the room it needs is part of the dial's place in the row, so the zones count it.
+              <View onLayout={onHeading} style={{ paddingRight: compact ? HEADING_BADGE_OVER * s : 0 }}>
+                <HeadingDial step={heading.step} compact={compact} onPress={heading.onPress} />
+              </View>
+            ) : null}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

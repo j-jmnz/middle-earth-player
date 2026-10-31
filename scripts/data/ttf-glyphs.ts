@@ -59,6 +59,11 @@ export function glyphPath(font: Uint8Array, index: number): string {
   const loca = found.get("loca");
   const glyf = found.get("glyf");
   if (!head || !loca || !glyf) throw new Error("The font has no head, loca or glyf table");
+  // The glyph must exist: a wrong index would read the next glyph's outline, or past the table.
+  const maxp = found.get("maxp");
+  if (!maxp) throw new Error("The font has no maxp table");
+  const glyphs = view.getUint16(maxp.offset + 4);
+  if (!Number.isInteger(index) || index < 0 || index >= glyphs) throw new Error(`Glyph ${index} is not in the font (${glyphs} glyphs)`);
   const long = view.getInt16(head.offset + 50) === 1;
   const offsetAt = (glyph: number) => (long ? view.getUint32(loca.offset + glyph * 4) : view.getUint16(loca.offset + glyph * 2) * 2);
   const begin = glyf.offset + offsetAt(index);

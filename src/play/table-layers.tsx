@@ -27,7 +27,7 @@ import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel } from "./readi
 import { foldTitle } from "./row-fold.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useScreenReader } from "./screen-reader.ts";
-import { PILE_WORDS, type PileId } from "./selectors.ts";
+import { hidesFace, PILE_WORDS, pileIds, type PileId } from "./selectors.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, TableStore } from "./store.ts";
@@ -53,7 +53,7 @@ function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay,
   return (
     <PileList
       title={PILE_WORDS[pile]}
-      cards={[...(pile === "discard" ? (game.seats[seat]?.discard ?? []) : pile === "corsairDiscard" ? (game.corsairDiscard ?? []) : game.encounterDiscard)].reverse().map((id) => ({ id, label: names.card(id) }))}
+      cards={[...pileIds(game, pile, seat)].reverse().map((id) => ({ id, label: names.card(id) }))}
       playable={pile === "discard" && !peeking ? discardPlays(game, seat, sheet) : []}
       onRead={onRead}
       onPlay={onPlay}
@@ -62,10 +62,15 @@ function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay,
   );
 }
 
+const NO_IDS: readonly string[] = [];
+
 // The cards a row folded away, as the canvas last laid the table out (store.ts, `folded`): a tile shows one large.
 function RowReading({ store, row, names, onRead, onClose }: { store: TableStore; row: "staging" | "engaged"; names: SheetNames; onRead: (cardId: string) => void; onClose: () => void }) {
-  const ids = useStore(store, (state) => state.folded[row]);
-  return <RowList title={foldTitle(row)} cards={ids.map((id) => ({ id, label: names.card(id) }))} onRead={onRead} onClose={onClose} />;
+  const ids = useStore(store, (state) => state.rowFolds[row]);
+  // A card the table hides the face of (facedown) is not named, as it is not on the canvas (selectors.ts, hidesFace).
+  const hiddenKey = useStore(store, (state) => state.rowFolds[row].filter((id) => hidesFace(state.game.cards[id])).join(","));
+  const hidden = hiddenKey === "" ? NO_IDS : hiddenKey.split(",");
+  return <RowList title={foldTitle(row)} cards={ids.map((id) => ({ id, label: hidden.includes(id) ? "Facedown card" : names.card(id) }))} onRead={onRead} onClose={onClose} />;
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {

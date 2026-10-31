@@ -20,8 +20,8 @@ export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioStat
 export { effectById } from "../rules/listen.ts";
 
 // The cards a row folded into its stack (row-fold.ts), as the canvas laid the table out: the table's pick reads them (a folded card is not on the table), and the row list shows them.
-export type FoldedIds = { staging: readonly string[]; engaged: readonly string[] };
-export const NO_FOLDS: FoldedIds = { staging: [], engaged: [] };
+export type RowFolds = { staging: readonly string[]; engaged: readonly string[] };
+export const NO_ROW_FOLDS: RowFolds = { staging: [], engaged: [] };
 
 export type TableState = {
   game: ScenarioState;
@@ -48,12 +48,12 @@ export type TableState = {
   // null when the table opens and returns to null with every new state (a new moment, so also a new sheet key or acting seat).
   viewedSeat: number | null;
   // The cards the staging row and the engagement row folded away, written by the canvas when it lays the table out (UI-only, never in the save).
-  folded: FoldedIds;
+  rowFolds: RowFolds;
 };
 
 export type TableActions = {
   // The canvas says which cards its rows folded; the same lists leave the state as it was.
-  setFolded: (folded: FoldedIds) => void;
+  setRowFolds: (folds: RowFolds) => void;
   // `accepted` is called the moment the reducer accepts the intent, before the table's next state is built and the save is written, so a
   // haptic tick for an accepted intent does not wait for them. It is not called for a refused one.
   dispatch: (intent: PlayerIntent, accepted?: () => void) => boolean;
@@ -135,12 +135,12 @@ export function createTableStore(input: TableInput): TableStore {
     history: input.history ?? [],
     spotlight: NO_SPOTLIGHT,
     viewedSeat: null,
-    folded: NO_FOLDS,
-    setFolded: (folded) => {
-      const now = get().folded;
+    rowFolds: NO_ROW_FOLDS,
+    setRowFolds: (folds) => {
+      const now = get().rowFolds;
       const same = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((id, at) => id === b[at]);
-      if (same(now.staging, folded.staging) && same(now.engaged, folded.engaged)) return;
-      set({ folded });
+      if (same(now.staging, folds.staging) && same(now.engaged, folds.engaged)) return;
+      set({ rowFolds: folds });
     },
     dispatch: (intent, accepted) => {
       const before = get().game;

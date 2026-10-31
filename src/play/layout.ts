@@ -8,6 +8,7 @@
 import type { CardInstance } from "../rules/state.ts";
 
 import { unturn } from "./frame.ts";
+import { hidesFace } from "./selectors.ts";
 import type { BasePileId, FightKind, PileId, PileView, SecondPileId, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
@@ -101,6 +102,8 @@ export type LayoutOptions = {
   deckTop?: CardInstance | null;
   // The cards a Sailing test looked at, top of the deck first, with the success symbols each prints: laid in a strip over staging (look-strip.ts).
   look?: readonly { card: CardInstance; success: number }[];
+  // The sea family's staging stacks: a staging card with more than one card under it shows one peek and a count (placeStaging). Off, every attachment peeks as it always did.
+  stacks?: boolean;
   // The cards a fold must keep on the table (row-fold.ts): those the open moment asks about, the picked ones and the one the banner's beat names.
   keep?: ReadonlySet<string>;
   // The UI scale (ui-scale.ts, user request, 2026-10-28): the gutter, the gaps, the peeks, the hand's strip, the combat marks' room and the
@@ -155,7 +158,7 @@ export function handCardSize(card: { w: number; h: number }, width: number, coun
 }
 
 // What a row needs to fold: the cards to keep, the fold stack's size and the sink for the stacks (row-fold.ts).
-type RowFolding = { keep: ReadonlySet<string> | undefined; pile: { w: number; h: number }; folds: FoldPlace[]; target: number };
+type RowFolding = { keep: ReadonlySet<string> | undefined; pile: { w: number; h: number }; folds: FoldPlace[]; target: number; stacks: boolean };
 
 // One peek under a staging card that holds more than one card, with the count: a grappled arm, Black Key on the Raider Flagship (the last put is the one that shows).
 function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: Metrics): void {
@@ -174,7 +177,7 @@ function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; ca
   const top = byId.get(stack.top);
   const id = `fold:${zone}`;
   folds.push({ id, zone, rect, cards: stack.cards, top: stack.top });
-  out.push({ ...rect, id, code: top?.code ?? "", zone, kind: "pile", exhausted: false, faceDown: top == null, landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone });
+  out.push({ ...rect, id, code: top && !hidesFace(top) ? top.code : "", zone, kind: "pile", exhausted: false, faceDown: top == null || hidesFace(top), landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone });
 }
 
 function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding): void {
@@ -194,7 +197,7 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size:
     if (left == null) return;
     group.forEach((entry, at) => {
       const rect = cardRect(entry.card, left + at * size.w * PAIR_STEP, area.y, size);
-      if (zone === "staging") placeStaging(entry, rect, out, m);
+      if (zone === "staging" && folding?.stacks) placeStaging(entry, rect, out, m);
       else placeUnder(entry, zone, rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
@@ -363,7 +366,7 @@ export function tableLayout(
   }
   // Staging and the engagement area squeeze to 44 pt steps and then fold the groups the moment does not ask about into a stack at the row's left end (row-fold.ts).
   const folds: FoldPlace[] = [];
-  const folding: RowFolding = { keep: options.keep, pile, folds, target: touch(scale, MIN_TARGET) };
+  const folding: RowFolding = { keep: options.keep, pile, folds, target: touch(scale, MIN_TARGET), stacks: options.stacks === true };
   placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);

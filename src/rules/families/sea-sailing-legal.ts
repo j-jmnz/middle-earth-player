@@ -20,6 +20,11 @@ export function askingToShift(state: Pick<ScenarioState, "sea" | "window">): boo
   return state.sea?.sailing?.step === "shift" && state.window?.kind === "choose";
 }
 
+/** The first player has seen the cards looked at and answers Done before they are discarded. */
+export function askingToLook(state: Pick<ScenarioState, "sea" | "window">): boolean {
+  return state.sea?.sailing?.step === "look" && state.window?.kind === "choose";
+}
+
 /** The characters that can be committed to the test: the tester's ready characters, and any ship that can be committed to any Sailing test
  * (the Dream-chaser, whoever controls it). */
 export function sailingCommitters(state: ScenarioState, ctx: ReduceContext): string[] {

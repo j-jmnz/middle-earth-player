@@ -1,6 +1,7 @@
 // The choice's pure half (docs/design-system-table.md, Choice tray; phase 21): the rows of a sheet, the count the dock's title speaks,
 // the command column's box (the width the rows and the reading panels share), and what a tap outside it does. The component is
 // choice-tray.tsx, drawn inside the dock; the hook that holds the fold is use-table-choice.ts.
+import { successWords } from "./sea-words.ts";
 import type { Choice } from "./table-choice.ts";
 import type { OptionMark, Sheet, SheetStat } from "./sheet-types.ts";
 
@@ -27,7 +28,7 @@ export function trayTiles(sheet: Sheet): TrayTile[] {
       label: row.name,
       code: row.code,
       readId: row.id,
-      detail: row.success > 0 ? (row.success === 1 ? "Success" : `Success ×${row.success}`) : null,
+      detail: row.success > 0 ? successWords(row.success) : null,
       stats: row.success > 0 ? [{ icon: "sailingSuccess" as const, value: row.success, word: "Success" }] : [],
       mark: null,
       look: row.success,
@@ -51,6 +52,11 @@ export function trayTiles(sheet: Sheet): TrayTile[] {
     case "outcome":
       return [];
   }
+}
+
+/** What a tap on a tile does: a card a Sailing test looked at is no choice, so it opens the card large ("read"); any other tile picks. */
+export function tileAction(tile: Pick<TrayTile, "look">): "read" | "pick" {
+  return tile.look != null ? "read" : "pick";
 }
 
 // The sheet's verb without its trailing preposition ("Defend with" is "Defend").

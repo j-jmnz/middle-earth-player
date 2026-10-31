@@ -348,3 +348,28 @@ describe("motionsBetween: Boarding, the Corsair pair and the look strip", () => 
     expect(ghosts[0]?.dx).toBe(485 - 125);
   });
 });
+
+// Rules: none (the table's own crowding rule, docs/design-system-table.md, Spacing and the play area's rows). A card moves out of and into a row's fold stack, and is not revealed again.
+describe("motionsBetween: the fold stack", () => {
+  const stack = { x: 100, y: 20, w: 50, h: 70 };
+  const withFold = (slots: readonly CardSlot[], cards: readonly string[]): TableLayout => ({ ...layout(slots), folds: cards.length > 0 ? [{ id: "fold:staging", zone: "staging", rect: stack, cards, top: cards[0] ?? "" }] : [] });
+
+  it("brings a card that left the stack out of the stack, face up and not revealed again", () => {
+    const before = withFold([slot("fold:staging", "staging", stack, { count: 2 }, "pile")], ["a", "b"]);
+    const after = withFold([slot("fold:staging", "staging", stack, { count: 1 }, "pile"), slot("a", "staging", at(200, 20))], ["b"]);
+    const motion = motionsBetween(before, after, () => "staging", { zoneWas: () => "staging" }).motions.get("a");
+    expect(motion?.dx).toBe(125 - 225);
+    expect(motion?.dy).toBe(55 - 55);
+    expect(motion?.flip).toBe(false);
+    expect(motion?.land).toBeNull();
+    expect(motion?.fromOpacity).toBe(1);
+  });
+
+  it("glides a card that folded into the stack toward it, and does not fade it where it stood", () => {
+    const before = withFold([slot("a", "staging", at(200, 20))], []);
+    const after = withFold([slot("fold:staging", "staging", stack, { count: 1 }, "pile")], ["a"]);
+    const { ghosts } = motionsBetween(before, after, () => "staging");
+    expect(ghosts).toHaveLength(1);
+    expect(ghosts[0]).toMatchObject({ leave: "glide", dx: 125 - 225, dy: 0 });
+  });
+});

@@ -10,18 +10,19 @@ import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../sc
 import { enemy as seaEnemy, hero as seaHero, seaTable, send, ship as seaShip, shipEnemy, until } from "../rules/families/sea-table.ts";
 
 import { actionsSheet, commitSheet, windowSheet } from "./bar-sheets.ts";
-import { sailingTable } from "./sea-fixture.ts";
+import { sailingTable, seaFixture, seaViews } from "./sea-fixture.ts";
+import { dropTargets, draggableIds } from "./selection.ts";
 import { whyNotChosen } from "./why.ts";
-import { highlightKeys } from "./highlight-of.ts";
+import { highlightKeys, highlightOf } from "./highlight-of.ts";
 import { momentOf } from "./outcome.ts";
 import { tableLayout } from "./layout.ts";
 import { readoutFor } from "./readout.ts";
-import { actingSeat, onTableFor, PILES, pileSelector, shownSeat, TABLE_ZONES, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
+import { actingSeat, lookedOf, onTableFor, PILES, pileSelector, shownSeat, TABLE_ZONES, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import { twoHanded } from "./seat-fixture.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
 import { createTableStore } from "./store.ts";
-import { tapAction, trayTiles } from "./tray-logic.ts";
+import { tapAction, tileAction, trayTiles } from "./tray-logic.ts";
 import { choiceFor, dockFor, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
@@ -328,6 +329,29 @@ describe("the sea family's moments on the table", () => {
     expect(whyNotChosen(state, seaCtx, ids.dc!, sheet)).toBeNull();
   });
 
+  it("says nothing on a veiled card outside the sea family: the same pick in a game with no sea state has no refusal", () => {
+    const { state, ids, ctx: seaCtx } = underShipAttack();
+    const sheet = sheetFor(state, seaCtx, legalIntents(state, seaCtx), SEA_NAMES);
+    expect(whyNotChosen(state, seaCtx, ids.aragorn!, sheet)).not.toBeNull();
+    expect(whyNotChosen({ ...state, sea: undefined }, seaCtx, ids.aragorn!, sheet)).toBeNull();
+  });
+
+  it("keeps the moment's cards on the table while the tray is open or the table peeks: the fold reads the sheet, not the glow", () => {
+    const fixture = seaFixture({ staging: 12, engaged: 0 });
+    const { views, piles } = seaViews(fixture);
+    const first = fixture.ids.staged0!;
+    const pick: Sheet = { kind: "multi", key: "k", step: "Quest", title: "Pick", note: null, verb: "Pick", options: [{ id: first, label: "first", code: "galley" }], build: { kind: "Commit" }, allowEmpty: false, preselected: [], alternative: null };
+    const keys = highlightKeys({ game: fixture.state, seat: 0, sheet: pick, choice: { key: "k", ids: [], shares: [] }, panel: true });
+    // The tray is open: nothing glows, yet the option card is still kept.
+    expect(keys.glow).toBe("");
+    const highlight = highlightOf(keys);
+    expect(highlight.tappable.size).toBe(0);
+    expect([...highlight.keep]).toEqual([first]);
+    const folded = (keep: ReadonlySet<string>) => (tableLayout(591, 338, views, piles, { scale: 1.15, keep }).folds ?? []).flatMap((fold) => fold.cards);
+    expect(folded(new Set())).toContain(first);
+    expect(folded(highlight.keep)).not.toContain(first);
+  });
+
   it("veils the ships when the attack is not a ship-enemy's, and an attack on a non-ship enemy refuses the ships with the engine's words", () => {
     const built = sea({ cards: [seaHero("aragorn"), seaShip("dc", "Dream-chaser"), seaEnemy("raider")], effects: [], heroes: [{ code: "aragorn" }], allies: [{ code: "dc" }], enemies: [{ code: "raider" }] });
     const state = { ...built.state, phase: "Combat" as const, mode: "playerAttacks" as const, window: { kind: "playerAttack" as const }, boundaryPhase: "Combat" as const };
@@ -377,6 +401,45 @@ describe("the sea family's moments on the table", () => {
     expect(accepted2(state, seaCtx, dock.primary?.action)).toBe(true);
   });
 
+  it("holds the strip with a single Done when the answers bring the heading back to Sun, then discards it", () => {
+    const { state, ids, ctx: seaCtx } = atSailing();
+    const asked = send(state, { type: "Commit", cardIds: [ids.aragorn!, ids.dc!] }, seaCtx);
+    const held = send(asked, { type: "Choose", optionId: "shift" }, seaCtx);
+    // Cloud to Sun with two symbols unanswered: the same cards stay up, one answer.
+    expect(lookedOf(held)).toHaveLength(3);
+    const sheet = sheetFor(held, seaCtx, legalIntents(held, seaCtx), SEA_NAMES) as Sheet;
+    expect(sheet.kind).toBe("pick");
+    if (sheet.kind !== "pick") return;
+    expect(sheet.look).toHaveLength(3);
+    expect(sheet.title).toBe("Sailing test · 3 successes");
+    expect(sheet.primary).toEqual({ label: "Done", intent: { type: "Choose", optionId: "done" } });
+    expect(sheet.alternative).toBeNull();
+    expect(legalIntents(held, seaCtx)).toEqual([{ type: "Choose", optionId: "done" }]);
+    expect(readoutFor(held, seaCtx, sheet, null, (id) => id)?.result).toBe("Sun, no change");
+    const done = send(held, { type: "Choose", optionId: "done" }, seaCtx);
+    expect(lookedOf(done)).toHaveLength(0);
+    expect(done.encounterDiscard).toHaveLength(3);
+  });
+
+  it("names the commit's Pass once, saying nobody looks and the heading stays shifted", () => {
+    const { state, ids, ctx: seaCtx, sheet } = atSailing();
+    const table: TapContext = { game: state, ctx: seaCtx, legal: legalIntents(state, seaCtx), names: SEA_NAMES };
+    const dock = dockFor(sheet, { key: sheet.key, ids: [], shares: [] }, table, { overlay: false, passLegal: true, surface: "table" });
+    const passes = dock.secondary.filter((button) => button.action.kind === "intent" && button.action.intent.type === "Pass");
+    expect(passes).toHaveLength(1);
+    expect(passes[0]).toMatchObject({ label: "Pass", arm: true, armed: "Tap again: nobody looks, and the heading stays shifted" });
+    expect(accepted2(state, seaCtx, passes[0]?.action)).toBe(true);
+    expect(ids.aragorn).toBeDefined();
+  });
+
+  it("reads what one shift does, and how many symbols would still be asked after it", () => {
+    const rain = sailingTable({ heading: "Rain" });
+    // The shift as the test opens leaves Storm; the look is 3 symbols (1, 0 and 2).
+    const asked = send(rain.state, { type: "Commit", cardIds: [rain.ids.aragorn!, rain.ids.dc!] }, rain.ctx);
+    const sheet = sheetFor(asked, rain.ctx, legalIntents(asked, rain.ctx), SEA_NAMES) as Sheet;
+    expect(readoutFor(asked, rain.ctx, sheet, null, (id) => id)?.result).toBe("Storm to Rain · 2 more symbols");
+  });
+
   it("answers each symbol found with a shift or a keep, lists the cards looked at, and reads the heading change the engine would make", () => {
     const { state, ids, ctx: seaCtx } = atSailing();
     const asked = send(state, { type: "Commit", cardIds: [ids.aragorn!, ids.dc!] }, seaCtx);
@@ -396,6 +459,9 @@ describe("the sea family's moments on the table", () => {
     const tiles = trayTiles(sheet);
     expect(tiles.map((tile) => tile.look)).toEqual([1, 0, 2]);
     expect(tiles.map((tile) => tile.detail)).toEqual(["Success", null, "Success ×2"]);
+    // A look row is no choice: a tap on it reads the card, and every other tile picks.
+    expect(tiles.map(tileAction)).toEqual(["read", "read", "read"]);
+    expect(tileAction({})).toBe("pick");
   });
 
   it("offers every sea sheet's options as cards or answers, never a number to type", () => {
@@ -421,3 +487,18 @@ describe("the sea family's moments on the table", () => {
 function accepted2(state: ScenarioState, seaCtx: ReduceContext, action: Dock["primary"] extends infer P ? (P extends { action: infer A } ? A : never) | undefined : never): boolean {
   return action?.kind === "intent" && reduce(state, action.intent, seaCtx).ok;
 }
+
+describe("no quest drag during the Sailing commit (dcce.sailing-tests)", () => {
+  it("lets no character be dragged onto the quest while the first player is asked what to commit to the test, and still drags to the quest after it", () => {
+    const f = sailingTable();
+    const legal = legalIntents(f.state, f.ctx);
+    expect(legal).toContainEqual({ type: "Commit" });
+    expect(draggableIds(f.state, f.ctx, legal)).toEqual([]);
+    expect(dropTargets(f.state, f.ctx, legal, f.ids.aragorn!)).toEqual([]);
+    // After the test the quest commitment is open as ever.
+    const after = send(f.state, { type: "Pass" }, f.ctx);
+    const next = legalIntents(after, f.ctx);
+    expect(draggableIds(after, f.ctx, next)).toContain(f.ids.aragorn);
+    expect(dropTargets(after, f.ctx, next, f.ids.aragorn!)).toEqual([{ kind: "zone", zone: "questStage" }]);
+  });
+});

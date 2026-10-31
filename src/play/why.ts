@@ -64,11 +64,12 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
 
 /**
  * Why a character the open pick veils cannot be chosen, in the engine's own refusal (dcce.ship-enemies, dcce.ship-objectives): only a ship defends against a ship-enemy's attack, a ship attacks
- * only a ship-enemy. Null when the card is one of the pick's options, is not a character of the acting seat, or the engine would take it. The table adds no words of its own.
+ * only a ship-enemy. Null when the card is one of the pick's options, is not a character of the acting seat, or the engine would take it, and in every game outside the sea family
+ * (`sea` absent), where a veiled card says nothing. The table adds no words of its own.
  */
 export function whyNotChosen(game: ScenarioState, ctx: ReduceContext, cardId: string, sheet: Sheet | null): string | null {
   const card = game.cards[cardId];
-  if (!card || !sheet || card.controller !== game.activeSeat || game.lost || game.stageCleared) return null;
+  if (!card || !sheet || game.sea == null || card.controller !== game.activeSeat || game.lost || game.stageCleared) return null;
   if (sheet.kind !== "pick" && sheet.kind !== "multi") return null;
   if (sheet.options.some((item) => item.id === cardId)) return null;
   const type = printedOf(ctx.cards, card.code).type;

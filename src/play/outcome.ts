@@ -5,6 +5,7 @@
 // threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage,
 // travel, the cards revealed and the enemies that engaged. Every number is one the engine put in a step. The log keeps
 // the whole round; the banner keeps what changed the table.
+import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
 import type { EngineStep, PlayerIntent } from "../rules/intents.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
@@ -49,14 +50,13 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     (current ?? open(9, "", "plain")).lines.push({ text, mark, ...(cards.length > 0 ? { cards } : {}) });
   };
 
-  // Boarding (dcce.boarding): the Corsair cards a ship-enemy's engagement revealed engage after it in the same steps. They are one beat of the ship's own, "Boarding 2 · Corsair
-  // Warship: 2 Corsairs engage Player 1", not a beat each; an engagement with no ship before it is told as any other.
-  const fromCorsair = (enemyId: string) => before.cards[enemyId]?.zone === "corsairDeck" || before.cards[enemyId]?.zone === "corsairDiscard";
+  // Boarding (dcce.boarding): the Corsair cards a ship-enemy's Boarding revealed engage after it in the same steps (the engine names the ship on each: `boarding`). They are one beat of
+  // the ship's own, "Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1", not a beat each; a Corsair card another effect revealed keeps its own engage beat.
   const boarded = new Map<number, number>();
   const joined = new Set<number>();
   steps.forEach((step, index) => {
-    if (step.kind !== "engage" || !fromCorsair(step.enemyId)) return;
-    const shipAt = steps.findLastIndex((earlier, at) => at < index && earlier.kind === "engage" && !fromCorsair(earlier.enemyId));
+    if (step.kind !== "engage" || step.boarding == null) return;
+    const shipAt = steps.findLastIndex((earlier, at) => at < index && earlier.kind === "engage" && earlier.enemyId === step.boarding);
     if (shipAt < 0) return;
     joined.add(index);
     boarded.set(shipAt, (boarded.get(shipAt) ?? 0) + 1);
@@ -180,15 +180,15 @@ function listed(ids: readonly string[], card: (cardId: string) => string): strin
   return ids.map((id) => card(id)).join(", ");
 }
 
-/** The player's choice in words, for the banner after Undo ("Frodo Baggins committed to the quest"). */
-export function intentWords(intent: PlayerIntent, card: (cardId: string) => string): string {
+/** The player's choice in words, for the banner after Undo ("Frodo Baggins committed to the quest"). `before` is the state the intent was sent in: a Commit sent while the first player was asked what to commit to a Sailing test is the test's. */
+export function intentWords(intent: PlayerIntent, card: (cardId: string) => string, before?: ScenarioState): string {
   switch (intent.type) {
     case "Pass":
       return "Passed";
     case "PlayCard":
       return intent.hostId ? `Played ${card(intent.cardId)} on ${card(intent.hostId)}` : `Played ${card(intent.cardId)}`;
     case "Commit":
-      return `${listed(intent.cardIds, card)} committed to the quest`;
+      return `${listed(intent.cardIds, card)} committed to the ${before && askingToCommit(before) ? "Sailing test" : "quest"}`;
     case "CommitHide":
       return `${listed(intent.cardIds, card)} committed to the Hide test`;
     case "Travel":

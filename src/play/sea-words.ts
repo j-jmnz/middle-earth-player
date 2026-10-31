@@ -55,6 +55,9 @@ export function sailingTitle(successes: number): string {
 export const SAILING_COMMIT_TITLE = "Commit to the Sailing test";
 export const SAILING_COMMIT_NOTE = "Tap characters to commit them to the test. They exhaust, and each looks at one card from the encounter deck. They add no willpower.";
 
+/** The armed line of the commit's Pass (dcce.sailing-tests): nobody is committed, so nobody looks, and the heading stays shifted. */
+export const SAILING_PASS_ARMED = "Tap again: nobody looks, and the heading stays shifted";
+
 /** The commit's readout: "Looks at 3 cards · the Dream-chaser counts as 2". `counts` are the picked characters that count as more than one, with what gives it. */
 export function sailingLookWords(total: number, counts: readonly { name: string; weight: number; sources: readonly string[] }[]): string {
   const base = `Looks at ${total} ${total === 1 ? "card" : "cards"}`;
@@ -62,20 +65,22 @@ export function sailingLookWords(total: number, counts: readonly { name: string;
   return [base, ...extras].join(" · ");
 }
 
-/** The answer's readout: the heading change the engine would make if every symbol left shifted ("Rain to Sun"). */
+/** The heading change in words ("Rain to Sun", or "Sun, no change"). */
 export function headingChangeWords(from: string, to: string): string {
   return from === to ? `${from}, no change` : `${from} to ${to}`;
 }
 
-/** The look list's row for a card, for a screen reader and the tray: "Success" when it prints the symbol, else nothing. */
-export function lookRowWords(name: string, success: number): string {
-  return success === 0 ? name : success === 1 ? `${name} · Success` : `${name} · Success ×${success}`;
+/** What one tap on "Shift on-course" does, and how many symbols the test would still ask after it: "Rain to Cloud · 1 more symbol". */
+export function shiftReadoutWords(from: string, to: string, more: number): string {
+  return more > 0 ? `${headingChangeWords(from, to)} · ${more} more ${more === 1 ? "symbol" : "symbols"}` : headingChangeWords(from, to);
+}
+
+/** A looked-at card's success in words, on the tray row and for a screen reader: "Success", or "Success ×2" with two symbols. */
+export function successWords(success: number): string {
+  return success === 1 ? "Success" : `Success ×${success}`;
 }
 
 /** The success medallion's count: "×2" with two symbols, nothing with one. */
 export function medallionCount(success: number): string | null {
   return success > 1 ? `×${success}` : null;
 }
-
-/** The look strip is up and the table offers no Actions (dcce.sailing-tests, step 4): the dock says so. */
-export const SAILING_NO_ACTIONS = "Actions are not used during a Sailing test.";

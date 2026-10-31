@@ -2,8 +2,6 @@
 // up in a strip laid over staging, at the table's card size. One band holds as many as its width allows a gap apart, then squeezed to 44 pt steps; past one
 // band the strip uses the engagement band, then the play band; past three bands the cards overlap closer than 44 pt, and a tap in a look only previews. The strip is
 // never folded (row-fold.ts). Pure.
-import type { PrintedCard } from "../rules/printed.ts";
-
 import type { Rect } from "./layout.ts";
 
 export type Band = { x: number; y: number; w: number };
@@ -25,11 +23,6 @@ export type LookStrip = {
 /** The three bands the strip uses, top to bottom: staging, the engagement area, the play area, each as wide as its zone (the piles at the right stay clear). */
 export function lookBands(layout: { zones: { staging: Rect; engaged: Rect; play: Rect } }): readonly Band[] {
   return [layout.zones.staging, layout.zones.engaged, layout.zones.play].map((zone) => ({ x: zone.x, y: zone.y, w: zone.w }));
-}
-
-/** How many cards of this width a band of this width holds a gap apart. */
-export function naturalCapacity(width: number, card: number, gap: number): number {
-  return Math.max(1, Math.floor((width + gap) / (card + gap)));
 }
 
 /** How many it holds squeezed to steps of `target`: the first card whole, each next one a step on. */
@@ -69,11 +62,6 @@ export function lookStrip(count: number, bands: readonly Band[], card: { w: numb
   return { places, band: bandOf, step, crowded, bands: used };
 }
 
-/** The success symbols a card's ledger side prints (`sailingSuccess`): 0 when it prints none. Read from the printed card, as the engine reads them. */
-export function successOf(cards: ReadonlyMap<string, PrintedCard>, code: string): number {
-  return cards.get(code)?.keywords.sailingSuccess ?? 0;
-}
-
 /** The medallion's size: a 22 pt night disc, straddling the card's foot, upright (docs/design-system-table.md). */
 export const MEDALLION = 22;
 
@@ -81,16 +69,3 @@ export const MEDALLION = 22;
 export function medallionAt(place: Place, scale: number): { cx: number; cy: number; r: number } {
   return { cx: place.x + place.w / 2, cy: place.y + place.h, r: (MEDALLION / 2) * scale };
 }
-
-/** The cards looked at in the order of the success marks the strip draws: only a card that prints the symbol wears one. */
-export function marksOf(cards: ReadonlyMap<string, PrintedCard>, codes: readonly string[]): readonly number[] {
-  return codes.map((code) => successOf(cards, code));
-}
-
-/** The total of the symbols among the cards looked at. */
-export function totalSuccess(cards: ReadonlyMap<string, PrintedCard>, codes: readonly string[]): number {
-  return marksOf(cards, codes).reduce((sum, mark) => sum + mark, 0);
-}
-
-/** The stagger between two cards coming off the deck, in ms (MOTION.stagger). */
-export const LOOK_STAGGER_MS = 90;

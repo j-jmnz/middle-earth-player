@@ -25,6 +25,7 @@ import { AT_REST } from "./motion.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
+import { ReaderPiles } from "./reader-piles.tsx";
 import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useSharedImage } from "./table-assets.native.ts";
@@ -66,6 +67,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const lookedCards = useStore(store, (state) => lookedOf(state.game));
   const strip = useMemo(() => lookedCards.map((card) => ({ card, success: success(card.code) })), [lookedCards, success]);
   const looking = strip.length > 0;
+  // A sea game stacks the cards under a staging card into one counted peek (layout.ts); every other game peeks each as it always did.
+  const seaGame = useStore(store, (state) => state.game.sea != null);
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
   const draggable = useStore(store, (state) => (state.viewedSeat != null ? NO_DRAG : state.draggable));
@@ -80,17 +83,18 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
   // What a row's fold must keep on the table: the cards the open moment asks about, the picked ones, a card being dragged and the banner's beat (row-fold.ts).
-  const keep = useMemo(() => new Set([...highlight.tappable, ...targetIds, ...highlight.picked.keys(), ...beating, ...(selected ? [selected] : [])]), [highlight, targetIds, beating, selected]);
+  // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
+  const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, stacks: seaGame }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, seaGame],
   );
   // The cards the rows folded away are told to the table's pick (a folded card is not on the table) and to the row list (row-fold.ts).
   const foldedKey = (layout.folds ?? []).map((fold) => `${fold.zone}:${fold.cards.join(",")}`).join("|");
   useLayoutEffect(() => {
-    const folded = { staging: [] as string[], engaged: [] as string[] };
-    for (const fold of layout.folds ?? []) folded[fold.zone].push(...fold.cards);
-    store.getState().setFolded(folded);
+    const folds = { staging: [] as string[], engaged: [] as string[] };
+    for (const fold of layout.folds ?? []) folds[fold.zone].push(...fold.cards);
+    store.getState().setRowFolds(folds);
   }, [store, foldedKey, layout]);
 
   // Each new layout: where every card comes from, which tokens changed, and the clock that runs them (card-motion.native.tsx).
@@ -207,45 +211,49 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   ];
 
   return (
-    <GestureDetector gesture={gesture}>
-      <Canvas style={{ width, height }}>
-        {/* No felt and no zone boxes: the screen's fog (ember over the encounter, moonlight over the fellowship) shows through, and
-            the engagement area is told apart by a red haze toward its left, where the enemies stand. */}
-        <SkRect x={layout.zones.engaged.x - 12 * s} y={layout.zones.engaged.y - 10 * s} width={layout.zones.engaged.w + 24 * s} height={layout.zones.engaged.h + 20 * s}>
-          <RadialGradient
-            c={vec(layout.zones.engaged.x + layout.zones.engaged.w * 0.18, layout.zones.engaged.y + layout.zones.engaged.h / 2)}
-            r={Math.max(layout.zones.engaged.w * 0.5, 1)}
-            origin={vec(layout.zones.engaged.x + layout.zones.engaged.w * 0.18, layout.zones.engaged.y + layout.zones.engaged.h / 2)}
-            transform={[{ scaleY: Math.min(1, (layout.zones.engaged.h * 0.6) / Math.max(layout.zones.engaged.w * 0.5, 1)) }]}
-            colors={[withAlphaHex(t.threat, t.depth === "light" ? 0.18 : 0.3), withAlphaHex(t.threat, 0)]}
-          />
-        </SkRect>
-        {emptyWords.map(([rect, text]) => (
-          <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
-        ))}
-        {targetZones.map((rect, index) => (
-          <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.accent} style="stroke" strokeWidth={1.5 * s} />
-        ))}
-        {moves.ghosts.map((ghost) => (
-          <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
-            {drawBody(ghost.slot, false)}
-          </Leaving>
-        ))}
-        {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
-        <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
-        <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints)} contrast={contrast} />
-        {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
-        {layout.marks.map((mark) => (
-          <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />
-        ))}
-        {lifted ? (
-          <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-            <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
-            <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
-          </Group>
-        ) : null}
-      </Canvas>
-    </GestureDetector>
+    <>
+      <GestureDetector gesture={gesture}>
+        <Canvas style={{ width, height }}>
+          {/* No felt and no zone boxes: the screen's fog (ember over the encounter, moonlight over the fellowship) shows through, and
+              the engagement area is told apart by a red haze toward its left, where the enemies stand. */}
+          <SkRect x={layout.zones.engaged.x - 12 * s} y={layout.zones.engaged.y - 10 * s} width={layout.zones.engaged.w + 24 * s} height={layout.zones.engaged.h + 20 * s}>
+            <RadialGradient
+              c={vec(layout.zones.engaged.x + layout.zones.engaged.w * 0.18, layout.zones.engaged.y + layout.zones.engaged.h / 2)}
+              r={Math.max(layout.zones.engaged.w * 0.5, 1)}
+              origin={vec(layout.zones.engaged.x + layout.zones.engaged.w * 0.18, layout.zones.engaged.y + layout.zones.engaged.h / 2)}
+              transform={[{ scaleY: Math.min(1, (layout.zones.engaged.h * 0.6) / Math.max(layout.zones.engaged.w * 0.5, 1)) }]}
+              colors={[withAlphaHex(t.threat, t.depth === "light" ? 0.18 : 0.3), withAlphaHex(t.threat, 0)]}
+            />
+          </SkRect>
+          {emptyWords.map(([rect, text]) => (
+            <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
+          ))}
+          {targetZones.map((rect, index) => (
+            <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.accent} style="stroke" strokeWidth={1.5 * s} />
+          ))}
+          {moves.ghosts.map((ghost) => (
+            <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
+              {drawBody(ghost.slot, false)}
+            </Leaving>
+          ))}
+          {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
+          <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
+          <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints)} contrast={contrast} />
+          {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
+          {layout.marks.map((mark) => (
+            <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />
+          ))}
+          {lifted ? (
+            <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
+              <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
+              <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
+            </Group>
+          ) : null}
+        </Canvas>
+      </GestureDetector>
+      {/* A screen reader reaches the piles and the fold stacks through a button over each (reader-piles.tsx). */}
+      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} /> : null}
+    </>
   );
 }
 

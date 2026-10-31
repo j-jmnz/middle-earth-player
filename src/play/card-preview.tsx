@@ -52,6 +52,8 @@ export type PreviewCard = {
   noteTitle?: string;
   // The lines of it the app does not apply, and what that costs (not-applied.ts).
   notApplied?: NotApplied | null;
+  // The Heading card's four steps with where each stands, the current one marked (heading.ts): their own heading in the preview, not effects on the card.
+  steps?: readonly { text: string; current: boolean }[];
   // How far the card is drawn turned, in degrees counterclockwise, a multiple of 90: the Heading card, turned a quarter turn per step as the rule turns it (heading.ts).
   turn?: number;
 };
@@ -204,6 +206,16 @@ export function CardPreview({
                 {shown.notApplied ? (
                   <View className="mb-2">
                     <NotAppliedView notApplied={shown.notApplied} testID="card-preview-not-applied" />
+                  </View>
+                ) : null}
+                {(shown.steps ?? []).length > 0 ? (
+                  <View testID="card-preview-steps" className="mb-2">
+                    <Text className="font-display text-eyebrow uppercase text-accent">The four steps</Text>
+                    {(shown.steps ?? []).map((row) => (
+                      <Text key={row.text} accessibilityState={{ selected: row.current }} className={`mt-1 text-label ${row.current ? "text-accent" : "text-bone"}`}>
+                        {row.current ? `Now · ${row.text}` : row.text}
+                      </Text>
+                    ))}
                   </View>
                 ) : null}
                 {(shown.effects ?? []).length > 0 ? (

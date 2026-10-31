@@ -13,7 +13,8 @@ export type EngineStep =
   | { kind: "destroy"; targetId: string }
   | { kind: "eliminate"; seat: number }
   | { kind: "reveal"; seat: number; cardId: string; cause: Cause }
-  | { kind: "engage"; seat: number; enemyId: string }
+  // `boarding`: the ship-enemy whose Boarding keyword revealed this enemy from the Corsair deck (dcce.boarding); absent on every other engagement.
+  | { kind: "engage"; seat: number; enemyId: string; boarding?: string }
   | { kind: "commit"; cardId: string }
   | { kind: "hideCommit"; cardId: string }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }

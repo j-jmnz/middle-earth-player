@@ -53,15 +53,32 @@ export const MEC111_ICONS: readonly { name: string; codepoint: number }[] = [
 // The PDF the icon sync cuts the font out of: the pinned Dream-chaser rulebook (sources/rules.ts, `dcce`).
 const MEC111_URL = RULE_PDFS.find((pdf) => pdf.doc === "dcce")?.url ?? "";
 
-/** ToUnicode `<0001> <DB88DC91>` lines as glyph index -> codepoint. */
+// A ToUnicode destination, `<F2090>`'s UTF-16: one unit or a surrogate pair (`<DB88DC90>`), as a codepoint.
+function codepointOf(units: string): number {
+  const high = Number.parseInt(units.slice(0, 4), 16);
+  return units.length > 4 ? 0x10000 + ((high - 0xd800) << 10) + (Number.parseInt(units.slice(4, 8), 16) - 0xdc00) : high;
+}
+
+/** A ToUnicode CMap as glyph index -> codepoint: every `bfchar` block (`<0001> <DB88DC91>`) and every `bfrange` (`<0001> <0003> <DB88DC91>`, or `<0001> <0002> [<DB88DC91> <DB88DC92>]`). The codespace range above them is `<0000> <FFFF>` too, and is not read. */
 export function parseToUnicode(text: string): Map<number, number> {
   const map = new Map<number, number>();
-  // Only the bfchar lines: the codespace range above them is `<0000> <FFFF>` too.
-  const chars = /beginbfchar([^]*?)endbfchar/.exec(text)?.[1] ?? "";
-  for (const match of chars.matchAll(/<([0-9a-f]{4})>\s*<([0-9a-f]{4})([0-9a-f]{4})?>/gi)) {
-    const high = Number.parseInt(match[2] ?? "", 16);
-    const low = match[3] ? Number.parseInt(match[3], 16) : null;
-    map.set(Number.parseInt(match[1] ?? "", 16), low == null ? high : 0x10000 + ((high - 0xd800) << 10) + (low - 0xdc00));
+  for (const block of text.matchAll(/beginbfchar([^]*?)endbfchar/g)) {
+    for (const match of (block[1] ?? "").matchAll(/<([0-9a-f]{4})>\s*<([0-9a-f]{4}(?:[0-9a-f]{4})?)>/gi)) map.set(Number.parseInt(match[1] ?? "", 16), codepointOf(match[2] ?? ""));
+  }
+  for (const block of text.matchAll(/beginbfrange([^]*?)endbfrange/g)) {
+    for (const match of (block[1] ?? "").matchAll(/<([0-9a-f]{4})>\s*<([0-9a-f]{4})>\s*(?:<([0-9a-f]{4}(?:[0-9a-f]{4})?)>|\[([^\]]*)\])/gi)) {
+      const low = Number.parseInt(match[1] ?? "", 16);
+      const high = Number.parseInt(match[2] ?? "", 16);
+      if (match[3]) {
+        const first = codepointOf(match[3]);
+        for (let at = low; at <= high; at += 1) map.set(at, first + (at - low));
+      } else {
+        const listed = [...(match[4] ?? "").matchAll(/<([0-9a-f]{4}(?:[0-9a-f]{4})?)>/gi)];
+        listed.forEach((each, at) => {
+          if (low + at <= high) map.set(low + at, codepointOf(each[1] ?? ""));
+        });
+      }
+    }
   }
   return map;
 }
