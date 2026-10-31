@@ -65,6 +65,9 @@ export const printedKeywordsSchema = z.strictObject({
   // (dcce.boarding).
   sailing: z.boolean().optional(),
   boarding: z.number().int().positive().optional(),
+  // Uncharted on the Lost Island side of a double-sided location (dcce.uncharted): read from the ledger's side B, so a card shows the keyword only
+  // while it lies on that side (src/rules/families/uncharted.ts).
+  uncharted: z.boolean().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),

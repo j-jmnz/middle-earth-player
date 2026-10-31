@@ -19,6 +19,7 @@ import { stageNumber } from "../rules/families/caves-progress.ts";
 import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 import { nightmareWords } from "./nightmare-words.ts";
 import { seaPickWords, seaWords } from "./sea-words.ts";
+import { unchartedPickWords, unchartedWords } from "./uncharted-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -125,7 +126,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       const stat = STAT_WORDS[instruction.stat] ?? instruction.stat;
       const amount = typeof instruction.amount === "number" ? (instruction.amount >= 0 ? `+${instruction.amount}` : `${instruction.amount}`) : "+X";
       const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
-      const who = instruction.holders ? "each matching card" : refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target);
+      const who = instruction.holders ? (instruction.holders.uncharted === true ? "each Lost Island in the staging area" : "each matching card") : refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target);
       return `${who === "it" ? "it gets" : `${who} gets`} ${amount} ${stat}${until}`;
     }
     case "Heal":
@@ -293,7 +294,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -376,7 +377,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (play) return play;
   const burden = burdenPickWords(pick, next);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
   const one = article(noun);
   switch (next?.verb) {
@@ -441,7 +442,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     case "PutIntoPlay":
       return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };
     default:
-      return { verb: "Choose", prompt: `Choose ${one}.` };
+      return unchartedPickWords(pick, next, names, sourceId) ?? { verb: "Choose", prompt: `Choose ${one}.` };
   }
 }
 

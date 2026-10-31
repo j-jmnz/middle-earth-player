@@ -30,6 +30,38 @@ const healedOrReadied = (id: number, trigger: "healed" | "readied"): Effect => (
 // A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one; as in families/sidequests.ts).
 const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
 
+// 11180 Spyglass: "Action: Exhaust Spyglass to choose one: Look at a shadow card. / Look at the top and bottom card of your deck. / Place 1 progress on a location (2 progress instead if it is
+// Uncharted)." The Upgraded side may discard the shadow card, looks at any deck, and places 4 progress instead on an Uncharted location.
+const SHADOW_ENEMY = { type: "enemy", control: "any", staging: true, facedownShadow: true } as const;
+const ANY_LOCATION = { type: "location", control: "any" } as const;
+type Options = Extract<Effect["instructions"][number], { verb: "Choose" }>["options"];
+const spyglass = (side: "A" | "B"): Effect => {
+  const upgraded = side === "B";
+  const lines = [`11180:${side}:2`, `11180:${side}:3`, `11180:${side}:4`, `11180:${side}:5`];
+  const LOST_ISLAND = { type: "location", control: "any", uncharted: true } as const;
+  const shadow: Options = [
+    { id: "shadow", requires: { kind: "canPick", pick: SHADOW_ENEMY }, instructions: upgraded ? [{ verb: "Pick", pick: SHADOW_ENEMY }, { verb: "LookAtShadow", target: "picked" }, { verb: "MayDiscardShadow" }] : [{ verb: "Pick", pick: SHADOW_ENEMY }, { verb: "LookAtShadow", target: "picked" }] },
+  ];
+  const decks: Options = upgraded
+    ? [
+        { id: "player", instructions: [{ verb: "Pick", pick: { type: "player", control: "any" } }, { verb: "LookAtTop", count: 1, deck: "picked" }, { verb: "LookAtBottom", count: 1, deck: "picked" }] },
+        { id: "encounter", instructions: [{ verb: "LookAtTop", count: 1 }, { verb: "LookAtBottom", count: 1, deck: "encounter" }] },
+      ]
+    : [{ id: "decks", instructions: [{ verb: "LookAtTop", count: 1, deck: "own" }, { verb: "LookAtBottom", count: 1 }] }];
+  const progress: Options = [
+    {
+      id: "progress",
+      instructions: [
+        { verb: "Pick", pick: ANY_LOCATION },
+        { verb: "PlaceProgressOn", amount: 1, target: "picked", when: { kind: "not", condition: { kind: "matches", card: "picked", pick: LOST_ISLAND } } },
+        { verb: "PlaceProgressOn", amount: upgraded ? 4 : 2, target: "picked", when: { kind: "matches", card: "picked", pick: LOST_ISLAND } },
+      ],
+    },
+  ];
+  const options: Options = [...shadow, ...decks, ...progress];
+  return { id: `11180:action:${upgraded ? 2 : 1}`, cardCode: "11180", lines, timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Choose", who: "actor", options }] };
+};
+
 export const RECORDS: readonly Effect[] = [
   // 11217 Hard/Expert Mode card: "If you win the game, resolve this card's resolution." Hard (side A) gains 1 XP, Expert (side B) gains 2 XP.
   {"id":"11217:resolution:1","cardCode":"11217","lines":["11217:A:3"],"timing":"resolution","instructions":[{"verb":"GainXp","amount":1}]},
@@ -44,6 +76,20 @@ export const RECORDS: readonly Effect[] = [
   {"id":"11217:forced:2","cardCode":"11217","lines":["11217:B:2"],"timing":"forced","trigger":"cardsDrawn","instructions":[{"verb":"RaiseThreat","amount":{"x":true}}]},
   healedOrReadied(3, "healed"),
   healedOrReadied(4, "readied"),
+
+  // 11180 Spyglass (boon, attached to Calphon by the campaign card of The Fate of Númenor), both sides.
+  removedWhenLeaving("11180", "11180:A:1", 1),
+  spyglass("A"),
+  removedWhenLeaving("11180", "11180:B:1", 2),
+  spyglass("B"),
+
+  // 11181 Revenant (burden, shuffled into the encounter deck by the campaign card of The Fate of Númenor; Immune to player card effects is a keyword): +2 Attack and +2 Defense for each resource on the
+  // campaign card; no more than 2 damage is placed on it at a time; once destroyed it is shuffled into the encounter deck and the campaign card gains a resource.
+  {"id":"11181:constant:1","cardCode":"11181","lines":["11181:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"resources","ofNamed":"The Fate of Númenor","times":2},"until":"whileSourceInPlay","target":"self"},{"verb":"ModifyStat","stat":"defense","amount":{"stat":"resources","ofNamed":"The Fate of Númenor","times":2},"until":"whileSourceInPlay","target":"self"}]},
+  // The damage limit is held for as long as Revenant is in play: set when it comes into play (added to the staging area, or put into play engaged), and the smallest limit counts.
+  {"id":"11181:forced:2","cardCode":"11181","lines":["11181:A:3"],"timing":"forced","trigger":"addedToStaging","subject":"self","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
+  {"id":"11181:forced:3","cardCode":"11181","lines":["11181:A:3"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
+  {"id":"11181:forced:1","cardCode":"11181","lines":["11181:A:4"],"timing":"forced","trigger":"enemyDestroyed","subject":"self","instructions":[{"verb":"MoveEncounterCard","card":"self","to":"shuffle"},{"verb":"AddCampaignResource","amount":1}]},
 
   // 11172 Armor Plating, 11173 Ballista, 11174 Enlarged Quarters, 11175 Extra Sails: the Modification boons each ship-objective is fitted with (the campaign card's Setup),
   // on both sides. When one leaves play it is removed from the game; its Upgraded side adds a Response.

@@ -42,14 +42,14 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.0K)
     - 157–160 Maestro (~120)
-- `docs/architecture.md` — Architecture (~15.5K tok)
+- `docs/architecture.md` — Architecture (~15.6K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
   - 78–120 Modules (~970) ← 1
   - 121–146 State (~1.0K) ← 9
   - 147–168 Play loop (~250)
-  - 169–194 Engine (~2.2K)
-    - 183–194 Mechanic families (~1.3K)
+  - 169–194 Engine (~2.3K)
+    - 183–194 Mechanic families (~1.4K)
   - 195–200 Effects (~520)
   - 201–233 Scenario definition (~790)
   - 234–254 Persistence (~1.3K)
@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~48.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~49.7K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -89,19 +89,19 @@ Read the sections your task touches.
     - 537–557 Escape from Dol Guldur (~2.7K)
     - 558–572 The Oath (~2.3K)
     - 573–590 The Caves of Nibin-Dûm (~2.3K)
-  - 591–618 Dream-chaser (~3.8K)
-  - 619–627 Nightmare (~420)
-  - 628–666 Deckbuilding (~1.8K) ← 1
-  - 667–745 Effects (~3.2K)
-    - 669–727 Three layers (~2.4K)
-    - 728–737 Player side quests, contracts and saga cards (~430)
-    - 738–741 Window stack (~100)
-    - 742–745 Coverage test (~270)
-  - 746–766 Data sources (~560)
-  - 767–785 Card images (~1.1K) ← 6
-  - 786–810 Persistence and shipping (~1.5K)
-  - 811–851 Screens (~4.1K) ← 1
-    - 837–851 Table screen (~1.5K) ← 4
+  - 591–621 Dream-chaser (~4.6K)
+  - 622–630 Nightmare (~420)
+  - 631–669 Deckbuilding (~1.8K) ← 1
+  - 670–748 Effects (~3.2K)
+    - 672–730 Three layers (~2.4K)
+    - 731–740 Player side quests, contracts and saga cards (~430)
+    - 741–744 Window stack (~100)
+    - 745–748 Coverage test (~270)
+  - 749–769 Data sources (~560)
+  - 770–788 Card images (~1.1K) ← 6
+  - 789–813 Persistence and shipping (~1.5K)
+  - 814–854 Screens (~4.1K) ← 1
+    - 840–854 Table screen (~1.5K) ← 4
 - `docs/design-system-table.md` — Design system — Table (landscape) (~20.4K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~1.9K) ← 4
@@ -175,15 +175,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~4.8K tok)
+- `docs/phases/STATUS.md` — Phase status (~5.0K tok)
   - 5–16 Rules (~540)
-  - 17–75 Phases (~1.6K)
-  - 76–141 Open items (~2.2K)
-    - 78–89 Fixtures and Maestro (~370)
-    - 90–110 Rules and engine (~510)
-    - 111–125 Screens and code (~600)
-    - 126–141 Phone and tablet checks (~730)
-  - 142–157 Standing decisions (~380)
+  - 17–75 Phases (~1.7K)
+  - 76–142 Open items (~2.3K)
+    - 78–90 Fixtures and Maestro (~440)
+    - 91–111 Rules and engine (~510)
+    - 112–126 Screens and code (~600)
+    - 127–142 Phone and tablet checks (~730)
+  - 143–158 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)

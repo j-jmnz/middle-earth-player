@@ -237,6 +237,11 @@ export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Norma
   return placementsAt(data, difficulty).flatMap((card) => (card.pile === "corsairDeck" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
 }
 
+// The Uncharted deck a scenario deals, copy by copy (dcce.uncharted-deck): the `unchartedDeck` pile at the difficulty played.
+export function unchartedCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
+  return placementsAt(data, difficulty).flatMap((card) => (card.pile === "unchartedDeck" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
+}
+
 export function burdenCodes(data: ScenarioData): string[] {
   return data.cards.filter((card) => card.pile === "burden").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
 }

@@ -142,6 +142,12 @@ export const pickSchema = z.strictObject({
   attachable: z.string().min(1).optional(),
   guarded: z.boolean().optional(),
   progress: z.boolean().optional(),
+  // The uncharted family's filters (src/rules/families/uncharted-pick.ts). `uncharted`: a double-sided location lying on its Lost Island side, the keyword Uncharted (dcce.uncharted),
+  // `false`: any other card. `minProgress`: a card with at least this many progress tokens ("Remove 4 progress from Lost Island"). `bottom`: from the deck, only its bottom cards
+  // ("the bottom 5 cards of your deck").
+  uncharted: z.boolean().optional(),
+  minProgress: z.number().int().positive().optional(),
+  bottom: z.number().int().positive().optional(),
   // The attack family's filters (src/rules/families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the
   // printed Ranged keyword").
   printedKeyword: z.enum(["ranged", "sentinel"]).optional(),

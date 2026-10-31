@@ -1,0 +1,49 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 41. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `fate-won` (scripts/e2e-fate.ts): a real two-handed
+# game of The Fate of Númenor, parked on its win (the Shrine to Morgoth is in the victory display). The fixture is OPEN: no win of the two starter decklists was found in 100 seeds, so `fate-won` is
+# not committed and this flow cannot run until scripts/e2e-fixtures.ts writes one (docs/phases/STATUS.md). Confirming the win writes the XP from the campaign card (1 for each surviving player, Lush Jungle and Drowned Graves, the resources on the
+# card, threat 40 or less) and, with part 1 won in the log, unlocks Raid on the Grey Havens (src/campaign/golden-fate.test.ts pins the path). The fixture's log is the blank Dream-chaser log (`voyage-won` is open), so the path still shows part 1 as the next scenario; the Fate node reads Won.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/fate-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-fate-of-numenor-status
+    text: "Won.*"
+# The XP the Resolution gave is written: the line reads it and there is XP to spend.
+- assertVisible:
+    id: xp-line
+- assertVisible:
+    id: xp-open

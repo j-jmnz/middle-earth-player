@@ -58,7 +58,8 @@ export function previewCards(
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
     const refusal = id === cardId ? chosen(id) : null;
     const note = id === cardId ? (whyNotPlayable(game, ctx, id, cardName) ?? refusal) : null;
-    const described = describe(card.code, pictureKey(card));
+    // A look at the facedown side of a Lost Island shows the real side (dcce.uncharted); the card on the table keeps lying on its Lost Island side.
+    const described = describe(card.code, game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id) ? card.code : pictureKey(card));
     const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id);
     // The Heading card: titled by its step and its course, listing the four steps with the current one marked, and drawn turned a quarter turn per step (dcce.heading). A peek never changes the dial.
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;

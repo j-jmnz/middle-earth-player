@@ -39,7 +39,7 @@ export type TableCanvasProps = {
   picture: (code: string) => PictureSource | null;
   // Moves when the image cache gains a file, so a card drawn as its name is tried again.
   pictureRevision: number;
-  nameOf: (code: string) => string;
+  nameOf: (key: string) => string;
   // The sphere a card prints, for the icon on a card drawn as its name while its file is missing.
   sphereOf: (code: string) => string | null;
   // True for a card with a printed line the app does not apply (src/catalog/active-text.ts): the canvas marks it.

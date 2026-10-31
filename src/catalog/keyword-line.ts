@@ -19,6 +19,7 @@ const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   siege: "siege",
   "immune to player card effects": "immune",
   sailing: "sailing",
+  uncharted: "uncharted",
 };
 
 const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {

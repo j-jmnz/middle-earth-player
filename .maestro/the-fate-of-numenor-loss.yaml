@@ -1,0 +1,62 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 41. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `fate-lost` is a real two-handed game of
+# The Fate of Númenor (the Defenders of Gondor and Swords of the Noldor lists) from the blank log of a new Dream-chaser playthrough, parked on its loss: no seat remains.
+# A loss has no reward screen and writes nothing: the scenario stays current, no XP reaches the log. The path screen has no table-menu: the log is opened from `log-open`.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/fate-lost"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+- assertVisible:
+    id: rail-current
+    text: "Defeat"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 15000
+- assertVisible:
+    id: resolution-outcome
+    text: "Defeat"
+- assertVisible:
+    id: resolution-reason
+    text: ".+"
+- assertVisible: "The scenario was lost. Nothing is written to the log."
+- assertNotVisible:
+    id: resolution-confirm
+- tapOn:
+    id: resolution-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+# The log is unchanged: no XP was earned and the scenario is not completed.
+- assertNotVisible:
+    id: xp-open
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-the-fate-of-numenor
+    text: ".*Not completed.*"

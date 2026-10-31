@@ -1,6 +1,7 @@
 import type { Condition } from "../catalog/boundary.ts";
 
 import { questSucceeded } from "./families/costs-pay.ts";
+import { discardedCost } from "./families/uncharted-cards.ts";
 import { spendablePools } from "./families/costs-verbs.ts";
 import { engagedThisRound } from "./families/attack-events.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
@@ -246,6 +247,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "x":
       return (scope.x ?? 0) >= condition.min;
+    case "discardedCost":
+      return discardedCost(state, ctx) <= condition.max;
     case "byPlayerCard":
       return scope.byPlayerCard === true;
     case "excess":

@@ -186,6 +186,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The scenario is played in Campaign Mode, which is when its campaign card is in the game (rr.campaign-cards): "Use this
   // action only if you are playing campaign mode" (141062:A:1).
   z.strictObject({ kind: z.literal("campaign") }),
+  // The card DiscardBottom discarded in this effect has a printed cost of `max` or less ("If that card's printed cost is 2 or less", 11032:A:2); a card with no printed cost does not, and nothing
+  // discarded does not. Read by the uncharted family (src/rules/families/uncharted-cards.ts).
+  z.strictObject({ kind: z.literal("discardedCost"), max: z.number().int().min(0) }),
   // The running effect's X is at least `min`. The effect an attack leaves for its end has as X the number of characters the
   // attack destroyed ("If this attack destroys a character", 141065:A:2, 141066:A:2).
   z.strictObject({ kind: z.literal("x"), min: z.number().int().min(0) }),

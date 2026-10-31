@@ -144,7 +144,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const image = images.get(slot.picture ?? slot.code) ?? null;
     // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
     if (slot.kind === "pile" || slot.zone === "deck") {
-      const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.code)} fonts={fonts} label backs={backs} t={t} s={s} />;
+      const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.picture ?? slot.code)} fonts={fonts} label backs={backs} t={t} s={s} />;
       // A discard pile holding a card the seat may play from it (Elven-light) glows; its list plays the card.
       return slot.kind === "pile" && isTappable(slot) ? (
         <Group>
@@ -161,7 +161,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     return (
       <Group opacity={dim ? 0.35 : 1}>
         {glows ? <Glow slot={slot} picked={picked} t={t} s={s} /> : null}
-        <CardBody slot={slot} image={image} name={nameOf(slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} encounterBack={encounterBack} backs={backs} t={t} s={s} />
+        <CardBody slot={slot} image={image} name={nameOf(slot.picture ?? slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} encounterBack={encounterBack} backs={backs} t={t} s={s} />
       </Group>
     );
   };

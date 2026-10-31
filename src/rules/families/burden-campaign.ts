@@ -13,6 +13,7 @@ import { spawn } from "../zones.ts";
 const DURING_PLAY: ReadonlySet<Effect["timing"]> = new Set(["response", "forced", "triggered", "action", "constant"]);
 
 export function placeCampaignCard(state: ScenarioState, code: string | undefined, ctx: ReduceContext): ScenarioState {
-  if (!code || !ctx.effects.some((effect) => effect.cardCode === code && DURING_PLAY.has(effect.timing))) return state;
+  // A campaign card whose Setup says KeepCampaignCard stays too: a card of the scenario places resources on it and its Resolution counts them (families/uncharted-cards.ts).
+  if (!code || !ctx.effects.some((effect) => effect.cardCode === code && (DURING_PLAY.has(effect.timing) || effect.instructions.some((instruction) => instruction.verb === "KeepCampaignCard")))) return state;
   return spawn(state, code, { zone: "campaign" }).state;
 }

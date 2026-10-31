@@ -18,7 +18,7 @@
 // Nibin-Dûm from the log a real `oath-won` writes when it is confirmed (the e2e-nibin-dum script), parked on the win and on the loss. `nibin-dum-won` is open: the two decklists
 // start at threat 37 and 25 and the auto-player found no win in 120 seeds, so only `nibin-dum-lost` is committed.
 // `sea-solo` and `sea-duo` are games of Voyage Across Belegaer (Dream-chaser part 1) from the blank log of a new Dream-chaser playthrough (the e2e-voyage script): `sea-solo` true solo, parked on the first Sailing test's commit; `sea-duo`
-// two-handed, parked on the first player's planning window. `voyage-lost` is parked on the loss. `voyage-won` is open: no auto-played win with real decks was found (docs/phases/STATUS.md), so it is not committed.
+// two-handed, parked on the first player's planning window. `voyage-lost` is parked on the loss. `voyage-won` is open: no auto-played win with real decks was found (docs/phases/STATUS.md), so it is not committed. `fate-won` and `fate-lost` are two-handed games of The Fate of Númenor (Dream-chaser part 2, the e2e-fate script) from the same blank log, because `voyage-won` is open, parked on the win and on the loss. `fate-won` is open: no auto-played win of the two starter decklists was found in 100 seeds, so only `fate-lost` (Calphon left play) is committed.
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import dolGuldurFixtures from "./fixtures/escape-from-dol-guldur.json";
 import anduinFixtures from "./fixtures/journey-along-the-anduin.json";
@@ -26,6 +26,7 @@ import mirkwoodFixtures from "./fixtures/passage-through-mirkwood.json";
 import nibinDumFixtures from "./fixtures/the-caves-of-nibin-dum.json";
 import oathFixtures from "./fixtures/the-oath.json";
 import voyageFixtures from "./fixtures/voyage-across-belegaer.json";
+import fateFixtures from "./fixtures/the-fate-of-numenor.json";
 import fixtures from "./fixtures/scenario-1.json";
 
 import type { PlayerIntent } from "../rules/intents.ts";
@@ -34,14 +35,14 @@ import { ENGINE_VERSION } from "../rules/version.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
-export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost" | "anduin-won" | "anduin-lost" | "dol-guldur-won" | "dol-guldur-lost" | "oath-won" | "oath-lost" | "nibin-dum-won" | "nibin-dum-lost" | "sea-solo" | "sea-duo" | "voyage-won" | "voyage-lost";
+export type FixtureName = "won" | "lost" | "knife-lost" | "duo" | "mirkwood-won" | "mirkwood-lost" | "anduin-won" | "anduin-lost" | "dol-guldur-won" | "dol-guldur-lost" | "oath-won" | "oath-lost" | "nibin-dum-won" | "nibin-dum-lost" | "sea-solo" | "sea-duo" | "voyage-won" | "voyage-lost" | "fate-won" | "fate-lost";
 
 // `past`: the scenario 1 fixture and the Resolution answers whose log this fixture starts from.
 export type Fixture = { campaignId: string; seatCount: 1 | 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: FixtureName; choices: string[] } | null };
 
 type StoredFixture = { campaignId?: string; seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
 
-export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost", "anduin-won", "anduin-lost", "dol-guldur-won", "dol-guldur-lost", "oath-won", "oath-lost", "nibin-dum-won", "nibin-dum-lost", "sea-solo", "sea-duo", "voyage-won", "voyage-lost"];
+export const FIXTURE_NAMES: readonly FixtureName[] = ["won", "lost", "knife-lost", "duo", "mirkwood-won", "mirkwood-lost", "anduin-won", "anduin-lost", "dol-guldur-won", "dol-guldur-lost", "oath-won", "oath-lost", "nibin-dum-won", "nibin-dum-lost", "sea-solo", "sea-duo", "voyage-won", "voyage-lost", "fate-won", "fate-lost"];
 
 export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
@@ -56,6 +57,7 @@ const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = {
   ...(oathFixtures as Partial<Record<"oath-won" | "oath-lost", StoredFixture>>),
   ...(nibinDumFixtures as Partial<Record<"nibin-dum-won" | "nibin-dum-lost", StoredFixture>>),
   ...(voyageFixtures as Partial<Record<"sea-solo" | "sea-duo" | "voyage-won" | "voyage-lost", StoredFixture>>),
+  ...(fateFixtures as Partial<Record<"fate-won" | "fate-lost", StoredFixture>>),
 };
 
 // The fixture is committed. The e2e route opens only these.

@@ -40,6 +40,7 @@ import { TableMenu } from "../play/table-menu";
 import type { MenuItemId } from "../play/table-menu-items";
 import { previewCards } from "../play/table-preview";
 import { pictureCode, pictureKey } from "../play/picture-key";
+import { shownName } from "../play/shown-name";
 import { advanceButton, advanceWords } from "../play/quest-advance";
 import { QuestAdvanceView } from "../play/quest-advance-view";
 import { useQuestAdvance } from "../play/use-quest-advance";
@@ -69,8 +70,10 @@ import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
 import { useUiScale } from "../play/ui-scale";
 
-// By picture key (src/play/picture-key.ts): side B where it is bundled, else the card's side A picture.
-function picture(key: string): PictureSource | null {
+// By picture key (src/play/picture-key.ts): side B where it is bundled, else the card's side A picture. `exact`: a Lost Island's side B picture only, never the real side behind it
+// (dcce.uncharted): a build without it shows the card on paper.
+function picture(key: string, exact = false): PictureSource | null {
+  if (exact) return scanAssets[key]?.moduleId ?? null;
   const bundled = scanAssets[key] ?? scanAssets[pictureCode(key)];
   if (bundled) return bundled.moduleId;
   const cached = cachedImage(pictureCode(key));
@@ -81,10 +84,11 @@ function picture(key: string): PictureSource | null {
 // described during the render and its description is kept while its inputs are the same, so the picture it shows has to be an input: this
 // reads `picture` for a revision and is read again only when the revision moves, which re-describes the card when its file lands.
 let looked: { revision: number; sources: Map<string, PictureSource | null> } = { revision: -1, sources: new Map() };
-function pictureAt(key: string, revision: number): PictureSource | null {
+function pictureAt(key: string, revision: number, exact: boolean): PictureSource | null {
   if (looked.revision !== revision) looked = { revision, sources: new Map() };
-  if (!looked.sources.has(key)) looked.sources.set(key, picture(key));
-  return looked.sources.get(key) ?? null;
+  const at = exact ? `${key}!` : key;
+  if (!looked.sources.has(at)) looked.sources.set(at, picture(key, exact));
+  return looked.sources.get(at) ?? null;
 }
 
 // The canvas and the spotlight's layer read the image cache's revision themselves, so a picture that lands draws them and not the view above
@@ -172,10 +176,21 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [store, session],
   );
 
-  const nameOf = useCallback((code: string) => session.world.cards.get(code)?.name ?? code, [session]);
+  // By picture key: a Lost Island lying on its Lost Island side shows that name, never the location it turns out to be (src/play/shown-name.ts).
+  const nameOf = useCallback((key: string) => shownName(key, session.world.cards.get(pictureCode(key))), [session]);
   const sphereOf = useCallback((code: string) => session.world.cards.get(code)?.sphere ?? null, [session]);
+  // A Lost Island lying on its Lost Island side is drawn from its own picture only.
+  const lostIsland = useCallback((key: string) => key !== pictureCode(key) && session.world.cards.get(pictureCode(key))?.keywords.uncharted === true, [session]);
+  const pictureOf = useCallback((key: string) => picture(key, lostIsland(key)), [lostIsland]);
   const names: SheetNames = useMemo(
-    () => ({ card: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId), line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
+    () => ({
+      card: (cardId: string) => {
+        const card = store.getState().game.cards[cardId];
+        return nameOf(card ? pictureKey(card) : cardId);
+      },
+      // The real name of a Lost Island whose facedown side a look shows.
+      facedown: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId),
+      line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
     [nameOf, store, session],
   );
   // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
@@ -296,8 +311,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
   // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
-    name: nameOf(code),
-    source: pictureAt(key, revision),
+    name: nameOf(key),
+    source: pictureAt(key, revision, lostIsland(key)),
     landscape: session.world.cards.get(code)?.type === "quest",
     // A revealed quest stage reads its B side.
     text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
@@ -373,7 +388,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 store={store}
                 width={size.width}
                 height={size.height}
-                picture={picture}
+                picture={pictureOf}
                 nameOf={nameOf}
                 sphereOf={sphereOf}
                 inactive={inactive}
@@ -415,7 +430,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               guide={choice.guide}
               trayOpen={choice.panelOpen}
               count={trayCount(choice.sheet, choice.choice)}
-              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={picture} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
+              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
               onTop={setAnchor}
             />
           </View>
@@ -445,7 +460,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       />
       {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
           (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
-      <PicturedSpotlight handoff={handoff} picture={picture} nameOf={nameOf} sphereOf={sphereOf} />
+      <PicturedSpotlight handoff={handoff} picture={pictureOf} nameOf={nameOf} sphereOf={sphereOf} />
       {/* Over the top bar, the table and any open panel, centered on the screen at its top edge (user request, 2026-10-29), and
           narrowed so it never covers the command column's tray (banner-span.ts). While the table peeks it hangs under the peek pill, so
           Back to Player 1 stays in reach. */}
@@ -479,7 +494,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           button={advanceButton(game, ctx, advance.shown, ledgerLine)}
           asks={advance.asks}
           choice={choice}
-          picture={picture}
+          picture={pictureOf}
           onProgress={advance.close}
         />
       ) : null}

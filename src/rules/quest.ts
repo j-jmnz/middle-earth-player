@@ -27,7 +27,9 @@ type Cards = ReadonlyMap<string, PrintedCard>;
 
 // Printed quest points with constant effects applied, or null for a card that prints none.
 export function questPointsOf(state: ScenarioState, instance: CardInstance, cards: Cards): number | null {
-  return printedOf(cards, instance.code).questPoints == null ? null : modifiedStat(state, instance, "questPoints", cards);
+  const printed = printedOf(cards, instance.code);
+  // A Lost Island has no quest points and cannot be explored by progress (dcce.uncharted).
+  return printed.questPoints == null || (instance.face === "B" && printed.keywords.uncharted) ? null : modifiedStat(state, instance, "questPoints", cards);
 }
 
 // Printed engagement cost with constant effects applied, or null for a card that prints none.
@@ -53,6 +55,11 @@ export function stagingThreat(state: ScenarioState, cards: Cards): number {
         if (instance && flagged(state, id, "engagedThreat") && !flagged(state, id, "noThreatContribution")) total += modifiedStat(state, instance, "threat", cards);
       }
     }
+  }
+  // An active location that contributes its Threat to the staging area's ("While Flooded Ruins is the active location, it contributes its Threat", 11072:A:1).
+  for (const id of [state.activeLocation, state.secondActiveLocation]) {
+    const instance = id ? state.cards[id] : undefined;
+    if (instance && flagged(state, instance.id, "activeThreat")) total += modifiedStat(state, instance, "threat", cards);
   }
   return withStagingThreat(state, total);
 }

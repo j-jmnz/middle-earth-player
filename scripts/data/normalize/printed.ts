@@ -47,6 +47,11 @@ function ledgerKeywords(entry: LedgerEntry): PrintedKeywords {
   return entry.sailingSuccess ? { ...keywords, sailingSuccess: entry.sailingSuccess } : keywords;
 }
 
+// A double-sided location whose side B opens with the Uncharted keyword (dcce.uncharted): the card has it, and the engine reads it only while the card lies on that side.
+function uncharted(entry: LedgerEntry): PrintedKeywords {
+  return ledgerKeywords(entry).uncharted ? { uncharted: true } : {};
+}
+
 // Cards whose text came from Hall of Beorn take the ledger text. The core-set cards of the starter lists keep
 // RingsDB's marked-up text (the card screen renders it); their ledger entries are still compared.
 function pickBackStats(back: Card["back"]): Partial<Record<"willpower" | "attack" | "defense" | "health", number>> {
@@ -79,7 +84,7 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
     // The stats an override read from the scan of the Upgraded side stay on it (dcce.scalable-upgradable).
     const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null, ...pickBackStats(card.back) } : null;
     // A quest stage is played on its side B, so its keywords (Sailing) are read from that side too.
-    const sea = a && LEDGER_KEYWORD_PACKS.has(a.printing) ? { keywords: { ...(card.keywords ?? {}), ...ledgerKeywords(a), ...(card.type === "quest" && b ? ledgerKeywords(b) : {}) } } : {};
+    const sea = a && LEDGER_KEYWORD_PACKS.has(a.printing) ? { keywords: { ...(card.keywords ?? {}), ...ledgerKeywords(a), ...(card.type === "quest" && b ? ledgerKeywords(b) : {}), ...(card.type === "location" && b ? uncharted(b) : {}) } } : {};
     return {
       ...card,
       ...sea,

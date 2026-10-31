@@ -13,6 +13,8 @@ export type SheetNames = {
   line: (lineId: string) => string | null;
   // A card's catalog text by code, for a card the ledger does not hold (what is not applied is read from it).
   text?: (code: string) => string | null;
+  // The real name of a card lying on its Lost Island side, for the look that shows its facedown side (dcce.uncharted); `card` says Lost Island.
+  facedown?: (cardId: string) => string;
 };
 
 // A number the engine computed, shown with the game's icon beside it (willpower on a commit, defense on a defender).

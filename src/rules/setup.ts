@@ -22,6 +22,7 @@ import { placeCampaignCard } from "./families/burden-campaign.ts";
 import { snapshotOf } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
 import { stampRoutes } from "./families/sea-routes.ts";
+import { dealUnchartedDeck } from "./families/uncharted-deal.ts";
 
 export type StartSeat = {
   heroes: readonly string[];
@@ -49,6 +50,8 @@ export type StartScenario = {
   burdenDeck?: readonly string[];
   // The non-ship enemies the scenario deals as its Corsair deck (dcce.corsair-deck), when it has one; "Prepare the Corsair deck" shuffles it.
   corsairDeck?: readonly string[];
+  // The double-sided locations the scenario deals as its Uncharted deck (dcce.uncharted-deck), Lost Island side up; "Prepare the Uncharted deck" shuffles it.
+  unchartedDeck?: readonly string[];
   // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Nightmare adds nothing here: its
   // deck and setup card are in the definition and the encounter deck. Normal when absent.
   difficulty?: Difficulty;
@@ -82,6 +85,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = { ...state, corsairDeck: [], corsairDiscard: [] };
     for (const code of input.corsairDeck) state = spawn(state, code, { zone: "corsairDeck" }).state;
   }
+  if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;

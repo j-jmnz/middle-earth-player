@@ -445,3 +445,39 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
     expect(after.active).toBeNull();
   });
 });
+
+describe("The Fate of Númenor (Dream-chaser part 2, phase 41)", () => {
+  // The fixtures are games of two decklists from the blank log of a new Dream-chaser playthrough (voyage-won, whose win would write part 1's log, is open). A name whose game the seeds did
+  // not find is not committed and has nothing to check.
+  const names = (["fate-won", "fate-lost"] as const).filter((name) => hasFixture(name));
+
+  it("are games of two decklists dealt on the scenario, the Campaign Setup answered in the game", () => {
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("dream-chaser");
+      expect(found.loadout.scenarioId, name).toBe("the-fate-of-numenor");
+      expect(found.seatCount, name).toBe(2);
+      expect(found.past, name).toBeNull();
+      expect(found.loadout.ringBearer, name).toBeNull();
+    }
+  });
+
+  it("fate-won replays to a win, and fate-lost to a loss that writes nothing", () => {
+    for (const name of names) {
+      const world = worldFor(name);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const resumed = resume(save, world, CATALOG_VERSION);
+      expect(resumed.ok, name).toBe(true);
+      if (!resumed.ok) continue;
+      if (name === "fate-lost") {
+        expect(resumed.state.lost).toBe(true);
+        const after = finish(save, world, resumed.state);
+        expect(after.log).toEqual(save.log);
+        expect(after.active).toBeNull();
+      } else {
+        expect(resumed.state.stageCleared).toBe(true);
+        expect(resumed.state.lost).toBe(false);
+      }
+    }
+  });
+});

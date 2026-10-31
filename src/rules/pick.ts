@@ -23,6 +23,7 @@ import type { ScenarioState } from "./state.ts";
 import { heldAmount, inPlay, livingSeats } from "./state.ts";
 import { canDeclareDefender, isDefending } from "./families/defense-defenders.ts";
 import { facedownShadow } from "./families/defense-shadow.ts";
+import { deckPool, unchartedPickMatches } from "./families/uncharted-pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -69,7 +70,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
         if (top) raw.push(top);
       }
     }
-  } else if (from === "deck") for (const index of seats) raw.push(...(state.seats[index]?.deck ?? []).slice(0, spec.top ?? Number.MAX_SAFE_INTEGER));
+  } else if (from === "deck") for (const index of seats) raw.push(...deckPool(state, index, spec));
   else if (spec.type === "attachment") {
     for (const instance of Object.values(state.cards)) {
       if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
@@ -146,6 +147,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.active && state.activeLocation !== id && state.secondActiveLocation !== id) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments-pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
+  // The uncharted family's filters: a Lost Island, progress enough (families/uncharted-pick.ts).
+  if (!unchartedPickMatches(state, id, spec, ctx)) return false;
   if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
   // event's card, printed hit points, the top of a discard pile (families/attack-pick.ts).

@@ -1,10 +1,13 @@
-import type { Instruction, ModifierUntil, PickSpec, ScenarioDefinition } from "../catalog/boundary.ts";
+import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/boundary.ts";
 
 import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { CampaignFacts, ResolutionLog } from "./campaign-state.ts";
 import type { SeaState } from "./families/sea-types.ts";
+import type { UnchartedState } from "./families/uncharted-types.ts";
+import type { Discount } from "./discount-types.ts";
 
+export type { Discount };
 export type {
   DelayedEffect,
   EffectData,
@@ -45,6 +48,8 @@ export type ZoneName =
   // The Corsair deck and its own discard pile (dcce.corsair-deck): out of play, like the encounter deck and its discard pile.
   | "corsairDeck"
   | "corsairDiscard"
+  // The Uncharted deck (dcce.uncharted-deck): out of play, every card Lost Island side up.
+  | "unchartedDeck"
   | "victory"
   | "setAside"
   | "removed"
@@ -65,22 +70,6 @@ export type ZoneName =
   | "captive";
 
 export type CardFace = "up" | "down" | "A" | "B";
-
-// "Reduce the cost of the next Silvan ally you play this phase by 1": spent by the first card that matches.
-// `anySeat`: any player's next matching card spends it. The card that spends it gains Doomed `doomed`, needs no resource match
-// (`noMatch`) and cannot quest this round (`cannotQuest`). `used`: it lasts until spent.
-export type Discount = {
-  seat: number;
-  sourceId: string;
-  pick: PickSpec;
-  amount: number;
-  until: "endOfPhase" | "endOfRound" | "used";
-  min?: number;
-  anySeat?: true;
-  doomed?: number;
-  noMatch?: true;
-  cannotQuest?: true;
-};
 
 export type CardInstance = {
   id: string;
@@ -190,7 +179,7 @@ export type Window =
   | { kind: "cancelOffer"; seat: number }
   | { kind: "response"; seat: number }
   // A card shown to a player (the top of the encounter deck). The player closes it with a pass.
-  | { kind: "look"; seat: number; cardIds: readonly string[] }
+  | { kind: "look"; seat: number; cardIds: readonly string[]; side?: "A" }
   // The scenario is won: a player answers the choice that Resolution instruction `step` opens.
   | { kind: "resolution"; step: number; seat: number };
 
@@ -218,6 +207,8 @@ export type ScenarioState = {
   // The Corsair deck and its discard pile, present once a scenario deals a Corsair deck (dcce.corsair-deck; families/sea-corsair.ts).
   corsairDeck?: readonly string[];
   corsairDiscard?: readonly string[];
+  // The Uncharted deck and the codes of the double-sided locations that go back into it, present once a scenario deals one (families/uncharted.ts).
+  uncharted?: UnchartedState;
   // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a
   // Sailing test in progress. Absent in every other game (families/sea-types.ts).
   sea?: SeaState;

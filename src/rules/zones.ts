@@ -5,13 +5,14 @@ import { leaveWith } from "./families/play-zones.ts";
 import { releaseOrcGuard } from "./families/dungeon-guard.ts";
 import { dealtFace } from "./families/dreamchaser-facts.ts";
 import { routeDestination } from "./families/sea-routes.ts";
+import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute } from "./families/uncharted-zone.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
   | { zone: "seatQuest"; seat: number }
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" }
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage" }
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
@@ -84,6 +85,8 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return { ...state, corsairDeck: without(state.corsairDeck ?? [], id) };
     case "corsairDiscard":
       return { ...state, corsairDiscard: without(state.corsairDiscard ?? [], id) };
+    case "unchartedDeck":
+      return leaveUnchartedDeck(state, id);
     case "victory":
       return { ...state, victory: without(state.victory, id) };
     case "setAside":
@@ -199,6 +202,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, corsairDeck: append(stamped.corsairDeck ?? [], id) };
     case "corsairDiscard":
       return { ...stamped, corsairDiscard: append(stamped.corsairDiscard ?? [], id) };
+    case "unchartedDeck":
+      return joinUnchartedDeck(stamped, id);
     case "victory":
       return { ...stamped, victory: append(stamped.victory, id) };
     case "setAside":
@@ -239,12 +244,14 @@ export function moveCard(state: ScenarioState, id: string, wanted: Destination, 
   const current = state.cards[id];
   if (!current) return state;
   // A card with a route of its own never reaches the encounter deck or discard pile (families/sea-routes.ts); one that has no place there stays put.
-  const dest = routeDestination(state, current, wanted);
+  const dest = routeDestination(state, current, unchartedRoute(state, current, wanted));
   if (!dest) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted-zone.ts).
+  if (dest.zone === "unchartedDeck") moved = shuffleUnchartedDeck(moved);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon-guard.ts).

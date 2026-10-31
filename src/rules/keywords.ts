@@ -16,6 +16,7 @@ import { attackingHolds } from "./families/attack-strike.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
 import { alliesToHandDestination } from "./families/deck-rules.ts";
 import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
+import { LOST_ISLAND_THREAT } from "./families/uncharted-pick.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -24,6 +25,8 @@ type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | 
 
 // The printed value of a stat, on the side the card shows: a ship-objective dealt on its Upgraded side prints that side's stats (dcce.scalable-upgradable).
 function printedStat(printed: PrintedCard, stat: ModifierStat, face?: CardInstance["face"]): number {
+  // The Lost Island side of a double-sided location prints a Threat and no quest points (dcce.uncharted).
+  if (face === "B" && printed.keywords.uncharted && (stat === "threat" || stat === "questPoints")) return stat === "threat" ? LOST_ISLAND_THREAT : 0;
   const upgraded = face === "B" ? printed.upgraded : null;
   if (upgraded) {
     switch (stat) {
@@ -222,7 +225,11 @@ export function placeDamage(
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
-  const dealt = cap > 0 ? Math.max(0, Math.min(placedAmount(printed, amount), cap - taken)) : placedAmount(printed, amount);
+  // A card that places no more than a number of damage at a time ("place 2 damage instead", 11181:A:3).
+  const limits = state.modifiers.filter((modifier) => modifier.stat === "damageLimit" && modifier.instanceId === id && modifierActive(state, modifier)).map((modifier) => modifier.amount);
+  const limit = limits.length > 0 ? Math.min(...limits) : 0;
+  const placing = limit > 0 ? Math.min(placedAmount(printed, amount), limit) : placedAmount(printed, amount);
+  const dealt = cap > 0 ? Math.max(0, Math.min(placing, cap - taken)) : placing;
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(cap > 0 ? { ...state, roundDamage: { ...state.roundDamage, [id]: taken + dealt } } : state, id, { damage });
@@ -462,6 +469,7 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   // A card whose printed text box is blank has none of its printed keywords; one gained from another source stays (rr.blank).
   const blank = textBlank(state, id);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
+  if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
   if (!blank && printed.keywords[keyword]) return true;
   return (keyword === "sentinel" || keyword === "ranged") && flagged(state, id, keyword);
 }

@@ -5,7 +5,7 @@ import { constantInstructions, memoOf, type StateMemo } from "./constant-records
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
-import { printedOf } from "./printed.ts";
+import { isPlayerType, printedOf } from "./printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
@@ -99,6 +99,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
 export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: string, attachmentCode: string): boolean {
   const traits = printedOf(ctx.cards, attachmentCode).traits;
   if (flagged(state, hostId, "cannotHaveAttachments")) return true;
+  if (flagged(state, hostId, "noPlayerAttachments") && isPlayerType(printedOf(ctx.cards, attachmentCode))) return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
   return restricted(state, ctx, "attach").some(
     (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)),

@@ -24,7 +24,7 @@
 // src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e-oath.ts), written to
 // src/campaign/fixtures/the-oath.json. `sea-solo`, `sea-duo`, `voyage-won` and `voyage-lost`: Voyage Across Belegaer on a blank Dream-chaser log (scripts/e2e-voyage.ts), written to
 // src/campaign/fixtures/voyage-across-belegaer.json; `voyage-won` is written only when a seed wins. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e-nibin-dum.ts), written to
-// src/campaign/fixtures/the-caves-of-nibin-dum.json.
+// src/campaign/fixtures/the-caves-of-nibin-dum.json. `fate-won` and `fate-lost`: The Fate of Númenor on a blank Dream-chaser log (scripts/e2e-fate.ts), written to src/campaign/fixtures/the-fate-of-numenor.json; `fate-won` is written only when a seed wins.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -55,6 +55,7 @@ import { mirkwoodFixtures } from "./e2e-mirkwood.ts";
 import { nibinDumFixtures } from "./e2e-nibin-dum.ts";
 import { oathFixtures } from "./e2e-oath.ts";
 import { voyageFixtures } from "./e2e-voyage.ts";
+import { fateFixtures } from "./e2e-fate.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -384,6 +385,12 @@ void runScript("e2e-fixtures", () => {
   const voyageFile = path.join(dir, "voyage-across-belegaer.json");
   writeFileSync(voyageFile, `${JSON.stringify(voyage)}\n`);
   say.info(`wrote ${voyageFile} (${Object.keys(voyage).join(", ")})`);
+
+  // The Fate of Númenor (Dream-chaser part 2): from the same blank log, because `voyage-won` is open. A game not found in the seeds is left out.
+  const fate = say.step("play The Fate of Númenor's win and loss", () => fateFixtures());
+  const fateFile = path.join(dir, "the-fate-of-numenor.json");
+  writeFileSync(fateFile, `${JSON.stringify(fate)}\n`);
+  say.info(`wrote ${fateFile} (${Object.keys(fate).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

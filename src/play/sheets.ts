@@ -17,6 +17,7 @@ import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
+import { unchartedOptionLabel } from "./uncharted-words.ts";
 import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
@@ -265,7 +266,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         options: window.options.map((id): PickOption => {
           const card = option(game, names, id);
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? seaOptionLabel(wait.item.instruction, id, game, ctx.cards) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? unchartedOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           const label = sea ?? (outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).
@@ -302,10 +303,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         kind: "pick",
         key: `look:${window.cardIds.join(",")}`,
         step: step(game),
-        title: window.cardIds.map((id) => names.card(id)).join(", ") || "Look",
+        title: window.cardIds.map((id) => (window.side === "A" ? (names.facedown?.(id) ?? names.card(id)) : names.card(id))).join(", ") || "Look",
         // Dark Knowledge (01071:A:2) looks at a shadow card dealt to an enemy; a look at the top of a player's own deck
         // (LookAtTop with `deck: "own"`) says so.
-        note: lookNote(game, window.cardIds, window.seat),
+        note: lookNote(game, window.cardIds, window.seat, window.side),
         verb: "",
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },
@@ -390,11 +391,19 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
 }
 
 // What a look window shows: a shadow card dealt to an enemy, the top of a player's deck, or the top of the encounter deck.
-function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number): string {
+function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number, side?: "A"): string {
+  if (side === "A") return "The facedown side of a Lost Island. Only you see it. Nothing on it happens and it stays facedown.";
   if (cardIds.some((id) => game.cards[id]?.zone === "shadow")) return "A shadow card dealt to an enemy attacking you. Nothing moves.";
   const first = game.cards[cardIds[0] ?? ""];
-  if (first?.zone === "deck") return first.controller === seat ? "The top of your deck. Nothing moves." : "The top of that player's deck. Nothing moves.";
-  return "The top of the encounter deck. Nothing moves.";
+  if (first?.zone === "deck") {
+    const deck = game.seats[first.controller ?? seat]?.deck ?? [];
+    const end = deck[0] === first.id ? "top" : "bottom";
+    const count = cardIds.length;
+    const cards = count > 1 ? `The ${end} ${count} cards of` : `The ${end} of`;
+    return first.controller === seat ? `${cards} your deck. Nothing moves.` : `${cards} that player's deck. Nothing moves.`;
+  }
+  const deck = game.encounterDeck;
+  return `The ${deck[0] === cardIds[0] || deck.length === 0 ? "top" : "bottom"} of the encounter deck. Nothing moves.`;
 }
 
 // The Hide sheet's note, with the most characters a card lets commit ("players cannot commit more than 2 characters to a Hide test",

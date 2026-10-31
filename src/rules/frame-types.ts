@@ -97,6 +97,8 @@ export type EffectData = {
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
   excess?: number;
   hold?: string;
+  // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted-cards.ts).
+  discarded?: string;
   // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare-guards.ts).
   hideFailed?: boolean;
 };
