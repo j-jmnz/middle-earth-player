@@ -8,17 +8,21 @@
 import type { CardInstance } from "../rules/state.ts";
 
 import { unturn } from "./frame.ts";
-import type { FightKind, PileId, PileView, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
+import { hidesFace } from "./selectors.ts";
+import type { BasePileId, FightKind, PileId, PileView, SecondPileId, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
+import { foldRow, groupCards, keeps, stagingRank, type FoldGroup } from "./row-fold.ts";
+import { lookBands, lookStrip } from "./look-strip.ts";
 import { acrossGaps, DOWN, downGaps, SLACK } from "./table-spacing.ts";
 import { touch } from "./ui-scale.ts";
 
 export { MIN_TARGET } from "./layout-slots.ts";
-export { PLAY_FLOOR } from "./play-area.ts";
+export { PLAY_FLOOR, SHIP_GAP } from "./play-area.ts";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
+// A "pile" is a deck, a discard pile, or a row's fold stack (`fold:staging`, `fold:engaged`: row-fold.ts).
 export type SlotKind = "card" | "attachment" | "shadow" | "pile";
 
 export type SlotZone = ZoneId | PileId;
@@ -47,6 +51,12 @@ export type CardSlot = Rect & {
   held?: true;
   // A deck with an encounter card attached to it (Iron Shackles, 01105:A:1): a chain on its count strip.
   chained?: true;
+  // The one peek of a staging card with more than one card under it (a grappled arm, Black Key on the Raider Flagship): how many are under it, drawn as "×2".
+  stack?: number;
+  // A card of a Sailing test's look (look-strip.ts): how many success symbols its ledger side prints; absent on every other slot. Drawn over the table, face up, with its medallion.
+  success?: number;
+  // A row's fold stack (`fold:staging`): the zone it folds, with the count strip "+n" and the word "More" (row-fold.ts). `count` is the cards in it.
+  fold?: "staging" | "engaged";
 };
 
 // The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
@@ -54,12 +64,20 @@ export type CardSlot = Rect & {
 // `preview` marks a fight the player has picked but not confirmed yet.
 export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
+// The four piles every table has, and the second slot's when the scenario declares it (the Corsair pair: dcce.corsair-deck).
+export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId, T>>>;
+
+/** A row's fold stack: where it stands, the cards that left the row, and the card whose face it shows (row-fold.ts). */
+export type FoldPlace = { id: string; zone: "staging" | "engaged"; rect: Rect; cards: readonly string[]; top: string };
+
 export type TableLayout = {
   width: number;
   height: number;
   card: { w: number; h: number };
   zones: Readonly<Record<ZoneId, Rect>>;
-  piles: Readonly<Record<PileId, Rect>>;
+  piles: TablePiles<Rect>;
+  // The cards that left staging or the engagement area for a fold stack are on no slot: the row list shows them.
+  folds?: readonly FoldPlace[];
   slots: readonly CardSlot[];
   marks: readonly CombatMark[];
   // The enemy whose attack is in progress, edged on the table from the moment it attacks.
@@ -69,7 +87,7 @@ export type TableLayout = {
 };
 
 export type LayoutViews = Readonly<Record<ZoneId, ZoneView>>;
-export type PileViews = Readonly<Record<PileId, PileView>>;
+export type PileViews = TablePiles<PileView>;
 
 export type LayoutOptions = {
   // The hand card the player has picked: drawn whole above the bottom edge.
@@ -82,6 +100,12 @@ export type LayoutOptions = {
   preview?: { enemyId: string; ids: readonly string[]; kind: FightKind } | null;
   // The top card of the deck when the rules let the player play it (Gandalf, 142002): face up on the deck, and a card.
   deckTop?: CardInstance | null;
+  // The cards a Sailing test looked at, top of the deck first, with the success symbols each prints: laid in a strip over staging (look-strip.ts).
+  look?: readonly { card: CardInstance; success: number }[];
+  // The sea family's staging stacks: a staging card with more than one card under it shows one peek and a count (placeStaging). Off, every attachment peeks as it always did.
+  stacks?: boolean;
+  // The cards a fold must keep on the table (row-fold.ts): those the open moment asks about, the picked ones and the one the banner's beat names.
+  keep?: ReadonlySet<string>;
   // The UI scale (ui-scale.ts, user request, 2026-10-28): the gutter, the gaps, the peeks, the hand's strip, the combat marks' room and the
   // card's cap and floor are Medium's sizes times it. The 44 pt hit target is a floor (`touch`). Default 1.
   scale?: number;
@@ -133,7 +157,30 @@ export function handCardSize(card: { w: number; h: number }, width: number, coun
   return w === card.w ? card : { w, h: Math.round(w * ASPECT) };
 }
 
-function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics): void {
+// What a row needs to fold: the cards to keep, the fold stack's size and the sink for the stacks (row-fold.ts).
+type RowFolding = { keep: ReadonlySet<string> | undefined; pile: { w: number; h: number }; folds: FoldPlace[]; target: number; stacks: boolean };
+
+// One peek under a staging card that holds more than one card, with the count: a grappled arm, Black Key on the Raider Flagship (the last put is the one that shows).
+function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: Metrics): void {
+  const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
+  if (under.length <= 1) {
+    placeUnder(entry, "staging", rect, out, [], m.peek);
+    return;
+  }
+  const last = under[under.length - 1] as CardInstance;
+  out.push({ ...slotOf(last, "staging", last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + m.peek, w: rect.w, h: rect.h }), stack: under.length });
+}
+
+// A fold stack as a pile-sized slot at the row's left end: the first folded card's face, "+n" and "More" (row-fold.ts).
+function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; cards: readonly string[]; top: string }, y: number, row: { h: number }, pile: { w: number; h: number }, byId: ReadonlyMap<string, CardInstance>, out: CardSlot[], folds: FoldPlace[]): void {
+  const rect: Rect = { x: stack.x, y: y + Math.round((row.h - pile.h) / 2), w: pile.w, h: pile.h };
+  const top = byId.get(stack.top);
+  const id = `fold:${zone}`;
+  folds.push({ id, zone, rect, cards: stack.cards, top: stack.top });
+  out.push({ ...rect, id, code: top && !hidesFace(top) ? top.code : "", zone, kind: "pile", exhausted: false, faceDown: top == null || hidesFace(top), landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone });
+}
+
+function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding): void {
   // A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
   const groups: ZoneEntry[][] = [];
   for (const entry of entries) {
@@ -142,11 +189,16 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size:
     else groups.push([entry]);
   }
   const widths = groups.map((group) => footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * size.w * PAIR_STEP + (group.length > 1 ? m.gap : 0));
-  const xs = rowXs(widths, area.x, area.w, m.gap);
+  const fold = folding && zone === "staging" ? foldRow(groups.map((group, at): FoldGroup => ({ id: group[0]?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep) })), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }) : null;
+  const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
+  if (fold?.stack && folding) foldSlot("staging", fold.stack, area.y, { h: size.h }, folding.pile, new Map(entries.map((entry) => [entry.card.id, entry.card])), out, folding.folds);
   groups.forEach((group, groupAt) => {
+    const left = xs[groupAt];
+    if (left == null) return;
     group.forEach((entry, at) => {
-      const rect = cardRect(entry.card, (xs[groupAt] ?? area.x) + at * size.w * PAIR_STEP, area.y, size);
-      placeUnder(entry, zone, rect, out, [], m.peek);
+      const rect = cardRect(entry.card, left + at * size.w * PAIR_STEP, area.y, size);
+      if (zone === "staging" && folding?.stacks) placeStaging(entry, rect, out, m);
+      else placeUnder(entry, zone, rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
       out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
@@ -162,11 +214,18 @@ function groupWidth(entry: ZoneEntry, size: { w: number; h: number }, m: Metrics
   return footprint(entry.card, size) + shadows + paired;
 }
 
-function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], preview: string | null, m: Metrics): void {
+function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], preview: string | null, m: Metrics, folding?: RowFolding, attacker?: string | null): void {
   const widths = entries.map((entry) => groupWidth(entry, size, m) + (entry.paired.length > 0 ? m.gap : 0));
-  const xs = rowXs(widths, area.x, area.w, m.gap);
+  // Enemies that are not attacking, not fighting and not in the open moment fold, oldest first (row-fold.ts).
+  const fold = folding
+    ? foldRow(entries.map((entry, at): FoldGroup => ({ id: entry.card.id, width: widths[at] ?? 0, cards: groupCards([entry]), rank: 1, pinned: keeps([entry], folding.keep) || entry.paired.length > 0 || entry.card.id === attacker })), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w })
+    : null;
+  const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
+  if (fold?.stack && folding) foldSlot("engaged", fold.stack, area.y, { h: size.h }, folding.pile, new Map(entries.map((entry) => [entry.card.id, entry.card])), out, folding.folds);
   entries.forEach((entry, index) => {
-    const x = xs[index] ?? area.x;
+    const left = xs[index];
+    if (left == null) return;
+    const x = left;
     const rect = cardRect(entry.card, x, area.y, size);
     const faceUp: CardInstance[] = [];
     placeUnder(entry, "engaged", rect, out, faceUp, m.peek);
@@ -272,6 +331,12 @@ export function tableLayout(
   const pileY = stagingY + Math.round((card.h - pile.h) / 2);
   const encounterDeck: Rect = { x: width - rightGutter - encounterW, y: pileY, w: pile.w, h: pile.h };
   const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
+  // The second slot of piles (a scenario with a second deck: the Corsair pair) stands under the encounter pair, at the right end of the engagement area, as wide as the pair;
+  // the engagement area narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
+  const second = piles.corsairDeck != null || piles.corsairDiscard != null;
+  const secondY = engagedY + Math.round((card.h - pile.h) / 2);
+  const corsairDeck: Rect = { x: encounterDeck.x, y: secondY, w: pile.w, h: pile.h };
+  const corsairDiscard: Rect = { x: encounterDiscard.x, y: secondY, w: pile.w, h: pile.h };
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
   // player's deck and discard pile level with the play area.
@@ -285,7 +350,7 @@ export function tableLayout(
   const deck: Rect = { x: leftX, y: playY + Math.round((card.h - pile.h) / 2), w: pile.w, h: pile.h };
   const discard: Rect = { x: leftX + pile.w + gap, y: deck.y, w: pile.w, h: pile.h };
 
-  const engaged: Rect = { x: centerX, y: engagedY, w: centerW, h: engagedH };
+  const engaged: Rect = { x: centerX, y: engagedY, w: second ? Math.max(card.w, centerW - encounterW - gap) : centerW, h: engagedH };
   const play: Rect = { x: centerX, y: playY, w: centerW, h: playH };
   const hand: Rect = { x: gutter, y: handY, w: width - 2 * gutter, h: height - handY };
 
@@ -299,15 +364,32 @@ export function tableLayout(
     placeUnder(entry, id, rect, slots, [], peek);
     slots.push(slotOf(entry.card, id, "card", rect));
   }
-  placeRow(views.staging.entries, "staging", staging, card, slots, m);
-  placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m);
+  // Staging and the engagement area squeeze to 44 pt steps and then fold the groups the moment does not ask about into a stack at the row's left end (row-fold.ts).
+  const folds: FoldPlace[] = [];
+  const folding: RowFolding = { keep: options.keep, pile, folds, target: touch(scale, MIN_TARGET), stacks: options.stacks === true };
+  placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
+  placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);
-  const pileRects: Record<PileId, Rect> = { deck, discard, encounterDeck, encounterDiscard };
+  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}) };
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table-view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
+  for (const id of ["corsairDeck", "corsairDiscard"] as const) {
+    const view = piles[id];
+    const rect = pileRects[id];
+    if (view && rect) slots.push(pileSlot(view, rect, undefined));
+  }
+
+  // A Sailing test's look: the cards come off the encounter deck face up and stand in a strip over staging, then the engagement band and the play band (look-strip.ts).
+  if (options.look && options.look.length > 0) {
+    const strip = lookStrip(options.look.length, lookBands({ zones: { staging, engaged, play } }), card, gap, touch(scale, MIN_TARGET));
+    options.look.forEach((row, index) => {
+      const place = strip.places[index];
+      if (place) slots.push({ ...slotOf(row.card, "encounterDeck", "card", place), faceDown: false, success: row.success });
+    });
+  }
 
   // The hand fans along the bottom edge, a slight turn from the middle out, overlapping when it is long. Each card keeps at
   // least a 44 pt strip to touch: a long hand narrows its cards before the strip gets thinner. The picked card rises whole.
@@ -328,6 +410,7 @@ export function tableLayout(
     card,
     zones: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
     piles: pileRects,
+    folds,
     slots,
     marks,
     attacker: options.attacker ?? null,

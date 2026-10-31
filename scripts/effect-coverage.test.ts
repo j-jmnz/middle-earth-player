@@ -14,7 +14,7 @@ import { isPoolCard, withPool } from "./data/printed/pool.ts";
 import { PLAYER_REQUESTS } from "./data/printed/scope.ts";
 import { openLines } from "./data/effects/open-lines.ts";
 import { OPEN_LINES } from "../src/effects/open-lines.ts";
-import { dealtCodes, loadCampaign, loadScenarios, nightmareCodes, starterCodes } from "./data/load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios, nightmareCodes, starterCodes } from "./data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
@@ -143,7 +143,8 @@ describe("generated and authored records", () => {
   });
 
   it("list every printed line still without a record in open-lines.ts (pnpm effects:open rewrites it)", () => {
-    expect(OPEN_LINES).toEqual(openLines(cards, lines, campaign, scenarios, EFFECTS));
+    // Every built campaign, as pnpm effects:open reads them: a campaign with XP also deals the Hard/Expert Mode card.
+    expect(OPEN_LINES).toEqual(openLines(cards, lines, loadCampaigns(), scenarios, EFFECTS));
   });
 
   it("agree with the app's not-applied check on every pool card: it names the open lines, and no other", () => {

@@ -1,0 +1,291 @@
+{
+  "id": "flight-of-the-stormcaller",
+  "name": "Flight of the Stormcaller",
+  "number": 1,
+  "stages": [
+    "12012",
+    "12013",
+    "12014",
+    "12015"
+  ],
+  "encounterSets": [
+    {
+      "name": "Flight of the Stormcaller",
+      "count": 21
+    },
+    {
+      "name": "The Dream-chaser's Fleet",
+      "count": 0
+    },
+    {
+      "name": "Vast Oceans",
+      "count": 5
+    },
+    {
+      "name": "Stormy Weather",
+      "count": 9
+    },
+    {
+      "name": "Corsair Pirates",
+      "count": 9
+    }
+  ],
+  "cards": [
+    {
+      "code": "12020",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12021",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12025",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12026",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12027",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12028",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12029",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11050",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11051",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11052",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11053",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11054",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11055",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12012",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12013",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12015",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "staging",
+      "byPlayers": {
+        "few": 1,
+        "many": 2,
+        "from": 3
+      }
+    },
+    {
+      "code": "12019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "110138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "110139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11082",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "12023",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "12024",
+      "normal": 2,
+      "easy": 1,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11060",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11062",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11063",
+      "normal": 2,
+      "easy": 0,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "12016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "stormcallerQuests"
+    },
+    {
+      "code": "12017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "stormcallerQuests"
+    },
+    {
+      "code": "12018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "stormcallerQuests"
+    }
+  ],
+  "campaignCard": "11191",
+  "campaignPlaced": [
+    "11172",
+    "11173",
+    "11174",
+    "11175",
+    "11177",
+    "11178",
+    "11192",
+    "11193",
+    "12019"
+  ],
+  "reprints": {
+    "11080": "110136",
+    "11081": "110137",
+    "11082": "110140",
+    "11083": "110141",
+    "12019": "110042"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.4",
+    "dragnEasy": "E06.4",
+    "hobSlug": "Flight-of-the-Stormcaller"
+  }
+}

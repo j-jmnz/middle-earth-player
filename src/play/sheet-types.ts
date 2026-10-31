@@ -58,7 +58,12 @@ export type PickSheet = {
   about?: readonly string[];
   // A warning the confirm repeats before it sends, whatever is picked: the primary arms on its first tap.
   caution?: string;
+  // The cards a Sailing test looked at, listed read-only on the dock's List (docs/design-system-table.md, The Sailing test).
+  look?: readonly LookRow[];
 };
+
+// A card a Sailing test looked at, with the success symbols its ledger side prints (sea-sheets.ts).
+export type LookRow = { id: string; code: string; name: string; success: number };
 
 export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "attack"; enemyId: string };
 

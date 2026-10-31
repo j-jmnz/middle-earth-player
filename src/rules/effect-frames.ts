@@ -49,6 +49,8 @@ export type EffectSpec = {
   other?: string;
   // The damage the answered event dealt, and the card whose destruction waits while the effect resolves.
   dealt?: number;
+  // The damage an attack sent on past its defender (excessToShip).
+  excess?: number;
   hold?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
@@ -81,6 +83,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.subject ? { subject: spec.subject } : {}),
     ...(spec.other ? { other: spec.other } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
+    ...(spec.excess != null ? { excess: spec.excess } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);

@@ -6,9 +6,18 @@
 // - DragnCards' card backs, the ones its plugin names in jsons/cardBacks.json: the player back (the One Ring) and the
 //   encounter back (the Eye), 429x600 JPEGs, which the table draws on the decks and on face-down cards (user request,
 //   2026-10-25: the printed backs, not drawn ones).
+// - The Dream-chaser Campaign Expansion's rulebook (MEC111): the Heading's four steps and the Sailing success symbol are glyphs
+//   of its embedded LOTRLCGIcons font, which no web icon font carries (mec111-font.ts). The TrueType program and its ToUnicode map
+//   are kept, 6 KB; the PDF itself stays out of git.
 // Every file is kept verbatim under data/raw/icons and pinned by sha256; `pnpm data:build` cuts the icons out offline.
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { bytes, createLog, type Log } from "../../log.ts";
-import { combinedPin, fetchBytes, writeRaw, writeRawBytes, type SourceFile, type SourceRecord } from "./fetch.ts";
+import { DATA_DIR } from "../paths.ts";
+import { mec111Font } from "./mec111-font.ts";
+import { RULE_PDFS } from "./rules.ts";
+import { combinedPin, fetchBytes, sha256, writeRaw, writeRawBytes, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 export const RINGSDB_FONT_URL = "https://ringsdb.com/bundles/app/fonts/ringsdb.svg?h6hjpma";
 export const RINGSDB_CSS_URL = "https://ringsdb.com/css/app.css";
@@ -17,6 +26,24 @@ export const DRAGNCARDS_TOKEN_FILES = ["questPoints", "engagementCost", "resourc
 export const DRAGNCARDS_CARDBACKS = "https://dragncards-lotrlcg.s3.amazonaws.com/cardbacks";
 export const DRAGNCARDS_CARDBACK_FILES = ["player", "encounter"] as const;
 export type CardBackName = (typeof DRAGNCARDS_CARDBACK_FILES)[number];
+
+// The PDF the icons are cut from is the one `pnpm data:sync rules` pinned (the dcce rulebook): a different file would give different glyphs under the same URL. With no pin yet it is only
+// reported, so a first `data:sync icons` still works; with one, a different hash stops the sync.
+function checkPinned(file: string, url: string, body: Uint8Array, log: Log): void {
+  let pinned: string | undefined;
+  try {
+    const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources?: Record<string, { files?: { path: string; sha256: string }[] }> };
+    pinned = Object.values(sources.sources ?? {}).flatMap((source) => source.files ?? []).find((entry) => entry.path === file)?.sha256;
+  } catch {
+    pinned = undefined;
+  }
+  if (!pinned) {
+    log.warn(`${url} is not pinned in data/sources.json: run pnpm data:sync rules to pin it`);
+    return;
+  }
+  const actual = sha256(body);
+  if (actual !== pinned) throw new Error(`${url} is not the PDF data/sources.json pins as ${file} (sha256 ${actual}, pinned ${pinned}): run pnpm data:sync rules, then icons again`);
+}
 
 export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRecord> {
   const files: SourceFile[] = [];
@@ -35,5 +62,12 @@ export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRe
     const url = `${DRAGNCARDS_CARDBACKS}/${name}.jpg`;
     keep(writeRawBytes(`icons/dragncards/cardbacks/${name}.jpg`, url, await fetchBytes(url, undefined, log)));
   }
-  return { id: "icons", site: "https://ringsdb.com and https://dragncards-lotrlcg.s3.amazonaws.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
+  const mec111 = RULE_PDFS.find((pdf) => pdf.doc === "dcce");
+  if (!mec111) throw new Error("RULE_PDFS has no dcce");
+  const pdf = await fetchBytes(mec111.url, 300_000, log);
+  checkPinned(`pdf/${mec111.file}`, mec111.url, pdf, log);
+  const font = mec111Font(pdf);
+  keep(writeRawBytes("icons/mec111-icons.ttf", mec111.url, font.ttf));
+  keep(writeRaw("icons/mec111-icons.unicode.txt", mec111.url, font.unicode));
+  return { id: "icons", site: "https://ringsdb.com, https://dragncards-lotrlcg.s3.amazonaws.com and the MEC111 rulebook", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }

@@ -13,10 +13,12 @@ import type { IconName } from "./icon-map.ts";
 import type { LogMark } from "./log.ts";
 import { layoutAnim, springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";
+import { HEADING_HINT, headingArcs, headingDelta, headingDeltaWords, headingLook, headingWords, type HeadingStep } from "./heading.ts";
 import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
+import { DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -24,7 +26,7 @@ import { Text } from "./text.tsx";
 // How long the change badge stays beside the dial; the banner and the log say it too.
 const DELTA_MS = 3000;
 // The dial's diameter at Medium: a ring of threat red round a dark disc (docs/design-system-table.md).
-const DIAL = 46;
+const DIAL = DIAL_SIZE;
 
 // The dial's edge and fill at each level (threat-level.ts): threat red, tinted near elimination, solid when critical.
 const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: string; meter: string }> => ({
@@ -242,6 +244,86 @@ function ThreatDial({
           </Animated.View>
         ) : null}
       </View>
+    </Pressable>
+  );
+}
+
+/**
+ * The Heading dial of the top bar (dcce.heading), while the Heading card is in play: the Life dial's frame (46 pt, no number), the current step's icon in the disc, and a ring of four
+ * quarter arcs lit clockwise from the top (Sun four, Cloud three, Rain two, Storm one). Sun is the accent, Cloud and Rain bone, Storm threat red on a filled disc; the icon's shape and the
+ * arcs carry the step without the colour. A shift pops the dial as the threat dial pops and says the change for three seconds ("Toward Sun", "Toward Storm"); reduced motion keeps it still and
+ * shows the badge. A tap opens the Heading card's preview and never changes the dial. The engine owns the step. `compact` (the bar scrolls) drops the "Heading" word, which the spoken label keeps,
+ * and lays the badge under the disc; otherwise the label column is as wide as its widest word, so the dial's width never moves.
+ */
+export function HeadingDial({ step, compact = false, onPress }: { step: HeadingStep; compact?: boolean; onPress?: () => void }) {
+  const speed = useMotionScale();
+  const t = useTableTokens();
+  const s = useUiScale();
+  const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
+  const look = headingLook(step);
+  const color = t[look.tone];
+  const seen = useRef(step);
+  const [change, setChange] = useState<{ before: HeadingStep; after: HeadingStep; at: number } | null>(null);
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    const before = seen.current;
+    seen.current = step;
+    if (before === step) return;
+    setChange({ before, after: step, at: Date.now() });
+    if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
+  }, [step, speed, scale]);
+  useEffect(() => {
+    if (!change) return;
+    const timer = setTimeout(() => setChange(null), DELTA_MS);
+    return () => clearTimeout(timer);
+  }, [change]);
+  const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
+  const delta = change ? headingDelta(change.before, change.after) : null;
+  const deltaWords = change ? headingDeltaWords(change.before, change.after) : null;
+  const words = `${headingWords(step)}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const badgeOf = delta ? (
+    <Animated.View key={change?.at} entering={badge.in} exiting={badge.out} style={{ borderRadius: 999, paddingHorizontal: (compact ? 4 : 6) * s, backgroundColor: withAlphaHex(delta.towardSun ? t.accent : t.threat, 0.22) }}>
+      <Text testID="heading-delta" numberOfLines={1} className="font-display text-label text-bone">
+        {delta.text}
+      </Text>
+    </Animated.View>
+  ) : null;
+  return (
+    <Pressable
+      disabled={!onPress}
+      onPress={onPress}
+      accessible
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={words}
+      accessibilityHint={onPress ? HEADING_HINT : undefined}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+    >
+      <Animated.View style={pop}>
+        <View testID="heading" style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s }}>
+          <ArcRing size={DIAL * s} stroke={4 * s} parts={headingArcs(step, color)} track={withAlphaHex(t.bone, 0.16)}>
+            <View className="items-center justify-center" style={{ width: (DIAL - 8) * s, height: (DIAL - 8) * s, borderRadius: ((DIAL - 8) / 2) * s, backgroundColor: look.filled ? t.threat : t.night }}>
+              <GameIcon name={look.icon} size={22 * s} tint={look.filled ? "onThreat" : look.tone} />
+            </View>
+          </ArcRing>
+        </View>
+        {/* The step's word, clear text a flow reads (as rail-current is); the icon and the arcs are what the player sees. */}
+        <Text testID="heading-value" numberOfLines={1} pointerEvents="none" className="text-micro" style={{ position: "absolute", color: "transparent", lineHeight: 14 * s }}>
+          {look.word}
+        </Text>
+      </Animated.View>
+      {compact ? (
+        // The badge lies over the disc's foot, centred, and reaches into the gap either side (HEADING_BADGE_OVER); it takes no touch.
+        delta ? (
+          <View pointerEvents="none" style={{ position: "absolute", top: (DIAL - 8) * s, left: -HEADING_BADGE_OVER * s, right: -HEADING_BADGE_OVER * s, alignItems: "center" }}>
+            {badgeOf}
+          </View>
+        ) : null
+      ) : (
+        <View className="items-start gap-0.5" style={{ minWidth: HEADING_LABEL_W * s }}>
+          <Text className="text-label text-muted">{look.label}</Text>
+          {badgeOf}
+        </View>
+      )}
     </Pressable>
   );
 }

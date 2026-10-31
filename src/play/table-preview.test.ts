@@ -7,6 +7,7 @@ import { updateCard } from "../rules/state.ts";
 import { buildTable, idsOf, sceneCards } from "../../scripts/test-scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
+import { seaFixture } from "./sea-fixture.ts";
 import { previewCards, questTitle } from "./table-preview.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
@@ -53,5 +54,19 @@ describe("the quest card's preview title", () => {
     expect(stage.cards[stage.start]?.title).toMatch(/ · 0 \/ \d+$/);
     const enemy = previewCards(table.state, table.ctx, idsOf(table, "f0"), describeCode, (id) => id, [], ledgerLine);
     expect(enemy.cards[enemy.start]?.title).toBeUndefined();
+  });
+});
+
+describe("the Heading card's preview (dcce.heading)", () => {
+  it("lists the four steps under their own field with the current one marked, and leaves 'Effects on it' to the effects", () => {
+    const fixture = seaFixture({ heading: "Rain", ships: [{ code: "dream-chaser", seat: 0 }] });
+    const card = fixture.ids.heading!;
+    const { cards, start } = previewCards(fixture.state, fixture.ctx, card, describeCode, (id) => id, [], ledgerLine);
+    const shown = cards[start];
+    expect(shown?.title).toBe("Heading · Rain (off-course)");
+    expect(shown?.turn).toBe(180);
+    expect(shown?.steps?.map((row) => row.text)).toEqual(["Sun: on-course", "Cloud: off-course", "Rain: off-course", "Storm: off-course, the worst"]);
+    expect(shown?.steps?.filter((row) => row.current).map((row) => row.text)).toEqual(["Rain: off-course"]);
+    expect((shown?.effects ?? []).some((line) => line.includes("Sun: on-course"))).toBe(false);
   });
 });

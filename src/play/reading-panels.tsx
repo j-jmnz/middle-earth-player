@@ -71,6 +71,31 @@ export function PileList({
   );
 }
 
+/**
+ * A row's folded cards (row-fold.ts): the cards that left staging or the engagement area for the fold stack, left to right. A tile shows the card large and sends nothing. It stands in the
+ * reading panels' frame, like a discard pile's list.
+ */
+export function RowList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string }[]; onRead: (cardId: string) => void; onClose: () => void }) {
+  const s = useUiScale();
+  return (
+    <View testID="row-list" collapsable={false} style={{ flexShrink: 1 }}>
+      <View style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
+        <Text className="text-center font-display text-eyebrow uppercase text-inkLabel">{`${cards.length} more ${cards.length === 1 ? "card" : "cards"}`}</Text>
+        <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-ink">
+          {title}
+        </Text>
+      </View>
+      <PanelClose testID="row-list-close" onPress={onClose} />
+      <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
+        {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing is folded away.</Text> : null}
+        {cards.map((card) => (
+          <Tile key={card.id} label={card.label} selected={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
 /** This round's engine steps and their causes, on paper. Text only: it is how a player checks a number against its source. */
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
   const t = useTableTokens();

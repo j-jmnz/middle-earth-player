@@ -257,7 +257,11 @@ export function sheetSendsPass(sheet: Sheet): boolean {
     case "outcome":
     case "window":
       return true;
-    case "multi":
+    case "multi": {
+      // The Sailing commit names its own Pass (sea-sheets.ts): the dock does not add another.
+      const alternative = sheet.alternative;
+      return alternative != null && "intent" in alternative && alternative.intent.type === "Pass";
+    }
     case "distribute":
       return false;
   }

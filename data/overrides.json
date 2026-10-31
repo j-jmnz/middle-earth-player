@@ -129,6 +129,497 @@
       },
       "reason": "Hall of Beorn gives the burden enemy Ungoliant's Swarm no Threat and no engagement cost, and files its Threat icon (3) as Willpower. The scan prints engagement cost 33 (the number at the top of the card), Threat 3, Attack 2, Defense 2 and 5 hit points, so the engagement check can engage it and it counts in the staging area.",
       "source": "scan 01136.A, data/printed/mirkwood-paths.json"
+    },
+    {
+      "match": {
+        "code": "110077"
+      },
+      "set": {
+        "encounterSet": "Temple of the Deceived"
+      },
+      "reason": "Hall of Beorn files the Dream-chaser Campaign Expansion's Temple Guardian reprint under 'The Fate of Númenor Campaign'. The card is the reprint of Temple Guardian 12070, a Temple of the Deceived card (the scenario 6 Setup attaches it to the staging area; dcce.setup-temple-of-the-deceived names Temple of the Deceived as the set), and its Campaign Mode only side is used in that scenario (dcce.setup-temple-of-the-deceived, Campaign Setup).",
+      "source": "hallofbeorn.com/Export/EncounterCards (Temple-Guardian-DCC); scan 12070.A; dcce.campaign-setup-temple-of-the-deceived"
+    },
+    {
+      "match": {
+        "code": "110129"
+      },
+      "set": {
+        "encounterSet": "The City of Corsairs"
+      },
+      "reason": "Hall of Beorn has no row for the Dream-chaser Campaign Expansion's #129, the reprint of The Shattered Monument 12159; DragnCards has it (d777af13, both sides) with no encounter set. The reprint is a card of The City of Corsairs set (scan 12159.A, dcce.from-sea-to-land).",
+      "source": "dragncards cardDb.tsv (d777af13-989a-40b7-8825-61a7dc8e793c); scan 12159.A; dcce.from-sea-to-land"
+    },
+    {
+      "match": {
+        "code": "110138"
+      },
+      "set": {
+        "encounterSet": "The Dream-chaser's Fleet",
+        "willpower": 3,
+        "attack": 4,
+        "defense": 3,
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 5,
+          "defense": 4,
+          "health": 17
+        }
+      },
+      "reason": "Duskbringer is one of the six ship-objectives of The Dream-chaser's Fleet encounter set (dcce.ship-objectives, dcce.prepare-your-fleet). Hall of Beorn gives the ships no encounter info and lists only the four of the original box in its scenario files, so the new ship has no set from the sources. The scan prints Willpower 3, Attack 4, Defense 3 and 16 hit points (the ledger notes record the reading); Hall of Beorn has no stat fields for a ship-objective, so the engine would otherwise have none.",
+      "source": "dcce.ship-objectives; dcce.prepare-your-fleet; scan 110138.A, data/printed/dream-chaser.json, scan 110138.B"
+    },
+    {
+      "match": {
+        "code": "110139"
+      },
+      "set": {
+        "encounterSet": "The Dream-chaser's Fleet",
+        "willpower": 4,
+        "attack": 4,
+        "defense": 3,
+        "health": 17,
+        "back": {
+          "willpower": 5,
+          "attack": 5,
+          "defense": 4,
+          "health": 18
+        }
+      },
+      "reason": "Glórinaith is one of the six ship-objectives of The Dream-chaser's Fleet encounter set (dcce.ship-objectives, dcce.prepare-your-fleet). Hall of Beorn gives the ships no encounter info and lists only the four of the original box in its scenario files, so the new ship has no set from the sources. The scan prints Willpower 4, Attack 4, Defense 3 and 17 hit points (the ledger notes record the reading); Hall of Beorn has no stat fields for a ship-objective, so the engine would otherwise have none.",
+      "source": "dcce.ship-objectives; dcce.prepare-your-fleet; scan 110139.A, data/printed/dream-chaser.json, scan 110139.B"
+    },
+    {
+      "match": {
+        "code": "11080"
+      },
+      "set": {
+        "willpower": 5,
+        "attack": 4,
+        "defense": 4,
+        "health": 18
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 5, Attack 4, Defense 4 and 18 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
+      "source": "scan 11080.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11081"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 3,
+        "defense": 4,
+        "health": 16
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 4 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
+      "source": "scan 11081.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11082"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 3,
+        "defense": 5,
+        "health": 16
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 5 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
+      "source": "scan 11082.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11083"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 4,
+        "defense": 2,
+        "health": 14
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 4, Defense 2 and 14 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
+      "source": "scan 11083.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "110136"
+      },
+      "set": {
+        "willpower": 5,
+        "attack": 4,
+        "defense": 4,
+        "health": 18,
+        "back": {
+          "willpower": 6,
+          "attack": 5,
+          "defense": 5,
+          "health": 19
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 5, Attack 4, Defense 4 and 18 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110136.A, data/printed/dream-chaser.json, scan 110136.B"
+    },
+    {
+      "match": {
+        "code": "110137"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 3,
+        "defense": 4,
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 4,
+          "defense": 5,
+          "health": 18
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 4 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110137.A, data/printed/dream-chaser.json, scan 110137.B"
+    },
+    {
+      "match": {
+        "code": "110140"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 3,
+        "defense": 5,
+        "health": 16,
+        "back": {
+          "willpower": 4,
+          "attack": 4,
+          "defense": 6,
+          "health": 17
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 3, Attack 3, Defense 5 and 16 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110140.A, data/printed/dream-chaser.json, scan 110140.B"
+    },
+    {
+      "match": {
+        "code": "110141"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 4,
+        "defense": 2,
+        "health": 14,
+        "back": {
+          "willpower": 3,
+          "attack": 6,
+          "defense": 3,
+          "health": 16
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 4, Defense 2 and 14 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats (side B) are the `back` stats, read from the scan of side B (the ledger notes of side B record the reading).",
+      "source": "scan 110141.A, data/printed/dream-chaser.json, scan 110141.B"
+    },
+    {
+      "match": {
+        "code": "12123"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 2,
+        "health": 8
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 2, Defense 2 and 8 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
+      "source": "scan 12123.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "110102"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 2,
+        "health": 8,
+        "back": {
+          "willpower": 3,
+          "attack": 3,
+          "defense": 3,
+          "health": 10
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-objective, so the card has none. The scan prints Willpower 2, Attack 2, Defense 2 and 8 hit points (the ledger notes record the reading); the ship-objective is an objective ally that fights (dcce.ship-objectives), so the engine needs them. The Upgraded side's stats are in the ledger notes of side B.",
+      "source": "scan 110102.A, data/printed/dream-chaser.json, scan 110102.B"
+    },
+    {
+      "match": {
+        "code": "11022"
+      },
+      "set": {
+        "threat": 2,
+        "attack": 5,
+        "defense": 2,
+        "health": 7,
+        "engagementCost": 35
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 35, Threat 2, Attack 5, Defense 2 and 7 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 11022.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11057"
+      },
+      "set": {
+        "threat": 4,
+        "attack": 6,
+        "defense": 5,
+        "health": 7,
+        "engagementCost": 37
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 37, Threat 4, Attack 6, Defense 5 and 7 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 11057.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11058"
+      },
+      "set": {
+        "threat": 3,
+        "attack": 8,
+        "defense": 4,
+        "health": 9,
+        "engagementCost": 44
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 44, Threat 3, Attack 8, Defense 4 and 9 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 11058.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12019"
+      },
+      "set": {
+        "threat": 2,
+        "attack": 6,
+        "defense": 6,
+        "health": 18,
+        "engagementCost": 50,
+        "victory": 10
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 50, Threat 2, Attack 6, Defense 6 and 18 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them. It also prints Victory 10, which Hall of Beorn leaves out.",
+      "source": "scan 12019.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "110042"
+      },
+      "set": {
+        "threat": 2,
+        "attack": 6,
+        "defense": 6,
+        "health": 18,
+        "engagementCost": 50
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 50, Threat 2, Attack 6, Defense 6 and 18 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 110042.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12020"
+      },
+      "set": {
+        "threat": 2,
+        "attack": 4,
+        "defense": 3,
+        "health": 6,
+        "engagementCost": 46
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 46, Threat 2, Attack 4, Defense 3 and 6 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12020.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12021"
+      },
+      "set": {
+        "threat": 3,
+        "attack": 5,
+        "defense": 4,
+        "health": 8,
+        "engagementCost": 38
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 38, Threat 3, Attack 5, Defense 4 and 8 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12021.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12022"
+      },
+      "set": {
+        "threat": 1,
+        "attack": 2,
+        "defense": 2,
+        "health": 5,
+        "engagementCost": 24
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 24, Threat 1, Attack 2, Defense 2 and 5 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12022.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12124"
+      },
+      "set": {
+        "threat": 3,
+        "attack": 5,
+        "defense": 3,
+        "health": 18,
+        "engagementCost": 50
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 50, Threat 3, Attack 5, Defense 3 and 18 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12124.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12125"
+      },
+      "set": {
+        "threat": 3,
+        "attack": 4,
+        "defense": 4,
+        "health": 6,
+        "engagementCost": 28
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 28, Threat 3, Attack 4, Defense 4 and 6 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12125.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12126"
+      },
+      "set": {
+        "threat": 2,
+        "attack": 5,
+        "defense": 5,
+        "health": 7,
+        "engagementCost": 46
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 46, Threat 2, Attack 5, Defense 5 and 7 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12126.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12127"
+      },
+      "set": {
+        "threat": 5,
+        "attack": 7,
+        "defense": 5,
+        "health": 8,
+        "engagementCost": 42
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 42, Threat 5, Attack 7, Defense 5 and 8 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12127.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12152"
+      },
+      "set": {
+        "threat": 3,
+        "attack": 7,
+        "defense": 5,
+        "health": 5,
+        "engagementCost": 32
+      },
+      "reason": "Hall of Beorn has no stat fields for a ship-enemy, so the card has none. The scan prints engagement cost 32, Threat 3, Attack 7, Defense 5 and 5 hit points (the ledger notes record the reading); a ship-enemy is an enemy (dcce.ship-enemies), so the engagement check, the staging area and combat need them.",
+      "source": "scan 12152.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11177"
+      },
+      "set": {
+        "engagementCost": 46
+      },
+      "reason": "Hall of Beorn gives the burden enemy Thunderstruck no engagement cost (as it gives Stalking Goblin none). The scan prints engagement cost 46 (the number at the top of the card), so the engagement check can engage it and it counts in the staging area.",
+      "source": "scan 11177.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11178"
+      },
+      "set": {
+        "engagementCost": 35
+      },
+      "reason": "Hall of Beorn gives the burden enemy Crowley no engagement cost (as it gives Stalking Goblin none). The scan prints engagement cost 35 (the number at the top of the card), so the engagement check can engage it and it counts in the staging area.",
+      "source": "scan 11178.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11181"
+      },
+      "set": {
+        "engagementCost": 43
+      },
+      "reason": "Hall of Beorn gives the burden enemy Revenant no engagement cost (as it gives Stalking Goblin none). The scan prints engagement cost 43 (the number at the top of the card), so the engagement check can engage it and it counts in the staging area.",
+      "source": "scan 11181.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11188"
+      },
+      "set": {
+        "engagementCost": 47
+      },
+      "reason": "Hall of Beorn gives the burden enemy Graxar no engagement cost (as it gives Stalking Goblin none). The scan prints engagement cost 47 (the number at the top of the card), so the engagement check can engage it and it counts in the staging area.",
+      "source": "scan 11188.A, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12151"
+      },
+      "set": {
+        "type": "ship-enemy"
+      },
+      "reason": "Hall of Beorn files The City of Corsairs' Stormcaller as an Enemy. The scan prints the type line SHIP-ENEMY (Corsair. Ship., Boarding 1), the same card as the Stormcaller of the Dream-chaser box and Flight of the Stormcaller, so heroes cannot defend it, ship-objectives can attack it and its Boarding resolves (dcce.ship-enemies, dcce.boarding). Its printed stats (engagement cost 20, Threat 2, Attack 6, Defense 6, 18 hit points, Victory 10) are unchanged.",
+      "source": "scan 12151.A; dcce.ship-enemies"
+    },
+    {
+      "match": {
+        "code": "905304"
+      },
+      "set": {
+        "type": "ship-enemy"
+      },
+      "reason": "The Nightmare picture of Ramming Ship (Nightmare The Grey Havens & Dream-chaser / A Storm on Cobas Haven, 004) prints the type line SHIP-ENEMY; the source files it as an Enemy. Its stats (engagement cost 28, Threat 4, Attack 4, Defense 3, 8 hit points) agree with the picture.",
+      "source": "nightmare picture 004 - Ramming Ship (data/raw/nightmare/drive.json); dcce.ship-enemies"
+    },
+    {
+      "match": {
+        "code": "904903"
+      },
+      "set": {
+        "engagementCost": 44,
+        "threat": 4,
+        "attack": 4,
+        "defense": 2,
+        "health": 9
+      },
+      "reason": "The source has the Nightmare ship-enemy Tide-runner with no stats. The picture (Nightmare Dream-chaser / Flight of the Stormcaller, 003) prints engagement cost 44, Threat 4, Attack 4, Defense 2 and 9 hit points, type line SHIP-ENEMY.",
+      "source": "nightmare picture 003 - Tide-Runner (data/raw/nightmare/drive.json)"
+    },
+    {
+      "match": {
+        "code": "904904"
+      },
+      "set": {
+        "engagementCost": 34,
+        "threat": 5,
+        "attack": 8,
+        "defense": 5,
+        "health": 14
+      },
+      "reason": "The source has the Nightmare ship-enemy Venom's Bite with no stats. The picture (Nightmare Dream-chaser / Flight of the Stormcaller, 004) prints engagement cost 34, Threat 5, Attack 8, Defense 5, 14 hit points and Victory 5, type line SHIP-ENEMY.",
+      "source": "nightmare picture 004 - Venom's Bite (data/raw/nightmare/drive.json)"
     }
   ],
   "scenarioPiles": [
@@ -159,6 +650,91 @@
       "pile": "attached",
       "reason": "DragnCards stages An Evil Wound. Stage 1A prints 'Attach An Evil Wound to the Ring-bearer.'",
       "source": "scan 141028.A"
+    },
+    {
+      "scenario": "raid-on-the-grey-havens",
+      "code": "11038",
+      "pile": "staging",
+      "reason": "DragnCards sets The Havens Burn aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.'",
+      "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
+    },
+    {
+      "scenario": "raid-on-the-grey-havens",
+      "code": "11039",
+      "pile": "staging",
+      "reason": "DragnCards sets the Dream-chaser location aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.'",
+      "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
+    },
+    {
+      "scenario": "raid-on-the-grey-havens",
+      "code": "11041",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Sahír's Ravager twice: 2 copies in the encounter deck and 1 set aside. Stage 1A prints 'Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area.', so only the set-aside copy is staged and the other copies stay in the encounter deck.",
+      "source": "scan 11036.A; dcce.setup-raid-on-the-grey-havens"
+    },
+    {
+      "scenario": "flight-of-the-stormcaller",
+      "code": "12016",
+      "pile": "stormcallerQuests",
+      "reason": "DragnCards sets stage 2C (Full Sail Ahead!) aside, and puts 3C and 4C in a second quest deck. Stage 1A prints 'Prepare the Stormcaller's area with a second quest deck consisting of only stages 2C, 3C, and 4C', so the three are one deck.",
+      "source": "scan 12012.A; dcce.stormcallers-area"
+    },
+    {
+      "scenario": "temple-of-the-deceived",
+      "code": "12070",
+      "pile": "staging",
+      "reason": "DragnCards sets Temple Guardian aside. Stage 1A prints 'Add Temple Guardian to the staging area and attach Gate Key to it, guarded.'",
+      "source": "scan 12067.A; dcce.setup-temple-of-the-deceived"
+    },
+    {
+      "scenario": "the-drowned-ruins",
+      "code": "11079",
+      "pile": "setAside",
+      "reason": "DragnCards stages Na'asiyah. Stage 1A prints 'the last player takes control of Na'asiyah (objective-ally sides faceup)', so she starts out of play and the Setup puts her under a player's control.",
+      "source": "scan 12092.A; dcce.setup-the-drowned-ruins"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12134",
+      "pile": "encounter",
+      "reason": "DragnCards stages Sea-ward Tower. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12135",
+      "pile": "encounter",
+      "reason": "DragnCards stages Tower of the Gull. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12136",
+      "pile": "encounter",
+      "reason": "DragnCards stages The Beacon. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12137",
+      "pile": "encounter",
+      "reason": "DragnCards stages Tower of the Heron. Stage 1A prints 'Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area', so the four Dol Amroth objectives are in the encounter deck and the Setup stages one.",
+      "source": "scan 12120.A; dcce.setup-a-storm-on-cobas-haven"
+    },
+    {
+      "scenario": "the-city-of-corsairs",
+      "code": "12158",
+      "pile": "encounterDeck2",
+      "reason": "DragnCards sets Captain Sahír aside. Stage 1A sets The City of Corsairs encounter set aside as an inactive second encounter deck, and stage 3A prints 'Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play', so both are in that second deck until stage 3A.",
+      "source": "scan 12147.A; scan 12149.A; dcce.from-sea-to-land"
+    },
+    {
+      "scenario": "the-city-of-corsairs",
+      "code": "12159",
+      "pile": "encounterDeck2",
+      "reason": "DragnCards sets The Shattered Monument aside. Stage 1A sets The City of Corsairs encounter set aside as an inactive second encounter deck, and stage 3A prints 'Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play', so both are in that second deck until stage 3A.",
+      "source": "scan 12147.A; scan 12149.A; dcce.from-sea-to-land"
     }
   ],
   "scenarioEasy": [
@@ -175,6 +751,44 @@
       "easy": 1,
       "reason": "The DragnCards Easy deck keeps 3 Black Steed. Hall of Beorn gives 1 in both its scenario list and its card record. The gold Easy mark is printed on individual copies, so one scan cannot show it; the two agreeing Hall of Beorn fields win. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/Flight-to-the-Ford; hallofbeorn.com/Export/EncounterCards (Black Steed EasyModeQuantity 1)"
+    }
+  ],
+  "scenarioCounts": [
+    {
+      "scenario": "temple-of-the-deceived",
+      "code": "12078",
+      "normal": 4,
+      "easy": 4,
+      "reason": "The Temple of the Deceived set prints 31 cards (Deeper into the Ruins 19/31, scan 12078.A). Hall of Beorn's quantities for the set sum to 31 with 4 Deeper into the Ruins; DragnCards' Q06.6 and E06.6 load 3, which makes 30. Hall of Beorn lists 4 in both Normal and Easy.",
+      "source": "scan 12078.A (19/31); hallofbeorn.com Scenarios/Temple-of-the-Deceived; dragncards Q06.6, E06.6"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12128",
+      "easy": 1,
+      "reason": "Hall of Beorn's Easy count is used for Coast of Anfalas (1 of 3 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12127",
+      "easy": 0,
+      "reason": "Hall of Beorn's Easy count is used for Heavy Cruiser (none in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12126",
+      "easy": 2,
+      "reason": "Hall of Beorn's Easy count is used for Siege Ship (2 of 3 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "a-storm-on-cobas-haven",
+      "code": "12132",
+      "easy": 1,
+      "reason": "Hall of Beorn's Easy count is used for Taking on Water (1 of 2 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
+      "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
     }
   ],
   "campaigns": [
@@ -217,6 +831,22 @@
       "prefix": "410",
       "reason": "Hall of Beorn numbers The Dark of Mirkwood's cards 02001 to 02051, which are the codes RingsDB gives The Hunt for Gollum (02004 is Winged Guardian and also Surprise Attack). RingsDB lists the nine burden, boon and adaptation cards of the box as 41041 to 41049 (Stalking Goblin is 02041 in Hall of Beorn and 41041 in RingsDB). The code is therefore 410 and the two-digit collector number, for every card of the box, so the quest, encounter and campaign cards RingsDB does not list take the same pattern (After the Raid 41001, The Oath 41050).",
       "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet The Dark of Mirkwood, Number); ringsdb.com pack TDoM (41041 to 41049)"
+    },
+    {
+      "set": "Dream-chaser Campaign Expansion",
+      "prefix": "11",
+      "width": 3,
+      "from": 171,
+      "reason": "Hall of Beorn codes the Dream-chaser Campaign Expansion '12' and the collector number (13 to 217), which are the codes of the six Adventure Packs' own cards (12013 Full Sail Ahead, 12063 Scouting Party, 12138 Prince Imrahil) and of Ered Mithrin (12166 to 12204). RingsDB codes the box's boons and burdens 11172 to 11216, one gap per campaign card. A card with collector number 171 or more (the nine campaign cards, the 37 boons and burdens, the Hard and Expert Mode card) is therefore '11' and its number, which is RingsDB's code where RingsDB lists it and the same pattern where it does not (campaign cards 11171, 11179, 11182, 11191, 11194, 11197, 11200, 11209, 11215; Hard and Expert Mode 11217).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Dream-chaser Campaign Expansion, Number); ringsdb.com pack DCCE (11172 to 11216); Dream-chaser Campaign Expansion rulebook MEC111"
+    },
+    {
+      "set": "Dream-chaser Campaign Expansion",
+      "prefix": "110",
+      "width": 3,
+      "from": 0,
+      "reason": "A Dream-chaser Campaign Expansion card with a collector number below 171 is a 2023 reprint of a card the Adventure Packs print (Calphon 13, the Stormcaller 42, The Thing in the Depths 63, Temple Guardian 77, Gate Key 78, Dol Amroth Warship 102, the Shattered Monument 129, the six ships 136 to 141) with a Campaign Mode only or Upgraded side. Its Hall of Beorn code ('12' and the number) is the original's, so it is '110' and its three-digit number (110042 is the Stormcaller reprint; 12019 is the pack's). The six-digit prefix 110 is unused; the other six-digit prefixes are 131-132, 140-148 and 900-907. The two sides of one reprint share the code.",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Dream-chaser Campaign Expansion, Number); ringsdb.com pack DCCE (11172 to 11216); Dream-chaser Campaign Expansion rulebook MEC111"
     }
   ],
   "encounterSetAliases": [

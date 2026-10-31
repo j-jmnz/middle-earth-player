@@ -88,7 +88,16 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     next = runQuestResolution(next, cardId, ctx, steps);
     next = announceLeftPlay(next, cardId, ctx, steps, true);
   }
-  return next;
+  // A defeated stage that looks at the next ones (LookAtStages, families/quest-order.ts) asks the first player, in a frame of the stage's own record.
+  return next.stageChoice === "due" ? askStage(next, ctx, steps) : next;
+}
+
+function askStage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = state.questStage;
+  const code = id ? state.cards[id]?.code : undefined;
+  if (!id || !code) return state;
+  const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.instructions.some((instruction) => instruction.verb === "LookAtStages"));
+  return pushCardEffects({ ...state, stageChoice: "asking" }, "forced", id, state.firstPlayer, false, effects, ctx, steps);
 }
 
 // A stage that holds its quest points in progress but was held back advances as soon as nothing holds it any more

@@ -109,6 +109,7 @@ export function Tile({
   trailing = null,
   said = "",
   hint,
+  detailSpoken = true,
 }: {
   label: string;
   selected: boolean;
@@ -125,6 +126,8 @@ export function Tile({
   said?: string;
   // What a tap does, when the label does not say ("Tap to play it"); said before the long press's hint.
   hint?: string;
+  // The detail is drawn but not said again: its words are already in the stats ("Success" beside the success icon).
+  detailSpoken?: boolean;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
@@ -141,7 +144,7 @@ export function Tile({
       collapsable={false}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detail ?? ""].filter((part) => part.length > 0).join(". ")}
+      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detailSpoken ? (detail ?? "") : ""].filter((part) => part.length > 0).join(". ")}
       accessibilityHint={[hint, onLongPress ? "Hold to read the card" : null].filter(Boolean).join(". ") || undefined}
       onPress={onPress}
       onLongPress={onLongPress ?? undefined}

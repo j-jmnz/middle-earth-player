@@ -20,6 +20,7 @@ import { choiceSentence, promptSentence, resolutionView, settledSentence } from 
 import { contextOf, finish, resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
 import { reduce } from "../rules/reduce.ts";
+import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
 
 // The Maestro fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
@@ -394,5 +395,53 @@ describe("duo (the peek's two-handed fixture, phase 26)", () => {
     expect(state.seats[1]?.hand.length).toBeGreaterThan(0);
     expect(state.seats[1]?.heroes.length).toBeGreaterThan(0);
     expect(state.seats[0]?.hand).not.toEqual(state.seats[1]?.hand);
+  });
+});
+
+describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
+  it("are games of two decklists from the blank log a new Dream-chaser playthrough starts on, the Campaign Setup answered in the game", () => {
+    for (const name of ["sea-solo", "sea-duo", "voyage-lost"] as const) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("dream-chaser");
+      expect(found.loadout.scenarioId, name).toBe("voyage-across-belegaer");
+      expect(found.log, name).toEqual(emptyLog(found.seatCount));
+      expect(found.past, name).toBeNull();
+      expect(found.loadout.ringBearer, name).toBeNull();
+    }
+    expect(fixture("sea-solo").seatCount).toBe(1);
+    expect(fixture("sea-duo").seatCount).toBe(2);
+  });
+
+  it("sea-solo replays to the first Sailing test's commit with the Heading off-course, and the Dream-chaser and one other ship in play", () => {
+    const world = worldFor("sea-solo");
+    const resumed = resume(fixtureSave("sea-solo", "s", CATALOG_VERSION), world, CATALOG_VERSION);
+    expect(resumed.ok).toBe(true);
+    if (!resumed.ok) return;
+    expect(askingToCommit(resumed.state)).toBe(true);
+    expect(resumed.state.sea?.heading).toBe("Cloud");
+    const cards = contextOf(world).cards;
+    const ships = Object.values(resumed.state.cards).filter((card) => cards.get(card.code)?.ship === "objective" && card.zone === "play");
+    expect(ships.length).toBe(2);
+  });
+
+  it("sea-duo replays to the first player's planning window of round 1", () => {
+    const resumed = resume(fixtureSave("sea-duo", "s", CATALOG_VERSION), worldFor("sea-duo"), CATALOG_VERSION);
+    expect(resumed.ok).toBe(true);
+    if (!resumed.ok) return;
+    expect(resumed.state.mode).toBe("planning");
+    expect(resumed.state.activeSeat).toBe(0);
+    expect(resumed.state.round).toBe(1);
+  });
+
+  it("voyage-lost replays to a loss, and finishing it writes nothing", () => {
+    const world = worldFor("voyage-lost");
+    const save = fixtureSave("voyage-lost", "s", CATALOG_VERSION);
+    const resumed = resume(save, world, CATALOG_VERSION);
+    expect(resumed.ok && resumed.state.lost).toBe(true);
+    if (!resumed.ok) return;
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    const after = finish(save, world, resumed.state);
+    expect(after.log).toEqual(save.log);
+    expect(after.active).toBeNull();
   });
 });

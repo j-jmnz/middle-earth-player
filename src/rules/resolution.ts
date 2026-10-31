@@ -7,6 +7,7 @@ import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { fallenBase, printedOf } from "./printed.ts";
 import type { Earned, ResolutionLog } from "./campaign-state.ts";
+import { xpOf } from "./families/dreamchaser.ts";
 import { shuffleIds } from "./seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
@@ -132,6 +133,12 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       case "EarnAllBurdens":
         next = stepOver(next, earn(next, burdensEverywhere(next, ctx).map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt }))));
         break;
+      case "GainXp": {
+        // One line of the campaign card's XP list, or the Hard/Expert card's: the condition above already held. The lines add up in the log.
+        const log = next.resolutionLog;
+        next = stepOver(next, { ...log, xp: (log.xp ?? 0) + xpOf(next, instruction) });
+        break;
+      }
       case "MarkFallen": {
         const host = Object.values(next.cards).find((card) => card.code === instruction.attached && card.zone === "attached" && card.host != null);
         const hero = host?.host ? next.cards[host.host] : undefined;

@@ -16,6 +16,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
@@ -27,6 +28,7 @@ import { viewOf } from "../rules/families/breaking-areas.ts";
 import { questSeat } from "./selectors.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
 import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
+import { sailingSheet } from "./sea-sheets.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -159,6 +161,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     return { kind: "outcome", key: "lost", result: "lost", step: "Scenario", title: "Defeat", note: game.lossReason ? `${game.lossReason}.` : "The scenario is lost.", action: "Continue" };
   }
   if (game.stageCleared) return wonSheet(game);
+  // A Sailing test being asked: the first player's commit, then one shift-or-keep for each success symbol (sea-sheets.ts).
+  const sailing = sailingSheet(game, ctx, names);
+  if (sailing) return sailing;
   const window = game.window;
   if (!window) return null;
   const frame = topFrame(game);
@@ -253,7 +258,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? (seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game)) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
@@ -263,8 +268,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...(outOfPlay ? { confirm: asked.verb } : {}),
         options: window.options.map((id): PickOption => {
           const card = option(game, names, id);
+          // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
+          const sea = wait?.kind === "target" ? seaOptionLabel(wait.item.instruction, id, game, ctx.cards) : null;
           // Copies of one card in different zones are told apart by where each one is.
-          const label = outOfPlay ? outOfPlayLabel(game, id, words) : card.label;
+          const label = sea ?? (outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(pooled ?? {}), intent: { type: "Choose", optionId: id } };

@@ -48,12 +48,32 @@ export type PreviewCard = {
   role?: string;
   // Why a hand card cannot be played now (why.ts), when the tap that opened it found nothing to do.
   note?: string | null;
+  // What the note's heading says when it is not about playing: "Cannot be chosen now" for a character the open pick veils (why.ts, whyNotChosen).
+  noteTitle?: string;
   // The lines of it the app does not apply, and what that costs (not-applied.ts).
   notApplied?: NotApplied | null;
+  // The Heading card's four steps with where each stands, the current one marked (heading.ts): their own heading in the preview, not effects on the card.
+  steps?: readonly { text: string; current: boolean }[];
+  // How far the card is drawn turned, in degrees counterclockwise, a multiple of 90: the Heading card, turned a quarter turn per step as the rule turns it (heading.ts).
+  turn?: number;
 };
 
 // The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
 export function PreviewPicture({ card, width, height }: { card: PreviewCard; width: number; height: number }) {
+  const turn = ((card.turn ?? 0) % 360 + 360) % 360;
+  if (card.source && turn !== 0) {
+    // A quarter or half turn: the picture is drawn at its own size about the frame's centre, so a sideways card fills a sideways frame.
+    const across = turn % 180 === 90;
+    const w = across ? height : width;
+    const h = across ? width : height;
+    return (
+      <View style={{ width, height, alignItems: "center", justifyContent: "center" }}>
+        <View style={{ width: w, height: h, transform: [{ rotate: `${-turn}deg` }] }}>
+          <CardImage source={card.source} recyclingKey={card.code} accessibilityLabel={card.name} width={w} height={h} />
+        </View>
+      </View>
+    );
+  }
   return card.source ? (
     <CardImage source={card.source} recyclingKey={card.code} accessibilityLabel={card.name} width={width} height={height} />
   ) : (
@@ -96,7 +116,9 @@ export function CardPreview({
   const wide = screen.width > screen.height;
   const roomW = screen.width - insets.left - insets.right;
   const roomH = screen.height - insets.top - insets.bottom;
-  const size = wide ? previewSideSize(roomW, roomH, shown.landscape ?? false, s) : previewSize(screen.width, roomH, shown.landscape ?? false, s);
+  // A card turned a quarter turn (the Heading card) is drawn in a sideways frame, and its picture turned in it.
+  const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
+  const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH, sideways, s);
 
   useEffect(() => {
     if (scale > 0) progress.set(withSpring(1, springConfig(MOTION.previewIn, scale)));
@@ -177,13 +199,23 @@ export function CardPreview({
               <ScrollView style={{ flexShrink: 1 }} className="mt-2">
                 {shown.note ? (
                   <View testID="card-preview-why" className="mb-2">
-                    <Text className="font-display text-eyebrow uppercase text-accent">Not playable now</Text>
+                    <Text className="font-display text-eyebrow uppercase text-accent">{shown.noteTitle ?? "Not playable now"}</Text>
                     <Text className="mt-1 text-body text-bone">{shown.note}</Text>
                   </View>
                 ) : null}
                 {shown.notApplied ? (
                   <View className="mb-2">
                     <NotAppliedView notApplied={shown.notApplied} testID="card-preview-not-applied" />
+                  </View>
+                ) : null}
+                {(shown.steps ?? []).length > 0 ? (
+                  <View testID="card-preview-steps" className="mb-2">
+                    <Text className="font-display text-eyebrow uppercase text-accent">The four steps</Text>
+                    {(shown.steps ?? []).map((row) => (
+                      <Text key={row.text} accessibilityState={{ selected: row.current }} className={`mt-1 text-label ${row.current ? "text-accent" : "text-bone"}`}>
+                        {row.current ? `Now · ${row.text}` : row.text}
+                      </Text>
+                    ))}
                   </View>
                 ) : null}
                 {(shown.effects ?? []).length > 0 ? (

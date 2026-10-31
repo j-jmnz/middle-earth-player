@@ -6,10 +6,12 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-import { BodyText, Chip, NavBar, Screen, ScreenScroll, ScreenTitle, TwoPane } from "../../chrome";
+import { BodyText, Chip, Eyebrow, NavBar, Screen, ScreenScroll, ScreenTitle, TwoPane } from "../../chrome";
 import { CardFacts, CardName, CardPicture, DeckUse, useCardPicture, useCardRow } from "../../card-detail";
 import { pictureMaxWidth, type PicturePane } from "../../card-picture";
 import { cachePolicyFor } from "../../../play/image-cache";
+import { CardTextView } from "../../../play/card-text-view";
+import { sideText } from "../../../play/ledger";
 import { nightFade } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { routeCode } from "../../route-code";
@@ -72,8 +74,10 @@ export default function CardScreen() {
   const art = useArtGround();
   const s = useUiScale();
   const router = useRouter();
-  const params = useLocalSearchParams<{ code: string }>();
+  const params = useLocalSearchParams<{ code: string; side?: string }>();
   const code = routeCode(params.code);
+  // `side=B`: a card with an Upgraded side (the Spend XP rows) also shows that side's printed lines, read from the printed-text ledger.
+  const upgraded = code != null && routeCode(params.side) === "B" ? sideText(code, "B") : null;
   const { size, width: windowWidth } = useSizeClass();
   const insets = useSafeAreaInsets();
   // Expanded: the picture has a pane of its own, measured, and is sized by its height.
@@ -93,6 +97,14 @@ export default function CardScreen() {
     <>
       <CardName row={row} />
       <CardFacts row={row} />
+      {upgraded ? (
+        <View testID="card-upgraded-side" className="mt-5">
+          <Eyebrow tone="accent">Upgraded side</Eyebrow>
+          <View className="mt-2">
+            <CardTextView text={upgraded} />
+          </View>
+        </View>
+      ) : null}
       <DeckUse code={row.code} />
     </>
   ) : (

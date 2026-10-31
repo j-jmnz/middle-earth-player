@@ -1,0 +1,157 @@
+{
+  "id": "the-fate-of-numenor",
+  "name": "The Fate of Númenor",
+  "number": 2,
+  "stages": [
+    "11025",
+    "11026"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Fate of Númenor",
+      "count": 16
+    },
+    {
+      "name": "Drowned Dead",
+      "count": 9
+    },
+    {
+      "name": "Ruins of Númenor",
+      "count": 9
+    }
+  ],
+  "cards": [
+    {
+      "code": "11029",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11032",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11033",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11034",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11035",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11068",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11069",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11070",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11071",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11075",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11026",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11027",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11028",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11030",
+      "normal": 2,
+      "easy": 2,
+      "pile": "unchartedDeck"
+    },
+    {
+      "code": "11031",
+      "normal": 2,
+      "easy": 2,
+      "pile": "unchartedDeck"
+    },
+    {
+      "code": "11072",
+      "normal": 2,
+      "easy": 2,
+      "pile": "unchartedDeck"
+    },
+    {
+      "code": "11073",
+      "normal": 2,
+      "easy": 2,
+      "pile": "unchartedDeck"
+    },
+    {
+      "code": "11074",
+      "normal": 2,
+      "easy": 2,
+      "pile": "unchartedDeck"
+    }
+  ],
+  "campaignCard": "11179",
+  "campaignPlaced": [
+    "11180",
+    "11181"
+  ],
+  "reprints": {
+    "11028": "110013"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.2",
+    "dragnEasy": "E06.2",
+    "hobSlug": "The-Fate-of-Númenor"
+  }
+}

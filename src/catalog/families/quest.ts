@@ -57,6 +57,16 @@ export const VERBS = [
   // scenario definition copies it onto the stage (`stages[i].branch`) and advanceStage (rules/quest.ts) takes the branch, so running
   // it does nothing. A stage reached by a branch is the last one: defeating it wins the game.
   z.strictObject({ verb: z.literal("BranchStage"), codes: z.array(z.string().min(1)).min(2) }),
+  // Setup: "Shuffle each stage 2 card in the quest deck so that their order is random, leaving stage 3 on the bottom" (11016:A:1). The quest cards
+  // named by `codes` that are in the quest deck are put in a random order (the scenario's seed) on top of it, the others below them in the
+  // order they were. A quest with such a deck advances in the order of its quest deck (LookAtStages).
+  z.strictObject({ verb: z.literal("ShuffleStages"), codes: z.array(z.string().min(1)).min(2) }),
+  // On a quest stage: "When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of
+  // your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck" (11016:B:3,
+  // 11017:B:3). The scenario definition copies `count` onto the stage (`stages[i].look`), and a quest with one advances in the order of its
+  // quest deck (rules/quest.ts): off-course, to the top stage; on-course, the first player chooses one of the top `count` stages (the choice
+  // runs this record, so a choice is a frame like any other) and the others go to the bottom. Defeating the last stage wins the game.
+  z.strictObject({ verb: z.literal("LookAtStages"), count: z.number().int().min(2) }),
   // Removes `amount` progress tokens from the current quest card, no more than it holds ("Remove 4 progress tokens from the current quest
   // card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)", 01086:A:1; "remove 1
   // progress token from the current quest", 01111:A:1). RemoveQuestProgress counts progress per player instead.

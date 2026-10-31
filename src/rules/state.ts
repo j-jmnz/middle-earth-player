@@ -3,6 +3,7 @@ import type { Instruction, ModifierUntil, PickSpec, ScenarioDefinition } from ".
 import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { CampaignFacts, ResolutionLog } from "./campaign-state.ts";
+import type { SeaState } from "./families/sea-types.ts";
 
 export type {
   DelayedEffect,
@@ -41,6 +42,9 @@ export type ZoneName =
   | "encounterDeck"
   | "encounterDiscard"
   | "burdenDeck"
+  // The Corsair deck and its own discard pile (dcce.corsair-deck): out of play, like the encounter deck and its discard pile.
+  | "corsairDeck"
+  | "corsairDiscard"
   | "victory"
   | "setAside"
   | "removed"
@@ -53,6 +57,9 @@ export type ZoneName =
   | "campaign"
   // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/plans/nightmare-mode.md): in play all game.
   | "nightmare"
+  // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
+  // nothing that reads the Nightmare setup card reads it.
+  | "modeCard"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
   // nobody. The card's host is the Watcher.
   | "captive";
@@ -218,6 +225,12 @@ export type ScenarioState = {
   encounterDiscard: readonly string[];
   // Present only when the scenario makes a burden deck (Flight to the Ford) or sets the Ring-bearer's life.
   burdenDeck?: readonly string[];
+  // The Corsair deck and its discard pile, present once a scenario deals a Corsair deck (dcce.corsair-deck; families/sea-corsair.ts).
+  corsairDeck?: readonly string[];
+  corsairDiscard?: readonly string[];
+  // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a
+  // Sailing test in progress. Absent in every other game (families/sea-types.ts).
+  sea?: SeaState;
   life?: number;
   victory: readonly string[];
   setAside: readonly string[];
@@ -267,10 +280,20 @@ export type ScenarioState = {
   travelDone?: readonly number[];
   // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking-progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
-  stages: readonly { code: string; branch?: readonly string[] }[];
+  stages: readonly { code: string; branch?: readonly string[]; look?: number }[];
+  // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
+  // quest card's Setup is done (ScenarioDefinition.afterSetup).
+  part?: number;
+  afterSetup?: { card: string; instructions: readonly Instruction[] };
+  // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
+  // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
+  roundDamage?: Readonly<Record<string, number>>;
+  threatLoweredBy?: Readonly<Record<number, number>>;
   // The codes of the stages the quest advanced to, in order. Kept only by a quest that branches (BranchStage), for a Resolution that
   // reads which branch was taken ("If stage 3B was Beorn's Path", 01129:B:1).
   stagesReached?: readonly string[];
+  // The defeated stage waits for the first player to choose the next one (LookAtStages): "due" until its record is pushed, "asking" while it runs.
+  stageChoice?: "due" | "asking";
   setup: readonly Instruction[];
   widgets: ScenarioDefinition["widgets"];
   resolution: ScenarioDefinition["resolution"];
@@ -309,6 +332,8 @@ export type ScenarioState = {
   removedFromPool?: readonly { code: string; seat: number | null }[];
   // The campaign log's structured facts, when the scenario was started in Campaign Mode with any (CampaignFacts).
   campaignFacts?: CampaignFacts;
+  // The Hard/Expert Mode card to put next to the quest deck at the end of setup (dcce.hard-expert); finishSetup places it.
+  modeCard?: { code: string; side: "A" | "B" };
   // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
   // dropped when the opening hands are final.
   afterMulligan?: readonly (readonly string[])[];
@@ -405,6 +430,7 @@ export function blankScenario(input: {
     encounterDiscard: [],
     ...(input.definition.burdenDeck ? { burdenDeck: [] } : {}),
     ...(input.definition.life != null ? { life: input.definition.life } : {}),
+    ...(input.definition.modeCard ? { modeCard: input.definition.modeCard } : {}),
     victory: [],
     setAside: [],
     removed: [],
@@ -441,6 +467,8 @@ export function blankScenario(input: {
     setup: input.definition.setup,
     widgets: input.definition.widgets,
     resolution: input.definition.resolution,
+    ...(input.definition.part != null ? { part: input.definition.part } : {}),
+    ...(input.definition.afterSetup && input.definition.afterSetup.length > 0 && input.definition.campaignCard ? { afterSetup: { card: input.definition.campaignCard, instructions: input.definition.afterSetup } } : {}),
     resolutionAt: 0,
     resolutionSeat: 0,
     resolutionLog: { earned: [], fallen: [], captives: [] },
@@ -514,6 +542,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "attached" ||
     zone === "campaign" ||
     zone === "nightmare" ||
+    zone === "modeCard" ||
     zone === "captive"
   );
 }

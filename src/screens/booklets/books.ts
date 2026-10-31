@@ -1,11 +1,12 @@
 // The books the reader opens. One stored PDF per book; a later campaign adds its own id (architecture: Persistence). A campaign
 // opens the book its data names (`bookletId`, data/campaigns): the Fellowship its MEC109 book, Mirkwood Paths the Learn to Play,
-// The Dark of Mirkwood its own rulebook.
+// The Dark of Mirkwood its own rulebook, Dream-chaser the Campaign Expansion's (MEC111).
 export const BOOKLETS = [
   { id: "fellowship-of-the-ring", name: "Fellowship of the Ring campaign book" },
   { id: "learn-to-play", name: "Learn to Play" },
   { id: "rules-reference", name: "Rules Reference" },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood rulebook" },
+  { id: "dream-chaser", name: "Dream-chaser campaign rulebook" },
 ] as const;
 
 export type BookletId = (typeof BOOKLETS)[number]["id"];

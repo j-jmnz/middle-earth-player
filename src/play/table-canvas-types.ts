@@ -4,6 +4,7 @@ import type { SlotNumbers } from "./card-effects.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { SpotlightHandoff } from "./spotlight-handoff.ts";
+import type { ZoneFacts } from "./selectors.ts";
 import type { StageArea } from "./spotlight-stage.ts";
 import type { TableStore } from "./store.ts";
 
@@ -21,6 +22,8 @@ export type TableHighlight = {
   marks: ReadonlyMap<string, OptionMark>;
   // Hand cards that cannot be played in this planning window (why.ts says why on a tap): dimmed.
   muted: ReadonlySet<string>;
+  // The cards the open moment asks about or has picked, whether or not they glow now (the tray is open, or the table peeks): a row's fold never takes one (row-fold.ts).
+  keep: ReadonlySet<string>;
 };
 
 // The engine's numbers the canvas draws on a card (card-effects.ts, slotNumbers): the effects on it, its willpower while it
@@ -41,6 +44,10 @@ export type TableCanvasProps = {
   sphereOf: (code: string) => string | null;
   // True for a card with a printed line the app does not apply (src/catalog/active-text.ts): the canvas marks it.
   inactive: (code: string) => boolean;
+  // What the zone selectors read of a card's printing: its type (the fold order of staging) and its place among the ships (a seat's ships stand first).
+  facts: ZoneFacts;
+  // The success symbols a card's ledger side prints, for the Sailing test's look (look-strip.ts); 0 for a card with none.
+  success: (code: string) => number;
   // The engine's numbers on a card, read from the state the canvas is handed (so a render never reads the store) and the seat drawn.
   info: (game: ScenarioState, seat: number, cardId: string) => SlotInfo;
   highlight: TableHighlight;

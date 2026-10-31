@@ -18,6 +18,7 @@ const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   battle: "battle",
   siege: "siege",
   "immune to player card effects": "immune",
+  sailing: "sailing",
 };
 
 const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
@@ -26,6 +27,7 @@ const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
   archery: "archery",
   toughness: "toughness",
   secrecy: "secrecy",
+  boarding: "boarding",
 };
 
 // Hall of Beorn lists one keyword per entry, with the trailing period: "Hide 2.", "Surge.".

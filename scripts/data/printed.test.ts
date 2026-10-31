@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { keyOf, loadLedger, mergeLedgers, verifyScans } from "./printed/ledger.ts";
@@ -87,5 +89,50 @@ describe("Mirkwood printed-text ledger", () => {
     expect(text("41050", "A")).toContain("Each player chooses 1 Adaptation boon attachment");
     expect(text("41051", "A")).toContain("after drawing their starting hand (including taking a mulligan)");
     expect(text("41001", "A")).toContain("Shuffle the encounter deck.");
+  });
+});
+
+// Dream-chaser (phase 37): data/printed/dream-chaser.json, read from the pinned scans (the 2023 Campaign Expansion's, where it reprints a card).
+describe("Dream-chaser printed-text ledger", () => {
+  const file = JSON.parse(readFileSync(new URL("../../data/printed/dream-chaser.json", import.meta.url), "utf8")) as { entries: { code: string; side: string }[] };
+  const dream = file.entries.map((entry) => ledger.byKey.get(keyOf(entry.code, entry.side))).filter((entry): entry is NonNullable<typeof entry> => entry !== undefined);
+  const text = (code: string, side: string) => ledger.byKey.get(keyOf(code, side))?.lines.join(" ") ?? "";
+
+  it("holds both sides of each of the nine campaign cards and the Hard and Expert Mode card", () => {
+    for (const code of ["11171", "11179", "11182", "11191", "11194", "11197", "11200", "11209", "11215", "11217"]) {
+      expect(ledger.byKey.has(keyOf(code, "A")), `${code}.A`).toBe(true);
+      expect(ledger.byKey.has(keyOf(code, "B")), `${code}.B`).toBe(true);
+    }
+    expect(dream).toHaveLength(file.entries.length);
+    expect(file.entries.length).toBeGreaterThanOrEqual(304);
+  });
+
+  it("reads the 2023 text, not Hall of Beorn's 2016 text", () => {
+    expect(text("11171", "A")).toContain("Setup: Each player chooses a Modification boon for each of their ship-objectives");
+    expect(text("11171", "B")).toContain("1 XP if you ended the game on-course (Sun).");
+    expect(text("11016", "A")).toContain("Setup: Prepare the Corsair deck. Players prepare their fleet.");
+    expect(text("11016", "B")).toContain("on-course (Sun)");
+    expect(text("12147", "A")).toContain("Set The City of Corsairs encounter set aside, as an inactive second encounter deck");
+    expect(text("11182", "B")).toContain("If Graxar is in the victory display");
+    expect(text("110042", "B")).toContain("Campaign Mode only.");
+  });
+
+  it("records the Sailing success symbols of the encounter cards (Calm Waters prints two, Rolling Seas one, Fog Bank none)", () => {
+    const sails = (code: string) => ledger.byKey.get(keyOf(code, "A"))?.sailingSuccess;
+    expect(sails("11050")).toBe(2);
+    expect(sails("11051")).toBe(1);
+    expect(sails("11024")).toBe(0);
+    expect(sails("11176")).toBe(1);
+    // A quest card, a boon and a ship-objective have no encounter back: no reading is recorded for them.
+    expect(sails("11016")).toBeUndefined();
+    expect(sails("11172")).toBeUndefined();
+    expect(sails("11080")).toBeUndefined();
+  });
+
+  it("names the scan each side was read from, and who read it", () => {
+    for (const entry of dream) {
+      expect(entry.readBy, `${entry.code}.${entry.side}`).toMatch(/read from the scan image/);
+      expect(entry.scan.sha256, `${entry.code}.${entry.side}`).toMatch(/^[0-9a-f]{64}$/);
+    }
   });
 });

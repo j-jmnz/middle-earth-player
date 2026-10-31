@@ -26,6 +26,9 @@ import { attackRuleReason } from "./families/attack-targets.ts";
 import { sideQuestReason } from "./families/sidequests-quest.ts";
 import { freeSlot, mustTravel } from "./families/south-locations.ts";
 import { viewOf } from "./families/breaking-areas.ts";
+import { shipAttackReason, shipDefenseReason } from "./families/sea-ships.ts";
+import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "./families/sea-sailing-legal.ts";
+import { printedOf } from "./printed.ts";
 
 const NUMBER = "The engine computes that number";
 
@@ -41,7 +44,8 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
         ? [{ type: "Keep" }]
         : [{ type: "Keep" }, { type: "Mulligan" }, ...mulliganTriggers(state, ctx)];
     case "pass":
-      return passIntents(state, ctx);
+      // While the first player commits characters to a Sailing test, only that and passing are open (families/sea-sailing.ts).
+      return sailingIntents(state) ?? passIntents(state, ctx);
     case "frameAction":
       return passIntents(state, ctx);
     case "hideCommit":
@@ -78,7 +82,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "PlayCard":
       return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
     case "Commit":
-      return committers(state, state.activeSeat, ctx);
+      return askingToCommit(state) ? sailingCommitters(state, ctx) : committers(state, state.activeSeat, ctx);
     case "CommitHide":
       return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "Travel":
@@ -109,6 +113,9 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
   if (locked != null && state.activeSeat !== locked && !mandatory(state)) {
     return "Peril: other seats cannot act";
   }
+  // No Action is used during a Sailing test (dcce.sailing-tests).
+  const blocked = sailingBlocks(state, intent.type);
+  if (blocked) return blocked;
   switch (intent.type) {
     case "Keep":
       return state.window?.kind === "mulligan" ? null : "Mulligan is closed";
@@ -126,7 +133,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     case "PlayCard":
       return playReason(state, intent, ctx);
     case "Commit":
-      return commitReason(state, intent, ctx);
+      return askingToCommit(state) ? sailingCommitReason(state, intent.cardIds, ctx) : commitReason(state, intent, ctx);
     case "CommitHide":
       return hideCommitReason(state, intent, ctx);
     case "Trigger":
@@ -175,7 +182,8 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   for (const cardId of [...(state.seats[state.activeSeat]?.hand ?? []), ...(top ? [top] : []), ...discardPlayable(state, state.activeSeat, ctx)]) {
     if (playWindowReason(state, cardId, ctx) === null) intents.push({ type: "PlayCard", cardId });
   }
-  if (state.mode === "questCommit") intents.push({ type: "Commit" });
+  // The quest commitment is open in the pass window only, not in an action window between steps (a Sailing window before it, say).
+  if (state.mode === "questCommit" && state.window?.kind === "pass") intents.push({ type: "Commit" });
   intents.push(...triggerIntents(state, ctx));
   return intents;
 }
@@ -272,6 +280,9 @@ function defenderReason(
   if (defender.controller !== state.pendingAttack.seat) {
     if (!hasKeyword(state, defender.id, "sentinel", ctx.cards)) return "Sentinel is required to defend for another seat";
   }
+  // A ship-enemy's attack is defended only by a ship-objective (dcce.ship-enemies, dcce.ship-objectives).
+  const ship = shipDefenseReason(state, printedOf(ctx.cards, defender.code), ctx.cards);
+  if (ship) return ship;
   if (!canDefend(state, state.pendingAttack.seat, intent.defenderId, ctx.cards)) return "That character cannot defend";
   if (defenseBlocked(state, ctx, intent.defenderId)) return "That character cannot defend this enemy's attack";
   return null;
@@ -308,6 +319,8 @@ function attackReason(
     if (seen.has(attackerId)) return "That character cannot attack twice";
     seen.add(attackerId);
     if (!canAttack(state, state.activeSeat, attackerId, intent.enemyId, ctx.cards)) {
+      const ship = shipAttackReason(printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""), printedOf(ctx.cards, enemy.code));
+      if (ship) return ship;
       if (enemy.controller !== state.activeSeat) return "Ranged is required to attack an enemy engaged with another seat";
       return "That attack is illegal";
     }

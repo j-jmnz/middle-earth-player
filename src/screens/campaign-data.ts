@@ -1,3 +1,4 @@
+import dreamChaser from "../../data/campaigns/dream-chaser.json";
 import fellowship from "../../data/campaigns/fellowship-of-the-ring.json";
 import darkOfMirkwood from "../../data/campaigns/the-dark-of-mirkwood.json";
 import mirkwoodPaths from "../../data/campaigns/mirkwood-paths.json";
@@ -12,6 +13,15 @@ import caves from "../../data/scenarios/the-caves-of-nibin-dum.json";
 import oath from "../../data/scenarios/the-oath.json";
 import passage from "../../data/scenarios/passage-through-mirkwood.json";
 import south from "../../data/scenarios/the-ring-goes-south.json";
+import voyage from "../../data/scenarios/voyage-across-belegaer.json";
+import fate from "../../data/scenarios/the-fate-of-numenor.json";
+import raid from "../../data/scenarios/raid-on-the-grey-havens.json";
+import stormcaller from "../../data/scenarios/flight-of-the-stormcaller.json";
+import depths from "../../data/scenarios/the-thing-in-the-depths.json";
+import temple from "../../data/scenarios/temple-of-the-deceived.json";
+import ruins from "../../data/scenarios/the-drowned-ruins.json";
+import cobas from "../../data/scenarios/a-storm-on-cobas-haven.json";
+import corsairs from "../../data/scenarios/the-city-of-corsairs.json";
 import { printedScenarioName } from "../campaign/printed-name";
 import { campaignDataSchema, parseScenarioData, type CampaignData, type ScenarioData } from "../catalog/scenario-data";
 
@@ -19,8 +29,8 @@ import { campaignDataSchema, parseScenarioData, type CampaignData, type Scenario
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing eleven scenarios, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([fellowship, mirkwoodPaths, darkOfMirkwood].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, ScenarioData>();
@@ -41,6 +51,8 @@ export const BOXES: readonly Box[] = [
   { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", campaignId: "fellowship-of-the-ring", scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"] },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
+  // The Grey Havens, the six Adventure Packs and the Campaign Expansion are one box on the Scenarios tab (user decision, 2026-10-30).
+  { id: "dream-chaser", name: "Dream-chaser", campaignId: "dream-chaser", scenarios: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived", "the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"] },
 ];
 
 /** The box a scenario is printed in, or null for an id no box lists. */

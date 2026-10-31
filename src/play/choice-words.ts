@@ -20,6 +20,7 @@ import { stageNumber } from "../rules/families/caves-progress.ts";
 import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 import { nightmareWords } from "./nightmare-words.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";
+import { seaPickWords, seaWords } from "./sea-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -294,7 +295,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -371,6 +372,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
+  const sea = seaPickWords(pick);
+  if (sea) return sea;
   const play = playPickWords(pick);
   if (play) return play;
   const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game);
@@ -408,6 +411,17 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Claim", prompt: `Choose ${one} to carry ${sourceId ? names.card(sourceId) : "the objective"}.` };
     case "Discard":
       return { verb: "Discard", prompt: `Choose ${one} to discard.` };
+    // The Glórinaith's target (110139:A:4, 110139:B:5), Armor Plating's enemy (11172:B:3).
+    case "DiscardFromAnyDeck":
+      return { verb: "Target", prompt: `Choose ${one} to deal damage to.` };
+    case "DiscardShadow":
+      return { verb: "Discard", prompt: `Choose ${one} that has a shadow card. Its shadow card is discarded.` };
+    // Resources added to the picked hero (110138:A:3), or an attachment discarded for the resources it gives the enemy (11061:A:2).
+    case "AddResources":
+      return pick.pick.type === "attachment" ? { verb: "Discard", prompt: `Choose ${one} you control to discard. The enemy gets resources equal to its printed cost.` } : { verb: "Add", prompt: `Choose ${one} to add ${typeof next.amount === "number" ? `${next.amount} ${next.amount === 1 ? "resource" : "resources"}` : "resources"} to.` };
+    // The sea family (Voyage Across Belegaer): the Ship objective that takes the excess damage of a shadow attack (11055:A:2).
+    case "DamageShip":
+      return { verb: "Assign", prompt: "Choose the Ship objective you control that takes the excess damage." };
     // A set-aside boon or burden a campaign card attaches (01130:A:3, 01130:A:4): the hero that carries it.
     case "AttachSetAside":
       return { verb: "Attach", prompt: `Choose ${one} to carry ${names.code(next.code)}.` };

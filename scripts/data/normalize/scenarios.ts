@@ -11,12 +11,15 @@ import {
 } from "../../../src/catalog/scenario-data.ts";
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, PRODUCTS, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import type { Overrides } from "./cards.ts";
-import { nameIndex, parseSetup, type ParsedSetup, type SetupClause } from "./setup-text.ts";
+import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
+import { pileAccepts, questFacts } from "./scenario-piles.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { sameName } from "./names.ts";
 import { crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
 import { nightmareOf } from "./nightmare.ts";
+import { reprintsOf, isReprint } from "./reprints.ts";
+import { isNightmareCard } from "../nightmare-defs.ts";
 import type { RawData } from "./load-raw.ts";
 
 // Dragncards load groups -> our piles.
@@ -29,6 +32,9 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
   // The second shared deck is the burden deck of Flight to the Ford.
   sharedEncounterDeck2: "burden",
 };
+// Dream-chaser's decks beside the encounter deck (PILES, src/catalog/scenario-data.ts): their cards are dealt by the scenario's Setup
+// ("Prepare the Corsair deck", "Prepare the Uncharted deck"), never by a line naming each card, and they count toward their encounter sets.
+const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests"]);
 // The RingsDB twin packs (PRODUCTS): DragnCards names the Fellowship boxes by product, RingsDB by these pack codes.
 const TWIN_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => (product.twinPack ? [product.twinPack] : [])));
 
@@ -50,8 +56,19 @@ function textLines(text: string | null | undefined): string[] {
   return (text ?? "").split("\n").map((line) => line.trim()).filter((line) => line !== "");
 }
 
-function setupOf(text: string | null | undefined): string | null {
-  return textLines(text).find((line) => /^Setup:/.test(line)) ?? null;
+// A line of a card's text that opens an ability of its own ("Forced:", "Travel Action:", "Resolution:"): it ends a Setup paragraph.
+const LABELLED = /^[A-Z][A-Za-z' -]{2,28}:\s/;
+
+// The Setup ability of a quest or campaign card as one string (its "Setup:" line and, when `continued`, the unlabelled lines that continue it,
+// as the campaign cards of Dream-chaser print them), and the card's other lines.
+function setupOf(text: string | null | undefined, continued: boolean): { setup: string | null; others: string[] } {
+  const lines = textLines(text);
+  const at = lines.findIndex((line) => /^Setup:/.test(line));
+  if (at < 0) return { setup: null, others: lines };
+  let end = at + 1;
+  // Only a Dream-chaser campaign card continues its Setup on unlabelled lines; elsewhere the line after Setup is another ability.
+  while (continued && end < lines.length && !LABELLED.test(lines[end] ?? "")) end += 1;
+  return { setup: lines.slice(at, end).join(" "), others: [...lines.slice(0, at), ...lines.slice(end)] };
 }
 
 function bookletSetsOf(entry: RuleEntry | undefined): string[] {
@@ -84,14 +101,42 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
   // A campaign card is looked up in its own box's printing: two boxes can print a card of the same name.
   const campaignCardsOf = (packs: readonly string[]) => new Map(cards.filter((card) => card.type === "campaign" && card.printings.some((p) => packs.includes(p.pack))).map((card) => [card.name, card.code]));
 
-  const resolve = (databaseId: string): Card | null => {
-    const direct = byGuid.get(databaseId);
+  // A Dream-chaser card: DragnCards files each side of a double-sided card as a row of its own, named after that side, and Hall of Beorn
+  // has no OCTGN guid for many of them. The row's box (packName) and type find the card: by name when the name is one card's in the
+  // box (Dark Abyss), else by the collector number (the "Lost Island" side of Lush Jungle is #30). A card is `type` when it matches the row's type bar.
+  const typeKey = (value: string): string => value.toLowerCase().replace(/[\s-]/g, "");
+  const byProduct = (row: Record<string, string>): Card | null => {
+    const product = PRODUCTS.find((item) => item.name === row.packName && item.twinPack === null && item.load === "dragncards");
+    const pack = product?.packs[0];
+    if (!pack) return null;
+    const mine = cards.filter((card) => card.printings.some((printing) => printing.pack === pack) && typeKey(card.typeName) === typeKey(row.type ?? ""));
+    const named = mine.filter((card) => sameName(card.name, row.name ?? ""));
+    if (named.length === 1) return named[0] ?? null;
+    // Two cards of one name and number (the Grotto and Underwater sides of Shrine to Morgoth): the row's traits name the side.
+    const traitsOf = (list: readonly string[]) => [...list].sort().join(",");
+    const rowTraits = (row.traits ?? "").split(".").map((trait) => trait.trim()).filter((trait) => trait !== "");
+    const bySide = named.filter((card) => traitsOf(card.traits) === traitsOf(rowTraits));
+    if (named.length > 1 && bySide.length === 1) return bySide[0] ?? null;
+    const numbered = (list: readonly Card[]) => list.filter((card) => card.printings.some((printing) => printing.pack === pack && String(printing.number) === row.numberInPack));
+    const byNumber = numbered(named.length > 1 ? named : mine);
+    return byNumber.length === 1 ? (byNumber[0] ?? null) : null;
+  };
+  // `sided` (a Dream-chaser deck): the rows of one id are its two sides, and a side resolves to the card of that side's own row. Elsewhere the
+  // id's last row is the card, as it always was.
+  const sideRow = (databaseId: string, side: "a" | "b") => {
+    const sides = raw.dragnSides.get(databaseId);
+    return side === "a" ? (sides?.a ?? sides?.b) : sides?.b;
+  };
+  const resolve = (databaseId: string, side: "a" | "b" = "a", sided = false): Card | null => {
+    const direct = side === "a" ? byGuid.get(databaseId) : undefined;
     if (direct) return direct;
-    const row = raw.dragn.get(databaseId);
+    const row = sided ? sideRow(databaseId, side) : raw.dragn.get(databaseId);
     const pack = PRODUCTS.find((product) => product.name === row?.packName)?.twinPack;
     const hit = pack ? byPackNumber.get(`${pack}:${row?.numberInPack ?? ""}`) : undefined;
-    return hit && row && sameName(hit.name, row.name ?? "") ? hit : null;
+    if (hit && row && sameName(hit.name, row.name ?? "")) return hit;
+    return row ? byProduct(row) : null;
   };
+  const reprintOf = reprintsOf(cards);
 
   const scenarios: ScenarioData[] = [];
   const campaignCards: Record<string, string> = {};
@@ -108,17 +153,27 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     }
     const product = productOf(def.product);
     const fromDragn = product.load === "dragncards";
-    const packs = product.packs;
     const local: string[] = [];
-    const entry = fromDragn ? Object.entries(decks).find(([key, deck]) => /^Q0C\.\d+$/.test(key) && deck.label === hob.Title) : undefined;
-    if (fromDragn && !entry) {
-      problems.push(`${id}: DragnCards has no Q0C deck labelled "${hob.Title}"`);
+    // A scenario names its decks (`def.deck`, Dream-chaser's Q06/E06); otherwise the numbered Q0C deck labelled with its title.
+    const entry: [string, Deck | undefined] | undefined = !fromDragn
+      ? undefined
+      : def.deck
+        ? [def.deck.normal, decks[def.deck.normal]]
+        : Object.entries(decks).find(([key, deck]) => /^Q0C\.\d+$/.test(key) && deck.label === hob.Title);
+    if (fromDragn && !entry?.[1]) {
+      problems.push(`${id}: DragnCards has no ${def.deck?.normal ?? "Q0C"} deck labelled "${hob.Title}"`);
+      continue;
+    }
+    if (def.deck && entry?.[1]?.label !== hob.Title) {
+      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${hob.Title}"`);
       continue;
     }
     const [normalKey, normalDeck] = entry ?? [null, null];
-    const easyKey = normalKey?.replace("Q0C", "E0C") ?? null;
+    const easyKey = def.deck?.easy ?? normalKey?.replace("Q0C", "E0C") ?? null;
     const easyDeck = easyKey ? decks[easyKey] : undefined;
-    const campaignCard = campaignCardsOf(packs).get(hob.Title.replace(CAMPAIGN_SUFFIX, ""));
+    // The campaign card, boons and burdens are the box's (a Dream-chaser scenario's are the Campaign Expansion's).
+    const cardPacks = productOf(def.campaignProduct ?? def.product).packs;
+    const campaignCard = campaignCardsOf(cardPacks).get(hob.Title.replace(CAMPAIGN_SUFFIX, ""));
     if (!campaignCard) {
       problems.push(`${id}: no campaign card named "${hob.Title.replace(CAMPAIGN_SUFFIX, "")}"`);
       continue;
@@ -126,56 +181,74 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
 
     // Everything the scenario's own cards can name: Hall of Beorn's list, the quest cards, and the box's boons and burdens.
     const listed = new Set<string>();
+    // The scenario file also lists the quest cards of its Nightmare deck (Dream-chaser's); those are not this scenario's.
     for (const item of [...hob.QuestCards, ...hob.ScenarioCards]) {
       const card = bySlug.get(item.Slug);
-      if (card) listed.add(card.code);
+      if (card && !isNightmareCard(card)) listed.add(card.code);
     }
-    const scope = cards.filter((card) => listed.has(card.code) || (card.campaignKind != null && card.printings.some((p) => packs.includes(p.pack))));
-    const names = nameIndex(scope, new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
+    const scope = cards.filter((card) => listed.has(card.code) || (card.campaignKind != null && card.printings.some((p) => cardPacks.includes(p.pack))));
+    // The campaign card names more than the scenario lists: the Campaign Expansion's own cards (Sea Serpent) and the originals of its reprints
+    // (Calphon is in no list of Raid on the Grey Havens). They match a name only where no card of the scenario's own list bears it.
+    const extras = def.deck === undefined ? [] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code)));
+    const names = nameIndex([...scope, ...extras], new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
 
     // Stages in printed order: the Hall of Beorn quest cards give it, the Dragncards deck must agree.
-    const stages = hob.QuestCards.map((quest) => bySlug.get(quest.Slug)?.code).filter((code): code is string => code !== undefined);
+    // The Stormcaller's own stages (2C to 4C, `stormcallerQuests`) are listed with the others and leave `stages` once the load list is read.
+    const questCodes = hob.QuestCards.flatMap((quest) => {
+      const card = bySlug.get(quest.Slug);
+      return card && !isNightmareCard(card) ? [card.code] : [];
+    });
+    let stages = questCodes;
 
     // The printed Setup of the first quest stage and of the campaign card.
-    const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text);
-    const campaignSetup = setupOf(byCode.get(campaignCard)?.text);
+    const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text, false).setup;
+    const campaignLines = setupOf(byCode.get(campaignCard)?.text, def.deck !== undefined);
+    const campaignSetup = campaignLines.setup;
     const quest: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
     const camp: ParsedSetup = campaignSetup ? parseSetup(campaignSetup, names) : { clauses: [], unread: [] };
     for (const sentence of [...quest.unread, ...camp.unread]) local.push(`${id}: a Setup sentence no pattern reads: ${sentence}`);
-    const clausesOf = <K extends SetupClause["kind"]>(parsed: ParsedSetup, kind: K) => parsed.clauses.filter((clause): clause is Extract<SetupClause, { kind: K }> => clause.kind === kind);
-    const codesOf = (parsed: ParsedSetup, kinds: readonly SetupClause["kind"][]) =>
-      new Set(parsed.clauses.flatMap((clause) => (kinds.includes(clause.kind) && "codes" in clause ? clause.codes : [])));
     const nameOf = (code: string) => byCode.get(code)?.name ?? code;
 
+    // The side a Stormcaller Elite card is dealt faceup (dcce.stormcaller-elite): the quest card's Setup names it ("enemy side faceup",
+    // "objective-ally sides faceup"); a Setup that names none deals the DragnCards front, the enemy side (Raid on the Grey Havens).
+    const eliteFaceup = /objective[- ]ally sides? faceup/i.test(questSetup ?? "") ? "objective" : /enemy side faceup/i.test(questSetup ?? "") ? "enemy" : null;
+    // A key of `Loaded.placements`: code, pile and, for a two-sided card whose sides are two catalog cards, the code of its other side.
+    const keyOf = (code: string, pile: string, back?: string) => `${code}\u0000${pile}${back ? `\u0000${back}` : ""}`;
     const load = (deck: Deck): { placements: Map<string, number>; player: string[]; campaign: Set<string> } => {
       const placements = new Map<string, number>();
       const player: string[] = [];
       const campaign = new Set<string>();
+      const sided = def.deck !== undefined;
       for (const line of deck.cards) {
-        const card = resolve(line.databaseId);
-        const name = raw.dragn.get(line.databaseId)?.name ?? line.databaseId;
+        let card = resolve(line.databaseId, "a", sided);
+        let other = sided ? resolve(line.databaseId, "b", sided) : null;
+        const name = (sided ? sideRow(line.databaseId, "a") : raw.dragn.get(line.databaseId))?.name ?? line.databaseId;
         if (!card) {
           // The scenario overview card has no game text and no catalog row.
           if (name !== hob.Title) local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
           continue;
         }
         if (card.type === "campaign") continue;
-        if (line.loadGroupId === PLAYER_GROUP) {
+        if (line.loadGroupId === PLAYER_GROUP && def.groups?.[line.loadGroupId] === undefined) {
           if (!isHero(byCode, card.code)) player.push(card.code);
           continue;
         }
-        let pile: Pile | "campaign" | undefined = GROUP_PILE[line.loadGroupId];
+        let pile: Pile | "campaign" | undefined = def.groups?.[line.loadGroupId] ?? GROUP_PILE[line.loadGroupId];
         if (!pile) {
           local.push(`${deck.label}: group ${line.loadGroupId} is not supported (${name})`);
           continue;
         }
-        const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card.code);
+        // One physical card with two catalog cards for its sides: `card` is the side faceup, `other` its back. A folded card (Card.back) has none.
+        if (other && other.code === card.code) other = null;
+        if (other && eliteFaceup && card.type !== eliteFaceup && other.type === eliteFaceup) [card, other] = [other, card];
+        const was = pile;
+        const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card?.code && (rule.from === undefined || rule.from === was));
         if (moved) pile = moved.pile;
         if (pile === "campaign") {
           campaign.add(card.code);
           continue;
         }
-        const key = `${card.code}\u0000${pile}`;
+        const key = keyOf(card.code, pile, other?.code);
         placements.set(key, (placements.get(key) ?? 0) + line.quantity);
       }
       return { placements, player, campaign };
@@ -193,6 +266,17 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       for (const key of easy.placements.keys()) {
         if (!normal.placements.has(key)) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
       }
+      // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
+      // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.
+      if (clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
+        const dealt = new Set([...normal.placements.keys()].map((key) => byCode.get(key.split("\u0000")[0] ?? "")?.name));
+        for (const ship of cards.filter((card) => card.type === "ship-objective" && canon(card.encounterSet ?? "") === canon("The Dream-chaser's Fleet") && !dealt.has(card.name))) {
+          normal.placements.set(keyOf(ship.code, "setAside"), 1);
+          easy.placements.set(keyOf(ship.code, "setAside"), 1);
+        }
+      }
+      const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests")).map((key) => key.split("\u0000")[0] ?? ""));
+      stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
       if (JSON.stringify(stages) !== JSON.stringify(deckStages)) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
     } else {
@@ -204,44 +288,51 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // Placement: a pile card must be said by a Setup line (the quest's, the campaign card's, or its own).
     const placed: Placement[] = [];
     const campaignPlaced = new Set<string>();
-    const campaignNamed = codesOf(camp, ["aside", "stage", "active", "attachRingBearer", "shuffleInto", "earned", "choose", "putIntoPlay", "attachChosen", "addToHandAfterMulligan", "addToCampaignPool"]);
+    const campaignNamed = codesOf(camp, ["aside", "stage", "active", "attachRingBearer", "shuffleInto", "earned", "choose", "putIntoPlay", "attachChosen", "addToHandAfterMulligan", "addToCampaignPool", "step"]);
     // "Each player chooses 1 Adaptation boon": every boon of that trait in the box is a choice, dealt by the campaign card.
     for (const clause of clausesOf(camp, "eachPlayerChoosesBoon")) {
       for (const card of scope) if (card.campaignKind === "boon" && card.traits.includes(clause.trait)) campaignNamed.add(card.code);
     }
+    // The two sides of one physical card, by code: a Setup that names a card by title is satisfied by that card and its other side only.
+    const pairs = new Map<string, string>();
+    for (const key of normal.placements.keys()) {
+      const [code, , back] = key.split("\u0000");
+      if (code && back) {
+        pairs.set(code, back);
+        pairs.set(back, code);
+      }
+    }
+    const same = (left: string, right: string) => left === right || pairs.get(left) === right;
     for (const [key, count] of normal.placements) {
-      const [code = "", pile = ""] = key.split("\u0000");
+      const [code = "", pile = "", back] = key.split("\u0000");
       const printed = byCode.get(code);
-      const own = printed?.text ?? "";
-      const said = (kinds: readonly SetupClause["kind"][]) => codesOf(quest, kinds).has(code);
+      const facts = questFacts({ quest, code, printed, same, canon });
+      const namedByCampaign = [...campaignNamed].some((named) => same(named, code));
       // A card the campaign card's Setup places is dealt by that record, not by the load list.
-      if (campaignNamed.has(code) && !codesOf(quest, ["aside", "stage", "active", "attachRingBearer", "attachChosen"]).has(code)) {
+      if (namedByCampaign && !facts.said(["aside", "stage", "active", "attachRingBearer", "attachChosen"]) && !facts.steps("takeControl", "attach", "prepareStormcallerArea", "flipToCampaignSide")) {
         campaignPlaced.add(code);
         continue;
       }
-      let ok = true;
-      if (pile === "setAside") ok = said(["aside"]);
-      else if (pile === "activeLocation") ok = said(["active"]);
-      else if (pile === "attachedChosen") ok = said(["attachChosen"]);
-      else if (pile === "attached") ok = said(["attachRingBearer"]) || /Setup: Attach to the Ring-bearer/.test(own);
-      else if (pile === "staging") {
-        const eachPlayer = clausesOf(quest, "stage").some((clause) => clause.perPlayer != null && clause.codes.includes(code));
-        const explorers = clausesOf(quest, "eachPlayerAddsLocation").length > 0 && printed?.type === "location";
-        const searched = clausesOf(quest, "searchObjectives").length > 0 && printed?.type === "objective";
-        ok = said(["stage"]) || eachPlayer || explorers || searched || /Setup: Add .* to the staging area/.test(own);
-      } else if (pile === "burden") ok = true;
-      if (!ok && campaignNamed.has(code)) {
-        campaignPlaced.add(code);
-        continue;
-      }
-      if (!ok) {
-        local.push(`${id}: ${nameOf(code)} is in the ${pile} pile and no Setup line puts it there`);
+      if (!pileAccepts({ code, pile, printed, quest, facts })) {
+        if (namedByCampaign) campaignPlaced.add(code);
+        else local.push(`${id}: ${nameOf(code)} is in the ${pile} pile and no Setup line puts it there`);
         continue;
       }
       const perPlayer = clausesOf(quest, "stage").find((clause) => clause.perPlayer != null && clause.codes.includes(code))?.perPlayer;
       // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record.
       const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0;
-      placed.push({ code, pile: pile as Pile, normal: count, easy: Math.min(easy.placements.get(key) ?? 0, count), ...(perPlayer != null ? { perPlayer } : {}), ...(searched ? { searched: true as const } : {}) });
+      // "(2 copies instead if there are 3 or more players in the game)": the copies of this card the Setup stages.
+      const staged = pile === "staging" ? clausesOf(quest, "stage").find((clause) => clause.many != null && clause.codes.includes(code)) : undefined;
+      const byPlayers = staged?.many ? { few: staged.count, many: staged.many.count, from: staged.many.from } : undefined;
+      placed.push({ code, pile: pile as Pile, normal: count, easy: Math.min(easy.placements.get(key) ?? 0, count), ...(back ? { back } : {}), ...(perPlayer != null ? { perPlayer } : {}), ...(byPlayers ? { byPlayers } : {}), ...(searched ? { searched: true as const } : {}) });
+    }
+    // A printed count the sources disagree on: the card's own set size or Setup text settles it (overrides.scenarioCounts).
+    for (const rule of overrides.scenarioCounts.filter((item) => item.scenario === id)) {
+      const item = placed.find((candidate) => candidate.code === rule.code && candidate.pile === (rule.pile ?? "encounter"));
+      if (!item) local.push(`${id}: scenarioCounts names ${nameOf(rule.code)}, which the ${rule.pile ?? "encounter"} pile does not hold`);
+      else if (rule.normal != null) item.normal = rule.normal;
+      if (item && rule.easy != null) item.easy = rule.easy;
+      if (item) item.easy = Math.min(item.easy, item.normal);
     }
     // The campaign card's Setup also deals cards the load list put in an encounter deck or a hand.
     for (const code of codesOf(camp, ["stage", "attachRingBearer", "shuffleInto"])) {
@@ -256,9 +347,12 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     for (const code of codesOf(camp, ["earned", "choose"])) campaignPlaced.add(code);
     for (const code of campaignNamed) campaignPlaced.add(code);
     // The Resolution on the back names its rewards: they are dealt by the campaign, never by the load list.
-    for (const code of names.codesOf(byCode.get(campaignCard)?.back?.text ?? "")) campaignPlaced.add(code);
+    // Dream-chaser's XP list ("Gain the following: 1 XP for each Corsair Warship in the victory display") names cards it only counts.
+    for (const code of names.codesOf((byCode.get(campaignCard)?.back?.text ?? "").split("Gain the following")[0] ?? "")) campaignPlaced.add(code);
+    // The campaign card's other lines (The Thing in the Depths' Forced lines) name the Campaign Expansion's cards they deal.
+    if (def.deck !== undefined) for (const code of names.codesOf(campaignLines.others.join(" "))) if (byCode.get(code)?.printings.some((p) => cardPacks.includes(p.pack))) campaignPlaced.add(code);
     // Everything the quest Setup names must be in a pile.
-    const inPile = (code: string, piles: readonly string[]) => placed.some((item) => item.code === code && piles.includes(item.pile));
+    const inPile = (code: string, piles: readonly string[]) => placed.some((item) => same(item.code, code) && piles.includes(item.pile));
     for (const clause of quest.clauses) {
       if (clause.kind === "aside") for (const code of clause.codes) if (!inPile(code, ["setAside"])) local.push(`${id}: Setup sets ${nameOf(code)} aside, which the load list does not`);
       if (clause.kind === "stage") for (const code of clause.codes) if (!inPile(code, ["staging"])) local.push(`${id}: Setup adds ${nameOf(code)} to staging, which the load list does not`);
@@ -288,15 +382,29 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const rule = ruleById.get(def.setupSpan);
     const booklet = bookletSetsOf(rule);
     const first = hob.QuestCards[0];
-    const hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
-    if (booklet.length === 0) local.push(`${id}: the booklet's Setup paragraph ${def.setupSpan} lists no encounter sets`);
-    else if (JSON.stringify(booklet.map(canon).sort()) !== JSON.stringify(hobSets.map(canon).sort())) local.push(`${id}: encounter sets: booklet ${booklet.join(", ")} / Hall of Beorn ${hobSets.join(", ")}`);
-    const setNames = hobSets;
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
+    let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
+    if (booklet.length === 0) local.push(`${id}: the booklet's Setup paragraph ${def.setupSpan} lists no encounter sets`);
+    else if (def.deck) {
+      // A Dream-chaser scenario: Hall of Beorn lists the sets of its first quest card only (no second deck), so the booklet's paragraph is the
+      // list. Every set it names has a card in the load list, and every encounter card the load list deals is in one of them.
+      const printedSets = new Map<string, string>();
+      for (const item of placed) {
+        const card = byCode.get(item.code);
+        if (card && item.pile !== "quest" && !isCampaign(item.code) && card.encounterSet) printedSets.set(canon(card.encounterSet), card.encounterSet);
+      }
+      hobSets = booklet.map((name) => printedSets.get(canon(name)) ?? "");
+      booklet.forEach((name, at) => {
+        if (hobSets[at] === "") local.push(`${id}: the booklet names the encounter set ${name}, and no card of the load list belongs to it`);
+      });
+      const listedSets = new Set(booklet.map(canon));
+      for (const [key, name] of printedSets) if (!listedSets.has(key)) local.push(`${id}: the load list deals ${name} cards, which the booklet's encounter sets do not name`);
+    } else if (JSON.stringify(booklet.map(canon).sort()) !== JSON.stringify(hobSets.map(canon).sort())) local.push(`${id}: encounter sets: booklet ${booklet.join(", ")} / Hall of Beorn ${hobSets.join(", ")}`);
+    const setNames = hobSets;
     const encounterSets = setNames.map((name) => ({
       name,
       count: placed
-        .filter((card) => card.pile === "encounter" && !isCampaign(card.code) && byCode.get(card.code)?.encounterSet === name)
+        .filter((card) => (card.pile === "encounter" || (card.pile !== "stormcallerQuests" && EXTRA_DECKS.has(card.pile))) && !isCampaign(card.code) && byCode.get(card.code)?.encounterSet === name)
         .reduce((sum, card) => sum + card.normal, 0),
     }));
     // A fixed order, so the same data always shuffles the same way: pile, then booklet set, then code.
@@ -318,12 +426,13 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       if (!card || /\(Campaign\)$/.test(item.Title) || /Nightmare$/.test(item.EncounterSet ?? "")) continue;
       // Boons and burdens are dealt by the campaign (the pool, a campaign card, or the burden deck), not by the load list.
       if (campaignPlaced.has(card.code) || card.campaignKind != null) continue;
-      const mine = placed.filter((p) => p.code === card.code && p.pile !== "quest");
+      const mine = placed.filter((p) => (p.code === card.code || p.back === card.code) && p.pile !== "quest");
       const normalCount = mine.reduce((sum, p) => sum + p.normal, 0);
       const fixed = easyFix(card.code);
       const easyCount = fixed ?? mine.reduce((sum, p) => sum + p.easy, 0);
       const sheetProblem = easySheetProblem(id, product, item, card, removals, canon);
       if (sheetProblem) local.push(sheetProblem);
+      // Hall of Beorn's count against the load list's: a difference is a problem; an override settles it (overrides.scenarioCounts, scenarioEasy).
       if (normalCount !== item.NormalQuantity) local.push(`${id}: ${item.Title} Normal ${normalCount}, Hall of Beorn ${item.NormalQuantity}`);
       if (easyCount !== item.EasyQuantity) local.push(`${id}: ${item.Title} Easy ${easyCount}, Hall of Beorn ${item.EasyQuantity}`);
       if (fixed != null) for (const p of mine) p.easy = Math.min(fixed, p.normal);
@@ -347,6 +456,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       problems.push(...local);
       continue;
     }
+    // A campaign game deals the Campaign Expansion's reprint of each card that has one (ScenarioData.reprints).
+    const dealt = [...new Set([...placed.flatMap((item) => (item.back ? [item.code, item.back] : [item.code])), ...campaignPlaced])].sort();
+    const reprints = Object.fromEntries(dealt.flatMap((code) => (reprintOf.has(code) ? [[code, reprintOf.get(code) as string] as const] : [])));
     preludes.set(id, normal.player.map((code) => ({ code })));
     campaignCards[id] = campaignCard;
     scenarios.push(
@@ -359,6 +471,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         cards: placed,
         campaignCard,
         campaignPlaced: [...campaignPlaced].sort(),
+        ...(Object.keys(reprints).length > 0 ? { reprints } : {}),
         ...(life != null ? { life } : {}),
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },

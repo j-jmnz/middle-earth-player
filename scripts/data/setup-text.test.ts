@@ -117,3 +117,94 @@ describe("parseSetup: Mirkwood Paths and The Dark of Mirkwood Setup sentences", 
     expect(parse("Setup: Search the encounter deck for Goblin Troop. Shuffle the encounter deck.").unread).toEqual(["Search the encounter deck for Goblin Troop"]);
   });
 });
+
+// Dream-chaser (phase 37): each sentence is quoted from data/printed/dream-chaser.json (the scan-read ledger).
+describe("parseSetup: Dream-chaser Setup sentences", () => {
+  const cardsOf = [
+    card("d1", "Calphon", "objective"),
+    card("d2", "Spyglass", "attachment"),
+    card("d3", "Black Key", "attachment"),
+    card("d4", "Black Key", "objective"),
+    card("d5", "Captain Sahír", "enemy"),
+    card("d6", "Crowley", "enemy"),
+    card("d7", "Rolling Seas", "location"),
+    card("d8", "Stormcaller", "ship-enemy"),
+    card("d9", "Armor Plating", "attachment"),
+    card("e1", "Galdor's Counsel", "event"),
+    card("e2", "Galdor's Counsel", "event"),
+    card("f1", "Calaerion", "objective"),
+    card("f2", "Cirdan's Blessing", "attachment"),
+    card("f3", "Gavin", "objective"),
+  ].map((entry, at) => ({ ...entry, campaignKind: at === 2 || at === 8 || at === 9 || at === 10 || at === 12 ? "boon" : at === 3 || at === 5 ? "burden" : null, traits: at === 8 ? ["Modification"] : [] }) as Card);
+  const dream = nameIndex(cardsOf, new Set());
+  const read = (text: string) => parseSetup(text, dream);
+
+  it("reads the deck and fleet preparation of Voyage Across Belegaer (11016.A)", () => {
+    const parsed = read("Setup: Prepare the Corsair deck. Players prepare their fleet. Shuffle each stage 2 card in the quest deck so that their order is random, leaving stage 3 on the bottom. Shuffle the encounter deck.");
+    expect(parsed.unread).toEqual([]);
+    expect(parsed.clauses.map((clause) => (clause.kind === "step" ? clause.step : clause.kind))).toEqual(["prepareCorsairDeck", "prepareFleet", "shuffleStageTwos", "shuffleEncounterDeck"]);
+  });
+
+  it("reads a count that depends on the players (12012.A: 1 copy of Rolling Seas, 2 from 3 players)", () => {
+    const parsed = read("Setup: Search the encounter deck for 1 copy of Rolling Seas, and add it to the staging area (2 copies instead if there are 3 or more players in the game).");
+    expect(parsed).toEqual({ clauses: [{ kind: "stage", codes: ["d7"], perPlayer: null, count: 1, many: { count: 2, from: 3 } }], unread: [] });
+  });
+
+  it("reads the campaign cards' Setup (11171.A, 11182.A, 11191.A)", () => {
+    expect(read("Setup: Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Crowley into the Corsair deck.")).toEqual({
+      clauses: [{ kind: "eachPlayerChoosesBoon", trait: "Modification" }, { kind: "shuffleInto", codes: ["d6"], into: "Corsair deck", set: null }],
+      unread: [],
+    });
+    const raid = read("Setup: The first player takes control of Calphon and attaches Spyglass and Black Key (boon) to him. Each player may choose one copy of Galdor's Counsel and add it to their hand. For this game, X is plus 1 for each of those copies.");
+    expect(raid.unread).toEqual([]);
+    expect(raid.clauses).toEqual([
+      { kind: "step", step: "takeControl", codes: ["d1"] },
+      { kind: "step", step: "attach", codes: ["d2", "d3"], to: ["d1"] },
+      { kind: "step", step: "chooseCopies", codes: ["e1", "e2"] },
+      { kind: "step", step: "plusOneX", codes: [] },
+    ]);
+    const stormcaller = read(`Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Put Calaerion into play under the control of the player with the Dream-chaser.`);
+    expect(stormcaller.clauses.map((clause) => (clause.kind === "step" ? clause.step : clause.kind))).toEqual(["flipToCampaignSide", "attach", "putIntoPlay"]);
+    expect(stormcaller.clauses[1]).toMatchObject({ codes: ["d4"], to: ["d8"] });
+  });
+
+  it("matches a name through its accents and curly apostrophes (Círdan's Blessing is Cirdan's Blessing in the data)", () => {
+    const parsed = read("Setup: One player may choose one copy of Círdan’s Blessing and add it to their hand.");
+    expect(parsed.unread).toEqual([]);
+    expect(parsed.clauses).toEqual([{ kind: "step", step: "chooseCopies", codes: ["f2"] }]);
+  });
+
+  it("names the boon, not the burden, for 'Black Key (boon)' and both for the bare name", () => {
+    expect(dream.allCodesOf("Black Key (boon)")).toEqual(["d3"]);
+    expect(dream.allCodesOf("Black Key (burden)")).toEqual(["d4"]);
+    expect(dream.allCodesOf("Black Key").sort()).toEqual(["d3", "d4"]);
+  });
+
+  it("leaves a sentence unread when a name it must hold finds no card, instead of dropping the step", () => {
+    expect(read("Setup: The first player takes control of Aldarion and attaches Spyglass to him.").unread).toEqual(["The first player takes control of Aldarion and attaches Spyglass to him"]);
+    expect(read("Setup: Attach Black Key (boon) to Aldarion.").unread).toEqual(["Attach Black Key (boon) to Aldarion"]);
+    expect(read("Setup: Shuffle Aldarion into the Corsair deck.").unread).toEqual(["Shuffle Aldarion into the Corsair deck"]);
+    expect(read("Setup: Put Aldarion into play under the control of the player with the Dream-chaser.").unread).toEqual(["Put Aldarion into play under the control of the player with the Dream-chaser"]);
+    expect(read("Setup: Attach Black Key (boon) to Captain Sahír.").clauses).toEqual([{ kind: "step", step: "attach", codes: ["d3"], to: ["d5"] }]);
+  });
+
+  it("reads the Setup lines of the campaign cards of The Fate of Númenor to The City of Corsairs that name a campaign log fact or turn the card over", () => {
+    const parsed = read(`Setup: If "Gavin returned," put him into play under any player's control. Flip this card over.`);
+    expect(parsed.unread).toEqual([]);
+    expect(parsed.clauses).toEqual([
+      { kind: "step", step: "putIntoPlayIfLogged", codes: ["f3"] },
+      { kind: "step", step: "flipCampaignCard", codes: [] },
+    ]);
+  });
+
+  it("reads the set steps of The Thing in the Depths and The City of Corsairs (12039.A, 12147.A)", () => {
+    expect(read("Setup: Build the encounter deck using only The Stormcaller and Corsair Raiders encounter sets, setting The Thing in the Depths and The Stormcaller Elite encounter sets aside, out of play (enemy side faceup).").clauses).toEqual([
+      { kind: "step", step: "buildDeck", codes: [], sets: ["The Stormcaller", "Corsair Raiders"], asideSets: ["The Thing in the Depths", "The Stormcaller Elite"] },
+    ]);
+    expect(read("Setup: Set The City of Corsairs encounter set aside, as an inactive second encounter deck.").clauses).toEqual([{ kind: "step", step: "secondDeck", codes: [], asideSets: ["The City of Corsairs"] }]);
+  });
+
+  it("leaves a sentence no pattern reads unread", () => {
+    expect(read("Setup: Sail to Umbar.").unread).toEqual(["Sail to Umbar"]);
+  });
+});

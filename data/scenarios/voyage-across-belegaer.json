@@ -1,0 +1,259 @@
+{
+  "id": "voyage-across-belegaer",
+  "name": "Voyage Across Belegaer",
+  "number": 1,
+  "stages": [
+    "11016",
+    "11017",
+    "11018",
+    "11019",
+    "11020",
+    "11021"
+  ],
+  "encounterSets": [
+    {
+      "name": "Voyage Across Belegaer",
+      "count": 6
+    },
+    {
+      "name": "Vast Oceans",
+      "count": 6
+    },
+    {
+      "name": "Stormy Weather",
+      "count": 9
+    },
+    {
+      "name": "Umbar Fleet",
+      "count": 6
+    },
+    {
+      "name": "Corsair Pirates",
+      "count": 9
+    },
+    {
+      "name": "The Dream-chaser's Fleet",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "11022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11023",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11024",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11050",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11051",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11052",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11053",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11054",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11055",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11058",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11059",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11020",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11021",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "11022",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11051",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "110138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "110139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11082",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11060",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11062",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11063",
+      "normal": 2,
+      "easy": 0,
+      "pile": "corsairDeck"
+    }
+  ],
+  "campaignCard": "11171",
+  "campaignPlaced": [
+    "11172",
+    "11173",
+    "11174",
+    "11175",
+    "11176",
+    "11177",
+    "11178"
+  ],
+  "reprints": {
+    "11080": "110136",
+    "11081": "110137",
+    "11082": "110140",
+    "11083": "110141"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.1",
+    "dragnEasy": "E06.1",
+    "hobSlug": "Voyage-Across-Belegaer"
+  }
+}

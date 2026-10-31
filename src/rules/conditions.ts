@@ -23,6 +23,7 @@ import { shadowCards } from "./zones.ts";
 import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
+import { headingIs } from "./families/sea-heading.ts";
 import { lastHideFailed, onStage, withTwin } from "./families/nightmare-guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
@@ -37,6 +38,8 @@ export type Scope = {
   against?: string;
   subject?: string;
   explored?: boolean;
+  // The event a Forced effect answers was made by a player card's effect (a heal or a ready).
+  byPlayerCard?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
   // What the running effect has picked, and the other card the answered event names.
@@ -46,6 +49,8 @@ export type Scope = {
   x?: number;
   // The damage the answered event placed.
   dealt?: number;
+  // The damage the attack sent on past its defender (excessToShip).
+  excess?: number;
 };
 
 // The card a `matches` condition reads.
@@ -121,6 +126,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const read: AmountScope = { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}) };
       return resolveAmount(state, condition.left, read, ctx) < resolveAmount(state, condition.right, read, ctx);
     }
+    case "heading":
+      return headingIs(state, condition.is);
+    case "survivorsThreat":
+      return livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max);
     case "heroesAll": {
       const heroes = state.seats[scope.actor]?.heroes ?? [];
       return heroes.length > 0 && heroes.every((id) => hasTrait(state, id, condition.trait, ctx));
@@ -252,6 +261,12 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "x":
       return (scope.x ?? 0) >= condition.min;
+    case "byPlayerCard":
+      return scope.byPlayerCard === true;
+    case "excess":
+      return (scope.excess ?? 0) >= condition.min;
+    case "dealt":
+      return (scope.dealt ?? 0) >= (condition.min ?? 1);
     case "distinctTraits":
       return distinctTraitCount(state, scope.actor, ctx) >= condition.min;
     case "damageReached": {
