@@ -6,4 +6,10 @@
 // advanced reveals, and The Eaves of Mirkwood bars only the Responses that cancel: both can move a replayed game of The Oath.
 // 12: a full quest stage that was held back advances as soon as nothing holds it (To the River... once no Hill Troll is in play),
 // not at the next quest resolution (stage-reveal.ts, advanceFreed): a replayed game can reach the next stage sooner.
-export const ENGINE_VERSION = 12;
+// 13 (phases 15 and 16 review): while a Peril card's staging resolves, an "any player may" Response is offered only to the revealing seat, in every scenario
+// (mec109.peril, responses.ts), which can leave out an offer of a replayed game; the Breaking of the Fellowship fixes (the extra reveals of stage 4B, Drums in the
+// Deep, the first player lock, the 4B Response) move only that scenario.
+// 14: an enemy that attacks from the staging area makes the additional attack its shadow grants, and its shadow card's "after this attack" effect runs, whether or not
+// the enemy is flagged (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker); Lost in the Dark's "no progress" choice holds for the table
+// (the lasting ModifyStat `table` target): replayed Ring Goes South, Journey in the Dark and Caves of Nibin-Dûm games can move.
+export const ENGINE_VERSION = 14;

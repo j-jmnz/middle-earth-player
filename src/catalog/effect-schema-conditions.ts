@@ -1,6 +1,7 @@
 // Conditions in effect records, the targets an instruction names, and the phase names a condition reads.
 import { z } from "zod";
 
+import { amountSchema } from "./effect-schema-amount.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
 
 export const phaseNameSchema = z.enum([
@@ -77,7 +78,17 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("firstPlayer") }),
   // The card with this code, in play, holds at least `min` resource tokens ("If there are 6 or more resource tokens here", 41050:B:1): read at a
   // campaign card's Resolution (campaign family, src/rules/families/campaign.ts).
-  z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0) }),
+  // With `perPlayer`, `min` is for each player in the game ("X resource tokens on this stage. X is the number of players times 3", 142041:B:2).
+  z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0), perPlayer: z.boolean().optional() }),
+  // The total Threat of the encounter cards in the actor's staging area is at most `max` ("if the total Threat of encounter cards in this staging
+  // area is less than 4", 142063:A:1: max 3). Once stages are separate that is the actor's own area (mec109.multiple-staging-areas); read by
+  // src/rules/conditions.ts.
+  z.strictObject({ kind: z.literal("stagingThreat"), max: z.number().int().min(0) }),
+  // The source card holds at most `max` damage tokens (0: none, "if there are no damage tokens here", 142043:A:1). Read by the moria family
+  // (src/rules/families/moria.ts).
+  z.strictObject({ kind: z.literal("damageHere"), max: z.number().int().min(0) }),
+  // The amount `left` is less than the amount `right`: "If that character's printed Willpower is less than the discarded card's Threat" (142058:A:2).
+  z.strictObject({ kind: z.literal("less"), left: amountSchema, right: amountSchema }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the
@@ -94,6 +105,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // and the attacking enemy's engagement cost is higher than its controller's threat. `attacking`: the holder is
   // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
+  // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
+  // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/keywords.ts).
+  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0) }),
   // The source card is attached to a card with this name.
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
   // The actor controls a hero or ally in play with this code.
@@ -122,6 +136,8 @@ const atomSchema = z.discriminatedUnion("kind", [
     card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]),
     pick: pickSchema.optional(),
     inPlay: z.boolean().optional(),
+    // The card is in a staging area now (`false`: it is not): "raise your threat by its Threat to engage that enemy" needs the enemy still there (142067:B:2).
+    inStaging: z.boolean().optional(),
   }),
   // At most `max` other copies of the source card were played from the hand this round ("if this is the first time you
   // played a copy of ~ this round"); a card played again counts its earlier play. `you`: only the actor's plays count.
@@ -203,8 +219,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking" || condition?.kind === "versusDefender";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [
@@ -215,6 +231,8 @@ export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("subject") }),
   z.strictObject({ kind: z.literal("attacker") }),
   z.strictObject({ kind: z.literal("activeLocation") }),
+  // The card picked before the last ("discard that character" after the top card of the encounter deck was discarded, 142058:A:2).
+  z.strictObject({ kind: z.literal("previous") }),
   // The second card the answered event names (the enemy a character attacked).
   z.strictObject({ kind: z.literal("other") }),
   z.strictObject({

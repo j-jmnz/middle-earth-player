@@ -18,6 +18,9 @@ const placementSchema = z
     pile: z.enum(PILES),
     // Staging only: this many copies per player in the game ("1 Fell Rider per player"); `normal` is the box's total.
     perPlayer: z.number().int().positive().optional(),
+    // Staging only: the quest card's Setup finds these copies in the encounter deck, a different location for each player ("Each player adds 1
+    // different location to the staging area", 142040:A:1). They are dealt with the encounter pile and the Setup record searches for them.
+    searched: z.literal(true).optional(),
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
@@ -186,7 +189,7 @@ function placedCopies(card: Placement, difficulty: Difficulty, seatCount?: numbe
 // the Nightmare piles (placementsAt). The copies of a per-player Setup card the players did not take stay in the encounter deck.
 export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): string[] {
   return placementsAt(data, difficulty).flatMap((card) => {
-    const copies = card.pile === "encounter" ? copiesAt(card, difficulty) : card.pile === "quest" || card.pile === "burden" ? 0 : copiesAt(card, difficulty) - placedCopies(card, difficulty, seatCount);
+    const copies = card.pile === "encounter" || card.searched ? copiesAt(card, difficulty) : card.pile === "quest" || card.pile === "burden" ? 0 : copiesAt(card, difficulty) - placedCopies(card, difficulty, seatCount);
     return Array.from({ length: copies }, () => card.code);
   });
 }
@@ -206,7 +209,7 @@ export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "
   const cards = placementsAt(data, difficulty);
   for (const pile of ["setAside", "staging", "activeLocation", "attached"] as const) {
     for (const card of cards) {
-      if (card.pile !== pile) continue;
+      if (card.pile !== pile || card.searched) continue;
       for (let copy = 0; copy < placedCopies(card, difficulty, seatCount); copy += 1) instructions.push({ verb: SETUP_VERB[pile], code: card.code });
     }
   }

@@ -175,7 +175,7 @@ export const CAVES_GOLDENS: readonly CavesGolden[] = [
   { name: "true solo, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, Easy, won", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "true solo, \"No Time to Waste!\" played, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", boon: "play" },
-  { name: "true solo, threat 40 or higher at the end, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "tense", outcome: "won" },
+  { name: "true solo, threat 40 or higher at the end, won", seatCount: 1, seed: 2, difficulty: "Normal", decks: "tense", outcome: "won" },
   { name: "two-handed, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, Easy, \"No Time to Waste!\" played, won", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", boon: "play" },
   { name: "two-handed, threat 40 or higher at the end, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "won" },

@@ -9,7 +9,8 @@ import type { PlayerIntent } from "../rules/reduce.ts";
 import { ruleCause } from "../rules/cause.ts";
 import { runInstruction } from "../rules/interpret.ts";
 import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { placeQuestProgress } from "../rules/quest.ts";
+import { expireModifiers, type ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, travelTo, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";
@@ -118,6 +119,20 @@ describe("Lost in the Dark (41039:A:1, 41039:A:2)", () => {
     const run = resolveReveal(made.state, made.ctx, "41039", () => "noProgress");
     expect(torchOf(run.state)?.exhausted).toBe(false);
     expect(run.state.modifiers.some((modifier) => modifier.stat === "noQuestProgress" && modifier.until === "endOfPhase")).toBe(true);
+  });
+
+  it("holds the flag on the table, so no progress goes on the quest until the phase ends (41039:A:1)", () => {
+    const made = make({ attachments: ["41029"] });
+    const run = resolveReveal(made.state, made.ctx, "41039", () => "noProgress");
+    expect(run.state.modifiers.some((modifier) => modifier.stat === "noQuestProgress" && modifier.instanceId === "table")).toBe(true);
+    const stageId = run.state.questStage!;
+    const before = run.state.cards[stageId]!.progress;
+    const blocked = placeQuestProgress(run.state, 3, made.ctx.cards, [], () => false);
+    expect(blocked.cards[stageId]?.progress).toBe(before);
+    const later = placeQuestProgress(expireModifiers(run.state, ["endOfPhase"]), 3, made.ctx.cards, [], () => false);
+    expect(later.cards[stageId]?.progress).toBe(before + 3);
+    const free = make({ attachments: ["41029"] });
+    expect(placeQuestProgress(free.state, 3, free.ctx.cards, [], () => false).cards[free.state.questStage!]?.progress).toBe(3);
   });
 
   it("offers only the second branch when the Torch is exhausted, and nothing when nobody has it", () => {

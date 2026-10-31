@@ -9,6 +9,8 @@ import { attackStrength } from "../rules/combat.ts";
 import { DEFENDERS_FRAME, declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense-defenders.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
+import { questSeat } from "./selectors.ts";
+import { viewOf } from "../rules/families/breaking-areas.ts";
 import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { livingSeats } from "../rules/state.ts";
@@ -126,11 +128,13 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
   }
   // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).
   if (sheet?.kind === "pick" && game.window?.kind === "travel") {
-    const now = stagingThreat(game, ctx.cards);
+    // Once stages are separate the traveler reads its own staging area (mec109.multiple-staging-areas).
+    const area = viewOf(game, questSeat(game));
+    const now = stagingThreat(area, ctx.cards);
     const pickedId = choice?.ids[0];
     const location = pickedId ? game.cards[pickedId] : undefined;
     if (!location) return now > 0 ? { kind: "travel", stats: [THREAT(now)], result: "Staging threat now" } : null;
-    const after = stagingThreat({ ...game, staging: game.staging.filter((id) => id !== location.id) }, ctx.cards);
+    const after = stagingThreat({ ...area, staging: area.staging.filter((id) => id !== location.id) }, ctx.cards);
     const points = questPointsOf(game, location, ctx.cards);
     return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: points != null ? `It takes the next ${points} progress before the quest` : null };
   }
@@ -147,10 +151,12 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
       const card = game.cards[id];
       return sum + (card ? modifiedStat(game, card, questStatOf(game, id, ctx.cards), ctx.cards) : 0);
     }, 0);
-    const willpower = committedWillpower(game, ctx.cards) + added;
-    const threat = stagingThreat(game, ctx.cards);
+    // The acting seat quests against its own staging area once stages are separate.
+    const seat = questSeat(game);
+    const willpower = committedWillpower(game, ctx.cards, seat) + added;
+    const threat = stagingThreat(game, ctx.cards, seat);
     if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: commitWords(game, ctx, picked) };
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${questResult(willpower, threat)}${eliminationWords(game, threat - willpower)}` };
+    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${questResult(willpower, threat)}${eliminationWords(game, threat - willpower, seat)}` };
   }
   return null;
 }
@@ -178,9 +184,14 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
 
 // A quest that would fail by `shortfall`, as the engine fails it on a copy (failQuest): a seat whose threat reaches 50 is
 // eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
-function eliminationWords(game: ScenarioState, shortfall: number): string {
+function eliminationWords(game: ScenarioState, shortfall: number, only?: number): string {
   if (shortfall <= 0) return "";
-  const after = failQuest(game, shortfall, []);
+  const after = failQuest(game, shortfall, [], only == null ? undefined : [only]);
+  // Stages are separate: only the seat that quests raises its threat, so only it can be eliminated by this quest (mec109.multiple-staging-areas).
+  if (only != null) {
+    if (livingSeats(after).includes(only)) return "";
+    return livingSeats(game).length === 1 && after.lost && !game.lost ? `; threat reaches 50: ${lossWords(after.lossReason ?? "No seats remain")}` : `; threat reaches 50: Player ${only + 1} is eliminated`;
+  }
   if (after.lost && !game.lost) return `; threat reaches 50: ${lossWords(after.lossReason ?? "No seats remain")}`;
   const out = livingSeats(game).filter((seat) => !livingSeats(after).includes(seat));
   return out.length === 0 ? "" : `; threat reaches 50: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;

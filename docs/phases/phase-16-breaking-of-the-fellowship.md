@@ -4,7 +4,7 @@ Engine half depends on: phase 15's engine half
 Phone half depends on: phase 15
 Blocks: nothing in the proof of concept
 
-**State (2026-10-26):** not started. `breaking-of-the-fellowship` is not in `src/campaign/playable.ts`; its printed lines are among those listed in `src/effects/open-lines.ts`. Records go in a scenario file in `src/effects/authored/` and new vocabulary in a family, as phases 13 and 14 did.
+**State (2026-10-30):** engine half done and reviewed: `breaking-of-the-fellowship` is in `src/campaign/playable.ts` and its goldens run in Node (`src/campaign/golden-breaking.test.ts`). Phone half code done: the table draws the shown seat's staging area, stage and active location, the readouts and Choose words follow, and the four flows `.maestro/breaking-of-the-fellowship*.yaml` are written. Open: the fixtures `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` (no chained win of scenarios 1 to 5 yet), the flows run, and the phone checks.
 
 ## Goal
 
@@ -23,7 +23,7 @@ Blocks: nothing in the proof of concept
 
 ## Separate staging
 
-Each seat's quest, staging, and resolution from stage 2B follow the MEC109 span on separate staging. After a seat commits to its own stage, it reveals for its own stage and compares its committed willpower with its own staging threat. Progress goes on its stage, or its own threat rises. Another seat does not raise threat for that failure. Engagement checks use only that seat's staging area. Cards that say "the staging area", "this stage" or "the quest" mean that seat's. Archery is totaled per stage. If a seat is eliminated while stages are separate, that stage and the encounter cards at it are discarded. True solo has one staging area and one 3A of the player's choice.
+Each seat's quest, staging, and resolution from stage 2B follow the MEC109 span on separate staging. After a seat commits to its own stage, it reveals for its own stage and compares its committed willpower with its own staging threat. Progress goes on its stage, or its own threat rises. Another seat does not raise threat for that failure. Engagement checks use only that seat's staging area. Cards that say "the staging area", "this stage" or "the quest" mean that seat's. Archery is totaled per stage. If a seat is eliminated while stages are separate, that stage and the encounter cards at it are discarded. Each seat has an active location of its own, and travels in player order to a location of its own staging area. True solo has one staging area and one 3A of the player's choice.
 
 The per-seat staging slot and quest stage have existed on the model since phase 7. This is the first scenario that fills them. The second staging area renders only when the 2B record creates it.
 

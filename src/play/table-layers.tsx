@@ -74,7 +74,7 @@ function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore
     <ThreatPanel
       seatLabel={game.seatCount > 1 ? `Player ${seat + 1}` : null}
       threat={game.seats[seat]?.threat ?? 0}
-      rows={threatRows(game, ctx).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, seat) }))}
+      rows={threatRows(game, ctx, seat).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, seat) }))}
       onClose={onClose}
     />
   );

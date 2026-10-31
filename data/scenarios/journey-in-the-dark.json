@@ -120,25 +120,29 @@
       "code": "142052",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "staging",
+      "searched": true
     },
     {
       "code": "142053",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "staging",
+      "searched": true
     },
     {
       "code": "142054",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "staging",
+      "searched": true
     },
     {
       "code": "142055",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "staging",
+      "searched": true
     },
     {
       "code": "142044",

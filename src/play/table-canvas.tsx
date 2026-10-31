@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
+import { stagingWord } from "./area-words.ts";
 import { NO_HIGHLIGHT } from "./peek.ts";
 import { PILE_WORDS, PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
@@ -68,7 +69,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
   if (view.entries.length === 0) return null;
   return (
     <View className="mb-2">
-      <Text className="text-label text-muted">{ZONE_WORD[zone]}</Text>
+      <Text className="text-label text-muted">{zone === "staging" ? stagingWord(game, seat) : ZONE_WORD[zone]}</Text>
       <View className="flex-row flex-wrap gap-1">
         {view.entries.flatMap(({ card, attached, paired }) => [card, ...attached, ...paired]).map((card) => (
           <CardButton

@@ -32,7 +32,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DamageActiveLocation":
       return markLocationDamage(state);
     case "AttackFromStaging":
-      return attackFromStaging(state, focus, ctx, steps);
+      return attackFromStaging(state, instruction, focus, ctx, steps);
     case "PickHighestEngagement":
       return pickHighestEngagement(state, instruction, focus, ctx, steps);
     case "AttachToActiveLocation":

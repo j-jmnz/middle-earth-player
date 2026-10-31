@@ -5,7 +5,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 import { holds } from "./conditions.ts";
 import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { printedOf } from "./printed.ts";
+import { fallenBase, printedOf } from "./printed.ts";
 import type { Earned, ResolutionLog } from "./campaign-state.ts";
 import { shuffleIds } from "./seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
@@ -135,7 +135,9 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       case "MarkFallen": {
         const host = Object.values(next.cards).find((card) => card.code === instruction.attached && card.zone === "attached" && card.host != null);
         const hero = host?.host ? next.cards[host.host] : undefined;
-        const log = hero && printedOf(ctx.cards, hero.code).type === "hero" && !next.resolutionLog.fallen.includes(hero.code) ? { ...next.resolutionLog, fallen: [...next.resolutionLog.fallen, hero.code] } : next.resolutionLog;
+        // A hero Fallen Into Evil made an enemy is logged under its own code (rules/printed.ts).
+        const heroCode = hero ? fallenBase(hero.code) : null;
+        const log = hero && heroCode && printedOf(ctx.cards, heroCode).type === "hero" && !next.resolutionLog.fallen.includes(heroCode) ? { ...next.resolutionLog, fallen: [...next.resolutionLog.fallen, heroCode] } : next.resolutionLog;
         next = stepOver(next, log);
         break;
       }

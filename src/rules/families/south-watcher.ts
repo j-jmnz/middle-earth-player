@@ -4,6 +4,7 @@
 // An enemy that attacks without being engaged: the Watcher in the Water stays in the staging area but is considered engaged with each
 // player, so it attacks every player once in the combat phase; Storm of Howls makes the enemy in the staging area with the highest
 // engagement cost attack the player who revealed it. The combat code asks `attackHere` instead of reading the enemy's zone.
+import type { Instruction } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../intents.ts";
 import { ruleCause } from "../cause.ts";
 import { attackBarred } from "../constants.ts";
@@ -19,9 +20,16 @@ import type { Focus } from "./index.ts";
 import { effectData } from "./encounter-moves.ts";
 import { activeLocations } from "./south-locations.ts";
 
-// An enemy in the staging area that is considered engaged with each player.
+// An enemy in the staging area that is considered engaged with each player (the Watcher in the Water), or with the first player only (the
+// Balrog, `engagedWithFirst`, 142044:A:2): it stays in the staging area and attacks from there.
 export function engagedWithAll(state: ScenarioState, id: string): boolean {
-  return state.cards[id]?.zone === "staging" && flagged(state, id, "engagedWithAll");
+  return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst"));
+}
+
+// Whether the enemy in the staging area is considered engaged with this seat: every seat for the Watcher, the first player for the Balrog.
+function engagedWithSeat(state: ScenarioState, id: string, seat: number): boolean {
+  if (state.cards[id]?.zone !== "staging") return false;
+  return flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer);
 }
 
 // The enemy is where it can attack from: engaged, in the staging area but considered engaged with every player, or in the staging area
@@ -40,7 +48,7 @@ export function attackKey(state: ScenarioState, enemyId: string, seat: number): 
 
 // The enemies in the staging area that still attack this seat in this combat phase.
 export function stagingAttackers(state: ScenarioState, seat: number): string[] {
-  return state.staging.filter((id) => engagedWithAll(state, id) && !state.resolvedAttacks.includes(`${id}@${seat}`) && !attackBarred(state, id, seat));
+  return state.staging.filter((id) => engagedWithSeat(state, id, seat) && !state.resolvedAttacks.includes(`${id}@${seat}`) && !attackBarred(state, id, seat));
 }
 
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.
@@ -48,14 +56,16 @@ export function dealForAttack(state: ScenarioState, enemyId: string, steps: Engi
   return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps);
 }
 
-// AttackFromStaging: the picked enemy in the staging area attacks the actor now (142038:A:2).
-export function attackFromStaging(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = lastPicked(state);
+// AttackFromStaging: the picked enemy in the staging area (or the source, `target: self`) attacks the actor now (142038:A:2), or the first
+// player (`who: firstPlayer`, 142043:A:2).
+export function attackFromStaging(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackFromStaging" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = instruction.target === "self" ? (focus.sourceId ?? "") : lastPicked(state);
+  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
   const enemy = id ? state.cards[id] : undefined;
-  if (!id || enemy?.zone !== "staging" || attackBarred(state, id, focus.seat) || state.seats[focus.seat]?.eliminated) return state;
+  if (!id || enemy?.zone !== "staging" || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const begun = beginEnemyAttack(dealForAttack(counted, id, steps), focus.seat, id, ctx, steps, true);
+  const begun = beginEnemyAttack(dealForAttack(counted, id, steps), seat, id, ctx, steps, true);
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
 

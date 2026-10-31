@@ -50,7 +50,8 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // "Any player may trigger this response": each seat is offered it, the controller first.
-      const seats = effect.anyPlayer ? [seat, ...order.filter((other) => other !== seat)] : [seat];
+      // While a Peril card's staging resolves the other players cannot trigger Responses, whoever "any player may" names (mec109.peril).
+      const seats = effect.anyPlayer && locked == null ? [seat, ...order.filter((other) => other !== seat)] : [seat];
       for (const offered of seats) if (offerable(state, effect, instance.id, offered, ctx)) offers.push({ cardId: instance.id, effectId: effect.id, seat: offered, event });
     }
   }

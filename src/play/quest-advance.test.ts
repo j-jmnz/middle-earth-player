@@ -112,4 +112,15 @@ describe("the quest advance screen's latch", () => {
     }
     expect(openAdvance(latch, current)).toBeNull();
   });
+
+  it("also opens on a seat's own stage once stages are separate (Breaking of the Fellowship, 2B on), where no shared stage exists", () => {
+    const moment = (id: string): TableMoment => ({ seq: 3, kind: "sent", before: {} as ScenarioState, after: {} as ScenarioState, steps: [{ kind: "advance", cardId: id } as EngineStep] });
+    const view = { questStage: null, seatStages: "stage-a|stage-b" };
+    expect(advancedTo(moment("stage-b"), view)).toEqual({ seq: 3, stageId: "stage-b" });
+    expect(advancedTo(moment("stage-c"), view)).toBeNull();
+    // The screen stays up while that stage is one of the seats' and goes once it is not.
+    const latch = nextLatch(NO_ADVANCE, { seq: 3, stageId: "stage-a" }, { ...view, asking: null, over: false });
+    expect(openAdvance(latch, view)).toEqual({ seq: 3, stageId: "stage-a" });
+    expect(openAdvance(latch, { questStage: null, seatStages: "stage-b" })).toBeNull();
+  });
 });

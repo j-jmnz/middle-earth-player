@@ -4,6 +4,7 @@
 import { legalAttackEnemies } from "../rules/combat.ts";
 import { sideQuestIds } from "../rules/families/sidequests-quest.ts";
 import { printedOf } from "../rules/printed.ts";
+import { questSeat } from "./selectors.ts";
 import { stagingThreat } from "../rules/quest.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { legalTargets } from "../rules/reduce.ts";
@@ -84,7 +85,7 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
           pass: "Commit no one",
           passNote: "Pass sends no one.",
           // The quest is never skipped (rr.step-3-3): staging still reveals and its threat still counts against no willpower.
-          armed: noOneQuests(stagingThreat(game, ctx.cards)),
+          armed: noOneQuests(stagingThreat(game, ctx.cards, questSeat(game))),
         };
   }
   if (game.mode === "planning") {

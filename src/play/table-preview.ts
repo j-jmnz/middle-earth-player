@@ -1,5 +1,6 @@
 // What a long press on a table card shows (card-preview.tsx): the card, the cards attached to it and its face-up shadow cards,
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
+import { stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 
@@ -19,9 +20,12 @@ export type Describe = (code: string, picture?: string) => Omit<PreviewCard, "co
 /**
  * The quest stage's title line in its preview: its name and its progress over its quest points ("Flight to the Ford · 2 / 8"). A
  * stage with no quest points is won some other way: the title is the name and the detail line says how (objective.ts). Null for
- * any card that is not the quest stage.
+ * any card that is not the quest stage. Once stages are separate every seat's stage is one, read as that seat sees it (its stage, its
+ * staging area).
  */
-export function questTitle(game: ScenarioState, ctx: ReduceContext, cardId: string, name: string, line: (id: string) => string | null): Pick<PreviewCard, "title" | "detail"> | null {
+export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: string, name: string, line: (id: string) => string | null): Pick<PreviewCard, "title" | "detail"> | null {
+  const owner = stageSeat(whole, cardId);
+  const game = viewOf(whole, owner ?? undefined);
   const stage = game.questStage === cardId ? game.cards[cardId] : undefined;
   if (!stage) return null;
   const points = stagePoints(game, stage, ctx);

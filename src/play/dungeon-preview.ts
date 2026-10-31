@@ -2,17 +2,21 @@
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck. The engine decided each; nothing here changes one.
 import { freeOfEncounters } from "../rules/families/objectives.ts";
-import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/printed.ts";
+import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import { prisonerWords } from "./widgets.ts";
 
-/** The text of the engine's Orc Guard stand-in, from its printed definition (rules/printed.ts): the stats a real card would print. Null for any other code. */
+/**
+ * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
+ * is blank), from their printed definitions (rules/printed.ts): the stats a real card would print. Null for any other code.
+ */
 export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: string): string | null {
-  if (code !== ORC_GUARD_CODE) return null;
+  const fallen = code.endsWith(FALLEN_SUFFIX);
+  if (code !== ORC_GUARD_CODE && !(fallen && cards.has(fallenBase(code)))) return null;
   const printed = printedOf(cards, code);
   const threat = printed.threat ? `Threat ${printed.threat}` : "no Threat";
-  return `Enemy. Attack ${printed.attack ?? 0}, Defense ${printed.defense ?? 0}, ${printed.health ?? 0} hit point${printed.health === 1 ? "" : "s"}, ${threat}.`;
+  return `${fallen ? "Fallen into evil: an enemy now" : "Enemy"}. Attack ${printed.attack ?? 0}, Defense ${printed.defense ?? 0}, ${printed.health ?? 0} hit point${printed.health === 1 ? "" : "s"}, ${threat}.`;
 }
 
 /** The muted line under a card's name in its preview, or null: what only the table knows about it. */

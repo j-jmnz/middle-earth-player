@@ -6,7 +6,7 @@ import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { flagged, livingSeats, updateCard } from "./state.ts";
+import { flagged, heldAmount, livingSeats, updateCard } from "./state.ts";
 import { dealOneShadow, type ReduceContext } from "./interpret.ts";
 import { queueEvent } from "./queue.ts";
 import { resolveAttack } from "./shadow.ts";
@@ -26,21 +26,31 @@ import { offeredTargets, stagingAttackable, withCardTargets } from "./families/a
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
-export function archeryTotal(state: ScenarioState, cards: Cards): number {
+// The archery total. Once stages are separate it is calculated at each stage (mec109.multiple-staging-areas): `seat`'s staging area, its engaged
+// enemies and its stage.
+export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number): number {
+  const stage = seat != null && state.separate ? new Set([...(state.seats[seat]?.staging ?? []), ...(state.seats[seat]?.engaged ?? []), ...(state.seats[seat]?.stage ? [state.seats[seat]?.stage ?? ""] : [])]) : null;
+  // Archery X with X "the number of players at this stage" (142070:A:1): one player at each separate stage, the players in the game before that.
+  const players = state.separate ? 1 : livingSeats(state).length;
   let total = 0;
   for (const instance of Object.values(state.cards)) {
-    if (!inPlay(instance.zone)) continue;
+    if (!inPlay(instance.zone) || (stage && !stage.has(instance.id))) continue;
     const value = printedOf(cards, instance.code).keywords.archery;
     if (value != null && value > 0) total += value;
+    // Archery a card in play gives itself (142070:A:1, 142078:A:1).
+    if (state.modifiers.length > 0) total += heldAmount(state, instance.id, "archeryBonus") + (flagged(state, instance.id, "archeryPlayers") ? players : 0);
   }
+  // Archery a seat's stage gains until the end of the round (142082:A:1).
+  for (const index of livingSeats(state)) if (seat == null || index === seat) total += heldAmount(state, `seat:${index}`, "archeryBonus");
   return total;
 }
 
-export function archeryRecipients(state: ScenarioState, cards: Cards): string[] {
+// The characters archery damage may go to; once stages are separate, only the characters of the seat at that stage.
+export function archeryRecipients(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const ids: string[] = [];
   for (let index = 0; index < state.seatCount; index += 1) {
-    const seat = state.seats[index];
-    if (!seat || seat.eliminated) continue;
+    const owner = state.seats[index];
+    if (!owner || owner.eliminated || (seat != null && state.separate && index !== seat)) continue;
     ids.push(...characters(state, index, cards));
   }
   return ids;
@@ -212,6 +222,12 @@ export function canAttack(
   if (!isCharacterType(printed) || attacker.host != null) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
+  // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
+  // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
+    if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
+    return attacker.controller === seat || printed.keywords.ranged || flagged(state, attackerId, "ranged");
+  }
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack-targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");

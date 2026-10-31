@@ -1,0 +1,191 @@
+// Effect items that act on a picked or found card: ReturnToStaging, AttachSelf, the searches, ShuffleIntoDeck, DiscardRestricted, ReadyHero,
+// BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (a player chooses only among different cards), and the verb applies.
+import type { Instruction } from "../catalog/boundary.ts";
+import { frameScope, refCard } from "./amounts.ts";
+import { askTarget } from "./choices.ts";
+import { hasTrait, outOfPlayChoices, searchable } from "./conditions.ts";
+import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
+import { startReveal } from "./frames.ts";
+import type { EngineStep } from "./intents.ts";
+import type { ReduceContext } from "./interpret.ts";
+import { moveEncounter } from "./families/encounter-moves.ts";
+import { activeOf, stagingDest } from "./families/breaking-areas.ts";
+import { attachHeroHosts, attachHostChooser } from "./families/play-hooks.ts";
+import { discardRestricted } from "./families/objectives-claimed.ts";
+import { printedOf } from "./printed.ts";
+import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
+import type { Frame, QueueItem, ScenarioState } from "./state.ts";
+import { livingSeats, updateCard } from "./state.ts";
+import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
+import { patchTop, topFrame } from "./windows.ts";
+import { attachTo, moveCard } from "./zones.ts";
+
+function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const instance = state.cards[id];
+  return instance != null && printedOf(ctx.cards, instance.code).type === "enemy";
+}
+
+function candidates(state: ScenarioState, item: QueueItem, sourceId: string | null, ctx: ReduceContext): string[] {
+  const instruction = item.instruction;
+  switch (instruction.verb) {
+    case "ReturnToStaging": {
+      const target = instruction.target;
+      const source = sourceId ? state.cards[sourceId] : undefined;
+      if (target.kind === "self") return sourceId ? [sourceId] : [];
+      if (target.kind === "host") return source?.host ? [source.host] : [];
+      if (target.kind === "activeLocation") {
+        // The acting seat's own active location once stages are separate.
+        const active = activeOf(state, item.seat);
+        return active && active !== sourceId ? [active] : [];
+      }
+      if (target.kind === "picked" || target.kind === "previous" || target.kind === "subject" || target.kind === "attacker" || target.kind === "other") {
+        const id = refCard(state, target.kind, frameScope(state, item.seat, sourceId));
+        return id && hasEnemyType(state, id, ctx) && state.cards[id]?.zone === "engaged" ? [id] : [];
+      }
+      const seats = target.who === "actor" ? [item.seat] : livingSeats(state);
+      return seats
+        .flatMap((seat) => state.seats[seat]?.engaged ?? [])
+        .filter((id) => hasEnemyType(state, id, ctx))
+        .filter((id) => !target.trait || hasTrait(state, id, target.trait, ctx));
+    }
+    case "AttachSelf": {
+      const code = sourceId ? state.cards[sourceId]?.code : undefined;
+      const free = (id: string): boolean => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) && (code == null || !attachBlocked(state, ctx, id, code));
+      if (instruction.to.kind === "hero") {
+        const seat = attachSeat(state, instruction, item.seat, sourceId);
+        return seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);
+      }
+      const trait = instruction.to.trait;
+      return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
+    }
+    case "SearchMove":
+    case "SearchReveal": {
+      const found = searchable(state, instruction, ctx);
+      const required = instruction.verb === "SearchMove" && instruction.require ? searchable(state, { code: instruction.require }, ctx) : [];
+      if (required.length > 0) return required;
+      if (instruction.verb !== "SearchMove" || !instruction.different) return found;
+      // A different title: not one an earlier search of this effect has found (the frame's picked cards, kept by applyTargeted).
+      const data = topFrame(state)?.data;
+      const taken = new Set((data?.kind === "effect" ? (data.picked ?? []) : []).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
+      return found.filter((id) => !taken.has(printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
+    }
+    case "ShuffleIntoDeck":
+      return searchable(state, instruction, ctx, ["encounterDiscard"]);
+    case "DiscardRestricted":
+      return sourceId ? restrictedAttachments(state, sourceId, ctx) : [];
+    case "ShuffleOutOfPlayIntoEncounterDeck":
+      return outOfPlayChoices(state, instruction.code);
+    case "ReadyHero":
+    case "BarAttack":
+    case "PlaceProgressOnLocation":
+      return targetCandidates(state, instruction, item.seat, ctx);
+    default:
+      return [];
+  }
+}
+
+// Different copies of one card are the same choice. Only different cards make the player pick.
+export function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
+  const seen = new Set<string>();
+  return ids.filter((id) => {
+    const code = state.cards[id]?.code ?? id;
+    if (seen.has(code)) return false;
+    seen.add(code);
+    return true;
+  });
+}
+
+function picksOne(instruction: Instruction): boolean {
+  if (instruction.verb === "ReturnToStaging") return instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose";
+  // "Add each Nazgûl enemy found": every match goes, and nobody chooses.
+  if (instruction.verb === "SearchMove") return instruction.each !== true;
+  return true;
+}
+
+export function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const found = candidates(state, item, frame.cardId, ctx);
+  let ids = found;
+  if (item.chosen) {
+    ids = [item.chosen];
+  } else if (item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck") {
+    // On an encounter or quest effect the first player picks among the choices (rr.first-player).
+    if (found.length > 1) return askTarget(state, { ...item, seat: state.firstPlayer }, found);
+    ids = found.slice(0, 1);
+  } else if (picksOne(item.instruction)) {
+    const distinct = distinctByCode(state, found);
+    const chooser = attachHostChooser(state, item.instruction, attachSeat(state, item.instruction, item.seat, frame.cardId) ?? item.seat);
+    if (distinct.length > 1) return askTarget(state, { ...item, seat: chooser }, distinct);
+    ids = found.slice(0, 1);
+  }
+  return applyTargeted(state, item, ids, frame.cardId, ctx, steps);
+}
+
+function applyTargeted(
+  state: ScenarioState,
+  item: QueueItem,
+  ids: readonly string[],
+  sourceId: string | null,
+  ctx: ReduceContext,
+  steps: EngineStep[],
+): ScenarioState {
+  const instruction = item.instruction;
+  const first = ids[0];
+  switch (instruction.verb) {
+    case "ReturnToStaging": {
+      let next = state;
+      let count = 0;
+      for (const id of ids) {
+        if (!next.cards[id]) continue;
+        next = updateCard(moveCard(next, id, { zone: "staging" }), id, { controller: null });
+        count += 1;
+      }
+      const data = topFrame(next)?.data;
+      return data?.kind === "effect" ? patchTop(next, { data: { ...data, returned: data.returned + count } }) : next;
+    }
+    case "AttachSelf": {
+      if (!first || !sourceId || !state.cards[sourceId]) return state;
+      const attached = attachTo(moveCard(state, sourceId, { zone: "attached" }), sourceId, first);
+      return updateCard(attached, sourceId, { face: "up" });
+    }
+    case "SearchMove": {
+      let next = state;
+      for (const id of instruction.each ? ids : ids.slice(0, 1)) {
+        // "Put it into play engaged with you" (41013:A:1): the searching player engages it as it enters play (rr.engaged), so Forced effects
+        // that hear an engagement hear this one.
+        if (instruction.to === "engaged") {
+          next = moveEncounter(next, id, "engaged", item.seat, ctx, steps);
+          continue;
+        }
+        // Into the searching seat's own staging area once stages are separate (families/breaking-areas.ts).
+        next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
+        if (instruction.each) next = updateCard(next, id, { face: "up" });
+      }
+      // A `different` search tells the next one which titles are taken.
+      const data = topFrame(next)?.data;
+      const moved = instruction.each ? ids : ids.slice(0, 1);
+      return instruction.different && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
+    }
+    case "SearchReveal":
+      return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
+    case "ShuffleIntoDeck":
+    case "ShuffleOutOfPlayIntoEncounterDeck":
+      return first ? shuffleIntoEncounterDeck(state, first) : state;
+    case "DiscardRestricted":
+      return first ? discardRestricted(state, first) : state;
+    case "ReadyHero":
+    case "BarAttack":
+    case "PlaceProgressOnLocation":
+      return applyTargetVerb(state, instruction, first, sourceId, item.seat, ctx, steps);
+    default:
+      return state;
+  }
+}
+
+// The seat whose heroes an AttachSelf to a hero offers and who chooses among them: the player the effect picked for `control: "picked"`
+// ("attach this card to one of that player's heroes", 900106:A:1: the last player picked, though cards were picked since; null when no
+// player is picked), otherwise the seat the item runs for.
+function attachSeat(state: ScenarioState, instruction: Instruction, itemSeat: number, sourceId: string | null): number | null {
+  if (instruction.verb !== "AttachSelf" || instruction.to.kind !== "hero" || instruction.to.control !== "picked") return itemSeat;
+  const player = (frameScope(state, itemSeat, sourceId).picked ?? []).findLast((entry) => entry.startsWith("seat:"));
+  return player ? Number(player.slice("seat:".length)) : null;
+}

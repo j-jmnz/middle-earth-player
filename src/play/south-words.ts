@@ -9,7 +9,7 @@ export function southWords(instruction: Instruction): string | null {
     case "PickHighestEngagement":
       return `choose the ${instruction.trait} enemy in the staging area with the highest engagement cost`;
     case "AttackFromStaging":
-      return "that enemy attacks you";
+      return instruction.who === "firstPlayer" ? "that enemy attacks the first player" : "that enemy attacks you";
     case "AssignDamage":
       return "assign the damage among your characters";
     case "AdvanceStage":

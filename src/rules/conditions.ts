@@ -1,5 +1,6 @@
 import type { Condition } from "../catalog/boundary.ts";
 
+import { resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "./families/costs-pay.ts";
 import { spendablePools } from "./families/costs-verbs.ts";
 import { engagedThisRound } from "./families/attack-events.ts";
@@ -8,9 +9,10 @@ import { seatThreat } from "./families/play-hooks.ts";
 import { distinctTraitCount, flaggedTrait } from "./families/misc-traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
-import { modifiedStat, versusHighEngagement } from "./keywords.ts";
+import { modifiedStat, versusDefender, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
+import { stagingThreat } from "./quest.ts";
 import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -110,7 +112,15 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "firstPlayer":
       return scope.actor === state.firstPlayer;
     case "tokens":
-      return tokensOn(state, condition.code) >= condition.min;
+      return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? livingSeats(state).length : 1);
+    case "stagingThreat":
+      return stagingThreat(state, ctx.cards, scope.actor) <= condition.max;
+    case "damageHere":
+      return (scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0) <= condition.max;
+    case "less": {
+      const read: AmountScope = { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}) };
+      return resolveAmount(state, condition.left, read, ctx) < resolveAmount(state, condition.right, read, ctx);
+    }
     case "heroesAll": {
       const heroes = state.seats[scope.actor]?.heroes ?? [];
       return heroes.length > 0 && heroes.every((id) => hasTrait(state, id, condition.trait, ctx));
@@ -140,6 +150,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return (state.stagesReached ?? []).includes(condition.code) === condition.is;
     case "inPlay":
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
+    case "versusDefender": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && versusDefender(state, holder, condition.maxHitPoints, ctx.cards);
+    }
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
@@ -199,6 +213,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const card = id ? state.cards[id] : undefined;
       if (!id || !card) return false;
       if (condition.inPlay != null && inPlay(card.zone) !== condition.inPlay) return false;
+      if (condition.inStaging != null && (card.zone === "staging") !== condition.inStaging) return false;
       // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
       if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
       return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);

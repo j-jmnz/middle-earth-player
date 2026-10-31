@@ -23,6 +23,8 @@ import { tokenOutcome } from "./oath-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
+import { viewOf } from "../rules/families/breaking-areas.ts";
+import { questSeat } from "./selectors.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
 import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
 import { has, option, statOf, step } from "./sheet-parts.ts";
@@ -73,7 +75,9 @@ function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | und
  * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
  * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while the active location slots are full.
  */
-export function travelRefusals(game: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
+export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
+  // Once stages are separate the traveler has its own active location and staging area (mec109.multiple-staging-areas).
+  const game = viewOf(whole, questSeat(whole));
   if (!freeSlot(game)) return [];
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
@@ -111,7 +115,7 @@ function responseNote(game: ScenarioState, names: SheetNames, offers: readonly {
 // leave in staging (rr.optional-engagement, rr.engagement-check).
 function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, names: SheetNames): string {
   const seat = game.activeSeat;
-  const rows = threatRows(game, ctx);
+  const rows = threatRows(game, ctx, seat);
   const threat = game.seats[seat]?.threat ?? 0;
   const anyway = rows.filter((row) => row.engagesSeat === seat).map((row) => `${names.card(row.id)} (${row.cost})`);
   const stays = rows.filter((row) => row.engagesSeat == null).map((row) => `${names.card(row.id)} (${row.cost})`);
@@ -249,7 +253,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
@@ -309,9 +313,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const targets = has(legal, "Travel") ? legalTargets(game, { type: "Travel" }, ctx) : [];
       const unavailable = travelRefusals(game, ctx, names, targets);
       // Only one location can be active (rr.travel): while one is, say what exploring it still takes.
-      const active = game.activeLocation ? game.cards[game.activeLocation] : undefined;
+      const area = viewOf(game, questSeat(game));
+      const active = area.activeLocation ? game.cards[area.activeLocation] : undefined;
       const activePoints = active ? questPointsOf(game, active, ctx.cards) : null;
-      const waiting = game.staging.some((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "location");
+      const waiting = area.staging.some((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "location");
       const blocked = targets.length === 0 && active != null && waiting;
       return {
         kind: "pick",

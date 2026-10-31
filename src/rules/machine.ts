@@ -34,7 +34,7 @@ import { afterPaying } from "./families/deck-play.ts";
 import { doRefresh } from "./refresh.ts";
 import { askReadyPayments } from "./families/attachments-ready.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
-import { travelIntent } from "./travel.ts";
+import { travelIntent, travelTaken } from "./travel.ts";
 import { advanceFreed, resolutionStep } from "./stage-reveal.ts";
 import { pushDue } from "./delayed.ts";
 import { crossBoundary } from "./triggers.ts";
@@ -42,7 +42,7 @@ import { constantWin, heldStat, NO_COUNTS } from "./constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
-import { flagged, inPlay, livingSeats, markReached, reached, updateCard, withMode, type ScenarioState } from "./state.ts";
+import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "./state.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
@@ -140,7 +140,7 @@ export function applyIntent(
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
-      return { ...markReached(state, "traveled"), window: null };
+      return { ...travelTaken(state), window: null };
     case "Engage": {
       // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
       const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
@@ -198,14 +198,20 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       // The windows after staging (3.3) and after quest resolution (3.4).
       return stepWindow(state, ctx, state.questResolved ? "3.4" : "3.3") ?? resolutionStep(state, ctx, steps);
     case "travel": {
+      // "Skip the travel phase this round" (142062:A:1): no window opens and no location is traveled to.
+      if (flagged(state, "table", "skipTravel")) return withMode(state, nextAfterTravel(state));
       // The travel opportunity was taken or declined: the window after it (4.2), still in the Travel phase.
-      if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, "optionalEngage");
-      const seat = livingSeats(state)[0];
+      if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, nextAfterTravel(state));
+      const seat = state.separate ? livingSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
       if (seat == null) {
+        // Stages are separate and every seat has had its opportunity (families/breaking-areas.ts).
+        if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: livingSeats(state) });
         return state.lost
           ? state
           : { ...state, lost: true, lossReason: "No seats remain", window: null };
       }
+      // Each seat in player order may travel to a location of its own staging area, to its own active location (mec109.multiple-staging-areas).
+      if (state.separate) return { ...state, travelDone: [...(state.travelDone ?? []), seat], window: { kind: "travel" }, activeSeat: seat };
       return { ...state, window: { kind: "travel" }, activeSeat: seat };
     }
     case "optionalEngage":
@@ -218,7 +224,8 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       return next.mode === "combatStart" ? (stepWindow(state, ctx, "5.3") ?? next) : next;
     }
     case "combatStart":
-      return startCombat(state, ctx);
+      // "Skip the combat phase" (142075:A:2): the round goes on to the refresh phase.
+      return flagged(state, "table", "skipCombat") ? withMode({ ...state, engagement: null }, "refresh") : startCombat(state, ctx);
     case "combatShadows":
       return withMode(announceShadowsDealt(dealShadows(state, ctx.cards, steps), ctx), "combatActions");
     case "combatActions":
@@ -263,9 +270,16 @@ function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): S
   return openPass(withMode(next, "resourceActions"));
 }
 
+// The phase after Travel: the Encounter phase, which "Skip the encounter phase" (142061:B:1) leaves out.
+function nextAfterTravel(state: ScenarioState): ModeName {
+  return flagged(state, "table", "skipEncounter") ? "combatStart" : "optionalEngage";
+}
+
 function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  // No enemy a player could optionally engage (rr.optional-engagement): the step has nothing to offer.
-  if (optionalEnemies(state, ctx.cards).length === 0) {
+  // No enemy a player could optionally engage (rr.optional-engagement): the step has nothing to offer. Stages that are separate offer each seat
+  // the enemies in its own staging area (mec109.multiple-staging-areas).
+  const offered = state.separate ? livingSeats(state).some((seat) => optionalEnemies(state, ctx.cards, seat).length > 0) : optionalEnemies(state, ctx.cards).length > 0;
+  if (!offered) {
     return { ...withMode(state, "engagement"), window: null, engagement: { ordinal: 0, engagedThisPass: false } };
   }
   const seated = state.mode === "optionalEngage" ? state : withMode(state, "optionalEngage");
@@ -275,12 +289,27 @@ function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 // Archery damage is dealt as the combat phase begins (mec109.archery, rr.step-6-1), before the shadow cards
 // (rr.step-6-2).
 function startCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  if (state.separate) return startSeparateCombat(state, ctx);
   const total = archeryTotal(state, ctx.cards);
   const next = { ...withMode(state, "combatShadows"), resolvedAttacks: [], declaredAttacks: [], pendingAttack: null };
   if (total > 0 && archeryRecipients(next, ctx.cards).length > 0) {
     return { ...next, window: { kind: "archery", total }, activeSeat: livingSeats(next)[0] ?? next.firstPlayer };
   }
   return next;
+}
+
+// Archery is totaled at each stage and only the player at that stage assigns it (mec109.multiple-staging-areas): the seats in player order, each with
+// its own window, and the combat phase goes on once every stage has dealt its archery.
+function startSeparateCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const done = state.archeryDone ?? [];
+  for (const seat of livingSeats(state)) {
+    if (done.includes(seat)) continue;
+    const total = archeryTotal(state, ctx.cards, seat);
+    if (total <= 0 || archeryRecipients(state, ctx.cards, seat).length === 0) continue;
+    return { ...state, archeryDone: [...done, seat], window: { kind: "archery", total, seat }, activeSeat: seat };
+  }
+  const { archeryDone: _done, ...rest } = state;
+  return { ...withMode(rest, "combatShadows"), resolvedAttacks: [], declaredAttacks: [], pendingAttack: null };
 }
 
 function enemyStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

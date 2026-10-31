@@ -36,7 +36,7 @@ export function QuestAdvanceView({
   onProgress,
 }: {
   card: PreviewCard;
-  words: { eyebrow: string | null; title: string; detail: string | null };
+  words: { eyebrow: string | null; title: string; detail: string | null; also: readonly string[] };
   // The button back to the table (advanceButton): Begin, Continue or Progress.
   button: { label: string; hint: string };
   // The stage's When Revealed is asking: its question stands in place of Progress.
@@ -93,6 +93,11 @@ export function QuestAdvanceView({
               {words.detail}
             </Text>
           ) : null}
+          {words.also.map((line) => (
+            <Text key={line} testID="quest-advance-also" className="mt-1 text-label text-muted">
+              {line}
+            </Text>
+          ))}
           {asks ? (
             <View testID="quest-advance-asks" className="mt-3" style={{ flexShrink: 1 }}>
               <Text className="font-display text-eyebrow uppercase text-accent">{choice.header.step}</Text>

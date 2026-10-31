@@ -8,6 +8,7 @@ import { shadowCards } from "../rules/zones.ts";
 import { captiveUnder } from "../rules/families/south-captive.ts";
 import { prisonersOfSeat } from "../rules/families/prisoner.ts";
 import { declaredDefenders } from "../rules/families/defense-defenders.ts";
+import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../rules/families/breaking-areas.ts";
 
 import { threatRows } from "./foresight.ts";
 
@@ -71,18 +72,27 @@ function fightingIds(game: ScenarioState, seat: number): ReadonlySet<string> {
   return new Set([...combatPairs(game, seat).values()].flatMap((pair) => pair.ids));
 }
 
-/** The instance ids a zone holds, for the seat the table shows. A one-card zone is a list of zero or one. */
+/**
+ * The instance ids a zone holds, for the seat the table shows. A one-card zone is a list of zero or one. While stages are separate (Breaking
+ * of the Fellowship, stage 2B on) the staging area, the quest stage and the active location are the shown seat's own, and there is no second
+ * active location of a shared quest: each seat has one (families/breaking-areas.ts).
+ */
 export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readonly string[] {
   const owner = game.seats[seat];
   switch (zone) {
-    case "questStage":
-      return game.questStage ? [game.questStage] : NONE;
+    case "questStage": {
+      // A seat that has not chosen its stage yet (stage 2B resolving) still sees the shared stage.
+      const stage = stageOf(game, seat) ?? game.questStage;
+      return stage ? [stage] : NONE;
+    }
     case "staging":
-      return stagingOrder(game);
-    case "activeLocation":
-      return game.activeLocation ? [game.activeLocation] : NONE;
+      return stagingOrder(game, areaOrShared(game, seat));
+    case "activeLocation": {
+      const active = activeOf(game, seat);
+      return active ? [active] : NONE;
+    }
     case "secondActiveLocation":
-      return game.widgets.secondActiveLocation && game.secondActiveLocation ? [game.secondActiveLocation] : NONE;
+      return !isSeparate(game) && game.widgets.secondActiveLocation && game.secondActiveLocation ? [game.secondActiveLocation] : NONE;
     case "engaged":
       return owner?.engaged ?? NONE;
     case "play": {
@@ -104,19 +114,27 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
   }
 }
 
+// The shown seat's staging area; the cards in no seat's area yet (the shared staging area stage 2B is dealing out) stay in view until each has an owner.
+function areaOrShared(game: ScenarioState, seat: number): readonly string[] {
+  const own = stagingOf(game, seat);
+  if (!isSeparate(game)) return own;
+  const shared = sharedStaging(game);
+  return shared.length > 0 ? [...own, ...shared] : own;
+}
+
 // The staging area's cards in the order the table draws them: each guarded objective is followed by the encounter cards attached to it
 // (rr.guarded), so a guard stands beside the objective it guards.
-function stagingOrder(game: ScenarioState): readonly string[] {
-  if (!game.staging.some((id) => game.cards[id]?.guard === true)) return game.staging;
+function stagingOrder(game: ScenarioState, staging: readonly string[]): readonly string[] {
+  if (!staging.some((id) => game.cards[id]?.guard === true)) return staging;
   const ordered: string[] = [];
-  for (const id of game.staging) {
+  for (const id of staging) {
     const card = game.cards[id];
     if (!card || card.guard === true) continue;
     ordered.push(id);
-    for (const attached of card.attachments) if (game.cards[attached]?.guard === true && game.staging.includes(attached)) ordered.push(attached);
+    for (const attached of card.attachments) if (game.cards[attached]?.guard === true && staging.includes(attached)) ordered.push(attached);
   }
   // A guard whose objective left the staging area is a card of its own again.
-  for (const id of game.staging) if (!ordered.includes(id)) ordered.push(id);
+  for (const id of staging) if (!ordered.includes(id)) ordered.push(id);
   return ordered;
 }
 
@@ -234,21 +252,40 @@ export function threatSelector(): (game: ScenarioState) => readonly SeatThreat[]
   };
 }
 
+function ticksOf(game: ScenarioState, ctx: ReduceContext, seat?: number): string {
+  return threatRows(game, ctx, seat)
+    .filter((row) => !row.blocked)
+    .map((row) => row.cost)
+    .join(",");
+}
+
 /**
- * The engagement costs of the enemies in staging that can be engaged, lowest first, as one string ("2,4"; "" for none): the ticks marked on each
- * dial's meter. A string compares by value, so a subscriber renders only when a cost changes. It is made for one context (`ctx`), and the same game
- * object gives the previous string without asking the engine again.
+ * The engagement costs of the enemies in staging that can be engaged, lowest first, as one string ("2,4"; "" for none): the ticks marked on a dial's
+ * meter. A string compares by value, so a subscriber renders only when a cost changes. It is made for one context (`ctx`), and the same game
+ * object gives the previous string without asking the engine again. Once stages are separate they are the enemies in the staging area of `shown`.
  */
-export function tickKeySelector(ctx: ReduceContext): (game: ScenarioState) => string {
+export function tickKeySelector(ctx: ReduceContext, shown?: number): (game: ScenarioState) => string {
   let previous = "";
   let lastGame: ScenarioState | null = null;
   return (game) => {
     if (game === lastGame) return previous;
     lastGame = game;
-    previous = threatRows(game, ctx)
-      .filter((row) => !row.blocked)
-      .map((row) => row.cost)
-      .join(",");
+    previous = ticksOf(game, ctx, shown);
+    return previous;
+  };
+}
+
+/**
+ * The ticks of every dial, one key for each seat joined by "|": each seat's own staging area once stages are separate (mec109.multiple-staging-areas), the
+ * one staging area for every dial before. Same string-by-value contract as `tickKeySelector`.
+ */
+export function dialTicksSelector(ctx: ReduceContext): (game: ScenarioState) => string {
+  let previous = "";
+  let lastGame: ScenarioState | null = null;
+  return (game) => {
+    if (game === lastGame) return previous;
+    lastGame = game;
+    previous = Array.from({ length: game.seatCount }, (_, seat) => ticksOf(game, ctx, isSeparate(game) ? seat : undefined)).join("|");
     return previous;
   };
 }
@@ -260,6 +297,14 @@ export function tickKeySelector(ctx: ReduceContext): (game: ScenarioState) => st
 export function actingSeat(game: ScenarioState): number {
   const seat = game.activeSeat;
   return seat >= 0 && seat < game.seatCount ? seat : 0;
+}
+
+/**
+ * The seat whose staging area and stage the quest numbers (committed willpower against staging threat) read: the acting seat once stages are
+ * separate, each seat quests against its own (mec109.multiple-staging-areas); undefined before, when the whole table is one area.
+ */
+export function questSeat(game: ScenarioState): number | undefined {
+  return isSeparate(game) ? actingSeat(game) : undefined;
 }
 
 /**
@@ -286,7 +331,7 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
 
 /**
  * Whether a card is drawn whole on the table the seat sees, a full target for a tap: in staging, the active location or the
- * quest; in the seat's hand, heroes, play area or engagement area; fighting one of its enemies; or the top of its deck when
+ * quest (the seat's own once stages are separate); in the seat's hand, heroes, play area or engagement area; fighting one of its enemies; or the top of its deck when
  * the rules let it be played from there. An attachment or a shadow card only peeks out under its host, so a choice among
  * them is made on a panel's tiles instead.
  */
@@ -297,11 +342,16 @@ export function onTableFor(game: ScenarioState, seat: number): (cardId: string) 
     if (!card) return false;
     if (fighting.has(cardId)) return true;
     switch (card.zone) {
-      case "staging":
+      // Once stages are separate the table draws the seat's own area, stage and active location: a card of another seat's is not on it.
+      case "staging": {
+        const area = areaOf(game, cardId);
+        return area == null || area === seat;
+      }
       case "activeLocation":
       case "secondActiveLocation":
+        return !isSeparate(game) || activeOf(game, seat) === cardId;
       case "questStage":
-        return true;
+        return !isSeparate(game) || stageOf(game, seat) === cardId || game.questStage === cardId;
       case "hand":
       case "heroes":
       case "engaged":
