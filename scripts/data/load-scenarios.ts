@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
 import type { Card } from "../../src/catalog/card-facts.ts";
-import { campaignDataSchema, parseScenarioData, scenarioDefinition, type CampaignData, type ScenarioData } from "../../src/catalog/scenario-data.ts";
+import { campaignDataSchema, campaignGameCodes, parseScenarioData, scenarioDefinition, type CampaignData, type ScenarioData } from "../../src/catalog/scenario-data.ts";
 import { DATA_DIR } from "./paths.ts";
 
 // Reads data/scenarios and data/campaigns. Offline.
@@ -37,9 +37,17 @@ export function dealtCodes(campaign: CampaignData | readonly CampaignData[], sce
     codes.add(scenario.campaignCard);
     for (const card of scenario.cards) codes.add(card.code);
     for (const code of scenario.campaignPlaced) codes.add(code);
+    for (const code of gameCodes(campaign, scenario)) codes.add(code);
     if (nightmare) for (const code of nightmareCodes([scenario])) codes.add(code);
   }
   return codes;
+}
+
+// The cards a campaign game of the scenario deals beyond its piles (campaignGameCodes), for the campaign among these that plays it. With no
+// campaign (a scenario read alone) the Hard/Expert Mode card is not among them.
+export function gameCodes(campaign: CampaignData | readonly CampaignData[], scenario: ScenarioData): string[] {
+  const owners = asList(campaign).filter((one) => one.scenarios.includes(scenario.id));
+  return campaignGameCodes({ xp: owners.some((one) => one.xp === true) }, scenario);
 }
 
 // The cards a scenario deals on Nightmare that it does not deal otherwise: its Nightmare deck's setup card and cards.

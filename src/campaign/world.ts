@@ -6,11 +6,10 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import type { Effect } from "../catalog/boundary.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
-import { recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
+import { campaignGameCodes, recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
 import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
-import { MODE_CARD_CODE } from "./xp.ts";
 
 import { printedFromRow, printedMap, type CatalogRow } from "./cards.ts";
 
@@ -44,9 +43,8 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
   codes.add(scenario.campaignCard);
   for (const card of scenarioCards(scenario)) codes.add(card.code);
   for (const code of scenario.campaignPlaced) codes.add(code);
-  // A campaign game deals the Campaign Expansion's reprint of a card (ScenarioData.reprints), and the Hard/Expert Mode card is put beside the quest deck.
-  for (const code of Object.values(scenario.reprints ?? {})) codes.add(code);
-  if (campaign.xp) codes.add(MODE_CARD_CODE);
+  // The reprints a campaign game deals in place of the originals, and the Hard/Expert Mode card (campaignGameCodes).
+  for (const code of campaignGameCodes(campaign, scenario)) codes.add(code);
   // The Nightmare deck, so a briefing can switch to Nightmare without loading the world again.
   if (scenario.nightmare) {
     codes.add(scenario.nightmare.setupCard);

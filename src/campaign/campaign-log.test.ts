@@ -138,7 +138,7 @@ describe("carry-over to the next campaign", () => {
 
   it("an offer a save has taken is not made again, and returns when that save is gone", () => {
     const done = { ...newSave("done", "campaign", 2), log: applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards) };
-    const taker = newSave("taker", "mirkwood-paths", 1, done.log.carryOver, done.id);
+    const taker = newSave("taker", "mirkwood-paths", 1, { carried: done.log.carryOver, carriedFrom: done.id });
     expect(taker.log.carriedFrom).toBe("done");
     expect(carryOffers([done, taker], scenariosOf)).toEqual([]);
     expect(carryOffers([done], scenariosOf).map((offer) => [offer.saveId, offer.seatCount])).toEqual([["done", 2]]);
@@ -148,7 +148,7 @@ describe("carry-over to the next campaign", () => {
 
   it("a new save takes the cards in, and its first checklist moves them into the pool and clears carryIn", () => {
     const finished = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
-    const fresh = newSave("next", "mirkwood-paths", 2, finished.carryOver);
+    const fresh = newSave("next", "mirkwood-paths", 2, { carried: finished.carryOver });
     expect(fresh.log.carryIn).toHaveLength(3);
     expect(fresh.log.carryIn.map((card) => card.seat)).toEqual([null, 0, 1]);
     expect(fresh.log.campaignPool).toEqual([]);
@@ -166,10 +166,10 @@ describe("carry-over to the next campaign", () => {
 
   it("a copy for each player follows the new save's seats: two seats to one gives one copy, one to two gives each a copy", () => {
     const twoSeats = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
-    const solo = newSave("solo", "mirkwood-paths", 1, twoSeats.carryOver);
+    const solo = newSave("solo", "mirkwood-paths", 1, { carried: twoSeats.carryOver });
     expect(solo.log.carryIn.filter((card) => card.code === SUPPORT).map((card) => card.seat)).toEqual([0]);
     const oneSeat = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards);
-    const pair = newSave("pair", "mirkwood-paths", 2, oneSeat.carryOver);
+    const pair = newSave("pair", "mirkwood-paths", 2, { carried: oneSeat.carryOver });
     expect(pair.log.carryIn.filter((card) => card.code === SUPPORT).map((card) => card.seat)).toEqual([0, 1]);
   });
 

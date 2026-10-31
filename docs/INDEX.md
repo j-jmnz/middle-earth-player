@@ -42,14 +42,14 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.0K)
     - 157–160 Maestro (~120)
-- `docs/architecture.md` — Architecture (~15.2K tok)
+- `docs/architecture.md` — Architecture (~15.3K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
   - 78–120 Modules (~970) ← 1
   - 121–146 State (~1.0K) ← 9
   - 147–168 Play loop (~250)
   - 169–194 Engine (~1.9K)
-    - 183–194 Mechanic families (~1.0K)
+    - 183–194 Mechanic families (~1.1K)
   - 195–200 Effects (~520)
   - 201–233 Scenario definition (~790)
   - 234–254 Persistence (~1.3K)
@@ -58,9 +58,9 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~46.0K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~46.4K tok)
   - 17–37 Sections (~380)
-  - 38–49 Product (~490)
+  - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
   - 64–84 Decisions (~850)
   - 85–113 Stack (~810)
@@ -69,7 +69,7 @@ Read the sections your task touches.
   - 150–362 Domain (~9.0K)
     - 152–224 Campaign (~1.8K) ← 1
     - 225–239 Mirkwood campaign cards and carry-over (~870)
-    - 240–251 Standalone play (~790)
+    - 240–251 Standalone play (~800)
     - 252–263 Scenario state (~540)
     - 264–296 The engine plays the game (~2.1K) ← 2
     - 297–304 Engine steps (~180)
@@ -89,7 +89,7 @@ Read the sections your task touches.
     - 537–557 Escape from Dol Guldur (~2.7K)
     - 558–572 The Oath (~2.3K)
     - 573–590 The Caves of Nibin-Dûm (~2.3K)
-  - 591–604 Dream-chaser (~1.3K)
+  - 591–604 Dream-chaser (~1.6K)
   - 605–613 Nightmare (~420)
   - 614–652 Deckbuilding (~1.8K) ← 1
   - 653–731 Effects (~3.2K)
@@ -100,7 +100,7 @@ Read the sections your task touches.
   - 732–752 Data sources (~560)
   - 753–771 Card images (~1.1K) ← 6
   - 772–796 Persistence and shipping (~1.5K)
-  - 797–836 Screens (~3.8K) ← 1
+  - 797–836 Screens (~3.9K) ← 1
     - 823–836 Table screen (~1.2K) ← 4
 - `docs/design-system-table.md` — Design system — Table (landscape) (~17.4K tok)
   - 5–8 Overview (~150)
@@ -132,7 +132,7 @@ Read the sections your task touches.
   - 252–255 Haptics (~250)
   - 256–266 Banner (~580) ← 1
   - 267–270 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~21.9K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~22.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -146,16 +146,16 @@ Read the sections your task touches.
   - 206–219 Icons (~390) ← 6
   - 220–239 Card art (~780) ← 2
   - 240–254 Tablets (~510) ← 13
-  - 255–428 Screens (~11.5K)
+  - 255–428 Screens (~11.9K)
     - 259–262 Splash (~30)
     - 263–278 Campaigns (campaign list) (~1.3K) ← 5
     - 279–292 Scenarios (~730) ← 1
     - 293–305 History (~1.4K) ← 3
-    - 306–323 Briefing (~1.2K) ← 3
-    - 324–327 Campaign setup (~660) ← 3
+    - 306–323 Briefing (~1.3K) ← 3
+    - 324–327 Campaign setup (~700) ← 3
     - 328–333 Campaign path (~440) ← 2
-    - 334–337 Campaign log (~230) ← 1
-    - 338–341 Spend XP (~390) ← 1
+    - 334–337 Campaign log (~270) ← 1
+    - 338–341 Spend XP (~610) ← 1
     - 342–345 Table — landscape (~130) ← 1
     - 346–357 Resolution and standalone outcome (~980) ← 1
     - 358–365 Decks (~510) ← 1

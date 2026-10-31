@@ -53,6 +53,9 @@ export type ZoneName =
   | "campaign"
   // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/plans/nightmare-mode.md): in play all game.
   | "nightmare"
+  // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
+  // nothing that reads the Nightmare setup card reads it.
+  | "modeCard"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by
   // nobody. The card's host is the Watcher.
   | "captive";
@@ -287,6 +290,8 @@ export type ScenarioState = {
   removedFromPool?: readonly { code: string; seat: number | null }[];
   // The campaign log's structured facts, when the scenario was started in Campaign Mode with any (CampaignFacts).
   campaignFacts?: CampaignFacts;
+  // The Hard/Expert Mode card to put next to the quest deck at the end of setup (dcce.hard-expert); finishSetup places it.
+  modeCard?: { code: string; side: "A" | "B" };
   // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
   // dropped when the opening hands are final.
   afterMulligan?: readonly (readonly string[])[];
@@ -383,6 +388,7 @@ export function blankScenario(input: {
     encounterDiscard: [],
     ...(input.definition.burdenDeck ? { burdenDeck: [] } : {}),
     ...(input.definition.life != null ? { life: input.definition.life } : {}),
+    ...(input.definition.modeCard ? { modeCard: input.definition.modeCard } : {}),
     victory: [],
     setAside: [],
     removed: [],
@@ -492,6 +498,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "attached" ||
     zone === "campaign" ||
     zone === "nightmare" ||
+    zone === "modeCard" ||
     zone === "captive"
   );
 }

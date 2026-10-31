@@ -247,6 +247,16 @@ export function sideInstructions(effects: readonly Effect[], code: string, side:
   return effects.filter((effect) => effect.cardCode === code && effect.timing === timing && effect.lines.every((line) => line.startsWith(`${code}:${side}:`))).flatMap((effect) => effect.instructions);
 }
 
+// The Hard/Expert Mode card (collector 217, dcce.hard-expert): put next to the quest deck in a game of a campaign with XP.
+export const MODE_CARD_CODE = "11217";
+
+// The cards a campaign game deals beyond the scenario's own piles, the one list every reader of "what a game deals" shares (the world the
+// briefing loads, the effect tooling, the coverage tests): the Campaign Expansion's reprint of each card (ScenarioData.reprints) and, in a
+// campaign with XP, the Hard/Expert Mode card.
+export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints">): string[] {
+  return [...Object.values(scenario.reprints ?? {}), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
+}
+
 // What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
 // pile, the quest stages and the cards the campaign card places (ScenarioData.reprints). Standalone play deals the scenario as it is.
 export function campaignScenario(data: ScenarioData): ScenarioData {

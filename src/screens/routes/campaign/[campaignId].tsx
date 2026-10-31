@@ -59,7 +59,7 @@ export default function CampaignSetup() {
   function start(): void {
     if (started.current) return;
     started.current = true;
-    const save = createSave(user, id, seats, undefined, taken?.cards ?? [], taken?.saveId ?? null, hasXp ? mode : null);
+    const save = createSave(user, id, seats, { carried: taken?.cards ?? [], carriedFrom: taken?.saveId ?? null, modeDefault: hasXp ? mode : null });
     router.replace(pathHref(save.id));
   }
 
@@ -88,7 +88,7 @@ export default function CampaignSetup() {
         accessibilityLabel={`Players for ${name}`}
         stretch
       />
-      {hasXp ? <ModePicker mode={mode} onMode={setMode} testIDPrefix={`mode-${id}`} /> : null}
+      {hasXp ? <ModePicker mode={mode} onMode={setMode} testIDPrefix={`mode-${id}`} campaignName={name} setup /> : null}
       {carry.length > 0 ? (
         <View className="gap-2" testID="carry-over">
           <Section title="Carry over from a finished campaign" className="mt-4" />

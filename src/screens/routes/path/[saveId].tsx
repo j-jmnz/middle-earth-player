@@ -172,6 +172,11 @@ export default function CampaignPath() {
       <Text testID="xp-line" className="mt-0.5 text-label text-bone">
         {xpWords(save.log)}
       </Text>
+      {save.active != null ? (
+        <Label tone="muted" testID="xp-after-scenario">
+          Spend after this scenario.
+        </Label>
+      ) : null}
       {save.active == null && xpUnspentOf(save.log) > 0 ? (
         <View className="-ml-3 mt-1 items-start">
           <TextButton label="Spend XP" testID="xp-open" tone="accent" onPress={() => router.push({ pathname: "/xp/[saveId]", params: { saveId: save.id } })} />

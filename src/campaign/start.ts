@@ -27,8 +27,9 @@ export type StartInput = {
   // Pool cards that are put into play at the start of each scenario (Mendor): the checklist's step 8 left them out of the encounter
   // deck, and each enters play under the first player after the campaign card's own Setup.
   poolIntoPlay?: readonly string[];
-  // The campaign log's structured facts, handed to the engine (Campaign Mode only). Left out when the log holds none.
-  facts?: CampaignFacts;
+  // The campaign log's structured facts, handed to the engine (Campaign Mode only). Left out when the log holds none. The Hard/Expert Mode card
+  // the game is played with is `modeCard`, below: the facts take it from there.
+  facts?: Omit<CampaignFacts, "modeCard">;
   // Campaign when absent.
   mode?: PlayMode;
   // The Hard/Expert Mode card the players put next to the quest deck (dcce.hard-expert), Campaign Mode only: its Resolution adds its XP.
@@ -46,6 +47,13 @@ const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToSt
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;
+}
+
+// The facts the engine gets: the log's, and the Hard/Expert Mode card chosen for this game (the log records it when the scenario is won).
+function factsOf(input: StartInput): CampaignFacts | undefined {
+  const logged = input.facts ?? { prisoner: null, usedOnce: [], counters: {} };
+  const facts: CampaignFacts = input.modeCard ? { ...logged, modeCard: input.modeCard } : logged;
+  return hasFacts(facts) ? facts : undefined;
 }
 
 export function buildStart(start: StartInput): StartScenario {
@@ -93,6 +101,6 @@ export function buildStart(start: StartInput): StartScenario {
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
-    ...(!standalone && input.facts && hasFacts(input.facts) ? { facts: input.facts } : {}),
+    ...(!standalone && factsOf(input) ? { facts: factsOf(input) } : {}),
   };
 }

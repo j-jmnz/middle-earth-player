@@ -150,10 +150,10 @@ describe("what a win writes (41051:B:1)", () => {
       expect(offers[0]?.cards.map((card) => card.code), campaignId).toEqual(["41049"]);
       // Any other campaign takes it too: a Fellowship save, a Mirkwood Paths one, a The Dark of Mirkwood one.
       for (const next of ["mirkwood-paths", "the-dark-of-mirkwood", "fellowship-of-the-ring"]) {
-        const fresh = newSave("next", next, 2, finished.carryOver, "old");
+        const fresh = newSave("next", next, 2, { carried: finished.carryOver, carriedFrom: "old" });
         expect(fresh.log.carryIn.map((card) => `${card.code}:${card.seat}`), `${campaignId} to ${next}`).toEqual(["41049:0", "41049:1"]);
       }
-      const fresh = newSave("next", campaignId, 2, finished.carryOver, "old");
+      const fresh = newSave("next", campaignId, 2, { carried: finished.carryOver, carriedFrom: "old" });
       const plan = checklist({ log: fresh.log, scenario: caves, seats: cavesLoadout(2), effects: EFFECTS, cards });
       if (!plan.ok) throw new Error(plan.errors.join("; "));
       for (const seat of [0, 1]) expect(plan.seats[seat]?.deck.filter((code) => code === "41049"), `${campaignId} seat ${seat}`).toHaveLength(1);

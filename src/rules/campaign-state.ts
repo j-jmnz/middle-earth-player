@@ -12,6 +12,10 @@ export type Earned = {
   // earn is one copy of a code however often it is listed, whatever seat wrote it.
   perPlayer?: boolean;
 };
+
+// The Hard/Expert Mode card (11217, dcce.hard-expert): side A is Hard, side B is Expert.
+export type ModeCard = "hard" | "expert";
+
 export type ResolutionLog = {
   earned: readonly Earned[];
   fallen: readonly string[];
@@ -41,5 +45,5 @@ export type CampaignFacts = {
   levels?: Readonly<Record<string, number>>;
   upgraded?: readonly string[];
   // The Hard/Expert Mode card the players put next to the quest deck this game (dcce.hard-expert): the campaign log records it per scenario.
-  modeCard?: "hard" | "expert";
+  modeCard?: ModeCard;
 };

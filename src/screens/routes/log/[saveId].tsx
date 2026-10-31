@@ -3,8 +3,8 @@ import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
-import { gavinReturned, MODE_CARD_NAME } from "../../../campaign/xp";
-import { markedLines, xpWords } from "../../../campaign/xp-view";
+import { MODE_CARD_NAME, type ModeCard } from "../../../campaign/xp";
+import { markedLines, markedSpeech, xpWords } from "../../../campaign/xp-view";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
 import { BodyText, Column, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
@@ -29,7 +29,8 @@ import { Text, TextInput } from "../../../play/text";
 // A rule between the log's rows: a faint line of the ink, as on the printed sheet.
 const RULE = 0.28;
 
-function Row({ label, value, testID, icon }: { label: string; value: string; testID: string; icon?: IconName }) {
+// `speech`: what a screen reader hears for the value when the text alone says too little (the squares of a card's boxes).
+function Row({ label, value, testID, icon, speech }: { label: string; value: string; testID: string; icon?: IconName; speech?: string }) {
   const s = useUiScale();
   const palette = usePalette();
   return (
@@ -38,16 +39,16 @@ function Row({ label, value, testID, icon }: { label: string; value: string; tes
         {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
         <Text className="font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
-      <Text testID={testID} className="mt-0.5 text-body text-ink">
+      <Text testID={testID} className="mt-0.5 text-body text-ink" {...(speech ? { accessibilityLabel: speech } : {})}>
         {value}
       </Text>
     </View>
   );
 }
 
-// "4 rounds · 61 · 5 XP · Hard": a won scenario's row, with the XP its Resolution gave and the Hard/Expert Mode card it was played with.
-function scenarioWords(score: { rounds: number; score: number }, xp: number | undefined, mode: "hard" | "expert" | undefined): string {
-  return [`${score.rounds} rounds`, String(score.score), xp != null ? `${xp} XP` : null, mode ? MODE_CARD_NAME[mode] : null].filter(Boolean).join(" · ");
+// "5 XP · Hard": under a won scenario's name, the XP its Resolution gave and the Hard/Expert Mode card it was played with; empty where there is neither.
+function extrasWords(xp: number | undefined, mode: ModeCard | undefined): string {
+  return [xp != null ? `${xp} XP` : null, mode ? MODE_CARD_NAME[mode] : null].filter(Boolean).join(" · ");
 }
 
 export default function Log() {
@@ -136,9 +137,8 @@ export default function Log() {
           <Row label="Threat Modifiers" value={log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
           {/* Dream-chaser: the XP the Resolutions gave and what is unspent, and the boxes marked beside the scalable and upgradable cards (MEC111 p31). */}
           {campaign.xp ? <Row label="XP" value={xpWords(log)} testID="log-xp" /> : null}
-          {campaign.xp ? <Row label="Scalable Cards" value={markedLines(log, "scalable").join("\n") || "None"} testID="log-scalable" /> : null}
-          {campaign.xp ? <Row label="Upgradable Cards" value={markedLines(log, "upgradable").join("\n") || "None"} testID="log-upgradable" /> : null}
-          {campaign.xp && gavinReturned(log) ? <Row label="Gavin" value="Returned" testID="log-gavin" /> : null}
+          {campaign.xp ? <Row label="Scalable Cards" value={markedLines(log, "scalable").join("\n") || "None"} speech={markedSpeech(log, "scalable")} testID="log-scalable" /> : null}
+          {campaign.xp ? <Row label="Upgradable Cards" value={markedLines(log, "upgradable").join("\n") || "None"} speech={markedSpeech(log, "upgradable")} testID="log-upgradable" /> : null}
           <Row label="Boons" value={pool("boon")} testID="log-boons" />
           <Row label="Burdens" value={pool("burden")} testID="log-burdens" />
           <Row
@@ -156,12 +156,16 @@ export default function Log() {
             <Text className="font-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {
               const score = log.scenarios[id];
+              const extras = extrasWords(log.xpGained[id], log.modes[id]);
               return (
-                <View key={id} testID={`log-scenario-${id}`} className="mt-1 flex-row items-baseline gap-1.5">
-                  <Text className={score ? "text-body text-ink" : "text-body text-inkMuted"}>{names[id] ?? id}</Text>
-                  {/* Dotted leaders to the score, as a printed log ruled by hand. */}
-                  <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
-                  <Text className={score ? "font-display text-label text-ink" : "text-label text-inkMuted"}>{score ? scenarioWords(score, log.xpGained[id], log.modes[id]) : "Not completed"}</Text>
+                <View key={id} testID={`log-scenario-${id}`} className="mt-1">
+                  <View className="flex-row items-baseline gap-1.5">
+                    <Text className={score ? "shrink text-body text-ink" : "shrink text-body text-inkMuted"}>{names[id] ?? id}</Text>
+                    {/* Dotted leaders to the score, as a printed log ruled by hand. */}
+                    <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
+                    <Text className={score ? "font-display text-label text-ink" : "text-label text-inkMuted"}>{score ? `${score.rounds} rounds · ${score.score}` : "Not completed"}</Text>
+                  </View>
+                  {score && extras ? <Text testID={`log-extras-${id}`} className="text-label text-inkMuted">{extras}</Text> : null}
                 </View>
               );
             })}

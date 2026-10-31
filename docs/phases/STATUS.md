@@ -60,7 +60,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 35 | Nightmare difficulty | active | 2026-10-30. Built: the Nightmare deal and setup card, saves, the briefing switch, the list line, the top bar's Eye; `/reviewer` and `/ux` rounds done. Open: the switch, list and top bar on a phone and a tablet. |
 | 36 | Nightmare effects | active | 2026-10-30. Engine done: all seven playable scenarios on `NIGHTMARE_PLAYABLE`; review round done (known limits in the phase file). Open: one Nightmare game per scenario on a phone. |
 | 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
-| 38 | Dream-chaser campaign shell and XP | not started | |
+| 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. Phone checks open: Spend XP, Hard/Expert pickers, path and log XP rows, MEC111 reader; flows `dream-chaser-start`, `booklet-dream-chaser` not run. |
 | 39 | Sea mechanics family | not started | |
 | 39b | Ships on the table | not started | |
 | 40 | Voyage Across Belegaer | not started | |
@@ -88,6 +88,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 ### Rules and engine
 
+- Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
 - Dream-chaser ship stats are not in `data/cards` (ledger notes only); phase 39 needs them. The sea keywords (Sailing, Boarding, Aflame, Grapple, Uncharted) parse as unknown tokens until phase 39.
 
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).

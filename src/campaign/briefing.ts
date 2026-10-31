@@ -183,8 +183,8 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     poolEncounterCards: plan.poolEncounterCards,
     poolIntoPlay: plan.poolIntoPlay,
     ...(input.modeCard ? { modeCard: input.modeCard } : {}),
-    // The log's structured facts; a Dream-chaser log adds its scalable cards' levels, its upgraded cards and the Hard/Expert card in play.
-    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...(input.modeCard ? { modeCard: input.modeCard } : {}) },
+    // The log's structured facts; a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log) },
   });
 }
 

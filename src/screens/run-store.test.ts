@@ -57,7 +57,7 @@ describe("run store", () => {
 
   it("keeps a run when its save or game is deleted", () => {
     const user = openUser();
-    const save = createSave(user, "fellowship-of-the-ring", 1, 1000);
+    const save = createSave(user, "fellowship-of-the-ring", 1, { now: 1000 });
     writeRun(user, run({ refId: save.id, id: `campaign:${save.id}:x:1` }));
     deleteSave(user, save.id);
     expect(listRuns(user)).toHaveLength(1);

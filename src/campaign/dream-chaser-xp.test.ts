@@ -5,15 +5,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { effectSchema } from "../catalog/boundary.ts";
 import { cards as cardTable } from "../catalog/schema.ts";
-import { campaignScenario, sideInstructions } from "../catalog/scenario-data.ts";
+import { campaignGameCodes, campaignScenario, sideInstructions } from "../catalog/scenario-data.ts";
 import { EFFECTS } from "../effects/index.ts";
 import { holds } from "../rules/conditions.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import { startScenario, type ScenarioState } from "../rules/reduce.ts";
-import { updateCard, withSeat, withThreat } from "../rules/state.ts";
+import { reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/fixture.ts";
+import { inPlay, updateCard, withSeat, withThreat } from "../rules/state.ts";
 import { spawn } from "../rules/zones.ts";
-import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { dealtCodes, gameCodes, loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { loadWorld as loadTable, table, type World as Table } from "../../scripts/past-scene.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
@@ -27,7 +28,7 @@ import { buildStart } from "./start.ts";
 import { worldCodes, worldFrom, type World } from "./world.ts";
 import { mirkwoodLoadout, mirkwoodWorld } from "../../scripts/mirkwood-game.ts";
 import { campaign as mirkwoodCampaign, passage } from "../../scripts/mirkwood-scene.ts";
-import { gavinReturned, MODE_CARD_CODE, spendXp, xpUnspentOf } from "./xp.ts";
+import { gavinReturned, MODE_CARD_CODE, modeXp, spendXp, xpUnspentOf } from "./xp.ts";
 
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable, dcce.hard-expert, dcce.naasiyah (data/rules/entries.json). The Dream-chaser campaign shell: a
 // Resolution's GainXp lines, the XP the log keeps and the players spend, the Hard/Expert Mode card the deal places, the reprints a campaign game
@@ -164,6 +165,14 @@ describe("the Hard/Expert Mode card's records (11217)", () => {
   it("each side's Resolution is its own record: Hard gains 1 XP, Expert 2", () => {
     expect(sideInstructions(EFFECTS, MODE_CARD_CODE, "A", "resolution")).toEqual([{ verb: "GainXp", amount: 1 }]);
     expect(sideInstructions(EFFECTS, MODE_CARD_CODE, "B", "resolution")).toEqual([{ verb: "GainXp", amount: 2 }]);
+    expect([modeXp(EFFECTS, "hard"), modeXp(EFFECTS, "expert")]).toEqual([1, 2]);
+  });
+
+  it("GainXp is a Resolution verb: a record that gives XP at any other time is refused", () => {
+    const record = EFFECTS.find((effect) => effect.cardCode === MODE_CARD_CODE);
+    if (!record) throw new Error("11217 has no record");
+    expect(() => effectSchema.parse(record)).not.toThrow();
+    expect(() => effectSchema.parse({ ...record, timing: "forced" })).toThrow(/Resolution verb/);
   });
 });
 
@@ -206,17 +215,24 @@ describe("the deal in Campaign Mode", () => {
     }
   });
 
-  it("the engine places the card faceup next to the quest deck, on the side chosen, and keeps the choice for the log", async () => {
+  it("the engine places the card faceup in its own zone at the end of setup, on the side chosen, and keeps the choice for the log", async () => {
     // Played out on a scenario whose cards the engine prints (Passage Through Mirkwood): the card and the start do not depend on the campaign.
     const { cards: printed } = await mirkwoodWorld();
     const mode = (await loadPrinted([MODE_CARD_CODE])).get(MODE_CARD_CODE);
     if (!mode) throw new Error("11217 is not in data/cards");
     printed.set(MODE_CARD_CODE, mode);
+    const ctx = { effects: EFFECTS, cards: printed };
     for (const [modeCard, side] of [["hard", "A"], ["expert", "B"]] as const) {
-      const start = buildStart({ campaign: mirkwoodCampaign, scenario: passage, seatCount: 1, seed: 1, threatModifier: 0, seats: mirkwoodLoadout(1), effects: EFFECTS, modeCard, facts: { prisoner: null, usedOnce: [], counters: {}, modeCard } });
-      const state = startScenario(start, { effects: EFFECTS, cards: printed });
-      const placed = Object.values(state.cards).filter((card) => card.code === MODE_CARD_CODE);
-      expect(placed.map((card) => [card.zone, card.face])).toEqual([["nightmare", side]]);
+      const start = buildStart({ campaign: mirkwoodCampaign, scenario: passage, seatCount: 1, seed: 1, threatModifier: 0, seats: mirkwoodLoadout(1), effects: EFFECTS, modeCard });
+      expect(start.facts?.modeCard).toBe(modeCard);
+      const opening = startScenario(start, ctx);
+      const cardsOf = (state: ScenarioState) => Object.values(state.cards).filter((card) => card.code === MODE_CARD_CODE);
+      // Setup is not over: the card is put down at its end, after the mulligan and the quest's Setup.
+      expect(cardsOf(opening)).toEqual([]);
+      const state = expectOk(reduce(opening, { type: "Keep" }, ctx)).state;
+      expect(cardsOf(state).map((card) => [card.zone, card.face])).toEqual([["modeCard", side]]);
+      // It is in play, in a zone of its own.
+      expect(inPlay("modeCard")).toBe(true);
       expect(state.campaignFacts?.modeCard).toBe(modeCard);
       expect(state.resolution.at(-1)).toEqual({ verb: "GainXp", amount: modeCard === "hard" ? 1 : 2 });
     }
@@ -247,6 +263,20 @@ describe("the deal in Campaign Mode", () => {
     expect(setAside("campaign")).toEqual(["110138", "110139", "110136", "110137", "110140", "110141"]);
     expect(setAside("standalone")).toEqual(["110138", "110139", "11080", "11081", "11082", "11083"]);
     expect(worldCodes(campaign, scenario, EFFECTS)).toEqual(expect.arrayContaining(["110136", "110141", MODE_CARD_CODE]));
+  });
+
+  it("the effect tooling reads the same list of what a game deals: the reprints, and the Hard/Expert card in a campaign with XP", () => {
+    const scenario = loadScenario(VOYAGE);
+    const shared = campaignGameCodes(campaign, scenario);
+    expect(shared).toEqual(["110136", "110137", "110140", "110141", MODE_CARD_CODE]);
+    const dealt = dealtCodes(campaign, [scenario]);
+    for (const code of shared) expect(dealt.has(code), code).toBe(true);
+    // Every code the world loads for a deal beyond the piles is one the tooling counts (its open lines, its drafts, its coverage).
+    expect(gameCodes(campaign, scenario)).toEqual(shared);
+    // Read with no campaign, a scenario has no Hard/Expert card, and a campaign without XP offers none.
+    expect(dealtCodes([], [scenario]).has(MODE_CARD_CODE)).toBe(false);
+    expect(dealtCodes([], [scenario]).has("110136")).toBe(true);
+    expect(campaignGameCodes({}, scenario)).not.toContain(MODE_CARD_CODE);
   });
 
   it("changes nothing for a scenario with no reprint", () => {

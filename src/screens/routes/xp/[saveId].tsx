@@ -8,8 +8,8 @@ import { spendOnSave, pick, unpick, type Picks } from "../../../campaign/xp";
 import { pickSentence, xpView, type XpRowView } from "../../../campaign/xp-view";
 import { rowSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
-import { ActionBar, BodyText, Label, NavBar, PrimaryButton, Screen, ScreenScroll, Section, StatTile, TextButton } from "../../chrome";
-import { campaignOf } from "../../campaign-data";
+import { ActionBar, BodyText, IconButton, Label, NavBar, PrimaryButton, Screen, ScreenScroll, Section, StatTile, TextButton } from "../../chrome";
+import { campaignOf, scenarioNames } from "../../campaign-data";
 import { goBack } from "../../go-back";
 import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
@@ -17,7 +17,8 @@ import { useSave } from "../../use-save";
 import { useUiScale } from "../../../play/ui-scale";
 import { Text } from "../../../play/text";
 
-// The boxes beside a card: marked ones lit, picked ones ringed, the rest faint. Drawn for the eye; the row's label says the counts.
+// The boxes beside a card: marked ones filled in the accent, picked ones a thick ring with a dot inside, the rest a thin faint ring. The shapes differ,
+// not only the colours. Drawn for the eye; the row's label says the counts.
 function Boxes({ marked, picked, boxes }: { marked: number; picked: number; boxes: number }) {
   const palette = usePalette();
   const s = useUiScale();
@@ -29,49 +30,89 @@ function Boxes({ marked, picked, boxes }: { marked: number; picked: number; boxe
         return (
           <View
             key={index}
+            className="items-center justify-center"
             style={{
               width: 14 * s,
               height: 14 * s,
               borderRadius: 3 * s,
-              borderWidth: 1.5,
+              borderWidth: ringed ? 3 : 1.5,
               borderColor: lit || ringed ? palette.accent : palette.faint,
               backgroundColor: lit ? palette.accent : "transparent",
             }}
-          />
+          >
+            {ringed ? <View style={{ width: 4 * s, height: 4 * s, borderRadius: 2 * s, backgroundColor: palette.accent }} /> : null}
+          </View>
         );
       })}
     </View>
   );
 }
 
-function CardRow({ row, enabled, onPick, onUnpick }: { row: XpRowView; enabled: boolean; onPick: () => void; onUnpick: () => void }) {
+// A row that cannot take another box is dimmed to 70%: its words stay above 4.5 to 1 against the ground in both themes (about 5 to 1 on Light), and
+// why it is dimmed is in its words and, when it is tapped, in the sentence.
+const DIMMED = 0.7;
+const OPEN_REASON = "XP is spent only before or after a scenario";
+
+// The room Undo keeps beside a row whether or not it shows, so a pick never moves the row's words.
+const UNDO_SLOT = 64;
+
+// A dimmed row (no XP left, or a scenario still to win) is still pressed: the sentence says why. A row with every box marked is full opacity and
+// does nothing. The info button beside a row opens the card; the row stays the pick control.
+function CardRow({
+  row,
+  enabled,
+  onPick,
+  onUnpick,
+  onRefuse,
+  onInspect,
+}: {
+  row: XpRowView;
+  enabled: boolean;
+  onPick: () => void;
+  onUnpick: () => void;
+  onRefuse: (reason: string) => void;
+  onInspect: () => void;
+}) {
   const t = useTableTokens();
+  const s = useUiScale();
   const live = enabled && row.canPick;
+  const dimmed = !live && row.picked === 0 && !row.full;
+  const reason = enabled ? row.reason : OPEN_REASON;
+  const face = (pressed: boolean) => (
+    <View className="min-h-14 justify-center overflow-hidden rounded-item px-3.5 py-2" style={{ ...rowSurface(pressed && live, t), opacity: dimmed ? DIMMED : 1 }}>
+      <View className="flex-row items-baseline justify-between gap-2">
+        <Text className="shrink font-display text-heading text-bone">{row.name}</Text>
+        <Text testID={`xp-words-${row.code}`} className="text-label text-muted">
+          {row.note ?? row.words}
+        </Text>
+      </View>
+      <Boxes marked={row.marked} picked={row.picked} boxes={row.boxes} />
+    </View>
+  );
   return (
     <View className="mb-1.5 flex-row items-center">
-      <Pressable
-        testID={`xp-row-${row.code}`}
-        collapsable={false}
-        accessibilityRole="button"
-        accessibilityLabel={live ? `Mark a box beside ${row.label}` : row.label}
-        accessibilityHint={live ? undefined : (row.reason ?? undefined)}
-        accessibilityState={{ disabled: !live }}
-        onPress={live ? onPick : undefined}
-        className="flex-1"
-      >
-        {({ pressed }) => (
-          <View className="min-h-14 justify-center overflow-hidden rounded-item px-3.5 py-2" style={{ ...rowSurface(pressed && live, t), opacity: live || row.picked > 0 || row.full ? 1 : 0.55 }}>
-            <View className="flex-row items-baseline justify-between gap-2">
-              <Text className="shrink font-display text-heading text-bone">{row.name}</Text>
-              <Text testID={`xp-words-${row.code}`} className="text-label text-muted">
-                {row.words}
-              </Text>
-            </View>
-            <Boxes marked={row.marked} picked={row.picked} boxes={row.boxes} />
-          </View>
-        )}
-      </Pressable>
-      {row.picked > 0 ? <TextButton label="Undo" testID={`xp-unpick-${row.code}`} tone="accent" accessibilityLabel={`Take back the box picked beside ${row.name}`} onPress={onUnpick} /> : null}
+      {row.full && row.picked === 0 ? (
+        <View testID={`xp-row-${row.code}`} accessible accessibilityLabel={`${row.label}, every box marked`} className="flex-1">
+          {face(false)}
+        </View>
+      ) : (
+        <Pressable
+          testID={`xp-row-${row.code}`}
+          collapsable={false}
+          accessibilityRole="button"
+          accessibilityLabel={live ? `Mark a box beside ${row.label}` : row.label}
+          accessibilityHint={live ? undefined : (reason ?? undefined)}
+          accessibilityState={{ disabled: !live }}
+          onPress={live ? onPick : () => onRefuse(reason ?? "That card cannot take another box")}
+          className="flex-1"
+        >
+          {({ pressed }) => face(pressed)}
+        </Pressable>
+      )}
+      <View style={{ width: UNDO_SLOT * s }} className="items-center">
+        {row.picked > 0 ? <TextButton label="Undo" testID={`xp-unpick-${row.code}`} tone="accent" accessibilityLabel={`Take back the box picked beside ${row.name}`} onPress={onUnpick} /> : null}
+      </View>
+      <IconButton glyph="i" label={`Inspect ${row.name}`} testID={`xp-info-${row.code}`} tone="bone" onPress={onInspect} />
     </View>
   );
 }
@@ -104,19 +145,24 @@ export default function SpendXp() {
     );
   }
 
-  const view = xpView(save.log, picks);
+  const names = scenarioNames(campaign);
+  const view = xpView(save.log, picks, names);
   // XP is spent only before or after a scenario: never with one open.
   const open = save.active != null;
-  const total = view.scalable.length + view.upgradable.length;
 
   function mark(): void {
     if (!save) return;
-    const spent = spendOnSave(save, picks);
+    const spent = spendOnSave(save, picks, names);
     if (!spent.ok) {
       setRefused(spent.reason);
       return;
     }
     update(spent.save);
+    setPicks({});
+    setRefused(null);
+  }
+
+  function clear(): void {
     setPicks({});
     setRefused(null);
   }
@@ -128,10 +174,15 @@ export default function SpendXp() {
         row={row}
         enabled={!open}
         onPick={() => {
-          setPicks((current) => pick(save.log, current, row.code));
+          setPicks((current) => pick(save.log, current, row.code, names));
           setRefused(null);
         }}
-        onUnpick={() => setPicks((current) => unpick(current, row.code))}
+        onUnpick={() => {
+          setPicks((current) => unpick(current, row.code));
+          setRefused(null);
+        }}
+        onRefuse={setRefused}
+        onInspect={() => router.push({ pathname: "/card/[code]", params: row.kind === "upgradable" ? { code: row.code, side: "B" } : { code: row.code } })}
       />
     ));
 
@@ -156,19 +207,18 @@ export default function SpendXp() {
         {rows(view.scalable)}
         <Section title="Upgradable cards" className="mt-5" />
         {rows(view.upgradable)}
-        <Label tone="faint" className="mt-2">{`${total} cards`}</Label>
       </ScreenScroll>
       <ActionBar>
         <View className="gap-2">
-          <Label tone="muted" className="text-center" testID="xp-sentence">
+          <Label tone={refused != null ? "danger" : "muted"} className="text-center" testID="xp-sentence">
             {refused ?? pickSentence(view)}
           </Label>
-          {view.picked > 0 ? (
-            <View className="items-center">
-              <TextButton label="Clear picks" testID="xp-clear" tone="muted" onPress={() => setPicks({})} />
+          <View className="flex-row items-center gap-2">
+            {view.picked > 0 ? <TextButton label="Clear picks" testID="xp-clear" tone="muted" onPress={clear} /> : null}
+            <View className="min-w-0 flex-1">
+              <PrimaryButton compact label={view.picked === 0 ? "Mark boxes" : `Mark ${view.picked} ${view.picked === 1 ? "box" : "boxes"}`} testID="xp-commit" disabled={view.picked === 0 || open} onPress={mark} />
             </View>
-          ) : null}
-          <PrimaryButton label={view.picked === 0 ? "Mark boxes" : `Mark ${view.picked} ${view.picked === 1 ? "box" : "boxes"}`} testID="xp-commit" disabled={view.picked === 0 || open} onPress={mark} />
+          </View>
         </View>
       </ActionBar>
     </Screen>

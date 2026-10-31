@@ -6,7 +6,7 @@ import { loadCards } from "../../scripts/data/load-cards.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { campaignLogSchema, newSave, parseLog } from "./save.ts";
 import { XP_ROWS, gavinReturned, isUpgraded, levelOf, markRefusal, marksOf, pick, spendOnSave, spendXp, unpick, xpFacts, xpGainedOf, xpRowOf, xpSpentOf, xpUnspentOf } from "./xp.ts";
-import { markedLines, pickSentence, xpView } from "./xp-view.ts";
+import { markedLines, markedSpeech, pickSentence, xpView } from "./xp-view.ts";
 
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable (data/rules/entries.json). The Dream-chaser Campaign Log sheet's XP: the rows (MEC111 p31),
 // what is gained and unspent, the picks the Spend XP screen drafts, and what the game reads back.
@@ -134,15 +134,26 @@ describe("picking and marking boxes", () => {
     expect(spendXp(log, {})).toEqual({ ok: true, log });
   });
 
-  it("Gavin's boxes are marked after A Storm on Cobas Haven, and four of them are \"Gavin returned\"", () => {
+  it("Gavin's four boxes are one pick, offered after A Storm on Cobas Haven is won, and they are \"Gavin returned\"", () => {
     const before = logWith({ a: 6 }, {}, ["voyage-across-belegaer"]);
-    expect(markRefusal(before, {}, GAVIN)).toContain("is marked after");
+    expect(markRefusal(before, {}, GAVIN)).toBe("Gavin is marked after a storm on cobas haven is won");
+    expect(markRefusal(before, {}, GAVIN, { [CAPTAIN_SCENARIO]: "A Storm on Cobas Haven" })).toBe("Gavin is marked after A Storm on Cobas Haven is won");
     const after = logWith({ a: 6 }, {}, ["voyage-across-belegaer", CAPTAIN_SCENARIO]);
-    const spent = spendXp(after, { [GAVIN]: 4 });
+    // One tap picks all four boxes, one more tap is refused, and Undo takes all four back.
+    const picked = pick(after, {}, GAVIN);
+    expect(picked).toEqual({ [GAVIN]: 4 });
+    expect(markRefusal(after, picked, GAVIN)).toBe("Every box beside Gavin is marked");
+    expect(unpick(picked, GAVIN)).toEqual({});
+    const spent = spendXp(after, picked);
     if (!spent.ok) throw new Error(spent.reason);
     expect(gavinReturned(spent.log)).toBe(true);
     expect(gavinReturned(after)).toBe(false);
     expect(xpUnspentOf(spent.log)).toBe(2);
+    // Fewer than four XP unspent: not offered. A part of his boxes is never marked.
+    const poor = logWith({ a: 3 }, {}, [CAPTAIN_SCENARIO]);
+    expect(markRefusal(poor, {}, GAVIN)).toBe("Gavin takes 4 XP at once and fewer are left");
+    expect(pick(poor, {}, GAVIN)).toEqual({});
+    expect(spendXp(after, { [GAVIN]: 2 })).toEqual({ ok: false, reason: "Gavin takes 4 boxes at once" });
   });
 
   it("XP is spent on a save only before or after a scenario, never with one open", () => {
@@ -162,8 +173,8 @@ describe("what the Spend XP screen shows", () => {
     expect([view.gained, view.spent, view.unspent, view.picked, view.left]).toEqual([4, 5, 0, 1, 0]);
     const rich = xpView(logWith({ a: 9 }, { [COMMAND_LEADERSHIP]: 1, [BLACK_KEY_BOON]: 4 }), { [COMMAND_LEADERSHIP]: 2 });
     const command = rich.scalable.find((row) => row.code === COMMAND_LEADERSHIP);
-    expect(command).toMatchObject({ marked: 1, picked: 2, level: 3, words: "Level 3", full: false, canPick: true });
-    expect(command?.label).toBe("Command (Leadership), Level 3, 2 to mark, 4 boxes");
+    expect(command).toMatchObject({ marked: 1, picked: 2, level: 3, words: "Level 1 +2", note: null, full: false, canPick: true });
+    expect(command?.label).toBe("Command (Leadership), Level 1, 2 to mark, 4 boxes");
     expect(rich.upgradable.find((row) => row.code === BLACK_KEY_BOON)).toMatchObject({ full: true, canPick: false, words: "Upgraded", reason: "Every box beside Black Key (boon) is marked" });
     expect(rich.scalable).toHaveLength(14);
     expect(rich.upgradable).toHaveLength(28);
@@ -171,9 +182,18 @@ describe("what the Spend XP screen shows", () => {
 
   it("says nothing is spent until the boxes are marked, and the log's lines show the boxes", () => {
     expect(pickSentence({ picked: 0, left: 0 })).toBe("No XP is left to spend.");
-    expect(pickSentence({ picked: 2, left: 1 })).toBe("2 boxes picked, 1 XP left. Nothing is spent until you mark them.");
+    expect(pickSentence({ picked: 2, left: 1 })).toBe("2 boxes picked, 1 XP left. Marked boxes can't be taken back.");
+    expect(pickSentence({ picked: 1, left: 0 })).toBe("1 box picked, 0 XP left. Marked boxes can't be taken back.");
     expect(markedLines(log, "scalable")).toEqual(["Command (Leadership) ■□□□"]);
     expect(markedLines(log, "upgradable")).toEqual(["Black Key (boon) ■■■■"]);
+    expect(markedSpeech(log, "scalable")).toBe("Command (Leadership), 1 of 4 boxes marked");
+    expect(markedSpeech(log, "upgradable")).toBe("Black Key (boon), 4 of 4 boxes marked");
+  });
+
+  it("a card waiting on a scenario says so in the row's words, by the scenario's name, and a card with every box marked is not dimmed", () => {
+    const waiting = xpView(logWith({ a: 6 }), {}, { [CAPTAIN_SCENARIO]: "A Storm on Cobas Haven" });
+    expect(waiting.upgradable.find((row) => row.code === GAVIN)).toMatchObject({ note: "After A Storm on Cobas Haven", canPick: false, words: "0 of 4" });
+    expect(waiting.upgradable.find((row) => row.code === "11172")?.note).toBeNull();
   });
 });
 
@@ -195,7 +215,7 @@ describe("an old save and the stored log", () => {
   });
 
   it("a new playthrough keeps the Hard/Expert Mode card its setup chose", () => {
-    expect(newSave("s", "dream-chaser", 1, [], null, "hard").log.modeDefault).toBe("hard");
+    expect(newSave("s", "dream-chaser", 1, { modeDefault: "hard" }).log.modeDefault).toBe("hard");
     expect(newSave("s", "dream-chaser", 1).log.modeDefault).toBeNull();
     expect(marksOf(newSave("s", "dream-chaser", 1).log, COMMAND_LEADERSHIP)).toBe(0);
   });

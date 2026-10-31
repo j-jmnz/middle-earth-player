@@ -8,7 +8,8 @@ import { ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } f
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Problem, ScenarioFacts } from "../campaign/briefing";
-import type { ModeCard } from "../campaign/xp";
+import { MODE_CARDS, MODE_CARD_NAME, modeXp, type ModeCard } from "../campaign/xp";
+import { EFFECTS } from "../effects";
 import { cards, packs } from "../catalog/schema";
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data";
 import { GroundedScene } from "./art";
@@ -310,33 +311,37 @@ export function DifficultyPicker({
   );
 }
 
-// The Hard/Expert Mode card's options (dcce.hard-expert), as the switch words: None leaves the card out. What each side prints is in
-// data/printed/dream-chaser.json (11217); the XP is its Resolution's.
-const MODE_OPTIONS = ["None", "Hard", "Expert"] as const;
-type ModeOption = (typeof MODE_OPTIONS)[number];
-const MODE_NOTES: Readonly<Record<ModeOption, string>> = {
-  None: "No Hard/Expert Mode card.",
-  Hard: "The Hard side goes next to the quest deck: each player's threat cannot be reduced by more than 1 each round, and a player who draws cards raises their threat by that number. Winning gains 1 XP.",
-  Expert: "The Expert side goes next to the quest deck: threat cannot be reduced, a player who draws cards raises their threat by that number, and healing or readying a character with a player card effect raises its controller's threat by 1. Winning gains 2 XP.",
-};
+// The Hard/Expert Mode card's options (dcce.hard-expert), as the switch words: None leaves the card out. The note says what the app applies, the
+// XP the side's Resolution gains; the card's printed text is in the card inspect screen.
+const NONE = "None";
+const MODE_OPTIONS: readonly string[] = [NONE, ...MODE_CARDS.map((mode) => MODE_CARD_NAME[mode])];
 
-function optionOf(mode: ModeCard | null): ModeOption {
-  return mode == null ? "None" : mode === "hard" ? "Hard" : "Expert";
+function optionOf(mode: ModeCard | null): string {
+  return mode == null ? NONE : MODE_CARD_NAME[mode];
 }
 
-function modeOfOption(option: ModeOption): ModeCard | null {
-  return option === "None" ? null : option === "Hard" ? "hard" : "expert";
+function modeOfOption(option: string): ModeCard | null {
+  return MODE_CARDS.find((mode) => MODE_CARD_NAME[mode] === option) ?? null;
 }
 
-/** The Hard/Expert Mode card for a campaign with XP: the campaign setup offers it for every briefing, each briefing may change it (dcce.hard-expert). */
-export function ModePicker({ mode, onMode, testIDPrefix }: { mode: ModeCard | null; onMode: (next: ModeCard | null) => void; testIDPrefix: string }) {
+function modeNote(mode: ModeCard | null, setup: boolean): string {
+  const change = setup ? " Each scenario's briefing can change it." : "";
+  if (mode == null) return `No Hard/Expert Mode card.${change}`;
+  return `The ${MODE_CARD_NAME[mode]} side goes next to the quest deck at the end of setup. Winning gains ${modeXp(EFFECTS, mode)} XP, spent on Campaign Log cards between scenarios. The card's other lines are not applied.${change}`;
+}
+
+/**
+ * The Hard/Expert Mode card for a campaign with XP: the campaign setup offers it for every briefing (`setup`), each briefing may change it
+ * (dcce.hard-expert).
+ */
+export function ModePicker({ mode, onMode, testIDPrefix, campaignName, setup }: { mode: ModeCard | null; onMode: (next: ModeCard | null) => void; testIDPrefix: string; campaignName: string; setup?: boolean }) {
   const option = optionOf(mode);
   return (
     <>
       <Section title="Hard/Expert Mode card" className="mt-4" />
-      <Segmented options={MODE_OPTIONS} value={option} onChange={(next) => onMode(modeOfOption(next))} testIDPrefix={testIDPrefix} stretch accessibilityLabel="Hard or Expert Mode card" />
+      <Segmented options={MODE_OPTIONS} value={option} onChange={(next) => onMode(modeOfOption(next))} testIDPrefix={testIDPrefix} stretch accessibilityLabel={`Hard or Expert Mode card for ${campaignName}`} />
       <Label testID={`${testIDPrefix}-note`} tone="muted" className="mt-2">
-        {MODE_NOTES[option]}
+        {modeNote(mode, setup === true)}
       </Label>
     </>
   );

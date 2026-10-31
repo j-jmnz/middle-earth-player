@@ -94,10 +94,14 @@ export type Save = {
   loadout: StoredLoadout | null;
 };
 
-// A new save starts on a blank log (the Dark of Mirkwood mini campaign included). `carried` is the carry-over of a finished save
-// (carry-over.ts): the cards its first checklist takes into the pool. A copy for each player becomes one entry for each of this
-// save's seats, whatever the finished save had. `carriedFrom` is the finished save's id.
-export function newSave(id: string, campaignId: string, seatCount: 1 | 2, carried: readonly PoolCard[] = [], carriedFrom: string | null = null, modeDefault: ModeCard | null = null): Save {
+// What a new save may start with. `carried` is the carry-over of a finished save (carry-over.ts): the cards its first checklist takes into the
+// pool. A copy for each player becomes one entry for each of this save's seats, whatever the finished save had. `carriedFrom` is the finished
+// save's id. `modeDefault` is the Hard/Expert Mode card the campaign setup offers each briefing first (Dream-chaser).
+export type NewSaveOptions = { carried?: readonly PoolCard[]; carriedFrom?: string | null; modeDefault?: ModeCard | null };
+
+// A new save starts on a blank log (the Dark of Mirkwood mini campaign included).
+export function newSave(id: string, campaignId: string, seatCount: 1 | 2, options: NewSaveOptions = {}): Save {
+  const { carried = [], carriedFrom = null, modeDefault = null } = options;
   const carryIn = carried.flatMap((card) => (card.perPlayer ? Array.from({ length: seatCount }, (_, seat) => ({ ...card, seat })) : [card]));
   return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn, modeDefault, ...(carriedFrom ? { carriedFrom } : {}) }, active: null, loadout: null };
 }

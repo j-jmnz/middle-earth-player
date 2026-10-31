@@ -101,7 +101,7 @@ describe("The Oath in Mirkwood Paths and The Dark of Mirkwood", () => {
       { code: "01135", back: "player" as const, burdenSet: null, attachedTo: null, seat: null },
       { code: "01132", back: "player" as const, burdenSet: null, attachedTo: null, seat: null, perPlayer: true },
     ];
-    const save = newSave("next", "the-dark-of-mirkwood", 2, carried, "old");
+    const save = newSave("next", "the-dark-of-mirkwood", 2, { carried, carriedFrom: "old" });
     const plan = checklist({ log: save.log, scenario: oath, seats: oathLoadout(2), effects: EFFECTS, cards, choices: ["41044>q1", "41045>q4"] });
     if (!plan.ok) throw new Error(plan.errors.join("; "));
     expect(plan.poolIntoPlay).toEqual(["01135"]);

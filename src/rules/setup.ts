@@ -58,6 +58,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     seed: input.seed,
     definition: input.definition,
   });
+  // The campaign log's facts come first: an upgraded card is dealt on its Upgraded side wherever the campaign deals it (families/dreamchaser-facts.ts).
+  if (input.facts) state = { ...state, campaignFacts: input.facts };
   input.questDeck.forEach((code, index) => {
     const spawned = spawn(state, code, index === 0 ? { zone: "questStage" } : { zone: "questDeck" }, "A");
     state = spawned.state;
@@ -74,9 +76,6 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
-  // The Hard/Expert Mode card goes in the same place, faceup on the side the players chose (dcce.hard-expert).
-  if (input.definition.modeCard) state = spawn(state, input.definition.modeCard.code, { zone: "nightmare" }, input.definition.modeCard.side).state;
-  if (input.facts) state = { ...state, campaignFacts: input.facts };
   if (input.seats.some((seat) => (seat.afterMulligan?.length ?? 0) > 0)) state = { ...state, afterMulligan: input.seats.slice(0, input.seatCount).map((seat) => seat.afterMulligan ?? []) };
   for (let index = 0; index < input.seatCount; index += 1) {
     const seat = input.seats[index];
@@ -147,6 +146,8 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   next = questStageStart(next, ctx, steps);
   // The Nightmare setup card's Forced effects "During setup" (families/nightmare-setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
+  // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
+  if (next.modeCard) next = spawn(next, next.modeCard.code, { zone: "modeCard" }, next.modeCard.side).state;
   return withMode(next, "beginRound");
 }
 

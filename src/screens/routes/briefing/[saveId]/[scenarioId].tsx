@@ -7,7 +7,7 @@ import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "
 import { deal } from "../../../../campaign/session";
 import { isNightmarePlayable } from "../../../../campaign/playable";
 import { logCodes, loadWorld } from "../../../../campaign/world";
-import type { ModeCard } from "../../../../campaign/xp";
+import { xpUnspentOf, type ModeCard } from "../../../../campaign/xp";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { cards } from "../../../../catalog/schema";
 import { CATALOG_VERSION } from "../../../../catalog/version";
@@ -193,9 +193,16 @@ export default function Briefing() {
         </BodyText>
       ) : null}
 
+      {/* Dream-chaser: XP is spent only before or after a scenario (dcce.scalable-upgradable), so the reminder comes before the deal. */}
+      {campaign.xp && xpUnspentOf(save.log) > 0 ? (
+        <BodyText className="mt-3" testID="briefing-xp-unspent">
+          {`${xpUnspentOf(save.log)} XP unspent. Spend it on the path before you deal.`}
+        </BodyText>
+      ) : null}
+
       {/* The difficulty first: it is decided before the deck, and it must be seen before Deal (it is named over Deal too). */}
       <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} nightmare={nightmare} />
-      {campaign.xp ? <ModePicker mode={modeCard} onMode={setPickedMode} testIDPrefix="mode" /> : null}
+      {campaign.xp ? <ModePicker mode={modeCard} onMode={setPickedMode} testIDPrefix="mode" campaignName={campaign.name} /> : null}
 
       {seats.map((seat, index) => (
         <SeatPicker

@@ -6,13 +6,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { ruleCause } from "../rules/cause.ts";
 import { syncConstants } from "../rules/constants.ts";
 import { placeDamage } from "../rules/keywords.ts";
+import { spawn } from "../rules/zones.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { fordTable, loadFordWorld, type FordWorld } from "../../scripts/ford-scene.ts";
 import { loadWorld, table, type World } from "../../scripts/past-scene.ts";
 
 import { ledgerLine, ruleTitle } from "./ledger.ts";
 import { logLines, type LogNames } from "./log.ts";
-import { widgetReadouts } from "./widgets.ts";
+import { nightmareCardId, widgetReadouts } from "./widgets.ts";
 
 let ford: FordWorld;
 let past: World;
@@ -67,5 +68,16 @@ describe("the log's words for the Ring-bearer's life", () => {
     expect(lines[0]?.cause).toContain("Fell Rider");
     expect(lines[1]?.cause).toBe(`Rule: ${ruleTitle("rr.step-6-4-3")}`);
     expect(lines.every((line) => line.mark === "damage")).toBe(true);
+  });
+});
+
+describe("the Nightmare Eye", () => {
+  it("marks the Nightmare setup card, and never the Hard/Expert Mode card, which has a zone of its own (dcce.hard-expert)", () => {
+    const { state } = table(past);
+    expect(nightmareCardId(state)).toBeNull();
+    const mode = spawn(state, "11217", { zone: "modeCard" }, "A");
+    expect(nightmareCardId(mode.state)).toBeNull();
+    const setup = spawn(mode.state, "900101", { zone: "nightmare" }, "A");
+    expect(nightmareCardId(setup.state)).toBe(setup.id);
   });
 });

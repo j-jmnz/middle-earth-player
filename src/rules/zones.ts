@@ -3,6 +3,7 @@ import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts
 import { queueEvent } from "./queue.ts";
 import { leaveWith } from "./families/play-zones.ts";
 import { releaseOrcGuard } from "./families/dungeon-guard.ts";
+import { dealtFace } from "./families/dreamchaser-facts.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
@@ -15,6 +16,7 @@ export type Destination =
   | { zone: "attached" }
   | { zone: "campaign" }
   | { zone: "nightmare" }
+  | { zone: "modeCard" }
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null };
@@ -283,7 +285,7 @@ export function spawn(
     attachments: [],
     committed: false,
     shadowId: null,
-    face,
+    face: dealtFace(state, code, face),
     controller: null,
     enteredPlay: 0,
   };
