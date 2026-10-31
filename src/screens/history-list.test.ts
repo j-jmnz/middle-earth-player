@@ -1,9 +1,9 @@
-// History: the list sorts, groups and filters.
+// History: the list sorts, groups and sections the library.
 import { describe, expect, it } from "vitest";
 
 import type { RunRecord } from "../campaign/runs";
-import { filterRuns, groupRuns, libraryItems, newestFirst, scopesOf, startedOf, type LibraryInput, type LibraryItem } from "./history-list";
-import { courseWords, emptyWords, playthroughWords, resultWords, runDate, scoreWords, seatsWords } from "./history-words";
+import { groupRuns, libraryItems, newestFirst, startedOf, type LibraryInput, type LibraryItem } from "./history-list";
+import { courseWords, emptyWords, heroesWords, playthroughWords, resultWords, runDate, runDetail, scoreWords, seatsWords } from "./history-words";
 
 function run(id: string, overrides: Partial<RunRecord> = {}): RunRecord {
   return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["141002"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: 100, engineVersion: 6, backfilled: false, ...overrides };
@@ -23,18 +23,8 @@ describe("history list", () => {
     expect(newestFirst(runs).map((item) => item.id)).toEqual(["b", "d", "c", "a", "f", "e"]);
   });
 
-  it("filters by kind, by campaign or box, and by result", () => {
-    expect(filterRuns(runs, "campaign", { scope: null, result: null }).map((item) => item.id)).toEqual(["a", "b", "c"]);
-    expect(filterRuns(runs, "campaign", { scope: "mirkwood-paths", result: null }).map((item) => item.id)).toEqual(["c"]);
-    expect(filterRuns(runs, "campaign", { scope: null, result: "lost" }).map((item) => item.id)).toEqual(["b"]);
-    expect(filterRuns(runs, "standalone", { scope: "revised-core", result: null }).map((item) => item.id)).toEqual(["d"]);
-    expect(filterRuns(runs, "standalone", { scope: "revised-core", result: "lost" })).toEqual([]);
-    expect(scopesOf(runs, "campaign")).toEqual(["fellowship-of-the-ring", "mirkwood-paths"]);
-    expect(scopesOf(runs, "standalone")).toEqual(["revised-core", "fellowship-of-the-ring"]);
-  });
-
-  it("groups campaign runs under their playthrough, the one with the newest run first, each newest first", () => {
-    const groups = groupRuns(filterRuns(runs, "campaign", { scope: null, result: null }));
+  it("groups runs under their playthrough, the one with the newest run first, each newest first", () => {
+    const groups = groupRuns(runs.filter((item) => item.kind === "campaign"));
     expect(groups.map((group) => [group.refId, group.runs.map((item) => item.id)])).toEqual([
       ["save-a", ["b", "a"]],
       ["save-b", ["c"]],
@@ -54,7 +44,6 @@ function library(input: Partial<LibraryInput<Save, Game>> & { runs: RunRecord[] 
     archivedSaves: [],
     games: [],
     archivedGames: [],
-    filter: { scope: null, result: null },
     folded: () => false,
     finished: (item) => item.done,
     playing: (item) => item.playing,
@@ -66,53 +55,36 @@ const words = (items: LibraryItem<Save, Game>[]) => items.map((item) => `${item.
 describe("library items", () => {
   const runs = [run("a", { endedAt: 100 }), run("b", { endedAt: 300 }), run("c", { endedAt: 200, refId: "save-b" })];
 
-  it("sorts the playthroughs into In progress, Finished and Archived, a heading only for a section that holds something", () => {
+  it("sorts the playthroughs into In progress and Finished, then the Archived fold, each only when it holds something", () => {
     const items = library({ saves: [save("save-a"), save("save-b", true)], archivedSaves: [save("save-c")], runs });
-    expect(words(items)).toEqual([
-      "section:library-in-progress",
-      "save:history-save-a",
-      "run:run-b",
-      "run:run-a",
-      "section:library-finished",
-      "save:history-save-b",
-      "run:run-c",
-      "section:library-archived",
-      "save:history-save-c",
+    expect(words(items)).toEqual(["heading:library-in-progress", "save:save-save-a", "heading:library-finished", "save:save-save-b", "fold:library-archived", "save:save-save-c"]);
+    expect(items.flatMap((item) => (item.type === "save" ? [[item.save.id, item.archived, item.runs.map((one) => one.id)]] : []))).toEqual([
+      ["save-a", false, ["b", "a"]],
+      ["save-b", false, ["c"]],
+      ["save-c", true, []],
     ]);
-    expect(words(library({ saves: [save("save-a")], runs: [] }))).toEqual(["section:library-in-progress", "save:history-save-a"]);
+    expect(words(library({ saves: [save("save-a")], runs: [] }))).toEqual(["heading:library-in-progress", "save:save-save-a"]);
     expect(library({ runs: [] })).toEqual([]);
   });
 
-  it("a folded playthrough emits its header and no runs", () => {
-    const items = library({ saves: [save("save-a"), save("save-b")], runs, folded: (id) => id === "history-save-a" });
-    expect(words(items)).toEqual(["section:library-in-progress", "save:history-save-a", "save:history-save-b", "run:run-c"]);
+  it("a folded fold emits its header with its count and nothing under it", () => {
+    const items = library({ saves: [save("save-a")], archivedSaves: [save("save-b"), save("save-c")], runs: [], folded: (section) => section === "archived" });
+    expect(words(items)).toEqual(["heading:library-in-progress", "save:save-save-a", "fold:library-archived"]);
+    expect(items[2]).toMatchObject({ type: "fold", section: "archived", count: 2, folded: true });
   });
 
-  it("a playthrough with no run is listed with its count and start from the runs it has", () => {
+  it("a playthrough with no run is listed, and starts at the earliest time its runs know", () => {
     const [, first] = library({ saves: [save("save-a")], runs: [run("a", { startedAt: 50, endedAt: 100 })] });
     expect(first).toMatchObject({ type: "save", started: 50, runs: [{ id: "a" }] });
     expect(library({ saves: [save("save-z")], runs })[1]).toMatchObject({ type: "save", runs: [], started: null });
   });
 
-  it("puts the runs of a playthrough the stores no longer hold under Deleted, grouped", () => {
+  it("puts the runs of a playthrough the stores no longer hold under Deleted, together under one entry", () => {
     const items = library({ saves: [save("save-a")], runs });
-    expect(words(items)).toEqual(["section:library-in-progress", "save:history-save-a", "run:run-b", "run:run-a", "section:library-deleted", "gone:history-save-b", "run:run-c"]);
-    expect(items.filter((item) => item.type === "run").map((item) => item.deleted)).toEqual([false, false, true]);
-    expect(words(library({ runs, folded: () => true }))).toEqual(["section:library-deleted", "gone:history-save-a", "gone:history-save-b"]);
-  });
-
-  it("with a filter on, keeps only the playthroughs with a matching run and only the matching runs", () => {
-    const filter = { scope: null, result: "lost" } as const;
-    const lost = [run("a", { endedAt: 100 }), run("b", { endedAt: 300, result: "lost", score: null }), run("c", { endedAt: 200, refId: "save-b", campaignId: "mirkwood-paths" }), run("d", { endedAt: 400, refId: "save-b", result: "lost", score: null })];
-    expect(words(library({ saves: [save("save-a"), save("save-b"), save("save-z")], archivedSaves: [save("save-y")], runs: lost, filter }))).toEqual([
-      "section:library-in-progress",
-      "save:history-save-a",
-      "run:run-b",
-      "save:history-save-b",
-      "run:run-d",
-    ]);
-    // A deleted playthrough's runs are filtered the same way.
-    expect(words(library({ runs: lost, filter: { scope: "mirkwood-paths", result: null } }))).toEqual(["section:library-deleted", "gone:history-save-b", "run:run-c"]);
+    expect(words(items)).toEqual(["heading:library-in-progress", "save:save-save-a", "fold:library-deleted", "gone:gone-save-b"]);
+    expect(items[3]).toMatchObject({ type: "gone", runs: [{ id: "c" }] });
+    expect(words(library({ runs, folded: () => true }))).toEqual(["fold:library-deleted"]);
+    expect(library({ runs, folded: () => true })[0]).toMatchObject({ count: 2 });
   });
 
   describe("standalone", () => {
@@ -124,27 +96,22 @@ describe("library items", () => {
       run("a", { endedAt: 10 }),
     ];
 
-    it("lists playing, finished and archived games, a game's run inline and no fold", () => {
-      const items = library({ kind: "standalone", games: [game("g0", true), game("g1"), game("g2"), game("g3")], archivedGames: [game("g4")], runs: games, folded: () => true });
+    it("lists playing, finished and archived games with their run, and a deleted game's run as an entry of its own", () => {
+      const items = library({ kind: "standalone", games: [game("g0", true), game("g1"), game("g2"), game("g3")], archivedGames: [game("g4")], runs: games });
       expect(words(items)).toEqual([
-        "section:library-in-progress",
+        "heading:library-in-progress",
         "game:game-g0",
-        "section:library-finished",
+        "heading:library-finished",
         "game:game-g1",
         "game:game-g2",
         "game:game-g3",
-        "section:library-archived",
+        "fold:library-archived",
         "game:game-g4",
-        "section:library-deleted",
-        "run:run-standalone:gy",
-        "run:run-standalone:gx",
+        "fold:library-deleted",
+        "gone:gone-standalone:gy",
+        "gone:gone-standalone:gx",
       ]);
       expect(items.flatMap((item) => (item.type === "game" ? [item.run?.id ?? null] : []))).toEqual([null, "standalone:g1", "standalone:g2", null, null]);
-    });
-
-    it("with a filter on, keeps only the games whose run matches", () => {
-      const items = library({ kind: "standalone", games: [game("g0", true), game("g1"), game("g2")], runs: games, filter: { scope: null, result: "lost" } });
-      expect(words(items)).toEqual(["section:library-finished", "game:game-g2"]);
     });
   });
 
@@ -175,11 +142,13 @@ describe("history words", () => {
     expect(scoreWords(run("x", { score: 41, victoryPoints: 2, reward: ["1", "2"] }), name)).toBe("Score 41 · 2 victory points · Reward: N1, N2");
     expect(scoreWords(run("x", { result: "lost" }), name)).toBeNull();
     expect(seatsWords(run("x", { seatCount: 2, heroes: [["1"], ["2", "3"]] }), name)).toBe("Two-handed · N1 / N2, N3");
+    expect(heroesWords([[], []], name)).toBeNull();
+    expect(runDetail(run("x", { rounds: 4, threats: [30], score: 41, victoryPoints: null }), name)).toBe("4 rounds · threat 30 · Score 41");
+    expect(runDetail(run("x", { result: "lost", rounds: null, threats: null }), name)).toBeNull();
   });
 
   it("an empty list says so in one line", () => {
-    expect(emptyWords("campaign", false)).toBe("No playthrough yet. Start one from Campaigns.");
-    expect(emptyWords("standalone", false)).toBe("No game yet. Pick a scenario on Scenarios to deal one.");
-    expect(emptyWords("standalone", true)).toBe("No runs match these filters.");
+    expect(emptyWords("campaign")).toBe("No playthrough yet. Start one from Campaigns.");
+    expect(emptyWords("standalone")).toBe("No game yet. Pick a scenario on Scenarios to deal one.");
   });
 });

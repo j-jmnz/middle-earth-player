@@ -72,7 +72,7 @@ tags:
 # Kill and relaunch: the campaign is complete on the log, with the Ranger Sense in the pool and the carry-over written.
 - stopApp
 - launchApp
-# A finished playthrough is not on the Campaigns hub: History lists it under Finished, and the sheet its ⋯ opens has Open path.
+# A finished playthrough is not on the Campaigns hub: History lists it under Finished, and its card opens the path.
 - assertNotVisible:
     id: continue-next
 - tapOn:
@@ -80,9 +80,7 @@ tags:
 - assertVisible:
     id: library-finished
 - tapOn:
-    id: ref-menu-save-e2e-nibin-dum-won
-- tapOn:
-    id: ref-path
+    id: entry-save-e2e-nibin-dum-won
 - extendedWaitUntil:
     visible:
       id: campaign-path
