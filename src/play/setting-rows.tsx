@@ -7,9 +7,9 @@ import type { ReactNode } from "react";
 import { TextButton } from "./buttons.tsx";
 import { Segmented } from "./segmented.tsx";
 import { SettingSwitch } from "./setting-switch.tsx";
-import { AWAKE_LINE, CONTRAST_LINE, GUIDE_LINE, HAPTICS_LINE, NONE_YET, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
+import { AWAKE_LINE, CONTRAST_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "./motion-tokens.ts";
-import { REDUCE_MOTION_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "./table-settings.ts";
+import { CARD_QUALITY_OPTIONS, REDUCE_MOTION_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "./table-settings.ts";
 import { SectionHeading } from "./section-heading.tsx";
 import { useUiScale } from "./ui-scale.ts";
 import { Text } from "./text.tsx";
@@ -42,7 +42,7 @@ export function SettingGroup({ title, testID, first = false, children }: { title
 }
 
 /**
- * The groups, in the order a setting is reached during a game: Display (Theme, UI scale, Strong outlines), Motion and feel (Animation
+ * The groups, in the order a setting is reached during a game: Display (Theme, UI scale, Card pictures, Moving fog, Strong outlines), Motion and feel (Animation
  * speed, Reduce motion, Combat spotlight, Haptics) and At the table (First-game guide, Stops on when `stops`, Keep screen awake and the
  * Responses used every time). `groups` picks which to draw, so a wide Settings page can split them across two columns. Every change
  * goes through `onChange`; the stored `uiScale` and `theme` apply at once. The Stops switch is the tab's: the table's rail carries Stops.
@@ -78,6 +78,10 @@ export function SettingsRows({
           <SettingChoice title="UI scale" detail={SCALE_LINE} testID={id("scale")}>
             <Segmented options={UI_SCALE_OPTIONS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testIDPrefix={id("scale")} accessibilityLabel="UI scale" stretch words={SCALE_WORDS} />
           </SettingChoice>
+          <SettingChoice title="Card pictures" detail={QUALITY_LINE} testID={id("quality")}>
+            <Segmented options={CARD_QUALITY_OPTIONS} value={settings.cardQuality} onChange={(cardQuality) => onChange({ cardQuality })} testIDPrefix={id("quality")} accessibilityLabel="Card pictures" stretch words={QUALITY_WORDS} />
+          </SettingChoice>
+          <SettingSwitch roomy label="Moving fog" detail={FOG_LINE} value={settings.fogDrift} onChange={(fogDrift) => onChange({ fogDrift })} testID={id("fog")} />
           <SettingSwitch roomy label="Strong outlines" detail={CONTRAST_LINE} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID={id("contrast")} />
         </SettingGroup>
       ) : null}

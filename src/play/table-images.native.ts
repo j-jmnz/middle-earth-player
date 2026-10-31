@@ -1,5 +1,6 @@
 // Card pictures for the table canvas. Skia decodes the cached file and the table keeps a copy drawn at the largest size the canvas
-// draws that card (table-pictures.ts: a hand card at the scrub's lifted size, any other at its slot's), downscaled with linear
+// draws that card (table-pictures.ts: a hand card at the scrub's lifted size, any other at its slot's) in pixels at the ratio the
+// Card pictures setting gives (the phone's on High, half of it on Low; the spotlight keeps the phone's), downscaled with linear
 // filtering in halving steps so a 1200 px scan becomes a small card without aliasing; the full decode is released at once. A copy
 // is decoded again only when it is too small for where its card now is, or far larger than it needs. An image whose card leaves the
 // table is released too, except the PARKED codes it stopped drawing last, so a seat the table turns back to (two-handed play, a peek)
@@ -12,7 +13,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { Image as RNImage, PixelRatio } from "react-native";
 
 import type { PictureSource } from "./table-canvas-types.ts";
-import { coverPixels, redecode, type Box } from "./table-pictures.ts";
+import { coverPixels, pixelBoxes, redecode, type Box } from "./table-pictures.ts";
 
 function uriOf(source: PictureSource): string | null {
   if (typeof source !== "number") return source.uri;
@@ -30,10 +31,10 @@ function redraw(image: SkImage, w: number, h: number): SkImage {
   return next;
 }
 
-// The decoded file brought down to cover `box` on screen, keeping its shape: halved while it is more than twice the size (each
+// The decoded file brought down to cover `box` (pixels), keeping its shape: halved while it is more than twice the size (each
 // linear step then averages every pixel it drops), then drawn to the size.
 function atSize(full: SkImage, box: Box): SkImage {
-  const target = coverPixels({ w: full.width(), h: full.height() }, box, PixelRatio.get());
+  const target = coverPixels({ w: full.width(), h: full.height() }, box, 1);
   let image = full;
   while (image.width() >= 2 * target.w && image.height() >= 2 * target.h) {
     const half = redraw(image, Math.round(image.width() / 2), Math.round(image.height() / 2));
@@ -233,22 +234,25 @@ class Pictures {
 }
 
 /**
- * The images for the codes on the table, each decoded to cover its box (points). `revision` changes when the image cache gains a
+ * The images for the codes on the table, each decoded to cover its box (points) at `ratio` pixels a point (the phone's when absent;
+ * the table passes less on Low card pictures, the spotlight the phone's). `revision` changes when the image cache gains a
  * file, so a code that had no picture is tried again. Codes that leave the map are released; a code whose box outgrows its copy
  * (or shrinks far under it) is decoded again, and its old copy drawn until the new one is ready. The decodes are queued, as many in a
  * frame as fit its budget, and the canvas gets the finished ones once a frame (`Pictures`).
  */
-export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null, revision: number): ReadonlyMap<string, SkImage> {
+export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null, revision: number, ratio?: number): ReadonlyMap<string, SkImage> {
   const [images, setImages] = useState<ReadonlyMap<string, SkImage>>(NONE);
   const [pictures] = useState(() => new Pictures((next) => setImages(next)));
-  const key = keyOf(boxes);
+  // The boxes in pixels at the ratio the copies are kept at (the phone's, or less on Low), so a change of ratio is a change of key.
+  const wanted = pixelBoxes(boxes, ratio ?? PixelRatio.get());
+  const key = keyOf(wanted);
 
   useEffect(() => {
     pictures.disposeRetired();
   }, [images, pictures]);
 
-  // Tells the pictures what the table wants now. It runs when the boxes' key or the cache revision changes, and reads the latest `boxes` and `picture`.
-  const decodeWanted = useEffectEvent(() => pictures.want(boxes, picture));
+  // Tells the pictures what the table wants now. It runs when the boxes' key or the cache revision changes, and reads the latest boxes and `picture`.
+  const decodeWanted = useEffectEvent(() => pictures.want(wanted, picture));
   useEffect(() => {
     decodeWanted();
   }, [key, revision]);

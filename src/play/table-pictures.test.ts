@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CardSlot } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
-import { coverPixels, HAND_PICTURE_SCALE, pictureBoxes, pictureBytes, redecode } from "./table-pictures.ts";
+import { coverPixels, HAND_PICTURE_SCALE, pictureBoxes, pictureBytes, pictureRatio, pixelBoxes, redecode } from "./table-pictures.ts";
 
 const slot = (id: string, code: string, zone: CardSlot["zone"], w: number, h: number, extra: Partial<CardSlot> = {}): CardSlot => ({
   id,
@@ -57,6 +57,22 @@ describe("coverPixels", () => {
   });
 });
 
+describe("pictureRatio", () => {
+  it("is the device's ratio on High and half of it, never below 1, on Low", () => {
+    expect(pictureRatio(3, "high")).toBe(3);
+    expect(pictureRatio(2, "high")).toBe(2);
+    expect(pictureRatio(3, "low")).toBe(1.5);
+    expect(pictureRatio(2, "low")).toBe(1);
+    expect(pictureRatio(1, "low")).toBe(1);
+  });
+
+  it("turns point boxes into pixel boxes, which cover the same pixels as the points at that ratio", () => {
+    const boxes = new Map([["A", { w: 54, h: 76 }]]);
+    expect(pixelBoxes(boxes, 3).get("A")).toEqual({ w: 162, h: 228 });
+    expect(coverPixels(SCAN, pixelBoxes(boxes, 3).get("A")!, 1)).toEqual(coverPixels(SCAN, { w: 54, h: 76 }, 3));
+  });
+});
+
 describe("redecode", () => {
   it("decodes again when the copy is too small or more than twice what is needed, not for small changes", () => {
     expect(redecode(undefined, { w: 54, h: 76 })).toBe(true);
@@ -80,5 +96,13 @@ describe("a full table's pictures", () => {
     const tablet = pictureBytes(pictureBoxes(table({ w: 138, h: 193 }, { w: 138, h: 193 })), SCAN, 2);
     expect(phone / 2 ** 20).toBeLessThan(16);
     expect(tablet / 2 ** 20).toBeLessThan(36);
+  });
+
+  it("weigh at most about a quarter as much on Low as on High, under 4.5 MB on a 3x phone", () => {
+    const boxes = pictureBoxes(table({ w: 54, h: 76 }, { w: 54, h: 76 }));
+    const high = pictureBytes(boxes, SCAN, pictureRatio(3, "high"));
+    const low = pictureBytes(boxes, SCAN, pictureRatio(3, "low"));
+    expect(low / 2 ** 20).toBeLessThan(4.5);
+    expect(low).toBeLessThanOrEqual(high * 0.27);
   });
 });

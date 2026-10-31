@@ -4,6 +4,7 @@
 // size. Pure, so a test can weigh a full table's memory.
 import type { CardSlot } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
+import type { CardQualityOption } from "./table-settings.ts";
 
 export type Box = { w: number; h: number };
 
@@ -21,6 +22,16 @@ export function pictureBoxes(slots: readonly CardSlot[]): Map<string, Box> {
     boxes.set(key, { w: Math.max(held?.w ?? 0, slot.w * grow), h: Math.max(held?.h ?? 0, slot.h * grow) });
   }
   return boxes;
+}
+
+/** The pixels a point holds when card pictures are kept at `quality`: the device's on High, half of it (never below 1) on Low. */
+export function pictureRatio(device: number, quality: CardQualityOption): number {
+  return quality === "low" ? Math.max(1, device / 2) : device;
+}
+
+/** `boxes` (points) as pixel boxes at `ratio` pixels a point, which is what a copy is decoded to cover. */
+export function pixelBoxes(boxes: ReadonlyMap<string, Box>, ratio: number): Map<string, Box> {
+  return new Map([...boxes].map(([code, box]) => [code, { w: box.w * ratio, h: box.h * ratio }]));
 }
 
 /**

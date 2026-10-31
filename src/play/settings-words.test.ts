@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { alwaysCodes, alwaysRows, NONE_YET, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_WORDS } from "./settings-words.ts";
+import { alwaysCodes, alwaysRows, NONE_YET, QUALITY_WORDS, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_WORDS } from "./settings-words.ts";
 import { SPEEDS } from "./motion-tokens.ts";
-import { DEFAULT_SETTINGS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "./table-settings.ts";
+import { CARD_QUALITY_OPTIONS, DEFAULT_SETTINGS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "./table-settings.ts";
 
 const effects = [
   { id: "sam.ready", cardCode: "01015" },
@@ -37,6 +37,7 @@ describe("the words of each choice", () => {
     expect(Object.keys(REDUCE_MOTION_WORDS)).toEqual([...REDUCE_MOTION_OPTIONS]);
     expect(Object.keys(SCALE_WORDS)).toEqual([...UI_SCALE_OPTIONS]);
     expect(Object.keys(SPEED_WORDS)).toEqual([...SPEEDS]);
+    expect(Object.keys(QUALITY_WORDS)).toEqual([...CARD_QUALITY_OPTIONS]);
   });
 });
 

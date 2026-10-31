@@ -42,7 +42,7 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.0K)
     - 157–160 Maestro (~120)
-- `docs/architecture.md` — Architecture (~15.7K tok)
+- `docs/architecture.md` — Architecture (~15.8K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
   - 78–120 Modules (~970) ← 1
@@ -53,7 +53,7 @@ Read the sections your task touches.
   - 195–200 Effects (~520)
   - 201–233 Scenario definition (~790)
   - 234–254 Persistence (~1.3K)
-  - 255–260 Images (~860) ← 6
+  - 255–260 Images (~930) ← 6
   - 261–309 Screens (~3.7K) ← 1
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
@@ -103,14 +103,14 @@ Read the sections your task touches.
   - 824–848 Persistence and shipping (~1.5K)
   - 849–889 Screens (~4.3K) ← 1
     - 875–889 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~21.8K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~21.9K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
   - 28–33 Quest scale (~320)
   - 34–37 Canvas (~510) ← 1
   - 38–49 Spacing and the play area's rows (~1.5K) ← 7
-  - 50–55 Pictures on the table (~300)
+  - 50–55 Pictures on the table (~320)
   - 56–69 Cards (~1.7K) ← 3
   - 70–75 The Sailing test (~690) ← 5
   - 76–79 Tokens and effects (~320)
@@ -142,7 +142,7 @@ Read the sections your task touches.
   - 80–101 Surfaces (~690) ← 1
   - 102–119 Type (~670) ← 5
   - 120–137 Spacing, radius, border (~560) ← 2
-  - 138–159 Backdrops (~930) ← 3
+  - 138–159 Backdrops (~950) ← 3
   - 160–167 Navigation (~420) ← 3
   - 168–205 Components (~1.7K) ← 9
   - 206–220 Icons (~480) ← 6
@@ -165,7 +165,7 @@ Read the sections your task touches.
     - 376–385 Card pool (the Cards tab) (~700) ← 3
     - 386–391 Card (~480) ← 2
     - 392–397 Packs and pack cards (~130)
-    - 398–410 Settings (~580)
+    - 398–410 Settings (~590)
     - 411–416 Rules (~450) ← 1
     - 417–420 Rule (~220) ← 1
     - 421–424 Booklet (~100)

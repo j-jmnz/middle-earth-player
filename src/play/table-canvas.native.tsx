@@ -8,6 +8,7 @@
 // gates a rule, and snaps under reduced motion; a touch finishes it at once, and a new gesture cancels the lift in progress.
 import { Canvas, Group, RadialGradient, Rect as SkRect, RoundedRect, Text, vec, type SkFont } from "@shopify/react-native-skia";
 import { memo, useCallback, useEffectEvent, useLayoutEffect, useMemo } from "react";
+import { PixelRatio } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import { useStore } from "zustand";
 
@@ -32,7 +33,8 @@ import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useSharedImage } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
 import { useTableImages } from "./table-images.native.ts";
-import { pictureBoxes } from "./table-pictures.ts";
+import { pictureBoxes, pictureRatio } from "./table-pictures.ts";
+import { tableSettings } from "./table-settings.ts";
 import { TokenFx } from "./token-fx.native.tsx";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { useSpotlight } from "./use-spotlight.ts";
@@ -107,7 +109,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
 
   // Each face-up code at the largest size it is drawn: a hand card at the scrub's lifted size (table-pictures.ts).
   const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)]), [layout, moves]);
-  const images = useTableImages(boxes, picture, pictureRevision);
+  const quality = useStore(tableSettings, (state) => state.settings.cardQuality);
+  const images = useTableImages(boxes, picture, pictureRevision, pictureRatio(PixelRatio.get(), quality));
   const tokens: TokenImages = {
     resource: useSharedImage(ICON_FILES.resource),
     damage: useSharedImage(ICON_FILES.damage),

@@ -1,14 +1,17 @@
 // The words and lists the Settings screen (src/screens/settings-view.tsx) and the table's settings panel (reading-panels.tsx) share,
 // so the two say the same thing (user request, 2026-10-28). Pure, so a test reads them.
-import type { ReduceMotionOption, ThemeOption, UiScaleOption } from "./table-settings.ts";
+import type { CardQualityOption, ReduceMotionOption, ThemeOption, UiScaleOption } from "./table-settings.ts";
 import type { Speed } from "./motion-tokens.ts";
 
 export const THEME_WORDS: Readonly<Record<ThemeOption, string>> = { dark: "Dark", light: "Light", system: "System" };
 export const REDUCE_MOTION_WORDS: Readonly<Record<ReduceMotionOption, string>> = { system: "Follow system", always: "Always" };
 export const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: "Quick" };
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large" };
+export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high: "High", low: "Low" };
 
 export const SCALE_LINE = "Resizes the whole app, the table included.";
+export const QUALITY_LINE = "Low keeps the table's card pictures smaller, for phones that slow down on a full table. The preview stays sharp.";
+export const FOG_LINE = "The fog behind the screens drifts. Off holds it still and saves work on a slower phone.";
 // THEME_LINE and REDUCE_MOTION_LINE are spoken with their switches (setting-rows.tsx), not shown.
 export const THEME_LINE = "System follows your phone.";
 export const SPEED_LINE = "Quick shortens every motion and skips the phase title.";
