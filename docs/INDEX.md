@@ -297,6 +297,7 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
+- `docs/plans/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.3K tok)
 
 ## Handovers
 
