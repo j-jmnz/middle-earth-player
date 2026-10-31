@@ -14,23 +14,20 @@ import { useStore } from "zustand";
 
 import { beatIds } from "./beat-store.ts";
 import { cardCorner } from "./card-corner.ts";
-import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
+import { Leaving, useCardMotion } from "./card-motion.native.tsx";
 import { seatTag, stagingWord } from "./area-words.ts";
-import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, CardBody, CombatMarkView, RADIUS, StagingTag } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
-import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
 import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
-import { AT_REST } from "./motion.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { ReaderPiles } from "./reader-piles.tsx";
 import { useScreenReader } from "./screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
-import { useSharedImage } from "./table-assets.native.ts";
+import { useBackImages, useTokenImages } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
 import { useTableImages } from "./table-images.native.ts";
 import { pictureBoxes, pictureRatio } from "./table-pictures.ts";
@@ -38,6 +35,8 @@ import { tableSettings } from "./table-settings.ts";
 import { TokenFx } from "./token-fx.native.tsx";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
 import { useSpotlight } from "./use-spotlight.ts";
+import { drawBody, TablePiece } from "./table-piece.native.tsx";
+import { bodyProps, pieceProps, type PieceContext } from "./table-piece.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 
@@ -111,14 +110,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)]), [layout, moves]);
   const quality = useStore(tableSettings, (state) => state.settings.cardQuality);
   const images = useTableImages(boxes, picture, pictureRevision, pictureRatio(PixelRatio.get(), quality));
-  const tokens: TokenImages = {
-    resource: useSharedImage(ICON_FILES.resource),
-    damage: useSharedImage(ICON_FILES.damage),
-    progress: useSharedImage(ICON_FILES.progress),
-    questPoints: useSharedImage(ICON_FILES.questPoints),
-    engagementCost: useSharedImage(ICON_FILES.engagementCost),
-  };
-  const backs: BackImages = { player: useSharedImage(CARD_BACK_FILES.player), encounter: useSharedImage(CARD_BACK_FILES.encounter) };
+  const tokens = useTokenImages();
+  const backs = useBackImages();
   const fonts = useTableFonts(s);
   // The plan, the clock and the table's decodes go to the layer when the plan, whether it plays, the pictures to decode ahead or the motion scale changes; only the
   // layer listens, so this canvas does not render again for it. The decodes are a fallback until the layer's own are ready.
@@ -134,75 +127,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
 
+  // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.
+  const owner = seatTag(game, seat);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
-
-  const isTappable = (slot: CardSlot) => highlight.tappable.has(slot.id) || targetIds.has(slot.id);
-  const pickedCount = (slot: CardSlot) => highlight.picked.get(slot.id) ?? 0;
-  // A Sailing test's look veils staging, the engagement area and the play area under the strip (docs/design-system-table.md, The Sailing test).
-  const veiledByLook = (slot: CardSlot) => looking && slot.success == null && slot.kind !== "pile" && (slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "play");
-  const dimmed = (slot: CardSlot) => (highlight.dimOthers && !isTappable(slot) && pickedCount(slot) === 0) || highlight.muted.has(slot.id) || veiledByLook(slot);
-
-  // The card itself (it turns when exhausted), with the glow of the open moment under it, and what is drawn upright on it:
-  // tokens, effects, the open moment's marks.
-  const drawBody = (slot: CardSlot, dim: boolean) => {
-    const image = images.get(slot.picture ?? slot.code) ?? null;
-    // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
-    if (slot.kind === "pile" || slot.zone === "deck") {
-      const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={nameOf(slot.picture ?? slot.code)} fonts={fonts} label backs={backs} t={t} s={s} />;
-      // A discard pile holding a card the seat may play from it (Elven-light) glows; its list plays the card.
-      return slot.kind === "pile" && isTappable(slot) ? (
-        <Group>
-          <Glow slot={slot} picked={false} t={t} s={s} />
-          {pile}
-        </Group>
-      ) : (
-        pile
-      );
-    }
-    const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
-    const picked = pickedCount(slot) > 0;
-    const glows = slot.kind === "card" && (picked || isTappable(slot));
-    return (
-      <Group opacity={dim ? 0.35 : 1}>
-        {glows ? <Glow slot={slot} picked={picked} t={t} s={s} /> : null}
-        <CardBody slot={slot} image={image} name={nameOf(slot.picture ?? slot.code)} sphere={sphereIcon(sphereOf(slot.code))} fonts={fonts} encounterBack={encounterBack} backs={backs} t={t} s={s} />
-      </Group>
-    );
-  };
-  // What is drawn in the card's shape, inside its turned group: the accent edge, the picked edge, the veil, the beat ring.
-  const drawFrame = (slot: CardSlot) => {
-    if (slot.kind === "pile") return null;
-    const card = slot.kind === "card";
-    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={beating.has(slot.id)} t={t} s={s} veiled={peeking && card && slot.zone === "hand"} />;
-  };
-  const drawOverlay = (slot: CardSlot) => {
-    if (slot.kind === "pile") return null;
-    const rect = slotBounds(slot);
-    // A staging card with more than one card under it shows one peek and how many: "×2" (layout.ts, placeStaging).
-    const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(game, seat, slot.id) : null;
-    const optionMark = highlight.marks.get(slot.id);
-    // The veil is drawn in the card's turned group, under this upright layer, so a veiled card's tokens and marks are faded
-    // here instead; the option pill stays bright.
-    const veiled = slot.kind === "card" && dimmed(slot);
-    return (
-      <Group>
-        <Group opacity={veiled ? 0.55 : 1}>
-          {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} owner={slot.zone === "questStage" ? owner : null} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
-          {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-          {slotInfo?.fire ? <FireMarkView rect={rect} mark={slotInfo.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-          {slotInfo?.under ? <UnderMarkView rect={rect} mark={slotInfo.under} fonts={fonts} t={t} s={s} /> : null}
-          {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
-          <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
-          {slot.kind === "card" && !slot.faceDown && inactive(slot.picture ?? slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
-          {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}
-          {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
-        </Group>
-        {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}
-        {slot.kind === "card" ? <PickRing rect={rect} picked={pickedCount(slot)} share={highlight.share} dimmed={veiled} fonts={fonts} t={t} s={s} /> : null}
-        {slot.kind === "card" && optionMark ? <OptionMarkView rect={rect} mark={optionMark} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-      </Group>
-    );
-  };
 
   // What a screen reader hears of a card whose number is only on the canvas: The Havens Burn, with the cards under it against the number that loses.
   const spoken = (slot: CardSlot): string | null => {
@@ -210,13 +137,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     const under = info(game, seat, slot.id).under;
     return under ? `${nameOf(slot.picture ?? slot.code)}, ${under.speech}` : null;
   };
-  const piece = (slot: CardSlot) => (
-    <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? AT_REST} clock={clock} back={moves.motions.get(slot.id)?.flip ? drawBody({ ...slot, faceDown: true }, false) : undefined} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
-      {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
-    </Moving>
-  );
-  // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.
-  const owner = seatTag(game, seat);
+  // Everything a card's drawing reads, for this render; a card whose props did not change is not drawn again (table-piece.ts).
+  const ctx: PieceContext = { highlight, targetIds, looking, peeking, beating, liftedId: lifted?.id ?? null, motions: moves.motions, clock, images, game, seat, owner, contrast, nameOf, sphereOf, inactive, info, fonts, backs, tokens, t, s };
+  const piece = (slot: CardSlot) => <TablePiece key={`${slot.kind}:${slot.id}`} {...pieceProps(slot, ctx)} />;
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
   const emptyWords: [Rect, string][] = [
     ...(views.staging.entries.length === 0 ? [[layout.zones.staging, stagingWord(game, seat)] as [Rect, string]] : []),
@@ -248,7 +171,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           ))}
           {moves.ghosts.map((ghost) => (
             <Leaving key={`ghost:${ghost.slot.id}:${moves.at}`} ghost={ghost} clock={clock}>
-              {drawBody(ghost.slot, false)}
+              {drawBody(bodyProps(ghost.slot, ctx), ghost.slot, false)}
             </Leaving>
           ))}
           {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}

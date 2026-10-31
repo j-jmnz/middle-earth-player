@@ -6,6 +6,9 @@
 import { loadData, Skia, type DataSourceParam, type SkData, type SkFont, type SkImage, type SkTypeface } from "@shopify/react-native-skia";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
+import type { BackImages, TokenImages } from "./canvas-pieces.native.tsx";
+import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
+
 // A file being loaded or loaded: `value` is null until then.
 type Slot<T> = { value: T | null; started: boolean; listeners: Set<() => void> };
 
@@ -61,6 +64,23 @@ const typefaceOf = (data: SkData) => Skia.Typeface.MakeFreeTypeFaceFromData(data
 /** The image of an asset, shared by every reader; null while its file loads. */
 export function useSharedImage(source: DataSourceParam): SkImage | null {
   return useLoaded(IMAGES, source, imageOf);
+}
+
+/** The five token icons a card draws, as one object that keeps its identity until an image arrives (a hook call cannot sit inside an object the compiler memoizes). */
+export function useTokenImages(): TokenImages {
+  const resource = useSharedImage(ICON_FILES.resource);
+  const damage = useSharedImage(ICON_FILES.damage);
+  const progress = useSharedImage(ICON_FILES.progress);
+  const questPoints = useSharedImage(ICON_FILES.questPoints);
+  const engagementCost = useSharedImage(ICON_FILES.engagementCost);
+  return { resource, damage, progress, questPoints, engagementCost };
+}
+
+/** The two printed card backs, as one object that keeps its identity until an image arrives. */
+export function useBackImages(): BackImages {
+  const player = useSharedImage(CARD_BACK_FILES.player);
+  const encounter = useSharedImage(CARD_BACK_FILES.encounter);
+  return { player, encounter };
 }
 
 /** A font of a font asset at a size, shared by every reader; null while its file loads. */
