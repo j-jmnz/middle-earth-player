@@ -183,7 +183,7 @@ STATUS.md, then the active phase file.
     - 78–90 Fixtures and Maestro (~460)
     - 91–115 Rules and engine (~690)
     - 116–130 Screens and code (~590)
-    - 131–148 Phone and tablet checks (~830)
+    - 131–148 Phone and tablet checks (~850)
   - 149–164 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

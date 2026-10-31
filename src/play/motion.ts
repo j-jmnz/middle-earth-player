@@ -15,8 +15,7 @@ import { isDiscardPile, type PileId } from "./selectors.ts";
 //   flip: it starts face down and turns to its face at the midpoint (a drawn card, a revealed encounter card);
 //   delay: ms it waits before it starts, so cards drawn together leave one after another;
 //   arc: points it rises at mid-path;
-//   land: how it lands: "squash" (a card played from the hand), "pop" (a revealed card), or not at all;
-//   slide: a hand sliding up into place when the acting seat changes.
+//   land: how it lands: "squash" (a card played from the hand), "pop" (a revealed card), or not at all.
 export type Motion = {
   dx: number;
   dy: number;
@@ -28,7 +27,6 @@ export type Motion = {
   delay: number;
   arc: number;
   land: "squash" | "pop" | null;
-  slide: boolean;
 };
 
 // How a card that left the table goes: "shake" (destroyed or discarded from play: it shakes, then shrinks and fades to its
@@ -39,11 +37,9 @@ export type Leave = "shake" | "glide" | "fade";
 export type Ghost = { slot: CardSlot; dx: number; dy: number; scale: number; rot: number; leave: Leave };
 
 /**
- * What `motionsBetween` can be told: the acting seat changed (`handoff`), so the hand that appears slides up and nothing is dealt. A
- * peek at the other seat has no motion: card-motion.native.tsx draws its layout at rest.
+ * What `motionsBetween` can be told. A peek or a seat handoff has no motion: card-motion.native.tsx draws its layout at rest.
  */
 export type MotionOptions = {
-  handoff?: boolean;
   // Where a card was in the state before (null when it was nowhere): a card that came from the Corsair deck comes off that pile, not the encounter deck (Boarding, dcce.boarding).
   zoneWas?: (cardId: string) => ZoneName | null;
 };
@@ -66,9 +62,9 @@ function center(rect: { x: number; y: number; w: number; h: number }): { x: numb
 }
 
 /** A slot with no motion, for one the map has no entry for. */
-export const AT_REST: Motion = { dx: 0, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1, flip: false, delay: 0, arc: 0, land: null, slide: false };
+export const AT_REST: Motion = { dx: 0, dy: 0, scale: 1, fromRot: 0, toRot: 0, fromOpacity: 1, flip: false, delay: 0, arc: 0, land: null };
 
-const STILL = (slot: CardSlot): Motion => ({ dx: 0, dy: 0, scale: 1, fromRot: slotRotation(slot), toRot: slotRotation(slot), fromOpacity: 1, flip: false, delay: 0, arc: 0, land: null, slide: false });
+const STILL = (slot: CardSlot): Motion => ({ dx: 0, dy: 0, scale: 1, fromRot: slotRotation(slot), toRot: slotRotation(slot), fromOpacity: 1, flip: false, delay: 0, arc: 0, land: null });
 
 function from(slot: CardSlot, origin: { x: number; y: number; w: number; h: number }, rot: number, opacity: number): Motion {
   const a = center(origin);
@@ -78,7 +74,7 @@ function from(slot: CardSlot, origin: { x: number; y: number; w: number; h: numb
 
 /** True when nothing about the slot moves. */
 export function still(motion: Motion): boolean {
-  return motion.dx === 0 && motion.dy === 0 && motion.scale === 1 && motion.fromRot === motion.toRot && motion.fromOpacity === 1 && !motion.flip && motion.land == null && !motion.slide;
+  return motion.dx === 0 && motion.dy === 0 && motion.scale === 1 && motion.fromRot === motion.toRot && motion.fromOpacity === 1 && !motion.flip && motion.land == null;
 }
 
 /**
@@ -97,7 +93,6 @@ export function motionsBetween(
     return { motions, ghosts: [] };
   }
   const before = new Map(prev.slots.map((slot) => [slot.id, slot]));
-  const handoff = options.handoff === true;
   // A card that left a fold stack comes out of it; a card that folded glides into it (row-fold.ts).
   const stackedBefore = foldedAt(prev);
   const stackedNow = foldedAt(next);
@@ -114,14 +109,8 @@ export function motionsBetween(
     }
     if (was) {
       // A card that was in the hand and is not any more is played: it lifts, glides and lands with a squash.
-      const played = !handoff && was.zone === "hand" && slot.zone !== "hand";
+      const played = was.zone === "hand" && slot.zone !== "hand";
       motions.set(slot.id, { ...from(slot, was, slotRotation(was), 1), land: played ? "squash" : null });
-      continue;
-    }
-    if (handoff) {
-      // The acting seat changed: nothing is dealt. Its hand slides up into place and the rest fades in over the same time, so the two
-      // seats cross-fade (the old seat's cards leave as ghosts).
-      motions.set(slot.id, { ...STILL(slot), dy: slot.zone === "hand" ? slot.h * SHAPE.seatHandRise : 0, fromOpacity: 0, slide: true });
       continue;
     }
     // A card that left the fold stack (the moment now asks about it) starts at the stack, as it was, and is not revealed again.

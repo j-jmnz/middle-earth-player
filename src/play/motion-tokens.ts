@@ -76,7 +76,6 @@ export const MOTION = {
   sweep: tween(900, "linear"),
   seatPulse: tween(300, "outCubic"),
   seatPulseHalf: tween(150, "outCubic"),
-  seatHand: tween(300, "outCubic"),
   bannerIn: tween(260, null),
   bannerOut: tween(260, null),
   sheetIn: tween(220, null),
@@ -187,9 +186,8 @@ export const SHAPE = {
   floatFadeFrom: 400,
   // The sweep slides this far.
   sweepSlide: 40,
-  // The acting seat's dial pulses to this, and its hand slides up from this far below.
+  // The acting seat's dial pulses to this.
   seatPulse: 1.12,
-  seatHandRise: 0.6,
   // The dial pops to this when its number changes.
   dialPop: 1.22,
   // Drawn cards leave one after another, at most this many places apart.

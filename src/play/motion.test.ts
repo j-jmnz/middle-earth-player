@@ -138,29 +138,6 @@ describe("motionsBetween: leaving", () => {
   });
 });
 
-describe("motionsBetween: a seat handoff", () => {
-  const before = layout([slot("x", "hand", at(100, 230))]);
-  const after = layout([slot("y", "hand", at(100, 230)), slot("z", "play", at(100, 130))]);
-
-  it("slides the new hand up and deals nothing", () => {
-    const { motions } = motionsBetween(before, after, nowhere, { handoff: true });
-    const hand = motions.get("y");
-    expect(hand?.slide).toBe(true);
-    expect(hand?.flip).toBe(false);
-    expect(hand?.delay).toBe(0);
-    expect(hand?.dy).toBeGreaterThan(0);
-    // The new seat's other cards fade in over the hand's slide, so the two seats cross-fade, without moving.
-    const play = motions.get("z");
-    expect(play?.slide).toBe(true);
-    expect(play?.fromOpacity).toBe(0);
-    expect(play?.dy).toBe(0);
-    expect(play?.flip).toBe(false);
-    expect(poseAt(play as never, 0, 1).opacity).toBe(0);
-    expect(poseAt(play as never, MOTION.seatHand.ms / 2, 1).opacity).toBeGreaterThan(0.4);
-    expect(poseAt(play as never, motionEnd(play as never), 1).opacity).toBe(1);
-  });
-});
-
 describe("poseAt", () => {
   const before = layout([slot("a", "hand", at(100, 240))]);
   const draw = motionsBetween(before, layout([slot("a", "hand", at(100, 240)), slot("b", "hand", at(160, 240)), slot("c", "hand", at(220, 240))]), nowhere).motions;
