@@ -30,4 +30,8 @@
 // a different choice or take a different path.
 // 17: the merge of the separate-staging engine (phases 15 and 16: a staging area and a quest stage for each seat) and the Dream-chaser engine (phases 37 to 40: sea,
 // ships, the Heading card, Corsairs): a replayed game of either side keeps its path, and a save made before the merge drops its open scenario.
-export const ENGINE_VERSION = 17;
+// 18 (Dream-chaser, phase 41 fix pass): the Scramble in A Fateful Discovery changes which card lies behind each Lost Island instead of the places of the instances, an explored
+// location is heard by the Fate quest cards when it leaves play (in the staging area too) and a double-sided one reaches the victory display on its real side, Revenant holds its
+// damage limit as a constant, a quest stage takes the progress of a quest effect as questing does, and the campaign card's Ominous Fate XP line is taken once: a replayed
+// Fate of Númenor or Voyage Across Belegaer game can take a different path.
+export const ENGINE_VERSION = 18;

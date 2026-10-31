@@ -18,13 +18,14 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
 // The four piles every table shows, and the second slot's (docs/design-system-table.md, Piles): the Corsair deck and its discard pile while the scenario
-// has a Corsair deck (dcce.corsair-deck). The scenario phases add the Uncharted and Grotto decks. Only the discard piles open a list.
+// has a Corsair deck (dcce.corsair-deck), or the Uncharted deck alone while it deals one (dcce.uncharted-deck). The scenario phases add the Grotto deck. Only the discard piles open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck";
 export type PileId = BasePileId | SecondPileId;
 
 export const PILES: readonly BasePileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
 export const SECOND_PILES: readonly SecondPileId[] = ["corsairDeck", "corsairDiscard"];
+const UNCHARTED_PILES: readonly SecondPileId[] = ["unchartedDeck"];
 
 export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   deck: "Deck",
@@ -33,11 +34,13 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   encounterDiscard: "Encounter discard pile",
   corsairDeck: "Corsair deck",
   corsairDiscard: "Corsair discard pile",
+  unchartedDeck: "Uncharted deck",
 };
 
-/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea-corsair.ts). */
-export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck">): readonly SecondPileId[] {
-  return game.corsairDeck !== undefined ? SECOND_PILES : NONE_PILES;
+/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea-corsair.ts); else the Uncharted deck, while the scenario deals one. */
+export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted">): readonly SecondPileId[] {
+  if (game.corsairDeck !== undefined) return SECOND_PILES;
+  return game.uncharted !== undefined ? UNCHARTED_PILES : NONE_PILES;
 }
 
 /** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). A tap on one opens its list; a deck's does not (docs/design-system-table.md, Piles). */
@@ -261,6 +264,8 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
       return game.corsairDeck ?? NONE;
     case "corsairDiscard":
       return game.corsairDiscard ?? NONE;
+    case "unchartedDeck":
+      return game.uncharted?.deck ?? NONE;
   }
 }
 
@@ -274,7 +279,9 @@ export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) 
     const ids = pileIds(game, pile, seat);
     const faceUp = isDiscardPile(pile);
     const last = ids[ids.length - 1];
-    const top = faceUp && last ? (game.cards[last] ?? null) : null;
+    // The Uncharted deck shows its top card's Lost Island side; every copy of it is the same picture (dcce.uncharted-deck).
+    const topId = pile === "unchartedDeck" ? ids[0] : faceUp ? last : undefined;
+    const top = topId ? (game.cards[topId] ?? null) : null;
     const attached = pile === "deck" ? cardsOf(game, game.seats[seat]?.deckAttached ?? NONE) : EMPTY;
     if (previous && previous.ids === ids && previous.top === top && sameCards(previous.attached ?? EMPTY, attached)) return previous;
     previous = { pile, seat, ids, top, attached };

@@ -146,10 +146,12 @@ export function motionsBetween(
     } else if (slot.zone === "staging" || slot.zone === "engaged") {
       const reveal = slot.kind === "card" && !slot.faceDown;
       const corsair = options.zoneWas?.(slot.id) === "corsairDeck" && next.piles.corsairDeck != null;
+      // A Lost Island comes off the Uncharted deck as a reveal does.
+      const island = options.zoneWas?.(slot.id) === "unchartedDeck" ? (next.piles.unchartedDeck ?? null) : null;
       // Boarding: each Corsair card comes off the Corsair deck as a reveal does, then moves into the engagement row, the cards 90 ms apart.
       const delay = corsair ? Math.min(boarded, SHAPE.maxStagger) * MOTION.stagger.ms : 0;
       if (corsair) boarded += 1;
-      motions.set(slot.id, { ...from(slot, (corsair ? next.piles.corsairDeck : null) ?? next.piles.encounterDeck, 0, 0.4), flip: reveal, land: reveal ? "pop" : null, delay });
+      motions.set(slot.id, { ...from(slot, (corsair ? next.piles.corsairDeck : island) ?? next.piles.encounterDeck, 0, 0.4), flip: reveal, land: reveal ? "pop" : null, delay });
     } else motions.set(slot.id, { ...STILL(slot), scale: 0.82, fromOpacity: 0 });
   }
   const present = new Set(next.slots.map((slot) => slot.id));

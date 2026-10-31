@@ -188,7 +188,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
           {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
-          {slot.kind === "card" && !slot.faceDown && inactive(slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
+          {slot.kind === "card" && !slot.faceDown && inactive(slot.picture ?? slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
           {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}
           {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
         </Group>
@@ -249,7 +249,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           ))}
           {lifted ? (
             <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-              <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
+              <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.picture ?? lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
               <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
             </Group>
           ) : null}

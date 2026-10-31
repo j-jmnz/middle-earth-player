@@ -3,6 +3,8 @@
 import type { LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 
+import { pictureKey } from "./picture-key.ts";
+import { islandTell } from "./uncharted-words.ts";
 import { STEP_WORDS } from "./rail.ts";
 import type { SheetNames, SheetOption, SheetStat } from "./sheet-types.ts";
 
@@ -19,12 +21,20 @@ export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat
   return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
 }
 
+/** A card's name as a tile or row reads it; a Lost Island's is followed by what tells it from the others (progress, place in staging). */
+export function cardLabel(game: ScenarioState, names: SheetNames, id: string): string {
+  const card = game.cards[id];
+  const tell = card ? islandTell(game, card) : null;
+  return tell ? `${names.card(id)} · ${tell}` : names.card(id);
+}
+
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
   // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments-play.ts).
   if (id === "staging") return { id, label: "The staging area", code: null };
   const card = game.cards[id];
-  if (card) return { id, label: names.card(id), code: card.code };
+  // Lost Islands share one name: what tells them apart (progress, place in staging) follows it.
+  if (card) return { id, label: cardLabel(game, names, id), code: pictureKey(card) };
   // A branch of a Choose instruction is named by its id in the effect record.
   return { id, label: id.charAt(0).toUpperCase() + id.slice(1), code: null };
 }

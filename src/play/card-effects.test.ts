@@ -9,6 +9,7 @@ import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 import { starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { buildTable, idsOf } from "../../scripts/test-scene.ts";
+import { CODES, fateTable, idOf, loadFateWorld } from "../../scripts/fate-scene.ts";
 
 import { badgeSplit, BADGE_CAP, cardEffects, effectLines } from "./card-effects.ts";
 
@@ -109,5 +110,25 @@ describe("the pills down a card's edge", () => {
     expect(badgeSplit(2, 1)).toEqual({ shown: 0, hidden: 2 });
     expect(badgeSplit(1, 1)).toEqual({ shown: 1, hidden: 0 });
     expect(badgeSplit(4, 0)).toEqual({ shown: 0, hidden: 4 });
+  });
+});
+
+describe("a Lost Island and Revenant", () => {
+  it("a Lost Island shows no delta against the real side's numbers, and the real side shows its own", async () => {
+    const world = await loadFateWorld();
+    const hidden = fateTable(world, { staging: [{ code: CODES.lushJungle, face: "B" }, { code: CODES.forbiddenCoast, face: "up" }] });
+    const state = syncConstants(hidden.state, hidden.ctx);
+    expect(cardEffects(state, hidden.ctx, idOf(state, CODES.lushJungle)).stats).toEqual([]);
+    expect(cardEffects(state, hidden.ctx, idOf(state, CODES.forbiddenCoast)).stats).toEqual([]);
+  });
+
+  it("says Revenant takes at most 2 damage at a time", async () => {
+    const world = await loadFateWorld();
+    const made = fateTable(world, { staging: [CODES.revenant] });
+    // Its Forced effect sets the limit as it joins the staging area (11181:A:3).
+    const id = idOf(made.state, CODES.revenant);
+    const state = addModifier(syncConstants(made.state, made.ctx), id, id, "damageLimit", 2, "whileSourceInPlay");
+    expect(cardEffects(state, made.ctx, id).flags.map((flag) => flag.word)).toEqual(["Takes at most 2 damage at a time"]);
+    expect(effectLines(state, made.ctx, id, () => "Revenant")).toEqual(["Takes at most 2 damage at a time: its own text, while it is in play"]);
   });
 });

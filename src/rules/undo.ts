@@ -67,8 +67,9 @@ export function replay(
 // Zones whose cards the player has not seen.
 const UNSEEN: ReadonlySet<CardInstance["zone"]> = new Set(["deck", "encounterDeck", "questDeck", "burdenDeck"]);
 
-function unseen(card: CardInstance): boolean {
-  return UNSEEN.has(card.zone) || card.face === "down";
+// A double-sided location lying on its Lost Island side (face B) shows nothing of the real side, wherever it lies.
+function unseen(state: ScenarioState, card: CardInstance): boolean {
+  return UNSEEN.has(card.zone) || card.face === "down" || (card.face === "B" && state.uncharted?.codes.includes(card.code) === true);
 }
 
 // The cards the open window names, for a player to read: a Look's cards, a Choose's options (a Pick among the top of a deck,
@@ -83,7 +84,7 @@ function windowCards(state: ScenarioState): readonly string[] {
 /**
  * True when the intent from `before` to `after` showed the player something they had not seen, so the table's Undo cannot
  * take it back (docs/brief.md, The engine plays the game): a card that left a deck or turned face up (a draw, a reveal, a shadow card
- * turned), a card in a deck or face down that the open window names (a Look, a Pick among the top cards, a search), a new
+ * turned), a card in a deck or face down (a Lost Island on its Lost Island side too, turned over or looked at) that the open window names (a Look, a Pick among the top cards, a search), a new
  * card on top of a player's deck, a card that did not exist before, or a random result (the seed cursor moved: a shuffle, a
  * random discard).
  */
@@ -91,9 +92,11 @@ export function showedHidden(before: ScenarioState, after: ScenarioState): boole
   if (after.seedCursor !== before.seedCursor) return true;
   for (const [id, card] of Object.entries(after.cards)) {
     const was = before.cards[id];
-    if (!was || (unseen(was) && !unseen(card))) return true;
+    if (!was || (unseen(before, was) && !unseen(after, card))) return true;
   }
-  if (after.window !== before.window && windowCards(after).some((id) => after.cards[id] && unseen(after.cards[id]))) return true;
+  if (after.window !== before.window && windowCards(after).some((id) => after.cards[id] && unseen(after, after.cards[id]))) return true;
+  // A Look at the facedown side of a Lost Island (side A) shows what the card hides.
+  if (after.window !== before.window && after.window?.kind === "look" && after.window.side === "A") return true;
   return after.seats.some((seat, index) => seat.deck[0] !== before.seats[index]?.deck[0]);
 }
 

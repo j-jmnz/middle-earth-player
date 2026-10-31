@@ -8,6 +8,7 @@
 import type { CardInstance } from "../rules/state.ts";
 
 import { unturn } from "./frame.ts";
+import { pictureKey } from "./picture-key.ts";
 import { hidesFace } from "./selectors.ts";
 import type { BasePileId, FightKind, PileId, PileView, SecondPileId, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";
@@ -266,7 +267,9 @@ function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | und
   };
   // A deck whose top card can be played (Gandalf) is that card: it is picked up and played like a card in the hand.
   const chained = view.pile === "deck" && (view.attached?.length ?? 0) > 0 ? { chained: true as const } : {};
-  return view.pile === "deck" && deckTop ? { ...base, ...chained, id: deckTop.id, kind: "card" } : { ...base, ...chained };
+  // The Uncharted deck is drawn as its top card's Lost Island side, never the real one.
+  const lostIsland = view.pile === "unchartedDeck" && top ? { picture: pictureKey(top) } : {};
+  return view.pile === "deck" && deckTop ? { ...base, ...chained, id: deckTop.id, kind: "card" } : { ...base, ...chained, ...lostIsland };
 }
 
 // The views with a picked, unconfirmed fight drawn as if it were declared: the characters leave the play area and stand
@@ -333,10 +336,11 @@ export function tableLayout(
   const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
   // The second slot of piles (a scenario with a second deck: the Corsair pair) stands under the encounter pair, at the right end of the engagement area, as wide as the pair;
   // the engagement area narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
-  const second = piles.corsairDeck != null || piles.corsairDiscard != null;
+  const second = piles.corsairDeck != null || piles.corsairDiscard != null || piles.unchartedDeck != null;
   const secondY = engagedY + Math.round((card.h - pile.h) / 2);
   const corsairDeck: Rect = { x: encounterDeck.x, y: secondY, w: pile.w, h: pile.h };
   const corsairDiscard: Rect = { x: encounterDiscard.x, y: secondY, w: pile.w, h: pile.h };
+  const unchartedDeck = corsairDeck;
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
   // player's deck and discard pile level with the play area.
@@ -370,13 +374,13 @@ export function tableLayout(
   placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);
-  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}) };
+  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}) };
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table-view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
-  for (const id of ["corsairDeck", "corsairDiscard"] as const) {
+  for (const id of ["corsairDeck", "corsairDiscard", "unchartedDeck"] as const) {
     const view = piles[id];
     const rect = pileRects[id];
     if (view && rect) slots.push(pileSlot(view, rect, undefined));

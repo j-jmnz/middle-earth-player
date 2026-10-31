@@ -48,5 +48,7 @@ describe("the campaign card's XP list (11171:B:3 to 11171:B:10)", () => {
   it("gains -1 XP if Ominous Fate is in the victory display (11171:B:10)", () => {
     expect(xpOf({ victory: [OMINOUS_FATE] })).toBe(0);
     expect(xpOf({ victory: [OMINOUS_FATE, THUNDERSTRUCK, CROWLEY] })).toBe(3);
+    // Two copies cost it once.
+    expect(xpOf({ victory: [OMINOUS_FATE, OMINOUS_FATE] })).toBe(0);
   });
 });

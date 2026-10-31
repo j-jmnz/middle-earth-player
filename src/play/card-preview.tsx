@@ -56,6 +56,8 @@ export type PreviewCard = {
   steps?: readonly { text: string; current: boolean }[];
   // How far the card is drawn turned, in degrees counterclockwise, a multiple of 90: the Heading card, turned a quarter turn per step as the rule turns it (heading.ts).
   turn?: number;
+  // The card lies on its Lost Island side: the preview shows that side only, and Details (which opens the real card) is not offered.
+  lostIsland?: boolean;
 };
 
 // The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
@@ -164,7 +166,7 @@ export function CardPreview({
       <PreviewPicture card={shown} width={size.width} height={size.height} />
     </Animated.View>
   );
-  const buttons = onDetails ? (
+  const buttons = onDetails && shown.lostIsland !== true ? (
     <SecondaryButton
       label="Details"
       testID="card-preview-details"

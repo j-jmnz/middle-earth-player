@@ -1,6 +1,7 @@
 // What a long press on a table card shows (card-preview.tsx): the card, the cards attached to it and its face-up shadow cards,
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
 import { stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
+import { isLostIsland } from "../rules/families/uncharted-pick.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 
@@ -63,13 +64,15 @@ export function previewCards(
     const refusal = id === cardId ? chosen(id) : null;
     const note = id === cardId ? (whyNotPlayable(game, ctx, id, cardName) ?? refusal) : null;
     // A look at the facedown side of a Lost Island shows the real side (dcce.uncharted); the card on the table keeps lying on its Lost Island side.
-    const described = describe(card.code, game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id) ? card.code : pictureKey(card));
+    const looked = game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id);
+    const described = describe(card.code, looked ? card.code : pictureKey(card));
+    const lostIsland = !looked && isLostIsland(card, ctx);
     const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id);
     // The Heading card: titled by its step and its course, listing the four steps with the current one marked, and drawn turned a quarter turn per step (dcce.heading). A peek never changes the dial.
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
-    return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
+    return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(lostIsland ? { lostIsland } : {}), ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
   });
   return { cards, start: Math.max(0, ids.indexOf(cardId)) };
 }

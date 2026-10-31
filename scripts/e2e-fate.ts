@@ -1,14 +1,17 @@
 // The Maestro fixtures of The Fate of Númenor (Dream-chaser part 2), written into src/campaign/fixtures/the-fate-of-numenor.json by scripts/e2e-fixtures.ts: real games of saved decklists (the
 // Defenders of Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `fate-won` is the first seed that wins, parked on the win (the
 // Resolution waits); `fate-lost` the first that loses, parked on the loss. A game not found in the seeds is left out.
-// The log is the blank log of a new Dream-chaser playthrough: `voyage-won`, the game whose win would write the honest log of part 1, is open (docs/phases/STATUS.md), so nothing here
-// builds a log by hand and the first part reads as not played. The Campaign Setup (damage traded for threat) is answered in the game by the auto-player: no damage is traded.
+// The log has part 1 recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps the Fate locked and the path opens Voyage Across
+// Belegaer): it is the log the won game of Voyage Across Belegaer's golden writes (src/campaign/golden-voyage.test.ts, "two-handed, won"), run through the same `applyResolution` that
+// writes it in the app, with the golden's plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, a real-decklist win, is open (docs/phases/STATUS.md).
+// The Campaign Setup (damage traded for threat) is answered in the game by the auto-player: no damage is traded.
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
+import { applyResolution, emptyLog, type CampaignLog } from "../src/campaign/log.ts";
 import { contextOf, deal, resume } from "../src/campaign/session.ts";
 import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
-import { loadWorld } from "../src/campaign/world.ts";
+import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 import { characters, legalAttackEnemies } from "../src/rules/combat.ts";
@@ -19,13 +22,26 @@ import { nextIntent } from "./auto-player.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { createLog } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
+import { VOYAGE_GOLDENS, playGolden as playVoyage, voyageWorld } from "./voyage-game.ts";
 
 const say = createLog("e2e-fate");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
 const CAMPAIGN = "dream-chaser";
 
-export type FateFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[] };
+export type FateFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog };
 export type FateFixtureName = "fate-won" | "fate-lost";
+
+// The log of a playthrough whose first part was won: the Voyage golden's two-handed win resolved onto a new log, its heroes and what hangs on them left out.
+async function voyageWonLog(): Promise<CampaignLog> {
+  const golden = VOYAGE_GOLDENS.find((item) => item.name === "two-handed, won");
+  if (!golden) throw new Error("The Voyage golden \"two-handed, won\" is gone");
+  const world = await voyageWorld(golden.decks);
+  const game = playVoyage(golden, world.ctx);
+  if (!game.state.stageCleared || game.state.lost) throw new Error("The Voyage golden no longer wins");
+  const written = applyResolution(emptyLog(2), game.state.scenarioId, game.state, world.cards);
+  const blank = emptyLog(2);
+  return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
+}
 
 function listed(id: string): { heroes: string[]; deck: string[] } {
   const found = prebuilt.find((entry) => entry.id === id);
@@ -68,14 +84,14 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
 
 type Game = { loadout: StoredLoadout; intents: PlayerIntent[]; state: ScenarioState };
 
-function play(seed: number): Game {
+function play(seed: number, log: CampaignLog): Game {
   const campaign = loadCampaign(CAMPAIGN);
   const scenario = loadScenario("the-fate-of-numenor");
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
   const seats = DECKS.map((id) => ({ deckId: id, ...listed(id) }));
   const loadout: StoredLoadout = { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [], acceptPenalty: false };
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, seats.flatMap((seat) => [...seat.heroes, ...seat.deck]));
-  const dealt = deal(newSave("fixture", campaign.id, 2), world, loadout, seed, CATALOG_VERSION);
+  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)]);
+  const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed, CATALOG_VERSION);
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
   const resumed = resume(dealt.save, world, CATALOG_VERSION);
   if (!resumed.ok) throw new Error(resumed.reason);
@@ -93,21 +109,22 @@ function play(seed: number): Game {
   return { loadout, intents, state };
 }
 
-function firstSeed(wanted: (state: ScenarioState) => boolean, label: string): FateFixture | null {
+function firstSeed(log: CampaignLog, wanted: (state: ScenarioState) => boolean, label: string): FateFixture | null {
   const limit = Number(process.env.FATE_SEEDS ?? 100);
   for (let seed = 1; seed <= limit; seed += 1) {
-    const game = play(seed);
+    const game = play(seed, log);
     say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
     if (!wanted(game.state)) continue;
     say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : "won"}`);
-    return { campaignId: CAMPAIGN, seatCount: 2, loadout: game.loadout, seed, intents: game.intents };
+    return { campaignId: CAMPAIGN, seatCount: 2, loadout: game.loadout, seed, intents: game.intents, log };
   }
   say.warn(`no ${label} game found in ${limit} seeds`);
   return null;
 }
 
-export function fateFixtures(): Partial<Record<FateFixtureName, FateFixture>> {
-  const won = firstSeed((state) => state.stageCleared && !state.lost, "fate-won");
-  const lost = firstSeed((state) => state.lost, "fate-lost");
+export async function fateFixtures(): Promise<Partial<Record<FateFixtureName, FateFixture>>> {
+  const log = await voyageWonLog();
+  const won = firstSeed(log, (state) => state.stageCleared && !state.lost, "fate-won");
+  const lost = firstSeed(log, (state) => state.lost, "fate-lost");
   return { ...(won ? { "fate-won": won } : {}), ...(lost ? { "fate-lost": lost } : {}) };
 }

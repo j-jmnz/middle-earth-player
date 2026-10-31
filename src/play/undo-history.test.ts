@@ -73,6 +73,25 @@ describe("what counts as showing a hidden card", () => {
   });
 });
 
+describe("a Lost Island's facedown side", () => {
+  it("is hidden while the card lies on its Lost Island side: turning it over or looking at it cannot be taken back, a card already face up can be", () => {
+    const [{ before }] = playGame(1).slice(-1);
+    const first = Object.values(before.cards).find((card) => card.zone === "play" || card.zone === "heroes");
+    if (!first) throw new Error("No card");
+    const island = { ...first, id: "island", zone: "staging" as const, face: "B" as const };
+    const withIsland = { ...before, uncharted: { deck: [], codes: [first.code] }, cards: { ...before.cards, island } };
+    const flipped = { ...withIsland, cards: { ...withIsland.cards, island: { ...island, face: "A" as const } } };
+    expect(showedHidden(withIsland, flipped)).toBe(true);
+    // The same card face up (explored, seen) moving about shows nothing new.
+    const shown = { ...withIsland, cards: { ...withIsland.cards, island: { ...island, face: "A" as const } } };
+    expect(showedHidden(shown, { ...shown, cards: { ...shown.cards, island: { ...shown.cards.island!, zone: "victory" as const } } })).toBe(false);
+    // A look at the other side opens a window that names the card with side A.
+    expect(showedHidden(withIsland, { ...withIsland, window: { kind: "look", seat: 0, cardIds: ["island"], side: "A" } })).toBe(true);
+    // The card seen only on its Lost Island side is not new either way.
+    expect(showedHidden(withIsland, { ...withIsland })).toBe(false);
+  });
+});
+
 describe("Undo on the table", () => {
   it("goes back to the state before the intent and its round's log, tells the save, and stops at a revealed card", () => {
     const played = playGame(1);

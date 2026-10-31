@@ -8,6 +8,7 @@
 import { attackStrength } from "../rules/combat.ts";
 import { DEFENDERS_FRAME, declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense-defenders.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
+import { placedLimit } from "../rules/families/uncharted-limit.ts";
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
 import { questSeat } from "./selectors.ts";
 import { viewOf } from "../rules/families/breaking-areas.ts";
@@ -47,9 +48,11 @@ export function questResult(willpower: number, threat: number): string {
   return "No progress and no threat if nothing changes";
 }
 
-function damageWords(attack: number, defense: number): string {
+// `placed`: the most a card that limits the damage placed on it takes at a time (Revenant, 11181:A:3).
+function damageWords(attack: number, defense: number, placed?: number): string {
   const damage = Math.max(0, attack - defense);
-  return damage === 0 ? "No damage" : `${damage} damage`;
+  if (damage === 0) return "No damage";
+  return placed != null && placed < damage ? `${placed} damage, the most it takes at a time` : `${damage} damage`;
 }
 
 // The card the open sheet has picked, and what the pick means in the enemy's attack: a defender, or the hero an undefended
@@ -128,7 +131,8 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // Whether the attack destroys the enemy (toughness and indestructible are the engine's), or how far short it falls.
     const outcome = attackers.length > 0 && !strike ? damageOutcome(game, ctx, enemyId, Math.max(0, total - defense)) : null;
     const after = outcome ? (outcome.destroyed ? `; ${cardName(enemyId)} is destroyed` : outcome.spare != null ? `; ${outcome.spare} more damage destroys it` : "") : "";
-    return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: `${damageWords(total, defense)}${after}` };
+    const placed = placedLimit(game, enemyId, Number.POSITIVE_INFINITY);
+    return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: `${damageWords(total, defense, placed)}${after}` };
   }
   // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).
   if (sheet?.kind === "pick" && game.window?.kind === "travel") {

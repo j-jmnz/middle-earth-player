@@ -90,7 +90,7 @@ export function lookAtBottom(state: ScenarioState, instruction: Verb<"LookAtBott
   const owner = deckSeat(state, focus, instruction.deck === "picked" ? "picked" : "actor");
   const ids = instruction.deck === "encounter" ? state.encounterDeck.slice(-count) : owner == null ? [] : (state.seats[owner]?.deck ?? []).slice(-count);
   const data = effectData(state);
-  const noted = data ? patchTop(state, { data: { ...data, looked: ids, picked: [...(data.picked ?? []), ids.at(-1) ?? ""] } }) : state;
+  const noted = data ? patchTop(state, { data: { ...data, looked: ids, picked: [...(data.picked ?? []), ...ids.slice(-1)] } }) : state;
   if (ids.length === 0) return noted;
   return { ...noted, window: { kind: "look", seat: focus.seat, cardIds: ids }, activeSeat: focus.seat, passed: [] };
 }
@@ -137,8 +137,7 @@ export function discardEncounterTop(state: ScenarioState, instruction: Verb<"Dis
 
 /** StageLooked: each player in turn adds one card of the trait and type, among those the effect discarded, to the staging area. */
 export function stageLooked(state: ScenarioState, instruction: Verb<"StageLooked">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const seats = livingSeats(state);
-  const order = [...seats.filter((seat) => seat >= state.firstPlayer), ...seats.filter((seat) => seat < state.firstPlayer)];
+  const order = livingSeats(state);
   const seat = instruction.seat ?? order[0];
   if (seat == null || !order.includes(seat)) return state;
   const cause = currentCause(steps, UNATTRIBUTED);
@@ -168,8 +167,7 @@ export function removeWillpowerFromQuest(state: ScenarioState, instruction: Verb
 
 /** EachExhaustsOne: each player in turn exhausts one ready character they control, choosing among them. */
 export function eachExhaustsOne(state: ScenarioState, instruction: Verb<"EachExhaustsOne">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const seats = livingSeats(state);
-  const order = [...seats.filter((seat) => seat >= state.firstPlayer), ...seats.filter((seat) => seat < state.firstPlayer)];
+  const order = livingSeats(state);
   const seat = instruction.seat ?? order[0];
   if (seat == null || !order.includes(seat)) return state;
   const cause = currentCause(steps, UNATTRIBUTED);

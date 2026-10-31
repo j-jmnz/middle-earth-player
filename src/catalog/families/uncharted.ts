@@ -45,9 +45,8 @@ export const VERBS = [
   // "Look at the bottom card of your deck" / "the bottom 5 cards" (110013:A:2, 110013:B:3): the deck of the actor, or of the last picked player (`picked`), shown in a look
   // window. The cards shown are the ones the effect looked at, the bottom one the picked card, so a Pick with `looked` and SwapPicked can switch one with a card in hand.
   z.strictObject({ verb: z.literal("LookAtBottom"), count: positiveAmountSchema.optional(), deck: z.enum(["own", "picked", "encounter"]).optional(), ...when }),
-  // "Discard the bottom card of your deck" (11033:A:2, 11034:A:1, 11071:A:2, 11070:A:2): the bottom card of the deck of `who` (the actor; the first player; the player engaged with
-  // the source enemy, `engaged`) goes to its owner's discard pile, announced as discarded from the deck, and the effect remembers it, so the condition `discardedCost` can read its printed cost.
-  z.strictObject({ verb: z.literal("DiscardBottom"), who: z.enum(["actor", "firstPlayer", "engaged"]).optional(), ...when }),
+  // "Discard the bottom card of your deck" (11033:A:2, 11034:A:1, 11071:A:2, 11070:A:2): the bottom card of the deck of `who` (the actor; the first player) goes to its owner's discard pile, announced as discarded from the deck, and the effect remembers it, so the condition `discardedCost` can read its printed cost.
+  z.strictObject({ verb: z.literal("DiscardBottom"), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }),
   // "Then, he discards each card in his hand with a printed cost higher than that of the discarded card" (11034:A:1): from the hand of `who`, each card whose printed cost is higher
   // than that of the card DiscardBottom discarded goes to its owner's discard pile.
   z.strictObject({ verb: z.literal("DiscardCostlier"), who: who.exclude(["picked"]).optional(), ...when }),

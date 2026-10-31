@@ -24,7 +24,7 @@
 // src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e-oath.ts), written to
 // src/campaign/fixtures/the-oath.json. `sea-solo`, `sea-duo`, `voyage-won` and `voyage-lost`: Voyage Across Belegaer on a blank Dream-chaser log (scripts/e2e-voyage.ts), written to
 // src/campaign/fixtures/voyage-across-belegaer.json; `voyage-won` is written only when a seed wins. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e-nibin-dum.ts), written to
-// src/campaign/fixtures/the-caves-of-nibin-dum.json. `fate-won` and `fate-lost`: The Fate of Númenor on a blank Dream-chaser log (scripts/e2e-fate.ts), written to src/campaign/fixtures/the-fate-of-numenor.json; `fate-won` is written only when a seed wins.
+// src/campaign/fixtures/the-caves-of-nibin-dum.json. `fate-won` and `fate-lost`: The Fate of Númenor on the Dream-chaser log Voyage Across Belegaer's golden win writes (scripts/e2e-fate.ts), written to src/campaign/fixtures/the-fate-of-numenor.json; `fate-won` is written only when a seed wins.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -334,7 +334,7 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
 // the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
-void runScript("e2e-fixtures", () => {
+void runScript("e2e-fixtures", async () => {
   const searching = process.argv.includes("--won");
   if (!searching) say.info("the won game is open: pass --won to search for it (about two hours with no result so far)");
   const lost = say.step("play scenario 1's loss", () => playLoss());
@@ -386,8 +386,8 @@ void runScript("e2e-fixtures", () => {
   writeFileSync(voyageFile, `${JSON.stringify(voyage)}\n`);
   say.info(`wrote ${voyageFile} (${Object.keys(voyage).join(", ")})`);
 
-  // The Fate of Númenor (Dream-chaser part 2): from the same blank log, because `voyage-won` is open. A game not found in the seeds is left out.
-  const fate = say.step("play The Fate of Númenor's win and loss", () => fateFixtures());
+  // The Fate of Númenor (Dream-chaser part 2): from the log Voyage Across Belegaer's golden win writes, so the path resumes it. A game not found in the seeds is left out.
+  const fate = await say.stepAsync("play The Fate of Númenor's win and loss", () => fateFixtures());
   const fateFile = path.join(dir, "the-fate-of-numenor.json");
   writeFileSync(fateFile, `${JSON.stringify(fate)}\n`);
   say.info(`wrote ${fateFile} (${Object.keys(fate).join(", ")})`);

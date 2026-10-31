@@ -187,7 +187,7 @@ export function CardBody({
   );
 }
 
-const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard" };
+const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard", unchartedDeck: "Uncharted" };
 
 // The piles that show the printed encounter back (the Eye): the encounter pair and the Corsair pair.
 const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard"]);

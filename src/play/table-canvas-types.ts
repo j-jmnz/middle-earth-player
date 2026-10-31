@@ -43,7 +43,7 @@ export type TableCanvasProps = {
   // The sphere a card prints, for the icon on a card drawn as its name while its file is missing.
   sphereOf: (code: string) => string | null;
   // True for a card with a printed line the app does not apply (src/catalog/active-text.ts): the canvas marks it.
-  inactive: (code: string) => boolean;
+  inactive: (key: string) => boolean;
   // What the zone selectors read of a card's printing: its type (the fold order of staging) and its place among the ships (a seat's ships stand first).
   facts: ZoneFacts;
   // The success symbols a card's ledger side prints, for the Sailing test's look (look-strip.ts); 0 for a card with none.

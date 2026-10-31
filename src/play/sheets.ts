@@ -17,12 +17,13 @@ import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
-import { unchartedOptionLabel } from "./uncharted-words.ts";
+import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
 import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
 import { tokenOutcome } from "./oath-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
+import { pictureKey } from "./picture-key.ts";
 import { STEP_WORDS } from "./rail.ts";
 import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
 import { viewOf } from "../rules/families/breaking-areas.ts";
@@ -30,7 +31,7 @@ import { questSeat } from "./selectors.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
 import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
 import { sailingSheet } from "./sea-sheets.ts";
-import { has, option, statOf, step } from "./sheet-parts.ts";
+import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
@@ -51,8 +52,8 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
     if (!effect || !card) continue;
     options.push({
       id: `${intent.cardId}|${intent.effectId}`,
-      label: names.card(intent.cardId),
-      code: card.code,
+      label: cardLabel(game, names, intent.cardId),
+      code: pictureKey(card),
       effectId: intent.effectId,
       cardId: intent.cardId,
       timing: TIMING_WORDS[effect.timing],
@@ -89,7 +90,7 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
     if (!reason) return [];
     const travel = effectsOf(ctx, card.code).find((effect) => effect.timing === "travel");
     const line = lineOf(travel, names);
-    return [{ id, label: names.card(id), code: card.code, reason: line ? `${reason}. ${line}` : `${reason}.` }];
+    return [{ id, label: cardLabel(game, names, id), code: pictureKey(card), reason: line ? `${reason}. ${line}` : `${reason}.` }];
   });
 }
 
@@ -259,7 +260,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const asked = wait?.kind === "target" ? (seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game)) : { verb: "Choose", prompt: "Choose one." };
+      const trade = wait?.kind === "target" && wait.item.instruction.verb === "TradeDamageForThreat" ? wait.item.instruction : null;
+      const traded = trade?.character ? game.cards[trade.character] : undefined;
+      const tradeAsk = trade && traded ? { verb: "Trade", prompt: tradeWords(game, ctx.cards, trade, names.card(traded.id), effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"))) } : null;
+      const asked = wait?.kind === "target" ? (tradeAsk ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game)) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
@@ -269,13 +273,15 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...(outOfPlay ? { confirm: asked.verb } : {}),
         options: window.options.map((id): PickOption => {
           const card = option(game, names, id);
+          // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
+          const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? unchartedOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           const label = sea ?? (outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(pooled ?? {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }
@@ -397,7 +403,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
 
 // What a look window shows: a shadow card dealt to an enemy, the top of a player's deck, or the top of the encounter deck.
 function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number, side?: "A"): string {
-  if (side === "A") return "The facedown side of a Lost Island. Only you see it. Nothing on it happens and it stays facedown.";
+  if (side === "A") return "The facedown side of a Lost Island. Nothing on it happens and it stays facedown.";
   if (cardIds.some((id) => game.cards[id]?.zone === "shadow")) return "A shadow card dealt to an enemy attacking you. Nothing moves.";
   const first = game.cards[cardIds[0] ?? ""];
   if (first?.zone === "deck") {
@@ -405,7 +411,7 @@ function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number,
     const end = deck[0] === first.id ? "top" : "bottom";
     const count = cardIds.length;
     const cards = count > 1 ? `The ${end} ${count} cards of` : `The ${end} of`;
-    return first.controller === seat ? `${cards} your deck. Nothing moves.` : `${cards} that player's deck. Nothing moves.`;
+    return `${cards} ${first.controller === seat ? "your" : "that player's"} deck. ${switchNote(game, count) ?? "Nothing moves."}`;
   }
   const deck = game.encounterDeck;
   return `The ${deck[0] === cardIds[0] || deck.length === 0 ? "top" : "bottom"} of the encounter deck. Nothing moves.`;

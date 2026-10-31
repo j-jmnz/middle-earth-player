@@ -103,7 +103,7 @@ Read the sections your task touches.
   - 820–844 Persistence and shipping (~1.5K)
   - 845–885 Screens (~4.3K) ← 1
     - 871–885 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~21.0K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~21.2K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
@@ -114,26 +114,26 @@ Read the sections your task touches.
   - 56–66 Cards (~1.1K) ← 3
   - 67–72 The Sailing test (~690) ← 5
   - 73–76 Tokens and effects (~320)
-  - 77–84 Piles (~610) ← 2
-  - 85–90 Marks of the open moment (~400) ← 1
-  - 91–156 Motion (~2.7K) ← 8
-  - 157–183 Spotlight (~2.1K) ← 16
-  - 184–189 Gestures (~210) ← 5
-  - 190–193 Hold, slide and release (~690)
-  - 194–199 Peeking at the other seat (~600) ← 1
-  - 200–213 Command column (~1.6K) ← 7
-  - 214–217 Two taps (~320) ← 2
-  - 218–221 One answer, one tap (~240)
-  - 222–225 Stops and Always use (~250)
-  - 226–229 Guide (~120)
-  - 230–239 Choice tray (~780) ← 2
-  - 240–251 Reading panels (~930) ← 4
-  - 252–261 Phase carousel (~670)
-  - 262–267 Quest advance (~460) ← 1
-  - 268–271 Undo (~140)
-  - 272–275 Haptics (~250)
-  - 276–286 Banner (~580) ← 1
-  - 287–290 Android Back (~90)
+  - 77–85 Piles (~850) ← 2
+  - 86–91 Marks of the open moment (~400) ← 1
+  - 92–157 Motion (~2.7K) ← 8
+  - 158–184 Spotlight (~2.1K) ← 16
+  - 185–190 Gestures (~210) ← 5
+  - 191–194 Hold, slide and release (~690)
+  - 195–200 Peeking at the other seat (~600) ← 1
+  - 201–214 Command column (~1.6K) ← 7
+  - 215–218 Two taps (~320) ← 2
+  - 219–222 One answer, one tap (~240)
+  - 223–226 Stops and Always use (~250)
+  - 227–230 Guide (~120)
+  - 231–240 Choice tray (~780) ← 2
+  - 241–252 Reading panels (~930) ← 4
+  - 253–262 Phase carousel (~670)
+  - 263–268 Quest advance (~460) ← 1
+  - 269–272 Undo (~140)
+  - 273–276 Haptics (~250)
+  - 277–287 Banner (~580) ← 1
+  - 288–291 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~22.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
@@ -231,7 +231,7 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-39-sea-mechanics-family.md` — Phase 39 — Sea mechanics family (~490 tok)
 - `docs/phases/phase-39b-ships-on-the-table.md` — Phase 39b — Ships on the table (~6.7K tok)
   - 8–13 Goal (~220)
-  - 14–153 Design (~4.8K)
+  - 14–152 Design (~4.7K)
     - 16–25 Ships in the play area (~460)
     - 26–42 The Heading (~600)
     - 43–49 Ship-enemies, staging and combat (~340)
@@ -240,12 +240,12 @@ STATUS.md, then the active phase file.
     - 72–88 The Sailing test (~680)
     - 89–114 Crowding: squeeze, then fold (~740)
     - 115–118 The rule that no control types a number (~180)
-    - 119–153 Scenario areas (~1.2K)
-  - 154–164 Cards it must hold (~230)
-  - 165–171 Build (~240)
-  - 172–200 Tests (~560)
-  - 201–215 E2E (~250)
-  - 216–238 Exit (~320)
+    - 119–152 Scenario areas (~1.1K)
+  - 153–163 Cards it must hold (~230)
+  - 164–170 Build (~240)
+  - 171–199 Tests (~560)
+  - 200–214 E2E (~250)
+  - 215–237 Exit (~320)
 - `docs/phases/phase-40-voyage-across-belegaer.md` — Phase 40 — Voyage Across Belegaer (~950 tok)
 - `docs/phases/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~900 tok)
 - `docs/phases/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~900 tok)

@@ -2,7 +2,10 @@
 // Lost Island in the staging area gets +1 Threat", 11033:A:1), what a Pick or a question is for, and the label of an option that is no card. Every prompt names the card it is about and
 // leads with the decision.
 import type { Instruction } from "../catalog/boundary.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { modifiedStat } from "../rules/keywords.ts";
+import type { PrintedCard } from "../rules/printed.ts";
+import type { CardInstance, ScenarioState } from "../rules/state.ts";
+import { topFrame } from "../rules/windows.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
 
@@ -10,6 +13,60 @@ import type { ChoiceNames, PickWords } from "./choice-words.ts";
 export const LOST_ISLAND_NAME = "Lost Island";
 
 const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
+
+const ordinal = (n: number): string => {
+  const mod = n % 100;
+  if (mod >= 11 && mod <= 13) return `${n}th`;
+  return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+};
+
+/** What tells one Lost Island from another, which all carry one name: the progress on it and its place in the staging area ("3 progress · 2nd in staging"). Null for any other card. */
+export function islandTell(game: ScenarioState, card: Pick<CardInstance, "id" | "code" | "face" | "progress">): string | null {
+  if (card.face !== "B" || game.uncharted?.codes.includes(card.code) !== true) return null;
+  const place = game.staging.indexOf(card.id);
+  return [card.progress > 0 ? `${card.progress} progress` : null, place >= 0 ? `${ordinal(place + 1)} in staging` : null].filter((part) => part != null).join(" · ") || null;
+}
+
+/** The effect's next question trades a card of the deck for one of the hand ("Then, you may switch that card with a card in your hand"). */
+function switchesNext(game: ScenarioState): boolean {
+  const data = topFrame(game)?.data;
+  return data?.kind === "effect" && data.queue.some((item) => item.instruction.verb === "Choose" && item.instruction.options.some((option) => option.instructions.some((step) => step.verb === "SwapPicked")));
+}
+
+/** The look at the bottom of a deck says what comes next when the card may be switched with one in hand. Null otherwise. */
+export function switchNote(game: ScenarioState, count: number): string | null {
+  if (!switchesNext(game)) return null;
+  return `You may switch ${count > 1 ? "one of them" : "it"} with a card in your hand next.`;
+}
+
+type Choose = Extract<Instruction, { verb: "Choose" }>;
+
+/** The words of a branch of the family's Choose instructions, or null: "Switch it with a card in your hand" / "Keep your hand" (Calphon), "Place 1 progress on a location (2 on a Lost Island)"
+ * (Spyglass), "Raise each player's threat by 2 to look at a Lost Island's facedown side" (Aimless Wandering). */
+export function unchartedBranchWords(choose: Choose, optionId: string): string | null {
+  const option = choose.options.find((entry) => entry.id === optionId);
+  if (!option) return null;
+  const swaps = (steps: readonly Instruction[]) => steps.some((step) => step.verb === "SwapPicked");
+  if (swaps(option.instructions)) return "Switch it with a card in your hand";
+  if (option.instructions.length === 0 && choose.options.some((other) => swaps(other.instructions))) return "Keep your hand";
+  const placed = option.instructions.filter((step): step is Extract<Instruction, { verb: "PlaceProgressOn" }> => step.verb === "PlaceProgressOn");
+  const [plain, island] = placed;
+  if (placed.length === 2 && plain && island && typeof plain.amount === "number" && typeof island.amount === "number" && plain.when != null && island.when != null) {
+    return `Place ${plural(plain.amount, "progress", "progress")} on a location (${island.amount} on a Lost Island)`;
+  }
+  const doomed = option.instructions.find((step): step is Extract<Instruction, { verb: "Doomed" }> => step.verb === "Doomed");
+  if (doomed && option.instructions.some((step) => step.verb === "LookAtFacedown")) return `Raise each player's threat by ${typeof doomed.amount === "number" ? doomed.amount : "X"} to look at a Lost Island's facedown side`;
+  return null;
+}
+
+/** The sentence of a trade of damage for threat: who takes the damage, whose threat falls, and for Calphon what is left of him and what his leaving costs. */
+export function tradeWords(game: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, instruction: Extract<Instruction, { verb: "TradeDamageForThreat" }>, name: string, leavingLoses: boolean): string {
+  const card = instruction.character ? game.cards[instruction.character] : undefined;
+  const seat = (card?.controller ?? game.firstPlayer) + 1;
+  const left = card ? modifiedStat(game, card, "hitPoints", cards) - card.damage - instruction.damage : null;
+  const hurt = left == null ? "" : left <= 0 ? ` ${name} would leave play, and the players would lose the game.` : leavingLoses ? ` ${name} would have ${plural(left, "hit point", "hit points")} left; if he leaves play the players lose the game.` : ` ${name} would have ${plural(left, "hit point", "hit points")} left.`;
+  return `${name}: take ${plural(instruction.damage, "damage", "damage")} to lower Player ${seat}'s threat by ${instruction.threat}?${hurt}`;
+}
 
 /** One instruction in words, or null when it is not one of the family's. */
 export function unchartedWords(instruction: Instruction): string | null {
@@ -37,10 +94,6 @@ export function unchartedWords(instruction: Instruction): string | null {
 export function unchartedPickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null): PickWords | null {
   const host = sourceId ? names.card(sourceId) : "This card";
   switch (pick.verb) {
-    case "TradeDamageForThreat": {
-      const who = pick.character ? names.card(pick.character) : "A character";
-      return { verb: "Trade", prompt: `${who}: deal ${pick.damage} damage to it to lower its controller's threat by ${pick.threat}?` };
-    }
     case "EachExhaustsOne":
       return { verb: "Exhaust", prompt: `${host}: choose a character you control to exhaust.` };
     case "StageLooked":
@@ -56,7 +109,7 @@ export function unchartedPickWords(pick: Instruction, next: Instruction | undefi
   }
   switch (next?.verb) {
     case "LookAtFacedown":
-      return { verb: "Look", prompt: `${host}: choose a Lost Island to look at the facedown side of. Only you see it.` };
+      return { verb: "Look", prompt: `${host}: choose a Lost Island to look at the facedown side of.` };
     case "LookAtShadow":
       return { verb: "Look", prompt: `${host}: choose an enemy to look at its shadow card.` };
     case "LookAtTop":

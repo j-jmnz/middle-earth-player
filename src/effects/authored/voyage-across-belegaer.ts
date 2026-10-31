@@ -425,7 +425,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "11171:resolution:6", cardCode: "11171", lines: ["11171:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11058"] } }] },
   { id: "11171:resolution:7", cardCode: "11171", lines: ["11171:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11178"] }, max: 1 }] },
   { id: "11171:resolution:8", cardCode: "11171", lines: ["11171:B:9"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 2, each: { kind: "inVictory", codes: ["11177"] }, max: 2 }] },
-  { id: "11171:resolution:9", cardCode: "11171", lines: ["11171:B:10"], timing: "resolution", instructions: [{ verb: "GainXp", amount: -1, each: { kind: "inVictory", codes: ["11176"] }, max: 1 }] },
+  { id: "11171:resolution:9", cardCode: "11171", lines: ["11171:B:10"], timing: "resolution", instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }] },
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

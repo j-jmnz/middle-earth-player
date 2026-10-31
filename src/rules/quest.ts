@@ -2,7 +2,7 @@
 // rr.in-play-and-out-of-play, ltp.quest-resolution, ltp.successful-quest, ltp.unsuccessful-quest,
 // ltp.explored-active-location, ltp.quest-advancement, ltp.optional-engagement, ltp.engagement-checks-intro,
 // ltp.engagement-checks-repeat (data/rules/entries.json).
-import { ruleCause } from "./cause.ts";
+import { ruleCause, type Cause } from "./cause.ts";
 import { checkCost } from "./families/costs-stats.ts";
 import { engagementBarred, noteEngaged } from "./families/quest-engage.ts";
 import { currentQuestHas } from "./families/quest-conditions.ts";
@@ -63,7 +63,7 @@ export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number)
   // An active location that contributes its Threat to the staging area's ("While Flooded Ruins is the active location, it contributes its Threat", 11072:A:1).
   for (const id of [view.activeLocation, view.secondActiveLocation]) {
     const instance = id ? view.cards[id] : undefined;
-    if (instance && flagged(view, instance.id, "activeThreat")) total += modifiedStat(view, instance, "threat", cards);
+    if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) total += modifiedStat(view, instance, "threat", cards);
   }
   return withStagingThreat(view, total);
 }
@@ -181,27 +181,27 @@ export function placeQuestProgress(
     // A card in play may limit the progress the quest card takes this round, or stop it (families/caves-progress.ts).
     remaining = Math.min(remaining, questRoom(next));
     if (stage && remaining > 0) {
-      const points = questPointsOf(next, stage, cards);
-      if (points == null) {
-        next = noteQuestPlaced(updateCard(next, stageId, { progress: stage.progress + remaining }), remaining);
-        steps.push({ kind: "progress", targetId: stageId, amount: remaining, cause: ruleCause("rr.step-3-4") });
-      } else {
-        // A quest that can advance takes what it needs: the rest does not carry over to the next stage
-        // (rr.quest-advancement). One that cannot advance has no upper limit (faq.progress-without-advancing).
-        const advancing = canAdvance(next);
-        const placed = advancing ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining;
-        if (placed > 0) {
-          next = noteQuestPlaced(updateCard(next, stageId, { progress: stage.progress + placed }), placed);
-          steps.push({ kind: "progress", targetId: stageId, amount: placed, cause: ruleCause("rr.step-3-4") });
-        }
-        const updated = next.cards[stageId];
-        if (updated && updated.progress >= points && advancing) {
-          next = advanceStage(next, cards, steps, canAdvance);
-        }
-      }
+      next = putOnStage(next, stageId, remaining, questPointsOf(next, stage, cards), cards, steps, canAdvance, ruleCause("rr.step-3-4"), true);
     }
   }
   return next;
+}
+
+// Progress put on the current quest card: a quest that can advance takes what it needs, the rest does not carry over to the next stage (rr.quest-advancement); one that cannot advance
+// has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves-progress.ts).
+export function putOnStage(state: ScenarioState, stageId: string, amount: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
+  const stage = state.cards[stageId];
+  if (!stage) return state;
+  const advancing = points != null && canAdvance(state);
+  const placed = advancing ? Math.min(amount, Math.max(0, points - stage.progress)) : amount;
+  let next = state;
+  if (placed > 0) {
+    next = updateCard(next, stageId, { progress: stage.progress + placed });
+    if (counted) next = noteQuestPlaced(next, placed);
+    steps.push({ kind: "progress", targetId: stageId, amount: placed, cause });
+  }
+  const updated = next.cards[stageId];
+  return advancing && updated && updated.progress >= points ? advanceStage(next, cards, steps, canAdvance) : next;
 }
 
 // The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points

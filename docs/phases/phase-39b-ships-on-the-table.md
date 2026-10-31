@@ -123,7 +123,6 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 | Phase | Element | Shared (39b) | The scenario phase adds |
 | --- | --- | --- | --- |
 | 40 | Ships, Heading, Corsair deck, Boarding, Sailing | everything above | the setup picks: Modification per ship, "deal 2 damage to a ship for 1 resource"; its cards' words |
-| 41 | Uncharted deck | the second slot, one deck alone | `unchartedDeck` pile showing the Lost Island face (every copy is the same, `dcce.uncharted-deck`); the flip when Lost Island becomes active; a look at the facedown side, shown in the preview to that look only; the shuffle back into the deck |
 | 42 | Cards under The Havens Burn; Aflame | damage tokens on locations; `under` cards are not drawn | the under-count pill: a night pill at the host's foot, as the engagement cost pill, "2 under · lose at 5", threat red when one more card loses (11038); the Aflame value and damage in the preview |
 | 43 | The Stormcaller's area | fold order; the 30% night veil | see below |
 | 44 | Grapple | staging stacks: one peek with a count | the facedown arms under their location, the location's threat pill (+2 per arm, from the engine), "Grappled: 2 facedown enemies" in the preview, the detach flip into staging |

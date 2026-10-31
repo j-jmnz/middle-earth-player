@@ -33,3 +33,9 @@ export function shuffleUnchartedDeck(state: ScenarioState): ScenarioState {
   const shuffled = shuffleIds(uncharted.deck, state.seed, state.seedCursor);
   return { ...state, uncharted: { ...uncharted, deck: shuffled.ids }, seedCursor: shuffled.cursor };
 }
+
+/** A double-sided location that reaches the victory display lies on its real side, face A: it was explored there, and only the Uncharted deck holds a card Lost Island side up. */
+export function unchartedWon(state: ScenarioState, id: string): ScenarioState {
+  const card = state.cards[id];
+  return card?.face === "B" && state.uncharted?.codes.includes(card.code) ? updateCard(state, id, { face: "A" }) : state;
+}

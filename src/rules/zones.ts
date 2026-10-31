@@ -5,7 +5,7 @@ import { leaveWith } from "./families/play-zones.ts";
 import { releaseOrcGuard } from "./families/dungeon-guard.ts";
 import { dealtFace } from "./families/dreamchaser-facts.ts";
 import { routeDestination } from "./families/sea-routes.ts";
-import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute } from "./families/uncharted-zone.ts";
+import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "./families/uncharted-zone.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
@@ -250,7 +250,7 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
     case "unchartedDeck":
       return joinUnchartedDeck(stamped, id);
     case "victory":
-      return { ...stamped, victory: append(stamped.victory, id) };
+      return { ...unchartedWon(stamped, id), victory: append(stamped.victory, id) };
     case "setAside":
       return { ...stamped, setAside: append(stamped.setAside, id) };
     case "removed":

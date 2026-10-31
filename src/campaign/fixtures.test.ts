@@ -15,7 +15,7 @@ import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 import { briefing } from "./briefing.ts";
 import { emptyLog } from "./log.ts";
 import { fixture, fixtureSave, FIXTURE_NAMES, hasFixture, type FixtureName } from "./fixtures.ts";
-import { campaignPath } from "./path.ts";
+import { campaignPath, nextStep, openNode } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
@@ -107,8 +107,8 @@ describe("Maestro fixtures", () => {
       const save = fixtureSave(name, "s", CATALOG_VERSION);
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
-      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's.
-      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : []);
+      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's, the Fate of Númenor ones from the log Voyage Across Belegaer's golden win writes.
+      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : []);
     }
   });
 
@@ -447,8 +447,8 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
 });
 
 describe("The Fate of Númenor (Dream-chaser part 2, phase 41)", () => {
-  // The fixtures are games of two decklists from the blank log of a new Dream-chaser playthrough (voyage-won, whose win would write part 1's log, is open). A name whose game the seeds did
-  // not find is not committed and has nothing to check.
+  // The fixtures are games of two decklists from the log Voyage Across Belegaer's golden win writes (voyage-won, a win of real decklists, is open): part 1 is completed, so the playthrough's open
+  // scenario is the Fate and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
   const names = (["fate-won", "fate-lost"] as const).filter((name) => hasFixture(name));
 
   it("are games of two decklists dealt on the scenario, the Campaign Setup answered in the game", () => {
@@ -459,6 +459,19 @@ describe("The Fate of Númenor (Dream-chaser part 2, phase 41)", () => {
       expect(found.seatCount, name).toBe(2);
       expect(found.past, name).toBeNull();
       expect(found.loadout.ringBearer, name).toBeNull();
+    }
+  });
+
+  it("start from a log with part 1 recorded as won, so the node the path opens is the Fate, not Voyage Across Belegaer", () => {
+    const dreamChaser = loadCampaign("dream-chaser");
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.log.completed, name).toEqual(["voyage-across-belegaer"]);
+      expect(found.log.xpGained["voyage-across-belegaer"], name).toBeGreaterThan(0);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const path = campaignPath(dreamChaser, {}, save.log);
+      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("the-fate-of-numenor");
+      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "the-fate-of-numenor" } });
     }
   });
 

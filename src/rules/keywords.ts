@@ -16,6 +16,7 @@ import { attackingHolds } from "./families/attack-strike.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
 import { alliesToHandDestination } from "./families/deck-rules.ts";
 import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
+import { placedLimit } from "./families/uncharted-limit.ts";
 import { LOST_ISLAND_THREAT } from "./families/uncharted-pick.ts";
 import { discardArea } from "./families/breaking-areas.ts";
 
@@ -25,7 +26,7 @@ export type DamageSource = "framework" | "player" | "combat";
 type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
 
 // The printed value of a stat, on the side the card shows: a ship-objective dealt on its Upgraded side prints that side's stats (dcce.scalable-upgradable).
-function printedStat(printed: PrintedCard, stat: ModifierStat, face?: CardInstance["face"]): number {
+export function printedStat(printed: PrintedCard, stat: ModifierStat, face?: CardInstance["face"]): number {
   // The Lost Island side of a double-sided location prints a Threat and no quest points (dcce.uncharted).
   if (face === "B" && printed.keywords.uncharted && (stat === "threat" || stat === "questPoints")) return stat === "threat" ? LOST_ISLAND_THREAT : 0;
   const upgraded = face === "B" ? printed.upgraded : null;
@@ -215,15 +216,7 @@ function indestructible(state: ScenarioState, id: string, printed: PrintedCard):
   return printed.type === "enemy" && printed.keywords.indestructible && !flagged(state, id, "losesKeywords");
 }
 
-export function placeDamage(
-  state: ScenarioState,
-  assigned: string,
-  amount: number,
-  cards: ReadonlyMap<string, PrintedCard>,
-  steps: EngineStep[],
-  source: DamageSource,
-  cause: Cause,
-): ScenarioState {
+export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause): ScenarioState {
   // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
   const id = damageGoesTo(state, assigned);
   const instance = state.cards[id];
@@ -241,10 +234,7 @@ export function placeDamage(
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
-  // A card that places no more than a number of damage at a time ("place 2 damage instead", 11181:A:3).
-  const limits = state.modifiers.filter((modifier) => modifier.stat === "damageLimit" && modifier.instanceId === id && modifierActive(state, modifier)).map((modifier) => modifier.amount);
-  const limit = limits.length > 0 ? Math.min(...limits) : 0;
-  const placing = limit > 0 ? Math.min(placedAmount(printed, amount), limit) : placedAmount(printed, amount);
+  const placing = placedLimit(state, id, placedAmount(printed, amount));
   const dealt = cap > 0 ? Math.max(0, Math.min(placing, cap - taken)) : placing;
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });

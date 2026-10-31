@@ -15,6 +15,7 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const pileOf = useMemo(() => Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)])) as Record<BasePileId, ReturnType<typeof pileSelector>>, [seat]);
   // The second slot's piles (the Corsair pair), only while the game has a Corsair deck: they are shared, so a peek leaves them where they are.
   const corsair = useMemo(() => ({ deck: pileSelector("corsairDeck", seat), discard: pileSelector("corsairDiscard", seat) }), [seat]);
+  const uncharted = useMemo(() => pileSelector("unchartedDeck", seat), [seat]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
   const staging = useStore(store, (state) => zones.staging(state.game));
   const activeLocation = useStore(store, (state) => zones.activeLocation(state.game));
@@ -28,12 +29,13 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const encounterDiscard = useStore(store, (state) => pileOf.encounterDiscard(state.game));
   const corsairDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDeck") ? corsair.deck(state.game) : null));
   const corsairDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDiscard") ? corsair.discard(state.game) : null));
+  const unchartedDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("unchartedDeck") ? uncharted(state.game) : null));
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
-      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}) },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}) },
     }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard],
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck],
   );
 }
 

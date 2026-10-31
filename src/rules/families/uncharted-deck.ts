@@ -8,7 +8,7 @@ import { currentCause, UNATTRIBUTED } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ReduceContext } from "../interpret.ts";
 import { queueEvent } from "../queue.ts";
-import { questPointsOf, advanceStage } from "../quest.ts";
+import { putOnStage, questPointsOf } from "../quest.ts";
 import { restricted } from "../restrictions.ts";
 import { shuffleIds } from "../seed.ts";
 import { afterProgress } from "../stage-reveal.ts";
@@ -52,8 +52,8 @@ export function addSetAside(state: ScenarioState, instruction: Verb<"AddSetAside
   return stage(updateCard(state, id, { face: "B" }), id, focus.seat, ctx);
 }
 
-/** ScrambleUncharted: each Lost Island in the staging area loses its progress and the seed shuffles their places among themselves, so that nothing the players saw of their
- * positions says which one is which. */
+/** ScrambleUncharted: each Lost Island in the staging area loses its progress and the seed shuffles which card lies behind which: the codes change places among the instances, which stay where
+ * they are, so no id, place or token the players saw says which Lost Island is which. */
 export function scramble(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const cause = currentCause(steps, UNATTRIBUTED);
   const islands = state.staging.filter((id) => state.cards[id] && isLostIsland(state.cards[id], ctx));
@@ -64,9 +64,11 @@ export function scramble(state: ScenarioState, steps: EngineStep[], ctx: ReduceC
     if (progress > 0) steps.push({ kind: "progress", targetId: id, amount: -progress, cause });
     next = updateCard(next, id, { progress: 0 });
   }
-  const shuffled = shuffleIds(islands, next.seed, next.seedCursor);
-  const order = [...shuffled.ids];
-  return { ...next, staging: next.staging.map((id) => (islands.includes(id) ? (order.shift() ?? id) : id)), seedCursor: shuffled.cursor };
+  const shuffled = shuffleIds(islands.map((id) => next.cards[id]?.code ?? ""), next.seed, next.seedCursor);
+  islands.forEach((id, index) => {
+    next = updateCard(next, id, { code: shuffled.ids[index] ?? "" });
+  });
+  return { ...next, seedCursor: shuffled.cursor };
 }
 
 /** FlipUncharted: the Lost Island turns to its other side and loses all progress; the flip is announced to the Forced effects of the side it now shows. */
@@ -96,16 +98,8 @@ export function addStageProgress(state: ScenarioState, instruction: Verb<"AddSta
   const stageId = state.questStage;
   const quest = stageId ? state.cards[stageId] : undefined;
   if (!stageId || !quest || amount <= 0 || state.stageCleared) return state;
-  const points = questPointsOf(state, quest, ctx.cards);
   const canAdvance = (current: ScenarioState): boolean => restricted(current, ctx, "advance").length === 0;
-  const placed = points == null || !canAdvance(state) ? amount : Math.min(amount, Math.max(0, points - quest.progress));
   const before = steps.length;
-  let next = state;
-  if (placed > 0) {
-    next = updateCard(next, stageId, { progress: quest.progress + placed });
-    steps.push({ kind: "progress", targetId: stageId, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
-  }
-  const updated = next.cards[stageId];
-  if (points != null && updated && updated.progress >= points && canAdvance(next)) next = advanceStage(next, ctx.cards, steps, canAdvance);
+  const next = putOnStage(state, stageId, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, canAdvance, currentCause(steps, UNATTRIBUTED), false);
   return afterProgress(next, before, ctx, steps);
 }

@@ -21,7 +21,7 @@ import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cav
 import { nightmareWords } from "./nightmare-words.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";
 import { seaPickWords, seaWords } from "./sea-words.ts";
-import { unchartedPickWords, unchartedWords } from "./uncharted-words.ts";
+import { unchartedBranchWords, unchartedPickWords, unchartedWords } from "./uncharted-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -321,6 +321,8 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
+  const family = unchartedBranchWords(choose, optionId);
+  if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
   if (whole) return whole;

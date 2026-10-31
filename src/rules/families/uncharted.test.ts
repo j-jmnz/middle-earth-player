@@ -72,6 +72,19 @@ describe("the Lost Island side (11030:B:1 to B:4, dcce.uncharted)", () => {
   });
 });
 
+describe("an active location that contributes its Threat (11072:A:1)", () => {
+  it("adds it to the staging area's, unless the card does not contribute its Threat", () => {
+    const made = make({ active: { code: CODES.floodedRuins, face: "up" as const, progress: 0 } });
+    const id = idOf(made.state, CODES.floodedRuins);
+    const threat = (state: ScenarioState) => stagingThreat(state, made.ctx.cards);
+    const printed = modifiedStat(made.state, made.state.cards[id]!, "threat", made.ctx.cards);
+    expect(printed).toBeGreaterThan(0);
+    expect(threat(made.state)).toBe(printed);
+    const silent = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: id, sourceId: id, stat: "noThreatContribution" as const, amount: 1, until: "whileSourceInPlay" as const }] };
+    expect(threat(silent)).toBe(0);
+  });
+});
+
 describe("Explore the Island, Setup (11025:A:1, dcce.uncharted-deck)", () => {
   it("prepares the deck, adds 2 Lost Islands from the top (3 with 3 or 4 players), and brings Calphon into play under the first player", () => {
     const setup = AUTHORED_EFFECTS.find((effect) => effect.id === "11025:setup:1")!;
@@ -148,6 +161,13 @@ describe("Explore the Island, side B (11025:B:1 to B:3) and flipping (11030:B:3)
     expect(codesIn(state, "encounterDiscard")).toEqual([]);
   });
 
+  it("counts a location explored in the staging area too (\"after a location is explored\", 11025:B:2)", () => {
+    const made = make({ staging: [{ code: CODES.lushJungle, face: "up" as const, progress: 0 }], uncharted: [CODES.drownedGraves] });
+    const done = finish(run(made, { verb: "PlaceProgressOn", amount: 4, target: "eachStagingLocation" }), made.ctx);
+    expect(done.state.cards[done.state.questStage ?? ""]?.progress).toBe(4);
+    expect(done.state.cards[idOf(done.state, CODES.lushJungle)]?.zone).toBe("unchartedDeck");
+  });
+
   it("adds the printed quest points of a single-sided location too, and the stage advances at 20 (11025:B:2)", () => {
     const made = make({ active: { code: CODES.steepPlateau, progress: 2 }, progress: 18, uncharted: [CODES.lushJungle, CODES.forbiddenCoast, CODES.floodedRuins], setAside: [CODES.shrine] });
     const done = quest(made, 1);
@@ -169,7 +189,8 @@ describe("A Fateful Discovery (11026:A:1, 11026:B:1, 11026:B:2)", () => {
     const before = made.state.staging.map((id) => made.state.cards[id]?.code);
     const after = run(made, { verb: "ScrambleUncharted" }).state;
     const codes = after.staging.map((id) => after.cards[id]?.code);
-    // Only the Lost Islands' places change, among themselves; the other cards stay where they were; none keeps its progress.
+    // Only the cards behind the Lost Islands change, among themselves; every instance stays at its place, so the shuffle cannot be followed; none keeps its progress.
+    expect(after.staging).toEqual(made.state.staging);
     expect(codes[1]).toBe(CODES.steepPlateau);
     expect(codes[4]).toBe(CODES.fog);
     expect([...codes].sort()).toEqual([...before].sort());
@@ -183,6 +204,14 @@ describe("A Fateful Discovery (11026:A:1, 11026:B:1, 11026:B:2)", () => {
     const made = make({ stage: "11026", active: { code: CODES.lushJungle, progress: 3 }, uncharted: [CODES.floodedRuins] });
     const done = quest(made, 1);
     expect(codesIn(done.state, "victory")).toEqual([CODES.lushJungle]);
+    expect(deckCodes(done.state)).toEqual([CODES.floodedRuins]);
+  });
+
+  it("puts a location explored in the staging area in the victory display on its real side, face A (11026:B:1)", () => {
+    const made = make({ stage: "11026", staging: [{ code: CODES.lushJungle, face: "up" as const, progress: 0 }], uncharted: [CODES.floodedRuins] });
+    const done = finish(run(made, { verb: "PlaceProgressOn", amount: 4, target: "eachStagingLocation" }), made.ctx);
+    expect(codesIn(done.state, "victory")).toEqual([CODES.lushJungle]);
+    expect(done.state.cards[idOf(done.state, CODES.lushJungle)]).toMatchObject({ zone: "victory", face: "A" });
     expect(deckCodes(done.state)).toEqual([CODES.floodedRuins]);
   });
 

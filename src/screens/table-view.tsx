@@ -13,7 +13,7 @@ import { createBeats } from "../play/beat-store";
 import { slotNumbers } from "../play/card-effects";
 import { CardPreview } from "../play/card-preview";
 import { standInText } from "../play/dungeon-preview";
-import type { LogNames } from "../play/log";
+import { causeKey, type LogNames } from "../play/log";
 import { dockPills } from "../play/dock-extras";
 import { ChoiceTray } from "../play/choice-tray";
 import { isDense } from "../play/dock-budget";
@@ -174,7 +174,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   );
   // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
   const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
-  const inactive = useCallback((code: string) => inactiveSet.has(code), [inactiveSet]);
+  // By picture key: a Lost Island lying on its Lost Island side has no line the app leaves out, whatever its other side lacks.
+  const inactive = useCallback((key: string) => !lostIsland(key) && inactiveSet.has(pictureCode(key)), [inactiveSet, lostIsland]);
   // Read from the state the canvas holds and the seat it draws, never from the store in a render.
   const info = useCallback<TableCanvasProps["info"]>((now, seat, cardId) => slotNumbers(now, ctx, cardId, seat), [ctx]);
   const rail = useMemo(() => railFor(game), [game]);
@@ -183,8 +184,18 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const carousel = useMemo(() => (carouselOpen ? phaseCarousel(game, { stopsOn, stops }, ruleTitle) : null), [carouselOpen, game, stopsOn, stops]);
   const stopAhead = useMemo(() => stopAheadOf(game, { stopsOn, stops }), [game, stopsOn, stops]);
   const logNames: LogNames = useMemo(
-    () => ({ card: names.card, code: nameOf, effectCard: (effectId: string) => effectById(ctx, effectId)?.cardCode ?? null, rule: ruleTitle, line: ledgerLine }),
-    [names, nameOf, ctx],
+    () => ({
+      card: names.card,
+      code: nameOf,
+      // A cause on the Lost Island side of a double-sided location names a Lost Island, never the location.
+      effectCard: (effectId: string, lineId: string) => {
+        const code = effectById(ctx, effectId)?.cardCode;
+        return code ? causeKey(code, lineId, session.world.cards.get(code)?.keywords.uncharted === true) : null;
+      },
+      rule: ruleTitle,
+      line: ledgerLine,
+    }),
+    [names, nameOf, ctx, session],
   );
 
   // A menu row closes the menu and then acts (src/play/table-menu-items.ts).
@@ -297,7 +308,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     landscape: session.world.cards.get(code)?.type === "quest",
     // A revealed quest stage reads its B side.
     text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
-    notApplied: notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
+    notApplied: lostIsland(key) ? null : notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
   });
   const advancedCard = advance.shown ? game.cards[advance.shown.stageId] : undefined;
   const previewed = preview

@@ -5,7 +5,8 @@
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../rules/constant-records.ts";
-import { heldBy, modifiedStat } from "../rules/keywords.ts";
+import { placedLimit } from "../rules/families/uncharted-limit.ts";
+import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
 import type { ReduceContext } from "../rules/reduce.ts";
@@ -22,7 +23,7 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // round), so the pill shows it will go (rr.lasting-effects).
 export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged";
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit";
 
 // A "cannot" an effect put on the card, with the icon of the thing it cannot do.
 export type FlagBadge = { flag: FlagStat; icon: IconName; word: string };
@@ -55,7 +56,13 @@ const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotTakeNonCombatDamage", icon: "hitPoints", word: "Takes only combat damage" },
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },
   { flag: "cannotBeOptionallyEngaged", icon: "engagementCost", word: "Cannot be optionally engaged" },
+  { flag: "damageLimit", icon: "hitPoints", word: "Takes at most %n damage at a time" },
 ];
+
+// A flag's words; "%n" is the amount the effect holds (a damage limit).
+function flagWord(word: string, amount: number): string {
+  return word.replace("%n", String(amount));
+}
 
 // The numbers a card of this type prints, in the order the card shows them.
 function statsOf(printed: PrintedCard): readonly BadgeStat[] {
@@ -110,7 +117,8 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
   const printed = printedOf(ctx.cards, card.code);
   const stats: StatBadge[] = [];
   for (const stat of statsOf(printed)) {
-    const base = printedValue(printed, stat);
+    // The base is the side the card shows: a Lost Island prints its own Threat and no quest points, so the real side's numbers are no change.
+    const base = printedValue(printed, stat) == null ? null : printedStat(printed, stat, card.face);
     if (base == null) continue;
     const value = modifiedStat(game, card, stat, ctx.cards);
     if (value === base) continue;
@@ -118,7 +126,7 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
     const lasting = behind.length > 0 && behind.every((modifier) => TEMPORARY.has(modifier.until));
     stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting });
   }
-  const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag));
+  const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag)).map((entry) => ({ ...entry, word: flagWord(entry.word, placedLimit(game, cardId, Number.POSITIVE_INFINITY)) }));
   return { stats, flags };
 }
 
@@ -158,7 +166,7 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
       continue;
     }
     const flag = FLAGS.find((entry) => entry.flag === modifier.stat);
-    if (flag && modifier.amount > 0) lines.push(`${flag.word}: ${source}, ${UNTIL[modifier.until]}`);
+    if (flag && modifier.amount > 0) lines.push(`${flagWord(flag.word, modifier.amount)}: ${source}, ${UNTIL[modifier.until]}`);
   }
   return lines;
 }

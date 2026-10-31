@@ -8,8 +8,8 @@ export type LogNames = {
   card: (cardId: string) => string;
   // A card code (the card an effect record belongs to).
   code: (code: string) => string;
-  // The card code an effect record id belongs to.
-  effectCard: (effectId: string) => string | null;
+  // The picture key of the card an effect record belongs to (`causeKey`): its code, or the Lost Island key for a line of the Lost Island side.
+  effectCard: (effectId: string, lineId: string) => string | null;
   rule: (ruleId: string) => string | null;
   line: (lineId: string) => string | null;
 };
@@ -51,10 +51,15 @@ function signed(amount: number): string {
   return amount >= 0 ? `+${amount}` : String(amount);
 }
 
+/** The picture key a cause names its card by: a line of the B side of a double-sided location is the Lost Island side's, which never says which location it is (dcce.uncharted). */
+export function causeKey(code: string, lineId: string, uncharted: boolean): string {
+  return uncharted && lineId.split(":")[1] === "B" ? `${code}.B` : code;
+}
+
 /** The cause of a step in words: "Rule: <title>", or "<card>: <printed line>". */
 export function causeText(cause: Cause, names: LogNames): string {
   if ("rule" in cause) return `Rule: ${names.rule(cause.rule) ?? cause.rule}`;
-  const code = names.effectCard(cause.effect);
+  const code = names.effectCard(cause.effect, cause.line);
   const card = code ? names.code(code) : cause.effect;
   const line = names.line(cause.line);
   return line ? `${card}: ${line}` : card;
