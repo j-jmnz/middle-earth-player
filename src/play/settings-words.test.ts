@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { alwaysCodes, alwaysRows, NONE_YET, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_WORDS } from "./settings-words.ts";
+import { alwaysCodes, alwaysRows, FOG_LIGHT_LINE, FOG_LINE, FOG_REDUCED_LINE, fogLine, NONE_YET, QUALITY_WORDS, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_WORDS } from "./settings-words.ts";
 import { SPEEDS } from "./motion-tokens.ts";
-import { DEFAULT_SETTINGS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "./table-settings.ts";
+import { CARD_QUALITY_OPTIONS, DEFAULT_SETTINGS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "./table-settings.ts";
 
 const effects = [
   { id: "sam.ready", cardCode: "01015" },
@@ -37,6 +37,7 @@ describe("the words of each choice", () => {
     expect(Object.keys(REDUCE_MOTION_WORDS)).toEqual([...REDUCE_MOTION_OPTIONS]);
     expect(Object.keys(SCALE_WORDS)).toEqual([...UI_SCALE_OPTIONS]);
     expect(Object.keys(SPEED_WORDS)).toEqual([...SPEEDS]);
+    expect(Object.keys(QUALITY_WORDS)).toEqual([...CARD_QUALITY_OPTIONS]);
   });
 });
 
@@ -49,5 +50,14 @@ describe("the guide and Restore defaults", () => {
     const restored = restoreDefaults({ ...DEFAULT_SETTINGS, uiScale: "large", theme: "light", guideSeen: { "3.3": 2 } });
     expect(restored).toEqual({ ...DEFAULT_SETTINGS, guideSeen: { "3.3": 2 } });
     tableSettings.getState().hydrate(DEFAULT_SETTINGS);
+  });
+});
+
+describe("the Moving fog row's detail", () => {
+  it("says why the fog is already still, else what the switch does", () => {
+    expect(fogLine(false, false)).toBe(FOG_LINE);
+    expect(fogLine(true, false)).toBe(FOG_LIGHT_LINE);
+    expect(fogLine(false, true)).toBe(FOG_REDUCED_LINE);
+    expect(fogLine(true, true)).toBe(FOG_LIGHT_LINE);
   });
 });

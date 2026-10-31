@@ -72,6 +72,21 @@ describe("parseSettings", () => {
   });
 });
 
+describe("parseSettings card pictures and moving fog", () => {
+  it("defaults a missing or invalid cardQuality to high and a missing or invalid fogDrift to true", () => {
+    expect(parseSettings({}).cardQuality).toBe("high");
+    expect(parseSettings({ cardQuality: "ultra" }).cardQuality).toBe("high");
+    expect(parseSettings({ cardQuality: 2 }).cardQuality).toBe("high");
+    expect(parseSettings({}).fogDrift).toBe(true);
+    expect(parseSettings({ fogDrift: "no" }).fogDrift).toBe(true);
+  });
+
+  it("round-trips low and false", () => {
+    const stored = JSON.parse(JSON.stringify({ ...DEFAULT_SETTINGS, cardQuality: "low", fogDrift: false }));
+    expect(parseSettings(stored)).toMatchObject({ cardQuality: "low", fogDrift: false });
+  });
+});
+
 describe("restoreDefaults", () => {
   it("returns the defaults and keeps what the guide has explained", () => {
     const changed = { ...DEFAULT_SETTINGS, uiScale: "large" as const, theme: "light" as const, stopsOn: true, guide: false, guideSeen: { "3.3": 2 } };

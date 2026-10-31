@@ -4,6 +4,7 @@
 // size. Pure, so a test can weigh a full table's memory.
 import type { CardSlot } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
+import type { CardQualityOption } from "./table-settings.ts";
 
 export type Box = { w: number; h: number };
 
@@ -23,6 +24,16 @@ export function pictureBoxes(slots: readonly CardSlot[]): Map<string, Box> {
   return boxes;
 }
 
+/** The pixels a point holds when card pictures are kept at `quality`: the device's on High, half of it (never below 1) on Low. */
+export function pictureRatio(device: number, quality: CardQualityOption): number {
+  return quality === "low" ? Math.max(1, device / 2) : device;
+}
+
+/** `boxes` (points) as pixel boxes at `ratio` pixels a point, which is what a copy is decoded to cover. */
+export function pixelBoxes(boxes: ReadonlyMap<string, Box>, ratio: number): Map<string, Box> {
+  return new Map([...boxes].map(([code, box]) => [code, { w: box.w * ratio, h: box.h * ratio }]));
+}
+
 /**
  * The pixel size a picture `source` pixels big is kept at to cover `box` at `ratio` pixels a point, keeping its own shape (a quest
  * card's sideways picture stays sideways). Never larger than the file.
@@ -32,15 +43,27 @@ export function coverPixels(source: Box, box: Box, ratio: number): Box {
   return { w: Math.max(1, Math.round(source.w * scale)), h: Math.max(1, Math.round(source.h * scale)) };
 }
 
+/** How much smaller than wanted, in points, a copy may be and stay sharp enough. */
+export const SLACK = 0.5;
+
 /**
- * Whether a copy decoded for `held` must be decoded again for `wanted`: it is too small to stay sharp, or more than twice the
- * pixels it needs (a card that left the hand), so the table does not hold large copies of small cards. Small changes (a longer
- * hand narrowing its cards) keep the copy.
+ * Whether a copy decoded for `held` must be decoded again for `wanted`: it is too small to stay sharp (more than `slack` short in
+ * width or height, in the boxes' own unit: `SLACK` for point boxes, `SLACK * ratio` for boxes in pixels at `ratio` a point), or more
+ * than twice the pixels it needs (a card that left the hand), so the table does not hold large copies of small cards. Small changes
+ * (a longer hand narrowing its cards) keep the copy.
  */
-export function redecode(held: Box | undefined, wanted: Box): boolean {
+export function redecode(held: Box | undefined, wanted: Box, slack: number): boolean {
   if (!held) return true;
-  if (held.w < wanted.w - 0.5 || held.h < wanted.h - 0.5) return true;
+  if (held.w < wanted.w - slack || held.h < wanted.h - slack) return true;
   return held.w * held.h > 2 * wanted.w * wanted.h;
+}
+
+/**
+ * What the table asks `boxes` (points) to be decoded at, as a string: each code with its box rounded to whole points, and the
+ * `ratio` the copies are kept at, so a change of the Card pictures setting is a change of key and a fraction of a point is not.
+ */
+export function boxesKey(boxes: ReadonlyMap<string, Box>, ratio: number): string {
+  return `${ratio}|${[...boxes].map(([code, box]) => `${code}:${Math.round(box.w)}x${Math.round(box.h)}`).join(",")}`;
 }
 
 /** The bytes the table's decoded copies take at `ratio` pixels a point (four a pixel), for pictures `source` pixels big. */

@@ -1,7 +1,7 @@
 // The app's settings (docs/plans/done/table-experience.md, docs/plans/done/settings-theme-and-ui-scale.md): the theme and the UI scale,
-// haptics and reduced motion, keeping the screen awake, where the table stops to ask in a step's action window, the free
-// Responses the player always uses, the readability options and the first-game guide. Kept in user.db by the screens
-// (src/screens/settings-store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
+// haptics and reduced motion, the card picture quality and the moving fog, keeping the screen awake, where the table stops to ask
+// in a step's action window, the free Responses the player always uses, the readability options and the first-game guide. Kept in
+// user.db by the screens (src/screens/settings-store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
 // A setting is the player's own standing answer, chosen on purpose: that is the confirmation an auto-pass or an auto-use
 // stands on (brief, Screens, Table: no single tap sends an intent).
 import { createStore } from "zustand/vanilla";
@@ -38,6 +38,10 @@ export type TableSettings = {
   keepAwake: boolean;
   // The colors: Dark, Light, or whichever the phone is set to.
   theme: ThemeOption;
+  // How sharp the table's and the hand's card pictures are kept: High at the phone's pixel ratio, Low at half of it (table-pictures.ts, pictureRatio).
+  cardQuality: CardQualityOption;
+  // Whether the fog behind every screen drifts. Off holds it still (src/screens/backdrop-drift.ts).
+  fogDrift: boolean;
 };
 
 export const UI_SCALE_OPTIONS = ["small", "medium", "large"] as const;
@@ -46,11 +50,13 @@ export const REDUCE_MOTION_OPTIONS = ["system", "always"] as const;
 export type ReduceMotionOption = (typeof REDUCE_MOTION_OPTIONS)[number];
 export const THEME_OPTIONS = ["dark", "light", "system"] as const;
 export type ThemeOption = (typeof THEME_OPTIONS)[number];
+export const CARD_QUALITY_OPTIONS = ["high", "low"] as const;
+export type CardQualityOption = (typeof CARD_QUALITY_OPTIONS)[number];
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark" };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -75,6 +81,8 @@ export function parseSettings(raw: unknown): TableSettings {
     reduceMotion: REDUCE_MOTION_OPTIONS.find((option) => option === value.reduceMotion) ?? DEFAULT_SETTINGS.reduceMotion,
     keepAwake: flag(value.keepAwake, DEFAULT_SETTINGS.keepAwake),
     theme: THEME_OPTIONS.find((option) => option === value.theme) ?? DEFAULT_SETTINGS.theme,
+    cardQuality: CARD_QUALITY_OPTIONS.find((option) => option === value.cardQuality) ?? DEFAULT_SETTINGS.cardQuality,
+    fogDrift: flag(value.fogDrift, DEFAULT_SETTINGS.fogDrift),
   };
 }
 
