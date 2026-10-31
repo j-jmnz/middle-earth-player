@@ -16,6 +16,7 @@ import { stageNumber } from "./families/caves-progress.ts";
 import { topFrame } from "./windows.ts";
 import { shadowCards } from "./zones.ts";
 import { levelAmount } from "./families/aflame-values.ts";
+import { stormcallerStageNumber } from "./families/stormcaller-values.ts";
 
 // Who an amount is read for: the actor (the "you" of the card), the source, and what the running effect knows.
 export type AmountScope = {
@@ -132,6 +133,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.x) value = scope.x ?? 0;
   else if (amount.stage) value = stageNumber(state);
   else if (amount.players) value = livingSeats(state).length;
+  else if (amount.stormcallerStage) value = stormcallerStageNumber(state);
   else if (amount.part) value = state.part ?? 0;
   else if (amount.level) value = levelAmount(state, scope.sourceId, amount.halved === true);
   else if (amount.threat) {

@@ -42,7 +42,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Where the source card is now. `play` means any zone the source's controller plays from.
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
   // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck-play.ts).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand"]) }),
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
   // The actor's seat (`seat`) or the source card (`self`) holds this flag, a modifier of that stat that is in force now (`is`: false
@@ -97,11 +97,18 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The attack that left this effect for its end sent at least `min` damage on past its defender (excessToShip; 11055:A:2).
   // The heal or ready the effect answers was made by a player card's effect (11217:B:3), not by a rule, the refresh phase or an encounter card.
   z.strictObject({ kind: z.literal("byPlayerCard") }),
+  // The engagement the Forced effect answers was from the staging area ("When Corsair Skiff engages you from the staging area", 12022:A:3): known only in a game with ships (dcce.boarding).
+  z.strictObject({ kind: z.literal("fromStaging") }),
   z.strictObject({ kind: z.literal("excess"), min: z.number().int().positive() }),
   z.strictObject({ kind: z.literal("dealt"), min: z.number().int().positive().optional() }),
   // The Heading card's setting (dcce.heading): on-course (Sun, the only on-course setting), off-course (Cloud, Rain or Storm), or at the worst
   // setting (Storm). False when the game has no Heading card. Read by the sea family (src/rules/families/sea-heading.ts).
   z.strictObject({ kind: z.literal("heading"), is: z.enum(["onCourse", "offCourse", "worst"]) }),
+  // The actor's characters committed to the quest add up to at least `min` Willpower ("Each player contributing at least 8 Willpower to the quest", 12028:A:1): the stat the quest counts, as the quest reads it.
+  z.strictObject({ kind: z.literal("committedWillpower"), min: z.number().int().min(0) }),
+  // The players are at the same quest stage as the Stormcaller (`sameStage`, dcce.stormcallers-area-stages: their main quest stage's number matches its current stage), or not. False in a game
+  // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller-values.ts).
+  z.strictObject({ kind: z.literal("stormcaller"), is: z.enum(["sameStage", "ahead"]) }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the

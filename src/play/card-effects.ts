@@ -8,6 +8,8 @@ import { memoOf, type StateMemo } from "../rules/constant-records.ts";
 import { aflameTally, burnTally } from "../rules/families/aflame-values.ts";
 
 import { aflameLine, aflameMark, burnLine, burnMark } from "./aflame-words.ts";
+import { AREA_APART, AREA_TOGETHER, STAGE_TOGETHER } from "./stormcaller-words.ts";
+import { areaStanding } from "../rules/families/stormcaller-values.ts";
 import { placedLimit } from "../rules/families/uncharted-limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
@@ -161,6 +163,9 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   if (aflame && inPlay(card.zone)) lines.push(aflameLine(aflame));
   const burn = burnTally(game, cardId, ctx);
   if (burn) lines.push(burnLine(burn));
+  // A card of the Stormcaller's area says where it stands (dcce.stormcallers-area-stages).
+  const standing = areaStanding(game, cardId);
+  if (standing) lines.push(standing === "apart" ? AREA_APART : standing === "together" ? AREA_TOGETHER : STAGE_TOGETHER);
   for (const modifier of game.modifiers) {
     if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;
     const source = modifier.sourceId === cardId ? "its own text" : cardName(modifier.sourceId);

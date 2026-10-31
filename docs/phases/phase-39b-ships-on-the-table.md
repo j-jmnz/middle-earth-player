@@ -123,19 +123,11 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 | Phase | Element | Shared (39b) | The scenario phase adds |
 | --- | --- | --- | --- |
 | 40 | Ships, Heading, Corsair deck, Boarding, Sailing | everything above | the setup picks: Modification per ship, "deal 2 damage to a ship for 1 resource"; its cards' words |
-| 43 | The Stormcaller's area | fold order; the 30% night veil | see below |
 | 44 | Grapple | staging stacks: one peek with a count | the facedown arms under their location, the location's threat pill (+2 per arm, from the engine), "Grappled: 2 facedown enemies" in the preview, the detach flip into staging |
 | 45 | Island Map | the second slot; reading panels | see below |
 | 46 | Grotto deck | the second slot, one deck alone | `grottoDeck` showing its top card's Grotto face, since players may look at it (`dcce.grotto-deck`); a long press previews that face only; explored Grotto locations glide back to the deck, and Underwater ones go to the victory display |
 | 47 | Raider Flagship, four towers, Dol Amroth Warships | ship-enemies; Guarded pairs (Cards); fold order; ships first | the towers' words; freed towers as cards the players control in staging, whose Actions reach the action window's tray when folded; Send for Help set aside and not drawn |
 | 48 | From Sea to Land | the second slot | when the Corsair pair merges into the second encounter deck, the slot closes and the engagement area takes the room back (the cards slide); the inactive deck is not drawn until it becomes the encounter pair, in place |
-
-**The Stormcaller's area (phase 43,** `dcce.stormcallers-area`, `dcce.stormcallers-area-stages`).
-
-- **Place.** The area is the first group of the staging row, right beside the players' quest card. It holds the Stormcaller's current stage (2C to 4C), drawn sideways at a staging card's sideways footprint with its progress / quest points strip. The area's cards (the Stormcaller first, then Sahír's Escort, Vast Coastland) stand over the stage's right part, stepped as a guarded pair (`PAIR_STEP`).
-- **Not at the players' stage.** The area's cards carry the night veil at 30%. Their previews say "In the Stormcaller's area: not in the staging area, immune to player card effects". The area is the first group to fold, as one fold stack titled "Stormcaller's area".
-- **At the players' stage.** The veil lifts and the cards count as staging, in place, so nothing jumps. The stage's preview says "Same stage as the Stormcaller".
-- The Stormcaller's progress pops the strip as the quest card's does. Its stage advance uses the Quest advance pieces.
 
 **The Island Map (phase 45,** `dcce.island-map`, `dcce.exploration`).
 

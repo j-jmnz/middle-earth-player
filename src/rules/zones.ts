@@ -5,6 +5,7 @@ import { leaveWith } from "./families/play-zones.ts";
 import { releaseOrcGuard } from "./families/dungeon-guard.ts";
 import { dealtFace } from "./families/dreamchaser-facts.ts";
 import { routeDestination } from "./families/sea-routes.ts";
+import { discardedFromDeck, joinStormcallerArea } from "./families/stormcaller-zone.ts";
 import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "./families/uncharted-zone.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
@@ -14,7 +15,7 @@ export type Destination =
   | { zone: "seatQuest"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking-areas.ts); the card is in
   // `staging` and in that seat's list.
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck"; area?: number }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea"; area?: number }
   // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
   // Without it the card takes the state's own slot, which on a seat's view (families/breaking-areas.ts) is that seat's.
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }
@@ -249,6 +250,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, corsairDiscard: append(stamped.corsairDiscard ?? [], id) };
     case "unchartedDeck":
       return joinUnchartedDeck(stamped, id);
+    case "stormcallerArea":
+      return joinStormcallerArea(stamped, id);
     case "victory":
       return { ...unchartedWon(stamped, id), victory: append(stamped.victory, id) };
     case "setAside":
@@ -301,6 +304,8 @@ export function moveCard(state: ScenarioState, id: string, wanted: Destination, 
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller-zone.ts).
+  if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted-zone.ts).
   if (dest.zone === "unchartedDeck") moved = shuffleUnchartedDeck(moved);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).

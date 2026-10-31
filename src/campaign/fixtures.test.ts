@@ -108,7 +108,7 @@ describe("Maestro fixtures", () => {
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
       // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's, the Fate of Númenor ones from the log Voyage Across Belegaer's golden win writes.
-      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : name.startsWith("raid-") ? ["voyage-across-belegaer", "the-fate-of-numenor"] : []);
+      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : name.startsWith("raid-") ? ["voyage-across-belegaer", "the-fate-of-numenor"] : name.startsWith("stormcaller-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"] : []);
     }
   });
 
@@ -533,6 +533,56 @@ describe("Raid on the Grey Havens (Dream-chaser part 3, phase 42)", () => {
       expect(resumed.ok, name).toBe(true);
       if (!resumed.ok) continue;
       if (name === "raid-lost") {
+        expect(resumed.state.lost).toBe(true);
+        const after = finish(save, world, resumed.state);
+        expect(after.log).toEqual(save.log);
+        expect(after.active).toBeNull();
+      } else {
+        expect(resumed.state.stageCleared).toBe(true);
+        expect(resumed.state.lost).toBe(false);
+      }
+    }
+  });
+});
+
+describe("Flight of the Stormcaller (Dream-chaser part 4, phase 43)", () => {
+  // The fixtures are games of two decklists from the log the Voyage, Fate and Raid goldens' wins write (voyage-won, fate-won and raid-won, wins of real decklists, are open): parts 1 to 3 are completed, so the
+  // playthrough's open scenario is Flight of the Stormcaller and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
+  const names = (["stormcaller-won", "stormcaller-lost"] as const).filter((name) => hasFixture(name));
+
+  it("are games of two decklists dealt on the scenario, the Campaign Setup asking nothing", () => {
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("dream-chaser");
+      expect(found.loadout.scenarioId, name).toBe("flight-of-the-stormcaller");
+      expect(found.loadout.choices, name).toEqual([]);
+      expect(found.seatCount, name).toBe(2);
+      expect(found.past, name).toBeNull();
+      expect(found.loadout.ringBearer, name).toBeNull();
+    }
+  });
+
+  it("start from a log with parts 1 to 3 recorded as won, so the node the path opens is Flight of the Stormcaller, not an earlier part", () => {
+    const dreamChaser = loadCampaign("dream-chaser");
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"]);
+      expect(found.log.xpGained["raid-on-the-grey-havens"], name).toBeGreaterThan(0);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const path = campaignPath(dreamChaser, {}, save.log);
+      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("flight-of-the-stormcaller");
+      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "flight-of-the-stormcaller" } });
+    }
+  });
+
+  it("stormcaller-won replays to a win, and stormcaller-lost to a loss that writes nothing", () => {
+    for (const name of names) {
+      const world = worldFor(name);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const resumed = resume(save, world, CATALOG_VERSION);
+      expect(resumed.ok, name).toBe(true);
+      if (!resumed.ok) continue;
+      if (name === "stormcaller-lost") {
         expect(resumed.state.lost).toBe(true);
         const after = finish(save, world, resumed.state);
         expect(after.log).toEqual(save.log);

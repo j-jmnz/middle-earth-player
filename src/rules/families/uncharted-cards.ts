@@ -32,7 +32,8 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 export function putSetAsideInPlay(state: ScenarioState, instruction: Verb<"PutSetAsideInPlay">, ctx: ReduceContext): ScenarioState {
   const id = state.setAside.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name);
   if (!id) return state;
-  return updateCard(moveCard(state, id, { zone: "play", seat: state.firstPlayer }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
+  const holder = instruction.withCard ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.controller != null && printedOf(ctx.cards, card.code).name === instruction.withCard) : undefined;
+  return updateCard(moveCard(state, id, { zone: "play", seat: holder?.controller ?? state.firstPlayer }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
 }
 
 /** AttachSetAside: the set-aside copy of the card with this code is attached to the card in play with that name. */

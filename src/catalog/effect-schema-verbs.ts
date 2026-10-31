@@ -167,7 +167,8 @@ export const simpleVerbs = [
     verb: z.literal("SearchMove"),
     ...searchSelector,
     // `engaged`: into play engaged with the player who searches ("put it into play engaged with you", 41013:A:1, 41024:A:1).
-    to: z.enum(["staging", "engagedFirstPlayer", "engaged"]),
+    // `stormcallerArea`: into the Stormcaller's area ("add it to the Stormcaller's area", 12017:A:1; dcce.stormcallers-area).
+    to: z.enum(["staging", "engagedFirstPlayer", "engaged", "stormcallerArea"]),
     each: z.boolean().optional(),
     // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1).

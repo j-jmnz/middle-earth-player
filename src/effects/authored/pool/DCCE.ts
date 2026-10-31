@@ -1,4 +1,4 @@
-import type { Effect } from "../../../catalog/boundary.ts";
+import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for the Dream-chaser Campaign Expansion's own cards (data/cards/DCCE.json), added as each scenario phase uses them. Read from the scan
 // ledger (data/printed/dream-chaser.json). Rules: dcce.hard-expert, dcce.gaining-xp, dcce.scalable-upgradable, dcce.encounter-cards, dcce.sailing-tests,
@@ -106,7 +106,71 @@ const weaponBonus = (code: string, line: string, id: number, stat: "defense" | "
 // "+2 instead" at 2 or more resource tokens (or damage tokens) is the base plus 1 more: 0 at fewer than 2, 1 at 2 or more.
 const FROM_TWO = (of: "resources" | "damage"): Amount => ({ stat: of, of: "host", plus: -1, limit: 1 });
 
+// 11192 Black Key (burden, attached to the Stormcaller by the campaign card of Flight of the Stormcaller): the attached enemy gets +1 Threat, +1 Attack, +1 Defense and gains immune to player card effects;
+// side A adds a Forced effect for Captain Sahír. The Upgraded side (B) drops it.
+const blackKeyBurden = (side: "A" | "B", id: number): Effect => ({
+  id: `11192:constant:${id}`,
+  cardCode: "11192",
+  lines: [`11192:${side}:2`],
+  timing: "constant",
+  instructions: [
+    { verb: "ModifyStat", stat: "threat", amount: 1, until: "whileSourceInPlay", target: "host" },
+    { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", target: "host" },
+    { verb: "ModifyStat", stat: "defense", amount: 1, until: "whileSourceInPlay", target: "host" },
+    { verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", target: "host" },
+  ],
+});
+
+// 11193 Calaerion (objective ally the campaign card puts into play under the player with the Dream-chaser): the Action readies a ship or an ally and gives +1 Willpower, +1 Attack and +1 Defense.
+const calaerionBoost = (until: "endOfPhase" | "endOfRound"): Effect["instructions"] => [
+  { verb: "Ready", target: "picked" },
+  { verb: "ModifyStat", stat: "willpower", amount: 1, until, target: "picked" },
+  { verb: "ModifyStat", stat: "attack", amount: 1, until, target: "picked" },
+  { verb: "ModifyStat", stat: "defense", amount: 1, until, target: "picked" },
+];
+const DREAM_CHASER_SHIP: PickSpec = { type: "character", control: "any", names: ["Dream-chaser"] };
+const ANOTHER_ALLY: PickSpec = { type: "ally", control: "any", other: true };
+
 export const RECORDS: readonly Effect[] = [
+  // 11192 Black Key (burden), both sides.
+  removedWhenLeaving("11192", "11192:A:1", 1),
+  blackKeyBurden("A", 1),
+  {
+    id: "11192:forced:1",
+    cardCode: "11192",
+    lines: ["11192:A:3"],
+    timing: "forced",
+    trigger: "endOfPhase",
+    condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "canPick", pick: { type: "enemy", control: "any", staging: true, names: ["Captain Sahír"] } }] },
+    instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", staging: true, names: ["Captain Sahír"] }, instructions: [{ verb: "PlaceResourceTokens", amount: { players: true }, on: "picked" }] }],
+  },
+  removedWhenLeaving("11192", "11192:B:1", 2),
+  blackKeyBurden("B", 2),
+
+  // 11193 Calaerion, both sides. Side A: Action, spend 3 resources and exhaust him to ready the Dream-chaser and give it +1 Willpower, Attack and Defense until the end of the phase. Side B (Upgraded):
+  // Response, after a card is discarded from the encounter deck, shuffle it into that deck (once a round); Action, spend 2 resources and exhaust him to ready another ally and give it the bonus until the end of the round.
+  removedWhenLeaving("11193", "11193:A:1", 1),
+  {
+    id: "11193:action:1",
+    cardCode: "11193",
+    lines: ["11193:A:2"],
+    timing: "action",
+    cost: [{ kind: "exhaustSelf" }, { kind: "resources", amount: 3 }],
+    condition: { kind: "canPick", pick: DREAM_CHASER_SHIP },
+    instructions: [{ verb: "Pick", pick: DREAM_CHASER_SHIP }, ...calaerionBoost("endOfPhase")],
+  },
+  removedWhenLeaving("11193", "11193:B:1", 2),
+  { id: "11193:response:1", cardCode: "11193", lines: ["11193:B:2"], timing: "response", trigger: "discardedFromEncounterDeck", limit: "oncePerRound", instructions: [{ verb: "MoveEncounterCard", card: "subject", to: "shuffle" }] },
+  {
+    id: "11193:action:2",
+    cardCode: "11193",
+    lines: ["11193:B:3"],
+    timing: "action",
+    cost: [{ kind: "exhaustSelf" }, { kind: "resources", amount: 2 }],
+    condition: { kind: "canPick", pick: ANOTHER_ALLY },
+    instructions: [{ verb: "Pick", pick: ANOTHER_ALLY }, ...calaerionBoost("endOfRound")],
+  },
+
   // 11217 Hard/Expert Mode card: "If you win the game, resolve this card's resolution." Hard (side A) gains 1 XP, Expert (side B) gains 2 XP.
   {"id":"11217:resolution:1","cardCode":"11217","lines":["11217:A:3"],"timing":"resolution","instructions":[{"verb":"GainXp","amount":1}]},
   {"id":"11217:resolution:2","cardCode":"11217","lines":["11217:B:4"],"timing":"resolution","instructions":[{"verb":"GainXp","amount":2}]},

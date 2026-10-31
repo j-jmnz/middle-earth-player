@@ -30,7 +30,8 @@ export const VERBS = [
   // even where the quest card says no other progress can be placed on it (a quest effect, not a player card effect or the quest phase). A full stage advances.
   z.strictObject({ verb: z.literal("AddStageProgress"), amount: positiveAmountSchema, ...when }),
   // Setup: "The first player takes control of Calphon" (11025:A:1): the set-aside copy of the card with this name comes into play, ready, under the first player.
-  z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), ...when }),
+  // `withCard`: under the control of the player who controls the card in play with this name instead ("Put Calaerion into play under the control of the player with the Dream-chaser", 11191:A:2).
+  z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), ...when }),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
   z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }),

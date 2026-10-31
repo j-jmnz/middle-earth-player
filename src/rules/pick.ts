@@ -262,7 +262,8 @@ export function pickCandidates(
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   const source = sourceId ? state.cards[sourceId] : undefined;
-  const playerEffect = !counting && (source == null || isPlayerType(printedOf(ctx.cards, source.code)));
+  // A card the Dream-chaser box calls an encounter card (an objective ally with an encounter back: the ship-objectives, Calaerion; dcce.encounter-cards) has encounter card effects, though it is an ally.
+  const playerEffect = !counting && (source == null || (isPlayerType(printedOf(ctx.cards, source.code)) && printedOf(ctx.cards, source.code).backType !== "encounter"));
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   const found = raw.filter((id) => {

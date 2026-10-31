@@ -132,6 +132,8 @@ const stageSchema = z.strictObject({
   branch: z.array(z.string()).min(2).optional(),
   // The number of stages the first player looks at when this stage is defeated on-course (LookAtStages, 11016:B:3).
   look: z.number().int().min(2).optional(),
+  // Defeating this stage when the Stormcaller is at this stage number wins the game (CatchUpWins, 12013:B:3).
+  catchUp: z.number().int().positive().optional(),
 });
 
 const widgetsSchema = z.strictObject({

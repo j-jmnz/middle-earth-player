@@ -29,6 +29,8 @@ export const amountExprSchema = z.strictObject({
   stage: z.literal(true).optional(),
   // The number of players in the game.
   players: z.literal(true).optional(),
+  // The stage number of the Stormcaller's current quest stage (2 to 4, dcce.stormcallers-area): "X is the Stormcaller's current quest stage" (12028:A:2). 0 with no Stormcaller's area.
+  stormcallerStage: z.literal(true).optional(),
   // The part number of the campaign card of the scenario being played: its place in its campaign, counting from 1 ("X is the campaign card's part
   // number", 11176:A:3).
   part: z.literal(true).optional(),

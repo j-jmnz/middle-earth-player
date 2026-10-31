@@ -42,14 +42,14 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.0K)
     - 157–160 Maestro (~120)
-- `docs/architecture.md` — Architecture (~15.7K tok)
+- `docs/architecture.md` — Architecture (~16.0K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
   - 78–120 Modules (~970) ← 1
   - 121–146 State (~1.0K) ← 9
   - 147–168 Play loop (~250)
-  - 169–194 Engine (~2.3K)
-    - 183–194 Mechanic families (~1.4K)
+  - 169–194 Engine (~2.5K)
+    - 183–194 Mechanic families (~1.7K)
   - 195–200 Effects (~520)
   - 201–233 Scenario definition (~790)
   - 234–254 Persistence (~1.3K)
@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~55.0K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~56.0K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -90,20 +90,20 @@ Read the sections your task touches.
     - 568–588 Escape from Dol Guldur (~2.7K)
     - 589–603 The Oath (~2.3K)
     - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–656 Dream-chaser (~5.9K)
-  - 657–665 Nightmare (~420)
-  - 666–704 Deckbuilding (~1.8K) ← 1
-  - 705–783 Effects (~3.2K)
-    - 707–765 Three layers (~2.4K)
-    - 766–775 Player side quests, contracts and saga cards (~430)
-    - 776–779 Window stack (~100)
-    - 780–783 Coverage test (~270)
-  - 784–804 Data sources (~560)
-  - 805–823 Card images (~1.1K) ← 6
-  - 824–848 Persistence and shipping (~1.5K)
-  - 849–889 Screens (~4.3K) ← 1
-    - 875–889 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~21.8K tok)
+  - 622–659 Dream-chaser (~7.0K)
+  - 660–668 Nightmare (~420)
+  - 669–707 Deckbuilding (~1.8K) ← 1
+  - 708–786 Effects (~3.2K)
+    - 710–768 Three layers (~2.4K)
+    - 769–778 Player side quests, contracts and saga cards (~430)
+    - 779–782 Window stack (~100)
+    - 783–786 Coverage test (~270)
+  - 787–807 Data sources (~560)
+  - 808–826 Card images (~1.1K) ← 6
+  - 827–851 Persistence and shipping (~1.5K)
+  - 852–892 Screens (~4.3K) ← 1
+    - 878–892 Table screen (~1.6K) ← 4
+- `docs/design-system-table.md` — Design system — Table (landscape) (~22.1K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
@@ -111,29 +111,29 @@ Read the sections your task touches.
   - 34–37 Canvas (~510) ← 1
   - 38–49 Spacing and the play area's rows (~1.5K) ← 7
   - 50–55 Pictures on the table (~300)
-  - 56–69 Cards (~1.7K) ← 3
-  - 70–75 The Sailing test (~690) ← 5
-  - 76–79 Tokens and effects (~320)
-  - 80–88 Piles (~850) ← 2
-  - 89–94 Marks of the open moment (~400) ← 1
-  - 95–160 Motion (~2.7K) ← 8
-  - 161–187 Spotlight (~2.1K) ← 16
-  - 188–193 Gestures (~210) ← 5
-  - 194–197 Hold, slide and release (~690)
-  - 198–203 Peeking at the other seat (~600) ← 1
-  - 204–217 Command column (~1.6K) ← 7
-  - 218–221 Two taps (~320) ← 2
-  - 222–225 One answer, one tap (~240)
-  - 226–229 Stops and Always use (~250)
-  - 230–233 Guide (~120)
-  - 234–243 Choice tray (~780) ← 2
-  - 244–255 Reading panels (~930) ← 4
-  - 256–265 Phase carousel (~670)
-  - 266–271 Quest advance (~460) ← 1
-  - 272–275 Undo (~140)
-  - 276–279 Haptics (~250)
-  - 280–290 Banner (~580) ← 1
-  - 291–294 Android Back (~90)
+  - 56–74 Cards (~2.0K) ← 3
+  - 75–80 The Sailing test (~690) ← 5
+  - 81–84 Tokens and effects (~320)
+  - 85–93 Piles (~850) ← 2
+  - 94–99 Marks of the open moment (~400) ← 1
+  - 100–165 Motion (~2.7K) ← 8
+  - 166–192 Spotlight (~2.1K) ← 16
+  - 193–198 Gestures (~210) ← 5
+  - 199–202 Hold, slide and release (~690)
+  - 203–208 Peeking at the other seat (~600) ← 1
+  - 209–222 Command column (~1.6K) ← 7
+  - 223–226 Two taps (~320) ← 2
+  - 227–230 One answer, one tap (~240)
+  - 231–234 Stops and Always use (~250)
+  - 235–238 Guide (~120)
+  - 239–248 Choice tray (~780) ← 2
+  - 249–260 Reading panels (~930) ← 4
+  - 261–270 Phase carousel (~670)
+  - 271–276 Quest advance (~460) ← 1
+  - 277–280 Undo (~140)
+  - 281–284 Haptics (~250)
+  - 285–295 Banner (~580) ← 1
+  - 296–299 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~22.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
@@ -229,9 +229,9 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-37-dream-chaser-data.md` — Phase 37 — Dream-chaser data (~740 tok)
 - `docs/phases/phase-38-dream-chaser-campaign-shell.md` — Phase 38 — Dream-chaser campaign shell and XP (~650 tok)
 - `docs/phases/phase-39-sea-mechanics-family.md` — Phase 39 — Sea mechanics family (~490 tok)
-- `docs/phases/phase-39b-ships-on-the-table.md` — Phase 39b — Ships on the table (~6.6K tok)
+- `docs/phases/phase-39b-ships-on-the-table.md` — Phase 39b — Ships on the table (~6.3K tok)
   - 8–13 Goal (~220)
-  - 14–151 Design (~4.7K)
+  - 14–143 Design (~4.4K)
     - 16–25 Ships in the play area (~460)
     - 26–42 The Heading (~600)
     - 43–49 Ship-enemies, staging and combat (~340)
@@ -240,12 +240,12 @@ STATUS.md, then the active phase file.
     - 72–88 The Sailing test (~680)
     - 89–114 Crowding: squeeze, then fold (~740)
     - 115–118 The rule that no control types a number (~180)
-    - 119–151 Scenario areas (~1.1K)
-  - 152–162 Cards it must hold (~230)
-  - 163–169 Build (~240)
-  - 170–198 Tests (~560)
-  - 199–213 E2E (~250)
-  - 214–236 Exit (~320)
+    - 119–143 Scenario areas (~770)
+  - 144–154 Cards it must hold (~230)
+  - 155–161 Build (~240)
+  - 162–190 Tests (~560)
+  - 191–205 E2E (~250)
+  - 206–228 Exit (~320)
 - `docs/phases/phase-40-voyage-across-belegaer.md` — Phase 40 — Voyage Across Belegaer (~950 tok)
 - `docs/phases/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~900 tok)
 - `docs/phases/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~900 tok)

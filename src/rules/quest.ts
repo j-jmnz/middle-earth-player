@@ -24,6 +24,7 @@ import { branchFrom, reached as reachedStage } from "./families/quest-branch.ts"
 import { viewOf, withView } from "./families/breaking-areas.ts";
 import { oweDiscards } from "./families/breaking-progress.ts";
 import { orderedNext, stageToVictory } from "./families/quest-order.ts";
+import { caughtUp } from "./families/stormcaller-values.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -221,6 +222,8 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (!current) return { ...next, stageCleared: true };
     // A defeated stage that waits for the first player to choose the next one (LookAtStages) stays where it is until the choice is made.
     if (next.stageChoice === "due") return next;
+    // Defeating a stage when the Stormcaller is at its stage means the players have caught up to it and win (families/stormcaller-values.ts, 12013:B:3).
+    if (caughtUp(next, current.code)) return clearStage(next);
     const index = next.stages.findIndex((stage) => stage.code === current.code);
     // A quest that is ordered by its quest deck (ShuffleStages, LookAtStages, families/quest-order.ts) goes to the top stage of the deck, or asks.
     const ordered = orderedNext(next, current.code);

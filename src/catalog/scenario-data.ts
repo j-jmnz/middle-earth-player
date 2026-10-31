@@ -215,6 +215,8 @@ export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Nor
 
 const SETUP_VERB = {
   setAside: "SetAside",
+  // The Stormcaller's quest stages wait set aside until the Setup prepares the Stormcaller's area (dcce.stormcallers-area).
+  stormcallerQuests: "SetAside",
   staging: "AddToStaging",
   activeLocation: "MakeActiveLocation",
   attached: "AttachToRingBearer",
@@ -226,7 +228,7 @@ const SETUP_VERB = {
 export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount?: number): Instruction[] {
   const instructions: Instruction[] = [];
   const cards = placementsAt(data, difficulty);
-  for (const pile of ["setAside", "staging", "activeLocation", "attached"] as const) {
+  for (const pile of ["setAside", "stormcallerQuests", "staging", "activeLocation", "attached"] as const) {
     for (const card of cards) {
       if (card.pile !== pile || card.searched) continue;
       for (let copy = 0; copy < placedCopies(card, difficulty, seatCount); copy += 1) instructions.push({ verb: SETUP_VERB[pile], code: card.code });
@@ -281,10 +283,12 @@ export function campaignScenario(data: ScenarioData): ScenarioData {
 
 // A quest card whose Forced effect names the stages its defeat proceeds to (BranchStage, 01120:B:1) carries them as its `branch`.
 // A stage that names LookAtStages (11016:B:3) carries the number of stages it looks at as its `look`.
-function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number } {
+// A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
+function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
-  return { code, ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}) };
+  const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
+  return { code, ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }
 
 export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
@@ -305,6 +309,7 @@ export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, e
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(data.life != null ? { life: data.life } : {}),
     campaignCard: data.campaignCard,
-    ...(campaign.xp ? { part: data.number } : {}),
+    // The part of the campaign (the campaign card's "part number", dcce.gaining-xp): the scenario's place in the campaign, not its number in its product (Hall of Beorn numbers each Adventure Pack's scenario within the pack).
+    ...(campaign.xp ? { part: Math.max(1, campaign.scenarios.indexOf(data.id) + 1) } : {}),
   });
 }

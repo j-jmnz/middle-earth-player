@@ -33,7 +33,7 @@ export type RaidFixture = { campaignId: string; seatCount: 2; loadout: StoredLoa
 export type RaidFixtureName = "raid-won" | "raid-lost";
 
 // The log of a playthrough whose first two parts were won: the Voyage golden's two-handed win resolved onto a new log, then the Fate golden's, their heroes and what hangs on them left out.
-async function fateWonLog(): Promise<CampaignLog> {
+export async function fateWonLog(): Promise<CampaignLog> {
   const voyage = VOYAGE_GOLDENS.find((item) => item.name === "two-handed, won");
   if (!voyage) throw new Error("The Voyage golden \"two-handed, won\" is gone");
   const voyageWorldLoaded = await voyageWorld(voyage.decks);
@@ -50,7 +50,7 @@ async function fateWonLog(): Promise<CampaignLog> {
   return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
 }
 
-function listed(id: string): { heroes: string[]; deck: string[] } {
+export function listed(id: string): { heroes: string[]; deck: string[] } {
   const found = prebuilt.find((entry) => entry.id === id);
   if (!found) throw new Error(`No prebuilt deck ${id}`);
   return { heroes: [...found.heroes], deck: found.cards.flatMap((row) => Array.from({ length: row.count }, () => row.code)) };
@@ -58,7 +58,7 @@ function listed(id: string): { heroes: string[]; deck: string[] } {
 
 // The auto-player's answer with what the scenario asks: damage the players assign falls on the least wounded hero, the heroes attack together (Graxar alone), and the first location the travel phase
 // offers is travelled to.
-function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {
+export function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent {
   if (state.window?.kind === "choose") {
     const heroes = state.window.options.filter((option) => state.cards[option]?.zone === "heroes");
     const least = [...heroes].sort((a, b) => (state.cards[a]?.damage ?? 0) - (state.cards[b]?.damage ?? 0))[0];

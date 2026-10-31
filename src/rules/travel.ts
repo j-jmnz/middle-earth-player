@@ -36,7 +36,9 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
   const offered = offerResponses(moved, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
   // A Forced effect "After travelling to ~" (01107:A:1) resolves before the Responses, as every Forced effect does (rr.forced).
   const forced = fireForced(offered, { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
-  return fireForced(forced, { trigger: "becameActive", seat: null, cardId: locationId }, ctx, steps);
+  // The Responses "after it becomes the active location" (12026:A:2) are offered once its Forced effects (141048:A:2) have resolved.
+  const became = { trigger: "becameActive", seat: null, cardId: locationId } as const;
+  return fireForced(offerResponses(forced, became, ctx, steps), became, ctx, steps);
 }
 
 // The Travel intent. A location with a Travel effect makes the first player resolve it first, in a

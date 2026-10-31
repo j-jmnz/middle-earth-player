@@ -14,7 +14,7 @@ import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "
 import { modifiedStat, versusDefender, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
-import { stagingThreat } from "./quest.ts";
+import { committedWillpower, stagingThreat } from "./quest.ts";
 import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
@@ -26,6 +26,7 @@ import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
 import { headingIs } from "./families/sea-heading.ts";
+import { stormcallerHolds } from "./families/stormcaller-values.ts";
 import { lastHideFailed, onStage, withTwin } from "./families/nightmare-guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
@@ -42,6 +43,8 @@ export type Scope = {
   explored?: boolean;
   // The event a Forced effect answers was made by a player card's effect (a heal or a ready).
   byPlayerCard?: boolean;
+  // The engagement a Forced effect answers was from the staging area (kept only in a game with ships).
+  fromStaging?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
   // What the running effect has picked, and the other card the answered event names.
@@ -130,6 +133,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "heading":
       return headingIs(state, condition.is);
+    case "stormcaller":
+      return stormcallerHolds(state, condition);
+    case "committedWillpower":
+      return committedWillpower(state, ctx.cards, scope.actor) >= condition.min;
     case "survivorsThreat":
       return livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max);
     case "heroesAll": {
@@ -267,6 +274,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return discardedCost(state, ctx) <= condition.max;
     case "byPlayerCard":
       return scope.byPlayerCard === true;
+    case "fromStaging":
+      return scope.fromStaging === true;
     case "excess":
       return (scope.excess ?? 0) >= condition.min;
     case "dealt":
@@ -330,7 +339,7 @@ function engagedAs(card: { zone: string; controller: number | null }, engaged: "
   return engaged === "you" ? card.controller === seat : card.controller !== seat;
 }
 
-function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand"): boolean {
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
   // The second active location slot is an active location too (mec109.stage-4).

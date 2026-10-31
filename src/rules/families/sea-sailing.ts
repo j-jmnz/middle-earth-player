@@ -14,6 +14,7 @@ import { ruleCause } from "../cause.ts";
 import type { EngineStep } from "../intents.ts";
 import { shuffleDiscardIn } from "./encounter-moves.ts";
 import { moveCard } from "../zones.ts";
+import { committedTo, committedToSailing } from "./stormcaller-commit.ts";
 import { headingIs, shiftHeading } from "./sea-heading.ts";
 import { tester } from "./sea-sailing-legal.ts";
 import type { SailingTest } from "./sea-types.ts";
@@ -90,7 +91,10 @@ export function performSailing(state: ScenarioState, ids: readonly string[], ctx
   for (const id of ids) {
     count += committedWeight(next, id);
     next = updateCard(next, id, { exhausted: true });
+    // A hero committed to the test is announced, and so is the commitment (families/stormcaller-commit.ts).
+    if (next.cards[id]?.zone === "heroes") next = committedToSailing(next, tester(next), id);
   }
+  next = committedTo(next, tester(next), count);
   // 3. As many cards from the top of the encounter deck as characters, and the additional cards a card in play says to look at ("look at 2 additional cards",
   // 11050:A:1); a deck too short is first shuffled with its discard pile.
   count += Math.max(0, heldAmount(next, "table", "sailingLook"));

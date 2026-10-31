@@ -100,7 +100,9 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (seat == null || state.lost || state.failure) {
     const ended: ScenarioState = { ...withMode(state, "resolution"), revealCursor: null };
     // Responses "at the end of the staging step" (22145:A:1).
-    return state.lost || state.failure ? ended : offerResponses(ended, { trigger: "stagingStepEnds", seat: null }, ctx, steps);
+    // The Forced effects of the end of the step resolve before them ("Forced: At the end of the staging step", 12014:B:2).
+    const over = { trigger: "stagingStepEnds", seat: null } as const;
+    return state.lost || state.failure ? ended : fireForced(offerResponses(ended, over, ctx, steps), over, ctx, steps);
   }
   const advanced: ScenarioState = { ...state, revealCursor: { seats: cursor.seats, index: cursor.index + 1 } };
   if (advanced.seats[seat]?.eliminated) return advanced;

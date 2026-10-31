@@ -57,6 +57,8 @@ import { damageLoss } from "./families/south-locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
 import { refillCorsairDeck } from "./families/sea-corsair.ts";
 import { aflameSweep } from "./families/aflame-sweep.ts";
+import { syncStormcallerArea } from "./families/stormcaller-area.ts";
+import { committedTo } from "./families/stormcaller-commit.ts";
 import { announceCollected } from "./families/aflame-attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
 import { askingToCommit, askingToLook, askingToShift } from "./families/sea-sailing-legal.ts";
@@ -65,7 +67,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
     // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
-    current = refillCorsairDeck(refillEncounterDeck(damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards), steps));
+    // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller-area.ts).
+    current = syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards), steps)));
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
@@ -416,7 +419,7 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
     // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition).
     next = queueEvent(next, { trigger: "committed", seat: state.activeSeat, cardId: id, occurrence: `commit:${state.round}:${state.activeSeat}` });
   }
-  return next;
+  return committedTo(next, state.activeSeat, cardIds.length);
 }
 
 function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string {

@@ -24,7 +24,7 @@
 // src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e-oath.ts), written to
 // src/campaign/fixtures/the-oath.json. `sea-solo`, `sea-duo`, `voyage-won` and `voyage-lost`: Voyage Across Belegaer on a blank Dream-chaser log (scripts/e2e-voyage.ts), written to
 // src/campaign/fixtures/voyage-across-belegaer.json; `voyage-won` is written only when a seed wins. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e-nibin-dum.ts), written to
-// src/campaign/fixtures/the-caves-of-nibin-dum.json. `fate-won` and `fate-lost`: The Fate of Númenor on the Dream-chaser log Voyage Across Belegaer's golden win writes (scripts/e2e-fate.ts), written to src/campaign/fixtures/the-fate-of-numenor.json; `fate-won` is written only when a seed wins. `raid-won` and `raid-lost`: Raid on the Grey Havens from the log the Voyage and Fate goldens' wins write (scripts/e2e-raid.ts), written to src/campaign/fixtures/raid-on-the-grey-havens.json; `raid-won` is written only when a seed wins.
+// src/campaign/fixtures/the-caves-of-nibin-dum.json. `fate-won` and `fate-lost`: The Fate of Númenor on the Dream-chaser log Voyage Across Belegaer's golden win writes (scripts/e2e-fate.ts), written to src/campaign/fixtures/the-fate-of-numenor.json; `fate-won` is written only when a seed wins. `raid-won` and `raid-lost`: Raid on the Grey Havens from the log the Voyage and Fate goldens' wins write (scripts/e2e-raid.ts), written to src/campaign/fixtures/raid-on-the-grey-havens.json; `raid-won` is written only when a seed wins. `stormcaller-won` and `stormcaller-lost`: Flight of the Stormcaller from the log the Voyage, Fate and Raid goldens' wins write (scripts/e2e-stormcaller.ts), written to src/campaign/fixtures/flight-of-the-stormcaller.json; `stormcaller-won` is written only when a seed wins.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -57,6 +57,7 @@ import { oathFixtures } from "./e2e-oath.ts";
 import { voyageFixtures } from "./e2e-voyage.ts";
 import { fateFixtures } from "./e2e-fate.ts";
 import { raidFixtures } from "./e2e-raid.ts";
+import { stormcallerFixtures } from "./e2e-stormcaller.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -398,6 +399,12 @@ void runScript("e2e-fixtures", async () => {
   const raidFile = path.join(dir, "raid-on-the-grey-havens.json");
   writeFileSync(raidFile, `${JSON.stringify(raid)}\n`);
   say.info(`wrote ${raidFile} (${Object.keys(raid).join(", ")})`);
+
+  // Flight of the Stormcaller (Dream-chaser part 4): from the log the first three parts' wins write, so the path resumes it. A game not found in the seeds is left out.
+  const stormcaller = await say.stepAsync("play Flight of the Stormcaller's win and loss", () => stormcallerFixtures());
+  const stormcallerFile = path.join(dir, "flight-of-the-stormcaller.json");
+  writeFileSync(stormcallerFile, `${JSON.stringify(stormcaller)}\n`);
+  say.info(`wrote ${stormcallerFile} (${Object.keys(stormcaller).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

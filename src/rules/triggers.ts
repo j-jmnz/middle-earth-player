@@ -43,7 +43,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
       if (effect.timing !== timing || !hears(state, effect, instance, event, ctx)) continue;
       if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event) && !hearsFromSetAside(instance, event)) continue;
       const owner = forcedActor(state, instance, event, ctx);
-      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}), ...(event.byPlayerCard ? { byPlayerCard: true } : {}) };
+      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}), ...(event.byPlayerCard ? { byPlayerCard: true } : {}), ...(event.fromStaging ? { fromStaging: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // A Forced effect with a limit ("Limit once per game", 01130:A:4) does not fire once its uses are spent.
       if (effect.limit && limitSpent(state, effect, instance.id, owner)) continue;
