@@ -31,9 +31,10 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
 3. **Decode**, `src/play/table-images.native.ts`:
    - Add a last parameter: `useTableImages(boxes, picture, revision, ratio?)`. When it is absent, use `PixelRatio.get()` in the body; code-standards rule out a non-literal default.
    - Turn the boxes into pixel boxes (× ratio) before `Pictures.want`. `atSize` then calls `coverPixels(..., 1)`.
-   - `Pictures` needs no other change:
-     - `keyOf` changes when the setting does, so `want()` runs.
-     - `redecode()` now compares pixels. Going from High to Low, a copy is 4× the area it needs (over its 2× limit), so it shrinks. Going from Low to High, it is too small, so it grows. The old copy is drawn until the new one is ready.
+   - `Pictures` gets the ratio in `want()`:
+     - The key (`boxesKey`) rounds the boxes in points and holds the ratio, so `want()` runs when the setting changes.
+     - `redecode()` compares pixels with a slack of half a point (`SLACK * ratio`). Going from High to Low, a copy is 4× the area it needs (over its 2× limit), so it shrinks. Going from Low to High, it is too small, so it grows. The old copy is drawn until the new one is ready.
+     - A code whose copy fits its box drops the decode queued for it, so a quick High, Low, High does not decode every card again.
    - The spotlight (`use-spotlight-images.native.ts`) keeps the default ratio.
 4. **Wire it**, `src/play/table-canvas.native.tsx`:
    - Subscribe narrowly: `useStore(tableSettings, (s) => s.settings.cardQuality)`.
@@ -51,11 +52,11 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
 
 - **Words**, `src/play/settings-words.ts`:
   - `QUALITY_WORDS = { high: "High", low: "Low" }`.
-  - `QUALITY_LINE = "Low keeps the table's card pictures smaller, for phones that slow down on a full table. The preview stays sharp."`
-  - `FOG_LINE = "The fog behind the screens drifts. Off holds it still and saves work on a slower phone."`
-- **Rows**, `src/play/setting-rows.tsx`, in the **Display** group after UI scale:
-  - A `SettingChoice` titled "Card pictures", with a stretched `Segmented` (`id("quality")`).
-  - A `SettingSwitch` labelled "Moving fog" (`id("fog")`).
+  - `QUALITY_LINE = "Low draws the table's cards a little softer, easing a slow phone."`
+  - `FOG_LINE = "Off holds the fog still, easing a slow phone."`; when the Light theme or Reduce motion already holds the fog still, the row is dimmed and says so (`fogLine`).
+- **Rows**, `src/play/setting-rows.tsx`:
+  - In **Display**, after Strong outlines: a `SettingChoice` titled "Card pictures", with a stretched `Segmented` (`id("quality")`).
+  - In **Motion and feel**, after Reduce motion: a `SettingSwitch` labelled "Moving fog" (`id("fog")`).
   - The Settings screen and the table's settings panel both draw `SettingsRows`, so both show the new rows, and a change applies during a game.
 
 ## C. Skip redrawing cards that did not change

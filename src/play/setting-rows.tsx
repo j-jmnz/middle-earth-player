@@ -7,10 +7,12 @@ import type { ReactNode } from "react";
 import { TextButton } from "./buttons.tsx";
 import { Segmented } from "./segmented.tsx";
 import { SettingSwitch } from "./setting-switch.tsx";
-import { AWAKE_LINE, CONTRAST_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
+import { AWAKE_LINE, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "./motion-tokens.ts";
+import { useReduceMotion } from "./motion-run.ts";
 import { CARD_QUALITY_OPTIONS, REDUCE_MOTION_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "./table-settings.ts";
 import { SectionHeading } from "./section-heading.tsx";
+import { useTheme } from "./theme.ts";
 import { useUiScale } from "./ui-scale.ts";
 import { Text } from "./text.tsx";
 
@@ -42,8 +44,8 @@ export function SettingGroup({ title, testID, first = false, children }: { title
 }
 
 /**
- * The groups, in the order a setting is reached during a game: Display (Theme, UI scale, Card pictures, Moving fog, Strong outlines), Motion and feel (Animation
- * speed, Reduce motion, Combat spotlight, Haptics) and At the table (First-game guide, Stops on when `stops`, Keep screen awake and the
+ * The groups, in the order a setting is reached during a game: Display (Theme, UI scale, Strong outlines, Card pictures), Motion and feel (Animation
+ * speed, Reduce motion, Moving fog, Combat spotlight, Haptics) and At the table (First-game guide, Stops on when `stops`, Keep screen awake and the
  * Responses used every time). `groups` picks which to draw, so a wide Settings page can split them across two columns. Every change
  * goes through `onChange`; the stored `uiScale` and `theme` apply at once. The Stops switch is the tab's: the table's rail carries Stops.
  */
@@ -68,6 +70,10 @@ export function SettingsRows({
 }) {
   const id = (name: string) => `${testPrefix}-${name}`;
   const top = groups[0];
+  // The fog is already still in the Light theme (it has none) and under reduced motion: the row says so, dimmed, and still saves.
+  const light = useTheme() === "light";
+  const reduced = useReduceMotion();
+  const fogStill = light || reduced;
   return (
     <>
       {groups.includes("display") ? (
@@ -78,11 +84,10 @@ export function SettingsRows({
           <SettingChoice title="UI scale" detail={SCALE_LINE} testID={id("scale")}>
             <Segmented options={UI_SCALE_OPTIONS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testIDPrefix={id("scale")} accessibilityLabel="UI scale" stretch words={SCALE_WORDS} />
           </SettingChoice>
+          <SettingSwitch roomy label="Strong outlines" detail={CONTRAST_LINE} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID={id("contrast")} />
           <SettingChoice title="Card pictures" detail={QUALITY_LINE} testID={id("quality")}>
             <Segmented options={CARD_QUALITY_OPTIONS} value={settings.cardQuality} onChange={(cardQuality) => onChange({ cardQuality })} testIDPrefix={id("quality")} accessibilityLabel="Card pictures" stretch words={QUALITY_WORDS} />
           </SettingChoice>
-          <SettingSwitch roomy label="Moving fog" detail={FOG_LINE} value={settings.fogDrift} onChange={(fogDrift) => onChange({ fogDrift })} testID={id("fog")} />
-          <SettingSwitch roomy label="Strong outlines" detail={CONTRAST_LINE} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID={id("contrast")} />
         </SettingGroup>
       ) : null}
 
@@ -94,6 +99,7 @@ export function SettingsRows({
           <SettingChoice title="Reduce motion" testID={id("reduce-motion")}>
             <Segmented options={REDUCE_MOTION_OPTIONS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} testIDPrefix={id("reduce-motion")} accessibilityLabel={`Reduce motion. ${REDUCE_MOTION_LINE}`} stretch words={REDUCE_MOTION_WORDS} />
           </SettingChoice>
+          <SettingSwitch roomy label="Moving fog" detail={fogLine(light, reduced)} dim={fogStill} value={settings.fogDrift} onChange={(fogDrift) => onChange({ fogDrift })} testID={id("fog")} />
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
           <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />
         </SettingGroup>

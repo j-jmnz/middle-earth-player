@@ -43,15 +43,27 @@ export function coverPixels(source: Box, box: Box, ratio: number): Box {
   return { w: Math.max(1, Math.round(source.w * scale)), h: Math.max(1, Math.round(source.h * scale)) };
 }
 
+/** How much smaller than wanted, in points, a copy may be and stay sharp enough. */
+export const SLACK = 0.5;
+
 /**
- * Whether a copy decoded for `held` must be decoded again for `wanted`: it is too small to stay sharp, or more than twice the
- * pixels it needs (a card that left the hand), so the table does not hold large copies of small cards. Small changes (a longer
- * hand narrowing its cards) keep the copy.
+ * Whether a copy decoded for `held` must be decoded again for `wanted`: it is too small to stay sharp (more than `slack` short in
+ * width or height, in the boxes' own unit: `SLACK` for point boxes, `SLACK * ratio` for boxes in pixels at `ratio` a point), or more
+ * than twice the pixels it needs (a card that left the hand), so the table does not hold large copies of small cards. Small changes
+ * (a longer hand narrowing its cards) keep the copy.
  */
-export function redecode(held: Box | undefined, wanted: Box): boolean {
+export function redecode(held: Box | undefined, wanted: Box, slack: number): boolean {
   if (!held) return true;
-  if (held.w < wanted.w - 0.5 || held.h < wanted.h - 0.5) return true;
+  if (held.w < wanted.w - slack || held.h < wanted.h - slack) return true;
   return held.w * held.h > 2 * wanted.w * wanted.h;
+}
+
+/**
+ * What the table asks `boxes` (points) to be decoded at, as a string: each code with its box rounded to whole points, and the
+ * `ratio` the copies are kept at, so a change of the Card pictures setting is a change of key and a fraction of a point is not.
+ */
+export function boxesKey(boxes: ReadonlyMap<string, Box>, ratio: number): string {
+  return `${ratio}|${[...boxes].map(([code, box]) => `${code}:${Math.round(box.w)}x${Math.round(box.h)}`).join(",")}`;
 }
 
 /** The bytes the table's decoded copies take at `ratio` pixels a point (four a pixel), for pictures `source` pixels big. */

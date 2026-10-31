@@ -139,6 +139,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   };
   // Everything a card's drawing reads, for this render; a card whose props did not change is not drawn again (table-piece.ts).
   const ctx: PieceContext = { highlight, targetIds, looking, peeking, beating, liftedId: lifted?.id ?? null, motions: moves.motions, clock, images, game, seat, owner, contrast, nameOf, sphereOf, inactive, info, fonts, backs, tokens, t, s };
+  // The lifted copy draws the same picture, name and sphere as its card on the table.
+  const lift = lifted ? bodyProps(lifted, ctx) : null;
   const piece = (slot: CardSlot) => <TablePiece key={`${slot.kind}:${slot.id}`} {...pieceProps(slot, ctx)} />;
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
   const emptyWords: [Rect, string][] = [
@@ -181,9 +183,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           {layout.marks.map((mark) => (
             <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />
           ))}
-          {lifted ? (
+          {lifted && lift ? (
             <Group transform={liftTransform} origin={vec(lifted.x + lifted.w / 2, lifted.y + lifted.h / 2)}>
-              <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={images.get(lifted.picture ?? lifted.code) ?? null} name={nameOf(lifted.picture ?? lifted.code)} sphere={sphereIcon(sphereOf(lifted.code))} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
+              <CardBody slot={{ ...lifted, tilt: 0, exhausted: false }} image={lift.image} name={lift.name} sphere={sphereIcon(lift.sphere)} fonts={fonts} encounterBack={false} backs={backs} t={t} s={s} />
               <RoundedRect x={lifted.x} y={lifted.y} width={lifted.w} height={lifted.h} r={cardCorner(lifted.w, lifted.h)} color={t.accent} style="stroke" strokeWidth={2 * s} />
             </Group>
           ) : null}

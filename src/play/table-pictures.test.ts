@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CardSlot } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
-import { coverPixels, HAND_PICTURE_SCALE, pictureBoxes, pictureBytes, pictureRatio, pixelBoxes, redecode } from "./table-pictures.ts";
+import { boxesKey, coverPixels, HAND_PICTURE_SCALE, pictureBoxes, pictureBytes, pictureRatio, pixelBoxes, redecode, SLACK } from "./table-pictures.ts";
 
 const slot = (id: string, code: string, zone: CardSlot["zone"], w: number, h: number, extra: Partial<CardSlot> = {}): CardSlot => ({
   id,
@@ -75,13 +75,34 @@ describe("pictureRatio", () => {
 
 describe("redecode", () => {
   it("decodes again when the copy is too small or more than twice what is needed, not for small changes", () => {
-    expect(redecode(undefined, { w: 54, h: 76 })).toBe(true);
-    expect(redecode({ w: 54, h: 76 }, { w: 54, h: 76 })).toBe(false);
-    expect(redecode({ w: 54, h: 76 }, { w: 60, h: 84 })).toBe(true);
+    expect(redecode(undefined, { w: 54, h: 76 }, SLACK)).toBe(true);
+    expect(redecode({ w: 54, h: 76 }, { w: 54, h: 76 }, SLACK)).toBe(false);
+    expect(redecode({ w: 54, h: 76 }, { w: 60, h: 84 }, SLACK)).toBe(true);
     // A hand that grows narrows its cards: the larger copy stays.
-    expect(redecode({ w: 60, h: 84 }, { w: 54, h: 76 })).toBe(false);
+    expect(redecode({ w: 60, h: 84 }, { w: 54, h: 76 }, SLACK)).toBe(false);
     // A card played from the hand: its lifted-size copy is far larger than the table needs.
-    expect(redecode({ w: 54 * HAND_PICTURE_SCALE, h: 76 * HAND_PICTURE_SCALE }, { w: 54, h: 76 })).toBe(true);
+    expect(redecode({ w: 54 * HAND_PICTURE_SCALE, h: 76 * HAND_PICTURE_SCALE }, { w: 54, h: 76 }, SLACK)).toBe(true);
+  });
+
+  it("allows half a point short in the boxes' own unit: SLACK in points, SLACK times the ratio in pixels", () => {
+    const wanted = { w: 54, h: 76 };
+    expect(redecode({ w: 53.6, h: 75.6 }, wanted, SLACK)).toBe(false);
+    expect(redecode({ w: 53.4, h: 76 }, wanted, SLACK)).toBe(true);
+    // The same boxes in pixels at 3 a point: 1.5 pixels of slack is half a point, 0.5 pixel is not.
+    const pixels = pixelBoxes(new Map([["A", wanted]]), 3).get("A")!;
+    expect(redecode({ w: pixels.w - 1.4, h: pixels.h - 1.4 }, pixels, SLACK * 3)).toBe(false);
+    expect(redecode({ w: pixels.w - 1.6, h: pixels.h }, pixels, SLACK * 3)).toBe(true);
+    expect(redecode({ w: pixels.w - 1.4, h: pixels.h }, pixels, SLACK)).toBe(true);
+  });
+});
+
+describe("boxesKey", () => {
+  it("rounds the boxes to whole points and holds the ratio, so Low and High never share a key", () => {
+    const a = new Map([["A", { w: 54.2, h: 75.9 }]]);
+    const b = new Map([["A", { w: 53.8, h: 76.1 }]]);
+    expect(boxesKey(a, 3)).toBe(boxesKey(b, 3));
+    expect(boxesKey(a, 3)).not.toBe(boxesKey(new Map([["A", { w: 55, h: 76 }]]), 3));
+    expect(boxesKey(a, 3)).not.toBe(boxesKey(a, 1.5));
   });
 });
 

@@ -13,7 +13,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { Image as RNImage, PixelRatio } from "react-native";
 
 import type { PictureSource } from "./table-canvas-types.ts";
-import { coverPixels, pixelBoxes, redecode, type Box } from "./table-pictures.ts";
+import { boxesKey, coverPixels, pixelBoxes, redecode, SLACK, type Box } from "./table-pictures.ts";
 
 function uriOf(source: PictureSource): string | null {
   if (typeof source !== "number") return source.uri;
@@ -59,8 +59,6 @@ async function decode(source: PictureSource, box: Box): Promise<SkImage | null> 
   }
 }
 
-const keyOf = (boxes: ReadonlyMap<string, Box>) => [...boxes].map(([code, box]) => `${code}:${Math.round(box.w)}x${Math.round(box.h)}`).join(",");
-
 // How long a frame may spend decoding before the rest wait for the next frame (ms): the work that blocks the JS thread is the
 // decode and the downscale, and a 60 Hz frame is 16 ms.
 const FRAME_BUDGET = 6;
@@ -92,6 +90,8 @@ class Pictures {
   private loading = new Map<string, Box>();
   private queue = new Map<string, Job>();
   private wanted: ReadonlyMap<string, Box> = new Map();
+  // How much smaller than wanted a copy may be and stay (redecode): half a point, in the pixels the boxes are in.
+  private slack = SLACK;
   private busy = false;
   // Copies replaced or released, disposed only once the map without them is drawn: until then the canvas may still draw them.
   private retired: SkImage[] = [];
@@ -105,9 +105,13 @@ class Pictures {
     this.announce = announce;
   }
 
-  /** Decodes what the table wants now, and releases what it no longer shows beyond the PARKED it showed last. */
-  want(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null): void {
+  /**
+   * Decodes what the table wants now (`boxes` in pixels at `ratio` pixels a point), and releases what it no longer shows beyond the
+   * PARKED it showed last. A code whose copy already fits its box drops any decode queued or running for another size.
+   */
+  want(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null, ratio: number): void {
     this.wanted = boxes;
+    this.slack = SLACK * ratio;
     let changed = false;
     // The held codes are in the order they were last wanted, oldest first: one wanted now moves to the end.
     for (const code of boxes.keys()) {
@@ -132,9 +136,15 @@ class Pictures {
     }
     if (changed) this.announceSoon();
     for (const [code, box] of boxes) {
-      if (!redecode(this.held.get(code)?.box, box)) continue;
+      if (!redecode(this.held.get(code)?.box, box, this.slack)) {
+        // The copy held fits: a decode queued for another size (a quick High, Low, High) is dropped, and one already running is
+        // disposed when it ends (keep).
+        this.queue.delete(code);
+        this.loading.delete(code);
+        continue;
+      }
       const pending = this.loading.get(code);
-      if (pending && !redecode(pending, box)) continue;
+      if (pending && !redecode(pending, box, this.slack)) continue;
       const source = picture(code);
       if (!source) continue;
       this.loading.set(code, box);
@@ -201,7 +211,7 @@ class Pictures {
       this.pump(began);
       return;
     }
-    const box = redecode(job.box, wanted) ? wanted : job.box;
+    const box = redecode(job.box, wanted, this.slack) ? wanted : job.box;
     this.busy = true;
     void decode(job.source, box).then((image) => {
       this.busy = false;
@@ -222,7 +232,7 @@ class Pictures {
   private keep(code: string, box: Box, image: SkImage | null): void {
     if (!image) return;
     const wanted = this.wanted.get(code);
-    if (!wanted || redecode(box, wanted) || this.loading.has(code) || this.queue.has(code)) {
+    if (!wanted || redecode(box, wanted, this.slack) || this.loading.has(code) || this.queue.has(code)) {
       image.dispose();
       return;
     }
@@ -243,16 +253,17 @@ class Pictures {
 export function useTableImages(boxes: ReadonlyMap<string, Box>, picture: (code: string) => PictureSource | null, revision: number, ratio?: number): ReadonlyMap<string, SkImage> {
   const [images, setImages] = useState<ReadonlyMap<string, SkImage>>(NONE);
   const [pictures] = useState(() => new Pictures((next) => setImages(next)));
-  // The boxes in pixels at the ratio the copies are kept at (the phone's, or less on Low), so a change of ratio is a change of key.
-  const wanted = pixelBoxes(boxes, ratio ?? PixelRatio.get());
-  const key = keyOf(wanted);
+  // The boxes in pixels at the ratio the copies are kept at (the phone's, or less on Low); the key holds the ratio, so a change of ratio runs `want`.
+  const kept = ratio ?? PixelRatio.get();
+  const wanted = pixelBoxes(boxes, kept);
+  const key = boxesKey(boxes, kept);
 
   useEffect(() => {
     pictures.disposeRetired();
   }, [images, pictures]);
 
   // Tells the pictures what the table wants now. It runs when the boxes' key or the cache revision changes, and reads the latest boxes and `picture`.
-  const decodeWanted = useEffectEvent(() => pictures.want(wanted, picture));
+  const decodeWanted = useEffectEvent(() => pictures.want(wanted, picture, kept));
   useEffect(() => {
     decodeWanted();
   }, [key, revision]);

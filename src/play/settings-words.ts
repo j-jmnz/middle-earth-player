@@ -10,8 +10,11 @@ export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Sm
 export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high: "High", low: "Low" };
 
 export const SCALE_LINE = "Resizes the whole app, the table included.";
-export const QUALITY_LINE = "Low keeps the table's card pictures smaller, for phones that slow down on a full table. The preview stays sharp.";
-export const FOG_LINE = "The fog behind the screens drifts. Off holds it still and saves work on a slower phone.";
+export const QUALITY_LINE = "Low draws the table's cards a little softer, easing a slow phone.";
+export const FOG_LINE = "Off holds the fog still, easing a slow phone.";
+// What the Moving fog row says when the fog is already still (the switch still saves its value).
+export const FOG_LIGHT_LINE = "The Light theme has no fog.";
+export const FOG_REDUCED_LINE = "Reduce motion already holds it still.";
 // THEME_LINE and REDUCE_MOTION_LINE are spoken with their switches (setting-rows.tsx), not shown.
 export const THEME_LINE = "System follows your phone.";
 export const SPEED_LINE = "Quick shortens every motion and skips the phase title.";
@@ -26,6 +29,12 @@ export const NONE_YET = "None yet";
 
 export const CREDITS =
   "Card data comes from RingsDB, Hall of Beorn and DragnCards. The type is Marcellus SC and Barlow Semi Condensed, under the SIL Open Font License. This is a fan-made, unofficial app, not made, endorsed or sponsored by Fantasy Flight Games or Asmodee.";
+
+/** The Moving fog row's detail: why the fog is already still (the Light theme has none, Reduce motion holds it), else what the switch does. */
+export function fogLine(light: boolean, reduced: boolean): string {
+  if (light) return FOG_LIGHT_LINE;
+  return reduced ? FOG_REDUCED_LINE : FOG_LINE;
+}
 
 export type AlwaysRow = { effectId: string; label: string };
 

@@ -83,15 +83,18 @@ tags:
     id: log-close
 - assertNotVisible:
     id: log-sheet
-# Table settings opens its panel, with the Animation speed row (Normal and Quick).
+# Table settings opens its panel, with the Animation speed row (Normal and Quick), found by scrolling past the Display rows.
 - tapOn:
     id: table-menu
 - tapOn:
     id: settings-open
 - extendedWaitUntil:
     visible:
-      id: settings-speed
+      id: settings-theme
     timeout: 15000
+- scrollUntilVisible:
+    element:
+      id: settings-speed
 - assertVisible:
     id: settings-speed-normal
 - assertVisible:

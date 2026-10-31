@@ -100,7 +100,7 @@ Read the sections your task touches.
     - 780–783 Coverage test (~270)
   - 784–804 Data sources (~560)
   - 805–823 Card images (~1.1K) ← 6
-  - 824–848 Persistence and shipping (~1.5K)
+  - 824–848 Persistence and shipping (~1.6K)
   - 849–889 Screens (~4.3K) ← 1
     - 875–889 Table screen (~1.6K) ← 4
 - `docs/design-system-table.md` — Design system — Table (landscape) (~21.9K tok)
@@ -127,14 +127,14 @@ Read the sections your task touches.
   - 226–229 Stops and Always use (~250)
   - 230–233 Guide (~120)
   - 234–243 Choice tray (~780) ← 2
-  - 244–255 Reading panels (~930) ← 4
+  - 244–255 Reading panels (~940) ← 4
   - 256–265 Phase carousel (~670)
   - 266–271 Quest advance (~460) ← 1
   - 272–275 Undo (~140)
   - 276–279 Haptics (~250)
   - 280–290 Banner (~580) ← 1
   - 291–294 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~22.3K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~22.4K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -165,7 +165,7 @@ Read the sections your task touches.
     - 376–385 Card pool (the Cards tab) (~700) ← 3
     - 386–391 Card (~480) ← 2
     - 392–397 Packs and pack cards (~130)
-    - 398–410 Settings (~590)
+    - 398–410 Settings (~640)
     - 411–416 Rules (~450) ← 1
     - 417–420 Rule (~220) ← 1
     - 421–424 Booklet (~100)
@@ -297,7 +297,7 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
-- `docs/plans/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.3K tok)
+- `docs/plans/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.4K tok)
 
 ## Handovers
 
