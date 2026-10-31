@@ -7,6 +7,7 @@ import type { EngineStep } from "./intents.ts";
 import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
 import { activeOf, stagingOf } from "./families/breaking-areas.ts";
+import { cancelAttack } from "./families/defense-defenders.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
 import { notePlaced, progressRoom } from "./families/south-locations.ts";
@@ -88,9 +89,12 @@ export function applyTargetVerb(
       return flagged(state, id, "cannotReady") ? state : updateCard(state, id, { exhausted: false });
     case "BarAttack": {
       const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
-      return sourceId
-        ? { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: instruction.until ?? "endOfRound", seat: barred }] }
-        : state;
+      if (!sourceId) return state;
+      const next: ScenarioState = { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId, stat: "cannotAttack", amount: 1, until: instruction.until ?? "endOfRound", seat: barred }] };
+      // Used once the enemy is declared as an attacker against that player (Mr. Underhill after a failed Hide test, 141017:A:3), the
+      // attack it is making ends there, as a canceled one does (user decision, 2026-10-31; brief, Fellowship of the Ring).
+      const attack = state.pendingAttack;
+      return attack?.enemyId === id && attack.seat === barred ? cancelAttack(next) : next;
     }
     case "PlaceProgressOnLocation":
       return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps);

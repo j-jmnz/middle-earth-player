@@ -12,4 +12,7 @@
 // 14: an enemy that attacks from the staging area makes the additional attack its shadow grants, and its shadow card's "after this attack" effect runs, whether or not
 // the enemy is flagged (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker); Lost in the Dark's "no progress" choice holds for the table
 // (the lasting ModifyStat `table` target): replayed Ring Goes South, Journey in the Dark and Caves of Nibin-Dûm games can move.
-export const ENGINE_VERSION = 14;
+// 15: a two-seat planning phase goes on in player order from the first player, so seat 0 has its planning window in a round seat 1 is first (it had
+// none, pass.ts); a "cannot attack you" effect used on the enemy attacking that player ends that attack (effect-verbs.ts, Mr. Underhill): replayed
+// two-seat games of every scenario can move.
+export const ENGINE_VERSION = 15;

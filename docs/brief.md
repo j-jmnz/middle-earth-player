@@ -366,6 +366,7 @@ Every scenario in the box starts the same way. The engine does it. Do not ask th
 - Only one Fellowship-sphere hero may be in play. No other version of Frodo may be a starting hero or in the deck.
 - Fellowship-sphere heroes cannot be used outside saga scenarios. The deck may still be saved. The briefing refuses them.
 - Two-handed: when the first-player token passes in refresh, the new first seat gains control of the attached Ring-bearer, the resources in that hero's pool, and every card attached to that hero. If that transfer leaves a seat with no heroes, that seat is eliminated immediately.
+- A "cannot attack you" effect used on an enemy already declared as an attacker against that player ends that attack, as a canceled one does (Mr. Underhill, 141017:A:3, used after a failed Hide test has made a Black Rider attack; user decision, 2026-10-31). An attack against another player goes on.
 
 | # | Scenario id | Difficulty | Encounter sets and extra rules, from the booklet |
 | --- | --- | --- | --- |

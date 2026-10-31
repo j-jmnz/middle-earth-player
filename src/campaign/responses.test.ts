@@ -236,4 +236,21 @@ describe("141017 action", () => {
     expect(run.steps.some((step) => step.kind === "attack" && step.side === "enemy")).toBe(false);
     expect(run.state.window?.kind).toBe("playerAttack");
   });
+
+  it("used once the enemy is declared as an attacker, the attack ends with no defense and no damage", () => {
+    const table = buildTable(base, { ...scene, deck: ["f0", "f0", "card", "card", "card", "card"] });
+    const underhill = idsOf(table, "141017");
+    let run = begin(table.state);
+    for (let turn = 0; turn < 20 && !run.state.pendingAttack; turn += 1) {
+      if (run.state.window?.kind === "travel") run = send(run, { type: "DeclineTravel" }, table.ctx);
+      else if (run.state.window?.kind === "optionalEngage") run = send(run, { type: "DeclineEngage" }, table.ctx);
+      else run = send(run, { type: "Pass" }, table.ctx);
+    }
+    expect(run.state.pendingAttack?.enemyId).toBe(idsOf(table, RIDER));
+    run = send(run, { type: "Trigger", cardId: underhill, effectId: "141017:action:1" }, table.ctx);
+    for (let turn = 0; turn < 5 && run.state.pendingAttack; turn += 1) run = send(run, { type: "Pass" }, table.ctx);
+    expect(run.state.pendingAttack).toBeFalsy();
+    expect(run.state.window?.kind).toBe("playerAttack");
+    expect(run.state.cards[idsOf(table, FRODO)]?.damage).toBe(0);
+  });
 });
