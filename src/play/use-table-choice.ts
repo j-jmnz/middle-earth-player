@@ -25,7 +25,7 @@ import { fightOf, highlightKeys, highlightOf, playedCard } from "./highlight-of.
 import { listsResponses, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import { effectById } from "../rules/listen.ts";
-import type { PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
+import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 import type { DockExtra } from "./dock-buttons.tsx";
@@ -167,17 +167,20 @@ export function useTableChoice({
   }, []);
   // When the moment on the dock last changed, or its spotlight ended: a send just after it is the tail of a double tap (table-hooks.ts).
   const settled = useSettle(store, `${sheet.key}:${moment?.seq ?? 0}`);
+  // The table answers for the player where the player's settings say so (stops.ts); Pass to stop starts a run.
+  const sheetOf = useCallback((at: ScenarioState, offered: readonly LegalIntent[]) => sheetFor(at, ctx, offered, names) ?? windowSheet(at, ctx, offered, names), [ctx, names]);
+  const { startRun, follow } = useAutoAnswer({ store, ctx, game, sheet, legal, settings, moment, opened: live != null, sheetOf, hold });
   const dispatch = useCallback(
     (intent: PlayerIntent) => {
       // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
-      // gets the Refused tick, never both.
-      if (store.getState().dispatch(intent, tickSent)) reset();
-      else tickRefused();
+      // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
+      if (store.getState().dispatch(intent, tickSent)) {
+        reset();
+        follow();
+      } else tickRefused();
     },
-    [store, reset],
+    [store, reset, follow],
   );
-  // The table answers for the player where the player's settings say so (stops.ts); Pass to stop starts a run.
-  const startRun = useAutoAnswer({ store, ctx, game, sheet, legal, settings, moment, opened: live != null, hold });
 
   // A pick being made is put back first; otherwise the last intent is taken back.
   const picking = held != null && held.key === sheet.key && (held.ids.length > 0 || held.shares.length > 0);

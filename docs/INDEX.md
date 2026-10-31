@@ -102,7 +102,7 @@ Read the sections your task touches.
   - 783–807 Persistence and shipping (~1.5K)
   - 808–846 Screens (~3.7K) ← 1
     - 833–846 Table screen (~1.3K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~18.0K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~18.1K tok)
   - 5–8 Overview (~150)
   - 9–22 Top bar (~1.4K) ← 1
   - 23–26 Table menu (~330) ← 1
@@ -122,7 +122,7 @@ Read the sections your task touches.
   - 181–194 Command column (~1.6K) ← 7
   - 195–198 Two taps (~320) ← 2
   - 199–202 One answer, one tap (~240)
-  - 203–206 Stops and Always use (~200)
+  - 203–206 Stops and Always use (~250)
   - 207–210 Guide (~120)
   - 211–220 Choice tray (~780) ← 2
   - 221–231 Reading panels (~870) ← 4
@@ -180,7 +180,7 @@ STATUS.md, then the active phase file.
     - 64–74 Fixtures and Maestro (~360)
     - 75–93 Rules and engine (~540)
     - 94–108 Screens and code (~590)
-    - 109–126 Phone and tablet checks (~820)
+    - 109–126 Phone and tablet checks (~830)
   - 127–142 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

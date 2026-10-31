@@ -9,7 +9,7 @@ import { stageText } from "./objective.ts";
 import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } from "./outcome.ts";
 import { guideLine } from "./reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
-import { alwaysUseIntent, passableWindow, stopDecision, usableIds, type StopSettings } from "./stops.ts";
+import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "./stops.ts";
 import { effectsOf } from "../rules/listen.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "./store.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
@@ -109,10 +109,19 @@ export function useGuide(settings: Pick<TableSettings, "guide" | "guideSeen">, g
   return guide?.text ?? null;
 }
 
+export type AutoAnswer = {
+  // The dock's Pass to stop: starts a run to the next stop.
+  startRun: () => void;
+  // Called right after the player's send is accepted: the moments the table answers are answered in the same tap, so one it passes
+  // (the other seat's window in two-handed play) is never drawn, and the table does not flash to that seat and back.
+  follow: () => void;
+};
+
 /**
  * The answers the table gives for the player, once per moment, where the player's settings say so (stops.ts): a free
  * Response set to Always, and a step window that is not a stop. Anything else asks, and asking ends "Pass to next stop".
- * Returns what starts that run: the dock's Pass to stop.
+ * `follow` answers the moments after a send at once; the effect answers a moment reached any other way (a relaunch, Undo's held moment
+ * asks), and is the one that records what the player was asked at.
  */
 export function useAutoAnswer({
   store,
@@ -123,6 +132,7 @@ export function useAutoAnswer({
   settings,
   moment,
   opened,
+  sheetOf,
   hold = false,
 }: {
   store: TableStore;
@@ -134,27 +144,28 @@ export function useAutoAnswer({
   moment: TableMoment | null;
   // A sheet the player opened from the table is up: the table answers nothing under it.
   opened: boolean;
+  // The moment's sheet for a state, as the table builds it (use-table-choice.ts), for the moments `follow` answers before they are drawn.
+  sheetOf: (game: ScenarioState, legal: readonly LegalIntent[]) => Sheet;
   // A screen over the table holds the moment (the quest advance screen, use-quest-advance.ts): the table answers nothing until it
   // closes, and then answers the moment as it would have.
   hold?: boolean;
-}): () => void {
+}): AutoAnswer {
   const running = useRef(false);
   // The cards usable where the player was last asked: a new one makes a window ask again.
   const seen = useRef<Set<string>>(new Set());
   const autoKey = `${sheet.key}:${moment?.seq ?? 0}:${game.window?.kind ?? ""}:${hold ? "held" : ""}`;
+  const follow = useCallback(() => {
+    if (!hold) followAnswers(store, ctx, sheetOf, settings, running.current, seen.current);
+  }, [store, ctx, settings, sheetOf, hold]);
   // What the table answers with, read when the key changes: it runs once per moment; the key holds what decides that.
   const answer = useEffectEvent(() => {
     if (opened || hold) return;
     // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
     const held = moment?.kind === "undone";
     if (held) running.current = false;
-    const always = alwaysUseIntent(game, sheet, ctx, settings, held);
-    if (always) {
-      store.getState().dispatch(always);
-      return;
-    }
-    if (stopDecision({ game, sheet, legal, settings, running: running.current, held, seen: seen.current }) === "pass") {
-      store.getState().dispatch({ type: "Pass" });
+    const intent = tableAnswer(game, sheet, legal, ctx, settings, running.current, held, seen.current);
+    if (intent) {
+      if (store.getState().dispatch(intent)) follow();
       return;
     }
     // The table asks here: the cards usable now are seen, and a run to the next stop ends.
@@ -164,9 +175,10 @@ export function useAutoAnswer({
   useEffect(() => {
     answer();
   }, [autoKey]);
-  return useCallback(() => {
+  const startRun = useCallback(() => {
     running.current = true;
   }, []);
+  return { startRun, follow };
 }
 
 // How long a new moment ignores a send: the second tap of a double tap meant for the moment before lands where its button was, and a
