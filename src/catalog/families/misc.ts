@@ -40,8 +40,9 @@ export const VERBS = [
   // The source ally becomes an attachment on the last picked ally: it counts as a Restricted Mount attachment while it is (Wild
   // Stallion, 19033:A:2). One copy goes on each ally; a character with too many Restricted attachments discards one.
   z.strictObject({ verb: z.literal("AttachAsMount"), ...when }),
-  // The players lose the game ("If Bilbo Baggins leaves play, the players lose the game").
-  z.strictObject({ verb: z.literal("LoseGame"), ...when }),
+  // The players lose the game ("If Bilbo Baggins leaves play, the players lose the game"). `reason` is the loss as the log words it, where the card that left play is not the cause ("the Corsairs have
+  // destroyed the Elven fleet", 11038:A:2).
+  z.strictObject({ verb: z.literal("LoseGame"), reason: z.string().min(1).optional(), ...when }),
   // After CancelEffect on an encounter card just revealed: that card is discarded instead of being shuffled back into the
   // encounter deck ("cancel the effects of an encounter card just revealed ... and discard that card", 21009:A:1). The same player
   // then reveals another card.

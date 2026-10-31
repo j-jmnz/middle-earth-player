@@ -58,6 +58,8 @@ export type Keywords = {
   sailingSuccess: number | null;
   // Uncharted: the card is a double-sided location whose side B is a Lost Island (dcce.uncharted).
   uncharted: boolean;
+  // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
+  aflame: number | null;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -117,6 +119,7 @@ const EMPTY_KEYWORDS: Keywords = {
   boarding: null,
   sailingSuccess: null,
   uncharted: false,
+  aflame: null,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable).
@@ -294,6 +297,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       boarding: keywords.boarding ?? null,
       sailingSuccess: keywords.sailingSuccess ?? null,
       uncharted: keywords.uncharted === true,
+      aflame: keywords.aflame ?? null,
     },
   });
 }

@@ -46,6 +46,10 @@ export const amountExprSchema = z.strictObject({
   resourcesAboveCopies: z.literal(true).optional(),
   // The amount comes out negative ("gets -1 Willpower for each damaged hero you control"): the value read, below 0.
   negative: z.literal(true).optional(),
+  // A scalable card's level, read from the Campaign Log (dcce.scalable-upgradable): the level of the source card. `halved`: half of the value read, rounded up ("half the level of Galdor's
+  // Counsel, rounded up", 11184:A:1). Read by the aflame family (src/rules/families/aflame-values.ts).
+  level: z.literal(true).optional(),
+  halved: z.literal(true).optional(),
   // amount = value × times + plus, at most `limit`, at least 0.
   times: z.number().int().optional(),
   plus: z.number().int().optional(),

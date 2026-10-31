@@ -175,6 +175,11 @@ export function placeQuestProgress(
     next = oweDiscards(next, remaining);
     remaining = 0;
   }
+  // Progress a stage turns into the removal of damage from locations in play (families/aflame.ts, 11037:B:1): its record hears the amount.
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressHeals")) {
+    next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
+    remaining = 0;
+  }
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];

@@ -8,6 +8,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { fallenBase, printedOf } from "./printed.ts";
 import type { Earned, ResolutionLog } from "./campaign-state.ts";
 import { xpOf } from "./families/dreamchaser.ts";
+import { dealtCopies } from "./families/aflame-cards.ts";
 import { shuffleIds } from "./seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
@@ -31,8 +32,8 @@ function seatsFor(state: ScenarioState, instruction: Choosing): number[] {
   return instruction.who === "firstPlayer" ? order.slice(0, 1) : order;
 }
 
-function heroesOf(state: ScenarioState, seat: number): string[] {
-  return [...(state.seats[seat]?.heroes ?? [])];
+function heroesOf(state: ScenarioState, seat: number, anyHero?: boolean): string[] {
+  return anyHero ? livingSeats(state).flatMap((index) => state.seats[index]?.heroes ?? []) : [...(state.seats[seat]?.heroes ?? [])];
 }
 
 function stepOver(state: ScenarioState, log?: ResolutionLog): ScenarioState {
@@ -116,6 +117,10 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       case "Earn":
         next = stepOver(next, earn(next, copiesOf(next, instruction.codes, instruction.eachPlayer)));
         break;
+      // The copies of these cards the game holds, whoever played them (families/aflame-cards.ts).
+      case "EarnDealt":
+        next = stepOver(next, earn(next, dealtCopies(next, instruction.codes, next.resolutionAt)));
+        break;
       case "CarryOver": {
         // The next campaign's cards, one copy each or one for each player (the new save's seats decide how many); no dedupe.
         const carried = instruction.eachPlayer ? instruction.codes.map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt, perPlayer: true })) : copiesOf(next, instruction.codes, false);
@@ -188,7 +193,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
   if (codes.length === 0) return [];
-  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat).map((hero) => `${code}>${hero}`)) : codes;
+  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }
 
@@ -237,7 +242,8 @@ export function applyResolution(state: ScenarioState, optionId: string): Scenari
   } else if (optionId !== SKIP) {
     const [code = "", heroId] = optionId.split(">");
     const hero = heroId ? state.cards[heroId] : undefined;
-    log = { ...log, earned: [...log.earned, { code, to: instruction.to, seat, hero: hero?.code ?? null, step }] };
+    // A hero chosen from the whole table is earned for the seat that controls it.
+    log = { ...log, earned: [...log.earned, { code, to: instruction.to, seat: instruction.anyHero && hero?.controller != null ? hero.controller : seat, hero: hero?.code ?? null, step }] };
   }
   const seats = seatsFor(state, instruction);
   const more = state.resolutionSeat + 1 < seats.length;

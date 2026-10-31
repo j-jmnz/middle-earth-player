@@ -29,6 +29,7 @@ const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {
   toughness: "toughness",
   secrecy: "secrecy",
   boarding: "boarding",
+  aflame: "aflame",
 };
 
 // Hall of Beorn lists one keyword per entry, with the trailing period: "Hide 2.", "Surge.".

@@ -1,6 +1,7 @@
 // Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.step-6-4b, rr.ranged,
 // rr.step-6-8b, rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
 // ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
+import { announceEnemyAttacked, attackerLimitReached } from "./families/aflame-attack.ts";
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
@@ -227,7 +228,7 @@ export function canAttack(
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives).
   if (!shipMayAttack(printed, printedOf(cards, enemy.code))) return false;
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
-  if (flagged(state, enemyId, "cannotBeAttacked")) return false;
+  if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
@@ -301,7 +302,7 @@ export function applyPlayerAttack(
     if (!flagged(next, attackerId, "noExhaustAttack")) next = updateCard(next, attackerId, { exhausted: true });
     next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   }
-  const declared: ScenarioState = declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) });
+  const declared: ScenarioState = announceEnemyAttacked(declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) }), seat, enemyId, attackerIds, ctx);
   // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage. The Responses to
   // the declaration ("After ~ is declared as an attacker") resolve before them either way (families/attack-flow.ts).
   return playerAttackWindow(declared, ctx, "strike") ?? awaitStrike(declared, ctx) ?? continueStrike(declared, ctx, steps);

@@ -370,6 +370,10 @@ export const simpleVerbs = [
     to: z.enum(["pool", "hand", "hero"]),
     optional: z.boolean().optional(),
     leftover: z.enum(["firstPlayerDeck"]).optional(),
+    // The card is dealt where `to` says but not earned: the scenario's Resolution decides whether it joins the pool (11182:A:2, with EarnDealt on 11182:B:2).
+    unearned: z.boolean().optional(),
+    // With `to: hero` at a Resolution: the hero may be any player's, not only the chooser's ("record which hero you attach it to", 11182:B:1).
+    anyHero: z.boolean().optional(),
     ...when,
   }),
   // Resolution: these cards are earned, with no choice. `eachPlayer`: one copy for each living player ("Each player earns 1 copy of

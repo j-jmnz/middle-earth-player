@@ -22,6 +22,7 @@ import { nightmareWords } from "./nightmare-words.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";
 import { seaPickWords, seaWords } from "./sea-words.ts";
 import { unchartedBranchWords, unchartedPickWords, unchartedWords } from "./uncharted-words.ts";
+import { aflameBranchWords, aflamePickWords, aflameWords } from "./aflame-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -296,7 +297,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? aflameWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
@@ -321,7 +322,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId);
+  const family = unchartedBranchWords(choose, optionId) ?? aflameBranchWords(choose, optionId, names, sourceId);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
@@ -359,7 +360,7 @@ export function branchThreat(choose: ChooseInstruction, optionId: string): numbe
 export type PickWords = { verb: string; prompt: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */
-export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2, game?: ScenarioState): PickWords {
+export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2, game?: ScenarioState, amountNow?: number): PickWords {
   // A hero holding one Restricted attachment too many (rr.restricted): which one leaves. A claimed objective goes back to the staging area.
   if (pick.verb === "DiscardRestricted") {
     const host = sourceId ? names.card(sourceId) : "The hero";
@@ -381,7 +382,9 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (play) return play;
   const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  const family = aflamePickWords(pick, next, names, sourceId, amountNow);
+  if (family) return family;
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
   const one = article(noun);
   switch (next?.verb) {

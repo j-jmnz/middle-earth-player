@@ -1,5 +1,6 @@
 // Rules: rr.attacks-outside-the-combat-phase, rr.step-6-8b, rr.step-6-8-3, rr.active-location, rr.quest-advancement,
 // faq.limitations-on-attacks (data/rules/entries.json).
+import { announceEnemyAttacked } from "./aflame-attack.ts";
 import type { CardRef, Instruction } from "../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../amounts.ts";
 import { continueStrike } from "../combat.ts";
@@ -82,7 +83,7 @@ export function declareAttack(state: ScenarioState, instruction: Extract<Instruc
 // An attack an effect declares, its attackers already exhausted and announced: the strike is declared, the last attacker is
 // the effect's last picked card, and the attack resolves through the attack flow (also the attachments family's ChooseAttackers).
 export function openStrike(state: ScenarioState, seat: number, enemyId: string, attackerIds: string[], frameId: string | undefined, ctx: ReduceContext, steps: EngineStep[], ranged?: boolean): ScenarioState {
-  let next = declareStrike({ ...state, window: null }, { seat, enemyId, attackerIds, back: null, ...(ranged ? { ranged: true } : {}) });
+  let next = announceEnemyAttacked(declareStrike({ ...state, window: null }, { seat, enemyId, attackerIds, back: null, ...(ranged ? { ranged: true } : {}) }), seat, enemyId, attackerIds, ctx);
   next = discardPlayedEvent(pickAttacker(next, attackerIds.at(-1) ?? "", frameId), frameId);
   // 6.8.1: an action window comes before its strength; the Responses to the declaration resolve first either way.
   return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next, ctx) ?? continueStrike(next, ctx, steps);

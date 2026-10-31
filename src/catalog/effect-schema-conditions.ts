@@ -219,6 +219,13 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The highest threat among the players is at most `max`: a campaign card's Resolution reads "the final threat of the player with the highest
   // threat: if it is under 40" (41051:B:1). An eliminated player's threat is raised to 50 (rr.scoring), so that player counts as 50.
   z.strictObject({ kind: z.literal("highestThreat"), max: z.number().int().min(0) }),
+  // The cards facedown underneath The Havens Burn number at least `min` and at most `max` (dcce.aflame; "If there are X or more cards underneath The Havens Burn, ... X is 3 more than the
+  // number of players", 11038:A:2 is `min: 3, players: true`; "2 or fewer cards are underneath", 11182:B:5 is `max: 2`). With `players`, both bounds count the number of players in the game
+  // on top of what they name. Read by the aflame family (src/rules/families/aflame-values.ts).
+  z.strictObject({ kind: z.literal("underBurn"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
+  // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
+  // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
+  z.strictObject({ kind: z.literal("revealing") }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

@@ -64,8 +64,8 @@ export const VERBS = [
     ...when,
   }),
   // Constant: while the source is in play the card (the source, or its host) is controlled by the first player ("The first
-  // player gains control of attached ally"). The engine moves it whenever the first player changes.
-  z.strictObject({ verb: z.literal("ControlledBy"), who: z.literal("firstPlayer"), card: z.enum(["self", "host"]), ...when }),
+  // player gains control of attached ally"; `lastPlayer`: "The last player gains control of Na'asiyah", 11079:A:1, dcce.last-player). The engine moves it whenever the first player changes.
+  z.strictObject({ verb: z.literal("ControlledBy"), who: z.enum(["firstPlayer", "lastPlayer"]), card: z.enum(["self", "host"]), ...when }),
   // The actor takes the first player token: they are the first player from now on (rr.first-player).
   z.strictObject({ verb: z.literal("TakeFirstPlayer"), ...when }),
   // Each player raises their threat by `amount` from the doomed keyword the source gains (rr.doomed-x): "You may give ~

@@ -19,7 +19,7 @@ import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { recordUnclosedRun } from "../../../table-session";
 import { dealSeed } from "../../../e2e";
-import { actionLine, needWords } from "../../../briefing-words";
+import { actionLine, needWords, sphereTell } from "../../../briefing-words";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";
 import { routeCode } from "../../../route-code";
@@ -117,7 +117,7 @@ export default function Briefing() {
   }
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
-  const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? []) : null;
+  const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? [], nameOf) : null;
   const completed = save.log.completed.includes(scenario.id);
   const fallen = save.log.fallenHeroesBySeat.flat();
 
@@ -233,7 +233,7 @@ export default function Briefing() {
           {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
           {result.needs.options.map((option) => {
             const [code = "", host] = option.split(">");
-            const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : nameOf(code);
+            const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : `${nameOf(code)}${sphereTell(nameOf(code), world.cards.get(code)?.sphere)}`;
             // The card's Action line, so the choice is made knowing what the boon does.
             const action = option === "skip" ? null : actionLine(printedText[code]);
             return (

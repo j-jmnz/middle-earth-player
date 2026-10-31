@@ -107,7 +107,8 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
     const hero = host ?? null;
     if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });
     if (instruction.to === "hand") seats[seat]?.hand.push(code);
-    pool.push(poolCard(printed, code, printed.keywords.permanent ? hero : null, seat));
+    // An unearned card is only dealt: the scenario's Resolution decides whether it joins the pool (11182:B:2).
+    if (!instruction.unearned) pool.push(poolCard(printed, code, printed.keywords.permanent ? hero : null, seat));
     table.out.did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
   }
   if (instruction.leftover === "firstPlayerDeck") {

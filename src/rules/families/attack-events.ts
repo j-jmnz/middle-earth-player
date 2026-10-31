@@ -18,7 +18,7 @@ export function heard(state: ScenarioState, ctx: ReduceContext, trigger: string)
 // Whether a declared player attack waits before its strength is read: when a card in the game answers "is declared as an
 // attacker", or reads whether a card is attacking (a constant settle rebuilds, "While Aragorn is attacking").
 export function strikeWaits(state: ScenarioState, ctx: ReduceContext): boolean {
-  return heard(state, ctx, "declaredAttacker") || gameReads(state, ctx, '"attacking"');
+  return heard(state, ctx, "declaredAttacker") || heard(state, ctx, "enemyAttacked") || gameReads(state, ctx, '"attacking"');
 }
 
 // A drained `engaged` event marks its seat until the end of the round (an endOfRound modifier on "seat:N").

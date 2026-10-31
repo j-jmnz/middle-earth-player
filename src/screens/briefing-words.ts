@@ -31,11 +31,20 @@ export function actionLine(text: string | null | undefined): string | null {
  * What a campaign card's Setup choice says at the briefing: the sentence under "Seat N chooses" and the line the Deal bar gives while the choice
  * is unanswered. The Oath's choice (41050:A:2) is of Adaptation boons, which join the Campaign Pool; any other choice is a card.
  */
-export function needWords(seat: number, options: readonly string[], traitsOf: (code: string) => readonly string[]): { intro: string | null; waiting: string } {
+export function needWords(seat: number, options: readonly string[], traitsOf: (code: string) => readonly string[], nameOf?: (code: string) => string): { intro: string | null; waiting: string } {
   const codes = options.filter((option) => option !== "skip").map((option) => option.split(">")[0] ?? "");
   const adaptation = codes.length > 0 && codes.every((code) => traitsOf(code).includes("Adaptation"));
+  // Raid on the Grey Havens (11182:A:2): each player may take one Galdor's Counsel into hand; it joins the Campaign Pool only if the scenario is won.
+  const counsel = codes.length > 0 && nameOf != null && codes.every((code) => nameOf(code) === COUNSEL);
   return {
-    intro: adaptation ? "Choose 1 Adaptation boon and the hero who carries it. It joins your Campaign Pool." : null,
-    waiting: `Choose ${adaptation ? "an Adaptation" : "a card"} for seat ${seat + 1} above.`,
+    intro: adaptation ? "Choose 1 Adaptation boon and the hero who carries it. It joins your Campaign Pool." : counsel ? `Choose 1 ${COUNSEL} to add to your hand, or skip. It joins your Campaign Pool if you win the scenario.` : null,
+    waiting: `Choose ${adaptation ? "an Adaptation" : counsel ? COUNSEL : "a card"} for seat ${seat + 1} above.`,
   };
+}
+
+const COUNSEL = "Galdor's Counsel";
+
+/** What tells one option of a choice from another that carries the same name: the sphere of a Galdor's Counsel (four cards, one title). */
+export function sphereTell(name: string, sphere: string | null | undefined): string {
+  return name === COUNSEL && sphere ? ` (${sphere.charAt(0).toUpperCase()}${sphere.slice(1)})` : "";
 }

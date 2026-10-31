@@ -62,6 +62,50 @@ const spyglass = (side: "A" | "B"): Effect => {
   return { id: `11180:action:${upgraded ? 2 : 1}`, cardCode: "11180", lines, timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Choose", who: "actor", options }] };
 };
 
+
+// 11183 Black Key (boon, attached to Calphon by the campaign card of Raid on the Grey Havens): "Attached character gets +1 Willpower, +1 Attack, and +1 Defense" on both sides. The Upgraded side
+// adds a Response (a resource on the character after it quests successfully) and an Action (3 resources from it to ready it and the Key).
+const blackKeyStats = (side: "A" | "B", id: number): Effect => ({
+  id: `11183:constant:${id}`,
+  cardCode: "11183",
+  lines: [`11183:${side}:2`],
+  timing: "constant",
+  instructions: [
+    { verb: "ModifyStat", stat: "willpower", amount: 1, until: "whileSourceInPlay", target: "host" },
+    { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", target: "host" },
+    { verb: "ModifyStat", stat: "defense", amount: 1, until: "whileSourceInPlay", target: "host" },
+  ],
+});
+
+// 11184 to 11187 Galdor's Counsel (events the campaign card of Raid on the Grey Havens lets each player take into hand): X is the level of the card in the Campaign Log (half of it, rounded up, for
+// Leadership and Lore), plus 1 for the copy the campaign card gave ("For this game, X is plus 1 for each of those copies"). Each adds itself to the victory display.
+const counsel = (code: string, id: number, instructions: Effect["instructions"]): Effect => ({
+  id: `${code}:action:${id}`,
+  cardCode: code,
+  lines: [`${code}:A:1`],
+  timing: "action",
+  cost: { kind: "playEvent" },
+  instructions: [...instructions, { verb: "AddSourceToVictory" }],
+});
+type Amount = Extract<Effect["instructions"][number], { verb: "DamageCard" }>["amount"];
+const HALF_LEVEL_PLUS_ONE: Amount = { level: true, halved: true, plus: 1 };
+const LEVEL_PLUS_ONE: Amount = { level: true, plus: 1 };
+const counselX = (halved: boolean): Amount => (halved ? HALF_LEVEL_PLUS_ONE : LEVEL_PLUS_ONE);
+
+// 11189 Parrying Cutlass and 11190 Throwing Axe (Permanent, Restricted weapons, a hero's, earned at the Resolution of Raid on the Grey Havens): the bonus grows by `extra` while the hero holds `stat` tokens.
+const weaponBonus = (code: string, line: string, id: number, stat: "defense" | "attack", base: number, extra: Amount): Effect => ({
+  id: `${code}:constant:${id}`,
+  cardCode: code,
+  lines: [line],
+  timing: "constant",
+  instructions: [
+    { verb: "ModifyStat", stat, amount: base, until: "whileSourceInPlay", target: "host" },
+    { verb: "ModifyStat", stat, amount: extra, until: "whileSourceInPlay", target: "host" },
+  ],
+});
+// "+2 instead" at 2 or more resource tokens (or damage tokens) is the base plus 1 more: 0 at fewer than 2, 1 at 2 or more.
+const FROM_TWO = (of: "resources" | "damage"): Amount => ({ stat: of, of: "host", plus: -1, limit: 1 });
+
 export const RECORDS: readonly Effect[] = [
   // 11217 Hard/Expert Mode card: "If you win the game, resolve this card's resolution." Hard (side A) gains 1 XP, Expert (side B) gains 2 XP.
   {"id":"11217:resolution:1","cardCode":"11217","lines":["11217:A:3"],"timing":"resolution","instructions":[{"verb":"GainXp","amount":1}]},
@@ -90,6 +134,78 @@ export const RECORDS: readonly Effect[] = [
   {"id":"11181:forced:2","cardCode":"11181","lines":["11181:A:3"],"timing":"forced","trigger":"addedToStaging","subject":"self","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"11181:forced:3","cardCode":"11181","lines":["11181:A:3"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"11181:forced:1","cardCode":"11181","lines":["11181:A:4"],"timing":"forced","trigger":"enemyDestroyed","subject":"self","instructions":[{"verb":"MoveEncounterCard","card":"self","to":"shuffle"},{"verb":"AddCampaignResource","amount":1}]},
+
+  // 11183 Black Key (boon), both sides.
+  removedWhenLeaving("11183", "11183:A:1", 1),
+  blackKeyStats("A", 1),
+  removedWhenLeaving("11183", "11183:B:1", 2),
+  blackKeyStats("B", 2),
+  {
+    id: "11183:response:1",
+    cardCode: "11183",
+    lines: ["11183:B:3"],
+    timing: "response",
+    trigger: "questSucceeded",
+    eventSeat: "you",
+    condition: { kind: "matches", card: "host", pick: { type: "character", control: "any", committed: true } },
+    instructions: [{ verb: "AddResources", amount: 1, to: "host" }],
+  },
+  { id: "11183:action:1", cardCode: "11183", lines: ["11183:B:4"], timing: "action", cost: [{ kind: "exhaustSelf" }, { kind: "resources", amount: 3, from: "host" }], instructions: [{ verb: "Ready", target: "host" }] },
+
+  // 11184 Galdor's Counsel (Leadership), 11185 (Tactics), 11186 (Spirit), 11187 (Lore).
+  counsel("11184", 1, [{ verb: "Pick", pick: { type: "hero", control: "any" } }, { verb: "AddResources", amount: counselX(true), to: "picked" }]),
+  counsel("11185", 1, [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true, nonUnique: true } }, { verb: "DamageCard", amount: counselX(false), target: "picked" }]),
+  counsel("11186", 1, [{ verb: "Pick", pick: { type: "location", control: "any", stagingOnly: true, nonUnique: true } }, { verb: "PlaceProgressOn", amount: counselX(false), target: "picked" }]),
+  counsel("11187", 1, [
+    { verb: "Choose", who: "actor", options: [{ id: "top", instructions: [{ verb: "LookAtTop", count: counselX(true), deck: "own" }] }, { id: "bottom", instructions: [{ verb: "LookAtBottom", count: counselX(true) }] }] },
+    { verb: "Each", pick: { type: "card", control: "you", from: "deck", looked: true }, upTo: "any", instructions: [{ verb: "MovePicked", to: "hand" }] },
+    {
+      verb: "Repeat",
+      times: { count: { type: "card", control: "you", from: "deck", looked: true, different: true } },
+      instructions: [
+        { verb: "Pick", pick: { type: "card", control: "you", from: "deck", looked: true, different: true } },
+        { verb: "Choose", who: "actor", options: [{ id: "top", instructions: [{ verb: "PutOnDeck", position: "top" }] }, { id: "bottom", instructions: [{ verb: "PutOnDeck", position: "bottom" }] }] },
+      ],
+    },
+  ]),
+
+  // 11189 Parrying Cutlass: +1 Defense (+2 at 2 or more resources in the hero's pool); the Upgraded side +2 (+3) and a Response that takes a resource from the enemy the hero defends against.
+  weaponBonus("11189", "11189:A:2", 1, "defense", 1, FROM_TWO("resources")),
+  weaponBonus("11189", "11189:B:2", 2, "defense", 2, FROM_TWO("resources")),
+  {
+    id: "11189:response:1",
+    cardCode: "11189",
+    lines: ["11189:B:3"],
+    timing: "response",
+    trigger: "declaredDefender",
+    subject: "host",
+    cost: { kind: "exhaustSelf" },
+    condition: { kind: "canPick", pick: { type: "enemy", control: "any", attackingEnemy: true, hasResources: true } },
+    instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", attackingEnemy: true, hasResources: true } }, { verb: "DiscardResources", amount: 1, target: "picked" }, { verb: "AddResources", amount: 1, to: "host" }],
+  },
+
+  // 11190 Throwing Axe: +1 Attack (+2 at 2 or more damage on the hero); the Upgraded side +2 (+3) and an Action, once a game, that either deals 1 damage to an enemy or tosses the axe. The toss is thrown at the
+  // table: the player says which enemy it stopped on (4 damage to it) or that it missed (the use is spent either way).
+  weaponBonus("11190", "11190:A:2", 1, "attack", 1, FROM_TWO("damage")),
+  weaponBonus("11190", "11190:B:2", 2, "attack", 2, FROM_TWO("damage")),
+  {
+    id: "11190:action:1",
+    cardCode: "11190",
+    lines: ["11190:B:3"],
+    timing: "action",
+    limit: "oncePerGame",
+    instructions: [
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          { id: "damage", requires: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true } }, instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true } }, { verb: "DamageCard", amount: 1, target: "picked" }] },
+          { id: "hit", requires: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true } }, instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true } }, { verb: "DamageCard", amount: 4, target: "picked" }] },
+          { id: "miss", instructions: [] },
+        ],
+      },
+    ],
+  },
 
   // 11172 Armor Plating, 11173 Ballista, 11174 Enlarged Quarters, 11175 Extra Sails: the Modification boons each ship-objective is fitted with (the campaign card's Setup),
   // on both sides. When one leaves play it is removed from the game; its Upgraded side adds a Response.

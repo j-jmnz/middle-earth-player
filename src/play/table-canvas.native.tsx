@@ -16,7 +16,7 @@ import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
 import { seatTag, stagingWord } from "./area-words.ts";
-import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
@@ -186,6 +186,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         <Group opacity={veiled ? 0.55 : 1}>
           {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} owner={slot.zone === "questStage" ? owner : null} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
           {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
+          {slotInfo?.under ? <UnderMarkView rect={rect} mark={slotInfo.under} fonts={fonts} t={t} s={s} /> : null}
           {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
           {slot.kind === "card" && !slot.faceDown && inactive(slot.picture ?? slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}

@@ -108,7 +108,7 @@ describe("Maestro fixtures", () => {
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
       // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's, the Fate of Númenor ones from the log Voyage Across Belegaer's golden win writes.
-      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : []);
+      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : name.startsWith("raid-") ? ["voyage-across-belegaer", "the-fate-of-numenor"] : []);
     }
   });
 
@@ -483,6 +483,56 @@ describe("The Fate of Númenor (Dream-chaser part 2, phase 41)", () => {
       expect(resumed.ok, name).toBe(true);
       if (!resumed.ok) continue;
       if (name === "fate-lost") {
+        expect(resumed.state.lost).toBe(true);
+        const after = finish(save, world, resumed.state);
+        expect(after.log).toEqual(save.log);
+        expect(after.active).toBeNull();
+      } else {
+        expect(resumed.state.stageCleared).toBe(true);
+        expect(resumed.state.lost).toBe(false);
+      }
+    }
+  });
+});
+
+describe("Raid on the Grey Havens (Dream-chaser part 3, phase 42)", () => {
+  // The fixtures are games of two decklists from the log the Voyage and Fate goldens' wins write (voyage-won and fate-won, wins of real decklists, are open): parts 1 and 2 are completed, so the playthrough's
+  // open scenario is Raid and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
+  const names = (["raid-won", "raid-lost"] as const).filter((name) => hasFixture(name));
+
+  it("are games of two decklists dealt on the scenario, the Campaign Setup's Galdor's Counsel offer answered in the loadout", () => {
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.campaignId, name).toBe("dream-chaser");
+      expect(found.loadout.scenarioId, name).toBe("raid-on-the-grey-havens");
+      expect(found.loadout.choices, name).toEqual(["skip", "skip"]);
+      expect(found.seatCount, name).toBe(2);
+      expect(found.past, name).toBeNull();
+      expect(found.loadout.ringBearer, name).toBeNull();
+    }
+  });
+
+  it("start from a log with parts 1 and 2 recorded as won, so the node the path opens is Raid, not an earlier part", () => {
+    const dreamChaser = loadCampaign("dream-chaser");
+    for (const name of names) {
+      const found = fixture(name);
+      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor"]);
+      expect(found.log.xpGained["the-fate-of-numenor"], name).toBeGreaterThan(0);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const path = campaignPath(dreamChaser, {}, save.log);
+      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("raid-on-the-grey-havens");
+      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "raid-on-the-grey-havens" } });
+    }
+  });
+
+  it("raid-won replays to a win, and raid-lost to a loss that writes nothing", () => {
+    for (const name of names) {
+      const world = worldFor(name);
+      const save = fixtureSave(name, "s", CATALOG_VERSION);
+      const resumed = resume(save, world, CATALOG_VERSION);
+      expect(resumed.ok, name).toBe(true);
+      if (!resumed.ok) continue;
+      if (name === "raid-lost") {
         expect(resumed.state.lost).toBe(true);
         const after = finish(save, world, resumed.state);
         expect(after.log).toEqual(save.log);

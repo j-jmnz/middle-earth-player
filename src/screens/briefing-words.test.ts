@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { actionLine, dealSentence, needWords, problemWords } from "./briefing-words.ts";
+import { actionLine, dealSentence, needWords, problemWords, sphereTell } from "./briefing-words.ts";
 
 describe("briefing words", () => {
   it("words a missing Ring-bearer as the seat that needs one", () => {
@@ -39,5 +39,17 @@ describe("campaign choice words (41050:A:2)", () => {
     expect(actionLine("Setup. Attach to a hero.\nAttached hero gains the Lore resource icon.\nAction: Exhaust the attached hero to place 3 progress on a location. (Limit once per campaign.)")).toBe("Action: Exhaust the attached hero to place 3 progress on a location. (Limit once per campaign.)");
     expect(actionLine("Forced: something")).toBeNull();
     expect(actionLine(null)).toBeNull();
+  });
+});
+
+describe("campaign choice words (11182:A:2)", () => {
+  const nameOf = (code: string) => (code.startsWith("1118") ? "Galdor's Counsel" : "Other");
+  it("explains the offer of a Galdor's Counsel, naming what the Deal bar waits for, and tells the four copies apart by sphere", () => {
+    const words = needWords(0, ["11184", "11185", "11186", "11187", "skip"], () => [], nameOf);
+    expect(words.intro).toBe("Choose 1 Galdor's Counsel to add to your hand, or skip. It joins your Campaign Pool if you win the scenario.");
+    expect(words.waiting).toBe("Choose Galdor's Counsel for seat 1 above.");
+    expect(sphereTell("Galdor's Counsel", "leadership")).toBe(" (Leadership)");
+    expect(sphereTell("Spyglass", "neutral")).toBe("");
+    expect(needWords(0, ["02001", "skip"], () => [], nameOf).intro).toBeNull();
   });
 });

@@ -18,6 +18,7 @@ import { topFrame } from "../rules/windows.ts";
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
+import { dealtNow } from "./aflame-words.ts";
 import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
@@ -263,7 +264,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const trade = wait?.kind === "target" && wait.item.instruction.verb === "TradeDamageForThreat" ? wait.item.instruction : null;
       const traded = trade?.character ? game.cards[trade.character] : undefined;
       const tradeAsk = trade && traded ? { verb: "Trade", prompt: tradeWords(game, ctx.cards, trade, names.card(traded.id), effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"))) } : null;
-      const asked = wait?.kind === "target" ? (tradeAsk ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game)) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? (tradeAsk ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source))) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,

@@ -28,7 +28,9 @@ function revealsPerPlayer(effect: Effect): boolean {
         // Each player chooses a ship (families/sea-fleet.ts).
         instruction.verb === "PrepareFleet" ||
         // The Uncharted deck is prepared and Calphon comes into play under the first player (families/uncharted-deck.ts).
-        instruction.verb === "PrepareUnchartedDeck",
+        instruction.verb === "PrepareUnchartedDeck" ||
+        // Cards are discarded from the encounter deck until an Aflame location for each player is, and each joins the staging area (families/aflame-cards.ts).
+        instruction.verb === "DiscardUntilAflame",
     )
   );
 }

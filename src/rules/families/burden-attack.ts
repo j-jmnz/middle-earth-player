@@ -51,7 +51,7 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
   // `trait`: only the engaged enemies with it ("All engaged Troll enemies attack", 900208:A:1).
   const trait = instruction.trait;
   const queued = engagedEnemies(state)
-    .filter((enemy) => trait == null || hasTrait(state, enemy, trait, ctx))
+    .filter((enemy) => (trait == null || hasTrait(state, enemy, trait, ctx)) && (instruction.notTrait == null || !hasTrait(state, enemy, instruction.notTrait, ctx)))
     .map((enemy): QueueItem => ({ instruction: { ...instruction, enemy }, seat: focus.seat, chosen: null }));
   return patchTop(state, { data: { ...data, queue: [...queued, ...data.queue] } });
 }

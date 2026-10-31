@@ -1,3 +1,4 @@
+import { underBurnHolds } from "./families/aflame-values.ts";
 import type { Condition } from "../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
@@ -288,6 +289,11 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // Every seat of the game counts, and an eliminated player's threat is raised to 50 (rr.scoring).
     case "highestThreat":
       return Math.max(0, ...state.seats.slice(0, state.seatCount).map((seat, index) => (seat.eliminated ? 50 : seatThreat(state, index)))) <= condition.max;
+    // The aflame family's: the cards underneath The Havens Burn (families/aflame-values.ts). `revealing`: the source's own When Revealed is on the stack.
+    case "underBurn":
+      return underBurnHolds(state, condition, ctx);
+    case "revealing":
+      return state.stack.some((frame) => frame.frame === "whenRevealed" && frame.cardId === scope.sourceId);
     case "not":
       return !holds(state, condition.condition, scope, ctx);
     case "all":

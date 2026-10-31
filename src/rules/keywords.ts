@@ -13,6 +13,7 @@ import { claimedDestination } from "./families/objectives-claimed.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
 import { attackingHolds } from "./families/attack-strike.ts";
+import { resourceShield } from "./families/aflame-attack.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
 import { alliesToHandDestination } from "./families/deck-rules.ts";
 import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
@@ -204,8 +205,7 @@ export function lowerThreat(state: ScenarioState, seat: number, amount: number, 
   return withThreat(state, seat, current.threat - dropped);
 }
 
-// Immune to player card effects: printed, or gained while a card says so (`immuneToPlayerCards`, families/nightmare.ts: "While Bill Ferny
-// is in the staging area, he gains: Immune to player card effects", 906201:A:2).
+// Immune to player card effects: printed, or gained while a card says so (`immuneToPlayerCards`, families/nightmare.ts, 906201:A:2).
 export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string): boolean {
   if (state && id && flagged(state, id, "immuneToPlayerCards")) return false;
   return !printed.keywords.immuneToPlayerCardEffects;
@@ -234,11 +234,11 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
-  const placing = placedLimit(state, id, placedAmount(printed, amount));
-  const dealt = cap > 0 ? Math.max(0, Math.min(placing, cap - taken)) : placing;
+  const shield = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
+  const dealt = cap > 0 ? Math.max(0, Math.min(shield.amount, cap - taken)) : shield.amount;
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
-  let next = updateCard(cap > 0 ? { ...state, roundDamage: { ...state.roundDamage, [id]: taken + dealt } } : state, id, { damage });
+  let next = updateCard(cap > 0 ? { ...shield.state, roundDamage: { ...state.roundDamage, [id]: taken + dealt } } : shield.state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
   // An indestructible enemy keeps its damage but is never destroyed; it hears that it took damage (the Watcher in the Water, 142024:A:3).
   if (indestructible(state, id, printed)) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;

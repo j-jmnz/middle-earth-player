@@ -5,6 +5,7 @@
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../rules/constant-records.ts";
+import { aflameLine, burnTally } from "../rules/families/aflame-values.ts";
 import { placedLimit } from "../rules/families/uncharted-limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
@@ -154,6 +155,10 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   const printed = printedOf(ctx.cards, card.code);
   const shown = cardEffects(game, ctx, cardId);
   const lines: string[] = [];
+  const aflame = aflameLine(game, cardId, ctx);
+  if (aflame && inPlay(card.zone)) lines.push(aflame);
+  const burn = burnTally(game, cardId, ctx);
+  if (burn) lines.push(`${burn.count} ${burn.count === 1 ? "card is" : "cards are"} facedown underneath it, out of play. The players lose at ${burn.limit}.`);
   for (const modifier of game.modifiers) {
     if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;
     const source = modifier.sourceId === cardId ? "its own text" : cardName(modifier.sourceId);
@@ -225,7 +230,16 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     questPoints: questing ? (card.zone === "questStage" ? stagePoints(game, card, ctx) : questPointsOf(game, card, ctx.cards)) : null,
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
+    // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
+    under: card != null && inPlay(card.zone) ? underMark(burnTally(game, cardId, ctx)) : null,
   };
+}
+
+/** The pill on The Havens Burn: "2 under · lose at 5", threat red when the next card placed under it loses the game. */
+export type UnderMark = { text: string; loses: boolean };
+
+function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
+  return tally ? { text: `${tally.count} under · lose at ${tally.limit}`, loses: tally.count + 1 >= tally.limit } : null;
 }
 
 export type SlotNumbers = {
@@ -234,4 +248,5 @@ export type SlotNumbers = {
   questPoints: number | null;
   engagement: { cost: number; engages: boolean } | null;
   delayed: boolean;
+  under: UnderMark | null;
 };

@@ -5,6 +5,7 @@
 // their next attack), the wait for the Responses to that declaration, and its end (6.8.4): "for this attack" expires, the
 // attackers hear that they attacked, the effects delayed to the end of the attack resolve, and the window it came from (or
 // the attack it was declared during) goes on.
+import { noteAttackers } from "./aflame-attack.ts";
 import type { Modifier } from "../frame-types.ts";
 import { pushEffectFrame } from "../effect-frames.ts";
 import type { EngineStep } from "../intents.ts";
@@ -22,7 +23,7 @@ export function declareStrike(state: ScenarioState, strike: PendingStrike): Scen
   const enemy = state.cards[strike.enemyId];
   const engaged = enemy?.zone === "engaged" && enemy.controller != null ? { engagedSeat: enemy.controller } : {};
   const outer = state.pendingStrike ? { outer: state.pendingStrike } : {};
-  return spendNextAttackBonuses({ ...state, pendingStrike: { ...strike, ...engaged, ...outer } }, strike.attackerIds);
+  return spendNextAttackBonuses(noteAttackers({ ...state, pendingStrike: { ...strike, ...engaged, ...outer } }, strike), strike.attackerIds);
 }
 
 function spendNextAttackBonuses(state: ScenarioState, attackerIds: readonly string[]): ScenarioState {

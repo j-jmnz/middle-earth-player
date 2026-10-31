@@ -436,6 +436,22 @@ export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect
   return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} t={t} s={s} />;
 }
 
+/** The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with its words, threat red when the next card placed under it loses (11038:A:2). */
+export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean }; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, w, h } = rect;
+  const token = TOKEN * s;
+  const width = Math.min(w - 4 * s, fonts.badge.getTextWidth(mark.text) + 10 * s);
+  const left = x + (w - width) / 2;
+  const top = y + h - token - 4 * s;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
+      <Text x={left + 5 * s} y={top + token - 5 * s} text={mark.text} font={fonts.badge} color={t.bone} />
+    </Group>
+  );
+}
+
 /** An enemy's engagement cost in staging: threat red when the shown seat's threat engages it at the checks (rr.engagement-check). */
 export function EngagementMark({ rect, cost, engages, fonts, images, t, s }: { rect: Rect; cost: number; engages: boolean; fonts: Fonts; images: TokenImages; t: TableTokens; s: number }) {
   return <FootPill rect={rect} image={images.engagementCost} icon="threat" value={cost} danger={engages} lift={false} fonts={fonts} t={t} s={s} />;

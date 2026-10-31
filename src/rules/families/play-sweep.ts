@@ -16,6 +16,7 @@ import type { ScenarioState } from "../state.ts";
 import { flagged, inPlay, livingSeats } from "../state.ts";
 import { moveCard } from "../zones.ts";
 import { giveControl } from "./play-control.ts";
+import { lastPlayer } from "./sea-players.ts";
 
 type Codes = { swept: ReadonlySet<string>; hero: ReadonlySet<string> };
 
@@ -83,7 +84,8 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
     if (!source || !inPlay(source.zone)) continue;
     if (instruction.verb === "ControlledBy") {
       const id = instruction.card === "host" ? source.host : source.id;
-      if (id && next.cards[id]?.controller !== next.firstPlayer) next = giveControl(next, id, next.firstPlayer);
+      const holder = instruction.who === "lastPlayer" ? lastPlayer(next) : next.firstPlayer;
+      if (id && next.cards[id]?.controller !== holder) next = giveControl(next, id, holder);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);
     }

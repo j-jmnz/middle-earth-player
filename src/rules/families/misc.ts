@@ -79,7 +79,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       // 01129:A:3); a card that says it of itself names itself.
       const leaver = refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId)) ?? focus.sourceId;
       const name = leaver && state.cards[leaver] ? printedOf(ctx.cards, state.cards[leaver]?.code ?? "").name : "A card";
-      return { ...state, lost: true, lossReason: `${name} left play`, window: null };
+      return { ...state, lost: true, lossReason: instruction.reason ?? `${name} left play`, window: null };
     }
     case "DiscardCanceled": {
       const index = state.stack.findLastIndex((entry) => entry.data.kind === "reveal" && entry.data.canceled === true);

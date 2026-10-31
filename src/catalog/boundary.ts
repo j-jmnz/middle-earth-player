@@ -68,6 +68,8 @@ export const printedKeywordsSchema = z.strictObject({
   // Uncharted on the Lost Island side of a double-sided location (dcce.uncharted): read from the ledger's side B, so a card shows the keyword only
   // while it lies on that side (src/rules/families/uncharted.ts).
   uncharted: z.boolean().optional(),
+  // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame*.ts). A numbered keyword with a value of 0 does not exist.
+  aflame: z.number().int().positive().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),

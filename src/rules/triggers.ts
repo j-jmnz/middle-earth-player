@@ -1,5 +1,6 @@
 // Rules: rr.forced, rr.triggered-ability, rr.in-play-and-out-of-play, rr.timing-of-ability-resolution (data/rules/entries.json).
 import type { Effect } from "../catalog/boundary.ts";
+import { burnAtRoundEnd } from "./families/aflame-sweep.ts";
 
 import { holds } from "./conditions.ts";
 import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
@@ -126,6 +127,8 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);
   if (ended === "End of round") {
+    // Aflame X: each Aflame location in the staging area takes 1 damage (families/aflame-sweep.ts).
+    next = burnAtRoundEnd(next, ctx, steps);
     // The Responses to the end of the round are offered once its Forced effects have resolved ("Response: At the end of each round, place 1
     // resource token here", 41050:A:3): their frame goes under the Forced ones.
     const event = { trigger: "endOfRound", seat: null, phase: ended } as const;

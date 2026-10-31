@@ -56,6 +56,8 @@ import { announceProgress } from "./families/burden-effects.ts";
 import { damageLoss } from "./families/south-locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
 import { refillCorsairDeck } from "./families/sea-corsair.ts";
+import { aflameSweep } from "./families/aflame-sweep.ts";
+import { announceCollected } from "./families/aflame-attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
 import { askingToCommit, askingToLook, askingToShift } from "./families/sea-sailing-legal.ts";
 
@@ -92,7 +94,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
     const held = answerable || resolving ? damageHeld : undefined;
     // The play family's constants (families/play-sweep.ts): hero card type, first player control, discard at a stat.
-    const swept = current.lost || current.failure ? current : destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held);
+    const swept = current.lost || current.failure ? current : aflameSweep(destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {
       current = swept;
       continue;
@@ -263,6 +265,7 @@ function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) next = gainSeatResources(next, seat, steps, ruleCause("rr.step-1-2"));
+  next = announceCollected(next, ctx);
   const drawn: Record<number, string[]> = {};
   for (const seat of livingSeats(next)) {
     // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
