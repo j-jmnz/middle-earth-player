@@ -20,6 +20,7 @@ import type { CampaignFacts } from "./campaign-state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
 import { snapshotOf } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
+import { stampRoutes } from "./families/sea-routes.ts";
 
 export type StartSeat = {
   heroes: readonly string[];
@@ -45,6 +46,8 @@ export type StartScenario = {
   questDeck: readonly string[];
   // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
   burdenDeck?: readonly string[];
+  // The non-ship enemies the scenario deals as its Corsair deck (dcce.corsair-deck), when it has one; "Prepare the Corsair deck" shuffles it.
+  corsairDeck?: readonly string[];
   // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Nightmare adds nothing here: its
   // deck and setup card are in the definition and the encounter deck. Normal when absent.
   difficulty?: Difficulty;
@@ -72,6 +75,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     for (const code of input.burdenDeck) state = spawn(state, code, { zone: "burdenDeck" }).state;
     const shuffled = shuffleIds(state.burdenDeck ?? [], state.seed, state.seedCursor);
     state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
+  }
+  // The Corsair deck: dealt apart from the encounter deck, shuffled by its Setup step (families/sea-corsair.ts).
+  if (input.corsairDeck && input.corsairDeck.length > 0) {
+    state = { ...state, corsairDeck: [], corsairDiscard: [] };
+    for (const code of input.corsairDeck) state = spawn(state, code, { zone: "corsairDeck" }).state;
   }
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
@@ -106,6 +114,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = shuffleZone(state, index);
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
+  // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea-routes.ts): only in a game with ships.
+  state = stampRoutes(state, ctx.cards);
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   const quiet: EngineStep[] = [];

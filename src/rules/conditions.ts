@@ -21,6 +21,7 @@ import { shadowCards } from "./zones.ts";
 import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
+import { headingIs } from "./families/sea-heading.ts";
 import { lastHideFailed, onStage, withTwin } from "./families/nightmare-guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
@@ -111,6 +112,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.actor === state.firstPlayer;
     case "tokens":
       return tokensOn(state, condition.code) >= condition.min;
+    case "heading":
+      return headingIs(state, condition.is);
     case "survivorsThreat":
       return livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max);
     case "heroesAll": {

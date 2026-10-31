@@ -766,7 +766,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 35, Threat 2, Attack 5, Defense 2, Hit points 7."
     },
     {
       "code": "11023",
@@ -1538,7 +1539,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 37, Threat 4, Attack 6, Defense 5, Hit points 7."
     },
     {
       "code": "11058",
@@ -1557,7 +1559,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 44, Threat 3, Attack 8, Defense 4, Hit points 9; Victory 6."
     },
     {
       "code": "11059",
@@ -2345,7 +2348,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 46, Threat 3, Attack 6, Defense 5, Hit points 4; Victory 7."
     },
     {
       "code": "11178",
@@ -2363,7 +2367,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 35, Threat 2, Attack 2, Defense 2, Hit points 2."
     },
     {
       "code": "11179",
@@ -2468,7 +2473,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 43, Threat 3, Attack 3, Defense 3, Hit points 3."
     },
     {
       "code": "11182",
@@ -2638,7 +2644,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 47, Threat 3, Attack 3, Defense 0, Hit points 10; Victory 8."
     },
     {
       "code": "11189",
@@ -3763,7 +3770,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 50, Threat 2, Attack 6, Defense 6, Hit points 18; Victory 10."
     },
     {
       "code": "12020",
@@ -3783,7 +3791,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 46, Threat 2, Attack 4, Defense 3, Hit points 6."
     },
     {
       "code": "12021",
@@ -3802,7 +3811,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 0
+      "sailingSuccess": 0,
+      "notes": "Stats: Engagement cost 38, Threat 3, Attack 5, Defense 4, Hit points 8."
     },
     {
       "code": "12022",
@@ -3821,7 +3831,8 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGdpqDFqhMZnsN3ajP, read from the scan image",
       "confirmedBy": null,
-      "sailingSuccess": 1
+      "sailingSuccess": 1,
+      "notes": "Stats: Engagement cost 24, Threat 1, Attack 2, Defense 2, Hit points 5."
     },
     {
       "code": "12023",

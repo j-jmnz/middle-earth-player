@@ -13,7 +13,7 @@ import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 
 // A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective), or has the
-// first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch): the Setup the piles cannot place.
+// first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet): the Setup the piles cannot place.
 function revealsPerPlayer(effect: Effect): boolean {
   return (
     effect.timing === "setup" &&
@@ -21,7 +21,9 @@ function revealsPerPlayer(effect: Effect): boolean {
       (instruction) =>
         (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter")) ||
         (instruction.verb === "Each" && instruction.instructions.some((inner) => inner.verb === "GuardObjective")) ||
-        instruction.verb === "AttachSetAside",
+        instruction.verb === "AttachSetAside" ||
+        // Each player chooses a ship (families/sea-fleet.ts).
+        instruction.verb === "PrepareFleet",
     )
   );
 }

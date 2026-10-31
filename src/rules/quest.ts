@@ -249,10 +249,12 @@ export function engageEnemy(state: ScenarioState, seat: number, enemyId: string,
 // stop the enemy, which is engaged as it enters play.
 export function engageWith(state: ScenarioState, seat: number, enemyId: string, steps: EngineStep[]): ScenarioState {
   if (!state.cards[enemyId] || state.seats[seat]?.eliminated) return state;
+  // Boarding resolves only for an engagement from the staging area (dcce.boarding; families/sea-boarding.ts).
+  const fromStaging = state.sea != null && state.cards[enemyId]?.zone === "staging";
   const moved = noteEngaged(moveCard(state, enemyId, { zone: "engaged", seat }), enemyId);
   steps.push({ kind: "engage", seat, enemyId });
   // Responses hear that the player engaged the enemy ("After you engage an enemy with a higher engagement cost ...").
-  return queueEvent(moved, { trigger: "engaged", seat, subject: enemyId });
+  return queueEvent(moved, { trigger: "engaged", seat, subject: enemyId, ...(fromStaging ? { fromStaging } : {}) });
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {

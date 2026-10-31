@@ -36,6 +36,7 @@ export function printedFromRow(row: CatalogRow): PrintedCard {
     campaignKind: kindOf(row.campaignKind),
     burdenSet: row.burdenSet,
     backType: backOf(row.backType),
+    encounterSet: row.encounterSet,
   });
 }
 

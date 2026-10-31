@@ -429,8 +429,9 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     const inSet = set?.encounterSet ? { ...withBurden, encounterSet: set.encounterSet } : withBurden;
     const named = set?.name ? { ...inSet, name: set.name } : inSet;
-    // A printed Threat or engagement cost a source leaves out (a burden enemy: Hall of Beorn files its Threat icon as Willpower).
-    const stated = { ...named, ...pickDefined(set, ["threat", "engagementCost"]) };
+    // A printed stat a source leaves out: Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
+    // the stats and Victory of a ship, which Hall of Beorn has no field for.
+    const stated = { ...named, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health", "victory"]) };
     const next = outOfScope(overrides, stated) ? { ...stated, deckLegal: false } : stated;
     cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
   }

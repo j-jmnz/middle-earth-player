@@ -4,7 +4,7 @@ import type { Card } from "../catalog/card-facts.ts";
 export type PrintedSource = Pick<
   Card,
   | "code" | "name" | "type" | "traits" | "sphere" | "cost" | "threat" | "willpower" | "attack" | "defense" | "health"
-  | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType"
+  | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType" | "encounterSet"
 >;
 
 export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral" | "fellowship" | "baggins";
@@ -46,7 +46,16 @@ export type Keywords = {
   battle: boolean;
   siege: boolean;
   secrecy: number | null;
+  // The sea family's keywords (families/sea*.ts): Sailing on a quest stage (dcce.sailing), Boarding X on a ship-enemy (dcce.boarding).
+  sailing: boolean;
+  boarding: number | null;
+  // The Sailing success symbols the card prints (dcce.sailing-tests), null when it prints none.
+  sailingSuccess: number | null;
 };
+
+// A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
+// exceptions in dcce.ship-enemies and dcce.ship-objectives (families/sea-ships.ts).
+export type ShipKind = "enemy" | "objective";
 
 export type PrintedCard = {
   code: string;
@@ -72,6 +81,10 @@ export type PrintedCard = {
   campaignKind: "boon" | "burden" | null;
   burdenSet: string | null;
   backType: "player" | "encounter" | null;
+  // Null for a card that is not a ship.
+  ship: ShipKind | null;
+  // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).
+  encounterSet: string | null;
 };
 
 const EMPTY_KEYWORDS: Keywords = {
@@ -91,6 +104,9 @@ const EMPTY_KEYWORDS: Keywords = {
   battle: false,
   siege: false,
   secrecy: null,
+  sailing: false,
+  boarding: null,
+  sailingSuccess: null,
 };
 
 // The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
@@ -121,6 +137,8 @@ export function definePrinted(
     campaignKind: null,
     burdenSet: null,
     backType: null,
+    ship: null,
+    encounterSet: null,
     ...card,
     keywords: { ...EMPTY_KEYWORDS, ...card.keywords },
   };
@@ -171,7 +189,9 @@ const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.
 export function printedFromCard(card: PrintedSource): PrintedCard {
-  const type = CARD_TYPES.find((candidate) => candidate === card.type);
+  // A ship is an enemy or an objective ally that carries a mark (dcce.ships): the catalog types ship-enemy and ship-objective.
+  const ship: ShipKind | null = card.type === "ship-enemy" ? "enemy" : card.type === "ship-objective" ? "objective" : null;
+  const type = CARD_TYPES.find((candidate) => candidate === (ship === "enemy" ? "enemy" : ship === "objective" ? "objective" : card.type));
   if (!type) throw new Error(`Card ${card.code} ${card.name} has unsupported type ${card.type}`);
   let sphere: Sphere | null = null;
   if (card.sphere != null) {
@@ -201,6 +221,8 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     campaignKind: card.campaignKind,
     burdenSet: card.burdenSet,
     backType: card.backType,
+    ship,
+    encounterSet: card.encounterSet,
     keywords: {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,
@@ -217,6 +239,9 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       battle: keywords.battle === true,
       siege: keywords.siege === true,
       secrecy: keywords.secrecy ?? null,
+      sailing: keywords.sailing === true,
+      boarding: keywords.boarding ?? null,
+      sailingSuccess: keywords.sailingSuccess ?? null,
     },
   });
 }

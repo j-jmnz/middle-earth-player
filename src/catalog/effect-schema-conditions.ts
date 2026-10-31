@@ -81,6 +81,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Each surviving player's threat is at most `max` ("1 XP if each surviving player's threat is 40 or less", dcce.gaining-xp): read at a campaign
   // card's Resolution, true with no surviving player.
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
+  // The Heading card's setting (dcce.heading): on-course (Sun, the only on-course setting), off-course (Cloud, Rain or Storm), or at the worst
+  // setting (Storm). False when the game has no Heading card. Read by the sea family (src/rules/families/sea-heading.ts).
+  z.strictObject({ kind: z.literal("heading"), is: z.enum(["onCourse", "offCourse", "worst"]) }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the

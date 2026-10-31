@@ -1,5 +1,5 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup.ts";
 
@@ -80,6 +80,7 @@ export function buildStart(start: StartInput): StartScenario {
   const poolInPlay = standalone ? [] : (input.poolIntoPlay ?? []).filter((code) => !named.has(code));
   const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" ? [instruction.code] : []));
   const burden = burdenCodes(input.scenario);
+  const corsair = corsairCodes(input.scenario, input.difficulty);
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
@@ -100,6 +101,7 @@ export function buildStart(start: StartInput): StartScenario {
     encounterDeck: [...encounterCodes(input.scenario, input.difficulty, input.seatCount), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
+    ...(corsair.length > 0 ? { corsairDeck: corsair } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
     ...(!standalone && factsOf(input) ? { facts: factsOf(input) } : {}),
   };

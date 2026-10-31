@@ -60,6 +60,14 @@ export const printedKeywordsSchema = z.strictObject({
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).
   leavesPlayLoses: z.boolean().optional(),
+  // The sea family's keywords (src/rules/families/sea*.ts). Sailing on a quest stage: the first player performs a Sailing test at the beginning
+  // of each quest phase (dcce.sailing). Boarding X on a ship-enemy: it brings X Corsair enemies when it engages a player from the staging area
+  // (dcce.boarding).
+  sailing: z.boolean().optional(),
+  boarding: z.number().int().positive().optional(),
+  // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
+  // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
+  sailingSuccess: z.number().int().positive().optional(),
 });
 
 export const ringsDbPackSchema = z

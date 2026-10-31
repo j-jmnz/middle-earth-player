@@ -3,6 +3,7 @@ import type { Instruction, ModifierUntil, PickSpec, ScenarioDefinition } from ".
 import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { CampaignFacts, ResolutionLog } from "./campaign-state.ts";
+import type { SeaState } from "./families/sea-types.ts";
 
 export type {
   DelayedEffect,
@@ -41,6 +42,9 @@ export type ZoneName =
   | "encounterDeck"
   | "encounterDiscard"
   | "burdenDeck"
+  // The Corsair deck and its own discard pile (dcce.corsair-deck): out of play, like the encounter deck and its discard pile.
+  | "corsairDeck"
+  | "corsairDiscard"
   | "victory"
   | "setAside"
   | "removed"
@@ -211,6 +215,12 @@ export type ScenarioState = {
   encounterDiscard: readonly string[];
   // Present only when the scenario makes a burden deck (Flight to the Ford) or sets the Ring-bearer's life.
   burdenDeck?: readonly string[];
+  // The Corsair deck and its discard pile, present once a scenario deals a Corsair deck (dcce.corsair-deck; families/sea-corsair.ts).
+  corsairDeck?: readonly string[];
+  corsairDiscard?: readonly string[];
+  // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a
+  // Sailing test in progress. Absent in every other game (families/sea-types.ts).
+  sea?: SeaState;
   life?: number;
   victory: readonly string[];
   setAside: readonly string[];

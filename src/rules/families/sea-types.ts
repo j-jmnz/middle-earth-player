@@ -1,0 +1,29 @@
+// Rules: dcce.heading, dcce.sailing-tests, dcce.corsair-deck, dcce.stormcaller-elite (data/rules/entries.json). The sea family's state, types only;
+// state.ts holds it as `sea`, and the family's modules read and write it.
+
+// The Heading card's four settings, from the best (the only one that is on-course) to the worst (dcce.heading): Sun, Cloud, Rain, Storm. A
+// shift off-course moves one step toward Storm, a shift on-course one step toward Sun.
+export const HEADINGS = ["Sun", "Cloud", "Rain", "Storm"] as const;
+export type Heading = (typeof HEADINGS)[number];
+
+// Where a card goes in place of a discard pile that is not its own: a non-ship enemy to the Corsair discard pile (dcce.corsair-deck), and a
+// Stormcaller Elite card, which has no encounter card back and so never enters the encounter deck or its discard pile, to the victory display
+// as an enemy and out of the game as an objective ally (dcce.stormcaller-elite).
+export type SeaRoute = "corsair" | "victory" | "removed";
+
+// A Sailing test the first player is performing (dcce.sailing-tests). "ask": the first player chooses the characters to commit (a Commit intent, or
+// a Pass for none); the test resolves at once, and when its looked-at cards show Sailing success symbols and the heading can still shift on-course
+// it waits at "shift": `looked` are the cards looked at (still on top of the encounter deck, for the table to show), `left` the symbols not yet
+// answered, each answered by choosing "shift" or "keep".
+export type SailingTest = { step: "ask" } | { step: "shift"; looked: readonly string[]; left: number };
+
+export type SeaState = {
+  // The Heading card's setting, or null before the fleet is prepared (no Heading card yet).
+  heading: Heading | null;
+  // The Heading card attached to the Dream-chaser, once it is.
+  headingCard: string | null;
+  // The route of each card code that has one, set when the game is dealt (families/sea-routes.ts).
+  routes: Readonly<Record<string, SeaRoute>>;
+  // The first player is choosing what to commit to this round's Sailing test.
+  sailing?: SailingTest;
+};

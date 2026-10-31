@@ -7,7 +7,7 @@ const overridesSchema = z.object({
   cards: z.array(
     z.object({
       match: z.object({ code: z.string().optional(), name: z.string().optional(), set: z.string().optional(), number: z.number().optional() }),
-      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), encounterSet: z.string().optional(), name: z.string().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
+      set: z.object({ code: z.string().optional(), pack: z.string().optional(), burdenSet: z.string().optional(), encounterSet: z.string().optional(), name: z.string().optional(), threat: z.number().int().optional(), engagementCost: z.number().int().optional(), willpower: z.number().int().optional(), attack: z.number().int().optional(), defense: z.number().int().optional(), health: z.number().int().optional(), victory: z.number().int().optional(), keywords: z.record(z.string(), z.unknown()).optional() }),
       reason: z.string().min(1),
       source: z.string().min(1),
     }),

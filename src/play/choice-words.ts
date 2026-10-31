@@ -18,6 +18,7 @@ import { oathPickWords, oathWords } from "./oath-words.ts";
 import { stageNumber } from "../rules/families/caves-progress.ts";
 import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 import { nightmareWords } from "./nightmare-words.ts";
+import { seaWords } from "./sea-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -292,7 +293,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
+      return oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction);
   }
 }
 
