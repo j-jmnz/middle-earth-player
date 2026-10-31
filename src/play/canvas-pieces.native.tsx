@@ -12,6 +12,8 @@ import type { CardSlot, CombatMark, Rect } from "./layout.ts";
 import { medallionAt } from "./look-strip.ts";
 import { FOLD_WORD, foldCount } from "./row-fold.ts";
 import { medallionCount } from "./sea-words.ts";
+import { stripText } from "./table-canvas-views.ts";
+import { AREA_FOLD_WORD } from "./stormcaller-words.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
@@ -199,7 +201,7 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
   const strip = 15 * s;
   const encounter = ENCOUNTER_PILES.has(slot.zone);
   // A row's fold stack shows its first folded card, "+n" on the count strip and the word More (row-fold.ts).
-  const word = slot.fold ? FOLD_WORD : (PILE_WORD[slot.zone] ?? "");
+  const word = slot.areaFold ? AREA_FOLD_WORD : slot.fold ? FOLD_WORD : (PILE_WORD[slot.zone] ?? "");
   if (slot.count === 0) {
     return (
       <Group>
@@ -402,7 +404,7 @@ export function Badges({
       {questPoints != null ? (
         <Group>
           <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-          <Outlined x={x + w / 2} y={y + h - 3 * s} text={`${owner ? `${owner} · ` : ""}${slot.progress} / ${questPoints}`} font={fonts.numbers} t={t} s={s} />
+          <Outlined x={x + w / 2} y={y + h - 3 * s} text={stripText(slot, questPoints, owner) ?? ""} font={fonts.numbers} t={t} s={s} />
         </Group>
       ) : null}
     </Group>

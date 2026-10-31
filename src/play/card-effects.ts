@@ -8,6 +8,7 @@ import { memoOf, type StateMemo } from "../rules/constant-records.ts";
 import { aflameTally, burnTally } from "../rules/families/aflame-values.ts";
 
 import { aflameLine, aflameMark, burnLine, burnMark } from "./aflame-words.ts";
+import { areaRoleOf } from "./stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, STAGE_TOGETHER } from "./stormcaller-words.ts";
 import { areaStanding } from "../rules/families/stormcaller-values.ts";
 import { placedLimit } from "../rules/families/uncharted-limit.ts";
@@ -227,7 +228,8 @@ export function slotNumbers(game: ScenarioState, ctx: ReduceContext, cardId: str
 function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, seat: number): SlotNumbers {
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
-  const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest");
+  // The Stormcaller's current quest stage wears the strip a quest card does (dcce.stormcallers-area).
+  const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
   return {

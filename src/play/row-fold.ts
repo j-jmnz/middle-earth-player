@@ -22,6 +22,8 @@ export type FoldGroup = {
   // Folds first at the lowest rank; ties fold leftmost first. Never folds when pinned.
   rank: number;
   pinned: boolean;
+  // The Stormcaller's area: it folds even as the last group when it is wider than the row, where any other lone group stays and overflows.
+  foldsAlone?: true;
 };
 
 export type FoldStack = {
@@ -69,7 +71,9 @@ export function foldRow(groups: readonly FoldGroup[], row: { x: number; width: n
     const next = kept
       .filter((at) => groups[at]?.pinned !== true)
       .sort((left, right) => (groups[left]?.rank ?? 0) - (groups[right]?.rank ?? 0) || left - right)[0];
-    if (step >= row.target || kept.length <= 1 || next == null) {
+    const lone = kept.length === 1 ? groups[kept[0] as number] : undefined;
+    const tooWide = lone?.foldsAlone === true && lone.width > row.width - taken;
+    if (next == null || (!tooWide && (step >= row.target || kept.length <= 1))) {
       const xs: (number | null)[] = groups.map(() => null);
       const placed = rowXs(kept.map((at) => groups[at]?.width ?? 0), row.x + taken, row.width - taken, row.gap);
       kept.forEach((at, index) => {
@@ -99,8 +103,7 @@ export function foldTitle(where: "staging" | "engaged"): string {
   return where === "staging" ? "Staging" : "Engagement area";
 }
 
-// The fold order of a staging group, lowest first (docs/design-system-table.md): the Stormcaller's area while it is not at the players' stage (0, built by
-// its scenario phase), then cards the players control (`claimed`, the engine's marker for an objective a player took; a freed tower is one), then guarded
+// The fold order of a staging group, lowest first (docs/design-system-table.md): the Stormcaller's area while it is not at the players' stage (0), then cards the players control (`claimed`, the engine's marker for an objective a player took; a freed tower is one), then guarded
 // pairs, then locations, then enemies; any other card goes last. A revealed card has a `controller` (the seat that revealed it), so that says nothing here.
 export const STAGING_RANK = { area: 0, controlled: 1, guarded: 2, location: 3, enemy: 4, other: 5 } as const;
 
@@ -108,6 +111,8 @@ export const STAGING_RANK = { area: 0, controlled: 1, guarded: 2, location: 3, e
 export function stagingRank(group: readonly ZoneEntry[]): number {
   const lead = group[0];
   if (!lead) return STAGING_RANK.other;
+  // The area's group folds first while its cards are out of the staging area; at the players' stage they are staging cards and fold as a guarded pair does.
+  if (lead.area === "stage") return group.some((entry) => entry.area === "together") ? STAGING_RANK.guarded : STAGING_RANK.area;
   if (lead.card.claimed === true) return STAGING_RANK.controlled;
   if (group.length > 1) return STAGING_RANK.guarded;
   if (lead.kind === "location") return STAGING_RANK.location;

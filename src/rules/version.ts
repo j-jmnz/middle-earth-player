@@ -34,4 +34,7 @@
 // location is heard by the Fate quest cards when it leaves play (in the staging area too) and a double-sided one reaches the victory display on its real side, Revenant holds its
 // damage limit as a constant, a quest stage takes the progress of a quest effect as questing does, and the campaign card's Ominous Fate XP line is taken once: a replayed
 // Fate of Númenor or Voyage Across Belegaer game can take a different path.
-export const ENGINE_VERSION = 18;
+// 19 (Dream-chaser, phase 43): a Pick from an objective ally that has an encounter card back (a ship-objective, Calaerion, Calphon) is not a player card effect (dcce.encounter-cards), so it can target
+// cards that are immune to player card effects, and the Corsair Skiff offers its Boarding branch only while the Corsair deck or its discard pile holds a card: a replayed Voyage Across Belegaer,
+// Fate of Númenor or Raid on the Grey Havens game can take a different path.
+export const ENGINE_VERSION = 19;

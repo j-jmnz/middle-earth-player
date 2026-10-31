@@ -66,6 +66,8 @@ export const cardSchema = z.strictObject({
       attack: z.number().int().optional(),
       defense: z.number().int().optional(),
       health: z.number().int().optional(),
+      // The Victory the Campaign Mode only side of the Stormcaller prints (15; side A prints 10): the score counts the side the card was on (dcce.campaign-mode).
+      victory: z.number().int().optional(),
     })
     .nullable(),
   printings: z.array(printingSchema).min(1),

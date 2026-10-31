@@ -125,7 +125,7 @@ function campaignOfPacks(packCodes: readonly string[]): string | null {
 function upgradedOf(card: Card): string | null {
   const back = card.back;
   if (back?.willpower == null || back.attack == null || back.defense == null || back.health == null) return null;
-  return JSON.stringify({ willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health });
+  return JSON.stringify({ willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) });
 }
 
 function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMap<string, string>): Row {

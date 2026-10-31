@@ -18,10 +18,12 @@ import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
 import { seatTag, stagingWord } from "./area-words.ts";
 import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
+import { pictureKey } from "./picture-key.ts";
+import { areaSpeech } from "./stormcaller-table.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
-import { slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
+import { shownBounds, slotBounds, tableLayout, type CardSlot, type Rect } from "./layout.ts";
 import { AT_REST } from "./motion.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "./peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "./selectors.ts";
@@ -170,11 +172,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const drawFrame = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     const card = slot.kind === "card";
-    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={beating.has(slot.id)} t={t} s={s} veiled={peeking && card && slot.zone === "hand"} />;
+    // The night veil lies on the hand of a seat being peeked at, and on a card of the Stormcaller's area while the players are at another stage (docs/design-system-table.md, Cards).
+    return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={beating.has(slot.id)} t={t} s={s} veiled={card && ((peeking && slot.zone === "hand") || slot.stormcaller === "apart")} />;
   };
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
-    const rect = slotBounds(slot);
+    // The Stormcaller's stage keeps its strip and tokens in the part its area's cards leave uncovered.
+    const rect = shownBounds(slot);
     // A staging card with more than one card under it shows one peek and how many: "×2" (layout.ts, placeStaging).
     const slotInfo = slot.kind === "card" && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck" ? info(game, seat, slot.id) : null;
     const optionMark = highlight.marks.get(slot.id);
@@ -201,11 +205,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     );
   };
 
-  // What a screen reader hears of a card whose number is only on the canvas: The Havens Burn, with the cards under it against the number that loses.
+  // What a screen reader hears of a card whose number or place is only on the canvas: The Havens Burn, with the cards under it against the number that loses; the Stormcaller's stage and area.
   const spoken = (slot: CardSlot): string | null => {
     if (slot.kind !== "card" || slot.faceDown || slot.zone === "hand" || slot.zone === "deck") return null;
-    const under = info(game, seat, slot.id).under;
-    return under ? `${nameOf(slot.picture ?? slot.code)}, ${under.speech}` : null;
+    const numbers = info(game, seat, slot.id);
+    // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
+    if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
+    return numbers.under ? `${nameOf(slot.picture ?? slot.code)}, ${numbers.under.speech}` : null;
   };
   const piece = (slot: CardSlot) => (
     <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? AT_REST} clock={clock} back={moves.motions.get(slot.id)?.flip ? drawBody({ ...slot, faceDown: true }, false) : undefined} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>

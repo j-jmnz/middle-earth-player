@@ -132,6 +132,9 @@ export function motionsBetween(
       const delay = Math.min(looked, SHAPE.maxStagger) * MOTION.stagger.ms;
       looked += 1;
       motions.set(slot.id, { ...from(slot, next.piles.encounterDeck, 0, 0.4), flip: true, land: "pop", delay });
+    } else if (slot.stormcaller === "stage") {
+      // The Stormcaller's stage advance (dcce.stormcallers-area-stages): the new stage grows in where the last one stood and lands with a pop, as the quest card's does; the last one fades out.
+      motions.set(slot.id, { ...STILL(slot), scale: 0.82, fromOpacity: 0, land: "pop" });
     } else if (slot.zone === "staging" || slot.zone === "engaged") {
       const reveal = slot.kind === "card" && !slot.faceDown;
       const corsair = options.zoneWas?.(slot.id) === "corsairDeck" && next.piles.corsairDeck != null;

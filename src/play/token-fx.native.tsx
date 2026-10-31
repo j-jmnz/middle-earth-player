@@ -9,7 +9,7 @@ import { useDerivedValue } from "react-native-reanimated";
 
 import { Outlined, type Fonts, type TokenImages } from "./canvas-pieces.native.tsx";
 import type { Clock } from "./card-motion.native.tsx";
-import { slotBounds, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
+import { shownBounds, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { useSharedFont } from "./table-assets.native.ts";
 import { MARCELLUS } from "./table-fonts.native.ts";
 import { floatWords, type TokenKind } from "./token-deltas.ts";
@@ -109,7 +109,7 @@ export function TokenFx({
       {fx.map((item) => {
         const slot = layout.slots.find((candidate) => candidate.id === item.delta.cardId && candidate.kind !== "pile");
         if (!slot || slot.faceDown) return null;
-        const rect = slotBounds(slot);
+        const rect = shownBounds(slot);
         const key = `${item.delta.cardId}:${item.delta.token}:${clock.at}`;
         const strip = item.delta.token === "progress" ? stripOf(slot) : null;
         return (

@@ -23,6 +23,11 @@ export function stormcallerHolds(state: ScenarioState, condition: Extract<Condit
   return condition.is === "sameStage" ? atStormcallersStage(state) : !atStormcallersStage(state);
 }
 
+/** The condition `corsairHas`: the Corsair deck or its discard pile holds a card, so a Boarding keyword would reveal an enemy (dcce.boarding; the discard pile is shuffled back into an empty deck, dcce.corsair-deck). */
+export function corsairHolds(state: Pick<ScenarioState, "corsairDeck" | "corsairDiscard">): boolean {
+  return (state.corsairDeck?.length ?? 0) + (state.corsairDiscard?.length ?? 0) > 0;
+}
+
 /** The players have caught up to the Stormcaller by defeating this stage: the stage names the Stormcaller's stage number that makes it a win (CatchUpWins) and the Stormcaller is there. */
 export function caughtUp(state: ScenarioState, stageCode: string): boolean {
   const need = state.stages.find((stage) => stage.code === stageCode)?.catchUp;

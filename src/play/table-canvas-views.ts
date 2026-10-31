@@ -48,6 +48,7 @@ export function sphereRing(sphere: string | null, t: TableTokens = tableTokens):
 
 // The "progress / quest points" strip of a quest card or location, which pops when progress is placed on it.
 // `owner`: the seat the quest card's stage belongs to once stages are separate between players ("P2 · 2 / 8").
+// The Stormcaller's stage keeps it in the part its area's cards leave uncovered, so it is set close ("12/18") to stay inside it at 24/24 (dcce.stormcallers-area).
 export function stripText(slot: CardSlot, questPoints: number | null, owner?: string | null): string | null {
-  return questPoints == null ? null : `${owner ? `${owner} · ` : ""}${slot.progress} / ${questPoints}`;
+  return questPoints == null ? null : `${owner ? `${owner} · ` : ""}${slot.progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
 }

@@ -26,7 +26,7 @@ import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
 import { headingIs } from "./families/sea-heading.ts";
-import { stormcallerHolds } from "./families/stormcaller-values.ts";
+import { corsairHolds, stormcallerHolds } from "./families/stormcaller-values.ts";
 import { lastHideFailed, onStage, withTwin } from "./families/nightmare-guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
@@ -303,6 +303,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return encounterHolds(state, condition, ctx);
     case "underBurn":
       return underBurnHolds(state, condition, ctx);
+    case "corsairHas":
+      return corsairHolds(state);
     case "revealing":
       return state.stack.some((frame) => frame.frame === "whenRevealed" && frame.cardId === scope.sourceId);
     case "not":

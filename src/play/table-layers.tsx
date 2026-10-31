@@ -25,6 +25,8 @@ import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
 import { foldTitle } from "./row-fold.ts";
+import { areaRoleOf } from "./stormcaller-table.ts";
+import { AREA_LIST_TITLE, stageLabel } from "./stormcaller-words.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "./selectors.ts";
@@ -70,7 +72,11 @@ function RowReading({ store, row, names, onRead, onClose }: { store: TableStore;
   // A card the table hides the face of (facedown) is not named, as it is not on the canvas (selectors.ts, hidesFace).
   const hiddenKey = useStore(store, (state) => state.rowFolds[row].filter((id) => hidesFace(state.game.cards[id])).join(","));
   const hidden = hiddenKey === "" ? NO_IDS : hiddenKey.split(",");
-  return <RowList title={foldTitle(row)} cards={ids.map((id) => ({ id, label: hidden.includes(id) ? "Facedown card" : names.card(id) }))} onRead={onRead} onClose={onClose} />;
+  // A stack that holds only the Stormcaller's area is titled for it, and its stage is told from the players' stage of the same name (stormcaller-table.ts).
+  const areaOnly = useStore(store, (state) => row === "staging" && ids.length > 0 && ids.every((id) => areaRoleOf(state.game, id) != null));
+  const stageId = useStore(store, (state) => (areaOnly ? (state.game.sea?.stormcaller?.stage ?? null) : null));
+  const label = (id: string) => (hidden.includes(id) ? "Facedown card" : id === stageId ? stageLabel(names.card(id)) : names.card(id));
+  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={ids.map((id) => ({ id, label: label(id) }))} onRead={onRead} onClose={onClose} />;
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {

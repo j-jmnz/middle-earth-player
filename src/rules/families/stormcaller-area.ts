@@ -23,7 +23,8 @@ export function prepareStormcallerArea(state: ScenarioState, instruction: Verb<"
     ...state,
     sea: { ...(state.sea ?? { heading: null, headingCard: null, routes: {} }), stormcaller: { card: caller, stage: top, number: instruction.number, deck: rest.filter((id): id is string => id != null), members: [] } },
   };
-  // The current stage is the card on top of the Stormcaller's quest deck, flipped to its D side as the main quest's stage 1 is after its Setup; the Stormcaller stands beside it.
+  // The current stage is the card on top of the Stormcaller's quest deck (stage 2C), shown on its D side from the start: the C side is passed through only by an advance, "first advancing to the C side of
+  // the next stage, resolving its effects, and then advancing to the D side" (dcce.stormcallers-area-stages), and stage 2C prints no When Revealed. The Stormcaller stands beside it.
   const staged = updateCard(moveCard(prepared, top, { zone: "stormcallerArea" }), top, { face: "B" });
   return updateCard(moveCard(staged, caller, { zone: "stormcallerArea" }), caller, { face: "up" });
 }

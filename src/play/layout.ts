@@ -15,6 +15,7 @@ import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowX
 import { placePlay, playPlan } from "./play-area.ts";
 import { foldRow, groupCards, keeps, stagingRank, type FoldGroup } from "./row-fold.ts";
 import { lookBands, lookStrip } from "./look-strip.ts";
+import type { AreaRole } from "./stormcaller-table.ts";
 import { acrossGaps, DOWN, downGaps, SLACK } from "./table-spacing.ts";
 import { touch } from "./ui-scale.ts";
 
@@ -58,6 +59,12 @@ export type CardSlot = Rect & {
   success?: number;
   // A row's fold stack (`fold:staging`): the zone it folds, with the count strip "+n" and the word "More" (row-fold.ts). `count` is the cards in it.
   fold?: "staging" | "engaged";
+  // The fold stack that holds only the Stormcaller's area (its title and word say so): the row list opens as "Stormcaller's area".
+  areaFold?: true;
+  // A card of the Stormcaller's area (stormcaller-table.ts): `stage` its current quest stage, drawn sideways; `apart` a card of the area while the players are at another stage, under the night veil.
+  stormcaller?: AreaRole;
+  // The stage's width its area cards leave uncovered: the strip, the tokens and the pops are drawn in that part (`shownBounds`).
+  shown?: number;
 };
 
 // The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
@@ -69,7 +76,7 @@ export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: strin
 export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId, T>>>;
 
 /** A row's fold stack: where it stands, the cards that left the row, and the card whose face it shows (row-fold.ts). */
-export type FoldPlace = { id: string; zone: "staging" | "engaged"; rect: Rect; cards: readonly string[]; top: string };
+export type FoldPlace = { id: string; zone: "staging" | "engaged"; rect: Rect; cards: readonly string[]; top: string; area?: true };
 
 export type TableLayout = {
   width: number;
@@ -173,12 +180,48 @@ function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: Metrics)
 }
 
 // A fold stack as a pile-sized slot at the row's left end: the first folded card's face, "+n" and "More" (row-fold.ts).
-function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; cards: readonly string[]; top: string }, y: number, row: { h: number }, pile: { w: number; h: number }, byId: ReadonlyMap<string, CardInstance>, out: CardSlot[], folds: FoldPlace[]): void {
+function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; cards: readonly string[]; top: string }, y: number, row: { h: number }, pile: { w: number; h: number }, byId: ReadonlyMap<string, CardInstance>, out: CardSlot[], folds: FoldPlace[], areaOnly = false): void {
   const rect: Rect = { x: stack.x, y: y + Math.round((row.h - pile.h) / 2), w: pile.w, h: pile.h };
   const top = byId.get(stack.top);
   const id = `fold:${zone}`;
-  folds.push({ id, zone, rect, cards: stack.cards, top: stack.top });
-  out.push({ ...rect, id, code: top && !hidesFace(top) ? top.code : "", zone, kind: "pile", exhausted: false, faceDown: top == null || hidesFace(top), landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone });
+  folds.push({ id, zone, rect, cards: stack.cards, top: stack.top, ...(areaOnly ? { area: true as const } : {}) });
+  // The top card shows the side it lies on (the Stormcaller's Campaign Mode only side), never its code's other side.
+  const side = top && top.face === "B" && !hidesFace(top) ? { picture: pictureKey(top) } : {};
+  out.push({ ...rect, id, code: top && !hidesFace(top) ? top.code : "", ...side, zone, kind: "pile", exhausted: false, faceDown: top == null || hidesFace(top), landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone, ...(areaOnly ? { areaFold: true as const } : {}) });
+}
+
+// The Stormcaller's area (dcce.stormcallers-area): its current quest stage drawn sideways at a staging card's sideways footprint, and its cards over the stage's right part, stepped as a guarded pair
+// (PAIR_STEP, and never less than a 44 pt target). The stage keeps the strip, the tokens and the pops in the part the cards leave uncovered.
+const isAreaGroup = (group: readonly ZoneEntry[]): boolean => group[0]?.area === "stage";
+
+// How far in from the stage's left edge its first card stands: a guarded pair's step of the stage's sideways footprint, and the stage leaves a 44 pt target uncovered where the cards are small.
+function areaOffset(size: { w: number; h: number }, m: Metrics): number {
+  return Math.min(size.h, Math.max(Math.round(size.h * PAIR_STEP), touch(m.scale, MIN_TARGET)));
+}
+
+function areaStep(size: { w: number; h: number }, m: Metrics): number {
+  return Math.max(size.w * PAIR_STEP, touch(m.scale, MIN_TARGET));
+}
+
+function areaWidth(group: readonly ZoneEntry[], size: { w: number; h: number }, m: Metrics): number {
+  const cards = group.length - 1;
+  return cards <= 0 ? size.h : areaOffset(size, m) + size.w + (cards - 1) * areaStep(size, m) + m.gap;
+}
+
+// `room` is the row's width from the group's left edge: a group the open moment keeps on the table in a row too narrow for it steps its cards closer, never past the row's edge.
+function placeArea(group: readonly ZoneEntry[], left: number, y: number, size: { w: number; h: number }, out: CardSlot[], m: Metrics, stacks: boolean, room: number): void {
+  const [head, ...cards] = group;
+  if (!head) return;
+  const offset = areaOffset(size, m);
+  const step = cards.length > 1 ? Math.min(areaStep(size, m), Math.max(0, (room - offset - size.w) / (cards.length - 1))) : areaStep(size, m);
+  const rect: Rect = { x: left, y: y + Math.round((size.h - size.w) / 2), w: size.h, h: size.w };
+  out.push({ ...slotOf(head.card, "staging", "card", rect, true), stormcaller: "stage", ...(cards.length > 0 ? { shown: offset } : {}) });
+  cards.forEach((entry, at) => {
+    const card = cardRect(entry.card, left + offset + at * step, y, size);
+    if (stacks) placeStaging(entry, card, out, m);
+    else placeUnder(entry, "staging", card, out, [], m.peek);
+    out.push({ ...slotOf(entry.card, "staging", "card", card), ...(entry.area ? { stormcaller: entry.area } : {}) });
+  });
 }
 
 function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding): void {
@@ -187,15 +230,25 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size:
   for (const entry of entries) {
     const last = groups[groups.length - 1];
     if (zone === "staging" && entry.card.guard === true && last && last[0]?.card.id === entry.card.host) last.push(entry);
+    else if (zone === "staging" && entry.area != null && entry.area !== "stage" && last && isAreaGroup(last)) last.push(entry);
     else groups.push([entry]);
   }
-  const widths = groups.map((group) => footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * size.w * PAIR_STEP + (group.length > 1 ? m.gap : 0));
-  const fold = folding && zone === "staging" ? foldRow(groups.map((group, at): FoldGroup => ({ id: group[0]?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep) })), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }) : null;
+  const widths = groups.map((group) => (isAreaGroup(group) ? areaWidth(group, size, m) : footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * size.w * PAIR_STEP + (group.length > 1 ? m.gap : 0)));
+  // The area's group folds first and shows its Stormcaller on the stack, not its sideways stage.
+  const fold = folding && zone === "staging" ? foldRow(groups.map((group, at): FoldGroup => ({ id: (isAreaGroup(group) ? group[1] ?? group[0] : group[0])?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep), ...(isAreaGroup(group) ? { foldsAlone: true as const } : {}) })), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }) : null;
   const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
-  if (fold?.stack && folding) foldSlot("staging", fold.stack, area.y, { h: size.h }, folding.pile, new Map(entries.map((entry) => [entry.card.id, entry.card])), out, folding.folds);
+  if (fold?.stack && folding) {
+    const areaIds = new Set(entries.filter((entry) => entry.area != null).map((entry) => entry.card.id));
+    const areaOnly = fold.stack.cards.length > 0 && fold.stack.cards.every((id) => areaIds.has(id));
+    foldSlot("staging", fold.stack, area.y, { h: size.h }, folding.pile, new Map(entries.map((entry) => [entry.card.id, entry.card])), out, folding.folds, areaOnly);
+  }
   groups.forEach((group, groupAt) => {
     const left = xs[groupAt];
     if (left == null) return;
+    if (isAreaGroup(group)) {
+      placeArea(group, left, area.y, size, out, m, folding?.stacks === true, area.x + area.w - left);
+      return;
+    }
     group.forEach((entry, at) => {
       const rect = cardRect(entry.card, left + at * size.w * PAIR_STEP, area.y, size);
       if (zone === "staging" && folding?.stacks) placeStaging(entry, rect, out, m);
@@ -427,6 +480,12 @@ export function slotBounds(slot: CardSlot): Rect {
   "worklet";
   if (!slot.exhausted) return slot;
   return { x: slot.x + (slot.w - slot.h) / 2, y: slot.y + (slot.h - slot.w) / 2, w: slot.h, h: slot.w };
+}
+
+/** The part of a slot the strip, the tokens and the pops are drawn in: its bounds, narrowed to what the Stormcaller's area cards leave uncovered of the stage. */
+export function shownBounds(slot: CardSlot): Rect {
+  const bounds = slotBounds(slot);
+  return slot.shown != null ? { ...bounds, w: Math.min(bounds.w, slot.shown) } : bounds;
 }
 
 /** The rectangle a tap or a drag finds a slot in: its bounds, grown to 44 pt for a pile drawn smaller than that. */

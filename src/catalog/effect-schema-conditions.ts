@@ -233,6 +233,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
   z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional() }),
+  // The Corsair deck or its discard pile holds a card: Boarding has an enemy to reveal. The either/or of a card that gives a choice between a cost and Boarding ("raise your threat by 3 or it gains Boarding 1",
+  // 12022:A:3) offers the Boarding branch only then (rr.effects: an option that cannot change the game state is not offered). Read by the stormcaller family.
+  z.strictObject({ kind: z.literal("corsairHas") }),
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),

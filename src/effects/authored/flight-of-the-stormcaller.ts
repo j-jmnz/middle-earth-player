@@ -44,6 +44,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "12012",
     lines: ["12012:A:1"],
     timing: "setup",
+    // The Stormcaller starts at stage 2 on its D side: the C side is passed through only by an advance ("first advancing to the C side of the next stage, resolving its effects, and then advancing to the
+    // D side", dcce.stormcallers-area-stages), and stage 2C prints no When Revealed to resolve.
     instructions: [{ verb: "PrepareCorsairDeck" }, { verb: "PrepareFleet" }, { verb: "PrepareStormcallerArea", stages: STORMCALLER_STAGES, number: 2 }, { verb: "ShuffleEncounterDeck" }],
   },
   {
@@ -149,7 +151,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "actor",
         options: [
           { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 3 }] },
-          { id: "boarding", instructions: [{ verb: "ModifyStat", stat: "boarding", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+          // Boarding reveals from the Corsair deck: with no card in it or its discard pile the option changes nothing and is not offered (rr.effects), so the threat is raised.
+          { id: "boarding", requires: { kind: "corsairHas" }, instructions: [{ verb: "ModifyStat", stat: "boarding", amount: 1, until: "whileSourceInPlay", target: "self" }] },
         ],
       },
     ],

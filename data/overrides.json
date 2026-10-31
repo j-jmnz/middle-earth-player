@@ -256,10 +256,11 @@
           "willpower": 0,
           "attack": 7,
           "defense": 6,
-          "health": 20
+          "health": 20,
+          "victory": 15
         }
       },
-      "reason": "Hall of Beorn has no stat fields for the Stormcaller's reprint, so the card has none. The scan prints Threat 2, engagement cost 50, Attack 6, Defense 6 and 18 hit points on side A, and Attack 7, Defense 6 and 20 hit points on the Campaign Mode only side (Victory 15 there; the ledger notes record the reading). An enemy prints no Willpower, so the back's Willpower is 0.",
+      "reason": "Hall of Beorn has no stat fields for the Stormcaller's reprint, so the card has none. The scan prints Threat 2, engagement cost 50, Attack 6, Defense 6, 18 hit points and Victory 10 on side A, and Attack 7, Defense 6, 20 hit points and Victory 15 on the Campaign Mode only side (the ledger notes record the reading); the score counts the Victory of the side the card was on. An enemy prints no Willpower, so the back's Willpower is 0.",
       "source": "scan 110042.B, data/printed/dream-chaser.json"
     },
     {

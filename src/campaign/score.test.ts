@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
+import { definePrinted, printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { updateCard, withThreat } from "../rules/state.ts";
 import { moveCard, spawn } from "../rules/zones.ts";
@@ -51,6 +51,19 @@ describe("scoreOf", () => {
     expect(points).toBeGreaterThan(0);
     const won = { ...spawn(state, code, { zone: "victory" }).state };
     expect(scoreOf(won, cards)).toEqual({ rounds: 3, victoryPoints: points, score: 30 + 30 - points });
+  });
+
+  it("counts the Victory printed on the side the card was on: the Stormcaller is worth 10 on side A and 15 on its Campaign Mode only side (dcce.campaign-mode)", () => {
+    const caller = definePrinted({ code: "stormcaller", name: "Stormcaller", type: "enemy", victory: 10, upgraded: { willpower: 0, attack: 7, defense: 6, health: 20, victory: 15 } });
+    const held = new Map(cards).set(caller.code, caller);
+    const state = base();
+    const sideA = spawn(state, caller.code, { zone: "victory" }).state;
+    const sideB = (() => {
+      const made = spawn(state, caller.code, { zone: "play", seat: 0 });
+      return moveCard(updateCard(made.state, made.id, { face: "B" }), made.id, { zone: "victory" });
+    })();
+    expect(scoreOf(sideA, held)).toEqual({ rounds: 3, victoryPoints: 10, score: 30 + 30 - 10 });
+    expect(scoreOf(sideB, held)).toEqual({ rounds: 3, victoryPoints: 15, score: 30 + 30 - 15 });
   });
 
   it("counts an eliminated seat as 50 plus the threat cost of every hero it started with", () => {

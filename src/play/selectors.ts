@@ -12,6 +12,7 @@ import { declaredDefenders } from "../rules/families/defense-defenders.ts";
 import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../rules/families/breaking-areas.ts";
 
 import { threatRows } from "./foresight.ts";
+import { areaGroup, areaRoleOf, type AreaRole } from "./stormcaller-table.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
 
@@ -56,8 +57,8 @@ export type FightKind = "defense" | "undefended" | "attack";
 // the characters fighting it (`paired`) and how (`fight`): the defender, the hero an undefended attack hits, or the
 // attackers.
 // `kind` and `ship` are what the table knows of the card's printing when it is given the facts (ZoneFacts): the fold order of staging reads the kind, and the
-// play area stands ships first (0 the Dream-chaser, 1 any other ship-objective).
-export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1 };
+// play area stands ships first (0 the Dream-chaser, 1 any other ship-objective). `area` is the card's place in the Stormcaller's area (stormcaller-table.ts): its group heads staging.
+export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1; area?: AreaRole };
 
 /** What the zone selectors read of a card's printing: its type, and its place among the ships (null for a card that is no ship). Absent: nothing is known. */
 export type ZoneFacts = { typeOf: (code: string) => string | null; shipRank: (code: string) => 0 | 1 | null };
@@ -117,7 +118,7 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
       return stage ? [stage] : NONE;
     }
     case "staging":
-      return stagingOrder(game, areaOrShared(game, seat));
+      return withArea(game, stagingOrder(game, areaOrShared(game, seat)));
     case "activeLocation": {
       const active = activeOf(game, seat);
       return active ? [active] : NONE;
@@ -156,6 +157,14 @@ function areaOrShared(game: ScenarioState, seat: number): readonly string[] {
   return shared.length > 0 ? [...own, ...shared] : own;
 }
 
+// The Stormcaller's area heads the staging row (dcce.stormcallers-area): its stage and its cards first, wherever they stand, then the rest of the staging area. A game with no area is unchanged.
+function withArea(game: ScenarioState, ids: readonly string[]): readonly string[] {
+  const group = areaGroup(game);
+  if (group.length === 0) return ids;
+  const heads = new Set(group);
+  return [...group, ...ids.filter((id) => !heads.has(id))];
+}
+
 // The ship-objectives among `ids`, the Dream-chaser first (`shipRank`), the rest in the order they were given.
 function shipsFirst(game: ScenarioState, ids: readonly string[], facts: ZoneFacts): string[] {
   const rank = (id: string) => facts.shipRank(game.cards[id]?.code ?? "");
@@ -189,7 +198,7 @@ function sameEntries(previous: readonly ZoneEntry[], next: readonly ZoneEntry[])
   for (let index = 0; index < next.length; index += 1) {
     const a = previous[index];
     const b = next[index];
-    if (!a || !b || a.card !== b.card || a.fight !== b.fight || !sameCards(a.attached, b.attached) || !sameCards(a.paired, b.paired)) return false;
+    if (!a || !b || a.card !== b.card || a.fight !== b.fight || a.area !== b.area || !sameCards(a.attached, b.attached) || !sameCards(a.paired, b.paired)) return false;
   }
   return true;
 }
@@ -220,7 +229,8 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...(captive ? [captive] : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
-    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}) });
+    const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
+    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}), ...(area ? { area } : {}) });
   }
   return entries;
 }

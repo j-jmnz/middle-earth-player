@@ -8,6 +8,7 @@ import { settle } from "../rules/machine.ts";
 import { legalIntents } from "../rules/legal.ts";
 import { withMode, type ScenarioState } from "../rules/state.ts";
 import { areaOf } from "../rules/families/stormcaller-zone.ts";
+import { spawn } from "../rules/zones.ts";
 import { CODES, codesIn, finish, flightFight, flightTable, idOf, idsOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 let world: FlightWorld;
@@ -62,9 +63,15 @@ describe("Swift Raider (12021)", () => {
 });
 
 describe("Corsair Skiff (12022)", () => {
+  // A table with a Corsair deck of one enemy (dcce.corsair-deck), or with a Corsair discard pile of one, or with neither.
+  const withCorsairs = (state: ScenarioState, pile: "corsairDeck" | "corsairDiscard" | null): ScenarioState => {
+    const base: ScenarioState = { ...state, corsairDeck: [], corsairDiscard: [] };
+    return pile ? spawn(base, "corsair", { zone: pile }).state : base;
+  };
+
   it("lets the engaged player raise their threat by 3 or have it gain Boarding 1 when it engages from the staging area (A:3)", () => {
     const made = make({ phase: "Encounter", staging: [CODES.skiff] });
-    const engaged = settle({ ...made.state, window: null, mode: "engagement" }, made.ctx, []);
+    const engaged = settle({ ...withCorsairs(made.state, "corsairDeck"), window: null, mode: "engagement" }, made.ctx, []);
     expect(engaged.window).toMatchObject({ kind: "choose", options: ["threat", "boarding"] });
     const raised = send(start(engaged), { type: "Choose", optionId: "threat" }, made.ctx).state;
     expect(raised.seats[0]?.threat).toBe(31);
@@ -72,6 +79,16 @@ describe("Corsair Skiff (12022)", () => {
     expect(boarded.seats[0]?.threat).toBe(28);
     expect(modifiedStat(boarded, cardOf(boarded, CODES.skiff)!, "hitPoints", world.cards)).toBeGreaterThan(0);
     expect(boarded.modifiers.some((modifier) => modifier.stat === "boarding" && modifier.amount === 1)).toBe(true);
+  });
+
+  it("offers Boarding when only the Corsair discard pile holds a card, and raises the threat without asking when neither pile does (rr.effects: an option that changes nothing is not offered)", () => {
+    const made = make({ phase: "Encounter", staging: [CODES.skiff] });
+    const discarded = settle({ ...withCorsairs(made.state, "corsairDiscard"), window: null, mode: "engagement" }, made.ctx, []);
+    expect(discarded.window).toMatchObject({ kind: "choose", options: ["threat", "boarding"] });
+    const empty = settle({ ...withCorsairs(made.state, null), window: null, mode: "engagement" }, made.ctx, []);
+    expect(empty.window?.kind).not.toBe("choose");
+    expect(empty.seats[0]?.threat).toBe(31);
+    expect(empty.modifiers.some((modifier) => modifier.stat === "boarding")).toBe(false);
   });
 
   it("does not ask when the engagement is not from the staging area", () => {

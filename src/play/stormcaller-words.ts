@@ -42,3 +42,30 @@ export function stormcallerBranchWords(choose: Extract<Instruction, { verb: "Cho
   if (only?.verb !== "ModifyStat" || only.stat !== "boarding" || typeof only.amount !== "number" || only.amount <= 0) return null;
   return `${sourceId ? names.card(sourceId) : "It"} gains Boarding ${only.amount}`;
 }
+
+/** The word a card of the area wears on a list that does not draw it (the web table's list): where it stands in the Stormcaller's area. */
+export function areaTell(role: "stage" | "apart" | "together"): string {
+  return role === "stage" ? "the Stormcaller's quest stage" : role === "apart" ? "in the Stormcaller's area, out of reach" : "in the Stormcaller's area, in the staging area";
+}
+
+/** What a screen reader hears of the Stormcaller's current quest stage, which the canvas draws sideways at the head of staging: its name (the players' stage can share it), its number, its progress
+ * against its quest points, which cards stand in the area, and whether they can be reached. `names` are the cards of the area in order. */
+export function stageSpeech(facts: { name: string; number: number; progress: number; points: number | null; together: boolean; names: readonly string[] }): string {
+  const progress = facts.points == null ? `${facts.progress} progress` : `progress ${facts.progress} of ${facts.points}`;
+  const cards = facts.names.length === 0 ? "No cards in the area" : `In the area: ${facts.names.join(", ")}`;
+  const reach = facts.together ? "Reachable: the players are at the same stage, so its cards are in the staging area" : "Out of reach: the players are at another stage, so its cards are immune and not in the staging area";
+  return `The Stormcaller's quest stage ${facts.number}, ${facts.name}, ${progress}. ${cards}. ${reach}`;
+}
+
+/** What a screen reader hears of a card of the area: its name, that it is in the Stormcaller's area, and whether it can be reached. */
+export function memberSpeech(name: string, role: "apart" | "together"): string {
+  return `${name}, ${role === "apart" ? "in the Stormcaller's area, out of reach" : "in the Stormcaller's area, reachable in the staging area"}`;
+}
+
+/** The title of the row list a fold stack opens when only the area's group folded, and the fold stack's word and its reader phrase. */
+export const AREA_LIST_TITLE = "Stormcaller's area";
+export const AREA_FOLD_WORD = "Area";
+export const AREA_FOLD_WHERE = "the Stormcaller's area";
+
+/** A row of the area's list for the Stormcaller's stage, told from the players' stage that shares its name ("2B-Full Sail Ahead!" and "2D-Full Sail Ahead!"). */
+export const stageLabel = (name: string): string => `The Stormcaller's stage: ${name}`;
