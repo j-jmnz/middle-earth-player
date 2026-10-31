@@ -20,6 +20,7 @@ import { openStrike } from "./attack.ts";
 import { healBlocked } from "./burden-life.ts";
 import { effectData } from "./encounter-moves.ts";
 import type { Focus } from "./index.ts";
+import { playerSource } from "./quest-threat.ts";
 
 // The option that ends a choice made one card at a time.
 export const DONE = "done";
@@ -40,7 +41,7 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, [...options, DONE]) : state;
   const card = state.cards[chosen];
   if (!card) return state;
-  const healedOne = queueEvent(updateCard(state, chosen, { damage: card.damage - 1 }), { trigger: "healed", seat: card.controller, cardId: chosen });
+  const healedOne = queueEvent(updateCard(state, chosen, { damage: card.damage - 1 }), { trigger: "healed", seat: card.controller, cardId: chosen, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
   return again(healedOne, { ...instruction, healed: healed + 1 }, focus.seat);
 }
 

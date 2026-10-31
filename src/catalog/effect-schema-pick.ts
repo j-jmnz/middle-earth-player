@@ -61,6 +61,8 @@ export const pickSchema = z.strictObject({
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
   maxCost: z.number().int().min(0).optional(),
   minCost: z.number().int().min(0).optional(),
+  // A card whose printed cost is odd ("a card with an odd printed cost", 110138:A:3): a card with no printed cost, or with X, is not.
+  oddCost: z.literal(true).optional(),
   // The candidates are the cards the last picked attachment may be attached to.
   hostForPicked: z.boolean().optional(),
   // The card is going to be put into play: a unique card already in play cannot be chosen.

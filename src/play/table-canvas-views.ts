@@ -6,13 +6,15 @@ import { useStore } from "zustand";
 
 import { SPHERE_TINT } from "./icon-map.ts";
 import type { CardSlot, LayoutViews, PileViews } from "./layout.ts";
-import { PILES, TABLE_ZONES, pileSelector, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
+import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector, type BasePileId, type PileView, type ZoneFacts, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens, type TableTokens } from "./tokens.ts";
 
-export function useViews(store: TableCanvasProps["store"], seat: number): { views: LayoutViews; piles: PileViews } {
-  const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat]);
-  const pileOf = useMemo(() => Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)])) as Record<PileId, ReturnType<typeof pileSelector>>, [seat]);
+export function useViews(store: TableCanvasProps["store"], seat: number, facts: ZoneFacts): { views: LayoutViews; piles: PileViews } {
+  const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat, facts)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat, facts]);
+  const pileOf = useMemo(() => Object.fromEntries(PILES.map((pile) => [pile, pileSelector(pile, seat)])) as Record<BasePileId, ReturnType<typeof pileSelector>>, [seat]);
+  // The second slot's piles (the Corsair pair), only while the game has a Corsair deck: they are shared, so a peek leaves them where they are.
+  const corsair = useMemo(() => ({ deck: pileSelector("corsairDeck", seat), discard: pileSelector("corsairDiscard", seat) }), [seat]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
   const staging = useStore(store, (state) => zones.staging(state.game));
   const activeLocation = useStore(store, (state) => zones.activeLocation(state.game));
@@ -24,9 +26,14 @@ export function useViews(store: TableCanvasProps["store"], seat: number): { view
   const discard = useStore(store, (state) => pileOf.discard(state.game));
   const encounterDeck = useStore(store, (state) => pileOf.encounterDeck(state.game));
   const encounterDiscard = useStore(store, (state) => pileOf.encounterDiscard(state.game));
+  const corsairDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDeck") ? corsair.deck(state.game) : null));
+  const corsairDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDiscard") ? corsair.discard(state.game) : null));
   return useMemo(
-    () => ({ views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand }, piles: { deck, discard, encounterDeck, encounterDiscard } }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard],
+    () => ({
+      views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}) },
+    }),
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard],
   );
 }
 

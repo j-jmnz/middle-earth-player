@@ -121,6 +121,13 @@ function campaignOfPacks(packCodes: readonly string[]): string | null {
   return null;
 }
 
+// The stats of the Upgraded side, when the card has them all (dcce.scalable-upgradable).
+function upgradedOf(card: Card): string | null {
+  const back = card.back;
+  if (back?.willpower == null || back.attack == null || back.defense == null || back.health == null) return null;
+  return JSON.stringify({ willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health });
+}
+
 function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMap<string, string>): Row {
   const primary = card.printings[0];
   if (!primary) throw new Error(`Card ${card.code} has no printing`);
@@ -154,6 +161,7 @@ function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMa
     burden_set: card.burdenSet,
     back_type: card.backType,
     keywords: card.keywords ? JSON.stringify(card.keywords) : null,
+    upgraded: upgradedOf(card),
     text: card.text,
     has_errata: bit(card.hasErrata),
     errata: card.errata,

@@ -3,6 +3,8 @@
 import { describe, expect, it } from "vitest";
 
 import { armedRoom } from "./armed-room.ts";
+import { lookStrip } from "./look-strip.ts";
+import { foldRow, leastStep } from "./row-fold.ts";
 import { isDense, labelChars, linesPlace, planWords, titleLinesOf, wordsWindow } from "./dock-budget.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
 import { stageOf } from "./spotlight-stage.ts";
@@ -77,5 +79,28 @@ describe("scale 1 is unchanged and 1.15 is proportional", () => {
     expect(big.gap).toBeCloseTo(stage.gap * L, 6);
     expect(big.note.cy).toBeCloseTo(stage.note.cy * L, 6);
     expect(big.radius).toBeCloseTo(stage.radius * L, 6);
+  });
+
+  it("row-fold and look-strip", () => {
+    // The crowding rule works in points: scaled by 1.15 with a 1.15 target (`touch` at Large) it gives 1.15 times the answer.
+    const groups = Array.from({ length: 9 }, (_, at) => ({ id: `g${at}`, width: 50 + (at % 3) * 5, cards: [`g${at}`], rank: at % 4, pinned: at === 5 }));
+    const row = { x: 10, width: 300, gap: 6, target: 44, stackW: 40 };
+    const a = foldRow(groups, row);
+    const b = foldRow(groups.map((group) => ({ ...group, width: group.width * L })), { x: row.x * L, width: row.width * L, gap: row.gap * L, target: row.target * L, stackW: row.stackW * L });
+    a.xs.forEach((x, at) => (x == null ? expect(b.xs[at]).toBeNull() : expect(b.xs[at]).toBeCloseTo(x * L, 6)));
+    expect(b.stack?.groups).toEqual(a.stack?.groups);
+    expect(b.fits).toBe(a.fits);
+    expect(leastStep([50 * L, 50 * L, 50 * L], 120 * L, 6 * L)).toBeCloseTo(leastStep([50, 50, 50], 120, 6) * L, 6);
+    const bands = [{ x: 10, y: 20, w: 300 }, { x: 10, y: 100, w: 300 }, { x: 10, y: 180, w: 300 }];
+    for (const count of [3, 7, 11, 20]) {
+      const one = lookStrip(count, bands, { w: 50, h: 70 }, 6, 44);
+      const big = lookStrip(count, bands.map((band) => ({ x: band.x * L, y: band.y * L, w: band.w * L })), { w: 50 * L, h: 70 * L }, 6 * L, 44 * L);
+      expect(big.bands).toBe(one.bands);
+      expect(big.crowded).toBe(one.crowded);
+      big.places.forEach((place, index) => {
+        expect(place.x).toBeCloseTo((one.places[index]?.x ?? 0) * L, 6);
+        expect(place.y).toBeCloseTo((one.places[index]?.y ?? 0) * L, 6);
+      });
+    }
   });
 });

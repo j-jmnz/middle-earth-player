@@ -4,7 +4,7 @@ import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-d
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { productOf, scenarioDefs } from "../campaign-defs.ts";
-import { dealtCodes, starterCodes } from "../load-scenarios.ts";
+import { dealtCodes, gameCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
 import { isPoolCard } from "../printed/pool.ts";
 import { TEMPLATES, type Draft, type TemplateContext } from "./templates.ts";
@@ -24,7 +24,7 @@ export function boxOwners(campaigns: readonly CampaignData[], scenarios: readonl
   const owners = new Map<string, string>();
   const home = new Map(scenarioDefs().map((def) => [def.id, productOf(def.product).home]));
   for (const scenario of scenarios) {
-    for (const code of dealtCodes([], [scenario])) if (!owners.has(code)) owners.set(code, home.get(scenario.id) ?? "fellowship-of-the-ring");
+    for (const code of [...dealtCodes([], [scenario]), ...gameCodes(campaigns, scenario)]) if (!owners.has(code)) owners.set(code, home.get(scenario.id) ?? "fellowship-of-the-ring");
   }
   for (const code of boxCodes(campaigns, scenarios)) if (!owners.has(code)) owners.set(code, "fellowship-of-the-ring");
   return owners;

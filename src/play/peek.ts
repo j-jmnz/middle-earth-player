@@ -55,7 +55,7 @@ export function peekWords(game: ScenarioState, viewed: number | null): PeekWords
 }
 
 /** What the canvas marks while peeking: nothing glows, picks nothing and dims nothing (a tap on any card only opens its preview). The canvas also shows no banner beat while peeking (table-canvas.native.tsx). */
-export const NO_HIGHLIGHT: TableHighlight = { tappable: new Set(), picked: new Map(), share: null, dimOthers: false, marks: new Map(), muted: new Set() };
+export const NO_HIGHLIGHT: TableHighlight = { tappable: new Set(), picked: new Map(), share: null, dimOthers: false, marks: new Map(), muted: new Set(), keep: new Set() };
 
 /** The ids the canvas may lift to drag while peeking: none, so drag-to-play is off. */
 export const NO_DRAG: readonly string[] = [];

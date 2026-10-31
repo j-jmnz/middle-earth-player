@@ -8,6 +8,8 @@ import path from "node:path";
 
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { RAW_DIR } from "./paths.ts";
+import { glyphPath } from "./ttf-glyphs.ts";
+import { RULE_PDFS } from "./sources/rules.ts";
 import { DRAGNCARDS_CARDBACK_FILES, DRAGNCARDS_CARDBACKS, type CardBackName } from "./sources/icons.ts";
 
 // The RingsDB font glyphs the app uses, by the app's name. A glyph is found by its name in the font, or by the codepoint
@@ -37,6 +39,49 @@ export const VECTOR_ICONS: readonly { name: string; glyph?: string; css?: string
   { name: "contract", css: "contract" },
   { name: "oneRing", css: "onering" },
 ];
+
+// The MEC111 rulebook's icon font (sources/mec111-font.ts): the Heading's four steps and the Sailing success symbol, by the app's
+// name and the codepoint dcce.heading and dcce.sailing-tests quote. The ToUnicode map gives each codepoint's glyph.
+export const MEC111_ICONS: readonly { name: string; codepoint: number }[] = [
+  { name: "headingSun", codepoint: 0xf2091 },
+  { name: "headingCloud", codepoint: 0xf2092 },
+  { name: "headingRain", codepoint: 0xf2093 },
+  { name: "headingStorm", codepoint: 0xf2094 },
+  { name: "sailingSuccess", codepoint: 0xf2090 },
+];
+
+// The PDF the icon sync cuts the font out of: the pinned Dream-chaser rulebook (sources/rules.ts, `dcce`).
+const MEC111_URL = RULE_PDFS.find((pdf) => pdf.doc === "dcce")?.url ?? "";
+
+// A ToUnicode destination, `<F2090>`'s UTF-16: one unit or a surrogate pair (`<DB88DC90>`), as a codepoint.
+function codepointOf(units: string): number {
+  const high = Number.parseInt(units.slice(0, 4), 16);
+  return units.length > 4 ? 0x10000 + ((high - 0xd800) << 10) + (Number.parseInt(units.slice(4, 8), 16) - 0xdc00) : high;
+}
+
+/** A ToUnicode CMap as glyph index -> codepoint: every `bfchar` block (`<0001> <DB88DC91>`) and every `bfrange` (`<0001> <0003> <DB88DC91>`, or `<0001> <0002> [<DB88DC91> <DB88DC92>]`). The codespace range above them is `<0000> <FFFF>` too, and is not read. */
+export function parseToUnicode(text: string): Map<number, number> {
+  const map = new Map<number, number>();
+  for (const block of text.matchAll(/beginbfchar([^]*?)endbfchar/g)) {
+    for (const match of (block[1] ?? "").matchAll(/<([0-9a-f]{4})>\s*<([0-9a-f]{4}(?:[0-9a-f]{4})?)>/gi)) map.set(Number.parseInt(match[1] ?? "", 16), codepointOf(match[2] ?? ""));
+  }
+  for (const block of text.matchAll(/beginbfrange([^]*?)endbfrange/g)) {
+    for (const match of (block[1] ?? "").matchAll(/<([0-9a-f]{4})>\s*<([0-9a-f]{4})>\s*(?:<([0-9a-f]{4}(?:[0-9a-f]{4})?)>|\[([^\]]*)\])/gi)) {
+      const low = Number.parseInt(match[1] ?? "", 16);
+      const high = Number.parseInt(match[2] ?? "", 16);
+      if (match[3]) {
+        const first = codepointOf(match[3]);
+        for (let at = low; at <= high; at += 1) map.set(at, first + (at - low));
+      } else {
+        const listed = [...(match[4] ?? "").matchAll(/<([0-9a-f]{4}(?:[0-9a-f]{4})?)>/gi)];
+        listed.forEach((each, at) => {
+          if (low + at <= high) map.set(low + at, codepointOf(each[1] ?? ""));
+        });
+      }
+    }
+  }
+  return map;
+}
 
 // The token PNGs, by the app's name and the file under data/raw/icons/dragncards, each with the short side it must have.
 // An icon in chrome needs 256 px. A token the table puts on a card is drawn at 32 pt or less, so three times that (96 px)
@@ -245,6 +290,14 @@ export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
     const glyph = glyphs.find((entry) => (icon.glyph ? entry.name === icon.glyph : entry.unicode === character));
     if (!glyph) throw new Error(`The RingsDB font has no glyph for ${icon.name}`);
     records.push({ name: icon.name, kind: "vector", source: FONT_URL, glyph: glyph.name, viewBox: flippedViewBox(glyph.d), d: glyph.d });
+  }
+  const ttf = new Uint8Array(readFileSync(path.join(rawDir, "icons", "mec111-icons.ttf")));
+  const indexes = parseToUnicode(readFileSync(path.join(rawDir, "icons", "mec111-icons.unicode.txt"), "utf8"));
+  for (const icon of MEC111_ICONS) {
+    const index = [...indexes].find(([, codepoint]) => codepoint === icon.codepoint)?.[0];
+    if (index == null) throw new Error(`The MEC111 icon font has no glyph for ${icon.name}`);
+    const d = glyphPath(ttf, index);
+    records.push({ name: icon.name, kind: "vector", source: MEC111_URL, glyph: `U+${icon.codepoint.toString(16).toUpperCase()}`, viewBox: flippedViewBox(d), d });
   }
   records.push(eyeIcon());
   for (const icon of RASTER_ICONS) {

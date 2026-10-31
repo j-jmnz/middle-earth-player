@@ -14,12 +14,13 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   "easy-mode": "Easy Mode",
   mec109: bookletName("fellowship-of-the-ring"),
   tdom: bookletName("the-dark-of-mirkwood"),
+  dcce: bookletName("dream-chaser"),
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
-  return !/^(mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-)/.test(entry.id);
+  return !/^(mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-)/.test(entry.id);
 }
 
 function fold(text: string): string {
@@ -76,6 +77,7 @@ const BOOKS: Readonly<Partial<Record<string, BookletId>>> = {
   mec109: "fellowship-of-the-ring",
   "learn-to-play": "learn-to-play",
   tdom: "the-dark-of-mirkwood",
+  dcce: "dream-chaser",
   rr: "rules-reference",
 };
 

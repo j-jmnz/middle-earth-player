@@ -2,6 +2,9 @@ import { integer, sqliteTable, text, type SQLiteTable } from "drizzle-orm/sqlite
 
 import type { PrintedKeywords } from "./boundary.ts";
 
+/** The stats the Upgraded side of a ship-objective prints (dcce.scalable-upgradable). */
+export type UpgradedStats = { willpower: number; attack: number; defense: number; health: number };
+
 export const packs = sqliteTable("packs", {
   code: text("code").primaryKey(),
   name: text("name").notNull(),
@@ -49,6 +52,8 @@ export const cards = sqliteTable("cards", {
   backType: text("back_type"),
   // Null until the card's keywords have been read. An empty object means none.
   keywords: text("keywords", { mode: "json" }).$type<PrintedKeywords>(),
+  // The stats the Upgraded side of a ship-objective prints (dcce.scalable-upgradable): the engine reads them for a card dealt on side B.
+  upgraded: text("upgraded", { mode: "json" }).$type<UpgradedStats>(),
   text: text("text"),
   hasErrata: integer("has_errata", { mode: "boolean" }).notNull(),
   errata: text("errata"),

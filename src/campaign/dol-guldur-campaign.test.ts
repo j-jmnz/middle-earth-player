@@ -128,7 +128,7 @@ describe("what a win writes (01131:B:2)", () => {
     const offers = carryOffers([save("old", finished) as never], (campaignId) => (campaignId === "mirkwood-paths" ? campaign.scenarios : null));
     expect(offers).toHaveLength(1);
     expect(offers[0]?.cards.map((card) => card.code).sort()).toEqual(["01132", "01135"]);
-    const fresh = newSave("next", "mirkwood-paths", 2, finished.carryOver);
+    const fresh = newSave("next", "mirkwood-paths", 2, { carried: finished.carryOver });
     expect(fresh.log.carryIn.map((card) => card.code).sort()).toEqual(["01132", "01132", "01135"]);
     const plan = checklist({ log: fresh.log, scenario: loadScenario("passage-through-mirkwood"), seats: dolGuldurLoadout(2), effects: EFFECTS, cards });
     if (!plan.ok) throw new Error(plan.errors.join("; "));

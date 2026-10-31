@@ -12,12 +12,12 @@ import { queueEvent } from "./queue.ts";
 import { shuffleIds } from "./seed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { lowerThreatByEffect } from "./families/quest-threat.ts";
+import { lowerThreatByEffect, playerSource } from "./families/quest-threat.ts";
 import { placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
-import { isPlayerType, printedOf } from "./printed.ts";
+import { printedOf } from "./printed.ts";
 import { titleBarred } from "./families/nightmare-guards.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
@@ -82,7 +82,7 @@ export function runPlayerVerb(
     case "Ready": {
       if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender" || instruction.target === "other") {
         const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
-        return state.cards[id] ? readyCard(state, id) : state;
+        return state.cards[id] ? readyCard(state, id, playerSource(state, focus.sourceId, ctx)) : state;
       }
       if (instruction.target === "host") {
         const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
@@ -108,7 +108,7 @@ export function runPlayerVerb(
       if (amount <= 0) return state;
       // The step records the damage removed as a negative amount, the way a progress removal is recorded (the table's log).
       steps.push({ kind: "damage", targetId: id, amount: -amount, cause: currentCause(steps, UNATTRIBUTED) });
-      return queueEvent(updateCard(state, id, { damage: card.damage - amount }), { trigger: "healed", seat: card.controller, cardId: id });
+      return queueEvent(updateCard(state, id, { damage: card.damage - amount }), { trigger: "healed", seat: card.controller, cardId: id, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
     }
     case "PutOnDeck": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
@@ -157,7 +157,8 @@ export function runPlayerVerb(
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       if (!state.cards[id] || amount <= 0) return state;
       if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps);
-      return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
+      // An encounter or campaign card's damage is no player card effect, so a Ship objective's immunity to those does not stop it (dcce.ship-objectives).
+      return placeDamage(state, id, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
     }
     case "PlaceProgressOn": {
       const scope = frameScope(state, focus.seat, focus.sourceId);
@@ -306,11 +307,11 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
 }
 
 // A card readies or exhausts, and the Responses that hear it are told ("After ~ readies", "After ~ exhausts").
-export function readyCard(state: ScenarioState, id: string): ScenarioState {
+export function readyCard(state: ScenarioState, id: string, byPlayerCard = false): ScenarioState {
   const card = state.cards[id];
   // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
   if (!card?.exhausted || flagged(state, id, "cannotReady")) return state;
-  return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id });
+  return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
 }
 
 export function exhaustCard(state: ScenarioState, id: string): ScenarioState {
@@ -340,9 +341,4 @@ export function putOnDeck(state: ScenarioState, id: string, position: "top" | "b
 export function placePlayerDamage(state: ScenarioState, seat: number, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (titleBarred(state, seat, id, ctx.cards)) return state;
   return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
-}
-
-function playerSource(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
-  const source = sourceId ? state.cards[sourceId] : undefined;
-  return source != null && isPlayerType(printedOf(ctx.cards, source.code));
 }

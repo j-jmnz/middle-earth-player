@@ -273,6 +273,10 @@ export const effectSchema = z.strictObject({
   uncancelable: conditionSchema.optional(),
   condition: conditionSchema.optional(),
   instructions: z.array(instructionSchema),
+}).refine((effect) => effect.timing === "resolution" || !effect.instructions.some((instruction) => instruction.verb === "GainXp"), {
+  // The Resolution is the only place XP is awarded (dcce.gaining-xp): a GainXp line anywhere else would silently do nothing.
+  message: "GainXp is a Resolution verb",
+  path: ["timing"],
 });
 
 export type Instruction = z.infer<typeof instructionSchema>;

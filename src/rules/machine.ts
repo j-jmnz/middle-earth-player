@@ -51,14 +51,19 @@ import { eventWaits } from "./families/defense-listen.ts";
 import { announceShadowsDealt } from "./families/defense-shadow.ts";
 import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
 import { strikeResumes } from "./families/attack-flow.ts";
+import { pruneRoundCaps } from "./families/dreamchaser.ts";
 import { announceProgress } from "./families/burden-effects.ts";
 import { damageLoss } from "./families/south-locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
+import { refillCorsairDeck } from "./families/sea-corsair.ts";
+import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
+import { askingToCommit, askingToLook, askingToShift } from "./families/sea-sailing-legal.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
-    current = refillEncounterDeck(damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards), steps);
+    // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
+    current = refillCorsairDeck(refillEncounterDeck(damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards), steps));
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
@@ -119,7 +124,8 @@ export function applyIntent(
     case "Mulligan":
       return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps), true);
     case "Pass":
-      return applyPass(state);
+      // A Pass while the first player is asked what to commit to the Sailing test commits no one (dcce.sailing-tests).
+      return askingToCommit(state) ? performSailing(state, [], ctx, steps) : applyPass(state);
     case "PlayCard": {
       // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).
       // What the play adds beyond moving the card (families/costs-play.ts): its discount's riders, its additional costs.
@@ -128,13 +134,15 @@ export function applyIntent(
       return played.window?.kind === "pass" ? { ...played, passed: [] } : played;
     }
     case "Commit":
-      return commit(state, intent.cardIds, steps, intent.sideQuestId);
+      // The first player commits characters to the Sailing test, not to the quest (families/sea-sailing.ts).
+      return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
     case "Trigger":
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":
-      return applyChoice(state, intent.optionId);
+      if (askingToLook(state)) return chooseLookDone(state);
+      return askingToShift(state) ? chooseShift(state, intent.optionId) : applyChoice(state, intent.optionId);
     case "ChooseResolution":
       return applyResolution(state, intent.optionId);
     case "Travel":
@@ -186,8 +194,10 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "resourceGrant":
       return grant(state, steps, ctx);
     case "resourceActions":
-    case "questCommit":
       return openPass(state);
+    // The Sailing test comes before the characters are committed to the quest (dcce.sailing).
+    case "questCommit":
+      return sailingStep(state, ctx) ?? openPass(state);
     case "planning": {
       const opened = openPass(state);
       return { ...opened, planningSeat: opened.activeSeat };
@@ -245,7 +255,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
 }
 
 function enterBegin(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const bumped = pruneRoundRecords({ ...state, round: state.round + 1 });
+  const bumped = pruneRoundCaps(pruneRoundRecords({ ...state, round: state.round + 1 }));
   if (hasTiming(bumped, ctx, "beginningOfPhase")) return openPass(bumped);
   return withMode(bumped, "resourceGrant");
 }

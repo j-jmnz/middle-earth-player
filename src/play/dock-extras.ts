@@ -43,6 +43,8 @@ export function dockExtras(a: {
   const first = about[0];
   if (first) extras.push({ label: "Read", accessibilityLabel: "Read the card", testID: "sheet-inspect", onPress: () => a.onRead(first, about) });
   if (!a.panel && sheet.kind !== "window" && tappable(sheet).size > 0) extras.push({ label: "List", testID: "sheet-list", onPress: a.onList });
+  // A Sailing test's look: the cards listed with their marks, read-only (sea-sheets.ts); also the path a screen reader takes.
+  if (!a.panel && sheet.kind === "pick" && sheet.look != null && sheet.look.length > 0) extras.push({ label: "List", testID: "sheet-list", onPress: a.onList });
   if (sheet.kind === "window" && sheet.commit) extras.push({ label: "List", testID: "sheet-list", onPress: a.onCommit });
   if (sheet.kind === "window" && sheet.triggers.length > 0) extras.push({ label: `Actions (${sheet.triggers.length})`, testID: "table-actions", onPress: a.onActions });
   if (a.panel && !a.panelOpen) extras.push({ label: "Choose", testID: "sheet-expand", onPress: a.onChoose });

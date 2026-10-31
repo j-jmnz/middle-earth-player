@@ -104,6 +104,57 @@ export function barZones(bar: number, dials: number, scale = 1, center = bar / 2
   return { left: left * scale, rail: Math.max(0, room - left - right) * scale, right: right * scale, scroll: Math.ceil(natural) > left };
 }
 
+// ---- The dials row: the Heading dial (phase 39b, docs/design-system-table.md, Top bar). All sizes are logical points at Medium, as the zones above. ----
+
+/** A dial's disc, the padding either side of a dial, the gap between a disc and its label, and the gap between two dials (table-chrome.tsx, table-top-bar.tsx). */
+export const DIAL_SIZE = 46;
+export const DIAL_PAD = 4;
+export const DIAL_LABEL_GAP = 6;
+export const DIAL_GAP = 10;
+/** The fade at the right edge of a scrolling dials row, and the room the row keeps clear of it at its end. */
+export const EDGE_FADE = 28;
+// The seat dial: its disc, its padding and its "P1" label (two letters at label size).
+const SEAT_LABEL = Math.ceil(2 * LABEL_EM * LABEL_SIZE);
+/** A seat's dial in a two-handed game: padding, disc, gap, "P1". */
+export const SEAT_DIAL = 2 * DIAL_PAD + DIAL_SIZE + DIAL_LABEL_GAP + SEAT_LABEL;
+/** The Heading dial's label column at its widest: the widest of "Heading", "Toward Sun" and "Toward Storm" (the change badge, with its 6 pt of padding each side), so the dial's width does not move when the badge comes and goes. */
+const HEADING_WORD_W = Math.ceil(Math.max(...["Heading", "Toward Sun", "Toward Storm"].map((word) => word.length)) * LABEL_EM * LABEL_SIZE);
+export const HEADING_LABEL_W = HEADING_WORD_W + 12;
+/** The badge under a compact dial's disc: the widest word with 4 pt of padding each side. */
+export const HEADING_BADGE_W = HEADING_WORD_W + 8;
+
+/** The Heading dial's width: with its label column, or compact (the disc alone, the badge laid under it) while the bar scrolls. */
+export function headingDialWidth(compact: boolean): number {
+  return 2 * DIAL_PAD + DIAL_SIZE + (compact ? 0 : DIAL_LABEL_GAP + HEADING_LABEL_W);
+}
+
+/** How far a compact dial's badge reaches past the dial on each side. */
+export const HEADING_BADGE_OVER = Math.max(0, Math.ceil((HEADING_BADGE_W - headingDialWidth(true)) / 2));
+
+/**
+ * Whether the Heading dial drops its "Heading" word and lays its badge under the disc: when the dials, with the dial at its full width, would make the left zone scroll, or would take the rail
+ * below the width that shows its neighbor phases (RAIL_WIDE) where the compact dial keeps it. `others` is the width of the dials row without the Heading dial and the gap before it, in screen
+ * points; the answer does not depend on the dial's own current width, so it cannot flip back and forth.
+ */
+export function headingCompact(bar: number, others: number, scale = 1, center = bar / 2, narrow = false): boolean {
+  const full = barZones(bar, others + (DIAL_GAP + headingDialWidth(false)) * scale, scale, center);
+  if (full.scroll) return true;
+  const small = barZones(bar, others + (DIAL_GAP + headingDialWidth(true)) * scale, scale, center);
+  return !railWide(full.rail, narrow, scale) && railWide(small.rail, narrow, scale);
+}
+
+/**
+ * Where the dials row scrolls to (screen points) so the Heading dial and its badge stand whole inside the zone, clear of the fade at its right edge; 0 while the row does not scroll. `dial` is the
+ * dial's left edge and width in the row, with the room its badge reaches into after it (a compact dial's, HEADING_BADGE_OVER); `content` is the row's width.
+ */
+export function headingOffset(zones: Pick<BarZones, "left" | "scroll">, dial: { x: number; w: number }, content: number, scale = 1): number {
+  if (!zones.scroll) return 0;
+  const fade = EDGE_FADE * scale;
+  const wanted = dial.x + dial.w - (zones.left - fade);
+  const end = Math.max(0, content + fade - zones.left);
+  return Math.max(0, Math.min(wanted, end));
+}
+
 /** The pill shows the neighbor phases only when it has room, and the phone is 760 pt or wider inside the insets. */
 export function railWide(rail: number, narrowScreen: boolean, scale = 1): boolean {
   return !narrowScreen && rail / scale >= RAIL_WIDE;

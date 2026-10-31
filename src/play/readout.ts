@@ -17,12 +17,13 @@ import { livingSeats } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "./foresight.ts";
+import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "./sheet-types.ts";
 import { choiceFor, type Choice } from "./table-choice.ts";
 
 // `join` is the word between two numbers: "against" (willpower against threat), or "then" for the staging threat before and
 // after a travel.
-export type Readout = { kind: "quest" | "hide" | "attack" | "defense" | "travel"; stats: readonly SheetStat[]; result: string | null; join?: string };
+export type Readout = { kind: "quest" | "hide" | "attack" | "defense" | "travel" | "sailing"; stats: readonly SheetStat[]; result: string | null; join?: string };
 
 const WILL = (value: number): SheetStat => ({ icon: "willpower", value, word: "Willpower" });
 const THREAT = (value: number): SheetStat => ({ icon: "threat", value, word: "Threat" });
@@ -80,6 +81,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
   // Once the scenario is won or lost no number is in play: an attack the loss cut short is not shown.
   if (game.lost || game.stageCleared) return null;
   const choice = sheet ? choiceFor(sheet, held) : null;
+  // A Sailing test: how many cards the characters picked look at, then the heading the symbols found would make (sea-readout.ts).
+  const sailing = sailingReadout(game, ctx, choice?.ids ?? [], { card: cardName, line: () => null });
+  if (sailing) return sailing;
   // A Hide test's action window: the willpower committed against the threat of the cards discarded.
   if (sheet?.kind === "trigger" && sheet.hide) {
     const { willpower, threat, x } = sheet.hide;

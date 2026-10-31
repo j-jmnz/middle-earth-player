@@ -25,6 +25,8 @@ import { shadowFace } from "./families/defense-shadow.ts";
 import { drawCards } from "./families/dungeon-deck.ts";
 import { withView } from "./families/breaking-areas.ts";
 import { isBreakingVerb } from "./families/breaking.ts";
+import { announceDraw } from "./families/dreamchaser.ts";
+import { playerSource } from "./families/quest-threat.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -144,7 +146,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
-      return focus.sourceId ? readyCard(state, focus.sourceId) : state;
+      return focus.sourceId ? readyCard(state, focus.sourceId, playerSource(state, focus.sourceId, ctx)) : state;
     case "Commit":
       // A card the effect names commits as it is, and is announced (families/attack.ts).
       if (instruction.target) return commitCard(state, instruction.target, focus);
@@ -173,7 +175,8 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 // An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either.
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
-  return drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
+  const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
+  return announceDraw(state, drawn, seat);
 }
 
 function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {

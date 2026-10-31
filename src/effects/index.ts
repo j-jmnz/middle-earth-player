@@ -10,9 +10,11 @@ import { AUTHORED_EFFECTS as PASSAGE_AUTHORED, AUTHORED_REPLACES as PASSAGE_REPL
 import { AUTHORED_EFFECTS as CAVES_AUTHORED, AUTHORED_REPLACES as CAVES_REPLACES } from "./authored/the-caves-of-nibin-dum.ts";
 import { AUTHORED_EFFECTS as OATH_AUTHORED, AUTHORED_REPLACES as OATH_REPLACES } from "./authored/the-oath.ts";
 import { AUTHORED_EFFECTS as SOUTH_AUTHORED, AUTHORED_REPLACES as SOUTH_REPLACES } from "./authored/the-ring-goes-south.ts";
+import { AUTHORED_EFFECTS as VOYAGE_AUTHORED, AUTHORED_REPLACES as VOYAGE_REPLACES } from "./authored/voyage-across-belegaer.ts";
 import { FAMILY_AUTHORED_EFFECTS, FAMILY_AUTHORED_REPLACES } from "./authored/families/index.ts";
 import { NIGHTMARE_AUTHORED_EFFECTS, NIGHTMARE_AUTHORED_REPLACES } from "./authored/nightmare/index.ts";
 import { POOL_AUTHORED_EFFECTS, POOL_AUTHORED_REPLACES } from "./authored/pool/index.ts";
+import { GENERATED_EFFECTS as DREAM_CHASER_GENERATED } from "./generated/dream-chaser.ts";
 import { GENERATED_EFFECTS as BOX_GENERATED } from "./generated/fellowship-of-the-ring.ts";
 import { GENERATED_EFFECTS as MIRKWOOD_GENERATED } from "./generated/mirkwood-paths.ts";
 import { GENERATED_EFFECTS as TDOM_GENERATED } from "./generated/the-dark-of-mirkwood.ts";
@@ -25,10 +27,10 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
   return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
 }
 
-// The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's and The Dark of Mirkwood's) and the rest of the player pool's, one file per pack or
+// The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's, The Dark of Mirkwood's and Dream-chaser's) and the rest of the player pool's, one file per pack or
 // per mechanic family.
-export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...POOL_GENERATED_EFFECTS];
-export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...FORD_AUTHORED, ...SOUTH_AUTHORED, ...MORIA_AUTHORED, ...BREAKING_AUTHORED, ...PASSAGE_AUTHORED, ...ANDUIN_AUTHORED, ...DOL_GULDUR_AUTHORED, ...OATH_AUTHORED, ...CAVES_AUTHORED, ...NIGHTMARE_AUTHORED_EFFECTS, ...POOL_AUTHORED_EFFECTS, ...FAMILY_AUTHORED_EFFECTS];
-export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...FORD_REPLACES, ...SOUTH_REPLACES, ...MORIA_REPLACES, ...BREAKING_REPLACES, ...PASSAGE_REPLACES, ...ANDUIN_REPLACES, ...DOL_GULDUR_REPLACES, ...OATH_REPLACES, ...CAVES_REPLACES, ...NIGHTMARE_AUTHORED_REPLACES, ...POOL_AUTHORED_REPLACES, ...FAMILY_AUTHORED_REPLACES];
+export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...POOL_GENERATED_EFFECTS];
+export const AUTHORED_EFFECTS: readonly Effect[] = [...BOX_AUTHORED, ...FORD_AUTHORED, ...SOUTH_AUTHORED, ...MORIA_AUTHORED, ...BREAKING_AUTHORED, ...PASSAGE_AUTHORED, ...ANDUIN_AUTHORED, ...DOL_GULDUR_AUTHORED, ...OATH_AUTHORED, ...CAVES_AUTHORED, ...VOYAGE_AUTHORED, ...NIGHTMARE_AUTHORED_EFFECTS, ...POOL_AUTHORED_EFFECTS, ...FAMILY_AUTHORED_EFFECTS];
+export const AUTHORED_REPLACES: readonly string[] = [...BOX_REPLACES, ...FORD_REPLACES, ...SOUTH_REPLACES, ...MORIA_REPLACES, ...BREAKING_REPLACES, ...PASSAGE_REPLACES, ...ANDUIN_REPLACES, ...DOL_GULDUR_REPLACES, ...OATH_REPLACES, ...CAVES_REPLACES, ...VOYAGE_REPLACES, ...NIGHTMARE_AUTHORED_REPLACES, ...POOL_AUTHORED_REPLACES, ...FAMILY_AUTHORED_REPLACES];
 
 export const EFFECTS: readonly Effect[] = mergeEffects(GENERATED_EFFECTS, AUTHORED_EFFECTS);

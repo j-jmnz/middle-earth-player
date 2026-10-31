@@ -2,13 +2,20 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import { PRODUCT_PACKS } from "../campaign-defs.ts";
+import { PRODUCT_PACKS, PRODUCTS } from "../campaign-defs.ts";
+
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios } from "../load-scenarios.ts";
 import { RAW_DIR } from "../paths.ts";
 import { isNightmareCard, NIGHTMARE_DECKS, NIGHTMARE_PACK, nightmareDeckOfCode } from "../nightmare-defs.ts";
 import { deckFiles, nightmareFiles } from "../sources/nightmare.ts";
 import { driveFileUrl, type DriveFile } from "../sources/jvzijp.ts";
+import type { HobCard } from "../sources/hallofbeorn.ts";
+import { foldTwoSided } from "../normalize/product-cards.ts";
+import { titleKey } from "../normalize/names.ts";
+
+// The pack the Dream-chaser Campaign Expansion's cards are printed in (scripts/data/campaign-defs.ts).
+const DREAM_CHASER_EXPANSION = "DCCE";
 
 // The cards whose printed text the ledger holds: everything every built scenario deals (the six of the Fellowship box, the
 // three Revised Core scenarios, The Oath and The Caves of Nibin-Dûm), on every difficulty (the Nightmare decks of the nine that
@@ -26,8 +33,17 @@ export const MEC109_CHANGED = ["141078", "141080", "141081", "141082", "141083",
 export const KNOWN_ERRORS = ["141025", "141026", "141029", "142062"];
 
 // Hall of Beorn's own image path for these has a typo ("Striken-Dumb.jpg", "The-Argonauth.jpg") that 403s. The corrected
-// spelling exists.
+// spelling exists. A key is a code (side A) or "<code>.B". The Dream-chaser Campaign Expansion's scans keep the accent out of the
+// file name that Hall of Beorn's record keeps in (Nárelenya, Círdan's Blessing).
+const DREAM_CHASER_SCANS = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion";
 const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
+  "110139": [`${DREAM_CHASER_SCANS}/Glorinaith.jpg`],
+  "110140": [`${DREAM_CHASER_SCANS}/Narelenya.jpg`],
+  "110140.B": [`${DREAM_CHASER_SCANS}/Narelenya-Upgraded.jpg`],
+  "11205": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Leadership.jpg`],
+  "11206": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Tactics.jpg`],
+  "11207": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Spirit.jpg`],
+  "11208": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Lore.jpg`],
   "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
   "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
 };
@@ -65,15 +81,20 @@ function boxCodes(): string[] {
   const cards = loadCards();
   const bySlug = new Map(cards.flatMap((card) => card.printings.flatMap((printing) => (printing.hobSlug ? [[printing.hobSlug, card.code] as const] : []))));
   const codes = new Set<string>();
+  const nightmareCodes = new Set(cards.filter(isNightmareCard).map((card) => card.code));
   const dir = path.join(RAW_DIR, "hallofbeorn", "Scenarios");
   for (const name of readdirSync(dir).sort()) {
     const scenario = JSON.parse(readFileSync(path.join(dir, name), "utf8")) as { QuestCards: { Slug: string }[]; ScenarioCards: { Slug: string; EncounterSet: string | null }[] };
+    // A scenario file also lists the quest cards of its Nightmare deck (Dream-chaser's); a Nightmare card is read from its own proxy picture.
     for (const entry of [...scenario.QuestCards, ...scenario.ScenarioCards.filter((card) => !/Nightmare$/.test(card.EncounterSet ?? ""))]) {
       const code = bySlug.get(entry.Slug);
-      if (code) codes.add(code);
+      if (code && !nightmareCodes.has(code)) codes.add(code);
     }
   }
   for (const card of cards) if (card.campaignKind && card.printings.some((printing) => PRODUCT_PACKS.has(printing.pack))) codes.add(card.code);
+  // Everything the Dream-chaser Campaign Expansion prints that is not a player card: the nine campaign cards, the Hard and Expert Mode card
+  // (in no scenario's list), the 2023 reprints with their Campaign Mode only and Upgraded sides, the ships and every boon and burden.
+  for (const card of cards) if (card.printings.some((printing) => printing.pack === DREAM_CHASER_EXPANSION)) codes.add(card.code);
   // The box's Ring-bearer: every scenario starts with a Fellowship-sphere Ring-bearer hero in play (mec109.setting-up-the-game),
   // so his text is part of every game.
   for (const card of cards) {
@@ -88,23 +109,56 @@ export function scopeCodes(): string[] {
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
 
+// The rows are folded as the build folds them (foldTwoSided): a Dream-chaser Campaign Expansion card with an Upgraded or Campaign Mode
+// only side has that side's picture as its back.
 function hobImages(): HobImages[] {
-  return ["EncounterCards", "QuestCards", "PlayerCards"].flatMap((kind) => JSON.parse(readFileSync(path.join(RAW_DIR, "hallofbeorn", `${kind}.json`), "utf8")) as HobImages[]);
+  const rows = ["EncounterCards", "QuestCards", "PlayerCards"].flatMap((kind) => JSON.parse(readFileSync(path.join(RAW_DIR, "hallofbeorn", `${kind}.json`), "utf8")) as HobCard[]);
+  return foldTwoSided(rows).cards as unknown as HobImages[];
+}
+
+// DragnCards' card database, read once: the picture prefix and every row.
+let dragnTable: { prefix: string; rows: Record<string, string>[] } | null = null;
+function dragnRows(): { prefix: string; rows: Record<string, string>[] } {
+  if (dragnTable) return dragnTable;
+  const prefix = (JSON.parse(readFileSync(path.join(RAW_DIR, "dragncards", "imageUrlPrefix.json"), "utf8")) as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English;
+  const lines = readFileSync(path.join(RAW_DIR, "dragncards", "cardDb.tsv"), "utf8").split("\n");
+  const header = (lines[0] ?? "").split("\t");
+  const rows = lines.slice(1).filter((line) => line !== "").map((line) => {
+    const cells = line.split("\t");
+    return Object.fromEntries(header.map((key, at) => [key, cells[at] ?? ""]));
+  });
+  dragnTable = { prefix, rows };
+  return dragnTable;
 }
 
 // DragnCards' full-size picture for an OCTGN guid, the last resort when Hall of Beorn only has a thumbnail.
 function dragnImages(): ReadonlyMap<string, string> {
-  const prefix = (JSON.parse(readFileSync(path.join(RAW_DIR, "dragncards", "imageUrlPrefix.json"), "utf8")) as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English;
-  const lines = readFileSync(path.join(RAW_DIR, "dragncards", "cardDb.tsv"), "utf8").split("\n");
-  const header = (lines[0] ?? "").split("\t");
-  const idAt = header.indexOf("databaseId");
-  const imageAt = header.indexOf("imageUrl");
+  const { prefix, rows } = dragnRows();
   const out = new Map<string, string>();
-  for (const line of lines.slice(1)) {
-    const cells = line.split("\t");
-    if (cells[idAt] && cells[imageAt]) out.set(cells[idAt] ?? "", `${prefix}${cells[imageAt] ?? ""}`);
-  }
+  for (const row of rows) if (row.databaseId && row.imageUrl) out.set(row.databaseId, `${prefix}${row.imageUrl}`);
   return out;
+}
+
+// Hall of Beorn has no picture for the second side of some Dream-chaser cards. DragnCards files the facedown side of an Uncharted
+// location ("Lost Island") as a row of its own, and the second side of a multi-sided card as "<id>.B.jpg": that picture is the side's scan.
+// The card is the row of its pack and collector number that bears its name (accents and punctuation aside) or, for a card DragnCards names
+// otherwise (the Heading card Navigation), the one second-side row of its type.
+function dragnOtherSide(card: Card): string | null {
+  const printing = card.printings.find((item) => item.hobSlug !== undefined);
+  const product = PRODUCTS.find((item) => item.packs.some((pack) => pack === printing?.pack));
+  if (!printing || !product) return null;
+  const { prefix, rows: all } = dragnRows();
+  const typeKey = (value: string) => value.toLowerCase().replace(/[\s-]/g, "");
+  const rows = all.filter((row) => row.packName === product.name && row.numberInPack === String(printing.number));
+  const sameType = rows.filter((row) => typeKey(row.type ?? "") === typeKey(card.typeName));
+  // A location's facedown side is a row of its own under another name ("Lost Island"); any other multi-sided card keeps its second side
+  // in "<id>.B.jpg".
+  const other = rows.find((row) => row.type === card.typeName && row.name !== card.name && row.imageUrl);
+  if (card.type === "location" && other) return `${prefix}${other.imageUrl}`;
+  const seconds = sameType.filter((row) => (row.imageUrl ?? "").endsWith(".B.jpg"));
+  const second = seconds.find((row) => titleKey(row.name ?? "") === titleKey(card.name)) ?? (seconds.length === 1 ? seconds[0] : undefined);
+  if (second) return `${prefix}${second.imageUrl}`;
+  return other ? `${prefix}${other.imageUrl}` : null;
 }
 
 const CORE_ORDER = ["Revised Core Set", "Core Set"];
@@ -168,14 +222,16 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
     const first = sources[0];
     if (!first) throw new Error(`No scan URL for ${code} ${card.name}`);
     const isCampaign = card.type === "campaign";
-    const sideA = first.urls.filter((url) => !url.includes("dragncards"));
+    // A card Hall of Beorn has no picture of (the Campaign Expansion's #129) is read from its DragnCards pictures: front, then back.
+    const own = first.urls.filter((url) => !url.includes("dragncards"));
+    const sideA = own.length > 0 ? own : first.urls;
     const front = sideA[0];
-    const back = isCampaign && front ? front.replace("SetupA", "SetupB") : sideA[1];
-    if (!front) throw new Error(`No Hall of Beorn scan for ${code}`);
+    const back = isCampaign && front ? front.replace("SetupA", "SetupB") : (sideA[1] ?? (card.back ? dragnOtherSide(card) : null) ?? undefined);
+    if (!front) throw new Error(`No scan for ${code}`);
     const guid = card.printings.map((printing) => printing.octgnGuid).find((value) => value !== undefined);
     const fromDragn = guid ? dragn.get(guid) : undefined;
     out.push({ code, side: "A", printing: first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : [])] });
-    if (back) out.push({ code, side: "B", printing: first.printing, urls: [back] });
+    if (back) out.push({ code, side: "B", printing: first.printing, urls: [...(SCAN_URL_FIXES[`${code}.B`] ?? []), back] });
   }
   return out;
 }

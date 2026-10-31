@@ -93,6 +93,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
       bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc),
       bookletId: campaign.bookletId,
       saga: campaign.saga,
+      ...(def.xp ? { xp: true } : {}),
     })),
   };
   const scenarioDir = path.join(outDir, "scenarios");

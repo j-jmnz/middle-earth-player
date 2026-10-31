@@ -169,3 +169,36 @@ describe("Mirkwood spans", () => {
     expect(sheet).toContain("2x Dungeon Jailor");
   });
 });
+
+// Dream-chaser (phase 37): the Dream-chaser Campaign Expansion rulebook (MEC111) is the document `dcce`.
+describe("Dream-chaser spans", () => {
+  const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");
+  const SCENARIOS = ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived", "the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"];
+
+  it("pin the rulebook as a document of 32 pages with a span for each rule the plan names", () => {
+    expect(docs.get("dcce")?.pages.length).toBe(32);
+    for (const id of [
+      ...SCENARIOS.map((scenario) => `dcce.setup-${scenario}`),
+      ...["ships", "ship-enemies", "ship-objectives", "corsair-deck", "boarding", "prepare-your-fleet", "heading", "sailing", "sailing-tests", "stormcaller-elite", "campaign-mode", "uncharted", "uncharted-deck", "aflame", "stormcallers-area", "grapple", "island-map", "exploration", "grotto-deck", "from-sea-to-land", "indestructible", "archery", "last-player", "gaining-xp", "scalable-upgradable", "hard-expert"].map((rule) => `dcce.${rule}`),
+    ]) {
+      expect(byId.has(id), id).toBe(true);
+    }
+  });
+
+  it("print each scenario's encounter-deck paragraph, the set lists the build checks the cards against", () => {
+    expect(text("dcce.setup-voyage-across-belegaer")).toContain("Voyage Across Belegaer, Vast Oceans, Stormy Weather, Umbar Fleet, Corsair Pirates, and The Dream-chaser’s Fleet");
+    expect(text("dcce.setup-the-city-of-corsairs")).toContain("The City of Corsairs, Coast of Umbar, Stormy Weather, Umbar Fleet, Voyage Across Belegaer, Corsair Raiders, and The Dream-chaser’s Fleet");
+    expect(text("dcce.setup-the-thing-in-the-depths")).toContain("The Thing in the Depths, The Stormcaller, Corsair Raiders, and The Stormcaller Elite");
+  });
+
+  it("hold the sea rules as the rulebook words them", () => {
+    expect(text("dcce.sailing-tests")).toContain("symbol found on the looked at cards, you may shift your heading on-course");
+    expect(text("dcce.corsair-deck")).toContain("removing all non-ship enemies from the encounter deck");
+    expect(text("dcce.boarding")).toContain("reveal the top X cards from the Corsair deck");
+    expect(text("dcce.prepare-your-fleet")).toContain("One of the players must choose the Dream-chaser");
+    expect(text("dcce.gaining-xp")).toContain("Record this amount in the Campaign Log");
+    expect(text("dcce.scalable-upgradable")).toContain("Spending 1 XP allows the players to mark any one checkbox");
+    expect(text("dcce.naasiyah")).toContain("cannot be used in scenarios 1 through 7");
+    expect(text("dcce.from-sea-to-land")).toContain("shuffle the Corsair Deck and Corsair discard pile into the second encounter deck");
+  });
+});

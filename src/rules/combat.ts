@@ -23,6 +23,7 @@ import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/att
 import { countsDefense, struck } from "./families/attack-strike.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations } from "./families/south-watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
+import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong } from "./families/sea-ships.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -35,8 +36,9 @@ export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number):
   let total = 0;
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (stage && !stage.has(instance.id))) continue;
-    const value = printedOf(cards, instance.code).keywords.archery;
-    if (value != null && value > 0) total += value;
+    // Archery gained ("gains archery 4", dcce.archery) adds to the printed value; the effects of several cards are cumulative.
+    const value = (printedOf(cards, instance.code).keywords.archery ?? 0) + heldAmount(state, instance.id, "archery");
+    if (value > 0) total += value;
     // Archery a card in play gives itself (142070:A:1, 142078:A:1).
     if (state.modifiers.length > 0) total += heldAmount(state, instance.id, "archeryBonus") + (flagged(state, instance.id, "archeryPlayers") ? players : 0);
   }
@@ -157,6 +159,8 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
+  // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
+  if (!shipMayDefend(state, printed, cards)) return false;
   if (instance.controller === attackedSeat) return true;
   return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
 }
@@ -220,6 +224,11 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
+  // A ship-objective attacks only ship-enemies (dcce.ship-objectives).
+  if (!shipMayAttack(printed, printedOf(cards, enemy.code))) return false;
+  // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
+  if (flagged(state, enemyId, "cannotBeAttacked")) return false;
+  if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
   // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
@@ -374,6 +383,9 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   // A shadow effect sent the damage to an active location (families/south-watcher.ts).
   const locations = undefendedLocations(state);
   if (locations.length > 0) return locations;
+  // A ship-enemy's undefended attack damages a ship-objective its player controls, not a hero (dcce.ship-enemies).
+  const ships = shipEnemyAttacking(state, cards) ? shipObjectivesAmong(characters(state, seat, cards), state, cards) : [];
+  if (ships.length > 0) return ships;
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.

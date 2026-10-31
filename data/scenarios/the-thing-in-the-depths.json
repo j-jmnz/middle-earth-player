@@ -1,0 +1,202 @@
+{
+  "id": "the-thing-in-the-depths",
+  "name": "The Thing in the Depths",
+  "number": 2,
+  "stages": [
+    "12039",
+    "12040",
+    "12041"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Thing in the Depths",
+      "count": 18
+    },
+    {
+      "name": "The Stormcaller",
+      "count": 12
+    },
+    {
+      "name": "Corsair Raiders",
+      "count": 8
+    },
+    {
+      "name": "The Stormcaller Elite",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "12043",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12044",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12045",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12046",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12047",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12048",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11064",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11065",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11066",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11067",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12040",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12042",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "12049",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "11077"
+    },
+    {
+      "code": "11078",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "11079"
+    },
+    {
+      "code": "12050",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12051",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12053",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12054",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12055",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "12056",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounterDeck2"
+    }
+  ],
+  "campaignCard": "11194",
+  "campaignPlaced": [
+    "11183",
+    "11192",
+    "11195",
+    "11196"
+  ],
+  "reprints": {
+    "12049": "110063"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.5",
+    "dragnEasy": "E06.5",
+    "hobSlug": "The-Thing-in-the-Depths"
+  }
+}

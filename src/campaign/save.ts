@@ -7,6 +7,7 @@ import type { PlayerIntent } from "../rules/intents.ts";
 
 import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
 import type { ActiveScenario } from "./replay.ts";
+import { MODE_CARDS, type ModeCard } from "./xp.ts";
 
 export const FELLOWSHIP_ID = "fellowship-of-the-ring";
 
@@ -39,6 +40,11 @@ export const campaignLogSchema = z.strictObject({
   carryOver: z.array(poolCardSchema).default([]),
   carryIn: z.array(poolCardSchema).default([]),
   carriedFrom: z.string().optional(),
+  // Dream-chaser's XP and Hard/Expert choices (phase 38). A log saved before them reads with these defaults.
+  xpGained: z.record(z.string(), z.number().int().nonnegative()).default({}),
+  marks: z.record(z.string(), z.number().int().nonnegative()).default({}),
+  modes: z.record(z.string(), z.enum(MODE_CARDS)).default({}),
+  modeDefault: z.enum(MODE_CARDS).nullable().default(null),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open
@@ -60,6 +66,8 @@ export type StoredLoadout = {
   ringBearer: string | null;
   choices: string[];
   acceptPenalty: boolean;
+  // The Hard/Expert Mode card the briefing chose (dcce.hard-expert); absent for none and in a campaign without one.
+  modeCard?: ModeCard | undefined;
 };
 
 // What any deal keeps, campaign or standalone: the scenario, the difficulty, each seat's deck and the Ring-bearer slot.
@@ -74,6 +82,7 @@ export const dealtLoadoutSchema = z.strictObject({
 export const storedLoadoutSchema = dealtLoadoutSchema.extend({
   choices: z.array(z.string()),
   acceptPenalty: z.boolean(),
+  modeCard: z.enum(MODE_CARDS).optional(),
 });
 
 export type Save = {
@@ -85,12 +94,16 @@ export type Save = {
   loadout: StoredLoadout | null;
 };
 
-// A new save starts on a blank log (the Dark of Mirkwood mini campaign included). `carried` is the carry-over of a finished save
-// (carry-over.ts): the cards its first checklist takes into the pool. A copy for each player becomes one entry for each of this
-// save's seats, whatever the finished save had. `carriedFrom` is the finished save's id.
-export function newSave(id: string, campaignId: string, seatCount: 1 | 2, carried: readonly PoolCard[] = [], carriedFrom: string | null = null): Save {
+// What a new save may start with. `carried` is the carry-over of a finished save (carry-over.ts): the cards its first checklist takes into the
+// pool. A copy for each player becomes one entry for each of this save's seats, whatever the finished save had. `carriedFrom` is the finished
+// save's id. `modeDefault` is the Hard/Expert Mode card the campaign setup offers each briefing first (Dream-chaser).
+export type NewSaveOptions = { carried?: readonly PoolCard[]; carriedFrom?: string | null; modeDefault?: ModeCard | null };
+
+// A new save starts on a blank log (the Dark of Mirkwood mini campaign included).
+export function newSave(id: string, campaignId: string, seatCount: 1 | 2, options: NewSaveOptions = {}): Save {
+  const { carried = [], carriedFrom = null, modeDefault = null } = options;
   const carryIn = carried.flatMap((card) => (card.perPlayer ? Array.from({ length: seatCount }, (_, seat) => ({ ...card, seat })) : [card]));
-  return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn, ...(carriedFrom ? { carriedFrom } : {}) }, active: null, loadout: null };
+  return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn, modeDefault, ...(carriedFrom ? { carriedFrom } : {}) }, active: null, loadout: null };
 }
 
 export function parseSeatCount(value: number): 1 | 2 {

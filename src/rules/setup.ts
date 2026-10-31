@@ -7,6 +7,7 @@ import { threatCostCut } from "./families/costs-stats.ts";
 import type { EngineStep } from "./intents.ts";
 import { recordStartingThreat } from "./families/quest-threat.ts";
 import { questStageStart } from "./families/quest-setup.ts";
+import { pushCardEffects } from "./effect-frames.ts";
 import { placeContracts } from "./families/sidequests-contract.ts";
 import { setAsideEncounterCards } from "./families/sidequests-encounter.ts";
 import { pushPlayerSetup } from "./families/sidequests-setup.ts";
@@ -20,6 +21,7 @@ import type { CampaignFacts } from "./campaign-state.ts";
 import { placeCampaignCard } from "./families/burden-campaign.ts";
 import { snapshotOf } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
+import { stampRoutes } from "./families/sea-routes.ts";
 
 export type StartSeat = {
   heroes: readonly string[];
@@ -45,6 +47,8 @@ export type StartScenario = {
   questDeck: readonly string[];
   // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
   burdenDeck?: readonly string[];
+  // The non-ship enemies the scenario deals as its Corsair deck (dcce.corsair-deck), when it has one; "Prepare the Corsair deck" shuffles it.
+  corsairDeck?: readonly string[];
   // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Nightmare adds nothing here: its
   // deck and setup card are in the definition and the encounter deck. Normal when absent.
   difficulty?: Difficulty;
@@ -58,6 +62,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     seed: input.seed,
     definition: input.definition,
   });
+  // The campaign log's facts come first: an upgraded card is dealt on its Upgraded side wherever the campaign deals it (families/dreamchaser-facts.ts).
+  if (input.facts) state = { ...state, campaignFacts: input.facts };
   input.questDeck.forEach((code, index) => {
     const spawned = spawn(state, code, index === 0 ? { zone: "questStage" } : { zone: "questDeck" }, "A");
     state = spawned.state;
@@ -71,10 +77,14 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     const shuffled = shuffleIds(state.burdenDeck ?? [], state.seed, state.seedCursor);
     state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
   }
+  // The Corsair deck: dealt apart from the encounter deck, shuffled by its Setup step (families/sea-corsair.ts).
+  if (input.corsairDeck && input.corsairDeck.length > 0) {
+    state = { ...state, corsairDeck: [], corsairDiscard: [] };
+    for (const code of input.corsairDeck) state = spawn(state, code, { zone: "corsairDeck" }).state;
+  }
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
-  if (input.facts) state = { ...state, campaignFacts: input.facts };
   if (input.seats.some((seat) => (seat.afterMulligan?.length ?? 0) > 0)) state = { ...state, afterMulligan: input.seats.slice(0, input.seatCount).map((seat) => seat.afterMulligan ?? []) };
   for (let index = 0; index < input.seatCount; index += 1) {
     const seat = input.seats[index];
@@ -105,6 +115,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = shuffleZone(state, index);
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
+  // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea-routes.ts): only in a game with ships.
+  state = stampRoutes(state, ctx.cards);
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   const quiet: EngineStep[] = [];
@@ -141,11 +153,26 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     if (next.failure || next.lost) return next;
   }
   if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
+  // The campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup) goes down first, so it resolves after it.
+  next = campaignAfterSetup(next, ctx, steps);
   // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest-setup.ts).
   next = questStageStart(next, ctx, steps);
   // The Nightmare setup card's Forced effects "During setup" (families/nightmare-setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
+  // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
+  if (next.modeCard) next = spawn(next, next.modeCard.code, { zone: "modeCard" }, next.modeCard.side).state;
   return withMode(next, "beginRound");
+}
+
+// The campaign card's Setup instructions that name what the quest card's Setup prepares (the ship-objectives of the Dream-chaser's fleet): one frame, whose
+// cause is the campaign card's Setup record.
+function campaignAfterSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const after = state.afterSetup;
+  const stage = state.questStage;
+  if (!after || !stage) return state;
+  const record = ctx.effects.find((effect) => effect.cardCode === after.card && effect.timing === "campaignSetup");
+  if (!record) return state;
+  return pushCardEffects(state, "setup", stage, state.firstPlayer, false, [{ ...record, instructions: [...after.instructions] }], ctx, steps);
 }
 
 export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {

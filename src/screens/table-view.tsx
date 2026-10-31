@@ -19,7 +19,7 @@ import { ChoiceTray } from "../play/choice-tray";
 import { isDense } from "../play/dock-budget";
 import { MorePopoverView, useMorePopover } from "../play/dock-more";
 import { railFor } from "../play/rail";
-import { dialTicksSelector, shownSeat, threatSelector } from "../play/selectors";
+import { dialTicksSelector, threatSelector } from "../play/selectors";
 import type { SheetNames } from "../play/sheet-types";
 import { effectById, type ReduceContext, type TableStore } from "../play/store";
 import { createHandoff } from "../play/spotlight-handoff";
@@ -46,6 +46,7 @@ import { PEEK_ROOM, PEEK_TOP } from "../play/peek-banner";
 import { usePeek } from "../play/use-peek";
 import { AreaSummary } from "../play/area-summary";
 import { useTableChoice } from "../play/use-table-choice";
+import { useTableWiring } from "../play/use-table-wiring";
 import { trayCount } from "../play/tray-logic";
 import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
@@ -53,6 +54,7 @@ import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
 import { QuestScaleView } from "../play/quest-scale-view";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
+import { whyNotChosen } from "../play/why";
 import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
 import { notApplied, notAppliedCodes } from "../play/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
@@ -200,17 +202,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [router, nav],
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
-  // A discard pile opens its list; a deck with an encounter card attached to it (Iron Shackles, 01105:A:1) opens that card, whose preview says what it does.
-  const onPile = useCallback(
-    (id: string) => {
-      if (id === "discard" || id === "encounterDiscard") return setReading({ kind: "pile", pile: id });
-      const { game: now, viewedSeat } = store.getState();
-      const shackles = id === "deck" ? now.seats[shownSeat(now, viewedSeat)]?.deckAttached?.[0] : undefined;
-      if (shackles) setPreview({ id: shackles, extra: [] });
-    },
-    [store],
-  );
-  const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), []);
+  // The printed facts, the preview opener, the pile taps and the Heading dial (use-table-wiring.ts).
+  const { facts, success, onPreview, onPile, headingDial } = useTableWiring({ store, ctx, game, setReading, setPreview });
   // The stage the quest just advanced to, shown large until Progress (src/play/quest-advance.ts); the table answers nothing meanwhile.
   const advance = useQuestAdvance(store);
   const choice = useTableChoice({ store, ctx, names, beats, onPreview, onPile, onOutcome, hold: advance.held });
@@ -302,6 +295,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         names.card,
         preview.extra,
         ledgerLine,
+        (cardId) => whyNotChosen(game, ctx, cardId, choice.sheet),
       )
     : null;
   const shown = previewed?.cards[previewed.start];
@@ -332,6 +326,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           tokens={tokens}
+          heading={headingDial}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           rail={rail}
           stopAhead={stopAhead}
@@ -366,6 +361,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 nameOf={nameOf}
                 sphereOf={sphereOf}
                 inactive={inactive}
+                facts={facts}
+                success={success}
                 info={info}
                 highlight={choice.highlight}
                 beats={beats}

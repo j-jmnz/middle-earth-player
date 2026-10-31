@@ -1,0 +1,311 @@
+{
+  "id": "a-storm-on-cobas-haven",
+  "name": "A Storm on Cobas Haven",
+  "number": 5,
+  "stages": [
+    "12120",
+    "12121",
+    "12122"
+  ],
+  "encounterSets": [
+    {
+      "name": "A Storm on Cobas Haven",
+      "count": 23
+    },
+    {
+      "name": "Voyage Across Belegaer",
+      "count": 6
+    },
+    {
+      "name": "Umbar Fleet",
+      "count": 6
+    },
+    {
+      "name": "Corsair Pirates",
+      "count": 9
+    },
+    {
+      "name": "Corsair Raiders",
+      "count": 9
+    },
+    {
+      "name": "The Dream-chaser's Fleet",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "12125",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12126",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12127",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12128",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12129",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12130",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12131",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12132",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12133",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12134",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12135",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12136",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12137",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11023",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11024",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "11058",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "11059",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11067",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12120",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12121",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12122",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12124",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "11022",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "12123",
+      "normal": 2,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "110138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "110139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11082",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "11060",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11062",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11063",
+      "normal": 2,
+      "easy": 0,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11064",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11065",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "11066",
+      "normal": 2,
+      "easy": 0,
+      "pile": "corsairDeck"
+    }
+  ],
+  "campaignCard": "11209",
+  "campaignPlaced": [
+    "11172",
+    "11173",
+    "11174",
+    "11175",
+    "11177",
+    "11178",
+    "11192",
+    "11193",
+    "11205",
+    "11206",
+    "11207",
+    "11208",
+    "11210"
+  ],
+  "reprints": {
+    "11080": "110136",
+    "11081": "110137",
+    "11082": "110140",
+    "11083": "110141",
+    "12123": "110102"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.8",
+    "dragnEasy": "E06.8",
+    "hobSlug": "A-Storm-on-Cobas-Haven"
+  }
+}

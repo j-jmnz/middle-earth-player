@@ -1,11 +1,16 @@
 import type { Card } from "../catalog/card-facts.ts";
+import type { UpgradedStats } from "../catalog/schema.ts";
 
 // The part of a data/cards record the engine reads. A catalog row maps onto it (src/campaign/cards.ts).
 export type PrintedSource = Pick<
   Card,
   | "code" | "name" | "type" | "traits" | "sphere" | "cost" | "threat" | "willpower" | "attack" | "defense" | "health"
-  | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType"
->;
+  | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType" | "encounterSet"
+> & {
+  // The stats of the Upgraded side, side B (a catalog row carries them as `upgraded`, a data/cards record as `back`).
+  upgraded?: UpgradedStats | null;
+  back?: Card["back"];
+};
 
 export type Sphere = "leadership" | "tactics" | "spirit" | "lore" | "neutral" | "fellowship" | "baggins";
 
@@ -46,7 +51,16 @@ export type Keywords = {
   battle: boolean;
   siege: boolean;
   secrecy: number | null;
+  // The sea family's keywords (families/sea*.ts): Sailing on a quest stage (dcce.sailing), Boarding X on a ship-enemy (dcce.boarding).
+  sailing: boolean;
+  boarding: number | null;
+  // The Sailing success symbols the card prints (dcce.sailing-tests), null when it prints none.
+  sailingSuccess: number | null;
 };
+
+// A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
+// exceptions in dcce.ship-enemies and dcce.ship-objectives (families/sea-ships.ts).
+export type ShipKind = "enemy" | "objective";
 
 export type PrintedCard = {
   code: string;
@@ -72,6 +86,12 @@ export type PrintedCard = {
   campaignKind: "boon" | "burden" | null;
   burdenSet: string | null;
   backType: "player" | "encounter" | null;
+  // Null for a card that is not a ship.
+  ship: ShipKind | null;
+  // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).
+  encounterSet: string | null;
+  // The stats a card dealt on its Upgraded side, side B, has in place of the printed ones (dcce.scalable-upgradable). Null for a card without.
+  upgraded: UpgradedStats | null;
 };
 
 const EMPTY_KEYWORDS: Keywords = {
@@ -91,7 +111,16 @@ const EMPTY_KEYWORDS: Keywords = {
   battle: false,
   siege: false,
   secrecy: null,
+  sailing: false,
+  boarding: null,
+  sailingSuccess: null,
 };
+
+// The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable).
+function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
+  if (back?.willpower == null || back.attack == null || back.defense == null || back.health == null) return null;
+  return { willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health };
+}
 
 // The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
 // the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
@@ -121,6 +150,9 @@ export function definePrinted(
     campaignKind: null,
     burdenSet: null,
     backType: null,
+    ship: null,
+    encounterSet: null,
+    upgraded: null,
     ...card,
     keywords: { ...EMPTY_KEYWORDS, ...card.keywords },
   };
@@ -203,7 +235,10 @@ const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.
 export function printedFromCard(card: PrintedSource): PrintedCard {
-  const type = CARD_TYPES.find((candidate) => candidate === card.type);
+  // A ship is an enemy or an objective ally that carries a mark (dcce.ships): the catalog types ship-enemy and ship-objective.
+  const ship: ShipKind | null = card.type === "ship-enemy" ? "enemy" : card.type === "ship-objective" ? "objective" : null;
+  const engineType = ship === "enemy" ? "enemy" : ship === "objective" ? "objective" : card.type;
+  const type = CARD_TYPES.find((candidate) => candidate === engineType);
   if (!type) throw new Error(`Card ${card.code} ${card.name} has unsupported type ${card.type}`);
   let sphere: Sphere | null = null;
   if (card.sphere != null) {
@@ -233,6 +268,9 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     campaignKind: card.campaignKind,
     burdenSet: card.burdenSet,
     backType: card.backType,
+    ship,
+    encounterSet: card.encounterSet,
+    upgraded: card.upgraded ?? upgradedOfBack(card.back),
     keywords: {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,
@@ -249,6 +287,9 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       battle: keywords.battle === true,
       siege: keywords.siege === true,
       secrecy: keywords.secrecy ?? null,
+      sailing: keywords.sailing === true,
+      boarding: keywords.boarding ?? null,
+      sailingSuccess: keywords.sailingSuccess ?? null,
     },
   });
 }

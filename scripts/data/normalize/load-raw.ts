@@ -16,23 +16,30 @@ export type RawData = {
   scenarioIndex: z.infer<typeof hobScenarioIndexSchema>;
   // DragnCards cardDb rows by databaseId, which equals Hall of Beorn's OctgnGuid for the Black Riders and Road Darkens printings.
   dragn: Map<string, Record<string, string>>;
+  // The same rows by databaseId with the two sides of a double-sided card kept apart: DragnCards files a side B as a second row of the
+  // id (picture `<id>.B.jpg`), and `dragn` keeps the last row of an id, so the Dream-chaser build reads the sides from here.
+  dragnSides: Map<string, { a?: Record<string, string>; b?: Record<string, string> }>;
   // The DragnCards JSON-with-comments files as fetched; the scenario builder parses them.
   dragnRaw: { preBuiltDecks: string };
   // Where DragnCards keeps card pictures, for example https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/.
   dragnImagePrefix: string;
 };
 
-function readDragnCards(): Map<string, Record<string, string>> {
+function readDragnCards(): Pick<RawData, "dragn" | "dragnSides"> {
   const lines = readFileSync(path.join(RAW_DIR, "dragncards", "cardDb.tsv"), "utf8").split("\n");
   const header = (lines[0] ?? "").split("\t");
   const rows = new Map<string, Record<string, string>>();
+  const sides = new Map<string, { a?: Record<string, string>; b?: Record<string, string> }>();
   for (const line of lines.slice(1)) {
     if (line === "") continue;
     const cells = line.split("\t");
     const row = Object.fromEntries(header.map((key, index) => [key, cells[index] ?? ""]));
-    if (row.databaseId) rows.set(row.databaseId, row);
+    if (!row.databaseId) continue;
+    rows.set(row.databaseId, row);
+    const have = sides.get(row.databaseId) ?? {};
+    sides.set(row.databaseId, /\.B\.[a-z]+$/.test(row.imageUrl ?? "") ? { ...have, b: row } : { ...have, a: row });
   }
-  return rows;
+  return { dragn: rows, dragnSides: sides };
 }
 
 function readJson(...parts: string[]): unknown {
@@ -52,5 +59,5 @@ export function loadRaw(): RawData {
   const scenarios = readdirSync(path.join(RAW_DIR, "hallofbeorn", "Scenarios"))
     .sort()
     .map((file) => hobScenarioSchema.parse(readJson("hallofbeorn", "Scenarios", file)));
-  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, scenarioIndex: hobScenarioIndexSchema.parse(readJson("hallofbeorn", "Scenarios.json")), dragn: readDragnCards(), dragnImagePrefix: (readJson("dragncards", "imageUrlPrefix.json") as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English, dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
+  return { packs: packs.filter((pack) => ringsdb.has(pack.code)), ringsdb, hob, scenarios, scenarioIndex: hobScenarioIndexSchema.parse(readJson("hallofbeorn", "Scenarios.json")), ...readDragnCards(), dragnImagePrefix: (readJson("dragncards", "imageUrlPrefix.json") as { imageUrlPrefix: { English: string } }).imageUrlPrefix.English, dragnRaw: { preBuiltDecks: readFileSync(path.join(RAW_DIR, "dragncards", "preBuiltDecks.json"), "utf8") } };
 }

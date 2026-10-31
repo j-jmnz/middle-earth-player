@@ -60,6 +60,14 @@ export const printedKeywordsSchema = z.strictObject({
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).
   leavesPlayLoses: z.boolean().optional(),
+  // The sea family's keywords (src/rules/families/sea*.ts). Sailing on a quest stage: the first player performs a Sailing test at the beginning
+  // of each quest phase (dcce.sailing). Boarding X on a ship-enemy: it brings X Corsair enemies when it engages a player from the staging area
+  // (dcce.boarding).
+  sailing: z.boolean().optional(),
+  boarding: z.number().int().positive().optional(),
+  // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
+  // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
+  sailingSuccess: z.number().int().positive().optional(),
 });
 
 export const ringsDbPackSchema = z
@@ -117,6 +125,8 @@ const stageSchema = z.strictObject({
   code: z.string(),
   // The stages defeating this one proceeds to, one of them at random, the rest removed from the game (BranchStage, 01120:B:1).
   branch: z.array(z.string()).min(2).optional(),
+  // The number of stages the first player looks at when this stage is defeated on-course (LookAtStages, 11016:B:3).
+  look: z.number().int().min(2).optional(),
 });
 
 const widgetsSchema = z.strictObject({
@@ -143,7 +153,15 @@ export const scenarioDefinitionSchema = z.strictObject({
   campaignCard: z.string().min(1).optional(),
   // The Nightmare setup card, on Nightmare only: placed next to the quest deck before the Setup runs.
   nightmareCard: z.string().min(1).optional(),
+  // The Hard/Expert Mode card (dcce.hard-expert), side A Hard or B Expert, put next to the quest deck at the end of setup and in play all game:
+  // it takes the place the Nightmare setup card has. Its Resolution records are appended to `resolution`.
+  modeCard: z.strictObject({ code: z.string().min(1), side: z.enum(["A", "B"]) }).optional(),
   bookletPage: z.number().int().optional(),
+  // The part number of the scenario's campaign card (its place in a campaign with XP, counting from 1): "X is the campaign card's part number".
+  part: z.number().int().positive().optional(),
+  // The campaign card's Setup instructions that need the quest card's Setup done first (a Dream-chaser Setup that names the ship-objectives the quest
+  // card's Setup prepares): they resolve in a frame after it (rules/setup.ts).
+  afterSetup: z.array(instructionSchema).optional(),
 });
 
 export type RingsDbPack = z.infer<typeof ringsDbPackSchema>;

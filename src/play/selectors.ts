@@ -5,6 +5,7 @@
 import type { ReduceContext } from "../rules/reduce.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
+import { lookedIds } from "../rules/families/sea-sailing.ts";
 import { captiveUnder } from "../rules/families/south-captive.ts";
 import { prisonersOfSeat } from "../rules/families/prisoner.ts";
 import { declaredDefenders } from "../rules/families/defense-defenders.ts";
@@ -16,12 +17,33 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
-// The four piles the table shows. Only the two discard piles open a list (docs/design-system-table.md).
-export type PileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
+// The four piles every table shows, and the second slot's (docs/design-system-table.md, Piles): the Corsair deck and its discard pile while the scenario
+// has a Corsair deck (dcce.corsair-deck). The scenario phases add the Uncharted and Grotto decks. Only the discard piles open a list.
+export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
+export type SecondPileId = "corsairDeck" | "corsairDiscard";
+export type PileId = BasePileId | SecondPileId;
 
-export const PILES: readonly PileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
+export const PILES: readonly BasePileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
+export const SECOND_PILES: readonly SecondPileId[] = ["corsairDeck", "corsairDiscard"];
 
-export const PILE_WORDS: Readonly<Record<PileId, string>> = { deck: "Deck", discard: "Discard pile", encounterDeck: "Encounter deck", encounterDiscard: "Encounter discard pile" };
+export const PILE_WORDS: Readonly<Record<PileId, string>> = {
+  deck: "Deck",
+  discard: "Discard pile",
+  encounterDeck: "Encounter deck",
+  encounterDiscard: "Encounter discard pile",
+  corsairDeck: "Corsair deck",
+  corsairDiscard: "Corsair discard pile",
+};
+
+/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea-corsair.ts). */
+export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck">): readonly SecondPileId[] {
+  return game.corsairDeck !== undefined ? SECOND_PILES : NONE_PILES;
+}
+
+/** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). A tap on one opens its list; a deck's does not (docs/design-system-table.md, Piles). */
+export function isDiscardPile(pile: PileId): boolean {
+  return pile === "discard" || pile === "encounterDiscard" || pile === "corsairDiscard";
+}
 
 // How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
 export type FightKind = "defense" | "undefended" | "attack";
@@ -30,7 +52,12 @@ export type FightKind = "defense" | "undefended" | "attack";
 // (the first one first; a Ringwraith can carry an additional one, 141069:A:2). An engaged enemy in an attack also carries
 // the characters fighting it (`paired`) and how (`fight`): the defender, the hero an undefended attack hits, or the
 // attackers.
-export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null };
+// `kind` and `ship` are what the table knows of the card's printing when it is given the facts (ZoneFacts): the fold order of staging reads the kind, and the
+// play area stands ships first (0 the Dream-chaser, 1 any other ship-objective).
+export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1 };
+
+/** What the zone selectors read of a card's printing: its type, and its place among the ships (null for a card that is no ship). Absent: nothing is known. */
+export type ZoneFacts = { typeOf: (code: string) => string | null; shipRank: (code: string) => 0 | 1 | null };
 export type ZoneView = { zone: ZoneId; seat: number; entries: readonly ZoneEntry[] };
 
 /** A card whose face the table hides: facedown, except the prisoner, whose owner knows the card and may still open it (01123:B:1). */
@@ -44,6 +71,7 @@ export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host"
 }
 
 const NONE: readonly string[] = [];
+const NONE_PILES: readonly SecondPileId[] = [];
 const EMPTY: readonly CardInstance[] = [];
 
 /**
@@ -77,7 +105,7 @@ function fightingIds(game: ScenarioState, seat: number): ReadonlySet<string> {
  * of the Fellowship, stage 2B on) the staging area, the quest stage and the active location are the shown seat's own, and there is no second
  * active location of a shared quest: each seat has one (families/breaking-areas.ts).
  */
-export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readonly string[] {
+export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?: ZoneFacts): readonly string[] {
   const owner = game.seats[seat];
   switch (zone) {
     case "questStage": {
@@ -106,8 +134,11 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number): readon
       });
       // The seat's player side quest stands first in its row: its quest area (families/sidequests-play.ts).
       const quest = owner.questStage && game.cards[owner.questStage] ? [owner.questStage] : [];
+      // Then its ships, the Dream-chaser before any other (dcce.ship-objectives), then its heroes and the rest.
+      const ships = facts ? shipsFirst(game, here, facts) : [];
+      const rest = facts ? here.filter((id) => !ships.includes(id)) : here;
       // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
-      return [...quest, ...here, ...prisonersOfSeat(game, seat)];
+      return [...quest, ...ships, ...rest, ...prisonersOfSeat(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;
@@ -120,6 +151,12 @@ function areaOrShared(game: ScenarioState, seat: number): readonly string[] {
   if (!isSeparate(game)) return own;
   const shared = sharedStaging(game);
   return shared.length > 0 ? [...own, ...shared] : own;
+}
+
+// The ship-objectives among `ids`, the Dream-chaser first (`shipRank`), the rest in the order they were given.
+function shipsFirst(game: ScenarioState, ids: readonly string[], facts: ZoneFacts): string[] {
+  const rank = (id: string) => facts.shipRank(game.cards[id]?.code ?? "");
+  return ids.filter((id) => rank(id) != null).sort((a, b) => (rank(a) ?? 1) - (rank(b) ?? 1));
 }
 
 // The staging area's cards in the order the table draws them: each guarded objective is followed by the encounter cards attached to it
@@ -163,7 +200,11 @@ function cardsOf(game: ScenarioState, ids: readonly string[]): CardInstance[] {
   return out;
 }
 
-function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnType<typeof combatPairs>): ZoneEntry[] {
+function kindOf(type: string | null): ZoneEntry["kind"] {
+  return type === "enemy" || type === "location" ? type : "other";
+}
+
+function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnType<typeof combatPairs>, facts?: ZoneFacts): ZoneEntry[] {
   const entries: ZoneEntry[] = [];
   for (const id of ids) {
     const card = game.cards[id];
@@ -175,7 +216,8 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const captive = card.zone === "staging" || card.zone === "captive" ? captiveUnder(game, id) : null;
     const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...(captive ? [captive] : [])]);
     const pair = pairs.get(id);
-    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null });
+    const rank = facts?.shipRank(card.code) ?? null;
+    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}) });
   }
   return entries;
 }
@@ -184,7 +226,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
  * A memoized selector for one zone of one seat. It returns the previous view when every card and attachment in the zone is
  * the same object as before, whatever else changed in the state.
  */
-export function zoneSelector(zone: ZoneId, seat: number): (game: ScenarioState) => ZoneView {
+export function zoneSelector(zone: ZoneId, seat: number, facts?: ZoneFacts): (game: ScenarioState) => ZoneView {
   let previous: ZoneView | null = null;
   let lastGame: ScenarioState | null = null;
   return (game) => {
@@ -193,7 +235,7 @@ export function zoneSelector(zone: ZoneId, seat: number): (game: ScenarioState) 
     if (previous && game === lastGame) return previous;
     lastGame = game;
     const pairs = zone === "engaged" ? combatPairs(game, seat) : new Map<string, { ids: readonly string[]; kind: FightKind }>();
-    const entries = entriesOf(game, zoneIds(game, zone, seat), pairs);
+    const entries = entriesOf(game, zoneIds(game, zone, seat, facts), pairs, facts);
     if (previous && sameEntries(previous.entries, entries)) return previous;
     previous = { zone, seat, entries };
     return previous;
@@ -204,7 +246,8 @@ export function zoneSelector(zone: ZoneId, seat: number): (game: ScenarioState) 
 // A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it.
 export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[] };
 
-function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
+/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the Corsair pair. */
+export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
   switch (pile) {
     case "deck":
       return game.seats[seat]?.deck ?? NONE;
@@ -214,6 +257,10 @@ function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly stri
       return game.encounterDeck;
     case "encounterDiscard":
       return game.encounterDiscard;
+    case "corsairDeck":
+      return game.corsairDeck ?? NONE;
+    case "corsairDiscard":
+      return game.corsairDiscard ?? NONE;
   }
 }
 
@@ -225,7 +272,7 @@ export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) 
     if (previous && game === lastGame) return previous;
     lastGame = game;
     const ids = pileIds(game, pile, seat);
-    const faceUp = pile === "discard" || pile === "encounterDiscard";
+    const faceUp = isDiscardPile(pile);
     const last = ids[ids.length - 1];
     const top = faceUp && last ? (game.cards[last] ?? null) : null;
     const attached = pile === "deck" ? cardsOf(game, game.seats[seat]?.deckAttached ?? NONE) : EMPTY;
@@ -332,14 +379,16 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
 /**
  * Whether a card is drawn whole on the table the seat sees, a full target for a tap: in staging, the active location or the
  * quest (the seat's own once stages are separate); in the seat's hand, heroes, play area or engagement area; fighting one of its enemies; or the top of its deck when
- * the rules let it be played from there. An attachment or a shadow card only peeks out under its host, so a choice among
+ * the rules let it be played from there. A card `folded` into a row's stack (row-fold.ts) is not. An attachment or a shadow card only peeks out under its host, so a choice among
  * them is made on a panel's tiles instead.
  */
-export function onTableFor(game: ScenarioState, seat: number): (cardId: string) => boolean {
+export function onTableFor(game: ScenarioState, seat: number, folded?: ReadonlySet<string>): (cardId: string) => boolean {
   const fighting = fightingIds(game, seat);
   return (cardId) => {
     const card = game.cards[cardId];
     if (!card) return false;
+    // A card folded into a row's stack is not drawn whole (row-fold.ts): a pick that reaches it opens as the choice tray.
+    if (folded?.has(cardId)) return false;
     if (fighting.has(cardId)) return true;
     switch (card.zone) {
       // Once stages are separate the table draws the seat's own area, stage and active location: a card of another seat's is not on it.
@@ -364,4 +413,26 @@ export function onTableFor(game: ScenarioState, seat: number): (cardId: string) 
         return false;
     }
   };
+}
+
+const LOOKED = new WeakMap<object, readonly CardInstance[]>();
+const NO_LOOKED: readonly CardInstance[] = [];
+
+/**
+ * The cards a Sailing test looked at, still on top of the encounter deck, in the order they were looked at (dcce.sailing-tests): the table lays them in a strip, face up.
+ * The same array for the same test, so a canvas that selects it renders only when the look changes.
+ */
+export function lookedOf(game: ScenarioState): readonly CardInstance[] {
+  const test = game.sea?.sailing;
+  if (test?.step !== "shift" && test?.step !== "look") return NO_LOOKED;
+  const held = LOOKED.get(test);
+  if (held) return held;
+  const cards = cardsOf(game, test.looked);
+  LOOKED.set(test, cards);
+  return cards;
+}
+
+/** Whether a card is one of those a Sailing test looked at: its face is shown to every player, though the card is still on the deck. */
+export function isLooked(game: ScenarioState, cardId: string): boolean {
+  return lookedIds(game).includes(cardId);
 }

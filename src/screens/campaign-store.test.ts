@@ -23,8 +23,8 @@ function openUser() {
 describe("campaign store", () => {
   it("creates a save with its own id and a seat count that is stored once", () => {
     const user = openUser();
-    const first = createSave(user, "fellowship-of-the-ring", 2, 1000);
-    const second = createSave(user, "fellowship-of-the-ring", 1, 1000);
+    const first = createSave(user, "fellowship-of-the-ring", 2, { now: 1000 });
+    const second = createSave(user, "fellowship-of-the-ring", 1, { now: 1000 });
     expect(first.id).not.toBe(second.id);
     expect(readSave(user, first.id)).toEqual(first);
     expect(readSave(user, first.id)?.seatCount).toBe(2);
@@ -68,9 +68,9 @@ describe("campaign store", () => {
   it("a new playthrough stores the carry-over it took in, and an older stored log reads with the facts' defaults", () => {
     const user = openUser();
     const carried = [{ code: "01135", back: "encounter" as const, burdenSet: null, attachedTo: null, seat: null }];
-    const next = createSave(user, "mirkwood-paths", 1, 3000, carried);
+    const next = createSave(user, "mirkwood-paths", 1, { now: 3000, carried });
     expect(readSave(user, next.id)?.log.carryIn).toEqual(carried);
-    expect(createSave(user, "the-dark-of-mirkwood", 1, 4000).log).toEqual(emptyLog(1));
+    expect(createSave(user, "the-dark-of-mirkwood", 1, { now: 4000 }).log).toEqual(emptyLog(1));
     const { prisoner: _p, usedOnce: _u, counters: _c, carryOver: _o, carryIn: _i, ...old } = emptyLog(1);
     writeSave(user, { ...next, log: old as unknown as typeof next.log }, 3000);
     expect(readSave(user, next.id)?.log).toEqual(emptyLog(1));
@@ -124,7 +124,7 @@ describe("campaign store", () => {
     const active = { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] };
     const loadout = { scenarioId: "a-shadow-of-the-past", difficulty: "Normal" as const, seats: [], ringBearer: null, choices: [], acceptPenalty: false };
     const kept = { ...newSave("save-d", "fellowship-of-the-ring", 1), log: { ...emptyLog(1), notes: "kept" }, active, loadout };
-    const other = createSave(user, "fellowship-of-the-ring", 2, 2000);
+    const other = createSave(user, "fellowship-of-the-ring", 2, { now: 2000 });
     const later = newSave("save-e", "fellowship-of-the-ring", 1);
     writeSave(user, kept);
     writeSave(user, later);

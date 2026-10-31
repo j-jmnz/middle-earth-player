@@ -5,6 +5,7 @@ import { ruleCause } from "../rules/cause.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { shadowCards } from "../rules/zones.ts";
+import { hero, seaTable, send, ship, shipEnemy, until } from "../rules/families/sea-table.ts";
 import { attackOrPolicy, playUntil, type Reduced } from "../../scripts/combat-policy.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
@@ -215,5 +216,43 @@ describe("what gets no spotlight", () => {
       expect(strikes).toBeGreaterThan(2);
       expect(clashes).toBe(strikes);
     }
+  });
+});
+
+// Rules: dcce.ship-enemies, dcce.ship-objectives (data/rules/entries.json). The spotlight between ships (docs/design-system-table.md, Cards) is nothing new: a ship defending
+// against a ship-enemy, an undefended hit on a ship, and ships with heroes attacking a ship-enemy are clashes like any other, read from the engine's steps.
+describe("clashesOf at sea", () => {
+  const seaCards = () => [hero("aragorn"), ship("dc", "Dream-chaser", { attack: 4, defense: 4 }), ship("ds", "Dawn Star"), shipEnemy("corsair", { attack: 5, health: 12 })];
+
+  function defenseWindow(spec: Partial<Parameters<typeof seaTable>[0]> = {}) {
+    const built = seaTable({ cards: seaCards(), effects: [], heroes: [{ code: "aragorn" }], allies: [{ code: "dc" }, { code: "ds" }], enemies: [{ code: "corsair" }], ...spec });
+    return { ...built, state: until(send(built.state, { type: "DeclineEngage" }, built.ctx), built.ctx, (state) => state.window?.kind === "defense") };
+  }
+
+  it("reads a ship defending against a ship-enemy: the enemy attacks, the ship is the target with its own defense", () => {
+    const { state, ids, ctx } = defenseWindow();
+    const result = expectOk(reduce(state, { type: "DeclareDefender", defenderId: ids.dc! }, ctx));
+    const [clash, ...rest] = clashesOf(state, result.state, result.steps);
+    expect(rest).toEqual([]);
+    expect(clash).toMatchObject({ attackers: [ids.corsair], target: ids.dc, attack: 5, defense: 4, damage: 1, undefended: false, destroyed: false });
+  });
+
+  it("reads an undefended ship-enemy's hit on a ship, the whole attack as damage", () => {
+    const { state, ids, ctx } = defenseWindow();
+    const result = expectOk(reduce(state, { type: "Undefended", heroId: ids.ds! }, ctx));
+    const [clash] = clashesOf(state, result.state, result.steps);
+    expect(clash).toMatchObject({ attackers: [ids.corsair], target: ids.ds, attack: 5, damage: 5, undefended: true });
+  });
+
+  it("reads ships and heroes attacking a ship-enemy together as one clash with every attacker", () => {
+    const built = seaTable({ cards: seaCards(), effects: [], heroes: [{ code: "aragorn" }], allies: [{ code: "dc" }, { code: "ds" }], enemies: [{ code: "corsair" }] });
+    const state = { ...built.state, phase: "Combat" as const, mode: "playerAttacks" as const, window: { kind: "playerAttack" as const }, boundaryPhase: "Combat" as const };
+    const result = expectOk(reduce(state, { type: "DeclareAttackers", enemyId: built.ids.corsair!, attackerIds: [built.ids.dc!, built.ids.aragorn!, built.ids.ds!] }, built.ctx));
+    const [clash] = clashesOf(state, result.state, result.steps);
+    expect(clash?.target).toBe(built.ids.corsair);
+    expect([...(clash?.attackers ?? [])].sort()).toEqual([built.ids.dc, built.ids.aragorn, built.ids.ds].sort());
+    expect(clash?.defense).toBe(1);
+    // 4 + 2 + 3 against 1 Defense.
+    expect(clash?.damage).toBe(clash?.attack === undefined ? -1 : clash.attack - 1);
   });
 });

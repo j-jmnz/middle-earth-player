@@ -7,6 +7,7 @@ import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "
 import { deal } from "../../../../campaign/session";
 import { isNightmarePlayable } from "../../../../campaign/playable";
 import { logCodes, loadWorld } from "../../../../campaign/world";
+import { xpUnspentOf, type ModeCard } from "../../../../campaign/xp";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { cards } from "../../../../catalog/schema";
 import { CATALOG_VERSION } from "../../../../catalog/version";
@@ -19,7 +20,7 @@ import { useDatabases } from "../../../databases";
 import { recordUnclosedRun } from "../../../table-session";
 import { dealSeed } from "../../../e2e";
 import { actionLine, needWords } from "../../../briefing-words";
-import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";
 import { routeCode } from "../../../route-code";
 import { useSave } from "../../../use-save";
@@ -47,8 +48,11 @@ export default function Briefing() {
   const [choices, setChoices] = useState<readonly string[]>([]);
   const [accepted, setAccepted] = useState(false);
   const [dealError, setDealError] = useState<string | null>(null);
+  // The Hard/Expert Mode card (a campaign with XP, dcce.hard-expert): until the players change it, the one the campaign setup offered.
+  const [pickedMode, setPickedMode] = useState<ModeCard | null | undefined>(undefined);
 
   const campaign = save ? campaignOf(save.campaignId) : null;
+  const modeCard: ModeCard | null = campaign?.xp ? (pickedMode === undefined ? (save?.log.modeDefault ?? null) : pickedMode) : null;
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   const nightmare = scenarioId != null && isNightmarePlayable(scenarioId);
   const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
@@ -74,8 +78,8 @@ export default function Briefing() {
   }, [catalog, hasSave, campaign, scenario, codeKey]);
 
   const input: BriefingInput | null = useMemo(
-    () => (save && world ? { world, log: save.log, seatCount: save.seatCount, seats, ringBearer, difficulty, choices, acceptPenalty: accepted } : null),
-    [save, world, seats, ringBearer, difficulty, choices, accepted],
+    () => (save && world ? { world, log: save.log, seatCount: save.seatCount, seats, ringBearer, difficulty, choices, acceptPenalty: accepted, modeCard: modeCard ?? undefined } : null),
+    [save, world, seats, ringBearer, difficulty, choices, accepted, modeCard],
   );
   const result = useMemo(() => (input ? briefing(input) : null), [input]);
   const facts = useMemo(() => (world ? scenarioFacts(world, difficulty) : null), [world, difficulty]);
@@ -132,6 +136,7 @@ export default function Briefing() {
       ringBearer,
       choices: [...choices],
       acceptPenalty: accepted,
+      ...(modeCard ? { modeCard } : {}),
     };
     const problem = attempt(() => {
       const dealt = deal(save, world ?? input.world, stored, dealSeed(), CATALOG_VERSION, Date.now());
@@ -188,8 +193,16 @@ export default function Briefing() {
         </BodyText>
       ) : null}
 
+      {/* Dream-chaser: XP is spent only before or after a scenario (dcce.scalable-upgradable), so the reminder comes before the deal. */}
+      {campaign.xp && xpUnspentOf(save.log) > 0 ? (
+        <BodyText className="mt-3" testID="briefing-xp-unspent">
+          {`${xpUnspentOf(save.log)} XP unspent. Spend it on the path before you deal.`}
+        </BodyText>
+      ) : null}
+
       {/* The difficulty first: it is decided before the deck, and it must be seen before Deal (it is named over Deal too). */}
       <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} nightmare={nightmare} />
+      {campaign.xp ? <ModePicker mode={modeCard} onMode={setPickedMode} testIDPrefix="mode" campaignName={campaign.name} /> : null}
 
       {seats.map((seat, index) => (
         <SeatPicker

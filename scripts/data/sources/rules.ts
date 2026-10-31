@@ -14,6 +14,10 @@ export const RULE_PDFS = [
   // The Dark of Mirkwood's rulebook: its set lists and the campaign-mode page (Mirkwood Paths, the mini campaign). The same bytes (sha256 b0763922...) as FFG's older images-cdn URL, which answers
   // Node's fetch 503; the asmodee host is the one the other FFG PDFs use.
   { doc: "tdom", file: "dark_of_mirkwood_rulebook_v2.pdf", url: `${FFG}/dark_of_mirkwood_rulebook_v2.pdf` },
+  // The Dream-chaser Campaign Expansion's rulebook (MEC111, 32 pages, 2023 print): the sea rules, each scenario's setup paragraph, the
+  // campaign rules (XP, scalable and upgradable cards) and the Campaign Log. The FFG host answers 200 text/html for this name; the S3 host
+  // already serves `rr` and holds the PDF (sha256 2a4093f7...).
+  { doc: "dcce", file: "mec111_dream-chaser_campaign_expansion.pdf", url: "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC111.pdf" },
   { doc: "faq", file: "lotr_faq_19.pdf", url: `${FFG}/lotr_faq_19.pdf` },
   { doc: "campaign-log", file: "campaign-log.pdf", url: `${FFG}/campaign-log.pdf` },
   { doc: "easy-mode", file: "lotr_easy_mode.pdf", url: `${FFG}/lotr_easy_mode.pdf` },

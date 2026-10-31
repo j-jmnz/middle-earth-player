@@ -7,7 +7,7 @@ import type { LayoutOptions } from "./layout.ts";
 import type { OptionMark, Sheet } from "./sheet-types.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 
-export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string };
+export type HighlightKeys = { glow: string; picked: string; share: TableHighlight["share"]; dim: boolean; marks: string; muted: string; keep: string };
 
 export function highlightKeys({ game, seat, sheet, choice, panel }: { game: ScenarioState; seat: number; sheet: Sheet; choice: Choice; panel: boolean }): HighlightKeys {
   // A card the seat may play from its discard pile is not drawn on the table: the pile glows, and its list plays it. While the
@@ -17,9 +17,12 @@ export function highlightKeys({ game, seat, sheet, choice, panel }: { game: Scen
   // In planning, the hand cards that cannot be played now are dimmed, so the player sees which can (a tap says why not).
   const muted = !panel && sheet.kind === "window" && game.mode === "planning" ? (game.seats[seat]?.hand ?? []).filter((id) => !sheet.plays.includes(id)).join(",") : "";
   const marks = (panel ? [] : optionMarksOf(sheet)).map(([id, mark]) => `${id}=${mark.icon}:${mark.value}:${mark.danger ? 1 : 0}`).join(",");
+  const pickedNow = [...marked(sheet, choice)];
   return {
     glow,
-    picked: [...marked(sheet, choice)].map(([id, amount]) => `${id}=${amount}`).join(","),
+    // Not cleared by the open tray: a fold that took these would leave the moment unable to get back to the table.
+    keep: [...tappable(sheet), ...pickedNow.map(([id]) => id)].join(","),
+    picked: pickedNow.map(([id, amount]) => `${id}=${amount}`).join(","),
     share: sheet.kind === "distribute" ? (sheet.purpose.kind === "archery" ? "damage" : "pay") : null,
     // A pick (a defender, a location, a payment) dims what it does not ask about; the action window does not.
     dim: !panel && glow !== "" && sheet.kind !== "window",
@@ -44,6 +47,7 @@ export function highlightOf(keys: HighlightKeys): TableHighlight {
       }),
     ),
     muted: new Set(ids(keys.muted)),
+    keep: new Set(ids(keys.keep)),
   };
 }
 

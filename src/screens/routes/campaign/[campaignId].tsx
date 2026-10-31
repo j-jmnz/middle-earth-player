@@ -5,7 +5,8 @@ import { useRef, useState } from "react";
 import { View } from "react-native";
 
 import { FELLOWSHIP_ID } from "../../../campaign/save";
-import { BriefingScreen, CampaignBanner } from "../../briefing-parts";
+import type { ModeCard } from "../../../campaign/xp";
+import { BriefingScreen, CampaignBanner, ModePicker } from "../../briefing-parts";
 import { campaignListQueries } from "../../campaign-list";
 import { campaignOf } from "../../campaign-data";
 import { createSave } from "../../campaign-store";
@@ -26,6 +27,8 @@ export default function CampaignSetup() {
   const [seats, setSeats] = useState<1 | 2>(1);
   // The playthrough whose carry-over this one takes in, or null for a fresh start.
   const [taking, setTaking] = useState<string | null>(null);
+  // The Hard/Expert Mode card each briefing offers first, in a campaign with XP (dcce.hard-expert).
+  const [mode, setMode] = useState<ModeCard | null>(null);
   const carry = useCarryChoices(catalog, user);
   // Set by the first press, so a second tap before the screen is replaced cannot make another save.
   const started = useRef(false);
@@ -44,6 +47,7 @@ export default function CampaignSetup() {
   }
 
   const id = data.id;
+  const hasXp = data.xp === true;
   const name = row.name;
   const count = data.scenarios.length;
   const words = `${count} ${count === 1 ? "scenario" : "scenarios"}`;
@@ -55,7 +59,7 @@ export default function CampaignSetup() {
   function start(): void {
     if (started.current) return;
     started.current = true;
-    const save = createSave(user, id, seats, undefined, taken?.cards ?? [], taken?.saveId ?? null);
+    const save = createSave(user, id, seats, { carried: taken?.cards ?? [], carriedFrom: taken?.saveId ?? null, modeDefault: hasXp ? mode : null });
     router.replace(pathHref(save.id));
   }
 
@@ -84,6 +88,7 @@ export default function CampaignSetup() {
         accessibilityLabel={`Players for ${name}`}
         stretch
       />
+      {hasXp ? <ModePicker mode={mode} onMode={setMode} testIDPrefix={`mode-${id}`} campaignName={name} setup /> : null}
       {carry.length > 0 ? (
         <View className="gap-2" testID="carry-over">
           <Section title="Carry over from a finished campaign" className="mt-4" />

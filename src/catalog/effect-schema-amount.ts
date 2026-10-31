@@ -29,12 +29,17 @@ export const amountExprSchema = z.strictObject({
   stage: z.literal(true).optional(),
   // The number of players in the game.
   players: z.literal(true).optional(),
+  // The part number of the campaign card of the scenario being played: its place in its campaign, counting from 1 ("X is the campaign card's part
+  // number", 11176:A:3).
+  part: z.literal(true).optional(),
   // The actor's threat, and its tens digit (17084:A:1).
   threat: z.enum(["actor", "tens"]).optional(),
   // Cards in the actor's hand.
   hand: z.literal(true).optional(),
   // The damage the answered event dealt ("cancel that damage", "place that damage on ~ instead").
   dealt: z.literal(true).optional(),
+  // The damage an attack sent on past its defender (excessToShip), read by the effect the attack leaves for its end ("deal that much damage", 11055:A:2).
+  excess: z.literal(true).optional(),
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc-amounts.ts.
   facedown: z.literal(true).optional(),

@@ -5,6 +5,7 @@ import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
 import { scoreOf, type ScenarioScore } from "./score.ts";
+import { xpAwarded, type ModeCard } from "./xp.ts";
 
 // A boon or burden the players have earned. `back` says which deck it joins; `attachedTo` is the hero (a code) a
 // Permanent card is stuck to, recorded in the Notes of the paper log.
@@ -45,11 +46,20 @@ export type CampaignLog = {
   carryIn: readonly PoolCard[];
   // The finished save whose carry-over this one took in, so that save's offer is not made again. Absent when it took nothing.
   carriedFrom?: string;
+  // Dream-chaser's XP (dcce.gaining-xp, dcce.scalable-upgradable; src/campaign/xp.ts). An older log reads with these defaults.
+  // The XP each won scenario's Resolution awarded, by scenario id; the unspent XP is this less the boxes marked, never stored.
+  xpGained: Readonly<Record<string, number>>;
+  // The boxes marked beside each scalable and upgradable card, by the code of its row in xp.ts: one XP each, committed by the players.
+  marks: Readonly<Record<string, number>>;
+  // The Hard/Expert Mode card (dcce.hard-expert) each won scenario was played with, by scenario id, and the one the campaign setup chose to offer
+  // each briefing first (the briefing may change it); null for none.
+  modes: Readonly<Record<string, ModeCard>>;
+  modeDefault: ModeCard | null;
 };
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [] };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -131,5 +141,10 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     counters: { ...log.counters, ...(state.campaignFacts?.counters ?? {}), ...(result.counters ?? {}) },
     carryOver: [...log.carryOver, ...carried],
     carryIn: log.carryIn,
+    // The XP lines of the campaign card (and the Hard/Expert card's) added up to `xp`; a campaign with no such line writes none.
+    xpGained: result.xp != null ? { ...log.xpGained, [scenarioId]: xpAwarded(result.xp) } : log.xpGained,
+    marks: log.marks,
+    modes: state.campaignFacts?.modeCard ? { ...log.modes, [scenarioId]: state.campaignFacts.modeCard } : log.modes,
+    modeDefault: log.modeDefault,
   };
 }

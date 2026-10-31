@@ -6,6 +6,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
 import { effectsOf } from "../listen.ts";
+import { recordsOfFace } from "./dreamchaser-faces.ts";
 import type { CardInstance, ScenarioState } from "../state.ts";
 
 // The hero card an attachment of this card lends it, or null.
@@ -19,7 +20,8 @@ export function lentCard(state: ScenarioState, instance: CardInstance): CardInst
 
 // The effect records of a card: those of its own code, and those of a hero card its attachments lend it.
 export function effectsOfCard(state: ScenarioState, ctx: { effects: readonly Effect[] }, instance: CardInstance): readonly Effect[] {
-  const own = effectsOf(ctx, instance.code);
+  // A card shows one side (families/dreamchaser-faces.ts): the records of the side it does not show do not work.
+  const own = recordsOfFace(instance, effectsOf(ctx, instance.code));
   if (instance.attachments.length === 0) return own;
   const lent = lentCard(state, instance);
   return lent ? [...own, ...effectsOf(ctx, lent.code)] : own;

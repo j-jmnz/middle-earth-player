@@ -1,6 +1,6 @@
 // Rules: ltp.scoring, rr.scoring, faq.scoring (data/rules/entries.json).
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { heldAmount, type ScenarioState } from "../rules/state.ts";
 
 export type ScenarioScore = { rounds: number; victoryPoints: number; score: number };
 
@@ -36,7 +36,7 @@ export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, Prin
       for (const id of seat.heroes) damage += state.cards[id]?.damage ?? 0;
     }
   }
-  const victoryPoints = state.victory.reduce((sum, id) => sum + (printedOf(cards, state.cards[id]?.code ?? "").victory ?? 0), 0);
+  const victoryPoints = state.victory.reduce((sum, id) => sum + (printedOf(cards, state.cards[id]?.code ?? "").victory ?? heldAmount(state, id, "gainsVictory")), 0);
   return { threat, destroyed, damage, rounds: completedRounds(state), victoryPoints };
 }
 

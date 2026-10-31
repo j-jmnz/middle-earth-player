@@ -1,0 +1,189 @@
+{
+  "id": "the-drowned-ruins",
+  "name": "The Drowned Ruins",
+  "number": 4,
+  "stages": [
+    "12092",
+    "12093"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Drowned Ruins",
+      "count": 29
+    },
+    {
+      "name": "Drowned Dead",
+      "count": 9
+    },
+    {
+      "name": "The Stormcaller Elite",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "12096",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "12097",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12104",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "12105",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "12106",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "12107",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "12108",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11068",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "11069",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11070",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "11071",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "12092",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12093",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "12094",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "12095"
+    },
+    {
+      "code": "11077",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "11076"
+    },
+    {
+      "code": "11079",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "11078"
+    },
+    {
+      "code": "12098",
+      "normal": 2,
+      "easy": 2,
+      "pile": "grottoDeck",
+      "back": "12101"
+    },
+    {
+      "code": "12098",
+      "normal": 1,
+      "easy": 1,
+      "pile": "grottoDeck",
+      "back": "12102"
+    },
+    {
+      "code": "12099",
+      "normal": 2,
+      "easy": 2,
+      "pile": "grottoDeck",
+      "back": "12102"
+    },
+    {
+      "code": "12099",
+      "normal": 1,
+      "easy": 1,
+      "pile": "grottoDeck",
+      "back": "12103"
+    },
+    {
+      "code": "12100",
+      "normal": 1,
+      "easy": 1,
+      "pile": "grottoDeck",
+      "back": "12101"
+    },
+    {
+      "code": "12100",
+      "normal": 1,
+      "easy": 1,
+      "pile": "grottoDeck",
+      "back": "12103"
+    }
+  ],
+  "campaignCard": "11200",
+  "campaignPlaced": [
+    "11181",
+    "11183",
+    "11201",
+    "11202",
+    "11203",
+    "11204",
+    "11205",
+    "11206",
+    "11207",
+    "11208"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q06.7",
+    "dragnEasy": "E06.7",
+    "hobSlug": "The-Drowned-Ruins"
+  }
+}

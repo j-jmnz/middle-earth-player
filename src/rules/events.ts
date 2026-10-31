@@ -7,6 +7,7 @@ import { offerResponses } from "./responses.ts";
 import type { GameEvent, ScenarioState } from "./state.ts";
 import { fireForced } from "./triggers.ts";
 import { pushFrame } from "./windows.ts";
+import { board } from "./families/sea-boarding.ts";
 
 // Whether an event may be announced now. A Response is used immediately after its triggering condition has occurred and
 // resolved (rr.response), so an event is announced over any window the framework opened since (an action window, an
@@ -48,7 +49,7 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const { pendingEvents: _queued, ...without } = state;
   // An engagement is remembered for the round (families/attack-events.ts).
   const cleared: ScenarioState = [event, ...together].reduce(
-    (current, each) => noteEngaged(noteEvent(current, each, ctx), each, ctx),
+    (current, each) => board(noteEngaged(noteEvent(current, each, ctx), each, ctx), each, ctx, steps),
     rest.length > 0 ? { ...without, pendingEvents: rest } : (without as ScenarioState),
   );
   // The Forced effects go on top of the response frame, the first event's last, so they resolve in the order of the events.

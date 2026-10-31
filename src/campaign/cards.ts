@@ -33,9 +33,11 @@ export function printedFromRow(row: CatalogRow): PrintedCard {
     isUnique: row.isUnique,
     engagementCost: row.engagementCost,
     keywords: row.keywords,
+    upgraded: row.upgraded,
     campaignKind: kindOf(row.campaignKind),
     burdenSet: row.burdenSet,
     backType: backOf(row.backType),
+    encounterSet: row.encounterSet,
   });
 }
 

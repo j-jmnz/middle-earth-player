@@ -3,8 +3,11 @@ import { describe, expect, it } from "vitest";
 import { fixtureDefinition } from "../rules/fixture.ts";
 import { blankScenario, withSeat } from "../rules/state.ts";
 
+import { tableLayout } from "./layout.ts";
+import { seaFixture, seaViews } from "./sea-fixture.ts";
 import { twoHanded } from "./seat-fixture.ts";
-import { actingSeat, pileSelector, shownSeat, threatSelector, tickKeySelector, zoneIds, zoneSelector } from "./selectors.ts";
+import { actingSeat, isDiscardPile, PILE_WORDS, pileSelector, SECOND_PILES, secondPilesOf, shownSeat, threatSelector, tickKeySelector, zoneIds, zoneSelector } from "./selectors.ts";
+import { headingReadout } from "./widgets.ts";
 
 // The seat the table draws (phase 26): the seat the player peeks at, else the acting seat. A peek changes only what is drawn.
 describe("shownSeat", () => {
@@ -114,5 +117,51 @@ describe("selectors on the same game", () => {
     // The wolf in staging costs 20 to engage.
     expect(ticks(state)).toBe("20");
     expect(threatSelector()(state).map((row) => row.seat)).toEqual([0, 1]);
+  });
+});
+
+// Rules: dcce.corsair-deck, dcce.heading (data/rules/entries.json). The second slot's piles and the Heading dial are shared pieces: a peek at the other seat leaves them where they are.
+describe("the Corsair piles and the second slot (phase 39b)", () => {
+  const duo = seaFixture({ seatCount: 2, heading: "Rain", ships: [{ code: "dream-chaser", seat: 0 }, { code: "dawn-star", seat: 1 }], corsairDeck: 4, corsairDiscard: 2 });
+
+  it("views the Corsair deck as a pile of its cards with no top, and its discard pile with the last card put there on top", () => {
+    const deck = pileSelector("corsairDeck", 0)(duo.state);
+    const discard = pileSelector("corsairDiscard", 0)(duo.state);
+    expect(deck.ids).toBe(duo.state.corsairDeck);
+    expect(deck.top).toBeNull();
+    expect(discard.ids).toHaveLength(2);
+    expect(discard.top?.id).toBe(duo.state.corsairDiscard?.at(-1));
+    expect(PILE_WORDS.corsairDeck).toBe("Corsair deck");
+    expect(PILE_WORDS.corsairDiscard).toBe("Corsair discard pile");
+    expect(isDiscardPile("corsairDiscard")).toBe(true);
+    expect(isDiscardPile("corsairDeck")).toBe(false);
+  });
+
+  it("has the pair only while the game has a Corsair deck: none before it is prepared, none after it ends", () => {
+    expect(secondPilesOf(duo.state)).toEqual(["corsairDeck", "corsairDiscard"]);
+    const without = seaFixture({ heading: "Sun" });
+    expect(secondPilesOf(without.state)).toEqual([]);
+    expect(pileSelector("corsairDeck", 0)(without.state).ids).toEqual([]);
+  });
+
+  it("keeps the second slot and the Heading dial when the table peeks at the other seat: the piles are shared and the dial is the game's", () => {
+    for (const pile of SECOND_PILES) expect(pileSelector(pile, 1)(duo.state).ids).toBe(pileSelector(pile, 0)(duo.state).ids);
+    expect(headingReadout(duo.state)).toEqual({ step: "Rain", cardId: duo.ids.heading });
+    const seat0 = seaViews(duo, 0);
+    const seat1 = seaViews(duo, 1);
+    expect(Object.keys(seat1.piles).sort()).toEqual(Object.keys(seat0.piles).sort());
+    const at = tableLayout(591, 338, seat1.views, seat1.piles, {});
+    const home = tableLayout(591, 338, seat0.views, seat0.piles, {});
+    expect(at.piles.corsairDeck).toEqual(home.piles.corsairDeck);
+    expect(at.piles.corsairDiscard).toEqual(home.piles.corsairDiscard);
+    expect(at.zones.engaged.w).toBe(home.zones.engaged.w);
+  });
+
+  it("stands each seat's own ships in its own row: the other seat's ship is seen by peeking at that seat", () => {
+    const first = zoneIds(duo.state, "play", 0, duo.facts);
+    const second = zoneIds(duo.state, "play", 1, duo.facts);
+    expect(first).toContain(duo.ids.ship0);
+    expect(first).not.toContain(duo.ids.ship1);
+    expect(second).toContain(duo.ids.ship1);
   });
 });

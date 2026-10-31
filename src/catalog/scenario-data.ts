@@ -7,7 +7,12 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // `burden` is the burden deck (Flight to the Ford): a zone beside the quest deck, not part of the encounter deck.
 // `attachedChosen` is a card the quest's Setup attaches to a hero the first player chooses (The Caves of Nibin-Dûm's Cave
 // Torch): out of the encounter deck, dealt by the Setup record, not by `setupInstructions`.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen"] as const;
+// Dream-chaser's extra decks (docs/plans/dream-chaser.md, phase 37), each a zone the scenario's Setup prepares (the engine reads them from
+// phase 39 on): `corsairDeck` (the non-ship enemies, "Prepare the Corsair deck", dcce.corsair-deck), `encounterDeck2` (the deck the
+// quest swaps to: The Thing in the Depths 5, The City of Corsairs 9, dcce.from-sea-to-land), `unchartedDeck` (dcce.uncharted-deck),
+// `islandMap` (Temple of the Deceived's fifteen double-sided locations, dcce.island-map), `grottoDeck` (dcce.grotto-deck) and
+// `stormcallerQuests` (stages 2C to 4C beside the Stormcaller, dcce.stormcallers-area). None is part of the encounter deck.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -21,6 +26,14 @@ const placementSchema = z
     // Staging only: the quest card's Setup finds these copies in the encounter deck, a different location for each player ("Each player adds 1
     // different location to the staging area", 142040:A:1). They are dealt with the encounter pile and the Setup record searches for them.
     searched: z.literal(true).optional(),
+    // Staging only: "1 copy of Rolling Seas (2 copies instead if there are 3 or more players in the game)": `few` copies, `many` from `from`
+    // players on; the copies of `normal` the Setup does not stage stay in the encounter deck.
+    byPlayers: z.strictObject({ few: z.number().int().positive(), many: z.number().int().positive(), from: z.number().int().min(2) }).optional(),
+    // A card with two sides that are two catalog cards, `code` the side dealt faceup and `back` the other side of the same physical card
+    // (the Stormcaller Elite's enemy and objective-ally sides, the Grotto locations and the Underwater side each one is paired with: the pairings
+    // differ card to card, dcce.grotto-deck, so one code can appear in several placements of a pile). A card with a folded second side
+    // (Card.back) has no `back` here.
+    back: z.string().min(1).optional(),
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
@@ -52,6 +65,9 @@ export const scenarioDataSchema = z
     campaignCard: z.string().min(1),
     // Cards the campaign card's Setup places or shuffles in. They are not in `cards`; the records deal them.
     campaignPlaced: z.array(z.string().min(1)),
+    // Dream-chaser: the Campaign Expansion's reprint of a card this scenario deals (in `cards` or `campaignPlaced`), by the code it is dealt under.
+    // A campaign game deals the reprint, with its Campaign Mode only or Upgraded side; standalone play deals the card named in `cards`.
+    reprints: z.record(z.string().min(1), z.string().min(1)).optional(),
     // The Ring-bearer's starting life, when a Setup line sets it.
     life: z.number().int().positive().optional(),
     // Table pieces the cards call for, read from their printed text by the build.
@@ -68,8 +84,8 @@ export const scenarioDataSchema = z
     if (!same) context.addIssue({ code: "custom", message: "stages must be the quest-pile cards" });
     const seen = new Set<string>();
     for (const card of data.cards) {
-      const key = `${card.code}\u0000${card.pile}`;
-      if (seen.has(key)) context.addIssue({ code: "custom", message: `duplicate code and pile ${card.code} ${card.pile}` });
+      const key = `${card.code}\u0000${card.pile}\u0000${card.back ?? ""}`;
+      if (seen.has(key)) context.addIssue({ code: "custom", message: `duplicate code, pile and back ${card.code} ${card.pile} ${card.back ?? ""}` });
       seen.add(key);
     }
   });
@@ -108,6 +124,8 @@ export const campaignDataSchema = z.strictObject({
   // A saga campaign carries the Ring-bearer and the Fellowship-sphere rules (the Fellowship of the Ring only). The others
   // are plain campaigns: no Ring-bearer, and Fellowship heroes are not allowed.
   saga: z.boolean(),
+  // The campaign cards award XP the players spend on the log's scalable and upgradable cards (Dream-chaser, dcce.gaining-xp). Absent otherwise.
+  xp: z.boolean().optional(),
   // The page of the campaign's booklet where a scenario's setup is printed, by scenario id. Only scenarios whose
   // `setup-<id>` span (data/rules/index.json) is in that booklet have one; the reader opens on it, otherwise on the saved
   // last page.
@@ -182,6 +200,7 @@ function copiesAt(card: Placement, difficulty: Difficulty): number {
 // count (the catalog's definition) every copy is counted.
 function placedCopies(card: Placement, difficulty: Difficulty, seatCount?: number): number {
   const copies = copiesAt(card, difficulty);
+  if (card.byPlayers != null && seatCount != null) return Math.min(copies, seatCount >= card.byPlayers.from ? card.byPlayers.many : card.byPlayers.few);
   return card.perPlayer != null && seatCount != null ? Math.min(copies, card.perPlayer * seatCount) : copies;
 }
 
@@ -216,6 +235,11 @@ export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "
   return instructions;
 }
 
+// The Corsair deck a scenario deals, copy by copy (dcce.corsair-deck): the `corsairDeck` pile at the difficulty played.
+export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
+  return placementsAt(data, difficulty).flatMap((card) => (card.pile === "corsairDeck" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
+}
+
 export function burdenCodes(data: ScenarioData): string[] {
   return data.cards.filter((card) => card.pile === "burden").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
 }
@@ -225,13 +249,40 @@ export function recordInstructions(effects: readonly Effect[], code: string, tim
   return effects.filter((effect) => effect.cardCode === code && effect.timing === timing).flatMap((effect) => effect.instructions);
 }
 
-// A quest card whose Forced effect names the stages its defeat proceeds to (BranchStage, 01120:B:1) carries them as its `branch`.
-function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[] } {
-  const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
-  return branch?.verb === "BranchStage" ? { code, branch: branch.codes } : { code };
+// The same for one side of a double-sided card whose two sides are both in the game's records but only one is faceup (the Hard/Expert Mode
+// card: side A Hard, side B Expert). A record belongs to a side when every line it implements is a line of that side ("<code>:<side>:<n>").
+export function sideInstructions(effects: readonly Effect[], code: string, side: "A" | "B", timing: Effect["timing"]): Instruction[] {
+  return effects.filter((effect) => effect.cardCode === code && effect.timing === timing && effect.lines.every((line) => line.startsWith(`${code}:${side}:`))).flatMap((effect) => effect.instructions);
 }
 
-export function scenarioDefinition(data: ScenarioData, _campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
+// The Hard/Expert Mode card (collector 217, dcce.hard-expert): put next to the quest deck in a game of a campaign with XP.
+export const MODE_CARD_CODE = "11217";
+
+// The cards a campaign game deals beyond the scenario's own piles, the one list every reader of "what a game deals" shares (the world the
+// briefing loads, the effect tooling, the coverage tests): the Campaign Expansion's reprint of each card (ScenarioData.reprints) and, in a
+// campaign with XP, the Hard/Expert Mode card.
+export function campaignGameCodes(campaign: Pick<CampaignData, "xp">, scenario: Pick<ScenarioData, "reprints">): string[] {
+  return [...Object.values(scenario.reprints ?? {}), ...(campaign.xp ? [MODE_CARD_CODE] : [])];
+}
+
+// What a campaign game deals of a scenario that has reprints: the Campaign Expansion's reprint of each card in place of the original, in every
+// pile, the quest stages and the cards the campaign card places (ScenarioData.reprints). Standalone play deals the scenario as it is.
+export function campaignScenario(data: ScenarioData): ScenarioData {
+  const reprints = data.reprints;
+  if (!reprints) return data;
+  const swap = (code: string): string => reprints[code] ?? code;
+  return { ...data, stages: data.stages.map(swap), cards: data.cards.map((card) => ({ ...card, code: swap(card.code), ...(card.back != null ? { back: swap(card.back) } : {}) })), campaignPlaced: data.campaignPlaced.map(swap) };
+}
+
+// A quest card whose Forced effect names the stages its defeat proceeds to (BranchStage, 01120:B:1) carries them as its `branch`.
+// A stage that names LookAtStages (11016:B:3) carries the number of stages it looks at as its `look`.
+function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number } {
+  const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
+  const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
+  return { code, ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}) };
+}
+
+export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
   const burden = burdenCodes(data);
   return scenarioDefinitionSchema.parse({
     id: data.id,
@@ -249,5 +300,6 @@ export function scenarioDefinition(data: ScenarioData, _campaign: CampaignData, 
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(data.life != null ? { life: data.life } : {}),
     campaignCard: data.campaignCard,
+    ...(campaign.xp ? { part: data.number } : {}),
   });
 }

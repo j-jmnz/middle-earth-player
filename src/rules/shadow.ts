@@ -34,11 +34,11 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 
 // A shadow effect that asks a player (Pick, Choose: "Discard a non-objective attachment you control", 141071:A:2), repeats an
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
-// \"When Revealed\" effect of Iron Shackles", 01105:A:2), or assigns damage a point at a time ("Assign X damage among characters you control", 142057:A:2),
-// or runs on each card that matches ("exhaust all characters you control", 900103:A:2),
-// runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
+// \"When Revealed\" effect of Iron Shackles", 01105:A:2), assigns damage a point at a time ("Assign X damage among characters you control", 142057:A:2),
+// runs on each card that matches ("exhaust all characters you control", 900103:A:2), or
+// reveals an encounter card ("Reveal an encounter card", 11176:A:4), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes.
 function runsInFrame(effects: readonly Effect[]): boolean {
-  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "AssignDamage" || instruction.verb === "ResolveWhenRevealed"));
+  return effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Pick" || instruction.verb === "Choose" || instruction.verb === "Repeat" || instruction.verb === "Each" || instruction.verb === "AssignDamage" || instruction.verb === "ResolveWhenRevealed" || instruction.verb === "RevealEncounter"));
 }
 
 function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -258,6 +258,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (held) return held;
   // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
   const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
+  const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
     attack.immediate || done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
@@ -287,6 +288,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       instructions: waiting.length > 0 ? [...after, { verb: "StartShadowAttack", attackers: [...waiting] }] : after,
       cancel: null,
       blockCancel: null,
+      // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.
+      ...(sendsExcess ? { excess: attack.defense?.excess ?? 0 } : {}),
       ...(destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
       ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),

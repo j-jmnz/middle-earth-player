@@ -11,7 +11,7 @@ export type Deck = { label: string; cards: { databaseId: string; quantity: numbe
 export const PLAYER_GROUP = "player1Play1";
 
 // "the Journey in the Dark encounter set" and "The Ring Goes South" name the same set.
-export const plain = (name: string): string => name.replace(/^the /i, "").replaceAll("’", "'").toLowerCase();
+export const plain = (name: string): string => name.replace(/^the /i, "").replaceAll("’", "'").replaceAll("\u2011", "-").toLowerCase();
 
 // The Easy Mode sheet's list of the cards to remove from each Core Set encounter set (easy-mode.core-set):
 // "Dol Guldur Orcs / 1x Chieftain Ufthak / ..." and "Passage Through Mirkwood / None". Set name -> card name -> copies.

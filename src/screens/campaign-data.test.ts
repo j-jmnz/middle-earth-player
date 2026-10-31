@@ -34,7 +34,7 @@ describe("the registry", () => {
       if (built.includes(entry.id)) {
         expect(campaign?.name, entry.id).toBe(entry.name);
         expect(campaign?.scenarios.length, entry.id).toBe(entry.scenarioCount);
-      } else expect(campaign, entry.id).toBeNull();
+      } else expect(campaign, entry.id).toBeNull(); // The Two Towers and The Return of the King are listed locked and not built.
     }
   });
 
@@ -53,8 +53,8 @@ describe("the registry", () => {
     }
   });
 
-  it("splits the scenarios into three boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood"]);
+  it("splits the scenarios into four boxes, each scenario in one, each box inside its own campaign", () => {
+    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser"]);
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
     const every = new Set(campaignIds().flatMap((id) => campaignOf(id)?.scenarios ?? []));
@@ -65,11 +65,15 @@ describe("the registry", () => {
     }
     expect(boxOf("the-oath")?.id).toBe("the-dark-of-mirkwood");
     expect(boxOf("journey-along-the-anduin")?.id).toBe("revised-core");
+    // One box holds all nine Dream-chaser scenarios, in play order (user decision, 2026-10-30).
+    expect(BOXES.find((box) => box.id === "dream-chaser")?.scenarios).toEqual(campaignOf("dream-chaser")?.scenarios);
+    expect(boxOf("a-storm-on-cobas-haven")?.id).toBe("dream-chaser");
     expect(boxOf("nowhere")).toBeNull();
   });
 
   it("takes a standalone game's flags from its box: saga only for the Fellowship", () => {
     expect(campaignOfScenario("a-knife-in-the-dark")?.saga).toBe(true);
+    expect(campaignOfScenario("the-drowned-ruins")?.saga).toBe(false);
     expect(campaignOfScenario("passage-through-mirkwood")?.saga).toBe(false);
     expect(campaignOfScenario("the-caves-of-nibin-dum")?.saga).toBe(false);
     expect(campaignOfScenario("nowhere")).toBeNull();
@@ -79,6 +83,20 @@ describe("the registry", () => {
     expect(bookletParams("mirkwood-paths", "passage-through-mirkwood")).toEqual({ id: "learn-to-play", page: "25" });
     expect(bookletParams("the-dark-of-mirkwood", "the-oath")).toEqual({ id: "the-dark-of-mirkwood", page: "3" });
     expect(bookletParams("the-dark-of-mirkwood")).toEqual({ id: "the-dark-of-mirkwood" });
+  });
+
+  it("registers Dream-chaser: nine scenarios in order, the XP flag, its own booklet on each scenario's page, no saga", () => {
+    const campaign = campaignOf("dream-chaser");
+    expect(campaignIds()).toContain("dream-chaser");
+    expect(campaign).toMatchObject({ name: "Dream-chaser", saga: false, xp: true, bookletId: "dream-chaser", prelude: [] });
+    expect(campaign?.scenarios).toHaveLength(9);
+    for (const id of campaign?.scenarios ?? []) expect(scenarioOf(id)?.id).toBe(id);
+    expect(scenarioNames(campaign!)["voyage-across-belegaer"]).toBe("Voyage Across Belegaer");
+    expect(campaignOf("fellowship-of-the-ring")?.xp).toBeUndefined();
+    expect(campaignOf("mirkwood-paths")?.xp).toBeUndefined();
+    expect(bookletParams("dream-chaser", "voyage-across-belegaer")).toEqual({ id: "dream-chaser", page: "6" });
+    expect(bookletParams("dream-chaser", "the-city-of-corsairs")).toEqual({ id: "dream-chaser", page: "24" });
+    expect(bookletParams("dream-chaser")).toEqual({ id: "dream-chaser" });
   });
 
   it("names a scenario as printed, without Hall of Beorn's \" (Campaign)\" suffix", () => {

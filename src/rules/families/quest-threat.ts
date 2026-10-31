@@ -20,23 +20,28 @@ import { heard, queueHeard } from "./quest-events.ts";
 
 const QUEST_FAILURE: Cause = ruleCause("rr.step-3-4");
 
-function playerSource(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
+export function playerSource(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   return source != null && isPlayerType(printedOf(ctx.cards, source.code));
 }
 
-// A player card effect lowers the seat's threat: by at most 1 while the seat holds threatReductionToOne (22054:A:1). When the
-// dial moved, the seat hears which card lowered it (141015:A:2).
+// An effect lowers the seat's threat: by at most 1 while the seat holds threatReductionToOne (22054:A:1) and a player card is the source. The Hard/Expert
+// Mode card's lines name no source: "cannot be reduced by more than 1 each round" (11217:A:1) and "cannot be reduced" (11217:B:1) hold against every effect.
+// When the dial moved, the seat hears which card lowered it (141015:A:2).
 export function lowerThreatByEffect(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext, steps: EngineStep[], cause: Cause): ScenarioState {
   const player = playerSource(state, sourceId, ctx);
   // A contract bars the player's threat from being reduced by player card effects (1) or by those of cards other than contracts (2)
   // (A Perilous Voyage, 40047).
   const barred = player ? heldAmount(state, `seat:${seat}`, "noThreatReduction") : 0;
   const fromContract = sourceId != null && state.cards[sourceId] != null && printedOf(ctx.cards, state.cards[sourceId]?.code ?? "").type === "contract";
-  const reduced = barred === 1 || (barred > 1 && !fromContract) ? 0 : amount;
-  const capped = player && heldAmount(state, `seat:${seat}`, "threatReductionToOne") > 0 ? Math.min(reduced, 1) : reduced;
+  const reduced = barred === 1 || (barred > 1 && !fromContract) || heldAmount(state, `seat:${seat}`, "threatReductionBarred") > 0 ? 0 : amount;
+  const once = player && heldAmount(state, `seat:${seat}`, "threatReductionToOne") > 0 ? Math.min(reduced, 1) : reduced;
+  // "Cannot be reduced by more than 1 each round" (11217:A:1, dcce.hard-expert): what the round has already taken off counts.
+  const roundCap = heldAmount(state, `seat:${seat}`, "threatReductionCap");
+  const capped = roundCap > 0 ? Math.max(0, Math.min(once, roundCap - (state.threatLoweredBy?.[seat] ?? 0))) : once;
   const before = state.seats[seat]?.threat ?? 0;
-  const lowered = lowerThreat(state, seat, capped, steps, cause);
+  const moved = lowerThreat(state, seat, capped, steps, cause);
+  const lowered = roundCap > 0 ? { ...moved, threatLoweredBy: { ...moved.threatLoweredBy, [seat]: (moved.threatLoweredBy?.[seat] ?? 0) + (before - (moved.seats[seat]?.threat ?? 0)) } } : moved;
   if ((lowered.seats[seat]?.threat ?? 0) >= before || !sourceId) return lowered;
   return queueHeard(lowered, ctx, { trigger: "threatLowered", seat, subject: sourceId });
 }

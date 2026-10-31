@@ -25,6 +25,10 @@ export const ledgerEntrySchema = z.strictObject({
   confirmedBy: z.enum(["user", "sources"]).nullable(),
   basis: z.array(z.string().min(1)).optional(),
   notes: z.string().optional(),
+  // Dream-chaser's encounter cards: how many Sailing success symbols the card prints in the bottom left corner of its text box (Calm Waters
+  // prints two), which a Sailing test counts (dcce.sailing-tests). No source carries it, so the reader records it, 0 included, for every
+  // card the encounter deck can hold.
+  sailingSuccess: z.number().int().nonnegative().optional(),
 });
 export type LedgerEntry = z.infer<typeof ledgerEntrySchema>;
 

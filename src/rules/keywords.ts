@@ -23,7 +23,21 @@ export type DamageSource = "framework" | "player" | "combat";
 
 type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
 
-function printedStat(printed: PrintedCard, stat: ModifierStat): number {
+// The printed value of a stat, on the side the card shows: a ship-objective dealt on its Upgraded side prints that side's stats (dcce.scalable-upgradable).
+function printedStat(printed: PrintedCard, stat: ModifierStat, face?: CardInstance["face"]): number {
+  const upgraded = face === "B" ? printed.upgraded : null;
+  if (upgraded) {
+    switch (stat) {
+      case "willpower":
+      case "attack":
+      case "defense":
+        return upgraded[stat];
+      case "hitPoints":
+        return upgraded.health;
+      default:
+        break;
+    }
+  }
   switch (stat) {
     case "willpower":
     case "attack":
@@ -65,7 +79,7 @@ export function modifiedStat(
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);
-  let total = printedStat(printed, stat);
+  let total = printedStat(printed, stat, instance.face);
   let set: number | null = null;
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2).
   let floor = total;
@@ -221,10 +235,13 @@ export function placeDamage(
   // by Lightless Passage's Shadow (41033:A:2).
   if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
-  const dealt = placedAmount(printed, amount);
+  // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
+  const cap = heldAmount(state, id, "damageCap");
+  const taken = state.roundDamage?.[id] ?? 0;
+  const dealt = cap > 0 ? Math.max(0, Math.min(placedAmount(printed, amount), cap - taken)) : placedAmount(printed, amount);
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
-  let next = updateCard(state, id, { damage });
+  let next = updateCard(cap > 0 ? { ...state, roundDamage: { ...state.roundDamage, [id]: taken + dealt } } : state, id, { damage });
   const hurt = dealt > 0 && inPlay(instance.zone);
   // An indestructible enemy keeps its damage but is never destroyed; it hears that it took damage (the Watcher in the Water, 142024:A:3).
   if (indestructible(state, id, printed)) return hurt ? queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt }) : next;
@@ -366,7 +383,9 @@ export function destroyCard(
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).
-  next = moveCard(next, id, alliesToHandDestination(next, latest, printed) ?? defeatedDestination(latest, printed), instance.attachments);
+  // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
+  const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
+  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), instance.attachments);
   steps.push({ kind: "destroy", targetId: id });
   if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);

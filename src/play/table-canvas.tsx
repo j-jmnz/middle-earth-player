@@ -6,8 +6,12 @@ import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
 import { stagingWord } from "./area-words.ts";
+import { lookedIds } from "../rules/families/sea-sailing.ts";
+
 import { NO_HIGHLIGHT } from "./peek.ts";
-import { PILE_WORDS, PILES, hidesFace, isPrisoner, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
+import { headingStepOf, headingLook } from "./heading.ts";
+import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "./sea-words.ts";
+import { PILE_WORDS, PILES, hidesFace, isPrisoner, pileIds, secondPilesOf, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "./selectors.ts";
 import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "./tokens.ts";
 import { useUiScale } from "./ui-scale.ts";
@@ -94,23 +98,44 @@ function PileRow({ store, pile, seat, nameOf, onTap, onPreview, highlight, t }: 
   const top = view.top ? ` · ${nameOf(view.top.code)} on top` : "";
   // An encounter card attached to the deck (Iron Shackles, 01105:A:1): the list says so, as the canvas draws a chain.
   const held = (view.attached ?? []).length > 0 ? ` · ${(view.attached ?? []).map((card) => nameOf(card.code)).join(", ")} attached` : "";
-  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${PILE_WORDS[pile]} (${view.ids.length})${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} t={t} />;
+  return <CardButton id={`pile:${pile}`} faceDown={false} label={`${pileCountWords(PILE_WORDS[pile], view.ids.length)}${top}${held}`} onTap={onTap} onPreview={onPreview} highlight={highlight} t={t} />;
 }
 
-export function TableCanvas({ store, width, height, nameOf, inactive, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
+// The sea family's pieces in words (docs/design-system-table.md, Cards): the heading, the seat's ships with their damage, and the Corsair pair on one line. The web list does not fold.
+function SeaLines({ store, seat, nameOf, facts, t }: Pick<TableCanvasProps, "store" | "nameOf" | "facts"> & { seat: number; t: TableTokens }) {
+  const game = useStore(store, (state) => state.game);
+  const step = headingStepOf(game.sea?.heading);
+  const owner = game.seats[seat];
+  const ships = owner ? [...owner.heroes, ...owner.play].flatMap((id) => (game.cards[id] && facts.shipRank(game.cards[id]?.code ?? "") != null ? [game.cards[id]] : [])) : [];
+  const pair = secondPilesOf(game).map((pile) => ({ name: PILE_WORDS[pile], count: pileIds(game, pile, seat).length }));
+  const looked = lookedIds(game).length;
+  if (!step && ships.length === 0 && pair.length === 0 && looked === 0) return null;
+  return (
+    <View className="mb-2">
+      {step ? <Text className="text-label text-bone">{headingLine(step, headingLook(step).onCourse)}</Text> : null}
+      {ships.length > 0 ? <Text className="text-label text-bone">{shipsLine(ships.map((card) => ({ name: nameOf(card?.code ?? ""), damage: card?.damage ?? 0 })))}</Text> : null}
+      {pair.length > 0 ? <Text className="text-label text-bone">{secondSlotLine(pair)}</Text> : null}
+      {looked > 0 ? <Text className="text-label text-muted" style={{ color: t.muted }}>{`Sailing test: ${looked} ${looked === 1 ? "card" : "cards"} looked at`}</Text> : null}
+    </View>
+  );
+}
+
+export function TableCanvas({ store, width, height, nameOf, inactive, facts, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   // Peeking at the other seat: nothing is outlined or filled, and a tap only previews (use-table-choice.ts).
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
+  const second = useStore(store, (state) => secondPilesOf(state.game));
   return (
     <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
+      <SeaLines store={store} seat={seat} nameOf={nameOf} facts={facts} t={t} />
       {TABLE_ZONES.map((zone) => (
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}
       <View className="flex-row flex-wrap gap-1">
-        {PILES.map((pile) => (
+        {[...PILES, ...second].map((pile) => (
           <PileRow key={pile} pile={pile} {...rowProps} />
         ))}
       </View>
