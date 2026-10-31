@@ -124,8 +124,8 @@ function campaignOfPacks(packCodes: readonly string[]): string | null {
 // The stats of the Upgraded side, when the card has them all (dcce.scalable-upgradable).
 function upgradedOf(card: Card): string | null {
   const back = card.back;
-  if (back?.willpower == null || back.attack == null || back.defense == null || back.health == null) return null;
-  return JSON.stringify({ willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) });
+  if (back?.attack == null || back.defense == null || back.health == null) return null;
+  return JSON.stringify({ ...(back.willpower != null ? { willpower: back.willpower } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) });
 }
 
 function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMap<string, string>): Row {

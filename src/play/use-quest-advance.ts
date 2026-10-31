@@ -7,7 +7,7 @@ import { useStore } from "zustand";
 
 import { isOver } from "../rules/undo.ts";
 
-import { advancedTo, askingStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
+import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "./store.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";
 
@@ -29,7 +29,9 @@ export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const over = useStore(store, (state) => isOver(state.game));
   // The stages the seats are on once stages are separate: an advance of any seat's stage holds the screen.
   const seatStages = useStore(store, (state) => stagesKey(state.game));
-  const view = useMemo((): QuestView => ({ questStage, asking, over, seatStages }), [questStage, asking, over, seatStages]);
+  // The Stormcaller's stage once it is at its last: its advance there is told on the screen too (quest-advance.ts).
+  const callerStage = useStore(store, (state) => callerLastStage(state.game));
+  const view = useMemo((): QuestView => ({ questStage, asking, over, seatStages, callerStage }), [questStage, asking, over, seatStages, callerStage]);
   const spotlit = useSpotlightHold(store);
   const [latch, setLatch] = useState(() => openingLatch(view));
   // Set during render (the derived-state pattern): React renders again before it commits, so no effect sees the old latch.

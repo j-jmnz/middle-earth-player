@@ -8,7 +8,9 @@ import { modifiedStat, placeDamage } from "../keywords.ts";
 import { settle } from "../machine.ts";
 import type { EngineStep } from "../intents.ts";
 import { legalTargets } from "../legal.ts";
+import { moveCard } from "../zones.ts";
 import { placeQuestProgress } from "../quest.ts";
+import { travelCostUnpayable } from "../restrictions.ts";
 import type { ScenarioState } from "../state.ts";
 import { CODES, codesIn, finish, idOf, loadFlightWorld, flightTable, resolveRecords, type FlightLayout, type FlightWorld } from "../../../scripts/stormcaller-scene.ts";
 import { areaOf } from "./stormcaller-zone.ts";
@@ -74,6 +76,18 @@ describe("the Stormcaller's area (dcce.stormcallers-area)", () => {
   });
 });
 
+describe("a card discarded from the encounter deck (11193:B:2)", () => {
+  it("is announced in a game with ships even where the Stormcaller's area does not exist", () => {
+    const made = make({ deck: ["f3"] });
+    const noArea: ScenarioState = { ...made.state, sea: { ...made.state.sea!, stormcaller: undefined } };
+    const top = noArea.encounterDeck[0]!;
+    const moved = moveCard(noArea, top, { zone: "encounterDiscard" });
+    expect(moved.pendingEvents?.some((event) => event.trigger === "discardedFromEncounterDeck")).toBe(true);
+    const plain: ScenarioState = { ...noArea, sea: undefined };
+    expect(moveCard(plain, top, { zone: "encounterDiscard" }).pendingEvents?.some((event) => event.trigger === "discardedFromEncounterDeck") ?? false).toBe(false);
+  });
+});
+
 describe("the end of the round (12016:B:3, 12017:B:3, 12018:B:1)", () => {
   it("discards the top card of the encounter deck and places progress on the Stormcaller's stage equal to its Threat plus the Threat of that card", () => {
     const made = make({ deck: ["f3", "f0"] });
@@ -86,11 +100,13 @@ describe("the end of the round (12016:B:3, 12017:B:3, 12018:B:1)", () => {
     expect(progress[0]).toMatchObject({ amount: 5, cause: { effect: "12016:forced:1" } });
   });
 
-  it("adds the Threat of each Sahír's Escort in the area, and not of one that stands in the staging area", () => {
+  it("adds the Threat of each Sahír's Escort in the area, also while the players are at the Stormcaller's stage and it stands in the staging area (dcce.stormcallers-area-stages)", () => {
     const made = make({ deck: ["f0"], area: [CODES.escort, CODES.escort] });
     expect(stageOf(endRound(made).state).progress).toBe(2 + 2 + 2);
     const caught = make({ stage: "12013", deck: ["f0"], area: [CODES.escort, CODES.escort] });
-    expect(stageOf(endRound(caught).state).progress).toBe(2);
+    const caughtRound = endRound(caught, settle(caught.state, caught.ctx, []));
+    expect(codesIn(caughtRound.state, "staging")).toContain(CODES.escort);
+    expect(stageOf(caughtRound.state).progress).toBe(2 + 2 + 2);
   });
 
   it("gets +2 Threat while the players are off-course (12016:B:1, 12017:B:1), and the printed Threat of the discarded card only", () => {
@@ -185,11 +201,14 @@ describe("moving progress onto the Stormcaller's stage (12012:B:2, 12026:A:1)", 
     expect([stageOf(same).progress, same.cards[same.questStage ?? ""]?.progress]).toEqual([0, 5]);
   });
 
-  it("moves no more than the quest holds, and a full stage advances (Hidden Cove's Travel)", () => {
-    const made = make({ stage: "12013", progress: 1, callerProgress: 11, staging: [CODES.cove] });
-    const run = resolveRecords(made.state, made.ctx, CODES.cove, "travel", idOf(made.state, CODES.cove));
+  it("moves up to 2 progress and a full stage advances (Hidden Cove's Travel), and cannot be travelled to while the quest holds less than 2", () => {
+    const made = make({ stage: "12013", progress: 2, callerProgress: 10, staging: [CODES.cove] });
+    const cove = idOf(made.state, CODES.cove);
+    expect(travelCostUnpayable(made.state, made.ctx, cove)).toBe(false);
+    const run = resolveRecords(made.state, made.ctx, CODES.cove, "travel", cove);
     expect(run.state.cards[run.state.questStage ?? ""]?.progress).toBe(0);
     expect(stageOf(run.state)).toMatchObject({ number: 3, progress: 0 });
+    const short = make({ stage: "12013", progress: 1, callerProgress: 11, staging: [CODES.cove] });
+    expect(travelCostUnpayable(short.state, short.ctx, idOf(short.state, CODES.cove))).toBe(true);
   });
 });
-

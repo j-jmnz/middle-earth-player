@@ -26,7 +26,9 @@ import { freeOfEncounters } from "./families/objectives.ts";
 import { prisonerHero } from "./families/prisoner.ts";
 import { tokensOn } from "./families/campaign.ts";
 import { headingIs } from "./families/sea-heading.ts";
-import { corsairHolds, stormcallerHolds } from "./families/stormcaller-values.ts";
+import { corsairHolds } from "./families/sea-corsair.ts";
+import { stormcallerHolds } from "./families/stormcaller-values.ts";
+import { areaOf } from "./families/stormcaller-zone.ts";
 import { lastHideFailed, onStage, withTwin } from "./families/nightmare-guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
@@ -346,6 +348,8 @@ function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLo
   if (!source) return false;
   // The second active location slot is an active location too (mec109.stage-4).
   if (zone === "activeLocation") return source.zone === "activeLocation" || source.zone === "secondActiveLocation";
+  // A card of the Stormcaller's area stays one while it stands in the staging area at the Stormcaller's stage (dcce.stormcallers-area-stages: "considered to be in the staging area").
+  if (zone === "stormcallerArea") return areaOf(state)?.members.includes(source.id) ?? false;
   return zone === "play" ? inPlay(source.zone) : source.zone === zone;
 }
 

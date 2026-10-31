@@ -13,7 +13,7 @@ import { medallionAt } from "./look-strip.ts";
 import { FOLD_WORD, foldCount } from "./row-fold.ts";
 import { medallionCount } from "./sea-words.ts";
 import { stripText } from "./table-canvas-views.ts";
-import { AREA_FOLD_WORD } from "./stormcaller-words.ts";
+import { AREA_FOLD_WORD, STAGE_APART_WORD } from "./stormcaller-words.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
@@ -526,6 +526,33 @@ export function StagingTag({ rect, text, font, t, s }: { rect: Rect; text: strin
   return (
     <Group transform={[{ translateX: rect.x - 0.5 * s }, { translateY: rect.y + rect.h - 2 * s }, { rotate: -Math.PI / 2 }, { scale }]}>
       <Text x={0} y={0} text={text.toUpperCase()} font={font} color={t.faint} />
+    </Group>
+  );
+}
+
+/**
+ * The Stormcaller's stage marks, upright in the part of the stage its area's cards leave uncovered (`rect`, shownBounds): a pill at the top corner with the stage's number ("2", "3", threat red "4/4" at the last
+ * stage, where filling it loses the game), and, while the players are at another stage, an "Apart" plate across its middle that the veil on the area's cards does not say (docs/design-system-table.md, Cards).
+ */
+export function StageMarks({ rect, pill, apart, fonts, t, s }: { rect: Rect; pill: { text: string; danger: boolean }; apart: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+  const height = 11 * s;
+  const words = fonts.small.getTextWidth(pill.text);
+  const pillW = Math.min(rect.w - 6 * s, words + 8 * s);
+  const plate = fonts.small.getTextWidth(STAGE_APART_WORD);
+  const plateW = Math.min(rect.w - 6 * s, plate + 8 * s);
+  const plateY = rect.y + (rect.h - height) / 2;
+  return (
+    <Group>
+      <RoundedRect x={rect.x + 3 * s} y={rect.y + 3 * s} width={pillW} height={height} r={height / 2} color={pill.danger ? t.threat : withAlphaHex(t.night, 0.9)} />
+      <RoundedRect x={rect.x + 3 * s} y={rect.y + 3 * s} width={pillW} height={height} r={height / 2} color={pill.danger ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
+      <Text x={rect.x + 3 * s + (pillW - words) / 2} y={rect.y + 3 * s + height - 2.5 * s} text={pill.text} font={fonts.small} color={t.bone} />
+      {apart ? (
+        <Group>
+          <RoundedRect x={rect.x + (rect.w - plateW) / 2} y={plateY} width={plateW} height={height} r={2 * s} color={withAlphaHex(t.night, 0.9)} />
+          <RoundedRect x={rect.x + (rect.w - plateW) / 2} y={plateY} width={plateW} height={height} r={2 * s} color={t.hairline} style="stroke" strokeWidth={1 * s} />
+          <Text x={rect.x + (rect.w - plate) / 2} y={plateY + height - 2.5 * s} text={STAGE_APART_WORD} font={fonts.small} color={t.faint} />
+        </Group>
+      ) : null}
     </Group>
   );
 }

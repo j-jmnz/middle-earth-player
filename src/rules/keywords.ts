@@ -34,6 +34,8 @@ export function printedStat(printed: PrintedCard, stat: ModifierStat, face?: Car
   if (upgraded) {
     switch (stat) {
       case "willpower":
+        if (upgraded.willpower != null) return upgraded.willpower;
+        break;
       case "attack":
       case "defense":
         return upgraded[stat];

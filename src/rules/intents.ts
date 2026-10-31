@@ -19,7 +19,8 @@ export type EngineStep =
   | { kind: "commit"; cardId: string }
   | { kind: "hideCommit"; cardId: string }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
-  | { kind: "advance"; cardId: string }
+  // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.
+  | { kind: "advance"; cardId: string; stormcaller?: true }
   // The numbers quest resolution compared (rr.step-3-4): committed willpower against the threat in staging. It reports what
   // the engine read; the threat or progress that followed is its own step.
   | { kind: "quest"; willpower: number; threat: number; cause: Cause }

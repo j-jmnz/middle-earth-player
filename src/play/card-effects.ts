@@ -8,8 +8,8 @@ import { memoOf, type StateMemo } from "../rules/constant-records.ts";
 import { aflameTally, burnTally } from "../rules/families/aflame-values.ts";
 
 import { aflameLine, aflameMark, burnLine, burnMark } from "./aflame-words.ts";
-import { areaRoleOf } from "./stormcaller-table.ts";
-import { AREA_APART, AREA_TOGETHER, STAGE_TOGETHER } from "./stormcaller-words.ts";
+import { areaRoleOf, stageFactsOf } from "./stormcaller-table.ts";
+import { AREA_APART, AREA_TOGETHER, stageLines } from "./stormcaller-words.ts";
 import { areaStanding } from "../rules/families/stormcaller-values.ts";
 import { placedLimit } from "../rules/families/uncharted-limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
@@ -166,7 +166,12 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   if (burn) lines.push(burnLine(burn));
   // A card of the Stormcaller's area says where it stands (dcce.stormcallers-area-stages).
   const standing = areaStanding(game, cardId);
-  if (standing) lines.push(standing === "apart" ? AREA_APART : standing === "together" ? AREA_TOGETHER : STAGE_TOGETHER);
+  if (standing === "apart") lines.push(AREA_APART);
+  else if (standing === "together") lines.push(AREA_TOGETHER);
+  else if (standing === "stage" || standing === "stageApart") {
+    const facts = stageFactsOf(game, questPointsOf(game, card, ctx.cards));
+    if (facts) lines.push(...stageLines(facts));
+  }
   for (const modifier of game.modifiers) {
     if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;
     const source = modifier.sourceId === cardId ? "its own text" : cardName(modifier.sourceId);

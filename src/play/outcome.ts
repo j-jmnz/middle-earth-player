@@ -25,7 +25,14 @@ export const BEAT_MS = 650;
 
 // `shadow` gives the printed shadow line of a card, or null when it has no shadow effect; `stage` the printed lines of a quest
 // stage that say how it is won or held (not its When Revealed effects), or null.
-type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null };
+// `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
+type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null };
+
+// "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
+function stormcallerStageWords(state: ScenarioState, cardId: string): string {
+  const area = state.sea?.stormcaller;
+  return area && area.stage === cardId ? `stage ${area.number} of ${area.number + area.deck.length}` : "its next stage";
+}
 
 function seatWord(state: ScenarioState, seat: number): string {
   return state.seatCount > 1 ? `Player ${seat + 1} threat` : "Threat";
@@ -87,6 +94,14 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`, "progress");
         return;
       case "advance": {
+        // The Stormcaller's stage advance (dcce.stormcallers-area-stages): its C side's When Revealed is the beat's second line.
+        if (step.stormcaller === true) {
+          open(1, "The Stormcaller advances", "bad");
+          line(`The Stormcaller advances to ${stormcallerStageWords(after, step.cardId)}: ${names.card(step.cardId)}`);
+          const text = names.revealed?.(step.cardId);
+          if (text) line(text, null, [step.cardId]);
+          return;
+        }
         if (!current) open(1, "The quest advances", "good");
         line(`The quest advances to ${names.card(step.cardId)}`);
         // A stage a branch led to ("proceed to one of the 2 A Chosen Path stages, at random", 01120:B:1): the stages share a

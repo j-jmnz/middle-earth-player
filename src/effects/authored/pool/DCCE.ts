@@ -128,6 +128,8 @@ const calaerionBoost = (until: "endOfPhase" | "endOfRound"): Effect["instruction
   { verb: "ModifyStat", stat: "attack", amount: 1, until, target: "picked" },
   { verb: "ModifyStat", stat: "defense", amount: 1, until, target: "picked" },
 ];
+// Captain Sahír "in play": engaged, in the staging area or in the Stormcaller's area (11192:A:3).
+const BLACK_KEY_SAHIR: PickSpec = { type: "enemy", control: "any", staging: true, inStormcallerArea: true, names: ["Captain Sahír"] };
 const DREAM_CHASER_SHIP: PickSpec = { type: "character", control: "any", names: ["Dream-chaser"] };
 const ANOTHER_ALLY: PickSpec = { type: "ally", control: "any", other: true };
 
@@ -141,8 +143,8 @@ export const RECORDS: readonly Effect[] = [
     lines: ["11192:A:3"],
     timing: "forced",
     trigger: "endOfPhase",
-    condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "canPick", pick: { type: "enemy", control: "any", staging: true, names: ["Captain Sahír"] } }] },
-    instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", staging: true, names: ["Captain Sahír"] }, instructions: [{ verb: "PlaceResourceTokens", amount: { players: true }, on: "picked" }] }],
+    condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "canPick", pick: BLACK_KEY_SAHIR }] },
+    instructions: [{ verb: "Each", pick: BLACK_KEY_SAHIR, instructions: [{ verb: "PlaceResourceTokens", amount: { players: true }, on: "picked" }] }],
   },
   removedWhenLeaving("11192", "11192:B:1", 2),
   blackKeyBurden("B", 2),

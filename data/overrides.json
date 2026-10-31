@@ -253,15 +253,54 @@
         "health": 18,
         "engagementCost": 50,
         "back": {
-          "willpower": 0,
           "attack": 7,
           "defense": 6,
           "health": 20,
           "victory": 15
         }
       },
-      "reason": "Hall of Beorn has no stat fields for the Stormcaller's reprint, so the card has none. The scan prints Threat 2, engagement cost 50, Attack 6, Defense 6, 18 hit points and Victory 10 on side A, and Attack 7, Defense 6, 20 hit points and Victory 15 on the Campaign Mode only side (the ledger notes record the reading); the score counts the Victory of the side the card was on. An enemy prints no Willpower, so the back's Willpower is 0.",
+      "reason": "Hall of Beorn has no stat fields for the Stormcaller's reprint, so the card has none. The scan prints Threat 2, engagement cost 50, Attack 6, Defense 6, 18 hit points and Victory 10 on side A, and Attack 7, Defense 6, 20 hit points and Victory 15 on the Campaign Mode only side (the ledger notes record the reading); the score counts the Victory of the side the card was on. An enemy prints no Willpower, so the back has none.",
       "source": "scan 110042.B, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "11076"
+      },
+      "set": {
+        "backType": null
+      },
+      "reason": "The Stormcaller Elite's cards do not have encounter card backs (dcce.stormcaller-elite: 'Because these cards do not have encounter card backs, they can never be added to or shuffled into the encounter deck or discard pile'); the build files a card by its type and so gives Captain Sahír enemy an encounter back.",
+      "source": "dcce.stormcaller-elite"
+    },
+    {
+      "match": {
+        "code": "11077"
+      },
+      "set": {
+        "backType": null
+      },
+      "reason": "The Stormcaller Elite's cards do not have encounter card backs (dcce.stormcaller-elite: 'Because these cards do not have encounter card backs, they can never be added to or shuffled into the encounter deck or discard pile'); the build files a card by its type and so gives Captain Sahír objective ally an encounter back.",
+      "source": "dcce.stormcaller-elite"
+    },
+    {
+      "match": {
+        "code": "11078"
+      },
+      "set": {
+        "backType": null
+      },
+      "reason": "The Stormcaller Elite's cards do not have encounter card backs (dcce.stormcaller-elite: 'Because these cards do not have encounter card backs, they can never be added to or shuffled into the encounter deck or discard pile'); the build files a card by its type and so gives Na'asiyah enemy an encounter back.",
+      "source": "dcce.stormcaller-elite"
+    },
+    {
+      "match": {
+        "code": "11079"
+      },
+      "set": {
+        "backType": null
+      },
+      "reason": "The Stormcaller Elite's cards do not have encounter card backs (dcce.stormcaller-elite: 'Because these cards do not have encounter card backs, they can never be added to or shuffled into the encounter deck or discard pile'); the build files a card by its type and so gives Na'asiyah objective ally an encounter back.",
+      "source": "dcce.stormcaller-elite"
     },
     {
       "match": {

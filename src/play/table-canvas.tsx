@@ -11,6 +11,7 @@ import { lookedIds } from "../rules/families/sea-sailing.ts";
 import { NO_HIGHLIGHT } from "./peek.ts";
 import { pictureKey } from "./picture-key.ts";
 import { islandTell } from "./uncharted-words.ts";
+import { stageFactsOf } from "./stormcaller-table.ts";
 import { areaTell } from "./stormcaller-words.ts";
 import { headingStepOf, headingLook } from "./heading.ts";
 import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "./sea-words.ts";
@@ -83,7 +84,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
             key={card.id}
             id={card.id}
             faceDown={hidesFace(card)}
-            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(pictureKey(card))}${card.exhausted ? " (exhausted)" : ""}${islandTell(game, card) ? ` · ${islandTell(game, card)}` : ""}${inactive(pictureKey(card)) ? " · Not applied" : ""}${area ? ` · ${areaTell(area)}` : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
+            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(pictureKey(card))}${card.exhausted ? " (exhausted)" : ""}${islandTell(game, card) ? ` · ${islandTell(game, card)}` : ""}${inactive(pictureKey(card)) ? " · Not applied" : ""}${area ? ` · ${areaTell(area, area === "stage" ? stageFactsOf(game, info(game, seat, card.id).questPoints) : null)}` : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}

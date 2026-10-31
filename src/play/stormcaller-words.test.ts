@@ -11,7 +11,7 @@ import { CODES, flightTable, idOf, loadFlightWorld, type FlightWorld } from "../
 import { effectLines } from "./card-effects.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { AREA_APART, AREA_TOGETHER, STAGE_TOGETHER, stormcallerWords } from "./stormcaller-words.ts";
+import { AREA_APART, AREA_TOGETHER, STAGE_LOSS, stormcallerWords } from "./stormcaller-words.ts";
 
 let world: FlightWorld;
 
@@ -44,8 +44,8 @@ describe("the words of the Flight of the Stormcaller choices", () => {
         }
       });
     }
-    expect(seen).toContain("Raise your threat by 3");
-    expect(seen).toContain("12022 gains Boarding 1");
+    expect(seen).toContain("Raise your threat by 3 (to 31)");
+    expect(seen).toContain("12022 gains Boarding 1: reveal 1 Corsair card now");
   });
 
   it("every Pick that asks a player says what the card is for", () => {
@@ -80,10 +80,13 @@ describe("the preview of a card of the Stormcaller's area", () => {
     const lines = (made: ReturnType<typeof flightTable>, id: string): readonly string[] => effectLines(made.state, made.ctx, id, (card) => card);
     expect(lines(apart, apart.caller)).toEqual([AREA_APART]);
     expect(lines(apart, idOf(apart.state, CODES.skiff))).toEqual([]);
-    expect(lines(apart, apart.callerStage)).toEqual([]);
+    // The stage says where it stands against the players' stage, always, and what filling the last one does.
+    expect(lines(apart, apart.callerStage)).toEqual(["The Stormcaller's stage 2 of 4 · 0/12 · the players are at stage 1: its cards are out of reach"]);
+    const last = flightTable(world, { caller: 4, callerProgress: 10 });
+    expect(lines(last, last.callerStage)).toEqual(["The Stormcaller's stage 4 of 4 · 10/24 · the players are at stage 1: its cards are out of reach", STAGE_LOSS]);
     const together = flightTable(world, { stage: "12013", area: [CODES.escort] });
     const settled = settle(together.state, together.ctx, []);
     expect(effectLines(settled, together.ctx, together.caller, (card) => card)).toEqual([AREA_TOGETHER]);
-    expect(effectLines(settled, together.ctx, together.callerStage, (card) => card)).toEqual([STAGE_TOGETHER]);
+    expect(effectLines(settled, together.ctx, together.callerStage, (card) => card)).toEqual(["The Stormcaller's stage 2 of 4 · 0/12 · the players are at its stage: its cards are in the staging area"]);
   });
 });

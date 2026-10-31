@@ -58,7 +58,7 @@ function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: Engine
 export function afterProgress(state: ScenarioState, before: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // The progress a stage 3B turned into discards from the encounter deck (families/breaking-progress.ts).
   let next = payOwed(state, ctx, steps);
-  const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" ? [step.cardId] : []));
+  const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" && step.stormcaller !== true ? [step.cardId] : []));
   // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
   const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocation(next, step.targetId, ctx) ? [step.targetId] : []));
   // Goblin Trail (41014:A:2) puts progress on the current quest: its Response waits for the new stage's When Revealed (below), so the

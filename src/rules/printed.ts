@@ -124,8 +124,8 @@ const EMPTY_KEYWORDS: Keywords = {
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable).
 function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
-  if (back?.willpower == null || back.attack == null || back.defense == null || back.health == null) return null;
-  return { willpower: back.willpower, attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
+  if (back?.attack == null || back.defense == null || back.health == null) return null;
+  return { ...(back.willpower != null ? { willpower: back.willpower } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
 }
 
 // The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost

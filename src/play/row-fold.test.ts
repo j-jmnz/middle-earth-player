@@ -235,3 +235,37 @@ describe("the rule on the table", () => {
     }
   });
 });
+
+describe("a group that sheds cards before it folds (the Stormcaller's area)", () => {
+  // A pinned lead group of 200 with three cards that can leave (50 wide once they have), its last card 150 in.
+  const lead = (extra: Partial<FoldGroup> = {}) => group("lead", 200, { rank: 0, pinned: true, cards: ["lead", "a", "b", "c"], tail: 150, shed: { cards: ["a", "b", "c"], keptWidth: 50, keptTail: 0 }, ...extra });
+
+  it("sheds its cards into the stack before any other group folds, and never folds the lead", () => {
+    const groups = [lead(), ...Array.from({ length: 3 }, (_, at) => group(`g${at}`, 50))];
+    const plan = foldRow(groups, ROW);
+    expect(plan.shed).toEqual([0]);
+    expect(plan.stack?.groups).toEqual([]);
+    expect(plan.stack?.cards).toEqual(["a", "b", "c"]);
+    expect(plan.stack?.top).toBe("a");
+    expect(plan.xs[0]).not.toBeNull();
+  });
+
+  it("counts the last card's strip against the target: a group squeezed so its last card shows less than a target sheds or lets another group fold", () => {
+    // 200 + 60 + 60 + 60 + gaps = 338 in 300: a 13 pt squeeze keeps every step above the target, but the lead's last card (150 in) would show only 56 - 13 = 43.
+    const groups = [lead({ shed: { cards: [], keptWidth: 200, keptTail: 150 } }), group("x", 60), group("y", 60), group("z", 60)];
+    const plan = foldRow(groups, { ...ROW, target: 44 });
+    expect(plan.stack?.groups.length).toBeGreaterThan(0);
+    expect(plan.fits).toBe(true);
+  });
+
+  it("sheds when the lead is alone and wider than the row, and keeps a pinned card's place by not listing it", () => {
+    const plan = foldRow([lead({ width: 400, shed: { cards: ["b", "c"], keptWidth: 150, keptTail: 100 } })], { ...ROW, width: 300 });
+    expect(plan.shed).toEqual([0]);
+    expect(plan.stack?.cards).toEqual(["b", "c"]);
+  });
+
+  it("leaves the plan as it was for groups with no cards to shed", () => {
+    const groups = Array.from({ length: 9 }, (_, at) => group(`g${at}`, 50));
+    expect(foldRow(groups, ROW).shed).toEqual([]);
+  });
+});

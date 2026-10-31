@@ -16,10 +16,11 @@ import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
 import { seatTag, stagingWord } from "./area-words.ts";
-import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, StageMarks, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { pictureKey } from "./picture-key.ts";
-import { areaSpeech } from "./stormcaller-table.ts";
+import { areaFacts, areaSpeech } from "./stormcaller-table.ts";
+import { stagePill } from "./stormcaller-words.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
@@ -175,6 +176,9 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     // The night veil lies on the hand of a seat being peeked at, and on a card of the Stormcaller's area while the players are at another stage (docs/design-system-table.md, Cards).
     return <CardMarks slot={slot} tappable={card && isTappable(slot)} picked={card ? pickedCount(slot) : 0} dimmed={card && dimmed(slot)} beat={beating.has(slot.id)} t={t} s={s} veiled={card && ((peeking && slot.zone === "hand") || slot.stormcaller === "apart")} />;
   };
+  // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.
+  const stageFacts = areaFacts(game);
+  const stageMarks = stageFacts ? { pill: stagePill(stageFacts), apart: !stageFacts.together } : null;
   const drawOverlay = (slot: CardSlot) => {
     if (slot.kind === "pile") return null;
     // The Stormcaller's stage keeps its strip and tokens in the part its area's cards leave uncovered.
@@ -193,6 +197,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           {slotInfo?.fire ? <FireMarkView rect={rect} mark={slotInfo.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
           {slotInfo?.under ? <UnderMarkView rect={rect} mark={slotInfo.under} fonts={fonts} t={t} s={s} /> : null}
           {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
+          {slot.stormcaller === "stage" && stageMarks ? <StageMarks rect={rect} pill={stageMarks.pill} apart={stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
           {slot.kind === "card" && !slot.faceDown && inactive(slot.picture ?? slot.code) ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
           {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}

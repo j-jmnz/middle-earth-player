@@ -2,8 +2,8 @@ import { integer, sqliteTable, text, type SQLiteTable } from "drizzle-orm/sqlite
 
 import type { PrintedKeywords } from "./boundary.ts";
 
-/** The stats the other side of a double-sided card prints in place of its front's: the Upgraded side of a ship-objective (dcce.scalable-upgradable), the Stormcaller's Campaign Mode only side, which adds its Victory. */
-export type UpgradedStats = { willpower: number; attack: number; defense: number; health: number; victory?: number };
+/** The stats the other side of a double-sided card prints in place of its front's: the Upgraded side of a ship-objective (dcce.scalable-upgradable), the Stormcaller's Campaign Mode only side, which adds its Victory and prints no Willpower (an enemy has none). */
+export type UpgradedStats = { willpower?: number; attack: number; defense: number; health: number; victory?: number };
 
 export const packs = sqliteTable("packs", {
   code: text("code").primaryKey(),

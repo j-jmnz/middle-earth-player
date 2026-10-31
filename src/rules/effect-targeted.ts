@@ -156,11 +156,12 @@ function applyTargeted(
           next = moveEncounter(next, id, "engaged", item.seat, ctx, steps);
           continue;
         }
-        // Into the searching seat's own staging area once stages are separate (families/breaking-areas.ts).
+        // Into the Stormcaller's area (dcce.stormcallers-area).
         if (instruction.to === "stormcallerArea") {
           next = updateCard(moveCard(next, id, { zone: "stormcallerArea" }), id, { face: "up" });
           continue;
         }
+        // Into the searching seat's own staging area once stages are separate (families/breaking-areas.ts).
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each) next = updateCard(next, id, { face: "up" });
       }

@@ -17,6 +17,11 @@ export function hasCorsairDeck(state: Pick<ScenarioState, "corsairDeck">): boole
   return state.corsairDeck !== undefined;
 }
 
+/** The condition `corsairHas`: the Corsair deck or its discard pile holds a card, so a Boarding keyword would reveal an enemy (dcce.boarding; the discard pile is shuffled back into an empty deck, dcce.corsair-deck). */
+export function corsairHolds(state: Pick<ScenarioState, "corsairDeck" | "corsairDiscard">): boolean {
+  return (state.corsairDeck?.length ?? 0) + (state.corsairDiscard?.length ?? 0) > 0;
+}
+
 // The Corsair deck shuffled with the game's seed.
 function shuffledDeck(state: ScenarioState): ScenarioState {
   const shuffled = shuffleIds(state.corsairDeck ?? [], state.seed, state.seedCursor);

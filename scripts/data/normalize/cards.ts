@@ -437,7 +437,8 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     // The stats of the Upgraded side, side B, which Hall of Beorn has no fields for either (dcce.scalable-upgradable).
     const backed = set?.back && typed.back ? { ...typed, back: { ...typed.back, ...set.back } } : typed;
     const next = outOfScope(overrides, backed) ? { ...backed, deckLegal: false } : backed;
-    cards.push(cardSchema.parse({ ...next, backType: backTypeOf(next.type) }));
+    // A card whose printed back is not the one its type implies (the Stormcaller Elite has no encounter back) carries it as an override.
+    cards.push(cardSchema.parse({ ...next, backType: set?.backType !== undefined ? set.backType : backTypeOf(next.type) }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));
   return { cards, report };

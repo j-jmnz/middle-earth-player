@@ -310,6 +310,13 @@ export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, e
     ...(data.life != null ? { life: data.life } : {}),
     campaignCard: data.campaignCard,
     // The part of the campaign (the campaign card's "part number", dcce.gaining-xp): the scenario's place in the campaign, not its number in its product (Hall of Beorn numbers each Adventure Pack's scenario within the pack).
-    ...(campaign.xp ? { part: Math.max(1, campaign.scenarios.indexOf(data.id) + 1) } : {}),
+    ...(campaign.xp ? { part: partOf(campaign, data.id) } : {}),
   });
+}
+
+// The scenario's place in its campaign (1-based); a scenario the campaign does not list is a data error.
+function partOf(campaign: CampaignData, scenarioId: string): number {
+  const at = campaign.scenarios.indexOf(scenarioId);
+  if (at < 0) throw new Error(`Scenario ${scenarioId} is not in campaign ${campaign.id}`);
+  return at + 1;
 }

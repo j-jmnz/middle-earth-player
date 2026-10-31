@@ -92,6 +92,10 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       }
       // "Remove 4 damage from Cracked Pillar to travel here" (41028:A:2): the location must hold that much damage.
       if (instruction.verb === "Heal" && instruction.target === "self" && typeof instruction.amount === "number") return (state.cards[locationId]?.damage ?? 0) < instruction.amount;
+      // "Move 2 progress from the main quest to the Stormcaller's quest stage" (12026:A:1): the quest card must hold that much progress.
+      if (instruction.verb === "MoveProgressToStormcaller" && typeof instruction.amount === "number") {
+        return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < instruction.amount;
+      }
       if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
       const named = instruction.target.code;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;

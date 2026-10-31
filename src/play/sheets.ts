@@ -20,6 +20,7 @@ import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
 import { branchNow, dealtNow } from "./aflame-words.ts";
 import { fireRow } from "./aflame-sheets.ts";
+import { committedNote, stormcallerTravel } from "./stormcaller-sheets.ts";
 import { cavesXChoice } from "./caves-words.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
 import { threatRows } from "./foresight.ts";
@@ -273,7 +274,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       return {
         ...base,
-        note: [`${asked.prompt}${who}`, line].filter((part) => part != null).join(" "),
+        note: [`${asked.prompt}${who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
         ...(outOfPlay ? { confirm: asked.verb } : {}),
@@ -360,7 +361,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const travel = location ? effectsOf(ctx, location.code).find((effect) => effect.timing === "travel") : undefined;
           const line = lineOf(travel, names);
           const base = option(game, names, id);
-          return { ...base, label: line ? `${base.label} · ${line}` : base.label, stats, intent: { type: "Travel", locationId: id } };
+          // A Travel line that moves progress onto the Stormcaller's stage states what it leaves there, and arms the confirm when it advances the Stormcaller or loses the game.
+          const caller = stormcallerTravel(game, ctx, id);
+          const label = [base.label, line, caller?.words].filter((part) => part != null && part !== "").join(" · ");
+          return { ...base, label, stats, ...(caller?.caution ? { caution: caller.caution } : {}), intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,

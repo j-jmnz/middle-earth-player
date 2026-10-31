@@ -39,7 +39,7 @@ export const TRIGGERS = [
   "commitmentMade",
   // About a hero: the first player committed it to a Sailing test (dcce.sailing-tests), as `committed` says of the quest ("After the engaged player commits a hero to a Sailing test", 12023:A:2).
   "committedToSailing",
-  // About a card: it went from the top of the encounter deck to the encounter discard pile ("After a card is discarded from the encounter deck", 11193:B:2). Announced only in a game with a Stormcaller's area.
+  // About a card: it went from the top of the encounter deck to the encounter discard pile ("After a card is discarded from the encounter deck", 11193:B:2). Announced in every game with ships.
   "discardedFromEncounterDeck",
 ] as const;
 

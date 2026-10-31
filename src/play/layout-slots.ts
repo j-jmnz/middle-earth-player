@@ -11,6 +11,9 @@ export const ASPECT = 1.4;
 
 export const MIN_TARGET = 44;
 
+// Characters fighting the same enemy, and a guard over the objective it guards, overlap by this much of a card.
+export const PAIR_STEP = 0.72;
+
 // The sizes the layout works in, at one UI scale.
 export type Metrics = { scale: number; gutter: number; gap: number; peek: number; handMin: number; mark: number };
 
@@ -74,4 +77,15 @@ export function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: Card
 // The most cards peeking out under one card of these entries: attachments and face-down shadow cards.
 export function deepestUnder(entries: readonly ZoneEntry[]): number {
   return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
+}
+
+// One peek under a staging card that holds more than one card, with the count: a grappled arm, Black Key on the Raider Flagship (the last put is the one that shows).
+export function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: Metrics): void {
+  const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
+  if (under.length <= 1) {
+    placeUnder(entry, "staging", rect, out, [], m.peek);
+    return;
+  }
+  const last = under[under.length - 1] as CardInstance;
+  out.push({ ...slotOf(last, "staging", last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + m.peek, w: rect.w, h: rect.h }), stack: under.length });
 }

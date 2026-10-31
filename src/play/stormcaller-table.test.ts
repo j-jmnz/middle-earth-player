@@ -3,7 +3,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { settle } from "../rules/machine.ts";
+import type { EngineStep } from "../rules/intents.ts";
+import { momentOf } from "./outcome.ts";
+import { advanceFace, advanceWords, advancedTo, callerLastStage, questView } from "./quest-advance.ts";
 import type { ScenarioState } from "../rules/state.ts";
+import { areaOf } from "../rules/families/stormcaller-zone.ts";
 import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 import { hitBounds, shownBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect, type TableLayout } from "./layout.ts";
@@ -15,7 +19,7 @@ import { seaFixture, seaViews } from "./sea-fixture.ts";
 import { stagingRank } from "./row-fold.ts";
 import { stripText } from "./table-canvas-views.ts";
 import { areaFacts, areaGroup, areaRoleOf, areaSpeech } from "./stormcaller-table.ts";
-import { AREA_FOLD_WHERE, AREA_FOLD_WORD, memberSpeech, stageLabel, stageSpeech } from "./stormcaller-words.ts";
+import { AREA_FOLD_WHERE, AREA_FOLD_WORD, memberSpeech, stageSpeech, stageTitle, stagePill, STAGE_LOSS } from "./stormcaller-words.ts";
 import { UI_SCALES, touch } from "./ui-scale.ts";
 import { zoneFactsOf } from "./zone-facts.ts";
 
@@ -168,10 +172,10 @@ describe("the strip and the stage advance", () => {
 describe("what a screen reader hears", () => {
   const nameOf = (names: (id: string) => string) => (card: { id: string }) => names(card.id);
 
-  it("reads the stage's name, its number, its progress against its quest points, the cards of the area and that they are out of reach", () => {
+  it("reads the stage's numbers, its name, the cards of the area and that they are out of reach", () => {
     const { state, names, callerStage } = table({ ...APART, callerProgress: 3 });
     const label = areaSpeech(state, callerStage, nameOf(names), 8);
-    expect(label).toBe(`The Stormcaller's quest stage 2, ${names(callerStage)}, progress 3 of 8. In the area: ${world.cards.get(CODES.stormcallerOriginal)?.name}, ${world.cards.get(CODES.escort)?.name}, ${world.cards.get(CODES.coastland)?.name}. Out of reach: the players are at another stage, so its cards are immune and not in the staging area`);
+    expect(label).toBe(`Stormcaller · stage 2 of 4 · 3/8, ${names(callerStage)}. In the area: ${world.cards.get(CODES.stormcallerOriginal)?.name}, ${world.cards.get(CODES.escort)?.name}, ${world.cards.get(CODES.coastland)?.name}. Out of reach: the players are at another stage, so its cards are immune and not in the staging area`);
   });
 
   it("reads that the cards are reachable at the same stage, and tells each card of the area apart", () => {
@@ -183,80 +187,122 @@ describe("what a screen reader hears", () => {
     expect(areaSpeech(apart.state, "nobody", nameOf(apart.names), null)).toBeNull();
   });
 
-  it("says what a stage with no quest points or no cards in the area reads", () => {
-    expect(stageSpeech({ name: "Cape", number: 4, progress: 2, points: null, together: false, names: [] })).toBe("The Stormcaller's quest stage 4, Cape, 2 progress. No cards in the area. Out of reach: the players are at another stage, so its cards are immune and not in the staging area");
+  it("says what a stage with no quest points or no cards in the area reads, and that the last stage loses the game", () => {
+    const last = { number: 4, last: 4, progress: 2, points: null, playersAt: 2, together: false };
+    expect(stageSpeech({ ...last, name: "Cape", names: [] })).toBe(`Stormcaller · stage 4 of 4 · 2, Cape. No cards in the area. Out of reach: the players are at another stage, so its cards are immune and not in the staging area. ${STAGE_LOSS}`);
+    expect(stageTitle({ ...last, number: 3, points: 18, progress: 12 })).toBe("Stormcaller · stage 3 of 4 · 12/18");
   });
 
-  it("tells the Stormcaller's stage from the players' stage that shares its name", () => {
-    expect(stageLabel("Full Sail Ahead!")).toBe("The Stormcaller's stage: Full Sail Ahead!");
+  it("pills the stage with its number, and \"4/4\" in threat red at the last stage", () => {
+    expect(stagePill({ number: 2, last: 4 })).toEqual({ text: "2", danger: false });
+    expect(stagePill({ number: 3, last: 4 })).toEqual({ text: "3", danger: false });
+    expect(stagePill({ number: 4, last: 4 })).toEqual({ text: "4/4", danger: true });
+  });
+
+  it("knows the last stage and the players' stage", () => {
+    const apart = table({ ...APART, caller: 3 });
+    expect(areaFacts(apart.state)).toMatchObject({ number: 3, last: 4, playersAt: 1, together: false });
   });
 });
 
-// The table view's canvas: the screen less the command column (30% in logical points, 210 to 280) and, in the Quest phase, the quest scale (86 pt); under the bar (8 pt top and 52 pt).
-function canvas(width: number, height: number, scale: number, quest: boolean): { width: number; height: number } {
-  const command = Math.round(Math.min(280, Math.max(210, (width / scale) * 0.3)) * scale);
-  return { width: Math.floor(width - command - (quest ? 86 * scale : 0)), height: Math.floor(height - (8 + 52) * scale) };
+// The table view's canvas: the screen less its side insets, the command column (30% in logical points, 210 to 280) and, in the Quest phase, the quest scale (86 pt); under the bar (8 pt top and 52 pt).
+// 667 x 375 is a small phone; 844 x 390 has the notch and the home indicator (47 pt each side, 21 pt under).
+const DEVICES = [
+  { name: "667 x 375", width: 667, height: 375, side: 0, bottom: 0 },
+  { name: "844 x 390 with insets", width: 844, height: 390, side: 47, bottom: 21 },
+] as const;
+
+function canvas(device: (typeof DEVICES)[number], scale: number, quest: boolean): { width: number; height: number } {
+  const command = Math.round(Math.min(280, Math.max(210, (device.width / scale) * 0.3)) * scale);
+  return { width: Math.floor(device.width - 2 * device.side - command - (quest ? 86 * scale : 0)), height: Math.floor(device.height - (8 + 52) * scale) };
 }
 
 const contains = (outer: Rect, inner: Rect): boolean => inner.x >= outer.x - 0.5 && inner.y >= outer.y - 0.5 && inner.x + inner.w <= outer.x + outer.w + 0.5 && inner.y + inner.h <= outer.y + outer.h + 0.5;
 
-describe("667 x 375 at the three scales", () => {
-  for (const [name, scale] of Object.entries(UI_SCALES)) {
-    for (const quest of [false, true]) {
-      const at = `${name} (${scale})${quest ? " with the quest scale" : ""}`;
-      const size = canvas(667, 375, scale, quest);
+// The widest stretch of `bounds` that no later slot of the table covers (cards and piles; a peek under a card is drawn before it).
+function uncovered(layout: TableLayout, slot: CardSlot, bounds: Rect): number {
+  const later = layout.slots.slice(layout.slots.indexOf(slot) + 1).filter((other) => (other.kind === "card" || other.kind === "pile") && other.zone !== "hand").map(slotBounds);
+  const covers = later.filter((other) => other.y < bounds.y + bounds.h && other.y + other.h > bounds.y && other.x < bounds.x + bounds.w && other.x + other.w > bounds.x).sort((a, b) => a.x - b.x);
+  let best = 0;
+  let from = bounds.x;
+  for (const cover of covers) {
+    best = Math.max(best, cover.x - from);
+    from = Math.max(from, cover.x + cover.w);
+  }
+  return Math.max(best, bounds.x + bounds.w - from);
+}
 
-      it(`fits the group in the staging row, each card whole, with a target to touch on every card: ${at}`, () => {
-        const { views, piles, state } = table(APART);
-        // The moment asks about the Stormcaller (a pick), so the group stays on the table.
-        const layout = tableLayout(size.width, size.height, views, piles, { scale, stacks: true, keep: new Set(areaGroup(state)) });
-        const group = areaSlots(layout);
-        expect(group).toHaveLength(4);
-        const row: Rect = { x: layout.zones.staging.x, y: layout.zones.staging.y, w: layout.zones.staging.w, h: layout.card.h };
-        for (const slot of group) expect(contains(row, slotBounds(slot)), `${slot.id} ${JSON.stringify(slotBounds(slot))} in ${JSON.stringify(row)}`).toBe(true);
+const CROWD = (count: number): FlightLayout => ({ ...APART, staging: Array.from({ length: count }, (_, index) => (index % 2 === 0 ? CODES.raider : CODES.skiff)) });
+const SCENES: Record<string, FlightLayout> = { plain: APART, "3 staging": CROWD(3), "5 staging": CROWD(5), "9 staging": CROWD(9) };
+
+describe("every phone size and scale", () => {
+  for (const device of DEVICES) {
+    for (const [name, scale] of Object.entries(UI_SCALES)) {
+      for (const quest of [false, true]) {
+        const at = `${device.name}, ${name} (${scale})${quest ? " with the quest scale" : ""}`;
+        const size = canvas(device, scale, quest);
         const target = touch(scale, 44);
-        const sorted = [...group].sort((a, b) => a.x - b.x);
-        // The stage shows at least a target before its first card, and each card at least a target before the next.
-        // A row too narrow for the group steps its cards closer, to the row's edge and no further.
-        const last = slotBounds(sorted.at(-1) as CardSlot);
-        for (let index = 0; index + 1 < sorted.length; index += 1) {
-          const visible = (sorted[index + 1]?.x ?? 0) - (sorted[index]?.x ?? 0);
-          if (visible < target - 0.5) expect(last.x + last.w, `${sorted[index]?.id} steps closer only to fit`).toBeGreaterThanOrEqual(row.x + row.w - layout.card.w);
-        }
-        const stage = group.find((slot) => slot.stormcaller === "stage") as CardSlot;
-        expect(shownBounds(stage).x + shownBounds(stage).w).toBeLessThanOrEqual((sorted[1]?.x ?? 0) + 0.5);
-        // No tap target of the group is smaller than a touch.
-        for (const slot of group) expect(hitBounds(slot).w).toBeGreaterThanOrEqual(Math.min(slotBounds(slot).w, target));
-      });
+        const lay = (layout: FlightLayout, keep?: (made: ReturnType<typeof table>) => ReadonlySet<string>) => {
+          const made = table(layout);
+          return { made, layout: tableLayout(size.width, size.height, made.views, made.piles, { scale, stacks: true, bottomInset: device.bottom, ...(keep ? { keep: keep(made) } : {}) }) };
+        };
 
-      it(`folds the group first when staging is crowded, as one stack titled for the area: ${at}`, () => {
-        const crowd: FlightLayout = { ...APART, staging: Array.from({ length: 9 }, (_, index) => (index % 2 === 0 ? CODES.raider : CODES.skiff)) };
-        const { views, piles } = table(crowd);
-        const layout = tableLayout(size.width, size.height, views, piles, { scale, stacks: true });
-        const stack = layout.slots.find((slot) => slot.fold === "staging");
-        expect(stack).toBeDefined();
-        expect(layout.folds?.length).toBeGreaterThan(0);
-        const folded = layout.folds?.find((fold) => fold.zone === "staging");
-        const group = areaGroup(table(crowd).state);
-        // The area's group is the first to go: its four cards are in the stack, and the stack says whose they are when only they are in it.
-        for (const id of group) expect(folded?.cards, id).toContain(id);
-        if (folded?.cards.length === group.length) {
-          expect(folded.area).toBe(true);
-          expect(stack?.areaFold).toBe(true);
-          expect(pileSpeech(stack as CardSlot).label).toBe(`4 more cards in ${AREA_FOLD_WHERE}`);
-        }
-        // The shown groups keep a target between them, and no area card is drawn once folded.
-        expect(areaSlots(layout).length === 0 || areaSlots(layout).length === group.length).toBe(true);
-        expect(hitBounds(stack as CardSlot).w).toBeGreaterThanOrEqual(44);
-      });
+        it(`shows every area card a strip of a target that no later slot covers, the stage never folded: ${at}`, () => {
+          for (const [scene, layout] of Object.entries(SCENES)) {
+            for (const keepCaller of [false, true]) {
+              const run = lay(layout, keepCaller ? (made) => new Set([made.caller]) : undefined);
+              const row: Rect = { x: run.layout.zones.staging.x, y: run.layout.zones.staging.y, w: run.layout.zones.staging.w, h: run.layout.card.h };
+              const group = areaSlots(run.layout);
+              const label = `${scene}${keepCaller ? " keeping the Stormcaller" : ""}`;
+              // The stage always stands: it carries the Stormcaller's progress.
+              const stage = group.find((slot) => slot.stormcaller === "stage");
+              expect(stage, label).toBeDefined();
+              expect(run.layout.folds?.some((fold) => fold.cards.includes(run.made.callerStage)), label).toBeFalsy();
+              for (const slot of group) {
+                expect(contains(row, slotBounds(slot)), `${label} ${slot.id} in the row`).toBe(true);
+                const shown = slot.stormcaller === "stage" ? shownBounds(slot) : slotBounds(slot);
+                expect(uncovered(run.layout, slot, shown), `${label} ${slot.id}`).toBeGreaterThanOrEqual(Math.min(shown.w, target) - 0.5);
+                expect(hitBounds(slot).w).toBeGreaterThanOrEqual(Math.min(slotBounds(slot).w, target));
+              }
+              if (keepCaller) expect(group.some((slot) => slot.id === run.made.caller), label).toBe(true);
+            }
+          }
+        });
 
-      it(`keeps the group on the table when the open moment asks about one of its cards: ${at}`, () => {
-        const crowd: FlightLayout = { ...APART, staging: Array.from({ length: 9 }, (_, index) => (index % 2 === 0 ? CODES.raider : CODES.skiff)) };
-        const { views, piles, caller } = table(crowd);
-        const layout = tableLayout(size.width, size.height, views, piles, { scale, stacks: true, keep: new Set([caller]) });
-        expect(areaSlots(layout)).toHaveLength(4);
-        expect(layout.folds?.some((fold) => fold.cards.includes(caller))).toBe(false);
-      });
+        it(`folds only the area's cards first, as a stack that counts them and not the stage: ${at}`, () => {
+          for (const [scene, layout] of Object.entries(SCENES)) {
+            const { made, layout: laid } = lay(layout);
+            const members = areaGroup(made.state).slice(1);
+            const stack = laid.slots.find((slot) => slot.fold === "staging");
+            const folded = laid.folds?.find((fold) => fold.zone === "staging");
+            const standing = areaSlots(laid).filter((slot) => slot.stormcaller !== "stage").map((slot) => slot.id);
+            // The area's cards stand or fold, all of them or none, and the stage stands either way.
+            expect(members.filter((id) => standing.includes(id)).length === 0 || folded?.cards.every((id) => !members.includes(id)) !== false, scene).toBe(true);
+            if (!folded) {
+              expect(standing, scene).toHaveLength(members.length);
+              continue;
+            }
+            expect(folded.cards, scene).not.toContain(made.callerStage);
+            expect(stack?.count, scene).toBe(folded.cards.length);
+            const foldedMembers = members.filter((id) => folded.cards.includes(id));
+            // Other cards fold only after every card of the area has.
+            if (folded.cards.some((id) => !members.includes(id))) expect(foldedMembers, scene).toHaveLength(members.length);
+            else {
+              expect(folded.area, scene).toBe(true);
+              expect(stack?.areaFold, scene).toBe(true);
+              expect(pileSpeech(stack as CardSlot).label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
+              expect(stack?.code, scene).toBe(made.state.cards[folded.top]?.code);
+            }
+            expect(hitBounds(stack as CardSlot).w, scene).toBeGreaterThanOrEqual(44);
+          }
+        });
+
+        it(`keeps the cards the open moment asks about on the table: ${at}`, () => {
+          const { made, layout } = lay(CROWD(9), (m) => new Set([m.caller]));
+          expect(areaSlots(layout).some((slot) => slot.id === made.caller)).toBe(true);
+          expect(layout.folds?.some((fold) => fold.cards.includes(made.caller))).toBeFalsy();
+        });
+      }
     }
   }
 
@@ -264,12 +310,50 @@ describe("667 x 375 at the three scales", () => {
     expect(AREA_FOLD_WORD).toBe("Area");
   });
 
-  it("shows the Stormcaller's face on the stack, not its sideways stage", () => {
-    const crowd: FlightLayout = { ...APART, campaignSide: true, staging: Array.from({ length: 9 }, () => CODES.raider) };
-    const { views, piles } = table(crowd);
-    const layout = tableLayout(444, 315, views, piles, { stacks: true });
-    const stack = layout.slots.find((slot) => slot.fold === "staging") as CardSlot;
-    expect(stack.code).toBe(CODES.stormcaller);
-    expect(stack.picture).toBe(pictureKey({ code: CODES.stormcaller, face: "B" }));
+  it("shows the Stormcaller's face on a stack of the area's cards alone, and the first other folded card's in a mixed stack", () => {
+    const alone = table({ ...APART, campaignSide: true, staging: [CODES.raider, CODES.raider, CODES.raider] });
+    const laidAlone = tableLayout(440, 315, alone.views, alone.piles, { stacks: true });
+    const area = laidAlone.slots.find((slot) => slot.fold === "staging" && slot.areaFold) as CardSlot;
+    expect(area.code).toBe(CODES.stormcaller);
+    expect(area.picture).toBe(pictureKey({ code: CODES.stormcaller, face: "B" }));
+    const mixed = table({ ...APART, campaignSide: true, staging: Array.from({ length: 9 }, () => CODES.raider) });
+    const laidMixed = tableLayout(330, 315, mixed.views, mixed.piles, { stacks: true });
+    const stack = laidMixed.slots.find((slot) => slot.fold === "staging") as CardSlot;
+    expect(stack.areaFold).toBeUndefined();
+    expect(stack.code).toBe(CODES.raider);
+  });
+});
+
+describe("the Stormcaller's stage advance", () => {
+  // The round ends with the Stormcaller's stage full: the engine advances it and says so in a step (stormcaller: true).
+  function advanceFrom(layout: FlightLayout) {
+    const made = flightTable(world, layout);
+    const steps: EngineStep[] = [];
+    const settled = settle({ ...made.state, phase: "Beginning of round", boundaryPhase: "End of round", mode: "beginRound", window: null }, made.ctx, steps);
+    return { made, before: made.state, after: settled, steps };
+  }
+  const line = (id: string) => (id === "12017:A:1" ? "When Revealed: add a Sahír's Escort to the Stormcaller's area." : null);
+
+  it("is a beat of the banner for stage 3, with the C side's When Revealed, and not the quest advance screen", () => {
+    const run = advanceFrom({ caller: 2, callerProgress: 10, deck: ["f3"] });
+    expect(run.steps.some((step) => step.kind === "advance" && step.stormcaller === true)).toBe(true);
+    const names = { card: (id: string) => world.cards.get(run.after.cards[id]?.code ?? "")?.name ?? id, revealed: (id: string) => (run.after.cards[id]?.code === "12017" ? line("12017:A:1") : null) };
+    const moment = momentOf(run.before, run.after, run.steps, names);
+    expect(moment?.title).toBe("The Stormcaller advances");
+    expect(moment?.lines.map((item) => item.text)).toEqual(expect.arrayContaining([`The Stormcaller advances to stage 3 of 4: ${world.cards.get("12017")?.name}`, "When Revealed: add a Sahír's Escort to the Stormcaller's area."]));
+    const moments = { seq: 3, kind: "sent" as const, before: run.before, after: run.after, steps: run.steps };
+    expect(advancedTo(moments, questView(run.after))).toBeNull();
+  });
+
+  it("opens the quest advance screen for stage 4, on the C side, saying the Stormcaller is at stage 4 of 4", () => {
+    const run = advanceFrom({ caller: 3, callerProgress: 16, deck: ["f3"] });
+    const stage = areaOf(run.after)?.stage ?? "";
+    expect(callerLastStage(run.after)).toBe(stage);
+    const reached = advancedTo({ seq: 5, kind: "sent", before: run.before, after: run.after, steps: run.steps }, questView(run.after));
+    expect(reached).toEqual({ seq: 5, stageId: stage });
+    expect(advanceFace(run.after, run.after.cards[stage]!)).toBe("up");
+    const words = advanceWords(run.after, run.made.ctx, stage, "The Cape of Andrast", () => null);
+    expect(words).toMatchObject({ eyebrow: "Stormcaller · Stage 4 of 4", title: "The Cape of Andrast", also: [] });
+    expect(words.detail).toBe(`The Stormcaller is at stage 4 of 4. ${STAGE_LOSS}.`);
   });
 });

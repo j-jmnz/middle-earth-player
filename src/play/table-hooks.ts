@@ -45,13 +45,22 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     (cardId: string) => stageText(ctx, store.getState().game.cards[cardId]?.code ?? "", names.line),
     [store, ctx, names],
   );
+  // The printed When Revealed lines of a stage, for the beat of the Stormcaller's advance (stormcaller-words.ts).
+  const revealed = useCallback(
+    (cardId: string) => {
+      const code = store.getState().game.cards[cardId]?.code ?? "";
+      const text = [...new Set(effectsOf(ctx, code).filter((effect) => effect.timing === "whenRevealed").flatMap((effect) => effect.lines))].sort().flatMap((id) => names.line(id) ?? []);
+      return text.length > 0 ? text.join(" ") : null;
+    },
+    [store, ctx, names],
+  );
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage }));
-    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage });
-  }, [shown, names, shadow, stage]);
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage, revealed }));
+    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage, revealed });
+  }, [shown, names, shadow, stage, revealed]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
   const summary = useMemo((): Moment | null => {
     if (shown?.kind !== "sent" || !shown.ended) return null;

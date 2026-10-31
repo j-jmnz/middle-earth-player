@@ -158,8 +158,11 @@ describe("Jagged Reef (12025)", () => {
 
 describe("Hidden Cove (12026)", () => {
   it("heals 4 damage from each Ship objective after it becomes the active location (A:2)", () => {
-    const made = make({ staging: [CODES.cove], phase: "Travel" });
+    const made = make({ staging: [CODES.cove], phase: "Travel", progress: 2 });
     const chaser = idOf(made.state, CODES.dreamChaser);
+    // The Travel cost moves 2 progress from the quest: with less on it the players cannot travel here (rr.travel).
+    const bare = make({ staging: [CODES.cove], phase: "Travel" });
+    expect(legalIntents(bare.state, bare.ctx).some((intent) => intent.type === "Travel")).toBe(false);
     const hurt = { ...made.state, cards: { ...made.state.cards, [chaser]: { ...made.state.cards[chaser]!, damage: 6 } } };
     expect(legalIntents(hurt, made.ctx).some((intent) => intent.type === "Travel")).toBe(true);
     const traveled = send(start(hurt), { type: "Travel", locationId: idOf(hurt, CODES.cove) }, made.ctx).state;

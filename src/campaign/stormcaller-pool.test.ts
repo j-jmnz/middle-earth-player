@@ -47,6 +47,13 @@ describe("Black Key (11192)", () => {
     expect(run("B", 2)).toBe(0);
   });
 
+  it("also finds Captain Sahír in the Stormcaller's area, where he is in play (A:3)", () => {
+    const made = withKey({ area: ["11076"], phase: "Quest" });
+    expect(made.state.cards[idOf(made.state, "11076")]?.zone).toBe("stormcallerArea");
+    const to = settle(withMode({ ...made.state, window: null, mode: "resolution" }, "optionalEngage"), made.ctx, []);
+    expect(to.cards[idOf(to, "11076")]?.resources).toBe(1);
+  });
+
   it("is removed from the game when it leaves play (A:1, B:1)", () => {
     const made = withKey({});
     const left = moveCard(made.state, made.key, { zone: "discard", seat: 0 });

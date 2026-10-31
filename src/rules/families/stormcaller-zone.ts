@@ -16,7 +16,7 @@ export function joinStormcallerArea(state: ScenarioState, id: string): ScenarioS
   return { ...state, sea: { ...state.sea, stormcaller: { ...area, members: [...area.members, id] } } };
 }
 
-/** "After a card is discarded from the encounter deck" (11193:B:2): the card went from the encounter deck to the encounter discard pile. Announced only in a game with a Stormcaller's area, the one scenario whose cards hear it. */
+/** "After a card is discarded from the encounter deck" (11193:B:2): the card went from the encounter deck to the encounter discard pile. Announced in every game with ships (sea): Calaerion hears it in each scenario of the part, not only where the Stormcaller's area exists. */
 export function discardedFromDeck(state: ScenarioState, id: string): ScenarioState {
-  return state.sea?.stormcaller ? queueEvent(state, { trigger: "discardedFromEncounterDeck", seat: null, subject: id }) : state;
+  return state.sea ? queueEvent(state, { trigger: "discardedFromEncounterDeck", seat: null, subject: id }) : state;
 }

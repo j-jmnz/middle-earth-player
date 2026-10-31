@@ -22,24 +22,30 @@ export type FoldGroup = {
   // Folds first at the lowest rank; ties fold leftmost first. Never folds when pinned.
   rank: number;
   pinned: boolean;
-  // The Stormcaller's area: it folds even as the last group when it is wider than the row, where any other lone group stays and overflows.
-  foldsAlone?: true;
+  // How far in from the group's left edge its last card stands: the next group covers the last card from its own left edge on, so the strip the last card shows is the step less this (0 for a group whose
+  // last card stands at its left edge). The Stormcaller's area has its cards over its stage's right part.
+  tail?: number;
+  // The cards that leave this group before any group folds, the group's lead staying (the Stormcaller's area: its stage never folds, its cards do, docs/design-system-table.md, "The Stormcaller's area").
+  // `keptWidth` and `keptTail` are the group's width and tail once they have left. A pinned group sheds too: `cards` lists only the cards the moment does not ask about.
+  shed?: { cards: readonly string[]; keptWidth: number; keptTail: number };
 };
 
 export type FoldStack = {
   // The row's left end; its width is the stack's.
   x: number;
   w: number;
-  // The folded groups, left to right, and every card in them.
+  // The folded groups, left to right, and every card in them (the cards shed from a group stand where that group stands).
   groups: readonly number[];
   cards: readonly string[];
-  // The card whose face the stack shows: the first folded group's lead.
+  // The card whose face the stack shows: the first folded group's lead, or the first shed card when only shed cards are in it.
   top: string;
 };
 
 export type FoldPlan = {
   // The left edge of each group, or null for a folded one.
   xs: readonly (number | null)[];
+  // The groups that shed their cards (FoldGroup.shed), by index: they stand at `keptWidth`.
+  shed: readonly number[];
   stack: FoldStack | null;
   // The least step between two shown neighbours (Infinity with fewer than two shown).
   step: number;
@@ -48,44 +54,56 @@ export type FoldPlan = {
 };
 
 // The smallest step between neighbours when `widths` stand across `width`, squeezed evenly (`rowXs`) when they do not fit a gap apart. Infinity while
-// nothing overlaps: groups a gap apart need no target, however narrow.
-export function leastStep(widths: readonly number[], width: number, gap: number): number {
+// nothing overlaps: groups a gap apart need no target, however narrow. `tails` (per group, default 0) take the offset of a group's last card from the step: the strip that card shows.
+export function leastStep(widths: readonly number[], width: number, gap: number, tails?: readonly number[]): number {
   if (widths.length <= 1) return Infinity;
   const natural = widths.reduce((sum, w) => sum + w, 0) + gap * (widths.length - 1);
   if (natural <= width) return Infinity;
   const squeeze = (natural - width) / (widths.length - 1);
-  return Math.min(...widths.slice(0, -1).map((w) => w + gap - squeeze));
+  return Math.min(...widths.slice(0, -1).map((w, at) => w - (tails?.[at] ?? 0) + gap - squeeze));
 }
 
 /**
  * The row's groups across `[x, x + width]`: squeezed while every step stays at `target`, else folded. `stackW` is the fold stack's width; it and one gap
- * are taken from the row once anything has folded.
+ * are taken from the row once anything has folded or been shed.
  */
 export function foldRow(groups: readonly FoldGroup[], row: { x: number; width: number; gap: number; target: number; stackW: number }): FoldPlan {
   const folded: number[] = [];
+  const shedAt: number[] = [];
   const shown = () => groups.map((_, at) => at).filter((at) => !folded.includes(at));
+  const widthOf = (at: number) => (shedAt.includes(at) ? (groups[at]?.shed?.keptWidth ?? 0) : (groups[at]?.width ?? 0));
+  const tailOf = (at: number) => (shedAt.includes(at) ? (groups[at]?.shed?.keptTail ?? 0) : (groups[at]?.tail ?? 0));
   for (;;) {
     const kept = shown();
-    const taken = folded.length > 0 ? row.stackW + row.gap : 0;
-    const step = leastStep(kept.map((at) => groups[at]?.width ?? 0), row.width - taken, row.gap);
-    const next = kept
-      .filter((at) => groups[at]?.pinned !== true)
-      .sort((left, right) => (groups[left]?.rank ?? 0) - (groups[right]?.rank ?? 0) || left - right)[0];
-    const lone = kept.length === 1 ? groups[kept[0] as number] : undefined;
-    const tooWide = lone?.foldsAlone === true && lone.width > row.width - taken;
-    if (next == null || (!tooWide && (step >= row.target || kept.length <= 1))) {
+    const taken = folded.length + shedAt.length > 0 ? row.stackW + row.gap : 0;
+    const step = leastStep(kept.map(widthOf), row.width - taken, row.gap, kept.map(tailOf));
+    // What may leave next: a whole group (not pinned), or the cards a group sheds (once), lowest rank first, then leftmost.
+    const options = [
+      ...kept.filter((at) => groups[at]?.pinned !== true).map((at) => ({ at, whole: true })),
+      ...kept.filter((at) => !shedAt.includes(at) && (groups[at]?.shed?.cards.length ?? 0) > 0).map((at) => ({ at, whole: false })),
+    ].sort((left, right) => (groups[left.at]?.rank ?? 0) - (groups[right.at]?.rank ?? 0) || left.at - right.at || Number(left.whole) - Number(right.whole));
+    const next = options[0];
+    // A lone group that sheds cards sheds them when it is wider than the row; any other lone group stays and overflows.
+    const lone = kept.length === 1 ? kept[0] : undefined;
+    const tooWide = lone != null && !shedAt.includes(lone) && (groups[lone]?.shed?.cards.length ?? 0) > 0 && widthOf(lone) > row.width - taken;
+    if (next == null || (!tooWide && (step >= row.target || (kept.length <= 1 && next.whole)))) {
       const xs: (number | null)[] = groups.map(() => null);
-      const placed = rowXs(kept.map((at) => groups[at]?.width ?? 0), row.x + taken, row.width - taken, row.gap);
+      const placed = rowXs(kept.map(widthOf), row.x + taken, row.width - taken, row.gap);
       kept.forEach((at, index) => {
         xs[at] = placed[index] ?? row.x + taken;
       });
-      const order = [...folded].sort((left, right) => left - right);
+      const order = [...folded, ...shedAt].sort((left, right) => left - right);
       const first = order[0];
+      const cardsOf = (at: number) => (folded.includes(at) ? (groups[at]?.cards ?? []) : (groups[at]?.shed?.cards ?? []));
+      const topFolded = [...folded].sort((left, right) => left - right)[0];
       const stack: FoldStack | null =
-        first == null ? null : { x: row.x, w: row.stackW, groups: order, cards: order.flatMap((at) => groups[at]?.cards ?? []), top: groups[first]?.id ?? "" };
-      return { xs, stack, step, fits: step >= row.target };
+        first == null
+          ? null
+          : { x: row.x, w: row.stackW, groups: [...folded].sort((left, right) => left - right), cards: order.flatMap(cardsOf), top: topFolded != null ? (groups[topFolded]?.id ?? "") : (groups[first]?.shed?.cards[0] ?? "") };
+      return { xs, shed: [...shedAt].sort((left, right) => left - right), stack, step, fits: step >= row.target };
     }
-    folded.push(next);
+    if (next.whole) folded.push(next.at);
+    else shedAt.push(next.at);
   }
 }
 

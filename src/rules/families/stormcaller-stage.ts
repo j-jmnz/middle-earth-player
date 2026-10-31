@@ -35,8 +35,8 @@ function placeOnStage(state: ScenarioState, amount: number, ctx: ReduceContext, 
   return (next.cards[stage.id]?.progress ?? 0) >= points ? advanceStormcaller(next, ctx, steps) : next;
 }
 
-// The Stormcaller's stage is full: it advances to the next stage, C side first (its When Revealed effects resolve), then D side (dcce.stormcallers-area-stages), and the Stormcaller returns to the area
-// (12019:A:3). Each player hears it ("When the Stormcaller advances to the next quest stage", 12024:A:1). The last stage, filled, is announced instead (12018:B:2).
+// The Stormcaller's stage is full: it advances to the next stage, C side first (its When Revealed effects resolve), then D side (dcce.stormcallers-area-stages). Each player hears it, and the Stormcaller returns to its area on that
+// (12019:A:3, 110042:A:3, 110042:B:4) ("When the Stormcaller advances to the next quest stage", 12024:A:1). The last stage, filled, is announced instead (12018:B:2).
 function advanceStormcaller(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const area = areaOf(state);
   if (!area || !state.sea) return state;
@@ -46,7 +46,7 @@ function advanceStormcaller(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const advanced: ScenarioState = { ...state, sea: { ...state.sea, stormcaller: { ...area, stage: upcoming, number: area.number + 1, deck: rest } } };
   let next = moveCard(advanced, area.stage, { zone: "setAside" });
   next = updateCard(moveCard(next, upcoming, { zone: "stormcallerArea" }), upcoming, { face: "B" });
-  next = moveCard(next, area.card, { zone: "stormcallerArea" });
+  steps.push({ kind: "advance", cardId: upcoming, stormcaller: true });
   for (const seat of livingSeats(next)) next = queueEvent(next, { trigger: "stormcallerAdvanced", seat, subject: area.card });
   const revealed = ctx.effects.filter((effect) => effect.cardCode === next.cards[upcoming]?.code && effect.timing === "whenRevealed");
   return pushCardEffects(next, "whenRevealed", upcoming, next.firstPlayer, false, revealed, ctx, steps);
@@ -65,7 +65,7 @@ export function stormcallerProgress(state: ScenarioState, ctx: ReduceContext, st
   if (caller) amount += modifiedStat(next, caller, "threat", ctx.cards);
   for (const id of areaOf(next)?.members ?? []) {
     const member = next.cards[id];
-    if (member?.zone === "stormcallerArea" && id !== area.card && heldAmount(next, id, "stormcallerThreat") > 0) amount += modifiedStat(next, member, "threat", ctx.cards);
+    if (member && id !== area.card && heldAmount(next, id, "stormcallerThreat") > 0) amount += modifiedStat(next, member, "threat", ctx.cards);
   }
   next = placeOnStage(next, amount, ctx, steps, cause);
   return next;

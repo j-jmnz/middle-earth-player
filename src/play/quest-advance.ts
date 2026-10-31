@@ -10,10 +10,12 @@
 import { isSeparate, stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
 import { stagePlace } from "../rules/families/quest-branch.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import type { CardFace } from "../rules/state.ts";
 import { isOver } from "../rules/undo.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
+import { STAGE_LOSS } from "./stormcaller-words.ts";
 import type { TableMoment } from "./store.ts";
 
 /**
@@ -29,7 +31,8 @@ const OPENING_SEQ = 0;
  * What the screen reads of the game: the stage in play, the stage whose own effect is asking the player something now (if any), and whether
  * the game is over. The hook reads each on its own, so a state that changes none of them does not render it (use-quest-advance.ts).
  */
-export type QuestView = { questStage: string | null; asking: string | null; over: boolean; seatStages?: string };
+// `callerStage`: the Stormcaller's current quest stage once it is at its last stage (the one advance of its that opens the screen: the C side of stage 4, dcce.stormcallers-area-stages), else null.
+export type QuestView = { questStage: string | null; asking: string | null; over: boolean; seatStages?: string; callerStage?: string | null };
 
 /** The stages the seats are on once stages are separate (Breaking of the Fellowship, 2B on), joined by "|" so a subscriber compares one string; "" before. */
 export function stagesKey(game: ScenarioState): string {
@@ -37,8 +40,14 @@ export function stagesKey(game: ScenarioState): string {
 }
 
 // Whether the card is a stage in play: the shared stage or one of the seats' own.
-function isStage(view: Pick<QuestView, "questStage" | "seatStages">, id: string): boolean {
-  return view.questStage === id || (view.seatStages ?? "").split("|").includes(id);
+function isStage(view: Pick<QuestView, "questStage" | "seatStages" | "callerStage">, id: string): boolean {
+  return view.questStage === id || (view.seatStages ?? "").split("|").includes(id) || (view.callerStage != null && view.callerStage === id);
+}
+
+/** The Stormcaller's current quest stage when it is its last: the advance to it is told on the screen; an advance to an earlier stage is a beat of the banner (outcome.ts). Null otherwise. */
+export function callerLastStage(game: Pick<ScenarioState, "sea">): string | null {
+  const area = game.sea?.stormcaller;
+  return area && area.deck.length === 0 ? area.stage : null;
 }
 
 /** The stage whose own effect (its When Revealed) is resolving and waits on the player, or null. */
@@ -48,19 +57,22 @@ export function askingStage(game: ScenarioState): string | null {
 
 /** The view of a game. */
 export function questView(game: ScenarioState): QuestView {
-  return { questStage: game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game) };
+  return { questStage: game.questStage, asking: askingStage(game), over: isOver(game), seatStages: stagesKey(game), callerStage: callerLastStage(game) };
 }
 
 /**
  * The stage a sent intent advanced the quest to, while it is still the stage: the moment's last advance step, and any earlier one it also reached that is
  * still a stage (another seat's). Null for any other moment.
  */
-export function advancedTo(moment: TableMoment | null, game: Pick<QuestView, "questStage" | "seatStages">): QuestAdvance | null {
+export function advancedTo(moment: TableMoment | null, game: Pick<QuestView, "questStage" | "seatStages" | "callerStage">): QuestAdvance | null {
   if (moment?.kind !== "sent") return null;
-  const stages = [...new Set(moment.steps.flatMap((step) => (step.kind === "advance" ? [step.cardId] : [])))].filter((id) => isStage(game, id));
-  const reached = stages.at(-1);
+  const advanced = moment.steps.flatMap((step) => (step.kind === "advance" ? [step] : []));
+  const stages = [...new Set(advanced.filter((step) => step.stormcaller !== true).map((step) => step.cardId))].filter((id) => isStage(game, id));
+  // The Stormcaller's advance to its last stage is the one the screen tells (a stage before it is a beat of the banner).
+  const caller = advanced.find((step) => step.stormcaller === true && step.cardId === game.callerStage);
+  const reached = caller ? caller.cardId : stages.at(-1);
   if (reached == null) return null;
-  const also = stages.slice(0, -1);
+  const also = stages.filter((id) => id !== reached);
   return also.length > 0 ? { seq: moment.seq, stageId: reached, also } : { seq: moment.seq, stageId: reached };
 }
 
@@ -88,6 +100,13 @@ export function advanceWords(
   also?: readonly string[],
   nameOf?: (code: string) => string,
 ): { eyebrow: string | null; title: string; detail: string | null; also: readonly string[] } {
+  const area = game.sea?.stormcaller;
+  // The Stormcaller's stage (dcce.stormcallers-area-stages): told by its place among the Stormcaller's stages, and, at the last, what filling it does.
+  if (area && area.stage === stageId) {
+    const last = area.number + area.deck.length;
+    const loss = area.number >= last ? ` ${STAGE_LOSS}.` : "";
+    return { eyebrow: `Stormcaller · Stage ${area.number} of ${last}`, title: name, detail: `The Stormcaller is at stage ${area.number} of ${last}.${loss}`, also: [] };
+  }
   const seat = stageSeat(game, stageId);
   const view = viewOf(game, seat ?? undefined);
   const stage = view.cards[stageId];
@@ -139,7 +158,7 @@ export function openingLatch(game: QuestView): AdvanceLatch {
 }
 
 /** The advance on screen: the latched one, until the player went back to the table from it or its stage is no longer the stage. */
-export function openAdvance(latch: AdvanceLatch, game: Pick<QuestView, "questStage" | "seatStages">): QuestAdvance | null {
+export function openAdvance(latch: AdvanceLatch, game: Pick<QuestView, "questStage" | "seatStages" | "callerStage">): QuestAdvance | null {
   const { latched } = latch;
   return latched && latched.seq > latch.done && isStage(game, latched.stageId) ? latched : null;
 }
@@ -163,4 +182,9 @@ export function nextLatch(latch: AdvanceLatch, reached: QuestAdvance | null, gam
 /** The latch once the player taps Progress: back to the table. */
 export function closeLatch(latch: AdvanceLatch): AdvanceLatch {
   return { ...latch, done: Math.max(latch.done, latch.latched?.seq ?? OPENING_SEQ) };
+}
+
+/** The side of the stage the screen shows: the Stormcaller's stage advanced to its C side first (its When Revealed), which the screen tells; every other stage shows the side it is played on. */
+export function advanceFace(game: Pick<ScenarioState, "sea">, card: { id: string; face: CardFace }): CardFace {
+  return game.sea?.stormcaller?.stage === card.id ? "up" : card.face;
 }

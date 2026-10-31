@@ -100,6 +100,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));
+    if (spec.inStormcallerArea) raw.push(...Object.values(state.cards).filter((card) => card.zone === "stormcallerArea").map((card) => card.id));
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
     if (!spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
@@ -262,7 +263,7 @@ export function pickCandidates(
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   const source = sourceId ? state.cards[sourceId] : undefined;
-  // A card the Dream-chaser box calls an encounter card (an objective ally with an encounter back: the ship-objectives, Calaerion; dcce.encounter-cards) has encounter card effects, though it is an ally.
+  // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
   const playerEffect = !counting && (source == null || (isPlayerType(printedOf(ctx.cards, source.code)) && printedOf(ctx.cards, source.code).backType !== "encounter"));
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
