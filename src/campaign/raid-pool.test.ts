@@ -58,7 +58,8 @@ describe("Black Key (boon, 11183)", () => {
 describe("Galdor's Counsel (11184 to 11187)", () => {
   // The event is played from the first hand with the seat's resources; the answers are the first option.
   const played = (code: string, levels: Record<string, number>, layout: RaidLayout = {}, pick?: (state: ScenarioState) => string) => {
-    const made = make({ phase: "Combat", hand: [code], ...layout });
+    // One copy of this card was chosen at the Setup unless the layout says otherwise (RaidLayout.chosen).
+    const made = make({ phase: "Combat", hand: [code], chosen: [[code, 0]], ...layout });
     const hand = withLevels(made.state, levels);
     const stocked = tokens(tokens(hand, made.hero, { resources: 2 }), made.hero2, { resources: 0 });
     const card = idOf(stocked, code);
@@ -90,13 +91,27 @@ describe("Galdor's Counsel (11184 to 11187)", () => {
     }
   });
 
+  it("X is plus 1 for each copy the players chose at the Setup, so two chosen copies add 2 to each (11182:A:2)", () => {
+    // Tactics at level 2: two copies chosen (one by each seat) deal 2 + 2.
+    const both = played(CODES.counselTactics, { [CODES.counselTactics]: 2 }, { seats: 2, staging: ["f3"], chosen: [[CODES.counselTactics, 0], [CODES.counselLeadership, 1]] });
+    expect(cardOf(both.run.state, "f3")?.damage ?? 0).toBe(4);
+    // Leadership at level 3 (half rounded up is 2): the same two copies make it 4.
+    const leadership = played(CODES.counselLeadership, { [CODES.counselLeadership]: 3 }, { seats: 2, chosen: [[CODES.counselTactics, 0], [CODES.counselLeadership, 1]] });
+    expect((leadership.run.state.cards[leadership.made.hero]?.resources ?? 0) + (leadership.run.state.cards[leadership.made.hero2]?.resources ?? 0) - 2).toBe(4);
+  });
+
+  it("X is its level alone in a game whose Setup chose no copy, as in any later scenario (11182:A:2: for this game)", () => {
+    const later = played(CODES.counselTactics, { [CODES.counselTactics]: 2 }, { staging: ["f3"], chosen: [] });
+    expect(cardOf(later.run.state, "f3")?.damage ?? 0).toBe(2);
+  });
+
   it("Spirit places X progress on a non-unique location in the staging area, X its level plus 1 (A:1)", () => {
     const { run } = played(CODES.counselSpirit, { [CODES.counselSpirit]: 1 }, { staging: ["place"] });
     expect(cardOf(run.state, "place")?.progress ?? 0).toBe(2);
   });
 
   it("Lore looks at the top X cards of the deck, X half its level rounded up plus 1, adds any number to the hand, and puts the rest back on the top or the bottom in the order chosen (A:1)", () => {
-    const made = make({ phase: "Combat", hand: [CODES.counselLore], deckOf: ["c1", "c2", "c3", "ally", "event"] });
+    const made = make({ phase: "Combat", hand: [CODES.counselLore], chosen: [[CODES.counselLore, 0]], deckOf: ["c1", "c2", "c3", "ally", "event"] });
     const stocked = tokens(withLevels(made.state, { [CODES.counselLore]: 2 }), made.hero, { resources: 2 });
     const card = idOf(stocked, CODES.counselLore);
     const deckCodes = (state: ScenarioState) => state.seats[0]?.deck.map((id) => state.cards[id]?.code);

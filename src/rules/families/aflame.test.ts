@@ -2,11 +2,12 @@
 // (scripts/raid-scene.ts): the keyword, the end of the round, the destruction under The Havens Burn and what that costs, the Setup's discards, the quest cards' effects and the encounter cards that burn.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { holds } from "../conditions.ts";
+import { holds, outOfPlayCopies } from "../conditions.ts";
 import { settle } from "../machine.ts";
 import type { EngineStep } from "../intents.ts";
 import type { ScenarioState } from "../state.ts";
 import { legalTargets } from "../legal.ts";
+import { showedHidden } from "../undo.ts";
 import { AFLAME, CODES, codesIn, finish, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../scripts/raid-scene.ts";
 import { aflameOf } from "./aflame-values.ts";
 import { progressRoom } from "./south-locations.ts";
@@ -151,6 +152,32 @@ describe("what a destroyed Aflame location does under The Havens Burn", () => {
   });
 });
 
+describe("the cards facedown underneath The Havens Burn are hidden (dcce.aflame)", () => {
+  const burning = { code: CODES.piers, damage: 5 };
+
+  it("is a destroy step marked `under`, so no line names it, and no choice among out-of-play copies lists it", () => {
+    const made = make({ staging: [burning], deck: [] });
+    const { state, steps } = endRound(made);
+    expect(zoneOf(state, CODES.piers)).toBe("under");
+    const destroyed = steps.filter((step) => step.kind === "destroy");
+    expect(destroyed).toEqual([{ kind: "destroy", targetId: idOf(made.state, CODES.piers), under: true }]);
+    // The copies a card can shuffle in from out of play never include one lying under the Burn.
+    expect(outOfPlayCopies(state, CODES.piers)).toEqual([]);
+    expect(outOfPlayCopies(make({ discard: [CODES.piers] }).state, CODES.piers)).toHaveLength(1);
+  });
+
+  it("goes facedown without showing the player anything, so only the Burn's reveal keeps Undo from taking the burn back (docs/brief.md, The engine plays the game)", () => {
+    // Nothing to reveal: the card turned facedown is a card the players had already seen, so the intent showed nothing hidden and Undo may take it back.
+    const quiet = make({ staging: [burning], deck: [] });
+    const settled = endRound(quiet).state;
+    expect(zoneOf(settled, CODES.piers)).toBe("under");
+    expect(showedHidden(quiet.state, settled)).toBe(false);
+    // The Burn reveals the top card of the encounter deck when a card goes under it (11038:A:1): that is hidden information shown, and the burn cannot be undone.
+    const revealing = make({ staging: [burning], deck: ["f0", "f0"] });
+    expect(showedHidden(revealing.state, endRound(revealing).state)).toBe(true);
+  });
+});
+
 describe("Raid on the Grey Havens, Setup (11036:A:1)", () => {
   const setup = (layout: RaidLayout) => {
     const made = make({ stage: "11036", ...layout });
@@ -190,6 +217,17 @@ describe("The Corsairs' Assault, side B (11036:B:1)", () => {
     expect(damageOn(run.state, CODES.whiteShip)).toBe(1);
     expect(damageOn(run.state, CODES.caravel)).toBe(0);
   });
+
+  it("does not ask which of the tied locations when no Corsair enemy is in play, and deals nothing", () => {
+    const made = make({ phase: "Combat", staging: [CODES.caravel, CODES.whiteShip, "f3"] });
+    const asked: string[][] = [];
+    const run = resolveRecords(made.state, made.ctx, CODES.assault, "forced", made.state.questStage ?? undefined, (state) => {
+      if (state.window?.kind === "choose") asked.push([...state.window.options]);
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(asked).toEqual([]);
+    expect([damageOn(run.state, CODES.whiteShip), damageOn(run.state, CODES.caravel)]).toEqual([0, 0]);
+  });
 });
 
 // The answer that takes the option when the window offers it, else the first (a card to pick).
@@ -219,6 +257,25 @@ describe("the encounter cards that burn", () => {
     const added = reveal(CODES.pillaged, { discard: ["f0", "place", "f3"] }, chooses("discard"));
     expect(zoneOf(added.state, "f3")).toBe("staging");
     expect(zoneOf(added.state, "f0")).toBe("encounterDiscard");
+  });
+
+  it("offers only the options that can change the game: no search without an Aflame location to find, no discard option without an enemy in the discard pile (rr.effects)", () => {
+    const offered = (code: string, layout: RaidLayout): string[][] => {
+      const seen: string[][] = [];
+      reveal(code, layout, (state) => {
+        // The question between the branches, not the pick of a card that follows it.
+        if (state.window?.kind === "choose" && !/^i\d+$/.test(state.window.options[0] ?? "")) seen.push([...state.window.options]);
+        return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+      });
+      return seen;
+    };
+    expect(offered(CODES.arsonist, { staging: [CODES.piers], deck: ["f0"], discard: ["place"] })).toEqual([]);
+    expect(offered(CODES.arsonist, { staging: [CODES.piers], deck: ["f0"], discard: [CODES.whiteShip] })).toEqual([["damage", "search"]]);
+    // With no Aflame location in play only the search is left: it resolves without a question.
+    const searched = reveal(CODES.arsonist, { bare: true, discard: [CODES.piers] });
+    expect(zoneOf(searched.state, CODES.piers)).toBe("staging");
+    expect(offered(CODES.pillaged, { discard: ["place", "treachery"] })).toEqual([]);
+    expect(offered(CODES.pillaged, { discard: ["f3"] })).toEqual([["damage", "discard"]]);
   });
 
   it("Put to the Torch has each player deal 3 damage to a character they control or to an Aflame location (11048:A:1)", () => {

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { actionLine, dealSentence, needWords, problemWords, sphereTell } from "./briefing-words.ts";
+import { sphereTell } from "../play/aflame-words.ts";
+
+import { actionLine, dealSentence, needWords, problemWords } from "./briefing-words.ts";
 
 describe("briefing words", () => {
   it("words a missing Ring-bearer as the seat that needs one", () => {
@@ -48,8 +50,11 @@ describe("campaign choice words (11182:A:2)", () => {
     const words = needWords(0, ["11184", "11185", "11186", "11187", "skip"], () => [], nameOf);
     expect(words.intro).toBe("Choose 1 Galdor's Counsel to add to your hand, or skip. It joins your Campaign Pool if you win the scenario.");
     expect(words.waiting).toBe("Choose Galdor's Counsel for seat 1 above.");
-    expect(sphereTell("Galdor's Counsel", "leadership")).toBe(" (Leadership)");
-    expect(sphereTell("Spyglass", "neutral")).toBe("");
+    const text = "Action: Add X resources to any hero's resource pool. X is half the level of Galdor's Counsel (Leadership), rounded up. Add Galdor's Counsel to the victory display.";
+    expect(sphereTell("Galdor's Counsel", text)).toBe(" (Leadership)");
+    expect(sphereTell("Galdor's Counsel", "Action: Look at the top X or bottom X cards. X is half the level of Galdor's Counsel (Lore), rounded up.")).toBe(" (Lore)");
+    expect(sphereTell("Spyglass", text)).toBe("");
+    expect(sphereTell("Galdor's Counsel", null)).toBe("");
     expect(needWords(0, ["02001", "skip"], () => [], nameOf).intro).toBeNull();
   });
 });

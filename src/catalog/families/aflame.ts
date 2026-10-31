@@ -16,8 +16,8 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("SearchAflame"), ...when }),
   // "Captain Sahír engages the first player" (11076:A:1): the source enemy, in the staging area, engages the first player. (EngageLastPlayer is the sea family's: dcce.last-player.)
   z.strictObject({ verb: z.literal("EngageFirstPlayer"), ...when }),
-  // Resolution: "Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool" (11182:B:2). One copy of each card in the game with one of these codes is earned, by the seat
-  // that was dealt it, wherever the copy is now (in a hand, in the victory display, in a discard pile).
+  // Resolution: "Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool" (11182:B:2). One entry for each copy with one of these codes that a seat chose at the Setup
+  // (ScenarioState.chosenAtSetup), earned for that seat wherever the copy is now (in a hand, in the victory display, in a discard pile).
   z.strictObject({ verb: z.literal("EarnDealt"), codes: z.array(z.string().min(1)).min(1), ...when }),
   // "Add Na'asiyah and Captain Sahír to the staging area, enemy side faceup" (11037:A:1): the set-aside card with this code joins the staging area, announced as added to it (its Forced effects hear that,
   // "Captain Sahír engages the first player"), and enters play. It is not revealed (rr.staging).
@@ -36,7 +36,11 @@ export const TRIGGERS = [
   "placedUnder",
   // About the current stage: progress the players would place on it was turned into something else (a flag progressHeals); the event's amount is the progress (11037:B:1).
   "progressReplaced",
-  // About a seat: it collected its resources in the resource phase (rr.step-1-2), before it drew ("After the engaged player collects resources at the beginning of the resource phase", 11065:A:2).
+  // About the current stage: it was revealed and its When Revealed effects have resolved ("Forced: After stage 2B is revealed", 11182:A:3). The event names the stage as its subject, as `stageRevealed` does,
+  // and is heard by any card in play, the campaign card included; it resolves below the stage's own When Revealed frames.
+  "afterStageRevealed",
+  // About a seat: it collected its resources in the resource phase (rr.step-1-2) ("After the engaged player collects resources at the beginning of the resource phase", 11065:A:2). The event is queued
+  // once every seat has collected, and the queue drains in settle after the grant has also drawn the cards (machine.ts grant), so the effect resolves once the draws are done.
   "resourcesCollected",
   // About an enemy: a player attack was declared against it, once for the whole attack however many characters attack (the event's seat is the attacking player); the effect resolves before the attack's strength is read.
   "enemyAttacked",

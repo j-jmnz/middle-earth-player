@@ -22,7 +22,7 @@ import { nightmareWords } from "./nightmare-words.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";
 import { seaPickWords, seaWords } from "./sea-words.ts";
 import { unchartedBranchWords, unchartedPickWords, unchartedWords } from "./uncharted-words.ts";
-import { aflameBranchWords, aflamePickWords, aflameWords } from "./aflame-words.ts";
+import { aflameBranchWords, aflamePickWords, aflameWords, type BranchNow } from "./aflame-words.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -317,12 +317,12 @@ function readyPaymentWords(choose: ChooseInstruction, option: ChooseInstruction[
 }
 
 /** A branch of a Choose instruction in words: "Remove 2 progress from the quest", "Remove 2 heroes you control from the quest". */
-export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null): string {
+export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null, now?: BranchNow): string {
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId) ?? aflameBranchWords(choose, optionId, names, sourceId);
+  const family = unchartedBranchWords(choose, optionId) ?? aflameBranchWords(choose, optionId, names, sourceId, now);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
@@ -383,7 +383,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game);
   if (burden) return burden;
   if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
-  const family = aflamePickWords(pick, next, names, sourceId, amountNow);
+  const family = aflamePickWords(pick, next, names, sourceId, amountNow, game);
   if (family) return family;
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
   const one = article(noun);
@@ -424,7 +424,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Discard", prompt: `Choose ${one} that has a shadow card. Its shadow card is discarded.` };
     // Resources added to the picked hero (110138:A:3), or an attachment discarded for the resources it gives the enemy (11061:A:2).
     case "AddResources":
-      return pick.pick.type === "attachment" ? { verb: "Discard", prompt: `Choose ${one} you control to discard. The enemy gets resources equal to its printed cost.` } : { verb: "Add", prompt: `Choose ${one} to add ${typeof next.amount === "number" ? `${next.amount} ${next.amount === 1 ? "resource" : "resources"}` : "resources"} to.` };
+      return pick.pick.type === "attachment" ? { verb: "Discard", prompt: `Choose ${one} you control to discard. The enemy gets resources equal to its printed cost.` } : { verb: "Add", prompt: `Choose ${one} to add ${typeof next.amount === "number" || amountNow != null ? `${amountNow ?? next.amount} ${(amountNow ?? next.amount) === 1 ? "resource" : "resources"}` : "resources"} to.` };
     // The sea family (Voyage Across Belegaer): the Ship objective that takes the excess damage of a shadow attack (11055:A:2).
     case "DamageShip":
       return { verb: "Assign", prompt: "Choose the Ship objective you control that takes the excess damage." };
@@ -437,14 +437,14 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: down ? "Weaken" : "Boost", prompt: `Choose ${one} to ${down ? "weaken" : "boost"}${until}.` };
     }
     case "DamageCard":
-      return { verb: "Assign", prompt: `Choose ${one} to take ${amountWords(next.amount)} damage.` };
+      return { verb: "Assign", prompt: `Choose ${one} to take ${amountNow != null ? amountNow : amountWords(next.amount)} damage.` };
     // The Oath's Adaptations (41044:A:3, 41046:A:3) and Abandoned Camp (41015:A:1): the hero healed, the location that takes progress, the ally put into play.
     case "Heal":
       return { verb: "Heal", prompt: `Choose ${one} to heal${next.all ? " all damage from" : ""}.` };
     case "PlaceProgressOn": {
       // The Cave Torch's "Dark location" (41029:A:2): the trait the pick asks for.
       const kind = pick.pick.trait ? `${pick.pick.trait} ${noun}` : noun;
-      return { verb: "Place", prompt: `Choose ${article(kind)} to place ${amountWords(next.amount)} progress on.` };
+      return { verb: "Place", prompt: `Choose ${article(kind)} to place ${amountNow != null ? amountNow : amountWords(next.amount)} progress on.` };
     }
     case "PutIntoPlay":
       return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };

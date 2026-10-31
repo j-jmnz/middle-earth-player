@@ -34,6 +34,8 @@ export type StartSeat = {
   // Cards a campaign card's Setup adds to the hand once the mulligan is over (AddToHandAfterMulligan): not drawn, not shuffled
   // back by a mulligan, not counted in the opening hand.
   afterMulligan?: readonly string[];
+  // The cards the campaign card's Setup let this seat choose and a Resolution earns (ChooseCards `unearned`): recorded as a game fact (ScenarioState.chosenAtSetup).
+  chosen?: readonly string[];
   // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests-loot.ts).
   loot?: readonly string[];
 };
@@ -89,6 +91,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
+  const chosen = input.seats.slice(0, input.seatCount).flatMap((seat, at) => (seat.chosen ?? []).map((code) => ({ code, seat: at })));
+  if (chosen.length > 0) state = { ...state, chosenAtSetup: chosen };
   if (input.seats.some((seat) => (seat.afterMulligan?.length ?? 0) > 0)) state = { ...state, afterMulligan: input.seats.slice(0, input.seatCount).map((seat) => seat.afterMulligan ?? []) };
   for (let index = 0; index < input.seatCount; index += 1) {
     const seat = input.seats[index];

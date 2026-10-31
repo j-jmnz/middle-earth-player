@@ -78,7 +78,7 @@ const blackKeyStats = (side: "A" | "B", id: number): Effect => ({
 });
 
 // 11184 to 11187 Galdor's Counsel (events the campaign card of Raid on the Grey Havens lets each player take into hand): X is the level of the card in the Campaign Log (half of it, rounded up, for
-// Leadership and Lore), plus 1 for the copy the campaign card gave ("For this game, X is plus 1 for each of those copies"). Each adds itself to the victory display.
+// Leadership and Lore), plus 1 for each copy the players chose at the campaign card's Setup ("For this game, X is plus 1 for each of those copies", 0 in any other game). Each adds itself to the victory display.
 const counsel = (code: string, id: number, instructions: Effect["instructions"]): Effect => ({
   id: `${code}:action:${id}`,
   cardCode: code,
@@ -88,9 +88,9 @@ const counsel = (code: string, id: number, instructions: Effect["instructions"])
   instructions: [...instructions, { verb: "AddSourceToVictory" }],
 });
 type Amount = Extract<Effect["instructions"][number], { verb: "DamageCard" }>["amount"];
-const HALF_LEVEL_PLUS_ONE: Amount = { level: true, halved: true, plus: 1 };
-const LEVEL_PLUS_ONE: Amount = { level: true, plus: 1 };
-const counselX = (halved: boolean): Amount => (halved ? HALF_LEVEL_PLUS_ONE : LEVEL_PLUS_ONE);
+const HALF_LEVEL_PLUS_CHOSEN: Amount = { level: true, halved: true, plusChosen: true };
+const LEVEL_PLUS_CHOSEN: Amount = { level: true, plusChosen: true };
+const counselX = (halved: boolean): Amount => (halved ? HALF_LEVEL_PLUS_CHOSEN : LEVEL_PLUS_CHOSEN);
 
 // 11189 Parrying Cutlass and 11190 Throwing Axe (Permanent, Restricted weapons, a hero's, earned at the Resolution of Raid on the Grey Havens): the bonus grows by `extra` while the hero holds `stat` tokens.
 const weaponBonus = (code: string, line: string, id: number, stat: "defense" | "attack", base: number, extra: Amount): Effect => ({

@@ -5,7 +5,8 @@ import { loadCards } from "../../scripts/data/load-cards.ts";
 
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { campaignLogSchema, newSave, parseLog } from "./save.ts";
-import { XP_ROWS, gavinReturned, isUpgraded, levelOf, markRefusal, marksOf, pick, spendOnSave, spendXp, unpick, xpFacts, xpGainedOf, xpRowOf, xpSpentOf, xpUnspentOf } from "./xp.ts";
+import { dealtFace, NO_UPGRADED_SIDE } from "../rules/families/dreamchaser-facts.ts";
+import { NO_UPGRADED_REASON, XP_ROWS, gavinReturned, isUpgraded, levelOf, markRefusal, marksOf, pick, spendOnSave, spendXp, unpick, xpFacts, xpGainedOf, xpRowOf, xpSpentOf, xpUnspentOf } from "./xp.ts";
 import { markedLines, markedSpeech, pickSentence, xpView } from "./xp-view.ts";
 
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable (data/rules/entries.json). The Dream-chaser Campaign Log sheet's XP: the rows (MEC111 p31),
@@ -194,6 +195,40 @@ describe("what the Spend XP screen shows", () => {
     const waiting = xpView(logWith({ a: 6 }), {}, { [CAPTAIN_SCENARIO]: "A Storm on Cobas Haven" });
     expect(waiting.upgradable.find((row) => row.code === GAVIN)).toMatchObject({ note: "After A Storm on Cobas Haven", canPick: false, words: "0 of 4" });
     expect(waiting.upgradable.find((row) => row.code === "11172")?.note).toBeNull();
+  });
+});
+
+describe("the cards MEC111 lists as upgradable with no Upgraded side in the sources", () => {
+  const BURN = "11038";
+  const DREAM_CHASER_LOCATION = "11039";
+  const sides = (code: string): string[] => ledger.entries.filter((entry) => entry.code === code).map((entry) => entry.side);
+
+  it("are exactly the listed rows whose other side the scan ledger does not hold, and keep their sheet rows and box counts", () => {
+    expect([...NO_UPGRADED_SIDE].sort()).toEqual([BURN, DREAM_CHASER_LOCATION]);
+    for (const code of NO_UPGRADED_SIDE) expect(sides(code), code).toEqual(["A"]);
+    expect([xpRowOf(BURN)?.boxes, xpRowOf(DREAM_CHASER_LOCATION)?.boxes]).toEqual([2, 2]);
+    for (const code of ["11172", "11190", "11180"]) expect(sides(code)).toContain("B");
+  });
+
+  it("show in the Spend XP list, dimmed with the reason, and take no pick or mark even with XP to spend", () => {
+    const rich = logWith({ a: 9 });
+    const view = xpView(rich, {});
+    for (const code of [BURN, DREAM_CHASER_LOCATION]) {
+      expect(view.upgradable.find((row) => row.code === code)).toMatchObject({ canPick: false, reason: NO_UPGRADED_REASON, note: NO_UPGRADED_REASON, marked: 0 });
+      expect(markRefusal(rich, {}, code)).toBe("Upgraded side not in the sources");
+      expect(pick(rich, {}, code)).toEqual({});
+      expect(spendXp(rich, { [code]: 1 })).toEqual({ ok: false, reason: NO_UPGRADED_REASON });
+    }
+    expect(view.upgradable.find((row) => row.code === "11172")?.canPick).toBe(true);
+  });
+
+  it("are never upgraded, so the game never deals them on a side with no lines, even for a log that marked every box", () => {
+    const marked = logWith({ a: 9 }, { [BURN]: 2, [DREAM_CHASER_LOCATION]: 2, "11172": 2 });
+    expect(isUpgraded(marked, BURN)).toBe(false);
+    expect(isUpgraded(marked, "11172")).toBe(true);
+    expect(xpFacts(marked).upgraded).toEqual(["11172"]);
+    const facts = { campaignFacts: { prisoner: null, usedOnce: [], counters: {}, upgraded: [BURN, DREAM_CHASER_LOCATION, "11172"] } };
+    expect([dealtFace(facts, BURN, "up"), dealtFace(facts, DREAM_CHASER_LOCATION, "up"), dealtFace(facts, "11172", "up")]).toEqual(["up", "up", "B"]);
   });
 });
 

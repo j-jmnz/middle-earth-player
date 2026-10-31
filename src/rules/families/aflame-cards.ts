@@ -71,12 +71,10 @@ export function healLocations(state: ScenarioState, instruction: Verb<"HealLocat
   return healed + taken >= total ? next : queueFront(next, [{ instruction: { ...instruction, amount: total, healed: healed + taken }, seat: focus.seat, chosen: null, cause }]);
 }
 
-/** EarnDealt, at a Resolution: one pool entry for each card in the game with one of these codes, for the seat that holds or owns it (seat 0 for a copy in the victory display, which keeps no seat). */
+/** EarnDealt, at a Resolution: one pool entry for each card the Setup let a seat choose with one of these codes, for the seat that chose it, wherever the copy is now (a hand, a discard pile, the victory
+ * display after it was played). */
 export function dealtCopies(state: ScenarioState, codes: readonly string[], step: number): Earned[] {
-  return Object.values(state.cards)
-    .filter((card) => codes.includes(card.code))
-    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }))
-    .map((card) => ({ code: card.code, to: "pool" as const, seat: card.owner ?? card.controller ?? 0, hero: null, step }));
+  return (state.chosenAtSetup ?? []).filter((chosen) => codes.includes(chosen.code)).map((chosen) => ({ code: chosen.code, to: "pool" as const, seat: chosen.seat, hero: null, step }));
 }
 
 /** StageSetAside: the set-aside card with this code joins the staging area, announced as added to it and as entering play (its Forced effects hear that). */

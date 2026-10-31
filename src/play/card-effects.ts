@@ -5,7 +5,9 @@
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../rules/constant-records.ts";
-import { aflameLine, burnTally } from "../rules/families/aflame-values.ts";
+import { aflameTally, burnTally } from "../rules/families/aflame-values.ts";
+
+import { aflameLine, aflameMark, burnLine, burnMark } from "./aflame-words.ts";
 import { placedLimit } from "../rules/families/uncharted-limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
@@ -155,10 +157,10 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   const printed = printedOf(ctx.cards, card.code);
   const shown = cardEffects(game, ctx, cardId);
   const lines: string[] = [];
-  const aflame = aflameLine(game, cardId, ctx);
-  if (aflame && inPlay(card.zone)) lines.push(aflame);
+  const aflame = aflameTally(game, cardId, ctx);
+  if (aflame && inPlay(card.zone)) lines.push(aflameLine(aflame));
   const burn = burnTally(game, cardId, ctx);
-  if (burn) lines.push(`${burn.count} ${burn.count === 1 ? "card is" : "cards are"} facedown underneath it, out of play. The players lose at ${burn.limit}.`);
+  if (burn) lines.push(burnLine(burn));
   for (const modifier of game.modifiers) {
     if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;
     const source = modifier.sourceId === cardId ? "its own text" : cardName(modifier.sourceId);
@@ -232,14 +234,23 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
     under: card != null && inPlay(card.zone) ? underMark(burnTally(game, cardId, ctx)) : null,
+    // An Aflame location in play: its damage against the value that destroys it.
+    fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
   };
 }
 
-/** The pill on The Havens Burn: "2 under · lose at 5", threat red when the next card placed under it loses the game. */
-export type UnderMark = { text: string; loses: boolean };
+/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". */
+export type UnderMark = { text: string; loses: boolean; speech: string };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
-  return tally ? { text: `${tally.count} under · lose at ${tally.limit}`, loses: tally.count + 1 >= tally.limit } : null;
+  return tally ? burnMark(tally) : null;
+}
+
+/** The mark on an Aflame location in play: "3/5" damage against its value, threat red when one more damage destroys it. */
+export type FireMark = { text: string; danger: boolean };
+
+function fireMark(tally: { value: number; damage: number } | null): FireMark | null {
+  return tally ? aflameMark(tally) : null;
 }
 
 export type SlotNumbers = {
@@ -249,4 +260,5 @@ export type SlotNumbers = {
   engagement: { cost: number; engages: boolean } | null;
   delayed: boolean;
   under: UnderMark | null;
+  fire: FireMark | null;
 };

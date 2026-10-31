@@ -11,9 +11,10 @@ import { expectOk } from "../rules/fixture.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { settle } from "../rules/machine.ts";
-import { fireForced } from "../rules/triggers.ts";
+import type { EngineStep } from "../rules/intents.ts";
+import { advanceFreed } from "../rules/stage-reveal.ts";
 import { UPGRADED_CODES, RAID_GOLDENS, afterFate, playGolden, raidLoadout, raidPlan, raidStart, raidWorld } from "../../scripts/raid-game.ts";
-import { CODES, campaign, raid, raidTable, loadRaidWorld, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, campaign, idOf, raid, raidTable, loadRaidWorld, type RaidWorld } from "../../scripts/raid-scene.ts";
 
 import { buildStart } from "./start.ts";
 import { applyResolution } from "./log.ts";
@@ -71,14 +72,35 @@ describe("Raid on the Grey Havens in the Dream-chaser campaign", () => {
     expect(asked.ok).toBe(false);
     if (!asked.ok) expect(asked.needs).toEqual({ seat: 0, options: ["11184", "11185", "11186", "11187", "skip"] });
     const taken = raidPlan(2, afterFate(2), [CODES.counselLeadership, CODES.counselSpirit]);
-    expect(taken.seats.map((seat) => seat.hand)).toEqual([[CODES.counselLeadership], [CODES.counselSpirit]]);
+    // Dealt after the mulligan, so a mulligan cannot shuffle it into the deck, and recorded as chosen for the Resolution and for X.
+    expect(taken.seats.map((seat) => seat.afterMulligan)).toEqual([[CODES.counselLeadership], [CODES.counselSpirit]]);
+    expect(taken.seats.map((seat) => seat.hand)).toEqual([[], []]);
+    expect(taken.seats.map((seat) => seat.chosen)).toEqual([[CODES.counselLeadership], [CODES.counselSpirit]]);
     // Not in the pool: the Resolution earns it, and only if the game is won.
     expect(taken.log.campaignPool.map((card) => card.code)).toEqual([CODES.ominousFate]);
+    // The briefing says which Counsel each seat took, by its sphere, and that a seat skipped.
+    expect(taken.steps.find((step) => step.n === 6)?.did).toEqual(["Seat 1 takes Galdor's Counsel (Leadership) into hand.", "Seat 2 takes Galdor's Counsel (Spirit) into hand."]);
+    const mixed = raidPlan(2, afterFate(2), [CODES.counselLore, "skip"]);
+    expect(mixed.steps.find((step) => step.n === 6)?.did).toEqual(["Seat 1 takes Galdor's Counsel (Lore) into hand.", "Seat 2 skips Galdor's Counsel."]);
     const skipped = raidPlan(1, afterFate(1), ["skip"]);
-    expect(skipped.seats.map((seat) => seat.hand)).toEqual([[]]);
+    expect(skipped.seats.map((seat) => [seat.afterMulligan, seat.chosen])).toEqual([[[], undefined]]);
     // A copy taken by one player cannot be taken by the next.
     const same = checklist({ log: afterFate(2), scenario: campaignScenario(raid), seats: raidLoadout(2), effects: EFFECTS, cards, choices: [CODES.counselLeadership, CODES.counselLeadership] });
     expect(same.ok).toBe(false);
+  });
+
+  it("adds the chosen Galdor's Counsel to the hand after the mulligan, so a mulligan does not shuffle it into the deck, and records who chose which copy (11182:A:2)", () => {
+    const start = raidStart(2, 1, "Normal", undefined, afterFate(2), undefined, [CODES.counselLeadership, CODES.counselTactics]);
+    let state = startScenario(start, ctx);
+    expect(state.chosenAtSetup).toEqual([{ code: CODES.counselLeadership, seat: 0 }, { code: CODES.counselTactics, seat: 1 }]);
+    const inHand = (seat: number, code: string): boolean => (state.seats[seat]?.hand ?? []).some((id) => state.cards[id]?.code === code);
+    const inDeck = (seat: number, code: string): boolean => (state.seats[seat]?.deck ?? []).some((id) => state.cards[id]?.code === code);
+    // Not dealt before the mulligan: neither seat can shuffle it away.
+    expect([inHand(0, CODES.counselLeadership), inDeck(0, CODES.counselLeadership)]).toEqual([false, false]);
+    state = expectOk(reduce(state, { type: "Mulligan" }, ctx)).state;
+    state = expectOk(reduce(state, { type: "Mulligan" }, ctx)).state;
+    while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+    expect([inHand(0, CODES.counselLeadership), inDeck(0, CODES.counselLeadership), inHand(1, CODES.counselTactics), inDeck(1, CODES.counselTactics)]).toEqual([true, false, true, false]);
   });
 
   it("starts with Calphon in play under the first player carrying Spyglass and Black Key, the Aflame locations in the staging area and the campaign card beside the quest deck", () => {
@@ -107,18 +129,25 @@ describe("Raid on the Grey Havens in the Dream-chaser campaign", () => {
     expect(calphon?.attachments.map((id) => state.cards[id]?.face)).toEqual(["B", "B"]);
   });
 
-  it("removes Calphon and each attachment on him from the game after stage 2B is revealed, without the players losing (11182:A:3)", () => {
-    const made = raidTable(scene, { stage: "11037", campaign: true, calphon: true, setAside: [] });
+  it("removes Calphon and each attachment on him from the game after stage 2B is revealed, once its When Revealed has resolved, without the players losing (11182:A:3)", () => {
+    // Stage 1 holds the progress it needs and nothing holds it: the quest advances to Sahír's Advance, the real reveal path (stage-reveal.ts advanceFreed).
+    const made = raidTable(scene, { stage: "11036", progress: 99, campaign: true, calphon: true, setAside: [CODES.sahir, CODES.naasiyah], deck: ["f0", "f0", "f0"] });
     const calphon = made.calphon ?? "";
     const attachments = made.state.cards[calphon]?.attachments ?? [];
     expect(attachments).toHaveLength(2);
-    // The stage is revealed as the quest advances to it (the event the campaign card hears).
     expect(made.ctx.effects.filter((effect) => effect.id === "11182:forced:1")).toHaveLength(1);
-    const steps: never[] = [];
-    const run = { state: settle({ ...fireForced(made.state, { trigger: "stageRevealed", seat: null, subject: made.state.questStage ?? "" }, made.ctx, steps), window: null, mode: "stopped" }, made.ctx, steps) };
-    for (const id of [calphon, ...attachments]) expect(run.state.cards[id]?.zone).toBe("removed");
-    expect(run.state.lost).toBe(false);
-    expect(settle({ ...run.state, window: { kind: "pass" } }, made.ctx, []).lost).toBe(false);
+    const steps: EngineStep[] = [];
+    const revealed = advanceFreed({ ...made.state, window: null, mode: "stopped" }, made.ctx, steps);
+    expect(revealed.cards[revealed.questStage ?? ""]?.code).toBe(CODES.advance);
+    // The stage's When Revealed is on top of the stack and Calphon's removal waits under it: he is still in play while Sahír and Na'asiyah join.
+    expect(revealed.stack.map((frame) => frame.frame)).toEqual(["forced", "whenRevealed"]);
+    expect(revealed.stack.map((frame) => revealed.cards[frame.cardId ?? ""]?.code)).toEqual([CODES.campaignCard, CODES.advance]);
+    for (const id of [calphon, ...attachments]) expect(revealed.cards[id]?.zone).toBe("play");
+    const done = settle(revealed, made.ctx, steps);
+    expect(done.cards[idOf(done, CODES.sahir)]?.zone).toBe("engaged");
+    for (const id of [calphon, ...attachments]) expect(done.cards[id]?.zone).toBe("removed");
+    expect(done.lost).toBe(false);
+    expect(settle({ ...done, window: { kind: "pass" } }, made.ctx, []).lost).toBe(false);
   });
 
   it("writes the XP and the earned Galdor's Counsel to the log on a win and the next part follows; a loss writes nothing", async () => {

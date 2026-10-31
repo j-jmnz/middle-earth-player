@@ -1,4 +1,4 @@
-import { underBurnHolds } from "./families/aflame-values.ts";
+import { BURN_CODE, encounterHolds, underBurnHolds } from "./families/aflame-values.ts";
 import type { Condition } from "../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
@@ -290,6 +290,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "highestThreat":
       return Math.max(0, ...state.seats.slice(0, state.seatCount).map((seat, index) => (seat.eliminated ? 50 : seatThreat(state, index)))) <= condition.max;
     // The aflame family's: the cards underneath The Havens Burn (families/aflame-values.ts). `revealing`: the source's own When Revealed is on the stack.
+    case "encounterHas":
+      return encounterHolds(state, condition, ctx);
     case "underBurn":
       return underBurnHolds(state, condition, ctx);
     case "revealing":
@@ -401,7 +403,8 @@ export function grantedIcons(state: ScenarioState, id: string, ctx: ReduceContex
 // card removed from the game, which "has no further interaction with the game in any manner" (rr.removed-from-game). An
 // encounter card is never in a player's hand, deck or discard pile.
 export function outOfPlayCopies(state: ScenarioState, code: string): string[] {
-  const under = Object.values(state.cards).filter((card) => card.zone === "under").map((card) => card.id);
+  // The cards facedown underneath The Havens Burn are hidden: no choice among copies lists them (dcce.aflame).
+  const under = Object.values(state.cards).filter((card) => card.zone === "under" && !(card.host != null && state.cards[card.host]?.code === BURN_CODE)).map((card) => card.id);
   return [...state.setAside, ...state.encounterDiscard, ...state.victory, ...under].filter((id) => state.cards[id]?.code === code);
 }
 

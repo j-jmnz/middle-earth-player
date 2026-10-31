@@ -13,9 +13,10 @@ import { listenerInPlay } from "./nightmare-guards.ts";
 // A quest card became the current stage (afterProgress, rules/stage-reveal.ts): Forced effects that listen for it resolve
 // ("Forced: When stage 3A is revealed", 906101:A:2). The event is about no card, so the setup card next to the quest deck hears it; its
 // `subject` names the stage. It is announced only while a card that listens is in play.
-export function announceStageRevealed(state: ScenarioState, stageId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (!listenerInPlay(state, "stageRevealed", ctx.effects)) return state;
-  return fireForced(state, { trigger: "stageRevealed", seat: null, subject: stageId }, ctx, steps);
+// `afterStageRevealed` ("Forced: After stage 2B is revealed", 11182:A:3) is announced before the stage's When Revealed frames are pushed, so it resolves once they have.
+export function announceStageRevealed(state: ScenarioState, stageId: string, ctx: ReduceContext, steps: EngineStep[], trigger: "stageRevealed" | "afterStageRevealed" = "stageRevealed"): ScenarioState {
+  if (!listenerInPlay(state, trigger, ctx.effects)) return state;
+  return fireForced(state, { trigger, seat: null, subject: stageId }, ctx, steps);
 }
 
 // The setup card's own Setup lines (906401:A:2, "Setup: Set each copy of Pale-green Tentacle aside, out of play") resolve once the piles are

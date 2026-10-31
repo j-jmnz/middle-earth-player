@@ -6,7 +6,8 @@ import { modifiedStat } from "../rules/keywords.ts";
 import { legalIntents } from "../rules/legal.ts";
 import { settle } from "../rules/machine.ts";
 import { runInstruction } from "../rules/interpret.ts";
-import { shadowCards } from "../rules/zones.ts";
+import { fireForced } from "../rules/triggers.ts";
+import { moveCard, shadowCards } from "../rules/zones.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
 
@@ -128,6 +129,19 @@ describe("shadow effects", () => {
     expect(plain.run.state.cards[idOf(plain.run.state, "place")]?.damage).toBe(0);
   });
 
+  it("Put to the Torch offers the defending character's damage only when a character defends (11048:A:2, rr.effects)", () => {
+    const offered = (undefended: boolean): string[][] => {
+      const seen: string[][] = [];
+      raidFight(world, CODES.torch, "mild", { active: { code: CODES.pillaged } }, { undefended, pick: (state) => { if (state.window?.kind === "choose") seen.push([...state.window.options]); return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""; } });
+      return seen.filter((options) => options.includes("location"));
+    };
+    expect(offered(false)).toEqual([["location", "character"]]);
+    // Nobody defends: the damage to the defending character changes nothing, so the card deals its 3 damage to the location without asking.
+    expect(offered(true)).toEqual([]);
+    const location = raidFight(world, CODES.torch, "mild", { active: { code: CODES.pillaged } }, { undefended: true });
+    expect(cardOf(location.run.state, CODES.pillaged)?.damage).toBe(3);
+  });
+
   it("The Fires Spread deals 1 damage to each Aflame location when its attack destroys a character (11049:A:3)", () => {
     const destroyed = raidFight(world, CODES.fires, "mild", { active: { code: CODES.pillaged } }, { tweak: (state, made) => ({ ...state, cards: { ...state.cards, [made.hero]: { ...state.cards[made.hero]!, damage: 5 } } }) });
     expect(cardOf(destroyed.run.state, "dh1")?.zone).toBe("discard");
@@ -140,6 +154,29 @@ describe("shadow effects", () => {
   it("Burning Piers is added to the staging area after the attack (11043:A:4)", () => {
     const { run } = shadowed(CODES.piers, "mild");
     expect(cardOf(run.state, CODES.piers)?.zone).toBe("staging");
+  });
+});
+
+describe("Graxar (11188)", () => {
+  // Graxar engaged with the first player and dealt `dealt` shadow cards (the first one, then additional ones); the seat hears that shadow cards were dealt.
+  const dealtTo = (dealt: number, layout: RaidLayout = {}): ScenarioState => {
+    const made = make({ phase: "Combat", engaged: [{ code: CODES.graxar, seat: 0 }], deck: ["f0", "f0", "f0", "f0"], ...layout });
+    const graxar = idOf(made.state, CODES.graxar);
+    let state = made.state;
+    for (let at = 0; at < dealt; at += 1) {
+      const card = state.encounterDeck[0] ?? "";
+      state = moveCard(state, card, { zone: "shadow", enemyId: graxar });
+    }
+    return settle({ ...fireForced(state, { trigger: "shadowsDealt", seat: 0 }, made.ctx, []), window: null, mode: "stopped" }, made.ctx, []);
+  };
+
+  it("gets 1 resource for each shadow card dealt to him, not one for the dealing (A:4)", () => {
+    expect(cardOf(dealtTo(1), CODES.graxar)?.resources).toBe(1);
+    expect(cardOf(dealtTo(3), CODES.graxar)?.resources).toBe(3);
+  });
+
+  it("gets none when he was dealt no shadow card, even if the dealing was heard", () => {
+    expect(cardOf(dealtTo(0), CODES.graxar)?.resources).toBe(0);
   });
 });
 

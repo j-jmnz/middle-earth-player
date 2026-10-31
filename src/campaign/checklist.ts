@@ -6,6 +6,7 @@ import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { StartSeat } from "../rules/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
+import { xpRowOf } from "./xp.ts";
 
 // The Campaign Setup Checklist as numbered steps. Each step names the rule it follows and says what it did, so the
 // briefing screen (phase 10) and a test can show the same eight lines. The answers to the campaign card's own Setup
@@ -13,7 +14,7 @@ import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[] };
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[] };
 
 export type Need = { seat: number; options: readonly string[] };
 
@@ -96,20 +97,33 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
   const { seats, pool, name, input } = table;
   const order = seats.map((_, index) => index);
   const taken: string[] = [];
+  // Cards that share a title (the four Galdor's Counsel) are told apart by their sphere in the lines below.
+  const titles = instruction.codes.filter((code) => input.cards.has(code)).map((code) => name(code));
+  const same = (code: string): boolean => input.cards.has(code) && titles.filter((title) => title === name(code)).length > 1;
+  // The Campaign Log sheet's row names the copy ("Galdor's Counsel (Leadership)"): the data gives all four copies the neutral sphere.
+  const sphereOf = (code: string): string => {
+    const row = xpRowOf(code)?.name ?? "";
+    return same(code) && row.startsWith(name(code)) ? row.slice(name(code).length) : "";
+  };
+  const offered = new Set(titles).size === 1 ? (titles[0] ?? "the offer") : "the offer";
   for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
     const remaining = instruction.codes.filter((code) => !taken.includes(code));
     const options = instruction.to === "hero" ? remaining.flatMap((code) => (seats[seat]?.heroes ?? []).map((hero) => `${code}>${hero}`)) : remaining;
     const answer = takeAnswer(table, instruction.optional ? [...options, "skip"] : options, seat);
+    if (answer === "skip") table.out.did.push(`Seat ${seat + 1} skips ${offered}.`);
     if (answer == null || answer === "skip") continue;
     const [code = "", host] = answer.split(">");
     taken.push(code);
     const printed = printedOf(input.cards, code);
     const hero = host ?? null;
     if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });
-    if (instruction.to === "hand") seats[seat]?.hand.push(code);
+    // A card that joins the hand once the mulligan is over cannot be shuffled into the deck by it (rr.mulligan); an unearned one is also recorded as chosen (ScenarioState.chosenAtSetup).
+    if (instruction.to === "hand") (instruction.afterMulligan ? seats[seat]?.afterMulligan : seats[seat]?.hand)?.push(code);
+    const chosenBySeat = seats[seat];
+    if (instruction.unearned && chosenBySeat) chosenBySeat.chosen = [...(chosenBySeat.chosen ?? []), code];
     // An unearned card is only dealt: the scenario's Resolution decides whether it joins the pool (11182:B:2).
     if (!instruction.unearned) pool.push(poolCard(printed, code, printed.keywords.permanent ? hero : null, seat));
-    table.out.did.push(`Seat ${seat + 1} takes ${name(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
+    table.out.did.push(`Seat ${seat + 1} takes ${name(code)}${sphereOf(code)}${hero ? ` onto ${name(hero)}` : instruction.to === "hand" ? " into hand" : ""}.`);
   }
   if (instruction.leftover === "firstPlayerDeck") {
     // The players earned every one of these cards, so the unchosen ones join the pool too, as the first player's: step 7 shuffles

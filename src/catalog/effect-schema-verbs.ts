@@ -372,6 +372,8 @@ export const simpleVerbs = [
     leftover: z.enum(["firstPlayerDeck"]).optional(),
     // The card is dealt where `to` says but not earned: the scenario's Resolution decides whether it joins the pool (11182:A:2, with EarnDealt on 11182:B:2).
     unearned: z.boolean().optional(),
+    // With `to: hand`: the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck (the same as AddToHandAfterMulligan, 11182:A:2).
+    afterMulligan: z.boolean().optional(),
     // With `to: hero` at a Resolution: the hero may be any player's, not only the chooser's ("record which hero you attach it to", 11182:B:1).
     anyHero: z.boolean().optional(),
     ...when,

@@ -126,6 +126,11 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`, "damage", [step.targetId]);
         return;
       case "destroy": {
+        // A location placed facedown underneath The Havens Burn is hidden from now on: the line does not name it and rings no card (dcce.aflame).
+        if (step.under) {
+          line("A location burns and is placed facedown underneath The Havens Burn");
+          return;
+        }
         // A location leaves play explored, an enemy defeated, a character destroyed.
         const was = before.cards[step.targetId]?.zone;
         const verb = was === "activeLocation" || was === "secondActiveLocation" ? "explored" : was === "engaged" || was === "staging" ? "defeated" : "destroyed";

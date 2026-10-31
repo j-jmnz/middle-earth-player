@@ -58,7 +58,7 @@ Read the sections your task touches.
   - 310–315 Catalog build (~410)
   - 316–329 Tests (~860) ← 2
   - 330–343 Performance (~1.0K)
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~54.6K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~55.0K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -71,7 +71,7 @@ Read the sections your task touches.
     - 225–239 Mirkwood campaign cards and carry-over (~870)
     - 240–251 Standalone play (~800)
     - 252–263 Scenario state (~570)
-    - 264–296 The engine plays the game (~2.1K) ← 2
+    - 264–296 The engine plays the game (~2.1K) ← 3
     - 297–304 Engine steps (~180)
     - 305–333 Core round (~1.3K) ← 1
     - 334–363 Keywords implemented once (~1.6K)
@@ -90,7 +90,7 @@ Read the sections your task touches.
     - 568–588 Escape from Dol Guldur (~2.7K)
     - 589–603 The Oath (~2.3K)
     - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–656 Dream-chaser (~5.6K)
+  - 622–656 Dream-chaser (~5.9K)
   - 657–665 Nightmare (~420)
   - 666–704 Deckbuilding (~1.8K) ← 1
   - 705–783 Effects (~3.2K)
@@ -103,7 +103,7 @@ Read the sections your task touches.
   - 824–848 Persistence and shipping (~1.5K)
   - 849–889 Screens (~4.3K) ← 1
     - 875–889 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~21.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~21.8K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
@@ -111,29 +111,29 @@ Read the sections your task touches.
   - 34–37 Canvas (~510) ← 1
   - 38–49 Spacing and the play area's rows (~1.5K) ← 7
   - 50–55 Pictures on the table (~300)
-  - 56–67 Cards (~1.3K) ← 3
-  - 68–73 The Sailing test (~690) ← 5
-  - 74–77 Tokens and effects (~320)
-  - 78–86 Piles (~850) ← 2
-  - 87–92 Marks of the open moment (~400) ← 1
-  - 93–158 Motion (~2.7K) ← 8
-  - 159–185 Spotlight (~2.1K) ← 16
-  - 186–191 Gestures (~210) ← 5
-  - 192–195 Hold, slide and release (~690)
-  - 196–201 Peeking at the other seat (~600) ← 1
-  - 202–215 Command column (~1.6K) ← 7
-  - 216–219 Two taps (~320) ← 2
-  - 220–223 One answer, one tap (~240)
-  - 224–227 Stops and Always use (~250)
-  - 228–231 Guide (~120)
-  - 232–241 Choice tray (~780) ← 2
-  - 242–253 Reading panels (~930) ← 4
-  - 254–263 Phase carousel (~670)
-  - 264–269 Quest advance (~460) ← 1
-  - 270–273 Undo (~140)
-  - 274–277 Haptics (~250)
-  - 278–288 Banner (~580) ← 1
-  - 289–292 Android Back (~90)
+  - 56–69 Cards (~1.7K) ← 3
+  - 70–75 The Sailing test (~690) ← 5
+  - 76–79 Tokens and effects (~320)
+  - 80–88 Piles (~850) ← 2
+  - 89–94 Marks of the open moment (~400) ← 1
+  - 95–160 Motion (~2.7K) ← 8
+  - 161–187 Spotlight (~2.1K) ← 16
+  - 188–193 Gestures (~210) ← 5
+  - 194–197 Hold, slide and release (~690)
+  - 198–203 Peeking at the other seat (~600) ← 1
+  - 204–217 Command column (~1.6K) ← 7
+  - 218–221 Two taps (~320) ← 2
+  - 222–225 One answer, one tap (~240)
+  - 226–229 Stops and Always use (~250)
+  - 230–233 Guide (~120)
+  - 234–243 Choice tray (~780) ← 2
+  - 244–255 Reading panels (~930) ← 4
+  - 256–265 Phase carousel (~670)
+  - 266–271 Quest advance (~460) ← 1
+  - 272–275 Undo (~140)
+  - 276–279 Haptics (~250)
+  - 280–290 Banner (~580) ← 1
+  - 291–294 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~22.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
@@ -176,15 +176,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~5.4K tok)
+- `docs/phases/STATUS.md` — Phase status (~5.5K tok)
   - 5–16 Rules (~540)
-  - 17–75 Phases (~1.8K)
-  - 76–149 Open items (~2.6K)
-    - 78–90 Fixtures and Maestro (~480)
-    - 91–116 Rules and engine (~710)
-    - 117–131 Screens and code (~590)
-    - 132–149 Phone and tablet checks (~850)
-  - 150–165 Standing decisions (~380)
+  - 17–75 Phases (~1.9K)
+  - 76–150 Open items (~2.7K)
+    - 78–90 Fixtures and Maestro (~490)
+    - 91–117 Rules and engine (~770)
+    - 118–132 Screens and code (~590)
+    - 133–150 Phone and tablet checks (~850)
+  - 151–166 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)
@@ -331,6 +331,6 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
 - `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); design-system-table.md, Command column (6); design-system-table.md, Motion (6); architecture.md, Images (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system.md, Components (4); brief.md, Table screen (3); design-system-table.md, Cards (3); design-system-table.md, Reading panels (3); design-system-table.md, Top bar (3); design-system.md, Tablets (3); design-system.md, Type (3); plans/done/settings-theme-and-ui-scale.md, UI scale engine (3); design-system-table.md, Choice tray (2); design-system-table.md, Piles (2); design-system.md, Icons (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); design-system.md, Table — landscape (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1)
-- `src/rules`: architecture.md, State (1); brief.md, The engine plays the game (1)
+- `src/rules`: brief.md, The engine plays the game (2); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (5); design-system.md, Components (5); design-system.md, History (4); design-system.md, Briefing (3); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); design-system.md, Campaign log (1); design-system.md, Decks (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

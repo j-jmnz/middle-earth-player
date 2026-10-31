@@ -1,7 +1,7 @@
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable (data/rules/entries.json). What the Spend XP screen and the log's XP rows show, from the log and the
 // boxes the players have picked and not yet marked. Pure: the screen draws these numbers and sends the picks to spendXp.
 import type { CampaignLog } from "./log.ts";
-import { XP_ROWS, levelOf, markRefusal, marksOf, pickedCount, xpGainedOf, xpSpentOf, xpUnspentOf, type Picks, type ScenarioNames, type XpRow } from "./xp.ts";
+import { NO_UPGRADED_REASON, XP_ROWS, hasUpgradedSide, levelOf, markRefusal, marksOf, pickedCount, xpGainedOf, xpSpentOf, xpUnspentOf, type Picks, type ScenarioNames, type XpRow } from "./xp.ts";
 
 export type XpRowView = {
   code: string;
@@ -35,6 +35,7 @@ function wordsOf(row: XpRow, total: number): string {
 
 // The scenario that must be won before the card's boxes are marked, while it is not: the dimmed row says so on screen.
 function noteOf(log: CampaignLog, row: XpRow, names: ScenarioNames): string | null {
+  if (row.kind === "upgradable" && !hasUpgradedSide(row.code)) return NO_UPGRADED_REASON;
   return row.from != null && !log.completed.includes(row.from) ? `After ${names[row.from] ?? row.from.replaceAll("-", " ")}` : null;
 }
 

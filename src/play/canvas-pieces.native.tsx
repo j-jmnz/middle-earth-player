@@ -414,19 +414,23 @@ export function Badges({
  * danger edge when `danger`, night with a hairline otherwise. `lift` raises it above the token row, clear of the resource
  * count a character may hold.
  */
-function FootPill({ rect, image, icon, value, danger, lift, fonts, t, s }: { rect: Rect; image: SkImage | null; icon: IconName; value: number; danger: boolean; lift: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+function FootPill({ rect, image, icon, value, danger, lift, fonts, t, s }: { rect: Rect; image: SkImage | null; icon: IconName; value: number | string; danger: boolean; lift: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   const { x, y, w, h } = rect;
   const text = String(value);
   const token = TOKEN * s;
-  const width = token + fonts.badge.getTextWidth(text) + 8 * s;
+  const words = fonts.badge.getTextWidth(text);
+  // The pill stays inside the card: when the art and the number do not fit its width, the number stands alone.
+  const art = token + words + 8 * s <= w - 4 * s;
+  const width = art ? token + words + 8 * s : Math.min(words + 10 * s, w - 4 * s);
   const left = x + (w - width) / 2;
   const top = y + h - token - 4 * s - (lift ? token + 2 * s : 0);
   return (
     <Group>
       <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={danger ? t.threat : t.night} />
       <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={danger ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
-      {image ? <Image image={image} x={left + 1 * s} y={top + 1 * s} width={token - 2 * s} height={token - 2 * s} fit="contain" /> : <CanvasIcon name={icon} x={left + 3 * s} y={top + 3 * s} size={token - 6 * s} color={t.bone} />}
-      <Text x={left + token + 2 * s} y={top + token - 5 * s} text={text} font={fonts.badge} color={t.bone} />
+      {art && image ? <Image image={image} x={left + 1 * s} y={top + 1 * s} width={token - 2 * s} height={token - 2 * s} fit="contain" /> : null}
+      {art && !image ? <CanvasIcon name={icon} x={left + 3 * s} y={top + 3 * s} size={token - 6 * s} color={t.bone} /> : null}
+      <Text x={art ? left + token + 2 * s : left + (width - words) / 2} y={top + token - 5 * s} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }
@@ -436,7 +440,10 @@ export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect
   return <FootPill rect={rect} image={mark.icon === "damage" ? images.damage : null} icon={mark.icon} value={mark.value} danger={mark.danger} lift fonts={fonts} t={t} s={s} />;
 }
 
-/** The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with its words, threat red when the next card placed under it loses (11038:A:2). */
+/**
+ * The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with the short count ("2/5"), threat red when the next card placed under it loses (11038:A:2).
+ * The count is short on purpose: it stays inside the card at every size (the full sentence is in the preview and the screen reader's line). Only the count is shown, never which cards are underneath.
+ */
 export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean }; fonts: Fonts; t: TableTokens; s: number }) {
   const { x, y, w, h } = rect;
   const token = TOKEN * s;
@@ -447,9 +454,14 @@ export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: {
     <Group>
       <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
       <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
-      <Text x={left + 5 * s} y={top + token - 5 * s} text={mark.text} font={fonts.badge} color={t.bone} />
+      <Text x={left + (width - fonts.badge.getTextWidth(mark.text)) / 2} y={top + token - 5 * s} text={mark.text} font={fonts.badge} color={t.bone} />
     </Group>
   );
+}
+
+/** An Aflame location's damage against the value that destroys it ("3/5"): the damage token art and the count on a pill at the card's foot, threat red when one more damage destroys it (dcce.aflame). */
+export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; mark: { text: string; danger: boolean }; fonts: Fonts; images: TokenImages; t: TableTokens; s: number }) {
+  return <FootPill rect={rect} image={images.damage} icon="damage" value={mark.text} danger={mark.danger} lift={false} fonts={fonts} t={t} s={s} />;
 }
 
 /** An enemy's engagement cost in staging: threat red when the shown seat's threat engages it at the checks (rr.engagement-check). */

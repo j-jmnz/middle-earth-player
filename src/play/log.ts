@@ -85,7 +85,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       // A removal (141026:B:2) is a step with a negative amount: say what left the card, never a minus sign.
       return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`;
     case "destroy":
-      return `${names.card(step.targetId)} is destroyed`;
+      // A location placed facedown underneath The Havens Burn is out of play and hidden: the line never names it (dcce.aflame).
+      return step.under ? "A location burns and is placed facedown underneath The Havens Burn" : `${names.card(step.targetId)} is destroyed`;
     case "eliminate":
       return `${player(step.seat)} is eliminated`;
     case "reveal":

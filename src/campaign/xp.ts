@@ -4,6 +4,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 import { MODE_CARD_CODE, sideInstructions } from "../catalog/scenario-data.ts";
 import type { ModeCard } from "../rules/campaign-state.ts";
+import { NO_UPGRADED_SIDE } from "../rules/families/dreamchaser-facts.ts";
 
 import type { CampaignLog } from "./log.ts";
 import type { Save } from "./save.ts";
@@ -111,10 +112,18 @@ export function levelOf(log: Pick<CampaignLog, "marks">, code: string): number {
   return xpRowOf(code)?.kind === "scalable" ? marksOf(log, code) : 0;
 }
 
-/** An upgradable card is upgraded once every box beside it is marked: its Upgraded side is dealt from then on. */
+/** The reason a listed card takes no XP: its Upgraded side is in none of the sources (MEC111 lists the box, but there is no text to deal). */
+export const NO_UPGRADED_REASON = "Upgraded side not in the sources";
+
+/** Whether the card's Upgraded side has text, so its boxes can be marked. */
+export function hasUpgradedSide(code: string): boolean {
+  return !NO_UPGRADED_SIDE.has(code);
+}
+
+/** An upgradable card is upgraded once every box beside it is marked: its Upgraded side is dealt from then on (never a side with no text). */
 export function isUpgraded(log: Pick<CampaignLog, "marks">, code: string): boolean {
   const row = xpRowOf(code);
-  return row != null && row.kind === "upgradable" && marksOf(log, code) >= row.boxes;
+  return row != null && row.kind === "upgradable" && hasUpgradedSide(code) && marksOf(log, code) >= row.boxes;
 }
 
 /** "Gavin returned": the players spent 4 XP on him (A Storm on Cobas Haven's Resolution), which The City of Corsairs' Setup reads. */
@@ -149,6 +158,7 @@ export function stepOf(code: string): number {
 export function markRefusal(log: CampaignLog, picks: Picks, code: string, names: ScenarioNames = {}): string | null {
   const row = xpRowOf(code);
   if (!row) return "That card has no boxes in the Campaign Log";
+  if (row.kind === "upgradable" && !hasUpgradedSide(code)) return NO_UPGRADED_REASON;
   if (row.from != null && !log.completed.includes(row.from)) return `${row.name} is marked after ${names[row.from] ?? row.from.replaceAll("-", " ")} is won`;
   const step = stepOf(code);
   if (marksOf(log, code) + (picks[code] ?? 0) + step > row.boxes) return `Every box beside ${row.name} is marked`;

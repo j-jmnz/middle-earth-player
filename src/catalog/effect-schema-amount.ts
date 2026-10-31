@@ -17,8 +17,8 @@ export const amountExprSchema = z.strictObject({
   // With `count`: cards with the same title count once ("for each different player attachment on attached hero").
   distinct: z.literal(true).optional(),
   // A stat of a card. `printed` reads the printed value, else the current one. `damage`, `resources` and `progress` are
-  // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat; `attachments` the cards attached to it.
-  stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost", "attachments"]).optional(),
+  // tokens on the card; `cost` is its printed cost; `threatCost` a hero's printed threat; `attachments` the cards attached to it; `shadowCards` the shadow cards dealt to an enemy (11188:A:4).
+  stat: z.enum(["willpower", "attack", "defense", "threat", "hitPoints", "engagementCost", "questPoints", "damage", "resources", "progress", "cost", "threatCost", "attachments", "shadowCards"]).optional(),
   of: cardRefSchema.optional(),
   // With `stat`: read it from the card in play with this title instead of `of` ("Add Bilbo Baggins' total Willpower").
   ofNamed: z.string().min(1).optional(),
@@ -53,6 +53,8 @@ export const amountExprSchema = z.strictObject({
   // amount = value × times + plus, at most `limit`, at least 0.
   times: z.number().int().optional(),
   plus: z.number().int().optional(),
+  // Plus the number of cards the campaign card's Setup let the players choose ("X is plus 1 for each of those copies", 11182:A:2): 0 in a game whose Setup chose none.
+  plusChosen: z.literal(true).optional(),
   limit: z.number().int().min(0).optional(),
 });
 

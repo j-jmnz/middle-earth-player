@@ -114,6 +114,8 @@ export type RaidLayout = {
   engaged?: readonly (Entry | { code: string; seat: number; damage?: number; resources?: number })[];
   active?: Entry;
   hand?: readonly string[];
+  // The Galdor's Counsel the players chose at the campaign Setup, by seat (ScenarioState.chosenAtSetup), wherever the copies are now.
+  chosen?: readonly (readonly [string, number])[];
   deckOf?: readonly string[];
   play?: readonly string[];
   phase?: "Quest" | "Encounter" | "Combat" | "Travel" | "Refresh" | "Planning" | "PlayerAttacks";
@@ -197,6 +199,7 @@ export function raidTable(world: RaidWorld, layout: RaidLayout = {}): RaidTable 
     const id = Object.values(state.cards).find((card) => card.code === code)?.id;
     if (id) state = updateCard(state, id, { damage });
   }
+  if (layout.chosen) state = { ...state, chosenAtSetup: layout.chosen.map(([code, seat]) => ({ code, seat })) };
   if (layout.campaign) state = spawn(state, CODES.campaignCard, { zone: "campaign" }).state;
   if (layout.mode) state = spawn(state, CODES.hardMode, { zone: "modeCard" }, layout.mode).state;
   const asked = layout.phase ?? "Quest";

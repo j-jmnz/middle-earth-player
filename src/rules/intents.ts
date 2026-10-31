@@ -10,7 +10,8 @@ export type EngineStep =
   // The Ring-bearer's life went down by -`amount` (mec109.ringbearers-life).
   | { kind: "life"; amount: number; cause: Cause }
   | { kind: "progress"; targetId: string; amount: number; cause: Cause }
-  | { kind: "destroy"; targetId: string }
+  // `under`: an Aflame location placed facedown underneath The Havens Burn (dcce.aflame): out of play and hidden, so no line names it.
+  | { kind: "destroy"; targetId: string; under?: true }
   | { kind: "eliminate"; seat: number }
   | { kind: "reveal"; seat: number; cardId: string; cause: Cause }
   // `boarding`: the ship-enemy whose Boarding keyword revealed this enemy from the Corsair deck (dcce.boarding); absent on every other engagement.

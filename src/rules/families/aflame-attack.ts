@@ -21,7 +21,8 @@ export function resourceShield(state: ScenarioState, id: string, amount: number)
   return paid > 0 ? { state: updateCard(state, id, { resources: card.resources - paid }), amount: amount - paid } : { state, amount };
 }
 
-/** Each seat collected its resources in the resource phase (rr.step-1-2) and has not drawn yet: it hears `resourcesCollected` ("After the engaged player collects resources", 11065:A:2). Queued only in a game with a card that hears it. */
+/** Each seat collected its resources in the resource phase (rr.step-1-2): it hears `resourcesCollected` ("After the engaged player collects resources", 11065:A:2). The event is queued before the grant draws, and the
+ * queue drains in settle after the draws, so the Forced effect resolves once they are done. Queued only in a game with a card that hears it. */
 export function announceCollected(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (!gameReads(state, ctx, '"trigger":"resourcesCollected"')) return state;
   return livingSeats(state).reduce((next, seat) => queueEvent(next, { trigger: "resourcesCollected", seat, phase: "Resource" }), state);

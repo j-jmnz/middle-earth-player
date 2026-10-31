@@ -223,6 +223,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // number of players", 11038:A:2 is `min: 3, players: true`; "2 or fewer cards are underneath", 11182:B:5 is `max: 2`). With `players`, both bounds count the number of players in the game
   // on top of what they name. Read by the aflame family (src/rules/families/aflame-values.ts).
   z.strictObject({ kind: z.literal("underBurn"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
+  // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
+  // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
+  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional() }),
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),

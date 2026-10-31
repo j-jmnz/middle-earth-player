@@ -72,6 +72,8 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
     const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    // "Forced: After stage 2B is revealed" (11182:A:3) goes down first, so it resolves once the stage's When Revealed effects have.
+    next = announceStageRevealed(next, cardId, ctx, steps, "afterStageRevealed");
     // A stage a seat advanced to once stages are separate is revealed by that seat (families/breaking-areas.ts).
     next = pushCardEffects(next, "whenRevealed", cardId, stageSeat(next, cardId) ?? next.firstPlayer, false, effects, ctx, steps);
     // "Forced: When stage 3A is revealed" (906101:A:2) resolves above the stage's own When Revealed effects.

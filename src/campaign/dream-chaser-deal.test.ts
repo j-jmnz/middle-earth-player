@@ -25,18 +25,19 @@ const BLACK_KEY_BOON = "11183"; // upgradable, 4 boxes, a boon (player back)
 const BLACK_KEY_BURDEN = "11192"; // upgradable, 5 boxes, a burden (encounter back)
 const ARMOR_PLATING = "11172"; // upgradable, 2 boxes
 const COMMAND = "11201"; // scalable, 4 boxes, a boon (player back)
-const DREAM_CHASER = "11039"; // upgradable, 2 boxes; placed by the campaign card in the test
+// upgradable, 2 boxes, and a side B with text (the Dream-chaser location has none in the sources, NO_UPGRADED_SIDE); placed by the campaign card in the test
+const PLACED = "110013";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
 
-// A campaign card line that adds the Dream-chaser location to the staging area, standing for a card the campaign places (AddToStaging).
-const PLACES: Effect = { id: "01129:campaignSetup:test", cardCode: passage.campaignCard, lines: ["01129:A:1"], timing: "campaignSetup", instructions: [{ verb: "AddToStaging", code: DREAM_CHASER }] };
+// A campaign card line that adds a card to the staging area, standing for a card the campaign places (AddToStaging).
+const PLACES: Effect = { id: "01129:campaignSetup:test", cardCode: passage.campaignCard, lines: ["01129:A:1"], timing: "campaignSetup", instructions: [{ verb: "AddToStaging", code: PLACED }] };
 const EFFECTS_PLACING = [...EFFECTS, PLACES];
 
 beforeAll(async () => {
   const world = await mirkwoodWorld("strong");
-  cards = new Map([...world.cards, ...(await loadPrinted([BLACK_KEY_BOON, BLACK_KEY_BURDEN, ARMOR_PLATING, COMMAND, DREAM_CHASER, "01135", "01132"]))]);
+  cards = new Map([...world.cards, ...(await loadPrinted([BLACK_KEY_BOON, BLACK_KEY_BURDEN, ARMOR_PLATING, COMMAND, PLACED, "01135", "01132"]))]);
   ctx = { effects: EFFECTS_PLACING, cards };
 }, 120_000);
 
@@ -87,20 +88,20 @@ describe("the Campaign Pool and the checklist (ltp.campaign-pool)", () => {
 
   it("deals the pool cards a campaign card names: the card places one, and the checklist's pool cards are dealt around it", () => {
     const { state } = dealt(poolLog());
-    expect(Object.values(state.cards).filter((card) => card.code === DREAM_CHASER).map((card) => card.zone)).toEqual(["staging"]);
+    expect(Object.values(state.cards).filter((card) => card.code === PLACED).map((card) => card.zone)).toEqual(["staging"]);
   });
 });
 
 describe("a card upgraded in the log is dealt on its Upgraded side (dcce.scalable-upgradable)", () => {
-  const marks = { [BLACK_KEY_BOON]: 4, [BLACK_KEY_BURDEN]: 5, [ARMOR_PLATING]: 1, [DREAM_CHASER]: 2, [COMMAND]: 3 };
+  const marks = { [BLACK_KEY_BOON]: 4, [BLACK_KEY_BURDEN]: 5, [ARMOR_PLATING]: 1, [PLACED]: 2, [COMMAND]: 3 };
   const markedLog = () => logOf(marks, [BLACK_KEY_BOON, BLACK_KEY_BURDEN, ARMOR_PLATING, COMMAND]);
 
   it("turns up side B for a card with every box marked, wherever the campaign deals it: a pool card in a deck, one in the encounter deck, one the campaign card places", () => {
-    expect(xpFacts(markedLog()).upgraded).toEqual(expect.arrayContaining([BLACK_KEY_BOON, BLACK_KEY_BURDEN, DREAM_CHASER]));
+    expect(xpFacts(markedLog()).upgraded).toEqual(expect.arrayContaining([BLACK_KEY_BOON, BLACK_KEY_BURDEN, PLACED]));
     const { state } = dealt(markedLog());
     expect(facesOf(state, BLACK_KEY_BOON)).toEqual(["B"]);
     expect(facesOf(state, BLACK_KEY_BURDEN)).toEqual(["B"]);
-    expect(facesOf(state, DREAM_CHASER)).toEqual(["B"]);
+    expect(facesOf(state, PLACED)).toEqual(["B"]);
     // A card with a box still unmarked, and a scalable card, are dealt as printed.
     expect(facesOf(state, ARMOR_PLATING)).toEqual(["up"]);
     expect(facesOf(state, COMMAND)).toEqual(["up"]);
@@ -109,7 +110,7 @@ describe("a card upgraded in the log is dealt on its Upgraded side (dcce.scalabl
   it("deals the original side in a standalone game, which reads no log", () => {
     const { state } = dealt(markedLog(), "standalone");
     expect(state.campaignFacts).toBeUndefined();
-    expect(facesOf(state, DREAM_CHASER)).toEqual([]);
+    expect(facesOf(state, PLACED)).toEqual([]);
     for (const code of [BLACK_KEY_BOON, BLACK_KEY_BURDEN]) expect(facesOf(state, code).every((face) => face !== "B")).toBe(true);
   });
 });

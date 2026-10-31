@@ -75,14 +75,12 @@ describe("the campaign card's XP list (11182:B:3 to 11182:B:10)", () => {
 });
 
 describe("the cards the Resolution earns (11182:B:1, 11182:B:2)", () => {
-  it("adds the Galdor's Counsel dealt at the Setup to the Campaign Pool, wherever the copy is, for the seat that holds it (B:2)", () => {
-    const run = resolved({ seats: 2, hand: [], victory: [CODES.counselTactics] });
-    const made = raidTable(world, { ...BASE, seats: 2 });
-    void made;
-    expect(resolutionResult(run.state)?.earned.map((item) => item.code)).toEqual([CODES.counselTactics]);
-    const handed = resolved({ seats: 2, play: [], hand: [CODES.counselLeadership] });
-    // One copy in each of the two hands: one entry for each, for its seat.
-    expect(resolutionResult(handed.state)?.earned.map((item) => [item.code, item.seat])).toEqual([[CODES.counselLeadership, 0], [CODES.counselLeadership, 1]]);
+  it("adds the Galdor's Counsel chosen at the Setup to the Campaign Pool for the seat that chose it, wherever the copy is, the victory display after it was played too (B:2)", () => {
+    // Seat 0 chose Leadership and kept it in hand; seat 1 chose Tactics and played it, so it is in the victory display.
+    const run = resolved({ seats: 2, threat: [45, 45], hand: [CODES.counselLeadership], victory: [CODES.counselTactics], chosen: [[CODES.counselLeadership, 0], [CODES.counselTactics, 1]] });
+    expect(resolutionResult(run.state)?.earned.map((item) => [item.code, item.seat])).toEqual([[CODES.counselLeadership, 0], [CODES.counselTactics, 1]]);
+    // A game whose Setup chose none earns none, whatever copies are in it.
+    expect(resolutionResult(resolved({ seats: 2, victory: [CODES.counselTactics] }).state)?.earned).toEqual([]);
     expect(resolutionResult(resolved().state)?.earned).toEqual([]);
   });
 

@@ -28,7 +28,7 @@ export function aflameSweep(state: ScenarioState, ctx: ReduceContext, steps: Eng
     const card = id ? next.cards[id] : undefined;
     if (!id || !card || value == null || card.damage < value) continue;
     next = queueEvent(moveCard(leavePlay(releaseAttachments(next, id, ctx.cards, steps), id, ctx, steps), id, { zone: "under", locationId: burn }), { trigger: "placedUnder", seat: null, subject: id });
-    steps.push({ kind: "destroy", targetId: id });
+    steps.push({ kind: "destroy", targetId: id, under: true });
   }
   return next;
 }

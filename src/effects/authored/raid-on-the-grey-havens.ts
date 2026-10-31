@@ -11,6 +11,7 @@ const LOWEST_AFLAME: PickSpec = { ...AFLAME, lowestAflame: true, who: "firstPlay
 // An enemy in play with a Trait (in the staging area or engaged).
 const RAIDER: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Raider" };
 const CORSAIR = { type: "enemy", control: "any", staging: true, trait: "Corsair" } as const;
+const SOME_CORSAIR = { kind: "count", pick: CORSAIR, min: 1 } as const;
 const ELITE = ["Captain Sahír", "Na'asiyah"] as const;
 const DREAM_CHASER: PickSpec = { type: "location", control: "any", names: ["Dream-chaser"] };
 // The attacking enemy (a shadow effect's) and the Raider condition on it.
@@ -77,7 +78,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "endOfPhase",
     condition: { kind: "phase", is: "Combat" },
-    instructions: [{ verb: "Pick", pick: LOWEST_AFLAME }, { verb: "DamageCard", amount: { count: CORSAIR }, target: "picked" }],
+    // With no Corsair enemy in play X is 0: the first player is not asked to choose among the tied locations for damage that is not dealt.
+    instructions: [{ verb: "Pick", pick: LOWEST_AFLAME, when: SOME_CORSAIR }, { verb: "DamageCard", amount: { count: CORSAIR }, target: "picked", when: SOME_CORSAIR }],
   },
 
   // 11037 Sahír's Advance. When Revealed: Na'asiyah and Captain Sahír join the staging area on their enemy sides, each player reveals the top card of the encounter deck, both get resources equal to the damage on
@@ -147,7 +149,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "firstPlayer",
         options: [
           { id: "damage", requires: { kind: "canPick", pick: AFLAME }, instructions: [{ verb: "Pick", pick: { ...AFLAME, who: "firstPlayer" } }, { verb: "DamageCard", amount: 2, target: "picked" }] },
-          { id: "search", instructions: [{ verb: "SearchAflame" }] },
+          { id: "search", requires: { kind: "encounterHas", piles: "deckAndDiscard", cardType: "location", aflame: true }, instructions: [{ verb: "SearchAflame" }] },
         ],
       },
     ],
@@ -199,7 +201,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "firstPlayer",
         options: [
           { id: "damage", instructions: [{ verb: "DamageCard", amount: 3, target: "self" }] },
-          { id: "discard", instructions: [{ verb: "PickDiscardTop", types: ["enemy"] }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }] },
+          { id: "discard", requires: { kind: "encounterHas", piles: "discard", cardType: "enemy" }, instructions: [{ verb: "PickDiscardTop", types: ["enemy"] }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }] },
         ],
       },
     ],
@@ -275,7 +277,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "actor",
         options: [
           { id: "location", requires: ACTIVE_AFLAME, instructions: [{ verb: "DamageCard", amount: 3, target: "activeLocation" }] },
-          { id: "character", requires: ACTIVE_AFLAME, instructions: [{ verb: "DamageCard", amount: 1, target: "defender" }] },
+          { id: "character", requires: { kind: "all", conditions: [ACTIVE_AFLAME, { kind: "canPick", pick: { type: "character", control: "any", defending: true } }] }, instructions: [{ verb: "DamageCard", amount: 1, target: "defender" }] },
         ],
       },
     ],
@@ -343,7 +345,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "Pick", pick: ATTACKER_PICK, when: RAIDER_ATTACKS }, { verb: "PlaceResourceTokens", amount: 2, on: "picked", when: RAIDER_ATTACKS }],
   },
 
-  // 11076 Captain Sahír (enemy side). He engages the first player when he is added to the staging area. For each point of damage he would take, a resource is discarded from him and the damage canceled.
+  // 11076 Captain Sahír (enemy side). "Captain Sahír engages the first player" is a plain statement; `addedToStaging` stands in for it (he and Na'asiyah enter play only by being added to the staging area), so the
+  // Forced record engages him once, when he is added, and not again after he is disengaged. For each point of damage he would take, a resource is discarded from him and the damage canceled.
   // Forced: after he attacks, 2 resources on him (4 when his attack destroyed a character).
   { id: "11076:forced:1", cardCode: "11076", lines: ["11076:A:1"], timing: "forced", trigger: "addedToStaging", subject: "self", instructions: [{ verb: "EngageFirstPlayer" }] },
   { id: "11076:constant:1", cardCode: "11076", lines: ["11076:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "resourceShield", amount: 1, until: "whileSourceInPlay", target: "self" }] },
@@ -378,7 +381,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   resourceFromHero("11077", "11077:A:3"),
   losesWhenLeaving("11077", "11077:A:4"),
 
-  // 11078 Na'asiyah (enemy side). She engages the last player when she is added to the staging area. Forced: when she engages you, each event in your hand is discarded and she gets 1 resource for each.
+  // 11078 Na'asiyah (enemy side). "Na'asiyah engages the last player" is a plain statement; `addedToStaging` stands in for it, as for Captain Sahír. Forced: when she engages you, each event in your hand is discarded and she gets 1 resource for each.
   // Forced: when she attacks or defends she gets +1 Attack and +1 Defense for each resource on her for this attack; after it 1 resource is discarded from her.
   { id: "11078:forced:1", cardCode: "11078", lines: ["11078:A:1"], timing: "forced", trigger: "addedToStaging", subject: "self", instructions: [{ verb: "EngageLastPlayer" }] },
   {
@@ -448,7 +451,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "shadowsDealt",
     eventSeat: "you",
     condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "engaged" }, { kind: "matches", card: "self", pick: { type: "enemy", control: "any", hasShadow: true } }] },
-    instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }],
+    instructions: [{ verb: "PlaceResourceTokens", amount: { stat: "shadowCards", of: "self" }, on: "self" }],
   },
 
   // 11182 Raid on the Grey Havens (campaign card). Setup (Campaign Mode): Spyglass and Black Key are set aside and attached to Calphon once the quest card's Setup has run (ScenarioDefinition.afterSetup); the first
@@ -467,7 +470,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "ShuffleIntoEncounterDeck", code: "11188" },
       { verb: "AttachSetAsideTo", code: "11180", to: "Calphon" },
       { verb: "AttachSetAsideTo", code: "11183", to: "Calphon" },
-      { verb: "ChooseCards", codes: ["11184", "11185", "11186", "11187"], who: "eachSeat", to: "hand", optional: true, unearned: true },
+      { verb: "ChooseCards", codes: ["11184", "11185", "11186", "11187"], who: "eachSeat", to: "hand", optional: true, unearned: true, afterMulligan: true },
     ],
   },
   {
@@ -475,7 +478,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "11182",
     lines: ["11182:A:3"],
     timing: "forced",
-    trigger: "stageRevealed",
+    trigger: "afterStageRevealed",
     condition: { kind: "matches", card: "subject", pick: { type: "card", control: "any", names: ["Sahír's Advance"] } },
     instructions: [{ verb: "RemoveNamedFromGame", name: "Calphon" }],
   },

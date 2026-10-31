@@ -2,6 +2,7 @@
 // collector code; the bar shows them without codes, and words the missing Ring-bearer as the seat that needs one rather than
 // naming the first hero. Pure, so a test reads it.
 import type { Problem } from "../campaign/briefing";
+import { COUNSEL } from "../play/aflame-words";
 import { ruleSource } from "./rules-glossary";
 
 // The rule name the briefing gives a missing Ring-bearer (src/campaign/briefing.ts, RULE_OF).
@@ -42,9 +43,3 @@ export function needWords(seat: number, options: readonly string[], traitsOf: (c
   };
 }
 
-const COUNSEL = "Galdor's Counsel";
-
-/** What tells one option of a choice from another that carries the same name: the sphere of a Galdor's Counsel (four cards, one title). */
-export function sphereTell(name: string, sphere: string | null | undefined): string {
-  return name === COUNSEL && sphere ? ` (${sphere.charAt(0).toUpperCase()}${sphere.slice(1)})` : "";
-}

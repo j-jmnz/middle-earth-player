@@ -65,7 +65,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 39b | Ships on the table | completed | 2026-10-31. Review round done. Phone checks open: compact Heading dial and its scroll at 667 × 375, Sailing strip and Done, Boarding into a full row, fold stack and list, Corsair piles at Large, reader buttons. |
 | 40 | Voyage Across Belegaer | completed | 2026-10-31. Engine done, review round done. Phone checks and every Maestro run open (`voyage-across-belegaer*.yaml`, `sea-table.yaml`, `sea-duo.yaml`, extended `dream-chaser-start.yaml` with unrun ids); `voyage-won` missing, so the win flow cannot run. |
 | 41 | The Fate of Númenor | completed | 2026-10-31. Engine done, review round done. Phone checks open: Lost Island hiding (badges, tiles, Details, log, shuffle), Uncharted pile and crowded-table geometry, look sheets; both Maestro flows unrun; `fate-won` missing, so the win flow cannot run. |
-| 42 | Raid on the Grey Havens | not started | |
+| 42 | Raid on the Grey Havens | completed | 2026-10-31. Engine done, review round done. Phone checks open: Burn "2/5" pill and Aflame pills at 667 × 375 and the three scales, burn-pick row marks, Burn reader button, briefing Counsel offer; both Maestro flows unrun; `raid-won` missing, so the win flow cannot run. |
 | 43 | Flight of the Stormcaller | not started | |
 | 44 | The Thing in the Depths | not started | |
 | 45 | Temple of the Deceived | not started | |
@@ -85,13 +85,14 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `.maestro/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
 - `.maestro/deck.yaml` and `.maestro/rules.yaml` are phone flows; they cannot run on an expanded tablet.
 - No Maestro flow plays an attack through the redesigned combat spotlight.
-- `voyage-won` and `fate-won` are not committed (the Fate fixtures carry a Voyage win played from the golden): no auto-played win with real decks was found (the shipped pair in 100 seeds, each prebuilt deck solo in 40, 17 two-handed pairs in 60). The goldens win only with synthetic heroes.
+- `voyage-won`, `fate-won` and `raid-won` are not committed (the Fate fixtures carry a Voyage win played from the golden): no auto-played win with real decks was found (the shipped pair in 100 seeds, each prebuilt deck solo in 40, 17 two-handed pairs in 60). The goldens win only with synthetic heroes.
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea-ships.ts` still say "ship-objective".
 
 ### Rules and engine
 
 - Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
 - Dream-chaser: Aflame, Grapple and Exploration stay unparsed until their scenario phases; the Island Map chip and panel arrive with phase 45.
+- The Havens Burn and the Dream-chaser location are upgradable on the MEC111 log, but no source prints their Upgraded sides: their XP rows cannot be bought. Gavin and the four Send for Help cards have no B side in the ledger either.
 - Revenant's damage limit is two Forced records: `effect-coverage.test.ts` refuses a constant record on a printed "Forced:" line.
 - Staging folds rank "controlled" by `claimed`; a freed tower (phase 47) must set it.
 - The Corsair reshuffle glides the discard to the deck without a count pop.

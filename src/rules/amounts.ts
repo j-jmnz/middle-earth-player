@@ -14,6 +14,7 @@ import { livingSeats } from "./state.ts";
 import { activeOf } from "./families/breaking-areas.ts";
 import { stageNumber } from "./families/caves-progress.ts";
 import { topFrame } from "./windows.ts";
+import { shadowCards } from "./zones.ts";
 import { levelAmount } from "./families/aflame-values.ts";
 
 // Who an amount is read for: the actor (the "you" of the card), the source, and what the running effect knows.
@@ -91,6 +92,8 @@ function statOf(state: ScenarioState, id: string | null, stat: NonNullable<Exclu
       return card.type !== "hero" ? 0 : printed ? (card.threat ?? 0) : threatCostOf(state, instance.id, ctx);
     case "attachments":
       return instance.attachments.length;
+    case "shadowCards":
+      return shadowCards(instance).length;
     default:
       if (printed) return (stat === "hitPoints" ? card.health : card[stat]) ?? 0;
       return modifiedStat(state, instance, stat, ctx.cards);
@@ -138,7 +141,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.dealt) value = scope.dealt ?? 0;
   else if (amount.excess) value = scope.excess ?? 0;
   else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
-  value = value * (amount.times ?? 1) + (amount.plus ?? 0);
+  value = value * (amount.times ?? 1) + (amount.plus ?? 0) + (amount.plusChosen ? (state.chosenAtSetup?.length ?? 0) : 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);
   return amount.negative ? -Math.max(0, value) : Math.max(0, value);
 }

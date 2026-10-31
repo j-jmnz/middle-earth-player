@@ -16,7 +16,7 @@ import { cardCorner } from "./card-corner.ts";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Leaving, Moving, useCardMotion } from "./card-motion.native.tsx";
 import { seatTag, stagingWord } from "./area-words.ts";
-import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
+import { AttackerMark, Badges, StackMark, SuccessMedallion, CardBody, CombatMarkView, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, RADIUS, StagingTag, Tokens, UnderMarkView, type BackImages, type TokenImages } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
 import { CARD_BACK_FILES, ICON_FILES } from "./icons/files.generated.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
@@ -186,6 +186,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         <Group opacity={veiled ? 0.55 : 1}>
           {slotInfo ? <Badges slot={slot} rect={rect} effects={slotInfo.effects} willpower={slotInfo.willpower} questPoints={slotInfo.questPoints} owner={slot.zone === "questStage" ? owner : null} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
           {slotInfo?.engagement ? <EngagementMark rect={rect} cost={slotInfo.engagement.cost} engages={slotInfo.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
+          {slotInfo?.fire ? <FireMarkView rect={rect} mark={slotInfo.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
           {slotInfo?.under ? <UnderMarkView rect={rect} mark={slotInfo.under} fonts={fonts} t={t} s={s} /> : null}
           {slotInfo?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
           <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(sphereOf(slot.code), t) : null} contrast={contrast} />
@@ -200,6 +201,12 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     );
   };
 
+  // What a screen reader hears of a card whose number is only on the canvas: The Havens Burn, with the cards under it against the number that loses.
+  const spoken = (slot: CardSlot): string | null => {
+    if (slot.kind !== "card" || slot.faceDown || slot.zone === "hand" || slot.zone === "deck") return null;
+    const under = info(game, seat, slot.id).under;
+    return under ? `${nameOf(slot.picture ?? slot.code)}, ${under.speech}` : null;
+  };
   const piece = (slot: CardSlot) => (
     <Moving key={`${slot.kind}:${slot.id}`} slot={slot} motion={moves.motions.get(slot.id) ?? AT_REST} clock={clock} back={moves.motions.get(slot.id)?.flip ? drawBody({ ...slot, faceDown: true }, false) : undefined} frame={drawFrame(slot)} overlay={drawOverlay(slot)}>
       {drawBody(slot, lifted?.id === slot.id && slot.kind === "card")}
@@ -257,7 +264,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         </Canvas>
       </GestureDetector>
       {/* A screen reader reaches the piles and the fold stacks through a button over each (reader-piles.tsx). */}
-      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} /> : null}
+      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} speak={(slot) => spoken(slot)} /> : null}
     </>
   );
 }

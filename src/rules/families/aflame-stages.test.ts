@@ -140,16 +140,4 @@ describe("Captain Sahír (11076)", () => {
     const { card } = hurt(0, 5);
     expect(card?.zone).toBe("victory");
   });
-
-  it("places 2 resources on him after he attacks, and 4 when his attack destroyed a character (A:3)", () => {
-    const attacked = (hp: number) => {
-      const made = make({ phase: "Combat", engaged: [{ code: CODES.sahir, seat: 0 }], deck: ["f0"] });
-      const hero = made.state.cards[made.hero]!;
-      const weak = { ...made.state, cards: { ...made.state.cards, [made.hero]: { ...hero, damage: hero.damage + 0 } } };
-      void hp;
-      return { made, state: weak };
-    };
-    const { made } = attacked(0);
-    expect(made.state.cards[idOf(made.state, CODES.sahir)]?.resources).toBe(0);
-  });
 });
