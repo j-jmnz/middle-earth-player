@@ -19,10 +19,15 @@ export function resultWords(run: RunRecord): string {
   return run.result === "won" ? "Won" : run.lossCause ? `Lost · ${run.lossCause}` : "Lost";
 }
 
+/** "Aragorn, Théodred" or, two-handed, "Aragorn, Théodred / Gimli"; null with no hero known. */
+export function heroesWords(seats: readonly (readonly string[])[], nameOf: (code: string) => string): string | null {
+  const named = seats.map((seat) => seat.map(nameOf).join(", ")).filter((words) => words.length > 0);
+  return named.length > 0 ? named.join(" / ") : null;
+}
+
 /** "True solo · Aragorn, Théodred" or, two-handed, "Two-handed · Aragorn, Théodred / Gimli". */
 export function seatsWords(run: RunRecord, nameOf: (code: string) => string): string {
-  const seats = run.heroes.map((seat) => seat.map(nameOf).join(", ")).filter((words) => words.length > 0);
-  return [seatWord(run.seatCount), seats.length > 0 ? seats.join(" / ") : null].filter((part) => part != null).join(" · ");
+  return [seatWord(run.seatCount), heroesWords(run.heroes, nameOf)].filter((part) => part != null).join(" · ");
 }
 
 /** "4 rounds · threat 31" or "4 rounds · threat 28 / 33"; each part left out when the store did not know it. */
@@ -42,18 +47,23 @@ export function scoreWords(run: RunRecord, nameOf: (code: string) => string): st
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 
-/** The one line the screen reader gets for a row. */
+/** "4 rounds · threat 28 / 33 · Score 41 · Reward: Mendor": how a run went, or null when the store knew none of it. */
+export function runDetail(run: RunRecord, nameOf: (code: string) => string): string | null {
+  const parts = [courseWords(run), scoreWords(run, nameOf)].filter((part) => part != null);
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
+
+/** The one line the screen reader gets for a run. */
 export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string, deleted: boolean): string {
   return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), deleted ? deletedWords(run.kind) : null].filter((part) => part != null).join(", ");
 }
 
 export function deletedWords(kind: RunRecord["kind"]): string {
-  return kind === "campaign" ? "Its playthrough was deleted" : "This game was deleted";
+  return kind === "campaign" ? "Playthrough deleted" : "Game deleted";
 }
 
-/** The one line an empty list says: no playthrough or game at all, or a filter that leaves none. */
-export function emptyWords(kind: RunRecord["kind"], filtered: boolean): string {
-  if (filtered) return "No runs match these filters.";
+/** The one line an empty library says. */
+export function emptyWords(kind: RunRecord["kind"]): string {
   return kind === "campaign" ? "No playthrough yet. Start one from Campaigns." : "No game yet. Pick a scenario on Scenarios to deal one.";
 }
 

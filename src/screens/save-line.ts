@@ -24,6 +24,16 @@ export function saveLine(save: ListedSave, name: string): SaveLine {
   };
 }
 
+/** The fellowship a playthrough plays, seat by seat: the heroes the campaign log records, else the heroes the last loadout dealt. */
+export function partySeats(save: ListedSave): readonly (readonly string[])[] {
+  if (save.log.heroesBySeat.flat().length > 0) return save.log.heroesBySeat;
+  return save.loadout?.seats.map((seat) => seat.heroes) ?? [];
+}
+
+export function partyCodes(save: ListedSave): string[] {
+  return partySeats(save).flat();
+}
+
 export function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
 }
@@ -33,4 +43,4 @@ export function nextSummary(next: NextStep): string {
   return next.kind === "finished" ? "Every scenario is won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
 }
 
-export const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Your decks stay.";
+export const DELETE_SENTENCE = "Delete this playthrough? Its log, pool and any open scenario are gone for good. Its runs stay in History; your decks stay.";

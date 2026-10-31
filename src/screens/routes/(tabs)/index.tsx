@@ -11,20 +11,13 @@ import { campaignOf } from "../../campaign-data";
 import { listSaves, type ListedSave } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { usePalette } from "../../palette-hook";
-import { describe, nextSummary, saveLine, type SaveLine } from "../../save-line";
+import { describe, nextSummary, partyCodes, partySeats, saveLine, type SaveLine } from "../../save-line";
 import { NextStop } from "../../save-panels";
 import { CatalogGrid, CatalogTile, HubPage, leadFace, LockedTiles, OtherRuns, RunHero, RunRow, type PartyHero } from "../../hub-parts";
 import { splitRuns } from "../../hub-runs";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
-
-// The fellowship a playthrough plays: the heroes the campaign log records, else the heroes the last loadout dealt.
-function partyCodes(save: ListedSave): string[] {
-  const logged = save.log.heroesBySeat.flat();
-  if (logged.length > 0) return logged;
-  return save.loadout?.seats.flatMap((seat) => seat.heroes) ?? [];
-}
 
 // The Campaigns hub (docs/design-system.md, Campaigns (campaign list)): the unfinished playthrough written last as the hero over its
 // next scenario's scene, the other unfinished ones as rows, New playthrough (one tile per startable campaign), then Coming later.
@@ -49,10 +42,7 @@ export default function CampaignList() {
   const { hero, others } = splitRuns(saves, (save) => lineOf(save).next.kind !== "finished");
   const faces = deckFaces(catalog, saves.flatMap(partyCodes));
   // The fellowship as the hero words show it, seat by seat: each hero's painting, name and sphere.
-  const fellowshipOf = (save: ListedSave) => {
-    const seats = save.log.heroesBySeat.flat().length > 0 ? save.log.heroesBySeat : (save.loadout?.seats.map((seat) => seat.heroes) ?? []);
-    return seats.map((seat) => seat.map((code) => heroFace(faces, code)));
-  };
+  const fellowshipOf = (save: ListedSave) => partySeats(save).map((seat) => seat.map((code) => heroFace(faces, code)));
   const leadOf = (save: ListedSave): PartyHero | null => leadFace(faces, partyCodes(save)[0], palette);
 
   // Scrolls New playthrough into view once, then spends the param so coming back to Campaigns does not scroll again.
