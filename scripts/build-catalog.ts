@@ -84,18 +84,18 @@ function capitalize(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-// The front scan each ledgered card was read from (data/printed), by code. Each is pinned in data/sources.json.
-function ledgerFronts(dataDir: string): Map<string, string> {
+// The scan each ledgered card side was read from (data/printed), by code: side A's in `fronts`, side B's in `backs`. Each is pinned in
+// data/sources.json.
+function ledgerScans(dataDir: string): { fronts: Map<string, string>; backs: Map<string, string> } {
   const fronts = new Map<string, string>();
+  const backs = new Map<string, string>();
   const dir = path.join(dataDir, "printed");
-  if (!existsSync(dir)) return fronts;
+  if (!existsSync(dir)) return { fronts, backs };
   for (const name of readdirSync(dir).filter((file) => file.endsWith(".json")).sort()) {
     const ledger = parseLedger(JSON.parse(readFileSync(path.join(dir, name), "utf8")) as unknown);
-    for (const entry of ledger.entries) {
-      if (entry.side === "A") fronts.set(entry.code, entry.scan.url);
-    }
+    for (const entry of ledger.entries) (entry.side === "A" ? fronts : backs).set(entry.code, entry.scan.url);
   }
-  return fronts;
+  return { fronts, backs };
 }
 
 // The picture the phone downloads: RingsDB's `imagesrc` path. A card RingsDB has no picture for (quest and encounter cards)
@@ -108,6 +108,16 @@ export function pictureOf(card: Card, fronts: ReadonlyMap<string, string>): stri
   const printings = [...card.printings].sort((left, right) => Number(right.pack === "TFotR") - Number(left.pack === "TFotR"));
   const urls = printings.flatMap((printing) => printing.imageUrls ?? []);
   return urls.find((url) => !url.includes("dragncards")) ?? urls[0] ?? null;
+}
+
+// The side B picture the phone downloads for a card lying on its B side (a quest stage, a campaign card, an Upgraded ship): the ledgered
+// back, else a back from `imageUrls` (a Hall of Beorn quest stage's `<name>-<stage>B.jpg`, then a DragnCards `<guid>.B.jpg`), else none
+// (docs/brief.md, Card images).
+export function backPictureOf(card: Card, backs: ReadonlyMap<string, string>): string | null {
+  const ledgered = backs.get(card.code);
+  if (ledgered) return ledgered;
+  const urls = card.printings.flatMap((printing) => printing.imageUrls ?? []);
+  return urls.find((url) => url.includes("hallofbeorn") && /-\d+B\.jpg$/.test(url)) ?? urls.find((url) => url.includes("dragncards") && url.endsWith(".B.jpg")) ?? null;
 }
 
 // A card belongs to the campaign of the first catalog pack it is printed in that PACK_CAMPAIGN lists (a Fellowship card also in the
@@ -128,7 +138,7 @@ function upgradedOf(card: Card): string | null {
   return JSON.stringify({ ...(back.willpower != null ? { willpower: back.willpower } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) });
 }
 
-function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMap<string, string>): Row {
+function cardRow(card: Card, knownPacks: ReadonlySet<string>, scans: { fronts: ReadonlyMap<string, string>; backs: ReadonlyMap<string, string> }): Row {
   const primary = card.printings[0];
   if (!primary) throw new Error(`Card ${card.code} has no printing`);
   // Printings from packs the pack list does not know (the MEC109 box) are not catalog packs.
@@ -165,7 +175,8 @@ function cardRow(card: Card, knownPacks: ReadonlySet<string>, fronts: ReadonlyMa
     text: card.text,
     has_errata: bit(card.hasErrata),
     errata: card.errata,
-    imagesrc: pictureOf(card, fronts),
+    imagesrc: pictureOf(card, scans.fronts),
+    back_imagesrc: backPictureOf(card, scans.backs),
     deck_legal: bit(card.deckLegal),
     campaign_id: campaignOfPacks(packCodes),
   });
@@ -290,8 +301,8 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
         available: availableFlag(pack.available),
       }),
     );
-  const fronts = ledgerFronts(dataDir);
-  const cardRows = allCards.map((card) => cardRow(card, knownPacks, fronts)).sort((left, right) => String(left.code).localeCompare(String(right.code)));
+  const scans = ledgerScans(dataDir);
+  const cardRows = allCards.map((card) => cardRow(card, knownPacks, scans)).sort((left, right) => String(left.code).localeCompare(String(right.code)));
   const day = fetchedDay(dataDir);
   const metaRows = included.map((pack) => rowFrom(meta, { pack_code: pack.code, fetched_at: day }));
   const campaignRows = campaignIndexSchema

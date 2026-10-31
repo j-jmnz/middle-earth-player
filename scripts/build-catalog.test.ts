@@ -6,7 +6,7 @@ import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { Card } from "../src/catalog/card-facts.ts";
-import { buildCatalog, pictureOf, type BuildCatalogOptions } from "./build-catalog.ts";
+import { backPictureOf, buildCatalog, pictureOf, type BuildCatalogOptions } from "./build-catalog.ts";
 import { catalogStamp } from "../src/catalog/version.ts";
 
 const databases: DatabaseSync[] = [];
@@ -194,6 +194,16 @@ describe("buildCatalog", () => {
     expect(pictureOf(location, new Map([["30001", dragn]]))).toBe(dragn);
     expect(pictureOf(card({ imagesrc: null, printings: [{ pack: "TBR", number: 1, imageUrls: [dragn] }] }), new Map())).toBe(dragn);
     expect(pictureOf(card({ imagesrc: null }), new Map())).toBeNull();
+  });
+
+  it("points a two-sided card at its side B scan: the ledgered back, else a Hall of Beorn stage back, else a DragnCards back", () => {
+    const hob = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Departure-from-the-Havens-1";
+    const dragn = "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/guid";
+    const stage = card({ code: "11016", imagesrc: null, printings: [{ pack: "TGH", number: 16, imageUrls: [`${dragn}.jpg`, `${dragn}.B.jpg`, `${hob}A.jpg`, `${hob}B.jpg`] }] });
+    expect(backPictureOf(stage, new Map([["11016", "https://ledgered/back.jpg"]]))).toBe("https://ledgered/back.jpg");
+    expect(backPictureOf(stage, new Map())).toBe(`${hob}B.jpg`);
+    expect(backPictureOf(card({ printings: [{ pack: "TGH", number: 16, imageUrls: [`${dragn}.jpg`, `${dragn}.B.jpg`] }] }), new Map())).toBe(`${dragn}.B.jpg`);
+    expect(backPictureOf(card(), new Map())).toBeNull();
   });
 
   it("holds only cards, packs, campaigns and meta", () => {

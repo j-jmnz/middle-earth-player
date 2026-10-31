@@ -1,4 +1,4 @@
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -9,6 +9,7 @@ import { normalCopiesByCode, scenarioCards } from "../src/catalog/scenario-data.
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { cardImageUrl } from "../src/screens/images/policy.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
+import { loadCards } from "./data/load-cards.ts";
 import { buildCatalog } from "./build-catalog.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -101,6 +102,22 @@ describe("built catalog", () => {
         }
       }
       expect(unpictured).toEqual([]);
+      // Every two-sided card a built scenario deals (each quest stage, which the table shows on its B side from setup on; the campaign cards and ships) has a
+      // side B picture the phone can download, so the table never draws side A's picture for it (src/screens/table-view.tsx, picture).
+      const twoSided = new Set(loadCards().filter((card) => card.back != null).map((card) => card.code));
+      const backless: string[] = [];
+      for (const id of readdirSync(path.join("data", "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
+        const scenario = loadScenario(id);
+        for (const code of new Set([...scenario.stages, ...scenarioCards(scenario).map((card) => card.code), ...(scenario.campaignCard ? [scenario.campaignCard] : []), ...scenario.campaignPlaced])) {
+          if (!twoSided.has(code)) continue;
+          const row = database.prepare("select back_imagesrc from cards where code = ?").get(code);
+          if (typeof row?.back_imagesrc !== "string" || cardImageUrl(row.back_imagesrc) === null) backless.push(`${id} ${code}`);
+        }
+      }
+      expect(backless).toEqual([]);
+      expect(database.prepare("select back_imagesrc from cards where code = ?").get("11016")?.back_imagesrc).toBe(
+        "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Grey-Havens/Departure-from-the-Havens-1B.jpg",
+      );
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("dream-chaser")).toMatchObject({ name: "Dream-chaser", scenario_count: 9, playable: 1 });
       expect(database.prepare("select campaign_id from cards where code = ?").get("11171")?.campaign_id).toBe("dream-chaser");
       expect(database.prepare("select campaign_id from cards where code = ?").get("12019")?.campaign_id).toBe("dream-chaser");

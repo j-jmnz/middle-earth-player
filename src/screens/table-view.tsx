@@ -70,13 +70,19 @@ import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
 import { useUiScale } from "../play/ui-scale";
 
-// By picture key (src/play/picture-key.ts): side B where it is bundled, else the card's side A picture. `exact`: a Lost Island's side B picture only, never the real side behind it
-// (dcce.uncharted): a build without it shows the card on paper.
+// By picture key (src/play/picture-key.ts): the bundled picture of the key, else its downloaded file. `exact`: that picture only, never the other side's: a
+// Lost Island's side B never shows the real side behind it (dcce.uncharted), and a card on its B side that has a side B picture to download (a quest stage
+// turned to 1B) never shows side A meanwhile; until the file lands the card is drawn on paper. Otherwise a key with neither falls back to side A's picture.
 function picture(key: string, exact = false): PictureSource | null {
-  if (exact) return scanAssets[key]?.moduleId ?? null;
-  const bundled = scanAssets[key] ?? scanAssets[pictureCode(key)];
+  const bundledSide = scanAssets[key];
+  if (bundledSide) return bundledSide.moduleId;
+  const cachedSide = cachedImage(key);
+  if (cachedSide) return { uri: cachedSide.uri };
+  if (exact) return null;
+  const code = pictureCode(key);
+  const bundled = scanAssets[code];
   if (bundled) return bundled.moduleId;
-  const cached = cachedImage(pictureCode(key));
+  const cached = cachedImage(code);
   return cached ? { uri: cached.uri } : null;
 }
 
@@ -160,7 +166,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const sphereOf = useCallback((code: string) => (session.world.cards.get(code) ?? session.world.cards.get(pictureCode(code)))?.sphere ?? null, [session]);
   // A Lost Island lying on its Lost Island side is drawn from its own picture only.
   const lostIsland = useCallback((key: string) => key !== pictureCode(key) && session.world.cards.get(pictureCode(key))?.keywords.uncharted === true, [session]);
-  const pictureOf = useCallback((key: string) => picture(key, lostIsland(key)), [lostIsland]);
+  // A card on its B side with a side B picture to download (a quest stage after setup) is drawn from that picture only, never side A's (picture, above).
+  const ownSide = useCallback((key: string) => lostIsland(key) || (key !== pictureCode(key) && session.facts.get(pictureCode(key))?.backImagesrc != null), [lostIsland, session]);
+  const pictureOf = useCallback((key: string) => picture(key, ownSide(key)), [ownSide]);
   const names: SheetNames = useMemo(
     () => ({
       card: (cardId: string) => {
@@ -304,7 +312,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
     name: nameOf(key),
-    source: pictureAt(key, revision, lostIsland(key)),
+    source: pictureAt(key, revision, ownSide(key)),
     landscape: session.world.cards.get(code)?.type === "quest",
     // A revealed quest stage reads its B side.
     text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
