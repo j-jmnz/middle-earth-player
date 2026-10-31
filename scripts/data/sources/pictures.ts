@@ -187,8 +187,13 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     pdfs.set(url, pdf.file);
   }
   // The Nightmare decks' pictures are the `nightmare` source's (sources/nightmare.ts).
-  const cards = new Map(loadCards().filter((card) => !isNightmareCard(card)).map((card) => [card.code, card]));
-  const scoped = scanTargets().map((target) => ({ code: target.code, side: target.side, scoped: true }));
+  const all = loadCards();
+  const cards = new Map(all.filter((card) => !isNightmareCard(card)).map((card) => [card.code, card]));
+  // The scan scope holds the Nightmare cards too; their pictures are the `nightmare` source's, so this source skips them.
+  const nightmare = new Set(all.filter(isNightmareCard).map((card) => card.code));
+  const scoped = scanTargets()
+    .filter((target) => !nightmare.has(target.code))
+    .map((target) => ({ code: target.code, side: target.side, scoped: true }));
   const scopedCodes = new Set(scoped.map((target) => target.code));
   const targets = [...scoped, ...[...cards.keys()].filter((code) => !scopedCodes.has(code)).map((code) => ({ code, side: "A" as const, scoped: false }))];
   const tick = log.progress(targets.length, "picture");
