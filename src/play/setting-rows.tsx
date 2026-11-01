@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { TextButton } from "./buttons.tsx";
 import { Segmented } from "./segmented.tsx";
 import { SettingSwitch } from "./setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, ALWAYS_LINE, AWAKE_LINE, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, ALWAYS_LINE, AWAKE_LINE, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "./motion-tokens.ts";
 import { useReduceMotion } from "./motion-run.ts";
 import { CARD_QUALITY_OPTIONS, REDUCE_MOTION_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "./table-settings.ts";
@@ -78,7 +78,7 @@ export function SettingsRows({
 }) {
   const id = (name: string) => `${testPrefix}-${name}`;
   const top = groups[0];
-  // The fog is already still in the Light theme (it has none) and under reduced motion: the row says so, dimmed, and still saves.
+  // The fog is already still in the light theme, Rivendell (it has none) and under reduced motion: the row says so, dimmed, and still saves.
   const light = useTheme() === "light";
   const reduced = useReduceMotion();
   const fogStill = light || reduced;
@@ -87,7 +87,7 @@ export function SettingsRows({
       {groups.includes("display") ? (
         <SettingGroup title="Display" testID={id("display")} first={first && top === "display"}>
           <SettingChoice title="Theme" detail={THEME_LINE} testID={id("theme")}>
-            <Segmented options={THEME_OPTIONS} value={settings.theme} onChange={(theme) => onChange({ theme })} testIDPrefix={id("theme")} accessibilityLabel="Theme" stretch words={THEME_WORDS} />
+            <Segmented options={THEME_OPTIONS} value={settings.theme} onChange={(theme) => onChange({ theme })} testIDPrefix={id("theme")} accessibilityLabel="Theme" stretch words={THEME_WORDS} labels={THEME_LABELS} />
           </SettingChoice>
           <SettingChoice title="UI scale" detail={SCALE_LINE} testID={id("scale")}>
             <Segmented options={UI_SCALE_OPTIONS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testIDPrefix={id("scale")} accessibilityLabel="UI scale" stretch words={SCALE_WORDS} />

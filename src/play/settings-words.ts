@@ -3,7 +3,9 @@
 import type { CardQualityOption, ReduceMotionOption, ThemeOption, UiScaleOption } from "./table-settings.ts";
 import type { Speed } from "./motion-tokens.ts";
 
-export const THEME_WORDS: Readonly<Record<ThemeOption, string>> = { dark: "Dark", light: "Light", system: "System" };
+// The themes go by Middle-earth names: Ringwraith is the dark theme, Rivendell the light. A screen reader hears which is which (THEME_LABELS).
+export const THEME_WORDS: Readonly<Record<ThemeOption, string>> = { dark: "Ringwraith", light: "Rivendell", system: "System" };
+export const THEME_LABELS: Readonly<Record<ThemeOption, string>> = { dark: "Ringwraith, dark", light: "Rivendell, light", system: "System" };
 export const REDUCE_MOTION_WORDS: Readonly<Record<ReduceMotionOption, string>> = { system: "Follow system", always: "Always" };
 export const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: "Quick" };
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large" };
@@ -11,14 +13,14 @@ export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high
 
 // Each row's detail states what the setting changes. The settings that exist to lighten the load on the device sit in the Performance
 // group (setting-rows.tsx); Reduce motion and Keep screen awake, which also affect it, say so in their detail.
-export const THEME_LINE = "System follows the device's setting.";
+export const THEME_LINE = "Ringwraith is dark, Rivendell is light. System follows the device's setting.";
 export const SCALE_LINE = "Size of text, buttons and cards, the table included.";
 export const CONTRAST_LINE = "Thicker outlines on effect marks and token counts.";
 export const PERFORMANCE_LINE = "Lower these if the table stutters or the device runs hot. Gameplay is unchanged.";
 export const QUALITY_LINE = "Low draws table cards at a lower resolution and uses less memory. Previews stay sharp.";
 export const FOG_LINE = "Animated fog behind every screen. Off saves battery.";
 // What the Moving fog row says when the fog is already still (the switch still saves its value).
-export const FOG_LIGHT_LINE = "No effect: the Light theme has no fog.";
+export const FOG_LIGHT_LINE = "No effect: Rivendell has no fog.";
 export const FOG_REDUCED_LINE = "No effect: Reduce motion already stops the fog.";
 export const SPEED_LINE = "Quick shortens animations and skips the phase title.";
 export const REDUCE_MOTION_LINE = "Always turns off most animation, the fog and the combat replay, which lowers the load on the device. Follow system uses the device's setting.";

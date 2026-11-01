@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { alwaysCodes, alwaysRows, FOG_LIGHT_LINE, FOG_LINE, FOG_REDUCED_LINE, fogLine, NONE_YET, QUALITY_WORDS, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_WORDS } from "./settings-words.ts";
+import { alwaysCodes, alwaysRows, FOG_LIGHT_LINE, FOG_LINE, FOG_REDUCED_LINE, fogLine, NONE_YET, QUALITY_WORDS, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_LABELS, THEME_WORDS } from "./settings-words.ts";
 import { SPEEDS } from "./motion-tokens.ts";
 import { CARD_QUALITY_OPTIONS, DEFAULT_SETTINGS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "./table-settings.ts";
 
@@ -34,6 +34,7 @@ describe("the Responses list", () => {
 describe("the words of each choice", () => {
   it("has a word for every option", () => {
     expect(Object.keys(THEME_WORDS)).toEqual([...THEME_OPTIONS]);
+    expect(Object.keys(THEME_LABELS)).toEqual([...THEME_OPTIONS]);
     expect(Object.keys(REDUCE_MOTION_WORDS)).toEqual([...REDUCE_MOTION_OPTIONS]);
     expect(Object.keys(SCALE_WORDS)).toEqual([...UI_SCALE_OPTIONS]);
     expect(Object.keys(SPEED_WORDS)).toEqual([...SPEEDS]);

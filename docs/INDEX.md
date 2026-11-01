@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 298–301 Haptics (~250)
   - 302–312 Banner (~580) ← 1
   - 313–316 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~22.6K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~22.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -166,7 +166,7 @@ Read the sections your task touches.
     - 376–385 Card pool (the Cards tab) (~700) ← 3
     - 386–391 Card (~480) ← 2
     - 392–397 Packs and pack cards (~130)
-    - 398–411 Settings (~700)
+    - 398–411 Settings (~730)
     - 412–417 Rules (~450) ← 1
     - 418–421 Rule (~220) ← 1
     - 422–425 Booklet (~100)
@@ -183,7 +183,7 @@ STATUS.md, then the active phase file.
   - 76–153 Open items (~3.0K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
-    - 119–135 Screens and code (~800)
+    - 119–135 Screens and code (~810)
     - 136–153 Phone and tablet checks (~850)
   - 154–169 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
