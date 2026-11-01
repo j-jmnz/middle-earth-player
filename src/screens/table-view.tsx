@@ -121,6 +121,11 @@ export type TableNav = {
 /** What the table draws from: the opened world, the reducer context, and each card's picture source and text. */
 export type OpenedTable = { world: World; ctx: ReduceContext; facts: ReadonlyMap<string, CardFacts> };
 
+// The Nightmare setup card on the table, if the game has one (docs/plans/nightmare-mode.md).
+function setupCodes(game: { cards: Readonly<Record<string, { zone: string; code: string }>> }): string[] {
+  return Object.values(game.cards).filter((card) => card.zone === "nightmare").map((card) => card.code);
+}
+
 export function TableView({ session, store, nav }: { session: OpenedTable; store: TableStore; nav: TableNav }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -158,6 +163,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const look = useMemo(() => ({ contrast: highContrast }), [highContrast]);
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
+  // The scenario's setup card shown large from the menu (user request, 2026-11-01): a preview of its own, since the card need not be on the table.
+  const [setupShown, setSetupShown] = useState(false);
 
   // The pictures of the hand, the table and the screen about to open, and of a card picked up (use-table-pictures.ts).
   useTablePictures(store, session, game, peek.shown);
@@ -224,6 +231,10 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         case "booklet":
           router.push({ pathname: "/booklet/[id]", params: nav.booklet });
           return;
+        case "setup":
+          setPreview(null);
+          setSetupShown(true);
+          return;
         case "settings":
           setReading({ kind: "settings" });
           return;
@@ -262,13 +273,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       const step = backStep({
         ...playLayers(store),
         menuOpen, moreOpen, linesOpen,
-        previewOpen: preview != null, readingOpen: reading != null,
+        previewOpen: preview != null || setupShown, readingOpen: reading != null,
         overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen,
       });
       if (runBackStep(step, store)) return true;
       if (step === "closeMenu") setMenuOpen(false);
       else if (step === "closeMore" || step === "closeLines") closeMore();
-      else if (step === "closePreview") (previewClose.current ?? (() => setPreview(null)))();
+      else if (step === "closePreview") (previewClose.current ?? (() => (setupShown ? setSetupShown(false) : setPreview(null))))();
       else if (step === "closeReading") setReading(null);
       else if (step === "closeOverlay") choice.closeOverlay();
       else if (step === "foldPanel") choice.fold();
@@ -276,7 +287,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       return true;
     });
     return () => subscription.remove();
-  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, reading, choice, router, nav, advance]);
+  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, setupShown, reading, choice, router, nav, advance]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height, x } = event.nativeEvent.layout;
@@ -333,6 +344,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
       )
     : null;
   const shown = previewed?.cards[previewed.start];
+  // The setup card: the scenario's campaign card on its Setup side (rr.campaign-cards), then the Nightmare setup card on Nightmare.
+  const setupCards = setupShown ? [session.world.scenario.campaignCard, ...setupCodes(game)].map((code) => ({ code, ...describe(code) })) : [];
 
   // The stack locks the table to landscape, but iPadOS can still give the app a portrait window (a resizable window, Split
   // View). The table is not laid out for one, so it asks to be turned.
@@ -499,6 +512,17 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           choice={choice}
           picture={pictureOf}
           onProgress={advance.close}
+        />
+      ) : null}
+      {setupCards[0] ? (
+        <CardPreview
+          key="setup-card"
+          card={setupCards[0]}
+          related={setupCards.slice(1)}
+          onClose={() => setSetupShown(false)}
+          ownsBack={false}
+          closeRef={previewClose}
+          onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}

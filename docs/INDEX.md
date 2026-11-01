@@ -106,7 +106,7 @@ Read the sections your task touches.
 - `docs/design-system-table.md` — Design system — Table (landscape) (~25.9K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
-  - 24–27 Table menu (~330) ← 1
+  - 24–27 Table menu (~380) ← 1
   - 28–33 Quest scale (~320)
   - 34–37 Canvas (~560) ← 1
   - 38–49 Spacing and the play area's rows (~1.6K) ← 7

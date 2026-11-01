@@ -1,4 +1,4 @@
-// The rows of the table menu (docs/phases/phase-19-top-bar-menu.md): the five things that left the top bar. Pure, so a test
+// The rows of the table menu (docs/phases/phase-19-top-bar-menu.md): the five things that left the top bar, and the scenario's setup card. Pure, so a test
 // reads the order and the words. The testIDs are the ones the controls had in the bar, so a Maestro flow taps `table-menu`
 // and then the same id.
 import type { IconName } from "./icon-map.ts";
@@ -6,7 +6,7 @@ import type { IconName } from "./icon-map.ts";
 /** What the menu needs of the table's navigation: the word the table's back control names the screen it leads to. */
 export type MenuNav = { backLabel: string; backAccessibilityLabel: string };
 
-export type MenuItemId = "leave" | "log" | "rules" | "booklet" | "settings";
+export type MenuItemId = "leave" | "log" | "rules" | "booklet" | "setup" | "settings";
 
 export type MenuItem = {
   id: MenuItemId;
@@ -16,14 +16,14 @@ export type MenuItem = {
   label: string;
   accessibilityLabel: string;
   accessibilityHint?: string;
-  // The printed icon the game has for the row. None of the five has one.
+  // The printed icon the game has for the row. None of the rows has one.
   icon: IconName | null;
   // A mark drawn as views when no printed icon fits: Leave the table's door.
   glyph?: "leave";
 };
 
 /**
- * The menu's rows in order: what opens over the table (Log, Rules, Booklet, Table settings), then, apart at the foot, Leave the table
+ * The menu's rows in order: what opens over the table (Log, Rules, Booklet, the scenario's Setup card, Table settings), then, apart at the foot, Leave the table
  * with its door mark and no more words (user request, 2026-10-27); a screen reader still hears where it goes and that the game is saved.
  */
 export function menuItems(nav: MenuNav): readonly MenuItem[] {
@@ -31,6 +31,8 @@ export function menuItems(nav: MenuNav): readonly MenuItem[] {
     { id: "log", testID: "log-open", label: "Log", accessibilityLabel: "This round's log", icon: null },
     { id: "rules", testID: "rules-open", label: "Rules", accessibilityLabel: "Look up a rule", icon: null },
     { id: "booklet", testID: "booklet-open", label: "Booklet", accessibilityLabel: "Open the booklet", icon: null },
+    // The scenario's campaign card, its Setup side, shown large (user request, 2026-11-01).
+    { id: "setup", testID: "setup-card-open", label: "Setup card", accessibilityLabel: "Show the scenario's setup card", icon: null },
     { id: "settings", testID: "settings-open", label: "Table settings", accessibilityLabel: "Table settings", accessibilityHint: "Opens the table settings", icon: null },
     {
       id: "leave",
