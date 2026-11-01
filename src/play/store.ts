@@ -64,6 +64,8 @@ export type TableActions = {
   // game, any seat in a solo game) is null. The acting seat does not change.
   peek: (seat: number | null) => void;
   clearRefusal: () => void;
+  // The table refused a play before it reached the reducer (why.ts, cannotPay): the reason shows as a refusal does.
+  refuse: (reason: string) => void;
   // The spotlight finished ("done") or was skipped by a tap (the default); for the moment `seq`, else the current one. A gate that
   // already ended stays as it was.
   endSpotlight: (how?: "done" | "skipped", seq?: number) => void;
@@ -193,6 +195,7 @@ export function createTableStore(input: TableInput): TableStore {
       if (viewedSeat !== get().viewedSeat) set({ viewedSeat });
     },
     clearRefusal: () => set({ refusal: null }),
+    refuse: (reason) => set({ refusal: reason }),
     endSpotlight: (how = "skipped", seq) => {
       const gate = endGate(get().spotlight, how, seq);
       if (gate !== get().spotlight) set({ spotlight: gate });

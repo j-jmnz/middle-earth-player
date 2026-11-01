@@ -4,6 +4,8 @@
 // its heroes cannot pay for it yet. Read only when the player taps a card a moment does not ask about; nothing here decides
 // what is legal (the reducer does).
 import { attachmentTargets, playWindowReason } from "../rules/planning.ts";
+import { exhaustSlack } from "../rules/families/costs-play.ts";
+import { payingSlack } from "../rules/families/deck-play.ts";
 import { printedOf } from "../rules/printed.ts";
 import { reduce, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
@@ -52,14 +54,42 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
   }
   if (printed.type === "attachment" && attachmentTargets(game, card.code, ctx).length === 0) return "No card can take it now.";
   const request = playRequest(game, ctx, cardId);
-  if (request) {
-    const have = request.pools.reduce((sum, pool) => sum + pool.max, 0);
-    if (have < request.total) {
-      const whose = printed.sphere === "neutral" || printed.sphere == null ? "Your heroes have" : `Your ${sphere} heroes have`;
-      return `It costs ${request.total}. ${whose} ${have} ${have === 1 ? "resource" : "resources"}.`;
-    }
+  return request ? shortWords(request.total, request.pools.reduce((sum, pool) => sum + pool.max, 0), playSlack(game, ctx, cardId), printed.sphere) : null;
+}
+
+// "It costs 3. Your Spirit heroes have 1 resource." when the pools that can pay, with what lowers the cost as it is paid (`slack`:
+// characters exhausted for ExhaustToReduce, a card that pays for it), hold less than the cost, else null.
+function shortWords(total: number, have: number, slack: number, sphere: string | null | undefined): string | null {
+  if (have + slack >= total) return null;
+  const whose = sphere === "neutral" || sphere == null ? "Your heroes have" : `Your ${SPHERE_WORD[sphere] ?? sphere} heroes have`;
+  return `It costs ${total}. ${whose} ${have} ${have === 1 ? "resource" : "resources"}.`;
+}
+
+// What lowers a played card's cost as it is paid (pay.ts leaves the sheet inexact for it), so a card it covers is payable.
+function playSlack(game: ScenarioState, ctx: ReduceContext, cardId: string): number {
+  return exhaustSlack(game, game.activeSeat, cardId, ctx) + payingSlack(game, game.activeSeat, cardId, ctx);
+}
+
+/**
+ * Why a sheet the player is about to open asks for a payment the pools cannot make, or null. A payment sheet for playing a card or
+ * using an Action or Response whose pools (with what lowers the cost as it is paid) hold less than its cost is refused, and so is
+ * an attachment's host pick when no host can be paid for: the table plays the reject haptic and shows these words instead of
+ * opening a sheet that cannot be met (rr.cost: a cost must be paid in full).
+ */
+export function cannotPay(game: ScenarioState, ctx: ReduceContext, sheet: Sheet): string | null {
+  if (sheet.kind === "pick") {
+    const nexts = sheet.options.flatMap((item) => ("next" in item && item.next ? [item.next] : []));
+    if (nexts.length === 0 || nexts.length < sheet.options.length) return null;
+    const reasons = nexts.map((next) => cannotPay(game, ctx, next));
+    return reasons.every((reason) => reason != null) ? (reasons[0] ?? null) : null;
   }
-  return null;
+  if (sheet.kind !== "distribute" || sheet.purpose.kind === "archery") return null;
+  const cardId = sheet.purpose.cardId;
+  const card = game.cards[cardId];
+  if (!card) return null;
+  const have = sheet.options.reduce((sum, item) => sum + (item.max ?? 0), 0);
+  const slack = sheet.purpose.kind === "play" ? playSlack(game, ctx, cardId) : 0;
+  return shortWords(sheet.total, have, slack, printedOf(ctx.cards, card.code).sphere);
 }
 
 /**

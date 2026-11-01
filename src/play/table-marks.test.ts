@@ -12,9 +12,11 @@ import { delayedLines, slotNumbers } from "./card-effects.ts";
 import { enemiesToFace, threatRows, threatVerdict } from "./foresight.ts";
 import { ledgerLine } from "./ledger.ts";
 import { questObjective } from "./objective.ts";
-import type { SheetNames } from "./sheet-types.ts";
+import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
-import { whyNotPlayable } from "./why.ts";
+import { playSheet, windowSheet } from "./bar-sheets.ts";
+import { createTableStore } from "./store.ts";
+import { cannotPay, whyNotPlayable } from "./why.ts";
 
 const names: SheetNames = { card: (id) => id, line: () => null };
 let base: Awaited<ReturnType<typeof sceneCards>>;
@@ -102,5 +104,45 @@ describe("why a hand card does not glow", () => {
     expect(whyNotPlayable(funded, paid.ctx, idsOf(paid, "ally"), (id) => id)).toBeNull();
     const quest = buildTable(base, { start: "quest", heroes: [{ code: "pal", seat: 0 }], hand: [{ code: "ally", seat: 0 }], ring: "none" });
     expect(whyNotPlayable(quest.state, quest.ctx, idsOf(quest, "ally"), (id) => id)).toBe("Allies are played in the planning phase.");
+  });
+});
+
+describe("a play the heroes cannot pay for", () => {
+  // The stand-in ally costs 1 Leadership; Pal's pool is empty.
+  const short = () => buildTable(base, { start: "planning", heroes: [{ code: "pal", seat: 0 }], hand: [{ code: "ally", seat: 0 }], ring: "none" });
+
+  it("its payment sheet is refused with the cost against the pools, and allowed once the pools hold the cost", () => {
+    const paid = short();
+    const ally = idsOf(paid, "ally");
+    const legal = legalIntents(paid.state, paid.ctx);
+    const sheet = playSheet(paid.state, paid.ctx, legal, names, ally);
+    expect(sheet?.kind).toBe("distribute");
+    if (!sheet) return;
+    expect(cannotPay(paid.state, paid.ctx, sheet)).toBe("It costs 1. Your Leadership heroes have 0 resources.");
+    const funded = updateCard(paid.state, idsOf(paid, "pal"), { resources: 1 });
+    const fundedSheet = playSheet(funded, paid.ctx, legalIntents(funded, paid.ctx), names, ally);
+    expect(fundedSheet && cannotPay(funded, paid.ctx, fundedSheet)).toBeNull();
+  });
+
+  it("an attachment's host pick is refused only when no host can be paid for", () => {
+    const paid = short();
+    const ally = idsOf(paid, "ally");
+    const unpayable = playSheet(paid.state, paid.ctx, legalIntents(paid.state, paid.ctx), names, ally);
+    if (!unpayable) throw new Error("no sheet");
+    const host = (next: Sheet) => ({ id: "h", label: "h", code: null, next });
+    const pickOf = (...options: ReturnType<typeof host>[]) => ({ kind: "pick", key: "play:x", step: "", title: "", note: null, verb: "Attach to", options, primary: null, alternative: null }) as unknown as Sheet;
+    expect(cannotPay(paid.state, paid.ctx, pickOf(host(unpayable), host(unpayable)))).toBe("It costs 1. Your Leadership heroes have 0 resources.");
+    const payable = { ...unpayable, total: 0 } as Sheet;
+    expect(cannotPay(paid.state, paid.ctx, pickOf(host(unpayable), host(payable)))).toBeNull();
+  });
+
+  it("other sheets are never refused, and the store shows the reason as a refusal", () => {
+    const paid = short();
+    const legal = legalIntents(paid.state, paid.ctx);
+    const window = windowSheet(paid.state, paid.ctx, legal, names);
+    expect(window && cannotPay(paid.state, paid.ctx, window)).toBeNull();
+    const store = createTableStore({ ctx: paid.ctx, game: paid.state });
+    store.getState().refuse("It costs 1. Your Leadership heroes have 0 resources.");
+    expect(store.getState().refusal).toBe("It costs 1. Your Leadership heroes have 0 resources.");
   });
 });

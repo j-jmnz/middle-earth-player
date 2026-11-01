@@ -30,7 +30,7 @@ export function tickSent(): void {
   quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Confirm) : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)));
 }
 
-/** The reducer refused an intent (the reason is on the dock), or a card that cannot be played was let go out of the hand scrub. */
+/** The reducer refused an intent or the table refused a play it cannot pay for (the reason is on the dock), or a card that cannot be played was let go out of the hand scrub. */
 export function tickRefused(): void {
   quietly(() => (android ? Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Reject) : Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)));
 }

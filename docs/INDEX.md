@@ -103,7 +103,7 @@ Read the sections your task touches.
   - 838–862 Persistence and shipping (~1.6K)
   - 863–903 Screens (~4.4K) ← 2
     - 889–903 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~25.5K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~25.6K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
@@ -119,7 +119,7 @@ Read the sections your task touches.
   - 111–116 Marks of the open moment (~400) ← 1
   - 117–183 Motion (~2.7K) ← 8
   - 184–210 Spotlight (~2.1K) ← 16
-  - 211–216 Gestures (~210) ← 5
+  - 211–216 Gestures (~340) ← 5
   - 217–220 Hold, slide and release (~940)
   - 221–226 Peeking at the other seat (~600) ← 1
   - 227–240 Command column (~1.6K) ← 7
@@ -132,7 +132,7 @@ Read the sections your task touches.
   - 279–288 Phase carousel (~670)
   - 289–294 Quest advance (~460) ← 1
   - 295–298 Undo (~140)
-  - 299–302 Haptics (~270)
+  - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1
   - 314–317 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~22.7K tok)
@@ -177,14 +177,14 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~6.2K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~2.1K)
   - 76–153 Open items (~3.0K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
     - 119–135 Screens and code (~810)
-    - 136–153 Phone and tablet checks (~880)
+    - 136–153 Phone and tablet checks (~900)
   - 154–169 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

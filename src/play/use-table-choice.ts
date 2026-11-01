@@ -17,6 +17,7 @@ import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { hidesFace, actingSeat, isLooked, onTableFor } from "./selectors.ts";
 import { dropOutcome, targetFromKey } from "./selection.ts";
+import { cannotPay } from "./why.ts";
 import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock-extras.ts";
 import { usePeeking } from "./use-peek.ts";
@@ -198,12 +199,25 @@ export function useTableChoice({
     store.getState().undo();
     reset();
   }, [picking, store, reset]);
-  const open = useCallback(
-    (next: Sheet, asPanel = false) => {
-      setOverlay({ sheet: next, game: store.getState().game, panel: asPanel });
-      setHeld(null);
+  // A payment the pools cannot make: the reject haptic, and the reason on the dock as a reducer refusal shows.
+  const refuse = useCallback(
+    (reason: string) => {
+      tickRefused();
+      store.getState().refuse(reason);
     },
     [store],
+  );
+  // Every sheet the player opens comes through here: a payment sheet (or an attachment's host pick) the pools cannot pay is refused
+  // instead of opened (why.ts, cannotPay), whichever path asked for it.
+  const open = useCallback(
+    (next: Sheet, asPanel = false) => {
+      const game = store.getState().game;
+      const short = cannotPay(game, ctx, next);
+      if (short) return refuse(short);
+      setOverlay({ sheet: next, game, panel: asPanel });
+      setHeld(null);
+    },
+    [store, ctx, refuse],
   );
   const closeOverlay = useCallback(() => {
     setOverlay(null);
