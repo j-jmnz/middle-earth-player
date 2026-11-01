@@ -29,6 +29,7 @@ import * as uncharted from "./uncharted.ts";
 import * as aflame from "./aflame.ts";
 import * as stormcaller from "./stormcaller.ts";
 import * as grapple from "./grapple.ts";
+import * as island from "./island.ts";
 
 /** The seat an instruction resolves for and the card whose effect it is. `chosen`: the target a player chose when the verb
  * asked for one (askTarget in choices.ts puts the instruction back with it). */
@@ -36,7 +37,7 @@ export type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
 type Runner = (state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]) => ScenarioState | null;
 
-const RUNNERS: readonly Runner[] = [attack.run, defense.run, encounter.run, quest.run, play.run, costs.run, deck.run, attachments.run, sidequests.run, misc.run, burden.run, south.run, campaign.run, objectives.run, prisoner.run, dungeon.run, caves.run, nightmare.run, moria.run, breaking.run, dreamchaser.run, sea.run, uncharted.run, aflame.run, stormcaller.run, grapple.run];
+const RUNNERS: readonly Runner[] = [attack.run, defense.run, encounter.run, quest.run, play.run, costs.run, deck.run, attachments.run, sidequests.run, misc.run, burden.run, south.run, campaign.run, objectives.run, prisoner.run, dungeon.run, caves.run, nightmare.run, moria.run, breaking.run, dreamchaser.run, sea.run, uncharted.run, aflame.run, stormcaller.run, grapple.run, island.run];
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */
 export function runFamilyVerb(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {

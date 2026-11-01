@@ -139,9 +139,10 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
       const code = instruction.target?.kind === "byCode" ? instruction.target.code : undefined;
+      const named = instruction.target?.kind === "byName" ? instruction.target.name : undefined;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
-      const id = code
-        ? Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && (payer == null || card.controller === payer))?.id
+      const id = code || named
+        ? Object.values(state.cards).find((card) => (code ? card.code === code : printedOf(ctx.cards, card.code).name === named) && inPlay(card.zone) && !(named && (card.exhausted || card.controller == null)) && (payer == null || card.controller === payer))?.id
         : focus.sourceId;
       return id ? exhaustCard(state, id) : state;
     }

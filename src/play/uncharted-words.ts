@@ -2,6 +2,7 @@
 // Lost Island in the staging area gets +1 Threat", 11033:A:1), what a Pick or a question is for, and the label of an option that is no card. Every prompt names the card it is about and
 // leads with the decision.
 import type { Instruction } from "../catalog/boundary.ts";
+import { cellOf } from "../rules/families/island-map.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
@@ -12,6 +13,9 @@ import type { ChoiceNames, PickWords } from "./choice-words.ts";
 /** The name every Lost Island shows, whatever its other side is called (dcce.uncharted): the side that lies face up hides which location it is. */
 export const LOST_ISLAND_NAME = "Lost Island";
 
+/** The name the Temple column's locations of the Island Map show while they lie Uncharted side up (dcce.island-map): their other side is Temple Halls or The Grotto's Entrance. Their Uncharted side is the one that prints a Threat (4) of its own. */
+export const TEMPLE_NAME = "Temple of the Deceived";
+
 const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 const ordinal = (n: number): string => {
@@ -20,11 +24,13 @@ const ordinal = (n: number): string => {
   return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 };
 
-/** What tells one Lost Island from another, which all carry one name: the progress on it and its place in the staging area ("3 progress · 2nd in staging"). Null for any other card. */
+/** What tells one Lost Island from another, which all carry one name: the progress on it and its place ("3 progress · row 2, column 1" on the Island Map, "3 progress · 2nd in staging" in a staging area of Lost Islands). Null for any other card. */
 export function islandTell(game: ScenarioState, card: Pick<CardInstance, "id" | "code" | "face" | "progress">): string | null {
   if (card.face !== "B" || game.uncharted?.codes.includes(card.code) !== true) return null;
+  const mapped = game.uncharted.island ? cellOf(game.uncharted.island, card.id) : null;
   const place = game.staging.indexOf(card.id);
-  return [card.progress > 0 ? `${card.progress} progress` : null, place >= 0 ? `${ordinal(place + 1)} in staging` : null].filter((part) => part != null).join(" · ") || null;
+  const where = mapped ? `row ${mapped.row + 1}, column ${mapped.col + 1}` : place >= 0 ? `${ordinal(place + 1)} in staging` : null;
+  return [card.progress > 0 ? `${card.progress} progress` : null, where].filter((part) => part != null).join(" · ") || null;
 }
 
 /** The effect's next question trades a card of the deck for one of the hand ("Then, you may switch that card with a card in your hand"). */

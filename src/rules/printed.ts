@@ -125,8 +125,10 @@ const EMPTY_KEYWORDS: Keywords = {
   grapple: null,
 };
 
-// The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable).
+// The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable), or a location's side B that prints a Threat.
 function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
+  // A location's other side prints a Threat and no combat stats (the Temple of the Deceived side of a map location, Threat 4; dcce.uncharted).
+  if (back?.threat != null && back.attack == null && back.defense == null && back.health == null) return { threat: back.threat, attack: 0, defense: 0, health: 0 };
   if (back?.attack == null || back.defense == null || back.health == null) return null;
   return { ...(back.willpower != null ? { willpower: back.willpower } : {}), ...(back.threat != null ? { threat: back.threat } : {}), ...(back.engagementCost != null ? { engagementCost: back.engagementCost } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
 }

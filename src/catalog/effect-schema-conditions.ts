@@ -109,6 +109,11 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The players are at the same quest stage as the Stormcaller (`sameStage`, dcce.stormcallers-area-stages: their main quest stage's number matches its current stage), or not. False in a game
   // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller-values.ts).
   z.strictObject({ kind: z.literal("stormcaller"), is: z.enum(["sameStage", "ahead"]) }),
+  // No player holds more than `max` cards in hand ("If no cards were discarded by this effect": no player holds more than 3 cards, 12080:A:1).
+  z.strictObject({ kind: z.literal("handSize"), max: z.number().int().min(0) }),
+  // The Island Map (src/rules/families/island-pick.ts): at most `faceupAtMost` of its locations still lie Uncharted side faceup, Lost Island or Temple of the Deceived up ("4 or fewer Uncharted locations are faceup", 11197:B:6; dcce.uncharted), and/or the last travel went to the right
+  // ("When you travel to the right", 12077:A:1), and/or at least `revealed.min` copies of the card with this code are in the game and not secrets under a Temple location ("For each Recurring Nightmare that is not a secret", 11197:B:1).
+  z.strictObject({ kind: z.literal("island"), faceupAtMost: z.number().int().min(0).optional(), movedRight: z.literal(true).optional(), revealed: z.strictObject({ code: z.string().min(1), min: z.number().int().positive() }).optional() }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the

@@ -11,6 +11,10 @@ export type Earned = {
   // One copy for each player ("each player earns 1 copy"): a seat that holds no copy of the code gets another entry. Any other
   // earn is one copy of a code however often it is listed, whatever seat wrote it.
   perPlayer?: boolean;
+  // A card that goes into the chosen player's deck after the starting hand, for the rest of the campaign (Recurring Nightmare, 11197:B:1; ChooseCards `to: player`): `afterHand`. `copy` numbers the
+  // copies of a code the scenario earned (0 for the first), so two copies are two entries.
+  afterHand?: true;
+  copy?: number;
 };
 
 // The Hard/Expert Mode card (11217, dcce.hard-expert): side A is Hard, side B is Expert.

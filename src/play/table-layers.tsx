@@ -25,6 +25,8 @@ import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
+import { IslandPanel } from "./island-panel.tsx";
+import { islandFit, islandReadout } from "./island-table.ts";
 import { foldTitle } from "./row-fold.ts";
 import { areaRoleOf } from "./stormcaller-table.ts";
 import { AREA_LIST_TITLE } from "./stormcaller-words.ts";
@@ -86,6 +88,15 @@ function LogReading({ store, logNames, onClose }: { store: TableStore; logNames:
   const roundSteps = useStore(store, (state) => state.roundSteps);
   const lines = useMemo(() => logLines(roundSteps, logNames), [roundSteps, logNames]);
   return <LogPanel round={round} lines={lines} onClose={onClose} />;
+}
+
+// The Island Map: the map as the game lays it out, fitted to the room the panel has (island-table.ts); a tile shows its card large.
+function IslandReading({ store, ctx, width, maxHeight, onRead, onClose }: { store: TableStore; ctx: ReduceContext; width: number; maxHeight: number; onRead: (cardId: string) => void; onClose: () => void }) {
+  const s = useUiScale();
+  const game = useStore(store, (state) => state.game);
+  const readout = useMemo(() => islandReadout(game, ctx.cards), [game, ctx]);
+  const fit = useMemo(() => islandFit(width, maxHeight, s), [width, maxHeight, s]);
+  return readout ? <IslandPanel readout={readout} fit={fit} onRead={onRead} onClose={onClose} /> : null;
 }
 
 function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; seat: number; onClose: () => void }) {
@@ -204,6 +215,7 @@ export function TableLayers({
         {held?.kind === "row" ? <RowReading store={store} row={held.row} names={names} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
+        {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={width} maxHeight={screen.height - barBottom - foot - EDGE * s} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "settings" ? (
           <SettingsPanel
             settings={settings}

@@ -5,6 +5,7 @@ import type { XpCount } from "../../catalog/families/dreamchaser.ts";
 import { queueEvent } from "../queue.ts";
 import { livingSeats, type ScenarioState } from "../state.ts";
 import { tokensOn } from "./campaign.ts";
+import { flippedCount } from "./island-pick.ts";
 
 // The verbs src/catalog/families/dreamchaser.ts adds. GainXp is a Resolution verb: rules/resolution.ts runs it (xpOf below), so it changes
 // nothing here.
@@ -15,6 +16,7 @@ export function run(state: ScenarioState, instruction: Instruction): ScenarioSta
 function countOf(state: ScenarioState, each: XpCount): number {
   if (each.kind === "survivingPlayer") return livingSeats(state).length;
   if (each.kind === "tokens") return tokensOn(state, each.code);
+  if (each.kind === "islandFaceup") return flippedCount(state, each.code);
   return state.victory.filter((id) => each.codes.includes(state.cards[id]?.code ?? "")).length;
 }
 

@@ -4,6 +4,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 import { effectCause, ruleCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import { textBlank } from "./families/attachments-hold.ts";
+import { recordsOfFace } from "./families/dreamchaser-faces.ts";
 import { grantedTravel } from "./families/grapple-travel.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -30,7 +31,7 @@ const TRAVEL_HERE: Instruction = { verb: "Travel", to: "self" };
 // resolve first, so their frames go on top. Null if the location cannot be traveled to.
 export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   if (travelBlocked(state, ctx, locationId)) return null;
-  const traveled = travelTo(state, locationId, ctx.cards);
+  const traveled = travelTo(state, locationId, ctx.cards, steps);
   if (!traveled) return null;
   // The travel opportunity is taken; the Travel phase ends after the window that follows it (rr.framework-steps, 4.2).
   const moved = traveled.mode === "travel" ? travelTaken(traveled) : traveled;
@@ -48,7 +49,8 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
   const location = state.cards[locationId];
   if (!location) return state;
   // A location whose printed text box is blank has no Travel effect (rr.blank).
-  const effects = textBlank(state, locationId) ? [] : ctx.effects.filter((effect) => effect.cardCode === location.code && effect.timing === "travel");
+  // Only the Travel effect of the side the location shows works (12068:B:3, families/dreamchaser-faces.ts).
+  const effects = textBlank(state, locationId) ? [] : recordsOfFace(location, ctx.effects.filter((effect) => effect.cardCode === location.code)).filter((effect) => effect.timing === "travel");
   const first = effects[0];
   // A Travel cost another card gave the location comes after its own (families/grapple-travel.ts).
   const granted = grantedTravel(state, locationId);

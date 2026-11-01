@@ -134,6 +134,8 @@ function campaignOfPacks(packCodes: readonly string[]): string | null {
 // The stats of the Upgraded side, when the card has them all (dcce.scalable-upgradable).
 function upgradedOf(card: Card): string | null {
   const back = card.back;
+  // A location's other side prints a Threat and no combat stats (the Temple of the Deceived side of a map location; dcce.uncharted).
+  if (back?.threat != null && back.attack == null && back.defense == null && back.health == null) return JSON.stringify({ threat: back.threat, attack: 0, defense: 0, health: 0 });
   if (back?.attack == null || back.defense == null || back.health == null) return null;
   return JSON.stringify({ ...(back.willpower != null ? { willpower: back.willpower } : {}), ...(back.threat != null ? { threat: back.threat } : {}), ...(back.engagementCost != null ? { engagementCost: back.engagementCost } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) });
 }

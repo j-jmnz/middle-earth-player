@@ -20,7 +20,7 @@ const CHEAP_ALLY: PickSpec = { type: "ally", control: "any", cardType: "ally", m
 
 // The Lost Island side of a double-sided location, printed the same on every copy: Uncharted (a keyword), no player card attachments, flip it over once it is the active location, and
 // the Action that looks at the facedown side for 4 progress. `ids`: the position of each record among the card's records of its timing.
-function lostIsland(code: string, ids: { constant: number; forced: number }): Effect[] {
+export function lostIsland(code: string, ids: { constant: number; forced: number }): Effect[] {
   return [
     { id: `${code}:constant:${ids.constant}`, cardCode: code, lines: [`${code}:B:2`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay" }] },
     { id: `${code}:forced:${ids.forced}`, cardCode: code, lines: [`${code}:B:3`], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "FlipUncharted" }] },
@@ -37,7 +37,7 @@ function lostIsland(code: string, ids: { constant: number; forced: number }): Ef
 }
 
 // "Forced: After X is flipped over while active, ..." of the real side of a double-sided location.
-const flippedActive = (code: string, line: string, id: number, instructions: Effect["instructions"]): Effect => ({ id: `${code}:forced:${id}`, cardCode: code, lines: [line], timing: "forced", trigger: "flippedOver", subject: "self", condition: ACTIVE, instructions });
+export const flippedActive = (code: string, line: string, id: number, instructions: Effect["instructions"]): Effect => ({ id: `${code}:forced:${id}`, cardCode: code, lines: [line], timing: "forced", trigger: "flippedOver", subject: "self", condition: ACTIVE, instructions });
 
 // "Shadow: Discard the bottom card of the defending player's deck. If that card's printed cost is 2 or less, attacking enemy gets +2 Attack." (the shadow effect resolves for the defending player)
 const bottomAttack = (code: string, line: string): Effect => ({

@@ -46,13 +46,15 @@ function stepOver(state: ScenarioState, log?: ResolutionLog): ScenarioState {
 // A per-player copy that names its hero (a card attached to a hero, EarnAttached) is one copy for each hero: a player whose two heroes
 // each carry a copy takes both into the pool. A held copy is read as `{ code, seat, hero }` (`hero`: the hero it is on, or null), so an
 // earned entry and a pool entry go through one shape; `heldCopy` makes it.
-export type HeldCopy = { code: string; seat: number | null; hero: string | null };
+export type HeldCopy = { code: string; seat: number | null; hero: string | null; copy?: number };
 
-export function heldCopy(entry: { code: string; seat: number | null; hero?: string | null; attachedTo?: string | null }): HeldCopy {
-  return { code: entry.code, seat: entry.seat, hero: entry.hero ?? entry.attachedTo ?? null };
+export function heldCopy(entry: { code: string; seat: number | null; hero?: string | null; attachedTo?: string | null; copy?: number }): HeldCopy {
+  return { code: entry.code, seat: entry.seat, hero: entry.hero ?? entry.attachedTo ?? null, ...(entry.copy != null ? { copy: entry.copy } : {}) };
 }
 
-export function holdsCopy(held: readonly HeldCopy[], item: Pick<Earned, "code" | "seat" | "perPlayer"> & { hero?: string | null }): boolean {
+export function holdsCopy(held: readonly HeldCopy[], item: Pick<Earned, "code" | "seat" | "perPlayer" | "copy"> & { hero?: string | null }): boolean {
+  // A numbered copy (Recurring Nightmare, two of one code) is held when that number is.
+  if (item.copy != null) return held.some((have) => have.code === item.code && have.copy === item.copy);
   if (item.perPlayer && item.hero != null) return held.some((have) => have.code === item.code && have.hero === item.hero);
   return held.some((have) => have.code === item.code && (!item.perPlayer || have.seat === item.seat));
 }
@@ -193,7 +195,8 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
   if (codes.length === 0) return [];
-  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : codes;
+  // A card for a player: one option for each player in the game, named by the first hero they control.
+  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? codes.flatMap((code) => livingSeats(state).flatMap((index) => (state.seats[index]?.heroes[0] ? [`${code}>${state.seats[index]?.heroes[0]}`] : []))) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }
 
@@ -243,7 +246,13 @@ export function applyResolution(state: ScenarioState, optionId: string): Scenari
     const [code = "", heroId] = optionId.split(">");
     const hero = heroId ? state.cards[heroId] : undefined;
     // A hero chosen from the whole table is earned for the seat that controls it.
-    log = { ...log, earned: [...log.earned, { code, to: instruction.to, seat: instruction.anyHero && hero?.controller != null ? hero.controller : seat, hero: hero?.code ?? null, step }] };
+    // A card for a player goes into the pool for the seat that controls the hero chosen, to be shuffled into that player's deck after the starting hand; the copies of one code are numbered.
+    const copy = log.earned.filter((item) => item.code === code).length;
+    const entry: Earned =
+      instruction.to === "player"
+        ? { code, to: "pool", seat: hero?.controller ?? seat, hero: null, step, afterHand: true, copy }
+        : { code, to: instruction.to, seat: instruction.anyHero && hero?.controller != null ? hero.controller : seat, hero: hero?.code ?? null, step };
+    log = { ...log, earned: [...log.earned, entry] };
   }
   const seats = seatsFor(state, instruction);
   const more = state.resolutionSeat + 1 < seats.length;

@@ -48,8 +48,8 @@ export type ZoneName =
   // The Corsair deck and its own discard pile (dcce.corsair-deck): out of play, like the encounter deck and its discard pile.
   | "corsairDeck"
   | "corsairDiscard"
-  // The Uncharted deck (dcce.uncharted-deck), out of play, every card Lost Island side up; the Stormcaller's area (dcce.stormcallers-area), in play, outside the staging area.
-  | "unchartedDeck" | "stormcallerArea"
+  // The Uncharted deck (dcce.uncharted-deck), out of play, every card Lost Island side up; the Stormcaller's area (dcce.stormcallers-area) and the Island Map (dcce.island-map), in play, outside the staging area.
+  | "unchartedDeck" | "stormcallerArea" | "islandMap"
   | "victory"
   | "setAside"
   | "removed"
@@ -530,7 +530,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "staging" ||
     zone === "seatStaging" ||
     zone === "activeLocation" ||
-    zone === "secondActiveLocation" || zone === "stormcallerArea" ||
+    zone === "secondActiveLocation" || zone === "stormcallerArea" || zone === "islandMap" ||
     zone === "questStage" ||
     zone === "seatQuest" ||
     zone === "attached" ||

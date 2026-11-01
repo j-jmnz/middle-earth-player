@@ -12,6 +12,8 @@ export const xpCountSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("survivingPlayer") }),
   z.strictObject({ kind: z.literal("inVictory"), codes: z.array(code).min(1) }),
   z.strictObject({ kind: z.literal("tokens"), code }),
+  // The locations of the Island Map with this code that have been flipped over, showing the location they are ("1 XP for each faceup Temple Halls", 11197:B:5).
+  z.strictObject({ kind: z.literal("islandFaceup"), code }),
 ]);
 export type XpCount = z.infer<typeof xpCountSchema>;
 

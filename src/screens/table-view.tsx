@@ -235,8 +235,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
     [router, nav],
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
-  // The printed facts, the preview opener, the pile taps and the Heading dial (use-table-wiring.ts).
-  const { facts, success, onPreview, onPile, headingDial } = useTableWiring({ store, ctx, game, setReading, setPreview });
+  // The printed facts, the preview opener, the pile taps, the Heading dial and the Island Map chip (use-table-wiring.ts).
+  const { facts, success, onPreview, onPile, headingDial, island } = useTableWiring({ store, ctx, game, setReading, setPreview });
   // The stage the quest just advanced to, shown large until Progress (src/play/quest-advance.ts); the table answers nothing meanwhile.
   const advance = useQuestAdvance(store);
   const choice = useTableChoice({ store, ctx, names, beats, onPreview, onPile, onOutcome, hold: advance.held });
@@ -360,6 +360,8 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           burdenDeck={widgets.burdenDeck}
           tokens={tokens}
           heading={headingDial}
+          island={island}
+          onIsland={() => setReading({ kind: "island" })}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           rail={rail}
           stopAhead={stopAhead}

@@ -24,6 +24,9 @@ import { attachTo, moveCard, spawn } from "./zones.ts";
 import { stampRoutes } from "./families/sea-routes.ts";
 import { dealUnchartedDeck } from "./families/uncharted-deal.ts";
 
+/** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
+export const AFTER_HAND = "deck:";
+
 export type StartSeat = {
   heroes: readonly string[];
   deck: readonly string[];
@@ -33,6 +36,7 @@ export type StartSeat = {
   hand?: readonly string[];
   // Cards a campaign card's Setup adds to the hand once the mulligan is over (AddToHandAfterMulligan): not drawn, not shuffled
   // back by a mulligan, not counted in the opening hand.
+  // A code with the prefix AFTER_HAND is shuffled into the seat's deck instead ("shuffles that Recurring Nightmare into their deck after they draw their starting hand", 11197:B:1).
   afterMulligan?: readonly string[];
   // The cards the campaign card's Setup let this seat choose and a Resolution earns (ChooseCards `unearned`): recorded as a game fact (ScenarioState.chosenAtSetup).
   chosen?: readonly string[];
@@ -224,10 +228,15 @@ function dealAfterMulligan(state: ScenarioState): ScenarioState {
   if (!state.afterMulligan) return state;
   let next = state;
   state.afterMulligan.forEach((codes, seat) => {
-    for (const code of codes) next = spawn(next, code, { zone: "hand", seat }).state;
+    for (const code of codes) next = code.startsWith(AFTER_HAND) ? shuffleIntoDeck(next, seat, code.slice(AFTER_HAND.length)) : spawn(next, code, { zone: "hand", seat }).state;
   });
   const { afterMulligan: _dealt, ...rest } = next;
   return rest;
+}
+
+// A card joins a player's deck and the deck is shuffled (a pool card that is shuffled in after the starting hand).
+function shuffleIntoDeck(state: ScenarioState, seat: number, code: string): ScenarioState {
+  return shuffleZone(spawn(state, code, { zone: "deck", seat }).state, seat);
 }
 
 function shuffleZone(state: ScenarioState, zone: "encounter" | number): ScenarioState {

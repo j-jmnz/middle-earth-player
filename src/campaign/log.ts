@@ -11,11 +11,12 @@ import { xpAwarded, type ModeCard } from "./xp.ts";
 // Permanent card is stuck to, recorded in the Notes of the paper log.
 // `perPlayer` marks one copy of a code for each player ("each player earns 1 copy"): another seat's copy is another entry. Any other
 // entry is the one copy of its code. In a finished campaign's carry-over it stands for a copy for each player of the next save.
-export type PoolCard = { code: string; back: "player" | "encounter"; burdenSet: string | null; attachedTo: string | null; seat: number | null; perPlayer?: boolean };
+// `afterHand` marks a card shuffled into its seat's deck after the starting hand (Recurring Nightmare, 11197:B:1); `copy` numbers the copies of one code (two Recurring Nightmares are two entries).
+export type PoolCard = { code: string; back: "player" | "encounter"; burdenSet: string | null; attachedTo: string | null; seat: number | null; perPlayer?: boolean; afterHand?: true; copy?: number };
 
 // The one place a pool entry is built from a card's printed side.
-export function poolCard(printed: PrintedCard, code: string, attachedTo: string | null, seat: number | null, perPlayer = false): PoolCard {
-  return { code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat, ...(perPlayer ? { perPlayer } : {}) };
+export function poolCard(printed: PrintedCard, code: string, attachedTo: string | null, seat: number | null, perPlayer = false, copies?: { afterHand?: true; copy?: number }): PoolCard {
+  return { code, back: printed.backType ?? "player", burdenSet: printed.burdenSet, attachedTo, seat, ...(perPlayer ? { perPlayer } : {}), ...(copies?.afterHand ? { afterHand: true as const } : {}), ...(copies?.copy != null ? { copy: copies.copy } : {}) };
 }
 
 export type CampaignLog = {
@@ -117,9 +118,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   for (const earned of result.earned) {
     const printed = printedOf(cards, earned.code);
     const attachedTo = earned.hero ?? (printed.keywords.permanent ? bearer : null);
-    if (holdsCopy(pool.map(heldCopy), { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer, hero: earned.hero })) continue;
+    if (holdsCopy(pool.map(heldCopy), { code: earned.code, seat: earned.seat, perPlayer: earned.perPlayer, hero: earned.hero, ...(earned.copy != null ? { copy: earned.copy } : {}) })) continue;
     if (attachedTo != null && fallen.has(attachedTo)) continue;
-    pool.push(poolCard(printed, earned.code, attachedTo, earned.seat, earned.perPlayer));
+    pool.push(poolCard(printed, earned.code, attachedTo, earned.seat, earned.perPlayer, { ...(earned.afterHand ? { afterHand: true as const } : {}), ...(earned.copy != null ? { copy: earned.copy } : {}) }));
   }
   const carried: PoolCard[] = (result.carryOver ?? []).map((item) => poolCard(printedOf(cards, item.code), item.code, null, item.seat, item.perPlayer));
   const scenario = scoreOf(state, cards);

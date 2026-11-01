@@ -12,6 +12,7 @@ import { questPointsOf } from "../quest.ts";
 import type { ScenarioState } from "../state.ts";
 import { flagged, heldAmount, updateCard } from "../state.ts";
 import { moveCard } from "../zones.ts";
+import { exploring } from "./island-map.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 export type Slot = "activeLocation" | "secondActiveLocation";
@@ -105,7 +106,8 @@ export function placeOnActive(state: ScenarioState, amount: number, cards: Cards
     steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("rr.step-3-4") });
     remaining -= placed;
     const points = questPointsOf(next, location, cards);
-    if (points != null && location.progress + placed >= points) next = destroyCard(next, id, cards, steps, true);
+    // Under Exploration a location that is full stays in play (families/island-map.ts).
+    if (points != null && location.progress + placed >= points && !exploring(next)) next = destroyCard(next, id, cards, steps, true);
   }
   return { state: next, remaining };
 }

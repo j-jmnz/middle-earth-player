@@ -3,6 +3,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { recordsOfFace } from "./families/dreamchaser-faces.ts";
 import { grantedTravel } from "./families/grapple-travel.ts";
 import { modifiedStat } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
@@ -66,7 +67,9 @@ export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[]
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
-  const instructions = [...ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
+  // Only the Travel effect of the side the location shows counts: the Temple of the Deceived side of a map location prints one that its other side does not (12068:B:3).
+  const shown = state.cards[locationId];
+  const instructions = [...(shown ? recordsOfFace(shown, ctx.effects.filter((effect) => effect.cardCode === code)) : []).filter((effect) => effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
   return instructions.some((instruction) => {
       // "A player at this staging area must engage an enemy in any staging area to travel here" (142079:A:1): an enemy to engage must be in some staging area.
       if (instruction.verb === "Engage" && instruction.target === "picked") {
@@ -97,11 +100,11 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       if (instruction.verb === "MoveProgressToStormcaller" && typeof instruction.amount === "number") {
         return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < instruction.amount;
       }
-      if (instruction.verb !== "Exhaust" || instruction.target?.kind !== "byCode") return false;
-      const named = instruction.target.code;
+      if (instruction.verb !== "Exhaust" || (instruction.target?.kind !== "byCode" && instruction.target?.kind !== "byName")) return false;
+      const target = instruction.target;
       const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
       return !Object.values(state.cards).some(
-        (card) => card.code === named && inPlay(card.zone) && !card.exhausted && (payer == null || card.controller === payer),
+        (card) => (target.kind === "byCode" ? card.code === target.code : printedOf(ctx.cards, card.code).name === target.name) && inPlay(card.zone) && !card.exhausted && (target.kind === "byCode" || card.controller != null) && (payer == null || card.controller === payer),
       );
     });
 }

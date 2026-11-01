@@ -59,6 +59,8 @@ import { refillEncounterDeck } from "./verbs.ts";
 import { refillCorsairDeck } from "./families/sea-corsair.ts";
 import { aflameSweep } from "./families/aflame-sweep.ts";
 import { syncStormcallerArea } from "./families/stormcaller-area.ts";
+import { syncIsland } from "./families/island-map.ts";
+import { announceEnteredHand } from "./families/island-hand.ts";
 import { committedTo } from "./families/stormcaller-commit.ts";
 import { announceCollected } from "./families/aflame-attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
@@ -68,8 +70,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
     // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
-    // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller-area.ts).
-    current = syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceProgress(constantWin(current, ctx), steps, ctx), ctx.cards), steps)));
+    // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller-area.ts); the Island Map's locations as the active location says (families/island-map.ts).
+    current = syncIsland(syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceEnteredHand(announceProgress(constantWin(current, ctx), steps, ctx), steps, ctx), ctx.cards), steps))), ctx);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {

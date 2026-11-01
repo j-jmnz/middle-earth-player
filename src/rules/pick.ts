@@ -27,6 +27,7 @@ import { facedownShadow } from "./families/defense-shadow.ts";
 import { deckPool, unchartedPickMatches } from "./families/uncharted-pick.ts";
 import { aflamePickMatches, lowestAflame } from "./families/aflame-pick.ts";
 import { sidePickMatches } from "./families/grapple-values.ts";
+import { islandPool, outsideCells } from "./families/island-pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -62,6 +63,9 @@ function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): reado
 function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext): string[] {
   const seats = seatsOf(state, spec, asking);
   const raw: string[] = [];
+  // The Island Map's filters start from its own cards (families/island-pick.ts).
+  const mapped = islandPool(state, spec);
+  if (mapped) return mapped;
   // A burden card in play or in the encounter deck or its discard pile (142074:A:2).
   if (spec.burden) {
     return Object.values(state.cards)
@@ -105,6 +109,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
     if (!spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
+    // The locations of the Island Map outside the staging area are in play too (families/island-pick.ts).
+    if (!spec.stagingOnly && !spec.active) raw.push(...outsideCells(state));
   } else if (spec.type === "objective") {
     // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
@@ -178,6 +184,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The misc family's filters: controlled by the picked player, attached to the picked card, a player card, a Defense limit, drawn
   // in the resource phase (families/misc-pick.ts).
   if (!miscPickMatches(state, id, spec, at, ctx)) return false;
+  if (spec.minAttack != null && modifiedStat(state, instance, "attack", ctx.cards) < spec.minAttack) return false;
   // The nightmare family's filters: a Willpower at most this, below 0 counting as 0 (900102:A:1).
   if (spec.maxWillpower != null && Math.max(0, modifiedStat(state, instance, "willpower", ctx.cards)) > spec.maxWillpower) return false;
   // A copy of it in its controller's discard pile (900309:A:2).

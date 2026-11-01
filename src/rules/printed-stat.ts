@@ -9,8 +9,8 @@ type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | 
 
 // The printed value of a stat, on the side the card shows: a card dealt on its Upgraded side, or turned to its Campaign Mode only side, prints that side's stats (dcce.scalable-upgradable).
 export function printedStat(printed: PrintedCard, stat: ModifierStat, face?: CardInstance["face"]): number {
-  // The Lost Island side of a double-sided location prints a Threat and no quest points (dcce.uncharted).
-  if (face === "B" && printed.keywords.uncharted && (stat === "threat" || stat === "questPoints")) return stat === "threat" ? LOST_ISLAND_THREAT : 0;
+  // The Lost Island side of a double-sided location prints a Threat and no quest points (dcce.uncharted); the Temple of the Deceived side of a map location prints its own Threat (4).
+  if (face === "B" && printed.keywords.uncharted && (stat === "threat" || stat === "questPoints")) return stat === "threat" ? (printed.upgraded?.threat ?? LOST_ISLAND_THREAT) : 0;
   const upgraded = face === "B" ? printed.upgraded : null;
   if (upgraded) {
     switch (stat) {

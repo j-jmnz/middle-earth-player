@@ -3,7 +3,7 @@
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { recordInstructions, type ScenarioData } from "../catalog/scenario-data.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { StartSeat } from "../rules/setup.ts";
+import { AFTER_HAND, type StartSeat } from "../rules/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
 import { xpRowOf } from "./xp.ts";
@@ -246,7 +246,12 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
       did8.push(`${name(card.code)} is put into play instead of being shuffled into the encounter deck.`);
       continue;
     }
-    if (card.back === "player") {
+    if (card.afterHand) {
+      // Shuffled into the chosen player's deck once the starting hand is drawn (11197:B:1): dealt after the mulligan (setup.ts, AFTER_HAND).
+      const seat = Math.min(card.seat ?? 0, seatCount - 1);
+      seats[seat]?.afterMulligan.push(`${AFTER_HAND}${card.code}`);
+      did7.push(`${name(card.code)} is shuffled into seat ${seat + 1}'s deck after the starting hand is drawn.`);
+    } else if (card.back === "player") {
       const seat = Math.min(card.seat ?? 0, seatCount - 1);
       seats[seat]?.deck.push(card.code);
       did7.push(`${name(card.code)} is shuffled into seat ${seat + 1}'s deck.`);

@@ -16,7 +16,7 @@ export type Destination =
   | { zone: "seatQuest"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking-areas.ts); the card is in
   // `staging` and in that seat's list.
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea"; area?: number }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap"; area?: number }
   // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
   // Without it the card takes the state's own slot, which on a seat's view (families/breaking-areas.ts) is that seat's.
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }

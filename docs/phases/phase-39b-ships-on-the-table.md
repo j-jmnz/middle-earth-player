@@ -59,7 +59,6 @@ The setup attaches the Heading card to the Dream-chaser and sets it on-course (`
   - A non-ship enemy that is discarded leaves toward the Corsair discard pile (`cardLeave`). The reshuffle glides the discard pile's cards to the deck (`cardDepart`), and the deck's count pops.
   - Peeking leaves the slot where it is: it is shared, like the encounter piles.
 - **One deck alone.** The Uncharted and Grotto decks have no discard pile: their locations shuffle back into the deck. A deck alone takes the slot's left place, and the right place stays empty, with no dashed outline.
-- The Island Map's chip takes the same slot (Scenario areas).
 
 ### Boarding
 
@@ -123,22 +122,9 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 | Phase | Element | Shared (39b) | The scenario phase adds |
 | --- | --- | --- | --- |
 | 40 | Ships, Heading, Corsair deck, Boarding, Sailing | everything above | the setup picks: Modification per ship, "deal 2 damage to a ship for 1 resource"; its cards' words |
-| 45 | Island Map | the second slot; reading panels | see below |
 | 46 | Grotto deck | the second slot, one deck alone | `grottoDeck` showing its top card's Grotto face, since players may look at it (`dcce.grotto-deck`); a long press previews that face only; explored Grotto locations glide back to the deck, and Underwater ones go to the victory display |
 | 47 | Raider Flagship, four towers, Dol Amroth Warships | ship-enemies; Guarded pairs (Cards); fold order; ships first | the towers' words; freed towers as cards the players control in staging, whose Actions reach the action window's tray when folded; Send for Help set aside and not drawn |
 | 48 | From Sea to Land | the second slot | when the Corsair pair merges into the second encounter deck, the slot closes and the engagement area takes the room back (the cards slide); the inactive deck is not drawn until it becomes the encounter pair, in place |
-
-**The Island Map (phase 45,** `dcce.island-map`, `dcce.exploration`).
-
-- **Staging.** The locations next to the active location are in the staging area, so the staging row draws them as staging cards, beside the enemies. The active location is drawn in the active-location slot, even though it stays in its map position.
-- **The chip.** It takes the second slot, at the engagement row's height: a 5 × 3 grid of small portrait cells (`island-map-chip`), with the Temple column at the right as printed.
-  - Each cell shows its state: facedown Lost Island (faint), turned face up (bone), next to the active one (bone ring), active (accent fill with the resource token art as the marker).
-  - The chip is one 44 pt-plus target, heard as "Island Map, active: row 2, column 3, 3 locations in staging". A tap opens the map panel.
-- **The map panel** (`island-map`, `island-map-close`, cells `island-map-cell-<row>-<col>`).
-  - It is a parchment reading panel as wide as five cards across need, up to the table's card size. It is at least 300 pt, no wider than the screen less its insets and 16 pt, and its three rows fit under the top bar.
-  - It shows the cards as laid out, the marker, and the secrets under the Temple locations as facedown peeks.
-  - A cell's tap previews its card. Travel is picked on the staging row, and the panel sends nothing.
-- Directions in card text read from the map as printed ("to the right" is toward the Temple column).
 
 ## Cards it must hold
 

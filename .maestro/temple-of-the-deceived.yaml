@@ -1,0 +1,71 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 45. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `temple-won` (scripts/e2e-temple.ts): a real two-handed
+# game of Temple of the Deceived, parked on its win (the 8th progress is on The Grotto's Entrance). The fixture is OPEN when scripts/e2e-fixtures.ts found no win of the two starter decklists in its seeds
+# (docs/phases/STATUS.md). The Resolution asks, for each Recurring Nightmare that was flipped, which player it goes to ("Choose a player"; none is asked when both stayed secrets); confirming writes the XP from the
+# campaign card (1 for each surviving player, resources on the card, flipped Temple Halls, 4 or fewer Uncharted locations faceup, Temple Guardian in the victory display, threat 40 or less, Ominous Fate) and, with
+# parts 1 to 5 won in the log, unlocks The Drowned Ruins (src/campaign/golden-temple.test.ts pins the path). The fixture's log has parts 1 to 5 recorded as won (the logs the Voyage, Fate, Raid, Flight and Depths
+# goldens' wins write), so the path opens on Temple of the Deceived and resumes it; its node reads Won.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/temple-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+# The Island Map's chip is in the top bar, and a tap opens the map.
+- assertVisible:
+    id: island-map-chip
+- tapOn:
+    id: island-map-chip
+- assertVisible:
+    id: island-map
+- assertVisible:
+    id: island-map-cell-1-4
+- tapOn:
+    id: island-map-close
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+# A Recurring Nightmare that was flipped goes to a player the first player chooses (once for each).
+- repeat:
+    while:
+      visible: "Choose a player"
+    commands:
+      - tapOn: "Recurring Nightmare.*"
+      - tapOn:
+          id: resolution-confirm
+- tapOn:
+    id: resolution-confirm
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-temple-of-the-deceived-status
+    text: "Won.*"
+# The XP the Resolution gave is written: the line reads it and there is XP to spend.
+- assertVisible:
+    id: xp-line
+- assertVisible:
+    id: xp-open

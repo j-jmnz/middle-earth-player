@@ -1,5 +1,5 @@
 // The small wiring the table view hands its pieces (src/screens/table-view.tsx), kept here beside use-table-choice.ts: the printed facts the zone selectors and the look strip read, the card
-// preview opener, what a tap on a pile does (a discard pile's list, a fold stack's row list, the Iron Shackles card on a deck), and the Heading dial the top bar shows. Nothing here changes the game.
+// preview opener, what a tap on a pile does (a discard pile's list, a fold stack's row list, the Iron Shackles card on a deck), the Heading dial and the Island Map chip the top bar shows. Nothing here changes the game.
 import { useCallback, useMemo } from "react";
 
 import type { Reading } from "./reading.ts";
@@ -8,6 +8,7 @@ import { successOf } from "./sea-sheets.ts";
 import type { HeadingStep } from "./heading.ts";
 import type { ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import { headingReadout } from "./widgets.ts";
+import { islandReadout, type IslandReadout } from "./island-table.ts";
 import { zoneFactsOf } from "./zone-facts.ts";
 
 /** A card shown large, and the cards listed with it that are not on the table (the Look window's). */
@@ -38,5 +39,7 @@ export function useTableWiring({ store, ctx, game, setReading, setPreview }: { s
   const headingStep = headingNow?.step ?? null;
   const headingCard = headingNow?.cardId ?? null;
   const headingDial = useMemo((): HeadingDialProps | null => (headingStep ? { step: headingStep, onPress: () => (headingCard ? onPreview(headingCard) : undefined) } : null), [headingStep, headingCard, onPreview]);
-  return { facts, success, onPreview, onPile, headingDial };
+  // The Island Map's chip, after the dials, while the game has a map (dcce.island-map): a tap opens the map panel.
+  const island = useMemo((): IslandReadout | null => islandReadout(game, ctx.cards), [game, ctx]);
+  return { facts, success, onPreview, onPile, headingDial, island };
 }

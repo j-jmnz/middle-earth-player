@@ -60,6 +60,8 @@ export const amountExprSchema = z.strictObject({
   limit: z.number().int().min(0).optional(),
   // The number of enemies grappled with locations in the staging area ("equal to the number of enemies grappled with locations in the staging area", 12055:A:2; src/rules/families/grapple-values.ts).
   grappled: z.literal(true).optional(),
+  // The total Threat of the locations to the left of the active location, in its row on the Island Map ("X is the total Threat of all locations to the left of the active location", 12078:A:1; src/rules/families/island-pick.ts).
+  islandLeft: z.literal(true).optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),
 });

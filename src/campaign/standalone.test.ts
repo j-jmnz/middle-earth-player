@@ -147,7 +147,7 @@ describe("standalone briefing", () => {
   });
 
   it("refuses a scenario whose dealt cards are not all automated", () => {
-    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH, "journey-in-the-dark", "breaking-of-the-fellowship", "passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur", "the-oath", "the-caves-of-nibin-dum", "voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths"]);
+    expect(PLAYABLE_SCENARIOS).toEqual([PAST, KNIFE, FORD, SOUTH, "journey-in-the-dark", "breaking-of-the-fellowship", "passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur", "the-oath", "the-caves-of-nibin-dum", "voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived"]);
     // Every scenario in the data is playable now, so a scenario the list does not name stands in for one whose cards are not all automated.
     const world = loadWorld(catalog, campaign, { ...loadScenario(PAST), id: "not-automated" }, EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
     const result = standaloneBriefing({ world, seatCount: 1, seats: loadoutOf().seats, ringBearer: FRODO, difficulty: "Normal" });

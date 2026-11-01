@@ -39,7 +39,8 @@ export type ResolutionView =
       answered: readonly ResolutionAnswer[];
       tiles: readonly ResolutionTile[];
       decline: ResolutionDecline | null;
-      to: "pool" | "hand" | "hero" | "captive";
+      // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
+      to: "pool" | "hand" | "hero" | "captive" | "player";
     }
   | {
       kind: "settled";
@@ -81,7 +82,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   if (instruction.verb === "ChooseCards") {
     const kinds = new Set(instruction.codes.map((code) => world.cards.get(code)?.campaignKind ?? null));
     noun = kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
-    eyebrow = `Choose a ${noun}`;
+    eyebrow = instruction.to === "player" ? "Choose a player" : `Choose a ${noun}`;
   }
   const tiles: ResolutionTile[] = legalIntents(state, contextOf(world)).flatMap((intent): ResolutionTile[] => {
     if (intent.type !== "ChooseResolution") return [];
@@ -135,6 +136,8 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
       return `${tile.name} is recorded and starts the next scenario in hand.`;
     case "captive":
       return `${tile.name} is recorded as a captive.`;
+    case "player":
+      return `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} shuffles it into their deck after drawing their starting hand, for the rest of the campaign.`;
   }
 }
 
@@ -147,7 +150,7 @@ export function declineSentence(view: Extract<ResolutionView, { kind: "choosing"
 
 /** The sentence above Confirm before anything is chosen, built from the noun: "Choose a boon and a hero, or tap No boon." */
 export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" }>): string {
-  const what = view.to === "hero" ? `a ${view.noun} and a hero` : view.to === "captive" ? "a hero to name as a captive" : `a ${view.noun}`;
+  const what = view.to === "hero" ? `a ${view.noun} and a hero` : view.to === "captive" ? "a hero to name as a captive" : view.to === "player" ? "a player, by one of their heroes" : `a ${view.noun}`;
   const decline = view.decline ? `, or tap ${view.decline.label}` : "";
   return `Choose ${what}${decline}. Your choice is written to the campaign log when you confirm.`;
 }

@@ -1,5 +1,6 @@
 import { BURN_CODE, encounterHolds, underBurnHolds } from "./families/aflame-values.ts";
 import { locationThreatHolds } from "./families/grapple-values.ts";
+import { islandHolds } from "./families/island-pick.ts";
 import type { Condition } from "../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
@@ -108,6 +109,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // The objectives and prisoner families (families/objectives.ts, families/prisoner.ts).
     case "freeOfEncounters":
       return freeOfEncounters(state, scope.sourceId);
+    case "island":
+      return islandHolds(state, condition);
+    case "handSize":
+      return livingSeats(state).every((seat) => (state.seats[seat]?.hand.length ?? 0) <= condition.max);
     case "prisoner":
       return (prisonerHero(state) != null) === condition.is;
     case "inVictory":

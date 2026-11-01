@@ -17,6 +17,7 @@ import { topFrame } from "./windows.ts";
 import { shadowCards } from "./zones.ts";
 import { levelAmount } from "./families/aflame-values.ts";
 import { grappledCount, resourcesOnMatching } from "./families/grapple-values.ts";
+import { leftThreat } from "./families/island-pick.ts";
 import { stormcallerStageNumber } from "./families/stormcaller-values.ts";
 
 // Who an amount is read for: the actor (the "you" of the card), the source, and what the running effect knows.
@@ -145,6 +146,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.excess) value = scope.excess ?? 0;
   else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
   else if (amount.grappled) value = grappledCount(state);
+  else if (amount.islandLeft) value = leftThreat(state, ctx);
   else if (amount.resourcesOn) value = resourcesOnMatching(state, amount.resourcesOn, scope, ctx);
   value = value * (amount.times ?? 1) + (amount.plus ?? 0) + (amount.plusChosen ? (state.chosenAtSetup?.length ?? 0) : 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);

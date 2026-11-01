@@ -26,6 +26,7 @@ import { viewOf, withView } from "./families/breaking-areas.ts";
 import { oweDiscards } from "./families/breaking-progress.ts";
 import { orderedNext, stageToVictory } from "./families/quest-order.ts";
 import { caughtUp } from "./families/stormcaller-values.ts";
+import { islandTravelTo } from "./families/island-travel.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -54,7 +55,7 @@ export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number)
     total += modifiedStat(view, instance, "threat", cards);
   }
   // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1).
-  if (view.sea) {
+  if (view.sea || view.uncharted) {
     for (const seat of view.seats) {
       for (const id of seat.engaged) {
         const instance = view.cards[id];
@@ -182,6 +183,11 @@ export function placeQuestProgress(
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
     remaining = 0;
   }
+  // Progress a stage lets the players place on a location in the staging area instead (families/island.ts, 12067:B:2): its record hears the amount.
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressToStaging")) {
+    next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
+    remaining = 0;
+  }
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
@@ -269,7 +275,10 @@ export function clearCommitted(state: ScenarioState): ScenarioState {
   return updateCards(state, Object.values(state.cards).filter((instance) => instance.committed).map((instance) => [instance.id, { committed: false }]));
 }
 
-export function travelTo(state: ScenarioState, locationId: string, cards: Cards): ScenarioState | null {
+export function travelTo(state: ScenarioState, locationId: string, cards: Cards, steps: EngineStep[] = []): ScenarioState | null {
+  // Exploration: the active location stays where it lies and the players travel from it to the next (families/island-travel.ts).
+  const mapped = islandTravelTo(state, locationId, cards, steps);
+  if (mapped !== undefined) return mapped;
   // A second active location slot may be free (families/south-locations.ts).
   const slot = freeSlot(state);
   // With no slot free the active location returns to the staging area when a stage lets the players travel anyway (12041:B:1).

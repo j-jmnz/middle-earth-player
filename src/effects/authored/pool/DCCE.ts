@@ -136,7 +136,30 @@ const BLACK_KEY_SAHIR: PickSpec = { type: "enemy", control: "any", staging: true
 const DREAM_CHASER_SHIP: PickSpec = { type: "character", control: "any", names: ["Dream-chaser"] };
 const ANOTHER_ALLY: PickSpec = { type: "ally", control: "any", other: true };
 
+// 11198 Starla (the ally the campaign card of Temple of the Deceived places under a Temple location): X is half her level, rounded up (dcce.scalable-upgradable); she is played when she is discarded from a hand or a deck,
+// and places progress on a location when she exhausts.
+const starlaStat = (stat: "willpower" | "attack" | "defense"): Effect["instructions"][number] => ({ verb: "ModifyStat", stat, amount: { level: true, halved: true }, until: "whileSourceInPlay" });
+
 export const RECORDS: readonly Effect[] = [
+  // 11198 Starla, 11199 Recurring Nightmare. Recurring Nightmare: Defense X (the number of players); when it leaves play it is shuffled into a player's deck, the first player choosing whose; when it enters a hand it is added to the staging area.
+  { id: "11198:constant:1", cardCode: "11198", lines: ["11198:A:1"], timing: "constant", instructions: [starlaStat("willpower"), starlaStat("attack"), starlaStat("defense")] },
+  { id: "11198:response:1", cardCode: "11198", lines: ["11198:A:2"], timing: "response", trigger: "discardedFromHand", subject: "self", instructions: [{ verb: "PutIntoPlay", card: "self" }] },
+  { id: "11198:response:2", cardCode: "11198", lines: ["11198:A:2"], timing: "response", trigger: "discardedFromDeck", subject: "self", instructions: [{ verb: "PutIntoPlay", card: "self" }] },
+  {
+    id: "11198:response:3",
+    cardCode: "11198",
+    lines: ["11198:A:3"],
+    timing: "response",
+    trigger: "exhausted",
+    subject: "self",
+    condition: { kind: "canPick", pick: ANY_LOCATION },
+    instructions: [{ verb: "Pick", pick: ANY_LOCATION }, { verb: "PlaceProgressOn", amount: 1, target: "picked" }],
+  },
+  { id: "11199:constant:1", cardCode: "11199", lines: ["11199:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "defense", amount: { players: true }, until: "whileSourceInPlay" }] },
+  // (an encounter enemy that leaves play is destroyed: the engine announces no other leaving of one, so the destruction is the leaving)
+  { id: "11199:triggered:1", cardCode: "11199", lines: ["11199:A:2"], timing: "triggered", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "ShuffleIntoPlayerDeck" }] },
+  { id: "11199:forced:1", cardCode: "11199", lines: ["11199:A:3"], timing: "forced", trigger: "enteredHand", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
+
   // 11192 Black Key (burden), both sides.
   removedWhenLeaving("11192", "11192:A:1", 1),
   blackKeyBurden("A", 1),

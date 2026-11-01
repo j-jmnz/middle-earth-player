@@ -31,7 +31,7 @@ export type DepthsFixture = { campaignId: string; seatCount: 2; loadout: StoredL
 export type DepthsFixtureName = "depths-won" | "depths-lost";
 
 // The log of a playthrough whose first four parts were won: the log of the first three (scripts/e2e-stormcaller.ts), then the Flight golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
-async function stormcallerWonLog(): Promise<CampaignLog> {
+export async function stormcallerWonLog(): Promise<CampaignLog> {
   const before = await raidWonLog();
   const golden = FLIGHT_GOLDENS.find((item) => item.name === "two-handed, won");
   if (!golden) throw new Error("The Flight golden \"two-handed, won\" is gone");

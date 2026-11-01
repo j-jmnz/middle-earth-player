@@ -17,6 +17,7 @@ import { flagged, livingSeats, updateCard } from "./state.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 import { lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "./windows.ts";
+import { exploring } from "./families/island-map.ts";
 
 export type TargetVerb = Extract<Instruction, { verb: "ReadyHero" | "BarAttack" | "PlaceProgressOnLocation" }>;
 
@@ -112,7 +113,8 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   if (placed <= 0) return state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
   const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
-  if (points == null || location.progress + placed < points) return next;
+  // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
+  if (points == null || location.progress + placed < points || exploring(next)) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
   return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps, true);
 }

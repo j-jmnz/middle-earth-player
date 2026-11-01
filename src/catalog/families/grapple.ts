@@ -18,8 +18,8 @@ export const VERBS = [
   // "Discard cards from the top of the encounter deck until X Tentacle enemies are discarded ... Resolve the Grapple keyword on each of those enemies." (12041:A:1): until `count` enemies with the trait
   // are discarded, or the deck is empty; then each of them resolves its keyword.
   z.strictObject({ verb: z.literal("DiscardUntilGrapple"), trait: z.string().min(1), count: positiveAmountSchema, ...when }),
-  // Campaign Setup: "Use The Thing in the Depths' 'Campaign Mode only' side" (dcce.campaign-setup-the-thing-in-the-depths): the set-aside card with this title shows its side B, with the stats and the
-  // text printed there.
+  // Campaign Setup: "Use The Thing in the Depths' 'Campaign Mode only' side" (dcce.campaign-setup-the-thing-in-the-depths): the card with this title shows its side B, with the stats and the text printed there: the set-aside one, or
+  // the one the scenario dealt to the staging area ("Use Temple Guardian's 'Campaign Mode only' side", dcce.campaign-setup-temple-of-the-deceived).
   z.strictObject({ verb: z.literal("FlipSetAside"), name: z.string().min(1), ...when }),
   // "Flip Captain Sahír and Na'asiyah to their objective sides, removing all tokens from them" (12040:B:1): the card in play with this title (the enemy side of a Stormcaller Elite card) turns
   // into the objective ally side, loses its tokens and joins the play area of the first or the last player (11077:A:1, 11079:A:1). It hears that it flipped over. A card out of play stays so.

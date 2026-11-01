@@ -44,6 +44,8 @@ export const simpleVerbs = [
     target: z
       .discriminatedUnion("kind", [
         z.strictObject({ kind: z.literal("byCode"), code: z.string().min(1) }),
+        // A ready card in play with this title that a player controls, whichever printing the game deals ("Exhaust the Gate Key to travel here", 12068:B:3: 12071, or 110078 in a campaign).
+        z.strictObject({ kind: z.literal("byName"), name: z.string().min(1) }),
         z.strictObject({ kind: z.literal("picked") }),
         // Another card the effect knows: its host, the event's subject, the attacker or the defender.
         z.strictObject({ kind: z.literal("ref"), ref: cardRefSchema }),
@@ -368,7 +370,9 @@ export const simpleVerbs = [
     verb: z.literal("ChooseCards"),
     codes: z.array(z.string().min(1)).min(1),
     who: z.enum(["firstPlayer", "eachSeat"]),
-    to: z.enum(["pool", "hand", "hero"]),
+    // `player`: a Resolution's card for a player chosen from those at the table, earned for that player and shuffled into their deck after the starting hand in the scenarios that follow ("choose a
+    // player ... that player shuffles that Recurring Nightmare into their deck after they draw their starting hand", 11197:B:1).
+    to: z.enum(["pool", "hand", "hero", "player"]),
     optional: z.boolean().optional(),
     leftover: z.enum(["firstPlayerDeck"]).optional(),
     // The card is dealt where `to` says but not earned: the scenario's Resolution decides whether it joins the pool (11182:A:2, with EarnDealt on 11182:B:2).

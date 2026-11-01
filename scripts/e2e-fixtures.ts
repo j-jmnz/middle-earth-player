@@ -59,6 +59,7 @@ import { fateFixtures } from "./e2e-fate.ts";
 import { raidFixtures } from "./e2e-raid.ts";
 import { stormcallerFixtures } from "./e2e-stormcaller.ts";
 import { depthsFixtures } from "./e2e-depths.ts";
+import { templeFixtures } from "./e2e-temple.ts";
 import { createLog, runScript } from "./log.ts";
 import { temporaryCatalog } from "./temp-catalog.ts";
 
@@ -412,6 +413,12 @@ void runScript("e2e-fixtures", async () => {
   const depthsFile = path.join(dir, "the-thing-in-the-depths.json");
   writeFileSync(depthsFile, `${JSON.stringify(depths)}\n`);
   say.info(`wrote ${depthsFile} (${Object.keys(depths).join(", ")})`);
+
+  // Temple of the Deceived (Dream-chaser part 6): from the log the first five parts' wins write, so the path resumes it. A game not found in the seeds is left out.
+  const templeGames = await say.stepAsync("play Temple of the Deceived's win and loss", () => templeFixtures());
+  const templeFile = path.join(dir, "temple-of-the-deceived.json");
+  writeFileSync(templeFile, `${JSON.stringify(templeGames)}\n`);
+  say.info(`wrote ${templeFile} (${Object.keys(templeGames).join(", ")})`);
 
   if (won) {
     const past = wonLog(won);

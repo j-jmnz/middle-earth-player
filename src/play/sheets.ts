@@ -16,6 +16,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
+import { islandBlocked, islandOptionLabel, islandTravelNote, islandTravelRow } from "./island-words.ts";
 import { grantedTravelWords, grappleAsk, grappleFactsOf, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "./grapple-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
@@ -33,6 +34,9 @@ import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
 import { viewOf } from "../rules/families/breaking-areas.ts";
 import { questSeat } from "./selectors.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
+import { recordsOfFace } from "../rules/families/dreamchaser-faces.ts";
+import { exploring } from "../rules/families/island-map.ts";
+import { islandMayTravel } from "../rules/families/island-travel.ts";
 import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
 import { sailingSheet } from "./sea-sheets.ts";
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
@@ -86,13 +90,14 @@ function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | und
 export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
   // Once stages are separate the traveler has its own active location and staging area (mec109.multiple-staging-areas).
   const game = viewOf(whole, questSeat(whole));
-  if (!freeSlot(game)) return [];
+  // Under Exploration the active location stays: the refusals matter once it is full and the players may travel from it (families/island-travel.ts).
+  if (!freeSlot(game) && !islandMayTravel(game, ctx.cards)) return [];
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
     if (!card || targets.includes(id) || printedOf(ctx.cards, card.code).type !== "location") return [];
     const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
     if (!reason) return [];
-    const travel = effectsOf(ctx, card.code).find((effect) => effect.timing === "travel");
+    const travel = recordsOfFace(card, effectsOf(ctx, card.code)).find((effect) => effect.timing === "travel");
     const line = lineOf(travel, names) ?? grantedTravelWords(game, id);
     return [{ id, label: cardLabel(game, names, id), code: pictureKey(card), reason: line ? `${reason}. ${line}` : `${reason}.` }];
   });
@@ -284,7 +289,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? unchartedOptionLabel(wait.item.instruction, id, game, words)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
@@ -346,12 +351,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         kind: "pick",
         key: `travel:${game.round}`,
         step: "Travel",
-        title: targets.length > 0 ? "Travel to a location" : blocked && active ? `Explore ${names.card(active.id)} first` : "No location to travel to",
+        title: targets.length > 0 ? "Travel to a location" : blocked && active ? (exploring(game) ? `Fill ${names.card(active.id)} first` : `Explore ${names.card(active.id)} first`) : "No location to travel to",
         note:
           targets.length > 0
-            ? [travelNote(game, targets), returnsNote(game, ctx, names.card)].filter((part) => part != null).join(" ")
+            ? [islandTravelNote(game, names.card) ?? travelNote(game, targets), returnsNote(game, ctx, names.card)].filter((part) => part != null).join(" ")
             : blocked && active && activePoints != null
-              ? `${Math.max(0, activePoints - active.progress)} more progress explores it. Only one location can be active.`
+              ? (islandBlocked(game, activePoints - active.progress, names.card(active.id)) ?? `${Math.max(0, activePoints - active.progress)} more progress explores it. Only one location can be active.`)
               : null,
         verb: "Travel to",
         options: targets.map((id) => {
@@ -359,16 +364,18 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const points = location ? questPointsOf(game, location, ctx.cards) : null;
           const stats: SheetStat[] = [...statOf(game, ctx, id, "threat"), ...(points == null ? [] : [{ icon: "questPoints" as const, value: points, word: "Quest points" }])];
           // Its Travel line, when it prints one (a cost the travel pays: Great Forest Web's "exhaust 1 hero").
-          const travel = location ? effectsOf(ctx, location.code).find((effect) => effect.timing === "travel") : undefined;
+          const travel = location ? recordsOfFace(location, effectsOf(ctx, location.code)).find((effect) => effect.timing === "travel") : undefined;
           const line = lineOf(travel, names);
           const base = option(game, names, id);
+          // On the Island Map: how far the location is, what a Temple location brings back, who attacks when the players go right (island-words.ts).
+          const mapped = islandTravelRow(game, ctx, id, names.card);
           // A Travel line that moves progress onto the Stormcaller's stage states what it leaves there, and arms the confirm when it advances the Stormcaller or loses the game.
           const caller = stormcallerTravel(game, ctx, id);
           // A Travel cost another card gave it (Weather Deck, 12044:A:1), and the enemies grappled with it that come out and join the staging area (dcce.grapple): the confirm is armed with what they do.
           const granted = grantedTravelWords(game, id);
           const grapple = grappleTravel(game, ctx, id);
-          const label = [base.label, line, granted, caller?.words, grapple?.words].filter((part) => part != null && part !== "").join(" · ");
-          const caution = caller?.caution ?? grapple?.caution;
+          const label = [base.label, line, granted, caller?.words, grapple?.words, mapped?.words].filter((part) => part != null && part !== "").join(" · ");
+          const caution = caller?.caution ?? grapple?.caution ?? mapped?.caution;
           return { ...base, label, stats, ...(caution ? { caution } : {}), intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),

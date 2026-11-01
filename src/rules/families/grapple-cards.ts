@@ -51,9 +51,9 @@ export function discardAndGrapple(state: ScenarioState, instruction: Verb<"Disca
   return queueFront(next, grapplers.map((card) => ({ instruction: { verb: "ResolveGrapple" as const, card }, seat: next.firstPlayer, chosen: null, cause })));
 }
 
-/** FlipSetAside: the set-aside card with this title shows its side B. */
+/** FlipSetAside: the set-aside card with this title shows its side B; so does the one in the staging area, which the scenario dealt there before the campaign Setup ("Use Temple Guardian's 'Campaign Mode only' side"). */
 export function flipSetAside(state: ScenarioState, instruction: Verb<"FlipSetAside">, ctx: ReduceContext): ScenarioState {
-  const id = setAsideNamed(state, instruction.name, ctx);
+  const id = setAsideNamed(state, instruction.name, ctx) ?? state.staging.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name);
   return id ? updateCard(state, id, { face: "B" }) : state;
 }
 

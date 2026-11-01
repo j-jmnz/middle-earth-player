@@ -3,9 +3,10 @@
 import type { PrintedCard } from "../rules/printed.ts";
 
 import { pictureCode } from "./picture-key.ts";
-import { LOST_ISLAND_NAME } from "./uncharted-words.ts";
+import { LOST_ISLAND_NAME, TEMPLE_NAME } from "./uncharted-words.ts";
 
-export function shownName(key: string, printed: Pick<PrintedCard, "name" | "keywords"> | undefined): string {
+export function shownName(key: string, printed: Pick<PrintedCard, "name" | "keywords" | "upgraded"> | undefined): string {
   const code = pictureCode(key);
-  return key !== code && printed?.keywords.uncharted === true ? LOST_ISLAND_NAME : (printed?.name ?? code);
+  // The Temple of the Deceived side prints a Threat of its own (a Lost Island's is the same on every copy): it is a Temple location, whatever it turns out to be.
+  return key !== code && printed?.keywords.uncharted === true ? (printed.upgraded?.threat != null ? TEMPLE_NAME : LOST_ISLAND_NAME) : (printed?.name ?? code);
 }

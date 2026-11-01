@@ -135,10 +135,42 @@
         "code": "110077"
       },
       "set": {
-        "encounterSet": "Temple of the Deceived"
+        "encounterSet": "Temple of the Deceived",
+        "back": {
+          "threat": 0,
+          "engagementCost": 50,
+          "attack": 5,
+          "defense": 0,
+          "health": 10,
+          "victory": 5
+        }
       },
-      "reason": "Hall of Beorn files the Dream-chaser Campaign Expansion's Temple Guardian reprint under 'The Fate of Númenor Campaign'. The card is the reprint of Temple Guardian 12070, a Temple of the Deceived card (the scenario 6 Setup attaches it to the staging area; dcce.setup-temple-of-the-deceived names Temple of the Deceived as the set), and its Campaign Mode only side is used in that scenario (dcce.setup-temple-of-the-deceived, Campaign Setup).",
-      "source": "hallofbeorn.com/Export/EncounterCards (Temple-Guardian-DCC); scan 12070.A; dcce.campaign-setup-temple-of-the-deceived"
+      "reason": "Hall of Beorn files the Dream-chaser Campaign Expansion's Temple Guardian reprint under 'The Fate of Númenor Campaign'. The card is the reprint of Temple Guardian 12070, a Temple of the Deceived card (the scenario 6 Setup attaches it to the staging area; dcce.setup-temple-of-the-deceived names Temple of the Deceived as the set), and its Campaign Mode only side is used in that scenario (dcce.setup-temple-of-the-deceived, Campaign Setup). Hall of Beorn has no stat fields for that side: the scan prints Engagement cost 50, Threat X, Attack 5, Defense X, 10 hit points and Victory 5 on it (the ledger notes of 110077.B record the reading), against Threat X, Attack 6, Defense 4, 10 hit points and Victory 4 on side A. X is the number of players, which the card's record adds to the printed 0 of Threat and Defense; the score counts the Victory of the side the card was on.",
+      "source": "hallofbeorn.com/Export/EncounterCards (Temple-Guardian-DCC); scan 12070.A; scan 110077.B, data/printed/dream-chaser.json; dcce.campaign-setup-temple-of-the-deceived"
+    },
+    {
+      "match": {
+        "code": "12068"
+      },
+      "set": {
+        "back": {
+          "threat": 4
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for the Temple of the Deceived side of The Grotto's Entrance. The scan prints Threat 4 and no quest points on that side (the ledger notes of 12068.B record the reading), where a Lost Island prints Threat 2.",
+      "source": "scan 12068.B, data/printed/dream-chaser.json"
+    },
+    {
+      "match": {
+        "code": "12069"
+      },
+      "set": {
+        "back": {
+          "threat": 4
+        }
+      },
+      "reason": "Hall of Beorn has no stat fields for the Temple of the Deceived side of Temple Halls. The scan prints Threat 4 and no quest points on that side (the ledger notes of 12069.B record the reading), where a Lost Island prints Threat 2.",
+      "source": "scan 12069.B, data/printed/dream-chaser.json"
     },
     {
       "match": {

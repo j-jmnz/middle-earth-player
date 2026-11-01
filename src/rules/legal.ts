@@ -25,6 +25,8 @@ import { flagged, perilLock, type ScenarioState } from "./state.ts";
 import { attackRuleReason } from "./families/attack-targets.ts";
 import { sideQuestReason } from "./families/sidequests-quest.ts";
 import { travelsOverActive } from "./families/grapple-travel.ts";
+import { exploring } from "./families/island-map.ts";
+import { islandMayTravel, islandReach } from "./families/island-travel.ts";
 import { freeSlot, mustTravel } from "./families/south-locations.ts";
 import { viewOf } from "./families/breaking-areas.ts";
 import { shipAttackReason, shipDefenseReason } from "./families/sea-ships.ts";
@@ -87,7 +89,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "CommitHide":
       return state.window?.kind === "hideCommit" ? hideCommitters(state, state.window.seat, ctx.cards) : [];
     case "Travel":
-      return canTravel(state) ? travelTargets(state, ctx) : [];
+      return canTravel(state, ctx) ? travelTargets(state, ctx) : [];
     case "Engage":
       return optionalEnemies(state, ctx.cards);
     case "ChooseEnemy":
@@ -147,7 +149,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       return travelReason(state, intent, ctx);
     case "DeclineTravel":
       if (state.window?.kind !== "travel") return "That intent is not legal in this window";
-      return mustTravelNow(state, ctx) && canTravel(state) && travelTargets(state, ctx).length > 0 ? "The players must travel to a location, if able" : null;
+      return mustTravelNow(state, ctx) && canTravel(state, ctx) && travelTargets(state, ctx).length > 0 ? "The players must travel to a location, if able" : null;
     case "Engage":
       return engageReason(state, intent, ctx);
     case "DeclineEngage":
@@ -190,13 +192,20 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 }
 
 // A slot is free for the traveling seat: its own active location once stages are separate (families/breaking-areas.ts).
-function canTravel(state: ScenarioState): boolean {
-  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state);
+// Under Exploration the active location stays, and the players may travel from it once it holds progress equal to its quest points (families/island-travel.ts).
+function canTravel(state: ScenarioState, ctx: ReduceContext): boolean {
+  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards);
+}
+
+// The locations the players may travel to: those in the staging area, and the ones the active location lets them reach beyond it (Winding Caverns, 12073:A:2).
+function travelCandidates(state: ScenarioState, ctx: ReduceContext): string[] {
+  const staged = stagingLocations(state, ctx.cards, state.separate ? state.activeSeat : undefined);
+  return islandMayTravel(state, ctx.cards) ? [...staged, ...islandReach(state)] : staged;
 }
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
   // Once stages are separate the seat that travels chooses among the locations of its own staging area.
-  const open = stagingLocations(state, ctx.cards, state.separate ? state.activeSeat : undefined).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  const open = travelCandidates(state, ctx).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
   // A location that says the players must travel to it (01088:A:1) is the only one they may travel to.
   const forced = forcedTravel(state, ctx);
   return forced.length > 0 ? open.filter((id) => forced.includes(id)) : open;
@@ -209,7 +218,7 @@ function mustTravelNow(state: ScenarioState, ctx: ReduceContext): boolean {
 
 function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   const intents: LegalIntent[] = [{ type: "DeclineTravel" }];
-  if (canTravel(state) && travelTargets(state, ctx).length > 0) {
+  if (canTravel(state, ctx) && travelTargets(state, ctx).length > 0) {
     // "The players must travel to a location, if able" (mec109.stage-4): no declining while they can.
     return mustTravelNow(state, ctx) ? [{ type: "Travel" }] : [{ type: "Travel" }, ...intents];
   }
@@ -244,8 +253,8 @@ function travelReason(
   ctx: ReduceContext,
 ): string | null {
   if (state.window?.kind !== "travel") return "That intent is not legal in this window";
-  if (!canTravel(state)) return "An active location is already in play";
-  if (!stagingLocations(state, ctx.cards, state.separate ? state.activeSeat : undefined).includes(intent.locationId)) return "That location is not in staging";
+  if (!canTravel(state, ctx)) return exploring(state) ? "The active location needs progress equal to its quest points before the players can travel from it" : "An active location is already in play";
+  if (!travelCandidates(state, ctx).includes(intent.locationId)) return "That location is not in staging";
   const forced = forcedTravel(state, ctx);
   if (forced.length > 0 && !forced.includes(intent.locationId)) return "The players must travel to the location that says so";
   if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";

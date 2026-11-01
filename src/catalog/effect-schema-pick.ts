@@ -165,6 +165,9 @@ export const pickSchema = z.strictObject({
   uncharted: z.boolean().optional(),
   minProgress: z.number().int().positive().optional(),
   bottom: z.number().int().positive().optional(),
+  // The island family's filter (src/rules/families/island-pick.ts, dcce.island-map): `start`, the faceup left corners of the Island Map at Setup, before one is the active location; `temple`, the Temple column's
+  // locations that lie facedown, wherever they are on the map; `secret`, the cards facedown under those locations; `here`, the secret under the active location; `adjacent`, the copies of Lost Island (not Temple of the Deceived) next to the active location.
+  island: z.enum(["start", "temple", "secret", "here", "adjacent"]).optional(),
   // The attack family's filters (src/rules/families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the
   // printed Ranged keyword").
   printedKeyword: z.enum(["ranged", "sentinel"]).optional(),
@@ -189,6 +192,8 @@ export const pickSchema = z.strictObject({
   onPicked: z.boolean().optional(),
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),
+  // A character whose current Attack is at least this ("a character with at least 2 Attack", 12074:A:2).
+  minAttack: z.number().int().min(0).optional(),
   drawn: z.boolean().optional(),
   // Of the cards that match every other filter, only those with the most damage on them (all of them when tied): "the hero you control
   // with the most damage on it" (01137:A:2). Read by pickCandidates (src/rules/pick.ts).
