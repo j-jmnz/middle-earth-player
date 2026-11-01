@@ -63,6 +63,8 @@ agent-tools/
 
 # card images; shell icons stay
 *.jpg
+# what scans:pack packed each picture from
+assets/scans/.packed.json
 *.jpeg
 *.webp
 *.png

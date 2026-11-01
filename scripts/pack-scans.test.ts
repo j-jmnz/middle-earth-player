@@ -5,6 +5,7 @@ import path from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { sniffImage } from "../src/screens/images/policy.ts";
 import { sha256 } from "./data/sources/fetch.ts";
 import { createLog } from "./log.ts";
 import { MAX_SIDE, packScans, sceneOf, shrinkToMaxSide } from "./pack-scans.ts";
@@ -106,7 +107,7 @@ describe("pack scans", () => {
       log,
     );
     expect(fetched).toEqual([THREE_URL]);
-    expect(readdirSync(staged.options.scansDir).sort()).toEqual(["141001.jpg", "141022.jpg", "141031.B.jpg", "141031.jpg"]);
+    expect(readdirSync(staged.options.scansDir).sort()).toEqual([".packed.json", "141001.jpg", "141022.jpg", "141031.B.jpg", "141031.jpg"]);
     expect(packed.find((entry) => entry.code === "141031")).toMatchObject({ width: 423, height: 600 });
     expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
     const map = readFileSync(staged.options.mapPath, "utf8");
@@ -117,6 +118,29 @@ describe("pack scans", () => {
     expect(map).toContain("141022");
     expect(map).toContain("141001");
     expect(map).not.toContain("99999");
+  });
+
+  it("keeps a picture packed from the same pin, and packs one again when its pin moves", async () => {
+    const staged = stage();
+    const fetch = () => Promise.resolve(new Uint8Array(jpeg(560)));
+    const first = await packScans({ ...staged.options, fetch }, log);
+    const shrunk: string[] = [];
+    const shrink = (body: Uint8Array) => {
+      shrunk.push(String(sniffImage(body)?.height));
+      return Promise.resolve(body);
+    };
+    // Nothing moved: every picture is kept, nothing is loaded, and the map is the same.
+    const again = await packScans({ ...staged.options, shrink, fetch: () => Promise.reject(new Error("offline")) }, log);
+    expect(shrunk).toEqual([]);
+    expect(again).toEqual(first);
+    // Bag End's side A pin moves (a data:sync pictures): only it is packed again.
+    const sources = JSON.parse(readFileSync(staged.sources, "utf8")) as { sources: { scans: { files: { path: string }[] } } };
+    sources.sources.scans.files = sources.sources.scans.files.map((file) => (file.path === "scans/141031.A.jpg" ? staged.pin("141031", BAG_END_URL, jpeg(700)) : file));
+    writeFileSync(staged.sources, JSON.stringify(sources));
+    writeFileSync(path.join(staged.cache, "141031.A.jpg"), jpeg(700));
+    const moved = await packScans({ ...staged.options, shrink }, log);
+    expect(shrunk).toEqual(["700"]);
+    expect(moved.find((entry) => entry.code === "141031")).toMatchObject({ height: 700 });
   });
 
   it("fails when the fetched bytes do not match the pin", async () => {

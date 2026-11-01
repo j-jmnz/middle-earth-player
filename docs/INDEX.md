@@ -31,16 +31,16 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.4K tok)
+- `README.md` — Middle Earth LCG (~3.5K tok)
   - 7–17 Where it stands (~390)
   - 18–23 Rules come from the printed sources (~160)
-  - 24–51 Commands (~910)
+  - 24–51 Commands (~990)
   - 52–61 Documents (~260)
   - 62–65 Agents (~120)
   - 66–160 Run it locally (~1.4K)
     - 70–75 Mac browser (~120)
     - 76–81 Codespaces (~110)
-    - 82–156 Phone builds from scratch (Mac) (~1.0K)
+    - 82–156 Phone builds from scratch (Mac) (~1.1K)
     - 157–160 Maestro (~120)
 - `docs/architecture.md` — Architecture (~16.5K tok)
   - 7–41 Stack (~990)
