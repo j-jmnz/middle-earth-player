@@ -1,7 +1,7 @@
 // The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system-table.md, Gestures).
 import { describe, expect, it } from "vitest";
 
-import { cardAt, cancelled, fanTilts, handSlots, pick, pushed, restAt, restMove, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_REST_MS, SCRUB_SLOP, type Rest, type Spread } from "./hand-scrub.ts";
+import { cardAt, cancelled, fanTilts, handSlots, pick, pushed, pushing, pushMove, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_PUSH, SCRUB_SLOP, type Push, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 import { scrubPose } from "./scrub-pose.ts";
@@ -187,10 +187,12 @@ describe("spreadLayout", () => {
               expect(cy + halfH, where).toBeLessThanOrEqual(canvas.height - canvas.bottom + 1e-6);
             }
           }
-          // The cancel line is the risen hand's top less a slice, whatever the lifted card's grow: a finger on the risen hand
-          // never cancels.
-          expect(cancelled(spread, spread.top)).toBe(false);
-          expect(cancelled(spread, spread.top - (spread.reach ?? MIN_TARGET) - 1)).toBe(true);
+          // The cancel line is the lifted card's top less a slice: a finger anywhere on the risen hand or the lifted card never
+          // cancels. The lifted card stands above the risen hand and inside the canvas's edge.
+          expect(spread.ceiling).toBeLessThanOrEqual(spread.top + 1e-6);
+          expect(spread.ceiling).toBeGreaterThanOrEqual(spread.room.top - 1e-6);
+          expect(cancelled(spread, spread.ceiling)).toBe(false);
+          expect(cancelled(spread, spread.ceiling - (spread.reach ?? MIN_TARGET) - 1)).toBe(true);
           expect(spread.room.lift).toBeLessThanOrEqual(SHAPE.scrubLiftScale);
         }
       }
@@ -241,18 +243,18 @@ describe("cancelled and pick", () => {
   const spread: Spread = spreadLayout(layoutOf(5, canvas.width, canvas.height), canvas);
   const inside = spread.top + 20;
 
-  it("cancels more than 44 pt above the top of the risen hand, and not at or below that line", () => {
-    expect(cancelled(spread, spread.top - MIN_TARGET - 1)).toBe(true);
-    expect(cancelled(spread, 0)).toBe(true);
-    expect(cancelled(spread, spread.top - MIN_TARGET)).toBe(false);
-    expect(cancelled(spread, spread.top - 1)).toBe(false);
+  it("cancels more than 44 pt above the top of the lifted card, and not at or below that line", () => {
+    expect(cancelled(spread, spread.ceiling - MIN_TARGET - 1)).toBe(true);
+    expect(cancelled(spread, spread.ceiling - MIN_TARGET)).toBe(false);
+    expect(cancelled(spread, spread.ceiling)).toBe(false);
     expect(cancelled(spread, spread.top)).toBe(false);
     expect(cancelled(spread, canvas.height - 1)).toBe(false);
   });
 
-  it("picks the card under the finger, and none above the hand", () => {
+  it("picks the card under the finger, also high on the lifted card, and none above it", () => {
     expect(pick(spread, spread.centers[3] ?? 0, inside)).toBe(3);
-    expect(pick(spread, spread.centers[3] ?? 0, spread.top - MIN_TARGET - 1)).toBe(-1);
+    expect(pick(spread, spread.centers[3] ?? 0, spread.ceiling + 1)).toBe(3);
+    expect(pick(spread, spread.centers[3] ?? 0, spread.ceiling - MIN_TARGET - 1)).toBe(-1);
   });
 
   it("picks none off the ends of the hand, past half a slice", () => {
@@ -315,45 +317,45 @@ describe("the hold and the selection tick", () => {
   });
 });
 
-describe("a forward push from a rest picks the card up", () => {
+describe("a forward push picks the lifted card up", () => {
   const spread = spreadLayout(layoutOf(5, 390, 700), { width: 390, height: 700, bottom: 0 });
-  const half = (spread.reach ?? MIN_TARGET) / 2;
-  // The finger rests on card 2 at (200, 600) from t = 0.
-  const rested = restAt(200, 600, 0);
-  // Runs a path of [x, y, t] moves from a rest with card 2 under the finger, and says whether the last one picks it up.
-  function push(path: [number, number, number][], playable = 2, from: Rest = rested): boolean {
-    let rest = from;
+  const far = (spread.reach ?? MIN_TARGET) * SCRUB_PUSH;
+  // Runs a path of [x, y] moves from a run starting at (200, 600), and says whether the last one picks the card up.
+  function push(path: [number, number][], from: Push = { x: 200, y: 600 }): boolean {
+    let run = from;
     let last: [number, number] = [from.x, from.y];
-    for (const [x, y, t] of path) {
-      rest = restMove(rest, playable, x, y, t);
+    for (const [x, y] of path) {
+      run = pushMove(run, x, y);
       last = [x, y];
     }
-    return pushed(rest, spread, last[0], last[1]);
+    return pushed(run, spread, last[0], last[1]);
   }
 
-  it("picks up after a rest and a push up of half the reach", () => {
-    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [202, 600 - half, SCRUB_REST_MS + 30]])).toBe(true);
+  it("picks up after a push straight up of the push share of the reach, with no rest first", () => {
+    expect(far).toBeGreaterThan(SCRUB_SLOP);
+    expect(push([[200, 600 - far]])).toBe(true);
+    expect(push([[201, 598], [202, 600 - far]])).toBe(true);
   });
 
   it("does not pick up before the push has gone far enough", () => {
-    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [200, 600 - half + 2, SCRUB_REST_MS + 30]])).toBe(false);
+    expect(push([[200, 600 - far + 1]])).toBe(false);
   });
 
-  it("does not pick up without the rest: a slide that turns up cancels as before", () => {
-    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS - 1], [200, 600 - half, SCRUB_REST_MS + 30]])).toBe(false);
+  it("the run starts where the finger turns forward: a slide along the hand, then up", () => {
+    expect(push([[230, 600], [260, 601], [262, 601 - far]])).toBe(true);
+    // From the first point the move is more sideways than up, so it counts only from the turn.
+    expect(push([[230, 600], [260, 601], [262, 601 - far + 2]])).toBe(false);
   });
 
-  it("does not pick up a card that cannot be played", () => {
-    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [200, 600 - half, SCRUB_REST_MS + 30]], -1)).toBe(false);
+  it("a move more sideways than up is not a push, and going back down starts the run again", () => {
+    expect(push([[200 + far + 2, 600 - far]])).toBe(false);
+    expect(push([[200, 600 - far + 4], [200, 600 + 10], [200, 610 - far + 4]])).toBe(false);
   });
 
-  it("a move more sideways than up does not arm, and turning sideways disarms", () => {
-    expect(push([[210, 597, SCRUB_REST_MS], [210, 600 - half, SCRUB_REST_MS + 30]])).toBe(false);
-    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [230, 590, SCRUB_REST_MS + 20], [230, 600 - half - 10, SCRUB_REST_MS + 40]])).toBe(false);
-  });
-
-  it("moves within the slop keep the rest", () => {
-    const still = restMove(rested, 2, 203, 602, 50);
-    expect(still).toBe(rested);
+  it("a jitter within the slop keeps the run, and the card stays lifted while it goes forward", () => {
+    const run = { x: 200, y: 600 };
+    expect(pushMove(run, 203, 602)).toBe(run);
+    expect(pushing(run, 201, 595)).toBe(true);
+    expect(pushing(run, 210, 595)).toBe(false);
   });
 });

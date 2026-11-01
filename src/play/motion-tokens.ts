@@ -92,6 +92,9 @@ export const MOTION = {
   previewOut: tween(150, "inQuad"),
   dragLift: tween(90, null),
   dragReturn: tween(160, null),
+  // One swing of the shake a card pushed out of the hand scrub gives when it cannot be played and is let go (four swings, then
+  // `dragReturn` home).
+  dragRefuse: tween(45, "outQuad"),
   dialPopRise: tween(140, null),
   dialPopSettle: spring(350, 0.5),
   threatBadgeIn: tween(160, null),

@@ -6,15 +6,16 @@
 // (for the selection tick, the preview at the release, and the pick-up on a forward push) crosses to JavaScript.
 //
 // The first touch of the drag pan is the hurry and the spotlight's skip (finishMotions, `swallow`); a touch that skipped a spotlight
-// does nothing else, and its hold never starts a scrub. A scrub sends no intent and picks nothing: a forward push from a rest on a
-// playable card picks that card up into the drag, which follows the finger and, as any drag, picks only when dropped on a target.
+// does nothing else, and its hold never starts a scrub. A scrub sends no intent and picks nothing: a forward push picks the lifted
+// card up into the drag, which follows the finger and, as any drag, picks only when dropped on a target. A card that cannot be
+// played is carried too, and let go it shakes and goes home.
 import { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { Gesture } from "react-native-gesture-handler";
-import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import { cancelAnimation, useDerivedValue, useSharedValue, withDelay, withSequence, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { finishMotions } from "./card-motion.native.tsx";
-import { cancelled, NO_SPREAD, pick, pushed, restAt, restMove, SCRUB_HOLD_MS, SCRUB_REST_MS, SCRUB_SLOP, scrubClock, spreadLayout, startCard, startsScrub, type Rest, type Spread } from "./hand-scrub.ts";
+import { NO_SPREAD, pick, pushed, pushing, pushMove, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startCard, startsScrub, type Push, type Spread } from "./hand-scrub.ts";
 import { tickArmed } from "./haptics.ts";
 import { hitDrop, hitSlot, type CardSlot, type DropRect, type TableLayout } from "./layout.ts";
 import { timing } from "./motion-run.ts";
@@ -55,15 +56,17 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   const apartTiming = useMemo(() => timing(MOTION.scrubSpread, k), [k]);
   const scrubLiftTiming = useMemo(() => timing(MOTION.scrubLift, k), [k]);
   const fallTiming = useMemo(() => timing(MOTION.scrubFall, k), [k]);
+  const refuseTiming = useMemo(() => timing(MOTION.dragRefuse, k), [k]);
+  // How far the refusal shake swings each way: 6 pt at Medium, with the layout's UI scale.
+  const swing = 6 * (layout.scale ?? 1);
 
   // What the worklets read: the slots, which of them can be picked up, the selected card's drop rectangles and the spread hand.
   const slots = useSharedValue<readonly CardSlot[]>(layout.slots);
   const lifts = useSharedValue<readonly boolean[]>([]);
   const drops = useSharedValue<readonly DropRect[]>([]);
   const spreadNow = useSharedValue<Spread>(NO_SPREAD);
-  // Which spread cards (hand order) can be played, and where the finger last rested during the scrub.
-  const playable = useSharedValue<readonly boolean[]>([]);
-  const rest = useSharedValue<Rest>(restAt(0, 0, 0));
+  // Where the finger's current forward run started during the scrub.
+  const push = useSharedValue<Push>({ x: 0, y: 0 });
   const dragging = useSharedValue(-1);
   const dx = useSharedValue(0);
   const dy = useSharedValue(0);
@@ -98,8 +101,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   }, [layout, targets, drops]);
   useLayoutEffect(() => {
     spreadNow.set(spread);
-    playable.set(spread.ids.map((id) => draggableSet.has(id)));
-  }, [spread, spreadNow, draggableSet, playable]);
+  }, [spread, spreadNow]);
 
   // The hand goes back down: at once under reduced motion, else over the scrub's fall.
   const settle = useCallback(() => {
@@ -145,14 +147,31 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   }, [settle]);
 
   // The dragged card is let go at a point: on one of its drop targets the drop picks (the dock asks to confirm it) and the card is
-  // drawn where the next state puts it; anywhere else it goes back and nothing is asked. The drag pan and a carried scrub card end here.
+  // drawn where the next state puts it; anywhere else it goes back and nothing is asked. A card that cannot be played (only a scrub
+  // carries one) first shakes where it was let go, saying the move is not legal. The drag pan and a carried scrub card end here.
   const release = useCallback(
     (x: number, y: number) => {
       "worklet";
-      const slot = slots.get()[dragging.get()];
-      if (dragging.get() < 0 || !slot) return;
+      const at = dragging.get();
+      const slot = slots.get()[at];
+      if (at < 0 || !slot) return;
       const target = hitDrop(drops.get(), x, y);
       lift.set(1);
+      if (target === "" && k !== 0 && !lifts.get()[at]) {
+        const from = dx.get();
+        const shake = refuseTiming.duration * 4;
+        dx.set(withSequence(withTiming(from + swing, refuseTiming), withTiming(from - swing, refuseTiming), withTiming(from + swing / 2, refuseTiming), withTiming(from, refuseTiming), withTiming(0, returnTiming)));
+        dy.set(
+          withDelay(
+            shake,
+            withTiming(0, returnTiming, () => {
+              dragging.set(-1);
+              scheduleOnRN(select, null);
+            }),
+          ),
+        );
+        return;
+      }
       if (target !== "" || k === 0) {
         dx.set(0);
         dy.set(0);
@@ -170,7 +189,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         }),
       );
     },
-    [slots, dragging, drops, lift, dx, dy, k, returnTiming, onDrop, select],
+    [slots, lifts, dragging, drops, lift, dx, dy, k, returnTiming, refuseTiming, swing, onDrop, select],
   );
 
   const liftTransform = useDerivedValue(() => [{ translateX: dx.get() }, { translateY: dy.get() }, { scale: lift.get() }]);
@@ -250,8 +269,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         rise.set(k === 0 ? 1 : withTiming(1, riseTiming));
         apart.set(k === 0 ? 1 : withTiming(1, apartTiming));
         lifting(first);
-        // The press was held still on the card to start the scrub, so it has rested there already: a push up plays it at once.
-        rest.set(restAt(event.x, event.y, scrubClock() - SCRUB_REST_MS));
+        push.set({ x: event.x, y: event.y });
         begun.set(true);
         scheduleOnRN(onScrub, first, true, true);
       })
@@ -264,11 +282,11 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         if (!scrubbing.get()) return;
         const now = spreadNow.get();
         const under = index.get();
-        const moved = restMove(rest.get(), under >= 0 && playable.get()[under] ? under : -1, event.x, event.y, scrubClock());
-        rest.set(moved);
-        // Pushed forward from a rest on a playable card: the hand settles and the card is picked up, as a drag from the hand picks it
-        // up, centred under the finger. Its drop targets come with the selection, as a drag's do.
-        const pickedUp = pushed(moved, now, event.x, event.y) ? now.ids[moved.armed] : undefined;
+        const moved = pushMove(push.get(), event.x, event.y);
+        push.set(moved);
+        // Pushed forward: the hand settles and the lifted card is picked up, as a drag from the hand picks it up, centred under the
+        // finger. Its drop targets come with the selection, as a drag's do (none for a card that cannot be played).
+        const pickedUp = pushed(moved, now, event.x, event.y) ? now.ids[under] : undefined;
         const at = pickedUp === undefined ? -1 : slots.get().findIndex((slot) => slot.id === pickedUp && slot.kind === "card");
         const home = slots.get()[at];
         if (home && pickedUp !== undefined) {
@@ -286,14 +304,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
           scheduleOnRN(select, pickedUp);
           return;
         }
-        // Sliding up past the risen hand without that rest cancels for good; the hand settles back.
-        if (cancelled(now, event.y)) {
-          settle();
-          scheduleOnRN(onScrub, -1, false);
-          return;
-        }
-        // While a push is under way the armed card stays lifted, though the finger drifts toward a neighbour.
-        if (moved.armed >= 0) return;
+        // While a push is under way the lifted card stays lifted, though the finger drifts toward a neighbour.
+        if (pushing(moved, event.x, event.y)) return;
         const next = pick(now, event.x, event.y);
         if (next === under) return;
         lifting(next);
@@ -320,7 +332,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       });
 
     return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, spreadNow, playable, rest, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, release, select, onTap, onPreview, onScrub]);
+  }, [slots, lifts, spreadNow, push, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, release, select, onTap, onPreview, onScrub]);
 
   const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, left, drop, spread }), [rise, apart, scrubLift, index, left, drop, spread]);
   return { gesture, liftTransform, scrub };

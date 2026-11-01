@@ -117,24 +117,24 @@ Read the sections your task touches.
   - 98–101 Tokens and effects (~320)
   - 102–110 Piles (~850) ← 2
   - 111–116 Marks of the open moment (~400) ← 1
-  - 117–182 Motion (~2.7K) ← 8
-  - 183–209 Spotlight (~2.1K) ← 16
-  - 210–215 Gestures (~210) ← 5
-  - 216–219 Hold, slide and release (~860)
-  - 220–225 Peeking at the other seat (~600) ← 1
-  - 226–239 Command column (~1.6K) ← 7
-  - 240–243 Two taps (~320) ← 2
-  - 244–247 One answer, one tap (~240)
-  - 248–251 Stops and Always use (~250)
-  - 252–255 Guide (~120)
-  - 256–265 Choice tray (~780) ← 2
-  - 266–277 Reading panels (~960) ← 4
-  - 278–287 Phase carousel (~670)
-  - 288–293 Quest advance (~460) ← 1
-  - 294–297 Undo (~140)
-  - 298–301 Haptics (~250)
-  - 302–312 Banner (~580) ← 1
-  - 313–316 Android Back (~90)
+  - 117–183 Motion (~2.7K) ← 8
+  - 184–210 Spotlight (~2.1K) ← 16
+  - 211–216 Gestures (~210) ← 5
+  - 217–220 Hold, slide and release (~920)
+  - 221–226 Peeking at the other seat (~600) ← 1
+  - 227–240 Command column (~1.6K) ← 7
+  - 241–244 Two taps (~320) ← 2
+  - 245–248 One answer, one tap (~240)
+  - 249–252 Stops and Always use (~250)
+  - 253–256 Guide (~120)
+  - 257–266 Choice tray (~780) ← 2
+  - 267–278 Reading panels (~960) ← 4
+  - 279–288 Phase carousel (~670)
+  - 289–294 Quest advance (~460) ← 1
+  - 295–298 Undo (~140)
+  - 299–302 Haptics (~250)
+  - 303–313 Banner (~580) ← 1
+  - 314–317 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~22.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
@@ -184,7 +184,7 @@ STATUS.md, then the active phase file.
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
     - 119–135 Screens and code (~810)
-    - 136–153 Phone and tablet checks (~870)
+    - 136–153 Phone and tablet checks (~880)
   - 154–169 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
