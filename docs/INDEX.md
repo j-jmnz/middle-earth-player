@@ -103,7 +103,7 @@ Read the sections your task touches.
   - 838–862 Persistence and shipping (~1.6K)
   - 863–903 Screens (~4.4K) ← 2
     - 889–903 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~25.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~25.5K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
@@ -120,7 +120,7 @@ Read the sections your task touches.
   - 117–183 Motion (~2.7K) ← 8
   - 184–210 Spotlight (~2.1K) ← 16
   - 211–216 Gestures (~210) ← 5
-  - 217–220 Hold, slide and release (~920)
+  - 217–220 Hold, slide and release (~940)
   - 221–226 Peeking at the other seat (~600) ← 1
   - 227–240 Command column (~1.6K) ← 7
   - 241–244 Two taps (~320) ← 2
@@ -132,7 +132,7 @@ Read the sections your task touches.
   - 279–288 Phase carousel (~670)
   - 289–294 Quest advance (~460) ← 1
   - 295–298 Undo (~140)
-  - 299–302 Haptics (~250)
+  - 299–302 Haptics (~270)
   - 303–313 Banner (~580) ← 1
   - 314–317 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~22.7K tok)

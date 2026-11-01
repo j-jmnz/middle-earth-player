@@ -16,7 +16,7 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { finishMotions } from "./card-motion.native.tsx";
 import { NO_SPREAD, pick, pushed, pushing, pushMove, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startCard, startsScrub, type Push, type Spread } from "./hand-scrub.ts";
-import { tickArmed } from "./haptics.ts";
+import { tickArmed, tickRefused } from "./haptics.ts";
 import { hitDrop, hitSlot, type CardSlot, type DropRect, type TableLayout } from "./layout.ts";
 import { timing } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
@@ -148,7 +148,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
 
   // The dragged card is let go at a point: on one of its drop targets the drop picks (the dock asks to confirm it) and the card is
   // drawn where the next state puts it; anywhere else it goes back and nothing is asked. A card that cannot be played (only a scrub
-  // carries one) first shakes where it was let go, saying the move is not legal. The drag pan and a carried scrub card end here.
+  // carries one) plays the reject haptic as it is let go and first shakes there (not under reduced motion), saying the move is not
+  // legal. The drag pan and a carried scrub card end here.
   const release = useCallback(
     (x: number, y: number) => {
       "worklet";
@@ -157,7 +158,9 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       if (at < 0 || !slot) return;
       const target = hitDrop(drops.get(), x, y);
       lift.set(1);
-      if (target === "" && k !== 0 && !lifts.get()[at]) {
+      const refused = target === "" && !lifts.get()[at];
+      if (refused) scheduleOnRN(tickRefused);
+      if (refused && k !== 0) {
         const from = dx.get();
         const shake = refuseTiming.duration * 4;
         dx.set(withSequence(withTiming(from + swing, refuseTiming), withTiming(from - swing, refuseTiming), withTiming(from + swing / 2, refuseTiming), withTiming(from, refuseTiming), withTiming(0, returnTiming)));
