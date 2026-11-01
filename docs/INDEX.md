@@ -64,7 +64,7 @@ Read the sections your task touches.
   - 50–63 Non-goals (~560)
   - 64–84 Decisions (~850)
   - 85–113 Stack (~810)
-  - 114–131 Performance and feel (~750)
+  - 114–131 Performance and feel (~750) ← 1
   - 132–149 Repository layout (~440)
   - 150–363 Domain (~9.2K)
     - 152–224 Campaign (~1.8K) ← 1
@@ -120,7 +120,7 @@ Read the sections your task touches.
   - 117–182 Motion (~2.7K) ← 8
   - 183–209 Spotlight (~2.1K) ← 16
   - 210–215 Gestures (~210) ← 5
-  - 216–219 Hold, slide and release (~690)
+  - 216–219 Hold, slide and release (~690) ← 1
   - 220–225 Peeking at the other seat (~600) ← 1
   - 226–239 Command column (~1.6K) ← 7
   - 240–243 Two taps (~320) ← 2
@@ -261,6 +261,16 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
+- `docs/plans/accessibility.md` — Plan: accessibility (~3.7K tok)
+  - 3–10 Context (~340)
+  - 11–14 Decision for the user (~110)
+  - 15–47 1. The table without sight (~820)
+  - 48–71 2. Announcements and status messages (4.1.3) (~410)
+  - 72–92 3. Focus and modals (2.4.3, 2.1.2) (~390)
+  - 93–118 4. Names, roles and grouping (4.1.2, 1.3.1, 1.1.1) (~660)
+  - 119–136 5. Text size (1.4.4, 1.4.10) (~300)
+  - 137–163 6. Contrast and visible state (1.4.3, 1.4.11, 2.4.7) (~520)
+  - 164–173 7. Motion, language and tests (~180)
 - `docs/plans/dream-chaser.md` — Plan: Dream-chaser (The Grey Havens and the six Dream-chaser Adventure Packs) (~10.4K tok)
   - 3–26 Context (~760)
   - 27–88 Facts found during exploration (~3.3K) ← 1
