@@ -76,7 +76,7 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
     seed: plan.seed,
     burnMs: (shape.last ? MOTION.spotlightBurn : MOTION.spotlightSwap).ms,
     blocked,
-    ember: { x: (front.x + stage.target.x + stage.target.w) / 2, y: stage.target.y + stage.cardH * 0.95, size: stage.cardH },
+    smoke: { x: (front.x + stage.target.x + stage.target.w) / 2, y: stage.target.y + stage.cardH * 0.95, size: stage.cardH },
     converge: { x: front.x + front.w / 2, y: front.y + front.h / 2, size: stage.cardH },
     hit: { x: stage.contact.x, y: stage.contact.y, size: stage.cardH, dir: blocked ? Math.PI : SPARK_DIR },
     ash: { x: stage.target.x + stage.target.w / 2, y: stage.target.y + stage.target.h / 2, size: stage.cardH, w: stage.target.w },

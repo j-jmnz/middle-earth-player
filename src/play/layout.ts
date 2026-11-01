@@ -66,6 +66,9 @@ export type CardSlot = Rect & {
   stormcaller?: AreaRole;
   // The stage's width its area cards leave uncovered: the strip, the tokens and the pops are drawn in that part (`shownBounds`).
   shown?: number;
+  // A card of the back row of two stacked play rows: the screen y where the front row starts. Its tokens, effects and pops are drawn
+  // in the band above it, so a hero's resources are not hidden under the row in front (user request, 2026-11-01; `shownBounds`).
+  coveredFrom?: number;
 };
 
 // The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
@@ -441,10 +444,14 @@ export function slotBounds(slot: CardSlot): Rect {
   return { x: slot.x + (slot.w - slot.h) / 2, y: slot.y + (slot.h - slot.w) / 2, w: slot.h, h: slot.w };
 }
 
-/** The part of a slot the strip, the tokens and the pops are drawn in: its bounds, narrowed to what the Stormcaller's area cards leave uncovered of the stage. */
+/**
+ * The part of a slot the strip, the tokens and the pops are drawn in: its bounds, narrowed to what the Stormcaller's area cards leave
+ * uncovered of the stage, and cut off where the front row of stacked play rows starts.
+ */
 export function shownBounds(slot: CardSlot): Rect {
   const bounds = slotBounds(slot);
-  return slot.shown != null ? { ...bounds, w: Math.min(bounds.w, slot.shown) } : bounds;
+  const wide = slot.shown != null ? { ...bounds, w: Math.min(bounds.w, slot.shown) } : bounds;
+  return slot.coveredFrom != null ? { ...wide, h: Math.max(0, Math.min(wide.h, slot.coveredFrom - wide.y)) } : wide;
 }
 
 /** The rectangle a tap or a drag finds a slot in: its bounds, grown to 44 pt for a pile drawn smaller than that. */

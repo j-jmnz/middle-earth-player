@@ -5,7 +5,7 @@ import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Pat
 import type { ReactElement } from "react";
 
 import { cardCorner } from "./card-corner.ts";
-import { badgeSplit, type CardEffects } from "./card-effects.ts";
+import { badgeSplit, type CardEffects, type CombatNumber } from "./card-effects.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
 import { glyphCells, type PlaceMark } from "./island-place.ts";
@@ -409,6 +409,30 @@ export function Badges({
           <Outlined x={x + w / 2} y={y + h - 3 * s} text={stripText(slot, questPoints, owner) ?? ""} font={fonts.numbers} t={t} s={s} />
         </Group>
       ) : null}
+    </Group>
+  );
+}
+
+/**
+ * The number a card brings to the enemy attacks, at its foot where a committed character's willpower stands (user request,
+ * 2026-11-01): an enemy's attack on a threat-red pill, a character's defense on an accent pill, each with its icon. The value counts
+ * every effect; the effect pills down the card's left edge still say what changed it.
+ */
+export function CombatPill({ rect, combat, fonts, t, s }: { rect: Rect; combat: CombatNumber; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, w, h } = rect;
+  const pill = BADGE_H * s;
+  const text = String(combat.value);
+  const width = 18 * s + fonts.badge.getTextWidth(text) + 5 * s;
+  const left = x + (w - width) / 2;
+  const top = y + h - pill - 3 * s;
+  const attack = combat.stat === "attack";
+  const ink = attack ? t.bone : t.onAccent;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={attack ? t.threat : t.accent} />
+      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={attack ? t.danger : t.night} style="stroke" strokeWidth={1 * s} />
+      <CanvasIcon name={combat.stat} x={left + 3 * s} y={top + 2 * s} size={11 * s} color={ink} />
+      <Text x={left + 17 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={ink} />
     </Group>
   );
 }

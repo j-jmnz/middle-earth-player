@@ -254,8 +254,26 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
     loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
+    combat: card != null ? combatNumber(game, ctx, card) : null,
   };
 }
+
+/**
+ * The number a card brings to the enemy attacks (user request, 2026-11-01): an engaged enemy's attack, a character's defense in a
+ * play area, with every effect on it counted (modifiedStat). Null outside the enemy attacks step and on any other card.
+ */
+function combatNumber(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string]): CombatNumber | null {
+  if (game.mode !== "enemyAttacks" || card.face === "down") return null;
+  const printed = printedOf(ctx.cards, card.code);
+  if (card.zone === "engaged" && printed.type === "enemy") return { stat: "attack", value: modifiedStat(game, card, "attack", ctx.cards) };
+  if ((card.zone === "heroes" || card.zone === "play") && printed.defense != null && (printed.type === "hero" || printed.type === "ally")) {
+    return { stat: "defense", value: modifiedStat(game, card, "defense", ctx.cards) };
+  }
+  return null;
+}
+
+/** The pill at a card's foot in the enemy attacks step: an enemy's attack or a character's defense. */
+export type CombatNumber = { stat: "attack" | "defense"; value: number };
 
 // A location of the Island Map in the staging area: where it lies, and where the marker stands (the active location's cell), for the glyph on its card.
 function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
@@ -290,4 +308,6 @@ export type SlotNumbers = {
   loss: ShipLoss | null;
   // A location of the Island Map in the staging area: its place on the map and the marker's, drawn as the 5 × 3 glyph (island-place.ts).
   place: PlaceMark | null;
+  // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
+  combat: CombatNumber | null;
 };

@@ -129,11 +129,18 @@ export function advanceWords(
 
 /**
  * The button that goes back to the table, by what the screen shows (user request, 2026-10-29: not Progress where nothing can
- * progress): the table's opening on a new game (round 1 or before) begins it, the opening on a resumed game and an advance to a
- * stage that is held back continue it, and an advance the stage can be played on is Progress.
+ * progress): the table's opening on a new game (round 1 or before, nothing played yet) begins it, the opening on a resumed game
+ * (`resumed`: the save had intents, user request, 2026-11-01) and an advance to a stage that is held back continue it, and an
+ * advance the stage can be played on is Progress.
  */
-export function advanceButton(game: ScenarioState, ctx: ReduceContext, advance: QuestAdvance, line: (id: string) => string | null): { label: string; hint: string } {
-  if (isOpening(advance)) return game.round <= 1 ? { label: "Begin", hint: "Begins the game at the table" } : { label: "Continue", hint: "Back to the table" };
+export function advanceButton(
+  game: ScenarioState,
+  ctx: ReduceContext,
+  advance: QuestAdvance,
+  line: (id: string) => string | null,
+  resumed?: boolean,
+): { label: string; hint: string } {
+  if (isOpening(advance)) return game.round <= 1 && !resumed ? { label: "Begin", hint: "Begins the game at the table" } : { label: "Continue", hint: "Back to the table" };
   if (advanceHold(game, ctx, line)) return { label: "Continue", hint: "Back to the table" };
   return { label: "Progress", hint: "Back to the table" };
 }

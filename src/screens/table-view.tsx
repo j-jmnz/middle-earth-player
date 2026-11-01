@@ -133,6 +133,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const [handoff] = useState(createHandoff);
   // The pieces that draw pictures read the image cache's revision themselves (PicturedCanvas), so this view does not render for a file landing.
   const game = useStore(store, (state) => state.game);
+  const resumed = useStore(store, (state) => state.resumed);
   const refusal = useStore(store, (state) => state.refusal);
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
@@ -493,7 +494,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           key={advance.shown.seq}
           card={{ code: advancedCard.code, ...describe(advancedCard.code, pictureKey({ code: advancedCard.code, face: advanceFace(game, advancedCard) })) }}
           words={advanceWords(game, ctx, advance.shown.stageId, nameOf(advancedCard.code), ledgerLine, advance.shown.also, nameOf)}
-          button={advanceButton(game, ctx, advance.shown, ledgerLine)}
+          button={advanceButton(game, ctx, advance.shown, ledgerLine, resumed)}
           asks={advance.asks}
           choice={choice}
           picture={pictureOf}

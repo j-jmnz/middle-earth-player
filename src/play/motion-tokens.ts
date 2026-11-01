@@ -4,7 +4,7 @@
 //
 // Every duration passes through `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 0 under reduced motion (then
 // everything snaps). Each token is at most 500 ms; the sweep, the spotlight's hold and its whole run (phase 24), and the lives
-// of its embers and ash are the exceptions.
+// of its smoke and ash are the exceptions.
 // What is not motion stays out of the scale: a gate or a timer (the top bar's 400 ms measure fallback, the dock's second-tap
 // window, the banner's beats, the 350 ms settle after a new moment) is not a token.
 
@@ -140,9 +140,9 @@ export const MOTION = {
   // A kill holds longer at the hit (a boss stop): this replaces `spotlightStop` for it and the extra is taken from `spotlightImpact`,
   // so the return and the run keep their times.
   spotlightStopKill: tween(160, null),
-  // The particles' lives at Normal speed (spotlight-particles.ts): the slowest ember's loop, the slowest converging ember's flight and
+  // The particles' lives at Normal speed (spotlight-particles.ts): the slowest puff of smoke's loop, the slowest converging ember's flight and
   // the slowest ash's rise; each sprite lives a seeded share of its token.
-  spotlightEmber: tween(2000, "linear"),
+  spotlightSmoke: tween(2000, "linear"),
   spotlightConverge: tween(500, "linear"),
   spotlightAsh: tween(1100, "linear"),
   spotlight: tween(3200, "linear"),
@@ -162,8 +162,8 @@ export const SPOTLIGHT_BEATS = ["spotlightEnter", "spotlightRead", "spotlightCha
 export const SPOTLIGHT_AGAIN_BEATS = ["spotlightSwap", "spotlightReadAgain", "spotlightChargeAgain", "spotlightLunge", "spotlightStop", "spotlightImpact", "spotlightHold"] as const;
 export const SPOTLIGHT_AGAIN = 2200;
 
-/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold and its whole run, phase 24, and the lives of its embers and ash). */
-export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightEmber", "spotlightAsh"];
+/** The tokens that may pass 500 ms (a title sweep across the canvas, the combat spotlight's hold and its whole run, phase 24, and the lives of its smoke and ash). */
+export const LONG_TOKENS: readonly string[] = ["sweep", "spotlight", "spotlightHold", "spotlightSmoke", "spotlightAsh"];
 
 /** The longest a token runs, apart from LONG_TOKENS. */
 export const MAX_TOKEN_MS = 500;

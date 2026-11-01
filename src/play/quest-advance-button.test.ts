@@ -19,6 +19,8 @@ describe("the quest advance screen's button", () => {
     const opening = { seq: 0, stageId: table.state.questStage! };
     expect(advanceButton({ ...table.state, round: 1 }, table.ctx, opening, ledgerLine).label).toBe("Begin");
     expect(advanceButton({ ...table.state, round: 4 }, table.ctx, opening, ledgerLine).label).toBe("Continue");
+    // A save reopened in round 1 with intents already played continues it too (user request, 2026-11-01).
+    expect(advanceButton({ ...table.state, round: 1 }, table.ctx, opening, ledgerLine, true).label).toBe("Continue");
   });
 
   it("says Progress on an advance to a stage that can progress, and Continue on one held back (141022:B:2)", () => {

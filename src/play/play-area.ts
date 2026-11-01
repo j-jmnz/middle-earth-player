@@ -107,18 +107,21 @@ export function playPlan(entries: readonly ZoneEntry[], width: number, card: { w
 }
 
 // The play area, row under row (stacked rows a 44 pt band apart, the later one in front); a row that does not fit (the squeezed
-// fallback) overlaps its cards as staging does.
+// fallback) overlaps its cards as staging does. A back row's cards say where the front row starts (`coveredFrom`), so their tokens
+// are drawn in the band that shows.
 export function placePlay(plan: PlayPlan, area: Rect, out: CardSlot[], m: Metrics): void {
   let y = area.y;
-  for (const row of plan.rows) {
+  plan.rows.forEach((row, index) => {
+    const next = y + (plan.pitch ?? rowDepth(row, plan.size, m) + m.gap);
+    const covered = plan.pitch != null && index < plan.rows.length - 1 ? { coveredFrom: next } : {};
     const xs = rowXs(playWidths(row, plan.size, m), area.x, area.w, m.gap);
     row.forEach((entry, at) => {
       const rect = cardRect(entry.card, xs[at] ?? area.x, y, plan.size);
       placeUnder(entry, "play", rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
-      out.push(slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift }));
+      out.push({ ...slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift }), ...covered });
     });
-    y += plan.pitch ?? rowDepth(row, plan.size, m) + m.gap;
-  }
+    y = next;
+  });
 }

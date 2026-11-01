@@ -103,7 +103,7 @@ Read the sections your task touches.
   - 838–862 Persistence and shipping (~1.6K)
   - 863–903 Screens (~4.4K) ← 2
     - 889–903 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~25.6K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~25.8K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
   - 24–27 Table menu (~330) ← 1
@@ -111,14 +111,14 @@ Read the sections your task touches.
   - 34–37 Canvas (~510) ← 1
   - 38–49 Spacing and the play area's rows (~1.6K) ← 7
   - 50–55 Pictures on the table (~320)
-  - 56–77 Cards (~3.2K) ← 9
+  - 56–77 Cards (~3.3K) ← 9
   - 78–83 The Sailing test (~690) ← 5
   - 84–97 The Island Map (~1.7K) ← 8
   - 98–101 Tokens and effects (~320)
   - 102–110 Piles (~850) ← 2
   - 111–116 Marks of the open moment (~400) ← 1
   - 117–183 Motion (~2.7K) ← 8
-  - 184–210 Spotlight (~2.1K) ← 16
+  - 184–210 Spotlight (~2.2K) ← 16
   - 211–216 Gestures (~340) ← 5
   - 217–220 Hold, slide and release (~940)
   - 221–226 Peeking at the other seat (~600) ← 1
@@ -130,7 +130,7 @@ Read the sections your task touches.
   - 257–266 Choice tray (~780) ← 2
   - 267–278 Reading panels (~960) ← 4
   - 279–288 Phase carousel (~670)
-  - 289–294 Quest advance (~460) ← 1
+  - 289–294 Quest advance (~480) ← 1
   - 295–298 Undo (~140)
   - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1
@@ -180,11 +180,11 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~6.2K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~2.1K)
-  - 76–153 Open items (~3.0K)
+  - 76–153 Open items (~3.1K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
     - 119–135 Screens and code (~810)
-    - 136–153 Phone and tablet checks (~900)
+    - 136–153 Phone and tablet checks (~960)
   - 154–169 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CardInstance } from "../rules/state.ts";
 
-import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
+import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, shownBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { CROWDED_CANVASES, CROWDED_SCALES, crowdedTable, slotRows } from "./crowded-table.ts";
 import { PILES, TABLE_ZONES, type PileId, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";
 import { HAND_TUCK } from "./play-area.ts";
@@ -346,6 +346,14 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
         // One row where it squeezes no step under a target; else the back row shows a 44 pt band above the front row.
         expect(rows.length, where).toBeLessThanOrEqual(2);
         if (rows.length === 2) expect((rows[1] ?? 0) - (rows[0] ?? 0), where).toBeCloseTo(target, 9);
+        // The back row's cards draw their tokens in the band above the front row, so a hero's resources stay in sight; the front row's are whole.
+        if (rows.length === 2) {
+          for (const slot of cards) {
+            const shown = shownBounds(slot);
+            if (slot.y === rows[0] || slot.y === (rows[0] ?? 0) - 5 * scale) expect(shown.y + shown.h, where).toBeCloseTo(rows[1] ?? 0, 9);
+            else expect(shown, where).toEqual(slotBounds(slot));
+          }
+        }
         if (scale === 1 && play === 12) expect(rows, where).toHaveLength(2);
         expect(cards[0]?.w ?? 0, where).toBeGreaterThanOrEqual(target);
         for (const y of rows) {

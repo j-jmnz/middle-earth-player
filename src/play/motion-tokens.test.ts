@@ -42,9 +42,9 @@ describe("the tokens", () => {
     expect(MOTION.sweep.ms).toBe(900);
   });
 
-  it("let only the sweep, the whole spotlight run and the lives of its embers and ash pass 500 ms", () => {
-    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "spotlightHold", "sweep"]);
-    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightEmber", "spotlightHold", "sweep"]);
+  it("let only the sweep, the whole spotlight run and the lives of its smoke and ash pass 500 ms", () => {
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "spotlightSmoke", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "spotlightSmoke", "sweep"]);
   });
 
   it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the hold", () => {
@@ -69,7 +69,7 @@ describe("the tokens", () => {
     // A kill stops for 160 ms, the extra 60 coming out of the impact.
     expect(MOTION.spotlightStopKill.ms).toBe(160);
     expect(MOTION.spotlightStopKill.ms - MOTION.spotlightStop.ms).toBeLessThan(MOTION.spotlightImpact.ms);
-    expect([MOTION.spotlightEmber.ms, MOTION.spotlightConverge.ms, MOTION.spotlightAsh.ms]).toEqual([2000, 500, 1100]);
+    expect([MOTION.spotlightSmoke.ms, MOTION.spotlightConverge.ms, MOTION.spotlightAsh.ms]).toEqual([2000, 500, 1100]);
     expect([MOTION.spotlightFlash.ms, MOTION.spotlightRing.ms, MOTION.spotlightSparks.ms, MOTION.spotlightShake.ms]).toEqual([160, 360, 450, 420]);
     expect(MOTION.spotlightNumberRise.ms).toBe(140);
     expect(MOTION.spotlightNumberSettle).toEqual({ ms: 260, zeta: 0.5 });

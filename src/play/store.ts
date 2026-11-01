@@ -49,6 +49,9 @@ export type TableState = {
   viewedSeat: number | null;
   // The cards the staging row and the engagement row folded away, written by the canvas when it lays the table out (UI-only, never in the save).
   rowFolds: RowFolds;
+  // Whether the table opened on a save that had intents already (a resumed game, not a new deal): the quest screen the table opens on
+  // then says Continue, not Begin (quest-advance.ts, advanceButton). Set once when the store is built.
+  resumed: boolean;
 };
 
 export type TableActions = {
@@ -138,6 +141,7 @@ export function createTableStore(input: TableInput): TableStore {
     spotlight: NO_SPOTLIGHT,
     viewedSeat: null,
     rowFolds: NO_ROW_FOLDS,
+    resumed: (input.roundSteps?.length ?? 0) > 0 || (input.history?.length ?? 0) > 0,
     setRowFolds: (folds) => {
       const now = get().rowFolds;
       const same = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((id, at) => id === b[at]);

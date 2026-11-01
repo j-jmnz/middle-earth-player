@@ -44,7 +44,7 @@ Each point: what to check, where the code is, and the likely fix if it fails. De
 - If it is offset: log the uniforms and the card's rect from the layer and compare; the fix is in what `BurnLayer` passes, not in the SkSL.
 
 ### 5. `Atlas` additive blending
-- Check: embers, sparks, deflection sparks and ash glow and add up (`blendMode="plus"`, `colorBlendMode="modulate"`), with no black squares around sprites and no color shifts between Android and iOS.
+- Check: converging embers, sparks, deflection sparks and ash glow and add up (`blendMode="plus"`, `colorBlendMode="modulate"`), and the smoke reads as soft black and grey puffs over the cards (`srcOver`), with no black squares around sprites and no color shifts between Android and iOS.
 - Code: `spotlight-particles.native.tsx` (line 61, and `useSpriteTexture` built with `useTexture`).
 - If squares show: the sprite texture's alpha is not premultiplied the way `plus` expects; fix the texture, not the blend.
 

@@ -6,7 +6,7 @@
 // through the scale: a gate or a timer is not in here.
 //
 // One attack, at Normal (ms), when it is the only one (or the first of several, then without the last row):
-//   0    enter   the dark comes in, the cards arc from their slots to the center and overshoot, embers start
+//   0    enter   the dark comes in, the cards arc from their slots to the center and overshoot, smoke starts
 //   350  read    the medallions pop in; a turned shadow card flips in 3D with a glint
 //   650  charge  the attacker draws back and tilts, a rim glow builds, embers converge, the camera pushes in
 //   1000 lunge   a fast strike with three fading afterimages
@@ -143,9 +143,9 @@ export type Frame = {
   // The flash opacity (at most 0.7; one bump per attack) and the shockwave ring: its radius as a share of a card's height and its opacity.
   flash: number;
   ring: { r: number; alpha: number };
-  // The effect clocks, ms at Normal speed (-1 before): embers (the whole attack), converging embers (from the charge), sparks or
-  // deflection (from the impact) and ash (from the burn). The embers' and the charge's clocks stand still through the hit stop.
-  emberT: number;
+  // The effect clocks, ms at Normal speed (-1 before): smoke (the whole attack), converging embers (from the charge), sparks or
+  // deflection (from the impact) and ash (from the burn). The smoke's and the charge's clocks stand still through the hit stop.
+  smokeT: number;
   convergeT: number;
   sparkT: number;
   ashT: number;
@@ -219,7 +219,7 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
   const flipLength = length(MOTION.spotlightFlip, k);
   const glintAt = (t - b.readAt - flipLength / 2) / length(MOTION.spotlightGlint, k);
 
-  // The clocks of the embers and the charge hold through the hit stop and carry on from where they stood.
+  // The clocks of the smoke and the charge hold through the hit stop and carry on from where they stood.
   const running = t - clamp01((t - b.stopAt) / b.stop) * b.stop;
   const stampAt = blocked ? hit : shape.destroyed ? t - b.retAt : -1;
   const stampOut = blocked ? halfOut : shape.destroyed && shape.last ? 1 - clamp01((t - b.retAt - b.ret * 0.6) / (b.ret * 0.4)) : 1;
@@ -244,7 +244,7 @@ export function frameAt(shape: ClashShape, t: number, k: number, seed = 0): Fram
     trail: t >= b.lungeAt && t < b.stopAt ? 1 : 0,
     flash: flashAt((t - b.stopAt) / length(MOTION.spotlightFlash, k), blocked),
     ring: ringAt(hit / length(MOTION.spotlightRing, k)),
-    emberT: t >= 0 ? running / k : -1,
+    smokeT: t >= 0 ? running / k : -1,
     convergeT: t >= b.chargeAt ? (running - b.chargeAt) / k : -1,
     sparkT: hit >= 0 ? hit / k : -1,
     ashT: shape.destroyed && t >= b.retAt ? (t - b.retAt) / k : -1,

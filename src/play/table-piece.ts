@@ -169,6 +169,7 @@ const SLOT_FIELDS = Object.keys({
   areaFold: true,
   stormcaller: true,
   shown: true,
+  coveredFrom: true,
 } satisfies Record<keyof CardSlot, true>) as (keyof CardSlot)[];
 
 /** True when two slots are the same card in the same place and state: layout makes a new object for every slot whenever it runs. */

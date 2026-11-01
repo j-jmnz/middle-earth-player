@@ -8,10 +8,10 @@ import { updateCard } from "../rules/state.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 import { starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { buildTable, idsOf } from "../../scripts/test-scene.ts";
+import { buildTable, idsOf, sceneCards } from "../../scripts/test-scene.ts";
 import { CODES, fateTable, idOf, loadFateWorld } from "../../scripts/fate-scene.ts";
 
-import { badgeSplit, BADGE_CAP, cardEffects, effectLines } from "./card-effects.ts";
+import { badgeSplit, BADGE_CAP, cardEffects, effectLines, slotNumbers } from "./card-effects.ts";
 
 // Rules: rr.modifiers (data/rules/entries.json). The table shows on the card each printed number an effect changed, by how
 // much, and each "cannot"; the preview words them with the card they come from.
@@ -62,6 +62,20 @@ describe("effects on a card", () => {
       "-1 Willpower from Frodo Baggins, until the end of the round",
       "Cannot attack: Frodo Baggins, until the end of the phase",
     ]);
+  });
+});
+
+describe("the numbers of the enemy attacks", () => {
+  it("shows an engaged enemy's attack and each character's defense only in the enemy attacks step, effects counted (user request, 2026-11-01)", async () => {
+    const tab = buildTable(await sceneCards(), { ring: "none", heroes: [{ code: "pal", seat: 0 }], allies: [{ code: "ally", seat: 0 }], engaged: [{ code: "f3", seat: 0 }] });
+    const [pal, ally, enemy] = [idsOf(tab, "pal"), idsOf(tab, "ally"), idsOf(tab, "f3")];
+    expect(slotNumbers(tab.state, tab.ctx, enemy).combat).toBeNull();
+    const attacks = addModifier({ ...tab.state, phase: "Combat", mode: "enemyAttacks" }, enemy, pal, "attack", 2, "endOfPhase");
+    expect(slotNumbers(attacks, tab.ctx, enemy).combat).toEqual({ stat: "attack", value: 3 });
+    // The modifier's pill stays on the card's edge beside the number.
+    expect(slotNumbers(attacks, tab.ctx, enemy).effects.stats.map((badge) => [badge.stat, badge.delta])).toEqual([["attack", 2]]);
+    expect(slotNumbers(attacks, tab.ctx, pal).combat).toEqual({ stat: "defense", value: 1 });
+    expect(slotNumbers(attacks, tab.ctx, ally).combat).toEqual({ stat: "defense", value: 1 });
   });
 });
 
