@@ -113,6 +113,8 @@ export default function StandaloneBriefing() {
   return (
     <BriefingScreen
       {...frame}
+      campaignCard={world.scenario.campaignCard}
+      stages={world.scenario.stages}
       banner={<ScenarioBanner facts={facts} eyebrow={`Standalone · Scenario ${facts.number}`} />}
       bar={<DealBar problems={result.problems} dealError={dealError} dealable={result.dealable} onDeal={onDeal} />}
       aside={<EncounterDetails facts={facts} />}

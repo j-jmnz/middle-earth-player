@@ -14,6 +14,8 @@ import { cards, packs } from "../catalog/schema";
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data";
 import { GroundedScene } from "./art";
 import { dealSentence, problemWords } from "./briefing-words";
+import { ScenarioCards } from "./scenario-cards";
+import { useListPreview } from "./list-preview";
 import { ActionBar, Chevron, Chip, Column, FloatingBarShade, IconButton, Label, NavBar, PrimaryButton, Screen, Section, Segmented, TwoPane, useTitleShadow } from "./chrome";
 import { BRIEFING_SCENE_RANGE } from "./briefing-layout";
 import { deckListSpheres, emptyDeckListFilter, filterDecks, type DeckListFilter } from "./deck-list";
@@ -125,6 +127,8 @@ export function BriefingScreen({
   bar,
   backTestID = "briefing-back",
   barTestID = "briefing-deal-bar",
+  campaignCard,
+  stages,
 }: {
   testID: string;
   scenarioId: string | null;
@@ -138,11 +142,21 @@ export function BriefingScreen({
   // The words over the scene (ScenarioBanner); null while the scenario is loading or missing.
   banner: ReactNode;
   children: ReactNode;
-  // The reference matter (Before the deal, the encounter): after the content in compact and medium, under the scene when expanded.
+  // The reference matter (the scenario's cards, Before the deal, the encounter): after the content in compact and medium, under the scene when expanded.
   aside?: ReactNode;
   bar?: ReactNode;
+  // The scenario's campaign card and quest cards: rows at the head of the aside open them large (ScenarioCards).
+  campaignCard?: string;
+  stages?: readonly string[];
 }) {
   const insets = useSafeAreaInsets();
+  const preview = useListPreview();
+  const reference = (
+    <>
+      {campaignCard || stages ? <ScenarioCards stages={stages ?? []} onOpen={preview.openSides} {...(campaignCard ? { campaignCard } : {})} /> : null}
+      {aside}
+    </>
+  );
   const { size, s } = useSizeClass();
   const side = { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right };
   // Past the scene, a night bar shows behind Back and Booklet so they never sit on the words that scroll under them. The shade
@@ -185,7 +199,7 @@ export function BriefingScreen({
             <>
               <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
                 {scene}
-                {aside ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{aside}</View> : null}
+                {aside || campaignCard || stages ? <View style={{ paddingLeft: side.paddingLeft, paddingRight: 24 * s }}>{reference}</View> : null}
               </ScrollView>
               <FloatingBarShade shown={past} top={insets.top} />
               {navBar}
@@ -206,6 +220,7 @@ export function BriefingScreen({
             </>
           }
         />
+        {preview.overlay}
       </Screen>
     );
   }
@@ -218,12 +233,12 @@ export function BriefingScreen({
           {column ? (
             <View style={column}>
               {children}
-              {aside}
+              {reference}
             </View>
           ) : (
             <>
               {children}
-              {aside}
+              {reference}
             </>
           )}
         </View>
@@ -235,6 +250,7 @@ export function BriefingScreen({
       ) : null}
       <FloatingBarShade shown={past} top={insets.top} />
       {navBar}
+      {preview.overlay}
     </Screen>
   );
 }

@@ -174,6 +174,8 @@ export default function Briefing() {
   return (
     <BriefingScreen
       {...frame}
+      campaignCard={world.scenario.campaignCard}
+      stages={world.scenario.stages}
       banner={<ScenarioBanner facts={facts} eyebrow={`Scenario ${facts.number} · ${campaign.name}`} />}
       bar={
         <DealBar problems={result.problems} dealError={dealError} dropsOpen={save.loadout != null} dealable={result.dealable} waiting={asked?.waiting ?? null} onDeal={onDeal}>
