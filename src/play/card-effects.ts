@@ -6,8 +6,10 @@
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../rules/constant-records.ts";
 import { aflameTally, burnTally } from "../rules/families/aflame-values.ts";
+import { cellOf, islandOf } from "../rules/families/island-map.ts";
 
 import { aflameLine, aflameMark, burnLine, burnMark } from "./aflame-words.ts";
+import type { PlaceMark } from "./island-place.ts";
 import { areaRoleOf, stageFactsOf } from "./stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "./stormcaller-words.ts";
 import { shipLoss, type ShipLoss } from "./grapple-words.ts";
@@ -251,7 +253,16 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
     loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
+    place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
   };
+}
+
+// A location of the Island Map in the staging area: where it lies, and where the marker stands (the active location's cell), for the glyph on its card.
+function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
+  const island = islandOf(game);
+  const at = island ? cellOf(island, cardId) : null;
+  const marker = island && game.activeLocation ? cellOf(island, game.activeLocation) : null;
+  return at ? { row: at.row, col: at.col, from: marker } : null;
 }
 
 /** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". */
@@ -277,4 +288,6 @@ export type SlotNumbers = {
   under: UnderMark | null;
   fire: FireMark | null;
   loss: ShipLoss | null;
+  // A location of the Island Map in the staging area: its place on the map and the marker's, drawn as the 5 × 3 glyph (island-place.ts).
+  place: PlaceMark | null;
 };

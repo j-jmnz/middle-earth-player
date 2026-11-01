@@ -1,6 +1,6 @@
 // How a playthrough is worded in the lists, the hubs and History (docs/design-system.md, Campaigns (campaign list)): the line that
 // names its campaign, seats and progress, and the sentences a screen reader hears for it. Pure: no component.
-import { campaignPath, nextStep, type NextStep, type PathNode } from "../campaign/path";
+import { campaignPath, nextStep, soonWords, type NextStep, type PathNode } from "../campaign/path";
 import { campaignOf, scenarioNames } from "./campaign-data";
 import type { ListedSave } from "./campaign-store";
 import { seatWord } from "./seats";
@@ -38,8 +38,9 @@ export function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
 }
 
-/** "Next: A Knife in the Dark", "On the table: ...", or "Every scenario is won": the next step in one phrase (a row, a folded header). */
+/** "Next: A Knife in the Dark", "On the table: ...", "The Drowned Ruins is coming soon" or "Every scenario is won": the next step in one phrase (a row, a folded header). */
 export function nextSummary(next: NextStep): string {
+  if (next.kind === "soon") return soonWords(next.node);
   return next.kind === "finished" ? "Every scenario is won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
 }
 

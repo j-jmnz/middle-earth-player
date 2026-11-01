@@ -7,7 +7,7 @@ import { legalIntents } from "../rules/legal.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { CODES, loadTempleWorld, send, start, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 
-import { islandBlocked, islandOptionLabel, islandPickWords, islandTravelNote, islandTravelRow, islandWords } from "./island-words.ts";
+import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandPickWords, islandTravelNote, islandTravelRow, islandWords } from "./island-words.ts";
 import { sheetFor } from "./sheets.ts";
 import type { SheetNames } from "./sheet-types.ts";
 import { shownName } from "./shown-name.ts";
@@ -45,16 +45,21 @@ describe("the travel choice on the map", () => {
     expect(sheet?.title).toBe("Travel to a location");
     expect(sheet?.note).toContain("The marker moves to the location, which stays where it lies. Cursed Temple is explored and its");
     expect(sheet?.note).toContain("progress is removed");
+    // A covered destination is flipped over when the marker reaches it.
+    expect(sheet?.note).toContain("A covered location is flipped over when the marker reaches it");
     expect(sheet?.options.map((item) => item.label)).toEqual(expect.arrayContaining([expect.stringContaining("Lost Island")]));
     const covered = sheet?.options.find((item) => item.id === made.cells[7]);
     expect(covered?.label).toContain("Lost Island");
+    // The row leads with the direction from the marker and carries the glyph's place.
+    expect(covered?.label.startsWith("Right of the marker · Lost Island")).toBe(true);
+    expect(covered?.place).toEqual({ row: 1, col: 2, from: { row: 1, col: 1 } });
     expect(JSON.stringify(sheet)).not.toMatch(/Jagged|Cliffs/);
   });
 
   it("says what an active location that is not full still needs, and that it must be filled, not explored", () => {
     const { sheet } = travelSheet({ cellProgress: [[6, 1]] });
-    expect(sheet?.title).toBe("Fill Cursed Temple first");
-    expect(sheet?.note).toBe(`${full("11074") - 1} more progress on Cursed Temple before the players can travel from it.`);
+    expect(sheet?.title).toBe(`Cursed Temple needs ${full("11074") - 1} more progress`);
+    expect(sheet?.note).toBe("The players can travel from the active location once it is full.");
     expect(sheet?.options).toEqual([]);
   });
 
@@ -68,26 +73,28 @@ describe("the travel choice on the map", () => {
   it("tells a far location from a near one, and a covered Temple location with Temple Guardian in the victory display from any other, arming the confirm", () => {
     const made = templeTable(world, { map: MAP.map((code, at) => (at === 8 ? "12073" : code)), at: 8, phase: "Travel", key: "hero", victory: [CODES.guardian], cellProgress: [[8, full("12073")]], engaged: [{ code: "mild", seat: 0 }] });
     const far = islandTravelRow(made.state, made.ctx, made.cells[5] ?? "", nameOf(made.state));
-    expect(far?.words).toBe("3 locations away");
+    expect(far).toMatchObject({ lead: "3 left", words: "3 locations away", place: { row: 1, col: 0, from: { row: 1, col: 3 } } });
     const temple = islandTravelRow(made.state, made.ctx, made.cells[9] ?? "", nameOf(made.state));
     expect(temple?.words).toContain("Temple Guardian comes back");
     expect(temple?.caution).toBe("Tap again: Temple Guardian comes back into play, engaged with the player with the highest threat");
-    const adjacent = islandTravelRow(templeTable(world, { map: MAP, at: 6, phase: "Travel", engaged: [{ code: "mild", seat: 0 }] }).state, made.ctx, made.cells[5] ?? "", nameOf(made.state));
-    expect(adjacent).toBeNull();
+    const near = templeTable(world, { map: MAP, at: 6, phase: "Travel", engaged: [{ code: "mild", seat: 0 }] });
+    const adjacent = islandTravelRow(near.state, near.ctx, near.cells[5] ?? "", nameOf(near.state));
+    expect(adjacent).toMatchObject({ lead: "Left of the marker", words: null, caution: null });
   });
 
   it("names the enemy that attacks when the players travel to the right, only for a location to the right", () => {
     const made = templeTable(world, { map: MAP, at: 6, phase: "Travel", engaged: [{ code: CODES.profane, seat: 0 }], cellProgress: [[6, full("11074")]] });
     const right = islandTravelRow(made.state, made.ctx, made.cells[7] ?? "", nameOf(made.state));
-    expect(right).toMatchObject({ words: "Profane Dead attacks", caution: "Tap again: Profane Dead makes an immediate attack" });
-    expect(islandTravelRow(made.state, made.ctx, made.cells[5] ?? "", nameOf(made.state))).toBeNull();
-    expect(islandTravelRow(made.state, made.ctx, made.cells[1] ?? "", nameOf(made.state))).toBeNull();
+    expect(right).toMatchObject({ lead: "Right of the marker", words: "Profane Dead attacks", caution: "Tap again: Profane Dead makes an immediate attack" });
+    expect(islandTravelRow(made.state, made.ctx, made.cells[5] ?? "", nameOf(made.state))?.caution).toBeNull();
+    expect(islandTravelRow(made.state, made.ctx, made.cells[1] ?? "", nameOf(made.state))).toMatchObject({ lead: "Above the marker", caution: null });
   });
 
   it("is silent in a game with no map", () => {
     const made = templeTable(world, { phase: "Travel" });
     expect(islandTravelNote(made.state, () => "x")).toBeNull();
-    expect(islandBlocked(made.state, 3, "x")).toBeNull();
+    expect(islandBlocked(made.state)).toBeNull();
+    expect(islandBlockedTitle(made.state, 3, "x")).toBeNull();
   });
 });
 
@@ -143,7 +150,8 @@ describe("telling look-alike locations apart", () => {
     expect(tell(7)).toBe("3 progress · row 2, column 3");
     expect(tell(5)).toBe("row 2, column 1");
     expect(tell(11)).toBe("row 3, column 2");
-    // A flipped location is told by its name.
-    expect(tell(0)).toBeNull();
+    // A flipped location is told by its place as well, so a position is known for every location of the map.
+    expect(tell(0)).toBe("row 1, column 1");
+    expect(tell(4)).toBe("row 1, column 5");
   });
 });

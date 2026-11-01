@@ -11,7 +11,7 @@ import { CODES, campaign, temple } from "../../scripts/temple-scene.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
-import { campaignPath } from "./path.ts";
+import { campaignPath, nextStep } from "./path.ts";
 import { xpAwarded } from "./xp.ts";
 
 // A permanent golden: whole games of Temple of the Deceived in Campaign Mode played by the auto-player (scripts/temple-game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first five
@@ -44,18 +44,20 @@ function opened(golden: TempleGolden): ScenarioState {
 }
 
 // What the campaign card's list awards, counted from the final state: 1 XP for each surviving player; 1 for each resource on the campaign card (at most 3); 1 for each Temple Halls that was flipped over; 1 if 4 or
-// fewer locations of the map still lie Uncharted side up; 1 if Temple Guardian is in the victory display; 1 if each surviving player's threat is 40 or less; -1 if Ominous Fate is in the victory display; the Hard card
+// fewer of the map's double-sided locations are flipped over; 1 if Temple Guardian is in the victory display; 1 if each surviving player's threat is 40 or less; -1 if Ominous Fate is in the victory display; the Hard card
 // gains 1 and the Expert card 2.
 function expectedXp(state: ScenarioState, golden: TempleGolden): number {
   const victory = state.victory.map((id) => code(state, id));
   const survivors = state.seats.slice(0, state.seatCount).filter((seat) => !seat.eliminated);
   const cells = state.uncharted?.island?.cells ?? [];
   const campaignCard = Object.values(state.cards).find((card) => card.code === CODES.campaignCard);
+  // "4 or fewer Uncharted locations are faceup" (user decision, 2026-11-01): every double-sided location is an Uncharted location, and the faceup ones are those flipped to the location side (face A).
+  const flipped = cells.filter((id) => state.cards[id]?.face === "A").length;
   return (
     survivors.length +
     Math.min(3, campaignCard?.resources ?? 0) +
     cells.filter((id) => state.cards[id]?.code === CODES.halls && state.cards[id]?.face === "A").length +
-    (cells.filter((id) => state.cards[id]?.face === "B").length <= 4 ? 1 : 0) +
+    (flipped <= 4 ? 1 : 0) +
     (victory.includes(CODES.guardian) ? 1 : 0) +
     (survivors.every((seat) => seat.threat <= 40) ? 1 : 0) -
     (victory.includes(CODES.ominousFate) ? 1 : 0) +
@@ -112,7 +114,7 @@ describe("golden: a whole game of Temple of the Deceived", () => {
   });
 
   for (const golden of TEMPLE_GOLDENS.filter((item) => item.outcome === "won")) {
-    it(`${golden.name}: wins when the 8th progress is placed on The Grotto's Entrance, runs 11197's Resolution (the XP is awarded, the cards it earns join the pool) and unlocks the next part`, () => {
+    it(`${golden.name}: wins when the 8th progress is placed on The Grotto's Entrance, runs 11197's Resolution (the XP is awarded, the cards it earns join the pool) and the path stops at the next part, coming soon`, () => {
       const { state } = games.get(golden.name)!;
       const { cards } = worlds.get(golden.decks)!;
       expect(state.lost).toBe(false);
@@ -132,10 +134,11 @@ describe("golden: a whole game of Temple of the Deceived", () => {
       expect(log.campaignPool.map((card) => card.code).sort()).toEqual([...(golden.after ? [CODES.ominousFate] : []), ...expectedEarned(state)].sort());
       // A Recurring Nightmare in the pool is for the player the first player chose, to be shuffled into their deck after the starting hand.
       for (const card of log.campaignPool.filter((item) => item.code === CODES.nightmare)) expect(card).toMatchObject({ afterHand: true });
-      // The next part, The Drowned Ruins, is the one the path offers now.
+      // The next part, The Drowned Ruins, is coming soon: the path stops there, with nothing to begin (user decision, 2026-11-01).
       const path = campaignPath(campaign, {}, { ...log, completed: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived"] });
-      expect(path.map((node) => node.status).slice(0, 7)).toEqual(["completed", "completed", "completed", "completed", "completed", "completed", "current"]);
+      expect(path.map((node) => node.status).slice(0, 7)).toEqual(["completed", "completed", "completed", "completed", "completed", "completed", "soon"]);
       expect(path[6]?.id).toBe("the-drowned-ruins");
+      expect(nextStep(path, null)).toMatchObject({ kind: "soon", node: { id: "the-drowned-ruins" } });
       expect(campaign.scenarios[5]).toBe(temple.id);
       expect(UPGRADED_CODES).toEqual([CODES.blackKey, CODES.gateKey]);
     });

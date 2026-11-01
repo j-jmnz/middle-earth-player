@@ -182,6 +182,11 @@ function remainingCodes(state: ScenarioState, instruction: Extract<Instruction, 
   return instruction.codes.filter((code) => !taken.has(code));
 }
 
+// A card for a player: one option for each player in the game, named by the first hero they control.
+function playerOptions(state: ScenarioState, codes: readonly string[]): string[] {
+  return codes.flatMap((code) => livingSeats(state).flatMap((index) => (state.seats[index]?.heroes[0] ? [`${code}>${state.seats[index]?.heroes[0]}`] : [])));
+}
+
 function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: number, ctx: ReduceContext): string[] {
   if (instruction.verb === "NameCaptives") {
     const named = new Set(state.resolutionLog.captives.map((item) => item.seat));
@@ -195,8 +200,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
   if (codes.length === 0) return [];
-  // A card for a player: one option for each player in the game, named by the first hero they control.
-  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? codes.flatMap((code) => livingSeats(state).flatMap((index) => (state.seats[index]?.heroes[0] ? [`${code}>${state.seats[index]?.heroes[0]}`] : []))) : codes;
+  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }
 

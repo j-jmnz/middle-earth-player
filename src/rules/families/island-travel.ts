@@ -45,5 +45,6 @@ export function islandTravelTo(state: ScenarioState, locationId: string, cards: 
   const cleared = updateCard(state, old, { progress: 0 });
   const moved = setActive(moveCard(cleared, locationId, { zone: "islandMap" }), locationId);
   const uncharted = moved.uncharted;
-  return uncharted?.island ? { ...moved, uncharted: { ...uncharted, island: { ...uncharted.island, moved: { from: old, to: locationId } } } } : moved;
+  const explored = uncharted?.island?.explored ?? [];
+  return uncharted?.island ? { ...moved, uncharted: { ...uncharted, island: { ...uncharted.island, moved: { from: old, to: locationId }, explored: explored.includes(old) ? explored : [...explored, old] } } } : moved;
 }

@@ -8,6 +8,8 @@ import { cardCorner } from "./card-corner.ts";
 import { badgeSplit, type CardEffects } from "./card-effects.ts";
 import { SPHERE_TINT, type IconName } from "./icon-map.ts";
 import { ICONS } from "./icons/generated.ts";
+import { glyphCells, type PlaceMark } from "./island-place.ts";
+import { COLS, ROWS } from "./island-table.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
 import { medallionAt } from "./look-strip.ts";
 import { FOLD_WORD, foldCount } from "./row-fold.ts";
@@ -457,6 +459,38 @@ export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: {
       <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
       <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
       <Text x={left + (width - fonts.badge.getTextWidth(mark.text)) / 2} y={top + token - 5 * s} text={mark.text} font={fonts.badge} color={t.bone} />
+    </Group>
+  );
+}
+
+/**
+ * A location of the Island Map in the staging area: a night pill at the top of the card with the 5 × 3 glyph of the map, the card's place lit in accent and the marker's ringed (island-place.ts), so the look-alike Lost Islands
+ * in the staging area are told apart without reading a row. Decoration: the preview and the row say the place in words.
+ */
+export function PlaceMarkView({ rect, mark, t, s }: { rect: Rect; mark: PlaceMark; t: TableTokens; s: number }) {
+  const { x, y, w } = rect;
+  const cell = 4 * s;
+  const gap = 1 * s;
+  const pad = 2 * s;
+  const width = COLS * cell + (COLS - 1) * gap + 2 * pad;
+  const height = ROWS * cell + (ROWS - 1) * gap + 2 * pad;
+  const left = x + (w - width) / 2;
+  const top = y + 3 * s;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={height} r={3 * s} color={t.night} />
+      {glyphCells(mark).flatMap((cells, row) =>
+        cells.map((lit, col) => {
+          const at = { x: left + pad + col * (cell + gap), y: top + pad + row * (cell + gap) };
+          const marker = mark.from != null && mark.from.row === row && mark.from.col === col;
+          return (
+            <Group key={`${row}-${col}`}>
+              <RoundedRect x={at.x} y={at.y} width={cell} height={cell} r={1 * s} color={lit ? t.accent : t.hairline} />
+              {marker ? <RoundedRect x={at.x} y={at.y} width={cell} height={cell} r={1 * s} color={t.bone} style="stroke" strokeWidth={0.75 * s} /> : null}
+            </Group>
+          );
+        }),
+      )}
     </Group>
   );
 }

@@ -60,7 +60,7 @@ import { refillCorsairDeck } from "./families/sea-corsair.ts";
 import { aflameSweep } from "./families/aflame-sweep.ts";
 import { syncStormcallerArea } from "./families/stormcaller-area.ts";
 import { syncIsland } from "./families/island-map.ts";
-import { announceEnteredHand } from "./families/island-hand.ts";
+import { announceExits } from "./families/island-hand.ts";
 import { committedTo } from "./families/stormcaller-commit.ts";
 import { announceCollected } from "./families/aflame-attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
@@ -71,7 +71,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
   for (let guard = 0; guard < 400; guard += 1) {
     // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
     // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller-area.ts); the Island Map's locations as the active location says (families/island-map.ts).
-    current = syncIsland(syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceEnteredHand(announceProgress(constantWin(current, ctx), steps, ctx), steps, ctx), ctx.cards), steps))), ctx);
+    current = syncIsland(syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceExits(announceProgress(constantWin(current, ctx), steps, ctx), ctx), ctx.cards), steps))), ctx);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
@@ -131,7 +131,7 @@ export function applyIntent(
     case "Keep":
       return finishMulliganChoice(state, false);
     case "Mulligan":
-      return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps), true);
+      return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps, ctx), true);
     case "Pass":
       // A Pass while the first player is asked what to commit to the Sailing test commits no one (dcce.sailing-tests).
       return askingToCommit(state) ? performSailing(state, [], ctx, steps) : applyPass(state);
@@ -278,7 +278,7 @@ function grant(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): S
     // A card that lets its player draw additional cards in the resource phase holds an extraDraw on the seat.
     const draws = 1 + heldStat(next, seat, "extraDraw", NO_COUNTS);
     const before = new Set(next.seats[seat]?.hand ?? []);
-    next = drawMany(next, seat, draws, steps, ruleCause("rr.step-1-3"));
+    next = drawMany(next, seat, draws, steps, ruleCause("rr.step-1-3"), ctx);
     drawn[seat] = (next.seats[seat]?.hand ?? []).filter((id) => !before.has(id));
   }
   // The draw step is done: Forced effects hear it ("After drawing cards at the beginning of the resource phase", misc family),

@@ -108,6 +108,8 @@ export type TempleLayout = {
   // The fifteen cells of the Island Map, row by row ("?" for Uncharted side up), and the index of the active one (0 to 14). With no `map` there is none.
   map?: readonly string[] | true;
   at?: number;
+  // The cells at these indexes have been traveled from (explored).
+  explored?: readonly number[];
   // Progress on the cell at this index.
   cellProgress?: readonly (readonly [number, number])[];
   // The codes of the secrets under the Temple column's cells, top to bottom ("" for none).
@@ -178,7 +180,7 @@ export function templeTable(world: TempleWorld, layout: TempleLayout = {}): Temp
       cells.push(spawned.id);
     }
     const uncharted = state.uncharted;
-    if (uncharted) state = { ...state, uncharted: { ...uncharted, island: { cells } } };
+    if (uncharted) state = { ...state, uncharted: { ...uncharted, island: { cells, ...(layout.explored ? { explored: layout.explored.flatMap((at) => (cells[at] ? [cells[at]] : [])) } : {}) } } };
     for (const [at, progress] of layout.cellProgress ?? []) {
       const id = cells[at];
       if (id) state = updateCard(state, id, { progress });

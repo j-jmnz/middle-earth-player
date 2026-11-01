@@ -8,8 +8,9 @@ import { modifiedStat, placeDamage } from "../rules/keywords.ts";
 import { ruleCause } from "../rules/cause.ts";
 import { stagingThreat } from "../rules/quest.ts";
 import { settle } from "../rules/machine.ts";
-import { shadowCards } from "../rules/zones.ts";
+import { moveCard, shadowCards } from "../rules/zones.ts";
 import type { ScenarioState } from "../rules/state.ts";
+import type { Effect } from "../catalog/boundary.ts";
 import { CODES, finish, idOf, idsOf, legalIntents, loadTempleWorld, resolveRecords, send, start, templeFight, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 
 let world: TempleWorld;
@@ -146,6 +147,13 @@ describe("Profane Dead (12077:A:1, 12077:A:2)", () => {
     expect(stat(with_.during, idOf(with_.during, "mild"), "attack")).toBe(3 + 3);
     expect(stat(without.during, idOf(without.during, "mild"), "attack")).toBe(3);
   });
+
+  it("does not count a Gate Key that lies in the staging area (nobody controls it) or stays guarded", () => {
+    for (const key of ["free", "guard"] as const) {
+      const fight = templeFight(world, CODES.profane, "mild", { map: MAP, at: 6, key });
+      expect(stat(fight.during, idOf(fight.during, "mild"), "attack"), key).toBe(3);
+    }
+  });
 });
 
 describe("Deeper into the Ruins (12078:A:1)", () => {
@@ -188,6 +196,15 @@ describe("Furious Rainstorm (12079:A:1, 12079:A:2)", () => {
     expect(fatal.run.state.seats[0].threat).toBe(28 + 1);
     const safe = templeFight(world, CODES.rainstorm, "mild", {}, { undefended: true });
     expect(safe.run.state.seats[0].threat).toBe(28);
+  });
+
+  it("reads the attacking enemy's current Threat, so Temple Guardian's Threat X (one for each player) counts", () => {
+    for (const seats of [1, 2] as const) {
+      for (const guardian of [CODES.guardianOriginal, CODES.guardian]) {
+        const fatal = templeFight(world, CODES.rainstorm, guardian, { seats }, { undefended: true, tweak: (state, made) => ({ ...state, cards: { ...state.cards, [made.hero]: { ...state.cards[made.hero]!, damage: 5 } } }) });
+        expect(fatal.run.state.seats[0].threat, `${guardian} with ${seats} players`).toBe(28 + seats);
+      }
+    }
   });
 });
 
@@ -300,36 +317,59 @@ describe("Recurring Nightmare (11199:A:1 to 11199:A:3)", () => {
   it("is shuffled into a player's deck when it leaves play, the first player choosing whose with more than one", () => {
     const solo = make({ phase: "Combat", engaged: [{ code: CODES.nightmare, seat: 0 }, { code: "mild", seat: 0 }], deckOf: ["c0", "c1"] });
     const nightmare = idOf(solo.state, CODES.nightmare);
-    const gone = finish({ state: settle(placeDamage({ ...solo.state, window: null, mode: "stopped" }, nightmare, 99, world.cards, [], "framework", ruleCause("test")), solo.ctx, []), steps: [] }, solo.ctx);
+    const watchedSolo = settle({ ...solo.state, window: null, mode: "stopped" }, solo.ctx, []);
+    const gone = finish({ state: settle(placeDamage(watchedSolo, nightmare, 99, world.cards, [], "framework", ruleCause("test")), solo.ctx, []), steps: [] }, solo.ctx);
     expect(gone.state.cards[nightmare]).toMatchObject({ zone: "deck", controller: 0 });
     expect(gone.state.seats[0].deck).toContain(nightmare);
     const duo = make({ seats: 2, phase: "Combat", engaged: [{ code: CODES.nightmare, seat: 0 }, { code: "mild", seat: 0 }], deckOf: ["c0", "c1"] });
     const second = idOf(duo.state, CODES.nightmare);
-    const asked = settle(placeDamage({ ...duo.state, window: null, mode: "stopped" }, second, 99, world.cards, [], "framework", ruleCause("test")), duo.ctx, []);
+    const watchedDuo = settle({ ...duo.state, window: null, mode: "stopped" }, duo.ctx, []);
+    const asked = settle(placeDamage(watchedDuo, second, 99, world.cards, [], "framework", ruleCause("test")), duo.ctx, []);
     expect(asked.window).toMatchObject({ kind: "choose", options: ["seat:0", "seat:1"] });
     const done = finish({ state: asked, steps: [] }, duo.ctx, () => "seat:1");
     expect(done.state.cards[second]).toMatchObject({ zone: "deck", controller: 1 });
   });
 
-  it("is added to the staging area when it enters a hand", () => {
-    const made = make({ phase: "Planning", deckOf: [CODES.nightmare, "c1"] });
+  it("is shuffled into a player's deck on every way out of play: discarded, shuffled into the encounter deck, returned to a hand, removed", () => {
+    for (const zone of ["encounterDiscard", "encounterDeck", "hand", "removed"] as const) {
+      const made = make({ phase: "Combat", staging: [CODES.nightmare], deckOf: ["c0", "c1"] });
+      const nightmare = idOf(made.state, CODES.nightmare);
+      // The game settles after every intent: the Nightmare in play is watched before it leaves.
+      const watched = settle({ ...made.state, window: null, mode: "stopped" }, made.ctx, []);
+      const settled = settle(moveCard(watched, nightmare, zone === "hand" ? { zone, seat: 0 } : { zone }), made.ctx, []);
+      expect(finish({ state: settled, steps: [] }, made.ctx).state.cards[nightmare], zone).toMatchObject({ zone: "deck", controller: 0 });
+    }
+  });
+
+  it("is shuffled into a player's deck when an effect shuffles it into the encounter deck, as Put Off Pursuit does (21008:response:1)", () => {
+    const made = make({ phase: "Travel", engaged: [], staging: [CODES.nightmare], deckOf: ["c0", "c1"] });
     const nightmare = idOf(made.state, CODES.nightmare);
-    const draw = settle({ ...made.state, window: null, mode: "stopped" }, made.ctx, []);
-    void draw;
-    // Drawn into a hand, it is announced to itself, and its Forced effect adds it to the staging area.
-    const drawn = finish({ state: settle(drawOne(made.state, nightmare), made.ctx, drawSteps(made.state, nightmare)), steps: [] }, made.ctx);
+    const pursuit: Effect = {
+      id: "filler:forced:9",
+      cardCode: "filler",
+      lines: ["filler:A:9"],
+      timing: "forced",
+      instructions: [
+        { verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true, nonUnique: true } },
+        { verb: "MoveEncounterCard", to: "shuffle", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: true } },
+      ],
+    };
+    const ctx = { ...made.ctx, effects: [...made.ctx.effects, pursuit] };
+    const watched = settle({ ...made.state, window: null, mode: "stopped" }, ctx, []);
+    const run = resolveRecords(watched, ctx, "filler", "forced");
+    expect(run.state.cards[nightmare]).toMatchObject({ zone: "deck", controller: 0 });
+    expect(run.state.encounterDeck).not.toContain(nightmare);
+  });
+
+  it("is added to the staging area when a draw puts it into a hand, in a real resource phase draw through reduce", () => {
+    const made = make({ phase: "Refresh", deckOf: [CODES.nightmare, "c1"] });
+    const nightmare = idOf(made.state, CODES.nightmare);
+    expect(made.state.seats[0].deck[0]).toBe(nightmare);
+    // The Refresh phase has no intent to give: the machine (the settle every reduce ends with) carries the round into the resource phase, whose draw step draws the Nightmare.
+    const drawn = finish({ state: settle(made.state, made.ctx, []), steps: [] }, made.ctx);
     expect(drawn.state.cards[nightmare]?.zone).toBe("staging");
     expect(drawn.state.seats[0].hand).not.toContain(nightmare);
   });
 });
-
-function drawSteps(state: ScenarioState, id: string) {
-  return [{ kind: "draw" as const, seat: 0, cardId: id, cause: ruleCause("rr.setup") }];
-}
-
-function drawOne(state: ScenarioState, id: string): ScenarioState {
-  const seat = state.seats[0];
-  return { ...state, window: null, mode: "stopped", seats: [{ ...seat, deck: seat.deck.filter((other) => other !== id), hand: [...seat.hand, id] }, state.seats[1]], cards: { ...state.cards, [id]: { ...state.cards[id]!, zone: "hand", controller: 0 } } };
-}
 
 export type { Table };

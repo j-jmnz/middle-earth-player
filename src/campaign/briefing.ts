@@ -11,7 +11,7 @@ import type { StartScenario } from "../rules/setup.ts";
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
-import { isNightmarePlayable } from "./playable.ts";
+import { isNightmarePlayable, isPlayable } from "./playable.ts";
 import { printedScenarioName } from "./printed-name.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
@@ -123,9 +123,14 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
   return { problems, loadout };
 }
 
+/** A scenario the app cannot deal yet is coming soon (user decision, 2026-11-01): the one refusal of a campaign briefing, a standalone one and a deal, in the same words. */
+export function comingSoonProblems(world: World): Problem[] {
+  return isPlayable(world.scenario.id) ? [] : [{ rule: "Coming soon", message: `${printedScenarioName(world.scenario.name)} is coming soon.` }];
+}
+
 function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
   const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat(), heroBansOf(input.world.campaign, input.world.scenario.id));
-  return { problems: [...difficultyProblems(input.world, input.difficulty), ...problems], loadout };
+  return { problems: [...comingSoonProblems(input.world), ...difficultyProblems(input.world, input.difficulty), ...problems], loadout };
 }
 
 // Nightmare deals only where the scenario's Nightmare deck has an effect record for every printed line (NIGHTMARE_PLAYABLE).

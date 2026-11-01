@@ -23,7 +23,11 @@ import { inPlay, livingSeats, updateCard, withSeat } from "../state.ts";
 import { attachTo, cardsUnder, moveCard } from "../zones.ts";
 import type { Focus } from "./index.ts";
 import { effectData } from "./encounter-moves.ts";
-import { TEMPLE_COLUMN, cardAt, islandOf, ROWS } from "./island-map.ts";
+import { templeCells } from "./island-map.ts";
+
+/** A choice of a seat is offered as `seat:N` (askTarget); the seat a made choice names, or undefined while nothing is chosen. */
+const seatOption = (seat: number): string => `seat:${seat}`;
+const chosenSeat = (chosen: string | undefined): number | undefined => (chosen == null ? undefined : Number(chosen.slice("seat:".length)));
 
 /** The option that keeps the progress on the stage instead of placing it. */
 export const KEEP = "keep";
@@ -39,12 +43,6 @@ export function attachGuarded(state: ScenarioState, instruction: Verb<"AttachGua
   // A card the campaign log upgraded is dealt on its Upgraded side (dcce.scalable-upgradable).
   const placed = updateCard(moveCard(state, id, { zone: "attached" }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up"), controller: null, claimed: true });
   return attachTo(placed, id, host.id);
-}
-
-/** The Temple of the Deceived locations of the map, top to bottom. */
-export function templeCells(state: ScenarioState): string[] {
-  const island = islandOf(state);
-  return island ? Array.from({ length: ROWS }, (_, row) => cardAt(island, row, TEMPLE_COLUMN)).filter((id): id is string => id != null) : [];
 }
 
 /** PlaceSecrets: the set-aside copies of these cards (one for each code listed) are shuffled and lie facedown under the Temple locations, one each, from the top (11197:A:2). */
@@ -96,10 +94,10 @@ export function engageFromVictory(state: ScenarioState, instruction: Verb<"Engag
   const seats = livingSeats(state);
   const top = Math.max(...seats.map((seat) => seatThreat(state, seat)));
   const tied = seats.filter((seat) => seatThreat(state, seat) === top);
-  const chosen = focus.chosen != null ? Number(focus.chosen.slice("seat:".length)) : tied.length === 1 ? tied[0] : undefined;
+  const chosen = chosenSeat(focus.chosen) ?? (tied.length === 1 ? tied[0] : undefined);
   if (chosen == null || !tied.includes(chosen)) {
     if (!effectData(state)) return { ...state, failure: "Putting the Temple Guardian into play needs a choice, and no effect is asking" };
-    return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied.map((seat) => `seat:${seat}`));
+    return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied.map(seatOption));
   }
   return engageWith(updateCard(state, id, { face: "up" }), chosen, id, steps);
 }
@@ -110,10 +108,10 @@ export function shuffleIntoPlayerDeck(state: ScenarioState, instruction: Verb<"S
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || inPlay(card.zone)) return state;
   const seats = livingSeats(state);
-  const chosen = focus.chosen != null ? Number(focus.chosen.slice("seat:".length)) : seats.length === 1 ? seats[0] : instruction.seat;
+  const chosen = chosenSeat(focus.chosen) ?? (seats.length === 1 ? seats[0] : instruction.seat);
   if (chosen == null || !seats.includes(chosen)) {
     if (!effectData(state)) return { ...state, failure: "Shuffling a card into a deck needs a choice, and no effect is asking" };
-    return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, seats.map((seat) => `seat:${seat}`));
+    return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, seats.map(seatOption));
   }
   const placed = updateCard(moveCard(state, id, { zone: "deck", seat: chosen }), id, { face: "up", exhausted: false });
   const seat = placed.seats[chosen];

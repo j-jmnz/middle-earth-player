@@ -48,7 +48,7 @@ describe("Temple of the Deceived in the Dream-chaser campaign", () => {
   it("is the sixth part of a save, playable, and the campaign card names the cards it places and the reprints it deals", () => {
     const save = newSave("temple", campaign.id, 1);
     const unlocked = { ...save.log, completed: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths"] };
-    expect(campaignPath(campaign, {}, unlocked).map((node) => [node.id, node.status]).slice(4, 7)).toEqual([["the-thing-in-the-depths", "completed"], ["temple-of-the-deceived", "current"], ["the-drowned-ruins", "locked"]]);
+    expect(campaignPath(campaign, {}, unlocked).map((node) => [node.id, node.status]).slice(4, 7)).toEqual([["the-thing-in-the-depths", "completed"], ["temple-of-the-deceived", "current"], ["the-drowned-ruins", "soon"]]);
     expect(PLAYABLE_SCENARIOS).toContain("temple-of-the-deceived");
     expect(temple.campaignCard).toBe("11197");
     expect([...temple.campaignPlaced].sort()).toEqual(["11180", "11181", "11183", "11198", "11199"].sort());

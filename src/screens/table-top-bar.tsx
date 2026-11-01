@@ -19,7 +19,7 @@ import type { HeadingStep } from "../play/heading";
 import { MenuButton } from "../play/table-menu";
 import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
-import { BAR_PAD, barZones, DIAL_GAP, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../play/top-bar-layout";
+import { BAR_PAD, barZones, chipCompact, DIAL_GAP, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../play/top-bar-layout";
 import { useUiScale } from "../play/ui-scale";
 
 export { TOP_BAR };
@@ -41,7 +41,7 @@ export type TopBarProps = {
   tokens?: { name: string; tokens: number } | null;
   // The Heading dial, after the seat dials, while the Heading card is in play (dcce.heading): the current step, and what a tap does (the Heading card's preview). Absent: no dial.
   heading?: { step: HeadingStep; onPress: () => void } | null;
-  // The Island Map chip, after the Heading dial, while the game has a map (dcce.island-map): the map as the table reads it, and what a tap does (the map panel).
+  // The Island Map chip, right after the seat dials, while the game has a map (dcce.island-map): the map as the table reads it, and what a tap does (the map panel).
   island?: IslandReadout | null;
   onIsland?: () => void;
   // On Nightmare: opens the setup card next to the quest deck (the Eye of Sauron after the dials). Absent on Easy and Normal.
@@ -78,6 +78,9 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   // The Heading dial's place in the dials row, measured, so the row can scroll to it and the other dials' width can be told from it.
   const [headingBox, setHeadingBox] = useState({ x: 0, w: 0 });
   const onHeading = (event: LayoutChangeEvent) => setHeadingBox({ x: Math.round(event.nativeEvent.layout.x), w: Math.round(event.nativeEvent.layout.width) });
+  // The Map chip's width in the row, measured: the chip drops its word "Map" when the dials would scroll with it (chipCompact).
+  const [chipW, setChipW] = useState(0);
+  const onChip = (event: LayoutChangeEvent) => setChipW(Math.round(event.nativeEvent.layout.width));
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const onBar = (event: LayoutChangeEvent) => setBar({ width: Math.round(event.nativeEvent.layout.width), x: Math.round(event.nativeEvent.layout.x) });
   const onDials = (event: LayoutChangeEvent) => setDials(Math.round(event.nativeEvent.layout.width));
@@ -95,6 +98,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   // The Heading dial drops its word and lays its badge under the disc when the dial at its full width would make the dials scroll; that is told from the other dials' width, not the dial's own.
   const others = heading ? dials - headingBox.w - DIAL_GAP * s : dials;
   const compact = heading != null && bar.width > 0 && dials > 0 && headingCompact(bar.width - 2 * BAR_PAD, others, s, center, narrow);
+  const chipHere = island != null && onIsland != null;
+  const mapCompact = chipHere && bar.width > 0 && dials > 0 && chipCompact(bar.width - 2 * BAR_PAD, dials - chipW - DIAL_GAP * s, s, center);
   // While the dials scroll, the row keeps the Heading dial whole in the zone, clear of the fade (headingOffset).
   const offset = zones && heading ? headingOffset(zones, { x: headingBox.x, w: headingBox.w }, dials, s) : 0;
   useEffect(() => {
@@ -137,13 +142,18 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                 />
               );
             })}
+            {/* The Map chip follows the seat dials; it drops its word when the row would scroll with it. */}
+            {island && onIsland ? (
+              <View onLayout={onChip}>
+                <IslandChip readout={island} compact={mapCompact} onPress={onIsland} />
+              </View>
+            ) : null}
             {heading ? (
               // The compact dial's badge reaches past it; the room it needs is part of the dial's place in the row, so the zones count it.
               <View onLayout={onHeading} style={{ paddingRight: compact ? HEADING_BADGE_OVER * s : 0 }}>
                 <HeadingDial step={heading.step} compact={compact} onPress={heading.onPress} />
               </View>
             ) : null}
-            {island && onIsland ? <IslandChip readout={island} onPress={onIsland} /> : null}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

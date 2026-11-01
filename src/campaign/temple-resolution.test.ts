@@ -1,6 +1,6 @@
 // Rules: dcce.gaining-xp, dcce.hard-expert, dcce.campaign-mode, dcce.island-map, dcce.uncharted, ltp.campaign-pool (data/rules/entries.json). The XP lines of the campaign card's Resolution (11197:B:3 to 11197:B:9), each run on a
-// table that makes that line true against a baseline that makes every other line false: one surviving player over the threat limit, no resource on the campaign card, every location of the map lying Uncharted side up
-// (so none is flipped), Temple Guardian not in the victory display, Ominous Fate not in it either (1 XP). And the cards the Resolution earns (11197:B:1): Starla, and each Recurring Nightmare that is no secret, for a
+// table that makes that line true against a baseline that makes every other line false: one surviving player over the threat limit, no resource on the campaign card, five locations of the map flipped over (one more than earns B:6)
+// Temple Guardian not in the victory display, Ominous Fate not in it either (1 XP). And the cards the Resolution earns (11197:B:1): Starla, and each Recurring Nightmare that is no secret, for a
 // player the first player chooses.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -14,8 +14,8 @@ beforeAll(async () => {
   world = await loadTempleWorld();
 });
 
-// Every location lies Uncharted side up; the Temple column holds Temple Halls twice and The Grotto's Entrance once.
-const COVERED = ["?12072", "?12073", "?12074", "?11072", "?12068", "?11073", "?11074", "?12072", "?12073", "?12069", "?12074", "?11072", "?11073", "?11074", "?12069"] as const;
+// Five locations (indexes 1 to 3, 5 and 6) are flipped over and ten lie Uncharted side up, so the baseline is just past the 4 flipped locations that earn B:6; the Temple column holds Temple Halls twice and The Grotto's Entrance once.
+const COVERED = ["?12072", "12073", "12074", "11072", "?12068", "11073", "11074", "?12072", "?12073", "?12069", "?12074", "?11072", "?11073", "?11074", "?12069"] as const;
 const BASE: TempleLayout = { map: COVERED, at: 0, threat: [45, 26], campaign: true, phase: "Quest" };
 
 // The log the Resolution writes for the table `layout` describes, won; every choice is answered by `choice` (the first option by default).
@@ -62,17 +62,15 @@ describe("the campaign card's XP list (11197:B:2 to 11197:B:9)", () => {
     expect(xpOf({})).toBe(1);
   });
 
-  it("gains 1 XP if 4 or fewer Uncharted locations are faceup, lying Lost Island or Temple of the Deceived side up (B:6)", () => {
+  it("gains 1 XP if 4 or fewer of the double-sided locations are flipped over, a short route (B:6; user decision, 2026-11-01)", () => {
     const made = templeTable(world, { ...BASE });
-    const cover = (count: number) => flipped(...Array.from({ length: 15 - count }, (_, at) => at))(made);
-    // 5 left covered: no XP; 4 left covered: 1 XP (and the flipped Temple Halls among them gain theirs).
-    const only = (count: number) => (state: ScenarioState): ScenarioState => {
-      const tweaked = cover(count)(state);
-      return { ...tweaked, cards: Object.fromEntries(Object.entries(tweaked.cards).map(([id, card]) => [id, card.code === "12069" && card.face === "A" ? { ...card, code: "11072" } : card])) };
-    };
-    expect(xpOf({}, only(5))).toBe(1);
-    expect(xpOf({}, only(4))).toBe(2);
-    expect(xpOf({}, only(0))).toBe(2);
+    // The baseline flips 5 locations; the Temple Halls among them are no part of it (index 9 and 14 stay covered).
+    const unflip = (...indexes: number[]) => (state: ScenarioState): ScenarioState => ({ ...state, cards: Object.fromEntries(Object.entries(state.cards).map(([id, card]) => [id, indexes.some((at) => made.cells[at] === id) ? { ...card, face: "B" as const } : card])) });
+    expect(xpOf({})).toBe(1);
+    expect(xpOf({}, unflip(1))).toBe(2);
+    expect(xpOf({}, unflip(1, 2, 3, 5, 6))).toBe(2);
+    // A sixth flipped location still earns nothing.
+    expect(xpOf({}, flipped(7)(made))).toBe(1);
   });
 
   it("gains 1 XP if Temple Guardian is in the victory display, the reprint or the original (B:7)", () => {

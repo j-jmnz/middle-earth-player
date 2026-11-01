@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
 
-import { campaignPath, openNode, type PathNode } from "../../../campaign/path";
+import { campaignPath, openNode, soonNode, soonWords, type PathNode } from "../../../campaign/path";
 import { rowSurface } from "../../../play/surfaces";
 import { useTableTokens } from "../../../play/use-table-tokens";
 import { SceneArt } from "../../art";
@@ -108,6 +108,8 @@ export default function CampaignPath() {
       : save.log.campaignPool.map((card) => poolCardWords(card, save.log.usedOnce, name)).join(", ");
 
   const current = currentIndex >= 0 ? nodes[currentIndex] : null;
+  // The path stops at a scenario the app cannot deal yet: "Coming soon", no Begin, no briefing.
+  const soon = soonNode(nodes);
   // The stop a tap begins or resumes the game from: the open scenario, else the current one. The path has no Begin or Resume button
   // (user request, 2026-10-29): a tap on that stop on the road does it.
   const goNode = open ?? current;
@@ -125,7 +127,7 @@ export default function CampaignPath() {
       backLabel="Campaigns"
       title={campaign.name}
       subtitle={`${seatWord(save.seatCount)} · ${done} of ${nodes.length} completed`}
-      right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, nodes[currentIndex]?.id) })} />}
+      right={<IconButton icon="lore" label="Open the booklet" testID="booklet-open" onPress={() => router.push({ pathname: "/booklet/[id]", params: bookletParams(save.campaignId, nodes[currentIndex]?.id ?? soon?.id) })} />}
     />
   );
   const noticeRow = notice ? (
@@ -138,7 +140,7 @@ export default function CampaignPath() {
   const scores = new Map(nodes.flatMap((node) => (node.score != null ? [[node.id, String(node.score)] as const] : [])));
   const replay = (node: PathNode) => () => router.push(briefingHref(save.id, node.id));
   // The open scenario resumes its table (a replay of a won one too); a won stop opens its summary with Replay; the current one opens
-  // its briefing; a locked one does nothing.
+  // its briefing; a locked or coming-soon one does nothing.
   const onStop = (node: PathNode) =>
     open?.id === node.id
       ? () => router.push(tableHref(save.id))
@@ -197,6 +199,13 @@ export default function CampaignPath() {
     if (pickedNode) {
       return (
         <WonRow node={pickedNode} rounds={save.log.scenarios[pickedNode.id]?.rounds ?? null} rewards={pickedNode.reward.map(name)} onReplay={replay(pickedNode)} />
+      );
+    }
+    if (soon) {
+      return (
+        <Label testID="path-soon" className="text-center">
+          {`${soonWords(soon)}.`}
+        </Label>
       );
     }
     if (complete) {

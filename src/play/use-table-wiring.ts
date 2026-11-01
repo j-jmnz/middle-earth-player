@@ -39,7 +39,7 @@ export function useTableWiring({ store, ctx, game, setReading, setPreview }: { s
   const headingStep = headingNow?.step ?? null;
   const headingCard = headingNow?.cardId ?? null;
   const headingDial = useMemo((): HeadingDialProps | null => (headingStep ? { step: headingStep, onPress: () => (headingCard ? onPreview(headingCard) : undefined) } : null), [headingStep, headingCard, onPreview]);
-  // The Island Map's chip, after the dials, while the game has a map (dcce.island-map): a tap opens the map panel.
+  // The Island Map's chip, right after the seat dials, while the game has a map (dcce.island-map): a tap opens the map panel.
   const island = useMemo((): IslandReadout | null => islandReadout(game, ctx.cards), [game, ctx]);
   return { facts, success, onPreview, onPile, headingDial, island };
 }

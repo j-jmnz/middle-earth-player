@@ -17,8 +17,9 @@ import { runSetupVerb } from "./setup-verbs.ts";
 import { engageEnemy, engageWith, stagingEnemies, stagingLocations } from "./quest.ts";
 import { travelNow } from "./travel.ts";
 import type { ScenarioState } from "./state.ts";
-import { flagged, heldAmount, inPlay, updateCard } from "./state.ts";
+import { flagged, heldAmount, updateCard } from "./state.ts";
 import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
+import { readyNamedCard } from "./restrictions.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
 import { shadowFace } from "./families/defense-shadow.ts";
@@ -26,6 +27,7 @@ import { drawCards } from "./families/dungeon-deck.ts";
 import { withView } from "./families/breaking-areas.ts";
 import { isBreakingVerb } from "./families/breaking.ts";
 import { announceDraw } from "./families/dreamchaser.ts";
+import { announceEnteredHand } from "./families/island-hand.ts";
 import { playerSource } from "./families/quest-threat.ts";
 
 export type ReduceContext = {
@@ -138,12 +140,8 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ModifyStat":
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
-      const code = instruction.target?.kind === "byCode" ? instruction.target.code : undefined;
-      const named = instruction.target?.kind === "byName" ? instruction.target.name : undefined;
-      const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
-      const id = code || named
-        ? Object.values(state.cards).find((card) => (code ? card.code === code : printedOf(ctx.cards, card.code).name === named) && inPlay(card.zone) && !(named && (card.exhausted || card.controller == null)) && (payer == null || card.controller === payer))?.id
-        : focus.sourceId;
+      const target = instruction.target;
+      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null)?.id : focus.sourceId;
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
@@ -165,19 +163,19 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
 }
 
 // Setup (rr.setup step 5) and a mulligan (rr.mulligan) draw the opening hand.
-export function drawOpeningHand(state: ScenarioState, seat: number, steps: EngineStep[], cause: Cause = ruleCause("rr.setup")): ScenarioState {
+export function drawOpeningHand(state: ScenarioState, seat: number, steps: EngineStep[], ctx: ReduceContext, cause: Cause = ruleCause("rr.setup")): ScenarioState {
   let next = state;
   const count = Math.max(0, 6 - state.openingHandReduction);
-  next = drawMany(next, seat, count, steps, cause);
+  next = drawMany(next, seat, count, steps, cause, ctx);
   return next;
 }
 
 // A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon-deck.ts).
 // An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either.
-export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause): ScenarioState {
+export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
-  return announceDraw(state, drawn, seat);
+  return announceEnteredHand(state, announceDraw(state, drawn, seat), seat, ctx);
 }
 
 function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {

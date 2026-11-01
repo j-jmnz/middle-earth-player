@@ -48,7 +48,7 @@ export function drawVerb(
   const trait = instruction.perHero;
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
-  return drawMany(state, target, count, steps, UNATTRIBUTED);
+  return drawMany(state, target, count, steps, UNATTRIBUTED, ctx);
 }
 
 // The cards a player may pick for the verb.

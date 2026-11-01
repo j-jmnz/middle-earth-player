@@ -25,7 +25,7 @@ function drawEach(state: ScenarioState, instruction: Verb<"DrawEach">, focus: Fo
   const seats = livingSeats(state);
   const from = Math.max(0, seats.indexOf(state.firstPlayer));
   let next = state;
-  for (const seat of [...seats.slice(from), ...seats.slice(0, from)]) next = drawMany(next, seat, count, steps, UNATTRIBUTED);
+  for (const seat of [...seats.slice(from), ...seats.slice(0, from)]) next = drawMany(next, seat, count, steps, UNATTRIBUTED, ctx);
   return next;
 }
 

@@ -306,6 +306,8 @@ export type ScenarioState = {
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
+  // The cards in play that hear their own leaving by any route (`exitedPlay`); settle announces one once it is out of play (families/island-hand.ts). Kept only in a game with such a card.
+  exitWatch?: readonly string[];
   // The cards each seat drew in the draw step at the beginning of this round's resource phase ("choose and discard 1 of those
   // cards", families/misc-pick.ts).
   resourceDrawn?: Readonly<Record<number, readonly string[]>>;

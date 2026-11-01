@@ -13,7 +13,7 @@ export function briefingHref(saveId: string, scenarioId: string) {
   return { pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId, scenarioId } } as const;
 }
 
-/** Resume opens the table, Begin the briefing, and a finished campaign its path. */
+/** Resume opens the table, Begin the briefing, and a finished campaign or one whose next scenario is coming soon its path. */
 export function nextStepHref(saveId: string, step: NextStep) {
   if (step.kind === "resume") return tableHref(saveId);
   if (step.kind === "begin") return briefingHref(saveId, step.node.id);

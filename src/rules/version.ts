@@ -42,4 +42,7 @@
 // tokens placed on a set-aside card stay on it as it enters play (Captain Sahír and Na'asiyah, 12039:B:2); an enemy a stage made indestructible waits for the When Revealed that flips it, and no other enemy is held;
 // Crew Quarters adds its resource to each Raider card, the objective sides of Sahír and Na'asiyah included, and Quarter Deck deals its extra shadow card only in the combat phase: a replayed Thing in the Depths game
 // takes a different path.
-export const ENGINE_VERSION = 20;
+// 21 (Dream-chaser, phase 45 fix pass): an Exhaust that names a card by code or by title exhausts a ready one (readyNamedCard, as its Travel cost is checked), a card that hears its own leaving by any route
+// (`exitedPlay`, Recurring Nightmare) is announced once it is out of play, a card drawn into a hand that hears `enteredHand` is announced by the draw, and the Island Map keeps the locations the players traveled from:
+// a replayed Temple of the Deceived game can take a different path.
+export const ENGINE_VERSION = 21;

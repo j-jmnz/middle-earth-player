@@ -16,7 +16,7 @@ import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
 import { topFrame } from "../rules/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { islandBlocked, islandOptionLabel, islandTravelNote, islandTravelRow } from "./island-words.ts";
+import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "./island-words.ts";
 import { grantedTravelWords, grappleAsk, grappleFactsOf, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "./grapple-words.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "./uncharted-words.ts";
@@ -35,7 +35,6 @@ import { viewOf } from "../rules/families/breaking-areas.ts";
 import { questSeat } from "./selectors.ts";
 import { freeSlot } from "../rules/families/south-locations.ts";
 import { recordsOfFace } from "../rules/families/dreamchaser-faces.ts";
-import { exploring } from "../rules/families/island-map.ts";
 import { islandMayTravel } from "../rules/families/island-travel.ts";
 import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
 import { sailingSheet } from "./sea-sheets.ts";
@@ -351,12 +350,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         kind: "pick",
         key: `travel:${game.round}`,
         step: "Travel",
-        title: targets.length > 0 ? "Travel to a location" : blocked && active ? (exploring(game) ? `Fill ${names.card(active.id)} first` : `Explore ${names.card(active.id)} first`) : "No location to travel to",
+        title: targets.length > 0 ? "Travel to a location" : blocked && active ? (islandBlockedTitle(game, (activePoints ?? 0) - active.progress, names.card(active.id)) ?? `Explore ${names.card(active.id)} first`) : "No location to travel to",
         note:
           targets.length > 0
-            ? [islandTravelNote(game, names.card) ?? travelNote(game, targets), returnsNote(game, ctx, names.card)].filter((part) => part != null).join(" ")
+            ? [islandTravelNote(game, names.card, targets.some((id) => game.cards[id]?.face === "B")) ?? travelNote(game, targets), returnsNote(game, ctx, names.card)].filter((part) => part != null).join(" ")
             : blocked && active && activePoints != null
-              ? (islandBlocked(game, activePoints - active.progress, names.card(active.id)) ?? `${Math.max(0, activePoints - active.progress)} more progress explores it. Only one location can be active.`)
+              ? (islandBlocked(game) ?? `${Math.max(0, activePoints - active.progress)} more progress explores it. Only one location can be active.`)
               : null,
         verb: "Travel to",
         options: targets.map((id) => {
@@ -374,9 +373,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // A Travel cost another card gave it (Weather Deck, 12044:A:1), and the enemies grappled with it that come out and join the staging area (dcce.grapple): the confirm is armed with what they do.
           const granted = grantedTravelWords(game, id);
           const grapple = grappleTravel(game, ctx, id);
-          const label = [base.label, line, granted, caller?.words, grapple?.words, mapped?.words].filter((part) => part != null && part !== "").join(" · ");
+          const label = [mapped?.lead, base.label, line, granted, caller?.words, grapple?.words, mapped?.words].filter((part) => part != null && part !== "").join(" · ");
           const caution = caller?.caution ?? grapple?.caution ?? mapped?.caution;
-          return { ...base, label, stats, ...(caution ? { caution } : {}), intent: { type: "Travel", locationId: id } };
+          return { ...base, label, stats, ...(caution ? { caution } : {}), ...(mapped ? { place: mapped.place } : {}), intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,

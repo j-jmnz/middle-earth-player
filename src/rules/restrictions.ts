@@ -8,7 +8,7 @@ import { grantedTravel } from "./families/grapple-travel.ts";
 import { modifiedStat } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
-import { flagged, heldAmount, inPlay, livingSeats, type ScenarioState } from "./state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "./state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
@@ -101,12 +101,15 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < instruction.amount;
       }
       if (instruction.verb !== "Exhaust" || (instruction.target?.kind !== "byCode" && instruction.target?.kind !== "byName")) return false;
-      const target = instruction.target;
-      const payer = instruction.who === "firstPlayer" ? state.firstPlayer : null;
-      return !Object.values(state.cards).some(
-        (card) => (target.kind === "byCode" ? card.code === target.code : printedOf(ctx.cards, card.code).name === target.name) && inPlay(card.zone) && !card.exhausted && (target.kind === "byCode" || card.controller != null) && (payer == null || card.controller === payer),
-      );
+      return readyNamedCard(state, ctx, instruction.target, instruction.who === "firstPlayer" ? state.firstPlayer : null) == null;
     });
+}
+
+/** The card in play that an Exhaust names by code or by title and that is ready ("Exhaust the Gate Key to travel here"): a card named by title is one a player controls. `payer`: only a card this seat controls. */
+export function readyNamedCard(state: ScenarioState, ctx: ReduceContext, target: { kind: "byCode"; code: string } | { kind: "byName"; name: string }, payer: number | null): CardInstance | undefined {
+  return Object.values(state.cards).find(
+    (card) => (target.kind === "byCode" ? card.code === target.code : printedOf(ctx.cards, card.code).name === target.name) && inPlay(card.zone) && !card.exhausted && (target.kind === "byCode" || card.controller != null) && (payer == null || card.controller === payer),
+  );
 }
 
 export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: string, attachmentCode: string): boolean {

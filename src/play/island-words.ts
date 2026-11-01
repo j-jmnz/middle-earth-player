@@ -2,13 +2,14 @@
 // verbs inside a choice (src/catalog/families/island.ts): what a Pick or a question is for, the label of an option that is no card, and what a travel row on the map says. Every prompt names the card it is about and leads
 // with the decision; a travel row says what it leaves behind and what it brings back. Pure.
 import type { Instruction } from "../catalog/boundary.ts";
-import { cellOf, exploring, islandOf, TEMPLE_COLUMN } from "../rules/families/island-map.ts";
+import { cellOf, distance, exploring, islandOf, TEMPLE_COLUMN } from "../rules/families/island-map.ts";
 import { seatThreat } from "../rules/families/play-hooks.ts";
 import { effectsOf } from "../rules/listen.ts";
 import { printedOf } from "../rules/printed.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
+import { directionWords, type PlaceMark } from "./island-place.ts";
 
 const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
@@ -69,26 +70,35 @@ export function islandOptionLabel(instruction: Instruction, id: string, game: Sc
 
 // ---- Traveling on the map (docs/design-system-table.md, The Island Map). ----
 
-/** The sentence under a travel choice on the map: the marker moves, the location left stays where it lies and loses its progress. Null in a game with no map. */
-export function islandTravelNote(game: ScenarioState, name: (id: string) => string): string | null {
+/** The sentence under a travel choice on the map: the marker moves, the location left stays where it lies and loses its progress, and a covered destination is flipped over when the marker reaches it (`covered`:
+ * one of the choices lies Uncharted side up). Null in a game with no map. */
+export function islandTravelNote(game: ScenarioState, name: (id: string) => string, covered = false): string | null {
   if (!exploring(game) || !game.activeLocation) return null;
   const progress = game.cards[game.activeLocation]?.progress ?? 0;
-  return `The marker moves to the location, which stays where it lies. ${name(game.activeLocation)} is explored${progress > 0 ? ` and its ${plural(progress, "progress", "progress")} is removed` : ""}.`;
+  const flip = covered ? " A covered location is flipped over when the marker reaches it, and you see what it is." : "";
+  return `The marker moves to the location, which stays where it lies. ${name(game.activeLocation)} is explored${progress > 0 ? ` and its ${plural(progress, "progress", "progress")} is removed` : ""}.${flip}`;
 }
 
-/** What a full-up active location needs before the players can travel from it, as the empty travel sheet says it ("3 more progress before the players can travel from it"). Null in a game with no map. */
-export function islandBlocked(game: ScenarioState, needed: number, name: string): string | null {
-  return exploring(game) ? `${plural(Math.max(0, needed), "more progress", "more progress")} on ${name} before the players can travel from it.` : null;
+/** The title of the empty travel sheet on the map: what the full-up active location still needs ("Cursed Temple needs 3 more progress"). Null in a game with no map. */
+export function islandBlockedTitle(game: ScenarioState, needed: number, name: string): string | null {
+  return exploring(game) ? `${name} needs ${plural(Math.max(0, needed), "more progress", "more progress")}` : null;
 }
 
-export type IslandTravelRow = { words: string; caution: string | null };
+/** The note under that title: the players travel from a location only once it is full. Null in a game with no map. */
+export function islandBlocked(game: ScenarioState): string | null {
+  return exploring(game) ? "The players can travel from the active location once it is full." : null;
+}
+
+// `lead`: the direction from the marker, which the row opens with; `words`: what else the travel brings; `place`: the destination's place, drawn as the glyph.
+export type IslandTravelRow = { lead: string; words: string | null; caution: string | null; place: PlaceMark };
 
 // The enemies engaged with a player that attack when the players travel to the right ("Forced: When you travel to the right, Profane Dead makes an immediate attack", 12077:A:1).
 function attackersOnRight(game: ScenarioState, ctx: ReduceContext): string[] {
   return game.seats.flatMap((seat) => seat.engaged).filter((id) => effectsOf(ctx, game.cards[id]?.code ?? "").some((effect) => effect.trigger === "traveled" && effect.condition?.kind === "all" && effect.condition.conditions.some((entry) => entry.kind === "island" && entry.movedRight === true)));
 }
 
-/** What a travel row on the map says of the location: how far away it is (Winding Caverns), that the Temple Guardian comes back (a covered Temple location), and the enemies that attack when the players go right. The caution arms the confirm. */
+/** What a travel row on the map says of the location: where it lies from the marker ("Right of the marker", "2 right, 1 down", also how far Winding Caverns reaches), that the Temple Guardian comes back (a covered Temple location),
+ * and the enemies that attack when the players go right. The caution arms the confirm. */
 export function islandTravelRow(game: ScenarioState, ctx: ReduceContext, locationId: string, name: (id: string) => string): IslandTravelRow | null {
   const island = islandOf(game);
   const active = game.activeLocation;
@@ -98,7 +108,7 @@ export function islandTravelRow(game: ScenarioState, ctx: ReduceContext, locatio
   if (!to || !from) return null;
   const parts: string[] = [];
   const cautions: string[] = [];
-  const away = Math.abs(to.row - from.row) + Math.abs(to.col - from.col);
+  const away = distance(island, active, locationId) ?? 0;
   if (away > 1) parts.push(`${away} locations away`);
   // Every Temple location, whichever it turns out to be, brings Temple Guardian back from the victory display (12068:A:1, 12069:A:2).
   const guardian = game.victory.find((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name === "Temple Guardian");
@@ -114,6 +124,6 @@ export function islandTravelRow(game: ScenarioState, ctx: ReduceContext, locatio
       cautions.push(`${names} ${enemies.length === 1 ? "makes" : "make"} an immediate attack`);
     }
   }
-  if (parts.length === 0) return null;
-  return { words: parts.join(" · "), caution: cautions.length > 0 ? `Tap again: ${cautions.join("; ")}` : null };
+  const place: PlaceMark = { row: to.row, col: to.col, from: { row: from.row, col: from.col } };
+  return { lead: directionWords(from, to), words: parts.length > 0 ? parts.join(" · ") : null, caution: cautions.length > 0 ? `Tap again: ${cautions.join("; ")}` : null, place };
 }

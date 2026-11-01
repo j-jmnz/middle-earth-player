@@ -4,6 +4,7 @@ import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { UI_SCALES } from "./ui-scale.ts";
 import {
   barZones,
+  chipCompact,
   DIAL_GAP,
   DIAL_LABEL_GAP,
   DIAL_PAD,
@@ -16,6 +17,8 @@ import {
   headingDialWidth,
   headingOffset,
   headlineWidth,
+  MAP_WORD_W,
+  mapChipWidth,
   MENU_BUTTON,
   RAIL_FLOOR,
   RAIL_MAX,
@@ -184,5 +187,47 @@ describe("the Heading dial in the top bar (phase 39b)", () => {
     expect(large.zones.scroll).toBe(true);
     expect(large.offset).toBeGreaterThan(0);
     expect(Math.abs(large.zones.left + large.zones.rail / 2 - large.center)).toBeLessThanOrEqual(0.5);
+  });
+});
+
+describe("the Island Map chip in the top bar", () => {
+  const SCREENS = [{ width: 667, inset: 0 }, { width: 844, inset: 47 }, { width: 1024, inset: 0 }] as const;
+  const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large] as const;
+
+  // The dials row of a two-handed game on the map: the seat dials, a gap, the chip right after them (with the word "Map", or without it where the full chip would make the row scroll).
+  function barOf(screen: (typeof SCREENS)[number], scale: number, seats: number) {
+    const bar = screen.width - 2 * screen.inset - 2 * 8;
+    const center = bar / 2;
+    const before = seats * SEAT_DIAL * scale + (seats - 1) * DIAL_GAP * scale;
+    const compact = chipCompact(bar, before, scale, center);
+    const content = before + (DIAL_GAP + mapChipWidth(compact)) * scale;
+    return { bar, center, compact, content, zones: barZones(bar, content, scale, center), full: barZones(bar, before + (DIAL_GAP + mapChipWidth(false)) * scale, scale, center) };
+  }
+
+  it("is wider with the word Map than without it, by the word and its gap", () => {
+    expect(mapChipWidth(false) - mapChipWidth(true)).toBe(DIAL_LABEL_GAP + MAP_WORD_W);
+    expect(MAP_WORD_W).toBeGreaterThanOrEqual(Math.ceil("Map".length * 0.55 * 11));
+  });
+
+  it("counts the chip in the zones for two seats at Small, Medium and Large: the rail stays on the screen's middle at its floor, and the word goes only where the row would scroll with it", () => {
+    for (const screen of SCREENS) {
+      for (const scale of SCALES) {
+        const { zones, full, compact, center, bar } = barOf(screen, scale, 2);
+        const at = `${screen.width} at ${scale}`;
+        expect(Math.abs(zones.left + zones.rail / 2 - center), at).toBeLessThanOrEqual(0.5);
+        expect(zones.rail, at).toBeGreaterThanOrEqual(RAIL_FLOOR * scale - 0.5);
+        expect(zones.right, at).toBeGreaterThanOrEqual(MENU_BUTTON);
+        expect(Math.abs(bar - zones.left - zones.rail - zones.right), at).toBeLessThan(1);
+        // The word is dropped exactly when the full chip would scroll the row; a chip that fits keeps it, and a compact chip is never wider than the room.
+        expect(compact, at).toBe(full.scroll);
+        if (!compact) expect(zones.scroll, at).toBe(false);
+      }
+    }
+  });
+
+  it("drops the word on a 667 pt phone with two seats at Medium and Large, and keeps it on a tablet", () => {
+    expect(barOf(SCREENS[0], UI_SCALES.medium, 2).compact).toBe(true);
+    expect(barOf(SCREENS[0], UI_SCALES.large, 2).compact).toBe(true);
+    expect(barOf(SCREENS[2], UI_SCALES.medium, 2).compact).toBe(false);
   });
 });

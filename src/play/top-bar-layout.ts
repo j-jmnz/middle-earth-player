@@ -3,6 +3,7 @@
 // its words: its floor is the widest it can be, counted from its own words (the widest phase) at their type size and its seven ticks.
 // Pure, so a test reads it.
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
+import { CHIP, COLS } from "./island-table.ts";
 import { touch } from "./ui-scale.ts";
 
 // The bar's height: the 46 pt threat dial with 3 pt above and below; its pop (1.22) and the peek's bone ring may reach past the bar
@@ -141,6 +142,22 @@ export function headingCompact(bar: number, others: number, scale = 1, center = 
   if (full.scroll) return true;
   const small = barZones(bar, others + (DIAL_GAP + headingDialWidth(true)) * scale, scale, center);
   return !railWide(full.rail, narrow, scale) && railWide(small.rail, narrow, scale);
+}
+
+// ---- The Island Map chip (docs/design-system-table.md, The Island Map): in the dials row right after the seat dials. ----
+
+/** The chip's width: its 5 × 3 grid with the padding, 4 pt each side of the target, and the word "Map" with its 6 pt gap (label size) unless it is compact. */
+export const MAP_WORD_W = Math.ceil(3 * LABEL_EM * LABEL_SIZE);
+export function mapChipWidth(compact: boolean): number {
+  return 8 + COLS * CHIP.cell + (COLS - 1) * CHIP.gap + 2 * CHIP.pad + (compact ? 0 : DIAL_LABEL_GAP + MAP_WORD_W);
+}
+
+/**
+ * Whether the chip drops its word "Map": when the dials, with the chip at its full width, would make the left zone scroll. `others` is the width of the dials row without the chip and the gap before it, in screen
+ * points; the answer does not depend on the chip's own current width, so it cannot flip back and forth.
+ */
+export function chipCompact(bar: number, others: number, scale = 1, center = bar / 2): boolean {
+  return barZones(bar, others + (DIAL_GAP + mapChipWidth(false)) * scale, scale, center).scroll;
 }
 
 /**

@@ -13,14 +13,16 @@ import { Text } from "../play/text";
 /**
  * The stop the next tap plays, under the hero words: Next or On the table with its place in the book over the scenario's name at 24,
  * Begin or Resume as the screen's one primary (Resume goes straight to the table, Begin to the briefing; a 320 pt plate outside a
- * phone), then Full path and Campaign log as words under it. Nothing for a playthrough with no scenario left to play.
+ * phone), then Full path and Campaign log as words under it. Nothing for a playthrough with no scenario left to play; a scenario coming soon has no Begin.
  */
 export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line: SaveLine; onNext: () => void; onPath: () => void; onLog: () => void }) {
   const { s } = useSizeClass();
   const { next } = line;
   if (next.kind === "finished") return null;
+  // A scenario the app cannot deal yet has no Begin: the stop says it is coming soon and the path and log stay.
+  const soon = next.kind === "soon";
   const label = next.kind === "resume" ? "Resume" : "Begin";
-  const go = <PrimaryButton label={label} testID="continue" accessibilityLabel={`${label} ${next.node.name}, ${describe(line)}`} onPress={onNext} />;
+  const go = soon ? null : <PrimaryButton label={label} testID="continue" accessibilityLabel={`${label} ${next.node.name}, ${describe(line)}`} onPress={onNext} />;
   return (
     <View testID={`save-${id}`} style={{ gap: 14 * s }}>
       <View testID="continue-next" accessible accessibilityRole="header" accessibilityLabel={nextSummary(next)}>
@@ -29,7 +31,7 @@ export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line
           {next.node.name}
         </Text>
       </View>
-      <PrimaryPlate>{go}</PrimaryPlate>
+      {go ? <PrimaryPlate>{go}</PrimaryPlate> : null}
       <View className="flex-row" style={{ gap: 8 * s }}>
         <TextButton label="Full path" icon="oneRing" tone="accent" testID="continue-path" accessibilityLabel={`Path of ${describe(line)}`} onPress={onPath} />
         <TextButton label="Campaign log" icon="contract" tone="accent" testID="continue-log" accessibilityLabel={`Log of ${describe(line)}`} onPress={onLog} />

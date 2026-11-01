@@ -54,8 +54,10 @@ export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number)
     if (!instance || flagged(view, id, "noThreatContribution")) continue;
     total += modifiedStat(view, instance, "threat", cards);
   }
-  // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1).
-  if (view.sea || view.uncharted) {
+  // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1; "While engaged with a player, Faithless Desecrator
+  // contributes its Threat", 12075:A:1). Only the games with ships (`sea`) or an Uncharted deck (`uncharted`) have such a card, so no other game reads the engaged enemies here.
+  const hasEngagedContributors = view.sea || view.uncharted;
+  if (hasEngagedContributors) {
     for (const seat of view.seats) {
       for (const id of seat.engaged) {
         const instance = view.cards[id];

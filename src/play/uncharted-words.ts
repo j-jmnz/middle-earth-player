@@ -24,10 +24,11 @@ const ordinal = (n: number): string => {
   return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 };
 
-/** What tells one Lost Island from another, which all carry one name: the progress on it and its place ("3 progress · row 2, column 1" on the Island Map, "3 progress · 2nd in staging" in a staging area of Lost Islands). Null for any other card. */
+/** What tells one Lost Island from another, which all carry one name: the progress on it and its place ("3 progress · row 2, column 1" on the Island Map, "3 progress · 2nd in staging" in a staging area of Lost Islands). Every
+ * location of the Island Map has its place, whichever side lies up, so a flipped one is told too. Null for any other card. */
 export function islandTell(game: ScenarioState, card: Pick<CardInstance, "id" | "code" | "face" | "progress">): string | null {
-  if (card.face !== "B" || game.uncharted?.codes.includes(card.code) !== true) return null;
-  const mapped = game.uncharted.island ? cellOf(game.uncharted.island, card.id) : null;
+  const mapped = game.uncharted?.island ? cellOf(game.uncharted.island, card.id) : null;
+  if (mapped == null && (card.face !== "B" || game.uncharted?.codes.includes(card.code) !== true)) return null;
   const place = game.staging.indexOf(card.id);
   const where = mapped ? `row ${mapped.row + 1}, column ${mapped.col + 1}` : place >= 0 ? `${ordinal(place + 1)} in staging` : null;
   return [card.progress > 0 ? `${card.progress} progress` : null, where].filter((part) => part != null).join(" · ") || null;

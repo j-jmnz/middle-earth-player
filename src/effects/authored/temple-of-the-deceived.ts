@@ -19,7 +19,8 @@ const CURSED_TEMPLE_ACTIVE: Condition = { kind: "matches", card: "activeLocation
 const TEMPLE_FACEDOWN: PickSpec = { type: "location", control: "any", island: "temple" };
 const SECRET: PickSpec = { type: "card", control: "any", island: "secret" };
 const LOST_ISLAND_NEXT: PickSpec = { type: "location", control: "any", island: "adjacent" };
-const GATE_KEY_CONTROLLED: PickSpec = { type: "objective", control: "any", names: ["Gate Key"] };
+// The players control the Gate Key once it is claimed: a Gate Key lying in the staging area (guardless, unclaimed) is nobody's.
+const GATE_KEY_CONTROLLED: PickSpec = { type: "objective", control: "any", controlled: true, names: ["Gate Key"] };
 const HERO_HOLDS_KEY: Condition = { kind: "matches", card: "host", pick: { type: "hero", control: "any" } };
 
 // "Immune to player card effects" on the Temple of the Deceived side (a keyword line the engine reads on the printed side; the side B of a location is only read through a record).
@@ -272,7 +273,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         instructions: [
           {
             verb: "RaiseThreat",
-            amount: { stat: "threat", of: "self", printed: true },
+            amount: { stat: "threat", of: "self" },
             when: { kind: "x", min: 1 },
           },
         ],
@@ -301,7 +302,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [
       { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: { type: "location", control: "any", uncharted: true, stagingOnly: true } },
-      { verb: "Each", pick: { type: "card", control: "any", names: ["Captain Sahír", "Na'asiyah"], hasResources: true }, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }], when: ACTIVE_RUINS },
+      { verb: "Each", pick: { type: "ally", control: "any", objective: true, hasResources: true }, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }], when: ACTIVE_RUINS },
       { verb: "Each", pick: { type: "hero", control: "any", hasResources: true }, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }], when: ACTIVE_RUINS },
     ],
   },
@@ -354,7 +355,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "11197:resolution:3", cardCode: "11197", lines: ["11197:B:2", "11197:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11197:resolution:4", cardCode: "11197", lines: ["11197:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "tokens", code: "11197" }, max: 3 }] },
   { id: "11197:resolution:5", cardCode: "11197", lines: ["11197:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "islandFaceup", code: "12069" } }] },
-  { id: "11197:resolution:6", cardCode: "11197", lines: ["11197:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "island", faceupAtMost: 4 } }] },
+  { id: "11197:resolution:6", cardCode: "11197", lines: ["11197:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "island", flippedAtMost: 4 } }] },
   { id: "11197:resolution:7", cardCode: "11197", lines: ["11197:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "any", conditions: [{ kind: "inVictory", code: "12070", is: true }, { kind: "inVictory", code: "110077", is: true }] } }] },
   { id: "11197:resolution:8", cardCode: "11197", lines: ["11197:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } }] },
   {

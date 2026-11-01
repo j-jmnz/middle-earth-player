@@ -1,7 +1,7 @@
 // The campaign path's road (docs/design-system.md, Campaign path): one round stop per scenario, zig-zagging down the page, joined by
 // segments drawn from centre to centre. A won stop has a lit ring and a solid lit segment behind it; the scenario to play is larger,
 // ringed twice and glowing; a locked one is greyed under a veil, its segment dashed. Under each stop its name and a tag in small
-// capitals: Won · score, Next, Locked. The stops are laid out here (`roadLayout`), the screen decides what a tap does.
+// capitals: Won · score, Next, Locked, Coming soon (a scenario the app cannot deal yet: faint under the veil, not pressable). The stops are laid out here (`roadLayout`), the screen decides what a tap does.
 import { Pressable, View } from "react-native";
 
 import type { PathNode } from "../campaign/path";
@@ -12,7 +12,7 @@ import { withAlphaHex } from "../play/tokens";
 import { useUiScale } from "../play/ui-scale";
 import { Text } from "../play/text";
 
-const TAG = { completed: "Won", current: "Next", locked: "Locked" } as const;
+const TAG = { completed: "Won", current: "Next", locked: "Locked", soon: "Coming soon" } as const;
 
 /** Where the stops sit across the road, as fractions of its width: two columns on a phone, a wandering line on a wide screen. */
 const NARROW = [0.27, 0.73];
@@ -92,7 +92,7 @@ export function Road({ stops, height, width, label, onStop, scores, go = null }:
   return (
     <View style={{ width, height }} testID="path-road">
       {stops.slice(1).map((stop, index) => (
-        <Segment key={`seg-${stop.node.id}`} from={stops[index]!} to={stop} walked={stops[index]!.node.status === "completed" && stop.node.status !== "locked"} />
+        <Segment key={`seg-${stop.node.id}`} from={stops[index]!} to={stop} walked={stops[index]!.node.status === "completed" && stop.node.status !== "locked" && stop.node.status !== "soon"} />
       ))}
       {stops.map((stop) => {
         const { node, size } = stop;
@@ -112,11 +112,11 @@ export function Road({ stops, height, width, label, onStop, scores, go = null }:
             >
               <View style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", backgroundColor: palette.raised, boxShadow: stopRing(node.status, palette.night, palette.accent, palette.accentHigh, palette.accentLine, palette.glow) }}>
                 <SceneArt scenarioId={node.id} width={size} height={size} />
-                {node.status === "locked" ? <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.62) }} /> : null}
+                {node.status === "locked" || node.status === "soon" ? <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.62) }} /> : null}
               </View>
             </Pressable>
             <View importantForAccessibility="no-hide-descendants" style={{ minHeight: label, alignItems: "center", paddingTop: 8 * s }}>
-              <Text className="text-center font-display" style={{ fontSize: 15 * s, lineHeight: 18 * s, color: node.status === "locked" ? palette.faint : palette.bone }} numberOfLines={2}>
+              <Text className="text-center font-display" style={{ fontSize: 15 * s, lineHeight: 18 * s, color: node.status === "locked" || node.status === "soon" ? palette.faint : palette.bone }} numberOfLines={2}>
                 {node.name}
               </Text>
               <Text testID={`node-${node.id}-status`} className="mt-1 font-bold uppercase" style={{ fontSize: 11 * s, lineHeight: 14 * s, letterSpacing: 1.6 * s, color: tone }}>

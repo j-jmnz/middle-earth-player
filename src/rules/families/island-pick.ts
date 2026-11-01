@@ -7,7 +7,7 @@ import { modifiedStat } from "../keywords.ts";
 import type { ReduceContext } from "../interpret.ts";
 import type { ScenarioState } from "../state.ts";
 import { cardsUnder } from "../zones.ts";
-import { cardAt, cellOf, islandOf, leftOf, neighbors, ROWS, startCells, TEMPLE_COLUMN } from "./island-map.ts";
+import { cellOf, islandOf, leftOf, neighbors, startCells, templeCells } from "./island-map.ts";
 
 /** The cards an `island` filter starts from. `start`: the faceup left corners, before one is the active location; `temple`: the Temple
  * column's locations that lie facedown (their Temple of the Deceived side up); `secret`: the cards facedown under those locations. */
@@ -15,7 +15,7 @@ export function islandPool(state: ScenarioState, spec: PickSpec): string[] | nul
   const island = islandOf(state);
   if (!island || !spec.island) return null;
   if (spec.island === "start") return startCells(state);
-  const temple = Array.from({ length: ROWS }, (_, row) => cardAt(island, row, TEMPLE_COLUMN)).filter((id): id is string => id != null);
+  const temple = templeCells(state);
   if (spec.island === "temple") return temple.filter((id) => state.cards[id]?.face === "B");
   if (spec.island === "secret") return temple.flatMap((id) => cardsUnder(state, id));
   if (spec.island === "here") return state.activeLocation ? cardsUnder(state, state.activeLocation) : [];
@@ -41,20 +41,13 @@ export function flippedCount(state: ScenarioState, code?: string): number {
   return island.cells.filter((id) => state.cards[id]?.face === "A" && (code == null || state.cards[id]?.code === code)).length;
 }
 
-/** How many locations of the map still lie on their Uncharted side, Lost Island or Temple of the Deceived faceup, their real side facedown (dcce.uncharted: the Lost Island side "faceup, without looking at
- * the other side"): "4 or fewer Uncharted locations are faceup" (11197:B:6). */
-export function unchartedFaceup(state: ScenarioState): number {
-  const island = islandOf(state);
-  return island ? island.cells.filter((id) => state.cards[id]?.face === "B").length : 0;
-}
-
-/** The `island` condition: at most this many locations still lie Uncharted side up (11197:B:6), the last travel went to the right, to a column right of the one it left (12077:A:1), or this many copies of a card are no secret (11197:B:1). */
+/** The `island` condition: at most this many double-sided locations are flipped (11197:B:6, the short-route bonus), the last travel went to the right, to a column right of the one it left (12077:A:1), or this many copies of a card are no secret (11197:B:1). */
 export function islandHolds(state: ScenarioState, condition: Extract<Condition, { kind: "island" }>): boolean {
   if (condition.revealed) {
     const { code, min } = condition.revealed;
     if (Object.values(state.cards).filter((card) => card.code === code && card.zone !== "under" && card.zone !== "setAside").length < min) return false;
   }
-  if (condition.faceupAtMost != null && unchartedFaceup(state) > condition.faceupAtMost) return false;
+  if (condition.flippedAtMost != null && flippedCount(state) > condition.flippedAtMost) return false;
   if (condition.movedRight) {
     const island = islandOf(state);
     const moved = island?.moved;

@@ -13,9 +13,9 @@ export function campaignListQueries<TCatalogRun>(catalog: BaseSQLiteDatabase<"sy
 
 export type CampaignRow = { id: string; name: string; scenarioCount: number; playable: boolean };
 
-// The campaigns the list shows as locked tiles: not playable yet, named with their scenario count. Locking hides no card.
+// The campaigns the list shows as locked tiles: coming soon, named with their scenario count. Locking hides no card.
 export function lockedTiles(rows: readonly CampaignRow[]): { id: string; name: string; caption: string }[] {
   return rows
     .filter((row) => !row.playable)
-    .map((row) => ({ id: row.id, name: row.name, caption: `${row.scenarioCount} scenarios \u00b7 Locked` }));
+    .map((row) => ({ id: row.id, name: row.name, caption: `${row.scenarioCount} scenarios \u00b7 Coming soon` }));
 }

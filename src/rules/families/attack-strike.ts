@@ -93,7 +93,7 @@ export function struck(
   }
   for (const modifier of next.modifiers.filter((entry) => entry.stat === "drawOnAttackDestroy" && entry.instanceId === `seat:${seat}`)) {
     const cause = sourceCause(next, modifier.sourceId, ctx);
-    next = drawMany(next, seat, modifier.amount, steps, cause);
+    next = drawMany(next, seat, modifier.amount, steps, cause, ctx);
   }
   return next;
 }

@@ -10,13 +10,13 @@ import { Text } from "./text.tsx";
 
 /** The fill and the ring of a cell by its state, from the table's tokens. */
 export function cellLook(cell: Pick<IslandCell, "state" | "next" | "temple">, t: TableTokens): { fill: string; ring: string | null; edge: string | null } {
-  const fill = cell.state === "active" ? t.accent : cell.state === "explored" ? withAlphaHex(t.bone, 0.62) : withAlphaHex(t.bone, 0.16);
+  const fill = cell.state === "active" ? t.accent : cell.state === "explored" ? withAlphaHex(t.bone, 0.62) : cell.state === "revealed" ? withAlphaHex(t.bone, 0.38) : withAlphaHex(t.bone, 0.16);
   const ring = cell.next ? t.bone : null;
   const edge = cell.temple && cell.state === "covered" ? t.fellowship : null;
   return { fill, ring, edge };
 }
 
-export function IslandChip({ readout, onPress }: { readout: IslandReadout; onPress: () => void }) {
+export function IslandChip({ readout, compact, onPress }: { readout: IslandReadout; compact: boolean; onPress: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
   const cell = CHIP.cell * s;
@@ -44,7 +44,7 @@ export function IslandChip({ readout, onPress }: { readout: IslandReadout; onPre
           </View>
         ))}
       </View>
-      <Text className="text-label text-muted">Map</Text>
+      {compact ? null : <Text className="text-label text-muted">Map</Text>}
     </Pressable>
   );
 }

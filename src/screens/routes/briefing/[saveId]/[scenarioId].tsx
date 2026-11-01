@@ -5,7 +5,8 @@ import { View } from "react-native";
 
 import { briefing, scenarioFacts, type BriefingInput, type BriefingSeat } from "../../../../campaign/briefing";
 import { deal } from "../../../../campaign/session";
-import { isNightmarePlayable } from "../../../../campaign/playable";
+import { isNightmarePlayable, isPlayable } from "../../../../campaign/playable";
+import { printedScenarioName } from "../../../../campaign/printed-name";
 import { logCodes, loadWorld } from "../../../../campaign/world";
 import { xpUnspentOf, type ModeCard } from "../../../../campaign/xp";
 import type { Difficulty } from "../../../../catalog/scenario-data";
@@ -35,6 +36,12 @@ function attempt(run: () => string | null): string | null {
   }
 }
 
+// What a scenario the app cannot deal yet says in place of its briefing.
+function comingSoonLine(scenarioId: string): string {
+  const scenario = scenarioOf(scenarioId);
+  return `${scenario ? printedScenarioName(scenario.name) : "This scenario"} is coming soon.`;
+}
+
 export default function Briefing() {
   const router = useRouter();
   const params = useLocalSearchParams<{ saveId: string; scenarioId: string }>();
@@ -56,6 +63,8 @@ export default function Briefing() {
   const modeCard: ModeCard | null = campaign?.xp ? (pickedMode === undefined ? (save?.log.modeDefault ?? null) : pickedMode) : null;
   const scenario = scenarioId ? scenarioOf(scenarioId) : null;
   const nightmare = scenarioId != null && isNightmarePlayable(scenarioId);
+  // A scenario the app cannot deal yet opens no briefing, whoever types its address (user decision, 2026-11-01).
+  const soon = scenarioId != null && !isPlayable(scenarioId) ? comingSoonLine(scenarioId) : null;
   const briefingDecks = useBriefingDecks(campaign?.saga ?? false);
   const { savedDecks, candidates } = briefingDecks;
 
@@ -103,6 +112,15 @@ export default function Briefing() {
       <BriefingScreen {...frame} banner={null}>
         <BodyText tone="muted" className="mt-4">
           Loading
+        </BodyText>
+      </BriefingScreen>
+    );
+  }
+  if (soon) {
+    return (
+      <BriefingScreen {...frame} banner={null}>
+        <BodyText tone="muted" className="mt-4" testID="briefing-coming-soon">
+          {soon}
         </BodyText>
       </BriefingScreen>
     );

@@ -44,14 +44,24 @@ export function neighbors(island: IslandState, id: string): string[] {
   return [cardAt(island, cell.row - 1, cell.col), cardAt(island, cell.row, cell.col - 1), cardAt(island, cell.row, cell.col + 1), cardAt(island, cell.row + 1, cell.col)].filter((other): other is string => other != null);
 }
 
+/** The Temple of the Deceived locations of the map, top to bottom. */
+export function templeCells(state: Pick<ScenarioState, "uncharted">): string[] {
+  const island = islandOf(state);
+  return island ? Array.from({ length: ROWS }, (_, row) => cardAt(island, row, TEMPLE_COLUMN)).filter((id): id is string => id != null) : [];
+}
+
+/** How many orthogonal steps lie between two locations of the map, or null when one is not on it. */
+export function distance(island: IslandState, a: string, b: string): number | null {
+  const from = cellOf(island, a);
+  const to = cellOf(island, b);
+  return from && to ? Math.abs(from.row - to.row) + Math.abs(from.col - to.col) : null;
+}
+
 /** The locations up to `steps` locations away (orthogonal steps, over any card of the grid), not the location itself (12073:A:2). */
 export function within(island: IslandState, id: string, steps: number): string[] {
-  const cell = cellOf(island, id);
-  if (!cell) return [];
   return island.cells.filter((other) => {
-    const there = cellOf(island, other);
-    const away = there ? Math.abs(there.row - cell.row) + Math.abs(there.col - cell.col) : 0;
-    return other !== id && away >= 1 && away <= steps;
+    const away = distance(island, id, other);
+    return other !== id && away != null && away >= 1 && away <= steps;
   });
 }
 

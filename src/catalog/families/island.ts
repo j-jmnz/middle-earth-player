@@ -46,6 +46,9 @@ export const TRIGGERS = [
   // About a card: it was drawn into a player's hand and is not a player card ("When Recurring Nightmare enters your hand", 11199:A:3). Announced only when a card of the types that are not played from
   // a hand (an enemy) is drawn, so no other game's events change.
   "enteredHand",
+  // About a card: it is out of play, whichever way it left (destroyed, discarded, shuffled into a deck, returned to a hand, removed from the game; "When Recurring Nightmare leaves play", 11199:A:2).
+  // Announced only to a card whose record hears it, once it is out of play, so no other game's events change.
+  "exitedPlay",
 ] as const;
 
 export const FLAGS = [

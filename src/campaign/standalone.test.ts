@@ -152,7 +152,7 @@ describe("standalone briefing", () => {
     const world = loadWorld(catalog, campaign, { ...loadScenario(PAST), id: "not-automated" }, EFFECTS, [FRODO, SAM, MERRY, PIPPIN, ...deck]);
     const result = standaloneBriefing({ world, seatCount: 1, seats: loadoutOf().seats, ringBearer: FRODO, difficulty: "Normal" });
     expect(result.dealable).toBe(false);
-    expect(result.problems[0]?.rule).toBe("Not playable yet");
+    expect(result.problems[0]).toMatchObject({ rule: "Coming soon", message: expect.stringMatching(/ is coming soon\.$/) });
   });
 });
 

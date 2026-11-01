@@ -3,6 +3,7 @@
 // choice-tray.tsx, drawn inside the dock; the hook that holds the fold is use-table-choice.ts.
 import { successWords } from "./sea-words.ts";
 import type { Choice } from "./table-choice.ts";
+import type { PlaceMark } from "./island-place.ts";
 import type { OptionMark, Sheet, SheetStat } from "./sheet-types.ts";
 
 export type TrayTile = {
@@ -16,6 +17,8 @@ export type TrayTile = {
   stats: readonly SheetStat[];
   // The damage a defender would take, as a pill.
   mark: OptionMark | null;
+  // A location of the Island Map: its place, drawn as a 5 × 3 glyph with the location lit (island-place.ts).
+  place?: PlaceMark;
   // A card a Sailing test looked at, listed read-only (`sheet-look-<id>`): the symbols it prints. Absent on an option that can be picked.
   look?: number;
 };
@@ -45,6 +48,7 @@ export function trayTiles(sheet: Sheet): TrayTile[] {
         detail: null,
         stats: item.stats ?? [],
         mark: item.mark ?? null,
+        ...(item.place ? { place: item.place } : {}),
       }));
     case "trigger":
       return sheet.options.map((item) => ({ id: item.id, label: `${item.label} · ${item.timing}`, code: item.code, readId: item.cardId, detail: item.text, stats: [], mark: null }));

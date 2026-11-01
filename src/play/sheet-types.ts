@@ -4,6 +4,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import type { PlayerIntent } from "../rules/reduce.ts";
 
 import type { IconName } from "./icon-map.ts";
+import type { PlaceMark } from "./island-place.ts";
 import type { PayRequest } from "./pay.ts";
 
 export type SheetNames = {
@@ -24,7 +25,8 @@ export type SheetStat = { icon: IconName; value: number; word: string };
 // it destroys the card.
 export type OptionMark = { icon: IconName; value: number; danger: boolean };
 
-export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[]; mark?: OptionMark };
+// `place`: a location of the Island Map where the marker stands, drawn as a small 5 × 3 glyph with the location lit (island-place.ts).
+export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[]; mark?: OptionMark; place?: PlaceMark };
 
 // `caution`: what confirming this option costs that the player may not expect (a hero destroyed and the game lost). The
 // confirm then arms on its first tap and the line above it says this (docs/design-system-table.md, Two taps).

@@ -26,7 +26,7 @@ import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
 import { IslandPanel } from "./island-panel.tsx";
-import { islandFit, islandReadout } from "./island-table.ts";
+import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "./island-table.ts";
 import { foldTitle } from "./row-fold.ts";
 import { areaRoleOf } from "./stormcaller-table.ts";
 import { AREA_LIST_TITLE } from "./stormcaller-words.ts";
@@ -95,7 +95,7 @@ function IslandReading({ store, ctx, width, maxHeight, onRead, onClose }: { stor
   const s = useUiScale();
   const game = useStore(store, (state) => state.game);
   const readout = useMemo(() => islandReadout(game, ctx.cards), [game, ctx]);
-  const fit = useMemo(() => islandFit(width, maxHeight, s), [width, maxHeight, s]);
+  const fit = useMemo(() => islandFit(width, maxHeight, s, readout ? standingWords(readout) : ""), [width, maxHeight, s, readout]);
   return readout ? <IslandPanel readout={readout} fit={fit} onRead={onRead} onClose={onClose} /> : null;
 }
 
@@ -179,6 +179,9 @@ export function TableLayers({
   // The settings panel is wider than the other panels, so its three-word switches fit (settings-panel-width.ts).
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
+  // The Island Map's panel is wider than the reading frame, so its words stand beside the grid (island-table.ts); the "Choice waiting" line under it takes its room from the height.
+  const shown = held?.kind === "island" ? islandPanelWidth(width, screen.width - insets.left - insets.right - 2 * EDGE * s, s) : width;
+  const room = screen.height - barBottom - foot - EDGE * s;
   const open = reading?.kind === "carousel";
   const strip = useHeld(carousel);
   return (
@@ -195,7 +198,7 @@ export function TableLayers({
         </>
       ) : null}
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
-      <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width, bottom: foot, maxHeight: screen.height - barBottom - foot - EDGE * s }}>
+      <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
         {held?.kind === "pile" ? (
           <PileReading
             store={store}
@@ -215,7 +218,7 @@ export function TableLayers({
         {held?.kind === "row" ? <RowReading store={store} row={held.row} names={names} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
-        {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={width} maxHeight={screen.height - barBottom - foot - EDGE * s} onRead={onPreview} onClose={close} /> : null}
+        {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={shown} maxHeight={room - (trayShown ? WAITING * s : 0)} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "settings" ? (
           <SettingsPanel
             settings={settings}

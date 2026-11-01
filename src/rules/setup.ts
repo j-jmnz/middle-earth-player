@@ -134,7 +134,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
   state = handSetup(state, ctx, quiet);
-  for (const seat of livingSeats(state)) state = drawOpeningHand(state, seat, quiet);
+  for (const seat of livingSeats(state)) state = drawOpeningHand(state, seat, quiet, ctx);
   state = {
     ...withMode(state, "mulligan"),
     window: { kind: "mulligan" },
@@ -187,14 +187,14 @@ function campaignAfterSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   return pushCardEffects(state, "setup", stage, state.firstPlayer, false, [{ ...record, instructions: [...after.instructions] }], ctx, steps);
 }
 
-export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {
+export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = state;
   for (const id of [...(next.seats[seat]?.hand ?? [])]) next = moveCard(next, id, { zone: "deck", seat });
   const seatState = next.seats[seat];
   if (!seatState) return next;
   const shuffled = shuffleIds(seatState.deck, next.seed, next.seedCursor);
   next = { ...withSeat(next, seat, { ...seatState, deck: shuffled.ids }), seedCursor: shuffled.cursor };
-  return drawOpeningHand(next, seat, steps, ruleCause("rr.mulligan"));
+  return drawOpeningHand(next, seat, steps, ctx, ruleCause("rr.mulligan"));
 }
 
 export function finishMulliganChoice(state: ScenarioState, took: boolean): ScenarioState {

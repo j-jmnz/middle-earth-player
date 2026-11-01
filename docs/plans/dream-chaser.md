@@ -12,6 +12,8 @@ Campaign mode comes from the **Dream-chaser Campaign Expansion** (RingsDB `DCCE`
 Out of scope: the nine Dream-chaser Nightmare decks (their cards are already in `data/cards/Nightmare.json`, prefixes 9046 to 9054 in `scripts/data/nightmare-defs.ts`; they stay unbuilt, with no `scenario` set, until a later plan); the campaign Achievement list; Messenger of the King cards.
 
 User decisions (2026-10-30):
+- The work stops after phase 45 (2026-11-01): The Drowned Ruins, A Storm on Cobas Haven and The City of Corsairs show as coming soon, and phases 46 to 48 stay not started.
+- Temple of the Deceived's XP line 11197:B:6 counts the Uncharted locations flipped to their location side (2026-11-01).
 - The campaign is **Dream-chaser**, built from the Dream-chaser Campaign Expansion (DCCE, MEC111) printing, with the seven original sets for the base cards.
 - XP is fully automated: the Resolutions award it, and the players choose where to spend it (which scalable card gets a level, which card is upgraded). The app never spends XP for them.
 - The MEC111 rulebook is bundled as the campaign's booklet.

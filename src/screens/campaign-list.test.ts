@@ -25,6 +25,6 @@ describe("lockedTiles", () => {
       { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarioCount: 6, playable: true },
       { id: "the-two-towers", name: "The Two Towers", scenarioCount: 6, playable: false },
     ]);
-    expect(tiles).toEqual([{ id: "the-two-towers", name: "The Two Towers", caption: "6 scenarios \u00b7 Locked" }]);
+    expect(tiles).toEqual([{ id: "the-two-towers", name: "The Two Towers", caption: "6 scenarios \u00b7 Coming soon" }]);
   });
 });

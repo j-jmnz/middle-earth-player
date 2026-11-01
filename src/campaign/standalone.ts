@@ -15,12 +15,10 @@ import type { ScenarioState } from "../rules/reduce.ts";
 import { resolutionResult } from "../rules/resolution.ts";
 import type { StartScenario } from "../rules/setup.ts";
 
-import { difficultyProblems, loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
+import { comingSoonProblems, difficultyProblems, loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
 import type { LoadoutSeat } from "./loadout.ts";
-import { isPlayable } from "./playable.ts";
 import { beginActive, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import { dealtLoadoutSchema, parseActive } from "./save.ts";
-import { printedScenarioName } from "./printed-name.ts";
 import { completedRounds, scoreOf, type ScenarioScore } from "./score.ts";
 import { resumeFrom, staleReason, type Resumed } from "./session.ts";
 import { buildStart } from "./start.ts";
@@ -88,11 +86,8 @@ export type StandaloneBriefing = { problems: Problem[]; needsRingBearer: boolean
 // The briefing and the seats it would deal, from one pass over the loadout.
 function plan(input: StandaloneInput): { briefing: StandaloneBriefing; seats: LoadoutSeat[] } {
   const needsRingBearer = needsRingBearerSlot(input.world, input.seats[0]);
-  const playable = isPlayable(input.world.scenario.id)
-    ? []
-    : [{ rule: "Not playable yet", message: `${printedScenarioName(input.world.scenario.name)} is not playable yet: some of its cards have no effect record.` }];
   const { problems, loadout } = loadoutProblems(input, []);
-  const all = [...playable, ...difficultyProblems(input.world, input.difficulty), ...problems];
+  const all = [...comingSoonProblems(input.world), ...difficultyProblems(input.world, input.difficulty), ...problems];
   return { briefing: { problems: all, needsRingBearer, dealable: all.length === 0 }, seats: loadout };
 }
 

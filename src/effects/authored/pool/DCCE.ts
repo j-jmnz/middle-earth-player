@@ -156,8 +156,8 @@ export const RECORDS: readonly Effect[] = [
     instructions: [{ verb: "Pick", pick: ANY_LOCATION }, { verb: "PlaceProgressOn", amount: 1, target: "picked" }],
   },
   { id: "11199:constant:1", cardCode: "11199", lines: ["11199:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "defense", amount: { players: true }, until: "whileSourceInPlay" }] },
-  // (an encounter enemy that leaves play is destroyed: the engine announces no other leaving of one, so the destruction is the leaving)
-  { id: "11199:triggered:1", cardCode: "11199", lines: ["11199:A:2"], timing: "triggered", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "ShuffleIntoPlayerDeck" }] },
+  // (leaves play by any route: the engine announces an encounter card's leaving only to a card that hears `exitedPlay`)
+  { id: "11199:triggered:1", cardCode: "11199", lines: ["11199:A:2"], timing: "triggered", trigger: "exitedPlay", subject: "self", instructions: [{ verb: "ShuffleIntoPlayerDeck" }] },
   { id: "11199:forced:1", cardCode: "11199", lines: ["11199:A:3"], timing: "forced", trigger: "enteredHand", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
 
   // 11192 Black Key (burden), both sides.

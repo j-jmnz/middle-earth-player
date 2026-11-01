@@ -53,9 +53,9 @@ describe("comingScenarios", () => {
   it("lists the unplayable scenarios in book order, captioned with their box and place", () => {
     const playable = new Set(["a", "e"]);
     expect(comingScenarios(boxes, (id) => playable.has(id), nameOf)).toEqual([
-      { id: "b", name: "Name of b", caption: "Box One · 2" },
-      { id: "c", name: "Name of c", caption: "Box One · 3" },
-      { id: "d", name: "Name of d", caption: "Box Two · 1" },
+      { id: "b", name: "Name of b", caption: "Coming soon · Box One · 2" },
+      { id: "c", name: "Name of c", caption: "Coming soon · Box One · 3" },
+      { id: "d", name: "Name of d", caption: "Coming soon · Box Two · 1" },
     ]);
   });
 
@@ -75,6 +75,11 @@ describe("nextLabel", () => {
   it("says On the table for the open scenario", () => {
     const next: NextStep = { kind: "resume", node: node(3) };
     expect(nextLabel(next, path)).toBe("On the table · Scenario 3 of 6");
+  });
+
+  it("says Coming soon for a scenario the app cannot deal yet", () => {
+    const next: NextStep = { kind: "soon", node: node(7, "soon") };
+    expect(nextLabel(next, [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => node(n)))).toBe("Coming soon · Scenario 7 of 9");
   });
 
   it("says every scenario is won when none is left", () => {

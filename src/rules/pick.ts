@@ -114,7 +114,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else if (spec.type === "objective") {
     // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
-    if (spec.control !== "you") raw.push(...stagingFor(state, spec, asking));
+    if (spec.control !== "you" && !spec.controlled) raw.push(...stagingFor(state, spec, asking));
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   } else if (spec.type === "card" && spec.stagingOnly) {
     raw.push(...stagingFor(state, spec, asking));

@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { CardImage } from "./card-image.tsx";
 import { IconValue } from "./game-icon.tsx";
+import { PlaceGlyph } from "./island-glyph.tsx";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
@@ -32,6 +33,16 @@ const RISE = 16;
 const MIN_ROWS = 48;
 
 // The foreseen damage of a defender, as a pill; threat red when the card would be destroyed.
+// A row's leading mark: a travel row on the Island Map shows the glyph of its place (island-glyph.tsx) beside the card picture.
+function TileLead({ tile, source, dense, s }: { tile: TrayTile; source: PictureSource | null; dense: boolean; s: number }) {
+  return (
+    <View className="flex-row items-center" style={{ gap: 6 * s }}>
+      {tile.place ? <PlaceGlyph mark={tile.place} surface="night" /> : null}
+      {tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:tray`} {...cardBox(dense, s)} /> : null}
+    </View>
+  );
+}
+
 function DamagePill({ mark }: { mark: NonNullable<TrayTile["mark"]> }) {
   const t = useTableTokens();
   const s = useUiScale();
@@ -106,7 +117,7 @@ export function ChoiceTray({
               stats={tile.stats}
               selected={shown.kind === "distribute" ? share > 0 : marks.has(tile.id)}
               testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : tile.look != null ? `sheet-look-${tile.id}` : `sheet-option-${tile.id}`}
-              leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:tray`} {...cardBox(dense, s)} /> : null}
+              leading={tile.place || (tile.code && source) ? <TileLead tile={tile} source={source} dense={dense} s={s} /> : null}
               trailing={mark ? <DamagePill mark={mark} /> : null}
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
               // A card the Sailing test looked at is no choice: a tap opens it large, as a long press does.

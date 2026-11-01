@@ -359,13 +359,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           life={widgets.life}
           burdenDeck={widgets.burdenDeck}
           tokens={tokens}
-          heading={headingDial}
-          island={island}
+          heading={headingDial} island={island}
           onIsland={() => setReading({ kind: "island" })}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           rail={rail}
-          stopAhead={stopAhead}
-          carouselOpen={carouselOpen}
+          stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}
           ticks={ticks}
           ringSeat={held?.seat}

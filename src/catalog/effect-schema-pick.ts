@@ -189,6 +189,10 @@ export const pickSchema = z.strictObject({
   // count as attachments are left out).
   controlledBy: z.enum(["picked", "host"]).optional(),
   nonObjective: z.literal(true).optional(),
+  // A card whose printed type is objective ("each hero and objective ally", 12081:A:2: Captain Sahír and Na'asiyah on their objective ally sides).
+  objective: z.literal(true).optional(),
+  // With `type: objective`: only an objective a player controls (claimed and attached to a hero), not one in the staging area or guarded ("if the players control the Gate Key", 12077:A:2).
+  controlled: z.literal(true).optional(),
   onPicked: z.boolean().optional(),
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),
