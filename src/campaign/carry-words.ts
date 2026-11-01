@@ -3,8 +3,11 @@
 
 type Carried = { code: string; perPlayer?: boolean };
 
-/** The cards as one phrase, duplicates collapsed: "Mendor and a Mendor's Support for each player". Two copies of one card read "2 copies of Name". */
-export function carryWords(cards: readonly Carried[], nameOf: (code: string) => string): string {
+/** One part of the phrase: the card and the words around its name ("a " and " for each player", "2 copies of "). */
+export type CarryPart = { code: string; before: string; after: string };
+
+/** The cards as the parts of one phrase, duplicates collapsed: a copy of one card for each player, or 2 copies of one card. */
+export function carryParts(cards: readonly Carried[]): CarryPart[] {
   const rows = new Map<string, { code: string; count: number; perPlayer: boolean }>();
   for (const card of cards) {
     const key = `${card.code}\u0000${card.perPlayer === true}`;
@@ -12,8 +15,12 @@ export function carryWords(cards: readonly Carried[], nameOf: (code: string) => 
     if (row) row.count += 1;
     else rows.set(key, { code: card.code, count: 1, perPlayer: card.perPlayer === true });
   }
-  const parts = [...rows.values()].map((row) => (row.perPlayer ? `a ${nameOf(row.code)} for each player` : row.count > 1 ? `${row.count} copies of ${nameOf(row.code)}` : nameOf(row.code)));
-  return andList(parts);
+  return [...rows.values()].map((row) => (row.perPlayer ? { code: row.code, before: "a ", after: " for each player" } : row.count > 1 ? { code: row.code, before: `${row.count} copies of `, after: "" } : { code: row.code, before: "", after: "" }));
+}
+
+/** The cards as one phrase, duplicates collapsed: "Mendor and a Mendor's Support for each player". Two copies of one card read "2 copies of Name". */
+export function carryWords(cards: readonly Carried[], nameOf: (code: string) => string): string {
+  return andList(carryParts(cards).map((part) => `${part.before}${nameOf(part.code)}${part.after}`));
 }
 
 /** "A", "A and B", "A, B and C": an "and" only before the last. */

@@ -4,13 +4,14 @@ import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { MODE_CARD_NAME, type ModeCard } from "../../../campaign/xp";
-import { markedLines, markedSpeech, xpWords } from "../../../campaign/xp-view";
+import { markedRows, markedSpeech, xpWords } from "../../../campaign/xp-view";
 import { cards } from "../../../catalog/schema";
 import { inArray } from "drizzle-orm";
 import { BodyText, Column, Eyebrow, IconButton, NavBar, PrimaryButton, Screen } from "../../chrome";
 import { bookletParams, campaignOf, scenarioNames } from "../../campaign-data";
-import { carryWords } from "../../carry-words";
-import { poolCardWords, usedOnceWords } from "../../log-facts";
+import { CardLines } from "../../card-lines";
+import { carryLine, cardSegment, namesLine, poolCardLine, type Line } from "../../log-facts";
+import { useListPreview } from "../../list-preview";
 import { useDatabases } from "../../databases";
 import { goBack } from "../../go-back";
 import { usePalette } from "../../palette-hook";
@@ -29,8 +30,9 @@ import { Text, TextInput } from "../../../play/text";
 // A rule between the log's rows: a faint line of the ink, as on the printed sheet.
 const RULE = 0.28;
 
-// `speech`: what a screen reader hears for the value when the text alone says too little (the squares of a card's boxes).
-function Row({ label, value, testID, icon, speech }: { label: string; value: string; testID: string; icon?: IconName; speech?: string }) {
+// `speech`: what a screen reader hears for the value when the text alone says too little (the squares of a card's boxes). A row of
+// `lines` names cards: a tap on a name opens its preview (`onCard`), and no lines read "None".
+function Row({ label, value, lines, onCard, testID, icon, speech }: { label: string; value?: string; lines?: readonly Line[]; onCard?: (code: string) => void; testID: string; icon?: IconName; speech?: string }) {
   const s = useUiScale();
   const palette = usePalette();
   return (
@@ -39,9 +41,13 @@ function Row({ label, value, testID, icon, speech }: { label: string; value: str
         {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
         <Text className="font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
-      <Text testID={testID} className="mt-0.5 text-body text-ink" {...(speech ? { accessibilityLabel: speech } : {})}>
-        {value}
-      </Text>
+      {lines && onCard ? (
+        <CardLines lines={lines} empty="None" onCard={onCard} testID={testID} className="mt-0.5 text-body text-ink" {...(speech ? { speech } : {})} />
+      ) : (
+        <Text testID={testID} className="mt-0.5 text-body text-ink" {...(speech ? { accessibilityLabel: speech } : {})}>
+          {value}
+        </Text>
+      )}
     </View>
   );
 }
@@ -62,6 +68,7 @@ export default function Log() {
   const { save, loaded, update } = useSave(saveId ?? undefined);
   // The text being typed; null until the player types, so the saved notes show.
   const [edited, setEdited] = useState<string | null>(null);
+  const preview = useListPreview();
 
   const rows = useMemo<CatalogRow[]>(() => {
     if (!save) return [];
@@ -104,13 +111,18 @@ export default function Log() {
 
   const { log } = save;
   const seats = Array.from({ length: save.seatCount }, (_, index) => index);
-  const bySeat = (lists: readonly (readonly string[])[]) => (lists.every((list) => list.length === 0) ? "None" : seats.map((seat) => `${save.seatCount > 1 ? `Player ${seat + 1}: ` : ""}${(lists[seat] ?? []).map(nameOf).join(", ") || "None"}`).join("\n"));
-  const pool = (kind: "boon" | "burden") => {
+  // Each seat's heroes on a line ("Player 1: " in two-handed play); no lines when no seat has any.
+  const bySeat = (lists: readonly (readonly string[])[]): Line[] =>
+    lists.every((list) => list.length === 0) ? [] : seats.map((seat) => [{ text: save.seatCount > 1 ? `Player ${seat + 1}: ` : "" }, ...((lists[seat] ?? []).length > 0 ? namesLine(lists[seat] ?? [], nameOf) : [{ text: "None" }])]);
+  const pool = (kind: "boon" | "burden"): Line[] => {
     const picked = log.campaignPool.filter((card) => printed.get(card.code)?.campaignKind === kind);
     // A boon stuck to a hero names that hero, and in two-handed play the seat that took it (141044:B:1).
     const seatOf = (card: (typeof picked)[number]) => (save.seatCount > 1 && card.attachedTo && card.seat != null ? `Player ${card.seat + 1}: ` : "");
-    return picked.length === 0 ? "None" : picked.map((card) => `${seatOf(card)}${poolCardWords(card, log.usedOnce, nameOf)}`).join("\n");
+    return picked.map((card) => [{ text: seatOf(card) }, ...poolCardLine(card, log.usedOnce, nameOf)]);
   };
+  // The Dream-chaser's marked cards, each with its boxes.
+  const marked = (kind: "scalable" | "upgradable"): Line[] => markedRows(log, kind).map((row) => [{ text: row.name, code: row.code }, { text: ` ${row.boxes}` }]);
+  const card = preview.openCode;
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
 
@@ -132,26 +144,28 @@ export default function Log() {
             <View className="h-px bg-inkLine" />
             <View className="h-px bg-inkLine" />
           </View>
-          <Row label="Heroes" value={bySeat(log.heroesBySeat)} testID="log-heroes" />
-          <Row label="Fallen Heroes" value={bySeat(log.fallenHeroesBySeat)} testID="log-fallen" />
+          {/* A card's name in a row opens its preview (user request, 2026-11-01). */}
+          <Row label="Heroes" lines={bySeat(log.heroesBySeat)} onCard={card} testID="log-heroes" />
+          <Row label="Fallen Heroes" lines={bySeat(log.fallenHeroesBySeat)} onCard={card} testID="log-fallen" />
           <Row label="Threat Modifiers" value={log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
           {/* Dream-chaser: the XP the Resolutions gave and what is unspent, and the boxes marked beside the scalable and upgradable cards (MEC111 p31). */}
           {campaign.xp ? <Row label="XP" value={xpWords(log)} testID="log-xp" /> : null}
-          {campaign.xp ? <Row label="Scalable Cards" value={markedLines(log, "scalable").join("\n") || "None"} speech={markedSpeech(log, "scalable")} testID="log-scalable" /> : null}
-          {campaign.xp ? <Row label="Upgradable Cards" value={markedLines(log, "upgradable").join("\n") || "None"} speech={markedSpeech(log, "upgradable")} testID="log-upgradable" /> : null}
-          <Row label="Boons" value={pool("boon")} testID="log-boons" />
-          <Row label="Burdens" value={pool("burden")} testID="log-burdens" />
+          {campaign.xp ? <Row label="Scalable Cards" lines={marked("scalable")} onCard={card} speech={markedSpeech(log, "scalable")} testID="log-scalable" /> : null}
+          {campaign.xp ? <Row label="Upgradable Cards" lines={marked("upgradable")} onCard={card} speech={markedSpeech(log, "upgradable")} testID="log-upgradable" /> : null}
+          <Row label="Boons" lines={pool("boon")} onCard={card} testID="log-boons" />
+          <Row label="Burdens" lines={pool("burden")} onCard={card} testID="log-burdens" />
           <Row
             label="Captives"
-            value={log.captives.length === 0 ? "None" : log.captives.map((captive) => `${nameOf(captive.hero)}${save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : ""}`).join("\n")}
+            lines={log.captives.map((captive) => [cardSegment(captive.hero, nameOf), { text: save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : "" }])}
+            onCard={card}
             testID="log-captives"
           />
           {/* The hero Journey Along the Anduin's Resolution took prisoner (01130:B:1), taken at the start of Escape from Dol Guldur; the row goes once that scenario is completed (the hero is rescued or the scenario is over). */}
-          {log.prisoner && !log.completed.includes("escape-from-dol-guldur") ? <Row label="Prisoner" value={nameOf(log.prisoner)} testID="log-prisoner" /> : null}
+          {log.prisoner && !log.completed.includes("escape-from-dol-guldur") ? <Row label="Prisoner" lines={[[cardSegment(log.prisoner, nameOf)]]} onCard={card} testID="log-prisoner" /> : null}
           {/* Once-per-campaign uses ("Record in Campaign Log when used", the Adaptations of The Oath, 41044:A:3 to 41047:A:3). */}
-          {log.usedOnce.length > 0 ? <Row label="Used this campaign" value={usedOnceWords(log.usedOnce, nameOf)} testID="log-used-once" /> : null}
+          {log.usedOnce.length > 0 ? <Row label="Used this campaign" lines={[...new Set(log.usedOnce)].map((code) => [cardSegment(code, nameOf)])} onCard={card} testID="log-used-once" /> : null}
           {/* The cards a Resolution keeps for the next campaign, not this one (Escape from Dol Guldur's Mendor, 01131:B:2). */}
-          {log.carryOver.length > 0 ? <Row label="Next Campaign" value={carryWords(log.carryOver, nameOf)} testID="log-carry-over" /> : null}
+          {log.carryOver.length > 0 ? <Row label="Next Campaign" lines={[carryLine(log.carryOver, nameOf)]} onCard={card} testID="log-carry-over" /> : null}
           <View className="py-2.5" style={{ borderBottomWidth: 1, borderBottomColor: withAlphaHex(palette.inkLine, RULE) }}>
             <Text className="font-bold text-eyebrow uppercase text-inkLabel">Scenarios Completed</Text>
             {campaign.scenarios.map((id) => {
@@ -197,6 +211,7 @@ export default function Log() {
         ) : null}
         </Column>
       </ScrollView>
+      {preview.overlay}
     </Screen>
   );
 }

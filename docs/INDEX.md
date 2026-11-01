@@ -149,15 +149,15 @@ Read the sections your task touches.
   - 206–220 Icons (~480) ← 6
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
-  - 256–429 Screens (~12.0K)
+  - 256–429 Screens (~12.1K)
     - 260–263 Splash (~30)
     - 264–279 Campaigns (campaign list) (~1.3K) ← 5
     - 280–293 Scenarios (~740) ← 1
     - 294–305 History (~1.3K) ← 4
     - 306–323 Briefing (~1.3K) ← 3
     - 324–327 Campaign setup (~700) ← 3
-    - 328–333 Campaign path (~500) ← 2
-    - 334–337 Campaign log (~270) ← 1
+    - 328–333 Campaign path (~530) ← 2
+    - 334–337 Campaign log (~330) ← 1
     - 338–341 Spend XP (~610) ← 1
     - 342–345 Table — landscape (~130) ← 1
     - 346–357 Resolution and standalone outcome (~980) ← 1
@@ -177,14 +177,14 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.2K tok)
+- `docs/phases/STATUS.md` — Phase status (~6.3K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~2.1K)
-  - 76–153 Open items (~3.1K)
+  - 76–153 Open items (~3.2K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
     - 119–135 Screens and code (~810)
-    - 136–153 Phone and tablet checks (~960)
+    - 136–153 Phone and tablet checks (~1.0K)
   - 154–169 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)

@@ -8,7 +8,9 @@ import { useTableTokens } from "../../../play/use-table-tokens";
 import { SceneArt } from "../../art";
 import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { Road, roadLayout } from "../../path-road";
-import { poolCardWords } from "../../log-facts";
+import { CardLines } from "../../card-lines";
+import { poolCardLine, type Line } from "../../log-facts";
+import { useListPreview } from "../../list-preview";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
 import { xpWords } from "../../../campaign/xp-view";
 import { xpUnspentOf } from "../../../campaign/xp";
@@ -78,6 +80,8 @@ export default function CampaignPath() {
   const s = useUiScale();
   // The landscape column has no ActionBar: its scrolls keep the bottom inset clear at their end (use-bottom-inset.ts).
   const bottomInset = useBottomInset();
+  // A tap on a pool card's name opens its preview (user request, 2026-11-01).
+  const preview = useListPreview();
 
   const campaign = save ? campaignOf(save.campaignId) : null;
   const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : []), [save, campaign]);
@@ -102,10 +106,8 @@ export default function CampaignPath() {
   // The same open scenario the campaign list's Continue resumes (nextStep).
   const open = openNode(nodes, save.loadout?.scenarioId);
   const name = (code: string) => names.get(code) ?? code;
-  const poolText =
-    save.log.campaignPool.length === 0
-      ? "Nothing earned yet."
-      : save.log.campaignPool.map((card) => poolCardWords(card, save.log.usedOnce, name)).join(", ");
+  // The pool on one line, the cards a comma apart, each name opening its card.
+  const poolLines: Line[] = save.log.campaignPool.length === 0 ? [] : [save.log.campaignPool.flatMap((card, at) => [...(at > 0 ? [{ text: ", " }] : []), ...poolCardLine(card, save.log.usedOnce, name)])];
 
   const current = currentIndex >= 0 ? nodes[currentIndex] : null;
   // The path stops at a scenario the app cannot deal yet: "Coming soon", no Begin, no briefing.
@@ -162,9 +164,7 @@ export default function CampaignPath() {
   const poolLine = (
     <View className="mt-3">
       <Eyebrow>Pool</Eyebrow>
-      <Text testID="pool" className="mt-0.5 text-label text-bone">
-        {poolText}
-      </Text>
+      <CardLines lines={poolLines} empty="Nothing earned yet." onCard={preview.openCode} testID="pool" className="mt-0.5 text-label text-bone" />
     </View>
   );
   // A campaign with XP (Dream-chaser): what the won scenarios gave and what is unspent, and Spend XP between scenarios (dcce.scalable-upgradable).
@@ -270,6 +270,7 @@ export default function CampaignPath() {
             </ScreenScroll>
           </View>
         </View>
+        {preview.overlay}
       </Screen>
     );
   }
@@ -288,6 +289,7 @@ export default function CampaignPath() {
         {xpLine}
         {logButton}
       </ScreenScroll>
+      {preview.overlay}
     </Screen>
   );
 }

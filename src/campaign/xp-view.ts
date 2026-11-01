@@ -97,9 +97,14 @@ export function xpWords(log: Pick<CampaignLog, "xpGained" | "marks">): string {
 
 /** The log sheet's lines for the cards that have a box marked: "Command (Leadership) ■■□□", in the sheet's order. */
 export function markedLines(log: Pick<CampaignLog, "marks">, kind: XpRow["kind"]): string[] {
+  return markedRows(log, kind).map((row) => `${row.name} ${row.boxes}`);
+}
+
+/** The same lines as their parts: the card's code and name, and its boxes ("■■□□"), so the log can open the card. */
+export function markedRows(log: Pick<CampaignLog, "marks">, kind: XpRow["kind"]): { code: string; name: string; boxes: string }[] {
   return XP_ROWS.filter((row) => row.kind === kind && marksOf(log, row.code) > 0).map((row) => {
     const marked = Math.min(marksOf(log, row.code), row.boxes);
-    return `${row.name} ${"\u25a0".repeat(marked)}${"\u25a1".repeat(row.boxes - marked)}`;
+    return { code: row.code, name: row.name, boxes: `${"\u25a0".repeat(marked)}${"\u25a1".repeat(row.boxes - marked)}` };
   });
 }
 
