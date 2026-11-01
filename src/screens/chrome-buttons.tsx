@@ -172,7 +172,8 @@ export function ToggleChip({
       className="min-h-touch min-w-touch justify-center"
     >
       {({ pressed }) => (
-        <View className="min-w-touch flex-row items-center justify-center gap-1.5 rounded-control px-3.5" style={{ height: 36 * s, ...chipSurface(on, pressed, t) }}>
+        // The capsule radius is in the style, as on the Segmented thumb (segmented.tsx): a class radius was drawn square on Android when the fill changed.
+        <View className="min-w-touch flex-row items-center justify-center gap-1.5 px-3.5" style={{ height: 36 * s, borderRadius: 18 * s, ...chipSurface(on, pressed, t) }}>
           {leading}
           <Text className={`text-label ${on ? "font-semibold" : ""}`} style={{ color: on ? palette.accentHigh : palette.muted }}>
             {label}

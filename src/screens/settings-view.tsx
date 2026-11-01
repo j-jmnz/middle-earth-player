@@ -85,13 +85,14 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
       <ScreenScroll top={8} bottom={32} testID="app-settings-scroll" scrollRef={scroll} max={size === "expanded" ? "wide" : "readable"}>
         {size === "expanded" ? <View style={{ height: 0 }} onLayout={measure} /> : null}
         {equal ? (
-          // Two columns of groups (docs/design-system.md, Tablets): what you see, then what the table does and the page's own facts.
+          // Two columns of groups (docs/design-system.md, Tablets): what you see and how hard the phone works, then how the game moves,
+          // what the table does and the page's own facts.
           <View className="flex-row items-start" style={{ gap: equal.gap }} testID="app-settings-columns">
             <View className="flex-1">
-              <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["display", "motion"]} />
+              <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["display", "performance"]} />
             </View>
             <View className="flex-1">
-              <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["table"]} stops />
+              <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["motion", "table"]} stops />
               {about}
             </View>
           </View>

@@ -48,13 +48,16 @@ export function Segmented<T extends string>({
   // The track is 44 pt tall (a 38 pt thumb in 3 pt of padding), 36 pt compact (a 32 pt thumb in 2 pt): the option's vertical slop makes up
   // a 44 pt target at every scale.
   const thumb = (compact ? 32 : 38) * s;
+  const pad = (compact ? 2 : 3) * s;
   const slop = touchSlop(s, thumb);
+  // The capsule radii are drawn in the style, not the `rounded-control` class: on Android the selected thumb lost the class's radius when
+  // its fill changed on a pick and was drawn square (user report, 2026-11-01), so both corners are computed from their heights here.
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}
-      className={`flex-row rounded-control ${stretch ? "" : "self-start"}`}
-      style={{ padding: (compact ? 2 : 3) * s, ...sunkSurface(t) }}
+      className={`flex-row ${stretch ? "" : "self-start"}`}
+      style={{ padding: pad, borderRadius: thumb / 2 + pad, ...sunkSurface(t) }}
     >
       {options.map((option) => {
         const selected = option === value;
@@ -74,8 +77,8 @@ export function Segmented<T extends string>({
             {/* The thumb and its pressed fill are on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
             {({ pressed }) => (
               <View
-                className={`flex-row items-center justify-center gap-1.5 rounded-control ${compact ? "px-3" : stretch ? "px-2" : "px-4"}`}
-                style={{ minHeight: thumb, ...(selected ? segmentSurface(t, pressed) : segmentRestSurface(pressed, t)) }}
+                className={`flex-row items-center justify-center gap-1.5 ${compact ? "px-3" : stretch ? "px-2" : "px-4"}`}
+                style={{ minHeight: thumb, borderRadius: thumb / 2, overflow: "hidden", ...(selected ? segmentSurface(t, pressed) : segmentRestSurface(pressed, t)) }}
               >
                 {icons?.[option] ? <GameIcon name={icons[option]} size={(compact ? 14 : 16) * s} tint={selected ? "threat" : "muted"} /> : null}
                 <Text numberOfLines={1} className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>

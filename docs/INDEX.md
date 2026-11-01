@@ -135,21 +135,21 @@ Read the sections your task touches.
   - 298–301 Haptics (~250)
   - 302–312 Banner (~580) ← 1
   - 313–316 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~22.5K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~22.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
   - 45–79 Color (~1.2K)
   - 80–101 Surfaces (~690) ← 1
   - 102–119 Type (~670) ← 5
-  - 120–137 Spacing, radius, border (~560) ← 2
+  - 120–137 Spacing, radius, border (~600) ← 2
   - 138–159 Backdrops (~950) ← 3
   - 160–167 Navigation (~420) ← 3
   - 168–205 Components (~1.7K) ← 9
   - 206–220 Icons (~480) ← 6
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
-  - 256–428 Screens (~11.9K)
+  - 256–429 Screens (~12.0K)
     - 260–263 Splash (~30)
     - 264–279 Campaigns (campaign list) (~1.3K) ← 5
     - 280–293 Scenarios (~740) ← 1
@@ -166,26 +166,26 @@ Read the sections your task touches.
     - 376–385 Card pool (the Cards tab) (~700) ← 3
     - 386–391 Card (~480) ← 2
     - 392–397 Packs and pack cards (~130)
-    - 398–410 Settings (~640)
-    - 411–416 Rules (~450) ← 1
-    - 417–420 Rule (~220) ← 1
-    - 421–424 Booklet (~100)
-    - 425–428 Database (~20)
-  - 429–448 States (~590)
+    - 398–411 Settings (~740)
+    - 412–417 Rules (~450) ← 1
+    - 418–421 Rule (~220) ← 1
+    - 422–425 Booklet (~100)
+    - 426–429 Database (~20)
+  - 430–449 States (~590)
 
 ## Phases
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~6.1K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~2.1K)
-  - 76–152 Open items (~2.9K)
+  - 76–153 Open items (~3.0K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
-    - 119–134 Screens and code (~710)
-    - 135–152 Phone and tablet checks (~850)
-  - 153–168 Standing decisions (~380)
+    - 119–135 Screens and code (~800)
+    - 136–153 Phone and tablet checks (~850)
+  - 154–169 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)

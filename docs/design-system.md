@@ -123,7 +123,7 @@ Tailwind's 4-point steps. Phone gutters 14 for panels and lists inside the 24 pt
 
 | Radius | Class | Use |
 | --- | --- | --- |
-| capsule (half the height) | `rounded-control` | Every control: buttons, chips, toggles, segmented tracks and thumbs, fields, steppers, badges, switches, dials, portraits, the round glass button |
+| capsule (half the height) | `rounded-control`; a `Segmented` track and thumb and a toggle chip compute it in their style instead, since Android drew a class radius square when the fill changed on a pick | Every control: buttons, chips, toggles, segmented tracks and thumbs, fields, steppers, badges, switches, dials, portraits, the round glass button |
 | 12 | `rounded-item` | An item in a container: list rows, radio tiles, stat tiles, covers, poster and book tiles |
 | 20 | `rounded-container` | A floating container: the popover, phase carousel, reading panels, toast, banners, the quest-advance overlay, a panel |
 | 24 | `rounded-sheet`, `rounded-t-sheet` | The top of a parchment sheet |
@@ -397,16 +397,17 @@ On a tablet: the titles and the empty sentences sit in a 640 `Column`, and the r
 
 ### Settings
 
-`settings.tsx` (`settings-view.tsx`), scene `calm`, a pushed screen opened by the gear or the rail's foot (`settings-open`), screen `app-settings`. Back and the title Settings, then one scrolling page of four `Section` groups, no sub-menus. Each row is a semibold name over its muted detail with a stretched `Segmented` under it (so three words fit at Large) or the switch at its right.
+`settings.tsx` (`settings-view.tsx`), scene `calm`, a pushed screen opened by the gear or the rail's foot (`settings-open`), screen `app-settings`. Back and the title Settings, then one scrolling page of five `Section` groups, no sub-menus. Each row is a semibold name over a muted detail that says, in plain words, what the setting changes, with a stretched `Segmented` under it (so three words fit at Large) or the switch at its right. Every row shows its detail; none is spoken only. The words are in `src/play/settings-words.ts`.
 
-- **Display:** Theme (Dark, Light, System; "System follows your phone" is spoken with the switch), UI scale (Small, Medium, Large), Strong outlines, Card pictures (High, Low).
-- **Motion and feel:** Animation speed (Normal, Quick), Reduce motion (Follow system, Always; what each does is spoken with the switch), Moving fog (dimmed, saying why, when the fog is already still: "The Light theme has no fog." or "Reduce motion already holds it still."; it still saves), Combat spotlight, Haptics.
-- **At the table:** First-game guide, Stops on, Keep screen awake, and Responses used every time ("None yet" when empty; otherwise one accent text button per Response under "Tap one to have the table ask again.", heard as "Ask again: name"). The mid-game rows come first because they are reached during a game.
+- **Display:** Theme (Dark, Light, System), UI scale (Small, Medium, Large), Strong outlines.
+- **Performance:** a muted note under the heading says the group is for a phone that stutters, runs hot or drains fast, and that it changes the look, never the game (`app-settings-performance-note`). Card pictures (High, Low) and Moving fog (dimmed, saying why, when the fog is already still: "The Light theme has no fog, so this does nothing now." or "Reduce motion already holds the fog still."; it still saves). These are the two settings whose only job is to ease the phone. Elsewhere a row that also eases the phone or the battery says so in its detail: Reduce motion and Keep screen awake.
+- **Motion and feel:** Animation speed (Normal, Quick), Reduce motion (Follow system, Always), Combat spotlight, Haptics.
+- **At the table:** First-game guide, Stops on, Keep screen awake, and Responses used every time (its detail says what lands there; "None yet" when empty; otherwise one accent text button per Response under "Tap one to have it ask again.", heard as "Ask again: name").
 - **About:** the app version, the card data version, the credits, and Restore defaults.
 
-The first three groups are `SettingsRows` (`src/play/setting-rows.tsx`), and About is `SettingGroup`; the table's settings panel draws the same rows. The switch rows are `SettingSwitch` (`src/play/setting-switch.tsx`, because `src/play` cannot import `src/screens`; the carousel's Stops uses the same row), one 44 pt target heard as a switch with its detail as the hint. Every change applies at once and is saved; the page reflowing is the feedback, so there is no Save. Restore defaults asks in place: "Put every setting back to its default? Your games and decks are not touched.", then Restore (danger) beside Keep. It resets every setting except how many times the guide has explained each step. testIDs are `app-settings-*` (`app-settings-scale-large`, `app-settings-theme-light`, `app-settings-quality-low`, `app-settings-fog`, `app-settings-restore`, `app-settings-restore-confirm`).
+The first four groups are `SettingsRows` (`src/play/setting-rows.tsx`), and About is `SettingGroup`; the table's settings panel draws the same rows. The switch rows are `SettingSwitch` (`src/play/setting-switch.tsx`, because `src/play` cannot import `src/screens`; the carousel's Stops uses the same row), one 44 pt target heard as a switch with its detail as the hint. Every change applies at once and is saved; the page reflowing is the feedback, so there is no Save. Restore defaults asks in place: "Put every setting back to its default? Your games and decks are not touched.", then Restore (danger) beside Keep. It resets every setting except how many times the guide has explained each step. testIDs are `app-settings-*` (`app-settings-scale-large`, `app-settings-theme-light`, `app-settings-quality-low`, `app-settings-fog`, `app-settings-restore`, `app-settings-restore-confirm`).
 
-On a tablet: medium is one readable column, and so is an expanded window too narrow for two columns of at least 360. Otherwise expanded is two equal columns in a `wide` scroll (`app-settings-columns`, `SettingsRows`' `groups`): Display and Motion and feel on the left, At the table and About on the right. The title sits in a `Column` of the same width.
+On a tablet: medium is one readable column, and so is an expanded window too narrow for two columns of at least 360. Otherwise expanded is two equal columns in a `wide` scroll (`app-settings-columns`, `SettingsRows`' `groups`): Display and Performance on the left, Motion and feel, At the table and About on the right. The title sits in a `Column` of the same width.
 
 ### Rules
 
