@@ -1,10 +1,11 @@
 // The hand scrub (docs/design-system-table.md, Gestures; phase 25): pressed and held, the hand rises and spreads across the
-// canvas, and a finger sliding along it lifts one card at a time; letting go on a card opens its preview. Pure geometry: the
-// canvas animates between the hand layout.ts gives (the peeking, fanned strip) and the spread this works out, and the gesture's
-// worklets ask `cardAt`, `cancelled` and `pick` for the card under the finger on the UI thread. Nothing here sends an intent.
+// canvas, and a finger sliding along it lifts one card at a time; letting go on a card opens its preview, and pushing forward
+// (up, toward the table) after resting on a playable card plays it. Pure geometry: the canvas animates between the hand layout.ts
+// gives (the peeking, fanned strip) and the spread this works out, and the gesture's worklets ask `cardAt`, `cancelled`, `pick`,
+// `restMove` and `pushed` on the UI thread. Nothing here sends an intent.
 //
-// The hold (150 ms) and the slop (6 pt) are gesture thresholds, not motion: they stay out of motionScale, as the dock's ARM_MS
-// does.
+// The hold (150 ms), the rest (120 ms) and the slop (6 pt) are gesture thresholds, not motion: they stay out of motionScale, as the
+// dock's ARM_MS does.
 import { contains, hitSlot, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 import type { ScrubRoom } from "./scrub-pose.ts";
@@ -15,6 +16,9 @@ export const SCRUB_HOLD_MS = 150;
 
 /** How far the finger may move in that time, in pt; a move before it is a drag, which plays a card as always. */
 export const SCRUB_SLOP = 6;
+
+/** How long the finger stays within the slop on a card for a forward push from there to play it, in ms. */
+export const SCRUB_REST_MS = 120;
 
 // The risen hand keeps this far from the canvas's edges, and its cards this far apart when there is room. These are Medium's sizes;
 // the layout's UI scale (layout.scale) multiplies them.
@@ -158,4 +162,47 @@ export function startCard(spread: Spread, slots: readonly CardSlot[], x: number,
 /** The selection tick: when the scrub starts on a card and each time the card under the finger changes to another, nothing else. */
 export function ticksOn(previous: number, next: number): boolean {
   return next >= 0 && next !== previous;
+}
+
+/**
+ * Where the finger last came to rest during a scrub: the point (`x`, `y`) it has stayed within the slop of since `since` (ms), and
+ * the card a forward push would play (`armed`, -1 for none) with the point it rested on (`ax`, `ay`).
+ */
+export type Rest = { x: number; y: number; since: number; armed: number; ax: number; ay: number };
+
+/** The gesture clock, in ms: read in the worklets when a touch moves, never during a render. */
+export function scrubClock(): number {
+  "worklet";
+  return Date.now();
+}
+
+/** A rest starting at a point at a time, with nothing armed. */
+export function restAt(x: number, y: number, since: number): Rest {
+  "worklet";
+  return { x, y, since, armed: -1, ax: x, ay: y };
+}
+
+/** Whether the finger has gone more up than sideways from a point: toward the table. */
+function forward(ax: number, ay: number, x: number, y: number): boolean {
+  "worklet";
+  return ay - y > Math.abs(x - ax);
+}
+
+/**
+ * The rest after a move. Within the slop nothing changes. Leaving it, the finger starts a new rest here; if it had stayed on a
+ * playable card (`playable`, -1 when the card under the finger cannot be played) for `SCRUB_REST_MS` and leaves it forward, that
+ * card is armed, and it stays armed while the finger keeps going forward from where it rested. Any other move disarms it.
+ */
+export function restMove(rest: Rest, playable: number, x: number, y: number, now: number): Rest {
+  "worklet";
+  if (Math.hypot(x - rest.x, y - rest.y) <= SCRUB_SLOP) return rest;
+  if (now - rest.since >= SCRUB_REST_MS && playable >= 0 && forward(rest.x, rest.y, x, y)) return { x, y, since: now, armed: playable, ax: rest.x, ay: rest.y };
+  const keeps = rest.armed >= 0 && forward(rest.ax, rest.ay, x, y);
+  return { x, y, since: now, armed: keeps ? rest.armed : -1, ax: rest.ax, ay: rest.ay };
+}
+
+/** Whether the armed card is played now: the finger has pushed forward half the touch reach (22 pt, more at Large) from its rest. */
+export function pushed(rest: Rest, spread: Spread, x: number, y: number): boolean {
+  "worklet";
+  return rest.armed >= 0 && forward(rest.ax, rest.ay, x, y) && rest.ay - y >= (spread.reach ?? MIN_TARGET) / 2;
 }

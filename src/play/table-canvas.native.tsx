@@ -52,7 +52,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop, onPlay }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -128,7 +128,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
   const reader = useScreenReader();
   // The drag, the tap, the press and the hand scrub (hand-gestures.native.ts).
-  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop });
+  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop, onPlay });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
 
   // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.

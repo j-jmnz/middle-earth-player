@@ -1,7 +1,7 @@
 // The hand scrub (phase 25): the risen, spread hand and the card under the finger (docs/design-system-table.md, Gestures).
 import { describe, expect, it } from "vitest";
 
-import { cardAt, cancelled, fanTilts, handSlots, pick, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_SLOP, type Spread } from "./hand-scrub.ts";
+import { cardAt, cancelled, fanTilts, handSlots, pick, pushed, restAt, restMove, spreadLayout, startCard, startsScrub, ticksOn, SCRUB_HOLD_MS, SCRUB_REST_MS, SCRUB_SLOP, type Rest, type Spread } from "./hand-scrub.ts";
 import { cardSize, handCardSize, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
 import { SHAPE } from "./motion-tokens.ts";
 import { scrubPose } from "./scrub-pose.ts";
@@ -312,5 +312,48 @@ describe("the hold and the selection tick", () => {
     expect(ticksOn(-1, -1)).toBe(false);
     // Off the hand and back onto the same card ticks again: the finger came back to it.
     expect(ticksOn(-1, 3)).toBe(true);
+  });
+});
+
+describe("a forward push from a rest plays the card", () => {
+  const spread = spreadLayout(layoutOf(5, 390, 700), { width: 390, height: 700, bottom: 0 });
+  const half = (spread.reach ?? MIN_TARGET) / 2;
+  // The finger rests on card 2 at (200, 600) from t = 0.
+  const rested = restAt(200, 600, 0);
+  // Runs a path of [x, y, t] moves from a rest with card 2 under the finger, and says whether the last one plays it.
+  function push(path: [number, number, number][], playable = 2, from: Rest = rested): boolean {
+    let rest = from;
+    let last: [number, number] = [from.x, from.y];
+    for (const [x, y, t] of path) {
+      rest = restMove(rest, playable, x, y, t);
+      last = [x, y];
+    }
+    return pushed(rest, spread, last[0], last[1]);
+  }
+
+  it("plays after a rest and a push up of half the reach", () => {
+    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [202, 600 - half, SCRUB_REST_MS + 30]])).toBe(true);
+  });
+
+  it("does not play before the push has gone far enough", () => {
+    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [200, 600 - half + 2, SCRUB_REST_MS + 30]])).toBe(false);
+  });
+
+  it("does not play without the rest: a slide that turns up cancels as before", () => {
+    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS - 1], [200, 600 - half, SCRUB_REST_MS + 30]])).toBe(false);
+  });
+
+  it("does not play a card that cannot be played", () => {
+    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [200, 600 - half, SCRUB_REST_MS + 30]], -1)).toBe(false);
+  });
+
+  it("a move more sideways than up does not arm, and turning sideways disarms", () => {
+    expect(push([[210, 597, SCRUB_REST_MS], [210, 600 - half, SCRUB_REST_MS + 30]])).toBe(false);
+    expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [230, 590, SCRUB_REST_MS + 20], [230, 600 - half - 10, SCRUB_REST_MS + 40]])).toBe(false);
+  });
+
+  it("moves within the slop keep the rest", () => {
+    const still = restMove(rested, 2, 203, 602, 50);
+    expect(still).toBe(rested);
   });
 });

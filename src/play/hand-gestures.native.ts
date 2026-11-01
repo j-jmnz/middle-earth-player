@@ -3,17 +3,18 @@
 // pan that activates after a 150 ms hold on the hand scrubs through it. A move before the 150 ms is a drag, so the drag-to-play path
 // is never delayed; the scrub is a gesture of its own that fails at once for a press that is not on the hand. All of it runs on the
 // UI thread: the finger is read there, the canvas draws from the shared values, and only a change of the card under the finger
-// (for the selection tick, and the preview at the release) crosses to JavaScript.
+// (for the selection tick, the preview at the release and the play on a forward push) crosses to JavaScript.
 //
 // The first touch of the drag pan is the hurry and the spotlight's skip (finishMotions, `swallow`); a touch that skipped a spotlight
-// does nothing else, and its hold never starts a scrub. A scrub sends no intent and picks nothing.
+// does nothing else, and its hold never starts a scrub. A scrub sends no intent: a forward push asks the screen to play the card,
+// which opens the same dock a drop on its target does.
 import { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { Gesture } from "react-native-gesture-handler";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { finishMotions } from "./card-motion.native.tsx";
-import { cancelled, NO_SPREAD, pick, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startCard, startsScrub, type Spread } from "./hand-scrub.ts";
+import { cancelled, NO_SPREAD, pick, pushed, restAt, restMove, SCRUB_HOLD_MS, SCRUB_REST_MS, SCRUB_SLOP, scrubClock, spreadLayout, startCard, startsScrub, type Rest, type Spread } from "./hand-scrub.ts";
 import { tickArmed } from "./haptics.ts";
 import { hitDrop, hitSlot, type CardSlot, type DropRect, type TableLayout } from "./layout.ts";
 import { timing } from "./motion-run.ts";
@@ -44,9 +45,11 @@ type Args = {
   onTap: (cardId: string) => void;
   onPreview: (cardId: string) => void;
   onDrop: (cardId: string, target: string) => void;
+  // A hand card pushed forward out of the scrub: the screen plays it as if it were dropped on its target.
+  onPlay: (cardId: string) => void;
 };
 
-export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onPreview, onDrop }: Args) {
+export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onPreview, onDrop, onPlay }: Args) {
   const { progress: hurryProgress, clear: hurryClear } = hurry;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
@@ -60,6 +63,9 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   const lifts = useSharedValue<readonly boolean[]>([]);
   const drops = useSharedValue<readonly DropRect[]>([]);
   const spreadNow = useSharedValue<Spread>(NO_SPREAD);
+  // Which spread cards (hand order) can be played, and where the finger last rested during the scrub.
+  const playable = useSharedValue<readonly boolean[]>([]);
+  const rest = useSharedValue<Rest>(restAt(0, 0, 0));
   const dragging = useSharedValue(-1);
   const dx = useSharedValue(0);
   const dy = useSharedValue(0);
@@ -89,7 +95,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   }, [layout, targets, drops]);
   useLayoutEffect(() => {
     spreadNow.set(spread);
-  }, [spread, spreadNow]);
+    playable.set(spread.ids.map((id) => draggableSet.has(id)));
+  }, [spread, spreadNow, draggableSet, playable]);
 
   // The hand goes back down: at once under reduced motion, else over the scrub's fall.
   const settle = useCallback(() => {
@@ -239,20 +246,34 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         rise.set(k === 0 ? 1 : withTiming(1, riseTiming));
         apart.set(k === 0 ? 1 : withTiming(1, apartTiming));
         lifting(first);
+        // The press was held still on the card to start the scrub, so it has rested there already: a push up plays it at once.
+        rest.set(restAt(event.x, event.y, scrubClock() - SCRUB_REST_MS));
         begun.set(true);
         scheduleOnRN(onScrub, first, true, true);
       })
       .onUpdate((event) => {
         if (!scrubbing.get()) return;
         const now = spreadNow.get();
-        // Sliding up past the risen hand cancels for good; the hand settles back.
+        const under = index.get();
+        const moved = restMove(rest.get(), under >= 0 && playable.get()[under] ? under : -1, event.x, event.y, scrubClock());
+        rest.set(moved);
+        // Pushed forward from a rest on a playable card: the hand settles and the screen plays the card.
+        const played = now.ids[moved.armed];
+        if (played !== undefined && pushed(moved, now, event.x, event.y)) {
+          settle();
+          scheduleOnRN(onPlay, played);
+          return;
+        }
+        // Sliding up past the risen hand without that rest cancels for good; the hand settles back.
         if (cancelled(now, event.y)) {
           settle();
           scheduleOnRN(onScrub, -1, false);
           return;
         }
+        // While a push is under way the armed card stays lifted, though the finger drifts toward a neighbour.
+        if (moved.armed >= 0) return;
         const next = pick(now, event.x, event.y);
-        if (next === index.get()) return;
+        if (next === under) return;
         lifting(next);
         scheduleOnRN(onScrub, next, true);
       })
@@ -271,7 +292,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       });
 
     return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, drops, spreadNow, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onScrub]);
+  }, [slots, lifts, drops, spreadNow, playable, rest, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onPlay, onScrub]);
 
   const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, left, drop, spread }), [rise, apart, scrubLift, index, left, drop, spread]);
   return { gesture, liftTransform, scrub };

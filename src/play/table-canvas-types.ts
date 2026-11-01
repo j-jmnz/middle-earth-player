@@ -72,4 +72,6 @@ export type TableCanvasProps = {
   onPreview: (cardId: string) => void;
   // A drag ended on one of the selected card's drop targets (a key from targetKey). The screen picks; it does not send.
   onDrop: (cardId: string, target: string) => void;
+  // A hand card pushed forward out of the hand scrub (hand-gestures.native.ts): the screen plays it as a drop on its target would.
+  onPlay: (cardId: string) => void;
 };
