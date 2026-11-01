@@ -9,28 +9,28 @@ export const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", 
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large" };
 export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high: "High", low: "Low" };
 
-// Each row's detail says what the setting changes, in the player's words. A row that eases a slow phone or the battery says so in its
-// detail and sits in the Performance group (setting-rows.tsx), so a player looking for a smoother table finds every such switch in one place.
-export const THEME_LINE = "Dark or Light colours. System follows your phone.";
-export const SCALE_LINE = "Makes text, buttons and cards bigger or smaller, the table included.";
-export const CONTRAST_LINE = "Heavier outlines on effect marks and token counts, easier to read.";
-export const PERFORMANCE_LINE = "For a phone that stutters, runs hot or drains fast. They change the look a little, never the game.";
-export const QUALITY_LINE = "Low draws the cards on the table a little softer and uses less memory. Card close-ups stay sharp.";
-export const FOG_LINE = "The fog behind every screen drifts slowly. Off holds it still and saves battery.";
+// Each row's detail states what the setting changes. The settings that exist to lighten the load on the phone sit in the Performance
+// group (setting-rows.tsx); Reduce motion and Keep screen awake, which also affect it, say so in their detail.
+export const THEME_LINE = "System follows the phone's setting.";
+export const SCALE_LINE = "Size of text, buttons and cards, the table included.";
+export const CONTRAST_LINE = "Thicker outlines on effect marks and token counts.";
+export const PERFORMANCE_LINE = "Lower these if the table stutters or the phone runs hot. Gameplay is unchanged.";
+export const QUALITY_LINE = "Low draws table cards at a lower resolution and uses less memory. Previews stay sharp.";
+export const FOG_LINE = "Animated fog behind every screen. Off saves battery.";
 // What the Moving fog row says when the fog is already still (the switch still saves its value).
-export const FOG_LIGHT_LINE = "The Light theme has no fog, so this does nothing now.";
-export const FOG_REDUCED_LINE = "Reduce motion already holds the fog still.";
-export const SPEED_LINE = "Quick shortens every animation and skips the phase title.";
-export const REDUCE_MOTION_LINE = "Always turns off most animation, the drifting fog and the combat replay, which also eases a slow phone. Follow system uses your phone's setting.";
-export const SPOTLIGHT_LINE = "A large replay of each attack that deals or blocks damage. Tap to skip it.";
-export const HAPTICS_LINE = "The phone vibrates gently at key moments of the game.";
-export const GUIDE_LINE = "A short hint under the step title at the foot of the table, the first two times each step comes up.";
-export const STOPS_LINE = "The game pauses where you could play a card. Choose the steps on the table's rail.";
-export const AWAKE_LINE = "The screen stays on while a game is open. Uses more battery.";
+export const FOG_LIGHT_LINE = "No effect: the Light theme has no fog.";
+export const FOG_REDUCED_LINE = "No effect: Reduce motion already stops the fog.";
+export const SPEED_LINE = "Quick shortens animations and skips the phase title.";
+export const REDUCE_MOTION_LINE = "Always turns off most animation, the fog and the combat replay, which lowers the load on the phone. Follow system uses the phone's setting.";
+export const SPOTLIGHT_LINE = "A replay of each attack that deals or blocks damage. Tap to skip.";
+export const HAPTICS_LINE = "Vibration at key moments.";
+export const GUIDE_LINE = "A hint under the step title, the first two times each step comes up.";
+export const STOPS_LINE = "Pauses where a card can be played. Choose the steps on the table's rail.";
+export const AWAKE_LINE = "Keeps the screen on during a game. Uses more battery.";
 export const NONE_YET = "None yet";
-// The Responses list's detail: what lands in it, and how to take one out.
-export const ALWAYS_EMPTY_LINE = "Free Responses you set to Always use are listed here, so the game plays them without asking.";
-export const ALWAYS_LINE = "The game plays these without asking. Tap one to have it ask again.";
+// The Responses row's detail, empty and not.
+export const ALWAYS_EMPTY_LINE = "Free Responses set to Always use. The game plays them without asking.";
+export const ALWAYS_LINE = "Played without asking. Tap one to be asked again.";
 
 export const CREDITS =
   "Card data comes from RingsDB, Hall of Beorn and DragnCards. The type is Marcellus SC and Barlow Semi Condensed, under the SIL Open Font License. This is a fan-made, unofficial app, not made, endorsed or sponsored by Fantasy Flight Games or Asmodee.";
