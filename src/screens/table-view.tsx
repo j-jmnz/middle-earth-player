@@ -408,7 +408,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
                 onTap={choice.onTap}
                 onPreview={onPreview}
                 onDrop={choice.onDrop}
-                onPlay={choice.onPlay}
               />
             ) : null}
           </View>

@@ -1,6 +1,6 @@
 // The hand scrub (docs/design-system-table.md, Gestures; phase 25): pressed and held, the hand rises and spreads across the
 // canvas, and a finger sliding along it lifts one card at a time; letting go on a card opens its preview, and pushing forward
-// (up, toward the table) after resting on a playable card plays it. Pure geometry: the canvas animates between the hand layout.ts
+// (up, toward the table) after resting on a playable card picks it up into the drag, which plays it only when dropped on its target. Pure geometry: the canvas animates between the hand layout.ts
 // gives (the peeking, fanned strip) and the spread this works out, and the gesture's worklets ask `cardAt`, `cancelled`, `pick`,
 // `restMove` and `pushed` on the UI thread. Nothing here sends an intent.
 //
@@ -17,7 +17,7 @@ export const SCRUB_HOLD_MS = 150;
 /** How far the finger may move in that time, in pt; a move before it is a drag, which plays a card as always. */
 export const SCRUB_SLOP = 6;
 
-/** How long the finger stays within the slop on a card for a forward push from there to play it, in ms. */
+/** How long the finger stays within the slop on a card for a forward push from there to pick it up, in ms. */
 export const SCRUB_REST_MS = 120;
 
 // The risen hand keeps this far from the canvas's edges, and its cards this far apart when there is room. These are Medium's sizes;
@@ -166,7 +166,7 @@ export function ticksOn(previous: number, next: number): boolean {
 
 /**
  * Where the finger last came to rest during a scrub: the point (`x`, `y`) it has stayed within the slop of since `since` (ms), and
- * the card a forward push would play (`armed`, -1 for none) with the point it rested on (`ax`, `ay`).
+ * the card a forward push would pick up (`armed`, -1 for none) with the point it rested on (`ax`, `ay`).
  */
 export type Rest = { x: number; y: number; since: number; armed: number; ax: number; ay: number };
 
@@ -201,7 +201,7 @@ export function restMove(rest: Rest, playable: number, x: number, y: number, now
   return { x, y, since: now, armed: keeps ? rest.armed : -1, ax: rest.ax, ay: rest.ay };
 }
 
-/** Whether the armed card is played now: the finger has pushed forward half the touch reach (22 pt, more at Large) from its rest. */
+/** Whether the armed card is picked up now: the finger has pushed forward half the touch reach (22 pt, more at Large) from its rest. */
 export function pushed(rest: Rest, spread: Spread, x: number, y: number): boolean {
   "worklet";
   return rest.armed >= 0 && forward(rest.ax, rest.ay, x, y) && rest.ay - y >= (spread.reach ?? MIN_TARGET) / 2;

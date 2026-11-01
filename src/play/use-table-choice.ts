@@ -16,7 +16,7 @@ import type { Moment } from "./outcome.ts";
 import { readoutFor, type Readout } from "./readout.ts";
 import { useScreenReader } from "./screen-reader.ts";
 import { hidesFace, actingSeat, isLooked, onTableFor } from "./selectors.ts";
-import { dropOutcome, dropTargets, targetFromKey, targetKey } from "./selection.ts";
+import { dropOutcome, targetFromKey } from "./selection.ts";
 import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock-extras.ts";
 import { usePeeking } from "./use-peek.ts";
@@ -67,8 +67,6 @@ export type TableChoice = {
   onTap: (cardId: string) => void;
   onTile: (id: string) => void;
   onDrop: (cardId: string, key: string) => void;
-  // A hand card pushed forward out of the hand scrub: played as a drop on its target.
-  onPlay: (cardId: string) => void;
   onButton: (button: DockButton) => void;
   fold: () => void;
   // A tap outside the open tray (the canvas, the top bar, the empty part of the command column): folds it and reports true, so
@@ -285,21 +283,6 @@ export function useTableChoice({
   );
 
   const dropOnTable = useStable(onDrop);
-  // A hand card pushed forward out of the scrub: a drop on its one target (the play area, the staging area, its one host), or, with
-  // several hosts to choose from, the dock's host pick that playSheet opens for an attachment played on no host yet.
-  const onPlay = useCallback(
-    (cardId: string) => {
-      const targets = dropTargets(game, ctx, legal, cardId);
-      const only = targets.length === 1 ? targets[0] : undefined;
-      if (only) return onDrop(cardId, targetKey(only));
-      if (targets.length === 0 || foldOutside()) return;
-      store.getState().select(null);
-      const opened = playSheet(game, ctx, legal, names, cardId);
-      if (opened) open(opened);
-    },
-    [game, ctx, legal, onDrop, foldOutside, store, names, open],
-  );
-  const playOnTable = useStable(onPlay);
 
   // The dock's extra buttons (dock-extras.ts).
   const undoButton: DockExtra | null = !live && (canUndo || picking) ? { label: "Undo", testID: "table-undo", accessibilityLabel: picking ? "Put back this pick" : "Take back your last choice", onPress: undo } : null;
@@ -341,7 +324,6 @@ export function useTableChoice({
     onTap: tapOnTable,
     onTile,
     onDrop: dropOnTable,
-    onPlay: playOnTable,
     onButton,
     fold: () => setFolded(sheet.key),
     foldOutside,

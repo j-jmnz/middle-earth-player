@@ -315,12 +315,12 @@ describe("the hold and the selection tick", () => {
   });
 });
 
-describe("a forward push from a rest plays the card", () => {
+describe("a forward push from a rest picks the card up", () => {
   const spread = spreadLayout(layoutOf(5, 390, 700), { width: 390, height: 700, bottom: 0 });
   const half = (spread.reach ?? MIN_TARGET) / 2;
   // The finger rests on card 2 at (200, 600) from t = 0.
   const rested = restAt(200, 600, 0);
-  // Runs a path of [x, y, t] moves from a rest with card 2 under the finger, and says whether the last one plays it.
+  // Runs a path of [x, y, t] moves from a rest with card 2 under the finger, and says whether the last one picks it up.
   function push(path: [number, number, number][], playable = 2, from: Rest = rested): boolean {
     let rest = from;
     let last: [number, number] = [from.x, from.y];
@@ -331,19 +331,19 @@ describe("a forward push from a rest plays the card", () => {
     return pushed(rest, spread, last[0], last[1]);
   }
 
-  it("plays after a rest and a push up of half the reach", () => {
+  it("picks up after a rest and a push up of half the reach", () => {
     expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [202, 600 - half, SCRUB_REST_MS + 30]])).toBe(true);
   });
 
-  it("does not play before the push has gone far enough", () => {
+  it("does not pick up before the push has gone far enough", () => {
     expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [200, 600 - half + 2, SCRUB_REST_MS + 30]])).toBe(false);
   });
 
-  it("does not play without the rest: a slide that turns up cancels as before", () => {
+  it("does not pick up without the rest: a slide that turns up cancels as before", () => {
     expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS - 1], [200, 600 - half, SCRUB_REST_MS + 30]])).toBe(false);
   });
 
-  it("does not play a card that cannot be played", () => {
+  it("does not pick up a card that cannot be played", () => {
     expect(push([[200, 600 - SCRUB_SLOP - 1, SCRUB_REST_MS], [200, 600 - half, SCRUB_REST_MS + 30]], -1)).toBe(false);
   });
 

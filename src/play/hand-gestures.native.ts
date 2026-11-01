@@ -3,11 +3,11 @@
 // pan that activates after a 150 ms hold on the hand scrubs through it. A move before the 150 ms is a drag, so the drag-to-play path
 // is never delayed; the scrub is a gesture of its own that fails at once for a press that is not on the hand. All of it runs on the
 // UI thread: the finger is read there, the canvas draws from the shared values, and only a change of the card under the finger
-// (for the selection tick, the preview at the release and the play on a forward push) crosses to JavaScript.
+// (for the selection tick, the preview at the release, and the pick-up on a forward push) crosses to JavaScript.
 //
 // The first touch of the drag pan is the hurry and the spotlight's skip (finishMotions, `swallow`); a touch that skipped a spotlight
-// does nothing else, and its hold never starts a scrub. A scrub sends no intent: a forward push asks the screen to play the card,
-// which opens the same dock a drop on its target does.
+// does nothing else, and its hold never starts a scrub. A scrub sends no intent and picks nothing: a forward push from a rest on a
+// playable card picks that card up into the drag, which follows the finger and, as any drag, picks only when dropped on a target.
 import { useCallback, useEffect, useLayoutEffect, useMemo } from "react";
 import { Gesture } from "react-native-gesture-handler";
 import { cancelAnimation, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
@@ -45,11 +45,9 @@ type Args = {
   onTap: (cardId: string) => void;
   onPreview: (cardId: string) => void;
   onDrop: (cardId: string, target: string) => void;
-  // A hand card pushed forward out of the scrub: the screen plays it as if it were dropped on its target.
-  onPlay: (cardId: string) => void;
 };
 
-export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onPreview, onDrop, onPlay }: Args) {
+export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onPreview, onDrop }: Args) {
   const { progress: hurryProgress, clear: hurryClear } = hurry;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
@@ -77,6 +75,11 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
   const left = useSharedValue(-1);
   const drop = useSharedValue(0);
   const scrubbing = useSharedValue(false);
+  // The scrub handed its card to the drag (a forward push): the rest of this touch moves and drops it. Where the finger would be
+  // over the card's resting centre, so the card is drawn centred under the finger.
+  const carrying = useSharedValue(false);
+  const grabX = useSharedValue(0);
+  const grabY = useSharedValue(0);
   // A scrub started and JavaScript has not yet been told it closed.
   const begun = useSharedValue(false);
 
@@ -141,6 +144,35 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
     };
   }, [settle]);
 
+  // The dragged card is let go at a point: on one of its drop targets the drop picks (the dock asks to confirm it) and the card is
+  // drawn where the next state puts it; anywhere else it goes back and nothing is asked. The drag pan and a carried scrub card end here.
+  const release = useCallback(
+    (x: number, y: number) => {
+      "worklet";
+      const slot = slots.get()[dragging.get()];
+      if (dragging.get() < 0 || !slot) return;
+      const target = hitDrop(drops.get(), x, y);
+      lift.set(1);
+      if (target !== "" || k === 0) {
+        dx.set(0);
+        dy.set(0);
+        dragging.set(-1);
+        if (target !== "") scheduleOnRN(onDrop, slot.id, target);
+        else scheduleOnRN(select, null);
+        return;
+      }
+      dx.set(withTiming(0, returnTiming));
+      dy.set(
+        // Finished or cut short by a new touch, the lifted card is put down.
+        withTiming(0, returnTiming, () => {
+          dragging.set(-1);
+          scheduleOnRN(select, null);
+        }),
+      );
+    },
+    [slots, dragging, drops, lift, dx, dy, k, returnTiming, onDrop, select],
+  );
+
   const liftTransform = useDerivedValue(() => [{ translateX: dx.get() }, { translateY: dy.get() }, { scale: lift.get() }]);
 
   // Built once per set of callbacks, not on every render. The worklets read the shared values, never React state.
@@ -179,36 +211,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         dx.set(event.translationX);
         dy.set(event.translationY);
       })
-      .onEnd((event) => {
-        const slot = slots.get()[dragging.get()];
-        if (dragging.get() < 0 || !slot) return;
-        const target = hitDrop(drops.get(), event.x, event.y);
-        lift.set(1);
-        if (target !== "") {
-          // The drop picks; the dock asks to confirm it. The card is drawn where the next state puts it.
-          scheduleOnRN(onDrop, slot.id, target);
-          dx.set(0);
-          dy.set(0);
-          dragging.set(-1);
-          return;
-        }
-        if (k === 0) {
-          dx.set(0);
-          dy.set(0);
-          dragging.set(-1);
-          scheduleOnRN(select, null);
-          return;
-        }
-        // Dropped on nothing: the card goes back, and nothing is asked.
-        dx.set(withTiming(0, returnTiming));
-        dy.set(
-          // Finished or cut short by a new touch, the lifted card is put down.
-          withTiming(0, returnTiming, () => {
-            dragging.set(-1);
-            scheduleOnRN(select, null);
-          }),
-        );
-      });
+      .onEnd((event) => release(event.x, event.y));
 
     const tap = Gesture.Tap().onEnd((event) => {
       const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
@@ -238,6 +241,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         if (!touch || !startsScrub(spreadNow.get(), slots.get(), touch.x, touch.y, hitSlot(slots.get(), touch.x, touch.y))) manager.fail();
       })
       .onStart((event) => {
+        carrying.set(false);
         const first = startCard(spreadNow.get(), slots.get(), event.x, event.y);
         if (swallow.get() || first < 0) return;
         scrubbing.set(true);
@@ -252,16 +256,34 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         scheduleOnRN(onScrub, first, true, true);
       })
       .onUpdate((event) => {
+        if (carrying.get()) {
+          dx.set(event.x - grabX.get());
+          dy.set(event.y - grabY.get());
+          return;
+        }
         if (!scrubbing.get()) return;
         const now = spreadNow.get();
         const under = index.get();
         const moved = restMove(rest.get(), under >= 0 && playable.get()[under] ? under : -1, event.x, event.y, scrubClock());
         rest.set(moved);
-        // Pushed forward from a rest on a playable card: the hand settles and the screen plays the card.
-        const played = now.ids[moved.armed];
-        if (played !== undefined && pushed(moved, now, event.x, event.y)) {
+        // Pushed forward from a rest on a playable card: the hand settles and the card is picked up, as a drag from the hand picks it
+        // up, centred under the finger. Its drop targets come with the selection, as a drag's do.
+        const pickedUp = pushed(moved, now, event.x, event.y) ? now.ids[moved.armed] : undefined;
+        const at = pickedUp === undefined ? -1 : slots.get().findIndex((slot) => slot.id === pickedUp && slot.kind === "card");
+        const home = slots.get()[at];
+        if (home && pickedUp !== undefined) {
           settle();
-          scheduleOnRN(onPlay, played);
+          scheduleOnRN(onScrub, -1, false);
+          carrying.set(true);
+          grabX.set(home.x + home.w / 2);
+          grabY.set(home.y + home.h / 2);
+          cancelAnimation(dx);
+          cancelAnimation(dy);
+          dragging.set(at);
+          dx.set(event.x - grabX.get());
+          dy.set(event.y - grabY.get());
+          lift.set(k === 0 ? 1.08 : withTiming(1.08, liftTiming));
+          scheduleOnRN(select, pickedUp);
           return;
         }
         // Sliding up past the risen hand without that rest cancels for good; the hand settles back.
@@ -278,6 +300,12 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         scheduleOnRN(onScrub, next, true);
       })
       .onEnd((event, success) => {
+        // A carried card is dropped like a dragged one; a touch cut short (success false) puts it back.
+        if (carrying.get()) {
+          carrying.set(false);
+          release(success ? event.x : -1, success ? event.y : -1);
+          return;
+        }
         if (!scrubbing.get()) return;
         const now = spreadNow.get();
         const id = success ? now.ids[pick(now, event.x, event.y)] : undefined;
@@ -292,7 +320,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       });
 
     return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, drops, spreadNow, playable, rest, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, returnTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, select, onDrop, onTap, onPreview, onPlay, onScrub]);
+  }, [slots, lifts, spreadNow, playable, rest, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, release, select, onTap, onPreview, onScrub]);
 
   const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, left, drop, spread }), [rise, apart, scrubLift, index, left, drop, spread]);
   return { gesture, liftTransform, scrub };
