@@ -111,7 +111,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const { swallow, live } = spot;
 
   // Each face-up code at the largest size it is drawn: a hand card at the scrub's lifted size (table-pictures.ts).
-  const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)]), [layout, moves]);
+  const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)], layout.card), [layout, moves]);
   const quality = useStore(tableSettings, (state) => state.settings.cardQuality);
   const images = useTableImages(boxes, picture, pictureRevision, pictureRatio(PixelRatio.get(), quality));
   const tokens = useTokenImages();

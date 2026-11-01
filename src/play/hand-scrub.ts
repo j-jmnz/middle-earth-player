@@ -56,12 +56,13 @@ export function fanTilts(count: number): number[] {
 }
 
 /**
- * The hand risen and spread across the canvas: whole cards at the scrub's scale (1.5), centered, a gap apart when they fit and
- * overlapping evenly when they do not, always at least a 44 pt slice of each. A hand too wide for that at 1.5 gets a smaller scale
- * instead of a thinner slice. The cards are fanned: each turns by its `fanTilts` angle and drops by R(1 - cos) on an arc of
- * `SHAPE.fanRadius` card heights, so the middle stands highest; the x spacing is that of a flat row, and the margins and the
- * bottom leave room for the cards' turned corners. `canvas.bottom` is the
- * bottom safe-area inset the hand stays above.
+ * The hand risen and spread across the canvas: whole cards at the scrub's size, the table's card times `SHAPE.scrubScale` whatever the
+ * hand's length (user request, 2026-11-01: the risen cards never change size with the number of cards; a long hand's cards are narrowed
+ * on the table, not here), smaller only where the canvas is narrower than one card. Centered, a gap apart when they fit and overlapping
+ * evenly when they do not: a long hand gets a thinner slice of each card, where the nearest center still picks and the lifted copy shows
+ * which card it is. The cards are fanned: each turns by its `fanTilts` angle and drops by R(1 - cos) on an arc of `SHAPE.fanRadius`
+ * card heights, so the middle stands highest; the x spacing is that of a flat row, and the margins and the bottom leave room for the
+ * cards' turned corners. `canvas.bottom` is the bottom safe-area inset the hand stays above.
  */
 export function spreadLayout(layout: TableLayout, canvas: { width: number; height: number; bottom: number }): Spread {
   const cards = handSlots(layout);
@@ -74,17 +75,16 @@ export function spreadLayout(layout: TableLayout, canvas: { width: number; heigh
   const reach = touch(ui, MIN_TARGET);
   const tilts = fanTilts(count);
   const widest = Math.max(0, ...tilts.map(Math.abs));
-  // How far a turned card's corner reaches past its flat edge, sideways, at a card scale.
-  const cornerOverhang = (scale: number) => (first.h * scale * Math.sin(widest)) / 2 - (first.w * scale * (1 - Math.cos(widest))) / 2;
-  // The scale needs the room and the room needs the scale: `fit` once for a flat row's scale, whose overhang sets the margin, and
-  // again for the room that leaves. The second scale is never larger, so its corners fit in the margin the first one set aside.
-  // A hand too long for a 44 pt slice of every card even at its own size keeps its own size and a thinner, even slice: the nearest
-  // center still picks, and the lifted copy shows which card it is.
-  const fit = (room: number) => Math.max(1, Math.min(SHAPE.scrubScale, (room - (count - 1) * reach) / first.w));
-  const room = canvas.width - 2 * Math.max(edge, cornerOverhang(fit(canvas.width - 2 * edge)));
-  const scale = fit(room);
-  const w = first.w * scale;
-  const h = first.h * scale;
+  // The risen card's size: the table's card at the scrub's scale, held to the canvas's width.
+  const base = layout.card.w > 0 ? layout.card : first;
+  const size = Math.min(base.w * SHAPE.scrubScale, canvas.width - 2 * edge);
+  const w = size;
+  const h = (base.h / base.w) * size;
+  // How far a turned card's corner reaches past its flat edge, sideways: the margin the row keeps from the canvas's sides.
+  const cornerOverhang = (h * Math.sin(widest)) / 2 - (w * (1 - Math.cos(widest))) / 2;
+  const room = canvas.width - 2 * Math.max(edge, cornerOverhang);
+  // The scale from the card's place in the hand to its place in the spread.
+  const scale = w / first.w;
   const step = count > 1 ? Math.min(w + gap, (room - w) / (count - 1)) : 0;
   const x0 = (canvas.width - ((count - 1) * step + w)) / 2;
   const radius = SHAPE.fanRadius * h;

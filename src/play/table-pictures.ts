@@ -11,15 +11,21 @@ export type Box = { w: number; h: number };
 /** The most the hand scrub grows a hand card: the risen hand's scale times the lifted card's. */
 export const HAND_PICTURE_SCALE = SHAPE.scrubScale * SHAPE.scrubLiftScale;
 
-/** The box (in points) each face-up picture on the table is drawn in at its largest, by picture key (picture-key.ts). */
-export function pictureBoxes(slots: readonly CardSlot[]): Map<string, Box> {
+/**
+ * The box (in points) each face-up picture on the table is drawn in at its largest, by picture key (picture-key.ts). A hand card grows
+ * in the scrub from the table's card (`card`, hand-scrub.ts), not from its narrowed place in a long hand.
+ */
+export function pictureBoxes(slots: readonly CardSlot[], card?: Box): Map<string, Box> {
   const boxes = new Map<string, Box>();
   for (const slot of slots) {
     if (slot.faceDown || slot.code === "") continue;
-    const grow = slot.zone === "hand" ? HAND_PICTURE_SCALE : 1;
+    const hand = slot.zone === "hand";
+    const grow = hand ? HAND_PICTURE_SCALE : 1;
+    const w = hand && card ? Math.max(slot.w, card.w) : slot.w;
+    const h = hand && card ? Math.max(slot.h, card.h) : slot.h;
     const key = slot.picture ?? slot.code;
     const held = boxes.get(key);
-    boxes.set(key, { w: Math.max(held?.w ?? 0, slot.w * grow), h: Math.max(held?.h ?? 0, slot.h * grow) });
+    boxes.set(key, { w: Math.max(held?.w ?? 0, w * grow), h: Math.max(held?.h ?? 0, h * grow) });
   }
   return boxes;
 }

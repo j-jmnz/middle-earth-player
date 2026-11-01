@@ -85,16 +85,15 @@ describe("spreadLayout", () => {
     expect(spread.top).toBe(Math.min(...spread.slots.map((slot) => slot.y)));
   });
 
-  it("keeps at least a 44 pt slice of every card", () => {
+  it("keeps the risen cards the same size whatever the hand's length: the table's card at the scrub's scale (user request, 2026-11-01)", () => {
     for (const canvas of CANVASES) {
-      for (const count of [2, 3, 5, 7, 9, 12]) {
+      const layout = layoutOf(1, canvas.width, canvas.height, canvas.bottom, canvas.scale);
+      for (const count of [1, 2, 5, 9, 13, 16, 20]) {
         const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
-        for (let index = 0; index < count - 1; index += 1) {
-          const step = (spread.slots[index + 1]?.x ?? 0) - (spread.slots[index]?.x ?? 0);
-          expect(step, `${count} cards on ${canvas.width}`).toBeGreaterThanOrEqual(MIN_TARGET - 1e-9);
+        for (const slot of spread.slots) {
+          expect(slot.w, `${count} cards on ${canvas.width}`).toBeCloseTo(layout.card.w * SHAPE.scrubScale, 9);
+          expect(slot.h, `${count} cards on ${canvas.width}`).toBeCloseTo(layout.card.h * SHAPE.scrubScale, 9);
         }
-        // The last card shows whole.
-        expect(spread.slots[count - 1]?.w).toBeGreaterThanOrEqual(MIN_TARGET);
       }
     }
   });
@@ -109,12 +108,16 @@ describe("spreadLayout", () => {
     expect((short.slots[1]?.x ?? 0) - (short.slots[0]?.x ?? 0)).toBeGreaterThan(short.slots[0]?.w ?? 0);
   });
 
-  it("keeps consecutive centers at least a slice apart with the fan, 44 pt and 44 x the layout scale at Large", () => {
+  it("keeps the centers in hand order, evenly apart, so the nearest center picks each card", () => {
     for (const canvas of CANVASES) {
-      const reach = MIN_TARGET * (canvas.scale ?? 1);
-      for (const count of [2, 5, 9, 12]) {
+      for (const count of [2, 5, 9, 13, 20]) {
         const spread = spreadLayout(layoutOf(count, canvas.width, canvas.height, canvas.bottom, canvas.scale), canvas);
-        spread.centers.slice(1).forEach((center, index) => expect(center - (spread.centers[index] ?? 0), `${count} cards on ${canvas.width}`).toBeGreaterThanOrEqual(Math.min(reach, MIN_TARGET) - 1e-9));
+        const steps = spread.centers.slice(1).map((center, index) => center - (spread.centers[index] ?? 0));
+        for (const step of steps) {
+          expect(step, `${count} cards on ${canvas.width}`).toBeGreaterThan(0);
+          expect(step).toBeCloseTo(steps[0] ?? 0, 9);
+        }
+        spread.centers.forEach((center, index) => expect(cardAt(spread, center)).toBe(index));
       }
     }
   });

@@ -160,12 +160,19 @@ export function cardSize(width: number, height: number, scale = 1): { w: number;
 }
 
 
-/** The size of a hand card: the table's card, narrowed so `count` cards overlap by no more than leaves a 44 pt strip of each (more at Large, `touch`). */
+/**
+ * The size of a hand card: the table's card while `count` cards fit across `width` with each covering at most half of the one under
+ * it; past that, the largest card that does (user request, 2026-11-01: a long hand overlaps by up to half a card before its cards
+ * shrink, and fills the strip). Never under 36 pt; at the floor the cards overlap more.
+ */
 export function handCardSize(card: { w: number; h: number }, width: number, count: number, scale = 1): { w: number; h: number } {
   if (count <= 1) return card;
-  const w = Math.max(Math.round(36 * scale), Math.min(card.w, Math.floor(width - touch(scale, MIN_TARGET) * (count - 1))));
+  const w = Math.max(Math.round(HAND_FLOOR * scale), Math.min(card.w, Math.floor((2 * width) / (count + 1))));
   return w === card.w ? card : { w, h: Math.round(w * ASPECT) };
 }
+
+// The narrowest hand card, in Medium's points.
+const HAND_FLOOR = 36;
 
 // What a row needs to fold: the cards to keep, the fold stack's size and the sink for the stacks (row-fold.ts).
 type RowFolding = { keep: ReadonlySet<string> | undefined; pile: { w: number; h: number }; folds: FoldPlace[]; target: number; stacks: boolean };
@@ -410,8 +417,8 @@ export function tableLayout(
     });
   }
 
-  // The hand fans along the bottom edge, a slight turn from the middle out, overlapping when it is long. Each card keeps at
-  // least a 44 pt strip to touch: a long hand narrows its cards before the strip gets thinner. The picked card rises whole.
+  // The hand fans along the bottom edge, a slight turn from the middle out, overlapping evenly when it is long, each card covering at
+  // most half of the one under it before the cards narrow (handCardSize). The picked card rises whole.
   const handEntries = views.hand.entries;
   const handCard = handCardSize(card, hand.w, handEntries.length, scale);
   const xs = rowXs(handEntries.map(() => handCard.w), hand.x, hand.w, gap);

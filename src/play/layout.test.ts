@@ -147,15 +147,23 @@ describe("the table's layout at a UI scale", () => {
     }
   });
 
-  it("never narrows a hand card under the floor, and keeps the strip a target", () => {
+  it("keeps the table's card while each hand card covers at most half of the one under it, then narrows, never under the floor (user request, 2026-11-01)", () => {
     const base = { w: 60, h: 84 };
     for (const scale of SCALES) {
-      const narrowed = handCardSize(base, 220, 5, scale);
-      expect(narrowed.w).toBeGreaterThanOrEqual(Math.round(36 * scale));
       expect(handCardSize(base, 220, 1, scale)).toEqual(base);
-      // The strip of each card but the last: the width less the card, over the gaps between them, is at least 44.
-      expect((220 - narrowed.w) / 4).toBeGreaterThanOrEqual(MIN_TARGET - 0.001);
+      // Five cards of 60 overlapping by half take 180 pt: they keep the table's card.
+      expect(handCardSize(base, 220, 5, scale)).toEqual(base);
+      for (const count of [6, 9, 13, 16]) {
+        const narrowed = handCardSize(base, 300, count, scale);
+        expect(narrowed.w).toBeGreaterThanOrEqual(Math.round(36 * scale));
+        // Unless at the floor, the cards fit with a step of at least half a card; a narrowed card is the largest that does.
+        if (narrowed.w > Math.round(36 * scale)) expect(narrowed.w + ((count - 1) * narrowed.w) / 2, `${scale} ${count}`).toBeLessThanOrEqual(300);
+        if (narrowed.w < base.w && narrowed.w > Math.round(36 * scale)) expect(narrowed.w + 1 + ((count - 1) * (narrowed.w + 1)) / 2, `${scale} ${count}`).toBeGreaterThan(300);
+      }
     }
+    // Thirteen cards on a phone's strip keep the table's card (the 44 pt-strip rule left them at 36 pt); sixteen narrow to 67 pt.
+    expect(handCardSize({ w: 80, h: 112 }, 575, 13).w).toBe(80);
+    expect(handCardSize({ w: 80, h: 112 }, 575, 16).w).toBe(67);
   });
 
   it("grows a pile smaller than 44 pt to a 44 pt hit target at every scale", () => {
