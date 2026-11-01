@@ -17,6 +17,12 @@ import { bytes, runScript, type Log } from "./log.ts";
 export const MAX_SIDE = 1200;
 const KEEP_BYTES = 400_000;
 
+// What a picture in assets/scans was packed from, so a later pack keeps it while its pin is the same: the pinned file's sha256 and the
+// map entries it gave (the card, and its scene). Raise PACK_VERSION when shrinkToMaxSide or sceneOf changes what a pin packs to.
+const PACK_VERSION = 1;
+const STAMP_FILE = ".packed.json";
+type Stamp = { version: number; entries: Record<string, { pin: string; scans: PackedScan[] }> };
+
 export type PackedScan = {
   code: string;
   filename: string;
@@ -77,9 +83,12 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
     ];
   });
   mkdirSync(options.scansDir, { recursive: true });
+  const before = readStamp(options.scansDir);
+  const stamp: Stamp = { version: PACK_VERSION, entries: {} };
   const packed: PackedScan[] = [];
   const missing: string[] = [];
   let fetched = 0;
+  let kept = 0;
   let total = 0;
   const tick = log.progress(jobs.length, "picture");
   // Many at a time: on a machine without the cache each card is a fetch that mostly waits on the server (4 at once ran
@@ -92,32 +101,48 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
       const { key, card } = job;
       const picture = picturePins.get(key);
       const scan = scanPins.get(key);
+      const wantsScene = key === card.code && options.sceneCodes?.has(key) === true;
+      // Packed before from the same pin (and with its scene when one is wanted): kept as it is, with nothing loaded.
+      const earlier = before.entries[key];
+      const first = picture ?? scan;
+      if (first && earlier?.pin === first.sha256 && earlier.scans.length === (wantsScene ? 2 : 1) && earlier.scans.every((entry) => existsSync(path.join(options.scansDir, entry.filename)))) {
+        stamp.entries[key] = earlier;
+        packed.push(...earlier.scans);
+        kept += 1;
+        tick(`${key} kept`);
+        continue;
+      }
       let body: Uint8Array | null = null;
+      let from: Pin | null = null;
       for (const pin of [picture, scan]) {
         if (!pin || body) continue;
         const loaded = await loadPin(pin, context, log);
         if (loaded?.fetched) fetched += 1;
         body = loaded?.body ?? null;
+        if (body) from = pin;
       }
-      if (!body) {
+      if (!body || !from) {
         missing.push(`${key} ${card.name}`);
         tick(`${key} has no picture`);
         continue;
       }
       const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A");
       total += shown.byteLength;
-      packed.push(writeScan(key, shown, options.scansDir));
-      if (key === card.code && options.sceneCodes?.has(key)) {
+      const scans = [writeScan(key, shown, options.scansDir)];
+      if (wantsScene) {
         const scene = await (options.scene ?? sceneOf)(body, card.type_code);
         total += scene.byteLength;
-        packed.push(writeScan(`${key}.scene`, scene, options.scansDir));
+        scans.push(writeScan(`${key}.scene`, scene, options.scansDir));
       }
+      stamp.entries[key] = { pin: from.sha256, scans };
+      packed.push(...scans);
       tick(`${key} ${bytes(shown.byteLength)}`);
     }
   };
   await Promise.all(Array.from({ length: PACK_CONCURRENCY }, worker));
   packed.sort((left, right) => left.code.localeCompare(right.code));
   writeScanMap(options.mapPath, packed);
+  writeFileSync(path.join(options.scansDir, STAMP_FILE), `${JSON.stringify(stamp)}\n`);
   if (notes.noPdftoppm.length > 0) {
     log.warn(
       `pdftoppm is not installed, so ${notes.noPdftoppm.length} cards drawn from FFG's PDFs use their older scans (${notes.noPdftoppm.sort().join(", ")}). Install poppler (macOS: brew install poppler; Debian or Ubuntu: apt install poppler-utils) and run pnpm scans:pack again.`,
@@ -129,7 +154,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
     log.info(`${missing.length} card${missing.length === 1 ? "" : "s"} have no pinned picture or scan and show as text`);
     log.debug(missing.join(", "));
   }
-  log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${bytes(total)}, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
+  log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${kept} cards kept from the last pack; ${bytes(total)} written, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
   return packed;
 }
 
@@ -146,6 +171,18 @@ function sidePins(record: SourceRecord | undefined, kind: string, cacheDir: stri
 }
 
 const codeOf = (pinPath: string): string => path.basename(pinPath).split(".")[0] ?? "";
+
+// The last pack's stamp, or an empty one when there is none or it was written by another PACK_VERSION.
+function readStamp(scansDir: string): Stamp {
+  const file = path.join(scansDir, STAMP_FILE);
+  if (!existsSync(file)) return { version: PACK_VERSION, entries: {} };
+  try {
+    const stamp = JSON.parse(readFileSync(file, "utf8")) as Stamp;
+    return stamp.version === PACK_VERSION && typeof stamp.entries === "object" ? stamp : { version: PACK_VERSION, entries: {} };
+  } catch {
+    return { version: PACK_VERSION, entries: {} };
+  }
+}
 
 // "<pdf url>#page=<n>" names a page of a pinned PDF.
 function pageOf(url: string): { pdf: string; page: number } | null {
@@ -281,10 +318,11 @@ function isDirectRun(): boolean {
   return path.resolve(entry) === fileURLToPath(import.meta.url);
 }
 
+// --optional (pnpm start): a failed pack is a warning, so Metro still starts offline with the pictures of the last pack.
 if (isDirectRun()) {
   void runScript("pack-scans", async (log) => {
     const root = repoRoot();
-    await packScans(
+    const pack = packScans(
       {
         catalogDb: path.join(root, "assets/catalog.db"),
         sourcesPath: path.join(DATA_DIR, "sources.json"),
@@ -297,5 +335,11 @@ if (isDirectRun()) {
       },
       log,
     );
+    try {
+      await pack;
+    } catch (error) {
+      if (!process.argv.includes("--optional")) throw error;
+      log.warn(`pictures not packed, so this bundle keeps the last pack's: ${error instanceof Error ? error.message : String(error)}`);
+    }
   });
 }

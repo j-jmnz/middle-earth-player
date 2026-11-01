@@ -39,7 +39,7 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm docs:section <file> "<heading>"` | Prints one doc section with its subsections. |
 | `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `.cache/booklets/` for Metro. |
-| `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. |
+| `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. A picture whose pin has not moved since the last pack is kept (`assets/scans/.packed.json`), so a run after a pull packs only the new pins. `--optional` (`pnpm start`) warns instead of failing, keeping the last pack. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
@@ -47,7 +47,7 @@ The scripts log to stderr through `scripts/log.ts`: each line has the time since
 
 CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `tsc`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
 
-Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs and every card's picture ship in the binary too (`pnpm scans:pack`, run by `pnpm ios`, `pnpm android` and `eas-build-post-install`; the same Metro rule below applies to it). `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
+Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs and every card's picture ship in the binary too (`pnpm scans:pack`, run by `pnpm start`, `pnpm ios`, `pnpm android` and `eas-build-post-install`, so every local bundle and release takes the pictures `data/sources.json` pins; the same Metro rule below applies to it). `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `.cache/booklets/`, and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
 
 ## Documents
 
@@ -120,7 +120,7 @@ pnpm catalog:build
 pnpm scans:pack
 ```
 
-The first `scans:pack` downloads every pinned card picture at full size (about 5 GB, into `.cache/`; JvZijp's Drive files are about 4 MB each), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (272 MB) into `assets/scans`. Later runs read the cache and take about two minutes. `pnpm ios` and `pnpm android` run both steps themselves; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+The first `scans:pack` downloads every pinned card picture at full size (about 5 GB, into `.cache/`; JvZijp's Drive files are about 4 MB each), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (272 MB) into `assets/scans`. Later runs keep each picture whose pin has not moved and pack only the new ones, in seconds. `pnpm start`, `pnpm ios` and `pnpm android` run both steps themselves, so a pull that brings new pictures (a new campaign's) is packed on the next start; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
 
 #### 4. iPhone or iPad
 
