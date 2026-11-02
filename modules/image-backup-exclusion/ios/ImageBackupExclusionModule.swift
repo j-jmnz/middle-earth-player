@@ -4,8 +4,9 @@ import Foundation
 internal final class BackupExclusionFailed: Exception {
   private let detail: String
 
-  init(_ detail: String) {
+  init(_ detail: String, file: String = #fileID, line: UInt = #line, function: String = #function) {
     self.detail = detail
+    super.init(file: file, line: line, function: function)
   }
 
   override var reason: String { detail }

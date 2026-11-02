@@ -137,7 +137,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 None ran. Each needs a device.
 
-- Booklets: import, open, last page after a kill, Back; first open from the APK; Android pinch, double tap, pan and the sharper redraw.
+- Booklets: import, open, last page after a kill, Back; first open from the APK and from an iOS Debug and Release build (the module linked through its podspec); Android pinch, double tap, pan and the sharper redraw.
 - Data: airplane-mode play after a kill with images cached; `user.db` keeps the deck and log after a catalog version bump; a changed engine version drops the open scenario.
 - Campaign screens: the card names in the log's rows and the path's pool open the card's preview on a tap (and as links with VoiceOver and TalkBack); the path (stops resume or begin, Campaign log, the foot clear of three-button and gesture navigation), the briefing, the log rows (Prisoner, carry-over, Used this campaign), the Books grid (four covers a row on a tablet; every cover over its scene, the Rules Reference over Journey Along the Anduin), the Resolution and outcome reports.
 - Table chrome: the top bar at 667x375 with two seats; the rail and its three lines on the screen's middle; the dial and its pop under the top edge; the banner centered and its swipe; the menu, carousel, tray and dock at 667x375 and 844x390; the opening quest screen (Begin, Continue, Progress).

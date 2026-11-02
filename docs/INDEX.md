@@ -45,7 +45,7 @@ Read the sections your task touches.
 - `docs/architecture.md` — Architecture (~16.6K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
-  - 78–120 Modules (~970) ← 1
+  - 78–120 Modules (~1.0K) ← 2
   - 121–146 State (~1.0K) ← 9
   - 147–168 Play loop (~250)
   - 169–194 Engine (~2.8K)
@@ -177,10 +177,10 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.3K tok)
+- `docs/phases/STATUS.md` — Phase status (~6.4K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~2.1K)
-  - 76–153 Open items (~3.2K)
+  - 76–153 Open items (~3.3K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
     - 119–135 Screens and code (~810)
@@ -327,7 +327,7 @@ History and rationale; read only when a code comment or task cites one.
 
 The sections each area's comments cite, most cited first. Read these before changing code there.
 
-- `scripts`: brief.md, Card images (4); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
+- `scripts`: brief.md, Card images (4); architecture.md, Modules (1); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `src/campaign`: architecture.md, Tests (1)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
