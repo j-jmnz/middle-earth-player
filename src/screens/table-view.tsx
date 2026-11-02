@@ -4,7 +4,7 @@
 // the only writer of the game; how a tap becomes an intent is src/play/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
+import { Alert, BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
@@ -238,13 +238,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
         case "settings":
           setReading({ kind: "settings" });
           return;
+        case "resign":
+          // Asked first: a resigned scenario is lost and its outcome opens.
+          Alert.alert("Resign this scenario?", "The game is lost and its outcome opens.", [
+            { text: "Keep playing", style: "cancel" },
+            { text: "Resign", style: "destructive", onPress: () => store.getState().dispatch({ type: "Resign" }) },
+          ]);
+          return;
         default: {
           const unreachable: never = id;
           throw new Error(`Unknown menu row ${String(unreachable)}`);
         }
       }
     },
-    [router, nav],
+    [router, nav, store],
   );
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
   // The printed facts, the preview opener, the pile taps, the Heading dial and the Island Map chip (use-table-wiring.ts).

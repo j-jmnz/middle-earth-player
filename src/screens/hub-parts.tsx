@@ -12,6 +12,7 @@ import { useSizeClass } from "../play/use-size-class";
 import { HeroArt, Portrait, SceneArt, type ArtCard } from "./art";
 import { COVER } from "./art-crop";
 import { Chevron, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "./chrome";
+import { FoldSection } from "./fold-section";
 import { HeroTile, type HeroFace } from "./hero-tile";
 import type { Palette } from "./palette.js";
 import { usePalette } from "./palette-hook";
@@ -123,19 +124,34 @@ export function RunRow({ testID, title, line, lead, accessibilityLabel, onPress 
   );
 }
 
-/** The other open runs under their eyebrow: rows on a phone, two across on a medium tablet. `title` is the eyebrow ("Other journeys"). */
-export function OtherRuns({ testID, title, children }: { testID: string; title: string; children: ReactNode }) {
+/**
+ * The other open runs under their heading: rows on a phone, two across on a medium tablet. `title` is the heading ("Other journeys").
+ * With `fold` the heading is a FoldSection header (the Campaigns hub); without it, a plain eyebrow.
+ */
+export function OtherRuns({ testID, title, fold, children }: { testID: string; title: string; fold?: { id: string; folded: boolean; onFold: (folded: boolean) => void }; children: ReactNode }) {
   const s = useUiScale();
   const { size } = useSizeClass();
   const grid = size === "medium";
+  const rows = (
+    <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
+      {Children.map(children, (child) => (
+        <View style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>{child}</View>
+      ))}
+    </View>
+  );
+  if (fold) {
+    return (
+      <View testID={testID}>
+        <FoldSection id={fold.id} title={title} count={Children.count(children)} folded={fold.folded} onFold={fold.onFold}>
+          {rows}
+        </FoldSection>
+      </View>
+    );
+  }
   return (
     <View testID={testID} style={{ gap: 10 * s }}>
       <Eyebrow>{title}</Eyebrow>
-      <View className={grid ? "flex-row flex-wrap" : undefined} style={grid ? { rowGap: 8 * s, marginHorizontal: -4 * s } : { gap: 8 * s }}>
-        {Children.map(children, (child) => (
-          <View style={grid ? { width: "50%", paddingHorizontal: 4 * s } : undefined}>{child}</View>
-        ))}
-      </View>
+      {rows}
     </View>
   );
 }

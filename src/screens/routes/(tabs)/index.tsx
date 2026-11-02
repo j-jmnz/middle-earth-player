@@ -2,7 +2,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useRef, useState, type ComponentRef } from "react";
 import { ScrollView, View } from "react-native";
 
-import { Eyebrow, PillButton } from "../../chrome";
+import { PillButton } from "../../chrome";
 import { FoldSection, useFolds } from "../../fold-section";
 import { heroFace } from "../../hero-tile";
 import { deckFaces } from "../../deck-store";
@@ -16,14 +16,12 @@ import { NextStop } from "../../save-panels";
 import { CatalogGrid, CatalogTile, HubPage, leadFace, LockedTiles, OtherRuns, RunHero, RunRow, type PartyHero } from "../../hub-parts";
 import { splitRuns } from "../../hub-runs";
 import { nextStepHref, pathHref } from "../../scenario-links";
-import { useUiScale } from "../../../play/ui-scale";
 import { useSizeClass } from "../../../play/use-size-class";
 
 // The Campaigns hub (docs/design-system.md, Campaigns (campaign list)): the unfinished playthrough written last as the hero over its
 // next scenario's scene, the other unfinished ones as rows, New playthrough (one tile per startable campaign), then Coming later.
 export default function CampaignList() {
   const palette = usePalette();
-  const s = useUiScale();
   const { size } = useSizeClass();
   const router = useRouter();
   // `start=1`: a finished campaign's path sends the player here to start another, so the list scrolls to New playthrough.
@@ -85,7 +83,7 @@ export default function CampaignList() {
 
   const othersBlock =
     others.length > 0 ? (
-      <OtherRuns testID="other-journeys" title="Other journeys">
+      <OtherRuns testID="other-journeys" title="Other journeys" fold={{ id: "other-journeys", folded: folds.folded("other-journeys", false), onFold: (next) => folds.setFolded("other-journeys", next, false) }}>
         {others.map((save) => {
           const line = lineOf(save);
           return (
@@ -111,9 +109,9 @@ export default function CampaignList() {
   const posters = size === "compact" ? 0 : 3;
   const newBlock =
     startable.length > 0 ? (
-      <View testID="new-playthrough-tiles" style={{ gap: 10 * s }}>
-        <Eyebrow>New playthrough</Eyebrow>
-        <CatalogGrid posters={posters}>
+      <View testID="new-playthrough-tiles">
+        <FoldSection id="new-playthrough" title="New playthrough" count={startable.length} unit="campaign" folded={folds.folded("new-playthrough", false)} onFold={(next) => folds.setFolded("new-playthrough", next, false)}>
+          <CatalogGrid posters={posters}>
           {startable.map(({ id, name, data }) => {
             const count = data.scenarios.length;
             const words = `${count} ${count === 1 ? "scenario" : "scenarios"}`;
@@ -131,7 +129,8 @@ export default function CampaignList() {
               />
             );
           })}
-        </CatalogGrid>
+          </CatalogGrid>
+        </FoldSection>
       </View>
     ) : null;
 

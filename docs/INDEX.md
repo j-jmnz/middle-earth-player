@@ -103,10 +103,10 @@ Read the sections your task touches.
   - 838–862 Persistence and shipping (~1.6K)
   - 863–903 Screens (~4.4K) ← 2
     - 889–903 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~25.9K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~26.0K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.0K) ← 4
-  - 24–27 Table menu (~380) ← 1
+  - 24–27 Table menu (~430) ← 1
   - 28–33 Quest scale (~320)
   - 34–37 Canvas (~560) ← 1
   - 38–49 Spacing and the play area's rows (~1.6K) ← 7
@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1
   - 314–317 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~23.1K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~23.2K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -149,13 +149,13 @@ Read the sections your task touches.
   - 206–220 Icons (~480) ← 6
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
-  - 256–433 Screens (~12.5K)
+  - 256–433 Screens (~12.6K)
     - 260–263 Splash (~40)
     - 264–267 App icon (~80)
-    - 268–283 Campaigns (campaign list) (~1.3K) ← 5
+    - 268–283 Campaigns (campaign list) (~1.4K) ← 5
     - 284–297 Scenarios (~740) ← 1
     - 298–309 History (~1.4K) ← 4
-    - 310–327 Briefing (~1.5K) ← 3
+    - 310–327 Briefing (~1.6K) ← 3
     - 328–331 Campaign setup (~700) ← 3
     - 332–337 Campaign path (~530) ← 2
     - 338–341 Campaign log (~330) ← 1
