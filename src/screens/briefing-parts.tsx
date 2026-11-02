@@ -3,7 +3,7 @@
 // pinned Deal bar. One seat's fellowship is seat-picker.tsx.
 import { and, eq, like } from "drizzle-orm";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -111,6 +111,9 @@ export function useBriefingDecks(saga: boolean): BriefingDecks {
   return { savedDecks, seeded, seedReason, candidates, faces, readiness, filter, setFilter, spheres, shown, inactive, typeOf };
 }
 
+/** Opens a card large over the briefing (a hero, a Ring-bearer candidate): the briefing screen owns the preview, a seat picker inside it asks by code. */
+export const OpenCardContext = createContext<(code: string) => void>(() => {});
+
 /**
  * The briefing's frame. The scenario's scene runs under the status bar at the top, with Back and Booklet floating over it so
  * they stay in reach as the page scrolls; the content scrolls under them; the Deal bar is pinned at the foot in thumb reach.
@@ -191,6 +194,7 @@ export function BriefingScreen({
   if (expanded) {
     const trailing = 24 * s + insets.right;
     return (
+      <OpenCardContext.Provider value={preview.openCode}>
       <Screen testID={testID} scene="moon" bleed>
         <TwoPane
           kind="supporting"
@@ -222,10 +226,12 @@ export function BriefingScreen({
         />
         {preview.overlay}
       </Screen>
+      </OpenCardContext.Provider>
     );
   }
 
   return (
+    <OpenCardContext.Provider value={preview.openCode}>
     <Screen testID={testID} scene="moon" bleed>
       <ScrollView className="min-h-0 flex-1" contentContainerStyle={{ paddingBottom: 24 * s }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} scrollEventThrottle={64} onScroll={onScroll}>
         {scene}
@@ -252,6 +258,7 @@ export function BriefingScreen({
       {navBar}
       {preview.overlay}
     </Screen>
+    </OpenCardContext.Provider>
   );
 }
 

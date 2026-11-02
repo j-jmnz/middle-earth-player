@@ -132,6 +132,8 @@ export function applyIntent(
       return finishMulliganChoice(state, false);
     case "Mulligan":
       return finishMulliganChoice(mulliganSeat(state, state.activeSeat, steps, ctx), true);
+    case "Resign":
+      return { ...state, lost: true, lossReason: "The players resigned", window: null, pendingAttack: null };
     case "Pass":
       // A Pass while the first player is asked what to commit to the Sailing test commits no one (dcce.sailing-tests).
       return askingToCommit(state) ? performSailing(state, [], ctx, steps) : applyPass(state);

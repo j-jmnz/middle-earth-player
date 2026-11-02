@@ -1,15 +1,16 @@
 // One seat's fellowship on a briefing (docs/design-system.md, Briefing): the saved decks to choose from, then the picked deck as its
 // name and Change over its heroes, on the ground, with the Ring-bearer's rows when it needs one. Shared by the campaign briefing and the standalone briefing.
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../play/not-applied";
 import { rowSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
-import { Portrait } from "./art";
+import { CroppedArt } from "./art";
+import { PAINTING } from "./art-crop";
 import { usePalette } from "./palette-hook";
-import type { BriefingDecks } from "./briefing-parts";
+import { OpenCardContext, type BriefingDecks } from "./briefing-parts";
 import { BodyText, Chevron, Label, Section, TextButton } from "./chrome";
 import { editSavedDeck } from "./deck-draft";
 import { emptyDeckListFilter, useDeckListView } from "./deck-list";
@@ -62,6 +63,7 @@ export function SeatPicker({
   const t = useTableTokens();
   const palette = usePalette();
   const router = useRouter();
+  const openCard = useContext(OpenCardContext);
   const view = useDeckListView();
   const [changing, setChanging] = useState(false);
   // Expanded, the deck list is in the briefing's right pane: from 600 pt wide the covers go two to a row (briefing-layout.ts).
@@ -182,11 +184,11 @@ export function SeatPicker({
           {short ? <Label>{short}</Label> : null}
           <View className="mt-3.5 flex-row gap-2">
             {heroes.map((code) => (
-              <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} />
+              <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} onPress={() => openCard(code)} />
             ))}
             {slot ? (
               ringBearer ? (
-                <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onRemove={() => onRingBearer(null)} />
+                <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onPress={() => openCard(ringBearer)} onRemove={() => onRingBearer(null)} />
               ) : (
                 // The fourth place stays as room, so the tiles keep their width when the Ring-bearer is picked.
                 <View className="flex-1" />
@@ -217,11 +219,17 @@ export function SeatPicker({
                 collapsable={false}
                 accessibilityRole="button"
                 accessibilityLabel={`Choose ${candidate.name}${candidate.packName ? `, ${candidate.packName}` : ""}`}
+                accessibilityHint="Long press to see the card"
                 onPress={() => onRingBearer(candidate.code)}
+                onLongPress={() => openCard(candidate.code)}
+                delayLongPress={350}
               >
                 {({ pressed }) => (
                   <View className="min-h-14 flex-row items-center gap-3 rounded-item px-3 py-2" style={rowSurface(pressed, t)}>
-                    <Portrait card={faceOf(candidate.code)} size={36} />
+                    {/* The hero tile's painting, square-cornered like the tiles above: no circle, no sphere ring. */}
+                    <View className="overflow-hidden rounded-control" importantForAccessibility="no-hide-descendants">
+                      <CroppedArt card={faceOf(candidate.code)} region={PAINTING} width={56 * s} height={40 * s} />
+                    </View>
                     <View className="flex-1">
                       <Text className="font-display text-heading text-bone">{candidate.name}</Text>
                       {candidate.packName ? <Text className="text-label text-muted">{candidate.packName}</Text> : null}

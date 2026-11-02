@@ -111,6 +111,8 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
 export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx: ReduceContext): string | null {
   if (suppliesNumber(intent)) return NUMBER;
   if (state.lost) return "The game is lost";
+  // Resigning is open to the table at any moment, a Peril lock or an eliminated active seat included.
+  if (intent.type === "Resign") return null;
   if (state.seats[state.activeSeat]?.eliminated) return "That seat is eliminated";
   const locked = perilLock(state);
   if (locked != null && state.activeSeat !== locked && !mandatory(state)) {
