@@ -389,8 +389,10 @@ export function shownSeat(game: ScenarioState, viewed: number | null): number {
 export function inspectTargets(game: ScenarioState, cardId: string): readonly string[] {
   const card = game.cards[cardId];
   if (!card) return [];
-  const host = card.host && game.cards[card.host] ? game.cards[card.host] : card;
-  if (!host) return [cardId];
+  // A card names its host only while the host lists it: a shadow card moved on (Stalking Goblin, "Shadow: Add ~ to the staging area") keeps its `host` after
+  // the enemy has dropped it, and previewing it must show the card itself, not that enemy.
+  const named = card.host ? game.cards[card.host] : undefined;
+  const host = named && (named.attachments.includes(cardId) || shadowCards(named).includes(cardId)) ? named : card;
   const under = [...host.attachments, ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
   return [host.id, ...under];
 }

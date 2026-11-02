@@ -130,7 +130,7 @@ Read the sections your task touches.
   - 257–266 Choice tray (~780) ← 2
   - 267–278 Reading panels (~960) ← 4
   - 279–288 Phase carousel (~670)
-  - 289–294 Quest advance (~480) ← 1
+  - 289–294 Quest advance (~510) ← 1
   - 295–298 Undo (~140)
   - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1

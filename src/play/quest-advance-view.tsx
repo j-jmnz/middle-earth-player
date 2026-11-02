@@ -33,6 +33,7 @@ export function QuestAdvanceView({
   asks,
   choice,
   picture,
+  onRead,
   onProgress,
 }: {
   card: PreviewCard;
@@ -43,6 +44,8 @@ export function QuestAdvanceView({
   asks: boolean;
   choice: TableChoice;
   picture: (code: string) => PictureSource | null;
+  // A long press on an option shows that card large over this screen (card-preview.tsx).
+  onRead: (cardId: string) => void;
   onProgress: () => void;
 }) {
   const screen = useWindowDimensions();
@@ -117,6 +120,7 @@ export function QuestAdvanceView({
                       testID={`quest-advance-option-${tile.id}`}
                       leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:advance`} width={32 * s} height={44 * s} /> : null}
                       onPress={() => choice.onTile(tile.id)}
+                      onLongPress={tile.readId ? () => onRead(tile.readId as string) : null}
                     />
                   );
                 })}

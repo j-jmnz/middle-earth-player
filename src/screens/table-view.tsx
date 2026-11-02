@@ -498,17 +498,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           onDismiss={choice.dismissBanner}
         />
       ) : null}
-      {preview && previewed && shown ? (
-        <CardPreview
-          key={preview.id}
-          card={shown}
-          related={previewed.cards.filter((_, index) => index !== previewed.start)}
-          onClose={() => setPreview(null)}
-          ownsBack={false}
-          closeRef={previewClose}
-          onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
-        />
-      ) : null}
       {advance.shown && advancedCard ? (
         <QuestAdvanceView
           key={advance.shown.seq}
@@ -518,7 +507,20 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           asks={advance.asks}
           choice={choice}
           picture={pictureOf}
+          onRead={onPreview}
           onProgress={advance.close}
+        />
+      ) : null}
+      {/* After the quest advance screen, so a card read from its options stands over it. */}
+      {preview && previewed && shown ? (
+        <CardPreview
+          key={preview.id}
+          card={shown}
+          related={previewed.cards.filter((_, index) => index !== previewed.start)}
+          onClose={() => setPreview(null)}
+          ownsBack={false}
+          closeRef={previewClose}
+          onDetails={(code) => router.push({ pathname: "/card/[code]", params: { code } })}
         />
       ) : null}
       {setupCards[0] ? (

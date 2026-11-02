@@ -44,6 +44,8 @@ export type PreviewCard = {
   text?: string | null;
   // The effects on the card now, in words, when it is on the table.
   effects?: readonly string[];
+  // The tokens on it now (table-preview.ts, tokenLines): "2 damage", "1 progress", "3 resources", "Exhausted".
+  tokens?: readonly string[];
   // How it sits with the first card: "Attachment", "Shadow card".
   role?: string;
   // Why a hand card cannot be played now (why.ts), when the tap that opened it found nothing to do.
@@ -124,7 +126,7 @@ export function CardPreview({
   const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
   // Upright, the cards with it are a strip under the card (user request, 2026-11-02: a quest card's side B was out of reach on a phone);
   // the card gives up the strip's height.
-  const strip = !wide && all.length > 1 ? touch(s, 44) + 16 * s : 0;
+  const strip = !wide ? (all.length > 1 ? touch(s, 44) + 16 * s : 0) + ((shown.tokens ?? []).length > 0 ? 36 * s : 0) : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
@@ -203,6 +205,11 @@ export function CardPreview({
               </Text>
               {shown.detail ? <Text testID="card-preview-detail" className="text-label text-muted">{shown.detail}</Text> : null}
               {shown.role ? <Text className="text-label text-muted">{shown.role}</Text> : null}
+              {(shown.tokens ?? []).length > 0 ? (
+                <Text testID="card-preview-tokens" className="mt-1 text-body text-accent">
+                  {(shown.tokens ?? []).join(" · ")}
+                </Text>
+              ) : null}
               <ScrollView style={{ flexShrink: 1 }} className="mt-2">
                 {shown.note ? (
                   <View testID="card-preview-why" className="mb-2">
@@ -273,6 +280,13 @@ export function CardPreview({
           </Animated.View>
         ) : (
           <>
+            {(shown.tokens ?? []).length > 0 ? (
+              <Animated.View style={[{ marginTop: 12 * s }, buttonsStyle]}>
+                <Text testID="card-preview-tokens" className="text-body text-accent">
+                  {(shown.tokens ?? []).join(" · ")}
+                </Text>
+              </Animated.View>
+            ) : null}
             {all.length > 1 ? (
               <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 * s }}>
