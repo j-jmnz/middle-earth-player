@@ -61,7 +61,9 @@ export type PreviewCard = {
 };
 
 // The card's picture, or (while it is not on the phone) its name and text on paper. The quest advance screen draws its stage with it.
-export function PreviewPicture({ card, width, height }: { card: PreviewCard; width: number; height: number }) {
+// `imageKey`: the picture's own key when two cards of one code are shown in turn (a quest card's sides A and B); its code otherwise.
+export function PreviewPicture({ card, width, height, imageKey }: { card: PreviewCard; width: number; height: number; imageKey?: string }) {
+  const key = imageKey ?? card.code;
   const turn = ((card.turn ?? 0) % 360 + 360) % 360;
   if (card.source && turn !== 0) {
     // A quarter or half turn: the picture is drawn at its own size about the frame's centre, so a sideways card fills a sideways frame.
@@ -71,13 +73,13 @@ export function PreviewPicture({ card, width, height }: { card: PreviewCard; wid
     return (
       <View style={{ width, height, alignItems: "center", justifyContent: "center" }}>
         <View style={{ width: w, height: h, transform: [{ rotate: `${-turn}deg` }] }}>
-          <CardImage source={card.source} recyclingKey={card.code} accessibilityLabel={card.name} width={w} height={h} />
+          <CardImage source={card.source} recyclingKey={key} accessibilityLabel={card.name} width={w} height={h} />
         </View>
       </View>
     );
   }
   return card.source ? (
-    <CardImage source={card.source} recyclingKey={card.code} accessibilityLabel={card.name} width={width} height={height} />
+    <CardImage source={card.source} recyclingKey={key} accessibilityLabel={card.name} width={width} height={height} />
   ) : (
     <ScrollView className="flex-1 px-5 py-6">
       <Text accessibilityRole="header" className="mb-4 text-center font-display text-title text-ink">
@@ -120,7 +122,10 @@ export function CardPreview({
   const roomH = screen.height - insets.top - insets.bottom;
   // A card turned a quarter turn (the Heading card) is drawn in a sideways frame, and its picture turned in it.
   const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
-  const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH, sideways, s);
+  // Upright, the cards with it are a strip under the card (user request, 2026-11-02: a quest card's side B was out of reach on a phone);
+  // the card gives up the strip's height.
+  const strip = !wide && all.length > 1 ? touch(s, 44) + 16 * s : 0;
+  const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
     if (scale > 0) progress.set(withSpring(1, springConfig(MOTION.previewIn, scale)));
@@ -163,7 +168,7 @@ export function CardPreview({
 
   const frame = (
     <Animated.View style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : cardCorner(size.width, size.height), overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
-      <PreviewPicture card={shown} width={size.width} height={size.height} />
+      <PreviewPicture card={shown} width={size.width} height={size.height} imageKey={`${shown.code}:${at}`} />
     </Animated.View>
   );
   const buttons = onDetails && shown.lostIsland !== true ? (
@@ -248,7 +253,7 @@ export function CardPreview({
                             style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
                           >
                             <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
-                              {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
+                              {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                             </View>
                             <View className="shrink">
                               <Text numberOfLines={1} className="text-body text-bone">
@@ -266,9 +271,41 @@ export function CardPreview({
               {buttons ? <View className="mt-2 flex-row gap-3">{buttons}</View> : null}
             </View>
           </Animated.View>
-        ) : buttons ? (
-          <Animated.View style={[{ flexDirection: "row", gap: 12 * s, marginTop: 16 * s }, buttonsStyle]}>{buttons}</Animated.View>
-        ) : null}
+        ) : (
+          <>
+            {all.length > 1 ? (
+              <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 * s }}>
+                  {all.map((item, index) => (
+                    <Pressable
+                      key={`${item.code}:${index}`}
+                      testID={`card-preview-related-${index}`}
+                      accessibilityRole="button"
+                      accessibilityLabel={item.role ? `${item.name}, ${item.role}` : item.name}
+                      accessibilityState={{ selected: index === at }}
+                      onPress={() => setAt(index)}
+                    >
+                      {({ pressed }) => (
+                        <View
+                          className="flex-row items-center gap-2 rounded-item px-2"
+                          style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
+                        >
+                          <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
+                            {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
+                          </View>
+                          <Text numberOfLines={1} className="text-label text-bone">
+                            {item.role ?? item.name}
+                          </Text>
+                        </View>
+                      )}
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </Animated.View>
+            ) : null}
+            {buttons ? <Animated.View style={[{ flexDirection: "row", gap: 12 * s, marginTop: 16 * s }, buttonsStyle]}>{buttons}</Animated.View> : null}
+          </>
+        )}
       </Pressable>
     </View>
   );
