@@ -75,6 +75,6 @@ void runScript("data:sync", async (log) => {
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(file, `${JSON.stringify({ sources: sorted }, null, 2)}\n`);
   log.info(`wrote ${path.relative(process.cwd(), file)}; run pnpm data:build next`);
-  // The booklet PDFs the app bundles come from the rules just fetched (.cache/booklets, read by metro.config.js).
+  // The booklet PDFs the app bundles come from the rules just fetched (assets/booklets, read by metro.config.js).
   if (ids.includes("rules")) await packBookletsHere(log.child("booklets"));
 });

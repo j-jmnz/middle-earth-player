@@ -10,14 +10,15 @@ for (const extension of ["wasm", "pdf"]) {
   if (!config.resolver.assetExts.includes(extension)) config.resolver.assetExts.push(extension);
 }
 
-// The booklet PDFs are not in git. `pnpm booklets:pack` writes them and a map that requires them to .cache/booklets;
+// The booklet PDFs are not in git. `pnpm booklets:pack` writes them and a map that requires them to assets/booklets
+// (gitignored; not a dot directory, which iOS would copy into the app as a hidden folder);
 // when that map exists, it is bundled in place of the empty stub in src/screens/booklets.
 const bookletStub = path.join(__dirname, "src/screens/booklets/bundled-map.ts");
-const bookletMap = path.join(__dirname, ".cache/booklets/bundled-map.ts");
+const bookletMap = path.join(__dirname, "assets/booklets/bundled-map.ts");
 // Said once per Metro start, so a bundle without the books is never a surprise.
 console.log(
   fs.existsSync(bookletMap)
-    ? "booklets: bundling the packed PDFs from .cache/booklets"
+    ? "booklets: bundling the packed PDFs from assets/booklets"
     : "booklets: not packed, so this bundle carries none. Run pnpm booklets:pack, then restart Metro with --clear.",
 );
 const resolveRequest = config.resolver.resolveRequest;

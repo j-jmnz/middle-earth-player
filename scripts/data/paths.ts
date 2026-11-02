@@ -7,4 +7,6 @@ export const RAW_DIR = path.join(DATA_DIR, "raw");
 export const PDF_CACHE_DIR = path.join(ROOT, ".cache", "pdf");
 export const SCAN_CACHE_DIR = path.join(ROOT, ".cache", "scans");
 export const PICTURE_CACHE_DIR = path.join(ROOT, ".cache", "pictures");
-export const BOOKLET_CACHE_DIR = path.join(ROOT, ".cache", "booklets");
+// Not under a dot directory: iOS copies a bundled asset into the app at its project path, and a hidden `.cache` folder there
+// left the release IPA without its booklets (Android flattens the path into a resource name, so it was not affected).
+export const BOOKLET_PACK_DIR = path.join(ROOT, "assets", "booklets");

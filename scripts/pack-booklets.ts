@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { BOOKLETS, type BookletId } from "../src/screens/booklets/books.ts";
-import { BOOKLET_CACHE_DIR, DATA_DIR, PDF_CACHE_DIR } from "./data/paths.ts";
+import { BOOKLET_PACK_DIR, DATA_DIR, PDF_CACHE_DIR } from "./data/paths.ts";
 import { fetchBytes, sha256, type SourceRecord } from "./data/sources/fetch.ts";
 import { bytes, describeError, runScript, type Log } from "./log.ts";
 
@@ -77,9 +77,9 @@ function writeBookletMap(mapPath: string, packed: readonly PackedBooklet[]): voi
   );
 }
 
-/** Packs from this checkout's pins and PDF cache into `.cache/booklets`. `data:sync rules` runs it after a fetch. */
+/** Packs from this checkout's pins and PDF cache into `assets/booklets`. `data:sync rules` runs it after a fetch. */
 export function packBookletsHere(log: Log): Promise<PackedBooklet[]> {
-  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_CACHE_DIR }, log);
+  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR }, log);
 }
 
 function isDirectRun(): boolean {

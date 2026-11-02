@@ -58,8 +58,9 @@ agent-tools/
 **/ringsdb/**
 !data/raw/ringsdb/**
 
-# booklet PDFs
+# booklet PDFs, and the map pnpm booklets:pack writes beside them
 *.pdf
+assets/booklets/
 
 # card images; shell icons stay
 *.jpg
