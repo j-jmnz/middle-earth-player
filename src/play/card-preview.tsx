@@ -20,7 +20,7 @@ import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
-import { previewSideSize, previewSize } from "./preview-size.ts";
+import { previewSideSize, previewSize, STRIP_GAP, STRIP_ITEM_H, STRIP_ITEM_W, stripGrid } from "./preview-size.ts";
 import { SecondaryButton } from "./buttons.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { cardCorner } from "./card-corner.ts";
@@ -124,7 +124,9 @@ export function CardPreview({
   const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
   // Upright, the cards with it are a strip under the card (user request, 2026-11-02: a quest card's side B was out of reach on a phone);
   // the card gives up the strip's height.
-  const strip = !wide && all.length > 1 ? touch(s, 44) + 16 * s : 0;
+  // The strip wraps onto as many rows as the width needs, so no card runs off the screen (user request, 2026-11-02).
+  const grid = !wide && all.length > 1 ? stripGrid(all.length, roomW - 32 * s, s) : null;
+  const strip = grid ? grid.height + 16 * s : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
@@ -273,34 +275,35 @@ export function CardPreview({
           </Animated.View>
         ) : (
           <>
-            {all.length > 1 ? (
-              <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 * s }}>
-                  {all.map((item, index) => (
-                    <Pressable
-                      key={`${item.code}:${index}`}
-                      testID={`card-preview-related-${index}`}
-                      accessibilityRole="button"
-                      accessibilityLabel={item.role ? `${item.name}, ${item.role}` : item.name}
-                      accessibilityState={{ selected: index === at }}
-                      onPress={() => setAt(index)}
-                    >
-                      {({ pressed }) => (
-                        <View
-                          className="flex-row items-center gap-2 rounded-item px-2"
-                          style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
-                        >
-                          <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
-                            {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
-                          </View>
-                          <Text numberOfLines={1} className="text-label text-bone">
-                            {item.role ?? item.name}
-                          </Text>
+            {grid ? (
+              <Animated.View
+                testID="card-preview-attached"
+                style={[{ marginTop: 16 * s, width: grid.width, flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: STRIP_GAP * s }, buttonsStyle]}
+              >
+                {all.map((item, index) => (
+                  <Pressable
+                    key={`${item.code}:${index}`}
+                    testID={`card-preview-related-${index}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={item.role ? `${item.name}, ${item.role}` : item.name}
+                    accessibilityState={{ selected: index === at }}
+                    onPress={() => setAt(index)}
+                  >
+                    {({ pressed }) => (
+                      <View
+                        className="items-center rounded-item"
+                        style={{ width: STRIP_ITEM_W * s, height: STRIP_ITEM_H * s, paddingTop: 4 * s, backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
+                      >
+                        <View style={{ width: 28 * s, height: 39 * s, borderRadius: cardCorner(28 * s, 39 * s), overflow: "hidden", backgroundColor: t.raised }}>
+                          {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 28 * s, height: 39 * s }} /> : null}
                         </View>
-                      )}
-                    </Pressable>
-                  ))}
-                </ScrollView>
+                        <Text numberOfLines={1} className="mt-0.5 text-micro text-bone" style={{ maxWidth: (STRIP_ITEM_W - 4) * s }}>
+                          {item.role ?? item.name}
+                        </Text>
+                      </View>
+                    )}
+                  </Pressable>
+                ))}
               </Animated.View>
             ) : null}
             {buttons ? <Animated.View style={[{ flexDirection: "row", gap: 12 * s, marginTop: 16 * s }, buttonsStyle]}>{buttons}</Animated.View> : null}

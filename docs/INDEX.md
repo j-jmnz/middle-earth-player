@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1
   - 314–317 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~23.0K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~23.1K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -154,7 +154,7 @@ Read the sections your task touches.
     - 264–279 Campaigns (campaign list) (~1.3K) ← 5
     - 280–293 Scenarios (~740) ← 1
     - 294–305 History (~1.4K) ← 4
-    - 306–323 Briefing (~1.5K) ← 3
+    - 306–323 Briefing (~1.6K) ← 3
     - 324–327 Campaign setup (~700) ← 3
     - 328–333 Campaign path (~530) ← 2
     - 334–337 Campaign log (~330) ← 1

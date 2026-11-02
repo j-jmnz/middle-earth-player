@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { inspectSize, previewSideSize, previewSize } from "./preview-size.ts";
+import { inspectSize, previewSideSize, previewSize, STRIP_GAP, STRIP_ITEM_W, stripGrid } from "./preview-size.ts";
 
 describe("the long-press preview", () => {
   it("fills a phone's width with a portrait card and leaves room for the buttons", () => {
@@ -50,5 +50,25 @@ describe("the Card screen's picture", () => {
     const large = inspectSize(700 * 1.15, 900 * 1.15, 1.15);
     expect(large.width).toBe(Math.round(base.width * 1.15));
     expect(large.height).toBe(Math.round(base.height * 1.15));
+  });
+});
+
+describe("the upright preview's strip of other cards (user request, 2026-11-02)", () => {
+  it("never runs wider than its room, and shares the items evenly among the fewest rows", () => {
+    for (const s of [0.875, 1, 1.15]) {
+      for (const room of [288, 328, 358, 600]) {
+        for (let count = 2; count <= 12; count += 1) {
+          const grid = stripGrid(count, room, s);
+          expect(grid.width, `${s} ${room} ${count}`).toBeLessThanOrEqual(room + 1e-9);
+          expect(grid.perRow * grid.rows).toBeGreaterThanOrEqual(count);
+          // No row could be dropped: one fewer row would not hold them at the most a row fits.
+          const most = Math.floor((room + STRIP_GAP * s) / ((STRIP_ITEM_W + STRIP_GAP) * s));
+          if (grid.rows > 1) expect(most * (grid.rows - 1)).toBeLessThan(count);
+        }
+      }
+    }
+    // Six stages' sides on a 390 pt phone: two rows of three, not five and one.
+    expect(stripGrid(6, 358, 1)).toMatchObject({ perRow: 3, rows: 2 });
+    expect(stripGrid(2, 358, 1)).toMatchObject({ perRow: 2, rows: 1 });
   });
 });

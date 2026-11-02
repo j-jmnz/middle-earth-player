@@ -46,3 +46,18 @@ export function inspectSize(paneWidth: number, paneHeight: number, scale = 1): {
   const w = Math.min(roomW, roomH * CARD_ASPECT, INSPECT_MAX);
   return { width: Math.round(w * scale), height: Math.round((w / CARD_ASPECT) * scale) };
 }
+
+// One item of the upright strip (a thumbnail over its label) and the space between items, in Medium's points; an item is a 44 pt target.
+export const STRIP_ITEM_W = 60;
+export const STRIP_ITEM_H = 62;
+export const STRIP_GAP = 6;
+
+/** The upright strip as a grid that fits `room` wide: the fewest rows that hold every item, the items shared evenly among them, and its width and height. */
+export function stripGrid(count: number, room: number, s: number): { perRow: number; rows: number; width: number; height: number } {
+  const step = (STRIP_ITEM_W + STRIP_GAP) * s;
+  const most = Math.max(1, Math.min(count, Math.floor((room + STRIP_GAP * s) / step)));
+  // The rows it takes, then the items shared evenly among them (six in two rows of three, not five and one).
+  const rows = Math.ceil(count / most);
+  const perRow = Math.ceil(count / rows);
+  return { perRow, rows, width: perRow * step - STRIP_GAP * s, height: rows * STRIP_ITEM_H * s + (rows - 1) * STRIP_GAP * s };
+}
