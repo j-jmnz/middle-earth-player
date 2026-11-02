@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1
   - 314–317 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~23.0K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~23.1K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -149,29 +149,30 @@ Read the sections your task touches.
   - 206–220 Icons (~480) ← 6
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
-  - 256–429 Screens (~12.4K)
-    - 260–263 Splash (~30)
-    - 264–279 Campaigns (campaign list) (~1.3K) ← 5
-    - 280–293 Scenarios (~740) ← 1
-    - 294–305 History (~1.4K) ← 4
-    - 306–323 Briefing (~1.5K) ← 3
-    - 324–327 Campaign setup (~700) ← 3
-    - 328–333 Campaign path (~530) ← 2
-    - 334–337 Campaign log (~330) ← 1
-    - 338–341 Spend XP (~610) ← 1
-    - 342–345 Table — landscape (~130) ← 1
-    - 346–357 Resolution and standalone outcome (~980) ← 1
-    - 358–365 Decks (~510) ← 1
-    - 366–375 Deck builder (deck editor) (~790) ← 3
-    - 376–385 Card pool (the Cards tab) (~700) ← 3
-    - 386–391 Card (~480) ← 2
-    - 392–397 Packs and pack cards (~130)
-    - 398–411 Settings (~730)
-    - 412–417 Rules (~450) ← 1
-    - 418–421 Rule (~220) ← 1
-    - 422–425 Booklet (~100)
-    - 426–429 Database (~20)
-  - 430–449 States (~590)
+  - 256–433 Screens (~12.5K)
+    - 260–263 Splash (~20)
+    - 264–267 App icon (~80)
+    - 268–283 Campaigns (campaign list) (~1.3K) ← 5
+    - 284–297 Scenarios (~740) ← 1
+    - 298–309 History (~1.4K) ← 4
+    - 310–327 Briefing (~1.5K) ← 3
+    - 328–331 Campaign setup (~700) ← 3
+    - 332–337 Campaign path (~530) ← 2
+    - 338–341 Campaign log (~330) ← 1
+    - 342–345 Spend XP (~610) ← 1
+    - 346–349 Table — landscape (~130) ← 1
+    - 350–361 Resolution and standalone outcome (~980) ← 1
+    - 362–369 Decks (~510) ← 1
+    - 370–379 Deck builder (deck editor) (~790) ← 3
+    - 380–389 Card pool (the Cards tab) (~700) ← 3
+    - 390–395 Card (~480) ← 2
+    - 396–401 Packs and pack cards (~130)
+    - 402–415 Settings (~730)
+    - 416–421 Rules (~450) ← 1
+    - 422–425 Rule (~220) ← 1
+    - 426–429 Booklet (~100)
+    - 430–433 Database (~20)
+  - 434–453 States (~590)
 
 ## Phases
 
