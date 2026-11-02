@@ -65,7 +65,7 @@ Values live in `src/screens/palette.js`. `tailwind.config.js` maps them to utili
 | onAccent | `#0C1014` | `#F7F1E3` | Text on the primary; the switch's knob when on |
 | moon | `#8FA894` | `#725219` | Section headings, overlines |
 | ok | `#8FBF7A` | `#3B6B2C` | Ready to play, Won · score, Ahead |
-| paper / paperPressed / paperEdge | `#E6DCC6` / `#D2C4A6` / `#A8977A` | same | Parchment, lit in the middle and burnt at the rim (`parchmentSurface`); splash background |
+| paper / paperPressed / paperEdge | `#E6DCC6` / `#D2C4A6` / `#A8977A` | same | Parchment, lit in the middle and burnt at the rim (`parchmentSurface`) |
 | ink / inkMuted / inkLabel / inkLine | `#221E17` / `#5C4F3D` / `#6B4E1C` / `#4A3A24` | same | Ink on parchment; inkLine is drawn at 25 to 40% for the log's rules |
 | felt / feltLight | `#030405` / `#0C0F12` | `#E4DCCB` / `#F2EBDC` | The table's ground, kept for the panels that name it; the canvas itself is transparent over the fog |
 | threat / onThreat / threatEdge | `#D35537` / `#FBD9CC` / `#7A2214` | `#B8432C` / `#FFF4EC` / `#8F2A17` | The threat dial and the quest scale's threat dial, the engaged haze, an attacking enemy, a failure's banner edge |
@@ -259,7 +259,7 @@ Route files named below, such as `(tabs)/index.tsx` or `rule/[id].tsx`, are unde
 
 ### Splash
 
-Paper (`#E6DCC6`) with one ink ring. No card art.
+Black (`#000000`) with the app icon's glowing white ring (`assets/images/splash-icon.png`, 120 wide), so the icon opens into the same picture. No card art.
 
 ### App icon
 

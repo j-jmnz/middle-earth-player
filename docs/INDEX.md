@@ -150,7 +150,7 @@ Read the sections your task touches.
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
   - 256–433 Screens (~12.5K)
-    - 260–263 Splash (~20)
+    - 260–263 Splash (~40)
     - 264–267 App icon (~80)
     - 268–283 Campaigns (campaign list) (~1.3K) ← 5
     - 284–297 Scenarios (~740) ← 1
