@@ -21,10 +21,12 @@ import { Text } from "../play/text";
 // The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };
 
-// The scene each book's tile opens on: the first scenario it prints. The Rules Reference has none and shows the fog.
+// The scene each book's tile opens on: the first scenario it prints. The Rules Reference prints none, so it takes the core box's
+// second scenario, a scene no other tile shows.
 const BOOK_SCENE: Readonly<Record<string, string>> = {
   "fellowship-of-the-ring": "a-shadow-of-the-past",
   "learn-to-play": "passage-through-mirkwood",
+  "rules-reference": "journey-along-the-anduin",
   "the-dark-of-mirkwood": "the-oath",
   "dream-chaser": "voyage-across-belegaer",
 };
