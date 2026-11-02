@@ -8,7 +8,7 @@ import { buildTable, idsOf, sceneCards } from "../../scripts/test-scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
 import { seaFixture } from "./sea-fixture.ts";
-import { previewCards, questTitle } from "./table-preview.ts";
+import { previewCards, questTitle, tokenLines } from "./table-preview.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
 
@@ -68,5 +68,38 @@ describe("the Heading card's preview (dcce.heading)", () => {
     expect(shown?.steps?.map((row) => row.text)).toEqual(["Sun: on-course", "Cloud: off-course", "Rain: off-course", "Storm: off-course, the worst"]);
     expect(shown?.steps?.filter((row) => row.current).map((row) => row.text)).toEqual(["Rain: off-course"]);
     expect((shown?.effects ?? []).some((line) => line.includes("Sun: on-course"))).toBe(false);
+  });
+});
+
+describe("the tokens on a previewed card", () => {
+  it("lists damage, progress, resources and exhaustion, and nothing for a bare card", () => {
+    expect(tokenLines({ damage: 2, progress: 0, resources: 1, exhausted: true, committed: false })).toEqual(["2 damage", "1 resource", "Exhausted"]);
+    expect(tokenLines({ damage: 0, progress: 3, resources: 4, exhausted: false, committed: true })).toEqual(["3 progress", "4 resources", "Committed"]);
+    expect(tokenLines({ damage: 0, progress: 0, resources: 0, exhausted: false, committed: false })).toEqual([]);
+  });
+
+  it("is on the previewed card", () => {
+    const table = buildTable(base, { stage: "141022", staging: ["f0"] });
+    const id = idsOf(table, "f0");
+    const hurt = updateCard(table.state, id, { damage: 2 });
+    const shown = previewCards(hurt, table.ctx, id, describeCode, (name) => name, [], ledgerLine);
+    expect(shown.cards[shown.start]?.tokens).toEqual(["2 damage"]);
+  });
+
+  it("opens a shadow card that left its enemy as itself, not as the enemy it still names as host", () => {
+    const table = buildTable(base, { stage: "141022", staging: ["f0", "f0"] });
+    const [enemy, moved] = table.ids.f0 as [string, string];
+    const stale = updateCard(table.state, moved, { host: enemy });
+    const shown = previewCards(stale, table.ctx, moved, describeCode, (name) => name, [], ledgerLine);
+    expect(shown.cards.map((card) => card.code)).toEqual([stale.cards[moved]?.code]);
+  });
+
+  it("still opens a shadow card its enemy lists on the enemy first, at the shadow card", () => {
+    const table = buildTable(base, { stage: "141022", staging: ["f0", "f0"] });
+    const [enemy, dealt] = table.ids.f0 as [string, string];
+    const linked = updateCard(updateCard(table.state, dealt, { host: enemy, zone: "shadow", face: "up" }), enemy, { shadowId: dealt });
+    const shown = previewCards(linked, table.ctx, dealt, describeCode, (name) => name, [], ledgerLine);
+    expect(shown.start).toBe(1);
+    expect(shown.cards.map((card) => card.code)).toEqual([linked.cards[enemy]?.code, linked.cards[dealt]?.code]);
   });
 });

@@ -3,6 +3,7 @@
 import { stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
 import { isLostIsland } from "../rules/families/uncharted-pick.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import type { CardInstance } from "../rules/state.ts";
 
 
 import { dungeonDetail } from "./dungeon-preview.ts";
@@ -40,6 +41,20 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
 }
 
 /**
+ * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
+ * quest. Empty for a card with none (a card in the hand, a fresh enemy).
+ */
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">): string[] {
+  return [
+    ...(card.damage > 0 ? [`${card.damage} damage`] : []),
+    ...(card.progress > 0 ? [`${card.progress} progress`] : []),
+    ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
+    ...(card.exhausted ? ["Exhausted"] : []),
+    ...(card.committed ? ["Committed"] : []),
+  ];
+}
+
+/**
  * The cards the preview lists, and which of them it opens on. `extra` adds cards that are not on the table (Look). `line` reads a
  * printed line of the ledger by id, for the quest stage's objective.
  */
@@ -73,7 +88,8 @@ export function previewCards(
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
-    return [{ code: card.code, ...described, ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(lostIsland ? { lostIsland } : {}), ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
+    const tokens = tokenLines(card);
+    return [{ code: card.code, ...described, ...(tokens.length > 0 ? { tokens } : {}), ...(detail ? { detail } : {}), ...questTitle(game, ctx, id, described.name, line), ...turned, ...steps, effects, ...(lostIsland ? { lostIsland } : {}), ...(role ? { role } : {}), ...(note ? { note } : {}), ...(refusal && note === refusal ? { noteTitle: "Cannot be chosen now" } : {}) }];
   });
   return { cards, start: Math.max(0, ids.indexOf(cardId)) };
 }
