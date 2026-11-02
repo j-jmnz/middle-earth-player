@@ -72,7 +72,7 @@ export default function Scenarios() {
 
   const othersBlock =
     others.length > 0 ? (
-      <OtherRuns testID="other-games" title="Other games">
+      <OtherRuns testID="other-games" title="Other games" fold={{ id: "other-games", ...fold("other-games") }}>
         {others.map((game) => (
           <RunRow
             key={game.id}

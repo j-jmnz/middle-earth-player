@@ -153,7 +153,7 @@ Read the sections your task touches.
     - 260–263 Splash (~40)
     - 264–267 App icon (~80)
     - 268–283 Campaigns (campaign list) (~1.4K) ← 5
-    - 284–297 Scenarios (~740) ← 1
+    - 284–297 Scenarios (~760) ← 1
     - 298–309 History (~1.4K) ← 4
     - 310–327 Briefing (~1.6K) ← 3
     - 328–331 Campaign setup (~700) ← 3
@@ -178,15 +178,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.4K tok)
+- `docs/phases/STATUS.md` — Phase status (~6.5K tok)
   - 5–16 Rules (~540)
   - 17–75 Phases (~2.1K)
-  - 76–153 Open items (~3.3K)
+  - 76–154 Open items (~3.4K)
     - 78–90 Fixtures and Maestro (~500)
     - 91–118 Rules and engine (~840)
     - 119–135 Screens and code (~810)
-    - 136–153 Phone and tablet checks (~1.1K)
-  - 154–169 Standing decisions (~380)
+    - 136–154 Phone and tablet checks (~1.2K)
+  - 155–170 Standing decisions (~380)
 - `docs/phases/phase-00-correct-the-brief.md` — Phase 0 — Correct the brief (~1.3K tok)
 - `docs/phases/phase-01-tooling-shell.md` — Phase 1 — Tooling shell (~670 tok)
 - `docs/phases/phase-02-catalog-build.md` — Phase 2 — Catalog build (~600 tok)
