@@ -109,6 +109,7 @@ export function QuestAdvanceView({
               <ScrollView style={{ flexShrink: 1, marginTop: 8 * s }} showsVerticalScrollIndicator={false}>
                 {tiles.map((tile) => {
                   const source = tile.code ? picture(tile.code) : null;
+                  const readId = tile.readId;
                   return (
                     <Tile
                       key={tile.id}
@@ -120,11 +121,12 @@ export function QuestAdvanceView({
                       testID={`quest-advance-option-${tile.id}`}
                       leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:advance`} width={32 * s} height={44 * s} /> : null}
                       onPress={() => choice.onTile(tile.id)}
-                      onLongPress={tile.readId ? () => onRead(tile.readId as string) : null}
+                      onLongPress={readId ? () => onRead(readId) : null}
                     />
                   );
                 })}
               </ScrollView>
+              {tiles.some((tile) => tile.readId) ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               <View className="mt-2">
                 <DockButtons key={choice.resetKey} dock={choice.dock} picked={choice.picked} onButton={choice.onButton} />
               </View>

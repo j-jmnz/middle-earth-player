@@ -50,7 +50,7 @@ export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "res
     ...(card.progress > 0 ? [`${card.progress} progress`] : []),
     ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
     ...(card.exhausted ? ["Exhausted"] : []),
-    ...(card.committed ? ["Committed to the quest"] : []),
+    ...(card.committed ? ["Committed"] : []),
   ];
 }
 

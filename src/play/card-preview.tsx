@@ -126,7 +126,7 @@ export function CardPreview({
   const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
   // Upright, the cards with it are a strip under the card (user request, 2026-11-02: a quest card's side B was out of reach on a phone);
   // the card gives up the strip's height.
-  const strip = !wide ? (all.length > 1 ? touch(s, 44) + 16 * s : 0) + ((shown.tokens ?? []).length > 0 ? 36 * s : 0) : 0;
+  const strip = !wide ? (all.length > 1 ? touch(s, 44) + 16 * s : 0) + (all.some((item) => (item.tokens ?? []).length > 0) ? 12 * s + 40 * s : 0) : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
@@ -281,8 +281,8 @@ export function CardPreview({
         ) : (
           <>
             {(shown.tokens ?? []).length > 0 ? (
-              <Animated.View style={[{ marginTop: 12 * s }, buttonsStyle]}>
-                <Text testID="card-preview-tokens" className="text-body text-accent">
+              <Animated.View style={[{ marginTop: 12 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
+                <Text testID="card-preview-tokens" numberOfLines={2} className="text-center text-body text-accent">
                   {(shown.tokens ?? []).join(" · ")}
                 </Text>
               </Animated.View>

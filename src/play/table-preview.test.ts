@@ -74,7 +74,7 @@ describe("the Heading card's preview (dcce.heading)", () => {
 describe("the tokens on a previewed card", () => {
   it("lists damage, progress, resources and exhaustion, and nothing for a bare card", () => {
     expect(tokenLines({ damage: 2, progress: 0, resources: 1, exhausted: true, committed: false })).toEqual(["2 damage", "1 resource", "Exhausted"]);
-    expect(tokenLines({ damage: 0, progress: 3, resources: 4, exhausted: false, committed: true })).toEqual(["3 progress", "4 resources", "Committed to the quest"]);
+    expect(tokenLines({ damage: 0, progress: 3, resources: 4, exhausted: false, committed: true })).toEqual(["3 progress", "4 resources", "Committed"]);
     expect(tokenLines({ damage: 0, progress: 0, resources: 0, exhausted: false, committed: false })).toEqual([]);
   });
 
@@ -92,5 +92,14 @@ describe("the tokens on a previewed card", () => {
     const stale = updateCard(table.state, moved, { host: enemy });
     const shown = previewCards(stale, table.ctx, moved, describeCode, (name) => name, [], ledgerLine);
     expect(shown.cards.map((card) => card.code)).toEqual([stale.cards[moved]?.code]);
+  });
+
+  it("still opens a shadow card its enemy lists on the enemy first, at the shadow card", () => {
+    const table = buildTable(base, { stage: "141022", staging: ["f0", "f0"] });
+    const [enemy, dealt] = table.ids.f0 as [string, string];
+    const linked = updateCard(updateCard(table.state, dealt, { host: enemy, zone: "shadow", face: "up" }), enemy, { shadowId: dealt });
+    const shown = previewCards(linked, table.ctx, dealt, describeCode, (name) => name, [], ledgerLine);
+    expect(shown.start).toBe(1);
+    expect(shown.cards.map((card) => card.code)).toEqual([linked.cards[enemy]?.code, linked.cards[dealt]?.code]);
   });
 });
