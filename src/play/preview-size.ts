@@ -61,3 +61,13 @@ export function stripGrid(count: number, room: number, s: number): { perRow: num
   const perRow = Math.ceil(count / rows);
   return { perRow, rows, width: perRow * step - STRIP_GAP * s, height: rows * STRIP_ITEM_H * s + (rows - 1) * STRIP_GAP * s };
 }
+
+/** The height an upright preview keeps under its card and strip, in Medium's points: the Details row (a 44 pt target), the 16 pt above it and a margin. */
+export const UPRIGHT_FOOT = 76;
+
+/** A card size shrunk, keeping its shape, to at most `height` tall; unchanged when it fits. */
+export function fitInRoom(size: { width: number; height: number }, height: number): { width: number; height: number } {
+  if (size.height <= height || size.height <= 0) return size;
+  const k = Math.max(0, height) / size.height;
+  return { width: Math.round(size.width * k), height: Math.round(size.height * k) };
+}

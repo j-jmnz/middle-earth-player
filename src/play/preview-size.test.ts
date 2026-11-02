@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { inspectSize, previewSideSize, previewSize, STRIP_GAP, STRIP_ITEM_W, stripGrid } from "./preview-size.ts";
+import { inspectSize, previewSideSize, previewSize, STRIP_GAP, STRIP_ITEM_W, stripGrid, fitInRoom } from "./preview-size.ts";
 
 describe("the long-press preview", () => {
   it("fills a phone's width with a portrait card and leaves room for the buttons", () => {
@@ -70,5 +70,14 @@ describe("the upright preview's strip of other cards (user request, 2026-11-02)"
     // Six stages' sides on a 390 pt phone: two rows of three, not five and one.
     expect(stripGrid(6, 358, 1)).toMatchObject({ perRow: 3, rows: 2 });
     expect(stripGrid(2, 358, 1)).toMatchObject({ perRow: 2, rows: 1 });
+  });
+});
+
+describe("fitInRoom", () => {
+  it("leaves a card that fits, and shrinks one that does not to the room, keeping its shape", () => {
+    expect(fitInRoom({ width: 358, height: 252 }, 400)).toEqual({ width: 358, height: 252 });
+    const shrunk = fitInRoom({ width: 358, height: 252 }, 126);
+    expect(shrunk).toEqual({ width: 179, height: 126 });
+    expect(fitInRoom({ width: 100, height: 140 }, -10)).toEqual({ width: 0, height: 0 });
   });
 });

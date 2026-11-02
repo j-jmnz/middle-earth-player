@@ -20,7 +20,7 @@ import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "./motion-run.ts";
 import { MOTION } from "./motion-tokens.ts";
-import { previewSideSize, previewSize, STRIP_GAP, STRIP_ITEM_H, STRIP_ITEM_W, stripGrid } from "./preview-size.ts";
+import { fitInRoom, previewSideSize, previewSize, STRIP_GAP, STRIP_ITEM_H, STRIP_ITEM_W, stripGrid, UPRIGHT_FOOT } from "./preview-size.ts";
 import { SecondaryButton } from "./buttons.tsx";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { cardCorner } from "./card-corner.ts";
@@ -127,7 +127,10 @@ export function CardPreview({
   // The strip wraps onto as many rows as the width needs, so no card runs off the screen (user request, 2026-11-02).
   const grid = !wide && all.length > 1 ? stripGrid(all.length, roomW - 32 * s, s) : null;
   const strip = grid ? grid.height + 16 * s : 0;
-  const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
+  // Upright, the card, the strip and the Details row never pass the safe area's top or foot whatever the UI scale (user request,
+  // 2026-11-02): past the room they leave, the card shrinks (fitInRoom).
+  const upright = previewSize(screen.width, roomH - strip, sideways, s);
+  const size = wide ? previewSideSize(roomW, roomH, sideways, s) : fitInRoom(upright, roomH - strip - UPRIGHT_FOOT * s);
 
   useEffect(() => {
     if (scale > 0) progress.set(withSpring(1, springConfig(MOTION.previewIn, scale)));
@@ -291,8 +294,8 @@ export function CardPreview({
                   >
                     {({ pressed }) => (
                       <View
-                        className="items-center rounded-item"
-                        style={{ width: STRIP_ITEM_W * s, height: STRIP_ITEM_H * s, paddingTop: 4 * s, backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
+                        // The corners and the clip are styles, not classes, so the highlight stays rounded on the phone and holds its contents.
+                        style={{ width: STRIP_ITEM_W * s, height: STRIP_ITEM_H * s, alignItems: "center", justifyContent: "center", borderRadius: 12 * s, overflow: "hidden", backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
                       >
                         <View style={{ width: 28 * s, height: 39 * s, borderRadius: cardCorner(28 * s, 39 * s), overflow: "hidden", backgroundColor: t.raised }}>
                           {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 28 * s, height: 39 * s }} /> : null}
