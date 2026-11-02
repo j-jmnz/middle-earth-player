@@ -15,14 +15,13 @@ import { editSavedDeck } from "./deck-draft";
 import { emptyDeckListFilter, useDeckListView } from "./deck-list";
 import { DeckListBar } from "./deck-list-bar";
 import { deckCountLine, deckShortLine, notAppliedCards, notAppliedLine } from "./deck-status";
-import { DeckCover, DeckRow, HeroTile, heroFace, type HeroFace } from "./hero-tile";
+import { DeckCover, DeckRow, HeroTile, heroFace, PARTY_TILE_HEIGHT, type HeroFace } from "./hero-tile";
 import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
 import { Text } from "../play/text";
 
 const COVER_HEIGHT = 112;
-const TOOL_HEIGHT = 128;
 
 /**
  * One seat's fellowship. Until a deck is picked, and while it is being changed, the seat lists the saved decks with the Decks
@@ -183,11 +182,11 @@ export function SeatPicker({
           {short ? <Label>{short}</Label> : null}
           <View className="mt-3.5 flex-row gap-2">
             {heroes.map((code) => (
-              <HeroTile key={code} hero={faceOf(code)} height={TOOL_HEIGHT * s} dense ringBearer={!slot && carries(code)} />
+              <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} />
             ))}
             {slot ? (
               ringBearer ? (
-                <HeroTile hero={faceOf(ringBearer)} height={TOOL_HEIGHT * s} dense ringBearer onRemove={() => onRingBearer(null)} />
+                <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onRemove={() => onRingBearer(null)} />
               ) : (
                 // The fourth place stays as room, so the tiles keep their width when the Ring-bearer is picked.
                 <View className="flex-1" />

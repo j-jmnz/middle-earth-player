@@ -22,6 +22,9 @@ export type HeroFace = {
   imagesrc: string | null;
 };
 
+/** A party's hero tile height in Medium's points: the briefing's picked fellowship and History's runs show the same tiles (dense, three or four to a row). */
+export const PARTY_TILE_HEIGHT = 128;
+
 /** The face of a hero the catalog lacks: its code (or a name the caller knows), with no sphere and no picture. */
 export function heroFace(faces: ReadonlyMap<string, HeroFace>, code: string, name: string = code): HeroFace {
   return faces.get(code) ?? { code, name, sphereCode: null, sphereName: null, imagesrc: null };

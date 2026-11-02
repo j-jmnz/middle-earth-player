@@ -162,7 +162,8 @@ export function HistoryView({ initial }: { initial: RunKind }) {
   };
 
   // A live or archived card starts Manage on a long press, as a deck does; while managing it shows its head alone, so the list scans.
-  const card = (testID: string, state: CardState, words: CardWords, listed: readonly RunRecord[], open: { onPress: () => void; verb: string } | null, footer: ReactNode) => (
+  // `party`: a game's heroes by seat, shown as tiles under its lines (a playthrough's show under each of its runs).
+  const card = (testID: string, state: CardState, words: CardWords, listed: readonly RunRecord[], open: { onPress: () => void; verb: string } | null, footer: ReactNode, party?: readonly (readonly string[])[] | null) => (
     <HistoryCard
       testID={testID}
       state={state}
@@ -172,6 +173,8 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       lead={leadFace(faces, words.firstHero, palette)}
       runs={managing ? [] : listed}
       nameOf={nameOf}
+      faces={faces}
+      party={managing ? null : (party ?? null)}
       accessibilityLabel={open ? `${open.verb} ${words.spoken}` : words.spoken}
       onPress={open?.onPress ?? null}
       onLongPress={state === "gone" ? null : startManaging}
@@ -240,6 +243,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
               [],
               open ? { onPress: go(gameHref(item.game, open.to)), verb: open.verb } : null,
               actions(entry, item.archived),
+              item.run?.heroes ?? item.game.loadout?.seats.map((seat) => seat.heroes) ?? null,
             )}
           </View>
         );
@@ -249,7 +253,8 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         if (!words) return null;
         // A game's one run is worded in its card's lines; a playthrough's runs are listed under its name.
         const listed = item.runs[0]?.kind === "campaign" ? item.runs : [];
-        return <View className="pb-3">{card(item.id, "gone", words, listed, null, null)}</View>;
+        const party = listed.length === 0 ? (item.runs[0]?.heroes ?? null) : null;
+        return <View className="pb-3">{card(item.id, "gone", words, listed, null, null, party)}</View>;
       }
     }
   };
@@ -264,7 +269,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       <View className="min-h-0 flex-1" testID="history-list" onLayout={list.onLayout}>
         <FlashList
           data={items}
-          extraData={{ library, managing, asking, nameOf }}
+          extraData={{ library, managing, asking, nameOf, faces }}
           keyExtractor={(item) => item.id}
           getItemType={(item) => item.type}
           style={{ flex: 1 }}

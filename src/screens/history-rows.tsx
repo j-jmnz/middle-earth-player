@@ -13,10 +13,12 @@ import { Portrait } from "./art";
 import { scenarioName } from "./campaign-data";
 import { AskInPlace } from "./ask-in-place";
 import { Chevron, Chip, Label, TextButton } from "./chrome";
+import { HeroTile, heroFace, PARTY_TILE_HEIGHT, type HeroFace } from "./hero-tile";
 import type { CardChip, CardLine, CardState } from "./history-entries";
 import type { PartyHero } from "./hub-parts";
 import { runDate, runDetail } from "./history-words";
 import { usePalette } from "./palette-hook";
+import { useUiScale } from "../play/ui-scale";
 
 const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger", faint: "text-faint" };
 
@@ -35,6 +37,8 @@ export function HistoryCard({
   lead,
   runs,
   nameOf,
+  faces,
+  party,
   accessibilityLabel,
   onPress,
   onLongPress,
@@ -48,6 +52,10 @@ export function HistoryCard({
   lead: PartyHero | null;
   runs: readonly RunRecord[];
   nameOf: (code: string) => string;
+  // The heroes' faces, for the party tiles under each run.
+  faces: ReadonlyMap<string, HeroFace>;
+  // A game's party, each seat's heroes, shown as tiles under its lines (its one run is worded in the lines, not listed).
+  party?: readonly (readonly string[])[] | null;
   accessibilityLabel: string;
   onPress: (() => void) | null;
   onLongPress: (() => void) | null;
@@ -72,7 +80,8 @@ export function HistoryCard({
         {({ pressed }) => (
           <View className="px-4 py-3.5" style={gone ? undefined : rowSurface(pressed && onPress != null, t)}>
             <View className="flex-row items-center gap-3">
-              {lead ? <Portrait card={lead.card} size={36} tint={lead.tint} glow={false} /> : null}
+              {/* The first hero's face with no sphere-coloured ring (user request, 2026-11-02): the party's tiles under it carry the heroes. */}
+              {lead ? <Portrait card={lead.card} size={36} ring={false} /> : null}
               <View className="min-w-0 flex-1">
                 <View className="flex-row flex-wrap items-center gap-2">
                   <Text className={`shrink font-display text-heading ${gone ? "text-muted" : "text-bone"}`} numberOfLines={2}>
@@ -93,8 +102,9 @@ export function HistoryCard({
                 </View>
               ) : null}
             </View>
+            {party ? <RunParty heroes={party} faces={faces} nameOf={nameOf} testID={`${testID}-party`} /> : null}
             {runs.map((run) => (
-              <RunLine key={run.id} run={run} nameOf={nameOf} />
+              <RunLine key={run.id} run={run} nameOf={nameOf} faces={faces} />
             ))}
           </View>
         )}
@@ -115,7 +125,7 @@ export function HistoryCard({
  * One run inside a playthrough's card, told apart by the space above it: the scenario with Won or Lost, the date at the end, a
  * loss's cause in danger, and the rounds, threat and, on a win, the score and what it earned (`runDetail`).
  */
-function RunLine({ run, nameOf }: { run: RunRecord; nameOf: (code: string) => string }) {
+function RunLine({ run, nameOf, faces }: { run: RunRecord; nameOf: (code: string) => string; faces: ReadonlyMap<string, HeroFace> }) {
   const date = runDate(run);
   const detail = runDetail(run, nameOf);
   const won = run.result === "won";
@@ -135,6 +145,31 @@ function RunLine({ run, nameOf }: { run: RunRecord; nameOf: (code: string) => st
         </Text>
       ) : null}
       {detail ? <Text className="mt-0.5 text-label text-muted">{detail}</Text> : null}
+      <RunParty heroes={run.heroes} faces={faces} nameOf={nameOf} testID={`run-${run.id}-party`} />
+    </View>
+  );
+}
+
+/**
+ * A run's heroes as the briefing shows the picked fellowship (user request, 2026-11-02): their pictures as dense hero tiles, three to a
+ * row, each seat on a row of its own under "Player 1" in two-handed play. Seen, not tapped: the card's press goes through them.
+ */
+function RunParty({ heroes, faces, nameOf, testID }: { heroes: readonly (readonly string[])[]; faces: ReadonlyMap<string, HeroFace>; nameOf: (code: string) => string; testID: string }) {
+  const s = useUiScale();
+  const seats = heroes.filter((seat) => seat.length > 0);
+  if (seats.length === 0) return null;
+  return (
+    <View testID={testID} pointerEvents="none" className="mt-2.5 gap-2">
+      {seats.map((seat, at) => (
+        <View key={at}>
+          {seats.length > 1 ? <Label tone="faint">{`Player ${at + 1}`}</Label> : null}
+          <View className="mt-1 flex-row gap-2">
+            {seat.map((code) => (
+              <HeroTile key={code} hero={heroFace(faces, code, nameOf(code))} height={PARTY_TILE_HEIGHT * s} dense />
+            ))}
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
