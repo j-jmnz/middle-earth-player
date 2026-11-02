@@ -6,8 +6,8 @@ package = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))
 Pod::Spec.new do |s|
   s.name           = 'ImageBackupExclusion'
   s.version        = package['version']
-  s.summary        = 'Marks the app's image directory as excluded from iCloud backup'
-  s.description    = 'Marks the app's image directory as excluded from iCloud backup'
+  s.summary        = "Marks the app's image directory as excluded from iCloud backup"
+  s.description    = "Marks the app's image directory as excluded from iCloud backup"
   s.license        = 'UNLICENSED'
   s.author         = 'middle-earth-lcg'
   s.homepage       = 'https://github.com/j-jmnz/middle-earth-lcg'
