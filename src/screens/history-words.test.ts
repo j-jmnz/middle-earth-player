@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { RunRecord } from "../campaign/runs";
-import { durationWords, playtimeWords, runDetail, runLabel } from "./history-words";
+import { durationSpoken, durationWords, playtimeSpoken, playtimeWords, runDetail, runLabel } from "./history-words";
 
 const MIN = 60000;
 const HOUR = 60 * MIN;
@@ -59,8 +59,8 @@ describe("playtimeWords", () => {
     expect(playtimeWords(run({ startedAt: null, endedAt: 5, activeMs: 3 * MIN }))).toBe("played 3 min");
   });
 
-  it("gives start to end without active time, and null without both times", () => {
-    expect(playtimeWords(run({ startedAt: 0, endedAt: 107 * MIN }))).toBe("1 h 47 min start to end");
+  it("gives the whole span without active time, and null without both times", () => {
+    expect(playtimeWords(run({ startedAt: 0, endedAt: 107 * MIN }))).toBe("1 h 47 min in all");
     expect(playtimeWords(run({ startedAt: null, endedAt: 5 }))).toBeNull();
     expect(playtimeWords(run({ startedAt: 5, endedAt: null }))).toBeNull();
   });
@@ -68,6 +68,19 @@ describe("playtimeWords", () => {
   it("is part of the detail line and the spoken label", () => {
     const r = run({ startedAt: 0, endedAt: 107 * MIN, activeMs: 42 * MIN });
     expect(runDetail(r, (code) => code)).toBe("4 rounds · threat 30 · Score 44 · 0 victory points · played 42 min · away 1 h 05 min");
-    expect(runLabel(r, "A Shadow of the Past", (code) => code)).toContain("played 42 min · away 1 h 05 min");
+    const label = runLabel(r, "A Shadow of the Past", (code) => code);
+    expect(label).toContain("played 42 minutes, away 1 hour 5 minutes");
+    expect(label).not.toMatch(/\d+ (min|h)\b/);
+  });
+
+  it("says lengths in words for a screen reader", () => {
+    expect(durationSpoken(0)).toBe("less than a minute");
+    expect(durationSpoken(MIN)).toBe("1 minute");
+    expect(durationSpoken(42 * MIN)).toBe("42 minutes");
+    expect(durationSpoken(HOUR)).toBe("1 hour");
+    expect(durationSpoken(HOUR + 5 * MIN)).toBe("1 hour 5 minutes");
+    expect(durationSpoken(74 * HOUR)).toBe("3 days 2 hours");
+    expect(durationSpoken(48 * HOUR)).toBe("2 days");
+    expect(playtimeSpoken(run({ startedAt: 0, endedAt: 107 * MIN }))).toBe("1 hour 47 minutes in all");
   });
 });

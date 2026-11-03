@@ -54,7 +54,7 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
 import { CommandHead } from "../play/command-head-view";
-import { HEAD_GAP, headPlan, headRoom } from "../play/command-head";
+import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../play/command-head";
 import { victorySelector } from "../play/victory-display";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
 import { whyNotChosen } from "../play/why";
@@ -163,6 +163,10 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The command column's height and the dock's own: the head (victory display and quest meter) fills the room between them.
   const [columnHeight, setColumnHeight] = useState(0);
   const [dockHeight, setDockHeight] = useState(0);
+  // The readout's numbers row, as last measured (the dock drops it while the meter shows the numbers).
+  const [numbersRow, setNumbersRow] = useState(NUMBERS_ROW * s);
+  // Whether the dock, as last measured, drew that row.
+  const [dockHasNumbers, setDockHasNumbers] = useState(true);
   // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
   const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
   const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
@@ -325,8 +329,13 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The head stands in the column's room above the dock (command-head.ts). The quest meter is drawn in the Quest phase only; while it
   // shows, the dock keeps only the readout's result line, and with no room for it (or outside the Quest phase) the dock keeps the numbers.
   const footPad = Math.max(insets.bottom, 8 * s);
+  // Whether the head shows is planned against the dock with its numbers row, the same height whether the meter is up or not, so the dock
+  // shrinking when the meter takes the numbers cannot turn the head off again (no flip, and no dependence on which was measured first).
+  // The head itself stands in the room the dock really leaves.
   const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s);
-  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(room, 0, s, scale.live).mode !== "hidden";
+  const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
+  const planRoom = headRoom(columnHeight, footPad, dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers), HEAD_GAP * s);
+  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, 0, s, scale.live).mode !== "hidden";
   const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
   // the left inset) and the safe insets (spotlight-stage.ts).
@@ -441,7 +450,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
           <View testID="command" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ width: commandWidth, paddingBottom: footPad, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
             {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
-            <CommandHead store={store} select={victory} scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onPreview={onPreview} />
+            <CommandHead store={store} select={victory} scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onPreview={onPreview} onMore={() => setReading({ kind: "victory" })} />
             <TableDock
               step={choice.header.step}
               lead={choice.header.lead}
@@ -462,7 +471,11 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
               count={trayCount(choice.sheet, choice.choice)}
               tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
               onTop={setAnchor}
-              onHeight={setDockHeight}
+              onHeight={(height, hasNumbers) => {
+                setDockHeight(height);
+                setDockHasNumbers(hasNumbers);
+              }}
+              onNumbers={setNumbersRow}
             />
           </View>
         </View>

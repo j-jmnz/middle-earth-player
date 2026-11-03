@@ -1,4 +1,4 @@
-// Card art on the screens (docs/design-system.md, Card art): a region of a card picture filling a box, a hero's round portrait,
+// Card art on the screens (docs/design-system.md, Card art): a region of a card picture filling a box,
 // and a scenario's scene from its first quest card. Each falls back to a dark surface while its file is missing, so a screen never
 // waits on a picture and never shows a hole. Scene art is drawn desaturated and darkened (`ART_FILTER`), so it sits in the fog.
 
@@ -14,7 +14,7 @@ import { useTableTokens } from "../play/use-table-tokens";
 import { withAlphaHex } from "../play/tokens";
 import { FogVeil, LightVeil } from "./backdrop";
 import { heroVeil, rgbOf } from "./backdrop-scenes";
-import { cropFrame, FACE, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, sceneBand, WHOLE, type Region } from "./art-crop";
+import { cropFrame, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, sceneBand, WHOLE, type Region } from "./art-crop";
 import { scenarioOf } from "./campaign-data";
 import { SceneCanvas } from "./scene-canvas";
 import { cssMask, filterMatrix, sceneMask, type MaskRamp } from "./scene-mask";
@@ -98,44 +98,6 @@ export function CroppedArt({
         </View>
       ) : null}
       {children}
-    </View>
-  );
-}
-
-/**
- * A hero's face in a ring: the hero's sphere colour (`tint`) with a glow of it, or the accent. The name is the caller's to say; the
- * portrait is not read. `size` is the Medium size; it is scaled here. `glow` is off inside a list row (Performance).
- */
-export function Portrait({ card, size: base = 40, ring = true, tint, glow = true }: { card: ArtCard | null; size?: number; ring?: boolean; tint?: string; glow?: boolean }) {
-  const palette = usePalette();
-  const size = base * useUiScale();
-  const color = tint ?? palette.accent;
-  return (
-    <View
-      importantForAccessibility="no-hide-descendants"
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        overflow: "hidden",
-        ...(ring ? { borderWidth: 1.5, borderColor: color, ...(glow && tint ? { boxShadow: `0 0 10px ${withAlphaHex(tint, 0.55)}` } : {}) } : {}),
-      }}
-    >
-      <CroppedArt card={card} region={FACE} width={size - (ring ? 3 : 0)} height={size - (ring ? 3 : 0)} />
-    </View>
-  );
-}
-
-/** A row of overlapping portraits: a fellowship at a glance. */
-export function PortraitRow({ heroes, size: base = 40 }: { heroes: readonly ArtCard[]; size?: number }) {
-  const size = base * useUiScale();
-  return (
-    <View className="flex-row" importantForAccessibility="no-hide-descendants">
-      {heroes.map((hero, index) => (
-        <View key={`${hero.code}:${index}`} style={{ marginLeft: index === 0 ? 0 : -size * 0.3 }}>
-          <Portrait card={hero} size={base} />
-        </View>
-      ))}
     </View>
   );
 }

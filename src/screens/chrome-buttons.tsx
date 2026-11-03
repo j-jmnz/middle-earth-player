@@ -103,6 +103,7 @@ export function SearchField({
   placeholder,
   testID,
   accessibilityLabel,
+  accessibilityHint,
   search = true,
 }: {
   value: string;
@@ -110,6 +111,8 @@ export function SearchField({
   placeholder: string;
   testID: string;
   accessibilityLabel: string;
+  // What the field searches, said after its name.
+  accessibilityHint?: string;
   // False for a field that takes a value rather than searching (a RingsDB link): no magnifier.
   search?: boolean;
 }) {
@@ -127,6 +130,7 @@ export function SearchField({
         autoCorrect={false}
         autoCapitalize="none"
         accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
         className="min-h-touch min-w-0 flex-1 text-body text-bone"
       />
     </View>

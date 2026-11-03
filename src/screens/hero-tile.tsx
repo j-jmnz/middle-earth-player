@@ -4,8 +4,8 @@ import { Pressable, View } from "react-native";
 import { CroppedArt } from "./art";
 import { COVER, PAINTING, type Region } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
+import { HeroTrio } from "./hero-trio";
 import { CardThumb, useCardPreview } from "./images/picture";
-import { cardCorner } from "../play/card-corner";
 import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../play/surfaces";
 import { useTableTokens } from "../play/use-table-tokens";
 import type { PictureSource } from "../play/table-canvas-types";
@@ -367,34 +367,18 @@ export function Readiness({ testID, status, lines = 1, quietReady }: { testID: s
   );
 }
 
-const rowThumb = { width: 30, height: 42 };
-
 /** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
 export function DeckRow(props: DeckSummary) {
   const palette = usePalette();
   const t = useTableTokens();
-  const s = useUiScale();
   const { name, heroes, short, status, quietReady, note, testID, children, selected, disabled } = props;
-  const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
     <View className="mb-1.5 overflow-hidden rounded-item" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
       {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
       <Pressable {...pressProps(props)}>
         {({ pressed }) => (
           <View className="min-h-16 flex-row items-center gap-3 px-3 py-2" style={rowSurface(pressed && !disabled, t)}>
-            <View className="flex-row" style={{ width: thumb.width * 3 - 16 * s, opacity: disabled ? 0.45 : 1 }}>
-              {heroes.length > 0 ? (
-                heroes.slice(0, 3).map((hero, at) => (
-                  <View key={hero.code} style={{ marginLeft: at === 0 ? 0 : -8 * s, borderRadius: cardCorner(thumb.width, thumb.height), overflow: "hidden", boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
-                    <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={thumb.width} height={thumb.height} />
-                  </View>
-                ))
-              ) : (
-                <View className="items-center justify-center bg-dusk" style={{ ...thumb, borderRadius: cardCorner(thumb.width, thumb.height) }}>
-                  <Text className="text-label text-faint">—</Text>
-                </View>
-              )}
-            </View>
+            <HeroTrio heroes={heroes} placeholder dim={disabled} />
             <View className="flex-1">
               <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
                 {name}

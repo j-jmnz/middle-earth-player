@@ -2,9 +2,9 @@
 //
 // The victory display the command column draws (docs/design-system-table.md, Command column): the cards in `game.victory`, newest first, each with
 // the Victory points it scores on the side it lies (the same count the score adds up, campaign/score.ts), and the total. Pure, so a test reads it.
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { victoryOf } from "../rules/printed-stat.ts";
-import { heldAmount, type ScenarioState } from "../rules/state.ts";
+import type { PrintedCard } from "../rules/printed.ts";
+import { victoryPointsOf } from "../rules/printed-stat.ts";
+import type { ScenarioState } from "../rules/state.ts";
 
 import { pictureKey } from "./picture-key.ts";
 
@@ -22,7 +22,7 @@ export function victoryDisplayOf(game: Pick<ScenarioState, "victory" | "cards" |
     const id = game.victory[at] as string;
     const card = game.cards[id];
     if (!card) continue;
-    const points = victoryOf(card, printedOf(cards, card.code)) ?? heldAmount(game as ScenarioState, id, "gainsVictory");
+    const points = victoryPointsOf(game, id, cards);
     total += points;
     rows.push({ id, name: nameOf(pictureKey(card)), points });
   }

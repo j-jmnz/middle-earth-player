@@ -1,13 +1,14 @@
 // Drag to reorder the deck list (docs/design-system.md, Decks): a long press lifts a deck, the others make room, and letting go
 // writes the order. The list is still a FlashList; the layout of each deck's cell (`getLayout`) says where the slots are, so the
 // same code serves the Cards grid and the List column. The decks' own taps and the list's scrolling are untouched until the press.
-import { createContext, useContext, useEffect, useEffectEvent, useRef, useState, type ComponentRef, type ReactNode, type Ref, type RefObject } from "react";
+import { createContext, useContext, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, type ComponentRef, type ReactNode, type Ref, type RefObject } from "react";
 import { View, type NativeScrollEvent, type NativeSyntheticEvent, type ViewProps } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { tickArmed, tickLand } from "../play/haptics";
+import { useReduceMotion } from "../play/motion-run";
 import { moveItem, nearestSlot, shiftsFor, type Shift, type SlotRect } from "./deck-order";
 
 const LONG_PRESS_MS = 350;
@@ -27,7 +28,7 @@ export type DeckReorder = {
   // The list row of the held deck (-1 when none), so its cell is drawn above the others.
   liftedRow: number;
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
-  // A drag just ended: the tap that follows the release is not a request to open the deck.
+  // A drag ended a moment ago: opening a deck ignores a tap this soon after it (a release over a deck can read as one).
   recentlyDragged: () => boolean;
   from: SharedValue<number>;
   target: SharedValue<number>;
@@ -105,7 +106,8 @@ export function useDeckReorder({ ids, rowOffset, listRef, enabled, onReorder }: 
     resetOnOrder.current = false;
     reset();
   });
-  useEffect(() => {
+  // Before paint, so the decks never show one frame at their new places with the old shifts still on them.
+  useLayoutEffect(() => {
     afterOrder();
   }, [ids]);
 
@@ -215,10 +217,12 @@ export function DeckCell({ index, style, ...rest }: Omit<ViewProps, "ref"> & { i
 
 /**
  * One deck of the list under the drag gesture. At rest it is its cell as before. Held, it follows the finger, lifted; the decks
- * between it and its target slide one place, and on release it settles into the slot before the order is written.
+ * between it and its target slide one place, and on release it settles into the slot before the order is written. With reduced motion
+ * the others and the settle snap; the held deck still follows the finger.
  */
 export function ReorderItem({ reorder, index, children }: { reorder: DeckReorder; index: number; children: ReactNode }) {
   const { enabled, from, target, armed, held, settle, px, py, scroll, startScroll, shifts, begin, commit } = reorder;
+  const reduced = useReduceMotion();
   const pan = Gesture.Pan()
     .enabled(enabled)
     .activateAfterLongPress(LONG_PRESS_MS)
@@ -240,6 +244,11 @@ export function ReorderItem({ reorder, index, children }: { reorder: DeckReorder
       }
       const slot = target.get();
       held.set(1);
+      if (reduced) {
+        settle.set(1);
+        scheduleOnRN(commit, index, slot);
+        return;
+      }
       settle.set(withTiming(1, { duration: SETTLE_MS }, () => scheduleOnRN(commit, index, slot)));
     });
   const style = useAnimatedStyle(() => {
@@ -247,7 +256,9 @@ export function ReorderItem({ reorder, index, children }: { reorder: DeckReorder
     if (start < 0) return { transform: [{ translateX: 0 }, { translateY: 0 }, { scale: 1 }], shadowOpacity: 0 };
     const shift = shifts.get()[index];
     if (start !== index) {
-      return { transform: [{ translateX: withTiming(shift?.x ?? 0, { duration: SHIFT_MS }) }, { translateY: withTiming(shift?.y ?? 0, { duration: SHIFT_MS }) }, { scale: 1 }], shadowOpacity: 0 };
+      const x = shift?.x ?? 0;
+      const y = shift?.y ?? 0;
+      return { transform: [{ translateX: reduced ? x : withTiming(x, { duration: SHIFT_MS }) }, { translateY: reduced ? y : withTiming(y, { duration: SHIFT_MS }) }, { scale: 1 }], shadowOpacity: 0 };
     }
     const x = px.get();
     const y = py.get() + scroll.get() - startScroll.get();

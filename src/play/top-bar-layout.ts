@@ -112,6 +112,14 @@ export const DIAL_SIZE = 46;
 export const DIAL_PAD = 4;
 export const DIAL_LABEL_GAP = 6;
 export const DIAL_GAP = 10;
+/**
+ * How far below a dial's row (the 46 pt disc, at least a 44 pt target) a change badge's foot sits so it ends inside the bar's foot, not past it:
+ * the bar's room under the row, less 1 pt. The badge hangs from the row's bottom edge by this much (`bottom: -badgeFoot(s)`), over the disc's foot.
+ */
+export function badgeFoot(scale: number): number {
+  const row = Math.max(touch(scale, 44), DIAL_SIZE * scale);
+  return Math.max(0, (TOP_BAR * scale - row) / 2 - scale);
+}
 /** The fade at the right edge of a scrolling dials row, and the room the row keeps clear of it at its end. */
 export const EDGE_FADE = 28;
 // The seat dial: its disc, its padding and its "P1" label (two letters at label size).

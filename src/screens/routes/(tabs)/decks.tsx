@@ -150,7 +150,8 @@ export default function Decks() {
     ids,
     rowOffset: rows.length - shown.length,
     listRef,
-    enabled: draggable,
+    // Not while Manage is open: its Duplicate and Delete rows (and an ask in place) lie under the decks, and a drag would carry them.
+    enabled: draggable && !managing,
     onReorder: (order) => {
       writeDeckOrder(user, order);
       refresh();

@@ -57,19 +57,39 @@ export function durationWords(ms: number): string {
   return `${Math.floor(hours / 24)} d ${hours % 24} h`;
 }
 
-/**
- * "played 42 min · away 1 h 05 min" when the table counted its foreground time (away is the rest of the wall time, left out under a
- * minute); "1 h 47 min start to end" when only the two times are known; null otherwise.
- */
-export function playtimeWords(run: RunRecord): string | null {
+/** The same length in words a screen reader says: "less than a minute", "42 minutes", "1 hour 5 minutes", "3 days 2 hours". */
+export function durationSpoken(ms: number): string {
+  const minutes = Math.floor(Math.max(0, ms) / 60000);
+  if (minutes < 1) return "less than a minute";
+  if (minutes < 60) return plural(minutes, "minute");
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return minutes % 60 === 0 ? plural(hours, "hour") : `${plural(hours, "hour")} ${plural(minutes % 60, "minute")}`;
+  return hours % 24 === 0 ? plural(Math.floor(hours / 24), "day") : `${plural(Math.floor(hours / 24), "day")} ${plural(hours % 24, "hour")}`;
+}
+
+// The playtime of a run in a given wording: the counted time and the time away, or only the whole span when the table did not count.
+function playtime(run: RunRecord, length: (ms: number) => string, joiner: string, whole: string): string | null {
   const wall = run.startedAt != null && run.endedAt != null ? Math.max(0, run.endedAt - run.startedAt) : null;
   if (run.activeMs != null) {
-    const played = `played ${durationWords(run.activeMs)}`;
+    const played = `played ${length(run.activeMs)}`;
     if (wall == null) return played;
     const away = Math.max(0, wall - run.activeMs);
-    return away >= 60000 ? `${played} · away ${durationWords(away)}` : played;
+    return away >= 60000 ? `${played}${joiner}away ${length(away)}` : played;
   }
-  return wall == null ? null : `${durationWords(wall)} start to end`;
+  return wall == null ? null : `${length(wall)} ${whole}`;
+}
+
+/**
+ * "played 42 min · away 1 h 05 min" when the table counted its foreground time (away is the rest of the wall time, left out under a
+ * minute); "1 h 47 min in all" when only the two times are known; null otherwise.
+ */
+export function playtimeWords(run: RunRecord): string | null {
+  return playtime(run, durationWords, " · ", "in all");
+}
+
+/** The playtime as a screen reader says it: "played 42 minutes, away 1 hour 5 minutes", "1 hour 47 minutes in all". */
+export function playtimeSpoken(run: RunRecord): string | null {
+  return playtime(run, durationSpoken, ", ", "in all");
 }
 
 /** "4 rounds · threat 28 / 33 · Score 41 · Reward: Mendor · played 42 min": how a run went, or null when the store knew none of it. */
@@ -80,7 +100,7 @@ export function runDetail(run: RunRecord, nameOf: (code: string) => string): str
 
 /** The one line the screen reader gets for a run. */
 export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string): string {
-  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeWords(run)].filter((part) => part != null).join(", ");
+  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeSpoken(run)].filter((part) => part != null).join(", ");
 }
 
 /** The one line an empty library says. */

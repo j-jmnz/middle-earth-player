@@ -1,13 +1,10 @@
-// Where a picture sits inside a box so that one region of it fills the box (docs/design-system.md, Card art): a hero's face in a
-// round portrait, the painting of a hero card above its text box, the scene of a quest card between its title banners and its
+// Where a picture sits inside a box so that one region of it fills the box (docs/design-system.md, Card art): the painting of a hero card above its text box, the scene of a quest card between its title banners and its
 // text. The card pictures are printed cards, so each crop is a region of the printed layout, the same on every card of a kind.
 // Pure, so a test reads it; art.tsx draws the picture at the size and offset this returns.
 
 /** A region of a picture, as fractions of its width and height. */
 export type Region = { x: number; y: number; w: number; h: number };
 
-/** The face on a hero card: above the stat column's right, where every RingsDB hero's portrait sits. Square on a 429×600 card. */
-export const FACE: Region = { x: 0.47, y: 0.04, w: 0.3, h: 0.215 };
 /** The painting of a player card: right of the stat column, above the name banner. */
 export const PAINTING: Region = { x: 0.2, y: 0.03, w: 0.78, h: 0.55 };
 /** The heart of the painting, clear of the stat column and the gold border: a deck cover's slice, often wider than it is tall. */

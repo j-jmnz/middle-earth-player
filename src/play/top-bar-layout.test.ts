@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ROUND_PHASES, STEP_WORDS } from "./rail.ts";
 import { UI_SCALES } from "./ui-scale.ts";
 import {
+  badgeFoot,
   barZones,
   chipCompact,
   DIAL_GAP,
@@ -27,6 +28,7 @@ import {
   SEAT_DIAL,
   TICK,
   TICK_GAP,
+  TOP_BAR,
 } from "./top-bar-layout.ts";
 
 // The rail names a phase over its ticks and nothing longer, so it never needs more than this.
@@ -229,5 +231,17 @@ describe("the Island Map chip in the top bar", () => {
     expect(barOf(SCREENS[0], UI_SCALES.medium, 2).compact).toBe(true);
     expect(barOf(SCREENS[0], UI_SCALES.large, 2).compact).toBe(true);
     expect(barOf(SCREENS[2], UI_SCALES.medium, 2).compact).toBe(false);
+  });
+});
+
+describe("badgeFoot", () => {
+  it("ends a change badge inside the bar's foot at every scale", () => {
+    for (const scale of Object.values(UI_SCALES)) {
+      const row = Math.max(44, DIAL_SIZE * scale);
+      const rowTop = (TOP_BAR * scale - row) / 2;
+      const badgeBottom = rowTop + row + badgeFoot(scale);
+      expect(badgeBottom, `${scale}`).toBeLessThanOrEqual(TOP_BAR * scale);
+      expect(badgeFoot(scale)).toBeGreaterThanOrEqual(0);
+    }
   });
 });

@@ -5,7 +5,7 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { addActive } from "../campaign/replay";
-import { record, unrecord } from "../campaign/session";
+import { isWon, record, unrecord } from "../campaign/session";
 import { droppedIfStale, dropStandalone, resumeStandalone, type StandaloneGame } from "../campaign/standalone";
 import { loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
@@ -78,7 +78,12 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
   let saved: StandaloneGame = session.stored;
   const cache = sessionCacheOf<Opened>(user, "standalone");
   const base = createPlayClock();
-  const fold = (game: StandaloneGame): StandaloneGame => (game.active ? { ...game, active: addActive(game.active, base.take()) } : game);
+  // Nothing taken leaves the game as it is (the same object), so a pause with no new time writes nothing.
+  const fold = (game: StandaloneGame): StandaloneGame => {
+    if (!game.active) return game;
+    const active = addActive(game.active, base.take());
+    return active === game.active ? game : { ...game, active };
+  };
   // Asked for the game later (the outcome screen), the cache reads this table's game as it stands now; the row it must match is `saved`.
   const follow = () => {
     const { game, roundSteps, history } = store.getState();
@@ -100,9 +105,11 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
   const clock: PlayClock = {
     resume: base.resume,
     take: base.take,
+    // A game that is over, won or lost, writes nothing on a pause: its last intent folded the time already.
     pause: () => {
       base.pause();
-      if (store.getState().game.lost) return;
+      const { game } = store.getState();
+      if (game.lost || isWon(game)) return;
       const folded = fold(saved);
       if (folded === saved) return;
       saved = folded;

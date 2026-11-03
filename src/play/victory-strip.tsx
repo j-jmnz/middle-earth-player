@@ -1,10 +1,11 @@
 // The victory display in the command column's head (docs/design-system-table.md, Command column): "Victory · 3 VP" over the names of the cards in it,
-// newest first, one line each; a name opens that card large. Past the room the last line says "+n more"; empty, one muted line. The plan
+// newest first, one line each; a name opens that card large. Past the room the last line says "+n more", a button that opens the whole display; empty, one muted line. The plan
 // (command-head.ts) says how many lines the room holds.
 import { Pressable, View } from "react-native";
 
 import type { HeadPlan } from "./command-head.ts";
-import { VICTORY_HEADER, VICTORY_ROW } from "./command-head.ts";
+import { VICTORY_HEADER, victoryRow } from "./command-head.ts";
+import { textSurface } from "./surfaces.ts";
 import { Text } from "./text.tsx";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -15,37 +16,63 @@ export function victoryTitle(total: number): string {
   return `Victory · ${total} VP`;
 }
 
-function NameRow({ row, onPreview, height, tail }: { row: VictoryRow; onPreview: (id: string) => void; height: number; tail: string | null }) {
+// "+n more" (or "+n" beside the newest name): a button that opens the whole victory display. `height` is the row's; the target is never under 44 pt.
+function MoreButton({ label, height, onMore }: { label: string; height: number; onMore: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
   return (
     <Pressable
-      testID={`victory-${row.id}`}
+      testID="victory-more"
       accessibilityRole="button"
-      accessibilityLabel={`${row.name}, ${row.points} victory ${row.points === 1 ? "point" : "points"}`}
-      accessibilityHint="Shows the card"
+      accessibilityLabel={`${label}, shows the whole victory display`}
       hitSlop={{ top: touchSlop(s, height), bottom: touchSlop(s, height) }}
-      onPress={() => onPreview(row.id)}
-      className="flex-row items-center"
-      style={{ height, gap: 6 * s }}
+      onPress={onMore}
+      style={{ height }}
     >
-      <Text className="flex-1 text-label" numberOfLines={1} style={{ color: t.bone }}>
-        {row.name}
-      </Text>
-      {tail ? (
-        <Text className="text-micro" numberOfLines={1} style={{ color: t.muted }}>
-          {tail}
-        </Text>
-      ) : null}
+      {({ pressed }) => (
+        <View className="justify-center rounded-control" style={{ height, paddingHorizontal: 6 * s, ...textSurface(pressed, t) }}>
+          <Text className="text-micro" numberOfLines={1} style={{ color: t.muted }}>
+            {label}
+          </Text>
+        </View>
+      )}
     </Pressable>
   );
 }
 
-export function VictoryStrip({ display, plan, onPreview }: { display: VictoryDisplay; plan: HeadPlan; onPreview: (id: string) => void }) {
+// One card's name: a button that shows the card large. A full row is a 44 pt target on its own; the compact line (one row, nothing under it) borrows the rest as hit slop.
+function NameRow({ row, onPreview, height, tail, onMore }: { row: VictoryRow; onPreview: (id: string) => void; height: number; tail: string | null; onMore: () => void }) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  return (
+    <View className="flex-row items-center" style={{ height, gap: 4 * s }}>
+      <Pressable
+        testID={`victory-${row.id}`}
+        accessibilityRole="button"
+        accessibilityLabel={`${row.name}, ${row.points} victory ${row.points === 1 ? "point" : "points"}`}
+        accessibilityHint="Shows the card"
+        hitSlop={{ top: touchSlop(s, height), bottom: touchSlop(s, height) }}
+        onPress={() => onPreview(row.id)}
+        style={{ flex: 1, height }}
+      >
+        {({ pressed }) => (
+          <View className="justify-center rounded-control" style={{ height, paddingHorizontal: 6 * s, ...textSurface(pressed, t) }}>
+            <Text className="text-label" numberOfLines={1} style={{ color: t.bone }}>
+              {row.name}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+      {tail ? <MoreButton label={tail} height={height} onMore={onMore} /> : null}
+    </View>
+  );
+}
+
+export function VictoryStrip({ display, plan, onPreview, onMore }: { display: VictoryDisplay; plan: HeadPlan; onPreview: (id: string) => void; onMore: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
   const header = VICTORY_HEADER * s;
-  const row = VICTORY_ROW * s;
+  const row = victoryRow(s);
   const empty = display.rows.length === 0;
   const newest = display.rows[0];
   if (plan.mode === "hidden") return null;
@@ -69,7 +96,7 @@ export function VictoryStrip({ display, plan, onPreview }: { display: VictoryDis
     return (
       <View testID="victory-strip" className="flex-row items-center" style={{ height: header, gap: 8 * s }}>
         {title}
-        {newest ? <View className="min-w-0 flex-1"><NameRow row={newest} onPreview={onPreview} height={header} tail={more > 0 ? `+${more}` : null} /></View> : null}
+        {newest ? <View className="min-w-0 flex-1"><NameRow row={newest} onPreview={onPreview} height={header} tail={more > 0 ? `+${more}` : null} onMore={onMore} /></View> : null}
       </View>
     );
   }
@@ -81,13 +108,11 @@ export function VictoryStrip({ display, plan, onPreview }: { display: VictoryDis
         {title}
       </View>
       {shown.map((item, at) => (
-        <NameRow key={item.id} row={item} onPreview={onPreview} height={row} tail={at === shown.length - 1 ? tail : null} />
+        <NameRow key={item.id} row={item} onPreview={onPreview} height={row} tail={at === shown.length - 1 ? tail : null} onMore={onMore} />
       ))}
       {plan.more > 0 && plan.moreLine ? (
-        <View className="justify-center" style={{ height: row }}>
-          <Text testID="victory-more" className="text-micro" numberOfLines={1} style={{ color: t.muted }}>
-            {`+${plan.more} more`}
-          </Text>
+        <View className="items-start" style={{ height: row }}>
+          <MoreButton label={`+${plan.more} more`} height={row} onMore={onMore} />
         </View>
       ) : null}
     </View>

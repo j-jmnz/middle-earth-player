@@ -90,7 +90,12 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
   const cache = sessionCacheOf<Opened>(user, "save");
   const base = createPlayClock();
   // The foreground time since the last write, added to the open scenario.
-  const fold = (save: Save): Save => (save.active ? { ...save, active: addActive(save.active, base.take()) } : save);
+  // Nothing taken leaves the save as it is (the same object), so a pause with no new time writes nothing.
+  const fold = (save: Save): Save => {
+    if (!save.active) return save;
+    const active = addActive(save.active, base.take());
+    return active === save.active ? save : { ...save, active };
+  };
   // Asked for the save later (the Resolution), the cache reads this table's game as it stands now; the save it must match is `saved`.
   const follow = () => {
     const { game, roundSteps, history } = store.getState();
@@ -112,13 +117,15 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
       follow();
     },
   );
-  // A pause (the table left, the app in the background) writes the time since the last write, once; a game that is over writes nothing.
+  // A pause (the table left, the app in the background) writes the time since the last write, once; a game that is over, won or lost, writes nothing
+  // (its last intent folded the time already, and a pause must never write a finished scenario back).
   const clock: PlayClock = {
     resume: base.resume,
     take: base.take,
     pause: () => {
       base.pause();
-      if (store.getState().game.lost) return;
+      const { game } = store.getState();
+      if (game.lost || isWon(game)) return;
       const folded = fold(saved);
       if (folded === saved) return;
       saved = folded;
