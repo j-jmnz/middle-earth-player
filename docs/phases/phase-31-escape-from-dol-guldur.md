@@ -38,7 +38,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `escape-from-dol-guldur`:
 
 ## E2E
 
-`.maestro/escape-from-dol-guldur.yaml` (a win writes the carry-over and unlocks `the-oath` in Mirkwood Paths) and `.maestro/escape-from-dol-guldur-loss.yaml`, with their fixtures.
+`.maestro/scenarios/escape-from-dol-guldur/escape-from-dol-guldur.yaml` (a win writes the carry-over and unlocks `the-oath` in Mirkwood Paths) and `.maestro/scenarios/escape-from-dol-guldur/escape-from-dol-guldur-loss.yaml`, with their fixtures.
 
 ## Exit
 

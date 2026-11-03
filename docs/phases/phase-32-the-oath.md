@@ -34,7 +34,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-oath`:
 
 ## E2E
 
-`.maestro/the-oath.yaml` (a win unlocks `the-caves-of-nibin-dum` in both campaigns) and `.maestro/the-oath-loss.yaml`, with their fixtures.
+`.maestro/scenarios/the-oath/the-oath.yaml` (a win unlocks `the-caves-of-nibin-dum` in both campaigns) and `.maestro/scenarios/the-oath/the-oath-loss.yaml`, with their fixtures.
 
 ## Exit
 

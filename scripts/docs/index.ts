@@ -50,6 +50,7 @@ export function groups(): Group[] {
     { title: "Agents", note: "Each agent reads its own file.", files: [...markdownIn(".cursor/agents"), ...markdownIn(".claude/agents")] },
     { title: "Product, code and design", note: "Read the sections your task touches.", files: ["README.md", ...markdownIn("docs", (name) => name === "INDEX.md")] },
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
+    { title: "Done phases", note: "Completed phase specs; STATUS.md lists what each leaves open. Read only when a task or STATUS.md names one.", files: markdownIn("docs/phases/done") },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },
     { title: "Handovers", note: "Open work; read when a task names it.", files: markdownIn("docs/handover") },
     { title: "Done plans", note: "History and rationale; read only when a code comment or task cites one.", files: markdownIn("docs/plans/done") },

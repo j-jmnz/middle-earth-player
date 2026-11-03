@@ -129,7 +129,7 @@ Answers to the clarifying questions:
   - Rewrite the Spotlight paragraph and its beats table, and the Motion table rows.
   - Amend "Carved Stone designs no new motion" to name this as a user-request exception (2026-10-29).
   - Record the always-dark stage and the flash and particle budgets.
-- **`docs/phases/phase-24-combat-spotlight.md`:** add a "superseded by the 2026-10-29 redesign" note.
+- **`docs/phases/done/phase-24-combat-spotlight.md`:** add a "superseded by the 2026-10-29 redesign" note.
 - **`docs/phases/STATUS.md`:** add a section "Combat spotlight redesign, 2026-10-29 (user request)" with Built, Decided, Checked and Open. The phone, Android low-end cost and Maestro checks stay **Open**, since a cloud session has no device.
 
 ## Notes for the orchestrating agent

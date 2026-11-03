@@ -55,7 +55,7 @@ Replaying a won scenario is allowed and does not grant the reward a second time 
 
 ## E2E
 
-`.maestro/briefing.yaml` deals a legal loadout and refuses a loadout with no Ring-bearer, naming the rule. `.maestro/resolution.yaml` uses the dev-only resolution control: a win unlocks `a-knife-in-the-dark` and shows the chosen cards after a relaunch; a loss leaves that node locked. `.maestro/booklet.yaml` asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. Do not assert ability text.
+`.maestro/features/briefing.yaml` deals a legal loadout and refuses a loadout with no Ring-bearer, naming the rule. `.maestro/features/resolution.yaml` uses the dev-only resolution control: a win unlocks `a-knife-in-the-dark` and shows the chosen cards after a relaunch; a loss leaves that node locked. `.maestro/features/booklet.yaml` asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. Do not assert ability text.
 
 ## Exit
 

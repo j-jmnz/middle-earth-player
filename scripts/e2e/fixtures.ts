@@ -16,7 +16,7 @@
 //
 // `duo`: both starter decks, two-handed, Easy, parked on the first player's planning window of round 1 (the opening hands kept, the
 // first resource and the quest of nothing yet), for the flows that need two dials and a seat that is not acting (the peek,
-// `.maestro/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
+// `.maestro/features/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
 // `mirkwood-won` and `mirkwood-lost`: Passage Through Mirkwood (scripts/e2e/passage-through-mirkwood.ts), written to
 // src/campaign/fixtures/passage-through-mirkwood.json. `anduin-won` and `anduin-lost`: Journey Along the Anduin (scripts/e2e/journey-along-the-anduin.ts), written to

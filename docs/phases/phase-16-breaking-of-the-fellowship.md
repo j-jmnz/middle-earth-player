@@ -4,7 +4,7 @@ Engine half depends on: phase 15's engine half
 Phone half depends on: phase 15
 Blocks: nothing in the proof of concept
 
-**State (2026-10-30):** engine half done and reviewed: `breaking-of-the-fellowship` is in `src/campaign/playable.ts` and its goldens run in Node (`src/campaign/scenarios/breaking-of-the-fellowship/golden.test.ts`). Phone half code done: the table draws the shown seat's staging area, stage and active location, the readouts and Choose words follow, and the four flows `.maestro/breaking-of-the-fellowship*.yaml` are written. Open: the fixtures `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` (no chained win of scenarios 1 to 5 yet), the flows run, and the phone checks.
+**State (2026-10-30):** engine half done and reviewed: `breaking-of-the-fellowship` is in `src/campaign/playable.ts` and its goldens run in Node (`src/campaign/scenarios/breaking-of-the-fellowship/golden.test.ts`). Phone half code done: the table draws the shown seat's staging area, stage and active location, the readouts and Choose words follow, and the four flows `.maestro/scenarios/breaking-of-the-fellowship/breaking-of-the-fellowship*.yaml` are written. Open: the fixtures `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` (no chained win of scenarios 1 to 5 yet), the flows run, and the phone checks.
 
 ## Goal
 
@@ -29,7 +29,7 @@ The per-seat staging slot and quest stage have existed on the model since phase 
 
 ## E2E
 
-`.maestro/breaking-of-the-fellowship.yaml` opens a seeded true-solo save after stage 2B and asserts one staging area. A two-handed save asserts two, with two different stage 3 titles. A win records the burden choice and the captives. A loss writes nothing.
+`.maestro/scenarios/breaking-of-the-fellowship/breaking-of-the-fellowship.yaml` opens a seeded true-solo save after stage 2B and asserts one staging area. A two-handed save asserts two, with two different stage 3 titles. A win records the burden choice and the captives. A loss writes nothing.
 
 ## Exit
 

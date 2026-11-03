@@ -41,9 +41,9 @@ The human can play the scenario through its stages, lose without writing the log
 
 ## E2E
 
-Point `.maestro/resolution.yaml` at the real resolution screen and delete the dev-only control from the flow. Add `.maestro/scenario-1.yaml`. It opens a seeded save parked on the last choice, confirms the phase rail, chooses a boon and a burden, relaunches, and finds those cards on the log with A Knife in the Dark unlocked. A second flow parks a save on a loss and asserts the log is unchanged.
+Point `.maestro/features/resolution.yaml` at the real resolution screen and delete the dev-only control from the flow. Add `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml`. It opens a seeded save parked on the last choice, confirms the phase rail, chooses a boon and a burden, relaunches, and finds those cards on the log with A Knife in the Dark unlocked. A second flow parks a save on a loss and asserts the log is unchanged.
 
-Open, 2026-10-25: the won fixture `.maestro/scenario-1.yaml` opens is not committed. Once the rules audit was merged (main's won game kept a seat with no heroes in the game, `rr.player-elimination`), no legal win of the two starter decks was found: a seeded beam search, about two hours across seeds 1 to 40, lost every game. The user accepted leaving it open. `scripts/e2e/fixtures.ts --won` searches again; the tests that replay the fixture are skipped until it is committed. The loss fixture and `.maestro/scenario-1-loss.yaml` are unaffected.
+Open, 2026-10-25: the won fixture `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` opens is not committed. Once the rules audit was merged (main's won game kept a seat with no heroes in the game, `rr.player-elimination`), no legal win of the two starter decks was found: a seeded beam search, about two hours across seeds 1 to 40, lost every game. The user accepted leaving it open. `scripts/e2e/fixtures.ts --won` searches again; the tests that replay the fixture are skipped until it is committed. The loss fixture and `.maestro/scenarios/a-shadow-of-the-past/scenario-1-loss.yaml` are unaffected.
 
 ## Exit
 

@@ -32,7 +32,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-city-of-corsairs`, and
 
 ## E2E
 
-`.maestro/the-city-of-corsairs.yaml` (a win runs the Resolution, awards its XP and ends the campaign) and `.maestro/the-city-of-corsairs-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/the-city-of-corsairs/the-city-of-corsairs.yaml` (a win runs the Resolution, awards its XP and ends the campaign) and `.maestro/scenarios/the-city-of-corsairs/the-city-of-corsairs-loss.yaml` (a loss writes nothing), with their fixtures.
 
 ## Exit
 

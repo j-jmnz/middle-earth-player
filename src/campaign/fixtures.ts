@@ -8,7 +8,7 @@
 // the script is run again. `won`, and so `knife-lost`, are open (docs/phases/STATUS.md): no legal win of the two starter
 // decks has been found, so neither is committed, and a name whose fixture is absent is not offered (`hasFixture`). `duo` is a
 // two-handed game of scenario 1 parked on the first player's planning window of round 1, for the flows that need two dials and a seat
-// that is not acting (the peek, `.maestro/seat-peek.yaml`). `mirkwood-won` and `mirkwood-lost` are two-handed games of Passage Through
+// that is not acting (the peek, `.maestro/features/seat-peek.yaml`). `mirkwood-won` and `mirkwood-lost` are two-handed games of Passage Through
 // Mirkwood (Mirkwood Paths part 1) from an empty log, parked on the win and on the loss (the e2e-mirkwood script); a fixture names its campaign.
 // `anduin-won` and `anduin-lost` are two-handed games of Journey Along the Anduin (part 2) from the log `mirkwood-won` writes when it is confirmed
 // (`past`), parked on the win and on the loss (the e2e-anduin script). `dol-guldur-won` and `dol-guldur-lost` are two-handed games of Escape from

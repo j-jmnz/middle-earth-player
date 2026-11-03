@@ -35,7 +35,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-caves-of-nibin-dum`:
 
 ## E2E
 
-`.maestro/the-caves-of-nibin-dum.yaml` (a win completes the campaign and writes the carry-over) and `.maestro/the-caves-of-nibin-dum-loss.yaml`, with their fixtures.
+`.maestro/scenarios/the-caves-of-nibin-dum/the-caves-of-nibin-dum.yaml` (a win completes the campaign and writes the carry-over) and `.maestro/scenarios/the-caves-of-nibin-dum/the-caves-of-nibin-dum-loss.yaml`, with their fixtures.
 
 ## Exit
 

@@ -1,6 +1,6 @@
 # Plan: a local game-data store, fetched once, generated wherever possible
 
-**Status, 2026-10-26: carried out (phase 8b, `docs/phases/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/done/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
+**Status, 2026-10-26: carried out (phase 8b, `docs/phases/done/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/done/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
 
 ## Context
 
@@ -172,7 +172,7 @@ Now: the heading splitter was replaced by the curated `data/rules/index.json` (`
 - `docs/brief.md` keeps product decisions only (screens, seats, saves, non-goals). The Core round, Keywords, Hide and Setup-order prose is replaced by rule ids from `data/rules/entries.json`. The Data sources table is replaced by a pointer to `data/sources.json`.
 - `docs/architecture.md`: update Processes, Modules, Persistence, Catalog build and Tests. Point at Zod schemas instead of restating types.
 - Strip the "MEC109/TFotR printing read via Hall of Beorn … Confirm on the card" comments throughout `src/effects` and `src/rules`. Provenance lives in `data/sources.json` and `data/overrides.json`.
-- Add `docs/phases/phase-08b-data-store.md` and a STATUS row. Update `.claude/agents/*` to point at `data/`. Delete the step 0 scaffolding, keeping the full-game golden.
+- Add `docs/phases/done/phase-08b-data-store.md` and a STATUS row. Update `.claude/agents/*` to point at `data/`. Delete the step 0 scaffolding, keeping the full-game golden.
 
 ## Adding scenario 2 afterwards
 1. `pnpm data:build` already emits `data/scenarios/a-knife-in-the-dark.json` from `Q0C.02`. Review the cross-check report.

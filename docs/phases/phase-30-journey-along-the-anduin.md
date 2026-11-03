@@ -36,7 +36,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `journey-along-the-anduin`:
 
 ## E2E
 
-`.maestro/journey-along-the-anduin.yaml` (a win records the prisoner and unlocks `escape-from-dol-guldur`) and `.maestro/journey-along-the-anduin-loss.yaml`, with their fixtures.
+`.maestro/scenarios/journey-along-the-anduin/journey-along-the-anduin.yaml` (a win records the prisoner and unlocks `escape-from-dol-guldur`) and `.maestro/scenarios/journey-along-the-anduin/journey-along-the-anduin-loss.yaml`, with their fixtures.
 
 ## Exit
 

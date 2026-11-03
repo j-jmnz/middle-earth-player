@@ -32,7 +32,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `a-storm-on-cobas-haven`, a
 
 ## E2E
 
-`.maestro/a-storm-on-cobas-haven.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/a-storm-on-cobas-haven-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven-loss.yaml` (a loss writes nothing), with their fixtures.
 
 ## Exit
 

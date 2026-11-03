@@ -52,7 +52,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
     - Every card keeps its 44 pt slice.
     - The total angle is at most `FAN_MAX`.
   - `scrub-pose.test.ts:16-22`: risen means the final angle equals the target tilt, and lifted means 0.
-- **Docs:** design-system-table.md, Gestures (the scrub paragraph). Note that this reverses phase 25's "the fan flattens" (`docs/phases/phase-25-hand-scrub.md:29`), as a user request dated 2026-10-28.
+- **Docs:** design-system-table.md, Gestures (the scrub paragraph). Note that this reverses phase 25's "the fan flattens" (`docs/phases/done/phase-25-hand-scrub.md:29`), as a user request dated 2026-10-28.
 
 ## Part 2: Card preview without Close
 - **`src/play/cards/card-preview.tsx:153`:** remove the `card-preview-close` ChromeButton. Details stays, alone, in both layouts (`:231`, `:235`).
@@ -80,12 +80,12 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
   - Delete `PaperSwitch` and `PaperChoice`.
   - The panel renders `SettingsRows` with an Eyebrow/`font-display` title "Table settings" aligned left.
   - At its foot, an **All settings** text button (gold) opens the Settings tab. Add an `onAllSettings` callback through `table-layers.tsx`. It routes like the menu's other rows (`table-menu-items.ts`). The Settings tab is portrait on a phone, so this leaves the table, the same as Rules does today; the game is saved.
-  - The close button stays as a night-tone ChromeButton (`settings-close`, as used by `.maestro/table-menu.yaml:98`).
+  - The close button stays as a night-tone ChromeButton (`settings-close`, as used by `.maestro/features/table-menu.yaml:98`).
 - **`table-layers.tsx:131`.**
   - While `held.kind === "settings"`, the `TrayFrame` uses `surface="night"`. The other reading panels stay paper.
   - Settings width is `clamp(360·s, 40% of the canvas, 460·s)`, so a three-word Segmented fits at Large.
   - The "Choice waiting" line takes the night text color while it is on night.
-- **testIDs** stay `settings-speed-*`, `settings-spotlight`, `settings-contrast`, `settings-guide`, `settings-haptics`, `settings-scale-*`, `settings-theme-*`, `settings-close`. Check `.maestro/table-menu.yaml:91-98` (`settings-speed` was the PaperChoice group id; keep it on the `SettingChoice` row).
+- **testIDs** stay `settings-speed-*`, `settings-spotlight`, `settings-contrast`, `settings-guide`, `settings-haptics`, `settings-scale-*`, `settings-theme-*`, `settings-close`. Check `.maestro/features/table-menu.yaml:91-98` (`settings-speed` was the PaperChoice group id; keep it on the `SettingChoice` row).
 - **Docs:** rewrite `docs/design-system.md:361`, the SettingsPanel paragraph, which is stale and contradicts itself. Update the Components rows.
 
 ## Part 4: Tablet landscape for every other screen

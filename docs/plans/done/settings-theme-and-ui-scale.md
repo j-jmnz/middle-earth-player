@@ -204,7 +204,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
   - Backdrops: the light scenes.
   - The "One theme" line in `_layout.tsx` and the docs is replaced.
 - **`docs/phases/STATUS.md`:** add a dated section, "## Settings and UI scale, 2026-10-28 (user request)", with **Checked** and **Open** entries. Open: no phone check (cloud session) at three scales and both themes on Android and iOS, `userInterfaceStyle: automatic` after a prebuild, FlashList scroll performance with dynamic rem, keep-awake on the device, and Maestro not run.
-- **New `.maestro/settings.yaml` flow:** open the tab, switch to Large, relaunch, and check the choice is kept. It is not run in the cloud.
+- **New `.maestro/features/settings.yaml` flow:** open the tab, switch to Large, relaunch, and check the choice is kept. It is not run in the cloud.
 
 ## Notes for the implementing agents
 

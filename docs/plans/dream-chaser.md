@@ -118,7 +118,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 5. **Campaign facts.** "Gavin returned" is a log fact (`dcce` campaign card 11209 Resolution, read by 11215); the Campaign Pool holds the scalable cards (several copies of one code, as Command per sphere); the checklist deals the pool cards each campaign card names.
 6. **Hard/Expert Mode card** (11217): the campaign setup and each briefing offer Hard or Expert (`dcce.hard-expert`); the log stores the choice per scenario, the deal follows it, and the Resolution adds its XP.
 7. **Bump** `ENGINE_VERSION` and the catalog version if a column changes; migration in `drizzle/` if needed.
-8. **Tests and flows.** Registry, loadout, XP round trip, spend and upgrade, old-save load; `.maestro/dream-chaser-start.yaml`, `scenarios-boxes.yaml` updated, `booklet-dream-chaser.yaml`.
+8. **Tests and flows.** Registry, loadout, XP round trip, spend and upgrade, old-save load; `.maestro/features/dream-chaser-start.yaml`, `scenarios-boxes.yaml` updated, `booklet-dream-chaser.yaml`.
 
 **Exit:** Fellowship and Mirkwood goldens unchanged and green, new tests green, `pnpm lint` green. May be split into 38 and 38b (as 28 and 28b) if the XP screen is large.
 
@@ -138,7 +138,7 @@ The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 
 
 ### Phase 39b - Ships on the table
 
-How the table holds the sea family in its limited room, from 667 × 375 with two seats to a tablet (user request, 2026-10-30). The design is in `docs/phases/phase-39b-ships-on-the-table.md`. In short:
+How the table holds the sea family in its limited room, from 667 × 375 with two seats to a tablet (user request, 2026-10-30). The design is in `docs/phases/done/phase-39b-ships-on-the-table.md`. In short:
 - ships stand first in their controller's play-area row;
 - the Heading card adds one top-bar dial;
 - the Corsair deck and its discard pile take a second pile slot under the encounter pair;

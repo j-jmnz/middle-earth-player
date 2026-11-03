@@ -36,7 +36,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `passage-through-mirkwood`:
 
 ## E2E
 
-`.maestro/passage-through-mirkwood.yaml` (a win runs the resolution and unlocks `journey-along-the-anduin`) and `.maestro/passage-through-mirkwood-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/passage-through-mirkwood/passage-through-mirkwood.yaml` (a win runs the resolution and unlocks `journey-along-the-anduin`) and `.maestro/scenarios/passage-through-mirkwood/passage-through-mirkwood-loss.yaml` (a loss writes nothing), with their fixtures.
 
 ## Exit
 

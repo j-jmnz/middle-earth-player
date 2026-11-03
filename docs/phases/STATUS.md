@@ -24,7 +24,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 3 | Phone databases | completed | 2026-10-23. The open-card Maestro flow runs with the suite. |
 | 4 | Scenario 1 fixture | completed | 2026-10-23. |
 | 5 | Image cache | completed | 2026-10-23. Airplane-mode resume not run on a phone. |
-| 6 | Deck builder | completed | Redesigned 2026-10-25. Phone check open: fling the full pool and type in the filter; the redesigned deck screens; `.maestro/deck.yaml` not run. |
+| 6 | Deck builder | completed | Redesigned 2026-10-25. Phone check open: fling the full pool and type in the filter; the redesigned deck screens; `.maestro/features/deck.yaml` not run. |
 | 7 | Round engine | completed | Review fixes not re-reviewed. |
 | 8 | Scenario 1 effects | completed | 2026-10-24. |
 | 8b | Data store | completed | 2026-10-24. |
@@ -32,7 +32,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 8d | Campaign from cards | completed | 2026-10-24. Deferred: the no-replacement case of the fellowship-of-heroes rule. |
 | 9 | Starter effects | completed | 2026-10-24. Marked completed by the user without a second review; review fixes not re-reviewed. |
 | 10 | Campaign shell | active | 2026-10-24. Review fixes not re-reviewed. Phone checks, its Maestro flows and the native compile of `modules/booklet-pdf` (Swift, Kotlin) are open. |
-| 11 | Scenario 1 table | active | 2026-10-24. Review fixes not re-reviewed. Phone checks and every Maestro run open; `.maestro/scenario-1.yaml` needs the scenario 1 won fixture. |
+| 11 | Scenario 1 table | active | 2026-10-24. Review fixes not re-reviewed. Phone checks and every Maestro run open; `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` needs the scenario 1 won fixture. |
 | 12 | A Knife in the Dark | active | 2026-10-24. Engine done. Review fixes not re-reviewed. Phone checks and both Maestro runs open; the won flow has no fixture (user-accepted). |
 | 13 | Flight to the Ford | active | 2026-10-26. Engine done. `/ux` not run. Phone checks; three Maestro flows written, not run; fixtures `ford-*` not committed. |
 | 14 | The Ring Goes South | active | 2026-10-26. Engine done. `/reviewer` and `/ux` not run. Phone checks; four Maestro flows written, not run; fixtures `south-*` not committed. |
@@ -40,14 +40,14 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 16 | Breaking of the Fellowship | active | 2026-10-30. Engine done; review round done. Phone checks open (true solo and two-handed through 2B); four Maestro flows written, not run; fixtures `breaking-*` not committed. Not on Nightmare. |
 | 17 | Design system | completed | 2026-10-23. Superseded by Carved Stone (`docs/design-system.md`). |
 | 18 | Card frames follow the card | completed | 2026-10-26. ux fix not re-reviewed. Phone check open. |
-| 19 | Top bar and table menu | completed | 2026-10-26. Phone checks open; `.maestro/table-menu.yaml` not run. |
+| 19 | Top bar and table menu | completed | 2026-10-26. Phone checks open; `.maestro/features/table-menu.yaml` not run. |
 | 20 | Phase carousel | completed | 2026-10-26. Phone checks open. |
 | 21 | Choice tray | completed | 2026-10-26. Phone checks open. |
 | 22 | Declutter the board | completed | 2026-10-26. Phone checks open. |
 | 23 | Motion pass | completed | 2026-10-26. Phone checks open. |
 | 24 | Combat spotlight | completed | 2026-10-27. Look and timing superseded by the 2026-10-29 redesign. Phone checks open. |
 | 25 | Hold and slide through the hand | completed | 2026-10-27. Phone checks open. |
-| 26 | Peek at the other seat | completed | 2026-10-27. Phone checks open; `.maestro/seat-peek.yaml` not run. |
+| 26 | Peek at the other seat | completed | 2026-10-27. Phone checks open; `.maestro/features/seat-peek.yaml` not run. |
 | 27 | Multi-campaign data | completed | 2026-10-27. |
 | 28 | Campaign registry, saga gating, log, booklets | completed | 2026-10-27. Phone checks open; `mirkwood-start`, `scenarios-boxes`, `booklet-dark-of-mirkwood` flows not run. |
 | 28b | Collapsible sections and run history | completed | 2026-10-28. Phone checks open; `history`, `sections-fold` flows not run. Open review notes below. |
@@ -77,13 +77,13 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 ### Fixtures and Maestro
 
-- Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/a-knife-in-the-dark-loss.yaml` cannot run either.
+- Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark-loss.yaml` cannot run either.
 - A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
 - Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save (phase 13).
 - No Maestro flow has run. The flows that cross a stage advance must pass the quest advance screen (`quest-advance-progress`, Progress is optional); a fixture parked on a When Revealed question shows the question instead.
 - `seat-peek.yaml`, `scenario-1-loss.yaml` and `the-caves-of-nibin-dum.yaml` read `continue-next`, now matched by its accessibility label: run them.
-- `.maestro/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
-- `.maestro/deck.yaml` and `.maestro/rules.yaml` are phone flows; they cannot run on an expanded tablet.
+- `.maestro/features/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
+- `.maestro/features/deck.yaml` and `.maestro/features/rules.yaml` are phone flows; they cannot run on an expanded tablet.
 - No Maestro flow plays an attack through the redesigned combat spotlight.
 - `voyage-won`, `fate-won`, `raid-won`, `stormcaller-won`, `depths-won` and `temple-won` are not committed (the Fate fixtures carry a Voyage win played from the golden): no auto-played win with real decks was found (the shipped pair in 100 seeds, each prebuilt deck solo in 40, 17 two-handed pairs in 60). The goldens win only with synthetic heroes.
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
@@ -120,7 +120,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
-- Rounded chrome (`docs/plans/done/rounded-chrome.md`), phone checks open: both themes on a phone; the capsule controls' pressed darken (`filter: brightness`); the command column's radial fade and the start block's soft scene; the dock with choice rows open on a short phone; the carousel's seven rows at 667 × 375; `.maestro/table-menu.yaml`.
+- Rounded chrome (`docs/plans/done/rounded-chrome.md`), phone checks open: both themes on a phone; the capsule controls' pressed darken (`filter: brightness`); the command column's radial fade and the start block's soft scene; the dock with choice rows open on a short phone; the carousel's seven rows at 667 × 375; `.maestro/features/table-menu.yaml`.
 - Hub layout (`docs/plans/done/hub-layout.md`), phone checks open: both hubs, the campaign setup (carry-over rows) and History (cards, Manage, the Archive toast's Undo, Delete in place) on a phone and an iPad in both orientations, both themes; `start=1` from a finished path; flows `briefing`, `booklet`, `mirkwood-start`, `the-caves-of-nibin-dum`, `history` not run.
 - `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
@@ -129,9 +129,9 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Not built from the Carved Stone handoff: the card screen's "Add to a deck"; the table's encounter row and right-hand piles; the handoff's defend tray.
 - Tablet follow-ups: an Android `appCategory` or large-screen plugin if the table lock must hold on Android 16; pushed routes under the tabs; a Packs list-detail; a Deck import section in `docs/design-system.md`; a "Tap anywhere to close" hint on the preview.
 - Performance pass (`docs/plans/done/performance-pass.md`): its out-of-scope items (the per-card glow, an ArcRing of Views, particle buffer reuse, a UI-thread lift) wait for on-device profiling.
-- Table performance settings (`docs/plans/done/table-performance-settings.md`), phone checks open: Card pictures Low on a full table on a 2x and a 3x phone (a little softer; the long press and the Card screen sharp), a High, Low, High switch mid-game, Moving fog off holding the fog still, pickup and game-step frame timing with the memoized `TablePiece` against the commit before it, the table panel's fold at Medium and Large; `.maestro/table-menu.yaml` not run.
+- Table performance settings (`docs/plans/done/table-performance-settings.md`), phone checks open: Card pictures Low on a full table on a 2x and a 3x phone (a little softer; the long press and the Card screen sharp), a High, Low, High switch mid-game, Moving fog off holding the fog still, pickup and game-step frame timing with the memoized `TablePiece` against the commit before it, the table panel's fold at Medium and Large; `.maestro/features/table-menu.yaml` not run.
 - Settings page and table panel (user request, 2026-11-01), phone checks open: the selected `Segmented` thumb staying a capsule after a pick in phone portrait on Android (its radius is now in the style), the new Performance group, the longer details and Ringwraith / Rivendell / System on one line at Large on a 320 pt phone, the two-column tablet split (Display and Performance, then Motion and feel, At the table and About).
-- Playtime, card search, command head and deck/briefing requests (user request, 2026-11-03), phone checks open: the play clock across background, foreground and a table hidden by Activity; the quest meter's tween and reduced-motion snap, its gradients on native, full/compact/hidden heads on real phones' insets; the victory rows' 44 pt targets and the Victory display reading; the threat and Heading change badges inside the bar's foot; the denser smoke against card art and its frame cost at 110 sprites; deck drag (long press with the FlashList scroll, the lifted cell over its neighbours, auto-scroll, haptics, Move up/down with VoiceOver and TalkBack); HeroTrio at 30 × 42 in Light; the briefing seat fold with a screen reader; `.maestro/deck.yaml` not run.
+- Playtime, card search, command head and deck/briefing requests (user request, 2026-11-03), phone checks open: the play clock across background, foreground and a table hidden by Activity; the quest meter's tween and reduced-motion snap, its gradients on native, full/compact/hidden heads on real phones' insets; the victory rows' 44 pt targets and the Victory display reading; the threat and Heading change badges inside the bar's foot; the denser smoke against card art and its frame cost at 110 sprites; deck drag (long press with the FlashList scroll, the lifted cell over its neighbours, auto-scroll, haptics, Move up/down with VoiceOver and TalkBack); HeroTrio at 30 × 42 in Light; the briefing seat fold with a screen reader; `.maestro/features/deck.yaml` not run.
 - Run `pnpm scans:pack` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
 
 ### Phone and tablet checks

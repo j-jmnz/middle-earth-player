@@ -38,9 +38,9 @@ The saga setup still runs: the first seat's chosen Ring-bearer, The One Ring, on
 
 ## E2E
 
-`.maestro/a-knife-in-the-dark.yaml`, tagged `scenario`, opens a seeded save parked on this scenario's resolution, gives one seat a boon on a named hero, relaunches, and finds the boon on that hero in the log with `flight-to-the-ford` unlocked. A loss flow leaves the log unchanged.
+`.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark.yaml`, tagged `scenario`, opens a seeded save parked on this scenario's resolution, gives one seat a boon on a named hero, relaunches, and finds the boon on that hero in the log with `flight-to-the-ford` unlocked. A loss flow leaves the log unchanged.
 
-Open, 2026-10-25 (user-accepted): the won flow `.maestro/a-knife-in-the-dark.yaml` stays open because no genuine win was found. The loss flow `.maestro/a-knife-in-the-dark-loss.yaml` is written, but its fixture (`knife-lost`) is dealt from the log of scenario 1's won fixture, which is open too (phase 11, E2E): it is not committed, and its tests are skipped, until that win is found.
+Open, 2026-10-25 (user-accepted): the won flow `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark.yaml` stays open because no genuine win was found. The loss flow `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark-loss.yaml` is written, but its fixture (`knife-lost`) is dealt from the log of scenario 1's won fixture, which is open too (phase 11, E2E): it is not committed, and its tests are skipped, until that win is found.
 
 ## Exit
 

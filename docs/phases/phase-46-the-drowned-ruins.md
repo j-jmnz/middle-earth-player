@@ -32,7 +32,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-drowned-ruins`, and th
 
 ## E2E
 
-`.maestro/the-drowned-ruins.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/the-drowned-ruins-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/the-drowned-ruins/the-drowned-ruins.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/the-drowned-ruins/the-drowned-ruins-loss.yaml` (a loss writes nothing), with their fixtures.
 
 ## Exit
 
