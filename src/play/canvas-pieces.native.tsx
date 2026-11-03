@@ -1,4 +1,4 @@
-// The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its printed back), a pile, the
+// The pieces the table canvas draws: a card (its picture, or its name while the file is missing, or its printed back; a pile is pile-piece.native.tsx), the
 // token art on a card, the effects on it, the marks of the open moment, and the mark between an enemy and the characters
 // fighting it. Each is a Skia group at a slot's rectangle; table-canvas.native.tsx places and moves them.
 import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Path, RoundedRect, Skia, Text, type SamplingOptions, type SkFont, type SkImage, type SkPath, vec } from "@shopify/react-native-skia";
@@ -12,10 +12,9 @@ import { glyphCells, type PlaceMark } from "./island-place.ts";
 import { COLS, ROWS } from "./island-table.ts";
 import type { CardSlot, CombatMark, Rect } from "./layout.ts";
 import { medallionAt } from "./look-strip.ts";
-import { FOLD_WORD, foldCount } from "./row-fold.ts";
 import { medallionCount } from "./sea-words.ts";
 import { stripText } from "./table-canvas-views.ts";
-import { AREA_FOLD_WORD, STAGE_APART_WORD } from "./stormcaller-words.ts";
+import { STAGE_APART_WORD } from "./stormcaller-words.ts";
 import type { OptionMark } from "./sheet-types.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
@@ -25,7 +24,7 @@ import { wrapName } from "./wrap.ts";
 // hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
 // shorter side (`cardCorner`, user request, 2026-10-29); `RADIUS` is left for the shapes that are not cards (a drop zone's outline).
 export const RADIUS = 6;
-const LINE = 14;
+export const LINE = 14;
 const BADGE_H = 15;
 // A card picture is drawn at sizes other than its copy's (a hand card at rest is smaller than the scrub's lifted copy; a card moving
 // grows and shrinks): linear filtering between mipmap levels, so it neither aliases when smaller nor blocks when larger.
@@ -34,9 +33,8 @@ export const PICTURE_SAMPLING: SamplingOptions = { filter: FilterMode.Linear, mi
 // Every piece draws with the tokens of the theme in force, handed down from the canvas root as `t` (user request, 2026-10-28); a piece
 // does not read the theme itself.
 // Translucent night, from the token, so the palette drift test covers the canvas's veils too.
-const NO_IMAGES: readonly (SkImage | null)[] = [];
-const shadowOf = (t: TableTokens) => withAlphaHex(t.night, 0.5);
-const stripOf = (t: TableTokens) => withAlphaHex(t.night, 0.72);
+export const shadowOf = (t: TableTokens) => withAlphaHex(t.night, 0.5);
+export const stripOf = (t: TableTokens) => withAlphaHex(t.night, 0.72);
 
 export type Fonts = { names: SkFont; numbers: SkFont; small: SkFont; badge: SkFont };
 export type TokenImages = { resource: SkImage | null; damage: SkImage | null; progress: SkImage | null; questPoints: SkImage | null; engagementCost: SkImage | null };
@@ -125,7 +123,7 @@ export function HeldMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number
 
 // A card back: the printed one, the One Ring for a player card and the Eye for an encounter card. While its file decodes,
 // the player's is raised night with the accent ring, the encounter deck's night with a threat-red ring.
-function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens; s: number }) {
+export function Back({ x, y, w, h, encounter, backs, t, s }: { x: number; y: number; w: number; h: number; encounter: boolean; backs: BackImages; t: TableTokens; s: number }) {
   const image = encounter ? backs.encounter : backs.player;
   const radius = cardCorner(w, h);
   if (image) {
@@ -188,154 +186,6 @@ export function CardBody({
           {sphere ? <CanvasIcon name={sphere} x={x + w - 16 * s} y={y + h - 16 * s} size={12 * s} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
         </Group>
       )}
-    </Group>
-  );
-}
-
-const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard", unchartedDeck: "Uncharted", victory: "Victory" };
-
-// The turn of each card fanned behind the victory pile's top, the nearest first (radians, about the pile's foot; layout.ts keeps VICTORY_FAN of room for it).
-const FAN_TURNS = [-0.12, -0.24];
-
-/** The victory pile's fan: the cards before its top, turned about the pile's foot, the oldest farthest out (docs/design-system-table.md, Piles). */
-function VictoryFan({ slot, fan, t, s }: { slot: CardSlot; fan: readonly (SkImage | null)[]; t: TableTokens; s: number }) {
-  const { x, y, w, h } = slot;
-  const radius = cardCorner(w, h);
-  return (
-    <Group>
-      {fan.map((image, index) => {
-        const turn = FAN_TURNS[fan.length - 1 - index] ?? 0;
-        return (
-          <Group key={index} transform={[{ rotate: turn }]} origin={vec(x + w / 2, y + h)}>
-            <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
-            {image ? (
-              <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
-                <Image image={image} x={x} y={y} width={w} height={h} fit="cover" sampling={PICTURE_SAMPLING} />
-              </Group>
-            ) : (
-              <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
-            )}
-          </Group>
-        );
-      })}
-    </Group>
-  );
-}
-
-/** The victory pile's gold coin at its top right corner: the Victory points its cards score. */
-function PointsCoin({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
-  const r = 8 * s;
-  const cx = slot.x + slot.w - 2 * s;
-  const cy = slot.y + 2 * s;
-  const text = String(slot.points ?? 0);
-  return (
-    <Group>
-      <Circle cx={cx} cy={cy + 1 * s} r={r} color={shadowOf(t)} />
-      <Circle cx={cx} cy={cy} r={r} color={t.fellowship} />
-      <Circle cx={cx} cy={cy} r={r - 1 * s} color={t.ink} style="stroke" strokeWidth={0.75 * s} opacity={0.35} />
-      <Text x={cx - fonts.small.getTextWidth(text) / 2} y={cy + 3.5 * s} text={text} font={fonts.small} color={t.ink} />
-    </Group>
-  );
-}
-
-/** The mark on a discard pile that holds a card the open window lets the seat play from it (Elven-light): an accent disc with a play arrow at its top right corner. */
-function PlayableMark({ slot, t, s }: { slot: CardSlot; t: TableTokens; s: number }) {
-  const r = 8 * s;
-  const cx = slot.x + slot.w - 2 * s;
-  const cy = slot.y + 2 * s;
-  const arrow = `M ${cx - 2.5 * s} ${cy - 4 * s} L ${cx + 4 * s} ${cy} L ${cx - 2.5 * s} ${cy + 4 * s} Z`;
-  return (
-    <Group>
-      <Circle cx={cx} cy={cy + 1 * s} r={r} color={shadowOf(t)} />
-      <Circle cx={cx} cy={cy} r={r} color={t.accent} />
-      <Path path={arrow} color={t.onAccent} />
-    </Group>
-  );
-}
-
-// The piles that show the printed encounter back (the Eye): the encounter pair and the Corsair pair.
-const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard"]);
-
-/**
- * A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. The victory display
- * fans the cards before its top behind it and wears its Victory points on a gold coin; a discard pile the seat may play from wears the play mark.
- */
-export function Pile({
-  slot,
-  image,
-  fan,
-  name,
-  fonts,
-  label,
-  playable = false,
-  backs,
-  t,
-  s,
-}: {
-  slot: CardSlot;
-  image: SkImage | null;
-  fan?: readonly (SkImage | null)[];
-  name: string;
-  fonts: Fonts;
-  label: boolean;
-  playable?: boolean;
-  backs: BackImages;
-  t: TableTokens;
-  s: number;
-}) {
-  const { x, y, w, h } = slot;
-  const radius = cardCorner(w, h);
-  const strip = 15 * s;
-  const encounter = ENCOUNTER_PILES.has(slot.zone);
-  // A row's fold stack shows its first folded card, "+n" on the count strip and the word More (row-fold.ts).
-  const word = slot.areaFold ? AREA_FOLD_WORD : slot.fold ? FOLD_WORD : (PILE_WORD[slot.zone] ?? "");
-  if (slot.count === 0) {
-    return (
-      <Group>
-        <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.hairline} style="stroke" strokeWidth={1 * s}>
-          <DashPathEffect intervals={[4 * s, 4 * s]} />
-        </RoundedRect>
-        {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h / 2 + 4 * s} text={word} font={fonts.small} color={t.faint} /> : null}
-      </Group>
-    );
-  }
-  const depth = Math.min(3, Math.ceil(slot.count / 10));
-  const behind = fan ?? NO_IMAGES;
-  return (
-    <Group>
-      {behind.length > 0 ? <VictoryFan slot={slot} fan={behind} t={t} s={s} /> : null}
-      {Array.from({ length: depth }, (_, index) => (
-        <RoundedRect key={index} x={x + (depth - index) * 1.5 * s} y={y + (depth - index) * 1.5 * s} width={w} height={h} r={radius} color={encounter ? t.night : t.raised} />
-      ))}
-      {slot.faceDown ? (
-        <Back x={x} y={y} w={w} h={h} encounter={encounter} backs={backs} t={t} s={s} />
-      ) : image ? (
-        <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
-          <Image image={image} x={x} y={y} width={w} height={h} fit="cover" sampling={PICTURE_SAMPLING} />
-        </Group>
-      ) : (
-        // A face-up top whose file is missing shows its name, so a discard pile never looks like a deck.
-        <Group>
-          <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
-          <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 21 * s }}>
-            {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
-              <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
-            ))}
-          </Group>
-        </Group>
-      )}
-      <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-      <Outlined x={x + w / 2} y={y + h - 3 * s} text={slot.fold ? foldCount(slot.count) : String(slot.count)} font={fonts.numbers} t={t} s={s} />
-      {/* Iron Shackles is attached to this deck (01105:A:1): two linked rings at the strip's left end. */}
-      {slot.chained ? (
-        <Group>
-          <RoundedRect x={x + 3 * s} y={y + h - 11 * s} width={8 * s} height={6 * s} r={3 * s} color={t.bone} style="stroke" strokeWidth={1.25 * s} />
-          <RoundedRect x={x + 8 * s} y={y + h - 11 * s} width={8 * s} height={6 * s} r={3 * s} color={t.bone} style="stroke" strokeWidth={1.25 * s} />
-        </Group>
-      ) : null}
-      {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h + 11 * s} text={word} font={fonts.small} color={t.muted} /> : null}
-      {slot.points != null ? <PointsCoin slot={slot} fonts={fonts} t={t} s={s} /> : null}
-      {playable ? <PlayableMark slot={slot} t={t} s={s} /> : null}
     </Group>
   );
 }

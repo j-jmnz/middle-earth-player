@@ -24,7 +24,7 @@ import { carouselHeight } from "./carousel-size.ts";
 import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
-import { kindWords, victoryWords } from "./list-words.ts";
+import { kindWords, victorySaid, victoryWords } from "./list-words.ts";
 import { pictureKey } from "./picture-key.ts";
 import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, type ListCard } from "./reading-panels.tsx";
 import { IslandPanel } from "./island-panel.tsx";
@@ -37,7 +37,7 @@ import { useScreenReader } from "./screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "./selectors.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
-import type { ReduceContext, ScenarioState, TableStore } from "./store.ts";
+import type { ReduceContext, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
 import { victoryPointsOf } from "../rules/printed-stat.ts";
 import { settingsPanelWidth } from "./settings-panel-width.ts";
@@ -58,25 +58,28 @@ const EDGE = 8;
 
 type Pictures = (key: string) => PictureSource | null;
 
-// A card of a list as the table shows it: its name, its picture on the side it lies (none while facedown), and the line under it.
-function listCard(game: ScenarioState, id: string, names: SheetNames, picture: Pictures, detail: string | null, hidden = false): ListCard {
-  const card = game.cards[id];
-  const key = card && !hidden ? pictureKey(card) : "";
-  return { id, label: hidden ? "Facedown card" : names.card(id), detail, picture: key ? picture(key) : null, pictureKey: key || id };
+// A card of a list as the table shows it: its name, its picture on the side it lies (`key`, its picture key; "" while facedown), and the
+// line under it: `detail` when given (what a grapple says of a folded location), else its type and sphere, read from its printing.
+function listCard(id: string, code: string, key: string, names: SheetNames, picture: Pictures, cards: ReduceContext["cards"], detail: string | null = null): ListCard {
+  const facedown = key === "";
+  return { id, label: facedown ? "Facedown card" : names.card(id), detail: detail ?? (facedown ? null : kindWords(cards.get(code))), picture: facedown ? null : picture(key), pictureKey: key || id };
 }
 
 // The discard pile list, the log and the threat panel read the game themselves, so the layers above them do not render on every state.
 // A discard pile's line is each card's type and sphere; the victory display's adds the Victory points each card scores (list-words.ts).
 function PileReading({ store, ctx, pile, seat, names, picture, sheet, peeking, onRead, onPlay, onClose }: { store: TableStore; ctx: ReduceContext; pile: PileId; seat: number; names: SheetNames; picture: Pictures; sheet: Sheet; peeking: boolean; onRead: (cardId: string) => void; onPlay: (cardId: string) => void; onClose: () => void }) {
   const game = useStore(store, (state) => state.game);
-  const detailOf = (id: string) => {
-    const kind = kindWords(ctx.cards.get(game.cards[id]?.code ?? ""));
-    return pile === "victory" ? victoryWords(kind, victoryPointsOf(game, id, ctx.cards)) : kind;
-  };
+  const cards = [...pileIds(game, pile, seat)].reverse().map((id) => {
+    const card = game.cards[id];
+    const made = listCard(id, card?.code ?? "", card ? pictureKey(card) : "", names, picture, ctx.cards);
+    if (pile !== "victory") return made;
+    const points = victoryPointsOf(game, id, ctx.cards);
+    return { ...made, detail: victoryWords(made.detail ?? null, points), said: victorySaid(made.detail ?? null, points) };
+  });
   return (
     <PileList
       title={PILE_WORDS[pile]}
-      cards={[...pileIds(game, pile, seat)].reverse().map((id) => listCard(game, id, names, picture, detailOf(id)))}
+      cards={cards}
       playable={pile === "discard" && !peeking ? discardPlays(game, seat, sheet) : []}
       onRead={onRead}
       onPlay={onPlay}
@@ -85,24 +88,27 @@ function PileReading({ store, ctx, pile, seat, names, picture, sheet, peeking, o
   );
 }
 
-const NO_IDS: readonly string[] = [];
-
-// The cards a row folded away, as the canvas last laid the table out (store.ts, `folded`): a tile shows one large.
+// The cards a row folded away, as the canvas last laid the table out (store.ts, `folded`): a row shows one large. It subscribes to what it
+// draws of them, as one key each: the card's code and picture key ("" for a card the table hides the face of, which is not named: selectors.ts,
+// hidesFace) and what a folded location says of the enemies grappled under it (the count and the Threat they add), so a state that changes
+// none of that does not render it.
 function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; row: "staging" | "engaged"; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
-  const game = useStore(store, (state) => state.game);
   const ids = useStore(store, (state) => state.rowFolds[row]);
-  // A card the table hides the face of (facedown) is not named, as it is not on the canvas (selectors.ts, hidesFace).
-  const hiddenKey = useStore(store, (state) => state.rowFolds[row].filter((id) => hidesFace(state.game.cards[id])).join(","));
-  const hidden = hiddenKey === "" ? NO_IDS : hiddenKey.split(",");
-  // What a folded location says of the enemies grappled under it: the count and the Threat they add, one line a card ("" for a card with none).
-  const detailKey = useStore(store, (state) => state.rowFolds[row].map((id) => grappleDetail(state.game, id) ?? "").join("\n"));
-  const details = detailKey.split("\n");
+  const rowsKey = useStore(store, (state) =>
+    state.rowFolds[row]
+      .map((id) => {
+        const card = state.game.cards[id];
+        const key = card && !hidesFace(card) ? pictureKey(card) : "";
+        return [card?.code ?? "", key, grappleDetail(state.game, id) ?? ""].join("\t");
+      })
+      .join("\n"),
+  );
   // A stack that holds only the Stormcaller's area's cards is titled for it (stormcaller-table.ts); its stage never folds.
   const areaOnly = useStore(store, (state) => row === "staging" && ids.length > 0 && ids.every((id) => areaRoleOf(state.game, id) != null));
-  // Each card's line is what the grapple says of it, else its type and sphere; a facedown card has neither.
+  const rows = rowsKey.split("\n");
   const cards = ids.map((id, at) => {
-    const facedown = hidden.includes(id);
-    return listCard(game, id, names, picture, details[at] || (facedown ? null : kindWords(ctx.cards.get(game.cards[id]?.code ?? ""))), facedown);
+    const [code = "", key = "", grapple = ""] = (rows[at] ?? "").split("\t");
+    return listCard(id, code, key, names, picture, ctx.cards, grapple || null);
   });
   return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
 }
