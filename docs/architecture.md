@@ -84,6 +84,7 @@ flowchart TD
   rules[src/rules]
   campaign[src/campaign]
   play[src/play]
+  ui[src/ui]
   screens[src/screens]
   effects --> catalog
   rules --> catalog
@@ -97,6 +98,8 @@ flowchart TD
   screens --> campaign
   screens --> catalog
   screens --> effects
+  play --> ui
+  screens --> ui
 ```
 
 | Path | Owns | May import |
@@ -105,18 +108,55 @@ flowchart TD
 | `src/effects` | `generated/` (written by `data:build` from sentence templates) and `authored/` (per scenario, `pool/<pack>.ts` and `families/<family>.ts`); `EFFECTS` is both, an authored id replacing a generated one; `open-lines.ts` | `src/catalog` |
 | `src/rules` | The engine: state, round machine, window and frame stack, keywords, modifier list, effect interpreter, the mechanic families' engine (`families/`), reducer, undo, replay | `src/catalog` |
 | `src/campaign` | Save and log types, briefing and checklist, `buildStart`, resolution, scoring, replay of a save, standalone games, playable list | `src/catalog`, `src/rules`, `src/effects` |
-| `src/play` | Skia table, phase rail, sheets, choice logic, readouts, gesture-to-intent mapping, undo history | `src/rules`, `src/catalog`, `src/effects` |
+| `src/play` | Skia table, phase rail, sheets, choice logic, readouts, gesture-to-intent mapping, undo history | `src/rules`, `src/catalog`, `src/effects`, `src/ui` |
+| `src/ui` | The design system the table and the screens share: tokens and theme, text, UI scale and size class, surfaces, radius, buttons, game icons (`icons/`, written by `data:build`), motion tokens and the motion clock, accessibility, haptics, table settings | nothing in `src/` |
 | `modules/image-backup-exclusion` | Sets the platform's backup-exclusion flag on the image directory; `index.ts` is the JS side; autolinking links it through `ios/*.podspec` and `android/build.gradle` (`scripts/checks/local-modules.test.ts`) | `expo-modules-core` only |
 | `modules/booklet-pdf` | Native view and `pageCount` for one local PDF (Swift on iOS, Kotlin on Android; Android zooms in `ZoomList`, PDFKit zooms itself); `index.ts` is the JS side and reports `bookletPdfAvailable()`; autolinking links it through `ios/*.podspec` and `android/build.gradle` (`scripts/checks/local-modules.test.ts`) | `expo-modules-core` only |
-| `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog`, `src/effects` |
+| `src/screens` | Expo Router routes, SQLite, image cache, deck editor, booklet reader | `src/play`, `src/campaign`, `src/catalog`, `src/effects`, `src/ui` |
+| `test/` | Test support only: the harness (`harness/`: test catalog, scenes, auto-player, cause check) and one folder per scenario (`scenarios/<scenario-id>/`: its scene and its seeded whole game). Tests and scripts import it; the app never does | anything |
 
 The Expo Router root is `src/screens/routes`. Every file in that directory is a page. SQLite, the database provider, and tests stay in `src/screens`, outside that root.
 
-`eslint.config.js` enforces these edges (`pnpm lint`, CI). `import-x/no-restricted-paths` zones allow only the imports in the table, and `src/play` may not import `src/campaign` or `src/screens`; `src/screens` may not import `src/rules`, so it reads engine results through `src/play` and `src/campaign`. `src/rules` and `src/campaign` also may not import `react-native`, `expo` or `expo-*`, statically, dynamically or with `require`. Scripts and test files get the same zones except that they may import `src/effects` into `src/rules` and `src/catalog`; `src/rules/boundaries.test.ts` additionally scans `src/rules` for `src/effects`, `fetch`, `Math.random` and `better-sqlite3`. `src/rules` receives the effect list as an argument (`ReduceContext`). Vitest imports the same reducer the screen calls and passes the effect list in.
+`eslint.config.js` enforces these edges (`pnpm lint`, CI). `import-x/no-restricted-paths` zones allow only the imports in the table, and `src/play` may not import `src/campaign` or `src/screens`; `src/ui` may import nothing else under `src/`; `src/screens` may not import `src/rules`, so it reads engine results through `src/play` and `src/campaign`. `src/rules` and `src/campaign` also may not import `react-native`, `expo` or `expo-*`, statically, dynamically or with `require`. Scripts, `test/` and test files get the same zones except that they may import `src/effects` into `src/rules` and `src/catalog`; `src/rules/boundaries.test.ts` additionally scans `src/rules` for `src/effects`, `fetch`, `Math.random` and `better-sqlite3`. `src/rules` receives the effect list as an argument (`ReduceContext`). Vitest imports the same reducer the screen calls and passes the effect list in.
 
 The core round and the deck builder do not mention Fellowship by name. A scenario is `data/scenarios/<id>.json` and a `ScenarioDefinition` derived from it; `buildStart` turns a campaign and a scenario into the engine's start. A further scenario is more `data:sync` and `data:build` output, its campaign card's Setup and Resolution as records, and the records `pnpm effects:draft` drafts for its open lines. `src/campaign/playable.ts` lists the scenarios whose printed lines all have records (the first four Fellowship scenarios); `pnpm effects:open` lists the lines still open.
 
 `src/play` sends player intents. It does not assign threat, damage, resources, progress, or log fields.
+
+### Repository map
+
+Each folder answers one question; a test keeps it so (`scripts/checks/layout.test.ts`: no source folder over 40 files, one folder per mechanic family, scenario folders named by scenario id). Scenario folders everywhere use the id of `data/scenarios/<id>.json`. A file's test sits beside it; a `.native` file sits beside its base file. Move files with `pnpm move`, which rewrites every path that names them.
+
+```
+src/catalog/            schemas, types, the families' vocabulary (families/<family>.ts), CATALOG_VERSION
+src/effects/            generated/ (data:build), authored/ (<scenario-id>.ts, pool/<pack>.ts, nightmare/, families/)
+src/rules/              the engine
+  core/                 state, intents, zones, keywords, printed cards, seed, causes, test-fixture
+  engine/               reduce, the round machine, legal intents, refresh, undo, ENGINE_VERSION
+  windows/              windows, the frame stack, the queue, responses, triggers, events, delayed effects
+  interpret/            the effect interpreter, verbs, conditions, amounts, constants, restrictions, picks
+  combat/  quest/  setup/  player/      combat and shadows; quest, staging, travel; setup and resolution; actions and costs
+  families/<family>/    one mechanic family's engine: index.ts (its run) and its parts; families/index.ts orders them
+src/campaign/           saves, log, loadout, start, briefing, resolution, XP, runs, standalone games, playable list
+  scenarios/<scenario-id>/   that scenario's tests and its golden game (golden.json)
+  starter/              the starter-deck tests and goldens
+  fixtures/             the Maestro save fixtures (scripts/e2e/fixtures.ts writes them)
+src/ui/                 the design system (see the table above)
+src/play/               the table
+  store/  canvas/  layout/  motion/  spotlight/  phases/      state and selectors; the Skia table; zone geometry; card motion; the combat spotlight; the phase rail and carousel
+  choice/ (dock/)  readouts/  words/  cards/  chrome/         sheets, the tray and the dock; numbers and banners; choice wording per family; card text and preview; top bar, menu, panels
+  dream-chaser/         the Dream-chaser table pieces (the Island Map, the Heading dial)
+  scenarios/            table tests that play one scenario
+src/screens/            the app around the table
+  routes/               Expo Router pages only (each file is a URL)
+  kit/  nav/  art/  data/      the chrome UI kit and palette; navigation and insets; backdrops and hero art; databases, schema and stores
+  deck/  pool/  campaign/  briefing/  history/  session/  table/  settings/  rules/  images/  booklets/
+test/                   test support: harness/, scenarios/<scenario-id>/ (scene.ts, game.ts)
+scripts/                commands: data/ (sync, build, check, query, effects), build/ (catalog, scans, booklets), docs/, e2e/, card-smoke/, checks/, tools/ (pnpm move), log.ts
+data/  assets/  drizzle/  modules/  plugins/   sources and builds; bundled files; user.db migrations; native modules; Expo and Babel plugins
+.maestro/               scenarios/<scenario-id>/, features/, config.yaml
+docs/                   brief, architecture, design system; phases/ (STATUS.md, open phases, done/); plans/ (done/); handover/
+```
 
 ## State
 

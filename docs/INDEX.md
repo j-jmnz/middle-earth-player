@@ -42,22 +42,23 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.1K)
     - 157–160 Maestro (~170)
-- `docs/architecture.md` — Architecture (~16.8K tok)
+- `docs/architecture.md` — Architecture (~17.8K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
-  - 78–120 Modules (~1.0K) ← 3
-  - 121–146 State (~1.0K) ← 9
-  - 147–168 Play loop (~250)
-  - 169–194 Engine (~2.8K)
-    - 183–194 Mechanic families (~1.9K)
-  - 195–200 Effects (~520)
-  - 201–233 Scenario definition (~800)
-  - 234–254 Persistence (~1.4K)
-  - 255–260 Images (~1.0K) ← 6
-  - 261–309 Screens (~3.7K) ← 1
-  - 310–315 Catalog build (~410)
-  - 316–329 Tests (~870) ← 2
-  - 330–345 Performance (~1.2K) ← 3
+  - 78–160 Modules (~2.0K) ← 3
+    - 126–160 Repository map (~820) ← 1
+  - 161–186 State (~1.0K) ← 9
+  - 187–208 Play loop (~250)
+  - 209–234 Engine (~2.8K)
+    - 223–234 Mechanic families (~1.9K)
+  - 235–240 Effects (~520)
+  - 241–273 Scenario definition (~800)
+  - 274–294 Persistence (~1.4K)
+  - 295–300 Images (~1.0K) ← 6
+  - 301–349 Screens (~3.7K) ← 1
+  - 350–355 Catalog build (~410)
+  - 356–369 Tests (~870) ← 2
+  - 370–385 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
@@ -334,7 +335,7 @@ History and rationale; read only when a code comment or task cites one.
 The sections each area's comments cite, most cited first. Read these before changing code there.
 
 - `scripts/build`: brief.md, Card images (2)
-- `scripts/checks`: architecture.md, Modules (1)
+- `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/tools`: architecture.md, Modules (1)
