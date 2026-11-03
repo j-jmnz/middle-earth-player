@@ -172,7 +172,7 @@ Read the sections your task touches.
     - 422–425 Rule (~220) ← 1
     - 426–429 Booklet (~100)
     - 430–433 Database (~20)
-  - 434–453 States (~590)
+  - 434–453 States (~610)
 
 ## Phases
 

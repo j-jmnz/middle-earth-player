@@ -7,9 +7,9 @@ appId: com.middleearth.lcg
     visible: "Stealth and Steadfastness"
     timeout: 15000
 - assertVisible: "Wisdom and Wizardry"
-- assertVisible:
+# A ready deck shows no status line.
+- assertNotVisible:
     id: deck-stealth-and-steadfastness-status
-    text: "Ready to play"
 # The deck list filters by a hero's sphere: Spirit keeps Wisdom and Wizardry (Éowyn) and drops Stealth and Steadfastness.
 - tapOn:
     id: decks-sphere-spirit

@@ -226,6 +226,7 @@ export default function Decks() {
       detail: deckCountLine(deck),
       short: deckShortLine(deck),
       status: readiness.get(deck.id) ?? { ready: false, text: "" },
+      quietReady: true,
       note: notAppliedLine(deck, inactive),
       onPress: () => openDeck(deck),
       onLongPress: () => {

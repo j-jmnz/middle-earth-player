@@ -208,6 +208,8 @@ type DeckSummary = {
   // "47 of 50 cards" while the deck is short (deck-status.ts, deckShortLine); the cover and row show the count only then.
   short?: string | null;
   status: { ready: boolean; text: string };
+  // The deck list: a ready deck shows no status line and no dot; only a deck that is not ready shows its rule. The briefing's picker leaves it off.
+  quietReady?: boolean;
   // "6 cards with text not applied" (deck-status.ts, notAppliedLine), under the status; not a readiness rule.
   note?: string | null;
   onPress: () => void;
@@ -222,14 +224,15 @@ type DeckSummary = {
 };
 
 // The press props of a deck in the list (a button) or in the briefing's picker (a radio).
-function pressProps({ name, heroes, detail, status, note, onPress, onLongPress, testID, selected, disabled }: DeckSummary) {
+function pressProps({ name, heroes, detail, status, quietReady, note, onPress, onLongPress, testID, selected, disabled }: DeckSummary) {
   const picker = selected !== undefined;
+  const said = quietReady && status.ready ? "" : `, ${status.text}`;
   return {
     testID,
     collapsable: false,
     accessibilityRole: picker ? ("radio" as const) : ("button" as const),
     accessibilityState: picker ? { selected, disabled: disabled ?? false } : undefined,
-    accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}, ${status.text}${note ? `, ${note}` : ""}`,
+    accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}${said}${note ? `, ${note}` : ""}`,
     accessibilityHint: picker ? undefined : "Opens the deck",
     disabled: disabled ?? false,
     onPress,
@@ -252,13 +255,16 @@ function heroNames(heroes: readonly HeroFace[]): string {
   return heroes.length > 0 ? heroes.map((hero) => hero.name).join(", ") : "No heroes yet";
 }
 
-function StatusLine({ testID, short, status, note }: { testID: string; short?: string | null; status: DeckSummary["status"]; note?: string | null }) {
+function StatusLine({ testID, short, status, quietReady, note }: { testID: string; short?: string | null; status: DeckSummary["status"]; quietReady?: boolean; note?: string | null }) {
+  const quiet = quietReady && status.ready;
   return (
     <View>
-      <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
-        {short ? <Text className="text-label text-muted">{short}</Text> : null}
-        <Readiness testID={`${testID}-status`} status={status} />
-      </View>
+      {short || !quiet ? (
+        <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
+          {short ? <Text className="text-label text-muted">{short}</Text> : null}
+          <Readiness testID={`${testID}-status`} status={status} quietReady={quietReady} />
+        </View>
+      ) : null}
       {note ? (
         <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
           {note}
@@ -277,7 +283,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const { name, heroes, short, status, note, height, testID, children, selected, disabled } = props;
+  const { name, heroes, short, status, quietReady, note, height, testID, children, selected, disabled } = props;
   const foot = t.depth === "light" ? palette.raised : palette.dusk;
   return (
     <View className="overflow-hidden rounded-item" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
@@ -307,7 +313,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                 <Text className="min-w-0 shrink text-label text-muted" numberOfLines={1}>
                   {heroNames(heroes)}
                 </Text>
-                <Readiness testID={`${testID}-status`} status={status} />
+                <Readiness testID={`${testID}-status`} status={status} quietReady={quietReady} />
               </View>
               {short ? <Text className="text-label text-faint">{short}</Text> : null}
               {note ? (
@@ -324,11 +330,21 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   );
 }
 
-/** Ready to play, with a green dot, or what the deck still needs, with a red one. `testID` names the words. */
-export function Readiness({ testID, status, lines = 1 }: { testID: string; status: DeckSummary["status"]; lines?: number }) {
+/**
+ * Ready to play, with a green dot, or what the deck still needs, with a red one. `testID` names the words. With `quietReady`
+ * (the deck list and editor) a ready deck shows nothing and a deck that is not ready shows its rule in danger, with no dot.
+ */
+export function Readiness({ testID, status, lines = 1, quietReady }: { testID: string; status: DeckSummary["status"]; lines?: number; quietReady?: boolean }) {
   const palette = usePalette();
   const s = useUiScale();
   const color = status.ready ? palette.ok : palette.danger;
+  if (quietReady) {
+    return status.ready ? null : (
+      <Text testID={testID} className="shrink text-label" style={{ color }} numberOfLines={lines}>
+        {status.text}
+      </Text>
+    );
+  }
   return (
     <View className="shrink flex-row items-center gap-1.5">
       <View style={{ width: 7 * s, height: 7 * s, borderRadius: 3.5 * s, backgroundColor: color, boxShadow: `0 0 6px ${withAlphaHex(color, 0.7)}` }} />
@@ -346,7 +362,7 @@ export function DeckRow(props: DeckSummary) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const { name, heroes, short, status, note, testID, children, selected, disabled } = props;
+  const { name, heroes, short, status, quietReady, note, testID, children, selected, disabled } = props;
   const thumb = { width: rowThumb.width * s, height: rowThumb.height * s };
   return (
     <View className="mb-1.5 overflow-hidden rounded-item" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
@@ -371,7 +387,7 @@ export function DeckRow(props: DeckSummary) {
               <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
                 {name}
               </Text>
-              <StatusLine testID={testID} short={short} status={status} note={note} />
+              <StatusLine testID={testID} short={short} status={status} quietReady={quietReady} note={note} />
             </View>
             {selected === undefined ? <Chevron direction="right" color={palette.faint} size={8} /> : <SelectedMark selected={selected} />}
           </View>
