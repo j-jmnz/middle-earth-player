@@ -9,27 +9,15 @@ import { useTheme } from "../play/theme";
 import { useTableTokens } from "../play/use-table-tokens";
 import { useUiScale } from "../play/ui-scale";
 import { useSizeClass } from "../play/use-size-class";
-import { HeroArt, Portrait, SceneArt, type ArtCard } from "./art";
+import { HeroArt, SceneArt } from "./art";
 import { COVER } from "./art-crop";
 import { Chevron, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "./chrome";
 import { FoldSection } from "./fold-section";
 import { HeroTile, type HeroFace } from "./hero-tile";
-import type { Palette } from "./palette.js";
+import { HeroTrio } from "./hero-trio";
 import { usePalette } from "./palette-hook";
 import { useSplitColumns } from "./use-split-columns";
-import { SPHERE_TINT } from "../play/icon-map";
 import { Text } from "../play/text";
-
-/** A hero of the fellowship as the panels show it: the face, the name, and the sphere colour of its ring (none for a neutral hero). */
-export type PartyHero = { card: ArtCard; name: string; tint?: string };
-
-/** The face a row leads with, from the first hero's code: its picture, its name and its sphere's colour (none for a neutral hero); null when the catalog lacks it. */
-export function leadFace(faces: ReadonlyMap<string, HeroFace>, code: string | undefined, palette: Palette): PartyHero | null {
-  const face = code ? faces.get(code) : undefined;
-  if (!code || !face) return null;
-  const tint = SPHERE_TINT[face.sphereCode ?? ""];
-  return { card: { code, imagesrc: face.imagesrc }, name: face.name, tint: tint && tint !== "faint" ? palette[tint] : undefined };
-}
 
 // How far a fellowship painting laps over the one before it.
 const OVERLAP = 10;
@@ -101,8 +89,8 @@ export function RunHero({ overline, title, detail, seats, testID }: { overline: 
   );
 }
 
-/** Another open run: one 62 pt row that opens it, with the fellowship's first face, its title and a line under it. */
-export function RunRow({ testID, title, line, lead, accessibilityLabel, onPress }: { testID: string; title: string; line: string; lead: PartyHero | null; accessibilityLabel: string; onPress: () => void }) {
+/** Another open run: one 62 pt row that opens it, with the first seat's three heroes (`HeroTrio`), its title and a line under it. */
+export function RunRow({ testID, title, line, heroes, accessibilityLabel, onPress }: { testID: string; title: string; line: string; heroes: readonly HeroFace[]; accessibilityLabel: string; onPress: () => void }) {
   const palette = usePalette();
   const t = useTableTokens();
   const { s } = useSizeClass();
@@ -110,7 +98,7 @@ export function RunRow({ testID, title, line, lead, accessibilityLabel, onPress 
     <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}>
       {({ pressed }) => (
         <View className="flex-row items-center gap-3 rounded-item px-3" style={{ minHeight: 62 * s, ...rowSurface(pressed, t) }}>
-          {lead ? <Portrait card={lead.card} size={36} tint={lead.tint} glow={false} /> : null}
+          <HeroTrio heroes={heroes} />
           <View className="min-w-0 flex-1">
             <Text className="font-display text-heading text-bone" numberOfLines={1}>
               {title}

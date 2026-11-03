@@ -39,7 +39,7 @@ export function deleteGameSentence(described: string, hasRun: boolean): string {
   return `Delete ${described}? It is gone for good. ${hasRun ? "Its run stays in History; your decks stay." : "Your decks stay."}`;
 }
 
-export type CardWords = { title: string; lines: CardLine[]; chip: CardChip | null; spoken: string; firstHero: string | undefined };
+export type CardWords = { title: string; lines: CardLine[]; chip: CardChip | null; spoken: string; firstSeat: readonly string[] };
 
 const STATUS_CHIP: Record<StandaloneStatus, CardChip> = {
   playing: { label: "In progress", tone: "neutral" },
@@ -82,7 +82,7 @@ export function saveWords(ref: LibrarySave, runs: readonly RunRecord[], started:
     lines: [...line(playthroughWords(worded.seats, started, { done: worded.done, total: worded.total }), "muted"), ...line(heroesWords(seats, nameOf), "muted"), ...line(next, nextTone(archived))],
     chip: null,
     spoken: [describe(worded), next, runsSpoken(runs, nameOf)].join(". "),
-    firstHero: seats[0]?.[0],
+    firstSeat: seats[0] ?? [],
   };
 }
 
@@ -99,7 +99,7 @@ export function gameWords(game: ListedStandalone, run: RunRecord | null, opens: 
     lines: [...line(setup, "muted"), ...line(heroesWords(seats, nameOf), "muted"), ...runLines(run, nameOf), ...line(opens, nextTone(archived))],
     chip: STATUS_CHIP[standaloneStatus(game)],
     spoken: [`${scenarioName(game.scenarioId)}, ${gameCaption(game)}`, ...(run ? [runLabel(run, scenarioName(run.scenarioId), nameOf, false)] : [])].join(". "),
-    firstHero: seats[0]?.[0],
+    firstSeat: seats[0] ?? [],
   };
 }
 
@@ -115,7 +115,7 @@ export function goneWords(runs: readonly RunRecord[], nameOf: NameOf): CardWords
       lines: [...line(playthroughWords(seatWord(first.seatCount), startedOf(runs), null), "muted"), ...line(heroesWords(first.heroes, nameOf), "muted"), ...line(gone, "faint")],
       chip: null,
       spoken: [title, gone, runsSpoken(runs, nameOf)].join(". "),
-      firstHero: first.heroes[0]?.[0],
+      firstSeat: first.heroes[0] ?? [],
     };
   }
   const setup = [seatWord(first.seatCount), boxName(first.box)].filter((part) => part != null).join(" · ");
@@ -124,6 +124,6 @@ export function goneWords(runs: readonly RunRecord[], nameOf: NameOf): CardWords
     lines: [...line(setup, "muted"), ...line(heroesWords(first.heroes, nameOf), "muted"), ...runLines(first, nameOf), ...line(gone, "faint")],
     chip: RESULT_CHIP[first.result],
     spoken: runLabel(first, scenarioName(first.scenarioId), nameOf, true),
-    firstHero: first.heroes[0]?.[0],
+    firstSeat: first.heroes[0] ?? [],
   };
 }

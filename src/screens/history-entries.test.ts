@@ -48,7 +48,7 @@ describe("history cards", () => {
       { text: "N1, N2", tone: "muted" },
       { text: "Next: Flight to the Ford", tone: "accent" },
     ]);
-    expect(live.firstHero).toBe("1");
+    expect(live.firstSeat).toEqual(["1", "2"]);
     expect(live.spoken).toContain("2 runs, latest: A Shadow of the Past, Lost · Threat reached 50");
     expect(saveWords(save({ kind: "begin", node }), [], null, true, name).lines.at(-1)).toEqual({ text: "Next: Flight to the Ford", tone: "muted" });
     expect(saveWords(save({ kind: "finished" }), [], null, false, name).lines.at(-1)).toEqual({ text: "Campaign complete", tone: "accent" });

@@ -14,6 +14,7 @@ import { scenarioName } from "./campaign-data";
 import { archiveSave, deleteSave, restoreSave } from "./campaign-store";
 import { BodyText, NavBar, PillButton, Screen, Section, Segmented } from "./chrome";
 import { deckFaces } from "./deck-store";
+import { heroFace } from "./hero-tile";
 import { useDatabases } from "./databases";
 import { FoldHeader, useFolds } from "./fold-section";
 import { goBack } from "./go-back";
@@ -22,9 +23,7 @@ import { libraryItems, type FoldedSection, type LibraryItem, type OpenSection } 
 import { EMPTY_LIBRARY, readLibrary, type Library, type LibrarySave } from "./history-read";
 import { CardActions, HistoryCard } from "./history-rows";
 import { emptyWords } from "./history-words";
-import { leadFace } from "./hub-parts";
 import { useListGutter } from "./list-gutter";
-import { usePalette } from "./palette-hook";
 import { pathHref } from "./scenario-links";
 import { deleteSentence, describe, partyCodes } from "./save-line";
 import { archiveStandalone, deleteStandalone, restoreStandalone } from "./standalone-store";
@@ -51,7 +50,6 @@ type Managed = { id: string; name: string; described: string; sentence: string; 
 /** The History screen for one starting kind (the tab that opened it). */
 export function HistoryView({ initial }: { initial: RunKind }) {
   const router = useRouter();
-  const palette = usePalette();
   const list = useListGutter();
   const bottom = useBottomInset();
   const { catalog, user } = useDatabases();
@@ -170,7 +168,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       title={words.title}
       lines={words.lines}
       chip={words.chip}
-      lead={leadFace(faces, words.firstHero, palette)}
+      lead={words.firstSeat.map((code) => heroFace(faces, code))}
       runs={managing ? [] : listed}
       nameOf={nameOf}
       faces={faces}
