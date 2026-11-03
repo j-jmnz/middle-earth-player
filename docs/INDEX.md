@@ -153,7 +153,7 @@ Read the sections your task touches.
     - 260–263 Splash (~40)
     - 264–267 App icon (~80)
     - 268–283 Campaigns (campaign list) (~1.4K) ← 6
-    - 284–297 Scenarios (~770) ← 1
+    - 284–297 Scenarios (~790) ← 1
     - 298–309 History (~1.3K) ← 4
     - 310–327 Briefing (~1.6K) ← 3
     - 328–331 Campaign setup (~700) ← 3

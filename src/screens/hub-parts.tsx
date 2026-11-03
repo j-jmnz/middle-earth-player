@@ -150,14 +150,19 @@ export function PrimaryPlate({ children }: { children: ReactNode }) {
   return size === "compact" ? children : <View style={{ alignSelf: "flex-start", width: 320 * s }}>{children}</View>;
 }
 
-// The number in a small diamond on a scenario's art.
+// The number in a small capsule on a scenario's art: the pool's count badge (`pool-cards.tsx`, h-6 min-w-6, rounded-control, a drop
+// shadow, the accent number) on the surface the diamond had, so it reads over a bright sky on both themes. The number is its row's label.
 function NumberBadge({ number }: { number: number }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <View className="items-center justify-center" style={{ width: 24 * s, height: 24 * s, transform: [{ rotate: "45deg" }], backgroundColor: t.depth === "light" ? palette.raisedTop : withAlphaHex(palette.night, 0.82), boxShadow: dropShadowOf(t, 2, 6, 0.8) }}>
-      <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.accentHigh, transform: [{ rotate: "-45deg" }] }}>
+    <View
+      importantForAccessibility="no"
+      className="items-center justify-center rounded-control"
+      style={{ minWidth: 24 * s, height: 24 * s, paddingHorizontal: 6 * s, backgroundColor: t.depth === "light" ? palette.raisedTop : withAlphaHex(palette.night, 0.82), boxShadow: dropShadowOf(t, 2, 6, 0.8) }}
+    >
+      <Text className="font-display" style={{ fontSize: 12 * s, lineHeight: 15 * s, color: palette.accentHigh }}>
         {String(number)}
       </Text>
     </View>
@@ -179,7 +184,7 @@ export function CatalogGrid({ posters, children }: { posters: number; children: 
 
 /**
  * One catalog entry on its scene: a 64 pt row on a phone (`posters` 0), a poster on a tablet. `number` is the book number in a small
- * diamond on the art. `tone` is the colour of `line`, which is left out when empty.
+ * capsule on the art. `tone` is the colour of `line`, which is left out when empty.
  */
 export function CatalogTile({
   testID,
