@@ -156,7 +156,7 @@ For each phase:
 - `pnpm data:build -- --verbose` shows no failed cross-check; every dealt card has a ledger entry (phase 37).
 - `pnpm effects:draft <id>`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
 - New verbs go in a mechanic family, never bent from an existing one. Records go in `src/effects/authored/<scenario-id>.ts`; the boon and burden records go in `src/effects/authored/pool/DCCE.ts`.
-- Golden `src/campaign/golden/<id>.json` with a `golden-<short>.test.ts`, `scripts/<short>-scene.ts` and `<short>-game.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
+- Golden `src/campaign/scenarios/<id>/golden.json` with its `golden.test.ts`, `test/scenarios/<id>/scene.ts` and `game.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add the id to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone: words and widgets only where a line creates them (cite the line in `docs/brief.md`), built from phase 39b's pieces and its "Scenario areas" section, Maestro win and loss flows, fixtures.

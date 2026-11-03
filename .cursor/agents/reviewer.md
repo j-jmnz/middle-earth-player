@@ -88,13 +88,13 @@ A bug names the file, the input, and the wrong result. Any other finding names t
 Block: src/rules/quest/quest.ts places progress on the quest while Bag End is active
 Committed willpower 4 against staging threat 1 puts 3 progress on the quest. That progress belongs on the active location first.
 
-Block: src/screens/table.tsx applies damage
+Block: src/screens/table/view.tsx applies damage
 The screen adds `attack - defense` itself. That result belongs in the reducer. The screen can only dispatch the defender the player chose.
 
-Change: src/campaign/fellowship/shadow.ts duplicates staging
-The same reveal-and-surge loop is in src/rules/staging.ts. Call that function.
+Change: src/rules/families/south/reveal.ts duplicates staging
+The same reveal-and-surge loop is in src/rules/quest/stage-reveal.ts. Call that function.
 
-Note: src/play/Hand.tsx is 180 lines and still one job
+Note: src/play/canvas/hand-scrub.native.tsx is 180 lines and still one job
 No split.
 ```
 

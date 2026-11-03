@@ -85,6 +85,8 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `.maestro/features/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
 - `.maestro/features/deck.yaml` and `.maestro/features/rules.yaml` are phone flows; they cannot run on an expanded tablet.
 - No Maestro flow plays an attack through the redesigned combat spotlight.
+- `.maestro/config.yaml` lists `scenarios/*/*` and `features/*`: not yet run to see `maestro test .maestro` and the EAS `e2e` workflow (`flow_path: .maestro`) pick up every flow through it.
+- The committed `journey-along-the-anduin.json` and `the-caves-of-nibin-dum.json` fixtures predate the log's `modes`, `modeDefault`, `xpGained` and `marks` fields; `scripts/e2e/fixtures.ts` rewrites them with those fields, the same seeds and the same intents.
 - `voyage-won`, `fate-won`, `raid-won`, `stormcaller-won`, `depths-won` and `temple-won` are not committed (the Fate fixtures carry a Voyage win played from the golden): no auto-played win with real decks was found (the shipped pair in 100 seeds, each prebuilt deck solo in 40, 17 two-handed pairs in 60). The goldens win only with synthetic heroes.
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
@@ -138,6 +140,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 None ran. Each needs a device.
 
+- The app after the file restructure (`src/ui`, the feature folders of `src/play` and `src/screens`): the Android and iOS bundles build (`expo export`); a dev build on a phone opening every tab, a table and a booklet has not run.
 - Booklets: import, open, last page after a kill, Back; first open from the APK and from an iOS Debug and Release build (the module linked through its podspec); Android pinch, double tap, pan and the sharper redraw.
 - Data: airplane-mode play after a kill with images cached; `user.db` keeps the deck and log after a catalog version bump; a changed engine version drops the open scenario.
 - Campaign screens: the card names in the log's rows and the path's pool open the card's preview on a tap (and as links with VoiceOver and TalkBack); the path (stops resume or begin, Campaign log, the foot clear of three-button and gesture navigation), the briefing, the log rows (Prisoner, carry-over, Used this campaign), the Books grid (four covers a row on a tablet; every cover over its scene, the Rules Reference over Journey Along the Anduin), the Resolution and outcome reports.

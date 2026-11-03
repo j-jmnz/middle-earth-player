@@ -57,7 +57,7 @@ Read the sections your task touches.
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–369 Tests (~870) ← 2
+  - 356–369 Tests (~860) ← 2
   - 370–385 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.9K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.0K tok)
   - 5–16 Rules (~550)
   - 17–75 Phases (~2.1K)
-  - 76–156 Open items (~3.7K)
-    - 78–90 Fixtures and Maestro (~520)
-    - 91–118 Rules and engine (~840)
-    - 119–136 Screens and code (~1.0K)
-    - 137–156 Phone and tablet checks (~1.3K)
-  - 157–173 Standing decisions (~430)
+  - 76–159 Open items (~3.9K)
+    - 78–92 Fixtures and Maestro (~630)
+    - 93–120 Rules and engine (~840)
+    - 121–138 Screens and code (~1.0K)
+    - 139–159 Phone and tablet checks (~1.4K)
+  - 160–176 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.1K tok)
@@ -203,9 +203,9 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~910 tok)
-- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~910 tok)
-- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~920 tok)
+- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~940 tok)
+- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~930 tok)
+- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~950 tok)
 
 ## Done phases
 

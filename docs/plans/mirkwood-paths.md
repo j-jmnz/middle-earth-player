@@ -204,7 +204,7 @@ For each phase:
 - `pnpm effects:draft <id>`, then the `effect-author` agent, until coverage is green, including the campaign card, boons and burdens.
 - New verbs go in a mechanic family: `src/catalog/families/<f>.ts` plus `src/rules/families/<f>/`, each citing a ledger line or rule span, each with its own test.
 - Records go in `src/effects/authored/<scenario-id>.ts`; boon and burden pool records go in `authored/pool/RevCore.ts` and `authored/pool/TDoM.ts`.
-- Goldens: `src/campaign/golden/<id>.json` with `golden-<short>.test.ts`, `scripts/<short>-scene.ts` and `<short>-game.ts`. They cover true solo and two-handed, a win and a loss.
+- Goldens: `src/campaign/scenarios/<id>/golden.json` with its `golden.test.ts`, `test/scenarios/<id>/scene.ts` and `game.ts`. They cover true solo and two-handed, a win and a loss.
 - A campaign test checks that the previous part's pool reaches this part.
 - Add the id to `src/campaign/playable.ts`, then run `pnpm effects:open`.
 - Phone: words and widgets only where a line creates them, Maestro win and loss flows, fixtures.
