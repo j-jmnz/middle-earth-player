@@ -1,5 +1,5 @@
 // The vocabulary player attacks: attack modifiers and targets, immediate attacks, attacks into the staging area adds to effect records: simple verbs, triggers and stat flags.
-// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/attack/index*.ts runs them.
+// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/attack/ runs them.
 import { z } from "zod";
 
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";

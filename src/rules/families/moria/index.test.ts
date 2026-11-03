@@ -1,5 +1,5 @@
 // Rules: rr.damage, rr.attachment-cards, rr.destroy, rr.engaged (data/rules/entries.json). The moria family's verbs (src/catalog/families/moria.ts)
-// and the engine reads around them; the cards that use them are tested in src/campaign/moria-*.test.ts.
+// and the engine reads around them; the cards that use them are tested in src/campaign/scenarios/journey-in-the-dark/.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { pushCardEffects } from "../../interpret/effect-frames.ts";

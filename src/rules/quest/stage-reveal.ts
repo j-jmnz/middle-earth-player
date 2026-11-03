@@ -28,7 +28,7 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const asked = askQuestProgress(state, ctx, steps);
   if (asked) return asked;
   const before = steps.length;
-  // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest-*.ts).
+  // Who was committed, read before resolving clears it, and the threat a failed quest raises (families/quest/).
   const outcome = questOutcome(state, ctx);
   // The progress each side quest takes from its committed characters, read before resolution clears who is committed.
   const sides = sideQuestTotals(state, ctx);

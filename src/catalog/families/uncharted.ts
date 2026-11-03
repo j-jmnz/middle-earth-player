@@ -1,6 +1,6 @@
 // The uncharted family (phase 41, The Fate of Númenor): the Uncharted deck and its double-sided locations (dcce.uncharted, dcce.uncharted-deck), the objective ally Calphon, the
 // bottom of a deck, and the Campaign Setup choices of the campaign card 11179. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/uncharted/index.ts runs them (the
-// helpers are in uncharted-*.ts). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
+// helpers are beside it in src/rules/families/uncharted/). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
 import { positiveAmountSchema } from "../effect-schema-amount.ts";

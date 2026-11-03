@@ -22,6 +22,7 @@ import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { VOYAGE_GOLDENS, playGolden as playVoyage, voyageWorld } from "../../test/scenarios/voyage-across-belegaer/game.ts";
 import { playDealt, prebuiltDeck } from "./seed-kit.ts";
+import { engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-raid");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
@@ -72,12 +73,7 @@ export function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<
     const limited = enemy != null && ctx.cards.get(state.cards[enemy]?.code ?? "")?.name === "Graxar";
     if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: limited ? attackers.slice(0, 1) : attackers };
   }
-  if (state.window?.kind === "optionalEngage") {
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    const seat = state.seats[state.activeSeat];
-    if (enemy && seat && seat.engaged.length < 2) return { type: "Engage", enemyId: enemy };
-    return { type: "DeclineEngage" };
-  }
+  if (state.window?.kind === "optionalEngage") return engageOneEach(state, ctx, 2) ?? { type: "DeclineEngage" };
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory, legalIntents(state, ctx));
 }
 

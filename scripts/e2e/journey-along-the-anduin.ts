@@ -16,7 +16,6 @@ import { newSave, type Save, type StoredLoadout } from "../../src/campaign/save.
 import { loadWorld, logCodes } from "../../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { ENGINE_VERSION } from "../../src/rules/engine/version.ts";
 
@@ -26,6 +25,7 @@ import type { MirkwoodFixture } from "./passage-through-mirkwood.ts";
 import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { playDealt } from "./seed-kit.ts";
+import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-anduin");
 
@@ -76,18 +76,10 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   }
   // The scenario is won by defeating the enemies, which the auto-player alone never attacks: every ready character that can reach the first enemy
   // attacks it together, and each seat engages one enemy at a time in the optional engagement step.
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => state.cards[id]?.code !== "01135" && legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
-    const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    if (enemy && seat && seat.engaged.length < 2) return { type: "Engage", enemyId: enemy };
-  }
+  const together = attackTogether(state, ctx, (id) => state.cards[id]?.code !== "01135");
+  if (together) return together;
+  const engaging = engageOneEach(state, ctx, 2);
+  if (engaging) return engaging;
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory);
 }
 

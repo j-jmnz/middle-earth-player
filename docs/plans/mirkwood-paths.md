@@ -230,7 +230,7 @@ For each phase:
 - `src/rules/quest/quest.ts`, `src/rules/families/*`, `src/catalog/families/*`
 - `src/effects/index.ts`, `src/effects/authored/*`
 - `src/screens/{campaign-data,seat-picker,briefing-parts,rules-glossary}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts`
-- `docs/brief.md`, `docs/architecture.md` (registry note), `docs/phases/phase-27…33-*.md`, `docs/phases/STATUS.md`
+- `docs/brief.md`, `docs/architecture.md` (registry note), `docs/phases/phase-29…33-*.md` (27 and 28 in `docs/phases/done/`), `docs/phases/STATUS.md`
 
 ## Verification
 

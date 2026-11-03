@@ -1,5 +1,5 @@
 // The vocabulary enemy attacks: defenders, the damage window (cancel, prevent, reduce, redirect), shadow cards adds to effect records: simple verbs, triggers and stat flags.
-// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/defense/index*.ts runs them.
+// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/defense/ runs them.
 import { z } from "zod";
 
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";

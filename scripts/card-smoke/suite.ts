@@ -10,7 +10,7 @@ import { formatProblem, smokeCard, smokeCodes, smokeWorld, type SmokeWorld } fro
 // the table does not have is never played there. So most of them must be, not each one.
 const PLAYED_SHARE = 0.75;
 
-// Vitest runs a file in one worker, so the sweep is split across SMOKE_SHARDS files (card-smoke-<n>.test.ts) that run side by
+// Vitest runs a file in one worker, so the sweep is split across SMOKE_SHARDS files (suite-<n>.test.ts) that run side by
 // side. A shard takes every SMOKE_SHARDS-th code, so each one is a fair sample for the played share.
 export const SMOKE_SHARDS = 4;
 

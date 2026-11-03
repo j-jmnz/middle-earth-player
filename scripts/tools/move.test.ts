@@ -95,6 +95,22 @@ describe("pnpm move", () => {
     expect(plan.writes.get("src/catalog/x.ts")).toBe("// families/sea/ships.ts, rules/families/sea/ships.ts, sea/ships.ts and layout.ts; families/sea/index.ts\n");
   });
 
+  it("leaves a glob alone, and a folder that shares a moved file's stem", () => {
+    const { tracked, read } = repo({
+      "src/rules/families/sea.ts": "",
+      "src/rules/families/sea-ships.ts": "",
+      "src/play/frame.ts": "",
+      "src/play/frame/x.ts": "",
+      "docs/a.md": "`src/rules/families/sea*.ts` and src/play/frame/x.ts, src/play/frame and src/play/frame.ts\n",
+    });
+    const plan = planMove(tracked, { "src/rules/families/sea.ts": "src/rules/families/sea/index.ts", "src/rules/families/sea-*": "src/rules/families/sea/*", "src/play/frame.ts": "src/play/canvas/frame.ts" }, read);
+    expect(plan.writes.get("docs/a.md")).toBe("`src/rules/families/sea*.ts` and src/play/frame/x.ts, src/play/canvas/frame and src/play/canvas/frame.ts\n");
+  });
+
+  it("refuses a file moved to a name with no extension", () => {
+    expect(() => expandEntries({ "src/play/foo.ts": "src/play/bar" }, ["src/play/foo.ts", "src/play/foo.test.ts"])).toThrow(/no extension/);
+  });
+
   it("re-aims relative Markdown links, keeping anchors and the bare style", () => {
     const { tracked, read } = repo({
       "docs/phases/phase-01.md": "[brief](../brief.md#core-round) and [status](STATUS.md) and [web](https://x.dev/a.md)\n",

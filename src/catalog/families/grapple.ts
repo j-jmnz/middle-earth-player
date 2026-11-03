@@ -1,6 +1,6 @@
 // The grapple family (phase 44, The Thing in the Depths): Grapple X (dcce.grapple), the encounter set swap of the scenario (dcce.stormcaller-and-the-thing), the Stormcaller Elite's flip to its objective
 // ally sides (dcce.stormcaller-elite), the Campaign Mode only side of The Thing in the Depths (dcce.campaign-mode) and the cards the campaign card puts into hands. Simple verbs;
-// effect-schema-verbs.ts composes them and src/rules/families/grapple/index.ts runs them (the helpers are in grapple-*.ts). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*,
+// effect-schema-verbs.ts composes them and src/rules/families/grapple/index.ts runs them (the helpers are beside it in src/rules/families/grapple/). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*,
 // data/rules/entries.json).
 import { z } from "zod";
 

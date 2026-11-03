@@ -56,7 +56,7 @@ cards have no file under `src/effects/authored/families/`.
 
 ## Shared files
 
-`src/rules/*.ts`, `src/catalog/effect-schema*.ts`, `src/play/*`, `scripts/*` are shared with the other agents, who may edit
+`src/rules/{core,engine,windows,interpret,combat,quest,setup,player}/`, `src/catalog/effect-schema*.ts`, `src/play/`, `scripts/` are shared with the other agents, who may edit
 them too; the main session merges every branch afterwards. Keep your edits there minimal and surgical: a hook call into
 your family module, an optional field, a new case, a new event emitted. Do not reformat, reorder, rename or move code in
 shared files. Do not edit other families' files. Do not edit `src/effects/authored/pool/*.ts` except to fix a record that is

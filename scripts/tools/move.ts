@@ -19,7 +19,7 @@ import { runScript, type Log } from "../log.ts";
 //   specifier keeps its style: with or without the extension, "/index" left implicit, a trailing slash kept.
 // - In Markdown: relative link targets, "](../x.md#anchor)".
 // - Everywhere it reads (code, docs, agent files, YAML, shell, root JSON configs): repository paths written out from the
-//   root, "src/play/layout/layout.ts", "scripts/log.ts", a whole moved folder, or a file named without its extension; and a
+//   root, "src/play/layout.ts", "scripts/log.ts", a whole moved folder, or a file named without its extension; and a
 //   file named by a tail of its path no other file shares ("families/sea/ships.ts", or "sea/ships.ts" when it is renamed).
 //
 // Companions: a moved file takes along, unless the map names them, its platform variants (x.native.ts, x.ios.tsx, ...)
@@ -34,7 +34,7 @@ const MARKDOWN = /\.(md|mdc)$/;
 const TEXT = /\.(ts|tsx|js|mjs|cjs|mts|md|mdc|ya?ml|sh)$/;
 // JSON read for root-written paths: configs only, never data.
 const CONFIG_JSON = new Set(["package.json", "tsconfig.json", "app.json", "eas.json", ".claude/settings.json", ".vscode/settings.json", ".vscode/extensions.json"]);
-const NEVER = [/^data\//, /^assets\//, /^node_modules\//, /^docs\/INDEX\.md$/, /(^|\/)golden\//, /^src\/campaign\/fixtures\//, /^pnpm-lock\.yaml$/, /^scripts\/tools\/move\.test\.ts$/];
+const NEVER = [/^data\//, /^assets\//, /^node_modules\//, /^docs\/INDEX\.md$/, /(^|\/)golden\//, /^src\/campaign\/fixtures\//, /^pnpm-lock\.yaml$/, /^scripts\/tools\/move(\.test)?\.ts$/];
 
 // Extensions an import may leave off, in the order a resolver tries them.
 const IMPLICIT = [".ts", ".tsx", ".js", ".mjs", ".cjs", ".json", ".native.ts", ".native.tsx"];
@@ -85,6 +85,8 @@ export function expandEntries(entries: Record<string, string>, tracked: readonly
       continue;
     }
     if (tracked.includes(from)) {
+      // A file keeps an extension, so its test and platform variants have a name to follow it to.
+      if (path.extname(from) !== "" && path.extname(to) === "") throw new Error(`${rawTo} has no extension; name the file, not its folder`);
       add(from, to);
       continue;
     }
@@ -197,9 +199,11 @@ export function planMove(tracked: readonly string[], entries: Record<string, str
   }
 
   // Root-written paths: each moved file, its extensionless stem when no other file shares it, and each folder whose
-  // files all moved together. One alternation, longest first, so "src/play/layout/slots.ts" never matches as
-  // "src/play/layout/layout" plus a tail.
+  // files all moved together. One alternation, longest first, so "src/play/layout-slots.ts" never matches as
+  // "src/play/layout" plus a tail. A stem never matches before "/" (a folder of that name that did not move) and no
+  // path matches before "*" (a glob such as "families/sea*.ts" names more files than the one that moved).
   const rootPaths = new Map<string, string>();
+  const stemKeys = new Set<string>();
   for (const [from, to] of moves) rootPaths.set(from, to);
   const stems = new Map<string, Set<string>>();
   for (const file of tracked) {
@@ -212,15 +216,18 @@ export function planMove(tracked: readonly string[], entries: Record<string, str
     if (!group.size || ![...group].some((file) => moves.has(file))) continue;
     const newStems = new Set([...group].map((file) => stripExt(newOf(file))));
     const extsKept = [...group].every((file) => path.extname(file) === path.extname(newOf(file)));
-    if (newStems.size === 1 && extsKept) rootPaths.set(stem, [...newStems][0]!);
+    if (newStems.size === 1 && extsKept && !rootPaths.has(stem)) {
+      rootPaths.set(stem, [...newStems][0]!);
+      stemKeys.add(stem);
+    }
   }
   for (const dir of dirs) {
     const to = newDir(dir);
     if (to !== null && to !== dir) rootPaths.set(dir, to);
   }
-  // A moved file named by the tail of its path ("families/defense/excess.ts", "rules/families/x.ts") when no other file
+  // A moved file named by the tail of its path ("families/defense-excess.ts", "rules/families/x.ts") when no other file
   // ends that way: the same tail of its new path. Named by its bare file name, when that is unique and changes: the
-  // shortest tail of its new path, folder included, that no other file shares ("sea/ships.ts" → "sea/ships.ts").
+  // shortest tail of its new path, folder included, that no other file shares ("sea-ships.ts" → "sea/ships.ts").
   const tailCounts = (paths: Iterable<string>) => {
     const counts = new Map<string, number>();
     for (const file of paths) {
@@ -255,7 +262,7 @@ export function planMove(tracked: readonly string[], entries: Record<string, str
       }
     }
   }
-  const rootPattern = rootPaths.size === 0 ? null : new RegExp(`(?<![\\w./@-])(${[...rootPaths.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp).join("|")})(?![\\w-]|\\.[\\w])`, "g");
+  const rootPattern = rootPaths.size === 0 ? null : new RegExp(`(?<![\\w./@-])(${[...rootPaths.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp).join("|")})(?![\\w*-]|\\.[\\w])`, "g");
 
   const writes = new Map<string, string>();
   const counts = new Map<string, number>();
@@ -322,7 +329,8 @@ export function planMove(tracked: readonly string[], entries: Record<string, str
       next = next.replace(/\]\((?!https?:|mailto:|#|\/)([^)\s]+)\)/g, (_whole, spec: string) => `](${rewriteRelative(spec, true)})`);
     }
     if (rootPattern) {
-      next = next.replace(rootPattern, (match: string) => {
+      next = next.replace(rootPattern, (match: string, _key: string, offset: number, whole: string) => {
+        if (stemKeys.has(match) && whole[offset + match.length] === "/") return match;
         const replaced = rootPaths.get(match);
         if (replaced === undefined || replaced === match) return match;
         count += 1;

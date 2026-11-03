@@ -124,7 +124,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 
 ### Phase 39 - Sea mechanics family
 
-The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 8 and 9. New files `src/catalog/families/sea.ts` (schema) and `src/rules/families/sea/index*.ts` (engine), each verb citing a `dcce.*` span or ledger line, each with a test. Nothing is built for one scenario's card.
+The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 8 and 9. New files `src/catalog/families/sea.ts` (schema) and `src/rules/families/sea/` (engine), each verb citing a `dcce.*` span or ledger line, each with a test. Nothing is built for one scenario's card.
 - **Ships.** Ship-enemies are enemies with these exceptions: only ship-objectives defend their attacks, an undefended attack damages a ship-objective, ship-enemies can be attacked by ship-objectives and by non-ship characters. Ship-objectives are objective allies that attack only ship-enemies and defend only against ship-enemy attacks (`dcce.ship-enemies`, `dcce.ship-objectives`). The defender and attacker pickers, the legal-intent check and the "why not" refusal read the type.
 - **Fleet.** "Prepare your fleet": each player takes one of the six ships, one takes the Dream-chaser (a solo player takes the Dream-chaser and one other); unused ships leave the game (`dcce.prepare-your-fleet`). The seat picker and briefing show the choice; no control types a stat.
 - **Heading.** The Heading card on the Dream-chaser, set to on-course at the start; shift on-course / off-course one step; predicates `onCourse`, `offCourse`, `heading is worst`; the quest, location and enemy conditions the cards read (`dcce.heading`). A table widget exists only because the setup creates the card.
@@ -180,11 +180,11 @@ For each phase:
 - `scripts/data/campaign-defs.ts`, `scripts/data/sources/{hallofbeorn,rules,scans}.ts`, `data/sources.json`, `data/overrides.json`
 - `scripts/data/normalize/{cards,product-cards,scenarios,setup-text,setup-piles,campaigns,printed}.ts`, `scripts/data/{build,load-scenarios}.ts`, `scripts/data/printed/{scope,ledger}.ts`, `scripts/data/rules/spans.ts`, `data/rules/{index,columns}.json`, `data/printed/dream-chaser.json` (new)
 - `src/catalog/{card-facts,deck-legal,scenario-data,printed-ledger}.ts`, `src/catalog/families/{sea,dreamchaser}.ts` (new) and `index.ts`, `scripts/build/catalog.ts`, `src/catalog/version.ts`
-- `src/rules/{state,zones,quest,keywords,combat,stage-reveal}.ts`, `src/rules/families/sea/index*.ts` (new)
+- `src/rules/{state,zones,quest,keywords,combat,stage-reveal}.ts`, `src/rules/families/sea/` (new)
 - `src/campaign/{log,resolution,score,loadout,start,checklist,briefing,save,playable}.ts`
 - `src/effects/index.ts`, `src/effects/authored/*`, `src/effects/authored/pool/DCCE.ts` (new)
 - `src/screens/{campaign-data,rules-glossary,rules-view,seat-picker,briefing-parts}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts`
-- `docs/brief.md`, `docs/architecture.md`, `docs/phases/phase-37 to 48-*.md`, `docs/phases/STATUS.md`
+- `docs/brief.md`, `docs/architecture.md`, `docs/phases/phase-46 to 48-*.md` (37 to 45 in `docs/phases/done/`), `docs/phases/STATUS.md`
 
 ## Verification
 

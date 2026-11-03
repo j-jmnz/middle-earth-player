@@ -12,7 +12,6 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/
 import { newSave, type StoredLoadout } from "../../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../../src/campaign/world.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
@@ -21,6 +20,7 @@ import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { VOYAGE_GOLDENS, playGolden as playVoyage, voyageWorld } from "../../test/scenarios/voyage-across-belegaer/game.ts";
 import { playDealt, prebuiltDeck } from "./seed-kit.ts";
+import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-fate");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
@@ -57,20 +57,9 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
     const least = [...targets].sort((a, b) => (state.cards[a]?.damage ?? 0) - (state.cards[b]?.damage ?? 0))[0];
     if (least) return { type: "Undefended", heroId: least };
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const reachable = (id: string) => legalAttackEnemies(state, seat, id, ctx.cards);
-    const enemy = ready.flatMap(reachable)[0];
-    const attackers = ready.filter((id) => enemy != null && reachable(id).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
-  if (state.window?.kind === "optionalEngage") {
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    const seat = state.seats[state.activeSeat];
-    if (enemy && seat && seat.engaged.length < 2) return { type: "Engage", enemyId: enemy };
-    return { type: "DeclineEngage" };
-  }
+  const together = attackTogether(state, ctx);
+  if (together) return together;
+  if (state.window?.kind === "optionalEngage") return engageOneEach(state, ctx, 2) ?? { type: "DeclineEngage" };
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory, legalIntents(state, ctx));
 }
 

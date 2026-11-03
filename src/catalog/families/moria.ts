@@ -1,6 +1,6 @@
 // The vocabulary Journey in the Dark adds to effect records: damage tokens on an objective that count down to the Balrog, the Balrog's
 // place beside the first player, a hero given up for damage, and the burden objectives that attach to the hero an event names. Simple
-// verbs and stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/moria/index*.ts
+// verbs and stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/moria/
 // runs them.
 import { z } from "zod";
 

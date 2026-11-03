@@ -15,7 +15,6 @@ import { loadWorld } from "../../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { ENGINE_VERSION } from "../../src/rules/engine/version.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
@@ -23,6 +22,7 @@ import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { playDealt, prebuiltDeck } from "./seed-kit.ts";
+import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-oath");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
@@ -62,18 +62,10 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
     const heroes = [...legalTargets(state, { type: "Undefended" }, ctx)].sort((a, b) => left(b) - left(a));
     if (heroes[0]) return { type: "Undefended", heroId: heroes[0] };
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
-    const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    if (enemy && seat && seat.engaged.length < 3) return { type: "Engage", enemyId: enemy };
-  }
+  const together = attackTogether(state, ctx);
+  if (together) return together;
+  const engaging = engageOneEach(state, ctx, 3);
+  if (engaging) return engaging;
   // Each seat keeps its last hero out of the quest, ready to attack.
   if (state.mode === "questCommit" && state.window?.kind === "pass" && !Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat)) {
     const ids = legalTargets(state, { type: "Commit" }, ctx);

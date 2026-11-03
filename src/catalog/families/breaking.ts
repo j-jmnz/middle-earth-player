@@ -1,6 +1,6 @@
 // The vocabulary Breaking of the Fellowship (phase 16) adds to effect records: removing the Ring-bearer from the game, skipping the travel phase, the
 // shared staging area stage 2B deals out to a staging area for each player, and the stage each player is on after it. Simple verbs, triggers and
-// stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/breaking/index*.ts runs them. The state
+// stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/breaking/ runs them. The state
 // they work on (`ScenarioState.separate`, `Seat.staging`, `Seat.stage`) is described in src/rules/families/breaking/areas.ts.
 import { z } from "zod";
 

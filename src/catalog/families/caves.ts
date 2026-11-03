@@ -1,5 +1,5 @@
 // The vocabulary The Caves of Nibin-Dûm (phase 33) adds to effect records: simple verbs, triggers and stat flags. effect-schema-verbs.ts,
-// effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/caves/index*.ts runs them.
+// effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/caves/ runs them.
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";

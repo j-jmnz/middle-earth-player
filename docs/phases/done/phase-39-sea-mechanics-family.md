@@ -11,7 +11,7 @@ The ship, heading, sailing and Corsair-deck vocabulary that scenarios 1, 3, 4, 5
 
 ## Procedure
 
-New files `src/catalog/families/sea.ts` (schema) and `src/rules/families/sea/index*.ts` (engine), listed in `src/catalog/families/index.ts`. Each verb cites a `dcce.*` span or a ledger line and has a test next to it (`docs/plans/effect-authoring.md`, Mechanic families):
+New files `src/catalog/families/sea.ts` (schema) and `src/rules/families/sea/` (engine), listed in `src/catalog/families/index.ts`. Each verb cites a `dcce.*` span or a ledger line and has a test next to it (`docs/plans/effect-authoring.md`, Mechanic families):
 
 - **Ships** (`dcce.ship-enemies`, `dcce.ship-objectives`): who attacks and defends whom; the defender and attacker pickers, the legal-intent check and the refusal reason read the type.
 - **Fleet** (`dcce.prepare-your-fleet`): the seat picker and briefing show the choice; no control types a stat.

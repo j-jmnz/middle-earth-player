@@ -46,7 +46,7 @@ Read the sections your task touches.
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.0K) ← 3
-    - 126–160 Repository map (~820) ← 1
+    - 126–160 Repository map (~840) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
   - 209–234 Engine (~2.8K)
@@ -57,7 +57,7 @@ Read the sections your task touches.
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–369 Tests (~860) ← 2
+  - 356–369 Tests (~880) ← 2
   - 370–385 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
@@ -277,7 +277,7 @@ Read when a task names the plan.
     - 125–138 Phase 39 - Sea mechanics family (~740)
     - 139–152 Phase 39b - Ships on the table (~240)
     - 153–177 Phases 40-48 - one scenario each (phase 12 procedure) (~2.1K)
-  - 178–188 Critical files (~310)
+  - 178–188 Critical files (~320)
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
@@ -300,7 +300,7 @@ Read when a task names the plan.
     - 92–151 Phase 27 — Multi-campaign data (data only, nothing playable yet) (~1.1K)
     - 152–200 Phase 28 — Campaign registry, saga gating, log, booklets (~980)
     - 201–221 Phases 29–33 — one scenario each (phase 12 procedure) (~830)
-  - 222–234 Critical files (~260)
+  - 222–234 Critical files (~270)
   - 235–249 Verification (~170)
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
