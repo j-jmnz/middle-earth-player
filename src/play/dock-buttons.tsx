@@ -141,14 +141,14 @@ export function DockButtons({
       {/* The other answers are secondary capsules on a row of their own; the reading aids are text buttons with small muted words on
           one row under it (Undo, Read), which wraps if a third shows. */}
       {dock.secondary.length > 0 ? (
-        <View className="flex-row flex-wrap items-center justify-center gap-1.5">
+        <View className="flex-row flex-wrap items-center justify-center gap-2" style={{ marginTop: (dense ? 4 : 6) * s }}>
           {dock.secondary.map((button) => (
             <SecondaryButton key={button.testID} label={button.label} testID={button.testID} tight={dense} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
         </View>
       ) : null}
       {extras.length > 0 || more.length > 0 ? (
-        <View className="flex-row flex-wrap items-center justify-center gap-1">
+        <View className="flex-row flex-wrap items-center justify-center gap-1" style={{ marginTop: (dense ? 2 : 4) * s }}>
           {extras.map((item) => (
             <TextButton key={item.testID} label={item.label} testID={item.testID} small tight={dense} tone="muted" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
           ))}

@@ -67,6 +67,12 @@ function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay,
   );
 }
 
+// The whole victory display (the strip's "+n more"): its cards, the newest first, a tap shows one large.
+function VictoryReading({ store, names, onRead, onClose }: { store: TableStore; names: SheetNames; onRead: (cardId: string) => void; onClose: () => void }) {
+  const victory = useStore(store, (state) => state.game.victory);
+  return <PileList title="Victory display" cards={[...victory].reverse().map((id) => ({ id, label: names.card(id) }))} onRead={onRead} onClose={onClose} />;
+}
+
 const NO_IDS: readonly string[] = [];
 
 // The cards a row folded away, as the canvas last laid the table out (store.ts, `folded`): a tile shows one large.
@@ -215,6 +221,7 @@ export function TableLayers({
             onClose={close}
           />
         ) : null}
+        {held?.kind === "victory" ? <VictoryReading store={store} names={names} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "row" ? <RowReading store={store} row={held.row} names={names} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}

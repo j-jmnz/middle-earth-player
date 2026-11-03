@@ -1,5 +1,5 @@
 // What History shows (docs/design-system.md, History): the playthroughs or standalone games of one kind, each one entry with the
-// runs it wrote, in the sections In progress and Finished, then the folds Archived and Deleted. Pure. The runs come in the order
+// runs it wrote, in the sections In progress and Finished, then the fold Archived. Pure. The runs come in the order
 // they were written (run-store.ts listRuns), which breaks a tie between two with no time.
 import type { RunKind, RunRecord } from "../campaign/runs";
 
@@ -32,20 +32,19 @@ export function startedOf(runs: readonly RunRecord[]): number | null {
   return times.length > 0 ? Math.min(...times) : null;
 }
 
-/** The two sections that are always open, and the two folds under them. */
+/** The two sections that are always open, and the fold under them. */
 export type OpenSection = "in-progress" | "finished";
-export type FoldedSection = "archived" | "deleted";
+export type FoldedSection = "archived";
 
 /**
  * What the library list draws, flat: an open section's heading, a fold's header (with how many entries it holds), a playthrough or a
- * game with its runs, and the runs of a playthrough or game that no longer exists (`gone`).
+ * game with its runs.
  */
 export type LibraryItem<S, G> =
   | { type: "heading"; id: string; section: OpenSection }
   | { type: "fold"; id: string; section: FoldedSection; count: number; folded: boolean }
   | { type: "save"; id: string; save: S; archived: boolean; runs: RunRecord[]; started: number | null }
-  | { type: "game"; id: string; game: G; archived: boolean; run: RunRecord | null }
-  | { type: "gone"; id: string; runs: RunRecord[] };
+  | { type: "game"; id: string; game: G; archived: boolean; run: RunRecord | null };
 
 export type LibraryInput<S, G> = {
   kind: RunKind;
@@ -62,17 +61,14 @@ export type LibraryInput<S, G> = {
 };
 
 /**
- * The library one kind shows: In progress and Finished (each only when it holds something), then the folds Archived and Deleted (each
- * only when it holds something). A playthrough or game is listed whether or not it has a run; its runs attach by ref id, newest first.
- * The runs of a ref the stores no longer hold are Deleted: a playthrough's under one entry, a game's one entry each. A folded fold
- * emits its header and nothing under it. Pure.
+ * The library one kind shows: In progress and Finished (each only when it holds something), then the fold Archived (only when it holds
+ * something). A playthrough or game is listed whether or not it has a run; its runs attach by ref id, newest first. The runs of a ref
+ * the stores no longer hold are not listed. A folded fold emits its header and nothing under it. Pure.
  */
 export function libraryItems<S extends { id: string }, G extends { id: string }>(input: LibraryInput<S, G>): LibraryItem<S, G>[] {
   const { kind, folded } = input;
   const ofKind = input.runs.filter((run) => run.kind === kind);
   const byRef = new Map(groupRuns(ofKind).map((group) => [group.refId, group.runs]));
-  // A save's id and a game's never meet in one kind, so one set names every ref the stores hold.
-  const known = new Set([...input.saves, ...input.archivedSaves, ...input.games, ...input.archivedGames].map((ref) => ref.id));
 
   const saveItems = (list: readonly S[], archived: boolean): LibraryItem<S, G>[] =>
     list.map((save) => {
@@ -92,10 +88,5 @@ export function libraryItems<S extends { id: string }, G extends { id: string }>
   const finished = campaign ? saveItems(input.saves.filter(input.finished), false) : gameItems(input.games.filter((game) => !input.playing(game)), false);
   const archived = campaign ? saveItems(input.archivedSaves, true) : gameItems(input.archivedGames, true);
 
-  // The runs of no listed ref: a deleted playthrough (its runs together) or a deleted game (one run each).
-  const orphans = ofKind.filter((run) => !known.has(run.refId));
-  const gone = campaign
-    ? groupRuns(orphans).map((group): LibraryItem<S, G> => ({ type: "gone", id: `gone-${group.refId}`, runs: group.runs }))
-    : newestFirst(orphans).map((run): LibraryItem<S, G> => ({ type: "gone", id: `gone-${run.id}`, runs: [run] }));
-  return [...heading("in-progress", inProgress), ...heading("finished", finished), ...fold("archived", archived), ...fold("deleted", gone)];
+  return [...heading("in-progress", inProgress), ...heading("finished", finished), ...fold("archived", archived)];
 }

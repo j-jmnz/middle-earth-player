@@ -1,12 +1,12 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import migrations from "../../drizzle/migrations";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "../campaign/fixtures.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
-import { readSave, writeSave } from "./campaign-store.ts";
+import { readSave, savedAt, writeSave } from "./campaign-store.ts";
 import { openTable, recordUnclosedRun, sessionStore } from "./table-open.ts";
 import { flushRuns } from "./pending-runs.ts";
 import { listRuns } from "./run-store.ts";
@@ -76,6 +76,62 @@ describe("opening the table", () => {
       expect(undone.save.active?.intents.length).toBe(save.active!.intents.length - 1);
       expect(undone.game).toBe(live.store.getState().game);
       expect(openTable(catalog, drizzle(sqlite), "s1")).toMatchObject({ ok: true, game: undone.game });
+    }
+  });
+
+  it("folds the clock's foreground time into the save with each intent and on a pause", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    writeSave(user, { ...save, active: { ...save.active!, intents: save.active!.intents.slice(0, -2) } });
+    const opened = openTable(catalog, user, "s1");
+    if (!opened.ok) throw new Error("fixture did not open");
+    const live = sessionStore(opened, user);
+    const [first, second] = save.active!.intents.slice(-2);
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(1000);
+      live.clock.resume();
+      vi.setSystemTime(4000);
+      expect(live.store.getState().dispatch(first!)).toBe(true);
+      expect(live.save().active?.activeMs).toBe(3000);
+      expect(readSave(user, "s1")?.active?.activeMs).toBe(3000);
+      vi.setSystemTime(5000);
+      live.clock.pause();
+      expect(readSave(user, "s1")?.active?.activeMs).toBe(4000);
+      // Paused: the time away is not counted, and a second pause writes nothing more.
+      vi.setSystemTime(9000);
+      const written = savedAt(user).get("s1");
+      vi.setSystemTime(9100);
+      live.clock.pause();
+      expect(savedAt(user).get("s1")).toBe(written);
+      expect(readSave(user, "s1")?.active?.activeMs).toBe(4000);
+      live.clock.resume();
+      vi.setSystemTime(9600);
+      expect(live.store.getState().dispatch(second!)).toBe(true);
+      expect(readSave(user, "s1")?.active?.activeMs).toBe(4500);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each(["lost", "mirkwood-won"] as const)("writes nothing on a pause once the game is over (%s)", (fixtureName) => {
+    if (!hasFixture(fixtureName)) return;
+    const { user } = openUser();
+    writeSave(user, fixtureSave(fixtureName, "s1", CATALOG_VERSION));
+    const opened = openTable(catalog, user, "s1");
+    if (!opened.ok) throw new Error("fixture did not open");
+    const live = sessionStore(opened, user);
+    const before = savedAt(user).get("s1");
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(1000);
+      live.clock.resume();
+      vi.setSystemTime(8000);
+      live.clock.pause();
+      expect(readSave(user, "s1")?.active?.activeMs).toBe(opened.save.active?.activeMs);
+      expect(savedAt(user).get("s1")).toBe(before);
+    } finally {
+      vi.useRealTimers();
     }
   });
 

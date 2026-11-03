@@ -18,7 +18,7 @@ import { dialName, type DialRole } from "./peek.ts";
 import type { SeatThreat } from "./selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "./threat-level.ts";
 import { withAlphaHex, type TableTokens } from "./tokens.ts";
-import { DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
+import { badgeFoot, DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
@@ -231,19 +231,22 @@ function ThreatDial({
             </View>
           ) : null}
         </View>
-        {delta ? (
+      </View>
+      {/* The change badge floats over the disc's foot and takes no room, so the dial's row never changes height when it comes and goes; it ends inside the bar's foot (badgeFoot). */}
+      {delta ? (
+        <View pointerEvents="none" style={{ position: "absolute", zIndex: 1, bottom: -badgeFoot(s), left: 4 * s, width: DIAL * s, alignItems: "center" }}>
           <Animated.View
             key={change?.at}
             entering={badge.in}
             exiting={badge.out}
             style={{ borderRadius: 999, paddingHorizontal: 6 * s, backgroundColor: withAlphaHex(delta.lowered ? t.accent : t.threat, 0.22) }}
           >
-            <Text testID={`${id}-delta`} className="font-display text-label text-bone">
+            <Text testID={`${id}-delta`} numberOfLines={1} className="font-display text-label text-bone">
               {delta.text}
             </Text>
           </Animated.View>
-        ) : null}
-      </View>
+        </View>
+      ) : null}
     </Pressable>
   );
 }
@@ -314,16 +317,21 @@ export function HeadingDial({ step, compact = false, onPress }: { step: HeadingS
       {compact ? (
         // The badge lies over the disc's foot, centred, and reaches into the gap either side (HEADING_BADGE_OVER); it takes no touch.
         delta ? (
-          <View pointerEvents="none" style={{ position: "absolute", top: (DIAL - 8) * s, left: -HEADING_BADGE_OVER * s, right: -HEADING_BADGE_OVER * s, alignItems: "center" }}>
+          <View pointerEvents="none" style={{ position: "absolute", zIndex: 1, bottom: -badgeFoot(s), left: (4 - HEADING_BADGE_OVER) * s, width: (DIAL + 2 * HEADING_BADGE_OVER) * s, alignItems: "center" }}>
             {badgeOf}
           </View>
         ) : null
       ) : (
-        <View className="items-start gap-0.5" style={{ minWidth: HEADING_LABEL_W * s }}>
+        <View style={{ minWidth: HEADING_LABEL_W * s }}>
           <Text className="text-label text-muted">{look.label}</Text>
-          {badgeOf}
         </View>
       )}
+      {/* Under the label, over what lies below, ending inside the bar's foot (badgeFoot); it takes no room, so the dial's row keeps its height. */}
+      {!compact && delta ? (
+        <View pointerEvents="none" style={{ position: "absolute", zIndex: 1, bottom: -badgeFoot(s), left: (4 + DIAL + 6) * s }}>
+          {badgeOf}
+        </View>
+      ) : null}
     </Pressable>
   );
 }

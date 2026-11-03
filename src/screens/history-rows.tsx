@@ -9,21 +9,20 @@ import { rowSurface } from "../play/surfaces";
 import { withAlphaHex } from "../play/tokens";
 import { Text } from "../play/text";
 import { useTableTokens } from "../play/use-table-tokens";
-import { Portrait } from "./art";
 import { scenarioName } from "./campaign-data";
 import { AskInPlace } from "./ask-in-place";
 import { Chevron, Chip, Label, TextButton } from "./chrome";
 import { HeroTile, heroFace, PARTY_TILE_HEIGHT, type HeroFace } from "./hero-tile";
 import type { CardChip, CardLine, CardState } from "./history-entries";
-import type { PartyHero } from "./hub-parts";
+import { HeroTrio } from "./hero-trio";
 import { runDate, runDetail } from "./history-words";
 import { usePalette } from "./palette-hook";
 import { useUiScale } from "../play/ui-scale";
 
-const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger", faint: "text-faint" };
+const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger" };
 
 /**
- * One playthrough or game: the fellowship's first face, the title, its lines, a status chip, and its runs under them. The head and
+ * One playthrough or game: the first seat's three heroes, the title, its lines, a status chip, and its runs under them. The head and
  * the runs open while `onPress` is given (with a chevron) and are one sentence to a screen reader; a long press starts managing. A
  * game's one run is the game, so its card words the run in its lines and lists no runs. `footer` is the managing band, inside the
  * card's corners so it reads as the card's own.
@@ -49,7 +48,8 @@ export function HistoryCard({
   title: string;
   lines: readonly CardLine[];
   chip: CardChip | null;
-  lead: PartyHero | null;
+  // The first seat's heroes, shown as three small cards before the title.
+  lead: readonly HeroFace[];
   runs: readonly RunRecord[];
   nameOf: (code: string) => string;
   // The heroes' faces, for the party tiles under each run.
@@ -63,7 +63,6 @@ export function HistoryCard({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
-  const gone = state === "gone";
   return (
     <View className="overflow-hidden rounded-item">
       <Pressable
@@ -78,13 +77,12 @@ export function HistoryCard({
       >
         {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
         {({ pressed }) => (
-          <View className="px-4 py-3.5" style={gone ? undefined : rowSurface(pressed && onPress != null, t)}>
+          <View className="px-4 py-3.5" style={rowSurface(pressed && onPress != null, t)}>
             <View className="flex-row items-center gap-3">
-              {/* The first hero's face with no sphere-coloured ring (user request, 2026-11-02): the party's tiles under it carry the heroes. */}
-              {lead ? <Portrait card={lead.card} size={36} ring={false} /> : null}
+              <HeroTrio heroes={lead} />
               <View className="min-w-0 flex-1">
                 <View className="flex-row flex-wrap items-center gap-2">
-                  <Text className={`shrink font-display text-heading ${gone ? "text-muted" : "text-bone"}`} numberOfLines={2}>
+                  <Text className={`shrink font-display text-heading text-bone`} numberOfLines={2}>
                     {title}
                   </Text>
                   {chip ? <Chip label={chip.label} tone={chip.tone} /> : null}

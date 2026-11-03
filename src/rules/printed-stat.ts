@@ -2,8 +2,8 @@
 import type { ModifierStat } from "../catalog/boundary.ts";
 
 import { LOST_ISLAND_THREAT } from "./families/uncharted-pick.ts";
-import type { PrintedCard } from "./printed.ts";
-import type { CardInstance } from "./state.ts";
+import { printedOf, type PrintedCard } from "./printed.ts";
+import { heldAmount, type CardInstance, type ScenarioState } from "./state.ts";
 
 type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
 
@@ -49,4 +49,11 @@ export function printedStat(printed: PrintedCard, stat: ModifierStat, face?: Car
 /** The Victory the card scores on the side it shows: the Campaign Mode only side of The Thing in the Depths and the Enraged side of Sea Serpent print their own (dcce.campaign-mode). */
 export function victoryOf(instance: Pick<CardInstance, "face">, printed: PrintedCard): number | null {
   return (instance.face === "B" ? printed.upgraded?.victory : undefined) ?? printed.victory;
+}
+
+/** The Victory points a card on the victory display scores: the Victory printed on the side it lies, else a printed one, else the amount it holds as `gainsVictory`; 0 for an id the state does not hold. The score and the table's display both read this (ltp.scoring). */
+export function victoryPointsOf(state: Pick<ScenarioState, "cards" | "modifiers">, id: string, cards: ReadonlyMap<string, PrintedCard>): number {
+  const card = state.cards[id];
+  if (!card) return 0;
+  return victoryOf(card, printedOf(cards, card.code)) ?? heldAmount(state as ScenarioState, id, "gainsVictory");
 }

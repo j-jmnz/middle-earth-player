@@ -53,7 +53,9 @@ import { withAlphaHex } from "../play/tokens";
 import { useTableTokens } from "../play/use-table-tokens";
 import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
-import { QuestScaleView } from "../play/quest-scale-view";
+import { CommandHead } from "../play/command-head-view";
+import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../play/command-head";
+import { victorySelector } from "../play/victory-display";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
 import { whyNotChosen } from "../play/why";
 import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
@@ -68,6 +70,8 @@ import { cachedImage, useImageRevision, useImageSnapshot } from "./images/store"
 import type { World } from "../campaign/world";
 import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
+import type { PlayClock } from "./play-clock";
+import { usePlayClock } from "./use-play-clock";
 import { useUiScale } from "../play/ui-scale";
 
 // By picture key (src/play/picture-key.ts): the bundled picture of the key, else its downloaded file. `exact`: that picture only, never the other side's: a
@@ -126,13 +130,14 @@ function setupCodes(game: { cards: Readonly<Record<string, { zone: string; code:
   return Object.values(game.cards).filter((card) => card.zone === "nightmare").map((card) => card.code);
 }
 
-export function TableView({ session, store, nav }: { session: OpenedTable; store: TableStore; nav: TableNav }) {
+export function TableView({ session, store, clock, nav }: { session: OpenedTable; store: TableStore; clock: PlayClock; nav: TableNav }) {
+  usePlayClock(clock);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();
   const s = useUiScale();
   const t = useTableTokens();
-  // The canvas wrapper's size, and its left edge in the row (the quest scale's width, when it shows).
+  // The canvas wrapper's size, and its left edge in the row.
   const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
   // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight-handoff.ts).
   const [handoff] = useState(createHandoff);
@@ -155,6 +160,13 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   const [reading, setReading] = useState<Reading | null>(null);
   // The screen y of the top of the dock's content: the tap layer that folds the choice's rows covers the column above it.
   const [anchor, setAnchor] = useState<number | null>(null);
+  // The command column's height and the dock's own: the head (victory display and quest meter) fills the room between them.
+  const [columnHeight, setColumnHeight] = useState(0);
+  const [dockHeight, setDockHeight] = useState(0);
+  // The readout's numbers row, as last measured (the dock drops it while the meter shows the numbers).
+  const [numbersRow, setNumbersRow] = useState(NUMBERS_ROW * s);
+  // Whether the dock, as last measured, drew that row.
+  const [dockHasNumbers, setDockHasNumbers] = useState(true);
   // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
   const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
   const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
@@ -264,8 +276,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
-  // A tablet's table (a window 600 pt tall or more, in logical points) has room for the larger dials.
-  const tabletTable = screen.height / s >= 600;
+  const victory = useMemo(() => victorySelector(ctx.cards, nameOf), [ctx, nameOf]);
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
@@ -315,8 +326,19 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
+  // The head stands in the column's room above the dock (command-head.ts). The quest meter is drawn in the Quest phase only; while it
+  // shows, the dock keeps only the readout's result line, and with no room for it (or outside the Quest phase) the dock keeps the numbers.
+  const footPad = Math.max(insets.bottom, 8 * s);
+  // Whether the head shows is planned against the dock with its numbers row, the same height whether the meter is up or not, so the dock
+  // shrinking when the meter takes the numbers cannot turn the head off again (no flip, and no dependence on which was measured first).
+  // The head itself stands in the room the dock really leaves.
+  const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s);
+  const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
+  const planRoom = headRoom(columnHeight, footPad, dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers), HEAD_GAP * s);
+  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, 0, s, scale.live).mode !== "hidden";
+  const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
-  // the quest scale) and the safe insets (spotlight-stage.ts).
+  // the left inset) and the safe insets (spotlight-stage.ts).
   // The bar's top: under the top inset, and never at the screen's very edge (BAR_TOP).
   const barTop = Math.max(insets.top, BAR_TOP * s);
   const barBottom = barTop + TOP_BAR * s;
@@ -396,13 +418,6 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
-          {/* The quest scale at the left edge, in the Quest phase only (user request, 2026-10-29): the threat in staging against the
-              willpower committed, live as characters commit. Outside it the canvas takes its room. */}
-          {scale.live ? (
-            <View style={{ paddingBottom: Math.max(insets.bottom, 10 * s), paddingTop: 4 * s }}>
-              <QuestScaleView scale={scale} wide={tabletTable} />
-            </View>
-          ) : null}
           <View className="min-h-0 flex-1" style={{ paddingTop: peekRoom }} onLayout={onLayout}>
             {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (area-words.ts). */}
             <AreaSummary store={store} nameOf={nameOf} />
@@ -433,7 +448,9 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
             ) : null}
           </View>
           {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
-          <View testID="command" className="justify-between px-2" style={{ width: commandWidth, paddingBottom: Math.max(insets.bottom, 8 * s), backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
+          <View testID="command" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ width: commandWidth, paddingBottom: footPad, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
+            {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
+            <CommandHead store={store} select={victory} scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onPreview={onPreview} onMore={() => setReading({ kind: "victory" })} />
             <TableDock
               step={choice.header.step}
               lead={choice.header.lead}
@@ -441,8 +458,7 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               note={choice.header.note}
               picked={choice.picked}
               unavailable={choice.unavailable}
-              // The quest scale shows the willpower against the threat in the Quest phase, so the dock keeps only the readout's result line.
-              readout={dockReadout(choice.readout, scale.live)}
+              readout={dockReadout(choice.readout, meterShown)}
               refusal={refusal}
               dock={choice.dock}
               onButton={choice.onButton}
@@ -455,6 +471,11 @@ export function TableView({ session, store, nav }: { session: OpenedTable; store
               count={trayCount(choice.sheet, choice.choice)}
               tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
               onTop={setAnchor}
+              onHeight={(height, hasNumbers) => {
+                setDockHeight(height);
+                setDockHasNumbers(hasNumbers);
+              }}
+              onNumbers={setNumbersRow}
             />
           </View>
         </View>

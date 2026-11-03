@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import migrations from "../../drizzle/migrations";
 import { deckRevision } from "./deck-revision.ts";
-import { deleteDeck, duplicateDeck, isStarterDeck, listDecks, newDeckId, readDeck, resetStarterDeck, writeDeck } from "./deck-store.ts";
+import { deleteDeck, duplicateDeck, isStarterDeck, listDecks, newDeckId, readDeck, resetStarterDeck, writeDeck, writeDeckOrder } from "./deck-store.ts";
 import { insertStarterDecks, starterDeck, STEALTH_ID, WISDOM_ID } from "./starter-decks.ts";
 
 function openUser() {
@@ -81,5 +81,46 @@ describe("newDeckId", () => {
 
   it("differs between two decks saved in the same millisecond", () => {
     expect(newDeckId(1000)).not.toBe(newDeckId(1000));
+  });
+});
+
+describe("deck order", () => {
+  it("keeps a dragged order, with a deck that has no position ahead of it", () => {
+    const user = openUser();
+    insertStarterDecks(user);
+    const first = writeDeck(user, { id: null, name: "First", heroes: [], cards: [] }, 1000);
+    const second = writeDeck(user, { id: null, name: "Second", heroes: [], cards: [] }, 2000);
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([second, first, STEALTH_ID, WISDOM_ID]);
+
+    const start = deckRevision();
+    writeDeckOrder(user, [STEALTH_ID, first, WISDOM_ID, second]);
+    expect(deckRevision()).toBe(start + 1);
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([STEALTH_ID, first, WISDOM_ID, second]);
+
+    // A new deck has no position and leads; saving an ordered deck keeps its place.
+    const fresh = writeDeck(user, { id: null, name: "Fresh", heroes: [], cards: [] }, 3000);
+    writeDeck(user, { id: second, name: "Second, edited", heroes: [], cards: [] }, 4000);
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([fresh, STEALTH_ID, first, WISDOM_ID, second]);
+  });
+
+  it("orders several decks with no position as it always did", () => {
+    const user = openUser();
+    insertStarterDecks(user);
+    const older = writeDeck(user, { id: null, name: "Older", heroes: [], cards: [] }, 1000);
+    writeDeckOrder(user, [STEALTH_ID, WISDOM_ID, older]);
+    const a = writeDeck(user, { id: null, name: "A", heroes: [], cards: [] }, 5000);
+    const b = writeDeck(user, { id: null, name: "B", heroes: [], cards: [] }, 6000);
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([b, a, STEALTH_ID, WISDOM_ID, older]);
+  });
+
+  it("ignores ids that are not decks and survives a reset or a delete", () => {
+    const user = openUser();
+    insertStarterDecks(user);
+    const mine = writeDeck(user, { id: null, name: "Mine", heroes: [], cards: [] }, 1000);
+    writeDeckOrder(user, [mine, "gone", WISDOM_ID, STEALTH_ID]);
+    resetStarterDeck(user, WISDOM_ID);
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([mine, WISDOM_ID, STEALTH_ID]);
+    deleteDeck(user, mine);
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([WISDOM_ID, STEALTH_ID]);
   });
 });

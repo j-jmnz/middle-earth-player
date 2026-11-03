@@ -4,6 +4,7 @@ import entries from "../../data/rules/entries.json";
 
 import { parseRuleEntries, type RuleEntry } from "../catalog/rule-entry";
 import { bookletName, type BookletId } from "./booklets/books";
+import { fold } from "./fold";
 
 export type GlossaryEntry = RuleEntry & { source: string };
 
@@ -21,16 +22,6 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
   return !/^(mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-)/.test(entry.id);
-}
-
-function fold(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201c\u201d]/g, '"')
-    .toLowerCase()
-    .trim();
 }
 
 // A title's words without what opens it: an FAQ entry number ("(1.11) Limitations on Attacks"), a framework step number

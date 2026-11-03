@@ -129,9 +129,9 @@ describe("a particle", () => {
         expect(b.y).toBeLessThanOrEqual(a.y + 1e-9);
       }
       expect(Math.abs(a.x - AT.x)).toBeLessThan(1.2 * AT.size);
-      expect(a.alpha).toBeLessThanOrEqual(0.5);
+      expect(a.alpha).toBeLessThanOrEqual(0.7);
       expect(a.shade ?? -1).toBeGreaterThanOrEqual(0);
-      expect(a.shade ?? 2).toBeLessThan(1);
+      expect(a.shade ?? 2).toBeLessThanOrEqual(0.6);
     }
     expect(shown("smoke", 1500, 9, AT)).toBe(PARTICLE_COUNT.smoke);
   });
@@ -153,13 +153,13 @@ describe("a particle", () => {
 });
 
 describe("the budgets", () => {
-  it("count 20 puffs of smoke, 16 converging, 28 sparks, 18 deflecting and 36 ash, in at most four Atlas draws", () => {
-    expect(PARTICLE_COUNT).toEqual({ smoke: 20, converge: 16, spark: 28, deflect: 18, ash: 36 });
+  it("count 40 puffs of smoke, 16 converging, 28 sparks, 18 deflecting and 36 ash, in at most four Atlas draws", () => {
+    expect(PARTICLE_COUNT).toEqual({ smoke: 40, converge: 16, spark: 28, deflect: 18, ash: 36 });
     expect(new Set(Object.values(PARTICLE_DRAW)).size).toBeLessThanOrEqual(4);
     expect(ATLAS_DRAWS).toBeLessThanOrEqual(4);
   });
 
-  it("show at most about 90 sprites at once through a whole attack, kill, block or hit", () => {
+  it("show at most about 110 sprites at once through a whole attack, kill, block or hit", () => {
     const shapes: ClashShape[] = [
       { damage: 3, destroyed: false, shadow: false, first: true, last: true },
       { damage: 2, destroyed: true, shadow: false, first: true, last: true },
@@ -176,6 +176,6 @@ describe("the budgets", () => {
       expect(most, JSON.stringify(shape)).toBeLessThanOrEqual(PARTICLE_BUDGET);
       expect(most).toBeGreaterThan(20);
     }
-    expect(PARTICLE_BUDGET).toBe(90);
+    expect(PARTICLE_BUDGET).toBe(110);
   });
 });

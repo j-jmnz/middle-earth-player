@@ -273,7 +273,7 @@ export function CardPoolBody({
   return (
     <View className="min-h-0 flex-1">
       <View className="mt-3 flex-row items-center gap-2">
-        <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search cards" accessibilityLabel="Search cards" />
+        <SearchField testID="pool-search" value={search} onChangeText={setSearch} placeholder="Search name, trait or text" accessibilityLabel="Search cards" accessibilityHint="Searches card name, traits, type, sphere and text" />
         <FilterButton count={filters} onPress={openSheet} />
       </View>
       <SphereToggles value={applied.sphere} onChange={(sphere) => setApplied({ ...applied, sphere })} />

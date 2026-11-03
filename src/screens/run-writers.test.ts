@@ -55,6 +55,7 @@ describe("the campaign run writer", () => {
     const run = recordCampaignRun(user, before, wonLog(before, ["141078"]), asWorld(), state, 500);
     expect(run).toMatchObject({ result: "won", reward: ["141078"], startedAt: 111, endedAt: 500, heroes: [["scout", RING_BEARER]], kind: "campaign", refId: "save-a" });
     expect(run?.id).toBe(`campaign:save-a:${scenario.id}:2:111`);
+    expect(run?.activeMs).toBeNull();
     expect(listRuns(user)).toHaveLength(1);
   });
 
@@ -99,6 +100,14 @@ describe("the campaign run writer", () => {
     expect(listRuns(user)).toHaveLength(2);
   });
 
+  it("copies the foreground time the open scenario counted", () => {
+    const user = openUser();
+    const before = openSave(2, 111);
+    const counted = { ...before, active: { ...before.active!, activeMs: 90000 } };
+    expect(recordCampaignRun(user, counted, wonLog(counted, []), asWorld(), play(2), 500)?.activeMs).toBe(90000);
+    expect(listRuns(user)[0]?.activeMs).toBe(90000);
+  });
+
   it("writes nothing for a scenario still going or a save with none open", () => {
     const user = openUser();
     const going = goingPast(ctx, 2);
@@ -126,6 +135,7 @@ describe("the standalone run writer", () => {
     const state = play(2);
     const run = recordStandaloneRun(user, game, asWorld(), state, 9000);
     expect(run).toMatchObject({ kind: "standalone", refId: "game-1", startedAt: 4242, endedAt: 9000, reward: null, heroes: [["scout", RING_BEARER]] });
+    expect(run?.activeMs).toBeNull();
     recordStandaloneRun(user, game, asWorld(), state, 9999);
     expect(listRuns(user)).toHaveLength(1);
   });

@@ -7,7 +7,7 @@ import { useDatabases } from "./databases";
 import { cachedStandalone, openStandalone, type StandaloneSession } from "./standalone-open";
 import { writeStandalone } from "./standalone-store";
 
-export { openStandalone, standaloneCodes, standaloneStore, type StandaloneSession } from "./standalone-open";
+export { openStandalone, standaloneCodes, standaloneStore, type StandaloneSession, type StandaloneTable } from "./standalone-open";
 
 function writeDropped<TUser>(user: BaseSQLiteDatabase<"sync", TUser>, session: StandaloneSession | null): void {
   if (session && !session.ok && session.write) writeStandalone(user, session.write);

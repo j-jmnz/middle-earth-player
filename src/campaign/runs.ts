@@ -40,6 +40,8 @@ export type RunRecord = {
   reward: string[] | null;
   startedAt: number | null;
   endedAt: number | null;
+  // The ms the table was on screen with the app in the foreground; null when the store never counted it.
+  activeMs: number | null;
   engineVersion: number | null;
   // True for a row written from what the store already knew, when the table was added.
   backfilled: boolean;
@@ -76,6 +78,7 @@ export type RunInput = {
   reward: readonly string[] | null;
   startedAt: number | null;
   endedAt: number;
+  activeMs: number | null;
   engineVersion: number;
 };
 
@@ -103,6 +106,7 @@ export function runOf(input: RunInput): RunRecord | null {
     reward: won && input.reward ? [...input.reward] : null,
     startedAt: input.startedAt,
     endedAt: input.endedAt,
+    activeMs: input.activeMs,
     engineVersion: input.engineVersion,
     backfilled: false,
   };
@@ -138,6 +142,7 @@ export function backfillRuns(saves: readonly KnownSave[], games: readonly KnownG
         reward: save.log.earned[scenarioId] ? [...(save.log.earned[scenarioId] ?? [])] : null,
         startedAt: null,
         endedAt: null,
+        activeMs: null,
         engineVersion: null,
         backfilled: true,
       });
@@ -164,6 +169,7 @@ export function backfillRuns(saves: readonly KnownSave[], games: readonly KnownG
       reward: null,
       startedAt: game.createdAt,
       endedAt: null,
+      activeMs: null,
       engineVersion: null,
       backfilled: true,
     });

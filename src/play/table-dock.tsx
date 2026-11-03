@@ -21,11 +21,11 @@ import { Text } from "./text.tsx";
 
 /** The engine's numbers for the moment, large, and what they come to: inline in the dock, on no band. */
 // `oneLine`: the result is one line (the choice rows are open in the dock on a short phone); its words stay in the label.
-function ReadoutView({ readout, tight = false, oneLine = false }: { readout: Readout; tight?: boolean; oneLine?: boolean }) {
+function ReadoutView({ readout, tight = false, oneLine = false, onNumbers }: { readout: Readout; tight?: boolean; oneLine?: boolean; onNumbers?: (height: number) => void }) {
   return (
     <View testID={`readout-${readout.kind}`} className="px-2">
       {readout.stats.length > 0 ? (
-        <View className="flex-row items-center justify-center gap-2">
+        <View className="flex-row items-center justify-center gap-2" onLayout={(event) => onNumbers?.(Math.round(event.nativeEvent.layout.height))}>
           {readout.stats.map((stat, index) => (
             <View key={stat.word} className="flex-row items-center gap-2">
               {index > 0 ? <Text className="text-label text-faint">{readout.join ?? "against"}</Text> : null}
@@ -74,6 +74,8 @@ export function TableDock({
   count = "",
   tray = null,
   onTop,
+  onHeight,
+  onNumbers,
 }: {
   // The step in words ("Combat", "Stops on · Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
   step: string;
@@ -109,6 +111,11 @@ export function TableDock({
   tray?: ReactNode;
   // The screen y of the top of the dock's content: the choice tray's outside-tap layer over the column stops there.
   onTop?: (top: number) => void;
+  // The dock's own height (the content stack, padding included): the column's head fills the room above it.
+  // `hasNumbers`: whether the readout's numbers row is in it.
+  onHeight?: (height: number, hasNumbers: boolean) => void;
+  // The height of the readout's numbers row while it shows: the head plans against the dock with it, whether or not the quest meter has taken it over (command-head.ts, dockWithNumbers).
+  onNumbers?: (height: number) => void;
 }) {
   const t = useTableTokens();
   // The UI scale (ui-scale.ts): the dock's padding and budget are Medium's sizes times it.
@@ -154,7 +161,10 @@ export function TableDock({
         collapsable={false}
         testID="dock"
         className="px-3"
-        onLayout={measure}
+        onLayout={(event) => {
+          measure();
+          onHeight?.(Math.round(event.nativeEvent.layout.height), (readout?.stats.length ?? 0) > 0);
+        }}
         style={{
           paddingTop: (dense ? DENSE_PAD : TOP_PAD) * s,
           paddingBottom: (dense ? DENSE_PAD : FOOT_PAD) * s,
@@ -189,7 +199,7 @@ export function TableDock({
           className={dense ? "gap-0.5" : "gap-1"}
           style={{ flexShrink: 0, paddingTop: trayOpen ? (dense ? 2 : 4) * s : 0 }}
         >
-          {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} /> : null}
+          {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} onNumbers={onNumbers} /> : null}
           {refusal ? (
             <Text testID="sheet-refusal" numberOfLines={3} className="text-center text-label text-danger">
               {refusal}

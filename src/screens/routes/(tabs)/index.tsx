@@ -13,7 +13,7 @@ import { useDatabases } from "../../databases";
 import { usePalette } from "../../palette-hook";
 import { describe, nextSummary, partyCodes, partySeats, saveLine, type SaveLine } from "../../save-line";
 import { NextStop } from "../../save-panels";
-import { CatalogGrid, CatalogTile, HubPage, leadFace, LockedTiles, OtherRuns, RunHero, RunRow, type PartyHero } from "../../hub-parts";
+import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, RunHero, RunRow } from "../../hub-parts";
 import { splitRuns } from "../../hub-runs";
 import { nextStepHref, pathHref } from "../../scenario-links";
 import { useSizeClass } from "../../../play/use-size-class";
@@ -41,7 +41,6 @@ export default function CampaignList() {
   const faces = deckFaces(catalog, saves.flatMap(partyCodes));
   // The fellowship as the hero words show it, seat by seat: each hero's painting, name and sphere.
   const fellowshipOf = (save: ListedSave) => partySeats(save).map((seat) => seat.map((code) => heroFace(faces, code)));
-  const leadOf = (save: ListedSave): PartyHero | null => leadFace(faces, partyCodes(save)[0], palette);
 
   // Scrolls New playthrough into view once, then spends the param so coming back to Campaigns does not scroll again.
   const scrollToNew = useCallback(() => {
@@ -92,7 +91,7 @@ export default function CampaignList() {
               testID={`save-${save.id}`}
               title={line.name}
               line={`${line.seats} · ${nextSummary(line.next)}`}
-              lead={leadOf(save)}
+              heroes={fellowshipOf(save)[0] ?? []}
               accessibilityLabel={`Open ${describe(line)}`}
               onPress={() => openPath(save)}
             />

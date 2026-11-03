@@ -37,14 +37,25 @@ export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after:
     reward: fresh ? (after.log.earned[state.scenarioId] ?? []) : null,
     startedAt: active.startedAt ?? null,
     endedAt: now,
+    activeMs: active.activeMs ?? null,
     engineVersion: ENGINE_VERSION,
   });
   if (run) writeRun(user, run);
   return run;
 }
 
-/** Writes the run of a standalone game that ended. Its start is when it was dealt. */
-export function recordStandaloneRun<TRun>(user: UserDb<TRun>, game: StandaloneGame, world: World, state: ScenarioState, now: number = Date.now()): RunRecord | null {
+/**
+ * Writes the run of a standalone game that ended. Its start is when it was dealt. A finished game has no open scenario left, so the
+ * outcome screen passes the foreground ms the table counted (`activeMs`); by default they are read from the game's own scenario.
+ */
+export function recordStandaloneRun<TRun>(
+  user: UserDb<TRun>,
+  game: StandaloneGame,
+  world: World,
+  state: ScenarioState,
+  now: number = Date.now(),
+  activeMs: number | null = game.active?.activeMs ?? null,
+): RunRecord | null {
   const dealt = user.select({ createdAt: standaloneGames.createdAt }).from(standaloneGames).where(eq(standaloneGames.id, game.id)).get();
   const run = runOf({
     id: standaloneRunId(game.id),
@@ -58,6 +69,7 @@ export function recordStandaloneRun<TRun>(user: UserDb<TRun>, game: StandaloneGa
     reward: null,
     startedAt: dealt?.createdAt ?? null,
     endedAt: now,
+    activeMs,
     engineVersion: ENGINE_VERSION,
   });
   if (run) writeRun(user, run);

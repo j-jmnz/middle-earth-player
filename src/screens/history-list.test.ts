@@ -6,7 +6,7 @@ import { groupRuns, libraryItems, newestFirst, startedOf, type LibraryInput, typ
 import { courseWords, emptyWords, heroesWords, playthroughWords, resultWords, runDate, runDetail, scoreWords, seatsWords } from "./history-words";
 
 function run(id: string, overrides: Partial<RunRecord> = {}): RunRecord {
-  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["141002"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: 100, engineVersion: 6, backfilled: false, ...overrides };
+  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["141002"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: 100, activeMs: null, engineVersion: 6, backfilled: false, ...overrides };
 }
 
 describe("history list", () => {
@@ -79,12 +79,9 @@ describe("library items", () => {
     expect(library({ saves: [save("save-z")], runs })[1]).toMatchObject({ type: "save", runs: [], started: null });
   });
 
-  it("puts the runs of a playthrough the stores no longer hold under Deleted, together under one entry", () => {
-    const items = library({ saves: [save("save-a")], runs });
-    expect(words(items)).toEqual(["heading:library-in-progress", "save:save-save-a", "fold:library-deleted", "gone:gone-save-b"]);
-    expect(items[3]).toMatchObject({ type: "gone", runs: [{ id: "c" }] });
-    expect(words(library({ runs, folded: () => true }))).toEqual(["fold:library-deleted"]);
-    expect(library({ runs, folded: () => true })[0]).toMatchObject({ count: 2 });
+  it("leaves out the runs of a playthrough the stores no longer hold", () => {
+    expect(words(library({ saves: [save("save-a")], runs }))).toEqual(["heading:library-in-progress", "save:save-save-a"]);
+    expect(library({ runs })).toEqual([]);
   });
 
   describe("standalone", () => {
@@ -96,7 +93,7 @@ describe("library items", () => {
       run("a", { endedAt: 10 }),
     ];
 
-    it("lists playing, finished and archived games with their run, and a deleted game's run as an entry of its own", () => {
+    it("lists playing, finished and archived games with their run, and leaves out a deleted game's", () => {
       const items = library({ kind: "standalone", games: [game("g0", true), game("g1"), game("g2"), game("g3")], archivedGames: [game("g4")], runs: games });
       expect(words(items)).toEqual([
         "heading:library-in-progress",
@@ -107,9 +104,6 @@ describe("library items", () => {
         "game:game-g3",
         "fold:library-archived",
         "game:game-g4",
-        "fold:library-deleted",
-        "gone:gone-standalone:gy",
-        "gone:gone-standalone:gx",
       ]);
       expect(items.flatMap((item) => (item.type === "game" ? [item.run?.id ?? null] : []))).toEqual([null, "standalone:g1", "standalone:g2", null, null]);
     });

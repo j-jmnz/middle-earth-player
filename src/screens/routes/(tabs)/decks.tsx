@@ -1,15 +1,17 @@
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AccessibilityInfo, View } from "react-native";
 
 import { BodyText, HubHeader, IconButton, PillButton, Screen, TextButton } from "../../chrome";
 import { editSavedDeck, startNewDeck } from "../../deck-draft";
 import { copyDeckName, deckCountLine, deckReadiness, deckShortLine, newDeckName, notAppliedLine } from "../../deck-status";
-import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, type SavedDeck } from "../../deck-store";
+import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, writeDeckOrder, type SavedDeck } from "../../deck-store";
 import { useDatabases } from "../../databases";
-import { COVER_GAP, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
+import { COVER_GAP, deckListFiltered, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
 import { DeckListBar } from "../../deck-list-bar";
+import { moveItem } from "../../deck-order";
+import { DeckCell, LiftedRowProvider, ReorderItem, useDeckReorder } from "../../deck-reorder";
 import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../hero-tile";
 import {
   starterSeedReason,
@@ -140,12 +142,38 @@ export default function Decks() {
   const spheres = useMemo(() => deckListSpheres(saved, faces), [saved, faces]);
   const shown = useMemo(() => filterDecks(saved, filter, faces, (deck) => readiness.get(deck.id)?.ready ?? false), [saved, filter, faces, readiness]);
   const rows = useMemo(() => listRows(shown, saved.length, seed), [shown, saved.length, seed]);
+  // The decks can be dragged into a new order while the whole list shows; a filtered list is only part of it.
+  const ids = useMemo(() => shown.map((deck) => deck.id), [shown]);
+  const draggable = !deckListFiltered(filter) && shown.length > 1;
+  const listRef = useRef<FlashListRef<Row>>(null);
+  const reorder = useDeckReorder({
+    ids,
+    rowOffset: rows.length - shown.length,
+    listRef,
+    // Not while Manage is open: its Duplicate and Delete rows (and an ask in place) lie under the decks, and a drag would carry them.
+    enabled: draggable && !managing,
+    onReorder: (order) => {
+      writeDeckOrder(user, order);
+      refresh();
+    },
+  });
+
+  // The Move up / Move down actions of a screen reader: the same reorder as the drag, one place at a time.
+  function moveDeck(deck: SavedDeck, direction: "up" | "down"): void {
+    const at = ids.indexOf(deck.id);
+    const to = direction === "up" ? at - 1 : at + 1;
+    if (at < 0 || to < 0 || to >= ids.length) return;
+    writeDeckOrder(user, moveItem(ids, at, to));
+    refresh();
+    AccessibilityInfo.announceForAccessibility(`Moved ${deck.name} to place ${to + 1} of ${ids.length}`);
+  }
 
   function facesFor(deck: SavedDeck): HeroFace[] {
     return deck.heroes.map((code) => heroFace(faces, code));
   }
 
   function openDeck(deck: SavedDeck): void {
+    if (reorder.recentlyDragged()) return;
     editSavedDeck(deck);
     router.push({ pathname: "/deck/[id]", params: { id: deck.id } });
   }
@@ -219,6 +247,7 @@ export default function Decks() {
       );
     }
     const { deck, starter } = item;
+    const place = ids.indexOf(deck.id);
     const summary = {
       testID: `deck-${deck.id}`,
       name: deck.name,
@@ -226,12 +255,18 @@ export default function Decks() {
       detail: deckCountLine(deck),
       short: deckShortLine(deck),
       status: readiness.get(deck.id) ?? { ready: false, text: "" },
+      quietReady: true,
       note: notAppliedLine(deck, inactive),
       onPress: () => openDeck(deck),
-      onLongPress: () => {
-        setManaging(true);
-        setAsking(null);
-      },
+      // A long press drags the deck while the list can be reordered, and starts Manage when it cannot.
+      onLongPress: draggable
+        ? undefined
+        : () => {
+            setManaging(true);
+            setAsking(null);
+          },
+      onMove: draggable ? (direction: "up" | "down") => moveDeck(deck, direction) : undefined,
+      canMove: { up: place > 0, down: place < ids.length - 1 },
     };
     const actions = managing ? (
       <DeckActions
@@ -245,13 +280,20 @@ export default function Decks() {
         onReset={() => reset(deck)}
       />
     ) : null;
-    if (view === "List") return <DeckRow {...summary}>{actions}</DeckRow>;
+    const tile =
+      view === "List" ? (
+        <DeckRow {...summary}>{actions}</DeckRow>
+      ) : (
+        <View className="pb-3" style={columns > 1 ? { paddingHorizontal: (COVER_GAP / 2) * s } : undefined}>
+          <DeckCover {...summary} height={coverHeight(size) * s}>
+            {actions}
+          </DeckCover>
+        </View>
+      );
     return (
-      <View className="pb-3" style={columns > 1 ? { paddingHorizontal: (COVER_GAP / 2) * s } : undefined}>
-        <DeckCover {...summary} height={coverHeight(size) * s}>
-          {actions}
-        </DeckCover>
-      </View>
+      <ReorderItem reorder={reorder} index={place}>
+        {tile}
+      </ReorderItem>
     );
   }
 
@@ -307,7 +349,9 @@ export default function Decks() {
         >
           {/* Outside compact it mounts once the width is measured, so the columns are known before the first cover draws; a new column count remounts it. */}
           {listWidth > 0 || size === "compact" ? (
+          <LiftedRowProvider row={reorder.liftedRow}>
           <FlashList
+            ref={listRef}
             key={`${view}:${columns}`}
             data={rows}
             numColumns={columns}
@@ -318,7 +362,11 @@ export default function Decks() {
             keyExtractor={(item) => item.key}
             getItemType={(item) => `${item.kind}:${view}`}
             renderItem={renderRow}
-            extraData={{ managing, asking, readiness, view }}
+            extraData={{ managing, asking, readiness, view, draggable }}
+            CellRendererComponent={DeckCell}
+            onScroll={reorder.onScroll}
+            scrollEventThrottle={16}
+            scrollEnabled={!reorder.dragging}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             ListHeaderComponent={<View className="h-3" />}
@@ -326,6 +374,7 @@ export default function Decks() {
             style={{ flex: 1, ...(columns > 1 ? { marginHorizontal: -(COVER_GAP / 2) * s } : {}) }}
             contentContainerStyle={inset > 0 ? { paddingHorizontal: inset } : undefined}
           />
+          </LiftedRowProvider>
           ) : null}
         </View>
       )}

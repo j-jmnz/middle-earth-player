@@ -58,15 +58,21 @@ export type FoldHeaderProps = {
   // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
   count?: number;
   unit?: string;
+  // Words beside the title while folded, in place of the count (a seat's state): they never truncate, and `attention` sets them in danger.
+  // `lead` goes before them and shrinks to one line (the seat's deck name).
+  summary?: string;
+  lead?: string;
+  attention?: boolean;
   testID?: string;
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, testID }: FoldHeaderProps) {
+export function FoldHeader({ id, title, folded, onFold, count, unit, summary, lead, attention, testID }: FoldHeaderProps) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const counted = count == null ? null : unit ? plural(count, unit) : String(count);
+  const counted = summary != null ? (lead ? `${lead}, ${summary}` : summary) : count == null ? null : unit ? plural(count, unit) : String(count);
+  const summaryTone = attention ? "text-danger" : "text-muted";
   return (
     // The heading is the row, so screen-reader heading navigation lands on it and the button stays inside.
     <View accessibilityRole="header" className="flex-row items-center">
@@ -93,7 +99,18 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, testID }: F
                 {title}
               </Text>
               <View className="min-w-3 flex-1" />
-              {folded && counted != null ? <Text className="pr-1 text-label text-muted">{counted}</Text> : null}
+              {folded && summary != null ? (
+                <>
+                  {lead ? (
+                    <Text className="min-w-0 shrink text-label text-muted" numberOfLines={1}>
+                      {lead}
+                    </Text>
+                  ) : null}
+                  <Text className={`shrink-0 pr-1 text-label ${summaryTone}`}>{lead ? `· ${summary}` : summary}</Text>
+                </>
+              ) : folded && counted != null ? (
+                <Text className="pr-1 text-label text-muted">{counted}</Text>
+              ) : null}
             </View>
           </View>
         )}

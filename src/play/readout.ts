@@ -32,12 +32,12 @@ const ATTACK = (value: number): SheetStat => ({ icon: "attack", value, word: "At
 const DEFENSE = (value: number): SheetStat => ({ icon: "defense", value, word: "Defense" });
 
 /**
- * The readout the dock draws. While the quest scale shows (the Quest phase), the scale draws the willpower against the threat, so the
- * dock drops its numbers row and keeps the result line: the loss warning and the commit aids ("Threat +3 if nothing changes; threat
+ * The readout the dock draws. While the quest meter shows the numbers (the command column's head is drawn, in the Quest phase), the meter
+ * draws the willpower against the threat, so the dock drops its numbers row and keeps the result line: the loss warning and the commit aids ("Threat +3 if nothing changes; threat
  * reaches 50: ...", "Staging reveals 1 card next. Ready after this: 2") are said once, there. Another readout is unchanged.
  */
-export function dockReadout(readout: Readout | null, scaleLive: boolean): Readout | null {
-  if (!readout || !scaleLive || readout.kind !== "quest") return readout;
+export function dockReadout(readout: Readout | null, meterShown: boolean): Readout | null {
+  if (!readout || !meterShown || readout.kind !== "quest") return readout;
   return readout.result ? { ...readout, stats: [] } : null;
 }
 

@@ -4,6 +4,7 @@
 // that open it for a screen are in table-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { addActive } from "../campaign/replay";
 import type { Save } from "../campaign/save";
 import { drop, finish, isWon, record, resume, staleReason, unrecord } from "../campaign/session";
 import { logCodes, loadWorld } from "../campaign/world";
@@ -18,6 +19,7 @@ import { committingStore, replayForTable, type ReplayedGame } from "./open-game"
 import { flushRunsOnLeave } from "./flush-runs-on-leave";
 import { flushRuns, queueRun } from "./pending-runs";
 import { recordCampaignRun } from "./run-writers";
+import { createPlayClock, type PlayClock } from "./play-clock";
 import { fingerprintOf, sessionCacheOf } from "./session-cache";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
@@ -75,15 +77,25 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
   return opened;
 }
 
-export type SessionStore = { store: TableStore; save: () => Save };
+export type SessionStore = { store: TableStore; save: () => Save; clock: PlayClock };
 
 /**
  * The table store for an opened session. Each intent the reducer accepts is appended to the save and written at once, and an
- * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written.
+ * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written. `clock` counts the
+ * foreground time (play-clock.ts): each intent and each undo folds what it took into the save it writes, and a pause writes once more
+ * for the time since the last write.
  */
 export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStore {
   let saved: Save = session.save;
   const cache = sessionCacheOf<Opened>(user, "save");
+  const base = createPlayClock();
+  // The foreground time since the last write, added to the open scenario.
+  // Nothing taken leaves the save as it is (the same object), so a pause with no new time writes nothing.
+  const fold = (save: Save): Save => {
+    if (!save.active) return save;
+    const active = addActive(save.active, base.take());
+    return active === save.active ? save : { ...save, active };
+  };
   // Asked for the save later (the Resolution), the cache reads this table's game as it stands now; the save it must match is `saved`.
   const follow = () => {
     const { game, roundSteps, history } = store.getState();
@@ -92,7 +104,7 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
   const store = committingStore(
     session,
     (intent, game) => {
-      saved = record(saved, intent);
+      saved = fold(record(saved, intent));
       writeActive(user, saved);
       // A lost game can no longer be undone, and its run id is fixed: write the run now, so closing the Resolution any way (or never)
       // still leaves it. A win waits for its Resolution choices (the reward).
@@ -100,13 +112,29 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
       follow();
     },
     () => {
-      saved = unrecord(saved);
+      saved = fold(unrecord(saved));
       writeActive(user, saved);
       follow();
     },
   );
+  // A pause (the table left, the app in the background) writes the time since the last write, once; a game that is over, won or lost, writes nothing
+  // (its last intent folded the time already, and a pause must never write a finished scenario back).
+  const clock: PlayClock = {
+    resume: base.resume,
+    take: base.take,
+    pause: () => {
+      base.pause();
+      const { game } = store.getState();
+      if (game.lost || isWon(game)) return;
+      const folded = fold(saved);
+      if (folded === saved) return;
+      saved = folded;
+      writeActive(user, saved);
+      follow();
+    },
+  };
   follow();
-  return { store, save: () => saved };
+  return { store, save: () => saved, clock };
 }
 
 /**

@@ -1,6 +1,7 @@
 // Rules: ltp.scoring, rr.scoring, faq.scoring (data/rules/entries.json).
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { heldAmount, type ScenarioState } from "../rules/state.ts";
+import { victoryPointsOf } from "../rules/printed-stat.ts";
+import type { ScenarioState } from "../rules/state.ts";
 
 export type ScenarioScore = { rounds: number; victoryPoints: number; score: number };
 
@@ -20,14 +21,6 @@ export function completedRounds(state: ScenarioState): number {
 // victory points.
 export type ScoreParts = { threat: number; destroyed: number; damage: number; rounds: number; victoryPoints: number };
 
-// The Victory printed on the side the card was on when it reached the display: the Stormcaller's Campaign Mode only side (side B) prints 15 where side A prints 10 (dcce.campaign-mode).
-function victoryOf(state: ScenarioState, id: string, cards: ReadonlyMap<string, PrintedCard>): number {
-  const card = state.cards[id];
-  const printed = printedOf(cards, card?.code ?? "");
-  const side = card?.face === "B" ? printed.upgraded?.victory : undefined;
-  return side ?? printed.victory ?? heldAmount(state, id, "gainsVictory");
-}
-
 export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScoreParts {
   let threat = 0;
   let destroyed = 0;
@@ -44,7 +37,7 @@ export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, Prin
       for (const id of seat.heroes) damage += state.cards[id]?.damage ?? 0;
     }
   }
-  const victoryPoints = state.victory.reduce((sum, id) => sum + victoryOf(state, id, cards), 0);
+  const victoryPoints = state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   return { threat, destroyed, damage, rounds: completedRounds(state), victoryPoints };
 }
 

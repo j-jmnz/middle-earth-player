@@ -131,6 +131,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Performance pass (`docs/plans/done/performance-pass.md`): its out-of-scope items (the per-card glow, an ArcRing of Views, particle buffer reuse, a UI-thread lift) wait for on-device profiling.
 - Table performance settings (`docs/plans/done/table-performance-settings.md`), phone checks open: Card pictures Low on a full table on a 2x and a 3x phone (a little softer; the long press and the Card screen sharp), a High, Low, High switch mid-game, Moving fog off holding the fog still, pickup and game-step frame timing with the memoized `TablePiece` against the commit before it, the table panel's fold at Medium and Large; `.maestro/table-menu.yaml` not run.
 - Settings page and table panel (user request, 2026-11-01), phone checks open: the selected `Segmented` thumb staying a capsule after a pick in phone portrait on Android (its radius is now in the style), the new Performance group, the longer details and Ringwraith / Rivendell / System on one line at Large on a 320 pt phone, the two-column tablet split (Display and Performance, then Motion and feel, At the table and About).
+- Playtime, card search, command head and deck/briefing requests (user request, 2026-11-03), phone checks open: the play clock across background, foreground and a table hidden by Activity; the quest meter's tween and reduced-motion snap, its gradients on native, full/compact/hidden heads on real phones' insets; the victory rows' 44 pt targets and the Victory display reading; the threat and Heading change badges inside the bar's foot; the denser smoke against card art and its frame cost at 110 sprites; deck drag (long press with the FlashList scroll, the lifted cell over its neighbours, auto-scroll, haptics, Move up/down with VoiceOver and TalkBack); HeroTrio at 30 × 42 in Light; the briefing seat fold with a screen reader; `.maestro/deck.yaml` not run.
 - Run `pnpm scans:pack` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
 
 ### Phone and tablet checks
@@ -164,6 +165,6 @@ None ran. Each needs a device.
 - The table is landscape only; only a tablet (shortest side 600 pt) rotates other routes (user, 2026-10-28).
 - The hand scrub starts after a 150 ms hold and shows a fanned risen hand; the card preview has no Close (user, 2026-10-28).
 - In Daylight, gold is a bronze with a cream `onGold` (user, 2026-10-28).
-- The quest scale shows only in the Quest phase (user, 2026-10-29).
+- The quest meter (the command column's head, over the victory display) shows only in the Quest phase (user, 2026-11-03).
 - The combat spotlight stage is always dark, a lone attack runs about 2.2 s, and a destroyed target burns (user, 2026-10-29).
 - Page art has no hard edges: it fades to black or into the fog; framed tiles and panels keep theirs (user, 2026-10-30).

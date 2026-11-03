@@ -11,7 +11,7 @@ import { deckFaces } from "../../deck-store";
 import { useDatabases } from "../../databases";
 import { FoldSection, useFolds } from "../../fold-section";
 import { heroFace } from "../../hero-tile";
-import { CatalogGrid, CatalogTile, HubPage, leadFace, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow, type PartyHero } from "../../hub-parts";
+import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../hub-parts";
 import { comingScenarios, splitRuns } from "../../hub-runs";
 import { usePalette } from "../../palette-hook";
 import { seatWord } from "../../seats";
@@ -51,7 +51,6 @@ export default function Scenarios() {
   const { hero, others } = splitRuns(games, (game) => standaloneStatus(game) === "playing");
   const seatsOf = (game: ListedStandalone) => game.loadout?.seats.map((seat) => seat.heroes) ?? [];
   const faces = deckFaces(catalog, [hero, ...others].flatMap((game) => (game ? seatsOf(game).flat() : [])));
-  const leadOf = (game: ListedStandalone): PartyHero | null => leadFace(faces, seatsOf(game)[0]?.[0], palette);
   const spoken = (game: ListedStandalone) => `${scenarioName(game.scenarioId)}, ${gameCaption(game)}`;
 
   const heroBlock = hero ? (
@@ -79,7 +78,7 @@ export default function Scenarios() {
             testID={`other-game-${game.id}`}
             title={scenarioName(game.scenarioId)}
             line={[seatWord(game.seatCount), game.loadout?.difficulty, "On the table"].filter((part) => part != null).join(" · ")}
-            lead={leadOf(game)}
+            heroes={(seatsOf(game)[0] ?? []).map((code) => heroFace(faces, code))}
             accessibilityLabel={`Resume ${spoken(game)}`}
             onPress={() => resume(game)}
           />
