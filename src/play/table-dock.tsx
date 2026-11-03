@@ -7,7 +7,7 @@ import { useRef, useState, type ComponentRef, type ReactNode } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { DockButtons, type DockExtra } from "./dock-buttons.tsx";
-import { isDense, labelChars, PILL_PT, planWords, TRAY_ROOM_PX, wordsWindow } from "./dock-budget.ts";
+import { isDense, labelChars, PILL_PT, planWords, smallPictures, trayRoom, wordsWindow } from "./dock-budget.ts";
 import { dockLines } from "./dock-lines.ts";
 import type { Readout } from "./readout.ts";
 import { Stats } from "./sheet-paper.tsx";
@@ -125,12 +125,13 @@ export function TableDock({
   const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
   const measure = () => root.current?.measureInWindow((_x, y) => onTop?.(Math.round(y)));
   // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice rows) and two on a taller one.
-  const dense = isDense(useWindowDimensions().height, s);
+  const screenHeight = useWindowDimensions().height;
+  const dense = isDense(screenHeight, s);
   const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s) });
   // The words' window (budget in dock-budget.ts): the title keeps the lines that fit above the folded line and the buttons (and, with the
   // choice open, above one row), and the rest of it waits behind the "i", which sits on the title row when the room cannot hold a
   // folded line. With the choice open the folded line waits behind the "i" too.
-  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block + (trayOpen ? TRAY_ROOM_PX * s : 0), dense }, s) : Infinity;
+  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block + (trayOpen ? trayRoom(smallPictures(screenHeight, s)) * s : 0), dense }, s) : Infinity;
   const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) }, s);
   const pill = plan.pill ? (
     // The "i" button (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the reading aids.

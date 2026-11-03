@@ -6,8 +6,9 @@ import { memo } from "react";
 
 import { Moving } from "./card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { Badges, CardBody, CombatPill, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, Pile, PlaceMarkView, StackMark, ShipLossView, StageMarks, SuccessMedallion, Tokens, UnderMarkView } from "./canvas-pieces.native.tsx";
+import { Badges, CardBody, CombatPill, DelayedMark, EngagementMark, FireMarkView, HeldMark, NotAppliedMark, OptionMarkView, PlaceMarkView, StackMark, ShipLossView, StageMarks, SuccessMedallion, Tokens, UnderMarkView } from "./canvas-pieces.native.tsx";
 import { sphereIcon } from "./icon-map.ts";
+import { Pile } from "./pile-piece.native.tsx";
 import { shownBounds, type CardSlot } from "./layout.ts";
 import { sphereRing } from "./table-canvas-views.ts";
 import { samePiece, type BodyProps, type PieceProps } from "./table-piece.ts";

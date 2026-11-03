@@ -6,14 +6,15 @@ import { Pressable, View } from "react-native";
 import { hitBounds, type CardSlot } from "./layout.ts";
 import { pileSpeech } from "./pile-speech.ts";
 
-export function ReaderPiles({ slots, onTap, speak }: { slots: readonly CardSlot[]; onTap: (id: string) => void; speak?: (slot: CardSlot) => string | null }) {
+// `playable`: the piles that wear the play mark (a discard pile holding a card the open window lets the seat play from it), said after the count.
+export function ReaderPiles({ slots, onTap, speak, playable }: { slots: readonly CardSlot[]; onTap: (id: string) => void; speak?: (slot: CardSlot) => string | null; playable?: ReadonlySet<string> }) {
   return (
     <View pointerEvents="box-none" style={{ position: "absolute", left: 0, top: 0, right: 0, bottom: 0 }}>
       {slots
         .filter((slot) => slot.kind === "pile")
         .map((slot) => {
           const hit = hitBounds(slot);
-          const speech = pileSpeech(slot);
+          const speech = pileSpeech(slot, playable?.has(slot.id) === true);
           return (
             <Pressable
               key={slot.id}

@@ -5,7 +5,7 @@ import { palettes } from "./palette.js";
 
 // docs/design-system.md: the canvas copies felt, feltLight and the marks it draws from the palette. They must not drift. The keys that
 // build depth (surfaces.ts) and the lit edge are the table's own.
-const OWN = new Set(["lit", "depth", "shade", "primaryTop", "primaryMid"]);
+const OWN = new Set(["lit", "depth", "shade", "primaryTop", "primaryMid", "coin"]);
 describe("table tokens", () => {
   for (const theme of ["dark", "light"] as const) {
     it(`${theme} copy matches its palette, key for key`, () => {

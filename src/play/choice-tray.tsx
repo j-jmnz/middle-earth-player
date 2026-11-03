@@ -4,11 +4,12 @@
 // above them; the count stays in the title's spoken label. The readout, the refusal and the buttons are the dock's, once, under the
 // rows. A row is picked like a card on the table (the same pick, table-choice.ts); a long press on a card's row shows it large. A tap
 // outside folds it (use-table-choice.ts).
-import { ScrollView, View } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { CardImage } from "./card-image.tsx";
 import { cardCorner } from "./card-corner.ts";
+import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures, trayRoom } from "./dock-budget.ts";
 import { dropShadowOf } from "./surfaces.ts";
 import { IconValue } from "./game-icon.tsx";
 import { PlaceGlyph } from "./island-glyph.tsx";
@@ -26,19 +27,20 @@ import { useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
-// A card's picture beside its row: the table's card, 51 by 71, or 36 by 50 on a short phone, times the UI scale (docs/design-system-table.md, Choice tray).
+// A card's picture beside its row: the table's card, 51 by 71, or 36 by 50 on a phone, times the UI scale (dock-budget.ts, smallPictures; docs/design-system-table.md, Choice tray).
 // Its corners are rounded like the card screen's picture (card-image.tsx); a picked card's picture wears the accent ring it wears on the table.
-const cardBox = (dense: boolean, s: number) => (dense ? { width: 36 * s, height: 50 * s } : { width: 51 * s, height: 71 * s });
+const cardBox = (small: boolean, s: number) => {
+  const box = small ? LIST_PICTURE_SMALL : LIST_PICTURE;
+  return { width: box.w * s, height: box.h * s };
+};
 // The rows enter this far up (MOTION.trayEnter).
 const RISE = 16;
-// The shortest the rows are drawn when the column is short: one row with its card picture (dock-budget.ts, TRAY_ROOM_PX counts the short phone's), the rest scrolls.
-const minRows = (dense: boolean) => (dense ? 52 : 79);
 
 // The foreseen damage of a defender, as a pill; threat red when the card would be destroyed.
 // A row's leading mark: a travel row on the Island Map shows the glyph of its place (island-glyph.tsx) beside the card picture.
-function TileLead({ tile, source, dense, picked, s }: { tile: TrayTile; source: PictureSource | null; dense: boolean; picked: boolean; s: number }) {
+function TileLead({ tile, source, small, picked, s }: { tile: TrayTile; source: PictureSource | null; small: boolean; picked: boolean; s: number }) {
   const t = useTableTokens();
-  const box = cardBox(dense, s);
+  const box = cardBox(small, s);
   return (
     <View className="flex-row items-center" style={{ gap: 6 * s }}>
       {tile.place ? <PlaceGlyph mark={tile.place} surface="night" /> : null}
@@ -99,6 +101,8 @@ export function ChoiceTray({
   onRead: ((cardId: string) => void) | null;
 }) {
   const s = useUiScale();
+  // A phone draws the small picture, and the rows keep one row of it (dock-budget.ts; the dock budgets its words against the same).
+  const small = smallPictures(useWindowDimensions().height, s);
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   const shown = useHeld(open ? sheet : null) ?? sheet;
@@ -109,12 +113,13 @@ export function ChoiceTray({
   if (!open && !leaving) return null;
   return (
     <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0 }, motion]}>
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? minRows(dense) * s : 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small) * s : 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);
           const readId = tile.readId;
           const source = tile.code ? picture(tile.code) : null;
           const mark = tile.mark;
+          const selected = shown.kind === "distribute" ? share > 0 : marks.has(tile.id);
           return (
             <Tile
               key={tile.id}
@@ -123,9 +128,9 @@ export function ChoiceTray({
               label={shown.kind === "distribute" ? `${tile.label} · ${share}` : tile.label}
               detail={tile.detail}
               stats={tile.stats}
-              selected={shown.kind === "distribute" ? share > 0 : marks.has(tile.id)}
+              selected={selected}
               testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : tile.look != null ? `sheet-look-${tile.id}` : `sheet-option-${tile.id}`}
-              leading={tile.place || (tile.code && source) ? <TileLead tile={tile} source={source} dense={dense} picked={shown.kind === "distribute" ? share > 0 : marks.has(tile.id)} s={s} /> : null}
+              leading={tile.place || (tile.code && source) ? <TileLead tile={tile} source={source} small={small} picked={selected} s={s} /> : null}
               trailing={mark ? <DamagePill mark={mark} /> : null}
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
               // A card the Sailing test looked at is no choice: a tap opens it large, as a long press does.
