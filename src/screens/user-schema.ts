@@ -22,6 +22,9 @@ export const decks = sqliteTable("decks", {
   // When the player last saved the deck (ms since the epoch). The deck list puts the one saved last first. Starter rows
   // and rows from before 0005 read null and follow.
   updatedAt: integer("updated_at"),
+  // Where the player dragged the deck in the deck list (0 is first). Null until a reorder writes every deck's position: a deck
+  // with no position (new, imported, duplicated) leads the list, and saving a deck keeps its position.
+  position: integer("position"),
 });
 
 export const saves = sqliteTable("saves", {

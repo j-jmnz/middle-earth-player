@@ -42,9 +42,26 @@ export function newDeckId(now: number = Date.now(), random: () => number = Math.
 
 const columns = { id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards, updatedAt: decks.updatedAt };
 
-/** Every saved deck, the one saved last first; rows never saved since 0005 (the starters) follow in the order they were made. */
+/**
+ * Every saved deck in the player's order: the decks with no position first (new, imported or duplicated ones; the one saved last
+ * first, then rows never saved since 0005 in the order they were made), then the dragged order by position.
+ */
 export function listDecks<TRun>(user: Db<TRun>): SavedDeck[] {
-  return user.select(columns).from(decks).orderBy(desc(decks.updatedAt), asc(sql`rowid`)).all();
+  return user
+    .select(columns)
+    .from(decks)
+    .orderBy(sql`${decks.position} is not null`, asc(decks.position), desc(decks.updatedAt), asc(sql`rowid`))
+    .all();
+}
+
+/** Stores the list's order: position 0..n-1 for these ids, in one transaction. Ids that are not saved decks are ignored. */
+export function writeDeckOrder<TRun>(user: Db<TRun>, ids: readonly string[]): void {
+  user.transaction((tx) => {
+    ids.forEach((id, position) => {
+      tx.update(decks).set({ position }).where(eq(decks.id, id)).run();
+    });
+  });
+  bumpDeckRevision();
 }
 
 export function readDeck<TRun>(user: Db<TRun>, id: string): SavedDeck | null {

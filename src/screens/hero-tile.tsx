@@ -214,6 +214,9 @@ type DeckSummary = {
   note?: string | null;
   onPress: () => void;
   onLongPress?: () => void;
+  // The list can be reordered: a screen reader cannot drag, so each direction that has room is an action ("Move up", "Move down").
+  onMove?: (direction: "up" | "down") => void;
+  canMove?: { up: boolean; down: boolean };
   testID: string;
   // The row of actions under the deck while the list is managed, or Open in Decks in the briefing.
   children?: ReactNode;
@@ -224,8 +227,9 @@ type DeckSummary = {
 };
 
 // The press props of a deck in the list (a button) or in the briefing's picker (a radio).
-function pressProps({ name, heroes, detail, status, quietReady, note, onPress, onLongPress, testID, selected, disabled }: DeckSummary) {
+function pressProps({ name, heroes, detail, status, quietReady, note, onPress, onLongPress, onMove, canMove, testID, selected, disabled }: DeckSummary) {
   const picker = selected !== undefined;
+  const moves = onMove && canMove ? [...(canMove.up ? [{ name: "moveUp", label: "Move up" }] : []), ...(canMove.down ? [{ name: "moveDown", label: "Move down" }] : [])] : [];
   const said = quietReady && status.ready ? "" : `, ${status.text}`;
   return {
     testID,
@@ -234,6 +238,14 @@ function pressProps({ name, heroes, detail, status, quietReady, note, onPress, o
     accessibilityState: picker ? { selected, disabled: disabled ?? false } : undefined,
     accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}${said}${note ? `, ${note}` : ""}`,
     accessibilityHint: picker ? undefined : "Opens the deck",
+    accessibilityActions: moves.length > 0 ? moves : undefined,
+    onAccessibilityAction:
+      moves.length > 0
+        ? (event: { nativeEvent: { actionName: string } }) => {
+            if (event.nativeEvent.actionName === "moveUp") onMove?.("up");
+            if (event.nativeEvent.actionName === "moveDown") onMove?.("down");
+          }
+        : undefined,
     disabled: disabled ?? false,
     onPress,
     onLongPress,
