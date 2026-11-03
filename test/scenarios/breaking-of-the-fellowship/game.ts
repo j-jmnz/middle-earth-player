@@ -149,7 +149,7 @@ export function playBreaking(seatCount: 1 | 2, seed: number, difficulty: Difficu
 
 export { STAGES_3A };
 
-// The goldens (src/campaign/golden-breaking.test.ts), also played by the causes and replay tests. `stages` is each seat's preferred stage 3A. A win runs the campaign card's
+// The goldens (src/campaign/scenarios/breaking-of-the-fellowship/golden.test.ts), also played by the causes and replay tests. `stages` is each seat's preferred stage 3A. A win runs the campaign card's
 // Resolution (the first player takes the first burden of the pair, each seat names a captive and a hero that Fallen Into Evil still holds is logged as fallen); a loss writes nothing.
 export type BreakingGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: BreakingDecks; stages: readonly (readonly string[])[]; outcome: "won" | "lost"; lossReason?: string; separate: boolean };
 

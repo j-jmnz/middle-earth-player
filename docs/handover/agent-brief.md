@@ -82,7 +82,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
    `src/play/choice-words.ts` (`instructionWords`): a test checks every branch reads as a sentence.
 6. A line may stay open only if it is genuinely impossible to express in this engine; report it with the reason.
 7. A scenario phase also adds the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open,
-   pins a whole game in a golden (`src/campaign/golden-south.test.ts` and `src/campaign/golden/the-ring-goes-south.json` are
+   pins a whole game in a golden (`src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `src/campaign/scenarios/the-ring-goes-south/golden.json` are
    the pattern), and leaves its phone half open in `docs/phases/STATUS.md` when you have no phone.
 
 ## Checkpoints (API usage limits can stop you mid-task)

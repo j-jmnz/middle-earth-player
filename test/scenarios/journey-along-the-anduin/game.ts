@@ -103,7 +103,7 @@ export function playAnduin(seatCount: 1 | 2, seed: number, difficulty: Difficult
   return { start, kept, state, intents, steps };
 }
 
-// The goldens (src/campaign/golden-anduin.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a
+// The goldens (src/campaign/scenarios/journey-along-the-anduin/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a
 // loss writes nothing.
 export type AnduinGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: AnduinDecks; outcome: "won" | "lost"; lossReason?: string };
 

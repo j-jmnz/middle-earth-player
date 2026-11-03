@@ -20,7 +20,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `escape-from-dol-guldur`:
 - `pnpm effects:draft escape-from-dol-guldur`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution and the boons and burdens below.
 - A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/escape-from-dol-guldur.ts`; boon and burden pool records in `src/effects/authored/pool/RevCore.ts`.
-- Golden: `src/campaign/golden/escape-from-dol-guldur.json` with `golden-dol-guldur.test.ts`, `test/scenarios/escape-from-dol-guldur/scene.ts` and `test/scenarios/escape-from-dol-guldur/game.ts`: true solo and two-handed, a win and a loss.
+- Golden: `src/campaign/scenarios/escape-from-dol-guldur/golden.json` with `escape-from-dol-guldur/golden.test.ts`, `test/scenarios/escape-from-dol-guldur/scene.ts` and `test/scenarios/escape-from-dol-guldur/game.ts`: true solo and two-handed, a win and a loss.
 - A campaign test checks that Journey Along the Anduin's pool and its `prisoner` fact reach this scenario through the Campaign Setup Checklist.
 - Add `escape-from-dol-guldur` to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.

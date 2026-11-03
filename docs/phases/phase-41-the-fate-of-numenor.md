@@ -18,7 +18,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-fate-of-numenor`, and 
 - `pnpm effects:draft the-fate-of-numenor`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
 - A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/the-fate-of-numenor.ts`; boon and burden pool records in `src/effects/authored/pool/DCCE.ts`.
-- Golden: `src/campaign/golden/the-fate-of-numenor.json` with its `golden-*.test.ts`, scene and game scripts: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
+- Golden: `src/campaign/scenarios/the-fate-of-numenor/golden.json` with its `golden-*.test.ts`, scene and game scripts: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add `the-fate-of-numenor` to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.

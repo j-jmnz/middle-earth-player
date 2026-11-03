@@ -5,7 +5,7 @@ tags:
 # Phase 43. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `stormcaller-won` (scripts/e2e/flight-of-the-stormcaller.ts): a real two-handed
 # game of Flight of the Stormcaller, parked on its win (the players caught up to the Stormcaller). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds
 # (docs/phases/STATUS.md). Confirming the win writes the XP from the campaign card (1 for each surviving player, on-course, stage 2B, the Stormcaller destroyed, Crowley, Thunderstruck, no damage on a hero) and, with
-# parts 1 to 3 won in the log, unlocks The Thing in the Depths (src/campaign/golden-stormcaller.test.ts pins the path). The fixture's log has parts 1 to 3 recorded as won (the logs the Voyage, Fate and Raid
+# parts 1 to 3 won in the log, unlocks The Thing in the Depths (src/campaign/scenarios/flight-of-the-stormcaller/golden.test.ts pins the path). The fixture's log has parts 1 to 3 recorded as won (the logs the Voyage, Fate and Raid
 # goldens' wins write), so the path opens on Flight of the Stormcaller and resumes it; its node reads Won.
 - launchApp:
     clearState: true

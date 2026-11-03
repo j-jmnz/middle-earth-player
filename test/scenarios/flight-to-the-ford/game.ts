@@ -131,7 +131,7 @@ export function playFord(seatCount: 1 | 2, seed: number, difficulty: Difficulty,
   return { start, kept, state, intents, steps };
 }
 
-// The Flight to the Ford goldens (src/campaign/golden-ford.test.ts), also played by the causes and replay tests. A win runs
+// The Flight to the Ford goldens (src/campaign/scenarios/flight-to-the-ford/golden.test.ts), also played by the causes and replay tests. A win runs
 // the campaign card's Resolution; a loss on the Ring-bearer's life (mec109.ringbearers-life) and a loss on threat are both here.
 export type FordGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FordDecks; outcome: "won" | "lost"; lossReason?: string };
 

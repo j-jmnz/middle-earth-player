@@ -173,7 +173,7 @@ describe("two scenarios of the campaign", () => {
 
 // Scenario 2 set up from scenario 1's log and played to its end (rr.campaign-setup-checklist, mec109.setup, 141044:B:1).
 // The game is short-cut to stage 3B with no Nazgûl in play, so the stage's own win condition (141027:B:1) ends it; the
-// goldens (golden-knife.test.ts) play whole games.
+// goldens (a-knife-in-the-dark/golden.test.ts) play whole games.
 describe("A Knife in the Dark from the log of A Shadow of the Past", () => {
   const RING = "141085";
   const STARTER = Array.from({ length: 12 }, () => "card");

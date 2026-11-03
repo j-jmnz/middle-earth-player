@@ -2,7 +2,7 @@
 // Defenders of Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `raid-won` is the first seed that wins, parked on the win (the Resolution
 // waits); `raid-lost` the first that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has parts 1 and 2 recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps Raid locked and the path opens Voyage Across Belegaer): it is the log
-// the won game of Voyage Across Belegaer's golden writes (src/campaign/golden-voyage.test.ts, "two-handed, won"), and on top of it the one of The Fate of Númenor's golden (src/campaign/golden-fate.test.ts,
+// the won game of Voyage Across Belegaer's golden writes (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts, "two-handed, won"), and on top of it the one of The Fate of Númenor's golden (src/campaign/scenarios/the-fate-of-numenor/golden.test.ts,
 // "two-handed, won"), each run through the same `applyResolution` that writes it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won` and
 // `fate-won`, real-decklist wins, are open (docs/phases/STATUS.md). The Campaign Setup's offer of a Galdor's Counsel is answered in the loadout: neither player takes one.
 import Database from "better-sqlite3";

@@ -6,7 +6,7 @@ tags:
 # two-handed game of The Oath (the Defenders of Gondor and Swords of the Noldor lists, each seat with an Adaptation) from the blank log a new The Dark of Mirkwood
 # playthrough starts on (tdom.mini-campaign), parked on its win. 41050's Resolution asks nothing: 6 or more tokens on the campaign card earn Guilty
 # Conscience. Confirming writes the log and unlocks The Caves of Nibin-Dûm. The same win in Mirkwood Paths (part 4, from Escape from Dol
-# Guldur's log) unlocks the same scenario there: that is checked in Node (src/campaign/golden-oath.test.ts) and stays open on the phone until a real
+# Guldur's log) unlocks the same scenario there: that is checked in Node (src/campaign/scenarios/the-oath/golden.test.ts) and stays open on the phone until a real
 # `dol-guldur-won` fixture exists (it needs `anduin-won`, docs/phases/STATUS.md). The path screen has no table-menu: the log is opened from `log-open`.
 - launchApp:
     clearState: true

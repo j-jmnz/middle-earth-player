@@ -6,7 +6,7 @@ tags:
 # game of Raid on the Grey Havens, parked on its win (Captain Sahír is in the victory display and no location in play has damage). The fixture is OPEN: no win of the two starter decklists was found in
 # 200 seeds, so `raid-won` is not committed and this flow cannot run until scripts/e2e/fixtures.ts writes one (docs/phases/STATUS.md). Confirming the win writes the XP from the campaign card (1 for each
 # surviving player, the cards under The Havens Burn, the Elven Wave-runners, Na'asiyah, no enemies in play, threat 40 or less) and, with parts 1 and 2 won in the log, unlocks Flight of the Stormcaller
-# (src/campaign/golden-raid.test.ts pins the path). The fixture's log has parts 1 and 2 recorded as won (the logs the Voyage and Fate goldens' wins write), so the path opens on Raid and resumes it; the
+# (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts pins the path). The fixture's log has parts 1 and 2 recorded as won (the logs the Voyage and Fate goldens' wins write), so the path opens on Raid and resumes it; the
 # Raid node reads Won.
 - launchApp:
     clearState: true

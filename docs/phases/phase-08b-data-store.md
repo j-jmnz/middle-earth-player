@@ -14,7 +14,7 @@ Game data used to be hand-typed (`scripts/local-cards.ts`, `fixtures/*.json`, a 
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` are green with the network off and no `assets/catalog.db`.
-- The step 0 golden (printed cards, definition, full-game log on seeds 1, 2 and 9) held through every step. The full-game log stays as `src/campaign/golden.test.ts`.
+- The step 0 golden (printed cards, definition, full-game log on seeds 1, 2 and 9) held through every step. The full-game log stays as `src/campaign/scenarios/a-shadow-of-the-past/golden.test.ts`.
 - Phone checks: none changed.
 
 ## Open

@@ -2,7 +2,7 @@
 // Defenders of Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `stormcaller-won` is the first seed that wins, parked on the win (the Resolution
 // waits); `stormcaller-lost` the first that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the Grey Havens box (parts 1 to 3) recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps this part locked and the path opens Voyage Across
-// Belegaer): it is the log of `scripts/e2e/raid-on-the-grey-havens.ts` (the Voyage and Fate goldens' wins), and on top of it the one of Raid on the Grey Havens' golden (src/campaign/golden-raid.test.ts, "two-handed, won"), each run
+// Belegaer): it is the log of `scripts/e2e/raid-on-the-grey-havens.ts` (the Voyage and Fate goldens' wins), and on top of it the one of Raid on the Grey Havens' golden (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts, "two-handed, won"), each run
 // through the same `applyResolution` that writes it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, `fate-won` and `raid-won`, real-decklist
 // wins, are open (docs/phases/STATUS.md). The Campaign Setup asks no choice.
 import Database from "better-sqlite3";

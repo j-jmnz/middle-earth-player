@@ -107,7 +107,7 @@ export function playMirkwood(seatCount: 1 | 2, seed: number, difficulty: Difficu
   return { start, kept, state, intents, steps };
 }
 
-// The goldens (src/campaign/golden-mirkwood.test.ts), also played by the causes and replay tests. A win runs the campaign card's
+// The goldens (src/campaign/scenarios/passage-through-mirkwood/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's
 // Resolution; a loss writes nothing. `branch`: the stage 3B the won game reached.
 export type MirkwoodGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: MirkwoodDecks; outcome: "won" | "lost"; lossReason?: string; branch?: "01121" | "01122" };
 

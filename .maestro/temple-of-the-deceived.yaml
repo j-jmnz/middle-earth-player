@@ -7,7 +7,7 @@ tags:
 # (docs/phases/STATUS.md). The Resolution asks, for each Recurring Nightmare that was flipped, which player it goes to ("Choose a player"; none is asked when both stayed secrets); confirming writes the XP from the
 # campaign card (1 for each surviving player, resources on the card, flipped Temple Halls, 4 or fewer Uncharted locations faceup, Temple Guardian in the victory display, threat 40 or less, Ominous Fate) and, with
 # parts 1 to 5 won in the log, reaches The Drowned Ruins, which the app cannot deal yet: the path stops there and its node reads Coming soon, with no Begin (user decision, 2026-11-01;
-# src/campaign/golden-temple.test.ts pins the path). The fixture's log has parts 1 to 5 recorded as won (the logs the Voyage, Fate, Raid, Flight and Depths
+# src/campaign/scenarios/temple-of-the-deceived/golden.test.ts pins the path). The fixture's log has parts 1 to 5 recorded as won (the logs the Voyage, Fate, Raid, Flight and Depths
 # goldens' wins write), so the path opens on Temple of the Deceived and resumes it; its node reads Won.
 - launchApp:
     clearState: true

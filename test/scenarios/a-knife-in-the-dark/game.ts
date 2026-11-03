@@ -30,7 +30,7 @@ function starter(id: string): LoadoutSeat {
   };
 }
 
-// "starter": the seeded starter decks. "strong": the scenario 1 golden's loadout (src/campaign/golden.test.ts) for each
+// "starter": the seeded starter decks. "strong": the scenario 1 golden's loadout (src/campaign/scenarios/a-shadow-of-the-past/golden.test.ts) for each
 // seat: in-memory heroes with big numbers beside the saga Frodo and a deck of free events, so the outcome depends on the
 // engine and the seed, not on card play.
 export type KnifeDecks = "starter" | "strong";
@@ -131,7 +131,7 @@ export function playKnife(seatCount: 1 | 2, seed: number, difficulty: Difficulty
   return { start, kept, state, intents, steps };
 }
 
-// The A Knife in the Dark goldens (src/campaign/golden-knife.test.ts), also played by causes.test.ts and replay.test.ts.
+// The A Knife in the Dark goldens (src/campaign/scenarios/a-knife-in-the-dark/golden.test.ts), also played by causes.test.ts and replay.test.ts.
 // The wins use the strong loadout. The auto-player lost every starter-deck game it played in phase 12 (Easy and Normal,
 // seeds 1 to 12, true solo and two-handed), and the seeded beam search below (searchKnifeWin, Easy) found no win either:
 // true solo seeds 1 to 4 and two-handed seed 1 at width 12 and 10 tries a round, after earlier runs at widths 4 to 16 on

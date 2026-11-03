@@ -128,7 +128,7 @@ export function playSouth(seatCount: 1 | 2, seed: number, difficulty: Difficulty
   return { start, kept, state, intents, steps };
 }
 
-// The goldens (src/campaign/golden-south.test.ts), also played by the causes and replay tests. A win runs the campaign card's
+// The goldens (src/campaign/scenarios/the-ring-goes-south/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's
 // Resolution; a loss writes nothing.
 export type SouthGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: SouthDecks; outcome: "won" | "lost"; lossReason?: string };
 

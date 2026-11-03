@@ -147,7 +147,7 @@ export function playRaid(seatCount: 1 | 2, seed: number, difficulty: Difficulty,
   return { start, kept, state, intents, steps };
 }
 
-// The goldens (src/campaign/golden-raid.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
+// The goldens (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first two parts were won (the pool, XP and marks reach this part). `upgraded`: the Upgraded sides (Calphon, Spyglass, Black Key). `counsel`: what each seat takes at the Campaign Setup.
 export type RaidGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RaidDecks; outcome: "won" | "lost"; policy?: Partial<RaidPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; counsel?: CounselChoice; lossReason?: string };
 

@@ -157,7 +157,7 @@ export function playOath(seatCount: 1 | 2, seed: number, difficulty: Difficulty,
   return { start, kept, state, intents, steps };
 }
 
-// The goldens (src/campaign/golden-oath.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a loss writes
+// The goldens (src/campaign/scenarios/the-oath/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a loss writes
 // nothing.
 export type OathGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: OathDecks; outcome: "won" | "lost"; tokens?: "take" | "skip"; adaptations?: Adaptations; facts?: CampaignFacts; lossReason?: string };
 

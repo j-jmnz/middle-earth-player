@@ -56,7 +56,7 @@ describe("141079 whenRevealed Delay", () => {
       const data = topFrame(begun)?.data;
       expect(data?.kind === "effect" && data.uncancelable).toBe(ring === "exhausted");
       // Nothing cancels a delayed frame, so the instruction runs either way. The When Revealed itself is the one a
-      // cancel could answer (src/campaign/starter-cancel-search.test.ts).
+      // cancel could answer (src/campaign/starter/cancel-search.test.ts).
       const crossed = settle({ ...scheduled, phase: "Travel" }, ctx, steps);
       expect(crossed.cards[first(crossed, RIDER)]?.zone).toBe("engaged");
     }

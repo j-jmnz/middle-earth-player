@@ -20,7 +20,7 @@ Written 2026-10-24, after phase 8b. It reviews phases 9 to 16 against the new `d
 
 - One network command, pinned snapshots, an offline deterministic build, and a drift check in CI.
 - Effects are records. A template fires only on a whole line. The rest is authored, not parsed.
-- The engine is pure and seeded. A whole scenario replays on fixed seeds (`src/campaign/golden.test.ts`).
+- The engine is pure and seeded. A whole scenario replays on fixed seeds (`src/campaign/scenarios/a-shadow-of-the-past/golden.test.ts`).
 
 Keep all of that. The problems are in what the pipeline treats as authoritative.
 

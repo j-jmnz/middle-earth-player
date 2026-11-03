@@ -7,7 +7,7 @@ tags:
 # two-handed game of The Caves of Nibin-Dûm (the Defenders of Gondor and Swords of the Noldor lists) from the log a real `oath-won` writes when it is confirmed (The Dark of Mirkwood,
 # part 2 of 2), parked on its win. 41051's Resolution asks nothing: with the highest final threat under 40 each player earns a Ranger Sense and a Ranger Sense for each player is
 # kept for the next campaign. Confirming completes the campaign: there is no next scenario and the path has nothing to begin. The same win in Mirkwood Paths (part 5, from The Oath's log in
-# that campaign) completes that campaign the same way: that is checked in Node (src/campaign/nibin-campaign.test.ts) and stays open on the phone until a real `dol-guldur-won` fixture
+# that campaign) completes that campaign the same way: that is checked in Node (src/campaign/scenarios/the-caves-of-nibin-dum/campaign.test.ts) and stays open on the phone until a real `dol-guldur-won` fixture
 # exists (docs/phases/STATUS.md). The path screen has no table-menu: the log is opened from `log-open`.
 - launchApp:
     clearState: true
