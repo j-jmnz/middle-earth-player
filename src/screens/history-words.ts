@@ -79,12 +79,8 @@ export function runDetail(run: RunRecord, nameOf: (code: string) => string): str
 }
 
 /** The one line the screen reader gets for a run. */
-export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string, deleted: boolean): string {
-  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeWords(run), deleted ? deletedWords(run.kind) : null].filter((part) => part != null).join(", ");
-}
-
-export function deletedWords(kind: RunRecord["kind"]): string {
-  return kind === "campaign" ? "Playthrough deleted" : "Game deleted";
+export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string): string {
+  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeWords(run)].filter((part) => part != null).join(", ");
 }
 
 /** The one line an empty library says. */

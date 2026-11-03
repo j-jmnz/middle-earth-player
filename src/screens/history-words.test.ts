@@ -68,6 +68,6 @@ describe("playtimeWords", () => {
   it("is part of the detail line and the spoken label", () => {
     const r = run({ startedAt: 0, endedAt: 107 * MIN, activeMs: 42 * MIN });
     expect(runDetail(r, (code) => code)).toBe("4 rounds · threat 30 · Score 44 · 0 victory points · played 42 min · away 1 h 05 min");
-    expect(runLabel(r, "A Shadow of the Past", (code) => code, false)).toContain("played 42 min · away 1 h 05 min");
+    expect(runLabel(r, "A Shadow of the Past", (code) => code)).toContain("played 42 min · away 1 h 05 min");
   });
 });

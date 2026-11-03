@@ -100,7 +100,7 @@ Read the sections your task touches.
     - 794–797 Coverage test (~270)
   - 798–818 Data sources (~560)
   - 819–837 Card images (~1.1K) ← 6
-  - 838–862 Persistence and shipping (~1.6K)
+  - 838–862 Persistence and shipping (~1.5K)
   - 863–903 Screens (~4.4K) ← 2
     - 889–903 Table screen (~1.6K) ← 4
 - `docs/design-system-table.md` — Design system — Table (landscape) (~26.5K tok)
@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 304–307 Haptics (~280)
   - 308–318 Banner (~580) ← 1
   - 319–322 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~23.7K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~23.6K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~590)
   - 34–44 Performance (~650) ← 4
@@ -149,12 +149,12 @@ Read the sections your task touches.
   - 206–220 Icons (~480) ← 6
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
-  - 256–435 Screens (~13.0K)
+  - 256–435 Screens (~12.9K)
     - 260–263 Splash (~40)
     - 264–267 App icon (~80)
     - 268–283 Campaigns (campaign list) (~1.4K) ← 6
     - 284–297 Scenarios (~770) ← 1
-    - 298–309 History (~1.4K) ← 4
+    - 298–309 History (~1.3K) ← 4
     - 310–327 Briefing (~1.6K) ← 3
     - 328–331 Campaign setup (~700) ← 3
     - 332–337 Campaign path (~530) ← 2

@@ -46,5 +46,5 @@ export function nextSummary(next: NextStep): string {
 
 /** What Delete asks, naming the playthrough by `describe`, since two of one campaign differ only there. */
 export function deleteSentence(described: string): string {
-  return `Delete ${described}? Its log, pool and any open scenario are gone for good. Its runs stay in History; your decks stay.`;
+  return `Delete ${described}? Its log, pool and any open scenario are gone for good. Your decks stay.`;
 }

@@ -1,10 +1,10 @@
-// History's cards: how a playthrough, a game and a deleted one are worded, and where a game's card leads.
+// History's cards: how a playthrough, a game are worded, and where a game's card leads.
 import { describe, expect, it } from "vitest";
 
 import { emptyLog } from "../campaign/log";
 import type { RunRecord } from "../campaign/runs";
 import type { ListedStandalone, StandaloneLoadout } from "../campaign/standalone";
-import { deleteGameSentence, gameDestination, gameWords, goneWords, saveWords } from "./history-entries";
+import { deleteGameSentence, gameDestination, gameWords, saveWords } from "./history-entries";
 import type { LibrarySave } from "./history-read";
 import type { SaveLine } from "./save-line";
 
@@ -35,9 +35,8 @@ describe("history cards", () => {
     expect(gameDestination(game({ loadout: null }), false)).toBeNull();
   });
 
-  it("says a game's run stays only when it wrote one", () => {
-    expect(deleteGameSentence("A Shadow of the Past, True solo", true)).toBe("Delete A Shadow of the Past, True solo? It is gone for good. Its run stays in History; your decks stay.");
-    expect(deleteGameSentence("A Shadow of the Past, True solo", false)).toBe("Delete A Shadow of the Past, True solo? It is gone for good. Your decks stay.");
+  it("says what Delete asks of a game", () => {
+    expect(deleteGameSentence("A Shadow of the Past, True solo")).toBe("Delete A Shadow of the Past, True solo? It is gone for good. Your decks stay.");
   });
 
   it("words a playthrough with what is next, muted once it is archived, and its newest run to a screen reader", () => {
@@ -68,16 +67,5 @@ describe("history cards", () => {
     ]);
     // Managing leaves the run out.
     expect(gameWords(lost, null, null, false, name).lines).toHaveLength(2);
-  });
-
-  it("words a deleted playthrough's runs together and a deleted game's run alone", () => {
-    expect(goneWords([], name)).toBeNull();
-    const playthrough = goneWords([run("a", { seatCount: 2, heroes: [["1"], ["2"]] })], name);
-    expect(playthrough).toMatchObject({ title: "Fellowship of the Ring", chip: null });
-    expect(playthrough?.lines.at(-1)).toEqual({ text: "Playthrough deleted", tone: "faint" });
-    const lone = goneWords([run("g", { kind: "standalone", campaignId: null, box: "revised-core", scenarioId: "passage-through-mirkwood" })], name);
-    expect(lone).toMatchObject({ chip: { label: "Won" } });
-    expect(lone?.lines[0]).toEqual({ text: "True solo · Revised Core Set", tone: "muted" });
-    expect(lone?.lines.at(-1)).toEqual({ text: "Game deleted", tone: "faint" });
   });
 });

@@ -19,7 +19,7 @@ import { runDate, runDetail } from "./history-words";
 import { usePalette } from "./palette-hook";
 import { useUiScale } from "../play/ui-scale";
 
-const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger", faint: "text-faint" };
+const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger" };
 
 /**
  * One playthrough or game: the first seat's three heroes, the title, its lines, a status chip, and its runs under them. The head and
@@ -63,7 +63,6 @@ export function HistoryCard({
 }) {
   const palette = usePalette();
   const t = useTableTokens();
-  const gone = state === "gone";
   return (
     <View className="overflow-hidden rounded-item">
       <Pressable
@@ -78,12 +77,12 @@ export function HistoryCard({
       >
         {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
         {({ pressed }) => (
-          <View className="px-4 py-3.5" style={gone ? undefined : rowSurface(pressed && onPress != null, t)}>
+          <View className="px-4 py-3.5" style={rowSurface(pressed && onPress != null, t)}>
             <View className="flex-row items-center gap-3">
               <HeroTrio heroes={lead} />
               <View className="min-w-0 flex-1">
                 <View className="flex-row flex-wrap items-center gap-2">
-                  <Text className={`shrink font-display text-heading ${gone ? "text-muted" : "text-bone"}`} numberOfLines={2}>
+                  <Text className={`shrink font-display text-heading text-bone`} numberOfLines={2}>
                     {title}
                   </Text>
                   {chip ? <Chip label={chip.label} tone={chip.tone} /> : null}

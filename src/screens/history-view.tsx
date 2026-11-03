@@ -1,6 +1,6 @@
 // History (docs/design-system.md, History): the library of one kind, the playthroughs or the standalone games, each one card with the
-// runs it wrote. A switch picks the kind. In progress and Finished are open; Archived and Deleted fold, folded until the player opens
-// them. A card opens what it is (a playthrough's path; a game's table, outcome or a new deal). Manage, in the bar (or a long press on
+// runs it wrote. A switch picks the kind. In progress and Finished are open; Archived folds, folded until the player opens
+// it. A card opens what it is (a playthrough's path; a game's table, outcome or a new deal). Manage, in the bar (or a long press on
 // a card), folds each card to its head and puts Archive or Restore and Delete in a band at its foot: Archive and Restore act at once
 // with Undo in a toast, Delete asks in place. The list is a FlashList of flat items (history-list.ts).
 import { FlashList } from "@shopify/flash-list";
@@ -18,7 +18,7 @@ import { heroFace } from "./hero-tile";
 import { useDatabases } from "./databases";
 import { FoldHeader, useFolds } from "./fold-section";
 import { goBack } from "./go-back";
-import { deleteGameSentence, gameDestination, gameWords, goneWords, saveWords, type CardState, type CardWords, type GameDestination } from "./history-entries";
+import { deleteGameSentence, gameDestination, gameWords, saveWords, type CardState, type CardWords, type GameDestination } from "./history-entries";
 import { libraryItems, type FoldedSection, type LibraryItem, type OpenSection } from "./history-list";
 import { EMPTY_LIBRARY, readLibrary, type Library, type LibrarySave } from "./history-read";
 import { CardActions, HistoryCard } from "./history-rows";
@@ -36,13 +36,13 @@ import { useBottomInset } from "./use-bottom-inset";
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
 
-const SECTION_TITLES: Record<OpenSection | FoldedSection, string> = { "in-progress": "In progress", finished: "Finished", archived: "Archived", deleted: "Deleted" };
+const SECTION_TITLES: Record<OpenSection | FoldedSection, string> = { "in-progress": "In progress", finished: "Finished", archived: "Archived" };
 
 
 type Item = LibraryItem<LibrarySave, ListedStandalone>;
 
-// What a fold counts: playthroughs or games, except a deleted game, whose entry is its run.
-const foldUnit = (kind: RunKind, section: FoldedSection): string => (kind === "campaign" ? "playthrough" : section === "deleted" ? "run" : "game");
+// What a fold counts: playthroughs or games.
+const foldUnit = (kind: RunKind): string => (kind === "campaign" ? "playthrough" : "game");
 
 // What managing can do to a playthrough or game: its name for the toast and a screen reader, and how to put it away, bring it back and delete it.
 type Managed = { id: string; name: string; described: string; sentence: string; archive: () => void; restore: () => void; remove: () => void };
@@ -142,11 +142,11 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       deleteSave(user, ref.id);
     },
   });
-  const managedGame = (game: ListedStandalone, hasRun: boolean): Managed => ({
+  const managedGame = (game: ListedStandalone): Managed => ({
     id: game.id,
     name: scenarioName(game.scenarioId),
     described: `${scenarioName(game.scenarioId)}, ${gameCaption(game)}`,
-    sentence: deleteGameSentence(`${scenarioName(game.scenarioId)}, ${gameCaption(game)}`, hasRun),
+    sentence: deleteGameSentence(`${scenarioName(game.scenarioId)}, ${gameCaption(game)}`),
     archive: () => archiveStandalone(user, game.id),
     restore: () => restoreStandalone(user, game.id),
     remove: () => deleteStandalone(user, game.id),
@@ -175,7 +175,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       party={managing ? null : (party ?? null)}
       accessibilityLabel={open ? `${open.verb} ${words.spoken}` : words.spoken}
       onPress={open?.onPress ?? null}
-      onLongPress={state === "gone" ? null : startManaging}
+      onLongPress={startManaging}
       footer={footer}
     />
   );
@@ -215,7 +215,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
               testID={item.id}
               title={SECTION_TITLES[item.section]}
               count={item.count}
-              unit={foldUnit(kind, item.section)}
+              unit={foldUnit(kind)}
               folded={item.folded}
               onFold={(next) => folds.setFolded(foldId(item.section), next, true)}
             />
@@ -230,7 +230,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         );
       }
       case "game": {
-        const entry = managedGame(item.game, item.run != null);
+        const entry = managedGame(item.game);
         const open = gameDestination(item.game, item.run != null);
         return (
           <View className="pb-3">
@@ -245,14 +245,6 @@ export function HistoryView({ initial }: { initial: RunKind }) {
             )}
           </View>
         );
-      }
-      case "gone": {
-        const words = goneWords(item.runs, nameOf);
-        if (!words) return null;
-        // A game's one run is worded in its card's lines; a playthrough's runs are listed under its name.
-        const listed = item.runs[0]?.kind === "campaign" ? item.runs : [];
-        const party = listed.length === 0 ? (item.runs[0]?.heroes ?? null) : null;
-        return <View className="pb-3">{card(item.id, "gone", words, listed, null, null, party)}</View>;
       }
     }
   };
