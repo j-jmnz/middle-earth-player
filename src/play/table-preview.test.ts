@@ -4,7 +4,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { updateCard } from "../rules/core/state.ts";
-import { buildTable, idsOf, sceneCards } from "../../scripts/test-scene.ts";
+import { buildTable, idsOf, sceneCards } from "../../test/harness/scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
 import { seaFixture } from "./sea-fixture.ts";

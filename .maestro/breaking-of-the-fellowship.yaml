@@ -4,7 +4,7 @@ tags:
 ---
 # OPEN (2026-10-30): its fixture `breaking-solo` is not committed. It is a real true-solo game of Breaking of the Fellowship parked in the planning window of the
 # round after stage 2B, dealt from the log of five scenarios no win has been found for (docs/phases/STATUS.md; see the-ring-goes-south.yaml). Run
-# scripts/e2e-fixtures.ts --won when a chain of wins is found, then add `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` to src/campaign/fixtures.ts.
+# scripts/e2e/fixtures.ts --won when a chain of wins is found, then add `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` to src/campaign/fixtures.ts.
 # Phase 16. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which opens the fixture route.
 # True solo after stage 2B: one dial, one staging area, one stage 3A of the player's choice. `table-area` is the table's one accessible line about the area it draws
 # (src/play/area-words.ts): "Staging area · Stage <stage 3A> · <n> cards · <active location>". No peek: there is no second dial and no second area.

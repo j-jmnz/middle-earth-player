@@ -15,7 +15,7 @@ The app knows more than one campaign. The campaign list, the Scenarios tab, the 
 
 - `src/campaign/save.ts` and `src/screens/campaign-data.ts` become a map from campaign id to its data and scenarios. Metro needs static JSON imports, so the map is written by hand; a test checks it against `data/campaigns/index.json`.
 - `campaignOf` and `nameOf` work for any id. Remove every `FELLOWSHIP_ID` fallback the plan lists (`(tabs)/index.tsx`, `(tabs)/scenarios.tsx`, `standalone/briefing/[scenarioId].tsx`, `log/[saveId].tsx`, …).
-- `scripts/build-catalog.ts` tags `cards.campaign_id` from a pack → campaign map.
+- `scripts/build/catalog.ts` tags `cards.campaign_id` from a pack → campaign map.
 
 ## Screens
 
@@ -42,10 +42,10 @@ The app knows more than one campaign. The campaign list, the Scenarios tab, the 
 
 ## Booklets
 
-- `BOOKLETS` (`src/screens/booklets/books.ts`) and `BOOKLET_SOURCES` (`scripts/pack-booklets.ts`) gain `rules-reference` (`MEC101.pdf`, pinned as `rr`) and `the-dark-of-mirkwood` (`dark_of_mirkwood_rulebook_v2.pdf`, pinned in phase 27).
+- `BOOKLETS` (`src/screens/booklets/books.ts`) and `BOOKLET_SOURCES` (`scripts/build/pack-booklets.ts`) gain `rules-reference` (`MEC101.pdf`, pinned as `rr`) and `the-dark-of-mirkwood` (`dark_of_mirkwood_rulebook_v2.pdf`, pinned in phase 27).
 - Mirkwood Paths opens `learn-to-play`, which holds the core campaign and setup pages. The Dark of Mirkwood opens `the-dark-of-mirkwood`. `bookletParams` returns `campaign.bookletId`.
 - `rules-glossary.ts` `DOC_NAMES`/`BOOKS` gain `tdom` and `rr`.
-- Update the brief's booklet ids and its "two booklet PDFs" line, and `scripts/pack-booklets.test.ts`.
+- Update the brief's booklet ids and its "two booklet PDFs" line, and `scripts/build/pack-booklets.test.ts`.
 
 ## Brief
 

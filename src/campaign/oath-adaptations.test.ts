@@ -1,6 +1,6 @@
 // Rules: rr.limits, rr.resource-match, rr.action, rr.campaign-pool, rr.campaign-log (data/rules/entries.json). The four Adaptation boons of The Oath (41044 to
 // 41047, ledger data/printed/mirkwood-paths.json) and the once-per-campaign limit: "Limit once per campaign. Record in Campaign Log when used."
-// The tests run the records on a table of plain-number heroes (scripts/oath-scene.ts), with the boon attached to the first hero.
+// The tests run the records on a table of plain-number heroes (test/scenarios/the-oath/scene.ts), with the boon attached to the first hero.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -8,9 +8,9 @@ import { legalIntents } from "../rules/engine/legal.ts";
 import { heroPays } from "../rules/player/payments.ts";
 import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import { updateCard, type ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { loadOathWorld, oathTable, settleChoices, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { loadOathWorld, oathTable, settleChoices, type OathLayout, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: OathWorld;
 

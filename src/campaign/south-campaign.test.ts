@@ -11,9 +11,9 @@ import { settle } from "../rules/engine/machine.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { attachTo, spawn } from "../rules/core/zones.ts";
-import { playGolden, SOUTH_GOLDENS, southWorld } from "../../scripts/south-game.ts";
-import { campaign, DOORS, loadSouthWorld, LUST, south, southTable, type SouthWorld } from "../../scripts/south-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { playGolden, SOUTH_GOLDENS, southWorld } from "../../test/scenarios/the-ring-goes-south/game.ts";
+import { campaign, DOORS, loadSouthWorld, LUST, south, southTable, type SouthWorld } from "../../test/scenarios/the-ring-goes-south/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { resolutionView } from "./resolution-view.ts";

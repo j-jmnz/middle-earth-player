@@ -6,7 +6,7 @@ import { modifiedStat } from "../rules/core/keywords.ts";
 import { settle } from "../rules/engine/machine.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, depthsTable, idOf, idsOf, loadDepthsWorld, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { CODES, depthsTable, idOf, idsOf, loadDepthsWorld, send, start, type DepthsLayout, type DepthsWorld } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 import { logLines } from "./log.ts";
 import { hitBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews } from "./layout.ts";

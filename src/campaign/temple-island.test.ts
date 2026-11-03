@@ -1,6 +1,6 @@
 // Rules: dcce.island-map, dcce.exploration, dcce.uncharted, rr.travel, rr.active-location, rr.explored (data/rules/entries.json); ledger lines 12067:A:1, 12067:B:1, 12067:B:2, 12072:A:1, 12073:A:2, 12074:A:1. The Island
 // Map and Exploration: the grid, the active location marked where it lies, the locations next to it standing in the staging area, a full location that stays in play, traveling from the active location
-// once it is full, and the reach of Winding Caverns (scripts/temple-scene.ts).
+// once it is full, and the reach of Winding Caverns (test/scenarios/temple-of-the-deceived/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { islandMayTravel, islandReach } from "../rules/families/island/travel.ts";
@@ -9,7 +9,7 @@ import { placeQuestProgress, stagingThreat } from "../rules/quest/quest.ts";
 import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { finish, send, start, templeTable, loadTempleWorld, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
+import { finish, send, start, templeTable, loadTempleWorld, type TempleLayout, type TempleWorld } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 
 let world: TempleWorld;
 

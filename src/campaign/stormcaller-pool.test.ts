@@ -8,7 +8,7 @@ import { syncConstants } from "../rules/interpret/constants.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { withMode, type ScenarioState } from "../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
-import { CODES, flightTable, idOf, loadFlightWorld, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
+import { CODES, flightTable, idOf, loadFlightWorld, send, start, type FlightLayout, type FlightWorld } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 let world: FlightWorld;
 

@@ -9,9 +9,9 @@ import { restricted } from "../../interpret/restrictions.ts";
 import { reduce, type ScenarioState } from "../../engine/reduce.ts";
 import { engagementCostOf } from "../../quest/quest.ts";
 import { modifiedStat } from "../../core/keywords.ts";
-import { causeProblems } from "../../../../scripts/cause-check.ts";
-import { ARGONATH, DIVIDED, FRODOS_CHOICE, GREAT_RIVER, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A, codes, fire, ids, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
-import { first } from "../../../../scripts/past-scene.ts";
+import { causeProblems } from "../../../../test/harness/cause-check.ts";
+import { ARGONATH, DIVIDED, FRODOS_CHOICE, GREAT_RIVER, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A, codes, fire, ids, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: BreakingWorld;
 

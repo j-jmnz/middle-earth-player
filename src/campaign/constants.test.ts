@@ -7,7 +7,7 @@ import { qualifyingEnemies, resolveQuest } from "../rules/quest/quest.ts";
 import { attachBlocked, heroLimitExempt, restricted } from "../rules/interpret/restrictions.ts";
 import { updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
-import { buildTable, begin, FRODO, idsOf, RIDER, SAM, sceneCards, send, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { buildTable, begin, FRODO, idsOf, RIDER, SAM, sceneCards, send, type Scene, type Table } from "../../test/harness/scene.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
 

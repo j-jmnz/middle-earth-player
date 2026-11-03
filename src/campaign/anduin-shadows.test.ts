@@ -1,13 +1,13 @@
 // Rules: rr.step-6-4-2, rr.shadow-effects, ltp.undefended-attack, rr.attacks-outside-the-combat-phase, rr.exhausted, rr.engaged (data/rules/entries.json).
-// The Shadow lines of the Journey Along the Anduin encounter cards, played through a real attack (scripts/anduin-scene.ts).
+// The Shadow lines of the Journey Along the Anduin encounter cards, played through a real attack (test/scenarios/journey-along-the-anduin/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Run } from "../../scripts/past-scene.ts";
+import type { Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { legalIntents } from "../rules/engine/legal.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { fight, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
-import { codesOf, first, send } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { fight, loadAnduinWorld, type AnduinWorld } from "../../test/scenarios/journey-along-the-anduin/scene.ts";
+import { codesOf, first, send } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: AnduinWorld;
 

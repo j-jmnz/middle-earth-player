@@ -1,6 +1,6 @@
 // Rules: dcce.uncharted, rr.engaged, rr.shadow-effects, rr.search, rr.refresh-phase, rr.discard-pile-and-victory-display, rr.attachment-cards (data/rules/entries.json). The encounter cards
 // of The Fate of Númenor that no template reads (the Fate of Númenor, Drowned Dead and Ruins of Númenor sets): each line of the ledger (data/printed/dream-chaser.json) has a record, and these
-// tests run them on a table of plain-number heroes (scripts/fate-scene.ts).
+// tests run them on a table of plain-number heroes (test/scenarios/the-fate-of-numenor/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -9,7 +9,7 @@ import { runInstruction } from "../rules/interpret/interpret.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, codesIn, fateFight, fateTable, finish, idOf, loadFateWorld, resolveReveal, send, start, type FateLayout, type FateWorld, type Run } from "../../scripts/fate-scene.ts";
+import { CODES, codesIn, fateFight, fateTable, finish, idOf, loadFateWorld, resolveReveal, send, start, type FateLayout, type FateWorld, type Run } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 
 let world: FateWorld;
 

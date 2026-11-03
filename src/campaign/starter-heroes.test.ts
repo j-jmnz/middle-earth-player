@@ -8,8 +8,8 @@ import { legalIntents } from "../rules/engine/reduce.ts";
 import { updateCard, withMode } from "../rules/core/state.ts";
 import { definePrinted } from "../rules/core/printed.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { CHEAP, DEAR, fund, refusal, starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { CHEAP, DEAR, fund, refusal, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const SAM = "141002";
 const MERRY = "141003";

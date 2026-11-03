@@ -1,6 +1,6 @@
 // Rules: rr.step-3-3, rr.travel, rr.step-6-4-3, rr.damage, rr.hit-points, rr.optional-engagement, rr.explored, rr.step-7-3, rr.search
 // (data/rules/entries.json). The Journey Along the Anduin encounter cards: each line of the ledger (data/printed/mirkwood-paths.json) has a
-// record, and these tests run them on a table of plain-number heroes (scripts/anduin-scene.ts).
+// record, and these tests run them on a table of plain-number heroes (test/scenarios/journey-along-the-anduin/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -12,9 +12,9 @@ import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { anduinTable, fight, loadAnduinWorld, type AnduinLayout, type AnduinWorld } from "../../scripts/anduin-scene.ts";
-import { first, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { anduinTable, fight, loadAnduinWorld, type AnduinLayout, type AnduinWorld } from "../../test/scenarios/journey-along-the-anduin/scene.ts";
+import { first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: AnduinWorld;
 

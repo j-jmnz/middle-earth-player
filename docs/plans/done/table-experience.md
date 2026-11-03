@@ -23,7 +23,7 @@ At each step the video names the decision and what it costs:
 
 **Measured on this repo** (scratch scripts, not committed; run again after merging main on 2026-10-26, with the same results).
 
-- **Starter decks.** `scripts/auto-player.ts` played both MEC109 starter decks, seeds 1, 2, 4, 5 and 9, true solo, Normal, with card play and actions on.
+- **Starter decks.** `test/harness/auto-player.ts` played both MEC109 starter decks, seeds 1, 2, 4, 5 and 9, true solo, Normal, with card play and actions on.
   - In 29 rounds it made 560 decisions, and 329 of them were Pass (59%). A round averaged 19.3 decisions and 11.3 passes, from 7 to 38 decisions.
   - Most passes came in an action window where something was legal, so the engine did not skip it (`stepWindow` in `src/rules/engine/step-window.ts`). Each Pass takes two taps, so a round spends about 20 taps on passing.
   - All 10 games were lost to "The One Ring left play", six of them by round 2.

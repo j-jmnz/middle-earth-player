@@ -1,5 +1,5 @@
 // Rules: dcce.stormcaller-elite, dcce.last-player, dcce.naasiyah, rr.step-6-4-3, rr.step-6-8-3, rr.ownership-and-control (data/rules/entries.json). Captain Sahír, Na'asiyah and Graxar, the enemy sides and the objective
-// ally sides, on a table of plain-number heroes and the Campaign Expansion's cards (scripts/raid-scene.ts).
+// ally sides, on a table of plain-number heroes and the Campaign Expansion's cards (test/scenarios/raid-on-the-grey-havens/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { canAttack } from "../rules/combat/combat.ts";
@@ -8,7 +8,7 @@ import { legalIntents, reduce } from "../rules/engine/reduce.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, send, start, type RaidLayout, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 let world: RaidWorld;
 

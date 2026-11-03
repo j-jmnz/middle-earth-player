@@ -14,10 +14,10 @@ import { expectOk } from "../../core/test-fixture.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { prisonerHero } from "./index.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../../scripts/dol-guldur-scene.ts";
-import { dolGuldurWorld, dolGuldurStart, LOGGED_PRISONER, STRONG_HEROES } from "../../../../scripts/dol-guldur-game.ts";
-import { send, start, type Run } from "../../../../scripts/past-scene.ts";
-import { causeProblems } from "../../../../scripts/cause-check.ts";
+import { dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
+import { dolGuldurWorld, dolGuldurStart, LOGGED_PRISONER, STRONG_HEROES } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { causeProblems } from "../../../../test/harness/cause-check.ts";
 
 let world: DolGuldurWorld;
 

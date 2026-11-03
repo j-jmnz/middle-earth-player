@@ -9,9 +9,9 @@ import { holds } from "../rules/interpret/conditions.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { withSeat } from "../rules/core/state.ts";
-import { OATH_GOLDENS, oathPlan, oathWorld, playGolden as playOath } from "../../scripts/oath-game.ts";
-import { CAVES_GOLDENS, cavesLoadout, cavesWorld, playGolden } from "../../scripts/nibin-dum-game.ts";
-import { campaign, cavesTable, loadCavesWorld, caves, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
+import { OATH_GOLDENS, oathPlan, oathWorld, playGolden as playOath } from "../../test/scenarios/the-oath/game.ts";
+import { CAVES_GOLDENS, cavesLoadout, cavesWorld, playGolden } from "../../test/scenarios/the-caves-of-nibin-dum/game.ts";
+import { campaign, cavesTable, loadCavesWorld, caves, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
 
 import { carryOffers } from "./carry-over.ts";

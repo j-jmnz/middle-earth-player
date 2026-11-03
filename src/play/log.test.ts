@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 import { ledgerLine, ruleTitle } from "./ledger.ts";
 
 import { causeText, logLines, type LogNames } from "./log.ts";

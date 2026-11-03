@@ -9,7 +9,7 @@ import { fireForced } from "../rules/windows/triggers.ts";
 import {
   first, frames, FRODO, loadWorld, reveal, RIDER, SAM, send, table,
   type Layout, type World,
-} from "../../scripts/past-scene.ts";
+} from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: World;
 

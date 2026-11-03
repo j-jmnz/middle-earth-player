@@ -4,8 +4,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { shadowCards } from "../rules/core/zones.ts";
-import { attackOrPolicy } from "../../scripts/combat-policy.ts";
-import { starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
+import { attackOrPolicy } from "../../test/harness/combat-policy.ts";
+import { starterStart, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.step-6-8-3, ltp.shadow-discard (data/rules/entries.json). The combat
 // phase from the table's side, over whole games of both starter decks: every attacking enemy carries a face-down shadow card

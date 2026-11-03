@@ -5,15 +5,15 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { UPGRADED_CODES, VOYAGE_GOLDENS, playGolden, voyageWorld, type VoyageDecks, type VoyageGame, type VoyageGolden } from "../../scripts/voyage-game.ts";
-import { campaign, SHIP_CODES, voyage } from "../../scripts/voyage-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { UPGRADED_CODES, VOYAGE_GOLDENS, playGolden, voyageWorld, type VoyageDecks, type VoyageGame, type VoyageGolden } from "../../test/scenarios/voyage-across-belegaer/game.ts";
+import { campaign, SHIP_CODES, voyage } from "../../test/scenarios/voyage-across-belegaer/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { xpAwarded } from "./xp.ts";
 
-// A permanent golden: whole games of Voyage Across Belegaer in Campaign Mode played by the auto-player (scripts/voyage-game.ts), true solo and two-handed, through a win (in Normal
+// A permanent golden: whole games of Voyage Across Belegaer in Campaign Mode played by the auto-player (test/scenarios/voyage-across-belegaer/game.ts), true solo and two-handed, through a win (in Normal
 // and Easy, with the ships sailing and trading damage, with the Hard and the Expert Mode card, with every ship and Modification boon on its Upgraded side) and through a loss, on
 // fixed seeds. It pins the path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the sea family (fleet, Heading, Sailing, Corsair deck,
 // Boarding) and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

@@ -1,6 +1,6 @@
 // Rules: rr.step-3-3, rr.engaged, rr.shadow-effects, rr.explored, rr.search, rr.damage, rr.hit-points, rr.active-location, rr.first-player (data/rules/entries.json). The encounter
 // cards of The Caves of Nibin-Dûm that no template reads: each line of the ledger (data/printed/mirkwood-paths.json) has a record, and these tests run them on a table of
-// plain-number heroes (scripts/nibin-dum-scene.ts). The Cave Torch cards are in nibin-torch.test.ts.
+// plain-number heroes (test/scenarios/the-caves-of-nibin-dum/scene.ts). The Cave Torch cards are in nibin-torch.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -11,9 +11,9 @@ import { settle } from "../rules/engine/machine.ts";
 import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import { seatThreat } from "../rules/families/play/hooks.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
-import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, type CavesLayout, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
+import { first, reveal, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: CavesWorld;
 

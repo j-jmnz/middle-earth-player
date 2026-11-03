@@ -1,6 +1,6 @@
 // Rules: dcce.island-map, dcce.exploration, dcce.uncharted, rr.guarded, rr.travel, rr.action, rr.attachment-cards, rr.search (data/rules/entries.json); ledger lines 12067:B:1, 12067:B:2, 12068:A:1, 12068:A:2, 12068:B:3,
 // 12068:B:4, 12069:A:1, 12069:A:2, 12070:A:1, 12070:A:3, 12070:A:4, 110077:B:2, 12071:A:1, 12071:A:2, 110078:B:3, 11197:A:3. The quest card, the Temple locations, Temple Guardian, the Gate Key and the secrets: each
-// line of the ledger (data/printed/dream-chaser.json) has a record, run on a table that makes it true (scripts/temple-scene.ts).
+// line of the ledger (data/printed/dream-chaser.json) has a record, run on a table that makes it true (test/scenarios/temple-of-the-deceived/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -10,7 +10,7 @@ import { placeQuestProgress } from "../rules/quest/quest.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { legalIntents } from "../rules/engine/legal.ts";
-import { CODES, answer, finish, idOf, loadTempleWorld, send, start, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
+import { CODES, answer, finish, idOf, loadTempleWorld, send, start, templeTable, type TempleLayout, type TempleWorld } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 
 let world: TempleWorld;
 

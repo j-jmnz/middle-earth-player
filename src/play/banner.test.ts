@@ -8,9 +8,9 @@ import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
-import { buildTable, idsOf, SAM, sceneCards } from "../../scripts/test-scene.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { buildTable, idsOf, SAM, sceneCards } from "../../test/harness/scene.ts";
 
 import { finishedRoundSteps, momentOf, roundSummary } from "./outcome.ts";
 import { guideLine } from "./reference.ts";

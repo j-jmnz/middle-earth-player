@@ -1,6 +1,6 @@
 // Rules: rr.step-3-3, rr.engaged, rr.shadow-effects, rr.search, rr.cancel, rr.doomed-x, rr.attachment-cards (data/rules/entries.json). The Oath's encounter
 // enemies and treacheries: each line of the ledger (data/printed/mirkwood-paths.json) has a record, and these tests run them on a table of plain-number
-// heroes (scripts/oath-scene.ts).
+// heroes (test/scenarios/the-oath/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -8,9 +8,9 @@ import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
 import { modifiedStat } from "../rules/core/keywords.ts";
 import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
+import { first, reveal, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: OathWorld;
 

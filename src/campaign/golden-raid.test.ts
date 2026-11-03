@@ -6,15 +6,15 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { inPlay } from "../rules/core/state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { RAID_GOLDENS, UPGRADED_CODES, playGolden, raidWorld, type RaidDecks, type RaidGame, type RaidGolden } from "../../scripts/raid-game.ts";
-import { CODES, campaign, raid } from "../../scripts/raid-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { RAID_GOLDENS, UPGRADED_CODES, playGolden, raidWorld, type RaidDecks, type RaidGame, type RaidGolden } from "../../test/scenarios/raid-on-the-grey-havens/game.ts";
+import { CODES, campaign, raid } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { xpAwarded } from "./xp.ts";
 
-// A permanent golden: whole games of Raid on the Grey Havens in Campaign Mode played by the auto-player (scripts/raid-game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first two
+// A permanent golden: whole games of Raid on the Grey Havens in Campaign Mode played by the auto-player (test/scenarios/raid-on-the-grey-havens/game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first two
 // parts, with a Galdor's Counsel taken, with the Hard and the Expert Mode card, with Calphon, Spyglass and Black Key on their Upgraded sides) and through a loss (the fleet burnt, the Dream-chaser burnt, the
 // threat), on fixed seeds. It pins the path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the aflame family (the Aflame locations, The Havens Burn, Sahír's Advance, the
 // Stormcaller Elite) and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

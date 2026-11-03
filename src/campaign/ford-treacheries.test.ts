@@ -8,9 +8,9 @@ import { hasKeyword } from "../rules/core/keywords.ts";
 import { legalIntents } from "../rules/engine/legal.ts";
 import type { ReduceContext } from "../rules/engine/reduce.ts";
 import { expireModifiers, flagged, updateCard, type ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
-import { codesOf, first, FRODO, reveal, RING, SAM, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../test/scenarios/flight-to-the-ford/scene.ts";
+import { codesOf, first, FRODO, reveal, RING, SAM, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: FordWorld;
 

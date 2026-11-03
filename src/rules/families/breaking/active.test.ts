@@ -7,7 +7,7 @@ import { expectOk } from "../../core/test-fixture.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../engine/reduce.ts";
 import { moveCard } from "../../core/zones.ts";
 import { areaOf, discardArea, viewOf, withView } from "./areas.ts";
-import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
+import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 let world: BreakingWorld;
 

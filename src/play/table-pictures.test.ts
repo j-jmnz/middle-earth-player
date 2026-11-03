@@ -27,7 +27,7 @@ const slot = (id: string, code: string, zone: CardSlot["zone"], w: number, h: nu
   ...extra,
 });
 
-// A bundled picture (scripts/pack-scans.ts, MAX_SIDE 1200).
+// A bundled picture (scripts/build/pack-scans.ts, MAX_SIDE 1200).
 const SCAN = { w: 857, h: 1200 };
 
 describe("pictureBoxes", () => {

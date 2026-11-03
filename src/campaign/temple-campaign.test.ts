@@ -9,8 +9,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { modifiedStat } from "../rules/core/keywords.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { UPGRADED_CODES, afterDepths, templeLoadout, templePlan, templeStart, templeWorld } from "../../scripts/temple-game.ts";
-import { CODES, campaign, temple } from "../../scripts/temple-scene.ts";
+import { UPGRADED_CODES, afterDepths, templeLoadout, templePlan, templeStart, templeWorld } from "../../test/scenarios/temple-of-the-deceived/game.ts";
+import { CODES, campaign, temple } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 
 import { buildStart } from "./start.ts";
 import { EFFECTS } from "../effects/index.ts";

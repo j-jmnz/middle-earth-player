@@ -8,9 +8,9 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { MIRKWOOD_GOLDENS, mirkwoodLoadout, mirkwoodWorld, playGolden, type MirkwoodGame } from "../../scripts/mirkwood-game.ts";
-import { campaign, passage } from "../../scripts/mirkwood-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { MIRKWOOD_GOLDENS, mirkwoodLoadout, mirkwoodWorld, playGolden, type MirkwoodGame } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { campaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { applyResolution, emptyLog } from "./log.ts";

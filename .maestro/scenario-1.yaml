@@ -1,7 +1,7 @@
 appId: com.middleearth.lcg
 ---
 # OPEN (2026-10-25): its fixture is not committed. No legal win of the two starter decks has been found on this engine, so
-# the e2e route opens nothing for it (docs/phases/STATUS.md). Run scripts/e2e-fixtures.ts --won when one is found.
+# the e2e route opens nothing for it (docs/phases/STATUS.md). Run scripts/e2e/fixtures.ts --won when one is found.
 # Phase 11. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which
 # opens the fixture route. The fixture is a real two-handed game of both starter decks parked on the first Resolution
 # choice (src/campaign/fixtures). Maestro reads text and testIDs; it does not address card pictures or judge a drag.

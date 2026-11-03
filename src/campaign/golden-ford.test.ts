@@ -5,16 +5,16 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { inPlay } from "../rules/core/state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { FORD_GOLDENS, fordLoadout, fordWorld, playGolden, type FordDecks, type FordGame } from "../../scripts/ford-game.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { BURDENS } from "../../scripts/ford-scene.ts";
+import { FORD_GOLDENS, fordLoadout, fordWorld, playGolden, type FordDecks, type FordGame } from "../../test/scenarios/flight-to-the-ford/game.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { BURDENS } from "../../test/scenarios/flight-to-the-ford/scene.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
 
 import { validateLoadout } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of Flight to the Ford played by the auto-player (scripts/ford-game.ts), true solo and
+// A permanent golden: whole games of Flight to the Ford played by the auto-player (test/scenarios/flight-to-the-ford/game.ts), true solo and
 // two-handed, through a win and through a loss, on fixed seeds. The wins use the big-number loadout beside the saga Frodo; the
 // starter decks lose on the Ring-bearer's life, and the weak heroes lose on it and on threat. It pins the path from data/
 // through buildStart, the scenario's records, the burden deck, the Ring-bearer's life and the reducer, so a change that moves a

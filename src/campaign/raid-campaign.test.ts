@@ -13,8 +13,8 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { settle } from "../rules/engine/machine.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import { advanceFreed } from "../rules/quest/stage-reveal.ts";
-import { UPGRADED_CODES, RAID_GOLDENS, afterFate, playGolden, raidLoadout, raidPlan, raidStart, raidWorld } from "../../scripts/raid-game.ts";
-import { CODES, campaign, idOf, raid, raidTable, loadRaidWorld, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { UPGRADED_CODES, RAID_GOLDENS, afterFate, playGolden, raidLoadout, raidPlan, raidStart, raidWorld } from "../../test/scenarios/raid-on-the-grey-havens/game.ts";
+import { CODES, campaign, idOf, raid, raidTable, loadRaidWorld, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 import { buildStart } from "./start.ts";
 import { applyResolution } from "./log.ts";

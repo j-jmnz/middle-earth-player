@@ -5,15 +5,15 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { CAVES_GOLDENS, cavesPlan, cavesWorld, playGolden, type CavesDecks, type CavesGame } from "../../scripts/nibin-dum-game.ts";
+import { CAVES_GOLDENS, cavesPlan, cavesWorld, playGolden, type CavesDecks, type CavesGame } from "../../test/scenarios/the-caves-of-nibin-dum/game.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
-import { campaign } from "../../scripts/nibin-dum-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { campaign } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of The Caves of Nibin-Dûm in Campaign Mode played by the auto-player (scripts/nibin-dum-game.ts), true solo and two-handed, through a
+// A permanent golden: whole games of The Caves of Nibin-Dûm in Campaign Mode played by the auto-player (test/scenarios/the-caves-of-nibin-dum/game.ts), true solo and two-handed, through a
 // win (with "No Time to Waste!" kept and played, with a final threat under 40 and at 40 or more, in Normal and Easy) and through a loss, on fixed seeds. It pins the path
 // from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the Cave Torch, the Pillar, the Chieftain and the reducer, so a change that moves a
 // game shows up as a diff here. Update the snapshot only when the change is meant.

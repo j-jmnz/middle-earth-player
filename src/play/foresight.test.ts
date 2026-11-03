@@ -10,11 +10,11 @@ import { settle } from "../rules/engine/machine.ts";
 import { definePrinted } from "../rules/core/printed.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { withMode, withThreat } from "../rules/core/state.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
-import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { begin, buildTable, FRODO, idsOf, MERRY, passWindows, RIDER, SAM, sceneCards, send } from "../../scripts/test-scene.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { fund, payFor, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { begin, buildTable, FRODO, idsOf, MERRY, passWindows, RIDER, SAM, sceneCards, send } from "../../test/harness/scene.ts";
 
 import { noOneQuests, windowSheet } from "./bar-sheets.ts";
 import { damageOutcome, lossWords, outcomeWords } from "./foresight.ts";

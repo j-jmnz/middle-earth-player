@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, fateTable, loadFateWorld, type FateLayout, type FateWorld } from "../../scripts/fate-scene.ts";
+import { CODES, fateTable, loadFateWorld, type FateLayout, type FateWorld } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 
 let world: FateWorld;
 

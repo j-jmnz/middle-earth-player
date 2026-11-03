@@ -1,12 +1,12 @@
 // Rules: dcce.uncharted, rr.travel, rr.active-location, rr.refresh-phase, rr.search, rr.explored (data/rules/entries.json). The real sides of the double-sided locations of The Fate of Númenor
 // (Shrine to Morgoth, Lush Jungle, Forbidden Coast, Flooded Ruins, Drowned Graves, Cursed Temple): each line of the ledger (data/printed/dream-chaser.json) has a record. A location is flipped by
-// travelling to it, and its Forced effect "After X is flipped over while active" resolves (scripts/fate-scene.ts).
+// travelling to it, and its Forced effect "After X is flipped over while active" resolves (test/scenarios/the-fate-of-numenor/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
 import { hasKeyword, modifiedStat } from "../rules/core/keywords.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, codesIn, fateTable, finish, idOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../scripts/fate-scene.ts";
+import { CODES, codesIn, fateTable, finish, idOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 import { runInstruction } from "../rules/interpret/interpret.ts";
 import { doRefresh } from "../rules/engine/refresh.ts";
 

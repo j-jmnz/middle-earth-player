@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # OPEN (2026-10-30): its fixture `moria-won` is not committed. It is a real game of Journey in the Dark with The Balrog in play, parked on its win, dealt
-# from the log of four scenarios no win has been found for (docs/phases/STATUS.md; see the-ring-goes-south.yaml). Run scripts/e2e-fixtures.ts --won
+# from the log of four scenarios no win has been found for (docs/phases/STATUS.md; see the-ring-goes-south.yaml). Run scripts/e2e/fixtures.ts --won
 # when a chain of wins is found, then add `moria-won`, `moria-pairs` and `moria-lost` to src/campaign/fixtures.ts.
 # Phase 15. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which opens the fixture route.
 # 142039's Resolution reads the final state: with The Balrog still in play (it is in the staging area, Doom, Doom, Doom spent) all four burdens are earned

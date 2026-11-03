@@ -1,7 +1,7 @@
 // Rules: dcce.island-map, dcce.exploration (data/rules/entries.json). Where a location lies on the Island Map told from the marker: the words a travel row leads with, the glyph, and the mark a location in the staging area wears.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { loadTempleWorld, templeTable, type TempleWorld } from "../../scripts/temple-scene.ts";
+import { loadTempleWorld, templeTable, type TempleWorld } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 import { slotNumbers } from "./card-effects.ts";
 import { directionWords, glyphCells, placeWords } from "./island-place.ts";
 

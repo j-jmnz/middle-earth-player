@@ -11,12 +11,12 @@ import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { prisonerHero } from "../rules/families/prisoner/index.ts";
 import { textBlank } from "../rules/families/attachments/hold.ts";
-import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../scripts/anduin-game.ts";
-import { DOL_GULDUR_GOLDENS, dolGuldurLoadout, dolGuldurStart, dolGuldurWorld, playGolden } from "../../scripts/dol-guldur-game.ts";
-import { campaign, dolGuldur } from "../../scripts/dol-guldur-scene.ts";
+import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../test/scenarios/journey-along-the-anduin/game.ts";
+import { DOL_GULDUR_GOLDENS, dolGuldurLoadout, dolGuldurStart, dolGuldurWorld, playGolden } from "../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { campaign, dolGuldur } from "../../test/scenarios/escape-from-dol-guldur/scene.ts";
 import { loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { carryOffers } from "./carry-over.ts";
 import { checklist } from "./checklist.ts";

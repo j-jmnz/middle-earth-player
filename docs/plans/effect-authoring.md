@@ -17,13 +17,13 @@ something else.
 2. Write the records (see Where records live).
 3. `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
    compares it with the data, so run it after adding or removing records.
-4. Check: `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
+4. Check: `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
+   `node --experimental-strip-types scripts/card-smoke/run.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
    seeded game with the card in hand or on the table and fails on a throw, a refusal or `state.failure`; it shows the
    records run, not that they do what the card says. For that, write a test next to the family
    (`src/rules/families/<family>/index.test.ts`) that names the rule ids it implements.
 
-`scripts/effect-coverage.test.ts` is the gate: every printed line of a card a playable scenario deals (`src/campaign/playable.ts`)
+`scripts/checks/effect-coverage.test.ts` is the gate: every printed line of a card a playable scenario deals (`src/campaign/playable.ts`)
 or of a deck-legal player card is owned by a record that names it in `lines`, by a keyword the engine reads (a line that is
 only keywords needs no record), or by an `inert` entry in the printed-text ledger (`data/printed`). A record names lines of
 its own card, and the timing of the record matches the line's label. If one sentence pattern repeats on many cards, it

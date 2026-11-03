@@ -114,7 +114,7 @@ export function useSceneCard(scenarioId: string | null | undefined): ArtCard | n
 }
 
 /**
- * A scenario's picture: the scene bundled on its own at its source's size (`<code>.scene`, scripts/pack-scans.ts), drawn whole; else
+ * A scenario's picture: the scene bundled on its own at its source's size (`<code>.scene`, scripts/build/pack-scans.ts), drawn whole; else
  * the first quest card, the scene cropped from it. `sourceWidth` is the bundled scene's, which bounds how large it is drawn sharp.
  */
 export function useScenePicture(scenarioId: string | null | undefined): { card: ArtCard | null; region: Region; aspect: number; sourceWidth: number | null } {

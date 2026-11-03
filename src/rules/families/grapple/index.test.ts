@@ -12,7 +12,7 @@ import { moveEncounter } from "../encounter/moves.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { settle } from "../../engine/machine.ts";
-import { CODES, depthsTable, finish, idOf, idsOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../../../scripts/depths-scene.ts";
+import { CODES, depthsTable, finish, idOf, idsOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 const resolveRecordsOf = (made: ReturnType<typeof depthsTable>, code: string) => resolveRecords(made.state, made.ctx, code, "whenRevealed", idOf(made.state, code));
 

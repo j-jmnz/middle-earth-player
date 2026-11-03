@@ -12,10 +12,10 @@ import { destroyCard } from "../../core/keywords.ts";
 import { reduce, startScenario } from "../../engine/reduce.ts";
 import { expectOk } from "../../core/test-fixture.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { dolGuldurTable, loadDolGuldurWorld, OBJECTIVES, type DolGuldurLayout, type DolGuldurWorld } from "../../../../scripts/dol-guldur-scene.ts";
-import { dolGuldurStart, dolGuldurWorld } from "../../../../scripts/dol-guldur-game.ts";
-import { codesOf, first, send, start, type Run } from "../../../../scripts/past-scene.ts";
-import { causeProblems } from "../../../../scripts/cause-check.ts";
+import { dolGuldurTable, loadDolGuldurWorld, OBJECTIVES, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
+import { dolGuldurStart, dolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { codesOf, first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { causeProblems } from "../../../../test/harness/cause-check.ts";
 
 let world: DolGuldurWorld;
 

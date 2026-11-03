@@ -1,6 +1,6 @@
 // Rules: rr.quest-advancement, ltp.quest-advancement (data/rules/entries.json). The quest advance screen's reading of the table
 // (quest-advance.ts): which sent intent advanced the quest, and whether the new stage's own When Revealed is asking, on the stages of
-// The Caves of Nibin-Dûm (scripts/nibin-dum-scene.ts): Surprise Attack has each player search for an enemy as it is revealed (41005:A:1).
+// The Caves of Nibin-Dûm (test/scenarios/the-caves-of-nibin-dum/scene.ts): Surprise Attack has each player search for an enemy as it is revealed (41005:A:1).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -10,7 +10,7 @@ import { runInstruction } from "../rules/interpret/interpret.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { cavesTable, loadCavesWorld, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
+import { cavesTable, loadCavesWorld, type CavesLayout, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
 import { advancedTo, advanceWords, closeLatch, nextLatch, NO_ADVANCE, openAdvance, openingLatch, questView, stageAsks } from "./quest-advance.ts";

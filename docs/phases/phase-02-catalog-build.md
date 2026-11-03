@@ -5,7 +5,7 @@ Blocks: phases 3, 4, and 7
 
 ## Goal
 
-`scripts/build-catalog.ts` writes `assets/catalog.db` from RingsDB. The phone does not ship in this phase. Node tests read the built database.
+`scripts/build/catalog.ts` writes `assets/catalog.db` from RingsDB. The phone does not ship in this phase. Node tests read the built database.
 
 ## Build
 

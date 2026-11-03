@@ -7,14 +7,14 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { prisonerHero } from "../rules/families/prisoner/index.ts";
-import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden, type DolGuldurDecks, type DolGuldurGame } from "../../scripts/dol-guldur-game.ts";
-import { campaign, dolGuldur } from "../../scripts/dol-guldur-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden, type DolGuldurDecks, type DolGuldurGame } from "../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { campaign, dolGuldur } from "../../test/scenarios/escape-from-dol-guldur/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of Escape from Dol Guldur in Campaign Mode played by the auto-player (scripts/dol-guldur-game.ts), true solo and
+// A permanent golden: whole games of Escape from Dol Guldur in Campaign Mode played by the auto-player (test/scenarios/escape-from-dol-guldur/game.ts), true solo and
 // two-handed, through a win (with the prisoner at random and the Campaign Log's, with and without Mendor in play at the end) and through a loss, on fixed
 // seeds. It pins the path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the guarded objectives, the prisoner,
 // the Orc Guards and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

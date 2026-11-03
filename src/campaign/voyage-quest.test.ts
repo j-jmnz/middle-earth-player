@@ -1,6 +1,6 @@
 // Rules: rr.quest-cards-quest-deck, rr.quest-advancement, rr.search, rr.winning-the-game, dcce.heading, dcce.sailing, dcce.prepare-your-fleet, dcce.corsair-deck, dcce.ship-enemies,
 // ltp.victory-display (data/rules/entries.json). The six quest cards of Voyage Across Belegaer: each line of the ledger (data/printed/dream-chaser.json) has a record, and these tests
-// run them on a table of plain-number heroes and the campaign's ships (scripts/voyage-scene.ts).
+// run them on a table of plain-number heroes and the campaign's ships (test/scenarios/voyage-across-belegaer/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -9,8 +9,8 @@ import { modifiedStat } from "../rules/core/keywords.ts";
 import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
 import { settle } from "../rules/engine/machine.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { first, send, start, type Run } from "../../scripts/past-scene.ts";
-import { codesIn, loadVoyageWorld, resolveReveal, SHIPS, SCOUTING_SHIP, voyageTable, type VoyageLayout, type VoyageWorld } from "../../scripts/voyage-scene.ts";
+import { first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesIn, loadVoyageWorld, resolveReveal, SHIPS, SCOUTING_SHIP, voyageTable, type VoyageLayout, type VoyageWorld } from "../../test/scenarios/voyage-across-belegaer/scene.ts";
 
 let world: VoyageWorld;
 

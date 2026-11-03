@@ -7,7 +7,7 @@ import { legalIntents } from "../rules/engine/legal.ts";
 import { settle } from "../rules/engine/machine.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, depthsTable, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { CODES, depthsTable, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 import { slotNumbers } from "./card-effects.ts";
 import { attackSource, grappleDetail, grantedTravelWords, returnsNote, shipLoss } from "./grapple-words.ts";

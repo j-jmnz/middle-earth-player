@@ -1,5 +1,5 @@
 // Rules: rr.quest-advancement, rr.winning-the-game, rr.search, rr.discard-pile-and-victory-display, rr.first-player (data/rules/entries.json). The three quest cards of The
-// Oath (41001, 41002, 41003) on a table of plain-number heroes (scripts/oath-scene.ts): their Setup, When Revealed and what keeps a stage from advancing.
+// Oath (41001, 41002, 41003) on a table of plain-number heroes (test/scenarios/the-oath/scene.ts): their Setup, When Revealed and what keeps a stage from advancing.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -9,8 +9,8 @@ import { settle } from "../rules/engine/machine.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { codesIn, loadOathWorld, oathTable, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { codesIn, loadOathWorld, oathTable, type OathLayout, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: OathWorld;
 

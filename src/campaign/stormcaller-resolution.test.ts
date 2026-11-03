@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
+import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 let world: FlightWorld;
 

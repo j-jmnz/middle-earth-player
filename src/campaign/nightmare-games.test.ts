@@ -12,8 +12,8 @@ import { settle } from "../rules/engine/machine.ts";
 import { announceStageRevealed } from "../rules/families/nightmare/setup.ts";
 import { reduce, startScenario } from "../rules/engine/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { playOut } from "../../scripts/auto-player.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { playOut } from "../../test/harness/auto-player.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
 
 import { NIGHTMARE_PLAYABLE } from "./playable.ts";

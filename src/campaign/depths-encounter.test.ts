@@ -1,5 +1,5 @@
 // Rules: dcce.grapple, dcce.stormcaller-and-the-thing, rr.travel, rr.step-6-4-2, rr.shadow-effects, rr.search, rr.attacks-outside-the-combat-phase (data/rules/entries.json). The Stormcaller and The Thing in the Depths encounter cards on a table of plain-number
-// heroes and the Campaign Expansion's cards (scripts/depths-scene.ts): the locations, the treacheries, the enemies and their shadow effects.
+// heroes and the Campaign Expansion's cards (test/scenarios/the-thing-in-the-depths/scene.ts): the locations, the treacheries, the enemies and their shadow effects.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds } from "../rules/interpret/conditions.ts";
@@ -8,7 +8,7 @@ import { modifiedStat } from "../rules/core/keywords.ts";
 import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
 import { settle } from "../rules/engine/machine.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, codesIn, depthsFight, depthsTable, finish, idOf, idsOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { CODES, codesIn, depthsFight, depthsTable, finish, idOf, idsOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 let world: DepthsWorld;
 

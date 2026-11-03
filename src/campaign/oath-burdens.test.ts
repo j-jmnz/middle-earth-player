@@ -7,9 +7,9 @@ import { legalIntents } from "../rules/engine/legal.ts";
 import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import { settle } from "../rules/engine/machine.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: OathWorld;
 

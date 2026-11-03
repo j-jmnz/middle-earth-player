@@ -5,8 +5,8 @@ import { printedOf } from "../rules/core/printed.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { withThreat } from "../rules/core/state.ts";
 import { moveCard } from "../rules/core/zones.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 import { cardSize, HAND_SHOW, handCardSize, hitSlot, tableLayout } from "./layout.ts";
 import { inspectTargets, onTableFor, pileSelector, PILES, threatSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";

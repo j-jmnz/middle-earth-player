@@ -10,8 +10,8 @@ import { campaignScenario } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { UPGRADED_CODES, VOYAGE_GOLDENS, playGolden, voyageLoadout, voyagePlan, voyageStart, voyageWorld } from "../../scripts/voyage-game.ts";
-import { campaign, SHIP_CODES, voyage } from "../../scripts/voyage-scene.ts";
+import { UPGRADED_CODES, VOYAGE_GOLDENS, playGolden, voyageLoadout, voyagePlan, voyageStart, voyageWorld } from "../../test/scenarios/voyage-across-belegaer/game.ts";
+import { campaign, SHIP_CODES, voyage } from "../../test/scenarios/voyage-across-belegaer/scene.ts";
 
 import { buildStart } from "./start.ts";
 import { checklist } from "./checklist.ts";

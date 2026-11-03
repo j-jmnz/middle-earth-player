@@ -1,6 +1,6 @@
 // Rules: dcce.ship-objectives, dcce.prepare-your-fleet, dcce.scalable-upgradable, dcce.encounter-cards, dcce.sailing-tests, dcce.boarding, dcce.hard-expert, rr.player-elimination, rr.cancel
 // (data/rules/entries.json). The six ship-objectives, the Modification boons, the burdens the campaign card shuffles in and the Hard/Expert Mode card, on each side they have: every line of the
-// ledger (data/printed/dream-chaser.json) has a record, and these tests run them on a table of plain-number heroes (scripts/voyage-scene.ts).
+// ledger (data/printed/dream-chaser.json) has a record, and these tests run them on a table of plain-number heroes (test/scenarios/voyage-across-belegaer/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -17,13 +17,13 @@ import { readyCard } from "../rules/interpret/player-verbs.ts";
 import { doRefresh } from "../rules/engine/refresh.ts";
 import { pruneRoundCaps } from "../rules/families/dreamchaser/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
-import { voyageStart, voyageWorld } from "../../scripts/voyage-game.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { voyageStart, voyageWorld } from "../../test/scenarios/voyage-across-belegaer/game.ts";
 import {
   ARMOR_PLATING, BALLISTA, CROWLEY, CUNNING_PIRATE, ENLARGED_QUARTERS, EXTRA_SAILS, HARD_MODE, OMINOUS_FATE, SCOUTING_SHIP, SHIPS, THUNDERSTRUCK, codesIn, loadVoyageWorld, resolveReveal, voyageFight, voyageTable,
   type VoyageLayout, type VoyageWorld,
-} from "../../scripts/voyage-scene.ts";
+} from "../../test/scenarios/voyage-across-belegaer/scene.ts";
 
 let world: VoyageWorld;
 

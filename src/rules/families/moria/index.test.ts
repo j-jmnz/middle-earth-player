@@ -5,9 +5,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
-import { causeProblems } from "../../../../scripts/cause-check.ts";
-import { BALROG, DOOM, loadMoriaWorld, makeTable, recordOf, runOne, settled, WOUND, type MoriaWorld } from "../../../../scripts/moria-scene.ts";
-import { first } from "../../../../scripts/past-scene.ts";
+import { causeProblems } from "../../../../test/harness/cause-check.ts";
+import { BALROG, DOOM, loadMoriaWorld, makeTable, recordOf, runOne, settled, WOUND, type MoriaWorld } from "../../../../test/scenarios/journey-in-the-dark/scene.ts";
+import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MoriaWorld;
 

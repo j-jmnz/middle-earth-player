@@ -6,9 +6,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { prisonerHero } from "../rules/families/prisoner/index.ts";
-import { dolGuldurStart, dolGuldurWorld } from "../../scripts/dol-guldur-game.ts";
-import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { dolGuldurStart, dolGuldurWorld } from "../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../test/scenarios/escape-from-dol-guldur/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { dungeonDetail } from "./dungeon-preview.ts";
 import { hitBounds, tableLayout } from "./layout.ts";

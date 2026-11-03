@@ -8,8 +8,8 @@ import { syncConstants } from "../rules/interpret/constants.ts";
 import { placeDamage } from "../rules/core/keywords.ts";
 import { spawn } from "../rules/core/zones.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
-import { fordTable, loadFordWorld, type FordWorld } from "../../scripts/ford-scene.ts";
-import { loadWorld, table, type World } from "../../scripts/past-scene.ts";
+import { fordTable, loadFordWorld, type FordWorld } from "../../test/scenarios/flight-to-the-ford/scene.ts";
+import { loadWorld, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { ledgerLine, ruleTitle } from "./ledger.ts";
 import { logLines, type LogNames } from "./log.ts";

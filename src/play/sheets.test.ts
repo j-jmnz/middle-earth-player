@@ -2,12 +2,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
-import { intentsOf } from "../../scripts/sheet-intents.ts";
-import { fund, starterBase } from "../../scripts/starter-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { buildTable, idsOf } from "../../scripts/test-scene.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { intentsOf } from "../../test/harness/sheet-intents.ts";
+import { fund, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { buildTable, idsOf } from "../../test/harness/scene.ts";
 import { updateCard } from "../rules/core/state.ts";
 
 import { railFor, STEP_WORDS } from "./rail.ts";

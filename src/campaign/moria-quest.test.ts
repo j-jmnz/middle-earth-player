@@ -14,9 +14,9 @@ import { stagingThreat } from "../rules/quest/quest.ts";
 import { revealsAllowed } from "../rules/families/encounter/reveal.ts";
 import { ruleCause } from "../rules/core/cause.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { moriaStart, moriaWorld } from "../../scripts/moria-game.ts";
-import { BALROG, BRIDGE, CHAMBER, DOOM, fire, loadMoriaWorld, makeTable, moria, recordOf, runOne, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
-import { codesOf, first } from "../../scripts/past-scene.ts";
+import { moriaStart, moriaWorld } from "../../test/scenarios/journey-in-the-dark/game.ts";
+import { BALROG, BRIDGE, CHAMBER, DOOM, fire, loadMoriaWorld, makeTable, moria, recordOf, runOne, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { codesOf, first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MoriaWorld;
 let startCtx: ReduceContext;

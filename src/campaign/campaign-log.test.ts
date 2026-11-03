@@ -5,8 +5,8 @@ import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import { spawn } from "../rules/core/zones.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { loadWorld, table, type World } from "../../scripts/past-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { loadWorld, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 
 import { carryOffers } from "./carry-over.ts";

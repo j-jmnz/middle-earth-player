@@ -8,7 +8,7 @@ import { addModifier } from "../rules/core/keywords.ts";
 import { updateCard } from "../rules/core/state.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { CODES, fateTable, idOf, legalIntents, loadFateWorld, send, start, type FateLayout, type FateWorld, type PlayerIntent } from "../../scripts/fate-scene.ts";
+import { CODES, fateTable, idOf, legalIntents, loadFateWorld, send, start, type FateLayout, type FateWorld, type PlayerIntent } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 
 import { causeKey, causeText, type LogNames } from "./log.ts";
 import { pictureCode, pictureKey } from "./picture-key.ts";

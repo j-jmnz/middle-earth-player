@@ -5,7 +5,7 @@ import { legalIntents } from "../rules/engine/reduce.ts";
 import {
   codeOf, codesOf, first, FRODO, loadWorld, reveal, RIDER, RING, SAM, send, start, table, frames,
   type Layout, type World,
-} from "../../scripts/past-scene.ts";
+} from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: World;
 

@@ -1,5 +1,5 @@
 // Rules: dcce.aflame, dcce.setup-raid-on-the-grey-havens, rr.damage, rr.first-player (data/rules/entries.json). Aflame X and The Havens Burn on a table of plain-number heroes and the Campaign Expansion's cards
-// (scripts/raid-scene.ts): the keyword, the end of the round, the destruction under The Havens Burn and what that costs, the Setup's discards, the quest cards' effects and the encounter cards that burn.
+// (test/scenarios/raid-on-the-grey-havens/scene.ts): the keyword, the end of the round, the destruction under The Havens Burn and what that costs, the Setup's discards, the quest cards' effects and the encounter cards that burn.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds, outOfPlayCopies } from "../../interpret/conditions.ts";
@@ -8,7 +8,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { legalTargets } from "../../engine/legal.ts";
 import { showedHidden } from "../../engine/undo.ts";
-import { AFLAME, CODES, codesIn, finish, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../../scripts/raid-scene.ts";
+import { AFLAME, CODES, codesIn, finish, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 import { aflameOf } from "./values.ts";
 import { progressRoom } from "../south/locations.ts";
 

@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/the-thing-in-the-depths.ts";
 import { RECORDS as DCCE_RECORDS } from "../effects/authored/pool/DCCE.ts";
-import { CODES, depthsTable, idOf, loadDepthsWorld, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { CODES, depthsTable, idOf, loadDepthsWorld, type DepthsWorld } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 import { effectLines } from "./card-effects.ts";
 import { pickWords, type ChoiceNames } from "./choice-words.ts";

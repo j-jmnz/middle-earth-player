@@ -1,5 +1,5 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, dcce.immune, dcce.sailing-tests, rr.quest-advancement, rr.winning-the-game (data/rules/entries.json). The Stormcaller's area on a table of plain-number
-// heroes and the Campaign Expansion's cards (scripts/stormcaller-scene.ts): where its cards stand, the end of the round, the stage advance, catching up, and the progress that moves onto its stage.
+// heroes and the Campaign Expansion's cards (test/scenarios/flight-of-the-stormcaller/scene.ts): where its cards stand, the end of the round, the stage advance, catching up, and the progress that moves onto its stage.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds } from "../../interpret/conditions.ts";
@@ -12,7 +12,7 @@ import { moveCard } from "../../core/zones.ts";
 import { placeQuestProgress } from "../../quest/quest.ts";
 import { travelCostUnpayable } from "../../interpret/restrictions.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { CODES, codesIn, finish, idOf, loadFlightWorld, flightTable, resolveRecords, type FlightLayout, type FlightWorld } from "../../../../scripts/stormcaller-scene.ts";
+import { CODES, codesIn, finish, idOf, loadFlightWorld, flightTable, resolveRecords, type FlightLayout, type FlightWorld } from "../../../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 import { areaOf } from "./zone.ts";
 
 let world: FlightWorld;

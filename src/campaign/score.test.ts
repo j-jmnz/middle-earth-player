@@ -4,7 +4,7 @@ import { definePrinted, printedOf, type PrintedCard } from "../rules/core/printe
 import type { ScenarioState } from "../rules/core/state.ts";
 import { updateCard, withThreat } from "../rules/core/state.ts";
 import { moveCard, spawn } from "../rules/core/zones.ts";
-import { first, loadWorld, table, type World } from "../../scripts/past-scene.ts";
+import { first, loadWorld, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { scoreOf } from "./score.ts";
 

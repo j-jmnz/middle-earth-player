@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../catalog/boundary.ts";
 import { EFFECTS } from "../effects/index.ts";
-import { loadMoriaWorld, makeTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
+import { loadMoriaWorld, makeTable, type MoriaWorld } from "../../test/scenarios/journey-in-the-dark/scene.ts";
 
 import { branchWords, pickWords } from "./choice-words.ts";
 

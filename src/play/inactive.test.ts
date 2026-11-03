@@ -5,9 +5,9 @@ import { printedOf } from "../rules/core/printed.ts";
 import { legalIntents, reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { updateCard } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { inactiveCodes, textCheck } from "../catalog/active-text.ts";
 import { shippedLedger } from "../catalog/printed-ledger.ts";

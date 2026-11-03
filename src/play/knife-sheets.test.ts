@@ -4,8 +4,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { moveCard } from "../rules/core/zones.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { KNIFE_GOLDENS, knifeIntent, knifeStart, knifeWorld, type KnifeGolden } from "../../scripts/knife-game.ts";
-import { intentsOf } from "../../scripts/sheet-intents.ts";
+import { KNIFE_GOLDENS, knifeIntent, knifeStart, knifeWorld, type KnifeGolden } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
+import { intentsOf } from "../../test/harness/sheet-intents.ts";
 
 import { actionsSheet, commitSheet } from "./bar-sheets.ts";
 import { PEEK, tableLayout } from "./layout.ts";
@@ -223,8 +223,8 @@ describe("what a Pick is for", () => {
 
 describe("travel to Weathertop", () => {
   it("is refused while The One Ring is exhausted, and the sheet says why (141046:A:3, rr.travel)", async () => {
-    const { loadPrinted } = await import("../../scripts/test-catalog.ts");
-    const { first, loadWorld, table } = await import("../../scripts/past-scene.ts");
+    const { loadPrinted } = await import("../../test/harness/catalog.ts");
+    const { first, loadWorld, table } = await import("../../test/scenarios/a-shadow-of-the-past/scene.ts");
     const { withMode } = await import("../rules/core/state.ts");
     const { ledgerLine } = await import("./ledger.ts");
     const base = await loadWorld();

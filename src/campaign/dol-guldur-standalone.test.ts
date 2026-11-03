@@ -5,8 +5,8 @@ import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { prisonerHero } from "../rules/families/prisoner/index.ts";
 import { reduce, startScenario } from "../rules/engine/reduce.ts";
-import { dolGuldurStart, dolGuldurWorld } from "../../scripts/dol-guldur-game.ts";
-import { dolGuldur, campaign, MENDOR } from "../../scripts/dol-guldur-scene.ts";
+import { dolGuldurStart, dolGuldurWorld } from "../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { dolGuldur, campaign, MENDOR } from "../../test/scenarios/escape-from-dol-guldur/scene.ts";
 
 import { buildStart } from "./start.ts";
 

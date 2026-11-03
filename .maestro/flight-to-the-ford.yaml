@@ -4,7 +4,7 @@ tags:
 ---
 # OPEN (2026-10-26): its fixture `ford-start` is not committed. It is dealt from the log scenarios 1 and 2 write when they are
 # won, and neither win has been found with the starter decks on this engine (docs/phases/STATUS.md; Maestro flows scenario-1.yaml
-# and a-knife-in-the-dark-loss.yaml wait on the same chain). Run scripts/e2e-fixtures.ts --won when one is found, then add
+# and a-knife-in-the-dark-loss.yaml wait on the same chain). Run scripts/e2e/fixtures.ts --won when one is found, then add
 # `ford-start`, `ford-won` and `ford-lost` to src/campaign/fixtures.ts.
 # Phase 13. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which
 # opens the fixture route. The fixture is a real game of Flight to the Ford, dealt in Campaign Mode and parked at its start.

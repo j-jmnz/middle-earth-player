@@ -8,7 +8,7 @@ import { CATALOG_VERSION } from "../catalog/version.ts";
 import { reduce, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { briefing, scenarioFacts, startFor, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { emptyLog } from "./log.ts";

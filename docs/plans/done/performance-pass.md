@@ -204,7 +204,7 @@ After the work, run the `reviewer` agent on the diff, and the `ux` agent because
 - A timing script in the scratchpad (not committed): replay each golden game through `reduce` and time the total, before
   and after section 4, and time `writeSave` against `writeActive` on a 500-intent save with better-sqlite3. Report the
   numbers.
-- `node --experimental-strip-types scripts/card-smoke.ts --all` passes, so no throw, refusal or stall comes from the engine
+- `node --experimental-strip-types scripts/card-smoke/run.ts --all` passes, so no throw, refusal or stall comes from the engine
   changes.
 - `pnpm data:check` passes; nothing under `data/` should change.
 - This cloud session has no phone, simulator or Maestro, so on-device feel (React DevTools Profiler, Perf Monitor, frame

@@ -1,6 +1,6 @@
 // Rules: rr.step-3-3, rr.travel, rr.search, rr.first-player, rr.exhausted, rr.step-6-4-2, rr.shadow-effects, rr.step-7-3 (data/rules/entries.json).
 // The Passage Through Mirkwood encounter cards: each line of the ledger (data/printed/mirkwood-paths.json) has a record, and these tests
-// run them on a table of plain-number heroes (scripts/mirkwood-scene.ts).
+// run them on a table of plain-number heroes (test/scenarios/passage-through-mirkwood/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -13,10 +13,10 @@ import type { EngineStep } from "../rules/core/intents.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { spawn } from "../rules/core/zones.ts";
 import { pickCandidates } from "../rules/interpret/pick.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { HERO, HERO2, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
-import { codesOf, first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { HERO, HERO2, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { codesOf, first, reveal, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MirkwoodWorld;
 

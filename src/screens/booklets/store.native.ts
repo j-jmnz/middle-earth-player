@@ -86,7 +86,7 @@ async function storeBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: st
   }
 }
 
-/** True when this build carries the book's PDF (scripts/pack-booklets.ts filled the map). */
+/** True when this build carries the book's PDF (scripts/build/pack-booklets.ts filled the map). */
 export function hasBundledBooklet(id: string): boolean {
   return bundledBooklets[id] != null;
 }

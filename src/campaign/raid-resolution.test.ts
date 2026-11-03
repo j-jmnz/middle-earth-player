@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 let world: RaidWorld;
 

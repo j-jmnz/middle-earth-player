@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { campaign, knife, knifeIntent, knifeStart, knifeWorld } from "../../scripts/knife-game.ts";
+import { campaign, knife, knifeIntent, knifeStart, knifeWorld } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
 
 import { choiceSentence, consequenceSentence, declineSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import type { World } from "./world.ts";

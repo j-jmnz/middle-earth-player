@@ -1,6 +1,6 @@
 // Rules: dcce.encounter-cards, dcce.scalable-upgradable, dcce.campaign-setup-the-fate-of-numenor, dcce.setup-the-fate-of-numenor, rr.first-player, rr.search (data/rules/entries.json). Calphon (objective
 // ally, 11028 and the Campaign Expansion's reprint 110013 with its Upgraded side), the Spyglass boon he carries (11180) and the Revenant burden (11181), each line of the ledger
-// (data/printed/dream-chaser.json) run on a table of plain-number heroes (scripts/fate-scene.ts).
+// (data/printed/dream-chaser.json) run on a table of plain-number heroes (test/scenarios/the-fate-of-numenor/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -9,7 +9,7 @@ import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, codesIn, fateTable, finish, idOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../scripts/fate-scene.ts";
+import { CODES, codesIn, fateTable, finish, idOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 
 let world: FateWorld;
 

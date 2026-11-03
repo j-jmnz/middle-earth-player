@@ -5,8 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { tableLayout } from "./layout.ts";
 import { PILES, TABLE_ZONES, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
-import { DOOM, loadMoriaWorld, makeTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { DOOM, loadMoriaWorld, makeTable, type MoriaWorld } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { campaignTokens } from "./widgets.ts";
 

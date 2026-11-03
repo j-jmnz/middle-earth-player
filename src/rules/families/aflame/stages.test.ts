@@ -1,5 +1,5 @@
 // Rules: dcce.aflame, dcce.stormcaller-elite, dcce.last-player, rr.first-player, rr.quest-advancement, rr.winning-the-game (data/rules/entries.json). Sahír's Advance (stage 2) and the Stormcaller Elite's enemy
-// and objective ally sides on a table of plain-number heroes and the Campaign Expansion's cards (scripts/raid-scene.ts).
+// and objective ally sides on a table of plain-number heroes and the Campaign Expansion's cards (test/scenarios/raid-on-the-grey-havens/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { ruleCause } from "../../core/cause.ts";
@@ -8,7 +8,7 @@ import { placeDamage } from "../../core/keywords.ts";
 import { settle } from "../../engine/machine.ts";
 import { placeQuestProgress } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { CODES, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../../scripts/raid-scene.ts";
+import { CODES, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 let world: RaidWorld;
 

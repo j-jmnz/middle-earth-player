@@ -7,8 +7,8 @@ import type { Instruction } from "../catalog/boundary.ts";
 import { moveCard } from "../rules/core/zones.ts";
 import { withSeat } from "../rules/core/state.ts";
 import { printedOf } from "../rules/core/printed.ts";
-import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../scripts/breaking-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { areaWords, seatTag, stagingWord } from "./area-words.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";

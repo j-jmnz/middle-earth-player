@@ -2,7 +2,7 @@
 // (quest-advance.ts, advanceButton): Progress only where the stage can progress (user request, 2026-10-29).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { buildTable, sceneCards } from "../../scripts/test-scene.ts";
+import { buildTable, sceneCards } from "../../test/harness/scene.ts";
 
 import { ledgerLine } from "./ledger.ts";
 import { advanceButton } from "./quest-advance.ts";

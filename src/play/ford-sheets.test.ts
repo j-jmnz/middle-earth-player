@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { FORD_GOLDENS, fordIntent, fordStart, fordWorld, type FordGolden } from "../../scripts/ford-game.ts";
-import { intentsOf } from "../../scripts/sheet-intents.ts";
+import { FORD_GOLDENS, fordIntent, fordStart, fordWorld, type FordGolden } from "../../test/scenarios/flight-to-the-ford/game.ts";
+import { intentsOf } from "../../test/harness/sheet-intents.ts";
 
 import { actionsSheet, commitSheet } from "./bar-sheets.ts";
 import { railFor } from "./rail.ts";

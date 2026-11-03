@@ -6,14 +6,14 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, playGolden, type BreakingDecks, type BreakingGame } from "../../scripts/breaking-game.ts";
-import { ARGONATH, breaking, campaign, FRODOS_CHOICE, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A } from "../../scripts/breaking-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, playGolden, type BreakingDecks, type BreakingGame } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
+import { ARGONATH, breaking, campaign, FRODOS_CHOICE, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of Breaking of the Fellowship played by the auto-player (scripts/breaking-game.ts), true solo and two-handed, through wins (with two
+// A permanent golden: whole games of Breaking of the Fellowship played by the auto-player (test/scenarios/breaking-of-the-fellowship/game.ts), true solo and two-handed, through wins (with two
 // different stage 3 titles, with a hero fallen into evil, in Normal and Easy) and losses (before the Fellowship breaks, and at the separate stages), on fixed seeds. It pins
 // the path from data/ through the Campaign Setup Checklist, buildStart, the scenario's records, the Ring-bearer's removal, a staging area, stage and active location for
 // each seat, the stage 3B discards, Frodo's Choice, stage 4 and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

@@ -2,14 +2,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { PrintedCard } from "../rules/core/printed.ts";
 import type { ReduceContext } from "../rules/engine/reduce.ts";
-import { KNIFE_GOLDENS, knifeLoadout, knifeWorld, playGolden, type KnifeGame } from "../../scripts/knife-game.ts";
+import { KNIFE_GOLDENS, knifeLoadout, knifeWorld, playGolden, type KnifeGame } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
 
 import { validateLoadout } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
 
-// A permanent golden: whole games of A Knife in the Dark played by the auto-player (scripts/knife-game.ts), true solo and
+// A permanent golden: whole games of A Knife in the Dark played by the auto-player (test/scenarios/a-knife-in-the-dark/game.ts), true solo and
 // two-handed, through a win and through a loss, on fixed seeds. The wins use the scenario 1 golden's big-number loadout
 // beside the saga Frodo; the starter decks lose. It pins the path from data/ through buildStart, the scenario's records
 // and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

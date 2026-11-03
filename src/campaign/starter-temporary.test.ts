@@ -8,8 +8,8 @@ import { settle } from "../rules/engine/machine.ts";
 import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
 import { syncConstants } from "../rules/interpret/constants.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { fund, payFor, refusal, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const SAM = "141002";
 const PIPPIN = "141004";

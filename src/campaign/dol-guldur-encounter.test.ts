@@ -1,14 +1,14 @@
 // Rules: rr.step-3-3, rr.shadow-effects, rr.attachment-cards, rr.guarded, rr.discard-pile-and-victory-display (data/rules/entries.json). The Escape from
 // Dol Guldur encounter cards: each line of the ledger (data/printed/mirkwood-paths.json) has a record, and these tests run them on a table of
-// plain-number heroes (scripts/dol-guldur-scene.ts).
+// plain-number heroes (test/scenarios/escape-from-dol-guldur/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
 import { attachBlocked } from "../rules/interpret/restrictions.ts";
 import { flagged } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../test/scenarios/escape-from-dol-guldur/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: DolGuldurWorld;
 

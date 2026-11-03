@@ -13,8 +13,8 @@ import { legalIntents, legalTargets } from "../../engine/legal.ts";
 import { settle } from "../../engine/machine.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
-import { DOORS, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../../../scripts/south-scene.ts";
-import { codesOf, first, send } from "../../../../scripts/past-scene.ts";
+import { DOORS, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../../../test/scenarios/the-ring-goes-south/scene.ts";
+import { codesOf, first, send } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: SouthWorld;
 

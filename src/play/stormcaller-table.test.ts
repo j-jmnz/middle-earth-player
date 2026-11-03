@@ -8,7 +8,7 @@ import { momentOf } from "./outcome.ts";
 import { advanceFace, advanceWords, advancedTo, callerLastStage, questView } from "./quest-advance.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
-import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
+import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 import { hitBounds, shownBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect, type TableLayout } from "./layout.ts";
 import { motionsBetween } from "./motion.ts";

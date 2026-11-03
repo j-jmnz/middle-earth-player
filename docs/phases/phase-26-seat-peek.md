@@ -69,7 +69,7 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 
 ## E2E
 
-`.maestro/seat-peek.yaml` opens a two-handed fixture save, taps the second seat's dial, asserts `peek-banner`, taps `peek-back`, and asserts the banner is gone. Add a two-handed fixture if none fits (`scripts/e2e-fixtures.ts`).
+`.maestro/seat-peek.yaml` opens a two-handed fixture save, taps the second seat's dial, asserts `peek-banner`, taps `peek-back`, and asserts the banner is gone. Add a two-handed fixture if none fits (`scripts/e2e/fixtures.ts`).
 
 ## Exit
 

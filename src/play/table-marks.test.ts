@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { legalIntents } from "../rules/engine/reduce.ts";
 import { updateCard, withThreat, type ScenarioState } from "../rules/core/state.ts";
-import { buildTable, FRODO, idsOf, RIDER, SAM, sceneCards } from "../../scripts/test-scene.ts";
+import { buildTable, FRODO, idsOf, RIDER, SAM, sceneCards } from "../../test/harness/scene.ts";
 
 import { delayedLines, slotNumbers } from "./card-effects.ts";
 import { enemiesToFace, threatRows, threatVerdict } from "./foresight.ts";

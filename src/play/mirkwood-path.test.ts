@@ -7,7 +7,7 @@ import type { EngineStep } from "../rules/core/intents.ts";
 import { runInstruction } from "../rules/interpret/interpret.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { loadMirkwoodWorld, mirkwoodTable, SPAWN, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
+import { loadMirkwoodWorld, mirkwoodTable, SPAWN, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 
 import { slotNumbers } from "./card-effects.ts";
 import { ledgerLine } from "./ledger.ts";

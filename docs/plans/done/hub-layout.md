@@ -148,7 +148,7 @@ Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
 
 - `docs/design-system.md`: rewrite the Campaigns (campaign list), Scenarios and History screen sections to match. Add a Campaign setup screen section next to Briefing. Update the Navigation hub-head line (no Manage). Then run `pnpm docs:index`.
 - `docs/brief.md`: rewrite what it says about the start panel (`start-<id>`), Manage and Archived on the hubs, and the Screens table rows for Campaign list, History and Scenarios, to the new shape.
-- Doc citations in code name real headings, or `scripts/docs-index.test.ts` fails. The headings "Campaigns (campaign list)", "Scenarios", "History" and "Tablets" stay; "Campaign setup" is added. The comments that cite "Campaigns, tablet landscape" (`index.tsx`), "Campaigns" (`save-panels.tsx`) and Tablets (`split-columns.ts`) match the new text.
+- Doc citations in code name real headings, or `scripts/docs/index.test.ts` fails. The headings "Campaigns (campaign list)", "Scenarios", "History" and "Tablets" stay; "Campaign setup" is added. The comments that cite "Campaigns, tablet landscape" (`index.tsx`), "Campaigns" (`save-panels.tsx`) and Tablets (`split-columns.ts`) match the new text.
 - Maestro flows (`.maestro/`), written but not run in a cloud session:
   - **`briefing.yaml`, `booklet.yaml`**: tap `new-fellowship-of-the-ring`, assert `campaign-setup`, then tap `start-fellowship`.
   - **`mirkwood-start.yaml`**: tap `new-mirkwood-paths`, then `start-mirkwood-paths`. Its comment about one start panel with a campaign chooser is rewritten.

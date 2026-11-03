@@ -2,7 +2,7 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# Phases 39b and 40. Written in a cloud session: it has not run. Needs the e2e-test build and the fixture `sea-duo` (scripts/e2e-voyage.ts, written by scripts/e2e-fixtures.ts): a real two-handed
+# Phases 39b and 40. Written in a cloud session: it has not run. Needs the e2e-test build and the fixture `sea-duo` (scripts/e2e/voyage-across-belegaer.ts, written by scripts/e2e/fixtures.ts): a real two-handed
 # game of Voyage Across Belegaer, Player 1 with the Dream-chaser, parked on the first planning window.
 # A peek at the seat without the Dream-chaser keeps the Heading dial; a tap on the dial opens the Heading card's preview.
 - launchApp:

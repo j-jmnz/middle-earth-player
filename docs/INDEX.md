@@ -44,7 +44,7 @@ Read the sections your task touches.
     - 157–160 Maestro (~120)
 - `docs/architecture.md` — Architecture (~16.8K tok)
   - 7–41 Stack (~990)
-  - 42–77 Processes (~650)
+  - 42–77 Processes (~660)
   - 78–120 Modules (~1.0K) ← 3
   - 121–146 State (~1.0K) ← 9
   - 147–168 Play loop (~250)
@@ -56,7 +56,7 @@ Read the sections your task touches.
   - 255–260 Images (~1.0K) ← 6
   - 261–309 Screens (~3.7K) ← 1
   - 310–315 Catalog build (~410)
-  - 316–329 Tests (~860) ← 2
+  - 316–329 Tests (~870) ← 2
   - 330–345 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
@@ -220,11 +220,11 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-27-multi-campaign-data.md` — Phase 27 — Multi-campaign data (~1.6K tok)
 - `docs/phases/phase-28-campaign-registry.md` — Phase 28 — Campaign registry, saga gating, log, booklets (~1.3K tok)
 - `docs/phases/phase-28b-history-and-collapsible.md` — Phase 28b — Collapsible sections and run history (~1.3K tok)
-- `docs/phases/phase-29-passage-through-mirkwood.md` — Phase 29 — Passage Through Mirkwood (~950 tok)
-- `docs/phases/phase-30-journey-along-the-anduin.md` — Phase 30 — Journey Along the Anduin (~950 tok)
-- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~990 tok)
-- `docs/phases/phase-32-the-oath.md` — Phase 32 — The Oath (~900 tok)
-- `docs/phases/phase-33-caves-of-nibin-dum.md` — Phase 33 — The Caves of Nibin-Dûm (~920 tok)
+- `docs/phases/phase-29-passage-through-mirkwood.md` — Phase 29 — Passage Through Mirkwood (~960 tok)
+- `docs/phases/phase-30-journey-along-the-anduin.md` — Phase 30 — Journey Along the Anduin (~960 tok)
+- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~1.0K tok)
+- `docs/phases/phase-32-the-oath.md` — Phase 32 — The Oath (~910 tok)
+- `docs/phases/phase-33-caves-of-nibin-dum.md` — Phase 33 — The Caves of Nibin-Dûm (~930 tok)
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
@@ -276,7 +276,7 @@ Read when a task names the plan.
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~5.5K tok)
-  - 12–31 Workflow (~430)
+  - 12–31 Workflow (~440)
   - 32–47 Where records live (~310)
   - 48–72 The record (~500)
   - 73–89 Which card an instruction acts on (~380)
@@ -328,8 +328,10 @@ History and rationale; read only when a code comment or task cites one.
 
 The sections each area's comments cite, most cited first. Read these before changing code there.
 
-- `scripts`: brief.md, Card images (4); architecture.md, Modules (1); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
+- `scripts/build`: brief.md, Card images (2)
+- `scripts/checks`: architecture.md, Modules (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
+- `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/tools`: architecture.md, Modules (1)
 - `src/campaign`: architecture.md, Tests (1)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)

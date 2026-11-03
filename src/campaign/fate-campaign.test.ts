@@ -9,8 +9,8 @@ import { campaignScenario } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { UPGRADED_CODES, FATE_GOLDENS, afterVoyage, fateLoadout, fatePlan, fateStart, fateWorld, playGolden } from "../../scripts/fate-game.ts";
-import { CODES, campaign, fate } from "../../scripts/fate-scene.ts";
+import { UPGRADED_CODES, FATE_GOLDENS, afterVoyage, fateLoadout, fatePlan, fateStart, fateWorld, playGolden } from "../../test/scenarios/the-fate-of-numenor/game.ts";
+import { CODES, campaign, fate } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 
 import { buildStart } from "./start.ts";
 import { applyResolution } from "./log.ts";

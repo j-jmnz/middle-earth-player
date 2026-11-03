@@ -102,12 +102,12 @@ suite once at the end, and never kill processes you did not start (no `pkill`).
 
 - `pnpm exec tsc --noEmit`
 - `pnpm lint`
-- `pnpm effects:open`, then `pnpm vitest run scripts/effect-coverage.test.ts src/effects src/rules/families`
-- `node --experimental-strip-types scripts/card-smoke.ts <codes>` for every card you wrote records for: no problems reported.
+- `pnpm effects:open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
+- `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for every card you wrote records for: no problems reported.
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
 - Full `pnpm test` once at the end (about 10 minutes). The golden snapshots in `src/campaign/golden` (the scenario games and the
   starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
-  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e-fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
+  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e/fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
 
 ## Merge
 

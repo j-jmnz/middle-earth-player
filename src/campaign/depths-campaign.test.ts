@@ -11,8 +11,8 @@ import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { attachTo, spawn } from "../rules/core/zones.ts";
-import { UPGRADED_CODES, afterFlight, depthsLoadout, depthsPlan, depthsStart, depthsWorld } from "../../scripts/depths-game.ts";
-import { CODES, campaign, depths, depthsTable, finish, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { UPGRADED_CODES, afterFlight, depthsLoadout, depthsPlan, depthsStart, depthsWorld } from "../../test/scenarios/the-thing-in-the-depths/game.ts";
+import { CODES, campaign, depths, depthsTable, finish, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsWorld } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 import { buildStart } from "./start.ts";
 import { EFFECTS } from "../effects/index.ts";

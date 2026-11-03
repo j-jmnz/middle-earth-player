@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { attackBarred } from "../rules/interpret/constants.ts";
 import { legalIntents } from "../rules/engine/reduce.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { begin, buildTable, frameNames, FRODO, idsOf, MERRY, RIDER, SAM, sceneCards, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { begin, buildTable, frameNames, FRODO, idsOf, MERRY, RIDER, SAM, sceneCards, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
 

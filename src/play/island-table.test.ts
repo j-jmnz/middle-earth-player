@@ -2,7 +2,7 @@
 // a screen reader says, that nothing says what lies on a facedown side, and the panel's geometry on every screen down to 667 x 375 at the three UI scales.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { CODES, loadTempleWorld, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
+import { CODES, loadTempleWorld, templeTable, type TempleLayout, type TempleWorld } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 import { trayBox } from "./tray-logic.ts";
 import { CHIP, COLS, LEGEND, ROWS, TEMPLE_LABEL_WORD, TEMPLE_NAME, WAITING, chipHeight, chipWidth, chipWords, islandFit, islandPanelWidth, islandReadout, standingWords, tileMarks } from "./island-table.ts";
 import { LOST_ISLAND_NAME } from "./uncharted-words.ts";

@@ -5,8 +5,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { legalTargets } from "../rules/engine/legal.ts";
 import { legalIntents, reduce } from "../rules/engine/reduce.ts";
 import { withMode, type ScenarioState } from "../rules/core/state.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { first, loadWorld, RING, table, type Layout, type World } from "../../scripts/past-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { first, loadWorld, RING, table, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 // Weathertop's Travel cost (141046:A:3, "Travel: The first player must exhaust The One Ring to travel here."),
 // rr.travel: "If the players cannot pay the Travel cost, then they cannot travel to that location.", and rr.first-player:

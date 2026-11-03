@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it, vi } from "vitest";
 
 import migrations from "../../drizzle/migrations";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "../campaign/fixtures.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
 import { readSave, savedAt, writeSave } from "./campaign-store.ts";

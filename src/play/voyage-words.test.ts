@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/voyage-across-belegaer.ts";
 import { RECORDS as DCCE_RECORDS } from "../effects/authored/pool/DCCE.ts";
-import { loadVoyageWorld, voyageTable, type VoyageWorld } from "../../scripts/voyage-scene.ts";
+import { loadVoyageWorld, voyageTable, type VoyageWorld } from "../../test/scenarios/voyage-across-belegaer/scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { pushEffectFrame } from "../rules/interpret/effect-frames.ts";

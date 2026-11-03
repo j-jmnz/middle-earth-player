@@ -1,5 +1,5 @@
 // Rules: dcce.aflame, dcce.stormcaller-elite, rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, rr.step-1-2, rr.first-player (data/rules/entries.json). The Raid on the Grey Havens and Corsair Raiders encounter cards and the
-// Stormcaller Elite's enemy sides: the Raiders that grow with resources, the shadow effects, the treacheries, on a table of plain-number heroes and the Campaign Expansion's cards (scripts/raid-scene.ts).
+// Stormcaller Elite's enemy sides: the Raiders that grow with resources, the shadow effects, the treacheries, on a table of plain-number heroes and the Campaign Expansion's cards (test/scenarios/raid-on-the-grey-havens/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { modifiedStat } from "../rules/core/keywords.ts";
@@ -9,7 +9,7 @@ import { runInstruction } from "../rules/interpret/interpret.ts";
 import { fireForced } from "../rules/windows/triggers.ts";
 import { moveCard, shadowCards } from "../rules/core/zones.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 let world: RaidWorld;
 

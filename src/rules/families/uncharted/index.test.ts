@@ -1,5 +1,5 @@
 // Rules: dcce.uncharted, dcce.uncharted-deck, dcce.setup-the-fate-of-numenor, rr.explored, rr.travel, rr.active-location, rr.quest-advancement, rr.winning-the-game (data/rules/entries.json). The
-// Uncharted deck and its double-sided locations, on a table of plain-number heroes and the Campaign Expansion's cards (scripts/fate-scene.ts): the Lost Island side (Threat 2, no quest points,
+// Uncharted deck and its double-sided locations, on a table of plain-number heroes and the Campaign Expansion's cards (test/scenarios/the-fate-of-numenor/scene.ts): the Lost Island side (Threat 2, no quest points,
 // no player card attachments), the deck and its top cards, flipping on travel, the shuffle back, the quest card's progress, the stage that ends the game, and the Action that looks.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -11,7 +11,7 @@ import { holds } from "../../interpret/conditions.ts";
 import { attachBlocked } from "../../interpret/restrictions.ts";
 import { questPointsOf, stagingThreat } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { CODES, codesIn, fateTable, finish, idOf, idsOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../../../scripts/fate-scene.ts";
+import { CODES, codesIn, fateTable, finish, idOf, idsOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../../../test/scenarios/the-fate-of-numenor/scene.ts";
 import { AUTHORED_EFFECTS } from "../../../effects/authored/the-fate-of-numenor.ts";
 import { isLostIsland } from "./pick.ts";
 

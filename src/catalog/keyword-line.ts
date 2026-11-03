@@ -1,7 +1,7 @@
 // Rules: rr.keywords (data/rules/entries.json).
 //
 // Which printed words are keywords the engine reads. A line that is only keywords is owned by the keyword, not by an effect
-// record: the coverage test (scripts/effect-coverage.test.ts) and the app's "not applied" check (active-text.ts) use this one
+// record: the coverage test (scripts/checks/effect-coverage.test.ts) and the app's "not applied" check (active-text.ts) use this one
 // reading. Moved from scripts/data/normalize so the app can share it.
 import type { PrintedKeywords } from "./boundary.ts";
 

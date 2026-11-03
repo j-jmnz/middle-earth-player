@@ -5,8 +5,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
-import { playOut } from "../../scripts/auto-player.ts";
-import { campaign, scenario, loadWorld, type World } from "../../scripts/past-scene.ts";
+import { playOut } from "../../test/harness/auto-player.ts";
+import { campaign, scenario, loadWorld, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { emptyLog } from "./log.ts";
 import { campaignRunId, runOf, standaloneRunId, type RunInput } from "./runs.ts";

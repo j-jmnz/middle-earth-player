@@ -8,7 +8,7 @@ Read first: `docs/plans/done/combat-spotlight-redesign.md` (the plan), `docs/des
 
 - `pnpm android` (or `pnpm android:usb --device` when the phone cannot reach Metro over the network) and `pnpm ios`. Both run `catalog:build`, `booklets:pack` and `scans:pack` first; the pictures need `pnpm data:sync scans pictures` once (CLAUDE.md, Data).
 - Table settings: Animation speed (Normal, Quick), Theme (Dark, Light), Combat spotlight on, Reduce motion on Follow system with the phone's setting off.
-- Scenario 1 reaches each case below within a few rounds. The Maestro save fixtures in `src/campaign/fixtures/` open mid-game; `scripts/e2e-fixtures.ts` can park a new one at a combat moment.
+- Scenario 1 reaches each case below within a few rounds. The Maestro save fixtures in `src/campaign/fixtures/` open mid-game; `scripts/e2e/fixtures.ts` can park a new one at a combat moment.
 
 The cases to play, each at Normal and at Quick, in Dark and in Light:
 1. An enemy attacks a defender and deals damage.

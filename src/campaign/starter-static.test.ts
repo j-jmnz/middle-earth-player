@@ -7,8 +7,8 @@ import { legalIntents } from "../rules/engine/reduce.ts";
 import { hasTrait } from "../rules/interpret/conditions.ts";
 import { ruleCause } from "../rules/core/cause.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { ARAGORN, CHEAP, DEAR, refusal, starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, idsOf, send, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { ARAGORN, CHEAP, DEAR, refusal, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { begin, buildTable, idsOf, send, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const SAM = "141002";
 const MERRY = "141003";

@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { SOUTH_GOLDENS, southIntent, southStart, southWorld, type SouthGolden } from "../../scripts/south-game.ts";
-import { intentsOf } from "../../scripts/sheet-intents.ts";
+import { SOUTH_GOLDENS, southIntent, southStart, southWorld, type SouthGolden } from "../../test/scenarios/the-ring-goes-south/game.ts";
+import { intentsOf } from "../../test/harness/sheet-intents.ts";
 
 import { actionsSheet, commitSheet } from "./bar-sheets.ts";
 import { railFor } from "./rail.ts";

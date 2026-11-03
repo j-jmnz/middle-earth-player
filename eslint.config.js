@@ -48,7 +48,7 @@ const packageBan = {
 };
 
 // src/campaign, src/play and src/screens import src/effects directly. src/rules receives effects as an argument,
-// so only tests and scripts (allowEffects) may reach into it from there.
+// so only tests, scripts and test/ (allowEffects) may reach into it from there.
 function zones(allowEffects) {
   const effects = allowEffects ? ["./effects"] : [];
   const app = ["./effects"];
@@ -130,6 +130,7 @@ module.exports = defineConfig([
   {
     files: [
       "scripts/**/*.{js,jsx,ts,tsx,mjs,cjs}",
+      "test/**/*.{js,jsx,ts,tsx,mjs,cjs}",
       "**/*.{test,spec}.ts",
       "**/*.{test,spec}.tsx",
     ],

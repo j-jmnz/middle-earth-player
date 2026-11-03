@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { duration, runScript, type Log } from "../log.ts";
-import { packBookletsHere } from "../pack-booklets.ts";
+import { packBookletsHere } from "../build/pack-booklets.ts";
 import { DATA_DIR } from "./paths.ts";
 import { syncDragnCards } from "./sources/dragncards.ts";
 import { recordChanges, type SourceRecord } from "./sources/fetch.ts";

@@ -8,8 +8,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
-import { UPGRADED_CODES, afterRaid, FLIGHT_GOLDENS, flightPlan, flightStart, flightWorld, playGolden } from "../../scripts/stormcaller-game.ts";
-import { CODES, MODIFICATIONS, SHIP_CODES, campaign, flight } from "../../scripts/stormcaller-scene.ts";
+import { UPGRADED_CODES, afterRaid, FLIGHT_GOLDENS, flightPlan, flightStart, flightWorld, playGolden } from "../../test/scenarios/flight-of-the-stormcaller/game.ts";
+import { CODES, MODIFICATIONS, SHIP_CODES, campaign, flight } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 import { buildStart } from "./start.ts";
 import { applyResolution, emptyLog } from "./log.ts";

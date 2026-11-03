@@ -64,7 +64,7 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
   - `printed/ledger.ts` (`loadLedger` default)
   - `normalize/printed.ts` (TFotR gate)
   - `rules/spans.ts:11` (closed id regex)
-- Catalog: `src/catalog/printed-ledger.ts:3`, `scripts/build-catalog.ts:18-19,151` (one campaign and pack set).
+- Catalog: `src/catalog/printed-ledger.ts:3`, `scripts/build/catalog.ts:18-19,151` (one campaign and pack set).
 - `src/catalog/scenario-data.ts`: `campaignCard`, `prelude` and `starterDecks` are required, and there is no booklet id or saga flag.
 - Every `FELLOWSHIP_ID` use, starting with `src/campaign/save.ts:11` and `src/screens/campaign-data.ts`:
   - `(tabs)/index.tsx:73,122,247`
@@ -79,7 +79,7 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
 - `src/campaign/start.ts`: only `AttachToRingBearer` and `AddToStaging` campaign-setup verbs are dealt.
 - `src/campaign/resolution.ts` `earn()` and `log.ts` `applyResolution`: the pool is deduplicated by code, but "each player earns 1 copy" needs several copies of one code.
 - `src/rules/quest/quest.ts` `advanceStage()` is linear, so Passage Through Mirkwood's random 3B branch can't be expressed.
-- Booklets: `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules-glossary.ts` `DOC_NAMES`/`BOOKS`.
+- Booklets: `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules-glossary.ts` `DOC_NAMES`/`BOOKS`.
 
 ## Approach: seven new phases (27–33)
 
@@ -141,7 +141,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - Drop the TFotR gate in `applyPrinted`.
    - Order: `pnpm data:build`, then `pnpm data:sync scans pictures` (CLAUDE.md, Data), then read.
    - A scan the agent cannot read is a question for the user.
-8. **Tests**: generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/catalog-exit.test.ts` and `scripts/build-catalog.test.ts` per campaign. The existing Fellowship assertions stay.
+8. **Tests**: generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/build/catalog-exit.test.ts` and `scripts/build/catalog.test.ts` per campaign. The existing Fellowship assertions stay.
 9. **Effects tooling**
    - `effects:draft` and `effects:open` read all campaigns.
    - The draft target for non-pool cards is `src/effects/authored/<campaign-scenario>.ts`.
@@ -154,7 +154,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 1. **Registry**
    - `src/campaign/save.ts` and `src/screens/campaign-data.ts` become a map from campaign id to campaign data and scenarios. Metro needs static JSON imports, so the map is written by hand, and a test checks that it matches `data/campaigns/index.json`.
    - `campaignOf` and `nameOf` work for any id. Remove every `FELLOWSHIP_ID` fallback listed above.
-   - `scripts/build-catalog.ts` tags `cards.campaign_id` from a pack→campaign map.
+   - `scripts/build/catalog.ts` tags `cards.campaign_id` from a pack→campaign map.
 2. **Screens**
    - Campaign list: one New playthrough tile per playable campaign, opening that campaign's setup screen. `start-fellowship` keeps its testID; the new ones are `start-<id>`. Each save's progress line reads its own campaign.
    - Scenarios tab: one section per box (Fellowship, Revised Core, The Dark of Mirkwood).
@@ -193,7 +193,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - Mirkwood Paths opens `learn-to-play`, which already holds the core campaign and setup pages. The Dark of Mirkwood opens `the-dark-of-mirkwood`.
    - `rules-glossary.ts` `DOC_NAMES`/`BOOKS` gain `tdom` and `rr`.
    - `bookletParams` returns `campaign.bookletId`.
-   - Update the brief's booklet ids and the "two booklet PDFs" line, and `scripts/pack-booklets.test.ts`.
+   - Update the brief's booklet ids and the "two booklet PDFs" line, and `scripts/build/pack-booklets.test.ts`.
 7. **Tests**: registry, loadout gating (Fellowship unchanged; Mirkwood refuses a Fellowship hero and needs no Ring-bearer), multi-copy earn, carry-over round trip, booklet map. Write Maestro flows: `mirkwood-start.yaml` (start, briefing with no Ring-bearer slot), `scenarios-boxes.yaml`, `booklet-dark-of-mirkwood.yaml`.
 
 **Exit:** all Fellowship goldens unchanged and green, the new tests green, `pnpm lint` green. `/reviewer` and `/ux` report no blocks.
@@ -225,11 +225,11 @@ For each phase:
 - `scripts/data/normalize/{cards,scenarios,setup-text,campaigns,printed}.ts`
 - `scripts/data/{build,load-scenarios}.ts`, `scripts/data/printed/{scope,ledger}.ts`, `scripts/data/rules/spans.ts`
 - `scripts/data/effects/{draft,open}`, `data/overrides.json`, `data/rules/{index,columns}.json`, `data/printed/mirkwood-paths.json` (new)
-- `src/catalog/{scenario-data,printed-ledger}.ts`, `scripts/build-catalog.ts`, `src/catalog/version.ts`
+- `src/catalog/{scenario-data,printed-ledger}.ts`, `scripts/build/catalog.ts`, `src/catalog/version.ts`
 - `src/campaign/{save,start,checklist,loadout,briefing,log,resolution,path,playable}.ts`
 - `src/rules/quest/quest.ts`, `src/rules/families/*`, `src/catalog/families/*`
 - `src/effects/index.ts`, `src/effects/authored/*`
-- `src/screens/{campaign-data,seat-picker,briefing-parts,rules-glossary}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts`
+- `src/screens/{campaign-data,seat-picker,briefing-parts,rules-glossary}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts`
 - `docs/brief.md`, `docs/architecture.md` (registry note), `docs/phases/phase-27…33-*.md`, `docs/phases/STATUS.md`
 
 ## Verification
@@ -239,7 +239,7 @@ After each phase:
 - `pnpm data:build -- --verbose` (no failed cross-checks)
 - `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test`
 - `pnpm effects:open`, which shows no lines for scenarios in `playable.ts`
-- `node --experimental-strip-types scripts/card-smoke.ts <new codes>`
+- `node --experimental-strip-types scripts/card-smoke/run.ts <new codes>`
 - `pnpm catalog:build`, then commit `src/catalog/version.ts`
 - `pnpm booklets:pack`, which packs four books with matching sha256
 - the per-scenario golden tests

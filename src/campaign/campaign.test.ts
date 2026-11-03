@@ -8,8 +8,8 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { moveCard } from "../rules/core/zones.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Table } from "../../scripts/test-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Table } from "../../test/harness/scene.ts";
 
 import { checklist, type ChecklistInput } from "./checklist.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";

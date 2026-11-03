@@ -7,7 +7,7 @@ import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
 import { legalIntents, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { blankScenario, withThreat } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 const RIDER = "141039";
 const RING = "141085";

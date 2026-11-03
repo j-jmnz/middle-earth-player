@@ -4,8 +4,8 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
-import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
+import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 import { enemy as seaEnemy, hero as seaHero, seaTable, send, ship as seaShip, shipEnemy, until } from "../rules/families/sea/table.ts";
 

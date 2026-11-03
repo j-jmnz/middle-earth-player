@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/raid-on-the-grey-havens.ts";
 import { RECORDS as DCCE_RECORDS } from "../effects/authored/pool/DCCE.ts";
-import { CODES, idOf, loadRaidWorld, raidTable, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, idOf, loadRaidWorld, raidTable, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 import { aflameWords, branchNow, dealtNow } from "./aflame-words.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";

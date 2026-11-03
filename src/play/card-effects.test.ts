@@ -5,11 +5,11 @@ import { syncConstants } from "../rules/interpret/constants.ts";
 import { addModifier, modifiedStat } from "../rules/core/keywords.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
-import { starterBase } from "../../scripts/starter-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { buildTable, idsOf, sceneCards } from "../../scripts/test-scene.ts";
-import { CODES, fateTable, idOf, loadFateWorld } from "../../scripts/fate-scene.ts";
+import { starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { buildTable, idsOf, sceneCards } from "../../test/harness/scene.ts";
+import { CODES, fateTable, idOf, loadFateWorld } from "../../test/scenarios/the-fate-of-numenor/scene.ts";
 
 import { badgeSplit, BADGE_CAP, cardEffects, effectLines, slotNumbers } from "./card-effects.ts";
 

@@ -3,8 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { legalIntents } from "../rules/engine/reduce.ts";
-import { starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, idsOf, send } from "../../scripts/test-scene.ts";
+import { starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { begin, buildTable, idsOf, send } from "../../test/harness/scene.ts";
 
 import type { SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";

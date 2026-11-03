@@ -249,7 +249,7 @@ export const effectSchema = z.strictObject({
   id: z.string().min(1),
   cardCode: z.string(),
   // The printed lines this record implements, as "<code>:<side>:<n>" ledger line ids (data/printed). Every record names
-  // at least one; scripts/effect-coverage.test.ts checks that they exist, belong to cardCode and match the timing.
+  // at least one; scripts/checks/effect-coverage.test.ts checks that they exist, belong to cardCode and match the timing.
   lines: z.array(z.string().min(1)).min(1),
   timing: timingSchema,
   trigger: triggerSchema.optional(),

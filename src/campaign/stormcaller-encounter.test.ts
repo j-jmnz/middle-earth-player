@@ -1,5 +1,5 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, dcce.sailing-tests, dcce.boarding, dcce.heading, dcce.archery, rr.step-6-4-2, rr.shadow-effects, rr.search, rr.doomed-x (data/rules/entries.json).
-// The Flight of the Stormcaller encounter cards on a table of plain-number heroes and the Campaign Expansion's cards (scripts/stormcaller-scene.ts): the ships that grow or engage on a commitment, the
+// The Flight of the Stormcaller encounter cards on a table of plain-number heroes and the Campaign Expansion's cards (test/scenarios/flight-of-the-stormcaller/scene.ts): the ships that grow or engage on a commitment, the
 // locations, the treacheries and the shadow effects.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -9,7 +9,7 @@ import { legalIntents } from "../rules/engine/legal.ts";
 import { withMode, type ScenarioState } from "../rules/core/state.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { CODES, codesIn, finish, flightFight, flightTable, idOf, idsOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
+import { CODES, codesIn, finish, flightFight, flightTable, idOf, idsOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 let world: FlightWorld;
 

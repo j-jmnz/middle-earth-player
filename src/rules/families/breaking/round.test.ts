@@ -13,8 +13,8 @@ import { withSeat, withThreat } from "../../core/state.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { settle } from "../../engine/machine.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { codes, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
-import { first } from "../../../../scripts/past-scene.ts";
+import { codes, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: BreakingWorld;
 

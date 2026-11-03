@@ -5,9 +5,9 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { CAVES_GOLDENS, cavesWorld, playGolden } from "../../scripts/nibin-dum-game.ts";
-import { campaign, caves } from "../../scripts/nibin-dum-scene.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { CAVES_GOLDENS, cavesWorld, playGolden } from "../../test/scenarios/the-caves-of-nibin-dum/game.ts";
+import { campaign, caves } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { resolutionView, settledSentence } from "./resolution-view.ts";
 import { loadWorld } from "./world.ts";

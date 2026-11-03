@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { campaign } from "../../scripts/temple-scene.ts";
+import { campaign } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 
 import { emptyLog } from "./log.ts";
 import { campaignPath, currentNode, nextStep, openNode, soonNode, soonWords, type PathNode } from "./path.ts";

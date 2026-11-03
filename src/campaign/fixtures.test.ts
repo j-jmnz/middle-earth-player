@@ -7,7 +7,7 @@ import { EFFECTS } from "../effects/index.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { cards as cardRows } from "../catalog/schema.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
@@ -24,7 +24,7 @@ import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
 // The Maestro fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
-// game writes. When this fails, run scripts/e2e-fixtures.ts again. `won` and `knife-lost` are open (docs/phases/STATUS.md):
+// game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are open (docs/phases/STATUS.md):
 // no legal win of the two starter decks has been found, so the tests that need them are skipped until they are committed.
 const COMMITTED = FIXTURE_NAMES.filter(hasFixture);
 const WON = hasFixture("won");

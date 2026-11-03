@@ -70,7 +70,7 @@ A sentence no template reads is authored, as in phase 8.
 
 ## Tests
 
-Generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/catalog-exit.test.ts` and `scripts/build-catalog.test.ts` per campaign. The Fellowship assertions stay as they are.
+Generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/build/catalog-exit.test.ts` and `scripts/build/catalog.test.ts` per campaign. The Fellowship assertions stay as they are.
 
 ## E2E
 

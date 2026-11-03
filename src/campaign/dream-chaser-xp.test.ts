@@ -15,9 +15,9 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { inPlay, updateCard, withSeat, withThreat } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
 import { dealtCodes, gameCodes, loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { loadWorld as loadTable, table, type World as Table } from "../../scripts/past-scene.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { loadWorld as loadTable, table, type World as Table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import prebuilt from "../../data/decks/prebuilt.json";
 
 import { briefing, loadoutProblems, startFor, type BriefingInput } from "./briefing.ts";
@@ -26,8 +26,8 @@ import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { buildStart } from "./start.ts";
 import { worldCodes, worldFrom, type World } from "./world.ts";
-import { mirkwoodLoadout, mirkwoodWorld } from "../../scripts/mirkwood-game.ts";
-import { campaign as mirkwoodCampaign, passage } from "../../scripts/mirkwood-scene.ts";
+import { mirkwoodLoadout, mirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { campaign as mirkwoodCampaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 import { gavinReturned, MODE_CARD_CODE, modeXp, spendXp, xpUnspentOf } from "./xp.ts";
 
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable, dcce.hard-expert, dcce.naasiyah (data/rules/entries.json). The Dream-chaser campaign shell: a

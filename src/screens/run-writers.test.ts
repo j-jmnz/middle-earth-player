@@ -3,8 +3,8 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import migrations from "../../drizzle/migrations";
-import { goingPast, pastContext, playPast, RING_BEARER } from "../../scripts/past-play";
-import { scenario, loadWorld, type World } from "../../scripts/past-scene";
+import { goingPast, pastContext, playPast, RING_BEARER } from "../../test/scenarios/a-shadow-of-the-past/play";
+import { scenario, loadWorld, type World } from "../../test/scenarios/a-shadow-of-the-past/scene";
 import type { ReduceContext, ScenarioState } from "../play/store";
 import { emptyLog } from "../campaign/log";
 import { ENGINE_VERSION } from "../campaign/replay";

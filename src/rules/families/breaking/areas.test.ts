@@ -10,9 +10,9 @@ import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { stagingThreat } from "../../quest/quest.ts";
 import { areaOf, sharedStaging, stageOf, stagingOf, viewOf } from "./areas.ts";
 import { moveCard } from "../../core/zones.ts";
-import { causeProblems } from "../../../../scripts/cause-check.ts";
-import { DIVIDED, FRODOS_CHOICE, SEAT_OF_SEEING, codes, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
-import { first } from "../../../../scripts/past-scene.ts";
+import { causeProblems } from "../../../../test/harness/cause-check.ts";
+import { DIVIDED, FRODOS_CHOICE, SEAT_OF_SEEING, codes, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: BreakingWorld;
 

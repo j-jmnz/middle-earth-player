@@ -8,10 +8,10 @@ import { playerCardEffectCanChoose } from "../rules/core/keywords.ts";
 import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { definePrinted } from "../rules/core/printed.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { BALROG, loadMoriaWorld, moriaTable, settled, type MoriaLayout, type MoriaWorld } from "../../scripts/moria-scene.ts";
-import { first, send, start, type Run } from "../../scripts/past-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { BALROG, loadMoriaWorld, moriaTable, settled, type MoriaLayout, type MoriaWorld } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MoriaWorld;
 

@@ -12,8 +12,8 @@ import { optionalEnemies, stagingThreat } from "../rules/quest/quest.ts";
 import { ruleCause } from "../rules/core/cause.ts";
 import { reduce, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
 import { flagged } from "../rules/core/state.ts";
-import { BALROG, BRIDGE, DOOM, loadMoriaWorld, makeTable, runOne, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
+import { BALROG, BRIDGE, DOOM, loadMoriaWorld, makeTable, runOne, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MoriaWorld;
 

@@ -4,8 +4,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { playUntil, type Reduced } from "../../scripts/combat-policy.ts";
-import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
+import { playUntil, type Reduced } from "../../test/harness/combat-policy.ts";
+import { starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 import { clashesOf } from "./clash.ts";
 import { tableLayout, type TableLayout } from "./layout.ts";

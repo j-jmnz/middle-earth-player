@@ -6,9 +6,9 @@ import { syncConstants } from "../rules/interpret/constants.ts";
 import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
 import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
-import { first, SAM, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../test/scenarios/flight-to-the-ford/scene.ts";
+import { first, SAM, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: FordWorld;
 

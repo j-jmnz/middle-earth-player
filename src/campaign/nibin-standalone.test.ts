@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario } from "../rules/engine/reduce.ts";
-import { cavesStart, cavesWorld } from "../../scripts/nibin-dum-game.ts";
-import { campaign, caves } from "../../scripts/nibin-dum-scene.ts";
+import { cavesStart, cavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/game.ts";
+import { campaign, caves } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 
 import { buildStart } from "./start.ts";
 

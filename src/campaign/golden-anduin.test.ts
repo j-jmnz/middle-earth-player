@@ -6,15 +6,15 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinDecks, type AnduinGame } from "../../scripts/anduin-game.ts";
-import { anduin, campaign } from "../../scripts/anduin-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinDecks, type AnduinGame } from "../../test/scenarios/journey-along-the-anduin/game.ts";
+import { anduin, campaign } from "../../test/scenarios/journey-along-the-anduin/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { validateLoadout } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of Journey Along the Anduin in Campaign Mode played by the auto-player (scripts/anduin-game.ts), true solo
+// A permanent golden: whole games of Journey Along the Anduin in Campaign Mode played by the auto-player (test/scenarios/journey-along-the-anduin/game.ts), true solo
 // and two-handed, through a win (with and without Valor, Scarred and a prisoner) and through a loss, on fixed seeds. It pins the path from
 // data/ through buildStart, the scenario's records, the stage rules, Mendor, Valor and Scarred, and the reducer, so a change that moves a game
 // shows up as a diff here. Update the snapshot only when the change is meant.

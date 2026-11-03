@@ -9,9 +9,9 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import { openResolution } from "../rules/setup/resolution.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { BREAKING_GOLDENS, breakingGameWorld, playGolden } from "../../scripts/breaking-game.ts";
-import { breaking, campaign } from "../../scripts/breaking-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { BREAKING_GOLDENS, breakingGameWorld, playGolden } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
+import { breaking, campaign } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";

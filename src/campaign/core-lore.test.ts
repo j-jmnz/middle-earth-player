@@ -13,9 +13,9 @@ import { stagingThreat } from "../rules/quest/quest.ts";
 import { legalIntents } from "../rules/engine/reduce.ts";
 import { updateCard, withMode, type ScenarioState } from "../rules/core/state.ts";
 import { attachTo, spawn } from "../rules/core/zones.ts";
-import { fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { fund, payFor, refusal, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const DENETHOR = "01010";
 const GLORFINDEL = "01011";

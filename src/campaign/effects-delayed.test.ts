@@ -8,7 +8,7 @@ import { advanceFrame } from "../rules/windows/frames.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { topFrame } from "../rules/windows/windows.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { first, loadWorld, RIDER, RING, send, start, table, type Layout, type World } from "../../scripts/past-scene.ts";
+import { first, loadWorld, RIDER, RING, send, start, table, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: World;
 

@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { poolOf } from "./pool-cache.ts";
 import { sortPool } from "./pool-filter.ts";
 

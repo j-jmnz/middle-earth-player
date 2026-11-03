@@ -14,15 +14,15 @@ import { stageNumber } from "../rules/families/caves/progress.ts";
 import { alternativeActions } from "../rules/families/deck/play.ts";
 import { readyPaymentChoice } from "../rules/families/attachments/ready.ts";
 import { attachTo, spawn } from "../rules/core/zones.ts";
-import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
-import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
-import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
-import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
+import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../test/scenarios/journey-along-the-anduin/scene.ts";
+import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../test/scenarios/escape-from-dol-guldur/scene.ts";
+import { loadOathWorld, oathTable, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
 import { AUTHORED_EFFECTS as CAVES_EFFECTS } from "../effects/authored/the-caves-of-nibin-dum.ts";
-import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
+import { cavesTable, loadCavesWorld, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 
 import { legalIntents } from "../rules/engine/legal.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
 import type { SheetNames } from "./sheet-types.ts";

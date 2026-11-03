@@ -1,5 +1,5 @@
 // Rules: dcce.scalable-upgradable, dcce.campaign-setup-raid-on-the-grey-havens, dcce.encounter-cards, rr.victory, rr.step-3-4 (data/rules/entries.json). The cards the campaign card of Raid on the Grey Havens places or
-// the Resolution earns: Black Key (boon), the four Galdor's Counsel, Parrying Cutlass and Throwing Axe, on a table of plain-number heroes (scripts/raid-scene.ts).
+// the Resolution earns: Black Key (boon), the four Galdor's Counsel, Parrying Cutlass and Throwing Axe, on a table of plain-number heroes (test/scenarios/raid-on-the-grey-havens/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -8,7 +8,7 @@ import { legalIntents, type PlayerIntent, type ScenarioState } from "../rules/en
 import { settle } from "../rules/engine/machine.ts";
 import { updateCard } from "../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
-import { CODES, finish, idOf, idsOf, loadRaidWorld, raidTable, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, finish, idOf, idsOf, loadRaidWorld, raidTable, send, start, type RaidLayout, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 let world: RaidWorld;
 

@@ -11,9 +11,9 @@ import { modifiedStat } from "../rules/core/keywords.ts";
 import type { Instruction } from "../catalog/boundary.ts";
 import type { ReduceContext } from "../rules/engine/reduce.ts";
 import { updateCard, type ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { CAMPAIGN_CARD, HERO, loadMirkwoodWorld, MENDOR, mirkwoodTable, passage, type MirkwoodLayout, type MirkwoodWorld, SPAWN, SUPPORT } from "../../scripts/mirkwood-scene.ts";
-import { codesOf, first, send, start } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { CAMPAIGN_CARD, HERO, loadMirkwoodWorld, MENDOR, mirkwoodTable, passage, type MirkwoodLayout, type MirkwoodWorld, SPAWN, SUPPORT } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { codesOf, first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MirkwoodWorld;
 

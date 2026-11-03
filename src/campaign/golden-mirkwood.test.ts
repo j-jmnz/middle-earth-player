@@ -6,15 +6,15 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { MIRKWOOD_GOLDENS, mirkwoodLoadout, mirkwoodWorld, playGolden, type MirkwoodDecks, type MirkwoodGame } from "../../scripts/mirkwood-game.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { campaign, passage } from "../../scripts/mirkwood-scene.ts";
+import { MIRKWOOD_GOLDENS, mirkwoodLoadout, mirkwoodWorld, playGolden, type MirkwoodDecks, type MirkwoodGame } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { campaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 
 import { validateLoadout } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of Passage Through Mirkwood in Campaign Mode played by the auto-player (scripts/mirkwood-game.ts),
+// A permanent golden: whole games of Passage Through Mirkwood in Campaign Mode played by the auto-player (test/scenarios/passage-through-mirkwood/game.ts),
 // true solo and two-handed, through a win on each stage 3B and through a loss, on fixed seeds. It pins the path from data/ through
 // buildStart, the scenario's records, the branching stage 3, Mendor and the reducer, so a change that moves a game shows up as a diff here.
 // Update the snapshot only when the change is meant.

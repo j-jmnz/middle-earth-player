@@ -6,15 +6,15 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { SOUTH_GOLDENS, southLoadout, southWorld, playGolden, type SouthDecks, type SouthGame } from "../../scripts/south-game.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { campaign, south } from "../../scripts/south-scene.ts";
+import { SOUTH_GOLDENS, southLoadout, southWorld, playGolden, type SouthDecks, type SouthGame } from "../../test/scenarios/the-ring-goes-south/game.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { campaign, south } from "../../test/scenarios/the-ring-goes-south/scene.ts";
 
 import { validateLoadout } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of The Ring Goes South played by the auto-player (scripts/south-game.ts), true solo and two-handed,
+// A permanent golden: whole games of The Ring Goes South played by the auto-player (test/scenarios/the-ring-goes-south/game.ts), true solo and two-handed,
 // through a win and through a loss, on fixed seeds. The wins use the big-number loadout beside the saga Frodo: the Council of Elrond's
 // faceup cards, the Hunt, the Watcher holding the Ring-bearer and Doors of Durin explored with it back in the first player's hands.
 // It pins the path from data/ through buildStart, the scenario's records, the second active location, the facedown Ring-bearer and the

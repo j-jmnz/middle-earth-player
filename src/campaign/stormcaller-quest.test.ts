@@ -1,5 +1,5 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, dcce.sailing, dcce.heading, rr.quest-advancement, rr.search, rr.cancel (data/rules/entries.json). The Flight of the Stormcaller quest stages on a table of
-// plain-number heroes and the Campaign Expansion's cards (scripts/stormcaller-scene.ts): the progress caps, the extra reveal, the Weather treachery the Cape of Andrast resolves and the damage it deals.
+// plain-number heroes and the Campaign Expansion's cards (test/scenarios/flight-of-the-stormcaller/scene.ts): the progress caps, the extra reveal, the Weather treachery the Cape of Andrast resolves and the damage it deals.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { modifiedStat } from "../rules/core/keywords.ts";
@@ -7,7 +7,7 @@ import { settle } from "../rules/engine/machine.ts";
 import { placeQuestProgress } from "../rules/quest/quest.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { questRoom } from "../rules/families/caves/progress.ts";
-import { CODES, codesIn, flightTable, idOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
+import { CODES, codesIn, flightTable, idOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 let world: FlightWorld;
 

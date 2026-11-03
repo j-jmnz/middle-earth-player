@@ -17,8 +17,8 @@ import { syncConstants } from "../../interpret/constants.ts";
 import { spawn } from "../../core/zones.ts";
 import { revealsAllowed } from "../encounter/reveal.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { ARGONATH, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING, codes, fire, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
-import { first } from "../../../../scripts/past-scene.ts";
+import { ARGONATH, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING, codes, fire, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: BreakingWorld;
 

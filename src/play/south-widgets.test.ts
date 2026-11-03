@@ -2,8 +2,8 @@
 // which declares a second active location, with what the engine holds, and absent for the other scenarios.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { DOORS, loadSouthWorld, southTable, WATCHER, type SouthWorld } from "../../scripts/south-scene.ts";
-import { first, loadWorld, table, type World } from "../../scripts/past-scene.ts";
+import { DOORS, loadSouthWorld, southTable, WATCHER, type SouthWorld } from "../../test/scenarios/the-ring-goes-south/scene.ts";
+import { first, loadWorld, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { locationReadout, ringWords } from "./widgets.ts";
 

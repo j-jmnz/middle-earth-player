@@ -8,7 +8,7 @@ Written 2026-10-24, after phase 8b. It reviews phases 9 to 16 against the new `d
 | --- | --- |
 | Findings 1 to 9 | All addressed. The RingsDB snapshot is committed (1). Findings 2 and 3 are fixed in the build: `pnpm data:build` writes all six scenarios in `data/scenarios`, with the campaign card, the burden deck and per-player counts modelled. Finding 4: the heading heuristic (`scripts/data/rules/split.ts`) is gone, see E. Finding 5 and 6: the checklist, scoring and the campaign cards' records are in `src/campaign` and `src/effects/authored`. 7: see B. 8: see F. 9: see below. |
 | A. Printed-text ledger | Done: `data/printed/fellowship-of-the-ring.json` (read by `scripts/data/printed/ledger.ts`), scans pinned by `data/sources.json` and kept in `.cache/scans/`. The build uses ledger lines in place of Hall of Beorn text. |
-| B. Line-addressed effects | Done: `Effect.lines`. `scripts/effect-coverage.test.ts` checks that every printed line of a dealt card is owned. `pnpm effects:open` (`src/effects/open-lines.ts`) lists the printed lines no record owns yet. |
+| B. Line-addressed effects | Done: `Effect.lines`. `scripts/checks/effect-coverage.test.ts` checks that every printed line of a dealt card is owned. `pnpm effects:open` (`src/effects/open-lines.ts`) lists the printed lines no record owns yet. |
 | C. Scenarios from cards | Done as written: the campaign card's and the quest card's Setup records are run by `buildStart` (`src/campaign/start.ts`); DragnCards and Hall of Beorn are cross-checks, with `data/overrides.json` for disagreements. |
 | D. Campaign is cards plus the checklist | Done: `src/campaign/checklist.ts`, `briefing.ts`, `log.ts` (`campaignPool`, `threatPenalty`, `captives`, per-scenario `rounds`), `score.ts`; the campaign cards' Setup and Resolution are records with timings `campaignSetup` and `resolution`; `authored.resolution` is gone from the campaign file. |
 | E. Rules as verified spans | Done, with the shape changed: `data/rules/index.json` (spans with `doc`, `page`, `column`, exact `from` and `to`), `data/rules/columns.json` (column boxes per document), and `data/rules/entries.json` built from them by `scripts/data/rules/`. Archery, toughness, scoring and the checklist have ids. |
@@ -87,7 +87,7 @@ Stage 2A (142062) removes the Ring-bearer and its attachments from the game. Sta
 
 ### 7. Coverage counts lines; it does not own them
 
-`scripts/effect-coverage.test.ts` checks that there are at least as many records as segments, and as many per timing as labels. A record for the wrong line passes. A duplicated source line fails. An unlabelled constant ("The players cannot advance while…") is checked only by the count.
+`scripts/checks/effect-coverage.test.ts` checks that there are at least as many records as segments, and as many per timing as labels. A record for the wrong line passes. A duplicated source line fails. An unlabelled constant ("The players cannot advance while…") is checked only by the count.
 
 ### 8. Engine steps do not say why
 

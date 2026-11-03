@@ -14,8 +14,8 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import { stagingThreat } from "../rules/quest/quest.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { DOORS, GREAT_WARG_CHIEF, LUST, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../scripts/south-scene.ts";
-import { codesOf, first } from "../../scripts/past-scene.ts";
+import { DOORS, GREAT_WARG_CHIEF, LUST, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../test/scenarios/the-ring-goes-south/scene.ts";
+import { codesOf, first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: SouthWorld;
 

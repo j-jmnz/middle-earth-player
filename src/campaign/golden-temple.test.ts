@@ -6,15 +6,15 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { inPlay } from "../rules/core/state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { TEMPLE_GOLDENS, UPGRADED_CODES, afterDepths, playGolden, templeWorld, type TempleDecks, type TempleGame, type TempleGolden } from "../../scripts/temple-game.ts";
-import { CODES, campaign, temple } from "../../scripts/temple-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { TEMPLE_GOLDENS, UPGRADED_CODES, afterDepths, playGolden, templeWorld, type TempleDecks, type TempleGame, type TempleGolden } from "../../test/scenarios/temple-of-the-deceived/game.ts";
+import { CODES, campaign, temple } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath, nextStep } from "./path.ts";
 import { xpAwarded } from "./xp.ts";
 
-// A permanent golden: whole games of Temple of the Deceived in Campaign Mode played by the auto-player (scripts/temple-game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first five
+// A permanent golden: whole games of Temple of the Deceived in Campaign Mode played by the auto-player (test/scenarios/temple-of-the-deceived/game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first five
 // parts, with the secrets flipped, with the Hard and the Expert Mode card, with the Black Key and the Gate Key on their Upgraded sides) and through a loss (the threat, Captain Sahír and Na'asiyah destroyed), on fixed
 // seeds. It pins the path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the island family (the map, Exploration, the Gate Key, the secrets) and the reducer, so a change that
 // moves a game shows up as a diff here. Update the snapshot only when the change is meant.

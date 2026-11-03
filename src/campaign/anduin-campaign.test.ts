@@ -19,12 +19,12 @@ import { queueEvent } from "../rules/windows/queue.ts";
 import { updateCard } from "../rules/core/state.ts";
 import { attachTo, spawn } from "../rules/core/zones.ts";
 import { loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinGame } from "../../scripts/anduin-game.ts";
-import { anduin, anduinTable, campaign, fight, loadAnduinWorld, MENDOR, type AnduinLayout, type AnduinWorld } from "../../scripts/anduin-scene.ts";
-import { MIRKWOOD_GOLDENS, mirkwoodWorld, playGolden as playPassage } from "../../scripts/mirkwood-game.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
-import { first, send, start, type Run } from "../../scripts/past-scene.ts";
+import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinGame } from "../../test/scenarios/journey-along-the-anduin/game.ts";
+import { anduin, anduinTable, campaign, fight, loadAnduinWorld, MENDOR, type AnduinLayout, type AnduinWorld } from "../../test/scenarios/journey-along-the-anduin/scene.ts";
+import { MIRKWOOD_GOLDENS, mirkwoodWorld, playGolden as playPassage } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
+import { first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { checklist } from "./checklist.ts";
 import { resolutionView, settledSentence } from "./resolution-view.ts";

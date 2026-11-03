@@ -7,7 +7,7 @@ import { encounterCodes, type Difficulty } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { difficultyProblems, scenarioFacts } from "./briefing.ts";
 import { parseLoadout } from "./save.ts";

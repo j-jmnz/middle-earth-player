@@ -13,7 +13,7 @@ export const COVER: Region = { x: 0.3, y: 0.06, w: 0.62, h: 0.45 };
 export const SCENE: Region = { x: 0.02, y: 0.21, w: 0.8, h: 0.36 };
 
 /**
- * The scene bundled on its own for each scenario (scripts/pack-scans.ts, sceneOf), cut from the laid-down quest picture at the
+ * The scene bundled on its own for each scenario (scripts/build/pack-scans.ts, sceneOf), cut from the laid-down quest picture at the
  * source's size: SCENE, starting under the stage number's medallion, which reaches a little lower on a printed card's scan.
  */
 export const SCENE_PICTURE: Region = { x: 0.02, y: 0.235, w: 0.8, h: 0.335 };

@@ -10,7 +10,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { moveCard } from "../rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { buildStart } from "./start.ts";
 

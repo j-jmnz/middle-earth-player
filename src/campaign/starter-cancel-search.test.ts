@@ -5,9 +5,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { settle } from "../rules/engine/machine.ts";
 import { legalIntents } from "../rules/engine/reduce.ts";
 import { withMode } from "../rules/core/state.ts";
-import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { fund, payFor, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 const SAM = "141002";
 const MERRY = "141003";

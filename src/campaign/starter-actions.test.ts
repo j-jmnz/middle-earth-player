@@ -8,8 +8,8 @@ import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
 import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { updateCard, withMode, withThreat } from "../rules/core/state.ts";
-import { CHEAP, fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
-import { begin, buildTable, FRODO, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { CHEAP, fund, payFor, refusal, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { begin, buildTable, FRODO, idsOf, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const SAM = "141002";
 const MERRY = "141003";

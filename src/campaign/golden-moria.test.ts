@@ -6,14 +6,14 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
-import { MORIA_GOLDENS, moriaWorld, playGolden, type MoriaDecks, type MoriaGame } from "../../scripts/moria-game.ts";
-import { BALROG, BRIDGE, campaign, CHAMBER, DOOM, moria } from "../../scripts/moria-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { MORIA_GOLDENS, moriaWorld, playGolden, type MoriaDecks, type MoriaGame } from "../../test/scenarios/journey-in-the-dark/game.ts";
+import { BALROG, BRIDGE, campaign, CHAMBER, DOOM, moria } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 
-// A permanent golden: whole games of Journey in the Dark played by the auto-player (scripts/moria-game.ts), true solo and two-handed, through wins (with the
+// A permanent golden: whole games of Journey in the Dark played by the auto-player (test/scenarios/journey-in-the-dark/game.ts), true solo and two-handed, through wins (with the
 // Balrog still to come and with the Balrog in play) and losses, on fixed seeds. It pins the path from data/ through buildStart, the scenario's records, the
 // Doom, Doom, Doom countdown, the Balrog beside the first player, the resource tokens on stage 2, the Great Bridge and the reducer, so a change that moves a game
 // shows up as a diff here. Update the snapshot only when the change is meant.

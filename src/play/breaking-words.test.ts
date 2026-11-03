@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../catalog/boundary.ts";
 import { EFFECTS } from "../effects/index.ts";
-import { loadBreakingWorld, makeBreaking, STAGES_3A, type BreakingWorld } from "../../scripts/breaking-scene.ts";
+import { loadBreakingWorld, makeBreaking, STAGES_3A, type BreakingWorld } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 import { branchWords, pickWords } from "./choice-words.ts";
 

@@ -6,15 +6,15 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
-import { FLIGHT_GOLDENS, UPGRADED_CODES, playGolden, flightWorld, type FlightDecks, type FlightGame, type FlightGolden } from "../../scripts/stormcaller-game.ts";
-import { CODES, campaign, flight } from "../../scripts/stormcaller-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { FLIGHT_GOLDENS, UPGRADED_CODES, playGolden, flightWorld, type FlightDecks, type FlightGame, type FlightGolden } from "../../test/scenarios/flight-of-the-stormcaller/game.ts";
+import { CODES, campaign, flight } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { xpAwarded } from "./xp.ts";
 
-// A permanent golden: whole games of Flight of the Stormcaller in Campaign Mode played by the auto-player (scripts/stormcaller-game.ts), true solo and two-handed, through a win (on stage 2B, 3B and 4B, in Normal and
+// A permanent golden: whole games of Flight of the Stormcaller in Campaign Mode played by the auto-player (test/scenarios/flight-of-the-stormcaller/game.ts), true solo and two-handed, through a win (on stage 2B, 3B and 4B, in Normal and
 // Easy, after the first three parts, with the Hard and the Expert Mode card, with the ships, the Modification boons, Black Key and Calaerion on their Upgraded sides) and through a loss (the threat, the Dream-chaser
 // destroyed, the Stormcaller defeating stage 4), on fixed seeds. It pins the path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the stormcaller family (the area, its stages, the
 // catch-up), the sea family and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

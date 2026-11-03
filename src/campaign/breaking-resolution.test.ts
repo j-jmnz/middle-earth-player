@@ -1,5 +1,5 @@
 // Rules: rr.campaign-cards, rr.burdens, rr.campaign-pool, mec109.campaign-mode, mec109.setup-breaking-of-the-fellowship (data/rules/entries.json). The resolution screen of Breaking of
-// the Fellowship (resolution-view.ts) on whole games (scripts/breaking-game.ts): the first player's burden choice (Followed by Night or Ill Fate), each seat's captive, then what
+// the Fellowship (resolution-view.ts) on whole games (test/scenarios/breaking-of-the-fellowship/game.ts): the first player's burden choice (Followed by Night or Ill Fate), each seat's captive, then what
 // confirming writes (the boon and burden earned, the captives and the hero Fallen Into Evil still holds as fallen); a loss shows Defeat and writes nothing. The log rows are the
 // campaign log's own (log.ts), so no new row type or screen is needed.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -7,8 +7,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../scripts/breaking-game.ts";
-import { breaking, campaign } from "../../scripts/breaking-scene.ts";
+import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
+import { breaking, campaign } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 import { applyResolution } from "./log.ts";
 import { resolutionView, settledSentence, type ResolutionView } from "./resolution-view.ts";

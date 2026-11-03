@@ -8,10 +8,10 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { MORIA_GOLDENS, moriaWorld, playGolden } from "../../scripts/moria-game.ts";
-import { BALROG, campaign, loadMoriaWorld, makeTable, moria, type MoriaWorld } from "../../scripts/moria-scene.ts";
-import { first } from "../../scripts/past-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { MORIA_GOLDENS, moriaWorld, playGolden } from "../../test/scenarios/journey-in-the-dark/game.ts";
+import { BALROG, campaign, loadMoriaWorld, makeTable, moria, type MoriaWorld } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { first } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { resolutionView } from "./resolution-view.ts";

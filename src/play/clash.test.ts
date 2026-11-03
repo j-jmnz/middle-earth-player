@@ -6,14 +6,14 @@ import type { EngineStep } from "../rules/core/intents.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { shadowCards } from "../rules/core/zones.ts";
 import { hero, seaTable, send, ship, shipEnemy, until } from "../rules/families/sea/table.ts";
-import { attackOrPolicy, playUntil, type Reduced } from "../../scripts/combat-policy.ts";
-import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
+import { attackOrPolicy, playUntil, type Reduced } from "../../test/harness/combat-policy.ts";
+import { starterStart, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 import { clashesOf, type Clash } from "./clash.ts";
 
 // Rules: rr.step-6-4-3, rr.step-6-8b, rr.step-6-8-3, ltp.shadow-discard (data/rules/entries.json). The attacks of a new state for the
 // combat spotlight, read from the engine's steps in whole starter games played the way src/campaign/combat-flow.test.ts plays
-// them (scripts/combat-policy.ts): a defended attack, a blocked one, an undefended hero, a defender destroyed, two attackers
+// them (test/harness/combat-policy.ts): a defended attack, a blocked one, an undefended hero, a defender destroyed, two attackers
 // destroying an enemy, a shadow card, and two attacks in one state. Every number is checked against the steps and the states.
 const DECK = "stealth-and-steadfastness";
 let ctx: ReduceContext;

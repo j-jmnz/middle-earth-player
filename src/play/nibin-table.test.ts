@@ -5,8 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { legalIntents } from "../rules/engine/legal.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { syncConstants } from "../rules/interpret/constants.ts";
-import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
-import { first, send, start, type Run } from "../../scripts/past-scene.ts";
+import { cavesTable, loadCavesWorld, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
+import { first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { questTitle } from "./table-preview.ts";
 import { playerAttackSheet } from "./combat-sheets.ts";

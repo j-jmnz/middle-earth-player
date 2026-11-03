@@ -6,15 +6,15 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { inPlay } from "../rules/core/state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { DEPTHS_GOLDENS, UPGRADED_CODES, playGolden, depthsWorld, type DepthsDecks, type DepthsGame, type DepthsGolden } from "../../scripts/depths-game.ts";
-import { CODES, campaign, depths } from "../../scripts/depths-scene.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
+import { DEPTHS_GOLDENS, UPGRADED_CODES, playGolden, depthsWorld, type DepthsDecks, type DepthsGame, type DepthsGolden } from "../../test/scenarios/the-thing-in-the-depths/game.ts";
+import { CODES, campaign, depths } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { xpAwarded } from "./xp.ts";
 
-// A permanent golden: whole games of The Thing in the Depths in Campaign Mode played by the auto-player (scripts/depths-game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first four
+// A permanent golden: whole games of The Thing in the Depths in Campaign Mode played by the auto-player (test/scenarios/the-thing-in-the-depths/game.ts), true solo and two-handed, through a win (in Normal and Easy, after the first four
 // parts, with the Hard and the Expert Mode card, with the Black Keys on their Upgraded sides) and through a loss (the threat, a Ship location's Threat, Captain Sahír and Na'asiyah destroyed), on fixed seeds. It pins the
 // path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the grapple family (the arms under their locations, the detach, the encounter set swap, The Thing in the Depths) and the
 // reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.

@@ -1,6 +1,6 @@
 // Rules: dcce.island-map, dcce.exploration, dcce.uncharted, rr.travel, rr.step-6-4-2, rr.shadow-effects, rr.forced, rr.doomed-x, rr.search (data/rules/entries.json); ledger lines 12072:A:2, 12074:A:2, 12073:A:1,
 // 12075:A:1, 12075:A:2, 12076:A:1, 12076:A:2, 12077:A:1, 12077:A:2, 12078:A:1, 12079:A:1, 12079:A:2, 12080:A:1, 12080:A:2, 12081:A:2, 11198:A:1 to 11199:A:3. The Temple of the Deceived encounter cards, the
-// locations of the map and Starla and Recurring Nightmare on a table of plain-number heroes (scripts/temple-scene.ts).
+// locations of the map and Starla and Recurring Nightmare on a table of plain-number heroes (test/scenarios/temple-of-the-deceived/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -11,7 +11,7 @@ import { settle } from "../rules/engine/machine.ts";
 import { moveCard, shadowCards } from "../rules/core/zones.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import type { Effect } from "../catalog/boundary.ts";
-import { CODES, finish, idOf, idsOf, legalIntents, loadTempleWorld, resolveRecords, send, start, templeFight, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
+import { CODES, finish, idOf, idsOf, legalIntents, loadTempleWorld, resolveRecords, send, start, templeFight, templeTable, type TempleLayout, type TempleWorld } from "../../test/scenarios/temple-of-the-deceived/scene.ts";
 
 let world: TempleWorld;
 

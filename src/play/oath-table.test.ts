@@ -5,8 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { legalIntents } from "../rules/engine/legal.ts";
 import { settle } from "../rules/engine/machine.ts";
 import type { PlayerIntent } from "../rules/engine/reduce.ts";
-import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
+import { loadOathWorld, oathTable, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { oathDetail } from "./oath-preview.ts";
 import { sheetFor, wonSheet } from "./sheets.ts";

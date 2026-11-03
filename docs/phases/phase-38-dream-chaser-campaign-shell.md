@@ -14,7 +14,7 @@ The app knows the Dream-chaser campaign: it is on the campaign list and the Scen
 
 The plan's Phase 38 items 1 to 8:
 
-1. **Registry.** `src/screens/campaign-data.ts`, `campaignIds`, the Scenarios tab section, `start-dream-chaser`, the registry test against `data/campaigns/index.json`, `scripts/build-catalog.ts`. `saga` is false.
+1. **Registry.** `src/screens/campaign-data.ts`, `campaignIds`, the Scenarios tab section, `start-dream-chaser`, the registry test against `data/campaigns/index.json`, `scripts/build/catalog.ts`. `saga` is false.
 2. **Booklet.** `BOOKLETS` id `dream-chaser`, `BOOKLET_SOURCES`, `rules-glossary.ts`, `rules-view.tsx`, `bookletParams`. The pinned MEC111 file is bundled.
 3. **Loadout.** Na'asiyah (12109) refused in scenarios 1 to 7 of a campaign game, citing `dcce.naasiyah`.
 4. **Campaign log: XP.** New log fields with defaults so old saves load; a `GainXp` effect verb in a new `dreamchaser` campaign-family file, run by the Resolution; the path shows XP; a "Spend XP" screen lets the players choose where each XP goes. No typing of numbers, no automatic spend (`dcce.gaining-xp`, `dcce.scalable-upgradable`).

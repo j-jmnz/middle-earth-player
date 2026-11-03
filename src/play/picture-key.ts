@@ -1,5 +1,5 @@
 // Which picture a card shows (docs/architecture.md, Images): a card turned to its B side (a quest stage once it is revealed,
-// rr.quest-cards-quest-deck) shows its side B picture, bundled as `<code>.B` (scripts/pack-scans.ts); every other card its code's.
+// rr.quest-cards-quest-deck) shows its side B picture, bundled as `<code>.B` (scripts/build/pack-scans.ts); every other card its code's.
 // A build with no side B picture for the card falls back to side A (`pictureCode`). A hero that Fallen Into Evil made an enemy (`<code>~enemy`,
 // rules/core/printed.ts) shows the hero's own card.
 import { fallenBase } from "../rules/core/printed.ts";

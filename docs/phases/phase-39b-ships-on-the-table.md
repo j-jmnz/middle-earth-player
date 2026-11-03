@@ -186,7 +186,7 @@ Two flows, which need fixtures. A fixture is a real dealt game, so the fixtures 
   1. Peek at the seat without the Dream-chaser (`threat-1`) and assert that `heading` is still shown.
   2. Tap `heading`, assert `card-preview`, and close it.
 
-If Voyage does not deal before phase 40, both fixtures (`scripts/e2e-fixtures.ts`) and their runs move to phase 40's phone half, and `STATUS.md` says so. In a cloud session the runs stay open.
+If Voyage does not deal before phase 40, both fixtures (`scripts/e2e/fixtures.ts`) and their runs move to phase 40's phone half, and `STATUS.md` says so. In a cloud session the runs stay open.
 
 ## Exit
 

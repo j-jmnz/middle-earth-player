@@ -14,8 +14,8 @@ import { syncConstants } from "../../interpret/constants.ts";
 import { moveCard } from "../../core/zones.ts";
 import { activeOf, mergeView, stageOf, viewOf } from "./areas.ts";
 import { revealSeat } from "../encounter/reveal.ts";
-import { FRODOS_CHOICE, fire, loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
-import { first } from "../../../../scripts/past-scene.ts";
+import { FRODOS_CHOICE, fire, loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
+import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: BreakingWorld;
 

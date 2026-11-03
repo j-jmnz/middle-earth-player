@@ -1,6 +1,6 @@
 // Rules: dcce.aflame, rr.effects (data/rules/entries.json). The rows of the picks that burn Aflame locations or heal them (Corsairs' Assault, Sahír's Ravager, Corsair Arsonist, Put to the Torch, Sahír's Advance): the
 // damage a location would stand at, the damage as a mark that is threat red when it destroys the card, and a caution when it burns the location or loses the game, on a table of plain-number heroes
-// and the Campaign Expansion's cards (scripts/raid-scene.ts).
+// and the Campaign Expansion's cards (test/scenarios/raid-on-the-grey-havens/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
@@ -10,7 +10,7 @@ import { settle } from "../rules/engine/machine.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
+import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 import { fireRow } from "./aflame-sheets.ts";
 import type { PickSheet, SheetNames } from "./sheet-types.ts";

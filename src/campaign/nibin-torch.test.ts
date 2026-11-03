@@ -1,5 +1,5 @@
 // Rules: rr.action, rr.exhausted, rr.travel, rr.engaged, rr.cancel, rr.step-6-2, rr.explored, rr.step-6-8-3 (data/rules/entries.json). The Cave Torch (41029) and the cards that read
-// it (Cavern Warg 41031, Lightless Passage 41033, Lost in the Dark 41039), and Cracked Pillar (41028), on a table of plain-number heroes (scripts/nibin-dum-scene.ts).
+// it (Cavern Warg 41031, Lightless Passage 41033, Lost in the Dark 41039), and Cracked Pillar (41028), on a table of plain-number heroes (test/scenarios/the-caves-of-nibin-dum/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -11,9 +11,9 @@ import { runInstruction } from "../rules/interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
 import { placeQuestProgress } from "../rules/quest/quest.ts";
 import { expireModifiers, type ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, travelTo, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
-import { first, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, travelTo, type CavesLayout, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
+import { first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: CavesWorld;
 

@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import prebuilt from "../../data/decks/prebuilt.json";
 import { EFFECTS } from "../effects/index.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { briefing, type BriefingInput } from "./briefing.ts";
 import { emptyLog } from "./log.ts";

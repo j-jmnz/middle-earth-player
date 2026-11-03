@@ -77,7 +77,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 ### Fixtures and Maestro
 
-- Scenario 1's `won` fixture is not committed. `scripts/e2e-fixtures.ts --won` searches for it. Until it exists `.maestro/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/a-knife-in-the-dark-loss.yaml` cannot run either.
+- Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/a-knife-in-the-dark-loss.yaml` cannot run either.
 - A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
 - Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save (phase 13).
 - No Maestro flow has run. The flows that cross a stage advance must pass the quest advance screen (`quest-advance-progress`, Progress is optional); a fixture parked on a When Revealed question shows the question instead.

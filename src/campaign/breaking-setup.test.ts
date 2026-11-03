@@ -7,9 +7,9 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { restricted } from "../rules/interpret/restrictions.ts";
 import { syncConstants } from "../rules/interpret/constants.ts";
-import { breakingGameWorld, breakingStart } from "../../scripts/breaking-game.ts";
-import { codesOf } from "../../scripts/past-scene.ts";
-import { ARGONATH, FRODOS_CHOICE, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING } from "../../scripts/breaking-scene.ts";
+import { breakingGameWorld, breakingStart } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
+import { codesOf } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { ARGONATH, FRODOS_CHOICE, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 let ctx: ReduceContext;
 

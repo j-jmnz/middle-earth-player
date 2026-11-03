@@ -9,9 +9,9 @@ import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { expireModifiers, updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { fireForced } from "../rules/windows/triggers.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { fordTable, loadFordWorld, FELL_RIDER, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
-import { first, reveal, SAM, send } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { fordTable, loadFordWorld, FELL_RIDER, type FordLayout, type FordWorld } from "../../test/scenarios/flight-to-the-ford/scene.ts";
+import { first, reveal, SAM, send } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: FordWorld;
 

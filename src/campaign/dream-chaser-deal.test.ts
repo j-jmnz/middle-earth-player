@@ -8,9 +8,9 @@ import { expectOk } from "../rules/core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { mirkwoodLoadout, mirkwoodWorld } from "../../scripts/mirkwood-game.ts";
-import { campaign, passage } from "../../scripts/mirkwood-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { mirkwoodLoadout, mirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { campaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { emptyLog, poolCard, type CampaignLog } from "./log.ts";

@@ -10,9 +10,9 @@ import { settle } from "../rules/engine/machine.ts";
 import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
 import { updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { attachTo, spawn } from "../rules/core/zones.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { CAUGHT, HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
-import { codesOf, first, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { CAUGHT, HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { codesOf, first, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: MirkwoodWorld;
 

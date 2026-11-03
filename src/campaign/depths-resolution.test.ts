@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, openResolution, resolutionIntents, resolutionResult } from "../rules/setup/resolution.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { CODES, depthsTable, idOf, loadDepthsWorld, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
+import { CODES, depthsTable, idOf, loadDepthsWorld, type DepthsLayout, type DepthsWorld } from "../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 let world: DepthsWorld;
 

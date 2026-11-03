@@ -8,9 +8,9 @@ import { byCode, expectOk } from "../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { printedOf } from "../rules/core/printed.ts";
 import { modifiedStat } from "../rules/core/keywords.ts";
-import { FORD_GOLDENS, fordWorld, playGolden } from "../../scripts/ford-game.ts";
-import { BURDENS, campaign, ford, loadFordWorld, type FordWorld } from "../../scripts/ford-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { FORD_GOLDENS, fordWorld, playGolden } from "../../test/scenarios/flight-to-the-ford/game.ts";
+import { BURDENS, campaign, ford, loadFordWorld, type FordWorld } from "../../test/scenarios/flight-to-the-ford/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { resolutionView, settledSentence } from "./resolution-view.ts";

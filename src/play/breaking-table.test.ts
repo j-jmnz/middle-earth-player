@@ -1,5 +1,5 @@
 // Rules: mec109.multiple-staging-areas, mec109.saga-staging-rules, rr.active-location, rr.travel, rr.step-3-4, rr.first-player (data/rules/entries.json).
-// Breaking of the Fellowship on the phase 16 table, in whole games (the goldens' seeds, scripts/breaking-game.ts). Once stage 2B splits the table the canvas, the web list
+// Breaking of the Fellowship on the phase 16 table, in whole games (the goldens' seeds, test/scenarios/breaking-of-the-fellowship/game.ts). Once stage 2B splits the table the canvas, the web list
 // and the pile list draw the staging area, quest stage and active location of the shown seat (`shownSeat`: the acting seat, or the seat peeked at) and never a second active
 // location of a shared quest; the quest numbers and every pick stay on the acting seat. In every window of the games each option a sheet offers is an intent the reducer
 // accepts. True solo has one staging area and one stage; a fallen hero is an enemy drawn with the hero's own picture.
@@ -10,8 +10,8 @@ import { stageOf, stagingOf, activeOf, sharedStaging } from "../rules/families/b
 import { FALLEN_SUFFIX } from "../rules/core/printed.ts";
 import { stagingThreat } from "../rules/quest/quest.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
-import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../scripts/breaking-game.ts";
-import { intentsOf } from "../../scripts/sheet-intents.ts";
+import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
+import { intentsOf } from "../../test/harness/sheet-intents.ts";
 
 import { areaWords } from "./area-words.ts";
 import { threatRows } from "./foresight.ts";
@@ -25,7 +25,7 @@ import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { isStepWindow, sheetFor } from "./sheets.ts";
 import { stagesKey } from "./quest-advance.ts";
 
-// The context of the game being played: the deck set decides the heroes (scripts/breaking-game.ts).
+// The context of the game being played: the deck set decides the heroes (test/scenarios/breaking-of-the-fellowship/game.ts).
 let ctx: ReduceContext;
 let strong: ReduceContext;
 let slow: ReduceContext;

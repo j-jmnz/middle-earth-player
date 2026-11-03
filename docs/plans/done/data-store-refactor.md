@@ -78,7 +78,7 @@ Add a temporary `scripts/refactor-golden.test.ts` that dumps three things:
 Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per-scenario golden.
 
 ### 1. Sync framework and raw snapshots (`scripts/data/`)
-- `sources/ringsdb.ts`: move `loadPayload`, the manifest, `mergeCopy`, `assertRulesMatch` and the `ALeP` filter out of `scripts/build-catalog.ts`.
+- `sources/ringsdb.ts`: move `loadPayload`, the manifest, `mergeCopy`, `assertRulesMatch` and the `ALeP` filter out of `scripts/build/catalog.ts`.
 - `sources/hallofbeorn.ts`: the five export endpoints, a 120-second timeout, and a Zod schema over the fields read.
 - `sources/dragncards.ts`: fetch `cardDb.tsv`, `preBuiltDecks.json`, `steps.json`, `phases.json`, `imageUrlPrefix.json`, `playerCards.json` and `encounterCards.json` from `raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/<sha>/…`.
   - `preBuiltDecks.json` and `playerCards.json` contain `//` comments, so parse them with `jsonc-parser`.
@@ -144,24 +144,24 @@ Now: the heading splitter was replaced by the curated `data/rules/index.json` (`
 
   New `.claude/agents/effect-author.md`: reads a bundle, writes `src/effects/authored/`, and runs the coverage and scenario tests.
 - New verbs are still added to `effect-schema.ts` and `src/rules/interpret/interpret.ts` by hand. That's engine work, not data.
-- `scripts/effect-coverage.test.ts` reads timings from `data/cards`, iterates `data/scenarios/*.json` plus the prelude, and requires the nth record from generated plus authored. There's no manifest file and no SQLite.
+- `scripts/checks/effect-coverage.test.ts` reads timings from `data/cards`, iterates `data/scenarios/*.json` plus the prelude, and requires the nth record from generated plus authored. There's no manifest file and no SQLite.
 
 ### 6. Direct imports, slim catalog
 - `src/effects/index.ts` exports generated plus authored. `src/screens`, `src/play` and `src/campaign` import it. `src/rules` still receives effects as an argument; `eslint.config.js` keeps `allowEffects` only for tests and scripts, which may import `src/effects` into `src/rules` and `src/catalog`.
 - `scripts/validate-effects.ts` moves into a Vitest schema test. Delete the `effects` and `scenarios` tables, `scripts/effects-roundtrip.test.ts`, and the readers in `src/screens/routes/{pool,card/[code],debug}.tsx`. `activeCardCodes` (`src/catalog/active-text.ts`) takes the effect list.
-- `scripts/build-catalog.ts` becomes an offline `data/` → `catalog.db` transform (`cards` with text and image URLs, `packs`, `campaigns`, `meta`).
+- `scripts/build/catalog.ts` becomes an offline `data/` → `catalog.db` transform (`cards` with text and image URLs, `packs`, `campaigns`, `meta`).
   - The version is a content hash. `src/screens/applied-catalog-version.ts` compares for equality.
   - Delete `scripts/catalog-snapshot.ts`'s `nextVersion` and `scripts/ensure-catalog.ts`.
 - Images: encounter and quest art comes from DragnCards (`imageUrlPrefix` plus `imageUrl`), falling back to Hall of Beorn `ImagePath`. This fills the gap RingsDB leaves for `src/screens/images/`.
 
 ### 7. Offline tests and CI
-- `scripts/test-catalog.ts` becomes `loadCards()` over `data/cards`.
+- `test/harness/catalog.ts` becomes `loadCards()` over `data/cards`.
 - No test needs the network or a prebuilt database. Display tests build `catalog.db` in a temporary directory from `data/`.
 - `.claude/hooks/session-start.sh` drops the catalog build.
 - `.github/workflows/test.yml` runs `data:check`, then `pnpm test` and `pnpm lint`.
 
 ### 8. Query helper for agents
-`pnpm data:query "<sql>"` loads `data/cards`, `data/scenarios` and `data/rules/entries.json` into an in-memory `node:sqlite` database (Node 22 is already used by `scripts/effect-coverage.test.ts`) and prints rows. Example: `select code,name,text from cards where encounterSet='Hunted'`. There's no committed database file, because the JSON stays canonical and diffable.
+`pnpm data:query "<sql>"` loads `data/cards`, `data/scenarios` and `data/rules/entries.json` into an in-memory `node:sqlite` database (Node 22 is already used by `scripts/checks/effect-coverage.test.ts`) and prints rows. Example: `select code,name,text from cards where encounterSet='Hunted'`. There's no committed database file, because the JSON stays canonical and diffable.
 
 ### 9. Governance and docs rewrite
 - Rewrite `.cursor/rules/authority.mdc` and `CLAUDE.md`:

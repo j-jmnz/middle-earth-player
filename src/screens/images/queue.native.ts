@@ -124,7 +124,7 @@ export function enqueueImageDownloads(jobs: readonly ImageDownloadRequest[]): vo
   const front: { code: string; url: string }[] = [];
   const back: { code: string; url: string }[] = [];
   for (const job of jobs) {
-    // A scan the release build bundled (scripts/pack-scans.ts) is not downloaded again.
+    // A scan the release build bundled (scripts/build/pack-scans.ts) is not downloaded again.
     if (queued.has(job.code) || cachedImage(job.code) || scanAssets[job.code]) continue;
     const url = cardImageUrl(job.imagesrc);
     if (!url) continue;

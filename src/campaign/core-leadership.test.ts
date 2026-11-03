@@ -9,9 +9,9 @@ import { settle } from "../rules/engine/machine.ts";
 import { definePrinted } from "../rules/core/printed.ts";
 import { legalIntents } from "../rules/engine/reduce.ts";
 import { withMode, type ScenarioState } from "../rules/core/state.ts";
-import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { fund, payFor, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";

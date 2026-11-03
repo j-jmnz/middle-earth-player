@@ -19,7 +19,7 @@ The plan's Phase 37 items 1 to 8, in order:
 4. **Setup parser.** The nine campaign cards' and nine stage 1A Setup sentences, quoted from the ledger; a sentence no pattern reads is listed by `pnpm data:build -- --verbose`.
 5. **Rules.** `dcce` in the span-id regex, the MEC111 boxes in `data/rules/columns.json`, the hand-checked `dcce.*` spans in `data/rules/index.json`, `scripts/data/rules.test.ts`.
 6. **Ledger.** `data/printed/dream-chaser.json`, read from the pinned scans (`docs/plans/done/authoritative-data.md` section A). Order: `pnpm data:build`, `pnpm data:sync scans`, read. Every dealt, campaign, boon and burden card side, with each encounter card's Sailing success symbol; each entry records `readBy` and the scan sha256. A scan nobody can read is a question for the user, not a guess.
-7. **Tests.** Generalize the `scripts/data` tests, `catalog-exit.test.ts` and `build-catalog.test.ts` for the fourth campaign; the existing assertions stay.
+7. **Tests.** Generalize the `scripts/data` tests, `catalog-exit.test.ts` and `build/catalog.test.ts` for the fourth campaign; the existing assertions stay.
 8. **Effects tooling.** `effects:draft` and `effects:open` read the fourth campaign; `src/effects/index.ts` imports the new files.
 
 ## E2E

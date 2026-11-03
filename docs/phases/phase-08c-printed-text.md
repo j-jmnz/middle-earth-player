@@ -21,7 +21,7 @@ The text the build reads for a dealt card is the text printed on that card, pinn
 ## Line-owned effects
 
 - A ledger line has the id `<code>:<side>:<n>`. `Effect` gains `lines: string[]`. Templates set it. Existing authored records get it.
-- `scripts/effect-coverage.test.ts` checks ownership: each line of a dealt card is owned by a record, by an implemented keyword, or by an `inert` entry. Each record's lines exist and belong to its card. Remove the per-timing count checks.
+- `scripts/checks/effect-coverage.test.ts` checks ownership: each line of a dealt card is owned by a record, by an implemented keyword, or by an `inert` entry. Each record's lines exist and belong to its card. Remove the per-timing count checks.
 
 ## Rule spans
 

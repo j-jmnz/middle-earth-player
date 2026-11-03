@@ -1,5 +1,5 @@
 // Rules: rr.quest-advancement, rr.winning-the-game, rr.search, rr.step-3-3, rr.active-location, rr.first-player (data/rules/entries.json). The four quest cards of The Caves of
-// Nibin-Dûm (41004 to 41007) on a table of plain-number heroes (scripts/nibin-dum-scene.ts): their When Revealed, the constants and what advances each stage.
+// Nibin-Dûm (41004 to 41007) on a table of plain-number heroes (test/scenarios/the-caves-of-nibin-dum/scene.ts): their When Revealed, the constants and what advances each stage.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -11,8 +11,8 @@ import { questStageStart } from "../rules/families/quest/setup.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { codesIn, loadCavesWorld, cavesTable, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
+import { codesIn, loadCavesWorld, cavesTable, type CavesLayout, type CavesWorld } from "../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: CavesWorld;
 

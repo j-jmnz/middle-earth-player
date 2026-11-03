@@ -6,7 +6,7 @@ import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/flight-of-the-stormcaller.ts";
 import { RECORDS as DCCE_RECORDS } from "../effects/authored/pool/DCCE.ts";
 import { settle } from "../rules/engine/machine.ts";
-import { CODES, flightTable, idOf, loadFlightWorld, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
+import { CODES, flightTable, idOf, loadFlightWorld, type FlightWorld } from "../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 import { effectLines } from "./card-effects.ts";
 

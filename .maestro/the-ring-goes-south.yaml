@@ -4,7 +4,7 @@ tags:
 ---
 # OPEN (2026-10-26): its fixture `south-stage-4` is not committed. It is dealt from the log scenarios 1 to 3 write when they are won,
 # and no win of scenario 1 or 2 has been found with the starter decks (docs/phases/STATUS.md; see flight-to-the-ford.yaml). Run
-# scripts/e2e-fixtures.ts --won when one is found, then add `south-start`, `south-stage-4`, `south-won` and `south-lost` to
+# scripts/e2e/fixtures.ts --won when one is found, then add `south-start`, `south-stage-4`, `south-won` and `south-lost` to
 # src/campaign/fixtures.ts.
 # Phase 14. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json), which
 # opens the fixture route. The fixture is a real game of The Ring Goes South parked on stage 4B: Doors of Durin is the active

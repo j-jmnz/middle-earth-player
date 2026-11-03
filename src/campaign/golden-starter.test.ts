@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { playStarter, starterLoadout, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
-import { campaign } from "../../scripts/past-scene.ts";
+import { playStarter, starterLoadout, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { campaign } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { validateLoadout } from "./loadout.ts";
 
-// Permanent goldens: a whole game of A Shadow of the Past with each seeded starter deck (scripts/starter-game.ts), played by
+// Permanent goldens: a whole game of A Shadow of the Past with each seeded starter deck (test/scenarios/a-shadow-of-the-past/game.ts), played by
 // the auto-player with card play on. It pins the path from data/ through the starter effect records and the reducer, so a
 // change to a record or to the engine that moves a game shows up as a diff here. Update the snapshot only when the change
 // is meant.

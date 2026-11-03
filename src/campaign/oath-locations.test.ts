@@ -1,5 +1,5 @@
 // Rules: rr.travel, rr.active-location, rr.explored, rr.search, rr.cancel, rr.engaged, rr.drawing-cards, rr.first-player, rr.action (data/rules/entries.json). The
-// Oath's locations on a table of plain-number heroes (scripts/oath-scene.ts): Travel costs, Responses, the Quest Action of Spider Den and The Eaves of Mirkwood.
+// Oath's locations on a table of plain-number heroes (test/scenarios/the-oath/scene.ts): Travel costs, Responses, the Quest Action of Spider Den and The Eaves of Mirkwood.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../catalog/boundary.ts";
@@ -12,9 +12,9 @@ import { settle } from "../rules/engine/machine.ts";
 import { offerResponses } from "../rules/windows/responses.ts";
 import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
 import { flagged, type ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { codesIn, loadOathWorld, oathTable, settleChoices, travelTo, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
-import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { codesIn, loadOathWorld, oathTable, settleChoices, travelTo, type OathLayout, type OathWorld } from "../../test/scenarios/the-oath/scene.ts";
+import { first, reveal, send, start, type Run } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: OathWorld;
 

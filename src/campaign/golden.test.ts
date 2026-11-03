@@ -4,8 +4,8 @@ import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import { definePrinted } from "../rules/core/printed.ts";
 import { reduce, startScenario } from "../rules/engine/reduce.ts";
-import { playOut } from "../../scripts/auto-player.ts";
-import { campaign, loadWorld, scenario } from "../../scripts/past-scene.ts";
+import { playOut } from "../../test/harness/auto-player.ts";
+import { campaign, loadWorld, scenario } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { buildStart } from "./start.ts";
 

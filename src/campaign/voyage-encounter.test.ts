@@ -1,6 +1,6 @@
 // Rules: dcce.heading, dcce.sailing-tests, dcce.boarding, dcce.corsair-deck, dcce.ship-enemies, rr.step-3-3, rr.engaged, rr.shadow-effects, rr.search, rr.travel, rr.cancel, rr.damage
 // (data/rules/entries.json). The encounter cards of Voyage Across Belegaer that no template reads: each line of the ledger (data/printed/dream-chaser.json) has a record, and these
-// tests run them on a table of plain-number heroes and the campaign's ships (scripts/voyage-scene.ts).
+// tests run them on a table of plain-number heroes and the campaign's ships (test/scenarios/voyage-across-belegaer/scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/interpret/constants.ts";
@@ -9,12 +9,12 @@ import { legalAttackEnemies, canAttack } from "../rules/combat/combat.ts";
 import { stagingThreat } from "../rules/quest/quest.ts";
 import { legalIntents, legalTargets } from "../rules/engine/reduce.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
-import { causeProblems } from "../../scripts/cause-check.ts";
-import { first, send, start } from "../../scripts/past-scene.ts";
+import { causeProblems } from "../../test/harness/cause-check.ts";
+import { first, send, start } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import {
   BOARDING_PARTY, CALM_WATERS, CORSAIR_WARSHIP, CUNNING_PIRATE, FOG_BANK, LIGHT_CRUISER, ROLLING_SEAS, ROUGH_WATERS, SCOUTING_SHIP, SHIPS, SOUTHRON_SAILOR, STARLIT_SEA, SUDDEN_STORMS, THROWN_OFF_COURSE,
   UMBAR_CAPTAIN, VICIOUS_MARAUDER, WATERSPOUT, WINDS_OF_WRATH, codesIn, loadVoyageWorld, resolveReveal, voyageFight, voyageTable, type VoyageLayout, type VoyageWorld,
-} from "../../scripts/voyage-scene.ts";
+} from "../../test/scenarios/voyage-across-belegaer/scene.ts";
 
 let world: VoyageWorld;
 

@@ -28,13 +28,9 @@ export default defineConfig({
   test: {
     environment: "node",
     include: [
-      "src/rules/**/*.test.ts",
-      "src/campaign/**/*.test.ts",
-      "src/effects/**/*.test.ts",
-      "src/catalog/**/*.test.ts",
-      "src/screens/**/*.test.ts",
-      "src/play/**/*.test.ts",
+      "src/**/*.test.ts",
       "scripts/**/*.test.ts",
+      "test/**/*.test.ts",
     ],
     passWithNoTests: true,
     // Most files import the effect list and data/; one module cache per worker loads them once instead of once per file.
