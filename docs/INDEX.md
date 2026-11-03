@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~1.7K tok)
+- `CLAUDE.md` — Claude Code (~1.8K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
 - `.cursor/rules/code-standards.mdc` — Code standards (~1.5K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.0K tok)
@@ -45,7 +45,7 @@ Read the sections your task touches.
 - `docs/architecture.md` — Architecture (~16.7K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
-  - 78–120 Modules (~1.0K) ← 2
+  - 78–120 Modules (~1.0K) ← 3
   - 121–146 State (~1.0K) ← 9
   - 147–168 Play loop (~250)
   - 169–194 Engine (~2.8K)
@@ -330,6 +330,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 
 - `scripts`: brief.md, Card images (4); architecture.md, Modules (1); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
+- `scripts/tools`: architecture.md, Modules (1)
 - `src/campaign`: architecture.md, Tests (1)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)

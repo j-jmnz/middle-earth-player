@@ -26,6 +26,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm lint` checks import boundaries.
+- `pnpm move <old> <new>` (or `pnpm move <map.json>`, `--dry-run` first) moves tracked files and folders and rewrites every relative import and every root-written path in code, docs and configs that names them; a file's `.native` variants and its test go with it. It lists what it cannot follow (paths built at run time). Move files with it, not by hand.
 - `node --experimental-strip-types scripts/e2e-fixtures.ts` rewrites the Maestro save fixtures (`src/campaign/fixtures/`) when `fixtures.test.ts` says a fixture no longer reaches its moment. `--won` also searches for scenario 1's won game, which is open (`docs/phases/STATUS.md`).
 - `pnpm android:usb --device` runs the app on a phone plugged in by USB when the phone cannot reach Metro over the network (a VPN or isolated Wi-Fi shows a blank screen and `ConnectException` to the Mac's LAN address): it forwards port 8081 with `adb reverse` and points the app at `localhost`.
 - `pnpm catalog:build` writes `assets/catalog.db` and `src/catalog/version.ts` from `data/`. Do not commit `catalog.db`. Commit `version.ts` when it changes; a test checks it.
