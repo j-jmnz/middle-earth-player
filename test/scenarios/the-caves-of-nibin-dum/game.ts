@@ -1,20 +1,18 @@
 import { checklist } from "../../../src/campaign/checklist.ts";
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import { buildStart } from "../../../src/campaign/start.ts";
-import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import type { CampaignFacts } from "../../../src/rules/core/campaign-state.ts";
 import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { caves, campaign, CHIEFTAIN, NO_TIME, PILLAR, RANGER_SENSE } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Caves of Nibin-Dûm in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too
 // small to quest, or too brittle to survive an attack), and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on
@@ -28,11 +26,7 @@ export const CAVES_POLICY: PolicyOptions = { scout: "", prefer: PILLAR, protect:
 // "tense": strong heroes that start the game with a high threat (42), so a win ends with 40 or more.
 export type CavesDecks = "strong" | "steady" | "weak" | "brittle" | "tense";
 
-export function cavesLoadout(seatCount: 1 | 2): LoadoutSeat[] {
-  const filler = Array.from({ length: 30 }, () => "filler");
-  const first = { heroes: ["q1", "q2", "q3"], deck: filler };
-  return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-}
+export const cavesLoadout = fillerLoadout;
 
 const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
 const STRONG_STATS = { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
@@ -45,7 +39,7 @@ export async function cavesWorld(decks: CavesDecks = "strong"): Promise<{ cards:
   const codes = [...scenarioCards(caves).map((card) => card.code), ...caves.campaignPlaced, caves.campaignCard, RANGER_SENSE];
   const cards = new Map(await loadPrinted([...new Set(codes)]));
   for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   LOADED = cards;
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
@@ -145,25 +139,12 @@ export function cavesIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
   return nextIntent(state, ctx, CAVES_POLICY, memory, legalIntents(state, ctx));
 }
 
-export type CavesGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+export type CavesGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playCaves(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount), policy: CavesPolicy = { boon: "keep" }, limit = 8000): CavesGame {
   const start = cavesStart(seatCount, seed, difficulty, facts, log);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = cavesIntent(state, ctx, memory, policy);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, kept, state, intents, steps };
+  return playToEnd(start, ctx, (state, memory) => cavesIntent(state, ctx, memory, policy), limit);
 }
 
 // The goldens (src/campaign/scenarios/the-caves-of-nibin-dum/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a loss writes nothing.

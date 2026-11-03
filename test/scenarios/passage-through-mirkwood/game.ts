@@ -1,31 +1,24 @@
 import { buildStart } from "../../../src/campaign/start.ts";
-import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaign, passage } from "./scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Passage Through Mirkwood in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are
 // big numbers (or too small to quest), and the decks free events, so the outcome depends on the engine, the seed and the encounter deck,
 // not on player card play. Mendor is put into play by the campaign card's Setup; no saga setup runs (Mirkwood Paths is not a saga).
-export const STRONG_HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
+export { STRONG_HEROES };
 export const MIRKWOOD_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: true, act: true };
 // "strong": big-number heroes. "weak": heroes too small to quest, so the players lose on threat.
 export type MirkwoodDecks = "strong" | "weak";
 
-export function mirkwoodLoadout(seatCount: 1 | 2): LoadoutSeat[] {
-  const filler = Array.from({ length: 30 }, () => "filler");
-  const first = { heroes: ["q1", "q2", "q3"], deck: filler };
-  return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-}
+export const mirkwoodLoadout = fillerLoadout;
 
 const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
 const STRONG_STATS = { threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
@@ -36,7 +29,7 @@ export async function mirkwoodWorld(decks: MirkwoodDecks = "strong"): Promise<{ 
   for (const code of STRONG_HEROES) {
     cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...(decks === "weak" ? WEAK_STATS : STRONG_STATS) }));
   }
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
 
@@ -59,13 +52,8 @@ export function mirkwoodIntent(state: ScenarioState, ctx: ReduceContext, memory:
       if (questers.length > 0) return { type: "Commit", cardIds: questers };
     }
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
-    const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
+  const together = attackTogether(state, ctx);
+  if (together) return together;
   // With the strong loadout no hero defends; the undefended damage goes on the least wounded hero (or the location a shadow card names).
   if (state.window?.kind === "defense") {
     const targets = legalTargets(state, { type: "Undefended" }, ctx);
@@ -78,33 +66,17 @@ export function mirkwoodIntent(state: ScenarioState, ctx: ReduceContext, memory:
     const spawn = state.window.options.find((id) => state.cards[id]?.code === "01076");
     if (spawn) return { type: "Choose", optionId: spawn };
   }
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    if (enemy && seat && seat.engaged.length < seat.heroes.length) return { type: "Engage", enemyId: enemy };
-  }
+  const engaging = engageOneEach(state, ctx);
+  if (engaging) return engaging;
   return nextIntent(state, ctx, MIRKWOOD_POLICY, memory);
 }
 
-export type MirkwoodGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+export type MirkwoodGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playMirkwood(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, limit = 8000): MirkwoodGame {
   const start = mirkwoodStart(seatCount, seed, difficulty);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = mirkwoodIntent(state, ctx, memory);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, kept, state, intents, steps };
+  return playToEnd(start, ctx, (state, memory) => mirkwoodIntent(state, ctx, memory), limit);
 }
 
 // The goldens (src/campaign/scenarios/passage-through-mirkwood/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's

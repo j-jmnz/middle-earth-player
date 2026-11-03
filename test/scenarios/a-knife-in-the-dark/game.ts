@@ -2,16 +2,15 @@ import { buildStart } from "../../../src/campaign/start.ts";
 import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
 import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { attackTogether, engageOneEach, FILLER, fillerCard, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of A Knife in the Dark played by the auto-player, true solo or two-handed. With the seeded
 // starter decks, true solo is Stealth and Steadfastness with the saga Frodo as a fourth hero (the Ring-bearer does not
@@ -46,7 +45,7 @@ export function knifeLoadout(seatCount: 1 | 2, decks: KnifeDecks = "starter"): L
   return seatCount === 1 ? [first] : [first, starter("wisdom-and-wizardry")];
 }
 
-export const STRONG_HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
+export { STRONG_HEROES };
 
 export async function knifeWorld(): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
   const codes = [
@@ -59,7 +58,7 @@ export async function knifeWorld(): Promise<{ cards: Map<string, PrintedCard>; c
   for (const code of STRONG_HEROES) {
     cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 }));
   }
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
 
@@ -86,13 +85,8 @@ export function knifeIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
       if (questers.length > 0) return { type: "Commit", cardIds: questers };
     }
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => state.cards[id]?.code !== RING_BEARER && legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
-    const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
+  const together = attackTogether(state, ctx, (id) => state.cards[id]?.code !== RING_BEARER);
+  if (together) return together;
   // With the strong loadout no hero defends, so the one kept out of the quest is ready to attack; the undefended damage goes
   // on the least wounded strong hero (100 hit points), never on the Ring-bearer.
   if (state.window?.kind === "defense") {
@@ -101,34 +95,18 @@ export function knifeIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
     if (least) return { type: "Undefended", heroId: least };
   }
   // Optional engagement: one enemy at a time, while the seat has fewer engaged than heroes.
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    if (enemy && seat && seat.engaged.length < seat.heroes.length) return { type: "Engage", enemyId: enemy };
-  }
+  const engaging = engageOneEach(state, ctx);
+  if (engaging) return engaging;
   return nextIntent(state, ctx, KNIFE_POLICY, memory);
 }
 
-export type KnifeGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+export type KnifeGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered. `steps` are the engine steps of the
 // Keep and of every intent after it.
 export function playKnife(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, decks: KnifeDecks = "starter", limit = 6000): KnifeGame {
   const start = knifeStart(seatCount, seed, difficulty, decks);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = knifeIntent(state, ctx, memory);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, kept, state, intents, steps };
+  return playToEnd(start, ctx, (state, memory) => knifeIntent(state, ctx, memory), limit);
 }
 
 // The A Knife in the Dark goldens (src/campaign/scenarios/a-knife-in-the-dark/golden.test.ts), also played by causes.test.ts and replay.test.ts.

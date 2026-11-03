@@ -1,36 +1,29 @@
 import { checklist } from "../../../src/campaign/checklist.ts";
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import { buildStart } from "../../../src/campaign/start.ts";
-import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import type { CampaignFacts } from "../../../src/rules/core/campaign-state.ts";
-import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { dolGuldur, campaign } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Escape from Dol Guldur in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big
 // numbers (or too small to quest), and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on
 // player card play. Mendor is put into play by the campaign card's Setup; Appointed by Fate is attached to a hero of the first player's choice
 // by the checklist (here: the first seat's first hero); no saga setup runs.
-export const STRONG_HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
+export { STRONG_HEROES };
 export const DOL_GULDUR_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: true, act: true };
 // "strong": big-number heroes. "weak": heroes too small to quest, so the players lose on threat. "brittle": strong quest and attack with 3 hit points
 // and no Defense, so an enemy's attack destroys a hero.
 export type DolGuldurDecks = "strong" | "weak" | "brittle";
 
-export function dolGuldurLoadout(seatCount: 1 | 2): LoadoutSeat[] {
-  const filler = Array.from({ length: 30 }, () => "filler");
-  const first = { heroes: ["q1", "q2", "q3"], deck: filler };
-  return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-}
+export const dolGuldurLoadout = fillerLoadout;
 
 const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
 const STRONG_STATS = { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
@@ -42,7 +35,7 @@ export async function dolGuldurWorld(decks: DolGuldurDecks = "strong"): Promise<
   for (const code of STRONG_HEROES) {
     cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...(decks === "weak" ? WEAK_STATS : decks === "brittle" ? BRITTLE_STATS : STRONG_STATS) }));
   }
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   LOADED = cards;
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
@@ -88,13 +81,8 @@ export function dolGuldurIntent(state: ScenarioState, ctx: ReduceContext, memory
       if (questers.length > 0) return { type: "Commit", cardIds: questers };
     }
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
-    const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
+  const together = attackTogether(state, ctx);
+  if (together) return together;
   // A choice among heroes (the host of a claimed objective, the hero a card picks): the hero with the fewest attachments, so the Restricted
   // objectives are shared out (a hero holds two).
   if (state.window?.kind === "choose" && state.window.options.length > 1 && state.window.options.every((id) => state.cards[id]?.zone === "heroes")) {
@@ -108,11 +96,8 @@ export function dolGuldurIntent(state: ScenarioState, ctx: ReduceContext, memory
     const least = [...(heroes.length > 0 ? heroes : targets)].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
     if (least) return { type: "Undefended", heroId: least };
   }
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    if (enemy && seat && seat.engaged.length < seat.heroes.length) return { type: "Engage", enemyId: enemy };
-  }
+  const engaging = engageOneEach(state, ctx);
+  if (engaging) return engaging;
   // Dungeon Torch raises its hero's controller's threat by 2 every round: the players claim it last, once the prisoner is rescued.
   const stage = state.cards[state.questStage ?? ""]?.code;
   const wait = stage === "01123" || Object.values(state.cards).some((card) => card.zone === "captive" && card.prisoner === true && card.host == null);
@@ -120,25 +105,12 @@ export function dolGuldurIntent(state: ScenarioState, ctx: ReduceContext, memory
   return nextIntent(state, ctx, DOL_GULDUR_POLICY, memory, intents);
 }
 
-export type DolGuldurGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+export type DolGuldurGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playDolGuldur(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: CampaignFacts, limit = 8000): DolGuldurGame {
   const start = dolGuldurStart(seatCount, seed, difficulty, facts);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = dolGuldurIntent(state, ctx, memory);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, kept, state, intents, steps };
+  return playToEnd(start, ctx, (state, memory) => dolGuldurIntent(state, ctx, memory), limit);
 }
 
 // The goldens (src/campaign/scenarios/escape-from-dol-guldur/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution;

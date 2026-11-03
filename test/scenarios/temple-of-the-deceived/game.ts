@@ -1,22 +1,20 @@
 import { checklist } from "../../../src/campaign/checklist.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../../src/campaign/log.ts";
 import { buildStart } from "../../../src/campaign/start.ts";
-import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import { cellOf } from "../../../src/rules/families/island/map.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { campaign, CODES, temple } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
 import { gameCodes } from "../../../scripts/data/load-scenarios.ts";
+import { engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Temple of the Deceived in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an
 // attack) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to the nearest Cursed Temple, where Temple Guardian
@@ -27,11 +25,7 @@ export const TEMPLE_POLICY: PolicyOptions = { scout: "", prefer: "", protect: ""
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type TempleDecks = "strong" | "weak" | "brittle";
 
-export function templeLoadout(seatCount: 1 | 2): LoadoutSeat[] {
-  const filler = Array.from({ length: 30 }, () => "filler");
-  const first = { heroes: ["q1", "q2", "q3"], deck: filler };
-  return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-}
+export const templeLoadout = fillerLoadout;
 
 const STATS = {
   strong: { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 },
@@ -46,7 +40,7 @@ export async function templeWorld(decks: TempleDecks = "strong"): Promise<{ card
   const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, temple), ...temple.cards.map((card) => card.code), CODES.ominousFate, CODES.sahirAlly, CODES.naasiyahAlly, CODES.guardianOriginal, CODES.gateKeyOriginal];
   const cards = new Map(await loadPrinted([...new Set(codes)]));
   for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   LOADED = cards;
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
@@ -196,34 +190,18 @@ export function templeIntent(state: ScenarioState, ctx: ReduceContext, memory: S
     const target = legalTargets(state, { type: "Undefended" }, ctx)[0];
     if (target) return { type: "Undefended", heroId: target };
   }
-  if (state.window?.kind === "optionalEngage") {
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    const seat = state.seats[state.activeSeat];
-    if (enemy && seat && seat.engaged.length < 2) return { type: "Engage", enemyId: enemy };
-  }
+  const engaging = engageOneEach(state, ctx, 2);
+  if (engaging) return engaging;
   void nameOf;
   return nextIntent(state, ctx, TEMPLE_POLICY, memory, intents);
 }
 
-export type TempleGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+export type TempleGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playTemple(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), policy: TemplePolicy = DEFAULT_POLICY, modeCard?: ModeCard, limit = 6000): TempleGame {
   const start = templeStart(seatCount, seed, difficulty, facts, log, modeCard);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = templeIntent(state, ctx, memory, policy);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, kept, state, intents, steps };
+  return playToEnd(start, ctx, (state, memory) => templeIntent(state, ctx, memory, policy), limit);
 }
 
 // The goldens (src/campaign/scenarios/temple-of-the-deceived/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.

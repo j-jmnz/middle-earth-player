@@ -4,16 +4,15 @@ import { buildStart } from "../../../src/campaign/start.ts";
 import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { ARGONATH, breaking, campaign, PARTH_GALEN, SARN_GEBIR, STAGES_3A } from "./scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { attackTogether, engageOneEach, FILLER, fillerCard, playToEnd } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Breaking of the Fellowship played by the auto-player, true solo or two-handed. The loadouts are the ones the Journey in the Dark goldens use
 // (test/scenarios/journey-in-the-dark/game.ts): the saga Frodo beside big-number heroes and a deck of free events, so the outcome depends on the engine and the seed, not on card play. The
@@ -44,7 +43,7 @@ export async function breakingGameWorld(decks: BreakingDecks = "strong"): Promis
   const codes = [...scenarioCards(breaking).map((card) => card.code), ...breaking.campaignPlaced, "142015", "142016", "142017", "142018", "142083", breaking.campaignCard, ...campaign.prelude.map((card) => card.code), RING_BEARER];
   const cards = new Map(await loadPrinted([...new Set(codes)]));
   for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
 
@@ -86,13 +85,8 @@ export function breakingIntent(state: ScenarioState, ctx: ReduceContext, memory:
       if (questers.length > 0) return { type: "Commit", cardIds: questers };
     }
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => state.cards[id]?.code !== RING_BEARER && legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
-    const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
+  const together = attackTogether(state, ctx, (id) => state.cards[id]?.code !== RING_BEARER);
+  if (together) return together;
   // Undefended damage goes on the least wounded strong hero.
   if (state.window?.kind === "defense") {
     const targets = legalTargets(state, { type: "Undefended" }, ctx);
@@ -113,11 +107,8 @@ export function breakingIntent(state: ScenarioState, ctx: ReduceContext, memory:
     const other = state.window.options.find((id) => state.cards[id] != null && state.cards[id]?.code !== RING_BEARER);
     if (other) return { type: "Choose", optionId: other };
   }
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
-    if (enemy && seat && seat.engaged.length < seat.heroes.length) return { type: "Engage", enemyId: enemy };
-  }
+  const engaging = engageOneEach(state, ctx);
+  if (engaging) return engaging;
   if (state.window?.kind === "travel") {
     const targets = legalTargets(state, { type: "Travel" }, ctx);
     const wanted = TRAVEL_TO.map((code) => targets.find((id) => state.cards[id]?.code === code)).find((id) => id != null);
@@ -131,20 +122,7 @@ export type BreakingGame = { start: StartScenario; log: CampaignLog; kept: Scena
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playBreaking(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, stages: readonly (readonly string[])[] = [], limit = 8000): BreakingGame {
   const { start, log } = breakingCampaignStart(seatCount, seed, difficulty, ctx.cards);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = breakingIntent(state, ctx, memory, stages);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, log, kept, state, intents, steps };
+  return { ...playToEnd(start, ctx, (state, memory) => breakingIntent(state, ctx, memory, stages), limit), log };
 }
 
 export { STAGES_3A };

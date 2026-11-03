@@ -1,22 +1,19 @@
 import { checklist } from "../../../src/campaign/checklist.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../../src/campaign/log.ts";
 import { buildStart } from "../../../src/campaign/start.ts";
-import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
-import type { CampaignFacts , ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
+import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { askingToCommit } from "../../../src/rules/families/sea/sailing-legal.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { campaign, CODES, flight, MODIFICATIONS, ORIGINAL_SHIPS, SHIP_CODES } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
 import { gameCodes } from "../../../scripts/data/load-scenarios.ts";
+import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Flight of the Stormcaller in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small
 // to quest, or too brittle to survive an attack) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play.
@@ -27,11 +24,7 @@ export const FLIGHT_POLICY: PolicyOptions = { scout: "", prefer: "", protect: ""
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type FlightDecks = "strong" | "weak" | "brittle" | "tense";
 
-export function flightLoadout(seatCount: 1 | 2): LoadoutSeat[] {
-  const filler = Array.from({ length: 30 }, () => "filler");
-  const first = { heroes: ["q1", "q2", "q3"], deck: filler };
-  return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-}
+export const flightLoadout = fillerLoadout;
 
 const STATS = {
   strong: { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 },
@@ -47,7 +40,7 @@ export async function flightWorld(decks: FlightDecks = "strong"): Promise<{ card
   const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, flight), ...SHIP_CODES, ...ORIGINAL_SHIPS, ...flight.cards.map((card) => card.code), CODES.ominousFate, COUNSEL];
   const cards = new Map(await loadPrinted([...new Set(codes)]));
   for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
+  cards.set(FILLER, fillerCard());
   LOADED = cards;
   return { cards, ctx: { effects: EFFECTS, cards } };
 }
@@ -122,14 +115,8 @@ export function flightIntent(state: ScenarioState, ctx: ReduceContext, memory: S
       if (questers.length > 0) return { type: "Commit", cardIds: questers };
     }
   }
-  if (state.window?.kind === "playerAttack" && legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) {
-    const seat = state.activeSeat;
-    const ready = characters(state, seat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-    const reachable = (id: string) => legalAttackEnemies(state, seat, id, ctx.cards);
-    const enemy = ready.flatMap(reachable)[0];
-    const attackers = ready.filter((id) => enemy != null && reachable(id).includes(enemy));
-    if (enemy && attackers.length > 0) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers };
-  }
+  const together = attackTogether(state, ctx);
+  if (together) return together;
   // Damage the players assign among their characters falls on the least wounded hero (the heroes are big numbers), never on a ship.
   if (state.window?.kind === "choose") {
     const heroes = state.window.options.filter((option) => HEROES.includes(state.cards[option]?.code ?? ""));
@@ -145,36 +132,18 @@ export function flightIntent(state: ScenarioState, ctx: ReduceContext, memory: S
     if (least) return { type: "Undefended", heroId: least };
   }
   if (state.window?.kind === "optionalEngage" && policy.engage === "none") return { type: "DeclineEngage" };
-  if (state.window?.kind === "optionalEngage") {
-    const targets = legalTargets(state, { type: "Engage" }, ctx);
-    const enemy = targets[0];
-    const seat = state.seats[state.activeSeat];
-    if (enemy && seat && seat.engaged.length < 2) return { type: "Engage", enemyId: enemy };
-  }
+  const engaging = engageOneEach(state, ctx, 2);
+  if (engaging) return engaging;
   return nextIntent(state, ctx, FLIGHT_POLICY, memory, legalIntents(state, ctx));
 }
 
-export type FlightGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+export type FlightGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playFlight(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), policy: FlightPolicy = DEFAULT_POLICY, modeCard?: ModeCard, limit = 8000): FlightGame {
   const start = flightStart(seatCount, seed, difficulty, facts, log, modeCard);
-  const opened = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx));
-  const kept = opened.state;
-  const steps: EngineStep[] = [...opened.steps];
-  let state = kept;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
-    const intent = flightIntent(state, ctx, memory, policy);
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    steps.push(...result.steps);
-    intents.push(intent);
-  }
-  return { start, kept, state, intents, steps };
+  return playToEnd(start, ctx, (state, memory) => flightIntent(state, ctx, memory, policy), limit);
 }
-
 
 // The goldens (src/campaign/scenarios/flight-of-the-stormcaller/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `upgraded`: the cards the log marks as upgraded (the ships, the Modification boons, Black Key and Calaerion), dealt on their Upgraded side. `mode`: the Hard or Expert Mode card.
