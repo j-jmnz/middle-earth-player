@@ -19,13 +19,13 @@ export default function TableScreen() {
   // Opened once per save, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
   // written to user.db.
   const session = useTableSessionAfterPaint(saveId);
-  const store = useMemo(() => (session?.ok ? sessionStore(session, user).store : null), [session, user]);
+  const table = useMemo(() => (session?.ok ? sessionStore(session, user) : null), [session, user]);
 
   if (saveId && !session) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.
     return <TableLoading onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backLabel="Path" />;
   }
-  if (!saveId || !session || !session.ok || !store) {
+  if (!saveId || !session || !session.ok || !table) {
     const sentence =
       session?.ok === false && session.reason === "dropped"
         ? "The scenario in progress was dropped because the rules or the card data changed. Your log and decks are kept."
@@ -46,5 +46,5 @@ export default function TableScreen() {
     outcome: { pathname: "/resolution/[saveId]", params: { saveId } },
     booklet: bookletParams(session.save.campaignId, session.save.loadout?.scenarioId),
   };
-  return <TableView session={session} store={store} nav={nav} />;
+  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} />;
 }

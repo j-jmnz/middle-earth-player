@@ -16,6 +16,8 @@ export type ActiveScenario = {
   intents: PlayerIntent[];
   // When it was dealt (ms since the epoch), for the run history. A scenario dealt before phase 28b has none.
   startedAt?: number;
+  // The ms the table was on screen with the app in the foreground (the run's playtime). A scenario played before it has none.
+  activeMs?: number;
 };
 
 export function beginActive(start: StartScenario, dataHash: number, startedAt?: number): ActiveScenario {
@@ -24,6 +26,11 @@ export function beginActive(start: StartScenario, dataHash: number, startedAt?: 
 
 export function recordIntent(active: ActiveScenario, intent: PlayerIntent): ActiveScenario {
   return { ...active, intents: [...active.intents, intent] };
+}
+
+// Adds the foreground ms the table counted since the last write; nothing to add leaves the scenario as it is.
+export function addActive(active: ActiveScenario, ms: number): ActiveScenario {
+  return ms > 0 ? { ...active, activeMs: (active.activeMs ?? 0) + ms } : active;
 }
 
 // Takes the last intent back (the table's Undo): replaying the rest gives the state before it.

@@ -4,6 +4,7 @@
 // not replayed again (session-cache.ts). Pure of React: the hooks that open it for a screen are in standalone-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { addActive } from "../campaign/replay";
 import { record, unrecord } from "../campaign/session";
 import { droppedIfStale, dropStandalone, resumeStandalone, type StandaloneGame } from "../campaign/standalone";
 import { loadWorld } from "../campaign/world";
@@ -13,6 +14,7 @@ import type { TableStore } from "../play/store";
 
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
+import { createPlayClock, type PlayClock } from "./play-clock";
 import { fingerprintOf, sessionCacheOf } from "./session-cache";
 import { readStandalone, writeStandaloneActive } from "./standalone-store";
 
@@ -66,10 +68,17 @@ export function openStandalone<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<
   return opened;
 }
 
-/** The table store for an opened game. Each intent the reducer accepts is appended and written at once; Undo takes it off. */
-export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): TableStore {
+export type StandaloneTable = { store: TableStore; clock: PlayClock };
+
+/**
+ * The table store for an opened game. Each intent the reducer accepts is appended and written at once; Undo takes it off. `clock`
+ * counts the foreground time as the session store's does (table-open.ts): folded into each write, and written once on a pause.
+ */
+export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): StandaloneTable {
   let saved: StandaloneGame = session.stored;
   const cache = sessionCacheOf<Opened>(user, "standalone");
+  const base = createPlayClock();
+  const fold = (game: StandaloneGame): StandaloneGame => (game.active ? { ...game, active: addActive(game.active, base.take()) } : game);
   // Asked for the game later (the outcome screen), the cache reads this table's game as it stands now; the row it must match is `saved`.
   const follow = () => {
     const { game, roundSteps, history } = store.getState();
@@ -78,16 +87,29 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): TableSto
   const store = committingStore(
     session,
     (intent) => {
-      saved = record(saved, intent);
+      saved = fold(record(saved, intent));
       writeStandaloneActive(user, saved);
       follow();
     },
     () => {
-      saved = unrecord(saved);
+      saved = fold(unrecord(saved));
       writeStandaloneActive(user, saved);
       follow();
     },
   );
+  const clock: PlayClock = {
+    resume: base.resume,
+    take: base.take,
+    pause: () => {
+      base.pause();
+      if (store.getState().game.lost) return;
+      const folded = fold(saved);
+      if (folded === saved) return;
+      saved = folded;
+      writeStandaloneActive(user, saved);
+      follow();
+    },
+  };
   follow();
-  return store;
+  return { store, clock };
 }

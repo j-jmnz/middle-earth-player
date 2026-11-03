@@ -68,6 +68,8 @@ import { cachedImage, useImageRevision, useImageSnapshot } from "./images/store"
 import type { World } from "../campaign/world";
 import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
+import type { PlayClock } from "./play-clock";
+import { usePlayClock } from "./use-play-clock";
 import { useUiScale } from "../play/ui-scale";
 
 // By picture key (src/play/picture-key.ts): the bundled picture of the key, else its downloaded file. `exact`: that picture only, never the other side's: a
@@ -126,7 +128,8 @@ function setupCodes(game: { cards: Readonly<Record<string, { zone: string; code:
   return Object.values(game.cards).filter((card) => card.zone === "nightmare").map((card) => card.code);
 }
 
-export function TableView({ session, store, nav }: { session: OpenedTable; store: TableStore; nav: TableNav }) {
+export function TableView({ session, store, clock, nav }: { session: OpenedTable; store: TableStore; clock: PlayClock; nav: TableNav }) {
+  usePlayClock(clock);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screen = useWindowDimensions();

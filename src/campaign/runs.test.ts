@@ -41,7 +41,7 @@ beforeAll(async () => {
 const play = (seed: number): ScenarioState => playOut(kept(seed), ctx, POLICY).state;
 
 function input(state: ScenarioState, overrides: Partial<RunInput> = {}): RunInput {
-  return { id: "run-1", kind: "standalone", refId: "game-1", campaignId: null, box: "fellowship-of-the-ring", state, cards: ctx.cards, heroes: [[RING_BEARER, "scout"]], reward: null, startedAt: 100, endedAt: 200, engineVersion: ENGINE_VERSION, ...overrides };
+  return { id: "run-1", kind: "standalone", refId: "game-1", campaignId: null, box: "fellowship-of-the-ring", state, cards: ctx.cards, heroes: [[RING_BEARER, "scout"]], reward: null, startedAt: 100, endedAt: 200, activeMs: null, engineVersion: ENGINE_VERSION, ...overrides };
 }
 
 describe("a run", () => {
@@ -49,7 +49,7 @@ describe("a run", () => {
     const state = play(2);
     const run = runOf(input(state));
     const score = scoreOf(state, ctx.cards);
-    expect(run).toMatchObject({ result: "won", lossCause: null, rounds: score.rounds, victoryPoints: score.victoryPoints, score: score.score, threats: [state.seats[0].threat], seatCount: 1, scenarioId: state.scenarioId, startedAt: 100, endedAt: 200, engineVersion: ENGINE_VERSION, backfilled: false });
+    expect(run).toMatchObject({ result: "won", lossCause: null, rounds: score.rounds, victoryPoints: score.victoryPoints, score: score.score, threats: [state.seats[0].threat], seatCount: 1, scenarioId: state.scenarioId, startedAt: 100, endedAt: 200, activeMs: null, engineVersion: ENGINE_VERSION, backfilled: false });
   });
 
   it("on a campaign win carries the reward the Resolution chose; on a standalone win none", () => {

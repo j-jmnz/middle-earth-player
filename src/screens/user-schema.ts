@@ -110,6 +110,7 @@ export const runs = sqliteTable("runs", {
   reward: text("reward", { mode: "json" }).$type<string[] | null>(),
   startedAt: integer("started_at"),
   endedAt: integer("ended_at"),
+  activeMs: integer("active_ms"),
   engineVersion: integer("engine_version"),
   backfilled: integer("backfilled", { mode: "boolean" }).notNull().default(false),
 });

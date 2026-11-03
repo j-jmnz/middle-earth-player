@@ -47,15 +47,40 @@ export function scoreWords(run: RunRecord, nameOf: (code: string) => string): st
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 
-/** "4 rounds · threat 28 / 33 · Score 41 · Reward: Mendor": how a run went, or null when the store knew none of it. */
+/** "<1 min", "42 min", "1 h 05 min", and past 24 hours "3 d 2 h". */
+export function durationWords(ms: number): string {
+  const minutes = Math.floor(Math.max(0, ms) / 60000);
+  if (minutes < 1) return "<1 min";
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} h ${String(minutes % 60).padStart(2, "0")} min`;
+  return `${Math.floor(hours / 24)} d ${hours % 24} h`;
+}
+
+/**
+ * "played 42 min · away 1 h 05 min" when the table counted its foreground time (away is the rest of the wall time, left out under a
+ * minute); "1 h 47 min start to end" when only the two times are known; null otherwise.
+ */
+export function playtimeWords(run: RunRecord): string | null {
+  const wall = run.startedAt != null && run.endedAt != null ? Math.max(0, run.endedAt - run.startedAt) : null;
+  if (run.activeMs != null) {
+    const played = `played ${durationWords(run.activeMs)}`;
+    if (wall == null) return played;
+    const away = Math.max(0, wall - run.activeMs);
+    return away >= 60000 ? `${played} · away ${durationWords(away)}` : played;
+  }
+  return wall == null ? null : `${durationWords(wall)} start to end`;
+}
+
+/** "4 rounds · threat 28 / 33 · Score 41 · Reward: Mendor · played 42 min": how a run went, or null when the store knew none of it. */
 export function runDetail(run: RunRecord, nameOf: (code: string) => string): string | null {
-  const parts = [courseWords(run), scoreWords(run, nameOf)].filter((part) => part != null);
+  const parts = [courseWords(run), scoreWords(run, nameOf), playtimeWords(run)].filter((part) => part != null);
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 /** The one line the screen reader gets for a run. */
 export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string, deleted: boolean): string {
-  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), deleted ? deletedWords(run.kind) : null].filter((part) => part != null).join(", ");
+  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeWords(run), deleted ? deletedWords(run.kind) : null].filter((part) => part != null).join(", ");
 }
 
 export function deletedWords(kind: RunRecord["kind"]): string {

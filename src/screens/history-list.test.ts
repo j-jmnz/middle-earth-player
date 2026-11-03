@@ -6,7 +6,7 @@ import { groupRuns, libraryItems, newestFirst, startedOf, type LibraryInput, typ
 import { courseWords, emptyWords, heroesWords, playthroughWords, resultWords, runDate, runDetail, scoreWords, seatsWords } from "./history-words";
 
 function run(id: string, overrides: Partial<RunRecord> = {}): RunRecord {
-  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["141002"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: 100, engineVersion: 6, backfilled: false, ...overrides };
+  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["141002"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: 100, activeMs: null, engineVersion: 6, backfilled: false, ...overrides };
 }
 
 describe("history list", () => {

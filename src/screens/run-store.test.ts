@@ -41,6 +41,7 @@ function run(overrides: Partial<RunRecord> = {}): RunRecord {
     reward: null,
     startedAt: 10,
     endedAt: 20,
+    activeMs: 7,
     engineVersion: 6,
     backfilled: false,
     ...overrides,

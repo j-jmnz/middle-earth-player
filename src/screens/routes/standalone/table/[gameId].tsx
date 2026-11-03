@@ -20,13 +20,13 @@ export default function StandaloneTableScreen() {
   // Opened once per game, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
   // written to user.db.
   const session = useStandaloneSessionAfterPaint(gameId);
-  const store = useMemo(() => (session?.ok ? standaloneStore(session, user) : null), [session, user]);
+  const table = useMemo(() => (session?.ok ? standaloneStore(session, user) : null), [session, user]);
 
   if (gameId && !session) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.
     return <TableLoading onBack={() => goBack(router, "/scenarios")} backLabel="Scenarios" />;
   }
-  if (!gameId || !session || !session.ok || !store) {
+  if (!gameId || !session || !session.ok || !table) {
     const sentence = session?.ok === false && session.reason === "dropped" ? STANDALONE_DROPPED : "This game is not open.";
     return (
       <Screen testID="table" scene="calm">
@@ -44,5 +44,5 @@ export default function StandaloneTableScreen() {
     outcome: { pathname: "/standalone/outcome/[gameId]", params: { gameId } },
     booklet: bookletParams(session.stored.campaignId, session.stored.scenarioId),
   };
-  return <TableView session={session} store={store} nav={nav} />;
+  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} />;
 }
