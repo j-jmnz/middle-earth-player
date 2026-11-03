@@ -106,6 +106,13 @@ describe("pnpm move", () => {
     expect(plan.writes.get("docs/phases/STATUS.md")).toBe("[one](done/phase-01.md)\n");
   });
 
+  it("re-aims a moved file's path to an untracked build output", () => {
+    const { tracked, read } = repo({ "src/screens/open-databases.ts": 'const db = require("../../assets/catalog.db");\n' });
+    const plan = planMove(tracked, { "src/screens/open-databases.ts": "src/screens/data/open-databases.ts" }, read, { exists: (file) => file === "assets/catalog.db" });
+    expect(plan.writes.get("src/screens/data/open-databases.ts")).toBe('const db = require("../../../assets/catalog.db");\n');
+    expect(plan.warnings).toEqual([]);
+  });
+
   it("warns about paths it cannot follow and refuses a collision", () => {
     const { tracked, read } = repo({
       "scripts/a.ts": 'const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");\nconst g = `./golden/${id}.json`;\n',

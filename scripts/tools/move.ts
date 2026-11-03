@@ -181,7 +181,7 @@ function escapeRegExp(text: string): string {
  * The whole move, computed without touching the disk: `read` gives a tracked file's text (null for a file it should not
  * read). Throws on a collision: two files to one path, or onto a tracked file that stays.
  */
-export function planMove(tracked: readonly string[], entries: Record<string, string>, read: (file: string) => string | null, options: { companions?: boolean } = {}): Plan {
+export function planMove(tracked: readonly string[], entries: Record<string, string>, read: (file: string) => string | null, options: { companions?: boolean; exists?: (file: string) => boolean } = {}): Plan {
   const moves = expandEntries(entries, tracked, options.companions ?? true);
   const files = new Set(tracked);
   const dirs = foldersOf(tracked);
@@ -276,7 +276,12 @@ export function planMove(tracked: readonly string[], entries: Record<string, str
       const hashAt = markdown ? spec.search(/[#?]/) : spec.search(/\?/);
       const bare = hashAt >= 0 ? spec.slice(0, hashAt) : spec;
       const tail = hashAt >= 0 ? spec.slice(hashAt) : "";
-      const resolved = resolveRelative(file, bare, files, dirs);
+      // An untracked file on disk (a build output: assets/catalog.db) never moves, but a moved file's path to it does.
+      const untracked = (): Resolved | null => {
+        const target = posix.normalize(posix.join(posix.dirname(file), bare)).replace(/\/+$/, "");
+        return moved && !target.startsWith("../") && options.exists?.(target) ? { kind: "file", file: target, added: "" } : null;
+      };
+      const resolved = resolveRelative(file, bare, files, dirs) ?? untracked();
       if (!resolved) {
         if (moved && !markdown) warnings.push(`${file}: "${spec}" resolves to no tracked file; check it by hand`);
         return spec;
@@ -387,7 +392,7 @@ function main(log: Log): void {
       return null;
     }
   };
-  const plan = planMove(tracked, entries, read, { companions: !flags.has("--no-companions") });
+  const plan = planMove(tracked, entries, read, { companions: !flags.has("--no-companions"), exists: (file) => existsSync(path.join(ROOT, file)) });
   const rewrites = [...plan.counts.values()].reduce((sum, count) => sum + count, 0);
   for (const [file, count] of plan.counts) log.debug(`${file}: ${count} path${count === 1 ? "" : "s"}`);
   for (const warning of plan.warnings) log.warn(warning);
