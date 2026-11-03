@@ -69,20 +69,26 @@ function zones(allowEffects) {
     {
       target: "./src/play",
       from: "./src",
-      except: ["./rules", "./catalog", "./play", ...app],
-      message: "src/play may import only src/rules, src/catalog and src/effects from src/.",
+      except: ["./rules", "./catalog", "./play", "./ui", ...app],
+      message: "src/play may import only src/rules, src/catalog, src/effects and src/ui from src/.",
     },
     {
       target: "./src/screens",
       from: "./src",
-      except: ["./play", "./campaign", "./catalog", "./screens", ...app],
-      message: "src/screens may import only src/play, src/campaign, src/catalog and src/effects.",
+      except: ["./play", "./campaign", "./catalog", "./screens", "./ui", ...app],
+      message: "src/screens may import only src/play, src/campaign, src/catalog, src/effects and src/ui.",
     },
     {
       target: "./src/effects",
       from: "./src",
       except: ["./catalog", "./effects"],
       message: "src/effects may import only src/catalog.",
+    },
+    {
+      target: "./src/ui",
+      from: "./src",
+      except: ["./ui"],
+      message: "src/ui (the design system) may not import other modules under src/.",
     },
     {
       target: "./src/catalog",

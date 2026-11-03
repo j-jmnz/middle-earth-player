@@ -3,9 +3,9 @@
 import { useRouter } from "expo-router";
 import { View } from "react-native";
 
-import { CardTextView } from "../play/card-text-view";
-import { Text } from "../play/text";
-import { useUiScale } from "../play/ui-scale";
+import { CardTextView } from "../play/cards/card-text-view";
+import { Text } from "../ui/text";
+import { useUiScale } from "../ui/ui-scale";
 import { Eyebrow, Label, ScreenTitle, SecondaryButton, ToggleChip } from "./chrome";
 import { bookPage, glossary, paragraphs, seeAlso, type GlossaryEntry } from "./rules-glossary";
 

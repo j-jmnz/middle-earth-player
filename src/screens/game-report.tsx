@@ -4,7 +4,7 @@ import { View } from "react-native";
 
 import type { GameReport } from "../campaign/report";
 import { BodyText, Label, Section } from "./chrome";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 function Row({ label, value, tone = "bone", testID }: { label: string; value: string; tone?: "bone" | "muted" | "danger"; testID?: string }) {
   return (

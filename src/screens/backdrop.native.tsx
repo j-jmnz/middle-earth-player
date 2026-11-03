@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { PixelRatio, StyleSheet, useWindowDimensions, View } from "react-native";
 import { useDerivedValue, useFrameCallback, useSharedValue, type SharedValue } from "react-native-reanimated";
 
-import { useTheme } from "../play/theme";
+import { useTheme } from "../ui/theme";
 import { useDriftRunning } from "./backdrop-drift";
 import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
 

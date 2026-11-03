@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 // A Pressable with a `className` and a `style` function loses the function's result on the phone (NativeWind merges the class into
 // the style, and the function never runs): the size, the radius and the pressed fill vanish (user report, 2026-10-25; the header of
-// src/play/buttons.tsx). Every Pressable puts its look on a view inside its children function instead.
+// src/ui/buttons.tsx). Every Pressable puts its look on a view inside its children function instead.
 function sources(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
@@ -41,7 +41,7 @@ describe("Pressable styling", () => {
   });
 
   it("holds in no screen or table component", () => {
-    const found = [...sources("src/play"), ...sources("src/screens")].flatMap((file) => classNameWithStyleFunction(readFileSync(file, "utf8"), file).map((line) => `${file}:${line}`));
+    const found = [...sources("src/ui"), ...sources("src/play"), ...sources("src/screens")].flatMap((file) => classNameWithStyleFunction(readFileSync(file, "utf8"), file).map((line) => `${file}:${line}`));
     expect(found).toEqual([]);
   });
 });

@@ -4,16 +4,16 @@ import type { ReactNode } from "react";
 import { View } from "react-native";
 
 import { usePalette } from "./palette-hook";
-import { useTheme } from "../play/theme";
-import { GameIcon } from "../play/game-icon";
-import { SPHERE_TINT } from "../play/icon-map";
-import { accentSurface } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import { useUiScale } from "../play/ui-scale";
-import { withAlphaHex } from "../play/tokens";
+import { useTheme } from "../ui/theme";
+import { GameIcon } from "../ui/game-icon";
+import { SPHERE_TINT } from "../ui/icon-map";
+import { accentSurface } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { useUiScale } from "../ui/ui-scale";
+import { withAlphaHex } from "../ui/tokens";
 import { palettes, type Palette } from "./palette.js";
 import type { MarkedSphere } from "./sphere-mark";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 /** A chevron drawn as views (no printed icon fits), pointing left for Back, right for a row that opens, down for a fold that is open. */
 export function Chevron({ direction = "left", color, size = 10 }: { direction?: "left" | "right" | "down"; color?: string; size?: number }) {

@@ -6,7 +6,7 @@ const rem = (px) => `${px / 14}rem`;
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/screens/**/*.{js,jsx,ts,tsx}", "./src/play/**/*.{js,jsx,ts,tsx}"],
+  content: ["./src/screens/**/*.{js,jsx,ts,tsx}", "./src/play/**/*.{js,jsx,ts,tsx}", "./src/ui/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   // NativeWind's web runtime throws if a scheme is set while this stays "media".
   darkMode: "class",
@@ -17,7 +17,7 @@ module.exports = {
       fontFamily: {
         // Embedded at build time by the expo-font config plugin (app.json). No runtime load. Carved Stone (docs/design-system.md, Type):
         // Marcellus SC for names, titles, buttons and the numbers the player watches; Barlow Semi Condensed for everything read in a
-        // sentence. `Text` (src/play/text.tsx) gives every text the body face unless it asks for the display one. Marcellus SC has one
+        // sentence. `Text` (src/ui/text.tsx) gives every text the body face unless it asks for the display one. Marcellus SC has one
         // weight, so it is named by its file; Barlow is one family with 400, 600, 700 and italic, so a weight class picks its file.
         display: ["MarcellusSC-Regular", "Marcellus SC", "serif"],
         body: ["Barlow Semi Condensed", "sans-serif"],
@@ -31,7 +31,7 @@ module.exports = {
         eyebrow: [rem(11), { lineHeight: rem(16), letterSpacing: rem(2.6) }],
         micro: [rem(11), { lineHeight: rem(14), letterSpacing: rem(0.4) }],
       },
-      // Four radii (docs/design-system.md, Spacing, radius, border; src/play/radius.ts holds the same numbers for a style written by hand): a
+      // Four radii (docs/design-system.md, Spacing, radius, border; src/ui/radius.ts holds the same numbers for a style written by hand): a
       // control is a capsule, an item inside a container 12, a floating container 20, the top of a parchment sheet 24.
       borderRadius: {
         control: "999px",

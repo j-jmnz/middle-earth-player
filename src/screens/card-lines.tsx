@@ -2,7 +2,7 @@
 // pool. Each line is segments (log-facts.ts); a segment with a code is drawn with a dotted underline and is a link to a screen reader.
 import { Fragment } from "react";
 
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 import type { Line } from "./log-facts";
 
 export function CardLines({ lines, empty, onCard, testID, className, speech }: { lines: readonly Line[]; empty: string; onCard: (code: string) => void; testID: string; className: string; speech?: string }) {

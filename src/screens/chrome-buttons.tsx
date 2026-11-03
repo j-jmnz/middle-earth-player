@@ -1,25 +1,25 @@
 // The chrome's controls (docs/design-system.md, Components): the round glass button and its capsule, the primary, secondary and text
-// buttons (src/play/buttons.tsx), filter chips, the segmented switch and the search field. Every control is a capsule. Re-exported by
+// buttons (src/ui/buttons.tsx), filter chips, the segmented switch and the search field. Every control is a capsule. Re-exported by
 // chrome.tsx.
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 import { useMemo, type ReactNode } from "react";
 
 import { Chevron, Magnifier } from "./chrome-marks";
 import { usePalette } from "./palette-hook";
-import { GameIcon } from "../play/game-icon";
-import type { IconName } from "../play/icon-map";
-import { CONTROL_RADIUS } from "../play/radius";
-import { chipSurface, glassSurface, sunkSurface } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import { touch, useUiScale } from "../play/ui-scale";
-import { Text, TextInput } from "../play/text";
-import { GlassIconButton } from "../play/buttons";
+import { GameIcon } from "../ui/game-icon";
+import type { IconName } from "../ui/icon-map";
+import { CONTROL_RADIUS } from "../ui/radius";
+import { chipSurface, glassSurface, sunkSurface } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { touch, useUiScale } from "../ui/ui-scale";
+import { Text, TextInput } from "../ui/text";
+import { GlassIconButton } from "../ui/buttons";
 
 // The night switch row the phase carousel's Stops and the Settings screen share (src/play cannot import screens, so it lives there).
-export { SettingSwitch } from "../play/setting-switch";
-// The segmented switch and the word buttons are shared the same way (src/play/segmented.tsx, src/play/buttons.tsx).
-export { Segmented } from "../play/segmented";
-export { PrimaryButton, PrimaryFace, SecondaryButton, TextButton } from "../play/buttons";
+export { SettingSwitch } from "../ui/setting-switch";
+// The segmented switch and the word buttons are shared the same way (src/ui/segmented.tsx, src/ui/buttons.tsx).
+export { Segmented } from "../ui/segmented";
+export { PrimaryButton, PrimaryFace, SecondaryButton, TextButton } from "../ui/buttons";
 
 /** The fill of a pressed button on night, and on paper, in the theme in force. */
 export function usePressedNight() {
@@ -30,7 +30,7 @@ export function usePressedNight() {
 /**
  * The round glass button (Back, the gear, the book): 44 pt, a dark disc (a pale one on Light) and one mark in the
  * accent: a chevron, a printed game icon or a glyph. It always carries a label, which a screen reader says. It is the table's
- * `GlassIconButton` (src/play/buttons.tsx) with a mark built from its icon, glyph or chevron.
+ * `GlassIconButton` (src/ui/buttons.tsx) with a mark built from its icon, glyph or chevron.
  */
 export function IconButton({
   label,

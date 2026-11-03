@@ -41,7 +41,7 @@ The next campaign is out of scope. It will be more `data:sync` output, its ledge
 
 Phase 26 is merged. In two-handed play the table can show a seat that is not acting:
 
-- `viewedSeat` (UI-only, `src/play/store.ts`) is the seat being peeked at; it is null after every new state, when the table opens and on Back. `shownSeat(game, viewed)` (`src/play/selectors.ts`) is the seat the canvas, the web list and the pile list draw; `actingSeat(game)` is the seat that picks, pays and sends (`use-table-choice.ts` must never read the shown seat; a test guards it).
-- The peek swaps only the seat zones (`zoneIds`, `pileIds`); staging and the quest stay shared. When 2B creates a staging area and a quest stage per seat, draw them from `shownSeat`, so a peek shows that seat's staging and stage, and keep every pick, engagement and reveal on `actingSeat`. A peek has no motion (`kindMoves` in `motion-kind.ts`), so nothing else changes for it.
+- `viewedSeat` (UI-only, `src/play/store/store.ts`) is the seat being peeked at; it is null after every new state, when the table opens and on Back. `shownSeat(game, viewed)` (`src/play/store/selectors.ts`) is the seat the canvas, the web list and the pile list draw; `actingSeat(game)` is the seat that picks, pays and sends (`use-table-choice.ts` must never read the shown seat; a test guards it).
+- The peek swaps only the seat zones (`zoneIds`, `pileIds`); staging and the quest stay shared. When 2B creates a staging area and a quest stage per seat, draw them from `shownSeat`, so a peek shows that seat's staging and stage, and keep every pick, engagement and reveal on `actingSeat`. A peek has no motion (`kindMoves` in `motion/kind.ts`), so nothing else changes for it.
 - `peek-banner` is a 36 pt night pill 2 pt under the top bar, across the top of the canvas, over the staging row's name strips. A second staging row must leave it room, or move it.
-- Android Back is `skipSpotlight`, `cancelScrub`, `endPeek`, then the rest (`src/play/back.ts`).
+- Android Back is `skipSpotlight`, `cancelScrub`, `endPeek`, then the rest (`src/play/chrome/back.ts`).

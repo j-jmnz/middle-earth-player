@@ -7,9 +7,9 @@ import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 
 import { cards } from "../catalog/schema";
-import { CardPreview, type PreviewCard } from "../play/card-preview";
-import { sideText } from "../play/ledger";
-import type { PictureSource } from "../play/table-canvas-types";
+import { CardPreview, type PreviewCard } from "../play/cards/card-preview";
+import { sideText } from "../play/cards/ledger";
+import type { PictureSource } from "../play/canvas/table-canvas-types";
 import { useDatabases } from "./databases";
 
 import { cardImageUrl, shownCardImage } from "./images/policy";

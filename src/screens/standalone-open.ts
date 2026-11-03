@@ -10,7 +10,7 @@ import { droppedIfStale, dropStandalone, resumeStandalone, type StandaloneGame }
 import { loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
-import type { TableStore } from "../play/store";
+import type { TableStore } from "../play/store/store";
 
 import { campaignOf, scenarioOf } from "./campaign-data";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";

@@ -2,10 +2,10 @@ import { Pressable, View } from "react-native";
 
 import { copyCapRule } from "../catalog/deck-save";
 import { usePalette } from "./palette-hook";
-import { dropShadowOf } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTableTokens } from "../play/use-table-tokens";
-import { Text } from "../play/text";
+import { dropShadowOf } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { Text } from "../ui/text";
 
 /** Whether one more copy would break the copy limit (rr.deckbuilding). */
 export function stepperFull(count: number, deckLimit: number | null): boolean {

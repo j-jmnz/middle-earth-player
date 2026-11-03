@@ -12,7 +12,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 
 ## Now
 
-- `SidePanel` (`src/play/table-panel.tsx:42-142`) sits on `SheetFrame edge="right"` (`src/play/sheet-paper.tsx`):
+- `SidePanel` (`src/play/table-panel.tsx:42-142`) sits on `SheetFrame edge="right"` (`src/play/choice/sheet-paper.tsx`):
   - paper;
   - 46% of the width, 320 to 480 pt;
   - anchored to the right and the bottom (`table-view.tsx:168-171`).
@@ -29,7 +29,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 
 ## Build
 
-**Tray (`src/play/choice-tray.tsx`)**
+**Tray (`src/play/choice/tray.tsx`)**
 - It is anchored to the top of the dock's button block and rises over the command column's upper part, where the quest band is. It is the command column's width plus up to 40 pt into the canvas, at most 340 pt, and never covers the dock's armed line or buttons.
 - Night raised fill, hairline edge, `rounded-card` corners on the top and on the canvas side.
 - Its top shows only a muted count ("2 of 4 picked", or the pick's own words from the sheet). It does not repeat the step or the moment, which the dock already shows.
@@ -54,12 +54,12 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 - The tray is the default and does not fold on outside taps, so every choice stays a control a screen reader reaches.
 - The web build keeps listing every choice (it reports a screen reader).
 
-**Reading panels (`src/play/reading-panels.tsx`)**
+**Reading panels (`src/play/chrome/reading-panels.tsx`)**
 - `PileList`, `LogPanel` and `ThreatPanel` open in one place, the same tray frame, one at a time. A new one replaces the last.
 - Each has a labeled ✕ Close and closes on a tap outside.
 - The Log may stay on paper (design system: paper is what gets recorded).
 
-**Motion** (values to move to `motion-tokens.ts` in phase 23)
+**Motion** (values to move to `src/ui/motion-tokens.ts` in phase 23)
 - The tray enters in 260 ms decelerate (translateY 16 to 0, plus a fade).
 - It leaves in 180 ms accelerate. Today the panels have no exit.
 - Both snap under reduced motion.
@@ -77,12 +77,12 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 
 ## Tests
 
-- `src/play/table-choice.test.ts` or `use-table-choice` logic tests:
+- `src/play/choice/table-choice.test.ts` or `use-table-choice` logic tests:
   - an outside tap while the tray is open folds it and sends no intent;
   - with a screen reader on it does not fold;
   - `Choose` reopens the same sheet key;
   - a new moment opens its tray unfolded.
-- `src/play/back.test.ts`: Back closes a reading panel, then folds the tray, then (phase 19) the menu order holds.
+- `src/play/chrome/back.test.ts`: Back closes a reading panel, then folds the tray, then (phase 19) the menu order holds.
 
 ## E2E
 

@@ -14,15 +14,15 @@ import { deckRevision, subscribeDeckRevision } from "./deck-revision";
 import { deckReadiness } from "./deck-status";
 import { deckFaces, listDecks } from "./deck-store";
 import { usePalette } from "./palette-hook";
-import { GameIcon } from "../play/game-icon";
-import { iconAspect, type IconName } from "../play/icon-map";
-import { raisedEdgeOf } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTableTokens } from "../play/use-table-tokens";
-import { RAIL } from "../play/size-class";
-import { useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { GameIcon } from "../ui/game-icon";
+import { iconAspect, type IconName } from "../ui/icon-map";
+import { raisedEdgeOf } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { RAIL } from "../ui/size-class";
+import { useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 type TabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 

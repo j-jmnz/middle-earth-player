@@ -5,17 +5,17 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 
-import { sectionTitleStyle } from "../play/section-heading";
-import { textSurface } from "../play/surfaces";
-import { useUiScale } from "../play/ui-scale";
-import { useTableTokens } from "../play/use-table-tokens";
+import { sectionTitleStyle } from "../ui/section-heading";
+import { textSurface } from "../ui/surfaces";
+import { useUiScale } from "../ui/ui-scale";
+import { useTableTokens } from "../ui/use-table-tokens";
 import { Chevron } from "./chrome-marks";
 import { useDatabases } from "./databases";
 import { foldWords, isFolded, type Sections } from "./fold-state";
 import { plural } from "./history-words";
 import { usePalette } from "./palette-hook";
 import { readSections, writeSection } from "./section-store";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 /** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it. */
 export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => boolean; setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void } {

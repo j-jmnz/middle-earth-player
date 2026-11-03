@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import migrations from "../../drizzle/migrations";
 import { goingPast, pastContext, playPast, RING_BEARER } from "../../test/scenarios/a-shadow-of-the-past/play";
 import { scenario, loadWorld, type World } from "../../test/scenarios/a-shadow-of-the-past/scene";
-import type { ReduceContext, ScenarioState } from "../play/store";
+import type { ReduceContext, ScenarioState } from "../play/store/store";
 import { emptyLog } from "../campaign/log";
 import { ENGINE_VERSION } from "../campaign/replay";
 import { newSave, type Save } from "../campaign/save";

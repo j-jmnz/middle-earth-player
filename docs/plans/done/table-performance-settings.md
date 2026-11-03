@@ -4,7 +4,7 @@
 
 On a crowded table, a weaker phone struggles. Reading the code turned up three costs:
 
-1. **Picture memory.** The table keeps a decoded copy of each face-up card at its on-screen size × the phone's pixel ratio (`src/play/table-images.native.ts`, `coverPixels` in `src/play/table-pictures.ts`). A hand card is kept at the scrub's lifted size (`HAND_PICTURE_SCALE` ≈ 2.3), so the hand takes about half of this memory.
+1. **Picture memory.** The table keeps a decoded copy of each face-up card at its on-screen size × the phone's pixel ratio (`src/play/canvas/table-images.native.ts`, `coverPixels` in `src/play/canvas/table-pictures.ts`). A hand card is kept at the scrub's lifted size (`HAND_PICTURE_SCALE` ≈ 2.3), so the hand takes about half of this memory.
 2. **The drifting fog.** Behind the transparent table canvas, the `table` scene's backdrop (`src/screens/backdrop.native.tsx`) redraws the whole screen about 30 times a second in Dark theme for as long as the screen is open. Only Reduce motion stops it today.
 3. **Every card redrawn on every change.** Any canvas render (a game step, a card picked up, new targets, a banner beat) rebuilds the drawing of every card (`table-canvas.native.tsx`, `piece`). That covers each card's body, its marks and its overlay of badges, tokens and pills, about 45 cards on a crowded table, though usually only one or two changed.
 
@@ -21,14 +21,14 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
 
 ## A. Card pictures (High / Low)
 
-1. **Setting**, `src/play/table-settings.ts`:
+1. **Setting**, `src/ui/table-settings.ts`:
    - Add `CARD_QUALITY_OPTIONS = ["high", "low"] as const` and `CardQualityOption`.
    - Add `cardQuality` to `TableSettings`, defaulting to `"high"`.
    - Parse it in `parseSettings` the way `uiScale` and `theme` are parsed, so old saves load as High.
    - `restoreDefaults` and the JSON row in `settings-store.ts` cover it, so no migration is needed.
-2. **Ratio**, `src/play/table-pictures.ts`:
+2. **Ratio**, `src/play/canvas/table-pictures.ts`:
    - Add `pictureRatio(device, quality)`: the device ratio on High, `Math.max(1, device / 2)` on Low.
-3. **Decode**, `src/play/table-images.native.ts`:
+3. **Decode**, `src/play/canvas/table-images.native.ts`:
    - Add a last parameter: `useTableImages(boxes, picture, revision, ratio?)`. When it is absent, use `PixelRatio.get()` in the body; code-standards rule out a non-literal default.
    - Turn the boxes into pixel boxes (× ratio) before `Pictures.want`. `atSize` then calls `coverPixels(..., 1)`.
    - `Pictures` gets the ratio in `want()`:
@@ -36,7 +36,7 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
      - `redecode()` compares pixels with a slack of half a point (`SLACK * ratio`). Going from High to Low, a copy is 4× the area it needs (over its 2× limit), so it shrinks. Going from Low to High, it is too small, so it grows. The old copy is drawn until the new one is ready.
      - A code whose copy fits its box drops the decode queued for it, so a quick High, Low, High does not decode every card again.
    - The spotlight (`use-spotlight-images.native.ts`) keeps the default ratio.
-4. **Wire it**, `src/play/table-canvas.native.tsx`:
+4. **Wire it**, `src/play/canvas/table-canvas.native.tsx`:
    - Subscribe narrowly: `useStore(tableSettings, (s) => s.settings.cardQuality)`.
    - Pass `pictureRatio(PixelRatio.get(), quality)` to `useTableImages`.
 
@@ -50,11 +50,11 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
 
 ## A + B. Settings UI
 
-- **Words**, `src/play/settings-words.ts`:
+- **Words**, `src/play/chrome/settings-words.ts`:
   - `QUALITY_WORDS = { high: "High", low: "Low" }`.
   - `QUALITY_LINE = "Low draws the table's cards a little softer, easing a slow phone."`
   - `FOG_LINE = "Off holds the fog still, easing a slow phone."`; when the Light theme or Reduce motion already holds the fog still, the row is dimmed and says so (`fogLine`).
-- **Rows**, `src/play/setting-rows.tsx`:
+- **Rows**, `src/play/chrome/setting-rows.tsx`:
   - In **Display**, after Strong outlines: a `SettingChoice` titled "Card pictures", with a stretched `Segmented` (`id("quality")`).
   - In **Motion and feel**, after Reduce motion: a `SettingSwitch` labelled "Moving fog" (`id("fog")`).
   - The Settings screen and the table's settings panel both draw `SettingsRows`, so both show the new rows, and a change applies during a game.
@@ -63,7 +63,7 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
 
 On every canvas render, `piece()` rebuilds the body, marks and overlay for every slot. The rebuilt elements are always new objects, so nothing below the canvas can skip work. The React Compiler can't memoize per item inside a `.map`. A canvas still records its whole scene on each commit (code-standards). What this saves is the JS-thread cost of building and reconciling about 45 cards' nodes, along with their badge, token and pill subtrees.
 
-1. **Pure props and equality**, new file `src/play/table-piece.ts`:
+1. **Pure props and equality**, new file `src/play/canvas/table-piece.ts`:
    - `PieceProps` holds everything one card's drawing reads, as primitives or stable references:
      - The card: `slot`, `motion`, `clock`, `flip`, `image`, `name`, `sphere`, `encounterBack`.
      - Highlight and marks: `dim`, `glow` (picked, tappable), the frame flags (tappable, picked, dimmed, beat, veiledHand) and `veiled`.
@@ -74,7 +74,7 @@ On every canvas render, `piece()` rebuilds the body, marks and overlay for every
      - `slot` is compared with `sameSlot`, field by field over `CardSlot`'s primitive fields. Layout makes new slot objects whenever `keep` changes, such as on a pickup.
      - `info` is compared with `sameNumbers`, a structural compare. `slotNumbers` is cached per game state, so it is a new object on every step.
      - `clock` is ignored when both motions are `still()`, since `Moving` draws a still card without the clock.
-2. **Component**, new file `src/play/table-piece.native.tsx`:
+2. **Component**, new file `src/play/canvas/table-piece.native.tsx`:
    - `TablePiece = memo(Piece, samePiece)` renders `Moving` with the body, frame, overlay and the flip's `back`.
    - `drawBody`, `drawFrame` and `drawOverlay` move here from `table-canvas.native.tsx`, which shrinks that file.
    - `HandScrub` takes a `piece` callback; it receives the same `TablePiece` render.
@@ -88,14 +88,14 @@ On every canvas render, `piece()` rebuilds the body, marks and overlay for every
 
 ## Tests
 
-- `src/play/table-pictures.test.ts`:
+- `src/play/canvas/table-pictures.test.ts`:
   - `pictureRatio`: 3→1.5, 2→1 and 1→1 on Low; unchanged on High.
   - On a full table on a 3× phone, Low weighs at most about ¼ of High, under about 4.5 MB, using `pictureBytes` like the existing 16 MB check.
 - The `parseSettings` test (wherever it lives today, e.g. `settings-store.test.ts`):
   - A missing or invalid `cardQuality` becomes `"high"`, and a missing `fogDrift` becomes `true`.
   - `"low"` and `false` round-trip.
-- `src/play/settings-words.test.ts`: `QUALITY_WORDS` has a word for every option in `CARD_QUALITY_OPTIONS`.
-- New `src/play/table-piece.test.ts`, on the `crowdedTable()` fixture laid out with `tableLayout`:
+- `src/play/chrome/settings-words.test.ts`: `QUALITY_WORDS` has a word for every option in `CARD_QUALITY_OPTIONS`.
+- New `src/play/canvas/table-piece.test.ts`, on the `crowdedTable()` fixture laid out with `tableLayout`:
   - Picking up one card: `samePiece` is false only for that card, true for the rest.
   - A damage token on one card: only that card differs.
   - A new clock with still motions: equal. A moving card: differs.

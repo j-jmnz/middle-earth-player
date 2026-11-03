@@ -5,18 +5,18 @@ import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
 
 import { BodyText, ListRow, Screen, SearchField, Section, TwoPane } from "./chrome";
 import { BOOKLETS } from "./booklets/books";
-import { GameIcon } from "../play/game-icon";
-import { tileSurface } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import { withAlphaHex } from "../play/tokens";
+import { GameIcon } from "../ui/game-icon";
+import { tileSurface } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { withAlphaHex } from "../ui/tokens";
 import { SceneArt } from "./art";
 import { usePalette } from "./palette-hook";
 import { RuleBody } from "./rule-detail";
 import { glossary, glossaryEntry, searchGlossary } from "./rules-glossary";
-import { capWidth } from "../play/size-class";
-import { useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { capWidth } from "../ui/size-class";
+import { useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 // The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };

@@ -14,10 +14,10 @@ import { cardNames } from "./card-names";
 import { useDatabases } from "./databases";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
-import { SettingGroup, SettingsRows } from "../play/setting-rows";
-import { restoreDefaults, tableSettings } from "../play/table-settings";
-import { alwaysCodes, alwaysRows, CREDITS } from "../play/settings-words";
-import { useUiScale } from "../play/ui-scale";
+import { SettingGroup, SettingsRows } from "../play/chrome/setting-rows";
+import { restoreDefaults, tableSettings } from "../ui/table-settings";
+import { alwaysCodes, alwaysRows, CREDITS } from "../play/chrome/settings-words";
+import { useUiScale } from "../ui/ui-scale";
 import { useSplitColumns } from "./use-split-columns";
 
 type Change = Parameters<ReturnType<typeof tableSettings.getState>["update"]>[0];

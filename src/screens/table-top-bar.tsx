@@ -1,26 +1,26 @@
 // The table's top bar, 52 pt (TOP_BAR), three zones and nothing else (docs/design-system-table.md): the threat dials at the left (then
 // Life and the Burden deck), the phase rail centered on the screen, and the menu button at the right. Back, Log, Rules, Booklet
-// and Table settings are in the menu (src/play/table-menu.tsx). The bar holds no state of its own beyond measurements; the
+// and Table settings are in the menu (src/play/chrome/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 
-import { setDialsEdge } from "../play/bar-edge";
-import { GameIcon } from "../play/game-icon";
-import { Text } from "../play/text";
-import { seatDial } from "../play/peek";
-import type { Rail } from "../play/rail";
-import type { SeatThreat } from "../play/selectors";
-import { PhaseRail } from "../play/phase-rail";
-import { HeadingDial, ThreatRing } from "../play/table-chrome";
-import { IslandChip } from "../play/island-chip";
-import type { IslandReadout } from "../play/island-table";
-import type { HeadingStep } from "../play/heading";
-import { MenuButton } from "../play/table-menu";
-import { useTableTokens } from "../play/use-table-tokens";
-import { withAlphaHex } from "../play/tokens";
-import { BAR_PAD, barZones, chipCompact, DIAL_GAP, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../play/top-bar-layout";
-import { useUiScale } from "../play/ui-scale";
+import { setDialsEdge } from "../play/chrome/bar-edge";
+import { GameIcon } from "../ui/game-icon";
+import { Text } from "../ui/text";
+import { seatDial } from "../play/store/peek";
+import type { Rail } from "../play/phases/rail";
+import type { SeatThreat } from "../play/store/selectors";
+import { PhaseRail } from "../play/phases/phase-rail";
+import { HeadingDial, ThreatRing } from "../play/chrome/table-chrome";
+import { IslandChip } from "../play/dream-chaser/island-chip";
+import type { IslandReadout } from "../play/dream-chaser/island-table";
+import type { HeadingStep } from "../play/dream-chaser/heading";
+import { MenuButton } from "../play/chrome/table-menu";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { withAlphaHex } from "../ui/tokens";
+import { BAR_PAD, barZones, chipCompact, DIAL_GAP, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../play/chrome/top-bar-layout";
+import { useUiScale } from "../ui/ui-scale";
 
 export { TOP_BAR };
 // The scroll fade: this many bands of this width (EDGE_FADE in all), rising to nearly the felt.
@@ -31,7 +31,7 @@ const NO_TICKS: readonly number[] = [];
 export type TopBarProps = {
   threats: readonly SeatThreat[];
   // The seat the engine is asking, whose label is accent in two-handed play, and the seat peeked at (never the acting one) or null: that
-  // dial gets a bone ring and an eye mark. A dial that is not shown peeks when tapped (src/play/peek.ts).
+  // dial gets a bone ring and an eye mark. A dial that is not shown peeks when tapped (src/play/store/peek.ts).
   acting: number;
   viewed: number | null;
   life: number | null;
@@ -105,7 +105,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   useEffect(() => {
     scroller.current?.scrollTo({ x: offset, animated: false });
   }, [offset]);
-  // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/bar-edge.ts).
+  // The tray's outside-tap layer over the bar stops where the dials end, so a dial tap reaches the dial (src/play/chrome/bar-edge.ts).
   const edge = zones ? BAR_PAD + Math.min(dials, zones.left) : 0;
   useEffect(() => setDialsEdge(edge), [edge]);
   return (

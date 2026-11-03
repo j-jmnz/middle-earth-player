@@ -4,9 +4,9 @@ import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
-import { notAppliedWords } from "../play/not-applied";
-import { rowSurface } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
+import { notAppliedWords } from "../play/cards/not-applied";
+import { rowSurface } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
 import { CroppedArt } from "./art";
 import { PAINTING } from "./art-crop";
 import { usePalette } from "./palette-hook";
@@ -20,9 +20,9 @@ import { deckCountLine, deckShortLine, notAppliedCards, notAppliedLine } from ".
 import { DeckCover, DeckRow, HeroTile, heroFace, PARTY_TILE_HEIGHT, type HeroFace } from "./hero-tile";
 import { seatFolded, seatState } from "./seat-state";
 import { COVER_GAP, coverColumns, coverWidth } from "./briefing-layout";
-import { useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 const COVER_HEIGHT = 112;
 

@@ -30,9 +30,9 @@ Back, Log, Rules and Booklet move into the menu.
 - The bar stays 44 pt, inside both side safe-area insets.
 - Left: the dials, in seat order, then Life and Burden. Their behavior is unchanged in this phase.
 - Middle: `PhaseRail`, centered on the screen rather than on the space left over. Phase 20 restyles it.
-- Right: a 44 pt menu button (`table-menu`). It shows a printed icon if one fits (`src/play/icon-map.ts`), else three dots drawn as views. The accessibility label is "Menu".
+- Right: a 44 pt menu button (`table-menu`). It shows a printed icon if one fits (`src/ui/icon-map.ts`), else three dots drawn as views. The accessibility label is "Menu".
 
-**Menu (`src/play/table-menu.tsx`)**
+**Menu (`src/play/chrome/table-menu.tsx`)**
 - A popover anchored under the button, at the top right. Night raised fill, hairline edge, `rounded-card` corners, 220 to 260 pt wide.
 - Rows are 48 pt and are `TextButton`-style bone text, each with its icon where the game has one. In order:
   1. **Leave the table**: the `TableNav` back label as its detail ("To the path", "To the scenarios"). testID `table-back`. A muted line under it says "The game is saved".
@@ -42,7 +42,7 @@ Back, Log, Rules and Booklet move into the menu.
   5. **Table settings** (`settings-open`). It opens `ReferencePanel` as it opens from the rail now. Phase 20 moves the phases out of it and leaves the settings.
 - A row closes the menu and then acts.
 - A tap anywhere outside closes the menu and sends nothing.
-- Android Back closes it first: `src/play/back.ts` gets a `menu` layer above the preview.
+- Android Back closes it first: `src/play/chrome/back.ts` gets a `menu` layer above the preview.
 
 **Round**
 - The separate Round text goes. The rail's accessibility label already says the round; until phase 20, the rail shows "R3" before the current step when it is not narrow.
@@ -50,15 +50,15 @@ Back, Log, Rules and Booklet move into the menu.
 **Code layout**
 - Move the top bar out of `table-view.tsx` (352 lines) into `src/screens/table-top-bar.tsx`. `table-view.tsx` passes it the handlers.
 
-**Motion** (values to move to `motion-tokens.ts` in phase 23)
+**Motion** (values to move to `src/ui/motion-tokens.ts` in phase 23)
 - The popover enters in 200 ms ease-out: scale 0.96 to 1 from the top right, plus a fade.
 - It leaves in 150 ms ease-in.
 - It snaps under reduced motion.
 
 ## Tests
 
-- `src/play/back.test.ts`: Back closes the menu before anything else.
-- A pure `menuItems(nav)` in `table-menu` words (or `src/play/table-menu-items.ts`): the five rows in order, with Leave named for the path and for the scenarios. Tested.
+- `src/play/chrome/back.test.ts`: Back closes the menu before anything else.
+- A pure `menuItems(nav)` in `table-menu` words (or `src/play/chrome/table-menu-items.ts`): the five rows in order, with Leave named for the path and for the scenarios. Tested.
 
 ## E2E
 

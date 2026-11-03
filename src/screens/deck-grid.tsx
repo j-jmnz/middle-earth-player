@@ -10,14 +10,14 @@ import { announceDraftChange, changeDraftCount, draftAddRefused, type DraftPicks
 import type { DeckSectionRow } from "./deck-status";
 import { CardThumb, useCardPreview } from "./images/picture";
 import { usePalette } from "./palette-hook";
-import { SectionHeading } from "../play/section-heading";
-import { cardCorner } from "../play/card-corner";
-import { dropShadowOf } from "../play/surfaces";
-import type { PictureSource } from "../play/table-canvas-types";
-import { withAlphaHex } from "../play/tokens";
-import { useUiScale } from "../play/ui-scale";
-import { useTableTokens } from "../play/use-table-tokens";
-import { Text } from "../play/text";
+import { SectionHeading } from "../ui/section-heading";
+import { cardCorner } from "../ui/card-corner";
+import { dropShadowOf } from "../ui/surfaces";
+import type { PictureSource } from "../play/canvas/table-canvas-types";
+import { withAlphaHex } from "../ui/tokens";
+import { useUiScale } from "../ui/ui-scale";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { Text } from "../ui/text";
 
 export type EditorCard = {
   code: string;

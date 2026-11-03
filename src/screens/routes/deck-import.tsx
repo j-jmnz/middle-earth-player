@@ -12,7 +12,7 @@ import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef,
 import { useDatabases } from "../databases";
 import { poolOf } from "../pool-cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
-import { useUiScale } from "../../play/ui-scale";
+import { useUiScale } from "../../ui/ui-scale";
 import { goBack } from "../go-back";
 import { useListGutter } from "../list-gutter";
 import { showToast } from "../toast";

@@ -3,9 +3,9 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { traitTokens } from "../catalog/deck-save";
-import { GameIcon } from "../play/game-icon";
-import type { IconName } from "../play/icon-map";
-import { useReduceMotion } from "../play/motion-run";
+import { GameIcon } from "../ui/game-icon";
+import type { IconName } from "../ui/icon-map";
+import { useReduceMotion } from "../ui/motion-run";
 import { PaperSheet, PrimaryButton, SettingSwitch, SphereMark, TextButton, markedSphere, sphereWord } from "./chrome";
 import { usePalette } from "./palette-hook";
 import { SheetModal } from "./sheet-modal";
@@ -18,10 +18,10 @@ import {
   type PoolCard,
   type PoolFilter,
 } from "./pool-filter";
-import { withAlphaHex } from "../play/tokens";
-import { useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { withAlphaHex } from "../ui/tokens";
+import { useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 type FilterRow = PoolCard & { typeName: string; sphereName: string | null };
 

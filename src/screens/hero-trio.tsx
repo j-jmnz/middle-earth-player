@@ -2,11 +2,11 @@
 // three small cards side by side, each lapping a little over the one before it, with no sphere ring. Seat 2 and on are not shown.
 import { View } from "react-native";
 
-import { cardCorner } from "../play/card-corner";
-import { dropShadowOf } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import { Text } from "../play/text";
-import { useUiScale } from "../play/ui-scale";
+import { cardCorner } from "../ui/card-corner";
+import { dropShadowOf } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { Text } from "../ui/text";
+import { useUiScale } from "../ui/ui-scale";
 import type { HeroFace } from "./hero-tile";
 import { CardThumb } from "./images/picture";
 

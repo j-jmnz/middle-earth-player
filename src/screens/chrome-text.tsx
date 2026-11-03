@@ -5,10 +5,10 @@ import { View } from "react-native";
 
 
 import { usePalette } from "./palette-hook";
-import { SectionHeading } from "../play/section-heading";
-import { useTheme } from "../play/theme";
-import { withAlphaHex } from "../play/tokens";
-import { Text } from "../play/text";
+import { SectionHeading } from "../ui/section-heading";
+import { useTheme } from "../ui/theme";
+import { withAlphaHex } from "../ui/tokens";
+import { Text } from "../ui/text";
 
 const eyebrowTone = { accent: "text-accent", moon: "text-moon", muted: "text-muted", inkLabel: "text-inkLabel", bone: "text-bone" } as const;
 
@@ -34,7 +34,7 @@ export function Eyebrow({ children, tone = "moon", testID, rule = false, onArt =
   );
 }
 
-/** A section's heading: its name in Marcellus SC in the section colour, with one optional control at the end (src/play/section-heading.tsx). */
+/** A section's heading: its name in Marcellus SC in the section colour, with one optional control at the end (src/ui/section-heading.tsx). */
 export function Section({ title, right, testID, className }: { title: string; right?: ReactNode; testID?: string; className?: string }) {
   return <SectionHeading title={title} right={right} testID={testID} className={className} />;
 }

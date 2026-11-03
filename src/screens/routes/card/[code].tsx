@@ -9,16 +9,16 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import { BodyText, Chip, Eyebrow, NavBar, Screen, ScreenScroll, ScreenTitle, TwoPane } from "../../chrome";
 import { CardFacts, CardName, CardPicture, DeckUse, useCardPicture, useCardRow } from "../../card-detail";
 import { pictureMaxWidth, type PicturePane } from "../../card-picture";
-import { cachePolicyFor } from "../../../play/image-cache";
-import { CardTextView } from "../../../play/card-text-view";
-import { sideText } from "../../../play/ledger";
-import { nightFade } from "../../../play/surfaces";
-import { useTableTokens } from "../../../play/use-table-tokens";
+import { cachePolicyFor } from "../../../ui/image-cache";
+import { CardTextView } from "../../../play/cards/card-text-view";
+import { sideText } from "../../../play/cards/ledger";
+import { nightFade } from "../../../ui/surfaces";
+import { useTableTokens } from "../../../ui/use-table-tokens";
 import { routeCode } from "../../route-code";
 import { useArtGround } from "../../art";
 import { goBack } from "../../go-back";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 function clampPan(value: number, size: number, nextScale: number): number {
   "worklet";

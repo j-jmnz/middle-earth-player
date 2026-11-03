@@ -9,7 +9,7 @@ import { View } from "react-native";
 import { gameReport } from "../../../../campaign/report";
 import { finishStandalone } from "../../../../campaign/standalone";
 import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton, TwoPane } from "../../../chrome";
-import { useSizeClass } from "../../../../play/use-size-class";
+import { useSizeClass } from "../../../../ui/use-size-class";
 import { GameReportView } from "../../../game-report";
 import { scenarioName } from "../../../campaign-data";
 import { useDatabases } from "../../../databases";

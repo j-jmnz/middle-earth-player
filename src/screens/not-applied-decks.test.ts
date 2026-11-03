@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { textCheck } from "../catalog/active-text";
 import { shippedLedger } from "../catalog/printed-ledger";
 import { EFFECTS } from "../effects";
-import { notAppliedCodes, notAppliedWords } from "../play/not-applied";
+import { notAppliedCodes, notAppliedWords } from "../play/cards/not-applied";
 import { prebuiltDecks, prebuiltNotApplied, withNotApplied } from "./deck-import";
 import { notAppliedCards, notAppliedLine } from "./deck-status";
 

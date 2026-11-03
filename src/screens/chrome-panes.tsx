@@ -4,8 +4,8 @@
 import { useState, type ReactNode } from "react";
 import { View, type LayoutChangeEvent } from "react-native";
 
-import { capWidth, paneWidths, type PaneKind } from "../play/size-class";
-import { useSizeClass } from "../play/use-size-class";
+import { capWidth, paneWidths, type PaneKind } from "../ui/size-class";
+import { useSizeClass } from "../ui/use-size-class";
 
 /** A column centred in the screen, no wider than a reading column (640) or a wide one (1040) at the scale; the full width in compact. */
 export function Column({ children, max = "readable", testID }: { children: ReactNode; max?: "readable" | "wide"; testID?: string }) {

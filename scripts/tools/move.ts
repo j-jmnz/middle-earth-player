@@ -19,7 +19,7 @@ import { runScript, type Log } from "../log.ts";
 //   specifier keeps its style: with or without the extension, "/index" left implicit, a trailing slash kept.
 // - In Markdown: relative link targets, "](../x.md#anchor)".
 // - Everywhere it reads (code, docs, agent files, YAML, shell, root JSON configs): repository paths written out from the
-//   root, "src/play/layout.ts", "scripts/log.ts", a whole moved folder, or a file named without its extension; and a
+//   root, "src/play/layout/layout.ts", "scripts/log.ts", a whole moved folder, or a file named without its extension; and a
 //   file named by a tail of its path no other file shares ("families/sea/ships.ts", or "sea/ships.ts" when it is renamed).
 //
 // Companions: a moved file takes along, unless the map names them, its platform variants (x.native.ts, x.ios.tsx, ...)
@@ -197,8 +197,8 @@ export function planMove(tracked: readonly string[], entries: Record<string, str
   }
 
   // Root-written paths: each moved file, its extensionless stem when no other file shares it, and each folder whose
-  // files all moved together. One alternation, longest first, so "src/play/layout-slots.ts" never matches as
-  // "src/play/layout" plus a tail.
+  // files all moved together. One alternation, longest first, so "src/play/layout/slots.ts" never matches as
+  // "src/play/layout/layout" plus a tail.
   const rootPaths = new Map<string, string>();
   for (const [from, to] of moves) rootPaths.set(from, to);
   const stems = new Map<string, Set<string>>();

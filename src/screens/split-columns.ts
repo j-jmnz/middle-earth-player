@@ -1,7 +1,7 @@
 // The math of the two-column screens (docs/design-system.md, Tablets): Campaigns, Scenarios and Settings split their scroll in two only
 // when the main column keeps room to read. An expanded window can be barely wider than 840 (the rail takes 88), so the size class alone
 // is not enough: the measured width decides. Pure, so a test reads it in Node; the hook is use-split-columns.ts.
-import { PANE_GAP, paneWidths, type SizeClass } from "../play/size-class";
+import { PANE_GAP, paneWidths, type SizeClass } from "../ui/size-class";
 
 /** The narrowest a main (or an equal) column may get, in logical points; under it the screen keeps its one readable column. */
 export const MIN_MAIN = 400;

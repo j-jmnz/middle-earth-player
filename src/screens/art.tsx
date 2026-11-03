@@ -8,10 +8,10 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { PixelRatio, Platform, View, type ViewStyle } from "react-native";
 
 import { cards } from "../catalog/schema";
-import { cachePolicyFor } from "../play/image-cache";
-import { nightFade, panelSurface, topShade } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import { withAlphaHex } from "../play/tokens";
+import { cachePolicyFor } from "../ui/image-cache";
+import { nightFade, panelSurface, topShade } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { withAlphaHex } from "../ui/tokens";
 import { FogVeil, LightVeil } from "./backdrop";
 import { heroVeil, rgbOf } from "./backdrop-scenes";
 import { cropFrame, PLAYER_CARD_ASPECT, QUEST_CARD_ASPECT, SCENE, sceneBand, WHOLE, type Region } from "./art-crop";
@@ -23,9 +23,9 @@ import { enqueueImageDownloads } from "./images/queue";
 import { useCardPreview } from "./images/picture";
 import { scanAssets } from "./images/scan-map";
 import { usePalette } from "./palette-hook";
-import { ITEM_RADIUS } from "../play/radius";
-import { useTheme } from "../play/theme";
-import { useUiScale } from "../play/ui-scale";
+import { ITEM_RADIUS } from "../ui/radius";
+import { useTheme } from "../ui/theme";
+import { useUiScale } from "../ui/ui-scale";
 
 export type ArtCard = { code: string; imagesrc: string | null };
 

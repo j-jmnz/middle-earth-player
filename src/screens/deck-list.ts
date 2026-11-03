@@ -1,4 +1,4 @@
-import { columnsFor, gutter, type SizeClass } from "../play/size-class";
+import { columnsFor, gutter, type SizeClass } from "../ui/size-class";
 import { sessionSetting } from "./session-setting.ts";
 
 // The deck list's filter and view. Filtering runs in memory on the decks the list already read.

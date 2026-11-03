@@ -9,12 +9,12 @@ import { contextOf, type Resumed } from "../campaign/session";
 import type { ReplayObserver } from "../campaign/replay";
 import type { World } from "../campaign/world";
 import { cards } from "../catalog/schema";
-import { createTableStore, keepIntent, type EngineStep, type Kept, type PlayerIntent, type ReduceContext, type ScenarioState, type TableStore } from "../play/store";
-import type { Undoable } from "../play/undo-history";
+import { createTableStore, keepIntent, type EngineStep, type Kept, type PlayerIntent, type ReduceContext, type ScenarioState, type TableStore } from "../play/store/store";
+import type { Undoable } from "../play/store/undo-history";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
-// `imagesrc` is side A's picture to download, `backImagesrc` side B's (a card the table shows on its B side, src/play/picture-key.ts).
+// `imagesrc` is side A's picture to download, `backImagesrc` side B's (a card the table shows on its B side, src/play/canvas/picture-key.ts).
 export type CardFacts = { imagesrc: string | null; backImagesrc: string | null; text: string | null };
 
 export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<string, CardFacts> {

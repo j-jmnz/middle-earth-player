@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { tableTokensByTheme } from "../play/tokens.ts";
+import { tableTokensByTheme } from "../ui/tokens.ts";
 import { palettes } from "./palette.js";
 
 // docs/design-system.md: the canvas copies felt, feltLight and the marks it draws from the palette. They must not drift. The keys that

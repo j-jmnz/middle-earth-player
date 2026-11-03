@@ -4,7 +4,7 @@ import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area
 
 import { AppTabBar, dockIcon } from "../../chrome";
 import { usePalette } from "../../palette-hook";
-import { useSizeClass } from "../../../play/use-size-class";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 // The dock: the campaigns to play, a scenario played on its own, the decks to play them with, every card, and the rules to look up
 // between turns (docs/design-system.md, Navigation). Each tab carries one of the game's printed icons (RingsDB font): the One Ring for

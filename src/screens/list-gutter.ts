@@ -5,8 +5,8 @@
 import { useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 
-import { gutter } from "../play/size-class";
-import { useSizeClass } from "../play/use-size-class";
+import { gutter } from "../ui/size-class";
+import { useSizeClass } from "../ui/use-size-class";
 import { seedWidth } from "./split-columns";
 
 export function useListGutter(max: "readable" | "wide" = "readable", pageInset = 24): {

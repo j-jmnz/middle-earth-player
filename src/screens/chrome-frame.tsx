@@ -12,16 +12,16 @@ import { IconButton } from "./chrome-buttons";
 import { Chevron } from "./chrome-marks";
 import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
-import { GameIcon } from "../play/game-icon";
-import type { IconName } from "../play/icon-map";
-import { SheetCornersContext, SheetFrame } from "../play/sheet-paper";
-import { nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import { withAlphaHex } from "../play/tokens";
-import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../play/size-class";
-import { touch, useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { GameIcon } from "../ui/game-icon";
+import type { IconName } from "../ui/icon-map";
+import { SheetCornersContext, SheetFrame } from "../play/choice/sheet-paper";
+import { nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { withAlphaHex } from "../ui/tokens";
+import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../ui/size-class";
+import { touch, useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 /**
  * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the status bar; in landscape (the card and booklet
@@ -179,7 +179,7 @@ export function ListRow({
 }: {
   label: string;
   detail?: string;
-  // A long press on a card row shows the card large (src/play/card-preview.tsx).
+  // A long press on a card row shows the card large (src/play/cards/card-preview.tsx).
   onLongPress?: () => void;
   // Small game icons before the detail line (a sphere, a cost). The detail stays words.
   detailIcons?: ReactNode;

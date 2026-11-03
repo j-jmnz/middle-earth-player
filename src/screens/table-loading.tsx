@@ -3,8 +3,8 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { BAR_PAD, BAR_TOP, TOP_BAR } from "../play/top-bar-layout";
-import { useUiScale } from "../play/ui-scale";
+import { BAR_PAD, BAR_TOP, TOP_BAR } from "../play/chrome/top-bar-layout";
+import { useUiScale } from "../ui/ui-scale";
 import { IconButton, Screen } from "./chrome";
 
 /** `testID` is "table-loading" so a flow waiting for the table waits for the real one; Back keeps "table-back". */

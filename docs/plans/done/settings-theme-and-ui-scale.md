@@ -20,7 +20,7 @@ Each step leaves the app working, with tests green.
 
 The user asked for a Settings section. It should hold the settings the app needs, apply game UX conventions, and add a **UI scale** setting with Small, Medium and Large options that scales the whole UI to fit different screen sizes.
 
-Today the only settings are the table's (`src/play/table-settings.ts`): animation speed, combat spotlight, strong outlines, the first-game guide, stops, and the Responses always used. They are stored in user.db `settings` under the key `"table"` (`src/screens/settings-store.ts`). They can only be reached from the table menu's paper panel (`SettingsPanel`, `src/play/reading-panels.tsx:181`). The app has no setting for haptics, no override for reduced motion, no keep-awake and no About page. No scale factor runs through any size.
+Today the only settings are the table's (`src/ui/table-settings.ts`): animation speed, combat spotlight, strong outlines, the first-game guide, stops, and the Responses always used. They are stored in user.db `settings` under the key `"table"` (`src/screens/settings-store.ts`). They can only be reached from the table menu's paper panel (`SettingsPanel`, `src/play/chrome/reading-panels.tsx:181`). The app has no setting for haptics, no override for reduced motion, no keep-awake and no About page. No scale factor runs through any size.
 
 The research the plan draws on:
 - **Game Accessibility Guidelines, basic tier:** an option to adjust game speed, a toggle for any haptics, a readable default text size, interactive elements that are large and well spaced on touch screens, and settings that are saved and remembered.
@@ -35,7 +35,7 @@ These are the user's choices from the questions:
 
 ## Settings model
 
-**`src/play/table-settings.ts`**
+**`src/ui/table-settings.ts`**
 - Extend `TableSettings` in this file and keep its one store. Persistence stays on the same `"table"` row, so existing rows parse and the new keys take their defaults.
 - Update the header comment: these are now the app's settings.
 - New fields and defaults:
@@ -54,7 +54,7 @@ These are the user's choices from the questions:
 
 The scale factors are Small 0.875, Medium 1 and Large 1.15. Each size is multiplied by the factor, so text stays crisp and layout reflows. There is no root `transform`: it would blur text on iOS, misbehave with Skia's Android view and RN `Modal`, and it would mean faking the window size.
 
-1. **New `src/play/ui-scale.ts`** (pure and tested):
+1. **New `src/ui/ui-scale.ts`** (pure and tested):
    - `UI_SCALES` maps each option to its factor.
    - `uiFactor(option)`.
    - `useUiScale()` reads the store and returns the factor `s`.
@@ -75,20 +75,20 @@ The scale factors are Small 0.875, Medium 1 and Large 1.15. Each size is multipl
    - Components multiply through `useUiScale()`. Examples: `tab-bar.tsx` `DOCK_ICON`, `chrome-marks.tsx` sizes, `size={n}` props, inline `width`/`padding`/`borderRadius`/`fontSize`.
    - Module constants stay as the Medium value and are multiplied where they are used.
    - Pure layout and budget modules take `scale` as a last parameter, defaulting to 1 so existing tests are unchanged. The common form is to compute in logical points (`screen / s`) and return points × `s`. The modules are:
-     - `src/play/top-bar-layout.ts`
-     - `dock-budget.ts` (including the `DENSE_BELOW` comparison)
+     - `src/play/chrome/top-bar-layout.ts`
+     - `dock/budget.ts` (including the `DENSE_BELOW` comparison)
      - `armed-room.ts`
      - `tray-logic.ts`
      - `preview-size.ts`
      - `carousel.ts`
-     - `spotlight-stage.ts`
+     - `spotlight/stage.ts`
      - `screens/pool-grid.ts`
      - `table-view.tsx` `commandWidth`
 5. **Table canvas**
-   - `src/play/layout.ts`: add `scale` to `LayoutOptions`. `GUTTER`, `GAP`, `PEEK`, `HAND_MIN`, `MARK`, the card cap of 96 and the card floor of 34 all scale. `MIN_TARGET` stays a floor through `touch()`.
+   - `src/play/layout/layout.ts`: add `scale` to `LayoutOptions`. `GUTTER`, `GAP`, `PEEK`, `HAND_MIN`, `MARK`, the card cap of 96 and the card floor of 34 all scale. `MIN_TARGET` stays a floor through `touch()`.
    - Pass the scale into the drag worklets with the layout object, not module constants.
    - `table-fonts.native.ts` `useTableFonts(scale)`: the Skia font sizes × `s`.
-   - The drawing constants scale: `canvas-pieces.native.tsx` (`RADIUS`, `LINE`, `BADGE_H`), `token-spots.ts` (`TOKEN`), `token-fx.native.tsx` (`FLOAT_SIZE`), and the zone word offsets in `table-canvas.native.tsx`.
+   - The drawing constants scale: `canvas/pieces.native.tsx` (`RADIUS`, `LINE`, `BADGE_H`), `token-spots.ts` (`TOKEN`), `token-fx.native.tsx` (`FLOAT_SIZE`), and the zone word offsets in `table-canvas.native.tsx`.
    - Cards still fit the measured canvas at every scale.
    - The web twin `table-canvas.tsx` is class-based and scales through rem.
 
@@ -100,7 +100,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
 - The **table follows the theme** too.
 
 1. **Setting.** Add `theme: "dark" | "light" | "system"` to the store, default `"dark"`, validated in `parseSettings`.
-   - `src/play/theme.ts` (pure, tested) provides:
+   - `src/ui/theme.ts` (pure, tested) provides:
      - `resolveTheme(setting, osScheme)`, which returns `"dark"` or `"light"`.
      - A `useTheme()` hook (store plus RN `useColorScheme()`) that returns the resolved name.
    - In `app.json`, `userInterfaceStyle` changes from `"dark"` to `"automatic"`, so the phone reports its scheme.
@@ -126,7 +126,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
    - `global.css` gets `:root` defaults with the dark values, so the static web export paints before hydration. A test checks they match `palettes.dark`.
 4. **JS colors become theme-aware.**
    - About 137 `palette.x` uses in 34 files move to `usePalette()` (from `src/screens/palette-hook.ts`).
-   - `src/play/tokens.ts` holds `tableTokensByTheme = { dark, light }` and `useTableTokens()`.
+   - `src/ui/tokens.ts` holds `tableTokensByTheme = { dark, light }` and `useTableTokens()`.
    - `play-tokens.test.ts` checks both copies for drift.
    - `surfaces.ts` functions (`panelSurface`, `goldSurface`, `slateSurface`, `nightFade`, `topShade`, …) take the tokens as a parameter instead of reading a module constant.
    - Skia components take the tokens through props or the hook: `table-canvas.native.tsx`, `canvas-pieces`, `card-marks`, `spotlight*`, `token-fx`, `hand-scrub`.
@@ -137,11 +137,11 @@ The user asked for this partway through planning: add a dark and a light theme, 
 
 ## Behaviour settings
 
-- **Haptics:** in `src/play/haptics.ts`, `quietly()` returns early when `tableSettings.getState().settings.haptics` is false.
+- **Haptics:** in `src/ui/haptics.ts`, `quietly()` returns early when `tableSettings.getState().settings.haptics` is false.
 - **Reduce motion:**
-  - Add `useReduceMotion()` to `src/play/motion-run.ts`. It returns `useReducedMotion() || reduceMotion === "always"`.
+  - Add `useReduceMotion()` to `src/ui/motion-run.ts`. It returns `useReducedMotion() || reduceMotion === "always"`.
   - Use it everywhere the OS value is read today:
-    - `motion-run.ts:53` (`useMotionScale`)
+    - `src/ui/motion-run.ts:53` (`useMotionScale`)
     - `phase-carousel.tsx:125`
     - `table-dock.tsx:221`
     - `use-spotlight.ts`, which already plays nothing when motion is reduced

@@ -25,10 +25,10 @@ import { useDatabases } from "./databases";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
 import { starterSeedReason, starterSeedStatus, subscribeStarterSeed, type StarterSeed } from "./starter-decks";
-import { capWidth } from "../play/size-class";
-import { useTheme } from "../play/theme";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { capWidth } from "../ui/size-class";
+import { useTheme } from "../ui/theme";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 export type SavedDeck = { id: string; name: string; heroes: string[]; cards: { code: string; count: number }[] };
 
@@ -64,7 +64,7 @@ export type BriefingDecks = {
   setFilter: (next: DeckListFilter) => void;
   spheres: { code: string; name: string }[];
   shown: SavedDeck[];
-  // The codes whose printed text the app does not apply (src/play/not-applied.ts), and each card's type for its loss words.
+  // The codes whose printed text the app does not apply (src/play/cards/not-applied.ts), and each card's type for its loss words.
   inactive: ReadonlySet<string>;
   typeOf: (code: string) => string | null;
 };

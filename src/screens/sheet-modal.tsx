@@ -6,9 +6,9 @@ import type { ReactNode } from "react";
 import { Modal, Pressable, View } from "react-native";
 
 import { usePalette } from "./palette-hook";
-import { SheetCornersContext } from "../play/sheet-paper";
-import { SHEET_MAX } from "../play/size-class";
-import { useIsTablet, useSizeClass } from "../play/use-size-class";
+import { SheetCornersContext } from "../play/choice/sheet-paper";
+import { SHEET_MAX } from "../ui/size-class";
+import { useIsTablet, useSizeClass } from "../ui/use-size-class";
 
 const ALL_ORIENTATIONS = ["portrait", "portrait-upside-down", "landscape", "landscape-left", "landscape-right"] as const;
 const PORTRAIT = ["portrait"] as const;

@@ -16,10 +16,10 @@ import { startImageDownloads } from "../images/queue";
 import { completeStarterInsert, insertStarterDecks } from "../starter-decks";
 import { openDatabases, type AppDatabases } from "../open-databases";
 import { palettes, themeVars } from "../palette.js";
-import { tableSettings, type ThemeOption } from "../../play/table-settings";
-import { ThemeContext, useResolvedTheme, type ThemeName } from "../../play/theme";
-import { REM_BASE, UiScaleContext, uiFactor } from "../../play/ui-scale";
-import { useIsTablet } from "../../play/use-size-class";
+import { tableSettings, type ThemeOption } from "../../ui/table-settings";
+import { ThemeContext, useResolvedTheme, type ThemeName } from "../../ui/theme";
+import { REM_BASE, UiScaleContext, uiFactor } from "../../ui/ui-scale";
+import { useIsTablet } from "../../ui/use-size-class";
 
 void SplashScreen.preventAutoHideAsync();
 

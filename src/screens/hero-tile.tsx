@@ -6,13 +6,13 @@ import { COVER, PAINTING, type Region } from "./art-crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "./chrome";
 import { HeroTrio } from "./hero-trio";
 import { CardThumb, useCardPreview } from "./images/picture";
-import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
-import type { PictureSource } from "../play/table-canvas-types";
-import { withAlphaHex } from "../play/tokens";
+import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
+import type { PictureSource } from "../play/canvas/table-canvas-types";
+import { withAlphaHex } from "../ui/tokens";
 import { usePalette } from "./palette-hook";
-import { useUiScale } from "../play/ui-scale";
-import { Text } from "../play/text";
+import { useUiScale } from "../ui/ui-scale";
+import { Text } from "../ui/text";
 
 export type HeroFace = {
   code: string;

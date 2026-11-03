@@ -8,9 +8,9 @@ import type { PathNode } from "../campaign/path";
 import { SceneArt } from "./art";
 import { useAheadLine } from "./chrome";
 import { usePalette } from "./palette-hook";
-import { withAlphaHex } from "../play/tokens";
-import { useUiScale } from "../play/ui-scale";
-import { Text } from "../play/text";
+import { withAlphaHex } from "../ui/tokens";
+import { useUiScale } from "../ui/ui-scale";
+import { Text } from "../ui/text";
 
 const TAG = { completed: "Won", current: "Next", locked: "Locked", soon: "Coming soon" } as const;
 

@@ -101,14 +101,14 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).
 - Simultaneous Forced and delayed effects resolve in a fixed order, not the first player's choice (FAQ 1.02).
-- `src/play/threat-level.ts` shows 50 as the elimination level and ignores The One Ring's `eliminationReduction`.
+- `src/play/readouts/threat-level.ts` shows 50 as the elimination level and ignores The One Ring's `eliminationReduction`.
 - Burglar's Turn loot has no table UI.
 - Collapsed Mine's per-round cap ignores progress placed before it appears (fixing it moves every game; in the brief).
 - 41004:B:1 prints "searches the encounter deck"; the record also searches the discard pile.
 - The Oath: the Tokens dial does not open the quest preview; the Resolution joins used Adaptations with a comma, not "and".
 - Escape from Dol Guldur: the claim prompt does not name the lasting effect.
 - A confirmed "another" defender cannot be backed out of (the declaration frame has no pass).
-- Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `burden-words.ts`.
+- Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `words/burden.ts`.
 - `CountsAs` and `byEncounterDeck` live in the shared schema, not a family. `why.ts` matches the "different heroes" refusal by its wording.
 - Ledger readings 41050.A, 41012.A and 01090.A were re-checked against the scans, not user-confirmed.
 - Frodo's Choice (142068:A:2): its Ring-bearer clauses find nothing, since stage 2A removed the Ring-bearer from the game; the revealer takes the first player token for the game. Not user-confirmed.

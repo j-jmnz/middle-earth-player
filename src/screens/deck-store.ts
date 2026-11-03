@@ -2,7 +2,7 @@ import { asc, desc, eq, inArray, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { cards } from "../catalog/schema";
-import { notAppliedCodes } from "../play/not-applied";
+import { notAppliedCodes } from "../play/cards/not-applied";
 import { bumpDeckRevision } from "./deck-revision";
 import type { DeckFace } from "./deck-status";
 import { STEALTH_ID, WISDOM_ID, starterDeck } from "./starter-decks";
@@ -135,7 +135,7 @@ export function deckFaces<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map
   return new Map(rows.map(({ errata, ...row }) => [row.code, { ...row, text: errata ?? row.text }]));
 }
 
-/** The codes among these faces with a printed line the app does not apply (src/play/not-applied.ts). */
+/** The codes among these faces with a printed line the app does not apply (src/play/cards/not-applied.ts). */
 export function notAppliedIn(faces: ReadonlyMap<string, DeckFace>): ReadonlySet<string> {
   return notAppliedCodes([...faces.values()].map((face) => [face.code, face.text ?? null] as const));
 }

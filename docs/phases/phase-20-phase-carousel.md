@@ -12,9 +12,9 @@ The middle of the top bar shows where the round is. A tap opens a strip of the r
 
 ## Now
 
-- `PhaseRail` (`src/play/table-chrome.tsx:42-84`): previous step, current step (gold caps), next step; the current step alone under 760 pt.
-- Words: `src/play/rail.ts` (`ROUND`, `STEP_WORDS`, `railFor`, `windowPoint`).
-- A tap opens `ReferencePanel` (`src/play/table-panel.tsx:277`, data `turnReference` in `src/play/reference.ts`): phases, steps, the Stops switches and the table settings, on a paper side panel.
+- `PhaseRail` (`src/play/chrome/table-chrome.tsx:42-84`): previous step, current step (gold caps), next step; the current step alone under 760 pt.
+- Words: `src/play/phases/rail.ts` (`ROUND`, `STEP_WORDS`, `railFor`, `windowPoint`).
+- A tap opens `ReferencePanel` (`src/play/table-panel.tsx:277`, data `turnReference` in `src/play/phases/reference.ts`): phases, steps, the Stops switches and the table settings, on a paper side panel.
 - The rail does not mark the stops (open note in `docs/phases/STATUS.md`).
 
 ## Build
@@ -36,7 +36,7 @@ The middle of the top bar shows where the round is. A tap opens a strip of the r
   - An action window shows its Stop switch, a whole 44 pt row as now, and the master Stops switch sits at the head of the strip.
 - The strip's surface is night raised with a hairline, not paper: it is reading, not deciding.
 - A chevron at each end and a swipe move one phase. A tap outside the strip, the pill again, or Android Back closes it. It sends no intent.
-- Motion (values to move to `motion-tokens.ts` in phase 23):
+- Motion (values to move to `src/ui/motion-tokens.ts` in phase 23):
   - the strip drops in, 240 ms ease-out (translateY −12 to 0, plus a fade);
   - it leaves in 180 ms;
   - it snaps under reduced motion;
@@ -47,12 +47,12 @@ The middle of the top bar shows where the round is. A tap opens a strip of the r
 
 ## Data
 
-- A pure `phaseCarousel(game, stops)` in `src/play/rail.ts` (or `src/play/carousel.ts` if `rail.ts` would pass 200 lines). It returns `{ round, phases: [{ id, name, state: "past" | "current" | "next", steps: [{ id, words, decision, current, window, stop }] }], stopAhead }`.
+- A pure `phaseCarousel(game, stops)` in `src/play/phases/rail.ts` (or `src/play/phases/carousel.ts` if `rail.ts` would pass 200 lines). It returns `{ round, phases: [{ id, name, state: "past" | "current" | "next", steps: [{ id, words, decision, current, window, stop }] }], stopAhead }`.
 - Every word comes from `STEP_WORDS`, `turnReference` and `data/rules` through them. Invent none.
 
 ## Tests
 
-`src/play/rail.test.ts`:
+`src/play/phases/rail.test.ts`:
 - seven phases in order;
 - past, current and next for a game in the quest phase and in the combat phase;
 - `stopAhead` true when a stop is later in this phase and false when it was earlier;

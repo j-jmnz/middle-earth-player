@@ -2,9 +2,9 @@
 // the player picks up. Never the whole cache: the canvas draws names until a file lands.
 import { useEffect, useMemo } from "react";
 
-import { pictureCode, pictureKey } from "../play/picture-key";
-import { prefetchCodes, resolutionCodes } from "../play/prefetch";
-import type { ScenarioState, TableStore } from "../play/store";
+import { pictureCode, pictureKey } from "../play/canvas/picture-key";
+import { prefetchCodes, resolutionCodes } from "../play/canvas/prefetch";
+import type { ScenarioState, TableStore } from "../play/store/store";
 import { enqueueImageDownloads } from "./images/queue";
 
 type PictureFacts = ReadonlyMap<string, { imagesrc?: string | null; backImagesrc?: string | null }>;

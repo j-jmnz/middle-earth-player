@@ -19,16 +19,16 @@ A tap on a fanned card's corner hits that card.
 
 ## Now
 
-- `Moving` (`src/play/canvas-pieces.native.tsx:445-468`) turns only its `children`. `drawBody` (`src/play/table-canvas.native.tsx:239-252`) puts `Glow` and `CardBody` there, so the halo turns with the card.
-- `drawOverlay` (`table-canvas.native.tsx:253-273`) draws the following on `slotBounds(slot)` (`src/play/layout.ts:337-341`), which swaps width and height for an exhausted card and ignores `slot.tilt`:
-  - `Marks` (the gold edge, the picked edge, the check ring, the veil; `canvas-pieces.native.tsx:338-361`);
+- `Moving` (`src/play/canvas/pieces.native.tsx:445-468`) turns only its `children`. `drawBody` (`src/play/canvas/table-canvas.native.tsx:239-252`) puts `Glow` and `CardBody` there, so the halo turns with the card.
+- `drawOverlay` (`table-canvas.native.tsx:253-273`) draws the following on `slotBounds(slot)` (`src/play/layout/layout.ts:337-341`), which swaps width and height for an exhausted card and ignores `slot.tilt`:
+  - `Marks` (the gold edge, the picked edge, the check ring, the veil; `canvas/pieces.native.tsx:338-361`);
   - the beat ring.
 - So a fanned hand card has a straight frame on a tilted picture. The end cards turn about 5°; a longer hand turns more.
 - `hitBounds` and `hitSlot` (`layout.ts:344-366`) ignore the tilt too.
 
 ## Build
 
-- One pure helper, `cardFrame(slot)` in `src/play/layout.ts` (or a new `src/play/frame.ts` if `layout.ts` would pass 400 lines). It returns the card's center, its unturned width and height, and its turn (`slotRotation`, `src/play/motion.ts:17`). The body and every card-shaped mark read it.
+- One pure helper, `cardFrame(slot)` in `src/play/layout/layout.ts` (or a new `src/play/canvas/frame.ts` if `layout.ts` would pass 400 lines). It returns the card's center, its unturned width and height, and its turn (`slotRotation`, `src/play/motion/motion.ts:17`). The body and every card-shaped mark read it.
 - Draw the card-shaped marks inside the turned group, next to `Glow`. `Moving` gains a second turned slot, or `drawBody` takes the marks:
   - the gold edge;
   - the picked edge;
@@ -46,7 +46,7 @@ A tap on a fanned card's corner hits that card.
 
 ## Tests
 
-- New `src/play/layout.test.ts` (or `frame.test.ts`):
+- New `src/play/layout/layout.test.ts` (or `frame.test.ts`):
   - `cardFrame` gives the same turn as `slotRotation` for a fanned card, an exhausted card and a straight card;
   - a point inside a tilted card's corner but outside its unturned rect hits that card;
   - a point inside the unturned rect but outside the tilted card does not.

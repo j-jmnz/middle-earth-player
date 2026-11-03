@@ -7,7 +7,7 @@ The user asked for five changes:
 1. Every screen gets a real tablet (iPad / large-screen) landscape layout, following tablet UX practice. Today only the table turns, and every other route is locked to portrait (`src/screens/routes/_layout.tsx:161-179`).
 2. A shorter hold before the hand's scrub preview opens. The risen hand fans out like a held hand instead of lying in a flat row.
 3. The card preview loses its Close button.
-4. The table settings panel (paper side panel from the table menu, `SettingsPanel` in `src/play/reading-panels.tsx:212`) looks bad and uses its own cramped controls.
+4. The table settings panel (paper side panel from the table menu, `SettingsPanel` in `src/play/chrome/reading-panels.tsx:212`) looks bad and uses its own cramped controls.
 5. The panel's UI scale and Theme rows get reworked.
 
 User decisions:
@@ -27,9 +27,9 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
 ---
 
 ## Part 1: Hand scrub, 150 ms hold and a fanned risen hand
-- **`src/play/hand-scrub.ts:12`:** set `SCRUB_HOLD_MS = 150`. Update `hand-scrub.test.ts:209`.
+- **`src/play/canvas/hand-scrub.ts:12`:** set `SCRUB_HOLD_MS = 150`. Update `hand-scrub.test.ts:209`.
 - **Comments and docs that say 250:**
-  - Code: `hand-scrub.ts:6`, `hand-gestures.native.ts:2-3,195,205`, `motion-tokens.ts:127`.
+  - Code: `hand-scrub.ts:6`, `hand-gestures.native.ts:2-3,195,205`, `src/ui/motion-tokens.ts:127`.
   - `docs/design-system.md:345`.
   - The phase-25 note in STATUS.
   - The table-card preview `LongPress.minDuration(350)` (`hand-gestures.native.ts:196`) stays as it is.
@@ -40,10 +40,10 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
   - The x spacing stays as today, so every card keeps its 44 pt slice.
   - The middle row is raised by the largest drop, and the edges grow by each rotated corner (`h/2·sin θmax`), so every card stays inside the canvas.
   - `top` becomes the highest slot y.
-  - New constants `FAN_STEP`, `FAN_MAX` and `FAN_RADIUS` go in `SHAPE` (`motion-tokens.ts`).
+  - New constants `FAN_STEP`, `FAN_MAX` and `FAN_RADIUS` go in `SHAPE` (`src/ui/motion-tokens.ts`).
 - **Hit-testing stays x-ordered.** `cardAt`, `pick`, `cancelled` and `startCard` keep working, because the centers are still ascending in x.
-- **`src/play/scrub-pose.ts`.** Change `rot` to `(target.tilt * (1 − lift) − slot.tilt) * clock.rise`. Risen cards take the fan angle, and the lifted card under the finger straightens so it can be read. Update the header comment ("flattens the fan" becomes "turns the fan").
-- **`src/play/hand-scrub.native.tsx`:** pass the tilted target through. The duplicate lifted card on top uses the same pose.
+- **`src/play/canvas/scrub-pose.ts`.** Change `rot` to `(target.tilt * (1 − lift) − slot.tilt) * clock.rise`. Risen cards take the fan angle, and the lifted card under the finger straightens so it can be read. Update the header comment ("flattens the fan" becomes "turns the fan").
+- **`src/play/canvas/hand-scrub.native.tsx`:** pass the tilted target through. The duplicate lifted card on top uses the same pose.
 - **Tests:**
   - `hand-scrub.test.ts`:
     - The tilts are symmetric and sum to 0.
@@ -55,7 +55,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
 - **Docs:** design-system-table.md, Gestures (the scrub paragraph). Note that this reverses phase 25's "the fan flattens" (`docs/phases/phase-25-hand-scrub.md:29`), as a user request dated 2026-10-28.
 
 ## Part 2: Card preview without Close
-- **`src/play/card-preview.tsx:153`:** remove the `card-preview-close` ChromeButton. Details stays, alone, in both layouts (`:231`, `:235`).
+- **`src/play/cards/card-preview.tsx:153`:** remove the `card-preview-close` ChromeButton. Details stays, alone, in both layouts (`:231`, `:235`).
 - **How it still closes:** a tap on the dimmed scrim or on the card, Android Back, and the table's Back step.
 - **Accessibility:**
   - Add `onAccessibilityEscape={close}` to the root `View` (the iOS VoiceOver scrub).
@@ -65,8 +65,8 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
 
 ## Part 3: The table settings panel matches the Settings tab
 - **Shared rows.**
-  - New `src/play/setting-rows.tsx` holds `SettingChoice` (title and detail over a stretched control, moved from `settings-view.tsx:23` `Choice`) and `SettingGroup` (moved from `Group`, `:36`).
-  - Move `Segmented` from `src/screens/chrome-buttons.tsx:270` to `src/play/segmented.tsx`. Use `useTableTokens()` in place of `usePalette()`: `night`, `hairline` and `goldLine` exist in both token sets. Re-export it from `chrome-buttons.tsx`, as `SettingSwitch` is.
+  - New `src/play/chrome/setting-rows.tsx` holds `SettingChoice` (title and detail over a stretched control, moved from `settings-view.tsx:23` `Choice`) and `SettingGroup` (moved from `Group`, `:36`).
+  - Move `Segmented` from `src/screens/chrome-buttons.tsx:270` to `src/ui/segmented.tsx`. Use `useTableTokens()` in place of `usePalette()`: `night`, `hairline` and `goldLine` exist in both token sets. Re-export it from `chrome-buttons.tsx`, as `SettingSwitch` is.
 - **Shared contents.**
   - New `SettingsRows({ settings, onChange, always, testPrefix, groups })`, also in `setting-rows.tsx`, renders the Display, Motion and feel, and At the table groups.
   - The Settings tab uses all of them, plus About, with prefix `app-settings`.
@@ -91,7 +91,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
 ## Part 4: Tablet landscape for every other screen
 
 ### 4a. Foundation
-- **New pure module `src/play/size-class.ts`** and `size-class.test.ts`.
+- **New pure module `src/ui/size-class.ts`** and `size-class.test.ts`.
   - Constants: `TABLET_MIN_SIDE 600`, `MEDIUM_MIN 600`, `EXPANDED_MIN 840`, `READABLE 640`, `WIDE 1040`, `RAIL 88`, `ACTION_GROUP 420`, `SHORT_WINDOW 480`.
   - Functions:
     - `isTabletScreen(w, h)`
@@ -103,7 +103,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
     - `paneWidths("list-detail" | "supporting", W, s)` (list 320–400; supporting 320–480)
     - `columnsFor(width, target, gap, s, min)`
   - Tests cover the device sizes (390×844, 744×1133, 834×1194, 600×960), the thresholds, and the scale cases (834/1.15 is medium; 1194/1.15 is expanded).
-- **`src/play/use-size-class.ts`:**
+- **`src/ui/use-size-class.ts`:**
   - `useSizeClass()` returns `{ size, width, height, s, rail, short }` from `useWindowDimensions` and `useUiScale`.
   - `useIsTablet()` reads `Dimensions.get("screen")` and stays live on change, for foldables.
 - **Root orientation, `routes/_layout.tsx:163`.** Use `orientation: useIsTablet() ? "all" : "portrait"`. The table routes stay `"landscape"`, and card, booklet, glossary and rule stay `"all"`.
@@ -119,7 +119,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
   - `align="fill"` is for a bar inside a pane.
 - **New `src/screens/sheet-modal.tsx`:** one wrapper for both RN Modals (`pool-filter-sheet.tsx:64`, `deck/[id].tsx:364`).
   - `supportedOrientations` set to all four orientations. iOS Modals default to portrait only.
-  - In medium and expanded the sheet is centered with `maxWidth` 560·s. This needs a `corners: "top" | "all"` prop on `SheetFrame` (`src/play/sheet-paper.tsx`).
+  - In medium and expanded the sheet is centered with `maxWidth` 560·s. This needs a `corners: "top" | "all"` prop on `SheetFrame` (`src/play/choice/sheet-paper.tsx`).
 - **Navigation rail.** expo-router 58 bundles React Navigation 7, so `tabBarPosition: "left"` is supported.
   - In `(tabs)/_layout.tsx`, while expanded, use `tabBarPosition: rail ? "left" : "bottom"`. Add a `screenLayout` that provides `SafeAreaInsetsContext` with `left: 0`, so `Screen` doesn't pad twice.
   - In `tab-bar.tsx`, `AppTabBar` gets a `rail` variant:
@@ -231,7 +231,7 @@ Compact (every phone) is unchanged. The other classes:
 - **Every agent you spawn runs on Sonnet.** Pass `model: "sonnet"` on every Agent call: `implementer`, `reviewer`, `ux`, `Explore` and `general-purpose`. The `.claude/agents/*.md` frontmatter may name another model, and the explicit `model` overrides it. Never spawn a `fork`, because it can't take a model override.
 - **You own the plan, the order and the commits.** Agents write code and report. You read their diff, run the gate yourself (`pnpm test`, `pnpm lint`, `npx tsc --noEmit`), commit one step at a time on `claude/ipad-landscape-ui-improvements-a7tjk9`, and push at the end with `git push -u origin <branch>` (retry with backoff only on network errors). Open no PR unless the user asks.
 - **Split the work into these implementer agents.** Each brief names the plan's part and section, the files it owns, and the done gate. Run them in parallel only where their files don't overlap:
-  - **A: Parts 1 and 2.** Owns `hand-scrub.ts`, `scrub-pose.ts`, `hand-scrub.native.tsx`, `hand-gestures.native.ts`, `motion-tokens.ts`, `card-preview.tsx` and their tests. Can run alongside B.
+  - **A: Parts 1 and 2.** Owns `hand-scrub.ts`, `scrub-pose.ts`, `hand-scrub.native.tsx`, `hand-gestures.native.ts`, `src/ui/motion-tokens.ts`, `card-preview.tsx` and their tests. Can run alongside B.
   - **B: Part 3.** Owns `setting-rows.tsx`, `segmented.tsx`, `chrome-buttons.tsx`, `settings-view.tsx`, `reading-panels.tsx` and `table-layers.tsx`.
   - **C: Part 4a.** The pure modules, hooks, primitives, `SheetModal`, the rail and the start-panel fix. Starts after B merges, because both touch `chrome-buttons.tsx`/chrome. Every later agent builds on it.
   - **D, E and F: Part 4b, in parallel after C**, with disjoint files:

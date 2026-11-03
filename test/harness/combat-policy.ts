@@ -7,7 +7,7 @@ import { nextIntent } from "./auto-player.ts";
 import { RING_BEARER } from "../scenarios/a-shadow-of-the-past/game.ts";
 
 // Test helper. The auto-player never attacks (its goldens are pinned), so a test of combat plays a whole starter game with this
-// policy instead (src/campaign/combat-flow.test.ts, src/play/clash.test.ts): the seat keeps its `keep` best attackers ready,
+// policy instead (src/campaign/combat-flow.test.ts, src/play/store/clash.test.ts): the seat keeps its `keep` best attackers ready,
 // back from the quest and from defense, and attacks the first enemy it can with every character that may join.
 
 // The heroes with the most attack, kept back from the quest and from defense so the seat has someone to attack with.

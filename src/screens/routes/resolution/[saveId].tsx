@@ -13,8 +13,8 @@ import { consequenceSentence, resolutionView, settledSentence, type ResolutionTi
 import { finish } from "../../../campaign/session";
 import { scoreParts, scoreTotal } from "../../../campaign/score";
 import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, TextButton, TwoPane } from "../../chrome";
-import { selectedRingOf, tileSurface } from "../../../play/surfaces";
-import { useTableTokens } from "../../../play/use-table-tokens";
+import { selectedRingOf, tileSurface } from "../../../ui/surfaces";
+import { useTableTokens } from "../../../ui/use-table-tokens";
 import { campaignOf, scenarioName } from "../../campaign-data";
 import { writeSave } from "../../campaign-store";
 import { recordCampaignRun } from "../../run-writers";
@@ -24,9 +24,9 @@ import { CardThumb } from "../../images/picture";
 import { GameReportView } from "../../game-report";
 import { routeCode } from "../../route-code";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../table-session";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
-import { Text } from "../../../play/text";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
+import { Text } from "../../../ui/text";
 
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
   const t = useTableTokens();

@@ -13,7 +13,7 @@ The player presses and holds the hand. It rises and spreads out larger. Sliding 
 ## Now
 
 - The hand peeks up from the bottom edge: 56% of a card, slightly fanned (`layout.ts:321`).
-- Gestures in `src/play/table-canvas.native.tsx:152-232` race against each other (`Gesture.Race(pan, hold, tap)`):
+- Gestures in `src/play/canvas/table-canvas.native.tsx:152-232` race against each other (`Gesture.Race(pan, hold, tap)`):
   - a tap picks or previews;
   - a 350 ms long press previews one card;
   - a pan drags a playable card toward a target.
@@ -26,7 +26,7 @@ The player presses and holds the hand. It rises and spreads out larger. Sliding 
 - A movement before 250 ms is a drag, which plays a card as now. A tap is a tap as now. The 350 ms preview on a single hand card is replaced by the scrub; the scrub's release opens the same preview.
 
 **While scrubbing**
-- The hand rises so that whole cards show, and its scale grows to about 1.5. The fan flattens and spreads across the canvas width, overlapping evenly. Rise 220 ms, spread 220 ms, both from `motion-tokens.ts`.
+- The hand rises so that whole cards show, and its scale grows to about 1.5. The fan flattens and spreads across the canvas width, overlapping evenly. Rise 220 ms, spread 220 ms, both from `src/ui/motion-tokens.ts`.
 - The card under the finger lifts above the others, scaled 1.25 over the spread, so it is drawn above the finger, not under it. A selection tick plays each time the card under the finger changes.
 - The rest of the table dims under night at 35%.
 - Releasing on a card opens `CardPreview` for that card, as a long press does now.
@@ -41,7 +41,7 @@ The player presses and holds the hand. It rises and spreads out larger. Sliding 
 
 ## Data
 
-- A pure `handScrub` in `src/play/hand-scrub.ts`:
+- A pure `handScrub` in `src/play/canvas/hand-scrub.ts`:
   - `spreadLayout(layout, canvas)` gives the risen, spread hand slots.
   - `cardAt(spread, x)` gives the index under the finger (the nearest center).
   - `cancelled(spread, y)` says whether the finger is above the risen hand.
@@ -49,7 +49,7 @@ The player presses and holds the hand. It rises and spreads out larger. Sliding 
 
 ## Tests
 
-`src/play/hand-scrub.test.ts`:
+`src/play/canvas/hand-scrub.test.ts`:
 - one, five and nine cards spread inside the canvas width;
 - `cardAt` at each card's center and at the edges;
 - above the hand cancels;

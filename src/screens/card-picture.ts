@@ -3,8 +3,8 @@
 // the picture in its own pane, sized by the pane's height (`inspectSize`); a quest card, printed sideways, is as wide as that
 // height, so it fills the pane's width the way a portrait card fills its height. Sizes are in screen points; the cap is Medium's
 // number times the scale `s`.
-import { inspectSize } from "../play/preview-size";
-import type { SizeClass } from "../play/size-class";
+import { inspectSize } from "../play/cards/preview-size";
+import type { SizeClass } from "../ui/size-class";
 
 export type PicturePane = { width: number; height: number };
 

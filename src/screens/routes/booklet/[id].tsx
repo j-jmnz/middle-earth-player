@@ -10,10 +10,10 @@ import { bookletUri, hasBundledBooklet, importBooklet, installBundledBooklet } f
 import { readBooklet, writeLastPage, type BookletRow } from "../../campaign-store";
 import { useDatabases } from "../../databases";
 import { routeCode } from "../../route-code";
-import { slateSurface } from "../../../play/surfaces";
-import { useTableTokens } from "../../../play/use-table-tokens";
-import { useSizeClass } from "../../../play/use-size-class";
-import { Text } from "../../../play/text";
+import { slateSurface } from "../../../ui/surfaces";
+import { useTableTokens } from "../../../ui/use-table-tokens";
+import { useSizeClass } from "../../../ui/use-size-class";
+import { Text } from "../../../ui/text";
 
 // Full-screen reader for one stored PDF. It opens from the campaign list, the path, the briefing and the log, and Close
 // returns to the screen that opened it. The engine never reads the file, and a missing file blocks nothing.

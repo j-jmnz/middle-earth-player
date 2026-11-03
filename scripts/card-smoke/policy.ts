@@ -1,4 +1,4 @@
-import { firstShares, playRequest, sharesReady, toPayments, triggerRequest, type PayRequest } from "../../src/play/pay.ts";
+import { firstShares, playRequest, sharesReady, toPayments, triggerRequest, type PayRequest } from "../../src/play/choice/pay.ts";
 import type { Payment } from "../../src/rules/core/intents.ts";
 import { printedOf } from "../../src/rules/core/printed.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";

@@ -129,7 +129,7 @@ Read the sections your task touches.
   - 260–263 Guide (~120)
   - 264–273 Choice tray (~820) ← 2
   - 274–286 Reading panels (~1.2K) ← 5
-  - 287–296 Phase carousel (~670)
+  - 287–296 Phase carousel (~680)
   - 297–302 Quest advance (~530) ← 1
   - 303–306 Undo (~140)
   - 307–310 Haptics (~280)
@@ -208,15 +208,15 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~770 tok)
 - `docs/phases/phase-16-breaking-of-the-fellowship.md` — Phase 16 — Breaking of the Fellowship (~1.7K tok)
 - `docs/phases/phase-17-design-system.md` — Phase 17 — Design system (~1.4K tok)
-- `docs/phases/phase-18-card-frames.md` — Phase 18 — Card frames follow the card (~790 tok)
-- `docs/phases/phase-19-top-bar-menu.md` — Phase 19 — Top bar and table menu (~920 tok)
+- `docs/phases/phase-18-card-frames.md` — Phase 18 — Card frames follow the card (~800 tok)
+- `docs/phases/phase-19-top-bar-menu.md` — Phase 19 — Top bar and table menu (~930 tok)
 - `docs/phases/phase-20-phase-carousel.md` — Phase 20 — Phase carousel (~1.1K tok)
 - `docs/phases/phase-21-choice-tray.md` — Phase 21 — Choice tray (~1.3K tok)
 - `docs/phases/phase-22-declutter.md` — Phase 22 — Declutter the board (~2.1K tok)
 - `docs/phases/phase-23-motion-pass.md` — Phase 23 — Motion pass (~1.4K tok)
 - `docs/phases/phase-24-combat-spotlight.md` — Phase 24 — Combat spotlight (~1.3K tok)
-- `docs/phases/phase-25-hand-scrub.md` — Phase 25 — Hold and slide through the hand (~840 tok)
-- `docs/phases/phase-26-seat-peek.md` — Phase 26 — Peek at the other seat (~980 tok)
+- `docs/phases/phase-25-hand-scrub.md` — Phase 25 — Hold and slide through the hand (~850 tok)
+- `docs/phases/phase-26-seat-peek.md` — Phase 26 — Peek at the other seat (~990 tok)
 - `docs/phases/phase-27-multi-campaign-data.md` — Phase 27 — Multi-campaign data (~1.6K tok)
 - `docs/phases/phase-28-campaign-registry.md` — Phase 28 — Campaign registry, saga gating, log, booklets (~1.3K tok)
 - `docs/phases/phase-28b-history-and-collapsible.md` — Phase 28b — Collapsible sections and run history (~1.3K tok)
@@ -245,7 +245,7 @@ STATUS.md, then the active phase file.
     - 118–128 Scenario areas (~330)
   - 129–139 Cards it must hold (~230)
   - 140–146 Build (~240)
-  - 147–175 Tests (~560)
+  - 147–175 Tests (~580)
   - 176–190 E2E (~250)
   - 191–213 Exit (~320)
 - `docs/phases/phase-40-voyage-across-belegaer.md` — Phase 40 — Voyage Across Belegaer (~960 tok)
@@ -312,7 +312,7 @@ Open work; read when a task names it.
 History and rationale; read only when a code comment or task cites one.
 
 - `docs/plans/done/authoritative-data.md` — Plan: printed cards as the authority, after the data store (~4.4K tok)
-- `docs/plans/done/board-ux.md` — Board UX: motion, focus and a quieter table (~3.4K tok)
+- `docs/plans/done/board-ux.md` — Board UX: motion, focus and a quieter table (~3.5K tok)
 - `docs/plans/done/combat-spotlight-redesign.md` — Combat spotlight redesign (~3.9K tok)
 - `docs/plans/done/data-store-refactor.md` — Plan: a local game-data store, fetched once, generated wherever possible (~5.1K tok)
 - `docs/plans/done/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
@@ -322,7 +322,7 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/settings-theme-and-ui-scale.md` — Settings tab, UI scale, and Dark/Light theme (~5.2K tok)
 - `docs/plans/done/table-experience.md` — Table experience: next improvements (~4.4K tok)
 - `docs/plans/done/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.4K tok)
-- `docs/plans/done/tablets-and-hand-fan.md` — Tablet landscape, fanned hand scrub, no preview Close, table settings panel (~6.2K tok)
+- `docs/plans/done/tablets-and-hand-fan.md` — Tablet landscape, fanned hand scrub, no preview Close, table settings panel (~6.3K tok)
 
 ## Code to docs
 
@@ -336,7 +336,8 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: architecture.md, Tests (1)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
-- `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); design-system-table.md, Motion (6); architecture.md, Images (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); design-system-table.md, Reading panels (4); design-system.md, Components (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system.md, Tablets (3); design-system.md, Type (3); plans/done/settings-theme-and-ui-scale.md, UI scale engine (3); design-system-table.md, Choice tray (2); design-system-table.md, Quest scale (2); design-system.md, Icons (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); design-system.md, Table — landscape (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1)
+- `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); design-system-table.md, Reading panels (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system-table.md, Choice tray (2); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
 - `src/rules`: brief.md, The engine plays the game (2); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Components (5); design-system.md, Briefing (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
+- `src/ui`: design-system.md, Components (3); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

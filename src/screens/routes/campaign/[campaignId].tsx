@@ -18,7 +18,7 @@ import { RadioTile } from "../../radio-tile";
 import { routeCode } from "../../route-code";
 import { pathHref } from "../../scenario-links";
 import { SEAT_WORDS, seatCountOf, seatWord } from "../../seats";
-import { Text } from "../../../play/text";
+import { Text } from "../../../ui/text";
 
 export default function CampaignSetup() {
   const router = useRouter();

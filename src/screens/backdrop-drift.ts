@@ -1,8 +1,8 @@
 import { useIsFocused } from "expo-router";
 import { useStore } from "zustand";
 
-import { useReduceMotion } from "../play/motion-run";
-import { tableSettings } from "../play/table-settings";
+import { useReduceMotion } from "../ui/motion-run";
+import { tableSettings } from "../ui/table-settings";
 
 /**
  * Whether the fog drifts now: only on the screen in front (screens under it stay mounted, and would draw for nothing), never under

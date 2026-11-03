@@ -6,9 +6,9 @@ import { useMemo, useState } from "react";
 import { View } from "react-native";
 
 import { cards } from "../catalog/schema";
-import { cardCorner } from "../play/card-corner";
-import { Text } from "../play/text";
-import { useUiScale } from "../play/ui-scale";
+import { cardCorner } from "../ui/card-corner";
+import { Text } from "../ui/text";
+import { useUiScale } from "../ui/ui-scale";
 import { ListRow, Section, TextButton } from "./chrome";
 import { useDatabases } from "./databases";
 import { RowCardImage } from "./images/picture";

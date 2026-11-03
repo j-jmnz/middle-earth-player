@@ -10,7 +10,7 @@ import { drop, finish, isWon, record, resume, staleReason, unrecord } from "../c
 import { logCodes, loadWorld } from "../campaign/world";
 import { CATALOG_VERSION } from "../catalog/version";
 import { EFFECTS } from "../effects";
-import type { TableStore } from "../play/store";
+import type { TableStore } from "../play/store/store";
 
 import { afterPaint } from "./after-paint";
 import { campaignOf, scenarioOf } from "./campaign-data";

@@ -79,7 +79,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
 4. The engine supports 1 to 4 seats. "Choose a player", control changes and "each player" must work with several seats.
 5. Choices: the reducer never takes a number or a card the engine did not offer; choices are frames with options (see
    `Pick`, `Choose`, `effect-frames.ts`). If you add a verb that can appear inside a `Choose` option, give it words in
-   `src/play/choice-words.ts` (`instructionWords`): a test checks every branch reads as a sentence.
+   `src/play/words/choice.ts` (`instructionWords`): a test checks every branch reads as a sentence.
 6. A line may stay open only if it is genuinely impossible to express in this engine; report it with the reason.
 7. A scenario phase also adds the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open,
    pins a whole game in a golden (`src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `src/campaign/scenarios/the-ring-goes-south/golden.json` are

@@ -112,7 +112,7 @@ describe("pack scans", () => {
     expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
     const map = readFileSync(staged.options.mapPath, "utf8");
     expect(map).toContain('"141031": { moduleId: require("../../../assets/scans/141031.jpg")');
-    // Side B is keyed `<code>.B` (src/play/picture-key.ts); a card with no side B pin has no such key.
+    // Side B is keyed `<code>.B` (src/play/canvas/picture-key.ts); a card with no side B pin has no such key.
     expect(map).toContain('"141031.B": { moduleId: require("../../../assets/scans/141031.B.jpg")');
     expect(map).not.toContain("141022.B");
     expect(map).toContain("141022");

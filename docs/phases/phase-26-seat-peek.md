@@ -18,7 +18,7 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 
 ## Now
 
-- `shownSeat(game)` (`src/play/selectors.ts:189-192`) returns `game.activeSeat`. Everything per seat follows it:
+- `shownSeat(game)` (`src/play/store/selectors.ts:189-192`) returns `game.activeSeat`. Everything per seat follows it:
   - the canvas (`table-canvas.native.tsx:64`, `useViews`);
   - the web list (`table-canvas.tsx:86`);
   - `useTableChoice` (`use-table-choice.ts:98`);
@@ -29,7 +29,7 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 ## Build
 
 **State**
-- A UI-only `viewedSeat: number | null` in the table store (`src/play/store.ts`). It is not engine state and not in the save.
+- A UI-only `viewedSeat: number | null` in the table store (`src/play/store/store.ts`). It is not engine state and not in the save.
 - It resets to null:
   - on a new moment (a new sheet key);
   - when `activeSeat` changes;
@@ -51,21 +51,21 @@ The table makes plain that this is not the seat acting. Who acts never changes b
 - The viewed hand carries the night veil at 30%, and its cards do not glow.
 - A tap on any card only opens its preview. Nothing is picked or sent.
 - The dock stays the acting seat's. Its eyebrow already starts with the seat ("Player 1 · …").
-- Android Back ends the peek before anything else that is open on the table (`src/play/back.ts`).
+- Android Back ends the peek before anything else that is open on the table (`src/play/chrome/back.ts`).
 
 **Motion**
-- The seat's zones slide out to the side and the other seat's slide in, 250 ms each way, from `motion-tokens.ts`. Going back reverses it.
+- The seat's zones slide out to the side and the other seat's slide in, 250 ms each way, from `src/ui/motion-tokens.ts`. Going back reverses it.
 - Phase 23's seat handoff plays when the engine turns to the other seat. A peek does not play it.
 - It snaps under reduced motion.
 
 ## Tests
 
-- New `src/play/selectors.test.ts`: `shownSeat` with and without `viewed`.
-- `src/play/table-choice.test.ts`:
+- New `src/play/store/selectors.test.ts`: `shownSeat` with and without `viewed`.
+- `src/play/choice/table-choice.test.ts`:
   - a card tap while peeking previews and sends nothing;
   - picks are still the acting seat's;
   - the peek ends on a new sheet key and on an `activeSeat` change.
-- `src/play/back.test.ts`: Back ends the peek first.
+- `src/play/chrome/back.test.ts`: Back ends the peek first.
 
 ## E2E
 

@@ -12,7 +12,7 @@ export type DeckFace = DeckSaveCard & {
   sphereName: string | null;
   imagesrc: string | null;
   threat: number | null;
-  // The printed text, for the "not applied" check (src/play/not-applied.ts). Optional: a face built elsewhere may lack it.
+  // The printed text, for the "not applied" check (src/play/cards/not-applied.ts). Optional: a face built elsewhere may lack it.
   text?: string | null;
   // The printed cost ("2", "X", "-"), for the editor's cost curve. Optional for the same reason.
   cost?: string | null;

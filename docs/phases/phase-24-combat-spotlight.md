@@ -23,7 +23,7 @@ Both sides come to the center, enlarged, over a darkened table. The attacker str
   - a red edge on the attacking enemy;
   - the defender or attackers beside it with a combat mark (`placeEngaged`, `layout.ts:188-211`; `CombatMarkView`);
   - the dock's readout ("1 damage, shadow card next");
-  - the banner's beats (`src/play/outcome.ts`, `momentOf`).
+  - the banner's beats (`src/play/store/outcome.ts`, `momentOf`).
 - Damage appears on the damage token's count.
 
 ## Build
@@ -36,7 +36,7 @@ Both sides come to the center, enlarged, over a darkened table. The attacker str
 | (+250 ms) | If the attack turned a shadow card, it flips face up beside the enemy before the strike. |
 | 250–500 ms | Anticipation: the attacker draws back 10 pt and tilts 4° away. |
 | 500–650 ms | The lunge: the attacker moves to touch the target. |
-| 650–730 ms | Hit stop: everything holds. A medium impact haptic plays (`tickImpact` in `src/play/haptics.ts`). |
+| 650–730 ms | Hit stop: everything holds. A medium impact haptic plays (`tickImpact` in `src/ui/haptics.ts`). |
 | 730–1100 ms | The target shakes ±5 pt, decaying over three swings. The damage token art bursts from the point of contact, one token per damage, 90 ms apart, and each flies to the target's damage corner. The count there pops as phase 23's tokens do. |
 | (no damage) | The defense icon on the target bounces once (1 → 1.25 → 1) with "Blocked" under it, in place of the burst. |
 | (destroyed) | The target greys (a night veil at 50%) and drops 12 pt with a fade before the return. |
@@ -53,7 +53,7 @@ Both sides come to the center, enlarged, over a darkened table. The attacker str
 - Under reduced motion there is no spotlight. The banner carries the attack as now.
 
 **Drawing**
-- A top layer on the table's Skia canvas (`src/play/spotlight.native.tsx`). It draws:
+- A top layer on the table's Skia canvas (`src/play/spotlight/spotlight.native.tsx`). It draws:
   - the scrim;
   - the enlarged card pictures, from the images the canvas already holds;
   - the token art;
@@ -63,13 +63,13 @@ Both sides come to the center, enlarged, over a darkened table. The attacker str
 
 ## Data
 
-- A pure `clashesOf(prev, next, steps)` in `src/play/clash.ts`. It returns, in order:
+- A pure `clashesOf(prev, next, steps)` in `src/play/store/clash.ts`. It returns, in order:
   - `[{ attackers: string[], target: string, attack: number, defense: number, damage: number, destroyed: boolean, shadow: string | null, undefended: boolean }]`.
 - It reads the same engine steps the banner reads (the strike and attack steps `outcome.ts` and `readout.ts` use). Every number is the engine's.
 
 ## Tests
 
-`src/play/clash.test.ts`, on games played the way `src/campaign/combat-flow.test.ts` plays them:
+`src/play/store/clash.test.ts`, on games played the way `src/campaign/combat-flow.test.ts` plays them:
 - a defended attack with 1 damage;
 - a blocked attack (0 damage);
 - an undefended attack on a hero;

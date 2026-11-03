@@ -7,8 +7,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-import { tickArmed, tickLand } from "../play/haptics";
-import { useReduceMotion } from "../play/motion-run";
+import { tickArmed, tickLand } from "../ui/haptics";
+import { useReduceMotion } from "../ui/motion-run";
 import { moveItem, nearestSlot, shiftsFor, type Shift, type SlotRect } from "./deck-order";
 
 const LONG_PRESS_MS = 350;

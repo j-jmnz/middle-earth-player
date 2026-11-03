@@ -16,7 +16,7 @@ import { NextStop } from "../../save-panels";
 import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, RunHero, RunRow } from "../../hub-parts";
 import { splitRuns } from "../../hub-runs";
 import { nextStepHref, pathHref } from "../../scenario-links";
-import { useSizeClass } from "../../../play/use-size-class";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 // The Campaigns hub (docs/design-system.md, Campaigns (campaign list)): the unfinished playthrough written last as the hero over its
 // next scenario's scene, the other unfinished ones as rows, New playthrough (one tile per startable campaign), then Coming later.

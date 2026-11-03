@@ -4,7 +4,7 @@
 // `scale` is the UI scale (docs/plans/done/settings-theme-and-ui-scale.md): the grid is laid out in logical points, the list's width over
 // the scale with a 10 point gap, and the results come back times the scale, so a card keeps its share of the screen at any size.
 
-import { columnsFor } from "../play/size-class";
+import { columnsFor } from "../ui/size-class";
 
 export const GRID_GAP = 10;
 

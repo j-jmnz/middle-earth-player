@@ -1,9 +1,9 @@
 // user.db `settings`: the table's settings as one JSON row (key "table"). Read once when the databases open, written on
-// each change; src/play/table-settings.ts holds them while the app runs.
+// each change; src/ui/table-settings.ts holds them while the app runs.
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import { parseSettings, tableSettings, type TableSettings } from "../play/table-settings";
+import { parseSettings, tableSettings, type TableSettings } from "../ui/table-settings";
 import { settings, type StoredJson } from "./user-schema";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;

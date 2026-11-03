@@ -5,10 +5,10 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import type { RunRecord } from "../campaign/runs";
-import { rowSurface } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { Text } from "../play/text";
-import { useTableTokens } from "../play/use-table-tokens";
+import { rowSurface } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { Text } from "../ui/text";
+import { useTableTokens } from "../ui/use-table-tokens";
 import { scenarioName } from "./campaign-data";
 import { AskInPlace } from "./ask-in-place";
 import { Chevron, Chip, Label, TextButton } from "./chrome";
@@ -17,7 +17,7 @@ import type { CardChip, CardLine, CardState } from "./history-entries";
 import { HeroTrio } from "./hero-trio";
 import { runDate, runDetail } from "./history-words";
 import { usePalette } from "./palette-hook";
-import { useUiScale } from "../play/ui-scale";
+import { useUiScale } from "../ui/ui-scale";
 
 const LINE_CLASS: Record<CardLine["tone"], string> = { muted: "text-muted", accent: "text-accentHigh", danger: "text-danger" };
 

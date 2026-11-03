@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { palettes, type Palette } from "./palette.js";
-import { TINT_ALPHA, TONAL_ALPHA } from "../play/surfaces.ts";
+import { TINT_ALPHA, TONAL_ALPHA } from "../ui/surfaces.ts";
 
 // WCAG 2.x contrast (user request, 2026-10-28: a Light theme that reads as well as Dark). Body text needs 4.5:1.
 function luminance(hex: string): number {

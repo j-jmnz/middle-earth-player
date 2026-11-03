@@ -8,16 +8,16 @@ import { ListRow, SphereMark, markedSphere } from "./chrome";
 import { CountStepper } from "./count-stepper";
 import { addDraftCard, announceDraftChange, takeDraftCard, type TitleLookup } from "./deck-draft";
 import { CardThumbFrame, RowCardImage, useCardPreview } from "./images/picture";
-import { cardCorner } from "../play/card-corner";
-import type { PictureSource } from "../play/table-canvas-types";
-import { dropShadowOf, selectedRingOf } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTableTokens } from "../play/use-table-tokens";
+import { cardCorner } from "../ui/card-corner";
+import type { PictureSource } from "../play/canvas/table-canvas-types";
+import { dropShadowOf, selectedRingOf } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { useTableTokens } from "../ui/use-table-tokens";
 import { usePalette } from "./palette-hook";
-import { useUiScale } from "../play/ui-scale";
+import { useUiScale } from "../ui/ui-scale";
 import { poolDetail, type PoolCard } from "./pool-filter";
 import { CARD_RATIO } from "./pool-grid";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 export type PoolRowCard = PoolCard & {
   typeName: string;

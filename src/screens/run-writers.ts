@@ -9,7 +9,7 @@ import type { Save } from "../campaign/save";
 import type { StandaloneGame } from "../campaign/standalone";
 import type { World } from "../campaign/world";
 import { ENGINE_VERSION } from "../campaign/replay";
-import type { ScenarioState } from "../play/store";
+import type { ScenarioState } from "../play/store/store";
 import { boxOf } from "./campaign-data";
 import { writeRun } from "./run-store";
 import { standaloneGames } from "./user-schema";

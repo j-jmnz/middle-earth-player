@@ -13,18 +13,18 @@ The table moves like a game, not a form. Motion is slower than today but stays s
 ## Now
 
 There are no motion tokens: every duration is a local literal. The list is in `docs/plans/done/board-ux.md` (What the table does now).
-- Cards move in 320 ms ease-out cubic (`MOVE_MS`, `src/play/table-canvas.native.tsx:29,108`). Their paths are worked out in `src/play/motion.ts`.
+- Cards move in 320 ms ease-out cubic (`MOVE_MS`, `src/play/canvas/table-canvas.native.tsx:29,108`). Their paths are worked out in `src/play/motion/motion.ts`.
 - Nothing flips, staggers, overshoots or pops.
 - Token counts change in place.
 
 ## Build
 
-**Tokens (`src/play/motion-tokens.ts`)**
+**Tokens (`src/ui/motion-tokens.ts`)**
 - Every duration, easing and spring the table uses: card move, flip, stagger, lift, land, exhaust, token pop, floating number, destroy, sheet, tray, menu, carousel, banner fade, preview, dial pop, threat badge.
 - Move every literal in `src/play` to it. The values the phases before this one named are in their phase files.
 - `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 0 under reduced motion. Every duration passes through it.
 - A new table setting, **Animation speed** (Normal, Quick):
-  - in `src/play/table-settings.ts`;
+  - in `src/ui/table-settings.ts`;
   - stored as the others are (`src/screens/settings-store.ts`);
   - shown in the Table settings panel.
 
@@ -57,7 +57,7 @@ There are no motion tokens: every duration is a local literal. The list is in `d
 - The tap is then handled as usual. This is the only input path the motion touches, and it never delays an intent.
 
 **Haptics**
-- A light impact when a card lands from play, at most one per new state (`src/play/haptics.ts`, `tickLand`).
+- A light impact when a card lands from play, at most one per new state (`src/ui/haptics.ts`, `tickLand`).
 
 ## Data
 
@@ -67,17 +67,17 @@ There are no motion tokens: every duration is a local literal. The list is in `d
   - `arc` (rise in points);
   - `land` ("squash" | "pop" | null).
 - `motionsBetween` sets them.
-- A pure `tokenDeltas(prev, next)` in `src/play/token-deltas.ts` lists `{ cardId, token, change }` from the two states' counts. The UI never computes a number of its own.
+- A pure `tokenDeltas(prev, next)` in `src/play/motion/token-deltas.ts` lists `{ cardId, token, change }` from the two states' counts. The UI never computes a number of its own.
 
 ## Tests
 
-- `src/play/motion.test.ts`:
+- `src/play/motion/motion.test.ts`:
   - drawn cards get increasing delays 90 ms apart;
   - a drawn card flips and a dealt shadow card does not;
   - a revealed encounter card pops;
   - a played card squashes.
-- `src/play/token-deltas.test.ts`: damage +2, resource −1, progress +3 between two states, and nothing when counts are equal.
-- `src/play/motion-tokens.test.ts`: `motionScale` is 0 under reduced motion, 0.6 under Quick, 1 under Normal. Every token is at most 500 ms except the spotlight and the sweep.
+- `src/play/motion/token-deltas.test.ts`: damage +2, resource −1, progress +3 between two states, and nothing when counts are equal.
+- `src/play/motion/tokens.test.ts`: `motionScale` is 0 under reduced motion, 0.6 under Quick, 1 under Normal. Every token is at most 500 ms except the spotlight and the sweep.
 
 ## E2E
 
@@ -86,7 +86,7 @@ None. The canvas is phone-only. The settings flow, if one exists, asserts the An
 ## Exit
 
 - `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit` and `pnpm data:check` pass.
-- `rg -n "duration\\(|withTiming\\(.*[0-9]{3}" src/play` finds no duration literal outside `motion-tokens.ts`.
+- `rg -n "duration\\(|withTiming\\(.*[0-9]{3}" src/play` finds no duration literal outside `src/ui/motion-tokens.ts`.
 - `docs/design-system-table.md` (Motion; Performance) is rewritten with the tokens.
 - STATUS.md lists the phone checks as open:
   - draws, reveals, plays and token pops at Normal and Quick;

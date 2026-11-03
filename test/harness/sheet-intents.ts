@@ -1,8 +1,8 @@
 // Test helper. The intents a choice sheet can send without the player building anything further: each option of a pick
 // (and of the sheet it opens next), the primary and the alternative, an empty and a one-card multi choice, one whole share
 // of a distribute sheet, Pass and each free trigger. The sheet tests send each one to the reducer.
-import { distributeIntent, multiIntent } from "../../src/play/bar-sheets.ts";
-import type { Sheet } from "../../src/play/sheet-types.ts";
+import { distributeIntent, multiIntent } from "../../src/play/choice/bar-sheets.ts";
+import type { Sheet } from "../../src/play/choice/sheet-types.ts";
 import type { PlayerIntent, ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 export function intentsOf(state: ScenarioState, sheet: Sheet): PlayerIntent[] {

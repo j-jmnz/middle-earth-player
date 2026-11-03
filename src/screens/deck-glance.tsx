@@ -2,20 +2,20 @@
 // deck at a glance (the sphere donut and count, the cost curve), its notes and the jump chips to its headings, which carry the counts by type.
 import { View } from "react-native";
 
-import { cardCorner } from "../play/card-corner";
-import { dropShadowOf } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTableTokens } from "../play/use-table-tokens";
-import { SPHERE_TINT } from "../play/icon-map";
+import { cardCorner } from "../ui/card-corner";
+import { dropShadowOf } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { SPHERE_TINT } from "../ui/icon-map";
 import { BodyText, Label, sphereWord, useTitleShadow } from "./chrome";
 import { CardThumb } from "./images/picture";
-import { ArcRing } from "../play/arc-ring";
+import { ArcRing } from "../ui/arc-ring";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./deck-status";
 import { JumpChips, type Jump } from "./deck-grid";
 import type { HeroFace } from "./hero-tile";
 import { usePalette } from "./palette-hook";
-import { touch, useUiScale } from "../play/ui-scale";
-import { Text, TextInput } from "../play/text";
+import { touch, useUiScale } from "../ui/ui-scale";
+import { Text, TextInput } from "../ui/text";
 
 // How far the head's top runs before the deck's own words: Back's row over the fan. The editor watches the scroll past it.
 export const BANNER_HEIGHT = 196;

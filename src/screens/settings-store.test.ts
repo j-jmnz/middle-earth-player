@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { afterEach, describe, expect, it } from "vitest";
 
 import migrations from "../../drizzle/migrations";
-import { DEFAULT_SETTINGS, parseSettings, restoreDefaults, tableSettings } from "../play/table-settings";
+import { DEFAULT_SETTINGS, parseSettings, restoreDefaults, tableSettings } from "../ui/table-settings";
 import { bindTableSettings, readTableSettings } from "./settings-store.ts";
 
 function openUser() {

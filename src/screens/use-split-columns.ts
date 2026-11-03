@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 
-import { useSizeClass } from "../play/use-size-class";
+import { useSizeClass } from "../ui/use-size-class";
 import { equalSplit, sideSplit } from "./split-columns";
 
 export function useSplitColumns(range: { min: number; max: number } | null): {

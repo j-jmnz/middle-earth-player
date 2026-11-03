@@ -23,7 +23,7 @@ User request, 2026-10-26. This plan reworks the landscape table described in `do
 Measured on `main` at `01b0714`:
 
 - **Top bar** (`src/screens/table-view.tsx:194-223`): Back, one threat dial per seat, Life, Burden, the phase rail, Round N, Log, Rules, Booklet.
-- **Command column** (`table-view.tsx:248-277`): the quest band, an "Active: …" line, a Ring-bearer line and the dock (`src/play/table-dock.tsx`). The dock holds:
+- **Command column** (`table-view.tsx:248-277`): the quest band, an "Active: …" line, a Ring-bearer line and the dock (`src/play/choice/dock/table-dock.tsx`). The dock holds:
   - the step, the moment, a scrolling note with guide lines, the readout, the picked cards, a refusal;
   - the armed line, the gold pill, a row of answers and a row of reading pills.
 - **Choice panel** (`SidePanel`, `src/play/table-panel.tsx:42-142`): paper, 46% of the width (320 to 480 pt), anchored to the right and the bottom.
@@ -32,9 +32,9 @@ Measured on `main` at `01b0714`:
   - "Look at the table" (`sheet-collapse`) folds it; `Choose` brings it back.
 - **Glow**:
   - `Glow` is drawn inside `Moving`'s rotated group, so it turns with the card.
-  - The gold edge, the picked edge, the veil and the beat ring are drawn on `slotBounds(slot)` (`src/play/layout.ts:337`), which ignores `tilt`.
+  - The gold edge, the picked edge, the veil and the beat ring are drawn on `slotBounds(slot)` (`src/play/layout/layout.ts:337`), which ignores `tilt`.
   - A fanned hand card therefore has a straight frame on a tilted picture, and `hitSlot` ignores the tilt too.
-- **Two-handed play**: `shownSeat(game)` (`src/play/selectors.ts:189`) is `game.activeSeat`. Nothing in the UI shows the other seat's hand or play area.
+- **Two-handed play**: `shownSeat(game)` (`src/play/store/selectors.ts:189`) is `game.activeSeat`. Nothing in the UI shows the other seat's hand or play area.
 - **Piles**: a tap or a long press on the player deck or the encounter deck does nothing (`table-view.tsx:125-127`).
 - **Motion** (every value is a local literal; there are no motion tokens):
 
@@ -109,7 +109,7 @@ Sources the plan follows.
 
 ## Principles for every phase
 
-- **Tokens, not literals.** Every duration, easing and spring lives in `src/play/motion-tokens.ts` (phase 23). Before phase 23, a phase that adds motion names its values in its phase file, and phase 23 moves them.
+- **Tokens, not literals.** Every duration, easing and spring lives in `src/ui/motion-tokens.ts` (phase 23). Before phase 23, a phase that adds motion names its values in its phase file, and phase 23 moves them.
 - **Timing:**
   - press feedback in the same frame;
   - small changes 200 to 300 ms;
@@ -153,7 +153,7 @@ These are the plan's own, from the research above. Each sits in the phase named.
 - **Tilt-aware hit testing:** a tap on the corner of a fanned card hits that card. (18)
 - **One More pill:** the dock's reading pills fold into one when more than two show. Undo stays out. (22)
 - **Ring mark on the dial** replaces the Ring-bearer line in the command column. (22)
-- **Impact haptic:** a medium impact at the spotlight's hit and a selection tick per card during the hand scrub, through `src/play/haptics.ts`. (24, 25)
+- **Impact haptic:** a medium impact at the spotlight's hit and a selection tick per card during the hand scrub, through `src/ui/haptics.ts`. (24, 25)
 - **Exit motion for panels:** today they vanish. (21)
 
 ## Order to build

@@ -20,7 +20,7 @@ import { writeSave } from "../../../campaign-store";
 import { useDatabases } from "../../../databases";
 import { recordUnclosedRun } from "../../../table-session";
 import { dealSeed } from "../../../e2e";
-import { sphereTell } from "../../../../play/aflame-words";
+import { sphereTell } from "../../../../play/words/aflame";
 import { actionLine, needWords } from "../../../briefing-words";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
 import { SeatPicker } from "../../../seat-picker";

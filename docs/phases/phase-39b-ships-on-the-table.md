@@ -65,7 +65,7 @@ The setup attaches the Heading card to the Dream-chaser and sets it on-course (`
 When a ship-enemy with Boarding X engages from staging, the engine reveals X Corsair cards engaged with that player (`dcce.boarding`).
 
 - **Motion.** Each card comes off the Corsair deck as Reveal says: the Eye, the turn, the pop. It then moves into the engagement row (`cardArrive`), the cards 90 ms apart (`stagger`).
-- **Banner.** The beat names the ship and the count: "Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1" (`sea-words.ts`). The ship's ring follows the banner's current beat.
+- **Banner.** The beat names the ship and the count: "Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1" (`words/sea.ts`). The ship's ring follows the banner's current beat.
 - No spotlight plays, because a reveal is not an attack. An empty Corsair deck that reshuffles mid-reveal plays the reshuffle first.
 
 ### The Sailing test
@@ -87,7 +87,7 @@ The test comes at the start of the quest phase, before the commit, and the quest
 
 ### Crowding: squeeze, then fold
 
-`row-fold.ts` is a pure module, the table's crowding budget as `dock-budget.ts` is the dock's. It lays out staging and the engagement area. Every scenario uses it. A row whose steps stay at 44 pt or more lays out exactly as `rowXs` does today, which a test pins for the Fellowship and Mirkwood tables.
+`row-fold.ts` is a pure module, the table's crowding budget as `dock/budget.ts` is the dock's. It lays out staging and the engagement area. Every scenario uses it. A row whose steps stay at 44 pt or more lays out exactly as `rowXs` does today, which a test pins for the Fellowship and Mirkwood tables.
 
 1. **Natural.** Groups stand a gap apart. A group is a card with its stack, a guarded pair, an engaged enemy with its shadows and fighters, or the Stormcaller's area.
 2. **Squeeze.** Groups overlap evenly while every step between them is at least a 44 pt target (`touch`). The steps inside a group do not change.
@@ -139,7 +139,7 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 
 ## Build
 
-- **Pure modules** (Node-tested): `row-fold.ts`, `look-strip.ts`, `heading.ts` (step to icon, word, arcs, colour token, label, badge and preview turn), `sea-words.ts`. Layout changes go in `layout.ts`, `play-area.ts` (ships first, `SHIP_GAP`, ships in the front row when stacked) and `top-bar-layout.ts`.
+- **Pure modules** (Node-tested): `row-fold.ts`, `look-strip.ts`, `heading.ts` (step to icon, word, arcs, colour token, label, badge and preview turn), `words/sea.ts`. Layout changes go in `layout.ts`, `play-area.ts` (ships first, `SHIP_GAP`, ships in the front row when stacked) and `top-bar-layout.ts`.
 - **Selectors.** `PileId` gains `corsairDeck` and `corsairDiscard`; the scenario phases add `unchartedDeck` and `grottoDeck`. `PILE_WORDS` and the pile list follow.
 - **Drawing.** The Heading dial in `table-chrome.tsx` and `table-top-bar.tsx`. The medallion, the fold stack and the second slot on the Skia canvas. The web list (`table-canvas.tsx`) names each new piece in words: "Heading: Rain (off-course)", "Ships: Dream-chaser, 3 damage", "Corsair deck 9 · Corsair discard pile 2". The web list does not fold.
 - **State** comes from the sea family (phase 39). A test state is built as `seat-fixture.ts` builds one (`sea-fixture.ts`).
@@ -148,30 +148,30 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 
 Node tests the implementer writes:
 
-- `src/play/row-fold.test.ts`: the three tiers. Every step is at least 44 pt at Small, Medium and Large. The fold order in staging and in the engagement area. A card the moment asks about never folds. With no fold the result equals `rowXs`.
-- `src/play/layout.test.ts`:
+- `src/play/layout/row-fold.test.ts`: the three tiers. Every step is at least 44 pt at Small, Medium and Large. The fold order in staging and in the engagement area. A card the moment asks about never folds. With no fold the result equals `rowXs`.
+- `src/play/layout/layout.test.ts`:
   - the second slot under the encounter pair, and the engagement area narrowed only when it is declared;
   - ships first in the row, after a side quest, the Dream-chaser leftmost, `SHIP_GAP` after them, two ships in solo;
   - ships in the front row when the play area stacks;
   - one staging peek with a count;
   - a Fellowship and a Mirkwood table unchanged.
-- `src/play/sea-layout.test.ts`, at 667 × 375 (insets 0) and 844 × 390 (insets 47) at Small, Medium and Large, and at 1024 × 768 and 1366 × 1024 at Medium and Large, for a solo table with two ships and a two-seat table:
+- `src/play/layout/sea-layout.test.ts`, at 667 × 375 (insets 0) and 844 × 390 (insets 47) at Small, Medium and Large, and at 1024 × 768 and 1366 × 1024 at Medium and Large, for a solo table with two ships and a two-seat table:
   - no two zones or piles overlap;
   - every slot keeps a 44 pt hit or is folded;
   - the fold stack and every pile hit at 44 pt.
-- `src/play/look-strip.test.ts`: the bands and steps for 1 to 12 cards at each screen above, with and without the quest scale; the success marks from the ledger.
-- `src/play/heading.test.ts`: every step's icon, word, arcs, colour, spoken label, badge and preview turn.
-- `src/play/top-bar-layout.test.ts`: two seats and the Heading dial at 667 × 375 keep the rail centred; at Large the dials scroll and none is cut.
-- `src/play/scale-budgets.test.ts`: `row-fold` and `look-strip` are proportional at Large.
-- `src/play/clash.test.ts`: a ship defends against a ship-enemy; an undefended ship-enemy attack hits a ship; ships and heroes attack a ship-enemy together.
-- `src/play/table-choice.test.ts`:
+- `src/play/layout/look-strip.test.ts`: the bands and steps for 1 to 12 cards at each screen above, with and without the quest scale; the success marks from the ledger.
+- `src/play/dream-chaser/heading.test.ts`: every step's icon, word, arcs, colour, spoken label, badge and preview turn.
+- `src/play/chrome/top-bar-layout.test.ts`: two seats and the Heading dial at 667 × 375 keep the rail centred; at Large the dials scroll and none is cut.
+- `src/play/layout/scale-budgets.test.ts`: `row-fold` and `look-strip` are proportional at Large.
+- `src/play/store/clash.test.ts`: a ship defends against a ship-enemy; an undefended ship-enemy attack hits a ship; ships and heroes attack a ship-enemy together.
+- `src/play/choice/table-choice.test.ts`:
   - a pick on a folded card opens the tray;
   - the ship-enemy defender pick veils non-ships with the engine's reason;
   - Raider Flagship's attacker pick;
   - the Sailing commit readout counts the Dream-chaser as 2, from the engine;
   - every sea sheet's options are cards or answers, never a number.
-- `src/play/selectors.test.ts`: the Corsair pile views; a peek keeps the second slot and the Heading dial.
-- `src/play/sea-words.test.ts`: the Boarding beat, the Sailing titles and readouts, the pile words.
+- `src/play/store/selectors.test.ts`: the Corsair pile views; a peek keeps the second slot and the Heading dial.
+- `src/play/words/sea.test.ts`: the Boarding beat, the Sailing titles and readouts, the pile words.
 
 ## E2E
 

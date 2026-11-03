@@ -9,7 +9,7 @@ import { deckCardCount, deckCountLine, DECK_MINIMUM } from "./deck-status";
 import { useDatabases } from "./databases";
 import { enqueueImageDownloads } from "./images/queue";
 import { useListPreview } from "./list-preview";
-import { notAppliedWords } from "../play/not-applied";
+import { notAppliedWords } from "../play/cards/not-applied";
 import { usePalette } from "./palette-hook";
 import { poolOf } from "./pool-cache";
 import { addingView, browseView } from "./pool-view";
@@ -18,16 +18,16 @@ import { LIST_ROW_HEIGHT, gridCardWidth, gridOffset, poolCellHeight, poolColumns
 import { activeFilterCount, applyTypeRequest, cycleGroups, emptyPoolFilter, filterPool, typeRequestWords, type PoolFilter } from "./pool-filter";
 import { PoolFilterSheet, typeChoices } from "./pool-filter-sheet";
 import { ToastView } from "./toast-view";
-import { gutter } from "../play/size-class";
-import { GameIcon } from "../play/game-icon";
-import { SPHERE_TINT } from "../play/icon-map";
-import { chipSurface } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTableTokens } from "../play/use-table-tokens";
-import type { PictureSource } from "../play/table-canvas-types";
-import { touch, useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
-import { Text } from "../play/text";
+import { gutter } from "../ui/size-class";
+import { GameIcon } from "../ui/game-icon";
+import { SPHERE_TINT } from "../ui/icon-map";
+import { chipSurface } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { useTableTokens } from "../ui/use-table-tokens";
+import type { PictureSource } from "../play/canvas/table-canvas-types";
+import { touch, useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
+import { Text } from "../ui/text";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };

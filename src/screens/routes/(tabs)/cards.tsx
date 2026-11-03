@@ -7,7 +7,7 @@ import { CardPool, CardPoolBody } from "../../card-pool";
 import { BodyText, HubHeader, PillButton, Screen } from "../../chrome";
 import { useListPreview } from "../../list-preview";
 import { ToastView } from "../../toast-view";
-import { useSizeClass } from "../../../play/use-size-class";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 // The detail pane beside the pool on a tablet in landscape.
 const DETAIL = 360;

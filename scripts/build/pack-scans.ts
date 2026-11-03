@@ -51,7 +51,7 @@ type Pin = SourceFile & { cacheDir: string };
 /**
  * Bundles side A of every card in the catalog, and side B of each card pinned with one (a quest stage, a campaign card), so the
  * app needs no network (user decision, 2026-10-29) and a quest stage on its B side shows that side. Side B is written as
- * `<code>.B` and keyed so in the map (src/play/picture-key.ts). The file is the
+ * `<code>.B` and keyed so in the map (src/play/canvas/picture-key.ts). The file is the
  * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
  * hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache), and a PDF page is rendered from
  * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data:sync scans pictures` to move the pins.

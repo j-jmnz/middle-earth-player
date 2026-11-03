@@ -1,11 +1,11 @@
 import { View } from "react-native";
 
-import { useSizeClass } from "../play/use-size-class";
+import { useSizeClass } from "../ui/use-size-class";
 import { Eyebrow, PrimaryButton, TextButton } from "./chrome";
 import { PrimaryPlate } from "./hub-parts";
 import { nextLabel } from "./hub-runs";
 import { describe, nextSummary, type SaveLine } from "./save-line";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 // The next stop under the Campaigns hub's hero (docs/design-system.md, Campaigns (campaign list)). The hero over the current scene and
 // the row for each other journey are in hub-parts.tsx; the line that words a save is in save-line.ts.

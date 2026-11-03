@@ -22,8 +22,8 @@ import {
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { AskInPlace } from "../../ask-in-place";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 type Row =
   | { kind: "deck"; key: string; deck: SavedDeck; starter: boolean }

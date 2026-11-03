@@ -66,8 +66,8 @@ touches what it says (Performance, State, Persistence).
   `table-view.tsx:202-226`, keeps `dockPills` stable, and stops `TableDock`, `DockButtons`, `TableLayers` and `ChoiceTray`
   re-rendering.
 - Smaller fixes:
-  - `canvas-pieces.native.tsx:60` `Outlined`: `color?: string`, then `color ?? t.bone` in the body.
-  - `dock-buttons.tsx:133`: move the ternary in the `||` chain into a `const`.
+  - `canvas/pieces.native.tsx:60` `Outlined`: `color?: string`, then `color ?? t.bone` in the body.
+  - `dock/buttons.tsx:133`: move the ternary in the `||` chain into a `const`.
   - `phase-rail.tsx:64`: replace the computed key with two plain style objects.
   - `spotlight.native.tsx:57/87/164`: memos the compiler cannot keep, and the method call that triggers the codegen error.
   - `popover-frame.tsx:103`, `routes/_layout.tsx:42`, `briefing/[saveId]/[scenarioId].tsx:123` (`onDeal`),
@@ -108,21 +108,21 @@ touches what it says (Performance, State, Persistence).
 7. **Smaller items**
    - `useImageSnapshot` (`table-view.tsx:92`): hand the revision only to the canvas and the preview, and fix the preview's
      missing `images.revision` dependency (`:257-264`).
-   - Icon paths (`canvas-pieces.native.tsx:54`): parse each glyph once into a module `Map<IconName, SkPath>` instead of
+   - Icon paths (`canvas/pieces.native.tsx:54`): parse each glyph once into a module `Map<IconName, SkPath>` instead of
      passing the SVG string on every re-record.
    - One module-level AccessibilityInfo store (reduce motion and screen reader) read through `useSyncExternalStore` by
-     `useReduceMotion`, `useScreenReader` and `useMotionScale` (`motion-run.ts:53-71`, `screen-reader.ts`), instead of one
+     `useReduceMotion`, `useScreenReader` and `useMotionScale` (`src/ui/motion-run.ts:53-71`, `screen-reader.ts`), instead of one
      listener per hook call.
-   - Cancel the animations on unmount: `dock-buttons.tsx:80` and `phase-sweep.tsx:39-43` (`cancelAnimation`).
+   - Cancel the animations on unmount: `dock/buttons.tsx:80` and `phase-sweep.tsx:39-43` (`cancelAnimation`).
    - Load each table font and icon once, shared by the canvas and the spotlight layer
-     (`table-fonts.native.ts`, `token-fx.native.tsx:104`, `spotlight-layer.native.tsx:32-36`).
+     (`table-fonts.native.ts`, `token-fx.native.tsx:104`, `spotlight/layer.native.tsx:32-36`).
 
 ## 4. Engine hot path (src/rules; golden games must stay identical)
 1. **`constantInstructions`** (`constant-records.ts:20-23`): cache the result in a `WeakMap<ScenarioState, …>`. The state is
    immutable, so the same state always gives the same result. Do the same for `restricted()` (`restrictions.ts:16-28`),
    keyed by state and code. `syncConstants` (`constants.ts:116-122`): compare old and new modifiers field by field instead of
    comparing two `JSON.stringify` strings. Also cache `slotNumbers`/`cardEffects` per `(game, seat)` → `Map<cardId, numbers>`
-   (`src/play/card-effects.ts:184-198`, the same pattern as `foresight.ts:90`).
+   (`src/play/cards/card-effects.ts:184-198`, the same pattern as `foresight.ts:90`).
 2. **Effects by id**: add an `effectById(effects, id)` WeakMap index next to `effectsOf` (`rules/windows/listen.ts:12-23`), and use it
    in `responses.ts:91/98/131/140`, `constants.ts:129`, `sheets.ts:30/81/331`, `objective.ts:31/40`, `stops.ts:88`,
    `table-hooks.ts:36`, `use-table-choice.ts:135` and `table-view.tsx:146`. The `src/play` callers import it from

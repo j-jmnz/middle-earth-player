@@ -3,8 +3,8 @@ import { useMemo, useState } from "react";
 import { View } from "react-native";
 
 import { campaignPath, openNode, soonNode, soonWords, type PathNode } from "../../../campaign/path";
-import { rowSurface } from "../../../play/surfaces";
-import { useTableTokens } from "../../../play/use-table-tokens";
+import { rowSurface } from "../../../ui/surfaces";
+import { useTableTokens } from "../../../ui/use-table-tokens";
 import { SceneArt } from "../../art";
 import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, TextButton } from "../../chrome";
 import { Road, roadLayout } from "../../path-road";
@@ -24,9 +24,9 @@ import { seatWord } from "../../seats";
 import { goBack } from "../../go-back";
 import { useBottomInset } from "../../use-bottom-inset";
 import { droppedSentence, useSave } from "../../use-save";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
-import { Text } from "../../../play/text";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
+import { Text } from "../../../ui/text";
 
 // The right column's width on a tablet in landscape: the completed scenarios and the next one's panel.
 const PATH_SIDE = 360;

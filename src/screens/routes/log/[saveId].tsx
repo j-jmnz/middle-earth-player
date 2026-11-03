@@ -17,15 +17,15 @@ import { goBack } from "../../go-back";
 import { usePalette } from "../../palette-hook";
 import { routeCode } from "../../route-code";
 import { useSave } from "../../use-save";
-import { GameIcon } from "../../../play/game-icon";
-import type { IconName } from "../../../play/icon-map";
-import { parchmentSurface } from "../../../play/surfaces";
-import { withAlphaHex } from "../../../play/tokens";
-import { useTableTokens } from "../../../play/use-table-tokens";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
+import { GameIcon } from "../../../ui/game-icon";
+import type { IconName } from "../../../ui/icon-map";
+import { parchmentSurface } from "../../../ui/surfaces";
+import { withAlphaHex } from "../../../ui/tokens";
+import { useTableTokens } from "../../../ui/use-table-tokens";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
 import { seatWord } from "../../seats";
-import { Text, TextInput } from "../../../play/text";
+import { Text, TextInput } from "../../../ui/text";
 
 // A rule between the log's rows: a faint line of the ink, as on the printed sheet.
 const RULE = 0.28;

@@ -63,7 +63,7 @@ function bailouts(file: string): string[] {
 
 describe("React Compiler coverage", () => {
   it("compiles every component and hook in src/play and src/screens", () => {
-    const files = [...sources(path.join(src, "play")), ...sources(path.join(src, "screens"))];
+    const files = [...sources(path.join(src, "ui")), ...sources(path.join(src, "play")), ...sources(path.join(src, "screens"))];
     expect(files.length).toBeGreaterThan(50);
     const failures = files.flatMap(bailouts);
     expect(failures).toEqual([]);

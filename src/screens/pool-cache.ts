@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { cards, packs } from "../catalog/schema";
-import { notAppliedCodes } from "../play/not-applied";
+import { notAppliedCodes } from "../play/cards/not-applied";
 
 import { sortPool } from "./pool-filter";
 

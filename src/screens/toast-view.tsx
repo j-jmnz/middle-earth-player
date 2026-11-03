@@ -3,12 +3,12 @@ import { useCallback, useEffect, useMemo } from "react";
 import { AccessibilityInfo, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
-import { layoutAnim, useMotionScale } from "../play/motion-run";
-import { MOTION } from "../play/motion-tokens";
-import { useScreenReader } from "../play/screen-reader";
+import { layoutAnim, useMotionScale } from "../ui/motion-run";
+import { MOTION } from "../ui/motion-tokens";
+import { useScreenReader } from "../ui/screen-reader";
 import { TextButton } from "./chrome";
 import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 /**
  * The toast of src/screens/toast.ts, docked at the foot of the screen's content, above its pinned bar. It takes its own

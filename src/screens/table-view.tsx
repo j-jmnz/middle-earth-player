@@ -1,67 +1,67 @@
 // The table of an open game, campaign or standalone, always in landscape (each table route's stack option,
 // routes/_layout.tsx). The canvas, the dock and the panels are src/play; the route opens the session and keeps each accepted
 // intent in user.db, and this view hands the canvas the pictures in the image cache and lays the pieces out. The reducer is
-// the only writer of the game; how a tap becomes an intent is src/play/use-table-choice.ts.
+// the only writer of the game; how a tap becomes an intent is src/play/choice/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
-import { backStep, playLayers, runBackStep } from "../play/back-steps";
-import { createBeats } from "../play/beat-store";
-import { slotNumbers } from "../play/card-effects";
-import { CardPreview } from "../play/card-preview";
-import { standInText } from "../play/dungeon-preview";
-import { causeKey, type LogNames } from "../play/log";
-import { dockPills } from "../play/dock-extras";
-import { ChoiceTray } from "../play/choice-tray";
-import { isDense } from "../play/dock-budget";
-import { MorePopoverView, useMorePopover } from "../play/dock-more";
-import { railFor } from "../play/rail";
-import { dialTicksSelector, threatSelector } from "../play/selectors";
-import type { SheetNames } from "../play/sheet-types";
-import { effectById, type ReduceContext, type TableStore } from "../play/store";
-import { createHandoff } from "../play/spotlight-handoff";
-import { SpotlightLayer } from "../play/spotlight-layer";
-import type { SpotlightLayerProps } from "../play/spotlight-handoff";
-import type { StageArea } from "../play/spotlight-stage";
-import { TableCanvas } from "../play/table-canvas";
-import type { PictureSource, TableCanvasProps } from "../play/table-canvas-types";
-import { MomentBanner } from "../play/moment-banner";
-import { TableDock } from "../play/table-dock";
-import { TableLayers } from "../play/table-layers";
-import { openReading, type Reading } from "../play/reading";
-import { phaseCarousel, stopAheadOf } from "../play/carousel";
-import { tableSettings } from "../play/table-settings";
-import { useKeepAwake } from "../play/use-keep-awake";
-import { TableMenu } from "../play/table-menu";
-import type { MenuItemId } from "../play/table-menu-items";
-import { previewCards } from "../play/table-preview";
-import { pictureCode, pictureKey } from "../play/picture-key";
-import { shownName } from "../play/shown-name";
-import { advanceButton, advanceFace, advanceWords } from "../play/quest-advance";
-import { QuestAdvanceView } from "../play/quest-advance-view";
-import { useQuestAdvance } from "../play/use-quest-advance";
-import { PEEK_ROOM, PEEK_TOP } from "../play/peek-banner";
-import { usePeek } from "../play/use-peek";
-import { AreaSummary } from "../play/area-summary";
-import { useTableChoice } from "../play/use-table-choice";
-import { useTableWiring } from "../play/use-table-wiring";
-import { trayCount } from "../play/tray-logic";
-import { withAlphaHex } from "../play/tokens";
-import { useTableTokens } from "../play/use-table-tokens";
-import { dockReadout } from "../play/readout";
-import { questScaleOf } from "../play/quest-scale";
-import { CommandHead } from "../play/command-head-view";
-import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../play/command-head";
-import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
-import { whyNotChosen } from "../play/why";
-import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
-import { notApplied, notAppliedCodes } from "../play/not-applied";
+import { backStep, playLayers, runBackStep } from "../play/chrome/back-steps";
+import { createBeats } from "../play/store/beat-store";
+import { slotNumbers } from "../play/cards/card-effects";
+import { CardPreview } from "../play/cards/card-preview";
+import { standInText } from "../play/cards/dungeon-preview";
+import { causeKey, type LogNames } from "../play/store/log";
+import { dockPills } from "../play/choice/dock/extras";
+import { ChoiceTray } from "../play/choice/tray";
+import { isDense } from "../play/choice/dock/budget";
+import { MorePopoverView, useMorePopover } from "../play/choice/dock/more";
+import { railFor } from "../play/phases/rail";
+import { dialTicksSelector, threatSelector } from "../play/store/selectors";
+import type { SheetNames } from "../play/choice/sheet-types";
+import { effectById, type ReduceContext, type TableStore } from "../play/store/store";
+import { createHandoff } from "../play/spotlight/handoff";
+import { SpotlightLayer } from "../play/spotlight/layer";
+import type { SpotlightLayerProps } from "../play/spotlight/handoff";
+import type { StageArea } from "../play/spotlight/stage";
+import { TableCanvas } from "../play/canvas/table-canvas";
+import type { PictureSource, TableCanvasProps } from "../play/canvas/table-canvas-types";
+import { MomentBanner } from "../play/readouts/moment-banner";
+import { TableDock } from "../play/choice/dock/table-dock";
+import { TableLayers } from "../play/chrome/table-layers";
+import { openReading, type Reading } from "../play/chrome/reading";
+import { phaseCarousel, stopAheadOf } from "../play/phases/carousel";
+import { tableSettings } from "../ui/table-settings";
+import { useKeepAwake } from "../play/chrome/use-keep-awake";
+import { TableMenu } from "../play/chrome/table-menu";
+import type { MenuItemId } from "../play/chrome/table-menu-items";
+import { previewCards } from "../play/cards/table-preview";
+import { pictureCode, pictureKey } from "../play/canvas/picture-key";
+import { shownName } from "../play/cards/shown-name";
+import { advanceButton, advanceFace, advanceWords } from "../play/readouts/quest-advance";
+import { QuestAdvanceView } from "../play/readouts/quest-advance-view";
+import { useQuestAdvance } from "../play/readouts/use-quest-advance";
+import { PEEK_ROOM, PEEK_TOP } from "../play/readouts/peek-banner";
+import { usePeek } from "../play/store/use-peek";
+import { AreaSummary } from "../play/canvas/area-summary";
+import { useTableChoice } from "../play/choice/use-table-choice";
+import { useTableWiring } from "../play/chrome/use-table-wiring";
+import { trayCount } from "../play/choice/tray-logic";
+import { withAlphaHex } from "../ui/tokens";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { dockReadout } from "../play/readouts/readout";
+import { questScaleOf } from "../play/readouts/quest-scale";
+import { CommandHead } from "../play/readouts/command-head-view";
+import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../play/readouts/command-head";
+import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/readouts/widgets";
+import { whyNotChosen } from "../play/choice/why";
+import { ledgerLine, ruleTitle, sideText } from "../play/cards/ledger";
+import { notApplied, notAppliedCodes } from "../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "./chrome";
 import { TableTopBar, TOP_BAR } from "./table-top-bar";
-import { BAR_TOP } from "../play/top-bar-layout";
+import { BAR_TOP } from "../play/chrome/top-bar-layout";
 import { goBack } from "./go-back";
 import { useTablePictures } from "./use-table-pictures";
 import { scanAssets } from "./images/scan-map";
@@ -71,9 +71,9 @@ import type { CardFacts } from "./open-game";
 import { commandWidth as commandWidthOf } from "./table-command";
 import type { PlayClock } from "./play-clock";
 import { usePlayClock } from "./use-play-clock";
-import { useUiScale } from "../play/ui-scale";
+import { useUiScale } from "../ui/ui-scale";
 
-// By picture key (src/play/picture-key.ts): the bundled picture of the key, else its downloaded file. `exact`: that picture only, never the other side's: a
+// By picture key (src/play/canvas/picture-key.ts): the bundled picture of the key, else its downloaded file. `exact`: that picture only, never the other side's: a
 // Lost Island's side B never shows the real side behind it (dcce.uncharted), and a card on its B side that has a side B picture to download (a quest stage
 // turned to 1B) never shows side A meanwhile; until the file lands the card is drawn on paper. Otherwise a key with neither falls back to side A's picture.
 function picture(key: string, exact = false): PictureSource | null {
@@ -138,7 +138,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const t = useTableTokens();
   // The canvas wrapper's size, and its left edge in the row.
   const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
-  // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight-handoff.ts).
+  // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight/handoff.ts).
   const [handoff] = useState(createHandoff);
   // The pieces that draw pictures read the image cache's revision themselves (PicturedCanvas), so this view does not render for a file landing.
   const game = useStore(store, (state) => state.game);
@@ -180,7 +180,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The pictures of the hand, the table and the screen about to open, and of a card picked up (use-table-pictures.ts).
   useTablePictures(store, session, game, peek.shown);
 
-  // By picture key: a fallen hero (`<code>~enemy`) keeps the hero's name, and a Lost Island lying on its Lost Island side shows that name, never the location it turns out to be (src/play/shown-name.ts).
+  // By picture key: a fallen hero (`<code>~enemy`) keeps the hero's name, and a Lost Island lying on its Lost Island side shows that name, never the location it turns out to be (src/play/cards/shown-name.ts).
   const nameOf = useCallback((key: string) => shownName(key, session.world.cards.get(pictureCode(key))), [session]);
   const sphereOf = useCallback((code: string) => (session.world.cards.get(code) ?? session.world.cards.get(pictureCode(code)))?.sphere ?? null, [session]);
   // A Lost Island lying on its Lost Island side is drawn from its own picture only.
@@ -225,7 +225,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
     [names, nameOf, ctx, session],
   );
 
-  // A menu row closes the menu and then acts (src/play/table-menu-items.ts).
+  // A menu row closes the menu and then acts (src/play/chrome/table-menu-items.ts).
   const onMenuRow = useCallback(
     (id: MenuItemId) => {
       setMenuOpen(false);
@@ -267,18 +267,18 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const onOutcome = useCallback(() => router.replace(nav.outcome), [router, nav]);
   // The printed facts, the preview opener, the pile taps, the Heading dial and the Island Map chip (use-table-wiring.ts).
   const { facts, success, onPreview, onPile, headingDial, island } = useTableWiring({ store, ctx, game, setReading, setPreview });
-  // The stage the quest just advanced to, shown large until Progress (src/play/quest-advance.ts); the table answers nothing meanwhile.
+  // The stage the quest just advanced to, shown large until Progress (src/play/readouts/quest-advance.ts); the table answers nothing meanwhile.
   const advance = useQuestAdvance(store);
   const choice = useTableChoice({ store, ctx, names, beats, onPreview, onPile, onOutcome, hold: advance.held });
   // A card shown large reads its picture from the cache, so it is described again when a file lands (pictureAt) while it is up.
   const revision = useImageRevision(preview != null || advance.shown != null);
-  // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
+  // The quiet pills: Undo and up to two others, or Undo and More (dock/extras.ts); More opens a popover (dock/more.tsx).
   const pills = dockPills(choice.extras);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
-  // Android hardware Back peels one layer at a time (src/play/back.ts) and only then leaves the table.
+  // Android hardware Back peels one layer at a time (src/play/chrome/back.ts) and only then leaves the table.
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       // The quest advance screen is on top: Back is its Progress, and does nothing while the stage asks.
@@ -336,7 +336,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, s, scale.live) !== "hidden";
   const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
-  // the left inset) and the safe insets (spotlight-stage.ts).
+  // the left inset) and the safe insets (spotlight/stage.ts).
   // The bar's top: under the top inset, and never at the screen's very edge (BAR_TOP).
   const barTop = Math.max(insets.top, BAR_TOP * s);
   const barBottom = barTop + TOP_BAR * s;
@@ -348,7 +348,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
   // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
   const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
-  // How a card code is shown large, by picture key (src/play/picture-key.ts): the preview's cards and the advanced stage.
+  // How a card code is shown large, by picture key (src/play/canvas/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
     name: nameOf(key),
     source: pictureAt(key, revision, ownSide(key)),
@@ -417,7 +417,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         />
         <View className="min-h-0 flex-1 flex-row">
           <View className="min-h-0 flex-1" style={{ paddingTop: peekRoom }} onLayout={onLayout}>
-            {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (area-words.ts). */}
+            {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (words/area.ts). */}
             <AreaSummary store={store} nameOf={nameOf} />
             {size ? (
               <PicturedCanvas

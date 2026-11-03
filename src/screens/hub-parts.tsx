@@ -3,12 +3,12 @@
 import { Children, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, View, type ScrollView } from "react-native";
 
-import { dropShadowOf, lapShadowOf, rowSurface, tileSurface } from "../play/surfaces";
-import { withAlphaHex } from "../play/tokens";
-import { useTheme } from "../play/theme";
-import { useTableTokens } from "../play/use-table-tokens";
-import { useUiScale } from "../play/ui-scale";
-import { useSizeClass } from "../play/use-size-class";
+import { dropShadowOf, lapShadowOf, rowSurface, tileSurface } from "../ui/surfaces";
+import { withAlphaHex } from "../ui/tokens";
+import { useTheme } from "../ui/theme";
+import { useTableTokens } from "../ui/use-table-tokens";
+import { useUiScale } from "../ui/ui-scale";
+import { useSizeClass } from "../ui/use-size-class";
 import { HeroArt, SceneArt } from "./art";
 import { COVER } from "./art-crop";
 import { Chevron, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "./chrome";
@@ -17,7 +17,7 @@ import { HeroTile, type HeroFace } from "./hero-tile";
 import { HeroTrio } from "./hero-trio";
 import { usePalette } from "./palette-hook";
 import { useSplitColumns } from "./use-split-columns";
-import { Text } from "../play/text";
+import { Text } from "../ui/text";
 
 // How far a fellowship painting laps over the one before it.
 const OVERLAP = 10;

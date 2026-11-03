@@ -11,7 +11,7 @@ import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, refusedCodes, TYP
 import { announceDraftChange, discardDraftChanges, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, startNewDeck, useDeckDraft, type TitleLookup } from "../../deck-draft";
 import { deckContentsPhrase, deckCountLine, deckReadiness, deckSections, notAppliedLine, savedDeckName, startingThreat } from "../../deck-status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck-store";
-import { notAppliedWords } from "../../../play/not-applied";
+import { notAppliedWords } from "../../../play/cards/not-applied";
 import { STARTER_NOTE } from "../../starter-decks";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
@@ -22,10 +22,10 @@ import { SheetModal } from "../../sheet-modal";
 import { showToast } from "../../toast";
 import { ToastView } from "../../toast-view";
 import { goBack } from "../../go-back";
-import { MEDIUM_ACTION_GROUP } from "../../../play/size-class";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
-import { Text } from "../../../play/text";
+import { MEDIUM_ACTION_GROUP } from "../../../ui/size-class";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
+import { Text } from "../../../ui/text";
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
 // The deck's head in an expanded window, in Medium's points (docs/design-system.md, Deck builder); its cards take the rest.

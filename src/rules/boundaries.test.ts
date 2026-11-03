@@ -50,4 +50,10 @@ describe("boundaries", () => {
     const offenders = sourceFiles(join(process.cwd(), "src/play")).filter((path) => /from\s+["'][./]*\/(screens|campaign)\//.test(readFileSync(path, "utf8")));
     expect(offenders).toEqual([]);
   });
+
+  // src/ui is the design system the table and the screens share: it reaches nothing else under src/.
+  it("keeps src/ui off every other module", () => {
+    const offenders = sourceFiles(join(process.cwd(), "src/ui")).filter((path) => /from\s+["'][./]*\/(catalog|effects|rules|campaign|play|screens)\//.test(readFileSync(path, "utf8")));
+    expect(offenders).toEqual([]);
+  });
 });

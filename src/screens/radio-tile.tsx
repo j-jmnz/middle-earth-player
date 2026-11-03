@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import { rowSurface, selectedRingOf, selectedWash } from "../play/surfaces";
-import { useTableTokens } from "../play/use-table-tokens";
+import { rowSurface, selectedRingOf, selectedWash } from "../ui/surfaces";
+import { useTableTokens } from "../ui/use-table-tokens";
 
 /**
  * One choice of a group the player picks one from: the silver ring and wash when chosen, a row's surface when not (never the accent

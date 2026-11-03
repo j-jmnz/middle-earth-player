@@ -10,15 +10,15 @@ import { useListGutter } from "../../list-gutter";
 import { useDatabases } from "../../databases";
 import { enqueueImageDownloads } from "../../images/queue";
 import { cardImageUrl, shownCardImage } from "../../images/policy";
-import { cardCorner } from "../../../play/card-corner";
+import { cardCorner } from "../../../ui/card-corner";
 import { RowCardImage } from "../../images/picture";
 import { routeCode } from "../../route-code";
 import { scanAssets } from "../../images/scan-map";
 import { useCachedImage } from "../../images/store";
 import { goBack } from "../../go-back";
 import { useListPreview } from "../../list-preview";
-import type { PictureSource } from "../../../play/table-canvas-types";
-import { useUiScale } from "../../../play/ui-scale";
+import type { PictureSource } from "../../../play/canvas/table-canvas-types";
+import { useUiScale } from "../../../ui/ui-scale";
 
 type PackCard = {
   code: string;
