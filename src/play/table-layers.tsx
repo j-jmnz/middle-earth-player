@@ -24,7 +24,9 @@ import { carouselHeight } from "./carousel-size.ts";
 import { PhaseCarousel } from "./phase-carousel.tsx";
 import { PhaseSweep } from "./phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
-import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel } from "./reading-panels.tsx";
+import { kindWords, victoryWords } from "./list-words.ts";
+import { pictureKey } from "./picture-key.ts";
+import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, type ListCard } from "./reading-panels.tsx";
 import { IslandPanel } from "./island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "./island-table.ts";
 import { foldTitle } from "./row-fold.ts";
@@ -35,7 +37,9 @@ import { useScreenReader } from "./screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "./selectors.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
-import type { ReduceContext, TableStore } from "./store.ts";
+import type { ReduceContext, ScenarioState, TableStore } from "./store.ts";
+import type { PictureSource } from "./table-canvas-types.ts";
+import { victoryPointsOf } from "../rules/printed-stat.ts";
 import { settingsPanelWidth } from "./settings-panel-width.ts";
 import { tableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";
@@ -52,13 +56,27 @@ import { Text } from "./text.tsx";
 const READING_MIN = 300;
 const EDGE = 8;
 
+type Pictures = (key: string) => PictureSource | null;
+
+// A card of a list as the table shows it: its name, its picture on the side it lies (none while facedown), and the line under it.
+function listCard(game: ScenarioState, id: string, names: SheetNames, picture: Pictures, detail: string | null, hidden = false): ListCard {
+  const card = game.cards[id];
+  const key = card && !hidden ? pictureKey(card) : "";
+  return { id, label: hidden ? "Facedown card" : names.card(id), detail, picture: key ? picture(key) : null, pictureKey: key || id };
+}
+
 // The discard pile list, the log and the threat panel read the game themselves, so the layers above them do not render on every state.
-function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay, onClose }: { store: TableStore; pile: PileId; seat: number; names: SheetNames; sheet: Sheet; peeking: boolean; onRead: (cardId: string) => void; onPlay: (cardId: string) => void; onClose: () => void }) {
+// A discard pile's line is each card's type and sphere; the victory display's adds the Victory points each card scores (list-words.ts).
+function PileReading({ store, ctx, pile, seat, names, picture, sheet, peeking, onRead, onPlay, onClose }: { store: TableStore; ctx: ReduceContext; pile: PileId; seat: number; names: SheetNames; picture: Pictures; sheet: Sheet; peeking: boolean; onRead: (cardId: string) => void; onPlay: (cardId: string) => void; onClose: () => void }) {
   const game = useStore(store, (state) => state.game);
+  const detailOf = (id: string) => {
+    const kind = kindWords(ctx.cards.get(game.cards[id]?.code ?? ""));
+    return pile === "victory" ? victoryWords(kind, victoryPointsOf(game, id, ctx.cards)) : kind;
+  };
   return (
     <PileList
       title={PILE_WORDS[pile]}
-      cards={[...pileIds(game, pile, seat)].reverse().map((id) => ({ id, label: names.card(id) }))}
+      cards={[...pileIds(game, pile, seat)].reverse().map((id) => listCard(game, id, names, picture, detailOf(id)))}
       playable={pile === "discard" && !peeking ? discardPlays(game, seat, sheet) : []}
       onRead={onRead}
       onPlay={onPlay}
@@ -67,16 +85,11 @@ function PileReading({ store, pile, seat, names, sheet, peeking, onRead, onPlay,
   );
 }
 
-// The whole victory display (the strip's "+n more"): its cards, the newest first, a tap shows one large.
-function VictoryReading({ store, names, onRead, onClose }: { store: TableStore; names: SheetNames; onRead: (cardId: string) => void; onClose: () => void }) {
-  const victory = useStore(store, (state) => state.game.victory);
-  return <PileList title="Victory display" cards={[...victory].reverse().map((id) => ({ id, label: names.card(id) }))} onRead={onRead} onClose={onClose} />;
-}
-
 const NO_IDS: readonly string[] = [];
 
 // The cards a row folded away, as the canvas last laid the table out (store.ts, `folded`): a tile shows one large.
-function RowReading({ store, row, names, onRead, onClose }: { store: TableStore; row: "staging" | "engaged"; names: SheetNames; onRead: (cardId: string) => void; onClose: () => void }) {
+function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; row: "staging" | "engaged"; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
   const ids = useStore(store, (state) => state.rowFolds[row]);
   // A card the table hides the face of (facedown) is not named, as it is not on the canvas (selectors.ts, hidesFace).
   const hiddenKey = useStore(store, (state) => state.rowFolds[row].filter((id) => hidesFace(state.game.cards[id])).join(","));
@@ -86,7 +99,12 @@ function RowReading({ store, row, names, onRead, onClose }: { store: TableStore;
   const details = detailKey.split("\n");
   // A stack that holds only the Stormcaller's area's cards is titled for it (stormcaller-table.ts); its stage never folds.
   const areaOnly = useStore(store, (state) => row === "staging" && ids.length > 0 && ids.every((id) => areaRoleOf(state.game, id) != null));
-  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={ids.map((id, at) => ({ id, label: hidden.includes(id) ? "Facedown card" : names.card(id), detail: details[at] || null }))} onRead={onRead} onClose={onClose} />;
+  // Each card's line is what the grapple says of it, else its type and sphere; a facedown card has neither.
+  const cards = ids.map((id, at) => {
+    const facedown = hidden.includes(id);
+    return listCard(game, id, names, picture, details[at] || (facedown ? null : kindWords(ctx.cards.get(game.cards[id]?.code ?? ""))), facedown);
+  });
+  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
@@ -132,12 +150,15 @@ export function TableLayers({
   barBottom,
   commandWidth,
   anchorTop,
+  picture,
   onPreview,
   onAllSettings,
 }: {
   store: TableStore;
   ctx: ReduceContext;
   names: SheetNames;
+  // A card's picture by its picture key, as the table and the choice's rows draw it.
+  picture: Pictures;
   nameOf: (code: string) => string;
   choice: TableChoice;
   reading: Reading | null;
@@ -182,6 +203,8 @@ export function TableLayers({
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
   const settingsOpen = held?.kind === "settings";
+  // The settings panel and the card lists (a pile's, a row's) stand on night; the log, the threat panel and the Island Map on paper.
+  const night = settingsOpen || held?.kind === "pile" || held?.kind === "row";
   // The settings panel is wider than the other panels, so its three-word switches fit (settings-panel-width.ts).
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
@@ -204,10 +227,12 @@ export function TableLayers({
         </>
       ) : null}
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
-      <TrayFrame open={panel != null} surface={settingsOpen ? "night" : "paper"} testID="reading" place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
+      <TrayFrame open={panel != null} surface={night ? "night" : "paper"} testID="reading" place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
         {held?.kind === "pile" ? (
           <PileReading
             store={store}
+            ctx={ctx}
+            picture={picture}
             pile={held.pile}
             seat={seat}
             names={names}
@@ -221,8 +246,7 @@ export function TableLayers({
             onClose={close}
           />
         ) : null}
-        {held?.kind === "victory" ? <VictoryReading store={store} names={names} onRead={onPreview} onClose={close} /> : null}
-        {held?.kind === "row" ? <RowReading store={store} row={held.row} names={names} onRead={onPreview} onClose={close} /> : null}
+        {held?.kind === "row" ? <RowReading store={store} ctx={ctx} row={held.row} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={shown} maxHeight={room - (trayShown ? WAITING * s : 0)} onRead={onPreview} onClose={close} /> : null}
@@ -237,7 +261,7 @@ export function TableLayers({
         ) : null}
         {/* A choice is still open under the panel: say so, and the dock's armed button is untouched by closing it. */}
         {trayShown && panel ? (
-          <Text testID="choice-waiting" className={`pt-1 text-center text-label ${settingsOpen ? "text-muted" : "text-inkMuted"}`}>
+          <Text testID="choice-waiting" className={`pt-1 text-center text-label ${night ? "text-muted" : "text-inkMuted"}`}>
             Choice waiting
           </Text>
         ) : null}

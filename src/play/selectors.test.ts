@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { fixtureDefinition } from "../rules/fixture.ts";
-import { blankScenario, withSeat } from "../rules/state.ts";
+import { blankScenario, withSeat, type ScenarioState } from "../rules/state.ts";
 
 import { tableLayout } from "./layout.ts";
 import { seaFixture, seaViews } from "./sea-fixture.ts";
 import { twoHanded } from "./seat-fixture.ts";
-import { actingSeat, isDiscardPile, PILE_WORDS, pileSelector, SECOND_PILES, secondPilesOf, shownSeat, threatSelector, tickKeySelector, zoneIds, zoneSelector } from "./selectors.ts";
+import { actingSeat, isDiscardPile, opensList, PILE_WORDS, pileSelector, SECOND_PILES, secondPilesOf, shownSeat, threatSelector, tickKeySelector, victoryPileSelector, zoneIds, zoneSelector } from "./selectors.ts";
 import { headingReadout } from "./widgets.ts";
 
 // The seat the table draws (phase 26): the seat the player peeks at, else the acting seat. A peek changes only what is drawn.
@@ -163,5 +163,37 @@ describe("the Corsair piles and the second slot (phase 39b)", () => {
     expect(first).toContain(duo.ids.ship0);
     expect(first).not.toContain(duo.ids.ship1);
     expect(second).toContain(duo.ids.ship1);
+  });
+});
+
+describe("victoryPileSelector", () => {
+  const made = (ids: readonly string[]) => {
+    const cards = Object.fromEntries(ids.map((id) => [id, { id, code: `c${id}`, zone: "victory" }]));
+    return { victory: ids, cards, modifiers: [] } as unknown as ScenarioState;
+  };
+
+  it("is null while the display is empty", () => {
+    expect(victoryPileSelector(() => 1)(made([]))).toBeNull();
+  });
+
+  it("shows the newest card on top, fans the two before it, oldest first, and totals the points", () => {
+    const view = victoryPileSelector((_, id) => (id === "a" ? 3 : 1))(made(["a", "b", "c", "d"]));
+    expect(view?.top?.id).toBe("d");
+    expect(view?.fan?.map((card) => card.id)).toEqual(["b", "c"]);
+    expect(view?.points).toBe(6);
+    expect(view?.ids).toHaveLength(4);
+  });
+
+  it("returns the same view while the display, its cards and the modifiers are the same", () => {
+    const select = victoryPileSelector(() => 1);
+    const game = made(["a", "b"]);
+    const first = select(game);
+    expect(select({ ...game })).toBe(first);
+  });
+
+  it("opens a list, as a discard pile does, and is named in words", () => {
+    expect(opensList("victory")).toBe(true);
+    expect(opensList("deck")).toBe(false);
+    expect(PILE_WORDS.victory).toBe("Victory display");
   });
 });

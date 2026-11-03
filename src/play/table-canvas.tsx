@@ -134,6 +134,8 @@ export function TableCanvas({ store, width, height, nameOf, inactive, facts, inf
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
   const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
   const second = useStore(store, (state) => secondPilesOf(state.game));
+  // The victory display is listed while a card is in it, as the canvas draws it.
+  const victory = useStore(store, (state) => state.game.victory.length > 0);
   return (
     <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
       <SeaLines store={store} seat={seat} nameOf={nameOf} facts={facts} t={t} />
@@ -141,7 +143,7 @@ export function TableCanvas({ store, width, height, nameOf, inactive, facts, inf
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}
       <View className="flex-row flex-wrap gap-1">
-        {[...PILES, ...second].map((pile) => (
+        {[...PILES, ...second, ...(victory ? (["victory"] as const) : [])].map((pile) => (
           <PileRow key={pile} pile={pile} {...rowProps} />
         ))}
       </View>

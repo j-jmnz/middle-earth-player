@@ -20,10 +20,12 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
 // The four piles every table shows, and the second slot's (docs/design-system-table.md, Piles): the Corsair deck and its discard pile while the scenario
-// has a Corsair deck (dcce.corsair-deck), or the Uncharted deck alone while it deals one (dcce.uncharted-deck). The scenario phases add the Grotto deck. Only the discard piles open a list.
+// has a Corsair deck (dcce.corsair-deck), or the Uncharted deck alone while it deals one (dcce.uncharted-deck). The scenario phases add the Grotto deck. The victory display is a pile
+// too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
 export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck";
-export type PileId = BasePileId | SecondPileId;
+export type VictoryPileId = "victory";
+export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
 export const PILES: readonly BasePileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
 export const SECOND_PILES: readonly SecondPileId[] = ["corsairDeck", "corsairDiscard"];
@@ -37,6 +39,7 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   corsairDeck: "Corsair deck",
   corsairDiscard: "Corsair discard pile",
   unchartedDeck: "Uncharted deck",
+  victory: "Victory display",
 };
 
 /** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea-corsair.ts); else the Uncharted deck, while the scenario deals one. */
@@ -48,6 +51,11 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "unchart
 /** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). A tap on one opens its list; a deck's does not (docs/design-system-table.md, Piles). */
 export function isDiscardPile(pile: PileId): boolean {
   return pile === "discard" || pile === "encounterDiscard" || pile === "corsairDiscard";
+}
+
+/** Whether a tap on a pile opens its list: a discard pile or the victory display. */
+export function opensList(pile: PileId): boolean {
+  return isDiscardPile(pile) || pile === "victory";
 }
 
 // How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
@@ -62,7 +70,7 @@ export type FightKind = "defense" | "undefended" | "attack";
 export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1; area?: AreaRole };
 
 /** What the zone selectors read of a card's printing: its type, and its place among the ships (null for a card that is no ship). Absent: nothing is known. */
-export type ZoneFacts = { typeOf: (code: string) => string | null; shipRank: (code: string) => 0 | 1 | null };
+export type ZoneFacts = { typeOf: (code: string) => string | null; shipRank: (code: string) => 0 | 1 | null; pointsOf?: (game: ScenarioState, cardId: string) => number };
 export type ZoneView = { zone: ZoneId; seat: number; entries: readonly ZoneEntry[] };
 
 /** A card whose face the table hides: facedown, except the prisoner, whose owner knows the card and may still open it (01123:B:1). */
@@ -258,8 +266,9 @@ export function zoneSelector(zone: ZoneId, seat: number, facts?: ZoneFacts): (ga
 }
 
 // A pile: how many cards it holds and, for a discard pile, the card on top (the last one put there).
-// A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it.
-export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[] };
+// A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it. The victory display also carries
+// the two cards under its top, fanned behind it, and the Victory points its cards score (victoryPileSelector).
+export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[]; fan?: readonly CardInstance[]; points?: number };
 
 /** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the Corsair pair. */
 export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
@@ -278,6 +287,8 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
       return game.corsairDiscard ?? NONE;
     case "unchartedDeck":
       return game.uncharted?.deck ?? NONE;
+    case "victory":
+      return game.victory;
   }
 }
 
@@ -289,7 +300,7 @@ export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) 
     if (previous && game === lastGame) return previous;
     lastGame = game;
     const ids = pileIds(game, pile, seat);
-    const faceUp = isDiscardPile(pile);
+    const faceUp = opensList(pile);
     const last = ids[ids.length - 1];
     // The Uncharted deck shows its top card's Lost Island side; every copy of it is the same picture (dcce.uncharted-deck).
     const topId = pile === "unchartedDeck" ? ids[0] : faceUp ? last : undefined;
@@ -456,4 +467,30 @@ export function lookedOf(game: ScenarioState): readonly CardInstance[] {
 /** Whether a card is one of those a Sailing test looked at: its face is shown to every player, though the card is still on the deck. */
 export function isLooked(game: ScenarioState, cardId: string): boolean {
   return lookedIds(game).includes(cardId);
+}
+
+/**
+ * The victory display as a pile (docs/design-system-table.md, Piles): its newest card on top, the two before it fanned behind, and the
+ * Victory points the cards score on the side they lie (`pointsOf`, the count the score adds up). Null while it is empty, so the table draws
+ * no pile. The same view while the display's list, its cards and the modifiers are the same objects.
+ */
+export function victoryPileSelector(pointsOf: (game: ScenarioState, cardId: string) => number): (game: ScenarioState) => PileView | null {
+  let previous: PileView | null = null;
+  let held: { victory: ScenarioState["victory"]; cards: ScenarioState["cards"]; modifiers: ScenarioState["modifiers"] } | null = null;
+  return (game) => {
+    const ids = game.victory;
+    if (ids.length === 0) {
+      previous = null;
+      held = null;
+      return null;
+    }
+    if (previous && held && held.victory === ids && held.cards === game.cards && held.modifiers === game.modifiers) return previous;
+    const top = game.cards[ids[ids.length - 1] as string] ?? null;
+    const fan = cardsOf(game, ids.slice(Math.max(0, ids.length - 3), -1));
+    const points = ids.reduce((sum, id) => sum + pointsOf(game, id), 0);
+    held = { victory: ids, cards: game.cards, modifiers: game.modifiers };
+    if (previous && previous.ids === ids && previous.top === top && previous.points === points && sameCards(previous.fan ?? EMPTY, fan)) return previous;
+    previous = { pile: "victory", seat: 0, ids, top, fan, points };
+    return previous;
+  };
 }

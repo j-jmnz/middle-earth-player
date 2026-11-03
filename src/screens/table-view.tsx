@@ -55,7 +55,6 @@ import { dockReadout } from "../play/readout";
 import { questScaleOf } from "../play/quest-scale";
 import { CommandHead } from "../play/command-head-view";
 import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../play/command-head";
-import { victorySelector } from "../play/victory-display";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../play/widgets";
 import { whyNotChosen } from "../play/why";
 import { ledgerLine, ruleTitle, sideText } from "../play/ledger";
@@ -160,7 +159,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const [reading, setReading] = useState<Reading | null>(null);
   // The screen y of the top of the dock's content: the tap layer that folds the choice's rows covers the column above it.
   const [anchor, setAnchor] = useState<number | null>(null);
-  // The command column's height and the dock's own: the head (victory display and quest meter) fills the room between them.
+  // The command column's height and the dock's own: the head (the quest meter) fills the room between them.
   const [columnHeight, setColumnHeight] = useState(0);
   const [dockHeight, setDockHeight] = useState(0);
   // The readout's numbers row, as last measured (the dock drops it while the meter shows the numbers).
@@ -276,7 +275,6 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The quiet pills: Undo and up to two others, or Undo and More (dock-extras.ts); More opens a popover (dock-more.tsx).
   const pills = dockPills(choice.extras);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
-  const victory = useMemo(() => victorySelector(ctx.cards, nameOf), [ctx, nameOf]);
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
@@ -335,7 +333,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s);
   const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
   const planRoom = headRoom(columnHeight, footPad, dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers), HEAD_GAP * s);
-  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, 0, s, scale.live).mode !== "hidden";
+  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, s, scale.live) !== "hidden";
   const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
   // the left inset) and the safe insets (spotlight-stage.ts).
@@ -450,7 +448,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
           <View testID="command" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ width: commandWidth, paddingBottom: footPad, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
             {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
-            <CommandHead store={store} select={victory} scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onPreview={onPreview} onMore={() => setReading({ kind: "victory" })} />
+            <CommandHead scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} />
             <TableDock
               step={choice.header.step}
               lead={choice.header.lead}
@@ -485,6 +483,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         ctx={ctx}
         names={names}
         nameOf={nameOf}
+        picture={pictureOf}
         choice={choice}
         reading={reading}
         onReading={setReading}

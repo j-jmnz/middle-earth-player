@@ -22,6 +22,8 @@ export type BodyProps = {
   slot: CardSlot;
   /** The decoded picture, or null while it loads (the card is drawn as its name). */
   image: SkImage | null;
+  /** The victory pile's cards fanned behind its top, each decoded or null while it loads; empty on every other slot. */
+  fan: readonly (SkImage | null)[];
   name: string;
   /** The sphere the card prints, for the icon of a card drawn as its name and the ring of its resource token. */
   sphere: string | null;
@@ -93,6 +95,8 @@ export type PieceContext = {
   s: number;
 };
 
+const NO_FAN: readonly (SkImage | null)[] = [];
+
 const isTappable = (slot: CardSlot, ctx: PieceContext) => ctx.highlight.tappable.has(slot.id) || ctx.targetIds.has(slot.id);
 const pickedCount = (slot: CardSlot, ctx: PieceContext) => ctx.highlight.picked.get(slot.id) ?? 0;
 // A Sailing test's look veils staging, the engagement area and the play area under the strip (docs/design-system-table.md, The Sailing test).
@@ -106,6 +110,7 @@ export function bodyProps(slot: CardSlot, ctx: PieceContext): BodyProps {
   return {
     slot,
     image: ctx.images.get(key) ?? null,
+    fan: slot.fan ? slot.fan.map((picture) => ctx.images.get(picture) ?? null) : NO_FAN,
     name: ctx.nameOf(key),
     sphere: slot.kind === "pile" ? null : ctx.sphereOf(slot.code),
     lifted: ctx.liftedId === slot.id && slot.kind === "card",
@@ -170,13 +175,22 @@ const SLOT_FIELDS = Object.keys({
   stormcaller: true,
   shown: true,
   coveredFrom: true,
+  fan: true,
+  points: true,
 } satisfies Record<keyof CardSlot, true>) as (keyof CardSlot)[];
 
 /** True when two slots are the same card in the same place and state: layout makes a new object for every slot whenever it runs. */
 export function sameSlot(a: CardSlot, b: CardSlot): boolean {
   if (a === b) return true;
-  for (const field of SLOT_FIELDS) if (a[field] !== b[field]) return false;
+  for (const field of SLOT_FIELDS) if (field === "fan" ? !sameList(a.fan, b.fan) : a[field] !== b[field]) return false;
   return true;
+}
+
+// Two lists of the same items in the same order (absent and absent are the same).
+function sameList<T>(a: readonly T[] | undefined, b: readonly T[] | undefined): boolean {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((item, at) => item === b[at]);
 }
 
 const MOTION_FIELDS = Object.keys({
@@ -235,6 +249,7 @@ const same = (a: unknown, b: unknown) => a === b;
 const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PieceProps[K]) => boolean } = {
   slot: sameSlot,
   image: same,
+  fan: sameList,
   name: same,
   sphere: same,
   lifted: same,

@@ -23,9 +23,11 @@ export function pictureBoxes(slots: readonly CardSlot[], card?: Box): Map<string
     const grow = hand ? HAND_PICTURE_SCALE : 1;
     const w = hand && card ? Math.max(slot.w, card.w) : slot.w;
     const h = hand && card ? Math.max(slot.h, card.h) : slot.h;
-    const key = slot.picture ?? slot.code;
-    const held = boxes.get(key);
-    boxes.set(key, { w: Math.max(held?.w ?? 0, w * grow), h: Math.max(held?.h ?? 0, h * grow) });
+    // The victory pile's fanned cards are drawn at the pile's size.
+    for (const key of [slot.picture ?? slot.code, ...(slot.fan ?? [])]) {
+      const held = boxes.get(key);
+      boxes.set(key, { w: Math.max(held?.w ?? 0, w * grow), h: Math.max(held?.h ?? 0, h * grow) });
+    }
   }
   return boxes;
 }

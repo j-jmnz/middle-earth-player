@@ -34,6 +34,7 @@ export const PICTURE_SAMPLING: SamplingOptions = { filter: FilterMode.Linear, mi
 // Every piece draws with the tokens of the theme in force, handed down from the canvas root as `t` (user request, 2026-10-28); a piece
 // does not read the theme itself.
 // Translucent night, from the token, so the palette drift test covers the canvas's veils too.
+const NO_IMAGES: readonly (SkImage | null)[] = [];
 const shadowOf = (t: TableTokens) => withAlphaHex(t.night, 0.5);
 const stripOf = (t: TableTokens) => withAlphaHex(t.night, 0.72);
 
@@ -191,13 +192,97 @@ export function CardBody({
   );
 }
 
-const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard", unchartedDeck: "Uncharted" };
+const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard", unchartedDeck: "Uncharted", victory: "Victory" };
+
+// The turn of each card fanned behind the victory pile's top, the nearest first (radians, about the pile's foot; layout.ts keeps VICTORY_FAN of room for it).
+const FAN_TURNS = [-0.12, -0.24];
+
+/** The victory pile's fan: the cards before its top, turned about the pile's foot, the oldest farthest out (docs/design-system-table.md, Piles). */
+function VictoryFan({ slot, fan, t, s }: { slot: CardSlot; fan: readonly (SkImage | null)[]; t: TableTokens; s: number }) {
+  const { x, y, w, h } = slot;
+  const radius = cardCorner(w, h);
+  return (
+    <Group>
+      {fan.map((image, index) => {
+        const turn = FAN_TURNS[fan.length - 1 - index] ?? 0;
+        return (
+          <Group key={index} transform={[{ rotate: turn }]} origin={vec(x + w / 2, y + h)}>
+            <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
+            {image ? (
+              <Group clip={{ rect: { x, y, width: w, height: h }, rx: radius, ry: radius }}>
+                <Image image={image} x={x} y={y} width={w} height={h} fit="cover" sampling={PICTURE_SAMPLING} />
+              </Group>
+            ) : (
+              <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
+            )}
+          </Group>
+        );
+      })}
+    </Group>
+  );
+}
+
+/** The victory pile's gold coin at its top right corner: the Victory points its cards score. */
+function PointsCoin({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
+  const r = 8 * s;
+  const cx = slot.x + slot.w - 2 * s;
+  const cy = slot.y + 2 * s;
+  const text = String(slot.points ?? 0);
+  return (
+    <Group>
+      <Circle cx={cx} cy={cy + 1 * s} r={r} color={shadowOf(t)} />
+      <Circle cx={cx} cy={cy} r={r} color={t.fellowship} />
+      <Circle cx={cx} cy={cy} r={r - 1 * s} color={t.ink} style="stroke" strokeWidth={0.75 * s} opacity={0.35} />
+      <Text x={cx - fonts.small.getTextWidth(text) / 2} y={cy + 3.5 * s} text={text} font={fonts.small} color={t.ink} />
+    </Group>
+  );
+}
+
+/** The mark on a discard pile that holds a card the open window lets the seat play from it (Elven-light): an accent disc with a play arrow at its top right corner. */
+function PlayableMark({ slot, t, s }: { slot: CardSlot; t: TableTokens; s: number }) {
+  const r = 8 * s;
+  const cx = slot.x + slot.w - 2 * s;
+  const cy = slot.y + 2 * s;
+  const arrow = `M ${cx - 2.5 * s} ${cy - 4 * s} L ${cx + 4 * s} ${cy} L ${cx - 2.5 * s} ${cy + 4 * s} Z`;
+  return (
+    <Group>
+      <Circle cx={cx} cy={cy + 1 * s} r={r} color={shadowOf(t)} />
+      <Circle cx={cx} cy={cy} r={r} color={t.accent} />
+      <Path path={arrow} color={t.onAccent} />
+    </Group>
+  );
+}
 
 // The piles that show the printed encounter back (the Eye): the encounter pair and the Corsair pair.
 const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard"]);
 
-/** A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. */
-export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: CardSlot; image: SkImage | null; name: string; fonts: Fonts; label: boolean; backs: BackImages; t: TableTokens; s: number }) {
+/**
+ * A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. The victory display
+ * fans the cards before its top behind it and wears its Victory points on a gold coin; a discard pile the seat may play from wears the play mark.
+ */
+export function Pile({
+  slot,
+  image,
+  fan,
+  name,
+  fonts,
+  label,
+  playable = false,
+  backs,
+  t,
+  s,
+}: {
+  slot: CardSlot;
+  image: SkImage | null;
+  fan?: readonly (SkImage | null)[];
+  name: string;
+  fonts: Fonts;
+  label: boolean;
+  playable?: boolean;
+  backs: BackImages;
+  t: TableTokens;
+  s: number;
+}) {
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const strip = 15 * s;
@@ -215,8 +300,10 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
     );
   }
   const depth = Math.min(3, Math.ceil(slot.count / 10));
+  const behind = fan ?? NO_IMAGES;
   return (
     <Group>
+      {behind.length > 0 ? <VictoryFan slot={slot} fan={behind} t={t} s={s} /> : null}
       {Array.from({ length: depth }, (_, index) => (
         <RoundedRect key={index} x={x + (depth - index) * 1.5 * s} y={y + (depth - index) * 1.5 * s} width={w} height={h} r={radius} color={encounter ? t.night : t.raised} />
       ))}
@@ -247,6 +334,8 @@ export function Pile({ slot, image, name, fonts, label, backs, t, s }: { slot: C
         </Group>
       ) : null}
       {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h + 11 * s} text={word} font={fonts.small} color={t.muted} /> : null}
+      {slot.points != null ? <PointsCoin slot={slot} fonts={fonts} t={t} s={s} /> : null}
+      {playable ? <PlayableMark slot={slot} t={t} s={s} /> : null}
     </Group>
   );
 }
