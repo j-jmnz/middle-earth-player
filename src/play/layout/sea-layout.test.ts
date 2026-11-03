@@ -3,7 +3,8 @@
 // side insets, the command column, the 52 pt bar under its 8 pt top, and and no quest scale (the quest meter stands in the command column).
 import { describe, expect, it } from "vitest";
 
-import { hitBounds, slotBounds, tableLayout, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
+import { tableLayout, type CardSlot, type Rect, type TableLayout } from "./layout.ts";
+import { hitBounds, slotBounds } from "./hits.ts";
 import { seaFixture, seaViews, type SeaSpec } from "../dream-chaser/sea-fixture.ts";
 import { UI_SCALES, touch } from "../../ui/ui-scale.ts";
 

@@ -7,7 +7,8 @@ import { describe, expect, it } from "vitest";
 
 import type { CardInstance } from "../../rules/core/state.ts";
 
-import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, shownBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
+import { cardSize, handCardSize, MIN_TARGET, PLAY_FLOOR, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
+import { hitBounds, shownBounds, slotBounds } from "./hits.ts";
 import { CROWDED_CANVASES, CROWDED_SCALES, crowdedTable, slotRows } from "./crowded-table.ts";
 import { PILES, TABLE_ZONES, type PileId, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "../store/selectors.ts";
 import { HAND_TUCK } from "./play-area.ts";

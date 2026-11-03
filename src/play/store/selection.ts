@@ -8,7 +8,8 @@ import { askingToCommit } from "../../rules/families/sea/sailing-legal.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
-import type { DropRect, TableLayout } from "../layout/layout.ts";
+import type { TableLayout } from "../layout/layout.ts";
+import type { DropRect } from "../layout/hits.ts";
 import { TABLE_ZONES, type ZoneId } from "./selectors.ts";
 
 export type DropTarget = { kind: "zone"; zone: ZoneId } | { kind: "card"; cardId: string };

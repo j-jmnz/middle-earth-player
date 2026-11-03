@@ -9,7 +9,8 @@ import { useDerivedValue } from "react-native-reanimated";
 
 import { Outlined, type Fonts, type TokenImages } from "../canvas/pieces.native.tsx";
 import type { Clock } from "./card-motion.native.tsx";
-import { shownBounds, type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
+import { type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
+import { shownBounds } from "../layout/hits.ts";
 import { useSharedFont } from "../canvas/table-assets.native.ts";
 import { MARCELLUS } from "../canvas/table-fonts.native.ts";
 import { floatWords, type TokenKind } from "./token-deltas.ts";

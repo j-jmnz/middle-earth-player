@@ -8,7 +8,8 @@ import { moveCard } from "../../rules/core/zones.ts";
 import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
 
-import { cardSize, HAND_SHOW, handCardSize, hitSlot, tableLayout } from "../layout/layout.ts";
+import { cardSize, HAND_SHOW, handCardSize, tableLayout } from "../layout/layout.ts";
+import { hitSlot } from "../layout/hits.ts";
 import { inspectTargets, onTableFor, pileSelector, PILES, threatSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";
 import { draggableIds, dropOutcome, dropRects, dropTargets, targetFromKey, targetKey } from "./selection.ts";
 import { createTableStore, nextRoundSteps } from "./store.ts";

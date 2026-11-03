@@ -10,7 +10,8 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { areaOf } from "../../rules/families/stormcaller/zone.ts";
 import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
-import { hitBounds, shownBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect, type TableLayout } from "../layout/layout.ts";
+import { tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect, type TableLayout } from "../layout/layout.ts";
+import { hitBounds, shownBounds, slotBounds } from "../layout/hits.ts";
 import { motionsBetween } from "../motion/motion.ts";
 import { pileSpeech } from "../canvas/pile-speech.ts";
 import { pictureKey } from "../canvas/picture-key.ts";

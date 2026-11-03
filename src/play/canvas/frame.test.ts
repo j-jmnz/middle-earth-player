@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { cardFrame, halo, unturn } from "./frame.ts";
-import { contains, hitSlot, slotBounds, type CardSlot } from "../layout/layout.ts";
+import { type CardSlot } from "../layout/layout.ts";
+import { contains, hitSlot, slotBounds } from "../layout/hits.ts";
 import { slotRotation } from "../motion/motion.ts";
 
 function slot(over: Partial<CardSlot> = {}): CardSlot {

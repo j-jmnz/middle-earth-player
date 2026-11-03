@@ -20,7 +20,8 @@ import { AttackerMark, CardBody, CombatMarkView, RADIUS, StagingTag } from "./pi
 import { sphereIcon } from "../../ui/icon-map.ts";
 import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
-import { slotBounds, tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
+import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
+import { slotBounds } from "../layout/hits.ts";
 import { pictureKey } from "./picture-key.ts";
 import { areaFacts, areaSpeech } from "../store/stormcaller-table.ts";
 import { grappleDetail } from "../words/grapple.ts";

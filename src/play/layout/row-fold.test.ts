@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import type { CardInstance } from "../../rules/core/state.ts";
 
 import { rowXs } from "./slots.ts";
-import { hitBounds, tableLayout, type LayoutViews, type PileViews } from "./layout.ts";
+import { tableLayout, type LayoutViews, type PileViews } from "./layout.ts";
+import { hitBounds } from "./hits.ts";
 import { FOLD_WORD, foldCount, foldRow, foldTitle, foldWords, groupCards, keeps, leastStep, stagingRank, type FoldGroup } from "./row-fold.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "../store/selectors.ts";
 import { touch, UI_SCALES } from "../../ui/ui-scale.ts";

@@ -20,14 +20,13 @@ import { isDense } from "../../play/choice/dock/budget";
 import { MorePopoverView, useMorePopover } from "../../play/choice/dock/more";
 import { railFor } from "../../play/phases/rail";
 import { dialTicksSelector, threatSelector } from "../../play/store/selectors";
-import type { SheetNames } from "../../play/choice/sheet-types";
 import { effectById, type ReduceContext, type TableStore } from "../../play/store/store";
 import { createHandoff } from "../../play/spotlight/handoff";
 import { SpotlightLayer } from "../../play/spotlight/layer";
 import type { SpotlightLayerProps } from "../../play/spotlight/handoff";
 import type { StageArea } from "../../play/spotlight/stage";
 import { TableCanvas } from "../../play/canvas/table-canvas";
-import type { PictureSource, TableCanvasProps } from "../../play/canvas/table-canvas-types";
+import type { TableCanvasProps } from "../../play/canvas/table-canvas-types";
 import { MomentBanner } from "../../play/readouts/moment-banner";
 import { TableDock } from "../../play/choice/dock/table-dock";
 import { TableLayers } from "../../play/chrome/table-layers";
@@ -38,8 +37,7 @@ import { useKeepAwake } from "../../play/chrome/use-keep-awake";
 import { TableMenu } from "../../play/chrome/table-menu";
 import type { MenuItemId } from "../../play/chrome/table-menu-items";
 import { previewCards } from "../../play/cards/table-preview";
-import { pictureCode, pictureKey } from "../../play/canvas/picture-key";
-import { shownName } from "../../play/cards/shown-name";
+import { pictureKey } from "../../play/canvas/picture-key";
 import { advanceButton, advanceFace, advanceWords } from "../../play/readouts/quest-advance";
 import { QuestAdvanceView } from "../../play/readouts/quest-advance-view";
 import { useQuestAdvance } from "../../play/readouts/use-quest-advance";
@@ -58,47 +56,20 @@ import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../.
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
-import { notApplied, notAppliedCodes } from "../../play/cards/not-applied";
+import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
 import { TableTopBar, TOP_BAR } from "./top-bar";
 import { BAR_TOP } from "../../play/chrome/top-bar-layout";
 import { goBack } from "../nav/go-back";
 import { useTablePictures } from "./use-table-pictures";
-import { scanAssets } from "../images/scan-map";
-import { cachedImage, useImageRevision, useImageSnapshot } from "../images/store";
+import { pictureAt, useCardLookups } from "./card-lookups";
+import { useImageRevision, useImageSnapshot } from "../images/store";
 import type { World } from "../../campaign/world";
 import type { CardFacts } from "../session/open-game";
 import { commandWidth as commandWidthOf } from "./command";
 import type { PlayClock } from "../session/play-clock";
 import { usePlayClock } from "../session/use-play-clock";
 import { useUiScale } from "../../ui/ui-scale";
-
-// By picture key (src/play/canvas/picture-key.ts): the bundled picture of the key, else its downloaded file. `exact`: that picture only, never the other side's: a
-// Lost Island's side B never shows the real side behind it (dcce.uncharted), and a card on its B side that has a side B picture to download (a quest stage
-// turned to 1B) never shows side A meanwhile; until the file lands the card is drawn on paper. Otherwise a key with neither falls back to side A's picture.
-function picture(key: string, exact = false): PictureSource | null {
-  const bundledSide = scanAssets[key];
-  if (bundledSide) return bundledSide.moduleId;
-  const cachedSide = cachedImage(key);
-  if (cachedSide) return { uri: cachedSide.uri };
-  if (exact) return null;
-  const code = pictureCode(key);
-  const bundled = scanAssets[code];
-  if (bundled) return bundled.moduleId;
-  const cached = cachedImage(code);
-  return cached ? { uri: cached.uri } : null;
-}
-
-// The lookups made since the image cache last changed (`revision`, images/store.ts). A card shown large (the preview, the advanced stage) is
-// described during the render and its description is kept while its inputs are the same, so the picture it shows has to be an input: this
-// reads `picture` for a revision and is read again only when the revision moves, which re-describes the card when its file lands.
-let looked: { revision: number; sources: Map<string, PictureSource | null> } = { revision: -1, sources: new Map() };
-function pictureAt(key: string, revision: number, exact: boolean): PictureSource | null {
-  if (looked.revision !== revision) looked = { revision, sources: new Map() };
-  const at = exact ? `${key}!` : key;
-  if (!looked.sources.has(at)) looked.sources.set(at, picture(key, exact));
-  return looked.sources.get(at) ?? null;
-}
 
 // The canvas and the spotlight's layer read the image cache's revision themselves, so a picture that lands draws them and not the view above
 // (the table view, its hooks and its panels).
@@ -180,29 +151,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The pictures of the hand, the table and the screen about to open, and of a card picked up (use-table-pictures.ts).
   useTablePictures(store, session, game, peek.shown);
 
-  // By picture key: a fallen hero (`<code>~enemy`) keeps the hero's name, and a Lost Island lying on its Lost Island side shows that name, never the location it turns out to be (src/play/cards/shown-name.ts).
-  const nameOf = useCallback((key: string) => shownName(key, session.world.cards.get(pictureCode(key))), [session]);
-  const sphereOf = useCallback((code: string) => (session.world.cards.get(code) ?? session.world.cards.get(pictureCode(code)))?.sphere ?? null, [session]);
-  // A Lost Island lying on its Lost Island side is drawn from its own picture only.
-  const lostIsland = useCallback((key: string) => key !== pictureCode(key) && session.world.cards.get(pictureCode(key))?.keywords.uncharted === true, [session]);
-  // A card on its B side with a side B picture to download (a quest stage after setup) is drawn from that picture only, never side A's (picture, above).
-  const ownSide = useCallback((key: string) => lostIsland(key) || (key !== pictureCode(key) && session.facts.get(pictureCode(key))?.backImagesrc != null), [lostIsland, session]);
-  const pictureOf = useCallback((key: string) => picture(key, ownSide(key)), [ownSide]);
-  const names: SheetNames = useMemo(
-    () => ({
-      card: (cardId: string) => {
-        const card = store.getState().game.cards[cardId];
-        return nameOf(card ? pictureKey(card) : cardId);
-      },
-      // The real name of a Lost Island whose facedown side a look shows.
-      facedown: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId),
-      line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
-    [nameOf, store, session],
-  );
-  // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.
-  const inactiveSet = useMemo(() => notAppliedCodes([...session.facts].map(([code, facts]) => [code, facts.text] as const)), [session]);
-  // By picture key: a Lost Island lying on its Lost Island side has no line the app leaves out, whatever its other side lacks.
-  const inactive = useCallback((key: string) => !lostIsland(key) && inactiveSet.has(pictureCode(key)), [inactiveSet, lostIsland]);
+  // Names, spheres, pictures and not-applied marks by picture key (card-lookups.ts).
+  const { nameOf, sphereOf, lostIsland, ownSide, pictureOf, names, inactive } = useCardLookups(session, store);
   // Read from the state the canvas holds and the seat it draws, never from the store in a render.
   const info = useCallback<TableCanvasProps["info"]>((now, seat, cardId) => slotNumbers(now, ctx, cardId, seat), [ctx]);
   const rail = useMemo(() => railFor(game), [game]);

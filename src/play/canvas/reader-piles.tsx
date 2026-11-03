@@ -3,7 +3,8 @@
 // A card whose number only the canvas shows (The Havens Burn: "The Havens Burn, 2 under, lose at 5") gets the same kind of button, opening its preview.
 import { Pressable, View } from "react-native";
 
-import { hitBounds, type CardSlot } from "../layout/layout.ts";
+import { type CardSlot } from "../layout/layout.ts";
+import { hitBounds } from "../layout/hits.ts";
 import { pileSpeech } from "./pile-speech.ts";
 
 export function ReaderPiles({ slots, onTap, speak }: { slots: readonly CardSlot[]; onTap: (id: string) => void; speak?: (slot: CardSlot) => string | null }) {

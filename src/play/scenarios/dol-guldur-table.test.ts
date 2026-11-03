@@ -11,7 +11,8 @@ import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../.
 import { first } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
-import { hitBounds, tableLayout } from "../layout/layout.ts";
+import { tableLayout } from "../layout/layout.ts";
+import { hitBounds } from "../layout/hits.ts";
 import { heldDial, prisonerWords } from "../readouts/widgets.ts";
 import { PILES, TABLE_ZONES, hidesFace, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "../store/selectors.ts";
 

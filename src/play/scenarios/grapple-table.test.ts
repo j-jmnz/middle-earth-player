@@ -9,7 +9,8 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { CODES, depthsTable, idOf, idsOf, loadDepthsWorld, send, start, type DepthsLayout, type DepthsWorld } from "../../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 import { logLines } from "../store/log.ts";
-import { hitBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews } from "../layout/layout.ts";
+import { tableLayout, type CardSlot, type LayoutViews, type PileViews } from "../layout/layout.ts";
+import { hitBounds, slotBounds } from "../layout/hits.ts";
 import { motionsBetween } from "../motion/motion.ts";
 import { momentOf } from "../store/outcome.ts";
 import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector } from "../store/selectors.ts";

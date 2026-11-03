@@ -6,7 +6,8 @@
 //
 // The hold (150 ms), the slop (6 pt) and the push (0.3 of the touch reach) are gesture thresholds, not motion: they stay out of
 // motionScale, as the dock's ARM_MS does.
-import { contains, hitSlot, MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
+import { MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
+import { contains, hitSlot } from "../layout/hits.ts";
 import { SHAPE } from "../../ui/motion-tokens.ts";
 import type { ScrubRoom } from "./scrub-pose.ts";
 import { touch } from "../../ui/ui-scale.ts";
