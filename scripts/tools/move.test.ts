@@ -83,6 +83,18 @@ describe("pnpm move", () => {
     expect(plan.writes.has("data/cards/x.json")).toBe(false);
   });
 
+  it("rewrites a unique tail of a moved path, and a bare file name only when it changes", () => {
+    const { tracked, read } = repo({
+      "src/rules/families/sea-ships.ts": "",
+      "src/rules/families/sea.ts": "",
+      "src/play/sea.ts": "",
+      "src/play/layout.ts": "",
+      "src/catalog/x.ts": "// families/sea-ships.ts, rules/families/sea-ships.ts, sea-ships.ts and layout.ts; families/sea.ts\n",
+    });
+    const plan = planMove(tracked, { "src/rules/families/sea.ts": "src/rules/families/sea/index.ts", "src/rules/families/sea-*": "src/rules/families/sea/*", "src/play/layout.ts": "src/play/layout/layout.ts" }, read);
+    expect(plan.writes.get("src/catalog/x.ts")).toBe("// families/sea/ships.ts, rules/families/sea/ships.ts, sea/ships.ts and layout.ts; families/sea/index.ts\n");
+  });
+
   it("re-aims relative Markdown links, keeping anchors and the bare style", () => {
     const { tracked, read } = repo({
       "docs/phases/phase-01.md": "[brief](../brief.md#core-round) and [status](STATUS.md) and [web](https://x.dev/a.md)\n",
