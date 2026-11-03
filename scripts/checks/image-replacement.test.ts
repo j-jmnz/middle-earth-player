@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import migrations from "../../drizzle/migrations.ts";
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { commitImageRecord, type ImageRecord } from "../../src/screens/images/policy.ts";
-import { writeAppliedCatalogVersion } from "../../src/screens/applied-catalog-version.ts";
+import { writeAppliedCatalogVersion } from "../../src/screens/data/applied-catalog-version.ts";
 
 function migrationSql(entry: { idx: number; tag: string }): string {
   const key = `m${entry.idx.toString().padStart(4, "0")}`;
@@ -69,7 +69,7 @@ describe("image files survive a catalog version bump", () => {
     expect(bumped.record.path).toBe("file:///images/141001.jpg");
 
     const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-    const opener = readFileSync(path.join(root, "src/screens/open-databases.ts"), "utf8");
+    const opener = readFileSync(path.join(root, "src/screens/data/open-databases.ts"), "utf8");
     expect(opener).not.toContain("image_files");
     expect(opener).not.toContain("images/");
   });

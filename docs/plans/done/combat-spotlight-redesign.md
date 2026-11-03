@@ -32,7 +32,7 @@ Answers to the clarifying questions:
 
 ### 1. Full-screen layer (mounting)
 - **New layer** `src/play/spotlight/layer.native.tsx`, with a web stub `spotlight/layer.tsx` that returns null (the `table-canvas(.native).tsx` pattern).
-  - `src/screens/table-view.tsx` renders it right after `<TableLayers>`, before the banner, the preview and the menu.
+  - `src/screens/table/view.tsx` renders it right after `<TableLayers>`, before the banner, the preview and the menu.
   - It is always mounted and holds the fonts, token icons, backs, particle sprite texture (`useTexture`) and its own stage-size decodes.
   - It mounts a `<Canvas pointerEvents="none">` (not opaque, so it is a TextureView on Android and stacks correctly) only while a spotlight plays.
 - **Handoff** `src/play/spotlight/handoff.ts`: a small vanilla zustand store `{ plan, progress, k, playing, tableImages }`.
@@ -40,7 +40,7 @@ Answers to the clarifying questions:
   - `TableCanvas` publishes it from a `useLayoutEffect` keyed on `[plan, playing, k]`.
   - Only the layer subscribes, so neither `TableView` nor the memoized canvas renders again.
   - The `progress` SharedValue is shared by both canvases.
-- **Coordinates.** `buildPlan` takes a stage area `{ width, height, origin: { x: insets.left + canvasLayoutX, y: barBottom }, safe: insets }` through a new `TableCanvasProps.stageArea`, memoized in `table-view.tsx`.
+- **Coordinates.** `buildPlan` takes a stage area `{ width, height, origin: { x: insets.left + canvasLayoutX, y: barBottom }, safe: insets }` through a new `TableCanvasProps.stageArea`, memoized in `table/view.tsx`.
   - `canvasLayoutX` comes from the wrapper's existing `onLayout`; it is non-zero when the quest scale shows.
   - `placeOf` adds `origin` to each slot rect.
   - `useSpotlight`'s `sameSize` check also compares the area.

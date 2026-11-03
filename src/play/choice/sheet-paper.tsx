@@ -20,7 +20,7 @@ import { Text } from "../../ui/text.tsx";
 
 /**
  * Which corners the parchment rounds: "top" for a sheet that rises from the bottom edge, "all" for one that floats centred on a wide
- * screen (screens/sheet-modal.tsx). A SheetModal provides it, so a sheet inside takes it without being told.
+ * screen (screens/kit/sheet-modal.tsx). A SheetModal provides it, so a sheet inside takes it without being told.
  */
 export type SheetCorners = "top" | "all";
 

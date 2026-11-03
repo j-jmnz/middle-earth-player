@@ -2,15 +2,15 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 
-import { BodyText, NavBar, Screen } from "../../../chrome";
-import { bookletParams } from "../../../campaign-data";
-import { useDatabases } from "../../../databases";
-import { goBack } from "../../../go-back";
-import { routeCode } from "../../../route-code";
-import { standaloneStore, useStandaloneSessionAfterPaint } from "../../../standalone-session";
-import { TableLoading } from "../../../table-loading";
-import { TableView, type TableNav } from "../../../table-view";
-import { STANDALONE_DROPPED } from "../../../standalone-words";
+import { BodyText, NavBar, Screen } from "../../../kit/chrome";
+import { bookletParams } from "../../../data/campaign-data";
+import { useDatabases } from "../../../data/databases";
+import { goBack } from "../../../nav/go-back";
+import { routeCode } from "../../../nav/route-code";
+import { standaloneStore, useStandaloneSessionAfterPaint } from "../../../session/standalone-session";
+import { TableLoading } from "../../../table/loading";
+import { TableView, type TableNav } from "../../../table/view";
+import { STANDALONE_DROPPED } from "../../../history/standalone-words";
 
 export default function StandaloneTableScreen() {
   const router = useRouter();

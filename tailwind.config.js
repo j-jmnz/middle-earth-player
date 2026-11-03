@@ -1,4 +1,4 @@
-const { themeColors } = require("./src/screens/palette.js");
+const { themeColors } = require("./src/screens/kit/palette.js");
 
 // One rem is 14 points times the UI scale (the root layout sets NativeWind's rem), so type and radii written through this resize with
 // the setting and Medium draws the same points as before (user request, 2026-10-28). Write the Medium point value.

@@ -20,7 +20,7 @@ Each step leaves the app working, with tests green.
 
 The user asked for a Settings section. It should hold the settings the app needs, apply game UX conventions, and add a **UI scale** setting with Small, Medium and Large options that scales the whole UI to fit different screen sizes.
 
-Today the only settings are the table's (`src/ui/table-settings.ts`): animation speed, combat spotlight, strong outlines, the first-game guide, stops, and the Responses always used. They are stored in user.db `settings` under the key `"table"` (`src/screens/settings-store.ts`). They can only be reached from the table menu's paper panel (`SettingsPanel`, `src/play/chrome/reading-panels.tsx:181`). The app has no setting for haptics, no override for reduced motion, no keep-awake and no About page. No scale factor runs through any size.
+Today the only settings are the table's (`src/ui/table-settings.ts`): animation speed, combat spotlight, strong outlines, the first-game guide, stops, and the Responses always used. They are stored in user.db `settings` under the key `"table"` (`src/screens/settings/store.ts`). They can only be reached from the table menu's paper panel (`SettingsPanel`, `src/play/chrome/reading-panels.tsx:181`). The app has no setting for haptics, no override for reduced motion, no keep-awake and no About page. No scale factor runs through any size.
 
 The research the plan draws on:
 - **Game Accessibility Guidelines, basic tier:** an option to adjust game speed, a toggle for any haptics, a readable default text size, interactive elements that are large and well spaced on touch screens, and settings that are saved and remembered.
@@ -47,7 +47,7 @@ These are the user's choices from the questions:
 - Add a `restoreDefaults()` helper. It returns `DEFAULT_SETTINGS` with `guideSeen` kept, so the guide does not replay.
 
 **Tests**
-- Extend `src/screens/settings-store.test.ts`: an old row that lacks the new keys loads with their defaults, and the new keys round-trip.
+- Extend `src/screens/settings/store.test.ts`: an old row that lacks the new keys loads with their defaults, and the new keys round-trip.
 - Add a parse test for wrong types.
 
 ## UI scale engine
@@ -82,8 +82,8 @@ The scale factors are Small 0.875, Medium 1 and Large 1.15. Each size is multipl
      - `preview-size.ts`
      - `carousel.ts`
      - `spotlight/stage.ts`
-     - `screens/pool-grid.ts`
-     - `table-view.tsx` `commandWidth`
+     - `screens/pool/grid.ts`
+     - `table/view.tsx` `commandWidth`
 5. **Table canvas**
    - `src/play/layout/layout.ts`: add `scale` to `LayoutOptions`. `GUTTER`, `GAP`, `PEEK`, `HAND_MIN`, `MARK`, the card cap of 96 and the card floor of 34 all scale. `MIN_TARGET` stays a floor through `touch()`.
    - Pass the scale into the drag worklets with the layout object, not module constants.
@@ -108,7 +108,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
      - The Android and iOS builds need a prebuild.
      - It stays open in STATUS as a phone check.
 2. **Two palettes, same token names.**
-   - `src/screens/palette.js` exports `palettes = { dark, light }`, plus `palette` (= dark) so build-time callers keep working.
+   - `src/screens/kit/palette.js` exports `palettes = { dark, light }`, plus `palette` (= dark) so build-time callers keep working.
    - The token names stay as roles: `night` is "the page" and `bone` is "the main text" in either theme. Renaming them would touch about 400 call sites for no gain. The design system says this in one line.
    - Light ("Daylight") values:
      - Warm parchment surfaces for night, dusk, raised, raisedTop, pressed and hairline.
@@ -125,7 +125,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
    - Also call `colorScheme.set(resolved)`, replacing the forced `"dark"` in `applyColorScheme`.
    - `global.css` gets `:root` defaults with the dark values, so the static web export paints before hydration. A test checks they match `palettes.dark`.
 4. **JS colors become theme-aware.**
-   - About 137 `palette.x` uses in 34 files move to `usePalette()` (from `src/screens/palette-hook.ts`).
+   - About 137 `palette.x` uses in 34 files move to `usePalette()` (from `src/screens/kit/palette-hook.ts`).
    - `src/ui/tokens.ts` holds `tableTokensByTheme = { dark, light }` and `useTableTokens()`.
    - `play-tokens.test.ts` checks both copies for drift.
    - `surfaces.ts` functions (`panelSurface`, `goldSurface`, `slateSurface`, `nightFade`, `topShade`, …) take the tokens as a parameter instead of reading a module constant.
@@ -133,7 +133,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
    - Stack `contentStyle` and the tabs' `sceneStyle` read the hook.
 5. **Backdrops.** `backdrop-scenes.ts` gets a light variant of each scene: dusk, ember, vale, plain, victory and felt. These are dawn and daylight versions of the same art, with a lighter vignette. `backdrop*.tsx` picks scenes by theme.
 6. **Status bar.** RN `StatusBar` uses `barStyle` light-content on dark and dark-content on light. The table keeps it hidden.
-7. **Contrast.** New `src/screens/contrast.test.ts` computes WCAG ratios for the listed pairs in both palettes and requires at least 4.5:1 for body text. The pairs are: bone/muted/faint on night, raised and raisedTop; gold text on night; onGold on gold; danger on night; and ink/inkMuted on paper. The light palette's values are tuned until it passes.
+7. **Contrast.** New `src/screens/kit/contrast.test.ts` computes WCAG ratios for the listed pairs in both palettes and requires at least 4.5:1 for body text. The pairs are: bone/muted/faint on night, raised and raisedTop; gold text on night; onGold on gold; danger on night; and ink/inkMuted on paper. The light palette's values are tuned until it passes.
 
 ## Behaviour settings
 
@@ -145,11 +145,11 @@ The user asked for this partway through planning: add a dark and a light theme, 
     - `phase-carousel.tsx:125`
     - `table-dock.tsx:221`
     - `use-spotlight.ts`, which already plays nothing when motion is reduced
-    - `screens/pool-filter-sheet.tsx:45-55`, which switches from `AccessibilityInfo` to the hook
+    - `screens/pool/filter-sheet.tsx:45-55`, which switches from `AccessibilityInfo` to the hook
   - Where `ReduceMotion.System` is passed to Reanimated builders or timing configs, pass `ReduceMotion.Always` while the override is on.
 - **Keep screen awake:**
   - Add `expo-keep-awake` as a direct dependency (`pnpm add expo-keep-awake@~58`). It already ships inside `expo`, so autolinking normally needs no new native build. Confirm on the phone.
-  - In `src/screens/table-view.tsx`, use `activateKeepAwakeAsync` / `deactivateKeepAwake` with a table-scoped tag while `keepAwake` is on. Releasing it when the table unmounts covers standalone games as well.
+  - In `src/screens/table/view.tsx`, use `activateKeepAwakeAsync` / `deactivateKeepAwake` with a table-scoped tag while `keepAwake` is on. Releasing it when the table unmounts covers standalone games as well.
 
 ## Settings tab and screen
 
@@ -158,7 +158,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
   - The game icon font has no gear, so draw one in `chrome-marks.tsx` (`GearMark`: views only, like `Chevron`). In `tab-bar.tsx`, add a `drawnIcon` sibling of `dockIcon` that tints it goldHigh or faint.
   - Tab labels get `adjustsFontSizeToFit` with `minimumFontScale`, so "Campaigns" fits six-across at Large on a 360 pt phone.
 - **Screen**
-  - The route is `src/screens/routes/(tabs)/settings.tsx` and the view is the new `src/screens/settings-view.tsx`.
+  - The route is `src/screens/routes/(tabs)/settings.tsx` and the view is the new `src/screens/settings/view.tsx`.
   - It uses `Screen scene="plain"`, `ScreenScroll`, `ScreenTitle` "Settings", and `Section` eyebrows.
   - There is one page with no sub-menus.
   - It reads and writes `tableSettings` with `useStore`. Every change applies at once and is saved by the existing `bindTableSettings`.
@@ -258,7 +258,7 @@ The user asked for this partway through planning: add a dark and a light theme, 
 - Steps 1 (model), 2 (theme) and 3 (scale) are sequential: theme and scale both rewrite the same inline styles.
 - Within step 2 or step 3, at most two agents may work in parallel. One owns `src/screens/**` and the other owns `src/play/**`.
 - The shared files belong to the step's lead agent alone: `tailwind.config.js`, `metro.config.js`, `global.css`, `palette.js`, `routes/_layout.tsx` and `table-settings.ts`.
-- Steps 4 and 5 may run in parallel after step 3: behaviour settings in `src/play` plus `table-view.tsx`, and the Settings screen in `src/screens` plus `reading-panels.tsx`.
+- Steps 4 and 5 may run in parallel after step 3: behaviour settings in `src/play` plus `table/view.tsx`, and the Settings screen in `src/screens` plus `reading-panels.tsx`.
 
 **Review**
 - After each step's green exit, run `reviewer` on that step's diff. After steps 2, 3 and 5, also run `ux`.

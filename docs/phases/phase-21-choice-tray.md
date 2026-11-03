@@ -15,7 +15,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 - `SidePanel` (`src/play/table-panel.tsx:42-142`) sits on `SheetFrame edge="right"` (`src/play/choice/sheet-paper.tsx`):
   - paper;
   - 46% of the width, 320 to 480 pt;
-  - anchored to the right and the bottom (`table-view.tsx:168-171`).
+  - anchored to the right and the bottom (`table/view.tsx:168-171`).
 - It covers the whole command column and about 135 pt of the canvas.
 - It repeats:
   - the eyebrow and title;
@@ -73,7 +73,7 @@ A choice whose options are not all whole cards on the table opens a compact nigh
 
 - `use-table-choice.ts` keeps `panelOpen`, `fold` and `expand` with the same meaning.
 - Add `foldOutside()`: a no-op while a screen reader is on.
-- `table-view.tsx` calls it from a hit layer under the tray, or from the canvas tap when `panelOpen`, before the tap is routed to `onTap`.
+- `table/view.tsx` calls it from a hit layer under the tray, or from the canvas tap when `panelOpen`, before the tap is routed to `onTap`.
 
 ## Tests
 

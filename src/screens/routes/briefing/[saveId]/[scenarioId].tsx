@@ -13,19 +13,19 @@ import type { Difficulty } from "../../../../catalog/scenario-data";
 import { cards } from "../../../../catalog/schema";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BodyText, Label, Section, TextButton } from "../../../chrome";
-import { bookletParams, campaignOf, scenarioOf } from "../../../campaign-data";
-import { goBack } from "../../../go-back";
-import { writeSave } from "../../../campaign-store";
-import { useDatabases } from "../../../databases";
-import { recordUnclosedRun } from "../../../table-session";
-import { dealSeed } from "../../../e2e";
+import { BodyText, Label, Section, TextButton } from "../../../kit/chrome";
+import { bookletParams, campaignOf, scenarioOf } from "../../../data/campaign-data";
+import { goBack } from "../../../nav/go-back";
+import { writeSave } from "../../../data/campaign-store";
+import { useDatabases } from "../../../data/databases";
+import { recordUnclosedRun } from "../../../session/table-session";
+import { dealSeed } from "../../../nav/e2e";
 import { sphereTell } from "../../../../play/words/aflame";
-import { actionLine, needWords } from "../../../briefing-words";
-import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
-import { SeatPicker } from "../../../seat-picker";
-import { routeCode } from "../../../route-code";
-import { useSave } from "../../../use-save";
+import { actionLine, needWords } from "../../../briefing/words";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
+import { SeatPicker } from "../../../briefing/seat-picker";
+import { routeCode } from "../../../nav/route-code";
+import { useSave } from "../../../data/use-save";
 
 // Runs a deal and returns what went wrong, or null. The try/catch lives here because the React Compiler cannot compile one in a component.
 function attempt(run: () => string | null): string | null {

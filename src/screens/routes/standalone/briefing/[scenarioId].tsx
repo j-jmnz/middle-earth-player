@@ -11,16 +11,16 @@ import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
-import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing-parts";
-import { SeatPicker } from "../../../seat-picker";
-import { bookletParams, campaignOfScenario, scenarioOf } from "../../../campaign-data";
-import { BodyText, Section, Segmented } from "../../../chrome";
-import { useDatabases } from "../../../databases";
-import { dealSeed } from "../../../e2e";
-import { goBack } from "../../../go-back";
-import { routeCode } from "../../../route-code";
-import { SEAT_WORDS, seatCountOf, seatWord } from "../../../seats";
-import { newStandaloneId, readStandalone, writeStandalone } from "../../../standalone-store";
+import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
+import { SeatPicker } from "../../../briefing/seat-picker";
+import { bookletParams, campaignOfScenario, scenarioOf } from "../../../data/campaign-data";
+import { BodyText, Section, Segmented } from "../../../kit/chrome";
+import { useDatabases } from "../../../data/databases";
+import { dealSeed } from "../../../nav/e2e";
+import { goBack } from "../../../nav/go-back";
+import { routeCode } from "../../../nav/route-code";
+import { SEAT_WORDS, seatCountOf, seatWord } from "../../../data/seats";
+import { newStandaloneId, readStandalone, writeStandalone } from "../../../data/standalone-store";
 
 export default function StandaloneBriefing() {
   const router = useRouter();

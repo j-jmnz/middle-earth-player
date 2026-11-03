@@ -9,7 +9,7 @@ import { sniffImage } from "../../src/screens/images/policy.ts";
 import { sha256 } from "../data/sources/fetch.ts";
 import { createLog } from "../log.ts";
 import { MAX_SIDE, packScans, sceneOf, shrinkToMaxSide } from "./pack-scans.ts";
-import { SCENE_PICTURE } from "../../src/screens/art-crop.ts";
+import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import sharp from "sharp";
 
 const roots: string[] = [];

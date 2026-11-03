@@ -54,7 +54,7 @@ Each point: what to check, where the code is, and the likely fix if it fails. De
 
 ### 7. Stacking on Android
 - Check: the spotlight canvas (not opaque, so a TextureView) sits over the table canvas, the top bar and the dock, and under the banner, the preview and the menu. The first frames of the dark coming in are not dropped while the canvas mounts.
-- Code: `spotlight/layer.native.tsx` (line 44) and its place right after `<TableLayers>` in `src/screens/table-view.tsx`.
+- Code: `spotlight/layer.native.tsx` (line 44) and its place right after `<TableLayers>` in `src/screens/table/view.tsx`.
 
 ### 8. Tap to skip, Back, the haptic and the banner
 - Check, mid-run: a tap on the canvas, a press on the top bar and on the dock each skip every attack of the moment at once, and nothing under them reacts; Android Back skips first; one medium impact haptic at each hit stop; the banner enters only when the spotlight ends or is skipped. Reduce motion, a screen reader and the setting off play none, and the banner shows at once.

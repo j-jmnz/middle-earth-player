@@ -8,12 +8,12 @@ import { spendOnSave, pick, unpick, type Picks } from "../../../campaign/xp";
 import { pickSentence, xpView, type XpRowView } from "../../../campaign/xp-view";
 import { rowSurface } from "../../../ui/surfaces";
 import { useTableTokens } from "../../../ui/use-table-tokens";
-import { ActionBar, BodyText, IconButton, Label, NavBar, PrimaryButton, Screen, ScreenScroll, Section, StatTile, TextButton } from "../../chrome";
-import { campaignOf, scenarioNames } from "../../campaign-data";
-import { goBack } from "../../go-back";
-import { usePalette } from "../../palette-hook";
-import { routeCode } from "../../route-code";
-import { useSave } from "../../use-save";
+import { ActionBar, BodyText, IconButton, Label, NavBar, PrimaryButton, Screen, ScreenScroll, Section, StatTile, TextButton } from "../../kit/chrome";
+import { campaignOf, scenarioNames } from "../../data/campaign-data";
+import { goBack } from "../../nav/go-back";
+import { usePalette } from "../../kit/palette-hook";
+import { routeCode } from "../../nav/route-code";
+import { useSave } from "../../data/use-save";
 import { useUiScale } from "../../../ui/ui-scale";
 import { Text } from "../../../ui/text";
 

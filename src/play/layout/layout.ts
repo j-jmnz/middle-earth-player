@@ -408,7 +408,7 @@ export function tableLayout(
   placePlay(plan, play, slots, m);
   const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}), ...(piles.victory ? { victory } : {}) };
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
-  // covers it; a tap on the deck opens it (table-view.tsx).
+  // covers it; a tap on the deck opens it (table/view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));

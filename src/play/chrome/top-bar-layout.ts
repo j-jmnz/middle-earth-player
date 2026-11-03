@@ -14,7 +14,7 @@ export const TOP_BAR = 52;
 // corner (user report, 2026-10-29).
 export const BAR_TOP = 8;
 export const MENU_BUTTON = 44;
-// The bar's side padding (px-2 in table-top-bar.tsx).
+// The bar's side padding (px-2 in table/top-bar.tsx).
 export const BAR_PAD = 8;
 const GAP = 8;
 // Wide enough for the widest pill with both neighbor phases inline (RAIL_WIDE), with room over.
@@ -107,7 +107,7 @@ export function barZones(bar: number, dials: number, scale = 1, center = bar / 2
 
 // ---- The dials row: the Heading dial (phase 39b, docs/design-system-table.md, Top bar). All sizes are logical points at Medium, as the zones above. ----
 
-/** A dial's disc, the padding either side of a dial, the gap between a disc and its label, and the gap between two dials (table-chrome.tsx, table-top-bar.tsx). */
+/** A dial's disc, the padding either side of a dial, the gap between a disc and its label, and the gap between two dials (table-chrome.tsx, table/top-bar.tsx). */
 export const DIAL_SIZE = 46;
 export const DIAL_PAD = 4;
 export const DIAL_LABEL_GAP = 6;

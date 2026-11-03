@@ -22,8 +22,8 @@ User request, 2026-10-26. This plan reworks the landscape table described in `do
 
 Measured on `main` at `01b0714`:
 
-- **Top bar** (`src/screens/table-view.tsx:194-223`): Back, one threat dial per seat, Life, Burden, the phase rail, Round N, Log, Rules, Booklet.
-- **Command column** (`table-view.tsx:248-277`): the quest band, an "Active: …" line, a Ring-bearer line and the dock (`src/play/choice/dock/table-dock.tsx`). The dock holds:
+- **Top bar** (`src/screens/table/view.tsx:194-223`): Back, one threat dial per seat, Life, Burden, the phase rail, Round N, Log, Rules, Booklet.
+- **Command column** (`table/view.tsx:248-277`): the quest band, an "Active: …" line, a Ring-bearer line and the dock (`src/play/choice/dock/table-dock.tsx`). The dock holds:
   - the step, the moment, a scrolling note with guide lines, the readout, the picked cards, a refusal;
   - the armed line, the gold pill, a row of answers and a row of reading pills.
 - **Choice panel** (`SidePanel`, `src/play/table-panel.tsx:42-142`): paper, 46% of the width (320 to 480 pt), anchored to the right and the bottom.
@@ -35,7 +35,7 @@ Measured on `main` at `01b0714`:
   - The gold edge, the picked edge, the veil and the beat ring are drawn on `slotBounds(slot)` (`src/play/layout/layout.ts:337`), which ignores `tilt`.
   - A fanned hand card therefore has a straight frame on a tilted picture, and `hitSlot` ignores the tilt too.
 - **Two-handed play**: `shownSeat(game)` (`src/play/store/selectors.ts:189`) is `game.activeSeat`. Nothing in the UI shows the other seat's hand or play area.
-- **Piles**: a tap or a long press on the player deck or the encounter deck does nothing (`table-view.tsx:125-127`).
+- **Piles**: a tap or a long press on the player deck or the encounter deck does nothing (`table/view.tsx:125-127`).
 - **Motion** (every value is a local literal; there are no motion tokens):
 
   | Motion | Value |

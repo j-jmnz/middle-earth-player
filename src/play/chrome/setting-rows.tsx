@@ -1,4 +1,4 @@
-// The settings rows the Settings tab (src/screens/settings-view.tsx) and the table's settings panel (reading-panels.tsx) share (docs/design-system.md,
+// The settings rows the Settings tab (src/screens/settings/view.tsx) and the table's settings panel (reading-panels.tsx) share (docs/design-system.md,
 // Components and Settings; user request, 2026-10-28): the grouped sections with their choices and switches, so the two cannot drift apart.
 // They live in src/play because src/play cannot import src/screens. `testPrefix` is `app-settings` on the tab and `settings` on the panel.
 import { View } from "react-native";

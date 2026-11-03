@@ -5,7 +5,7 @@
 On a crowded table, a weaker phone struggles. Reading the code turned up three costs:
 
 1. **Picture memory.** The table keeps a decoded copy of each face-up card at its on-screen size × the phone's pixel ratio (`src/play/canvas/table-images.native.ts`, `coverPixels` in `src/play/canvas/table-pictures.ts`). A hand card is kept at the scrub's lifted size (`HAND_PICTURE_SCALE` ≈ 2.3), so the hand takes about half of this memory.
-2. **The drifting fog.** Behind the transparent table canvas, the `table` scene's backdrop (`src/screens/backdrop.native.tsx`) redraws the whole screen about 30 times a second in Dark theme for as long as the screen is open. Only Reduce motion stops it today.
+2. **The drifting fog.** Behind the transparent table canvas, the `table` scene's backdrop (`src/screens/art/backdrop.native.tsx`) redraws the whole screen about 30 times a second in Dark theme for as long as the screen is open. Only Reduce motion stops it today.
 3. **Every card redrawn on every change.** Any canvas render (a game step, a card picked up, new targets, a banner beat) rebuilds the drawing of every card (`table-canvas.native.tsx`, `piece`). That covers each card's body, its marks and its overlay of badges, tokens and pills, about 45 cards on a crowded table, though usually only one or two changed.
 
 The changes:
@@ -25,7 +25,7 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
    - Add `CARD_QUALITY_OPTIONS = ["high", "low"] as const` and `CardQualityOption`.
    - Add `cardQuality` to `TableSettings`, defaulting to `"high"`.
    - Parse it in `parseSettings` the way `uiScale` and `theme` are parsed, so old saves load as High.
-   - `restoreDefaults` and the JSON row in `settings-store.ts` cover it, so no migration is needed.
+   - `restoreDefaults` and the JSON row in `settings/store.ts` cover it, so no migration is needed.
 2. **Ratio**, `src/play/canvas/table-pictures.ts`:
    - Add `pictureRatio(device, quality)`: the device ratio on High, `Math.max(1, device / 2)` on Low.
 3. **Decode**, `src/play/canvas/table-images.native.ts`:
@@ -44,7 +44,7 @@ The long-press preview and the Card screen use `expo-image`, not this pipeline, 
 
 1. **Setting**, `table-settings.ts`:
    - Add `fogDrift: boolean`, default `true`, parsed with `flag()`.
-2. **Use it**, `src/screens/backdrop-drift.ts`:
+2. **Use it**, `src/screens/art/backdrop-drift.ts`:
    - `useDriftRunning()` returns `focused && !reduceMotion && fogDrift`, reading `fogDrift` through a narrow `useStore` selector.
    - Both backdrops (`backdrop.native.tsx` and the web `backdrop.tsx`) and `HeroArt`'s fog already go through this hook. With the switch off, every screen's fog holds still: the canvas is drawn once and no frame callback runs.
 
@@ -91,7 +91,7 @@ On every canvas render, `piece()` rebuilds the body, marks and overlay for every
 - `src/play/canvas/table-pictures.test.ts`:
   - `pictureRatio`: 3→1.5, 2→1 and 1→1 on Low; unchanged on High.
   - On a full table on a 3× phone, Low weighs at most about ¼ of High, under about 4.5 MB, using `pictureBytes` like the existing 16 MB check.
-- The `parseSettings` test (wherever it lives today, e.g. `settings-store.test.ts`):
+- The `parseSettings` test (wherever it lives today, e.g. `settings/store.test.ts`):
   - A missing or invalid `cardQuality` becomes `"high"`, and a missing `fogDrift` becomes `true`.
   - `"low"` and `false` round-trip.
 - `src/play/chrome/settings-words.test.ts`: `QUALITY_WORDS` has a word for every option in `CARD_QUALITY_OPTIONS`.

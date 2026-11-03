@@ -25,7 +25,7 @@ There are no motion tokens: every duration is a local literal. The list is in `d
 - `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 0 under reduced motion. Every duration passes through it.
 - A new table setting, **Animation speed** (Normal, Quick):
   - in `src/ui/table-settings.ts`;
-  - stored as the others are (`src/screens/settings-store.ts`);
+  - stored as the others are (`src/screens/settings/store.ts`);
   - shown in the Table settings panel.
 
 **Card motion** (canvas, `motion.ts` and `table-canvas.native.tsx`)

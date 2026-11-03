@@ -4,10 +4,10 @@ import { useMemo } from "react";
 import { View } from "react-native";
 
 import { packs } from "../../catalog/schema";
-import { BodyText, Column, ListRow, NavBar, Screen, ScreenTitle } from "../chrome";
-import { useDatabases } from "../databases";
-import { goBack } from "../go-back";
-import { useListGutter } from "../list-gutter";
+import { BodyText, Column, ListRow, NavBar, Screen, ScreenTitle } from "../kit/chrome";
+import { useDatabases } from "../data/databases";
+import { goBack } from "../nav/go-back";
+import { useListGutter } from "../nav/list-gutter";
 
 export default function PackList() {
   const router = useRouter();

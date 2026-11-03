@@ -1,4 +1,4 @@
-// The web build has no Skia canvas (the same split as src/screens/backdrop.tsx): it lists each zone's cards and each pile
+// The web build has no Skia canvas (the same split as src/screens/art/backdrop.tsx): it lists each zone's cards and each pile
 // by name. A tap picks, as on the canvas, and a long press previews; the cards the open moment lets the player tap are
 // outlined, the picked ones filled. The phone draws the canvas in table-canvas.native.tsx.
 import { useMemo } from "react";

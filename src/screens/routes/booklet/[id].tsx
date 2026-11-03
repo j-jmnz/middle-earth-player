@@ -3,13 +3,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 
-import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../chrome";
+import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../kit/chrome";
 import { bookletName, isBookletId, startPage } from "../../booklets/books";
 import { BookletPdf } from "../../booklets/reader-view";
 import { bookletUri, hasBundledBooklet, importBooklet, installBundledBooklet } from "../../booklets/store";
-import { readBooklet, writeLastPage, type BookletRow } from "../../campaign-store";
-import { useDatabases } from "../../databases";
-import { routeCode } from "../../route-code";
+import { readBooklet, writeLastPage, type BookletRow } from "../../data/campaign-store";
+import { useDatabases } from "../../data/databases";
+import { routeCode } from "../../nav/route-code";
 import { slateSurface } from "../../../ui/surfaces";
 import { useTableTokens } from "../../../ui/use-table-tokens";
 import { useSizeClass } from "../../../ui/use-size-class";

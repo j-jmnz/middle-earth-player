@@ -12,7 +12,7 @@ The seeds are Stealth and Steadfastness (Sam, Merry, Pippin) and Wisdom and Wiza
 
 ## Starter lists are data
 
-Move the two lists out of `src/screens/starter-decks.ts` into `data/campaigns/fellowship-of-the-ring.json` as `starterDecks`, with the code chosen for each row and the MEC109 span that prints the list. A test checks each row's name and count against that span. The seed script reads the file. The Gandalf-to-Elrond note stays a note.
+Move the two lists out of `src/screens/deck/starter-decks.ts` into `data/campaigns/fellowship-of-the-ring.json` as `starterDecks`, with the code chosen for each row and the MEC109 span that prints the list. A test checks each row's name and count against that span. The seed script reads the file. The Gandalf-to-Elrond note stays a note.
 
 ## Keywords
 

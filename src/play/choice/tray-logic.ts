@@ -134,7 +134,7 @@ export function outsideLayers(a: { trayShown: boolean; reading: boolean; reader:
 export const TRAY_MAX = 340;
 // The shortest the box is, so a tall dock never leaves a box that is not there.
 const MIN_HEIGHT = 72;
-// The command column's side padding (table-view.tsx, px-2): the dock stands this far inside it, and so do the panels.
+// The command column's side padding (table/view.tsx, px-2): the dock stands this far inside it, and so do the panels.
 export const COLUMN_PAD = 8;
 
 export type TrayBox = { width: number; right: number; bottom: number; maxHeight: number };

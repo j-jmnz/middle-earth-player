@@ -1,5 +1,5 @@
-// The tokens the table canvas draws with, copied from src/screens/palette.js (docs/design-system.md: src/play cannot import
-// src/screens): Ringwraiths (Dark) and Rivendell (Light; the Carved Stone handoff, 2026-10-29). src/screens/play-tokens.test.ts fails when a value
+// The tokens the table canvas draws with, copied from src/screens/kit/palette.js (docs/design-system.md: src/play cannot import
+// src/screens): Ringwraiths (Dark) and Rivendell (Light; the Carved Stone handoff, 2026-10-29). src/screens/kit/play-tokens.test.ts fails when a value
 // here drifts from its palette. `tableTokens` is Dark, for the code that is not theme-aware yet; useTableTokens picks the theme's.
 export const tableTokens = {
   night: "#030405",

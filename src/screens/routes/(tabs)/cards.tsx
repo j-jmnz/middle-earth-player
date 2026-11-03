@@ -2,11 +2,11 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import { CardDetailPane } from "../../card-detail";
-import { CardPool, CardPoolBody } from "../../card-pool";
-import { BodyText, HubHeader, PillButton, Screen } from "../../chrome";
-import { useListPreview } from "../../list-preview";
-import { ToastView } from "../../toast-view";
+import { CardDetailPane } from "../../pool/card-detail";
+import { CardPool, CardPoolBody } from "../../pool/card-pool";
+import { BodyText, HubHeader, PillButton, Screen } from "../../kit/chrome";
+import { useListPreview } from "../../pool/list-preview";
+import { ToastView } from "../../kit/toast-view";
 import { useSizeClass } from "../../../ui/use-size-class";
 
 // The detail pane beside the pool on a tablet in landscape.

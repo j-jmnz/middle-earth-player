@@ -95,7 +95,7 @@ Stage 2A (142062) removes the Ring-bearer and its attachments from the game. Sta
 
 ### 9. Starter decks are hand-typed code
 
-(Fixed: the lists are `data/starter-decks.json`, read from the booklet spans; `Restricted` is a parsed keyword, `src/rules/core/keywords.ts`.) `src/screens/starter-decks.ts` held the two lists as TypeScript. The coverage test does not read them. `Restricted` appears in 79 cards (Sting, Glamdring, Andúril, and attachments in the starter decks) and is an unknown keyword token. The engine does not implement it.
+(Fixed: the lists are `data/starter-decks.json`, read from the booklet spans; `Restricted` is a parsed keyword, `src/rules/core/keywords.ts`.) `src/screens/deck/starter-decks.ts` held the two lists as TypeScript. The coverage test does not read them. `Restricted` appears in 79 cards (Sting, Glamdring, Andúril, and attachments in the starter decks) and is an unknown keyword token. The engine does not implement it.
 
 ## Fundamental changes
 

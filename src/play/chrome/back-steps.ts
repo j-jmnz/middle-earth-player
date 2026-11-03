@@ -1,4 +1,4 @@
-// The Back steps the play layer carries out itself (back.ts picks the step; src/screens/table-view.tsx peels the layers it owns, the
+// The Back steps the play layer carries out itself (back.ts picks the step; src/screens/table/view.tsx peels the layers it owns, the
 // menu, the popovers, the preview, the reading layer, the sheet and the tray): skip a combat spotlight that is playing, cancel an open
 // hand scrub, end a peek at the other seat, in that order. True when it handled the step.
 import type { BackLayers, BackStep } from "./back.ts";

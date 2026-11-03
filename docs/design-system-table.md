@@ -8,7 +8,7 @@ The table is played in landscape only (`orientation` on its stack screen), with 
 
 ## Top bar
 
-Code: `src/screens/table-top-bar.tsx`, `src/play/chrome/top-bar-layout.ts`.
+Code: `src/screens/table/top-bar.tsx`, `src/play/chrome/top-bar-layout.ts`.
 
 52 pt (`TOP_BAR`: the 46 pt dial with 3 pt above and below), under the top safe-area inset and inside both side ones, starting at least 8 pt under the screen's top edge (`BAR_TOP`) so a dial's pop stays on the screen. Where a status bar stays (an iPad), the bar starts right under its inset, counted once: the table's `Screen` bleeds and the table insets itself. Three zones and nothing else: the threat dials at the left, the phase rail centred on the screen, one menu button at the right.
 

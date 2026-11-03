@@ -1,4 +1,4 @@
-// Where the threat dials end in the top bar, measured by the bar (src/screens/table-top-bar.tsx) and read by the layers over it
+// Where the threat dials end in the top bar, measured by the bar (src/screens/table/top-bar.tsx) and read by the layers over it
 // (table-layers.tsx): the choice tray's outside-tap layer over the bar stops short of the dials, so a tap on a dial reaches it. A dial
 // cannot pick, so one tap is enough: the table view folds the tray and then peeks or opens the threat panel as usual. Plain module
 // state, as scrub-open.ts: there is one top bar. 0 until it is measured, when the layer covers the whole bar as before.

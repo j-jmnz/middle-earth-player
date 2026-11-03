@@ -2,8 +2,8 @@ import { Tabs } from "expo-router";
 import { useMemo, type ReactNode } from "react";
 import { SafeAreaInsetsContext, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AppTabBar, dockIcon } from "../../chrome";
-import { usePalette } from "../../palette-hook";
+import { AppTabBar, dockIcon } from "../../kit/chrome";
+import { usePalette } from "../../kit/palette-hook";
 import { useSizeClass } from "../../../ui/use-size-class";
 
 // The dock: the campaigns to play, a scenario played on its own, the decks to play them with, every card, and the rules to look up

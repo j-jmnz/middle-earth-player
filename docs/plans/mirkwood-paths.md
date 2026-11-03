@@ -66,7 +66,7 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
   - `rules/spans.ts:11` (closed id regex)
 - Catalog: `src/catalog/printed-ledger.ts:3`, `scripts/build/catalog.ts:18-19,151` (one campaign and pack set).
 - `src/catalog/scenario-data.ts`: `campaignCard`, `prelude` and `starterDecks` are required, and there is no booklet id or saga flag.
-- Every `FELLOWSHIP_ID` use, starting with `src/campaign/save.ts:11` and `src/screens/campaign-data.ts`:
+- Every `FELLOWSHIP_ID` use, starting with `src/campaign/save.ts:11` and `src/screens/data/campaign-data.ts`:
   - `(tabs)/index.tsx:73,122,247`
   - `(tabs)/scenarios.tsx:37,211`
   - `standalone/briefing/[scenarioId].tsx:43,70`
@@ -74,12 +74,12 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
 - Saga rules always run:
   - `src/campaign/loadout.ts:44-53`
   - `src/campaign/briefing.ts:121`
-  - `src/screens/seat-picker.tsx:63,168`
-  - `src/screens/briefing-parts.tsx:82`
+  - `src/screens/briefing/seat-picker.tsx:63,168`
+  - `src/screens/briefing/parts.tsx:82`
 - `src/campaign/start.ts`: only `AttachToRingBearer` and `AddToStaging` campaign-setup verbs are dealt.
 - `src/campaign/resolution.ts` `earn()` and `log.ts` `applyResolution`: the pool is deduplicated by code, but "each player earns 1 copy" needs several copies of one code.
 - `src/rules/quest/quest.ts` `advanceStage()` is linear, so Passage Through Mirkwood's random 3B branch can't be expressed.
-- Booklets: `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules-glossary.ts` `DOC_NAMES`/`BOOKS`.
+- Booklets: `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules/glossary.ts` `DOC_NAMES`/`BOOKS`.
 
 ## Approach: seven new phases (27–33)
 
@@ -152,7 +152,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 ### Phase 28 — Campaign registry, saga gating, log, booklets
 
 1. **Registry**
-   - `src/campaign/save.ts` and `src/screens/campaign-data.ts` become a map from campaign id to campaign data and scenarios. Metro needs static JSON imports, so the map is written by hand, and a test checks that it matches `data/campaigns/index.json`.
+   - `src/campaign/save.ts` and `src/screens/data/campaign-data.ts` become a map from campaign id to campaign data and scenarios. Metro needs static JSON imports, so the map is written by hand, and a test checks that it matches `data/campaigns/index.json`.
    - `campaignOf` and `nameOf` work for any id. Remove every `FELLOWSHIP_ID` fallback listed above.
    - `scripts/build/catalog.ts` tags `cards.campaign_id` from a pack→campaign map.
 2. **Screens**
@@ -164,7 +164,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - These run only when `campaign.saga`:
      - `validateLoadout`: `noRingBearer`, `twoFellowshipHeroes`, `secondFrodo`, `ringInDeck`, the fourth-hero allowance
      - `needsRingBearer`
-     - the Ring-bearer slot in `seat-picker.tsx` and `briefing-parts.tsx`
+     - the Ring-bearer slot in `seat-picker.tsx` and `briefing/parts.tsx`
    - Outside a saga, Fellowship-sphere heroes are refused, with the rule cited.
    - Standalone play follows the box's flag.
 4. **Campaign setup verbs** (`start.ts`, `checklist.ts`)
@@ -191,7 +191,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
      - `rules-reference` (`MEC101.pdf`, already pinned as `rr`)
      - `the-dark-of-mirkwood` (`dark_of_mirkwood_rulebook_v2.pdf`, pinned in phase 27)
    - Mirkwood Paths opens `learn-to-play`, which already holds the core campaign and setup pages. The Dark of Mirkwood opens `the-dark-of-mirkwood`.
-   - `rules-glossary.ts` `DOC_NAMES`/`BOOKS` gain `tdom` and `rr`.
+   - `rules/glossary.ts` `DOC_NAMES`/`BOOKS` gain `tdom` and `rr`.
    - `bookletParams` returns `campaign.bookletId`.
    - Update the brief's booklet ids and the "two booklet PDFs" line, and `scripts/build/pack-booklets.test.ts`.
 7. **Tests**: registry, loadout gating (Fellowship unchanged; Mirkwood refuses a Fellowship hero and needs no Ring-bearer), multi-copy earn, carry-over round trip, booklet map. Write Maestro flows: `mirkwood-start.yaml` (start, briefing with no Ring-bearer slot), `scenarios-boxes.yaml`, `booklet-dark-of-mirkwood.yaml`.

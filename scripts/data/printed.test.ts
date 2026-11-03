@@ -3,14 +3,14 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { keyOf, loadLedger, mergeLedgers, verifyScans } from "./printed/ledger.ts";
-import { starterPrints } from "../../src/screens/starter-decks.ts";
+import { starterPrints } from "../../src/screens/deck/starter-decks.ts";
 import { KNOWN_ERRORS, MEC109_CHANGED, scanTargets, scopeCodes, starterCodes } from "./printed/scope.ts";
 
 // The printed-text ledger (data/printed): every card in scope is read from a pinned scan.
 const ledger = loadLedger();
 
 describe("ledger scope", () => {
-  it("reads every starter code that src/screens/starter-decks.ts lists", () => {
+  it("reads every starter code that src/screens/deck/starter-decks.ts lists", () => {
     // starterCodes() reads the file as text, because Node cannot load its Drizzle import. This keeps the two in step.
     expect(starterCodes()).toEqual([...new Set(starterPrints().map((row) => row.code))].sort());
   });

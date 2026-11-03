@@ -8,17 +8,17 @@ import { View } from "react-native";
 
 import { gameReport } from "../../../../campaign/report";
 import { finishStandalone } from "../../../../campaign/standalone";
-import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton, TwoPane } from "../../../chrome";
+import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton, TwoPane } from "../../../kit/chrome";
 import { useSizeClass } from "../../../../ui/use-size-class";
-import { GameReportView } from "../../../game-report";
-import { scenarioName } from "../../../campaign-data";
-import { useDatabases } from "../../../databases";
-import { goBack } from "../../../go-back";
-import { routeCode } from "../../../route-code";
-import { useStandaloneSession } from "../../../standalone-session";
-import { outcomeLines } from "../../../standalone-words";
-import { recordStandaloneRun } from "../../../run-writers";
-import { writeStandalone } from "../../../standalone-store";
+import { GameReportView } from "../../../campaign/game-report";
+import { scenarioName } from "../../../data/campaign-data";
+import { useDatabases } from "../../../data/databases";
+import { goBack } from "../../../nav/go-back";
+import { routeCode } from "../../../nav/route-code";
+import { useStandaloneSession } from "../../../session/standalone-session";
+import { outcomeLines } from "../../../history/standalone-words";
+import { recordStandaloneRun } from "../../../data/run-writers";
+import { writeStandalone } from "../../../data/standalone-store";
 
 export default function StandaloneOutcome() {
   const router = useRouter();

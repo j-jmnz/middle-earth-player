@@ -17,7 +17,7 @@ Back, Log, Rules and Booklet move into the menu.
 
 ## Now
 
-`src/screens/table-view.tsx:194-223`, left to right:
+`src/screens/table/view.tsx:194-223`, left to right:
 - `‹ Path` or `‹ Scenarios` (`table-back`);
 - the dials (`ThreatRing compact`, plus Life and Burden when the scenario has them);
 - `PhaseRail`;
@@ -48,7 +48,7 @@ Back, Log, Rules and Booklet move into the menu.
 - The separate Round text goes. The rail's accessibility label already says the round; until phase 20, the rail shows "R3" before the current step when it is not narrow.
 
 **Code layout**
-- Move the top bar out of `table-view.tsx` (352 lines) into `src/screens/table-top-bar.tsx`. `table-view.tsx` passes it the handlers.
+- Move the top bar out of `table/view.tsx` (352 lines) into `src/screens/table/top-bar.tsx`. `table/view.tsx` passes it the handlers.
 
 **Motion** (values to move to `src/ui/motion-tokens.ts` in phase 23)
 - The popover enters in 200 ms ease-out: scale 0.96 to 1 from the top right, plus a fade.

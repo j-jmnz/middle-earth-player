@@ -1,4 +1,4 @@
-// The words and lists the Settings screen (src/screens/settings-view.tsx) and the table's settings panel (reading-panels.tsx) share,
+// The words and lists the Settings screen (src/screens/settings/view.tsx) and the table's settings panel (reading-panels.tsx) share,
 // so the two say the same thing (user request, 2026-10-28). Pure, so a test reads them.
 import type { CardQualityOption, ReduceMotionOption, ThemeOption, UiScaleOption } from "../../ui/table-settings.ts";
 import type { Speed } from "../../ui/motion-tokens.ts";

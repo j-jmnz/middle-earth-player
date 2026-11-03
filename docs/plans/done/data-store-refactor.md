@@ -150,7 +150,7 @@ Now: the heading splitter was replaced by the curated `data/rules/index.json` (`
 - `src/effects/index.ts` exports generated plus authored. `src/screens`, `src/play` and `src/campaign` import it. `src/rules` still receives effects as an argument; `eslint.config.js` keeps `allowEffects` only for tests and scripts, which may import `src/effects` into `src/rules` and `src/catalog`.
 - `scripts/validate-effects.ts` moves into a Vitest schema test. Delete the `effects` and `scenarios` tables, `scripts/effects-roundtrip.test.ts`, and the readers in `src/screens/routes/{pool,card/[code],debug}.tsx`. `activeCardCodes` (`src/catalog/active-text.ts`) takes the effect list.
 - `scripts/build/catalog.ts` becomes an offline `data/` → `catalog.db` transform (`cards` with text and image URLs, `packs`, `campaigns`, `meta`).
-  - The version is a content hash. `src/screens/applied-catalog-version.ts` compares for equality.
+  - The version is a content hash. `src/screens/data/applied-catalog-version.ts` compares for equality.
   - Delete `scripts/catalog-snapshot.ts`'s `nextVersion` and `scripts/ensure-catalog.ts`.
 - Images: encounter and quest art comes from DragnCards (`imageUrlPrefix` plus `imageUrl`), falling back to Hall of Beorn `ImagePath`. This fills the gap RingsDB leaves for `src/screens/images/`.
 

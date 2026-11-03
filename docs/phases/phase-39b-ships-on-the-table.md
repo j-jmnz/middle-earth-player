@@ -141,7 +141,7 @@ Each paragraph below is built by its scenario phase, from the shared pieces abov
 
 - **Pure modules** (Node-tested): `row-fold.ts`, `look-strip.ts`, `heading.ts` (step to icon, word, arcs, colour token, label, badge and preview turn), `words/sea.ts`. Layout changes go in `layout.ts`, `play-area.ts` (ships first, `SHIP_GAP`, ships in the front row when stacked) and `top-bar-layout.ts`.
 - **Selectors.** `PileId` gains `corsairDeck` and `corsairDiscard`; the scenario phases add `unchartedDeck` and `grottoDeck`. `PILE_WORDS` and the pile list follow.
-- **Drawing.** The Heading dial in `table-chrome.tsx` and `table-top-bar.tsx`. The medallion, the fold stack and the second slot on the Skia canvas. The web list (`table-canvas.tsx`) names each new piece in words: "Heading: Rain (off-course)", "Ships: Dream-chaser, 3 damage", "Corsair deck 9 · Corsair discard pile 2". The web list does not fold.
+- **Drawing.** The Heading dial in `table-chrome.tsx` and `table/top-bar.tsx`. The medallion, the fold stack and the second slot on the Skia canvas. The web list (`table-canvas.tsx`) names each new piece in words: "Heading: Rain (off-course)", "Ships: Dream-chaser, 3 damage", "Corsair deck 9 · Corsair discard pile 2". The web list does not fold.
 - **State** comes from the sea family (phase 39). A test state is built as `seat-fixture.ts` builds one (`sea-fixture.ts`).
 
 ## Tests

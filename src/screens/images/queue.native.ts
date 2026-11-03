@@ -4,8 +4,8 @@ import { Directory, DownloadTask, File, Paths } from "expo-file-system";
 
 import { excludeImageDirectoryFromBackup } from "image-backup-exclusion";
 
-import type { AppDatabases } from "../open-databases";
-import { imageFiles } from "../user-schema";
+import type { AppDatabases } from "../data/open-databases";
+import { imageFiles } from "../data/user-schema";
 import {
   DOWNLOAD_CONCURRENCY,
   IMAGE_DIRECTORY,

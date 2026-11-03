@@ -1,11 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
 
-import { BodyText, NavBar, Screen, ScreenScroll, ScreenTitle } from "../../chrome";
-import { goBack } from "../../go-back";
-import { RuleBody } from "../../rule-detail";
-import { routeCode } from "../../route-code";
-import { glossaryEntry } from "../../rules-glossary";
+import { BodyText, NavBar, Screen, ScreenScroll, ScreenTitle } from "../../kit/chrome";
+import { goBack } from "../../nav/go-back";
+import { RuleBody } from "../../rules/detail";
+import { routeCode } from "../../nav/route-code";
+import { glossaryEntry } from "../../rules/glossary";
 
 // One rule span as its book prints it, with the rules it sends the reader on to (RuleBody); a readable column outside compact.
 export default function Rule() {

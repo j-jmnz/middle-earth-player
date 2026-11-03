@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
 import sharp from "sharp";
 
-import { SCENE_PICTURE } from "../../src/screens/art-crop.ts";
+import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../data/paths.ts";
 import { fetchBytes, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";

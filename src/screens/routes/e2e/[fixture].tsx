@@ -9,12 +9,12 @@ import { useEffect, useMemo } from "react";
 
 import { fixtureSave, hasFixture, isFixtureName } from "../../../campaign/fixtures";
 import { CATALOG_VERSION } from "../../../catalog/version";
-import { BodyText, NavBar, Screen } from "../../chrome";
-import { restoreSave, writeSave } from "../../campaign-store";
-import { useDatabases } from "../../databases";
-import { e2eBuild } from "../../e2e";
-import { goBack } from "../../go-back";
-import { routeCode } from "../../route-code";
+import { BodyText, NavBar, Screen } from "../../kit/chrome";
+import { restoreSave, writeSave } from "../../data/campaign-store";
+import { useDatabases } from "../../data/databases";
+import { e2eBuild } from "../../nav/e2e";
+import { goBack } from "../../nav/go-back";
+import { routeCode } from "../../nav/route-code";
 
 export default function E2eFixture() {
   const router = useRouter();

@@ -3,25 +3,25 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AccessibilityInfo, View } from "react-native";
 
-import { BodyText, HubHeader, IconButton, PillButton, Screen, TextButton } from "../../chrome";
-import { editSavedDeck, startNewDeck } from "../../deck-draft";
-import { copyDeckName, deckCountLine, deckReadiness, deckShortLine, newDeckName, notAppliedLine } from "../../deck-status";
-import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, writeDeckOrder, type SavedDeck } from "../../deck-store";
-import { useDatabases } from "../../databases";
-import { COVER_GAP, deckListFiltered, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck-list";
-import { DeckListBar } from "../../deck-list-bar";
-import { moveItem } from "../../deck-order";
-import { DeckCell, LiftedRowProvider, ReorderItem, useDeckReorder } from "../../deck-reorder";
-import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../hero-tile";
+import { BodyText, HubHeader, IconButton, PillButton, Screen, TextButton } from "../../kit/chrome";
+import { editSavedDeck, startNewDeck } from "../../deck/draft";
+import { copyDeckName, deckCountLine, deckReadiness, deckShortLine, newDeckName, notAppliedLine } from "../../deck/status";
+import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, writeDeckOrder, type SavedDeck } from "../../deck/store";
+import { useDatabases } from "../../data/databases";
+import { COVER_GAP, deckListFiltered, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck/list";
+import { DeckListBar } from "../../deck/list-bar";
+import { moveItem } from "../../deck/order";
+import { DeckCell, LiftedRowProvider, ReorderItem, useDeckReorder } from "../../deck/reorder";
+import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../art/hero-tile";
 import {
   starterSeedReason,
   starterSeedStatus,
   subscribeStarterSeed,
   type StarterSeed,
-} from "../../starter-decks";
-import { showToast } from "../../toast";
-import { ToastView } from "../../toast-view";
-import { AskInPlace } from "../../ask-in-place";
+} from "../../deck/starter-decks";
+import { showToast } from "../../kit/toast";
+import { ToastView } from "../../kit/toast-view";
+import { AskInPlace } from "../../kit/ask-in-place";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 

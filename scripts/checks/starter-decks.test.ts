@@ -8,7 +8,7 @@ import {
   starterPrints,
   startersToInsert,
   type StarterCandidate,
-} from "../../src/screens/starter-decks.ts";
+} from "../../src/screens/deck/starter-decks.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 

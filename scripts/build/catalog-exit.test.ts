@@ -103,7 +103,7 @@ describe("built catalog", () => {
       }
       expect(unpictured).toEqual([]);
       // Every two-sided card a built scenario deals (each quest stage, which the table shows on its B side from setup on; the campaign cards and ships) has a
-      // side B picture the phone can download, so the table never draws side A's picture for it (src/screens/table-view.tsx, picture).
+      // side B picture the phone can download, so the table never draws side A's picture for it (src/screens/table/view.tsx, picture).
       const twoSided = new Set(loadCards().filter((card) => card.back != null).map((card) => card.code));
       const backless: string[] = [];
       for (const id of readdirSync(path.join("data", "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {

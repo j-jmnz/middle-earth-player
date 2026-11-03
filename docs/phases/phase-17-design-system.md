@@ -42,7 +42,7 @@ Tokens:
 - Type is large enough to read at arm's length. Tap targets are at least 44 points. The phase rail, the choice buttons, and back sit above the home indicator and clear of the notch and status bar.
 - Spacing and type use one scale. Name it.
 
-Shared chrome, if a screen would otherwise repeat the shell, lives in `src/screens/chrome.tsx`. It is views and text. It does not fetch, and it does not import `src/rules` or `src/play`.
+Shared chrome, if a screen would otherwise repeat the shell, lives in `src/screens/kit/chrome.tsx`. It is views and text. It does not fetch, and it does not import `src/rules` or `src/play`.
 
 ## Apply
 
@@ -55,9 +55,9 @@ Restyle the screens that exist:
 - `src/screens/routes/(tabs)/decks.tsx`
 - `src/screens/routes/pack/[code].tsx`
 - `src/screens/routes/card/[code].tsx`
-- `src/screens/database-error.tsx`
+- `src/screens/data/database-error.tsx`
 - `tailwind.config.js`
-- `src/screens/palette.js` (the values `tailwind.config.js` maps to utilities)
+- `src/screens/kit/palette.js` (the values `tailwind.config.js` maps to utilities)
 - `global.css`
 - The splash background in `app.json`
 

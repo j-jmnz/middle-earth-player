@@ -22,7 +22,7 @@ The table makes plain that this is not the seat acting. Who acts never changes b
   - the canvas (`table-canvas.native.tsx:64`, `useViews`);
   - the web list (`table-canvas.tsx:86`);
   - `useTableChoice` (`use-table-choice.ts:98`);
-  - the pile list (`table-view.tsx:303`).
+  - the pile list (`table/view.tsx:303`).
 - Tapping a dial opens that seat's threat panel. It does not change what is shown.
 - The acting seat's dial label is gold.
 

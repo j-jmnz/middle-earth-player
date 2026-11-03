@@ -154,7 +154,7 @@ export function TableDock({
   const readoutLine = dense && trayOpen;
   return (
     <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
-      {/* No panel: the dock stands on the command column's fade (table-view.tsx). The words, the choice's rows (when it is open) and the
+      {/* No panel: the dock stands on the command column's fade (table/view.tsx). The words, the choice's rows (when it is open) and the
           numbers and buttons are stacked from the foot of the column up. */}
       <View
         ref={root}

@@ -59,7 +59,7 @@ Each task updates the passage of `docs/design-system.md` that it supersedes, fol
   - `segmentSurface` and `sunkSurface` go flat: a tonal track and a lighter thumb, with no inset shadow.
   - Panels, tiles and parchment keep their depth.
   - Nothing in the backdrop changes.
-- `src/screens/chrome-buttons.tsx`:
+- `src/screens/kit/chrome-buttons.tsx`:
   - `PrimaryButton`, `SecondaryButton`, `TextButton`, `IconButton` and `PillButton` (44 tall, `rounded-control`) follow the four styles. `ToggleChip` becomes a 36 pt capsule in a 44 pt target: tinted when on, with its foot bar gone.
   - `SearchField` and `Segmented` (`src/ui/segmented.tsx`) become capsules.
   - Disabled takes the one look described above.

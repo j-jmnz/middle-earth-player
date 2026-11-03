@@ -1,7 +1,7 @@
 // The app's settings (docs/plans/done/table-experience.md, docs/plans/done/settings-theme-and-ui-scale.md): the theme and the UI scale,
 // haptics and reduced motion, the card picture quality and the moving fog, keeping the screen awake, where the table stops to ask
 // in a step's action window, the free Responses the player always uses, the readability options and the first-game guide. Kept in
-// user.db by the screens (src/screens/settings-store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
+// user.db by the screens (src/screens/settings/store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
 // A setting is the player's own standing answer, chosen on purpose: that is the confirmation an auto-pass or an auto-use
 // stands on (brief, Screens, Table: no single tap sends an intent).
 import { createStore } from "zustand/vanilla";
@@ -40,7 +40,7 @@ export type TableSettings = {
   theme: ThemeOption;
   // How sharp the table's and the hand's card pictures are kept: High at the phone's pixel ratio, Low at half of it (table-pictures.ts, pictureRatio).
   cardQuality: CardQualityOption;
-  // Whether the fog behind every screen drifts. Off holds it still (src/screens/backdrop-drift.ts).
+  // Whether the fog behind every screen drifts. Off holds it still (src/screens/art/backdrop-drift.ts).
   fogDrift: boolean;
 };
 

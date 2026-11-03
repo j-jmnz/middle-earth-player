@@ -1,4 +1,4 @@
-// The small wiring the table view hands its pieces (src/screens/table-view.tsx), kept here beside use-table-choice.ts: the printed facts the zone selectors and the look strip read, the card
+// The small wiring the table view hands its pieces (src/screens/table/view.tsx), kept here beside use-table-choice.ts: the printed facts the zone selectors and the look strip read, the card
 // preview opener, what a tap on a pile does (a discard pile's list, a fold stack's row list, the Iron Shackles card on a deck), the Heading dial and the Island Map chip the top bar shows. Nothing here changes the game.
 import { useCallback, useMemo } from "react";
 

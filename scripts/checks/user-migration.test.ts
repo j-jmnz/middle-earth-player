@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import migrations from "../../drizzle/migrations.ts";
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
-import { writeAppliedCatalogVersion } from "../../src/screens/applied-catalog-version.ts";
+import { writeAppliedCatalogVersion } from "../../src/screens/data/applied-catalog-version.ts";
 
 // Same key as drizzle-orm/expo-sqlite/migrator: journal idx 0 is `m0000`.
 function migrationSql(entry: { idx: number; tag: string }): string {
@@ -80,7 +80,7 @@ describe("user migration", () => {
     );
     const game = database.prepare("SELECT id, active_scenario, result, archived_at FROM standalone_games").get();
     expect(game).toEqual({ id: "game-1", active_scenario: null, result: null, archived_at: null });
-    // 0006: the table's settings, one JSON row per key (src/screens/settings-store.ts).
+    // 0006: the table's settings, one JSON row per key (src/screens/settings/store.ts).
     database.exec(`INSERT INTO settings (key, value) VALUES ('table', '{"stopsOn":true}')`);
     expect(database.prepare("SELECT key, value FROM settings").get()).toEqual({ key: "table", value: '{"stopsOn":true}' });
   });

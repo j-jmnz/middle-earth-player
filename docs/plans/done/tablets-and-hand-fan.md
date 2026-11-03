@@ -65,8 +65,8 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
 
 ## Part 3: The table settings panel matches the Settings tab
 - **Shared rows.**
-  - New `src/play/chrome/setting-rows.tsx` holds `SettingChoice` (title and detail over a stretched control, moved from `settings-view.tsx:23` `Choice`) and `SettingGroup` (moved from `Group`, `:36`).
-  - Move `Segmented` from `src/screens/chrome-buttons.tsx:270` to `src/ui/segmented.tsx`. Use `useTableTokens()` in place of `usePalette()`: `night`, `hairline` and `goldLine` exist in both token sets. Re-export it from `chrome-buttons.tsx`, as `SettingSwitch` is.
+  - New `src/play/chrome/setting-rows.tsx` holds `SettingChoice` (title and detail over a stretched control, moved from `settings/view.tsx:23` `Choice`) and `SettingGroup` (moved from `Group`, `:36`).
+  - Move `Segmented` from `src/screens/kit/chrome-buttons.tsx:270` to `src/ui/segmented.tsx`. Use `useTableTokens()` in place of `usePalette()`: `night`, `hairline` and `goldLine` exist in both token sets. Re-export it from `chrome-buttons.tsx`, as `SettingSwitch` is.
 - **Shared contents.**
   - New `SettingsRows({ settings, onChange, always, testPrefix, groups })`, also in `setting-rows.tsx`, renders the Display, Motion and feel, and At the table groups.
   - The Settings tab uses all of them, plus About, with prefix `app-settings`.
@@ -107,7 +107,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
   - `useSizeClass()` returns `{ size, width, height, s, rail, short }` from `useWindowDimensions` and `useUiScale`.
   - `useIsTablet()` reads `Dimensions.get("screen")` and stays live on change, for foldables.
 - **Root orientation, `routes/_layout.tsx:163`.** Use `orientation: useIsTablet() ? "all" : "portrait"`. The table routes stay `"landscape"`, and card, booklet, glossary and rule stay `"all"`.
-- **New `src/screens/chrome-panes.tsx`**, re-exported from `chrome.tsx`:
+- **New `src/screens/kit/chrome-panes.tsx`**, re-exported from `chrome.tsx`:
   - `Column({ max })`: centered, with `maxWidth` of `READABLE` or `WIDE` times s.
   - `TwoPane({ kind, start, end })`: measured, uses `paneWidths`, 24·s gap, panes `position: relative` so a NavBar and its shade can be scoped to a pane.
 - **`chrome-frame.tsx`:**
@@ -117,7 +117,7 @@ Repo rules: `src/play` cannot import `src/screens` (`pnpm lint`). Tests are Vite
     - medium: 480·s, centered
     - expanded: 420·s, at the trailing edge
   - `align="fill"` is for a bar inside a pane.
-- **New `src/screens/sheet-modal.tsx`:** one wrapper for both RN Modals (`pool-filter-sheet.tsx:64`, `deck/[id].tsx:364`).
+- **New `src/screens/kit/sheet-modal.tsx`:** one wrapper for both RN Modals (`pool/filter-sheet.tsx:64`, `deck/[id].tsx:364`).
   - `supportedOrientations` set to all four orientations. iOS Modals default to portrait only.
   - In medium and expanded the sheet is centered with `maxWidth` 560·s. This needs a `corners: "top" | "all"` prop on `SheetFrame` (`src/play/choice/sheet-paper.tsx`).
 - **Navigation rail.** expo-router 58 bundles React Navigation 7, so `tabBarPosition: "left"` is supported.
@@ -146,18 +146,18 @@ Compact (every phone) is unchanged. The other classes:
   - Full-width rows use `overrideItemLayout` with a span.
   - The list has `key={view:columns}`.
   - The List view uses a readable gutter.
-- **Cards and the pool** (`card-pool.tsx`, `pool-grid.ts`).
+- **Cards and the pool** (`card-pool.tsx`, `pool/grid.ts`).
   - `poolColumns(width, adding, s)` is `columnsFor(width, adding ? 166 : 107, GRID_GAP, s, adding ? 2 : 3)`. A phone still gets exactly 3 and 2. This replaces `card-pool.tsx:109`.
   - `recyclePool(columns, listH, cellH)` replaces `RECYCLE_POOL = 24`.
   - The FlashList gets `key={view:columns}`.
   - The filter sheet is a centered `SheetModal`.
 - **Rules and Glossary.** This is list-detail.
-  - Extract `RuleBody` from `rule/[id].tsx:30-77` into `src/screens/rule-detail.tsx`.
+  - Extract `RuleBody` from `rule/[id].tsx:30-77` into `src/screens/rules/detail.tsx`.
   - Left (`paneWidths` list-detail): search and the glossary.
   - Right: the selected rule. See also stays in the pane, and Open in book pushes the booklet.
   - Empty right pane: the Books on the Rules tab, and "Choose a rule to read it here." on the glossary.
   - `ListRow` gains `selected` (pressed fill, a 2 pt gold leading bar, `accessibilityState.selected`).
-  - The book cover breakpoint (`rules-view.tsx:28`) uses `size !== "compact"`.
+  - The book cover breakpoint (`rules/view.tsx:28`) uses `size !== "compact"`.
 - **Rule:** a readable column.
 - **Settings:** two columns of groups. Left: Display and Motion. Right: At the table and About.
 - **Card** (`card/[code].tsx`).
@@ -174,7 +174,7 @@ Compact (every phone) is unchanged. The other classes:
 - **Path** (`path/[saveId].tsx`). This is a supporting pane.
   - Left (capped 640): the trail.
   - Right (320–380): the journey bar, Pool, Log, and the next move with BEGIN/RESUME at its foot.
-- **Briefing**, campaign and standalone (`briefing-parts.tsx`). This is a supporting pane.
+- **Briefing**, campaign and standalone (`briefing/parts.tsx`). This is a supporting pane.
   - `BriefingScreen` gains `aside`.
   - Left (360–480): the scene with `ScenarioBanner`, and the floating Back and Booklet buttons scoped to the pane, then `aside` (Before the deal, penalty waived, `EncounterDetails`) in its own scroll.
   - Right: Players, Difficulty and the seats, with the DealBar as `ActionBar align="fill"` at the pane's foot.
@@ -193,7 +193,7 @@ Compact (every phone) is unchanged. The other classes:
 - **The table's landscape lock may not hold.**
   - Android 16 at targetSdk 36 ignores orientation locks on screens 600 dp and wider.
   - iPadOS 26 deprecates `requireFullScreen`.
-  - Either way, the table's existing portrait guard (`table-view.tsx:240-250`) covers it. I note this and leave it; no `appCategory` plugin.
+  - Either way, the table's existing portrait guard (`table/view.tsx:240-250`) covers it. I note this and leave it; no `appCategory` plugin.
 - **The width-driven two-pane Card screen also triggers on an iPhone in landscape (844×390).** The card and glossary routes already turn. Check that size.
 
 ---
@@ -232,7 +232,7 @@ Compact (every phone) is unchanged. The other classes:
 - **You own the plan, the order and the commits.** Agents write code and report. You read their diff, run the gate yourself (`pnpm test`, `pnpm lint`, `npx tsc --noEmit`), commit one step at a time on `claude/ipad-landscape-ui-improvements-a7tjk9`, and push at the end with `git push -u origin <branch>` (retry with backoff only on network errors). Open no PR unless the user asks.
 - **Split the work into these implementer agents.** Each brief names the plan's part and section, the files it owns, and the done gate. Run them in parallel only where their files don't overlap:
   - **A: Parts 1 and 2.** Owns `hand-scrub.ts`, `scrub-pose.ts`, `hand-scrub.native.tsx`, `hand-gestures.native.ts`, `src/ui/motion-tokens.ts`, `card-preview.tsx` and their tests. Can run alongside B.
-  - **B: Part 3.** Owns `setting-rows.tsx`, `segmented.tsx`, `chrome-buttons.tsx`, `settings-view.tsx`, `reading-panels.tsx` and `table-layers.tsx`.
+  - **B: Part 3.** Owns `setting-rows.tsx`, `segmented.tsx`, `chrome-buttons.tsx`, `settings/view.tsx`, `reading-panels.tsx` and `table-layers.tsx`.
   - **C: Part 4a.** The pure modules, hooks, primitives, `SheetModal`, the rail and the start-panel fix. Starts after B merges, because both touch `chrome-buttons.tsx`/chrome. Every later agent builds on it.
   - **D, E and F: Part 4b, in parallel after C**, with disjoint files:
     - **D:** the reading-column screens, Settings, Campaigns and Scenarios.
@@ -265,7 +265,7 @@ Compact (every phone) is unchanged. The other classes:
 - **Never break test ids.** Keep every existing testID. New testIDs follow the screen's prefix. Check `.maestro/*.yaml` before you rename anything.
 - **Reuse before you add:**
   - `Screen`, `ScreenScroll`, `ActionBar`, `NavBar`, `ListRow`, `Panel`, `Segmented`, `SettingSwitch`
-  - `gridCardWidth`/`gridOffset` (`pool-grid.ts`)
+  - `gridCardWidth`/`gridOffset` (`pool/grid.ts`)
   - `previewSize`/`previewSideSize` (`preview-size.ts`)
   - `touch()`/`useUiScale()` (`ui-scale.ts`)
   - `useTableTokens()`
