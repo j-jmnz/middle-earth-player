@@ -74,6 +74,7 @@ export function TableDock({
   count = "",
   tray = null,
   onTop,
+  onHeight,
 }: {
   // The step in words ("Combat", "Stops on · Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
   step: string;
@@ -109,6 +110,8 @@ export function TableDock({
   tray?: ReactNode;
   // The screen y of the top of the dock's content: the choice tray's outside-tap layer over the column stops there.
   onTop?: (top: number) => void;
+  // The dock's own height (the content stack, padding included): the column's head fills the room above it.
+  onHeight?: (height: number) => void;
 }) {
   const t = useTableTokens();
   // The UI scale (ui-scale.ts): the dock's padding and budget are Medium's sizes times it.
@@ -154,7 +157,10 @@ export function TableDock({
         collapsable={false}
         testID="dock"
         className="px-3"
-        onLayout={measure}
+        onLayout={(event) => {
+          measure();
+          onHeight?.(Math.round(event.nativeEvent.layout.height));
+        }}
         style={{
           paddingTop: (dense ? DENSE_PAD : TOP_PAD) * s,
           paddingBottom: (dense ? DENSE_PAD : FOOT_PAD) * s,

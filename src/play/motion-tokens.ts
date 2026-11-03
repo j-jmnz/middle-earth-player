@@ -97,6 +97,8 @@ export const MOTION = {
   dragRefuse: tween(45, "outQuad"),
   dialPopRise: tween(140, null),
   dialPopSettle: spring(350, 0.5),
+  // The quest meter's bars (quest-meter-view.tsx) rise and fall to each new value.
+  meterFill: tween(220, "outCubic"),
   threatBadgeIn: tween(160, null),
   threatBadgeOut: tween(400, null),
   toastIn: tween(160, null),

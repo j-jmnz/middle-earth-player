@@ -21,10 +21,9 @@ const SCREENS: readonly Screen[] = [
   { width: 1366, height: 1024, inset: 0, scales: [UI_SCALES.medium, UI_SCALES.large] },
 ];
 
-function canvasOf(screen: Screen, scale: number, quest: boolean) {
+function canvasOf(screen: Screen, scale: number) {
   const command = Math.round(Math.min(280, Math.max(210, (screen.width / scale) * 0.3)) * scale);
-  const questWidth = quest ? (screen.height / scale >= 600 ? 110 : 86) * scale : 0;
-  return { width: Math.floor(screen.width - 2 * screen.inset - command - questWidth), height: Math.floor(screen.height - 60 * scale) };
+  return { width: Math.floor(screen.width - 2 * screen.inset - command), height: Math.floor(screen.height - 60 * scale) };
 }
 
 describe("the look strip's room", () => {
@@ -33,43 +32,41 @@ describe("the look strip's room", () => {
     expect(squeezedCapacity(10, 50, 44)).toBe(1);
   });
 
-  it("places 1 to 12 cards at each screen, with and without the quest scale: a gap apart, then squeezed to a target, then over more bands", () => {
+  it("places 1 to 12 cards at each screen, a gap apart, then squeezed to a target, then over more bands", () => {
     for (const screen of SCREENS) {
       for (const scale of screen.scales) {
-        for (const quest of [false, true]) {
-          const size = canvasOf(screen, scale, quest);
-          const { views, piles } = seaViews(seaFixture({ heading: "Rain", staging: 3, engaged: 2, allies: 3, ships: [{ code: "dream-chaser", seat: 0 }] }));
-          const layout = tableLayout(size.width, size.height, views, piles, { scale });
-          const bands = lookBands(layout);
-          const target = touch(scale, 44);
-          const fit = squeezedCapacity(Math.min(...bands.map((band) => band.w)), layout.card.w, target);
-          for (let count = 1; count <= 12; count += 1) {
-            const strip = lookStrip(count, bands, layout.card, 6 * scale, target);
-            const at = `${count} cards ${screen.width}x${screen.height} at ${scale}${quest ? " quest" : ""}`;
-            expect(strip.places, at).toHaveLength(count);
-            expect(strip.bands, at).toBe(Math.min(3, Math.max(1, Math.ceil(count / fit))));
-            // Each band's cards stay inside the band and the cards are in reading order.
-            strip.places.forEach((place, index) => {
-              const band = bands[strip.band[index] ?? 0];
-              expect(place.x, at).toBeGreaterThanOrEqual((band?.x ?? 0) - 0.01);
-              expect(place.x + place.w, at).toBeLessThanOrEqual((band?.x ?? 0) + (band?.w ?? 0) + 0.01);
-              expect(place.y, at).toBe(band?.y);
-              if (index > 0) expect(strip.band[index], at).toBeGreaterThanOrEqual(strip.band[index - 1] ?? 0);
-            });
-            // Steps are a gap apart at most and a target at least, until the three bands cannot hold the cards.
-            if (!strip.crowded && strip.step !== Infinity) {
-              expect(strip.step, at).toBeGreaterThanOrEqual(Math.min(target, layout.card.w + 6 * scale) - 0.01);
-              expect(strip.step, at).toBeLessThanOrEqual(layout.card.w + 6 * scale + 0.01);
-            }
-            expect(strip.crowded, at).toBe(count > fit * 3);
+        const size = canvasOf(screen, scale);
+        const { views, piles } = seaViews(seaFixture({ heading: "Rain", staging: 3, engaged: 2, allies: 3, ships: [{ code: "dream-chaser", seat: 0 }] }));
+        const layout = tableLayout(size.width, size.height, views, piles, { scale });
+        const bands = lookBands(layout);
+        const target = touch(scale, 44);
+        const fit = squeezedCapacity(Math.min(...bands.map((band) => band.w)), layout.card.w, target);
+        for (let count = 1; count <= 12; count += 1) {
+          const strip = lookStrip(count, bands, layout.card, 6 * scale, target);
+          const at = `${count} cards ${screen.width}x${screen.height} at ${scale}`;
+          expect(strip.places, at).toHaveLength(count);
+          expect(strip.bands, at).toBe(Math.min(3, Math.max(1, Math.ceil(count / fit))));
+          // Each band's cards stay inside the band and the cards are in reading order.
+          strip.places.forEach((place, index) => {
+            const band = bands[strip.band[index] ?? 0];
+            expect(place.x, at).toBeGreaterThanOrEqual((band?.x ?? 0) - 0.01);
+            expect(place.x + place.w, at).toBeLessThanOrEqual((band?.x ?? 0) + (band?.w ?? 0) + 0.01);
+            expect(place.y, at).toBe(band?.y);
+            if (index > 0) expect(strip.band[index], at).toBeGreaterThanOrEqual(strip.band[index - 1] ?? 0);
+          });
+          // Steps are a gap apart at most and a target at least, until the three bands cannot hold the cards.
+          if (!strip.crowded && strip.step !== Infinity) {
+            expect(strip.step, at).toBeGreaterThanOrEqual(Math.min(target, layout.card.w + 6 * scale) - 0.01);
+            expect(strip.step, at).toBeLessThanOrEqual(layout.card.w + 6 * scale + 0.01);
           }
+          expect(strip.crowded, at).toBe(count > fit * 3);
         }
       }
     }
   });
 
   it("overlaps closer than 44 pt only past three bands", () => {
-    const size = canvasOf(SCREENS[0] as Screen, 1, false);
+    const size = canvasOf(SCREENS[0] as Screen, 1);
     const { views, piles } = seaViews(seaFixture({}));
     const layout = tableLayout(size.width, size.height, views, piles, {});
     const bands = lookBands(layout);

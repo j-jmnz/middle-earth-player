@@ -205,16 +205,16 @@ describe("what a screen reader hears", () => {
   });
 });
 
-// The table view's canvas: the screen less its side insets, the command column (30% in logical points, 210 to 280) and, in the Quest phase, the quest scale (86 pt); under the bar (8 pt top and 52 pt).
+// The table view's canvas: the screen less its side insets, the command column (30% in logical points, 210 to 280) under the bar (8 pt top and 52 pt).
 // 667 x 375 is a small phone; 844 x 390 has the notch and the home indicator (47 pt each side, 21 pt under).
 const DEVICES = [
   { name: "667 x 375", width: 667, height: 375, side: 0, bottom: 0 },
   { name: "844 x 390 with insets", width: 844, height: 390, side: 47, bottom: 21 },
 ] as const;
 
-function canvas(device: (typeof DEVICES)[number], scale: number, quest: boolean): { width: number; height: number } {
+function canvas(device: (typeof DEVICES)[number], scale: number): { width: number; height: number } {
   const command = Math.round(Math.min(280, Math.max(210, (device.width / scale) * 0.3)) * scale);
-  return { width: Math.floor(device.width - 2 * device.side - command - (quest ? 86 * scale : 0)), height: Math.floor(device.height - (8 + 52) * scale) };
+  return { width: Math.floor(device.width - 2 * device.side - command), height: Math.floor(device.height - (8 + 52) * scale) };
 }
 
 const contains = (outer: Rect, inner: Rect): boolean => inner.x >= outer.x - 0.5 && inner.y >= outer.y - 0.5 && inner.x + inner.w <= outer.x + outer.w + 0.5 && inner.y + inner.h <= outer.y + outer.h + 0.5;
@@ -238,71 +238,69 @@ const SCENES: Record<string, FlightLayout> = { plain: APART, "3 staging": CROWD(
 describe("every phone size and scale", () => {
   for (const device of DEVICES) {
     for (const [name, scale] of Object.entries(UI_SCALES)) {
-      for (const quest of [false, true]) {
-        const at = `${device.name}, ${name} (${scale})${quest ? " with the quest scale" : ""}`;
-        const size = canvas(device, scale, quest);
-        const target = touch(scale, 44);
-        const lay = (layout: FlightLayout, keep?: (made: ReturnType<typeof table>) => ReadonlySet<string>) => {
-          const made = table(layout);
-          return { made, layout: tableLayout(size.width, size.height, made.views, made.piles, { scale, stacks: true, bottomInset: device.bottom, ...(keep ? { keep: keep(made) } : {}) }) };
-        };
+      const at = `${device.name}, ${name} (${scale})`;
+      const size = canvas(device, scale);
+      const target = touch(scale, 44);
+      const lay = (layout: FlightLayout, keep?: (made: ReturnType<typeof table>) => ReadonlySet<string>) => {
+        const made = table(layout);
+        return { made, layout: tableLayout(size.width, size.height, made.views, made.piles, { scale, stacks: true, bottomInset: device.bottom, ...(keep ? { keep: keep(made) } : {}) }) };
+      };
 
-        it(`shows every area card a strip of a target that no later slot covers, the stage never folded: ${at}`, () => {
-          for (const [scene, layout] of Object.entries(SCENES)) {
-            for (const keepCaller of [false, true]) {
-              const run = lay(layout, keepCaller ? (made) => new Set([made.caller]) : undefined);
-              const row: Rect = { x: run.layout.zones.staging.x, y: run.layout.zones.staging.y, w: run.layout.zones.staging.w, h: run.layout.card.h };
-              const group = areaSlots(run.layout);
-              const label = `${scene}${keepCaller ? " keeping the Stormcaller" : ""}`;
-              // The stage always stands: it carries the Stormcaller's progress.
-              const stage = group.find((slot) => slot.stormcaller === "stage");
-              expect(stage, label).toBeDefined();
-              expect(run.layout.folds?.some((fold) => fold.cards.includes(run.made.callerStage)), label).toBeFalsy();
-              for (const slot of group) {
-                expect(contains(row, slotBounds(slot)), `${label} ${slot.id} in the row`).toBe(true);
-                const shown = slot.stormcaller === "stage" ? shownBounds(slot) : slotBounds(slot);
-                expect(uncovered(run.layout, slot, shown), `${label} ${slot.id}`).toBeGreaterThanOrEqual(Math.min(shown.w, target) - 0.5);
-                expect(hitBounds(slot).w).toBeGreaterThanOrEqual(Math.min(slotBounds(slot).w, target));
-              }
-              if (keepCaller) expect(group.some((slot) => slot.id === run.made.caller), label).toBe(true);
+      it(`shows every area card a strip of a target that no later slot covers, the stage never folded: ${at}`, () => {
+        for (const [scene, layout] of Object.entries(SCENES)) {
+          for (const keepCaller of [false, true]) {
+            const run = lay(layout, keepCaller ? (made) => new Set([made.caller]) : undefined);
+            const row: Rect = { x: run.layout.zones.staging.x, y: run.layout.zones.staging.y, w: run.layout.zones.staging.w, h: run.layout.card.h };
+            const group = areaSlots(run.layout);
+            const label = `${scene}${keepCaller ? " keeping the Stormcaller" : ""}`;
+            // The stage always stands: it carries the Stormcaller's progress.
+            const stage = group.find((slot) => slot.stormcaller === "stage");
+            expect(stage, label).toBeDefined();
+            expect(run.layout.folds?.some((fold) => fold.cards.includes(run.made.callerStage)), label).toBeFalsy();
+            for (const slot of group) {
+              expect(contains(row, slotBounds(slot)), `${label} ${slot.id} in the row`).toBe(true);
+              const shown = slot.stormcaller === "stage" ? shownBounds(slot) : slotBounds(slot);
+              expect(uncovered(run.layout, slot, shown), `${label} ${slot.id}`).toBeGreaterThanOrEqual(Math.min(shown.w, target) - 0.5);
+              expect(hitBounds(slot).w).toBeGreaterThanOrEqual(Math.min(slotBounds(slot).w, target));
             }
+            if (keepCaller) expect(group.some((slot) => slot.id === run.made.caller), label).toBe(true);
           }
-        });
+        }
+      });
 
-        it(`folds only the area's cards first, as a stack that counts them and not the stage: ${at}`, () => {
-          for (const [scene, layout] of Object.entries(SCENES)) {
-            const { made, layout: laid } = lay(layout);
-            const members = areaGroup(made.state).slice(1);
-            const stack = laid.slots.find((slot) => slot.fold === "staging");
-            const folded = laid.folds?.find((fold) => fold.zone === "staging");
-            const standing = areaSlots(laid).filter((slot) => slot.stormcaller !== "stage").map((slot) => slot.id);
-            // The area's cards stand or fold, all of them or none, and the stage stands either way.
-            expect(members.filter((id) => standing.includes(id)).length === 0 || folded?.cards.every((id) => !members.includes(id)) !== false, scene).toBe(true);
-            if (!folded) {
-              expect(standing, scene).toHaveLength(members.length);
-              continue;
-            }
-            expect(folded.cards, scene).not.toContain(made.callerStage);
-            expect(stack?.count, scene).toBe(folded.cards.length);
-            const foldedMembers = members.filter((id) => folded.cards.includes(id));
-            // Other cards fold only after every card of the area has.
-            if (folded.cards.some((id) => !members.includes(id))) expect(foldedMembers, scene).toHaveLength(members.length);
-            else {
-              expect(folded.area, scene).toBe(true);
-              expect(stack?.areaFold, scene).toBe(true);
-              expect(pileSpeech(stack as CardSlot).label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
-              expect(stack?.code, scene).toBe(made.state.cards[folded.top]?.code);
-            }
-            expect(hitBounds(stack as CardSlot).w, scene).toBeGreaterThanOrEqual(44);
+      it(`folds only the area's cards first, as a stack that counts them and not the stage: ${at}`, () => {
+        for (const [scene, layout] of Object.entries(SCENES)) {
+          const { made, layout: laid } = lay(layout);
+          const members = areaGroup(made.state).slice(1);
+          const stack = laid.slots.find((slot) => slot.fold === "staging");
+          const folded = laid.folds?.find((fold) => fold.zone === "staging");
+          const standing = areaSlots(laid).filter((slot) => slot.stormcaller !== "stage").map((slot) => slot.id);
+          // The area's cards stand or fold, all of them or none, and the stage stands either way.
+          expect(members.filter((id) => standing.includes(id)).length === 0 || folded?.cards.every((id) => !members.includes(id)) !== false, scene).toBe(true);
+          if (!folded) {
+            expect(standing, scene).toHaveLength(members.length);
+            continue;
           }
-        });
+          expect(folded.cards, scene).not.toContain(made.callerStage);
+          expect(stack?.count, scene).toBe(folded.cards.length);
+          const foldedMembers = members.filter((id) => folded.cards.includes(id));
+          // Other cards fold only after every card of the area has.
+          if (folded.cards.some((id) => !members.includes(id))) expect(foldedMembers, scene).toHaveLength(members.length);
+          else {
+            expect(folded.area, scene).toBe(true);
+            expect(stack?.areaFold, scene).toBe(true);
+            expect(pileSpeech(stack as CardSlot).label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
+            expect(stack?.code, scene).toBe(made.state.cards[folded.top]?.code);
+          }
+          expect(hitBounds(stack as CardSlot).w, scene).toBeGreaterThanOrEqual(44);
+        }
+      });
 
-        it(`keeps the cards the open moment asks about on the table: ${at}`, () => {
-          const { made, layout } = lay(CROWD(9), (m) => new Set([m.caller]));
-          expect(areaSlots(layout).some((slot) => slot.id === made.caller)).toBe(true);
-          expect(layout.folds?.some((fold) => fold.cards.includes(made.caller))).toBeFalsy();
-        });
-      }
+      it(`keeps the cards the open moment asks about on the table: ${at}`, () => {
+        const { made, layout } = lay(CROWD(9), (m) => new Set([m.caller]));
+        expect(areaSlots(layout).some((slot) => slot.id === made.caller)).toBe(true);
+        expect(layout.folds?.some((fold) => fold.cards.includes(made.caller))).toBeFalsy();
+      });
     }
   }
 

@@ -12,7 +12,7 @@ A dark, gritty, atmospheric game, not a form. The page is near-black stone under
 - **Wraith-light is the one thing to do.** The accent (silver on Dark, elven green on Light) marks the primary, the current step, and what is selected (the silver ring and wash). Beside the one primary, the accent is the word of a secondary or text button and the icon of a glass button.
 - **Every control is a capsule and sits flat.** A button, chip, toggle, segmented track and thumb, field, stepper and badge has a radius of half its height and a flat fill: no glow, lit edge, shadow or ring. Containers take 20 pt corners and items 12 (Spacing, radius, border). There are four button styles and no others: Primary, Secondary, Text and Glass (Components) (user instruction, 2026-10-30).
 - **The section colour names a section** (`moon`: a grey-green on Dark, an amber on Light): Your fellowship, Difficulty, Other journeys. It is information, never an action.
-- **Red is the enemy**: the threat dial, the engaged area's haze, the attacking enemy's ring, a failure's banner, Short on the quest scale, the Eye of Sauron that marks Nightmare.
+- **Red is the enemy**: the threat dial, the engaged area's haze, the attacking enemy's ring, a failure's banner, Short on the quest meter, the Eye of Sauron that marks Nightmare.
 - **Parchment is what gets recorded or decided**: the campaign log and every choice sheet on the table are weathered paper with ink, the same on both themes.
 - **Card art does the illustrating**, cropped by rule (Card art) and dimmed behind words. Do not draw characters or scenery beyond the fog. The game's printed icons are the exception (Icons).
 - **Few words.** A label says what something is, in plain words: no codes, no JSON-ish labels. The collector code shows only on the card screen and as row detail in a pack.
@@ -68,7 +68,7 @@ Values live in `src/screens/palette.js`. `tailwind.config.js` maps them to utili
 | paper / paperPressed / paperEdge | `#E6DCC6` / `#D2C4A6` / `#A8977A` | same | Parchment, lit in the middle and burnt at the rim (`parchmentSurface`) |
 | ink / inkMuted / inkLabel / inkLine | `#221E17` / `#5C4F3D` / `#6B4E1C` / `#4A3A24` | same | Ink on parchment; inkLine is drawn at 25 to 40% for the log's rules |
 | felt / feltLight | `#030405` / `#0C0F12` | `#E4DCCB` / `#F2EBDC` | The table's ground, kept for the panels that name it; the canvas itself is transparent over the fog |
-| threat / onThreat / threatEdge | `#D35537` / `#FBD9CC` / `#7A2214` | `#B8432C` / `#FFF4EC` / `#8F2A17` | The threat dial and the quest scale's threat dial, the engaged haze, an attacking enemy, a failure's banner edge |
+| threat / onThreat / threatEdge | `#D35537` / `#FBD9CC` / `#7A2214` | `#B8432C` / `#FFF4EC` / `#8F2A17` | The threat dial and the quest meter's threat bar, the engaged haze, an attacking enemy, a failure's banner edge |
 | glow | `#BED6BA` | `#FFFFFF` | The silver glows: the selected ring, the dock's active bar, the phase name |
 | leadership, tactics, spirit, lore, fellowship | `#B06098`, `#E03848`, `#54A8C0`, `#62B02A`, `#C9A961` | `#9A4A82`, `#B82A38`, `#2F7F96`, `#4A8A1C`, `#8F7434` | Sphere icon tints and glows, the donut's arcs, a portrait's ring; Light darkens them for contrast (Neutral uses faint) |
 | treachery, quest, location, objective | `#3A221C`, `#4D545B`, `#4D3A2D`, `#A68448` | same | Encounter marks |

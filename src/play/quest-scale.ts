@@ -1,6 +1,6 @@
 // Rules: rr.step-3-4, ltp.quest-resolution (data/rules/entries.json).
 //
-// The table's quest scale (docs/design-system-table.md): the threat in the staging area against the willpower committed to the
+// The table's quest scale (docs/design-system-table.md, Quest scale): the threat in the staging area against the willpower committed to the
 // quest, and how far apart they are. While the players commit, the dock's readout already adds the picked characters' willpower
 // (readout.ts), so the scale moves as each one is picked; otherwise it reads the engine's own totals. Pure, so a test reads it.
 import { committedWillpower, stagingThreat } from "../rules/quest.ts";
@@ -29,9 +29,30 @@ export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: R
   return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest", seat: owner };
 }
 
-/** The marker between the dials: "+2" Ahead, "−1" Short, or Even, and the words a screen reader hears. */
+/** What a screen reader hears of the scale: the threat in staging, the willpower committed and how far ahead or short it is (only the threat outside the Quest phase). */
+export function scaleLabel(scale: QuestScale): string {
+  const whose = scale.seat == null ? "" : `Player ${scale.seat + 1}'s `;
+  if (!scale.live) return `Quest scale, for the Quest phase. ${whose}threat in staging ${scale.threat}`;
+  const marker = scaleMarker(scale.delta);
+  const gap = marker.word === "Even" ? "even" : `${Math.abs(scale.delta)} ${marker.word.toLowerCase()}`;
+  return `${whose}threat in staging ${scale.threat}, willpower committed ${scale.willpower}, ${gap}`;
+}
+
+/** The word under the threat bar: "staging", or "P2 staging" once stages are separate between players. */
+export function stagingWord(scale: QuestScale): string {
+  return scale.seat == null ? "staging" : `P${scale.seat + 1} staging`;
+}
+
+/** The marker between the bars: "+2" Ahead, "−1" Short, or Even, and the words a screen reader hears. */
 export function scaleMarker(delta: number): { value: string; word: "Ahead" | "Short" | "Even"; tone: "ok" | "danger" | "muted" } {
   if (delta > 0) return { value: `+${delta}`, word: "Ahead", tone: "ok" };
   if (delta < 0) return { value: `−${-delta}`, word: "Short", tone: "danger" };
   return { value: "0", word: "Even", tone: "muted" };
+}
+
+/** The bars' heights as shares of the larger value (at least 1, so two zeros draw empty bars); the willpower bar rests empty outside the Quest phase. */
+export function meterFractions(scale: QuestScale): { threat: number; willpower: number; line: number } {
+  const most = Math.max(scale.threat, scale.willpower, 1);
+  const threat = scale.threat / most;
+  return { threat, willpower: scale.live ? scale.willpower / most : 0, line: threat };
 }
