@@ -1,8 +1,8 @@
 // Rules: dcce.sailing-tests, dcce.heading (data/rules/entries.json). The dock's numbers for a Sailing test: how many cards the characters picked would look at (the engine's
 // own count: a character that counts as more than one, from the card or from what another card gives it), and, once the cards are looked at, the heading change the symbols found would make.
-import { shiftHeading } from "../rules/families/sea-heading.ts";
-import { committedWeight } from "../rules/families/sea-sailing.ts";
-import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
+import { shiftHeading } from "../rules/families/sea/heading.ts";
+import { committedWeight } from "../rules/families/sea/sailing.ts";
+import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { modifierActive } from "../rules/state.ts";
 

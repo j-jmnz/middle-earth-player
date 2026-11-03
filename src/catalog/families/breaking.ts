@@ -1,7 +1,7 @@
 // The vocabulary Breaking of the Fellowship (phase 16) adds to effect records: removing the Ring-bearer from the game, skipping the travel phase, the
 // shared staging area stage 2B deals out to a staging area for each player, and the stage each player is on after it. Simple verbs, triggers and
-// stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/breaking*.ts runs them. The state
-// they work on (`ScenarioState.separate`, `Seat.staging`, `Seat.stage`) is described in src/rules/families/breaking-areas.ts.
+// stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/breaking/index*.ts runs them. The state
+// they work on (`ScenarioState.separate`, `Seat.staging`, `Seat.stage`) is described in src/rules/families/breaking/areas.ts.
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";
@@ -78,7 +78,7 @@ export const TRIGGERS = [
 
 export const FLAGS = [
   // On a stage: progress that would be placed on the quest discards that many cards from the top of the encounter deck instead (142063:B:1 to 142066:B:1;
-  // rules/families/breaking-progress.ts).
+  // rules/families/breaking/progress.ts).
   "progressDiscards",
   // On an enemy: Archery X, X the number of players at its stage (142070:A:1), the players in the game before stages are separate, one after. A number on an
   // enemy or a location in a staging area: archery added to the total at its stage ("gains archery 2", 142078:A:1). On a seat: archery added to the total at

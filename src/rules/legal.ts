@@ -11,7 +11,7 @@ import {
   undefendedTargets,
 } from "./combat.ts";
 import { optionIntents, optionReason } from "./choices.ts";
-import { mulliganTriggers } from "./families/deck-play.ts";
+import { mulliganTriggers } from "./families/deck/play.ts";
 import { hideCommitReason, hideCommitters } from "./hide.ts";
 import type { LegalIntent, PlayerIntent, Selection } from "./intents.ts";
 import { suppliesNumber } from "./intents.ts";
@@ -22,15 +22,15 @@ import { resolutionIntents, resolutionReason } from "./resolution.ts";
 import { optionalEnemies, stagingLocations } from "./quest.ts";
 import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable } from "./restrictions.ts";
 import { flagged, perilLock, type ScenarioState } from "./state.ts";
-import { attackRuleReason } from "./families/attack-targets.ts";
-import { sideQuestReason } from "./families/sidequests-quest.ts";
-import { travelsOverActive } from "./families/grapple-travel.ts";
-import { exploring } from "./families/island-map.ts";
-import { islandMayTravel, islandReach } from "./families/island-travel.ts";
-import { freeSlot, mustTravel } from "./families/south-locations.ts";
-import { viewOf } from "./families/breaking-areas.ts";
-import { shipAttackReason, shipDefenseReason } from "./families/sea-ships.ts";
-import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "./families/sea-sailing-legal.ts";
+import { attackRuleReason } from "./families/attack/targets.ts";
+import { sideQuestReason } from "./families/sidequests/quest.ts";
+import { travelsOverActive } from "./families/grapple/travel.ts";
+import { exploring } from "./families/island/map.ts";
+import { islandMayTravel, islandReach } from "./families/island/travel.ts";
+import { freeSlot, mustTravel } from "./families/south/locations.ts";
+import { viewOf } from "./families/breaking/areas.ts";
+import { shipAttackReason, shipDefenseReason } from "./families/sea/ships.ts";
+import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "./families/sea/sailing-legal.ts";
 import { printedOf } from "./printed.ts";
 
 const NUMBER = "The engine computes that number";
@@ -42,12 +42,12 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
   if (!window) return [];
   switch (window.kind) {
     case "mulligan":
-      // A Response used in place of the mulligan (Galdor of the Havens, families/deck-play.ts) is offered beside them.
+      // A Response used in place of the mulligan (Galdor of the Havens, families/deck/play.ts) is offered beside them.
       return state.mulliganSeats.includes(state.activeSeat)
         ? [{ type: "Keep" }]
         : [{ type: "Keep" }, { type: "Mulligan" }, ...mulliganTriggers(state, ctx)];
     case "pass":
-      // While the first player commits characters to a Sailing test, only that and passing are open (families/sea-sailing.ts).
+      // While the first player commits characters to a Sailing test, only that and passing are open (families/sea/sailing.ts).
       return sailingIntents(state) ?? passIntents(state, ctx);
     case "frameAction":
       return passIntents(state, ctx);
@@ -193,8 +193,8 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
   return intents;
 }
 
-// A slot is free for the traveling seat: its own active location once stages are separate (families/breaking-areas.ts).
-// Under Exploration the active location stays, and the players may travel from it once it holds progress equal to its quest points (families/island-travel.ts).
+// A slot is free for the traveling seat: its own active location once stages are separate (families/breaking/areas.ts).
+// Under Exploration the active location stays, and the players may travel from it once it holds progress equal to its quest points (families/island/travel.ts).
 function canTravel(state: ScenarioState, ctx: ReduceContext): boolean {
   return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards);
 }
@@ -322,7 +322,7 @@ function attackReason(
   if (intent.attackerIds.length === 0) return "Declare at least one attacker";
   const enemy = state.cards[intent.enemyId];
   if (!enemy || (enemy.zone !== "engaged" && enemy.zone !== "staging")) return "That enemy cannot be attacked";
-  // A card's attack window, an attack into the staging area (families/attack-targets.ts).
+  // A card's attack window, an attack into the staging area (families/attack/targets.ts).
   const ruled = attackRuleReason(state, intent);
   if (ruled) return ruled;
   if (attackDeclared(state, state.activeSeat, intent.enemyId)) return "That enemy was already attacked this phase";

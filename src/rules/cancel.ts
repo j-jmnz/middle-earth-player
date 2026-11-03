@@ -2,8 +2,8 @@
 import { holds } from "./conditions.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { noteSpent } from "./families/costs-pay.ts";
-import { encounterUncancelable } from "./families/encounter-cancel.ts";
+import { noteSpent } from "./families/costs/pay.ts";
+import { encounterUncancelable } from "./families/encounter/cancel.ts";
 import { heroPays, validatePayments } from "./payments.ts";
 import type { CancelOffer, EffectData, Frame, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
@@ -56,7 +56,7 @@ export function applyCancel(state: ScenarioState, intent: TriggerIntent, ctx: Re
     const hero = next.cards[payment.heroId];
     if (hero) next = updateCard(next, payment.heroId, { resources: hero.resources - payment.amount });
   }
-  // The pools that paid spent resources this round ("If you have not spent any resources this round", families/costs-pay.ts).
+  // The pools that paid spent resources this round ("If you have not spent any resources this round", families/costs/pay.ts).
   next = noteSpent(next, intent.payments ?? [], ctx);
   steps.push({ kind: "cancel", cardId: intent.cardId });
   const canceled = patchTop(next, { data: { ...data, canceled: true, wait: null } });

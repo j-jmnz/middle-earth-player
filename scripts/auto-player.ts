@@ -5,7 +5,7 @@ import { heroPays } from "../src/rules/payments.ts";
 import { printedOf } from "../src/rules/printed.ts";
 import { costPayer } from "../src/rules/usage.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
-import { hideCommitLimit } from "../src/rules/families/nightmare-guards.ts";
+import { hideCommitLimit } from "../src/rules/families/nightmare/guards.ts";
 import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
 // Test helper. A fixed policy that answers every window from the legal intents the reducer offers, so a

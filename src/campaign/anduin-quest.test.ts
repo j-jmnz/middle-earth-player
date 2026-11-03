@@ -3,13 +3,13 @@
 // reveals and engagement checks, and stage 3's skipped staging step and win (ledger lines 01126 to 01128).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { questStageStart } from "../rules/families/quest-setup.ts";
+import { questStageStart } from "../rules/families/quest/setup.ts";
 import { legalIntents, legalTargets } from "../rules/legal.ts";
 import { settle } from "../rules/machine.ts";
 import { pushCardEffects } from "../rules/effect-frames.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { syncConstants } from "../rules/constants.ts";
-import { revealsAllowed } from "../rules/families/encounter-reveal.ts";
+import { revealsAllowed } from "../rules/families/encounter/reveal.ts";
 import { qualifyingEnemies, engagementStep } from "../rules/quest.ts";
 import { restricted } from "../rules/restrictions.ts";
 import { expectOk } from "../rules/fixture.ts";
@@ -58,7 +58,7 @@ describe("the start of the game", () => {
     expect([...seen].sort()).toEqual(["revealed", "searched"]);
   });
 
-  it("runs the first stage's Setup and When Revealed in one frame after the other, Setup first (families/quest-setup.ts)", () => {
+  it("runs the first stage's Setup and When Revealed in one frame after the other, Setup first (families/quest/setup.ts)", () => {
     const made = make({ seats: 2, deck: ["f0", "f0", "f0", "01082", "f0"] });
     const steps: EngineStep[] = [];
     const pushed = questStageStart(made.state, made.ctx, steps);

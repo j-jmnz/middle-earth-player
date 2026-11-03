@@ -8,10 +8,10 @@ import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "./frames.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { moveEncounter } from "./families/encounter-moves.ts";
-import { activeOf, stagingDest } from "./families/breaking-areas.ts";
-import { attachHeroHosts, attachHostChooser } from "./families/play-hooks.ts";
-import { discardRestricted } from "./families/objectives-claimed.ts";
+import { moveEncounter } from "./families/encounter/moves.ts";
+import { activeOf, stagingDest } from "./families/breaking/areas.ts";
+import { attachHeroHosts, attachHostChooser } from "./families/play/hooks.ts";
+import { discardRestricted } from "./families/objectives/claimed.ts";
 import { printedOf } from "./printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
 import type { Frame, QueueItem, ScenarioState } from "./state.ts";
@@ -161,7 +161,7 @@ function applyTargeted(
           next = updateCard(moveCard(next, id, { zone: "stormcallerArea" }), id, { face: "up" });
           continue;
         }
-        // Into the searching seat's own staging area once stages are separate (families/breaking-areas.ts).
+        // Into the searching seat's own staging area once stages are separate (families/breaking/areas.ts).
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each) next = updateCard(next, id, { face: "up" });
       }

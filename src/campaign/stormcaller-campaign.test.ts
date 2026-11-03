@@ -7,7 +7,7 @@ import { campaignScenario } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/fixture.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { areaOf } from "../rules/families/stormcaller-zone.ts";
+import { areaOf } from "../rules/families/stormcaller/zone.ts";
 import { UPGRADED_CODES, afterRaid, FLIGHT_GOLDENS, flightPlan, flightStart, flightWorld, playGolden } from "../../scripts/stormcaller-game.ts";
 import { CODES, MODIFICATIONS, SHIP_CODES, campaign, flight } from "../../scripts/stormcaller-scene.ts";
 

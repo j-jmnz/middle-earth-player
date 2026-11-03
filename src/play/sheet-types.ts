@@ -144,7 +144,7 @@ export type WindowSheet = {
   note: string | null;
   // The quest commit in the commit window: a tap on a character puts it in or takes it out.
   commit: MultiSheet | null;
-  // The player side quests in the quest areas the commit can go to instead of the current quest (families/sidequests-quest.ts).
+  // The player side quests in the quest areas the commit can go to instead of the current quest (families/sidequests/quest.ts).
   sideQuests?: readonly { id: string; label: string }[];
   // Cards the player can play now, from the hand or the top of the deck.
   plays: readonly string[];

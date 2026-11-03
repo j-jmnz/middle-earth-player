@@ -3,26 +3,26 @@ import type { ScenarioDefinition } from "../catalog/boundary.ts";
 import type { Difficulty } from "../catalog/scenario-data.ts";
 
 import { ruleCause } from "./cause.ts";
-import { threatCostCut } from "./families/costs-stats.ts";
+import { threatCostCut } from "./families/costs/stats.ts";
 import type { EngineStep } from "./intents.ts";
-import { recordStartingThreat } from "./families/quest-threat.ts";
-import { questStageStart } from "./families/quest-setup.ts";
+import { recordStartingThreat } from "./families/quest/threat.ts";
+import { questStageStart } from "./families/quest/setup.ts";
 import { pushCardEffects } from "./effect-frames.ts";
-import { placeContracts } from "./families/sidequests-contract.ts";
-import { setAsideEncounterCards } from "./families/sidequests-encounter.ts";
-import { pushPlayerSetup } from "./families/sidequests-setup.ts";
+import { placeContracts } from "./families/sidequests/contract.ts";
+import { setAsideEncounterCards } from "./families/sidequests/encounter.ts";
+import { pushPlayerSetup } from "./families/sidequests/setup.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { shuffleIds } from "./seed.ts";
 import { handSetup, searchSetup } from "./setup-search.ts";
-import { nightmareDuringSetup, nightmareSetup } from "./families/nightmare-setup.ts";
+import { nightmareDuringSetup, nightmareSetup } from "./families/nightmare/setup.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "./state.ts";
 import type { CampaignFacts } from "./campaign-state.ts";
-import { placeCampaignCard } from "./families/burden-campaign.ts";
+import { placeCampaignCard } from "./families/burden/campaign.ts";
 import { snapshotOf } from "./undo.ts";
 import { attachTo, moveCard, spawn } from "./zones.ts";
-import { stampRoutes } from "./families/sea-routes.ts";
-import { dealUnchartedDeck } from "./families/uncharted-deal.ts";
+import { stampRoutes } from "./families/sea/routes.ts";
+import { dealUnchartedDeck } from "./families/uncharted/deal.ts";
 
 /** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
 export const AFTER_HAND = "deck:";
@@ -40,7 +40,7 @@ export type StartSeat = {
   afterMulligan?: readonly string[];
   // The cards the campaign card's Setup let this seat choose and a Resolution earns (ChooseCards `unearned`): recorded as a game fact (ScenarioState.chosenAtSetup).
   chosen?: readonly string[];
-  // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests-loot.ts).
+  // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests/loot.ts).
   loot?: readonly string[];
 };
 
@@ -71,7 +71,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     seed: input.seed,
     definition: input.definition,
   });
-  // The campaign log's facts come first: an upgraded card is dealt on its Upgraded side wherever the campaign deals it (families/dreamchaser-facts.ts).
+  // The campaign log's facts come first: an upgraded card is dealt on its Upgraded side wherever the campaign deals it (families/dreamchaser/facts.ts).
   if (input.facts) state = { ...state, campaignFacts: input.facts };
   input.questDeck.forEach((code, index) => {
     const spawned = spawn(state, code, index === 0 ? { zone: "questStage" } : { zone: "questDeck" }, "A");
@@ -86,7 +86,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     const shuffled = shuffleIds(state.burdenDeck ?? [], state.seed, state.seedCursor);
     state = { ...state, burdenDeck: shuffled.ids, seedCursor: shuffled.cursor };
   }
-  // The Corsair deck: dealt apart from the encounter deck, shuffled by its Setup step (families/sea-corsair.ts).
+  // The Corsair deck: dealt apart from the encounter deck, shuffled by its Setup step (families/sea/corsair.ts).
   if (input.corsairDeck && input.corsairDeck.length > 0) {
     state = { ...state, corsairDeck: [], corsairDiscard: [] };
     for (const code of input.corsairDeck) state = spawn(state, code, { zone: "corsairDeck" }).state;
@@ -117,9 +117,9 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     }
     for (const code of seat.hand ?? []) state = spawn(state, code, { zone: "hand", seat: index }).state;
     for (const code of seat.deck) state = spawn(state, code, { zone: "deck", seat: index }).state;
-    // The cards with the Encounter keyword are set aside, not drawn (families/sidequests-encounter.ts).
+    // The cards with the Encounter keyword are set aside, not drawn (families/sidequests/encounter.ts).
     state = setAsideEncounterCards(state, index, ctx);
-    // A contract in the deck begins the game in its player's play area (families/sidequests-contract.ts).
+    // A contract in the deck begins the game in its player's play area (families/sidequests/contract.ts).
     state = placeContracts(state, index, ctx);
     // Threat costs lowered by a card in play ("Each hero you control with a printed Lore resource icon gets -1 threat cost").
     threat -= threatCostCut(state, index, ctx);
@@ -127,7 +127,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = shuffleZone(state, index);
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
-  // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea-routes.ts): only in a game with ships.
+  // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea/routes.ts): only in a game with ships.
   state = stampRoutes(state, ctx.cards);
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
@@ -147,11 +147,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
 }
 
 export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  // The Setup lines of the players' heroes and contracts resolve first, in frames that can ask (families/sidequests-setup.ts).
+  // The Setup lines of the players' heroes and contracts resolve first, in frames that can ask (families/sidequests/setup.ts).
   const players = pushPlayerSetup(state, ctx, steps);
   if (players !== state) return players;
   let next = searchSetup(state, "encounter", ctx, steps);
-  // The Nightmare setup card's own Setup lines (families/nightmare-setup.ts).
+  // The Nightmare setup card's own Setup lines (families/nightmare/setup.ts).
   next = nightmareSetup(next, ctx, steps);
   if (next.failure || next.lost) return next;
   for (const instruction of next.setup) {
@@ -167,9 +167,9 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
   // The campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup) goes down first, so it resolves after it.
   next = campaignAfterSetup(next, ctx, steps);
-  // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest-setup.ts).
+  // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest/setup.ts).
   next = questStageStart(next, ctx, steps);
-  // The Nightmare setup card's Forced effects "During setup" (families/nightmare-setup.ts), on top: they resolve first.
+  // The Nightmare setup card's Forced effects "During setup" (families/nightmare/setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
   // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
   if (next.modeCard) next = spawn(next, next.modeCard.code, { zone: "modeCard" }, next.modeCard.side).state;

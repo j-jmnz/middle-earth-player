@@ -2,8 +2,8 @@
 // verbs inside a choice (src/catalog/families/island.ts): what a Pick or a question is for, the label of an option that is no card, and what a travel row on the map says. Every prompt names the card it is about and leads
 // with the decision; a travel row says what it leaves behind and what it brings back. Pure.
 import type { Instruction } from "../catalog/boundary.ts";
-import { cellOf, distance, exploring, islandOf, TEMPLE_COLUMN } from "../rules/families/island-map.ts";
-import { seatThreat } from "../rules/families/play-hooks.ts";
+import { cellOf, distance, exploring, islandOf, TEMPLE_COLUMN } from "../rules/families/island/map.ts";
+import { seatThreat } from "../rules/families/play/hooks.ts";
 import { effectsOf } from "../rules/listen.ts";
 import { printedOf } from "../rules/printed.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";

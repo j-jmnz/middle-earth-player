@@ -10,9 +10,9 @@ import { AUTHORED_EFFECTS as DOL_GULDUR_EFFECTS } from "../effects/authored/esca
 import { AUTHORED_EFFECTS as ANDUIN_EFFECTS } from "../effects/authored/journey-along-the-anduin.ts";
 import { AUTHORED_EFFECTS } from "../effects/authored/passage-through-mirkwood.ts";
 import { RECORDS as POOL_RECORDS } from "../effects/authored/pool/RevCore.ts";
-import { stageNumber } from "../rules/families/caves-progress.ts";
-import { alternativeActions } from "../rules/families/deck-play.ts";
-import { readyPaymentChoice } from "../rules/families/attachments-ready.ts";
+import { stageNumber } from "../rules/families/caves/progress.ts";
+import { alternativeActions } from "../rules/families/deck/play.ts";
+import { readyPaymentChoice } from "../rules/families/attachments/ready.ts";
 import { attachTo, spawn } from "../rules/zones.ts";
 import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
 import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";

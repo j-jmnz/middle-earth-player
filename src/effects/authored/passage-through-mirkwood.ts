@@ -29,7 +29,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01079 Eyes of the Forest
   {"id":"01079:whenRevealed:1","cardCode":"01079","lines":["01079:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","cardType":"event"}}]}]},
   // 01080 Caught in a Web: the highest threat player attaches it to a hero of his; that hero does not ready in the refresh phase unless its
-  // pool pays 2 (the controller is asked before the phase readies cards, rules/families/attachments-ready.ts).
+  // pool pays 2 (the controller is asked before the phase readies cards, rules/families/attachments/ready.ts).
   {"id":"01080:whenRevealed:1","cardCode":"01080","lines":["01080:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AttachSelf","to":{"kind":"hero","control":"highestThreat"}}]},
   {"id":"01080:constant:1","cardCode":"01080","lines":["01080:A:1"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"},{"verb":"ModifyStat","stat":"doesNotReady","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"readyPayment","amount":2,"until":"whileSourceInPlay","target":"host"}]},
   // 01089 Dol Guldur Orcs: 2 damage on a committed character of the first player's choice; the Shadow adds Attack (+3 when undefended).
@@ -62,7 +62,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01119 Flies and Spiders. The Setup record describes what the scenario's piles already place (a Forest Spider and an Old Forest Road
   // in the staging area) and the shuffle buildStart appends; the definition runs those, not this record, so nothing is placed twice.
   {"id":"01119:setup:1","cardCode":"01119","lines":["01119:A:1"],"timing":"setup","instructions":[{"verb":"AddToStaging","code":"01096"},{"verb":"AddToStaging","code":"01099"},{"verb":"ShuffleEncounterDeck"}]},
-  // 01120 A Fork in the Road: defeating it proceeds to 01121 or 01122 at random (BranchStage, rules/families/quest-branch.ts).
+  // 01120 A Fork in the Road: defeating it proceeds to 01121 or 01122 at random (BranchStage, rules/families/quest/branch.ts).
   {"id":"01120:forced:1","cardCode":"01120","lines":["01120:B:1"],"timing":"forced","trigger":"questCardDefeated","subject":"self","instructions":[{"verb":"BranchStage","codes":["01121","01122"]}]},
   // 01121 A Chosen Path, "Don't Leave the Path!": each player finds a Spider; it prints 0 quest points and cannot be advanced, the players win
   // when Ungoliant's Spawn is defeated. 01122, "Beorn's Path": it cannot be defeated while Ungoliant's Spawn is in play.

@@ -15,7 +15,7 @@ const GOBLIN_ENEMY = {"type":"enemy","control":"any","trait":"Goblin"} as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41004 The Dark of Nibin-Dûm. Setup: Goblin Chieftain and Cracked Pillar are set aside by the piles (the scenario data); the Cave Torch is dealt
-  // here: out of the encounter deck, then attached to a hero of the first player's choice (rules/families/quest-setup.ts runs this record).
+  // here: out of the encounter deck, then attached to a hero of the first player's choice (rules/families/quest/setup.ts runs this record).
   {"id":"41004:setup:1","cardCode":"41004","lines":["41004:A:1"],"timing":"setup","instructions":[{"verb":"SetAside","code":TORCH},{"verb":"Pick","pick":{"type":"hero","control":"you","attachable":TORCH}},{"verb":"AttachSetAside","code":TORCH},{"verb":"ShuffleEncounterDeck"}]},
   {"id":"41004:whenRevealed:1","cardCode":"41004","lines":["41004:B:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"SearchMove","type":"location","to":"staging","different":true}]},{"verb":"ShuffleEncounterDeck"}]},
   // 41005 Surprise Attack: Goblin Chieftain comes from the set-aside cards, each player finds an enemy in the deck or the discard pile; every enemy costs 0 to

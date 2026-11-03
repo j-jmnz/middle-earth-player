@@ -2,7 +2,7 @@ import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // A Knife in the Dark Nightmare (deck 9062, data/printed/nightmare.json). The One Ring is 141085, Ringwraith 141069, Trouble in Bree (stage 1)
 // 141025. Nightmare Weathertop (906204) takes the set-aside slot of the standard one: the quest's records that name Weathertop by code read it
-// (twinCode, src/rules/families/nightmare-guards.ts).
+// (twinCode, src/rules/families/nightmare/guards.ts).
 const RING = "141085";
 const RINGWRAITH = "141069";
 const STAGE_ONE = "141025";

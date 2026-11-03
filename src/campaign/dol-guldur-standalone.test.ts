@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/fixture.ts";
-import { prisonerHero } from "../rules/families/prisoner.ts";
+import { prisonerHero } from "../rules/families/prisoner/index.ts";
 import { reduce, startScenario } from "../rules/reduce.ts";
 import { dolGuldurStart, dolGuldurWorld } from "../../scripts/dol-guldur-game.ts";
 import { dolGuldur, campaign, MENDOR } from "../../scripts/dol-guldur-scene.ts";

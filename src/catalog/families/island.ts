@@ -1,5 +1,5 @@
 // The island family (phase 45, Temple of the Deceived): the Island Map and Exploration (dcce.island-map, dcce.exploration), the secrets the campaign card places under the Temple locations, the
-// guarded Gate Key and the verbs and flags of the locations on the map. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/island.ts runs them (the helpers are in island-*.ts).
+// guarded Gate Key and the verbs and flags of the locations on the map. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/island/index.ts runs them (the helpers are in island-*.ts).
 // The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 

@@ -15,15 +15,15 @@ import { moveCard, shadowCards } from "./zones.ts";
 import { effectCause, inCause, ruleCause } from "./cause.ts";
 import { offerResponses } from "./responses.ts";
 import { enemyAttackWindow } from "./step-window.ts";
-import { noteAttackDamage } from "./families/defense-damage.ts";
-import { combatDamage } from "./families/defense-excess.ts";
-import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "./families/defense-defenders.ts";
-import { holdAttack } from "./families/defense-listen.ts";
-import { startShadowAttack } from "./families/defense-shadow-attack.ts";
-import { announceShadowRaise, noteShadowStart } from "./families/defense-shadow.ts";
-import { announceShadowResolved } from "./families/dungeon-shadow.ts";
-import { announceDestroyed, charactersDestroyed } from "./families/burden-attack.ts";
-import { attackHere, attackKey, locationDamage } from "./families/south-watcher.ts";
+import { noteAttackDamage } from "./families/defense/damage.ts";
+import { combatDamage } from "./families/defense/excess.ts";
+import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "./families/defense/defenders.ts";
+import { holdAttack } from "./families/defense/listen.ts";
+import { startShadowAttack } from "./families/defense/shadow-attack.ts";
+import { announceShadowRaise, noteShadowStart } from "./families/defense/shadow.ts";
+import { announceShadowResolved } from "./families/dungeon/shadow.ts";
+import { announceDestroyed, charactersDestroyed } from "./families/burden/attack.ts";
+import { attackHere, attackKey, locationDamage } from "./families/south/watcher.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -205,7 +205,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const damaged = noteAttackDamage(next, defender ? combatDamage(next, attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
-  // A shadow effect sent the damage to an active location (families/south-watcher.ts).
+  // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const located = attack.toLocation ? locationDamage(next, attack, ctx, steps) : null;
   if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.

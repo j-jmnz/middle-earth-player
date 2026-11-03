@@ -12,7 +12,7 @@ import { loadWorld } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 import { characters, legalAttackEnemies } from "../src/rules/combat.ts";
-import { askingToCommit } from "../src/rules/families/sea-sailing-legal.ts";
+import { askingToCommit } from "../src/rules/families/sea/sailing-legal.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
 
 import prebuilt from "../data/decks/prebuilt.json" with { type: "json" };

@@ -126,7 +126,7 @@ export function breakingTable(world: BreakingWorld, layout: BreakingLayout = {})
       for (const code of layout.areas?.[seat] ?? []) state = spawn(state, code, { zone: "staging", area: seat }, "up").state;
       const active = layout.active?.[seat];
       if (active) {
-        // The seat's own active location, mirrored into the shared slots (families/breaking-areas.ts).
+        // The seat's own active location, mirrored into the shared slots (families/breaking/areas.ts).
         const made = spawn(state, active, { zone: "activeLocation" }, "up");
         const owner = made.state.seats[seat];
         state = owner ? withSeat({ ...made.state, activeLocation: seat === 0 ? made.id : state.activeLocation, secondActiveLocation: seat === 1 ? made.id : state.secondActiveLocation }, seat, { ...owner, active: made.id }) : made.state;

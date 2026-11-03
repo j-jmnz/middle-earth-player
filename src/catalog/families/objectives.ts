@@ -1,6 +1,6 @@
 // The vocabulary the guarded objectives of Escape from Dol Guldur add to effect records: an objective with the Guarded keyword that
 // is revealed gets the next encounter card attached, and a player claims it once it is free of encounters. Simple verbs and
-// triggers; effect-schema-verbs.ts and effect-schema.ts compose them. src/rules/families/objectives*.ts runs them.
+// triggers; effect-schema-verbs.ts and effect-schema.ts compose them. src/rules/families/objectives/index*.ts runs them.
 import { z } from "zod";
 
 import { cardRefSchema } from "../effect-schema-amount.ts";

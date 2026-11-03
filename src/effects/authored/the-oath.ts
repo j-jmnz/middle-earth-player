@@ -33,7 +33,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41009 Great Spider: the player it engages exhausts a character; the Shadow deals 1 damage to an exhausted character.
   {"id":"41009:forced:1","cardCode":"41009","lines":["41009:A:1"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"Pick","pick":READY_CHARACTER},{"verb":"Exhaust","target":{"kind":"picked"}}]},
   {"id":"41009:shadow:1","cardCode":"41009","lines":["41009:A:2"],"timing":"shadow","instructions":[{"verb":"Pick","pick":EXHAUSTED_CHARACTER},{"verb":"DamageCard","amount":1,"target":"picked"}]},
-  // 41010 The Eaves of Mirkwood: while it is the active location the table holds encounterUncancelable (families/encounter-cancel.ts).
+  // 41010 The Eaves of Mirkwood: while it is the active location the table holds encounterUncancelable (families/encounter/cancel.ts).
   {"id":"41010:constant:1","cardCode":"41010","lines":["41010:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"activeLocation"},"instructions":[{"verb":"ModifyStat","stat":"encounterUncancelable","amount":1,"until":"whileSourceInPlay","target":"table"}]},
   // 41011 Tangled Grove: its Threat is the number of locations in the staging area; each player discards a card at random to travel here.
   {"id":"41011:constant:1","cardCode":"41011","lines":["41011:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threat","amount":{"count":STAGING_LOCATIONS},"until":"whileSourceInPlay"}]},

@@ -6,7 +6,7 @@ import { encounterCodes } from "../catalog/scenario-data.ts";
 import { expectOk } from "../rules/fixture.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { prisonerHero } from "../rules/families/prisoner.ts";
+import { prisonerHero } from "../rules/families/prisoner/index.ts";
 import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden, type DolGuldurDecks, type DolGuldurGame } from "../../scripts/dol-guldur-game.ts";
 import { campaign, dolGuldur } from "../../scripts/dol-guldur-scene.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";

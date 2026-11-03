@@ -1,7 +1,7 @@
 // Rules: rr.guarded, rr.attachment-cards, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 01108:A:1-2, 01107:A:1, 01123:B:1, 01105:A:1.
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck. The engine decided each; nothing here changes one.
-import { freeOfEncounters } from "../rules/families/objectives.ts";
+import { freeOfEncounters } from "../rules/families/objectives/index.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 

@@ -73,7 +73,7 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
   }
   const printed = printedMap(rows);
   // The campaign card is dealt as an engine card only for the scenario being played, and only when it has an ability that works
-  // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden-campaign.ts).
+  // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden/campaign.ts).
   for (const row of rows) if (row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
   // The Orc Guard a deck card becomes (01107:A:1) is no card of the catalog: the engine makes it, and the table names it.
   printed.set(ORC_GUARD_CODE, printedOf(printed, ORC_GUARD_CODE));
@@ -97,7 +97,7 @@ export function loadWorld<TRun>(
   const codes = worldCodes(campaign, scenario, effects, extra);
   const rows = catalog.select().from(cards).where(inArray(cards.code, codes)).all();
   // A card that names the player's collection (Helm of Secrecy, Thorongil) needs every hero card the player may own: the app
-  // tracks no collection, so that is every deck-legal hero (families/misc-collection.ts).
+  // tracks no collection, so that is every deck-legal hero (families/misc/collection.ts).
   if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, rows);
   const known = new Set(rows.map((row) => row.code));
   const heroes = catalog.select().from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.deckLegal, true))).all();

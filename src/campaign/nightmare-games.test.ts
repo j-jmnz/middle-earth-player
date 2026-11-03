@@ -9,7 +9,7 @@ import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/fixture.ts";
 import { pushCardEffects } from "../rules/effect-frames.ts";
 import { settle } from "../rules/machine.ts";
-import { announceStageRevealed } from "../rules/families/nightmare-setup.ts";
+import { announceStageRevealed } from "../rules/families/nightmare/setup.ts";
 import { reduce, startScenario } from "../rules/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { playOut } from "../../scripts/auto-player.ts";
@@ -69,7 +69,7 @@ describe("a seeded Nightmare game of each scenario on NIGHTMARE_PLAYABLE", () =>
   }
 });
 
-// A record that names a card the recipe replaced reads the dealt card of the same title (twinCode, src/rules/families/nightmare-guards.ts): The
+// A record that names a card the recipe replaced reads the dealt card of the same title (twinCode, src/rules/families/nightmare/guards.ts): The
 // Ringwraiths Attack adds Weathertop (141046) to the staging area, which on Nightmare is Nightmare Weathertop (906204), set aside by the piles.
 describe("the quest's records on Nightmare", () => {
   it("add Nightmare Weathertop when The Ringwraiths Attack is revealed (141027:A:1)", () => {

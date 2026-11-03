@@ -4,7 +4,7 @@
 import type { Effect } from "../catalog/boundary.ts";
 import { MODE_CARD_CODE, sideInstructions } from "../catalog/scenario-data.ts";
 import type { ModeCard } from "../rules/campaign-state.ts";
-import { NO_UPGRADED_SIDE } from "../rules/families/dreamchaser-facts.ts";
+import { NO_UPGRADED_SIDE } from "../rules/families/dreamchaser/facts.ts";
 
 import type { CampaignLog } from "./log.ts";
 import type { Save } from "./save.ts";

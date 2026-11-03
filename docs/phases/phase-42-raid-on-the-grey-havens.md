@@ -16,7 +16,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `raid-on-the-grey-havens`, 
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 37).
 - `pnpm effects:draft raid-on-the-grey-havens`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
-- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
+- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/raid-on-the-grey-havens.ts`; boon and burden pool records in `src/effects/authored/pool/DCCE.ts`.
 - Golden: `src/campaign/golden/raid-on-the-grey-havens.json` with its `golden-*.test.ts`, scene and game scripts: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.

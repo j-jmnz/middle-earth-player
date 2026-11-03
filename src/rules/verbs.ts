@@ -16,16 +16,16 @@ import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "./q
 import { restricted } from "./restrictions.ts";
 import { nextUint, shuffleIds } from "./seed.ts";
 import { afterProgress } from "./stage-reveal.ts";
-import { mayGainResources } from "./families/misc-guards.ts";
-import { queueHeard } from "./families/quest-events.ts";
-import { refillsAnyTime } from "./families/nightmare-guards.ts";
-import { encounterRaised } from "./families/quest-threat.ts";
+import { mayGainResources } from "./families/misc/guards.ts";
+import { queueHeard } from "./families/quest/events.ts";
+import { refillsAnyTime } from "./families/nightmare/guards.ts";
+import { encounterRaised } from "./families/quest/threat.ts";
 import { livingSeats, updateCard, type ScenarioState } from "./state.ts";
 import { attachTo, cardsUnder, moveCard } from "./zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "./cause.ts";
-import { noteEncounterThreat } from "./families/encounter-reveal.ts";
-import { moveEncounter } from "./families/encounter-moves.ts";
-import { stagingDest } from "./families/breaking-areas.ts";
+import { noteEncounterThreat } from "./families/encounter/reveal.ts";
+import { moveEncounter } from "./families/encounter/moves.ts";
+import { stagingDest } from "./families/breaking/areas.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 

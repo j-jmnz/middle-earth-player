@@ -2,7 +2,7 @@
 // opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
 // player picked. The reducer still checks every intent.
 import { legalAttackEnemies } from "../rules/combat.ts";
-import { sideQuestIds } from "../rules/families/sidequests-quest.ts";
+import { sideQuestIds } from "../rules/families/sidequests/quest.ts";
 import { printedOf } from "../rules/printed.ts";
 import { questSeat } from "./selectors.ts";
 import { stagingThreat } from "../rules/quest.ts";
@@ -72,7 +72,7 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
   if (commit) {
     // Once a character is committed, passing ends the commit rather than sending no one.
     const some = Object.values(game.cards).some((card) => card.committed && card.controller === game.activeSeat);
-    // A player side quest in a quest area takes characters committed to it instead (families/sidequests-quest.ts).
+    // A player side quest in a quest area takes characters committed to it instead (families/sidequests/quest.ts).
     const sideQuests = sideQuestIds(game).map((id) => ({ id, label: names.card(id) }));
     const toSide = sideQuests.length > 0 ? ` Or send them to ${sideQuests.map((quest) => quest.label).join(" or ")}: its willpower goes on it as progress.` : "";
     return some

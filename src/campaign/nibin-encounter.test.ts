@@ -9,7 +9,7 @@ import { legalIntents } from "../rules/legal.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { settle } from "../rules/machine.ts";
 import type { PlayerIntent } from "../rules/reduce.ts";
-import { seatThreat } from "../rules/families/play-hooks.ts";
+import { seatThreat } from "../rules/families/play/hooks.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";

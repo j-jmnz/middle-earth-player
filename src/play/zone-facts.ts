@@ -1,7 +1,7 @@
 // What the table's zone selectors read of a card's printing (selectors.ts, ZoneFacts): its type, for staging's fold order, and its place among the ships,
 // for the play area's order (dcce.ship-objectives: a seat's ships stand first, the Dream-chaser before any other), and the Victory points a card in the victory display
 // scores on the side it lies (the victory pile's coin; the same count campaign/score.ts adds up). Built once per reduce context.
-import { DREAM_CHASER } from "../rules/families/sea-fleet.ts";
+import { DREAM_CHASER } from "../rules/families/sea/fleet.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { victoryPointsOf } from "../rules/printed-stat.ts";
 

@@ -1,17 +1,17 @@
 // Rules: dcce.sailing-tests (data/rules/entries.json). The two questions of a Sailing test, as the table answers them (docs/design-system-table.md, The Sailing test):
 // the first player's commit (a pick of characters on the play area, no willpower pill: this is not the quest commit) and, for each success symbol among the cards looked at,
 // shift the heading on-course or keep it. Every card, symbol and number comes from the engine; the sheets only name them.
-import { lookedIds, sailingSymbols, sailingTest, successSymbols } from "../rules/families/sea-sailing.ts";
+import { lookedIds, sailingSymbols, sailingTest, successSymbols } from "../rules/families/sea/sailing.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { modifierActive } from "../rules/state.ts";
 import { legalTargets } from "../rules/reduce.ts";
-import { askingToCommit, askingToLook, askingToShift } from "../rules/families/sea-sailing-legal.ts";
+import { askingToCommit, askingToLook, askingToShift } from "../rules/families/sea/sailing-legal.ts";
 
 import { SAILING_COMMIT_NOTE, SAILING_COMMIT_TITLE, SAILING_PASS_ARMED, sailingTitle } from "./sea-words.ts";
 import { option, step } from "./sheet-parts.ts";
 import type { LookRow, MultiSheet, PickSheet, Sheet, SheetNames } from "./sheet-types.ts";
 
-/** The success symbols a card prints: the engine's own count (families/sea-sailing.ts), which the table's marks, rows and total all read. */
+/** The success symbols a card prints: the engine's own count (families/sea/sailing.ts), which the table's marks, rows and total all read. */
 export const successOf = successSymbols;
 
 /** The cards a Sailing test looked at, with the success symbols each prints. */

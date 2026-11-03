@@ -7,8 +7,8 @@ import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { fallenBase, printedOf } from "./printed.ts";
 import type { Earned, ResolutionLog } from "./campaign-state.ts";
-import { xpOf } from "./families/dreamchaser.ts";
-import { dealtCopies } from "./families/aflame-cards.ts";
+import { xpOf } from "./families/dreamchaser/index.ts";
+import { dealtCopies } from "./families/aflame/cards.ts";
 import { shuffleIds } from "./seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "./state.ts";
 
@@ -119,7 +119,7 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       case "Earn":
         next = stepOver(next, earn(next, copiesOf(next, instruction.codes, instruction.eachPlayer)));
         break;
-      // The copies of these cards the game holds, whoever played them (families/aflame-cards.ts).
+      // The copies of these cards the game holds, whoever played them (families/aflame/cards.ts).
       case "EarnDealt":
         next = stepOver(next, earn(next, dealtCopies(next, instruction.codes, next.resolutionAt)));
         break;

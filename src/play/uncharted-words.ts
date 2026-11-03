@@ -2,7 +2,7 @@
 // Lost Island in the staging area gets +1 Threat", 11033:A:1), what a Pick or a question is for, and the label of an option that is no card. Every prompt names the card it is about and
 // leads with the decision.
 import type { Instruction } from "../catalog/boundary.ts";
-import { cellOf } from "../rules/families/island-map.ts";
+import { cellOf } from "../rules/families/island/map.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";

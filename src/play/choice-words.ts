@@ -16,7 +16,7 @@ import { miscPickWords, miscWords } from "./misc-words.ts";
 import { playPickWords, playWords } from "./play-words.ts";
 import { dungeonWords } from "./dungeon-words.ts";
 import { oathPickWords, oathWords } from "./oath-words.ts";
-import { stageNumber } from "../rules/families/caves-progress.ts";
+import { stageNumber } from "../rules/families/caves/progress.ts";
 import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cavesWords } from "./caves-words.ts";
 import { nightmareWords } from "./nightmare-words.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking-words.ts";

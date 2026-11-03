@@ -42,11 +42,11 @@ cards have no file under `src/effects/authored/families/`.
   `../effect-schema-conditions.ts`), `TRIGGERS` (event names), `FLAGS` (stat flags `ModifyStat` can set). Keep the
   `as const`. They are spread into the verb union, the trigger enum and the stat enum. Every verb carries a comment saying
   what the engine does with it.
-- `src/rules/families/<F>.ts`: `run()` resolves your verbs (`runFamilyVerb` in `src/rules/families/index.ts` asks the
-  families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>.ts` and helper
-  modules `src/rules/families/<F>-*.ts`.
-- `src/rules/families/<F>.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
-  the rule ids they implement. `src/rules/general-effects.test.ts` and the `<F>-fixture.ts` helpers of the existing families
+- `src/rules/families/<F>/index.ts`: `run()` resolves your verbs (`runFamilyVerb` in `src/rules/families/index.ts` asks the
+  families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>/index.ts` and helper
+  modules beside it in `src/rules/families/<F>/`.
+- `src/rules/families/<F>/index.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
+  the rule ids they implement. `src/rules/general-effects.test.ts` and the `<F>/fixture.ts` helpers of the existing families
   show a compact table setup.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   `src/effects/authored/<scenario-id>.ts` (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`) for a scenario.

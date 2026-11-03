@@ -1,7 +1,7 @@
 // Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.step-6-4b, rr.ranged,
 // rr.step-6-8b, rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
 // ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
-import { announceEnemyAttacked, attackerLimitReached } from "./families/aflame-attack.ts";
+import { announceEnemyAttacked, attackerLimitReached } from "./families/aflame/attack.ts";
 import { attackBarred } from "./constants.ts";
 import type { EngineStep } from "./intents.ts";
 import { modifiedStat, placeDamage } from "./keywords.ts";
@@ -14,17 +14,17 @@ import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "./quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "./step-window.ts";
 import { inPlay } from "./zones.ts";
-import { titleBarred } from "./families/nightmare-guards.ts";
+import { titleBarred } from "./families/nightmare/guards.ts";
 import { ruleCause } from "./cause.ts";
 import { fireForced } from "./triggers.ts";
-import { undefendedExtras } from "./families/defense-damage.ts";
-import { markDefender, moreDefenders } from "./families/defense-defenders.ts";
-import { holdAttack, queueHeard } from "./families/defense-listen.ts";
-import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/attack-flow.ts";
-import { countsDefense, struck } from "./families/attack-strike.ts";
-import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "./families/south-watcher.ts";
-import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack-targets.ts";
-import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong } from "./families/sea-ships.ts";
+import { undefendedExtras } from "./families/defense/damage.ts";
+import { markDefender, moreDefenders } from "./families/defense/defenders.ts";
+import { holdAttack, queueHeard } from "./families/defense/listen.ts";
+import { awaitStrike, backAfter, declareStrike, endStrike } from "./families/attack/flow.ts";
+import { countsDefense, struck } from "./families/attack/strike.ts";
+import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "./families/south/watcher.ts";
+import { offeredTargets, stagingAttackable, withCardTargets } from "./families/attack/targets.ts";
+import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong } from "./families/sea/ships.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -91,7 +91,7 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
     const enemies = (state.seats[seat]?.engaged ?? []).filter(
       (id) => !state.resolvedAttacks.includes(id) && !attackBarred(state, id, seat),
     );
-    // An enemy in the staging area that is considered engaged with each player (families/south-watcher.ts).
+    // An enemy in the staging area that is considered engaged with each player (families/south/watcher.ts).
     const staging = stagingAttackers(state, seat);
     if (enemies.length + staging.length > 0) return { seat, enemies: [...enemies, ...staging] };
   }
@@ -107,7 +107,7 @@ export function beginEnemyAttack(
   enemyId: string,
   ctx: ReduceContext,
   steps: EngineStep[],
-  // An effect made an enemy in the staging area attack (families/south-watcher.ts).
+  // An effect made an enemy in the staging area attack (families/south/watcher.ts).
   fromStaging = false,
 ): ScenarioState {
   const attacker = state.cards[enemyId];
@@ -240,7 +240,7 @@ export function canAttack(
     return attacker.controller === seat || printed.keywords.ranged || flagged(state, attackerId, "ranged");
   }
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
-  // only when a card lets the character attack it (families/attack-targets.ts).
+  // only when a card lets the character attack it (families/attack/targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");
   // A location in the staging area the first player may attack in the combat phase as if it were engaged with him (Cracked Pillar, 41028:A:1).
   if (enemy.zone === "staging" && flagged(state, enemyId, "attackableAsEngaged")) {
@@ -305,7 +305,7 @@ export function applyPlayerAttack(
   }
   const declared: ScenarioState = announceEnemyAttacked(declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) }), seat, enemyId, attackerIds, ctx);
   // 6.8.1: the attack and its attackers are declared; an action window comes before its strength and damage. The Responses to
-  // the declaration ("After ~ is declared as an attacker") resolve before them either way (families/attack-flow.ts).
+  // the declaration ("After ~ is declared as an attacker") resolve before them either way (families/attack/flow.ts).
   return playerAttackWindow(declared, ctx, "strike") ?? awaitStrike(declared, ctx) ?? continueStrike(declared, ctx, steps);
 }
 
@@ -321,7 +321,7 @@ export function continueStrike(state: ScenarioState, ctx: ReduceContext, steps: 
     const after = playerAttackWindow(next, ctx, "end");
     if (after) return after;
   }
-  // 6.8.4: "for this attack" expires, the window the attack came from comes back (families/attack-flow.ts).
+  // 6.8.4: "for this attack" expires, the window the attack came from comes back (families/attack/flow.ts).
   return endStrike({ ...next, pendingStrike: next.pendingStrike ?? declared }, ctx, steps);
 }
 
@@ -339,7 +339,7 @@ export function strikeEnemy(
   if (!enemy) return state;
   const next = state;
   const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
-  // An attacker may say the enemy does not count its Defense (families/attack-strike.ts).
+  // An attacker may say the enemy does not count its Defense (families/attack/strike.ts).
   const defense = countsDefense(next, attackerIds) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
   steps.push({ kind: "attack", side: "player", seat, enemyId, attackerIds: [...attackerIds] });
   const enemyNow = next.cards[enemyId];
@@ -347,7 +347,7 @@ export function strikeEnemy(
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
-  // an enemy"), and excess damage goes where a card sends it (families/attack-strike.ts).
+  // an enemy"), and excess damage goes where a card sends it (families/attack/strike.ts).
   return struck(next, damaged, seat, enemyId, attackerIds, Math.max(0, attack - defense), ctx, steps);
 }
 
@@ -382,7 +382,7 @@ export function heroIds(state: ScenarioState, seat: number): string[] {
 // The characters an undefended attack's damage may be assigned to: the seat's heroes, and a character that says damage from
 // undefended attacks may be assigned to it (takesUndefendedDamage).
 export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
-  // A shadow effect sent the damage to an active location (families/south-watcher.ts).
+  // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const locations = undefendedLocations(state);
   if (locations.length > 0) return locations;
   // A ship-enemy's undefended attack damages a ship-objective its player controls, not a hero (dcce.ship-enemies).

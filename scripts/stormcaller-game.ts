@@ -7,7 +7,7 @@ import { EFFECTS } from "../src/effects/index.ts";
 import type { CampaignFacts , ModeCard } from "../src/rules/campaign-state.ts";
 import { characters, legalAttackEnemies } from "../src/rules/combat.ts";
 import { expectOk } from "../src/rules/fixture.ts";
-import { askingToCommit } from "../src/rules/families/sea-sailing-legal.ts";
+import { askingToCommit } from "../src/rules/families/sea/sailing-legal.ts";
 import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
 import type { EngineStep } from "../src/rules/intents.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";

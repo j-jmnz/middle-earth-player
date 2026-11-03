@@ -222,12 +222,12 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-28b-history-and-collapsible.md` — Phase 28b — Collapsible sections and run history (~1.3K tok)
 - `docs/phases/phase-29-passage-through-mirkwood.md` — Phase 29 — Passage Through Mirkwood (~950 tok)
 - `docs/phases/phase-30-journey-along-the-anduin.md` — Phase 30 — Journey Along the Anduin (~950 tok)
-- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~1000 tok)
+- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~990 tok)
 - `docs/phases/phase-32-the-oath.md` — Phase 32 — The Oath (~900 tok)
 - `docs/phases/phase-33-caves-of-nibin-dum.md` — Phase 33 — The Caves of Nibin-Dûm (~920 tok)
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
-- `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.1K tok)
+- `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
 - `docs/phases/phase-37-dream-chaser-data.md` — Phase 37 — Dream-chaser data (~740 tok)
 - `docs/phases/phase-38-dream-chaser-campaign-shell.md` — Phase 38 — Dream-chaser campaign shell and XP (~650 tok)
 - `docs/phases/phase-39-sea-mechanics-family.md` — Phase 39 — Sea mechanics family (~490 tok)
@@ -285,7 +285,7 @@ Read when a task names the plan.
   - 120–126 Conditions (~110)
   - 127–146 Triggers and stat flags (~440)
   - 147–208 Patterns (~1.4K)
-  - 209–234 Mechanic families: engine and records together (~710) ← 2
+  - 209–234 Mechanic families: engine and records together (~720) ← 2
   - 235–254 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)

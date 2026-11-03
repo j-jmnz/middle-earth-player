@@ -18,7 +18,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-caves-of-nibin-dum`:
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 27).
 - `pnpm effects:draft the-caves-of-nibin-dum`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution and the boons and burdens below.
-- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
+- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/the-caves-of-nibin-dum.ts`; boon and burden pool records in `src/effects/authored/pool/TDoM.ts`.
 - Golden: `src/campaign/golden/the-caves-of-nibin-dum.json` with `golden-nibin-dum.test.ts`, `scripts/nibin-dum-scene.ts` and `scripts/nibin-dum-game.ts`: true solo and two-handed, a win and a loss.
 - A campaign test checks that The Oath's pool and facts reach this scenario in both campaigns.

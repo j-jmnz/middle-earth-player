@@ -1,30 +1,30 @@
-import { withTwin } from "./families/nightmare-guards.ts";
+import { withTwin } from "./families/nightmare/guards.ts";
 import type { Condition, Effect, Instruction } from "../catalog/boundary.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "./cancel.ts";
 import { effectCause, inCause, type Cause } from "./cause.ts";
 import { beginEnemyAttack } from "./combat.ts";
 import { attackBarred } from "./constants.ts";
-import { dealForAttack } from "./families/south-watcher.ts";
+import { dealForAttack } from "./families/south/watcher.ts";
 import { askTarget, openBranch } from "./choices.ts";
 import { holds } from "./conditions.ts";
 import { distinctByCode, targeted } from "./effect-targeted.ts";
 import { pushHide } from "./hide.ts";
 import type { EngineStep } from "./intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
-import { runEncounterItem } from "./families/encounter-items.ts";
-import { chooseEach } from "./families/deck-each.ts";
-import { lookedDeckSeat } from "./families/deck-rules.ts";
+import { runEncounterItem } from "./families/encounter/items.ts";
+import { chooseEach } from "./families/deck/each.ts";
+import { lookedDeckSeat } from "./families/deck/rules.ts";
 import { pickCandidates } from "./pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "./state.ts";
 import { livingSeats, withSeat } from "./state.ts";
 import { offerResponses } from "./responses.ts";
 import { holdsNow } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
-import { dealOut } from "./families/breaking-deal.ts";
+import { dealOut } from "./families/breaking/deal.ts";
 import { moveCard } from "./zones.ts";
-import { chooseAmount } from "./families/defense.ts";
-import { dealAttackShadow } from "./families/defense-listen.ts";
+import { chooseAmount } from "./families/defense/index.ts";
+import { dealAttackShadow } from "./families/defense/listen.ts";
 
 export type EffectSpec = {
   frame: FrameName;
@@ -187,7 +187,7 @@ function runItem(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare-guards.ts).
+  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare/guards.ts).
   const instruction = withTwin(state, item.instruction, ctx.cards);
   const twinned = instruction === item.instruction ? item : { ...item, instruction };
   if (!holdsNow(state, instruction, { actor: item.seat, sourceId: frame.cardId, returned }, ctx)) return state;
@@ -236,7 +236,7 @@ function runItemNow(
       return pick(state, item, frame, ctx);
     case "ArrangeTop":
       return arrangeTop(state, item);
-    // Stage 2B deals the shared staging area out to the seats (families/breaking-deal.ts).
+    // Stage 2B deals the shared staging area out to the seats (families/breaking/deal.ts).
     case "DealOutStaging":
       return dealOut(state, item);
     // The actor chooses the effect's X (defense family).
@@ -268,7 +268,7 @@ function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Re
   const instruction = item.instruction;
   const data = topFrame(state)?.data;
   if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
-  // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck-each.ts).
+  // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck/each.ts).
   if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
   const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null });
   const cause = item.cause ? { cause: item.cause } : {};
@@ -317,7 +317,7 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, seat: nu
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
   }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
-  // An attack an effect makes is dealt a shadow card of its own (families/defense-listen.ts).
+  // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts).
   const dealt = dealAttackShadow(state, sourceId, ctx, steps);
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;

@@ -29,8 +29,8 @@ export type CardType =
   | "campaign"
   // The Nightmare setup card, next to the quest deck on Nightmare (zone `nightmare`): its side A's lines stay active all game.
   | "nightmare"
-  // A player card played in the planning phase into its player's quest area (families/sidequests-play.ts), and a contract
-  // card that begins the game in its player's play area (families/sidequests-contract.ts).
+  // A player card played in the planning phase into its player's quest area (families/sidequests/play.ts), and a contract
+  // card that begins the game in its player's play area (families/sidequests/contract.ts).
   | "player-side-quest"
   | "contract";
 
@@ -65,7 +65,7 @@ export type Keywords = {
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
-// exceptions in dcce.ship-enemies and dcce.ship-objectives (families/sea-ships.ts).
+// exceptions in dcce.ship-enemies and dcce.ship-objectives (families/sea/ships.ts).
 export type ShipKind = "enemy" | "objective";
 
 export type PrintedCard = {
@@ -133,7 +133,7 @@ function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
   return { ...(back.willpower != null ? { willpower: back.willpower } : {}), ...(back.threat != null ? { threat: back.threat } : {}), ...(back.engagementCost != null ? { engagementCost: back.engagementCost } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
 }
 
-// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play-sweep.ts) lost
+// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play/sweep.ts) lost
 // the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
 export function cardTypeOf(instance: { zone: string }, printed: PrintedCard): CardType {
   return instance.zone === "heroes" ? "hero" : printed.type;
@@ -170,7 +170,7 @@ export function definePrinted(
 }
 
 // The code of the "Orc Guard" a deck card becomes in Escape from Dol Guldur (01107:A:1, 01125:B:1): not a printed card but a stand-in the
-// engine creates, "an enemy with 1 hit point, 1 Attack and 1 Defense" (families/dungeon-guard.ts). Every card map knows it.
+// engine creates, "an enemy with 1 hit point, 1 Attack and 1 Defense" (families/dungeon/guard.ts). Every card map knows it.
 export const ORC_GUARD_CODE = "orc-guard";
 const BUILT_IN: ReadonlyMap<string, PrintedCard> = new Map([
   [ORC_GUARD_CODE, definePrinted({ code: ORC_GUARD_CODE, name: "Orc Guard", type: "enemy", threat: 0, engagementCost: 0, attack: 1, defense: 1, health: 1 })],

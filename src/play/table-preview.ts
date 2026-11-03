@@ -1,7 +1,7 @@
 // What a long press on a table card shows (card-preview.tsx): the card, the cards attached to it and its face-up shadow cards,
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
-import { stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
-import { isLostIsland } from "../rules/families/uncharted-pick.ts";
+import { stageSeat, viewOf } from "../rules/families/breaking/areas.ts";
+import { isLostIsland } from "../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import type { CardInstance } from "../rules/state.ts";
 

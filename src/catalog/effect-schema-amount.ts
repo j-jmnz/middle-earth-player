@@ -43,13 +43,13 @@ export const amountExprSchema = z.strictObject({
   // The damage an attack sent on past its defender (excessToShip), read by the effect the attack leaves for its end ("deal that much damage", 11055:A:2).
   excess: z.literal(true).optional(),
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
-  // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc-amounts.ts.
+  // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
   resourcesAboveCopies: z.literal(true).optional(),
   // The amount comes out negative ("gets -1 Willpower for each damaged hero you control"): the value read, below 0.
   negative: z.literal(true).optional(),
   // A scalable card's level, read from the Campaign Log (dcce.scalable-upgradable): the level of the source card. `halved`: half of the value read, rounded up ("half the level of Galdor's
-  // Counsel, rounded up", 11184:A:1). Read by the aflame family (src/rules/families/aflame-values.ts).
+  // Counsel, rounded up", 11184:A:1). Read by the aflame family (src/rules/families/aflame/values.ts).
   level: z.literal(true).optional(),
   halved: z.literal(true).optional(),
   // amount = value × times + plus, at most `limit`, at least 0.
@@ -58,9 +58,9 @@ export const amountExprSchema = z.strictObject({
   // Plus the number of cards the campaign card's Setup let the players choose ("X is plus 1 for each of those copies", 11182:A:2): 0 in a game whose Setup chose none.
   plusChosen: z.literal(true).optional(),
   limit: z.number().int().min(0).optional(),
-  // The number of enemies grappled with locations in the staging area ("equal to the number of enemies grappled with locations in the staging area", 12055:A:2; src/rules/families/grapple-values.ts).
+  // The number of enemies grappled with locations in the staging area ("equal to the number of enemies grappled with locations in the staging area", 12055:A:2; src/rules/families/grapple/values.ts).
   grappled: z.literal(true).optional(),
-  // The total Threat of the locations to the left of the active location, in its row on the Island Map ("X is the total Threat of all locations to the left of the active location", 12078:A:1; src/rules/families/island-pick.ts).
+  // The total Threat of the locations to the left of the active location, in its row on the Island Map ("X is the total Threat of all locations to the left of the active location", 12078:A:1; src/rules/families/island/pick.ts).
   islandLeft: z.literal(true).optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),

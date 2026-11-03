@@ -2,8 +2,8 @@
 // off-course or deal 1 damage to each exhausted character", 11055:A:1).
 import type { Instruction } from "../catalog/boundary.ts";
 import { frameScope, resolveAmount } from "../rules/amounts.ts";
-import { controlledShips } from "../rules/families/sea-campaign.ts";
-import { titleDeck } from "../rules/families/sea-cards.ts";
+import { controlledShips } from "../rules/families/sea/campaign.ts";
+import { titleDeck } from "../rules/families/sea/cards.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";

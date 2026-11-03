@@ -6,7 +6,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
 import { stagingWord } from "./area-words.ts";
-import { lookedIds } from "../rules/families/sea-sailing.ts";
+import { lookedIds } from "../rules/families/sea/sailing.ts";
 
 import { NO_HIGHLIGHT } from "./peek.ts";
 import { pictureKey } from "./picture-key.ts";

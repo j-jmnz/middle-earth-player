@@ -18,7 +18,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `escape-from-dol-guldur`:
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 27).
 - `pnpm effects:draft escape-from-dol-guldur`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution and the boons and burdens below.
-- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
+- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/escape-from-dol-guldur.ts`; boon and burden pool records in `src/effects/authored/pool/RevCore.ts`.
 - Golden: `src/campaign/golden/escape-from-dol-guldur.json` with `golden-dol-guldur.test.ts`, `scripts/dol-guldur-scene.ts` and `scripts/dol-guldur-game.ts`: true solo and two-handed, a win and a loss.
 - A campaign test checks that Journey Along the Anduin's pool and its `prisoner` fact reach this scenario through the Campaign Setup Checklist.
@@ -28,7 +28,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `escape-from-dol-guldur`:
 ## Cards
 
 - **Guarded objectives and claim** (01108 to 01110): Setup attaches the next encounter card to each objective; "free of encounters"; claim and attach; return on detach.
-- **Prisoner and rescue**: generalize the captive in `south-captive.ts` (phase 14). The prisoner hero and its attachments are facedown and unusable; Mendor is captured with them; rescuing is an event.
+- **Prisoner and rescue**: generalize the captive in `south/captive.ts` (phase 14). The prisoner hero and its attachments are facedown and unusable; Mendor is captured with them; rescuing is an event.
 - Orc Guard (01107/01125): a deck card as a facedown enemy.
 - Iron Shackles (01105): attached to a player deck.
 - A group limit of one ally per round (01123/01124).

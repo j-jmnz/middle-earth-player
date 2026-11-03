@@ -4,8 +4,8 @@
 import { effectsOf } from "../rules/listen.ts";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { holds } from "../rules/conditions.ts";
-import { areaOf } from "../rules/families/stormcaller-zone.ts";
-import { stormcallerLastStage } from "../rules/families/stormcaller-values.ts";
+import { areaOf } from "../rules/families/stormcaller/zone.ts";
+import { stormcallerLastStage } from "../rules/families/stormcaller/values.ts";
 import { committedWillpower, questPointsOf } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 

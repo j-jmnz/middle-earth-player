@@ -6,7 +6,7 @@ import { currentCause, ruleCause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hideStep, pushHide } from "./hide.ts";
-import { encounterRaised } from "./families/quest-threat.ts";
+import { encounterRaised } from "./families/quest/threat.ts";
 import { raiseThreat } from "./keywords.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
@@ -16,10 +16,10 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "./verbs.ts";
 import { attachTo, moveCard } from "./zones.ts";
-import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watchReveal } from "./families/encounter-reveal.ts";
-import { discardsAfterReveal } from "./families/sidequests-encounter.ts";
-import { stagingDest } from "./families/breaking-areas.ts";
-import { grapplesOnReveal, pushGrapple } from "./families/grapple-attach.ts";
+import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watchReveal } from "./families/encounter/reveal.ts";
+import { discardsAfterReveal } from "./families/sidequests/encounter.ts";
+import { stagingDest } from "./families/breaking/areas.ts";
+import { grapplesOnReveal, pushGrapple } from "./families/grapple/attach.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.

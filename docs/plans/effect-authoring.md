@@ -21,7 +21,7 @@ something else.
    `node --experimental-strip-types scripts/card-smoke.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
    seeded game with the card in hand or on the table and fails on a throw, a refusal or `state.failure`; it shows the
    records run, not that they do what the card says. For that, write a test next to the family
-   (`src/rules/families/<family>.test.ts`) that names the rule ids it implements.
+   (`src/rules/families/<family>/index.test.ts`) that names the rule ids it implements.
 
 `scripts/effect-coverage.test.ts` is the gate: every printed line of a card a playable scenario deals (`src/campaign/playable.ts`)
 or of a deck-legal player card is owned by a record that names it in `lines`, by a keyword the engine reads (a line that is
@@ -221,9 +221,9 @@ family owns files that are composed by the `index.ts` next to them, so families 
   the trigger enum and the stat enum. `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb
   or condition kind fails when the schema loads. A new pick filter, condition kind or amount field goes in the shared
   `effect-schema-*.ts` file, with a comment naming the family file that reads it.
-- `src/rules/families/<family>.ts` exports `run`, which resolves the family's verbs and returns `null` for any other.
+- `src/rules/families/<family>/index.ts` exports `run`, which resolves the family's verbs and returns `null` for any other.
   `src/rules/families/index.ts` lists the runners; `interpret.ts` asks the families before the player verbs and the core
-  switch. Bigger families split into `<family>-<part>.ts` files. Tests go next to them (`<family>.test.ts`) and name the
+  switch. Bigger families split into part files in the family's folder (`<family>/<part>.ts`). Tests go next to them (`<family>/index.test.ts`) and name the
   rule ids they implement.
 - `src/effects/authored/families/<family>.ts` exports `RECORDS` and `REPLACES`, composed by that folder's `index.ts` (burden and
   south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.

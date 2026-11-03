@@ -2,24 +2,24 @@
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
-import { threatSaved } from "./families/quest-threat.ts";
-import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "./families/attachments-hold.ts";
+import { threatSaved } from "./families/quest/threat.ts";
+import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "./families/attachments/hold.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "./queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
-import { claimedDestination } from "./families/objectives-claimed.ts";
+import { claimedDestination } from "./families/objectives/claimed.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
-import { damageGoesTo, defenseFromWillpower } from "./families/defense-damage.ts";
-import { attackingHolds } from "./families/attack-strike.ts";
-import { resourceShield } from "./families/aflame-attack.ts";
-import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play-hooks.ts";
-import { alliesToHandDestination } from "./families/deck-rules.ts";
-import { reduceLife, takesLifeInstead } from "./families/burden-life.ts";
-import { placedLimit } from "./families/uncharted-limit.ts";
-import { discardArea } from "./families/breaking-areas.ts";
-import { grappleThreat } from "./families/grapple-values.ts";
+import { damageGoesTo, defenseFromWillpower } from "./families/defense/damage.ts";
+import { attackingHolds } from "./families/attack/strike.ts";
+import { resourceShield } from "./families/aflame/attack.ts";
+import { discardedFromPlay, doomedRaised, seatThreat } from "./families/play/hooks.ts";
+import { alliesToHandDestination } from "./families/deck/rules.ts";
+import { reduceLife, takesLifeInstead } from "./families/burden/life.ts";
+import { placedLimit } from "./families/uncharted/limit.ts";
+import { discardArea } from "./families/breaking/areas.ts";
+import { grappleThreat } from "./families/grapple/values.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
@@ -65,7 +65,7 @@ export function modifiedStat(
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
-    // "+1 Attack when attacking an Orc" (families/attack-strike.ts).
+    // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
     if (modifier.when?.kind === "attacking" && !attackingHolds(state, modifier.when, instance, { effects: [], cards }, against)) continue;
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
@@ -222,7 +222,7 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
     if (lethal && state.holdLethal) return next;
   }
   if (lethal) {
-    // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments-hold.ts).
+    // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments/hold.ts).
     if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, id, printed.type === "hero" ? cards : undefined);
     next = destroyCard(next, id, cards, steps, false, true);
     // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
@@ -285,7 +285,7 @@ export function defeatedDestination(
   if ((printed.type === "enemy" || printed.type === "location") && victoryOf(instance, printed) != null) {
     return { zone: "victory" };
   }
-  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives-claimed.ts).
+  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
   const usual: Destination =
     !fromEncounterDeck(printed) && instance.controller != null
       ? { zone: "discard", seat: instance.owner ?? instance.controller }
@@ -311,7 +311,7 @@ export function releaseAttachments(
   for (const attachmentId of attachmentIds) {
     const attachment = next.cards[attachmentId];
     if (!attachment) continue;
-    // A Guarded attachment the card guarded goes to its player instead (families/attachments-hold.ts).
+    // A Guarded attachment the card guarded goes to its player instead (families/attachments/hold.ts).
     if (isGuarded(next, attachmentId)) {
       next = releaseGuarded(next, attachmentId);
       continue;
@@ -334,7 +334,7 @@ export function destroyCard(
   cards: ReadonlyMap<string, PrintedCard>,
   steps: EngineStep[],
   explored = false,
-  // Damage destroyed it: it was not discarded (rr.destroy, families/play-hooks.ts).
+  // Damage destroyed it: it was not discarded (rr.destroy, families/play/hooks.ts).
   byDamage = false,
 ): ScenarioState {
   const instance = state.cards[id];
@@ -353,7 +353,7 @@ export function destroyCard(
   if (explored && printed.type === "location" && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
-  // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck-rules.ts).
+  // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
   next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), instance.attachments);

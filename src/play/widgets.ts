@@ -2,7 +2,7 @@
 // deck's count. A piece shows only when the scenario's definition declares it (`widgets`) and the game holds it, so a game of
 // A Shadow of the Past or A Knife in the Dark shows neither. The engine wrote both numbers; nothing here changes one.
 import type { Effect } from "../catalog/boundary.ts";
-import { stageOf } from "../rules/families/breaking-areas.ts";
+import { stageOf } from "../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../rules/reduce.ts";
 
 import { headingStepOf, type HeadingStep } from "./heading.ts";
@@ -25,7 +25,7 @@ export type LocationReadout = {
   // The code of the card the Ring-bearer is facedown under, when it is.
   heldUnder: string | null;
   // The seat that gets it back: the Watcher's Forced effect always returns the hero to the first player (releaseRingBearer,
-  // families/south-captive.ts), and a captive card keeps no controller. Null when it is not held. Its dial wears the Ring mark.
+  // families/south/captive.ts), and a captive card keeps no controller. Null when it is not held. Its dial wears the Ring mark.
   heldBy: number | null;
 };
 

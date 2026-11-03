@@ -8,11 +8,11 @@ import { costOfKind } from "../catalog/costs.ts";
 import { playCost } from "../rules/attach.ts";
 import type { Payment } from "../rules/intents.ts";
 import type { ReduceContext } from "../rules/interpret.ts";
-import { allyPools, distinctRule } from "../rules/families/costs-pay.ts";
-import { openPools } from "../rules/families/misc-guards.ts";
-import { exhaustSlack } from "../rules/families/costs-play.ts";
-import { payingSlack } from "../rules/families/deck-play.ts";
-import { chosenX } from "../rules/families/misc-cost.ts";
+import { allyPools, distinctRule } from "../rules/families/costs/pay.ts";
+import { openPools } from "../rules/families/misc/guards.ts";
+import { exhaustSlack } from "../rules/families/costs/play.ts";
+import { payingSlack } from "../rules/families/deck/play.ts";
+import { chosenX } from "../rules/families/misc/cost.ts";
 import { heroPays } from "../rules/payments.ts";
 import { printedOf, type Sphere } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";
@@ -58,7 +58,7 @@ export function playRequest(state: ScenarioState, ctx: ReduceContext, cardId: st
   // A cost that characters exhausted may pay in part (ExhaustToReduce) need not be met in resources: what is left unpaid is
   // paid by exhausting them, and the reducer checks there are enough.
   const distinct = distinctRule(state, cardId, ctx);
-  // So may one a Response lowers as the card is played (Erebor Guard, families/deck-play.ts).
+  // So may one a Response lowers as the card is played (Erebor Guard, families/deck/play.ts).
   return { seat, cardId, total: cost, exact: !chosen && exhaustSlack(state, seat, cardId, ctx) === 0 && payingSlack(state, seat, cardId, ctx) === 0, pools, ...(distinct ? { distinct } : {}) };
 }
 

@@ -3,8 +3,8 @@
 // once it is full, and the reach of Winding Caverns (scripts/temple-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { islandMayTravel, islandReach } from "../rules/families/island-travel.ts";
-import { cellOf, neighbors, stagingCells, within } from "../rules/families/island-map.ts";
+import { islandMayTravel, islandReach } from "../rules/families/island/travel.ts";
+import { cellOf, neighbors, stagingCells, within } from "../rules/families/island/map.ts";
 import { placeQuestProgress, stagingThreat } from "../rules/quest.ts";
 import { legalIntents, legalTargets } from "../rules/legal.ts";
 import { reduce } from "../rules/reduce.ts";

@@ -7,8 +7,8 @@
 // advanced already: the screen holds the moment so the stage is read before the round goes on, and the table answers nothing for
 // the player meanwhile (use-table-choice.ts). The table also opens on it (user request, 2026-10-29): the stage in play when the game is
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
-import { isSeparate, stageSeat, viewOf } from "../rules/families/breaking-areas.ts";
-import { stagePlace } from "../rules/families/quest-branch.ts";
+import { isSeparate, stageSeat, viewOf } from "../rules/families/breaking/areas.ts";
+import { stagePlace } from "../rules/families/quest/branch.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import type { CardFace } from "../rules/state.ts";
 import { isOver } from "../rules/undo.ts";

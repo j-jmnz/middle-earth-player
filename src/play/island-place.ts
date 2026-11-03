@@ -1,6 +1,6 @@
 // Rules: dcce.island-map, dcce.exploration (data/rules/entries.json). Where a location lies on the Island Map, told from the marker (docs/design-system-table.md, The Island Map): a travel row leads with the direction
 // ("Right of the marker", "2 right, 1 down") and a small 5 × 3 glyph with the location lit, and a location in the staging area wears the same glyph. Pure. The words name a place, never the side that lies down.
-import { COLS, ROWS } from "../rules/families/island-map.ts";
+import { COLS, ROWS } from "../rules/families/island/map.ts";
 
 export type Spot = { row: number; col: number };
 

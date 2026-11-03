@@ -1,7 +1,7 @@
 import type { Cause } from "./cause.ts";
 import type { Condition, Instruction, ModifierStat, ModifierUntil, Trigger } from "../catalog/boundary.ts";
 
-import type { AttackDefense } from "./families/defense-types.ts";
+import type { AttackDefense } from "./families/defense/types.ts";
 import type { Sphere } from "./printed.ts";
 import type { Window } from "./state.ts";
 
@@ -82,7 +82,7 @@ export type EffectData = {
   interrupted?: boolean;
   // The cards a Pick looked at in a deck: the ones still there are put back by ArrangeTop.
   looked?: readonly string[];
-  // The options a `different` Choose has taken in this effect (families/deck-choose.ts).
+  // The options a `different` Choose has taken in this effect (families/deck/choose.ts).
   options?: readonly string[];
   // The seat the event that offered this Response happened to.
   eventSeat?: number | null;
@@ -99,9 +99,9 @@ export type EffectData = {
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
   excess?: number;
   hold?: string;
-  // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted-cards.ts).
+  // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;
-  // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare-guards.ts).
+  // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare/guards.ts).
   hideFailed?: boolean;
 };
 
@@ -123,10 +123,10 @@ export type HideData = {
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
 // `other` is a second card the event names: the enemy a character defends against or attacks.
 // `amount` is the damage a `damaged` event dealt. `attachments` are the cards that left play with the card a
-// `leftPlayWithAttachments` event is about (families/play-zones.ts).
+// `leftPlayWithAttachments` event is about (families/play/zones.ts).
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
 // a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
-// "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea-boarding.ts).
+// "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts).
 export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromStaging?: boolean };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
@@ -157,9 +157,9 @@ export type Frame = {
 
 export type DelayedEffect = {
   id: string;
-  // `questSucceeded`: run when the players quest successfully this phase (families/quest-outcome.ts), dropped when the quest
+  // `questSucceeded`: run when the players quest successfully this phase (families/quest/outcome.ts), dropped when the quest
   // resolves otherwise. `questFailed`: the same, when they quest unsuccessfully (900307:A:1).
-  // `endOfAttack`: the end of the player attack in progress (families/attack-flow.ts).
+  // `endOfAttack`: the end of the player attack in progress (families/attack/flow.ts).
   // `startOfGame`: run once the opening hands are settled (misc family).
   until: "endOfPhase" | "endOfRound" | "questSucceeded" | "questFailed" | "endOfAttack" | "startOfGame";
   sourceId: string | null;
@@ -214,14 +214,14 @@ export type PendingAttack = {
   shadowFrame?: string;
   // The shadow effects are resolved, and the window before combat damage has been offered.
   shadowsDone?: boolean;
-  // The attacking enemy is in the staging area (an effect made it attack, 142038:A:2), not engaged (families/south-watcher.ts).
+  // The attacking enemy is in the staging area (an effect made it attack, 142038:A:2), not engaged (families/south/watcher.ts).
   fromStaging?: boolean;
   // A shadow effect says the undefended damage of this attack goes on an active location (142035:A:2).
   toLocation?: boolean;
   // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
-  // (families/defense-shadow-attack.ts).
+  // (families/defense/shadow-attack.ts).
   shadowAttackers?: readonly string[];
-  // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense-types.ts).
+  // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense/types.ts).
   defense?: AttackDefense;
 };
 
@@ -232,7 +232,7 @@ export type PendingStrike = {
   attackerIds: readonly string[];
   awaiting?: "strike" | "end";
   awaitDepth?: number;
-  // The attack family's marks (families/attack-flow.ts). `back`: the window given back when the attack ends (absent: the
+  // The attack family's marks (families/attack/flow.ts). `back`: the window given back when the attack ends (absent: the
   // combat phase's player attack window; null: none, an effect declared the attack and goes on). `outer`: the player attack
   // this one was declared during, which goes on when it ends. `engagedSeat`: the player the enemy was engaged with when the
   // attack was declared. `ranged`: a card called it a ranged attack. `excessTo`: the enemy that takes its excess damage.

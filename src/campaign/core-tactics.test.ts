@@ -223,7 +223,7 @@ describe("Stand Together (01038:A:1, rr.multiple-defenders)", () => {
     run = passWindows(run, tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = send(run, { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
-    // Another defender may be declared, or the declarations end (families/defense-defenders.ts moreDefenders).
+    // Another defender may be declared, or the declarations end (families/defense/defenders.ts moreDefenders).
     expect(choices(run, tab)).toEqual(["another", "done"]);
     run = send(run, { type: "Choose", optionId: "another" }, tab.ctx);
     expect(choices(run, tab).sort()).toEqual([legolas, thalin].sort());

@@ -1,5 +1,5 @@
 // The vocabulary the Nightmare decks (phase 36, docs/plans/nightmare-mode.md) add to effect records: verbs, triggers and stat flags.
-// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare.ts runs them (with nightmare-dungeon.ts and nightmare-setup.ts).
+// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare/index.ts runs them (with nightmare/dungeon.ts and nightmare/setup.ts).
 import { z } from "zod";
 
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
@@ -68,11 +68,11 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("MoveDamageTo"), from: cardRefSchema, to: cardRefSchema, ...when }),
   // Heard when a hero was taken prisoner at stage 1B (900301:A:2): more heroes are captured at random with the game's seed, from players who have
   // none captured, until the number captured is 1 with 1 or 2 players, 2 with 3 and 3 with 4. Each is facedown, "the prisoner", as the first
-  // (src/rules/families/prisoner.ts). Nothing is announced for them.
+  // (src/rules/families/prisoner/index.ts). Nothing is announced for them.
   z.strictObject({ verb: z.literal("TakeMorePrisoners"), ...when }),
   // In the effect an attack leaves for its end: the hero the reference names, still in play, is turned facedown as a "prisoner" when this attack
   // dealt it damage ("Any hero damaged (but not defeated) by this attack is turned face down, as a "prisoner."", 900302:A:2). It keeps its
-  // damage. `dealt` asks the attack to keep the damage it dealt (families/defense-excess.ts).
+  // damage. `dealt` asks the attack to keep the damage it dealt (families/defense/excess.ts).
   z.strictObject({ verb: z.literal("TakeHeroPrisoner"), card: cardRefSchema, dealt: z.literal(true), ...when }),
   // The players return to an earlier stage, side B: the current quest card goes back to the quest deck and the quest card of stage `stage` (its
   // place in the quest deck, counting from 1) is the current quest again, with no progress ("return to stage 2B of the quest", 900302:A:2). Its
@@ -120,6 +120,6 @@ export const FLAGS = [
   "encounterRefill",
   // On "seat:N": that player cannot attack, or damage by his card effects, an enemy whose title is not the title of the modifier's source ("If
   // you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland
-  // Outlaws", 900202:A:1). Read by combat.ts canAttack and the DamageCard verb (families/nightmare-guards.ts).
+  // Outlaws", 900202:A:1). Read by combat.ts canAttack and the DamageCard verb (families/nightmare/guards.ts).
   "attackOnlyTitle",
 ] as const;

@@ -3,7 +3,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds } from "../rules/conditions.ts";
-import { grappledWith } from "../rules/families/grapple-values.ts";
+import { grappledWith } from "../rules/families/grapple/values.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { legalIntents, legalTargets } from "../rules/legal.ts";
 import { settle } from "../rules/machine.ts";

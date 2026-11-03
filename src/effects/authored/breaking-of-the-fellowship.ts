@@ -23,7 +23,7 @@ const SEARCH_ENEMY_TO_STAGING = [{ verb: "SearchMove", type: "enemy", to: "stagi
 
 // Each stage 3B prints the same two lines and one Response of its own. "If Frodo's Choice is not in play, any time players would place progress on this quest,
 // discard an equal number of cards from the encounter deck instead" holds the flag progressDiscards; "Forced: After Frodo's Choice is revealed at this stage, advance to
-// stage 4A" hears the reveal of the seat whose stage it is (the stage is that seat's controller, rules/families/breaking.ts).
+// stage 4A" hears the reveal of the seat whose stage it is (the stage is that seat's controller, rules/families/breaking/index.ts).
 const STAGE_3B = (code: string, response: Omit<Effect, "id" | "cardCode" | "lines" | "timing" | "trigger" | "eventSeat">): readonly Effect[] => [
   {
     id: `${code}:constant:1`,

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../effects/authored/families/sidequests.ts";
 import { legalIntents } from "../rules/reduce.ts";
-import { play, put, questArea, questing, seat, send, sideCtx } from "../rules/families/sidequests-fixture.ts";
+import { play, put, questArea, questing, seat, send, sideCtx } from "../rules/families/sidequests/fixture.ts";
 
 import { windowSheet } from "./bar-sheets.ts";
 import { slotNumbers } from "./card-effects.ts";

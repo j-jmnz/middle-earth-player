@@ -3,16 +3,16 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { effectCause, ruleCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
-import { textBlank } from "./families/attachments-hold.ts";
-import { recordsOfFace } from "./families/dreamchaser-faces.ts";
-import { grantedTravel } from "./families/grapple-travel.ts";
+import { textBlank } from "./families/attachments/hold.ts";
+import { recordsOfFace } from "./families/dreamchaser/faces.ts";
+import { grantedTravel } from "./families/grapple/travel.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { travelTo } from "./quest.ts";
 import { offerResponses } from "./responses.ts";
 import { travelBlocked } from "./restrictions.ts";
 import type { ScenarioState } from "./state.ts";
-import { withView } from "./families/breaking-areas.ts";
+import { withView } from "./families/breaking/areas.ts";
 import { livingSeats, markReached } from "./state.ts";
 import { fireForced } from "./triggers.ts";
 
@@ -49,13 +49,13 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
   const location = state.cards[locationId];
   if (!location) return state;
   // A location whose printed text box is blank has no Travel effect (rr.blank).
-  // Only the Travel effect of the side the location shows works (12068:B:3, families/dreamchaser-faces.ts).
+  // Only the Travel effect of the side the location shows works (12068:B:3, families/dreamchaser/faces.ts).
   const effects = textBlank(state, locationId) ? [] : recordsOfFace(location, ctx.effects.filter((effect) => effect.cardCode === location.code)).filter((effect) => effect.timing === "travel");
   const first = effects[0];
-  // A Travel cost another card gave the location comes after its own (families/grapple-travel.ts).
+  // A Travel cost another card gave the location comes after its own (families/grapple/travel.ts).
   const granted = grantedTravel(state, locationId);
   if (!first && granted.length === 0) {
-    // Once stages are separate the seat travels to its own active location (families/breaking-areas.ts).
+    // Once stages are separate the seat travels to its own active location (families/breaking/areas.ts).
     let refused = false;
     const traveled = withView(state, state.separate ? state.activeSeat : undefined, (view) => {
       const moved = travelNow(view, locationId, ctx, steps);

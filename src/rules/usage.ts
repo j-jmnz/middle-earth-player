@@ -9,16 +9,16 @@ import { destroyCard, placeDamage, raiseThreat } from "./keywords.ts";
 import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { hasResourceMatch, heroPays, validatePayments } from "./payments.ts";
 import { distinctHeroesReason } from "./cost-rules.ts";
-import { allyPools, noteSpent } from "./families/costs-pay.ts";
-import { addToVictory } from "./families/sidequests-victory.ts";
-import { eventPlayReason } from "./families/costs-play.ts";
+import { allyPools, noteSpent } from "./families/costs/pay.ts";
+import { addToVictory } from "./families/sidequests/victory.ts";
+import { eventPlayReason } from "./families/costs/play.ts";
 import { printedOf, type Sphere } from "./printed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay, updateCard } from "./state.ts";
 import { moveCard } from "./zones.ts";
 import { queueEvent } from "./queue.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
-import { campaignUsed, noteCampaignUse } from "./families/campaign-used.ts";
+import { campaignUsed, noteCampaignUse } from "./families/campaign/used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
 // it resolves. A limit is spent by the use, whether or not the effect then does anything.
@@ -75,7 +75,7 @@ export function limitSpent(state: ScenarioState, effect: Effect, sourceId: strin
 // Heroes of the seat that can pay `sphere` and the resources they hold. `only` keeps the one hero a cost names.
 function pool(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext, forCard?: string, only?: string | null): number {
   // One card's own pool pays, an ally's too ("Pay 2 resources from Treebeard's pool"); allies whose pool pays for the card
-  // count beside the heroes (families/costs-pay.ts).
+  // count beside the heroes (families/costs/pay.ts).
   if (only != null && sphere == null) return state.cards[only]?.resources ?? 0;
   let total = 0;
   for (const id of [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx)]) {
@@ -109,7 +109,7 @@ function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: n
     }
     case "exhaustCode":
       return Object.values(state.cards).some((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
-    // An attachment whose host just left play answers from its owner's discard pile (families/attachments-hold.ts hostDefeated).
+    // An attachment whose host just left play answers from its owner's discard pile (families/attachments/hold.ts hostDefeated).
     case "addSelfToVictory":
       return inPlay(source.zone) || source.zone === "discard";
     case "discardSelf":
@@ -234,7 +234,7 @@ export function payUsage(
         next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, UNATTRIBUTED));
         break;
       case "discardDeckTop":
-        // Each card is announced ("After ~ is discarded from your deck", families/deck-moves.ts).
+        // Each card is announced ("After ~ is discarded from your deck", families/deck/moves.ts).
         for (const id of (next.seats[seat]?.deck ?? []).slice(0, cost.amount)) next = queueEvent(moveCard(next, id, { zone: "discard", seat }), { trigger: "discardedFromDeck", seat, cardId: id });
         break;
       case "playEvent":

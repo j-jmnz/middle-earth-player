@@ -2,11 +2,11 @@
 import { costOfKind } from "../catalog/costs.ts";
 
 import { holds } from "./conditions.ts";
-import { triggerHears } from "./families/play-hooks.ts";
-import { cancelBarred } from "./families/encounter-cancel.ts";
-import { cancelNotAllowed } from "./families/nightmare.ts";
+import { triggerHears } from "./families/play/hooks.ts";
+import { cancelBarred } from "./families/encounter/cancel.ts";
+import { cancelNotAllowed } from "./families/nightmare/index.ts";
 import { aboutCard, effectById, hears, hearsFromAnywhere } from "./listen.ts";
-import { effectsOfCard } from "./families/misc-text.ts";
+import { effectsOfCard } from "./families/misc/text.ts";
 import { playableFromDeck } from "./deck-play.ts";
 import { effectCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
@@ -88,7 +88,7 @@ export function offerResponses(state: ScenarioState, event: GameEvent, ctx: Redu
   );
 }
 
-// An offer whose effect cancels an encounter card's effect while The Eaves of Mirkwood bars it (families/encounter-cancel.ts).
+// An offer whose effect cancels an encounter card's effect while The Eaves of Mirkwood bars it (families/encounter/cancel.ts).
 function barred(state: ScenarioState, offer: ResponseOffer, ctx: ReduceContext): boolean {
   const effect = effectById(ctx, offer.effectId);
   return effect != null && offer.event != null && (cancelBarred(state, offer.event, effect) || cancelNotAllowed(state, offer, effect, ctx));

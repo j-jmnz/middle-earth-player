@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { expectOk } from "../rules/fixture.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { areaOf } from "../rules/families/stormcaller-zone.ts";
+import { areaOf } from "../rules/families/stormcaller/zone.ts";
 import { FLIGHT_GOLDENS, UPGRADED_CODES, playGolden, flightWorld, type FlightDecks, type FlightGame, type FlightGolden } from "../../scripts/stormcaller-game.ts";
 import { CODES, campaign, flight } from "../../scripts/stormcaller-scene.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";

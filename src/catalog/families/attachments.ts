@@ -78,7 +78,7 @@ export const FLAGS = [
   "progressFirst",
   // On a card that does not ready (`doesNotReady`): the resources its pool may pay to ready it in the refresh phase after all ("does not
   // ready during the refresh phase unless you pay 2 resources from that hero's pool", 01080:A:1). The controller is asked once, before the
-  // phase readies cards (rules/families/attachments-ready.ts); `readyAsked` (held by the table until the end of the phase) marks that.
+  // phase readies cards (rules/families/attachments/ready.ts); `readyAsked` (held by the table until the end of the phase) marks that.
   "readyPayment",
   "readyAsked",
 ] as const;

@@ -6,8 +6,8 @@ import { resolveAmount } from "./amounts.ts";
 import { characters } from "./combat.ts";
 import { hasTrait } from "./conditions.ts";
 import { constantInstructions } from "./constant-records.ts";
-import { attachedCount } from "./families/sidequests-contract.ts";
-import { areaOf } from "./families/stormcaller-zone.ts";
+import { attachedCount } from "./families/sidequests/contract.ts";
+import { areaOf } from "./families/stormcaller/zone.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
 import { cardTypeOf, isCharacterType, printedOf } from "./printed.ts";
@@ -47,7 +47,7 @@ function holdersOf(state: ScenarioState, source: CardInstance, target: string | 
       return source.host ? [source.host] : [];
     case "table":
       return ["table"];
-    // The Stormcaller, wherever it stands: in its area, in the staging area or engaged (families/stormcaller-zone.ts).
+    // The Stormcaller, wherever it stands: in its area, in the staging area or engaged (families/stormcaller/zone.ts).
     case "stormcaller": {
       const area = areaOf(state);
       return area ? [area.card] : [];

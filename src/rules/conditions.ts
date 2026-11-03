@@ -1,18 +1,18 @@
-import { BURN_CODE, encounterHolds, underBurnHolds } from "./families/aflame-values.ts";
-import { locationThreatHolds } from "./families/grapple-values.ts";
-import { islandHolds } from "./families/island-pick.ts";
+import { BURN_CODE, encounterHolds, underBurnHolds } from "./families/aflame/values.ts";
+import { locationThreatHolds } from "./families/grapple/values.ts";
+import { islandHolds } from "./families/island/pick.ts";
 import type { Condition } from "../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
-import { questSucceeded } from "./families/costs-pay.ts";
-import { discardedCost } from "./families/uncharted-cards.ts";
-import { spendablePools } from "./families/costs-verbs.ts";
-import { engagedThisRound } from "./families/attack-events.ts";
-import { attackingHolds } from "./families/attack-strike.ts";
-import { seatThreat } from "./families/play-hooks.ts";
-import { distinctTraitCount, flaggedTrait } from "./families/misc-traits.ts";
+import { questSucceeded } from "./families/costs/pay.ts";
+import { discardedCost } from "./families/uncharted/cards.ts";
+import { spendablePools } from "./families/costs/verbs.ts";
+import { engagedThisRound } from "./families/attack/events.ts";
+import { attackingHolds } from "./families/attack/strike.ts";
+import { seatThreat } from "./families/play/hooks.ts";
+import { distinctTraitCount, flaggedTrait } from "./families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest-conditions.ts";
+import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "./families/quest/conditions.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
@@ -20,18 +20,18 @@ import { committedWillpower, stagingThreat } from "./quest.ts";
 import { cardTypeOf, printedOf, type Sphere } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { inPlay, livingSeats } from "./state.ts";
-import { combatStepIs } from "./families/defense-conditions.ts";
-import { faceUp, flagHeld } from "./families/sidequests-contract.ts";
-import { copyInVictory } from "./families/sidequests-pick.ts";
+import { combatStepIs } from "./families/defense/conditions.ts";
+import { faceUp, flagHeld } from "./families/sidequests/contract.ts";
+import { copyInVictory } from "./families/sidequests/pick.ts";
 import { shadowCards } from "./zones.ts";
-import { freeOfEncounters } from "./families/objectives.ts";
-import { prisonerHero } from "./families/prisoner.ts";
-import { tokensOn } from "./families/campaign.ts";
-import { headingIs } from "./families/sea-heading.ts";
-import { corsairHolds } from "./families/sea-corsair.ts";
-import { stormcallerHolds } from "./families/stormcaller-values.ts";
-import { areaOf } from "./families/stormcaller-zone.ts";
-import { lastHideFailed, onStage, withTwin } from "./families/nightmare-guards.ts";
+import { freeOfEncounters } from "./families/objectives/index.ts";
+import { prisonerHero } from "./families/prisoner/index.ts";
+import { tokensOn } from "./families/campaign/index.ts";
+import { headingIs } from "./families/sea/heading.ts";
+import { corsairHolds } from "./families/sea/corsair.ts";
+import { stormcallerHolds } from "./families/stormcaller/values.ts";
+import { areaOf } from "./families/stormcaller/zone.ts";
+import { lastHideFailed, onStage, withTwin } from "./families/nightmare/guards.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -86,7 +86,7 @@ function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "m
 }
 
 export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx: ReduceContext): boolean {
-  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare-guards.ts).
+  // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare/guards.ts).
   const condition = withTwin(state, named, ctx.cards);
   switch (condition.kind) {
     case "hideFailed":
@@ -263,7 +263,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return currentQuestHas(state, condition.keyword, ctx.cards) === condition.is;
     case "questKeywords":
       return questHasKeywords(state, ctx) === condition.is;
-    // The attack family's conditions (families/attack-strike.ts, families/attack-events.ts).
+    // The attack family's conditions (families/attack/strike.ts, families/attack/events.ts).
     case "attacking": {
       const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
       const id = scope.holderId ?? (condition.card === "host" ? source?.host : condition.card === "subject" ? scope.subject : scope.sourceId);
@@ -306,7 +306,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // Every seat of the game counts, and an eliminated player's threat is raised to 50 (rr.scoring).
     case "highestThreat":
       return Math.max(0, ...state.seats.slice(0, state.seatCount).map((seat, index) => (seat.eliminated ? 50 : seatThreat(state, index)))) <= condition.max;
-    // The aflame family's: the cards underneath The Havens Burn (families/aflame-values.ts). `revealing`: the source's own When Revealed is on the stack.
+    // The aflame family's: the cards underneath The Havens Burn (families/aflame/values.ts). `revealing`: the source's own When Revealed is on the stack.
     case "encounterHas":
       return encounterHolds(state, condition, ctx);
     case "underBurn":
@@ -392,7 +392,7 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
   for (const attachmentId of instance.attachments) {
     const attachment = state.cards[attachmentId];
     if (!attachment) continue;
-    // A hero card attached to Thorongil lends its host its resource icon (families/misc-text.ts).
+    // A hero card attached to Thorongil lends its host its resource icon (families/misc/text.ts).
     const lent = attachment.lends ? state.cards[attachment.lends] : undefined;
     const lentSphere = lent ? printedOf(ctx.cards, lent.code).sphere : null;
     if (lentSphere && lentSphere !== "neutral" && lentSphere !== "fellowship" && lentSphere !== "baggins") found.push({ sphere: lentSphere });

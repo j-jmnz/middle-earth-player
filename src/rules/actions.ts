@@ -2,14 +2,14 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { applyCancel, cancelIntents, cancelReason } from "./cancel.ts";
 import { holds } from "./conditions.ts";
-import { effectsOfCard } from "./families/misc-text.ts";
+import { effectsOfCard } from "./families/misc/text.ts";
 import { effectCause, inCause } from "./cause.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { applyResponse, responseIntents, responseReason } from "./responses.ts";
-import { applyMulliganTrigger, mulliganTriggerReason } from "./families/deck-play.ts";
-import { textBlank } from "./families/attachments-hold.ts";
+import { applyMulliganTrigger, mulliganTriggerReason } from "./families/deck/play.ts";
+import { textBlank } from "./families/attachments/hold.ts";
 import { printedOf } from "./printed.ts";
 import { inPlay, type ScenarioState } from "./state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
@@ -61,7 +61,7 @@ export function triggerIntents(state: ScenarioState, ctx: ReduceContext): LegalI
 export function triggerReason(state: ScenarioState, intent: TriggerIntent, ctx: ReduceContext): string | null {
   if (state.window?.kind === "cancelOffer") return cancelReason(state, intent, ctx);
   if (state.window?.kind === "response") return responseReason(state, intent, ctx);
-  // A Response offered in place of the mulligan (families/deck-play.ts).
+  // A Response offered in place of the mulligan (families/deck/play.ts).
   if (state.window?.kind === "mulligan") return mulliganTriggerReason(state, intent, ctx);
   if (!inTriggerWindow(state)) return "That intent is not legal in this window";
   const effect = actionEffect(state, ctx, intent.cardId, intent.effectId);

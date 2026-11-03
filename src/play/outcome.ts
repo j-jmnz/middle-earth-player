@@ -5,7 +5,7 @@
 // threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage,
 // travel, the cards revealed and the enemies that engaged. Every number is one the engine put in a step. The log keeps
 // the whole round; the banner keeps what changed the table.
-import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
+import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 import type { EngineStep, PlayerIntent } from "../rules/intents.ts";
 import type { ScenarioState } from "../rules/state.ts";
 

@@ -25,7 +25,7 @@ const PHASE_QUEST = {"kind":"phase","is":"Quest"} as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 142040 The Long Dark of Moria. Setup: the piles set the Balrog, the Great Bridge and Chamber of Mazarbul aside and put Doom, Doom, Doom in the
-  // staging area; this record (rules/families/quest-setup.ts runs it) places its 10 damage tokens and has each player add a different location, found in
+  // staging area; this record (rules/families/quest/setup.ts runs it) places its 10 damage tokens and has each player add a different location, found in
   // the encounter deck, which the encounter deck is shuffled after. 1B: each optional engagement takes a damage token off Doom, Doom, Doom.
   {"id":"142040:setup:1","cardCode":"142040","lines":["142040:A:1"],"timing":"setup","instructions":[{"verb":"PlaceDamageOn","code":DOOM,"amount":10},{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"SearchMove","type":"location","to":"staging","different":true}]},{"verb":"ShuffleEncounterDeck"}]},
   {"id":"142040:forced:1","cardCode":"142040","lines":["142040:B:1"],"timing":"forced","trigger":"optionallyEngaged","instructions":[{"verb":"RemoveDamageFrom","code":DOOM,"amount":1}]},

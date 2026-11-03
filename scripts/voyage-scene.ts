@@ -6,7 +6,7 @@ import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
 import { attachTo, spawn } from "../src/rules/zones.ts";
-import { stampRoutes } from "../src/rules/families/sea-routes.ts";
+import { stampRoutes } from "../src/rules/families/sea/routes.ts";
 
 import { loadCampaign, loadScenario, gameCodes } from "./data/load-scenarios.ts";
 import { loadPrinted } from "./test-catalog.ts";

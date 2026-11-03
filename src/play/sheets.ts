@@ -30,13 +30,13 @@ import { tokenOutcome } from "./oath-words.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { pictureKey } from "./picture-key.ts";
 import { STEP_WORDS } from "./rail.ts";
-import { DEFENDERS_FRAME } from "../rules/families/defense-defenders.ts";
-import { viewOf } from "../rules/families/breaking-areas.ts";
+import { DEFENDERS_FRAME } from "../rules/families/defense/defenders.ts";
+import { viewOf } from "../rules/families/breaking/areas.ts";
 import { questSeat } from "./selectors.ts";
-import { freeSlot } from "../rules/families/south-locations.ts";
-import { recordsOfFace } from "../rules/families/dreamchaser-faces.ts";
-import { islandMayTravel } from "../rules/families/island-travel.ts";
-import { hideCommitLimit } from "../rules/families/nightmare-guards.ts";
+import { freeSlot } from "../rules/families/south/locations.ts";
+import { recordsOfFace } from "../rules/families/dreamchaser/faces.ts";
+import { islandMayTravel } from "../rules/families/island/travel.ts";
+import { hideCommitLimit } from "../rules/families/nightmare/guards.ts";
 import { sailingSheet } from "./sea-sheets.ts";
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -89,7 +89,7 @@ function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | und
 export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
   // Once stages are separate the traveler has its own active location and staging area (mec109.multiple-staging-areas).
   const game = viewOf(whole, questSeat(whole));
-  // Under Exploration the active location stays: the refusals matter once it is full and the players may travel from it (families/island-travel.ts).
+  // Under Exploration the active location stays: the refusals matter once it is full and the players may travel from it (families/island/travel.ts).
   if (!freeSlot(game) && !islandMayTravel(game, ctx.cards)) return [];
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
@@ -242,7 +242,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         kind: "pick" as const,
         key: `choose:${frame?.id ?? ""}:${window.options.join(",")}`,
         step: effect ? TIMING_WORDS[effect.timing] : step(game),
-        // Stand Together's further defenders (families/defense-defenders.ts): the sheet names the attack it is about.
+        // Stand Together's further defenders (families/defense/defenders.ts): the sheet names the attack it is about.
         title: source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
         ...(defending && game.pendingAttack ? { stats: statOf(game, ctx, game.pendingAttack.enemyId, "attack") } : {}),
         primary: null,
@@ -293,7 +293,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
           const label = fire?.label ?? sea ?? (outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
-          // Another defender's pooled damage (Stand Together, families/defense-defenders.ts).
+          // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ? { caution: fire.caution } : {}), intent: { type: "Choose", optionId: id } };
         }),

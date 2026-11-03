@@ -27,12 +27,12 @@ import { drawMany, gainSeatResources, type ReduceContext } from "./interpret.ts"
 import { applyPass, modeAfterPass } from "./pass.ts";
 import { applyResolution, openResolution } from "./resolution.ts";
 import { playCard } from "./planning.ts";
-import { afterPlay } from "./families/costs-play.ts";
+import { afterPlay } from "./families/costs/play.ts";
 import { gameReads } from "./game-reads.ts";
-import { playSweep } from "./families/play-sweep.ts";
-import { afterPaying } from "./families/deck-play.ts";
+import { playSweep } from "./families/play/sweep.ts";
+import { afterPaying } from "./families/deck/play.ts";
 import { doRefresh } from "./refresh.ts";
-import { askReadyPayments } from "./families/attachments-ready.ts";
+import { askReadyPayments } from "./families/attachments/ready.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "./quest.ts";
 import { travelIntent, travelTaken } from "./travel.ts";
 import { advanceFreed, resolutionStep } from "./stage-reveal.ts";
@@ -43,34 +43,34 @@ import { finishMulliganChoice, finishSetup, mulliganSeat } from "./setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "./shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "./state.ts";
-import { heldByLapsedStage } from "./families/grapple-values.ts";
+import { heldByLapsedStage } from "./families/grapple/values.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "./keywords.ts";
 import { effectsOf } from "./listen.ts";
-import { engagesAgain, optionallyEngaged } from "./families/quest-engage.ts";
-import { syncThreatSaves } from "./families/quest-threat.ts";
-import { eventWaits } from "./families/defense-listen.ts";
-import { announceShadowsDealt } from "./families/defense-shadow.ts";
-import { attackedEarly, earlyAttacks } from "./families/defense-order.ts";
-import { strikeResumes } from "./families/attack-flow.ts";
-import { pruneRoundCaps } from "./families/dreamchaser.ts";
-import { announceProgress } from "./families/burden-effects.ts";
-import { damageLoss } from "./families/south-locations.ts";
+import { engagesAgain, optionallyEngaged } from "./families/quest/engage.ts";
+import { syncThreatSaves } from "./families/quest/threat.ts";
+import { eventWaits } from "./families/defense/listen.ts";
+import { announceShadowsDealt } from "./families/defense/shadow.ts";
+import { attackedEarly, earlyAttacks } from "./families/defense/order.ts";
+import { strikeResumes } from "./families/attack/flow.ts";
+import { pruneRoundCaps } from "./families/dreamchaser/index.ts";
+import { announceProgress } from "./families/burden/effects.ts";
+import { damageLoss } from "./families/south/locations.ts";
 import { refillEncounterDeck } from "./verbs.ts";
-import { refillCorsairDeck } from "./families/sea-corsair.ts";
-import { aflameSweep } from "./families/aflame-sweep.ts";
-import { syncStormcallerArea } from "./families/stormcaller-area.ts";
-import { syncIsland } from "./families/island-map.ts";
-import { announceExits } from "./families/island-hand.ts";
-import { committedTo } from "./families/stormcaller-commit.ts";
-import { announceCollected } from "./families/aflame-attack.ts";
-import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea-sailing.ts";
-import { askingToCommit, askingToLook, askingToShift } from "./families/sea-sailing-legal.ts";
+import { refillCorsairDeck } from "./families/sea/corsair.ts";
+import { aflameSweep } from "./families/aflame/sweep.ts";
+import { syncStormcallerArea } from "./families/stormcaller/area.ts";
+import { syncIsland } from "./families/island/map.ts";
+import { announceExits } from "./families/island/hand.ts";
+import { committedTo } from "./families/stormcaller/commit.ts";
+import { announceCollected } from "./families/aflame/attack.ts";
+import { chooseLookDone, chooseShift, performSailing, sailingStep } from "./families/sea/sailing.ts";
+import { askingToCommit, askingToLook, askingToShift } from "./families/sea/sailing-legal.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
   for (let guard = 0; guard < 400; guard += 1) {
     // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
-    // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller-area.ts); the Island Map's locations as the active location says (families/island-map.ts).
+    // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller/area.ts); the Island Map's locations as the active location says (families/island/map.ts).
     current = syncIsland(syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceExits(announceProgress(constantWin(current, ctx), steps, ctx), ctx), ctx.cards), steps))), ctx);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
@@ -100,7 +100,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
     // The Stormcaller Elite whose indestructible lapsed with the stage (12039:B:1) wait, lethal, for the When Revealed that flips them (12040:B:1): advancing is immediate.
     const held = (candidate: ScenarioState, id: string): boolean => ((answerable || resolving) && damageHeld(candidate, id)) || heldByLapsedStage(candidate, id, ctx);
-    // The play family's constants (families/play-sweep.ts): hero card type, first player control, discard at a stat.
+    // The play family's constants (families/play/sweep.ts): hero card type, first player control, discard at a stat.
     const swept = current.lost || current.failure ? current : aflameSweep(destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {
       current = swept;
@@ -139,13 +139,13 @@ export function applyIntent(
       return askingToCommit(state) ? performSailing(state, [], ctx, steps) : applyPass(state);
     case "PlayCard": {
       // A play is an action opportunity taken: every seat may act again before the window closes (rr.action-windows).
-      // What the play adds beyond moving the card (families/costs-play.ts): its discount's riders, its additional costs.
-      // A Response that lowered its cost as it was played is paid for (families/deck-play.ts).
+      // What the play adds beyond moving the card (families/costs/play.ts): its discount's riders, its additional costs.
+      // A Response that lowered its cost as it was played is paid for (families/deck/play.ts).
       const played = afterPaying(state, afterPlay(state, playCard(state, intent, ctx, steps), intent, ctx, steps), intent, ctx, steps);
       return played.window?.kind === "pass" ? { ...played, passed: [] } : played;
     }
     case "Commit":
-      // The first player commits characters to the Sailing test, not to the quest (families/sea-sailing.ts).
+      // The first player commits characters to the Sailing test, not to the quest (families/sea/sailing.ts).
       return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
@@ -187,7 +187,7 @@ export function applyIntent(
 function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // An attack waits on the action window between two of its steps; once it closes, the attack goes on before any frame
   // under it (an attack a Hide test started).
-  // A player attack an effect made during an enemy attack's window goes on first (families/attack-flow.ts).
+  // A player attack an effect made during an enemy attack's window goes on first (families/attack/flow.ts).
   if (stepWindowResumes(state)) return strikeResumes(state) ? continueStrike(state, ctx, steps) : resumeAttack(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
@@ -225,7 +225,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, nextAfterTravel(state));
       const seat = state.separate ? livingSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
       if (seat == null) {
-        // Stages are separate and every seat has had its opportunity (families/breaking-areas.ts).
+        // Stages are separate and every seat has had its opportunity (families/breaking/areas.ts).
         if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: livingSeats(state) });
         return state.lost
           ? state
@@ -419,7 +419,7 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
   let next = state;
   for (const id of cardIds) {
     // "Does not exhaust to commit to a quest" (a flag) leaves the character ready. A side quest takes it instead of the current
-    // quest (families/sidequests-quest.ts).
+    // quest (families/sidequests/quest.ts).
     next = updateCard(next, id, { committed: true, exhausted: !flagged(next, id, "noExhaustQuest"), questTo: sideQuestId });
     steps.push({ kind: "commit", cardId: id });
     // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition).

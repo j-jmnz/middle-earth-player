@@ -1,31 +1,31 @@
 // Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
-import { sendAway } from "./families/objectives-claimed.ts";
+import { sendAway } from "./families/objectives/claimed.ts";
 import type { Instruction } from "../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 import { characters } from "./combat.ts";
-import { declareAttack } from "./families/attack.ts";
+import { declareAttack } from "./families/attack/index.ts";
 import { enforceRestricted } from "./attach.ts";
 import { placeProgress } from "./effect-verbs.ts";
 import { queueEvent } from "./queue.ts";
 import { shuffleIds } from "./seed.ts";
 import type { EngineStep } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { lowerThreatByEffect, playerSource } from "./families/quest-threat.ts";
+import { lowerThreatByEffect, playerSource } from "./families/quest/threat.ts";
 import { placeDamage } from "./keywords.ts";
 import { stagingLocations } from "./quest.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "./state.ts";
 import { printedOf } from "./printed.ts";
-import { titleBarred } from "./families/nightmare-guards.ts";
+import { titleBarred } from "./families/nightmare/guards.ts";
 import { patchTop, topFrame } from "./windows.ts";
 import { attachTo, moveCard } from "./zones.ts";
-import { afterCancel } from "./families/defense-damage.ts";
-import { healBlocked } from "./families/burden-life.ts";
-import { mayGainResources } from "./families/misc-guards.ts";
-import { addToVictory } from "./families/sidequests-victory.ts";
-import { announceCanceled } from "./families/nightmare.ts";
+import { afterCancel } from "./families/defense/damage.ts";
+import { healBlocked } from "./families/burden/life.ts";
+import { mayGainResources } from "./families/misc/guards.ts";
+import { addToVictory } from "./families/sidequests/victory.ts";
+import { announceCanceled } from "./families/nightmare/index.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -184,7 +184,7 @@ export function runPlayerVerb(
       const card = state.cards[id];
       const seat = card?.owner ?? card?.controller;
       if (!card || seat == null) return state;
-      // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives-claimed.ts).
+      // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives/claimed.ts).
       if (card.claimed) return sendAway(state, id, { zone: "discard", seat });
       const moved = moveCard(state, id, { zone: "discard", seat });
       // "After 1 or more cards are discarded from your hand", "After ~ is discarded from your deck".

@@ -3,7 +3,7 @@ import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 // Records for Journey Along the Anduin (Mirkwood Paths part 2, campaign card 01130): the encounter cards no template reads, the three
 // quest cards and the campaign card. Valor and Scarred, which the campaign card sets aside, are in pool/RevCore.ts. Every line is read from
 // the scan ledger (data/printed/mirkwood-paths.json). The Setup that reveals cards and the stage's When Revealed at the start of the game
-// are run by rules/families/quest-setup.ts.
+// are run by rules/families/quest/setup.ts.
 // Rules: rr.step-3-3, rr.travel, rr.search, rr.engagement-check, rr.optional-engagement, rr.winning-the-game, rr.campaign-cards (data/rules/entries.json).
 const NOT_UNDEFENDED = {"kind":"not","condition":{"kind":"undefended"}} as const;
 const THREAT_35 = {"kind":"threat","min":35} as const;
@@ -15,9 +15,9 @@ const HILL_TROLL: PickSpec = {"type":"enemy","control":"any","names":["Hill Trol
 const attachCopy = (code: string): Instruction => ({"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","attachable":code}},{"verb":"AttachSetAside","code":code}]});
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
-  // 01081 Wolf Rider (Surge): as a shadow card it attacks the defending player once the attack it was dealt to has ended (rules/families/defense-shadow-attack.ts).
+  // 01081 Wolf Rider (Surge): as a shadow card it attacks the defending player once the attack it was dealt to has ended (rules/families/defense/shadow-attack.ts).
   {"id":"01081:shadow:1","cardCode":"01081","lines":["01081:A:2"],"timing":"shadow","instructions":[{"verb":"ShadowAttacks"}]},
-  // 01082 Hill Troll: the excess of its combat damage raises its controller's threat (rules/families/defense-excess.ts).
+  // 01082 Hill Troll: the excess of its combat damage raises its controller's threat (rules/families/defense/excess.ts).
   {"id":"01082:constant:1","cardCode":"01082","lines":["01082:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"excessToThreat","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   // 01083 Goblin Sniper: it cannot be optionally engaged while another enemy is in the staging area; if it is there at the end of the
   // combat phase each player deals 1 damage to 1 of his characters.
@@ -56,7 +56,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01117:shadow:1","cardCode":"01117","lines":["01117:A:2"],"timing":"shadow","instructions":[{"verb":"RaiseThreat","amount":3,"who":"actor","when":NO_EXHAUSTED_ALLY},{"verb":"Pick","pick":EXHAUSTED_ALLY,"when":{"kind":"canPick","pick":EXHAUSTED_ALLY}},{"verb":"ReturnToHand","target":"picked","when":{"kind":"canPick","pick":EXHAUSTED_ALLY}}]},
   // 01118 Treacherous Fog: each location in the staging area gets +1 Threat this phase; each player with threat 35 or higher discards a card from hand.
   {"id":"01118:whenRevealed:1","cardCode":"01118","lines":["01118:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"threat","amount":1,"until":"endOfPhase","holders":STAGING_LOCATIONS},{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"DiscardFromHand","amount":1,"when":THREAT_35}]}]},
-  // 01126 To the River...: Setup reveals a card for each player (run by quest-setup.ts); side B searches for a Hill Troll when none is in play and
+  // 01126 To the River...: Setup reveals a card for each player (run by quest/setup.ts); side B searches for a Hill Troll when none is in play and
   // shuffles; the stage cannot be defeated while a Hill Troll is in play.
   {"id":"01126:setup:1","cardCode":"01126","lines":["01126:A:1"],"timing":"setup","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"RevealEncounter"}]}]},
   {"id":"01126:whenRevealed:1","cardCode":"01126","lines":["01126:B:1"],"timing":"whenRevealed","instructions":[{"verb":"SearchMove","code":"01082","to":"staging","when":{"kind":"inPlay","code":"01082","is":false}},{"verb":"ShuffleEncounterDeck"}]},

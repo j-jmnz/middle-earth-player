@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS as FOTW } from "../effects/authored/pool/FotW.ts";
-import { actionWindow, fighter, table } from "../rules/families/attack-fixture.ts";
+import { actionWindow, fighter, table } from "../rules/families/attack/fixture.ts";
 import { legalIntents } from "../rules/reduce.ts";
 
 import { windowSheet } from "./bar-sheets.ts";

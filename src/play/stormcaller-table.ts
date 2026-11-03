@@ -1,8 +1,8 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). What the table reads of the Stormcaller's area (docs/design-system-table.md, Cards, "The Stormcaller's area"): which cards
 // make its group, where each stands, and the numbers the reader labels say. Pure; the words are in stormcaller-words.ts. A game with no Stormcaller's area has no group and no role.
-import { areaOf } from "../rules/families/stormcaller-zone.ts";
-import { stageNumber } from "../rules/families/caves-progress.ts";
-import { areaPlace, atStormcallersStage, stormcallerLastStage } from "../rules/families/stormcaller-values.ts";
+import { areaOf } from "../rules/families/stormcaller/zone.ts";
+import { stageNumber } from "../rules/families/caves/progress.ts";
+import { areaPlace, atStormcallersStage, stormcallerLastStage } from "../rules/families/stormcaller/values.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 
 import { memberSpeech, stageSpeech, type StageFacts } from "./stormcaller-words.ts";
@@ -19,7 +19,7 @@ export function areaGroup(game: Pick<ScenarioState, "sea" | "cards">): readonly 
   return [area.stage, ...area.members.filter((id) => id !== area.stage && (game.cards[id]?.zone === "stormcallerArea" || game.cards[id]?.zone === "staging"))];
 }
 
-/** The role of a card in the area's group, or null for any other card. A card's place is stormcaller-values.ts's areaPlace; the stage is always the group's head. */
+/** The role of a card in the area's group, or null for any other card. A card's place is stormcaller/values.ts's areaPlace; the stage is always the group's head. */
 export function areaRoleOf(game: Pick<ScenarioState, "sea" | "cards">, id: string): AreaRole | null {
   const area = areaOf(game);
   if (!area || !game.cards[id]) return null;

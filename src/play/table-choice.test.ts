@@ -7,7 +7,7 @@ import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceCont
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
-import { enemy as seaEnemy, hero as seaHero, seaTable, send, ship as seaShip, shipEnemy, until } from "../rules/families/sea-table.ts";
+import { enemy as seaEnemy, hero as seaHero, seaTable, send, ship as seaShip, shipEnemy, until } from "../rules/families/sea/table.ts";
 
 import { actionsSheet, commitSheet, windowSheet } from "./bar-sheets.ts";
 import { sailingTable, seaFixture, seaViews } from "./sea-fixture.ts";

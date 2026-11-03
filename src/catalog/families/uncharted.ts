@@ -1,5 +1,5 @@
 // The uncharted family (phase 41, The Fate of Númenor): the Uncharted deck and its double-sided locations (dcce.uncharted, dcce.uncharted-deck), the objective ally Calphon, the
-// bottom of a deck, and the Campaign Setup choices of the campaign card 11179. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/uncharted.ts runs them (the
+// bottom of a deck, and the Campaign Setup choices of the campaign card 11179. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/uncharted/index.ts runs them (the
 // helpers are in uncharted-*.ts). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
@@ -39,7 +39,7 @@ export const VERBS = [
   // offered to its controller (trade or keep); a trade deals `damage` to it and lowers that player's threat by `threat`. `character` is engine use: the character being decided.
   z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }),
   // The campaign card stays beside the quest deck while the scenario is played, because a card of the scenario places resources on it (Revenant, 11181:A:4) and its Resolution
-  // counts them (11179:B:4). Changes nothing when it runs; rules/families/burden-campaign.ts reads it.
+  // counts them (11179:B:4). Changes nothing when it runs; rules/families/burden/campaign.ts reads it.
   z.strictObject({ verb: z.literal("KeepCampaignCard"), ...when }),
   // "Place 1 resource on the campaign card" (11181:A:4): the campaign card in play gains `amount` resource tokens.
   z.strictObject({ verb: z.literal("AddCampaignResource"), amount: positiveAmountSchema, ...when }),

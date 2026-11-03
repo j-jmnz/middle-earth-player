@@ -1,24 +1,24 @@
 // Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "./queue.ts";
-import { leaveWith } from "./families/play-zones.ts";
-import { releaseOrcGuard } from "./families/dungeon-guard.ts";
-import { dealtFace } from "./families/dreamchaser-facts.ts";
-import { routeDestination } from "./families/sea-routes.ts";
-import { grappledWith } from "./families/grapple-values.ts";
-import { discardedFromDeck, joinStormcallerArea } from "./families/stormcaller-zone.ts";
-import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "./families/uncharted-zone.ts";
+import { leaveWith } from "./families/play/zones.ts";
+import { releaseOrcGuard } from "./families/dungeon/guard.ts";
+import { dealtFace } from "./families/dreamchaser/facts.ts";
+import { routeDestination } from "./families/sea/routes.ts";
+import { grappledWith } from "./families/grapple/values.ts";
+import { discardedFromDeck, joinStormcallerArea } from "./families/stormcaller/zone.ts";
+import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "./families/uncharted/zone.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
   | { zone: "seatQuest"; seat: number }
-  // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking-areas.ts); the card is in
+  // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking/areas.ts); the card is in
   // `staging` and in that seat's list.
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap"; area?: number }
   // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
-  // Without it the card takes the state's own slot, which on a seat's view (families/breaking-areas.ts) is that seat's.
+  // Without it the card takes the state's own slot, which on a seat's view (families/breaking/areas.ts) is that seat's.
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }
   | { zone: "shadow"; enemyId: string }
   | { zone: "attached" }
@@ -28,7 +28,7 @@ export type Destination =
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null }
-  // Attached facedown to a location in the staging area by Grapple (families/grapple-attach.ts).
+  // Attached facedown to a location in the staging area by Grapple (families/grapple/attach.ts).
   | { zone: "grappled"; locationId: string };
 
 type SeatList = "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "staging";
@@ -114,7 +114,7 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return { ...state, questDeck: without(state.questDeck, id) };
     case "questStage": {
       if (state.questStage === id) return { ...state, questStage: null };
-      // A seat's own stage once stages are separate (families/breaking-areas.ts).
+      // A seat's own stage once stages are separate (families/breaking/areas.ts).
       const at = state.separate ? state.seats.findIndex((seat) => seat.stage === id) : -1;
       const owner = at < 0 ? undefined : state.seats[at];
       if (!owner) return state;
@@ -139,7 +139,7 @@ function detach(state: ScenarioState, id: string): ScenarioState {
   }
 }
 
-// A location leaves an active slot: the shared ones, and once stages are separate the seat's own (`Seat.active`, families/breaking-areas.ts).
+// A location leaves an active slot: the shared ones, and once stages are separate the seat's own (`Seat.active`, families/breaking/areas.ts).
 function leaveActive(state: ScenarioState, id: string): ScenarioState {
   let next = state;
   if (next.activeLocation === id) next = { ...next, activeLocation: null };
@@ -323,22 +323,22 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
 export function moveCard(state: ScenarioState, id: string, wanted: Destination, released: readonly string[] = []): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
-  // A card with a route of its own never reaches the encounter deck or discard pile (families/sea-routes.ts); one that has no place there stays put.
+  // A card with a route of its own never reaches the encounter deck or discard pile (families/sea/routes.ts); one that has no place there stays put.
   const dest = routeDestination(state, current, unchartedRoute(state, current, wanted));
   if (!dest) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
-  // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller-zone.ts).
+  // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
-  // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted-zone.ts).
+  // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).
   if (dest.zone === "unchartedDeck") moved = shuffleUnchartedDeck(moved);
   // The enemies grappled with a location that leaves the staging area: detached as it becomes the active location, discarded with it on every other exit (an explored location released them first, destroyCard).
   if (current.zone === "staging" && dest.zone !== "staging") moved = dest.zone === "activeLocation" || dest.zone === "secondActiveLocation" ? releaseGrappled(moved, id) : discardGrappled(moved, id);
-  // Its attachments leave play with it, however it left (rr.attachment-cards, families/play-zones.ts).
+  // Its attachments leave play with it, however it left (rr.attachment-cards, families/play/zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
-  // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon-guard.ts).
+  // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon/guard.ts).
   if (current.code === ORC_GUARD_CODE && inPlay(current.zone) && !inPlay(dest.zone)) moved = releaseOrcGuard(moved, id);
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).

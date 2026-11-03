@@ -3,8 +3,8 @@ import type { Instruction, ModifierUntil, ScenarioDefinition } from "../catalog/
 import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAttack, PendingStrike, UsedEffect } from "./frame-types.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { CampaignFacts, ResolutionLog } from "./campaign-state.ts";
-import type { SeaState } from "./families/sea-types.ts";
-import type { UnchartedState } from "./families/uncharted-types.ts";
+import type { SeaState } from "./families/sea/types.ts";
+import type { UnchartedState } from "./families/uncharted/types.ts";
 import type { Discount } from "./discount-types.ts";
 
 export type { Discount };
@@ -82,7 +82,7 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
-  // The side quest a committed character quests on instead of the current quest (families/sidequests-quest.ts). Absent for the
+  // The side quest a committed character quests on instead of the current quest (families/sidequests/quest.ts). Absent for the
   // current quest.
   questTo?: string;
   shadowId: string | null;
@@ -96,7 +96,7 @@ export type CardInstance = {
   owner?: number;
   // Order in which the card entered play. Forced effects resolve oldest first.
   enteredPlay: number;
-  // A hero card taken from the collection (families/misc-collection.ts): the id of the card whose effect brought it out.
+  // A hero card taken from the collection (families/misc/collection.ts): the id of the card whose effect brought it out.
   collection?: string;
   // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
   lends?: string;
@@ -122,15 +122,15 @@ export type Seat = {
   play: readonly string[];
   engaged: readonly string[];
   // This seat's own staging area, once stage 2B has created the separate areas (`ScenarioState.separate`): the ids of its encounter cards, a
-  // subset of `ScenarioState.staging`, which keeps every staging card in any area (families/breaking-areas.ts).
+  // subset of `ScenarioState.staging`, which keeps every staging card in any area (families/breaking/areas.ts).
   staging: readonly string[];
   // The seat's player side quest (zone seatQuest), not a stage of the scenario's quest.
   questStage: string | null;
   // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null.
-  // Absent in every other game (families/breaking-areas.ts).
+  // Absent in every other game (families/breaking/areas.ts).
   stage?: string;
   // The seat's own active location while stages are separate (the card, zone activeLocation); `ScenarioState.activeLocation` and `secondActiveLocation` then mirror the
-  // seats' (seat 0's and seat 1's) for code that reads them outside a seat's view (families/breaking-areas.ts). Absent in every other game.
+  // seats' (seat 0's and seat 1's) for code that reads them outside a seat's view (families/breaking/areas.ts). Absent in every other game.
   active?: string;
   eliminated: boolean;
   // Encounter cards attached to the top of this seat's deck, oldest first (Iron Shackles, 01105:A:1; families/dungeon.ts). Absent when none.
@@ -214,13 +214,13 @@ export type ScenarioState = {
   encounterDiscard: readonly string[];
   // Present only when the scenario makes a burden deck (Flight to the Ford) or sets the Ring-bearer's life.
   burdenDeck?: readonly string[];
-  // The Corsair deck and its discard pile, present once a scenario deals a Corsair deck (dcce.corsair-deck; families/sea-corsair.ts).
+  // The Corsair deck and its discard pile, present once a scenario deals a Corsair deck (dcce.corsair-deck; families/sea/corsair.ts).
   corsairDeck?: readonly string[];
   corsairDiscard?: readonly string[];
   // The Uncharted deck and the codes of the double-sided locations that go back into it, present once a scenario deals one (families/uncharted.ts).
   uncharted?: UnchartedState;
   // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a
-  // Sailing test in progress. Absent in every other game (families/sea-types.ts).
+  // Sailing test in progress. Absent in every other game (families/sea/types.ts).
   sea?: SeaState;
   life?: number;
   victory: readonly string[];
@@ -259,17 +259,17 @@ export type ScenarioState = {
   revealCursor: { seats: readonly number[]; index: number } | null;
   // True between the two passes that resolve the quest.
   questResolved: boolean;
-  // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking-areas.ts). Absent
+  // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking/areas.ts). Absent
   // in every other game and until then.
   separate?: true;
-  // Only on a seat's view of the state (families/breaking-areas.ts viewOf): the seat it is the view of. mergeView drops it.
+  // Only on a seat's view of the state (families/breaking/areas.ts viewOf): the seat it is the view of. mergeView drops it.
   viewSeat?: number;
   // The seats whose stage has dealt its archery this combat phase while stages are separate (machine.ts startCombat).
   archeryDone?: readonly number[];
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];
-  // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking-progress.ts).
+  // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking/progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
   stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number }[];
   // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
@@ -306,18 +306,18 @@ export type ScenarioState = {
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
-  // The cards in play that hear their own leaving by any route (`exitedPlay`); settle announces one once it is out of play (families/island-hand.ts). Kept only in a game with such a card.
+  // The cards in play that hear their own leaving by any route (`exitedPlay`); settle announces one once it is out of play (families/island/hand.ts). Kept only in a game with such a card.
   exitWatch?: readonly string[];
   // The cards each seat drew in the draw step at the beginning of this round's resource phase ("choose and discard 1 of those
-  // cards", families/misc-pick.ts).
+  // cards", families/misc/pick.ts).
   resourceDrawn?: Readonly<Record<number, readonly string[]>>;
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
-  // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests-setup.ts).
+  // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests/setup.ts).
   playerSetup?: true;
   // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the
-  // loot deck each seat has built, top card first (families/sidequests-loot.ts).
+  // loot deck each seat has built, top card first (families/sidequests/loot.ts).
   lootPlan?: readonly (readonly string[])[];
   lootDecks?: readonly (readonly string[])[];
   // The cards a player removed from the campaign pool during the game ("remove it from the campaign pool"), with the seat that
@@ -343,15 +343,15 @@ export type ScenarioState = {
   // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
   spent?: { round: number; ids: readonly string[] };
   // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest
-  // successfully this phase", "After Hirgon quests successfully"). Kept only in a game that reads it (families/costs-pay.ts).
+  // successfully this phase", "After Hirgon quests successfully"). Kept only in a game that reads it (families/costs/pay.ts).
   quested?: { round: number; committed: readonly string[]; succeeded: readonly number[] };
   // Each seat's starting threat level (rr.initial-threat-level), kept at setup only when a card of the game reads it (04053:A:2).
   startingThreat?: readonly number[];
   // The seats a card in play keeps in the game at the threat elimination level (10124:A:2): eliminateEmpties asks that card
-  // instead of eliminating the seat. settle keeps it current (families/quest-threat.ts).
+  // instead of eliminating the seat. settle keeps it current (families/quest/threat.ts).
   threatSaves?: readonly number[];
   // The seats that control an ally in play which can gain the hero card type (Prince Imrahil, 145005:A:1): a seat with no heroes left
-  // is not eliminated until the play sweep has given that ally the type (families/play-sweep.ts, rr.card-types).
+  // is not eliminated until the play sweep has given that ally the type (families/play/sweep.ts, rr.card-types).
   heroSavers?: readonly number[];
   undo: UndoLog;
 };

@@ -6,7 +6,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../rules/fixture.ts";
-import { stageOf, stagingOf, activeOf, sharedStaging } from "../rules/families/breaking-areas.ts";
+import { stageOf, stagingOf, activeOf, sharedStaging } from "../rules/families/breaking/areas.ts";
 import { FALLEN_SUFFIX } from "../rules/printed.ts";
 import { stagingThreat } from "../rules/quest.ts";
 import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";

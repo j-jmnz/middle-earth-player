@@ -30,7 +30,7 @@ export function cardLabel(game: ScenarioState, names: SheetNames, id: string): s
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
-  // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments-play.ts).
+  // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).
   if (id === "staging") return { id, label: "The staging area", code: null };
   const card = game.cards[id];
   // Lost Islands share one name: what tells them apart (progress, place in staging) follows it.

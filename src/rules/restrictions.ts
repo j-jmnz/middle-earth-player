@@ -3,8 +3,8 @@ import type { Instruction } from "../catalog/boundary.ts";
 
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { recordsOfFace } from "./families/dreamchaser-faces.ts";
-import { grantedTravel } from "./families/grapple-travel.ts";
+import { recordsOfFace } from "./families/dreamchaser/faces.ts";
+import { grantedTravel } from "./families/grapple/travel.ts";
 import { modifiedStat } from "./keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { isPlayerType, printedOf } from "./printed.ts";
@@ -151,7 +151,7 @@ export function restrictedAttachments(state: ScenarioState, hostId: string, ctx:
   if (!host) return [];
   return host.attachments.filter((id) => {
     const attachment = state.cards[id];
-    // Snowmane "loses the restricted keyword" while a flag says so (families/misc-traits.ts).
+    // Snowmane "loses the restricted keyword" while a flag says so (families/misc/traits.ts).
     return attachment != null && (printedOf(ctx.cards, attachment.code).keywords.restricted || flagged(state, id, "countsAsRestricted")) && !flagged(state, id, "losesRestricted");
   });
 }

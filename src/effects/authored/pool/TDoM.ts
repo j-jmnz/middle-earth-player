@@ -11,7 +11,7 @@ const ENGAGED_ENEMY = {"type":"enemy","control":"any","engaged":"you"} as const;
 
 export const RECORDS: readonly Effect[] = [
   // 41041 Stalking Goblin (burden enemy): after it engages a player the encounter deck, the discard pile and the collection are searched for a Goblin Sniper,
-  // which goes to the staging area (collection: families/encounter-collection.ts); as a Shadow card it is added to the staging area.
+  // which goes to the staging area (collection: families/encounter/collection.ts); as a Shadow card it is added to the staging area.
   {"id":"41041:forced:1","cardCode":"41041","lines":["41041:A:1"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"SearchCollection","code":"41020","to":"staging"},{"verb":"ShuffleEncounterDeck"}]},
   {"id":"41041:shadow:1","cardCode":"41041","lines":["41041:A:2"],"timing":"shadow","instructions":[{"verb":"MoveEncounterCard","card":"self","to":"staging"}]},
   // 41043 Guilty Conscience (burden treachery, Surge): attached to the hero with the highest threat cost; it counts as an Adaptation attachment whose Forced raises

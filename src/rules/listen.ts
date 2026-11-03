@@ -1,8 +1,8 @@
 // Rules: rr.triggered-ability, rr.in-play-and-out-of-play, rr.triggering-condition (data/rules/entries.json).
 import type { Effect, PickSpec } from "../catalog/boundary.ts";
 
-import { textBlank } from "./families/attachments-hold.ts";
-import { triggerHears } from "./families/play-hooks.ts";
+import { textBlank } from "./families/attachments/hold.ts";
+import { triggerHears } from "./families/play/hooks.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { matchesPick } from "./pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "./state.ts";

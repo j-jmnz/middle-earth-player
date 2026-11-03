@@ -86,7 +86,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `.maestro/deck.yaml` and `.maestro/rules.yaml` are phone flows; they cannot run on an expanded tablet.
 - No Maestro flow plays an attack through the redesigned combat spotlight.
 - `voyage-won`, `fate-won`, `raid-won`, `stormcaller-won`, `depths-won` and `temple-won` are not committed (the Fate fixtures carry a Voyage win played from the golden): no auto-played win with real decks was found (the shipped pair in 100 seeds, each prebuilt deck solo in 40, 17 two-handed pairs in 60). The goldens win only with synthetic heroes.
-- `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea-ships.ts` still say "ship-objective".
+- `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
 ### Rules and engine
 

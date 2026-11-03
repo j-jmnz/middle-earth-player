@@ -1,4 +1,4 @@
-import { withTwin } from "./families/nightmare-guards.ts";
+import { withTwin } from "./families/nightmare/guards.ts";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 
 import { currentCause, effectCause, inCause, ruleCause, UNATTRIBUTED, type Cause } from "./cause.ts";
@@ -7,9 +7,9 @@ import { placeDamage, playerCardEffectCanChoose } from "./keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { modifyStat } from "./attack-verbs.ts";
 import { frameScope, refCard } from "./amounts.ts";
-import { collectAllyResources } from "./families/costs-pay.ts";
+import { collectAllyResources } from "./families/costs/pay.ts";
 import { runFamilyVerb } from "./families/index.ts";
-import { commitCard } from "./families/attack.ts";
+import { commitCard } from "./families/attack/index.ts";
 import { exhaustCard, placePlayerDamage, readyCard, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "./frames.ts";
@@ -22,13 +22,13 @@ import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { readyNamedCard } from "./restrictions.ts";
 import { withFrame } from "./windows.ts";
 import { moveCard } from "./zones.ts";
-import { shadowFace } from "./families/defense-shadow.ts";
-import { drawCards } from "./families/dungeon-deck.ts";
-import { withView } from "./families/breaking-areas.ts";
-import { isBreakingVerb } from "./families/breaking.ts";
-import { announceDraw } from "./families/dreamchaser.ts";
-import { announceEnteredHand } from "./families/island-hand.ts";
-import { playerSource } from "./families/quest-threat.ts";
+import { shadowFace } from "./families/defense/shadow.ts";
+import { drawCards } from "./families/dungeon/deck.ts";
+import { withView } from "./families/breaking/areas.ts";
+import { isBreakingVerb } from "./families/breaking/index.ts";
+import { announceDraw } from "./families/dreamchaser/index.ts";
+import { announceEnteredHand } from "./families/island/hand.ts";
+import { playerSource } from "./families/quest/threat.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -93,13 +93,13 @@ export function runInstruction(
   if (state.failure) return state;
   const twin = withTwin(state, instruction, ctx.cards);
   // Once stages are separate "the staging area", "this stage" and "the quest" of an instruction are the acting seat's (mec109.multiple-staging-areas): the
-  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking-areas.ts). The verbs of the
+  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking/areas.ts). The verbs of the
   // breaking family are about the areas themselves and run on the whole state.
   if (state.separate && !isBreakingVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
   return runTwinned(state, twin, focus, ctx, steps);
 }
 
-// runInstruction with a code already read as its Nightmare twin (families/nightmare-guards.ts).
+// runInstruction with a code already read as its Nightmare twin (families/nightmare/guards.ts).
 function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const family = runFamilyVerb(state, instruction, focus, ctx, steps);
   if (family) return family;
@@ -170,7 +170,7 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
   return next;
 }
 
-// A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon-deck.ts).
+// A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon/deck.ts).
 // An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either.
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
@@ -197,7 +197,7 @@ export function gainSeatResources(state: ScenarioState, seat: number, steps: Eng
     next = updateCard(next, heroId, { resources: hero.resources + gained });
     for (let count = 0; count < gained; count += 1) steps.push({ kind: "gainResource", seat, heroId, cause: currentCause(steps, fallback) });
   }
-  // An ally that "collects 1 resource each resource phase" (families/costs-pay.ts).
+  // An ally that "collects 1 resource each resource phase" (families/costs/pay.ts).
   return collectAllyResources(next, seat, steps, currentCause(steps, fallback));
 }
 

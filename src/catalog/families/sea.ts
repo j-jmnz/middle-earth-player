@@ -1,5 +1,5 @@
 // The sea family (phase 39): the vocabulary of the ships, the Heading card, the Sailing test and the Corsair deck that the Dream-chaser scenarios
-// share. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/sea.ts runs them (the helpers are in sea-*.ts). The rules are
+// share. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/sea/index.ts runs them (the helpers are in sea-*.ts). The rules are
 // the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 

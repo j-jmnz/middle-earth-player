@@ -24,10 +24,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
   z.strictObject({ kind: z.literal("hideFailed"), scope: z.enum(["phase", "round"]) }),
   // The last Hide test the running effect made failed ("Each player who fails this Hide test raises his threat by 5", 906108:A:1; "If the
-  // engaged player fails the hide test", 906102:A:3). False before the effect has made one. Read by src/rules/families/nightmare.ts.
+  // engaged player fails the hide test", 906102:A:3). False before the effect has made one. Read by src/rules/families/nightmare/index.ts.
   z.strictObject({ kind: z.literal("lastHideFailed") }),
   // The current quest card is the quest deck's stage `stage`, its place in the deck counting from 1 ("If the players are on stage 3",
-  // 900204:A:2, 900302:A:2). Read by src/rules/families/nightmare-guards.ts.
+  // 900204:A:2, 900302:A:2). Read by src/rules/families/nightmare/guards.ts.
   z.strictObject({ kind: z.literal("onStage"), stage: z.number().int().positive() }),
   // The actor has an enemy engaged with them, with this trait if one is named.
   z.strictObject({ kind: z.literal("hasEngaged"), trait: z.string().min(1).optional() }),
@@ -41,7 +41,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
-  // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck-play.ts).
+  // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck/play.ts).
   z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
@@ -52,7 +52,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
   // The victory display holds a copy (a card with the same title) of the source, the card the answered event is about, the last
   // picked card, the second card the event names or the active location (`is`), or none does ("if there is a card with the same
-  // title in the victory display", src/rules/families/sidequests-pick.ts).
+  // title in the victory display", src/rules/families/sidequests/pick.ts).
   z.strictObject({ kind: z.literal("copyInVictory"), card: z.enum(["self", "subject", "picked", "other", "activeLocation"]), is: z.boolean().optional() }),
   // Some location other than the source is in the staging area or is the active location.
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
@@ -77,7 +77,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The actor holds the first player token ("Each other player searches ...", 41003:A:1, is `not` this one; src/rules/conditions.ts).
   z.strictObject({ kind: z.literal("firstPlayer") }),
   // The card with this code, in play, holds at least `min` resource tokens ("If there are 6 or more resource tokens here", 41050:B:1): read at a
-  // campaign card's Resolution (campaign family, src/rules/families/campaign.ts).
+  // campaign card's Resolution (campaign family, src/rules/families/campaign/index.ts).
   // With `perPlayer`, `min` is for each player in the game ("X resource tokens on this stage. X is the number of players times 3", 142041:B:2).
   z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0), perPlayer: z.boolean().optional() }),
   // The total Threat of the encounter cards in the actor's staging area is at most `max` ("if the total Threat of encounter cards in this staging
@@ -85,7 +85,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // src/rules/conditions.ts.
   z.strictObject({ kind: z.literal("stagingThreat"), max: z.number().int().min(0) }),
   // The source card holds at most `max` damage tokens (0: none, "if there are no damage tokens here", 142043:A:1). Read by the moria family
-  // (src/rules/families/moria.ts).
+  // (src/rules/families/moria/index.ts).
   z.strictObject({ kind: z.literal("damageHere"), max: z.number().int().min(0) }),
   // The amount `left` is less than the amount `right`: "If that character's printed Willpower is less than the discarded card's Threat" (142058:A:2).
   z.strictObject({ kind: z.literal("less"), left: amountSchema, right: amountSchema }),
@@ -102,16 +102,16 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("excess"), min: z.number().int().positive() }),
   z.strictObject({ kind: z.literal("dealt"), min: z.number().int().positive().optional() }),
   // The Heading card's setting (dcce.heading): on-course (Sun, the only on-course setting), off-course (Cloud, Rain or Storm), or at the worst
-  // setting (Storm). False when the game has no Heading card. Read by the sea family (src/rules/families/sea-heading.ts).
+  // setting (Storm). False when the game has no Heading card. Read by the sea family (src/rules/families/sea/heading.ts).
   z.strictObject({ kind: z.literal("heading"), is: z.enum(["onCourse", "offCourse", "worst"]) }),
   // The actor's characters committed to the quest add up to at least `min` Willpower ("Each player contributing at least 8 Willpower to the quest", 12028:A:1): the stat the quest counts, as the quest reads it.
   z.strictObject({ kind: z.literal("committedWillpower"), min: z.number().int().min(0) }),
   // The players are at the same quest stage as the Stormcaller (`sameStage`, dcce.stormcallers-area-stages: their main quest stage's number matches its current stage), or not. False in a game
-  // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller-values.ts).
+  // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller/values.ts).
   z.strictObject({ kind: z.literal("stormcaller"), is: z.enum(["sameStage", "ahead"]) }),
   // No player holds more than `max` cards in hand ("If no cards were discarded by this effect": no player holds more than 3 cards, 12080:A:1).
   z.strictObject({ kind: z.literal("handSize"), max: z.number().int().min(0) }),
-  // The Island Map (src/rules/families/island-pick.ts): at most `flippedAtMost` of its double-sided (Uncharted) locations are flipped over to the location side ("4 or fewer Uncharted locations are faceup", 11197:B:6, read as the flipped ones: a short route; user decision, 2026-11-01), and/or the last travel went to the right
+  // The Island Map (src/rules/families/island/pick.ts): at most `flippedAtMost` of its double-sided (Uncharted) locations are flipped over to the location side ("4 or fewer Uncharted locations are faceup", 11197:B:6, read as the flipped ones: a short route; user decision, 2026-11-01), and/or the last travel went to the right
   // ("When you travel to the right", 12077:A:1), and/or at least `revealed.min` copies of the card with this code are in the game and not secrets under a Temple location ("For each Recurring Nightmare that is not a secret", 11197:B:1).
   z.strictObject({ kind: z.literal("island"), flippedAtMost: z.number().int().min(0).optional(), movedRight: z.literal(true).optional(), revealed: z.strictObject({ code: z.string().min(1), min: z.number().int().positive() }).optional() }),
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
@@ -122,7 +122,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The source objective has no encounter card attached to it: it is "free of encounters" (rr.guarded; 01108:A:2). Read for a Guarded
   // objective in the staging area.
   z.strictObject({ kind: z.literal("freeOfEncounters") }),
-  // A hero is the "prisoner" now, facedown, until it is rescued (`is`), or none is (01124:B:3; src/rules/families/prisoner.ts).
+  // A hero is the "prisoner" now, facedown, until it is rescued (`is`), or none is (01124:B:3; src/rules/families/prisoner/index.ts).
   z.strictObject({ kind: z.literal("prisoner"), is: z.boolean() }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
@@ -194,7 +194,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // 01085:A:1). A card that was dealt none is not blank.
   z.strictObject({ kind: z.literal("shadowBlank") }),
   // The card is attacking in the player attack in progress (rr.step-6-8-4): read while a stat is read, for the stat's holder
-  // (src/rules/families/attack-strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
+  // (src/rules/families/attack/strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
   // (from that card's controller's side: `engaged`, `stagingOnly`, then its predicates); `notEnemy`: it does not ("an enemy
   // not engaged with you"); `alone`: no other character attacks with it; `ranged`: it is a ranged attack (rr.ranged).
   z.strictObject({
@@ -216,7 +216,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // action only if you are playing campaign mode" (141062:A:1).
   z.strictObject({ kind: z.literal("campaign") }),
   // The card DiscardBottom discarded in this effect has a printed cost of `max` or less ("If that card's printed cost is 2 or less", 11032:A:2); a card with no printed cost does not, and nothing
-  // discarded does not. Read by the uncharted family (src/rules/families/uncharted-cards.ts).
+  // discarded does not. Read by the uncharted family (src/rules/families/uncharted/cards.ts).
   z.strictObject({ kind: z.literal("discardedCost"), max: z.number().int().min(0) }),
   // The running effect's X is at least `min`. The effect an attack leaves for its end has as X the number of characters the
   // attack destroyed ("If this attack destroys a character", 141065:A:2, 141066:A:2).
@@ -234,13 +234,13 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("highestThreat"), max: z.number().int().min(0) }),
   // The cards facedown underneath The Havens Burn number at least `min` and at most `max` (dcce.aflame; "If there are X or more cards underneath The Havens Burn, ... X is 3 more than the
   // number of players", 11038:A:2 is `min: 3, players: true`; "2 or fewer cards are underneath", 11182:B:5 is `max: 2`). With `players`, both bounds count the number of players in the game
-  // on top of what they name. Read by the aflame family (src/rules/families/aflame-values.ts).
+  // on top of what they name. Read by the aflame family (src/rules/families/aflame/values.ts).
   z.strictObject({ kind: z.literal("underBurn"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
   z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional() }),
   // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
-  // src/rules/families/grapple-values.ts).
+  // src/rules/families/grapple/values.ts).
   z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
   // The Corsair deck or its discard pile holds a card: Boarding has an enemy to reveal. The either/or of a card that gives a choice between a cost and Boarding ("raise your threat by 3 or it gains Boarding 1",
   // 12022:A:3) offers the Boarding branch only then (rr.effects: an option that cannot change the game state is not offered). Read by the stormcaller family.

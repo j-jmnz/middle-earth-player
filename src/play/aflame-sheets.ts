@@ -2,7 +2,7 @@
 // damage off a location (Sahír's Advance), as the combat sheets show a defender: the card's name with the damage it would stand at, the damage as a mark on the card, and a caution when the damage destroys
 // the location (it goes underneath The Havens Burn) or loses the game, so the confirm asks twice. Only the number of cards under the Burn is ever used, never which.
 import type { Instruction } from "../catalog/boundary.ts";
-import { burnOutcome } from "../rules/families/aflame-values.ts";
+import { burnOutcome } from "../rules/families/aflame/values.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 
 import { damageOutcome } from "./foresight.ts";

@@ -4,8 +4,8 @@
 // its heroes cannot pay for it yet. Read only when the player taps a card a moment does not ask about; nothing here decides
 // what is legal (the reducer does).
 import { attachmentTargets, playWindowReason } from "../rules/planning.ts";
-import { exhaustSlack } from "../rules/families/costs-play.ts";
-import { payingSlack } from "../rules/families/deck-play.ts";
+import { exhaustSlack } from "../rules/families/costs/play.ts";
+import { payingSlack } from "../rules/families/deck/play.ts";
 import { printedOf } from "../rules/printed.ts";
 import { reduce, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 

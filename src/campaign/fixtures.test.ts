@@ -20,7 +20,7 @@ import { choiceSentence, promptSentence, resolutionView, settledSentence } from 
 import { contextOf, finish, resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
 import { reduce } from "../rules/reduce.ts";
-import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
+import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
 // The Maestro fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won

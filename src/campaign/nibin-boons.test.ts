@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../rules/constants.ts";
 import { legalIntents } from "../rules/legal.ts";
-import { seatThreat } from "../rules/families/play-hooks.ts";
+import { seatThreat } from "../rules/families/play/hooks.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, loadCavesWorld, cavesTable, settleChoices, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";

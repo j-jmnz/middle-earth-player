@@ -3,21 +3,21 @@
 import type { Effect } from "../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
-import { playLimit, playLimitReason } from "./families/dungeon-limit.ts";
+import { playLimit, playLimitReason } from "./families/dungeon/limit.ts";
 import { effectCause, ruleCause } from "./cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "./conditions.ts";
 import { effectsOf } from "./listen.ts";
 import { distinctHeroesReason, spendDiscount } from "./cost-rules.ts";
 import { pushEffectFrame } from "./effect-frames.ts";
-import { playElsewhere, playTargets } from "./families/attachments-play.ts";
-import { payerOk } from "./families/costs-pay.ts";
-import { exhaustSlack, extraCostReason } from "./families/costs-play.ts";
-import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck-play.ts";
-import { doomedRaise } from "./families/deck-rules.ts";
-import { chosenX } from "./families/misc-cost.ts";
-import { playBlocked } from "./families/sidequests-contract.ts";
-import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "./families/sidequests-play.ts";
+import { playElsewhere, playTargets } from "./families/attachments/play.ts";
+import { payerOk } from "./families/costs/pay.ts";
+import { exhaustSlack, extraCostReason } from "./families/costs/play.ts";
+import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "./families/deck/play.ts";
+import { doomedRaise } from "./families/deck/rules.ts";
+import { chosenX } from "./families/misc/cost.ts";
+import { playBlocked } from "./families/sidequests/contract.ts";
+import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "./families/sidequests/play.ts";
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { pickCandidates } from "./pick.ts";
@@ -64,7 +64,7 @@ export function playCard(
   next = spendDiscount(next, intent.cardId, seat, ctx);
   next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
-  // its next Doomed event (families/deck-rules.ts).
+  // its next Doomed event (families/deck/rules.ts).
   const doomed = doomedRaise(next, seat, printed);
   next = doomed.state;
   if (doomed.amount > 0) {
@@ -74,9 +74,9 @@ export function playCard(
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
     return playEvent(queueEvent(next, { trigger: "played", seat, cardId: intent.cardId }), intent.cardId, seat, ctx, steps, x);
   }
-  // A player side quest enters its player's quest area (families/sidequests-play.ts).
+  // A player side quest enters its player's quest area (families/sidequests/play.ts).
   if (printed.type === "player-side-quest") return enterQuestArea(next, intent.cardId, seat, steps);
-  // An attachment played unattached, onto a threat dial, or guarded (families/attachments-play.ts).
+  // An attachment played unattached, onto a threat dial, or guarded (families/attachments/play.ts).
   const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
@@ -110,7 +110,7 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
   const running = runningActions(state, cardId, seat, ctx);
   const first = running[0];
   if (!first) return moveCard(state, cardId, { zone: "discard", seat });
-  // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck-play.ts).
+  // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck/play.ts).
   const choice = alternativeActions(running);
   return pushEffectFrame(
     { ...noteEventLimits(state, running, cardId, seat, ctx, steps), window: null },
@@ -149,7 +149,7 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   }
   const running = runningActions(state, cardId, seat, ctx);
   if (running.length === 0) return "That card cannot be played now";
-  // "You can only play 1 copy of ~ each phase" (families/deck-play.ts).
+  // "You can only play 1 copy of ~ each phase" (families/deck/play.ts).
   const limited = eventLimitReason(state, running, cardId, seat);
   if (limited) return limited;
   for (const effect of running) {
@@ -212,19 +212,19 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (printed.type !== "event" && state.mode !== "planning") return "That intent is not legal in this window";
   if (printed.type !== "event" && planningTurn(state) !== state.activeSeat) return "Only the active player plays allies and attachments now";
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
-  // "You cannot play non-unique allies" (a contract, families/sidequests-contract.ts).
+  // "You cannot play non-unique allies" (a contract, families/sidequests/contract.ts).
   if (playBlocked(state, cardId, state.activeSeat, ctx)) return "A card in play forbids that card to be played";
-  // "The players, as a group, cannot play more than 1 ally card each round" (families/dungeon-limit.ts).
+  // "The players, as a group, cannot play more than 1 ally card each round" (families/dungeon/limit.ts).
   const limit = playLimit(state, cardId, ctx);
   if (limit) return playLimitReason(limit);
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
-  // A player side quest needs a free quest area (families/sidequests-play.ts).
+  // A player side quest needs a free quest area (families/sidequests/play.ts).
   const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;
   if (area) return area;
-  // "Limit 2 copies of ~ in play" (families/sidequests-play.ts).
+  // "Limit 2 copies of ~ in play" (families/sidequests/play.ts).
   const limited = inPlayLimitReason(state, cardId, ctx);
   if (limited) return limited;
-  // An additional cost that cannot be paid (PlayCost, families/costs-play.ts).
+  // An additional cost that cannot be paid (PlayCost, families/costs/play.ts).
   const extra = extraCostReason(state, cardId, state.activeSeat, ctx);
   if (extra) return extra;
   return printed.type === "event" ? eventReason(state, cardId, state.activeSeat, ctx) : null;
@@ -243,7 +243,7 @@ export function playReason(
   if (printed.type === "attachment") {
     if (!intent.hostId) return "Choose a host";
     const host = state.cards[intent.hostId];
-    // The staging area or a seat's play area, for a card that goes there (families/attachments-play.ts).
+    // The staging area or a seat's play area, for a card that goes there (families/attachments/play.ts).
     const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
     if (!targets.includes(intent.hostId)) {
       if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, host.id)) {
@@ -294,8 +294,8 @@ function paymentReason(
   if (chosenX(state, cardId, ctx)) return null;
   if (cost == null) return "That card has no printed cost";
   if (sum > cost) return "Overpay";
-  // Characters exhausted as part of the cost pay the rest (ExhaustToReduce, families/costs-play.ts).
-  // A Response that lowers its cost as it is played pays the rest (families/deck-play.ts).
+  // Characters exhausted as part of the cost pay the rest (ExhaustToReduce, families/costs/play.ts).
+  // A Response that lowers its cost as it is played pays the rest (families/deck/play.ts).
   if (sum < cost - exhaustSlack(state, seat, cardId, ctx) - payingSlack(state, seat, cardId, ctx)) return "Underpay";
   return null;
 }

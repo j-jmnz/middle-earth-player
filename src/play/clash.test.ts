@@ -5,7 +5,7 @@ import { ruleCause } from "../rules/cause.ts";
 import type { EngineStep } from "../rules/intents.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 import { shadowCards } from "../rules/zones.ts";
-import { hero, seaTable, send, ship, shipEnemy, until } from "../rules/families/sea-table.ts";
+import { hero, seaTable, send, ship, shipEnemy, until } from "../rules/families/sea/table.ts";
 import { attackOrPolicy, playUntil, type Reduced } from "../../scripts/combat-policy.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 

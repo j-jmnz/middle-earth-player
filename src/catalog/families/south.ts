@@ -1,6 +1,6 @@
 // The vocabulary The Ring Goes South adds to effect records: a second active location, the Ring-bearer facedown under an enemy, an enemy
 // engaged with every player, the faceup cards of stage 1B and a few locations' rules. Simple verbs, triggers and stat flags;
-// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/south*.ts runs them.
+// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/south/index*.ts runs them.
 import { z } from "zod";
 
 import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";

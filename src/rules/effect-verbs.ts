@@ -6,18 +6,18 @@ import { runQuestResolution } from "./explore.ts";
 import type { EngineStep } from "./intents.ts";
 import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "./keywords.ts";
-import { activeOf, stagingOf } from "./families/breaking-areas.ts";
-import { cancelAttack } from "./families/defense-defenders.ts";
+import { activeOf, stagingOf } from "./families/breaking/areas.ts";
+import { cancelAttack } from "./families/defense/defenders.ts";
 import { printedOf } from "./printed.ts";
 import { questPointsOf } from "./quest.ts";
-import { notePlaced, progressRoom } from "./families/south-locations.ts";
+import { notePlaced, progressRoom } from "./families/south/locations.ts";
 import { announceLeftPlay } from "./stage-reveal.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, livingSeats, updateCard } from "./state.ts";
 import { currentCause, UNATTRIBUTED } from "./cause.ts";
 import { lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "./windows.ts";
-import { exploring } from "./families/island-map.ts";
+import { exploring } from "./families/island/map.ts";
 
 export type TargetVerb = Extract<Instruction, { verb: "ReadyHero" | "BarAttack" | "PlaceProgressOnLocation" }>;
 
@@ -108,7 +108,7 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   const location = state.cards[id];
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);
-  // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south-locations.ts).
+  // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
   const placed = Math.min(amount, progressRoom(state, id, ctx.cards));
   if (placed <= 0) return state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });

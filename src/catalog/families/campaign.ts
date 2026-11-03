@@ -1,6 +1,6 @@
 // The vocabulary the Mirkwood campaign cards add to effect records (phase 28): the Setup instructions the campaign checklist deals
 // beside the Fellowship's, and the Resolution that hands cards to the next campaign. Simple verbs; effect-schema-verbs.ts composes
-// them. src/campaign/start.ts and checklist.ts deal the Setup ones; src/rules/families/campaign.ts and resolution.ts run the rest.
+// them. src/campaign/start.ts and checklist.ts deal the Setup ones; src/rules/families/campaign/index.ts and resolution.ts run the rest.
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";

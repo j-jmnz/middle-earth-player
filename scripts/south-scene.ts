@@ -4,7 +4,7 @@ import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData
 import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
 import type { ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
-import { captureRingBearer } from "../src/rules/families/south-captive.ts";
+import { captureRingBearer } from "../src/rules/families/south/captive.ts";
 import { attachTo, spawn } from "../src/rules/zones.ts";
 
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";

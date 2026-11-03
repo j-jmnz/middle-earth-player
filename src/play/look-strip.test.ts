@@ -6,7 +6,7 @@ import { loadCards } from "../../scripts/data/load-cards.ts";
 import { loadLedger } from "../../scripts/data/printed/ledger.ts";
 
 import { cardSize, tableLayout } from "./layout.ts";
-import { successSymbols } from "../rules/families/sea-sailing.ts";
+import { successSymbols } from "../rules/families/sea/sailing.ts";
 
 import { lookBands, lookStrip, MEDALLION, medallionAt, squeezedCapacity } from "./look-strip.ts";
 import { seaFixture, seaViews } from "./sea-fixture.ts";

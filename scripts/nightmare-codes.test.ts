@@ -9,7 +9,7 @@ import { loadScenarios } from "./data/load-scenarios.ts";
 
 // On Nightmare the setup card's recipe can replace a scenario card by a Nightmare card of the same title (docs/plans/nightmare-mode.md). A
 // record that names a scenario card by code (set it aside, add it to the staging area, search for it, "while it is in play") reads the
-// card of that title the game dealt (twinCode, src/rules/families/nightmare.ts). So for each scenario on NIGHTMARE_PLAYABLE, every
+// card of that title the game dealt (twinCode, src/rules/families/nightmare/index.ts). So for each scenario on NIGHTMARE_PLAYABLE, every
 // scenario card a dealt card's record names is dealt on Nightmare, itself or a card with its title.
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const scenarios = loadScenarios();

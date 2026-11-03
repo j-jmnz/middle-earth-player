@@ -5,12 +5,12 @@
 import type { ReduceContext } from "../rules/reduce.ts";
 import type { CardInstance, ScenarioState } from "../rules/state.ts";
 import { shadowCards } from "../rules/zones.ts";
-import { lookedIds } from "../rules/families/sea-sailing.ts";
-import { captiveUnder } from "../rules/families/south-captive.ts";
-import { grappledWith } from "../rules/families/grapple-values.ts";
-import { prisonersOfSeat } from "../rules/families/prisoner.ts";
-import { declaredDefenders } from "../rules/families/defense-defenders.ts";
-import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../rules/families/breaking-areas.ts";
+import { lookedIds } from "../rules/families/sea/sailing.ts";
+import { captiveUnder } from "../rules/families/south/captive.ts";
+import { grappledWith } from "../rules/families/grapple/values.ts";
+import { prisonersOfSeat } from "../rules/families/prisoner/index.ts";
+import { declaredDefenders } from "../rules/families/defense/defenders.ts";
+import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../rules/families/breaking/areas.ts";
 
 import { threatRows } from "./foresight.ts";
 import { areaGroup, areaRoleOf, type AreaRole } from "./stormcaller-table.ts";
@@ -42,7 +42,7 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   victory: "Victory display",
 };
 
-/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea-corsair.ts); else the Uncharted deck, while the scenario deals one. */
+/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); else the Uncharted deck, while the scenario deals one. */
 export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted">): readonly SecondPileId[] {
   if (game.corsairDeck !== undefined) return SECOND_PILES;
   return game.uncharted !== undefined ? UNCHARTED_PILES : NONE_PILES;
@@ -116,7 +116,7 @@ function fightingIds(game: ScenarioState, seat: number): ReadonlySet<string> {
 /**
  * The instance ids a zone holds, for the seat the table shows. A one-card zone is a list of zero or one. While stages are separate (Breaking
  * of the Fellowship, stage 2B on) the staging area, the quest stage and the active location are the shown seat's own, and there is no second
- * active location of a shared quest: each seat has one (families/breaking-areas.ts).
+ * active location of a shared quest: each seat has one (families/breaking/areas.ts).
  */
 export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?: ZoneFacts): readonly string[] {
   const owner = game.seats[seat];
@@ -145,7 +145,7 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
       });
-      // The seat's player side quest stands first in its row: its quest area (families/sidequests-play.ts).
+      // The seat's player side quest stands first in its row: its quest area (families/sidequests/play.ts).
       const quest = owner.questStage && game.cards[owner.questStage] ? [owner.questStage] : [];
       // Then its ships, the Dream-chaser before any other (dcce.ship-objectives), then its heroes and the rest.
       const ships = facts ? shipsFirst(game, here, facts) : [];

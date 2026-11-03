@@ -2,29 +2,29 @@
 import { pushCardEffects } from "./effect-frames.ts";
 import type { EngineStep } from "./intents.ts";
 import { runQuestResolution } from "./explore.ts";
-import { afterQuestOutcome, questOutcome } from "./families/quest-outcome.ts";
-import { questFailureRaise } from "./families/quest-threat.ts";
-import { askQuestProgress } from "./families/attachments-quest.ts";
-import { resolveSideQuests, sideQuestTotals } from "./families/sidequests-quest.ts";
+import { afterQuestOutcome, questOutcome } from "./families/quest/outcome.ts";
+import { questFailureRaise } from "./families/quest/threat.ts";
+import { askQuestProgress } from "./families/attachments/quest.ts";
+import { resolveSideQuests, sideQuestTotals } from "./families/sidequests/quest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { printedOf } from "./printed.ts";
 import { advanceStage, clearCommitted, questPointsOf, resolveQuest } from "./quest.ts";
-import { defeatedBefore, questCardDefeatedHeard } from "./families/quest-branch.ts";
+import { defeatedBefore, questCardDefeatedHeard } from "./families/quest/branch.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses } from "./responses.ts";
 import { restricted } from "./restrictions.ts";
 import { livingSeats, withMode, type ScenarioState } from "./state.ts";
-import { stageSeat } from "./families/breaking-areas.ts";
-import { payOwed } from "./families/breaking-progress.ts";
+import { stageSeat } from "./families/breaking/areas.ts";
+import { payOwed } from "./families/breaking/progress.ts";
 import { fireForced } from "./triggers.ts";
-import { announceStageRevealed } from "./families/nightmare-setup.ts";
+import { announceStageRevealed } from "./families/nightmare/setup.ts";
 
 // Resolving the quest is two passes. The first adds progress, and each stage the quest advanced to has
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends
 // the phase. The phase does not end while a new stage is still resolving.
 export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.questResolved) return finish({ ...state, questResolved: false });
-  // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments-quest.ts).
+  // A location that may take the progress first asks the players once (Explorer's Almanac, families/attachments/quest.ts).
   const asked = askQuestProgress(state, ctx, steps);
   if (asked) return asked;
   const before = steps.length;
@@ -56,7 +56,7 @@ function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: Engine
 // effects pushed as frames, and a location the progress explored has its Responses offered first (those that put progress on the quest, under the
 // stage's frames).
 export function afterProgress(state: ScenarioState, before: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  // The progress a stage 3B turned into discards from the encounter deck (families/breaking-progress.ts).
+  // The progress a stage 3B turned into discards from the encounter deck (families/breaking/progress.ts).
   let next = payOwed(state, ctx, steps);
   const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" && step.stormcaller !== true ? [step.cardId] : []));
   // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
@@ -74,7 +74,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
     // "Forced: After stage 2B is revealed" (11182:A:3) goes down first, so it resolves once the stage's When Revealed effects have.
     next = announceStageRevealed(next, cardId, ctx, steps, "afterStageRevealed");
-    // A stage a seat advanced to once stages are separate is revealed by that seat (families/breaking-areas.ts).
+    // A stage a seat advanced to once stages are separate is revealed by that seat (families/breaking/areas.ts).
     next = pushCardEffects(next, "whenRevealed", cardId, stageSeat(next, cardId) ?? next.firstPlayer, false, effects, ctx, steps);
     // "Forced: When stage 3A is revealed" (906101:A:2) resolves above the stage's own When Revealed effects.
     next = announceStageRevealed(next, cardId, ctx, steps);
@@ -90,7 +90,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     next = runQuestResolution(next, cardId, ctx, steps);
     next = announceLeftPlay(next, cardId, ctx, steps, true);
   }
-  // A defeated stage that looks at the next ones (LookAtStages, families/quest-order.ts) asks the first player, in a frame of the stage's own record.
+  // A defeated stage that looks at the next ones (LookAtStages, families/quest/order.ts) asks the first player, in a frame of the stage's own record.
   return next.stageChoice === "due" ? askStage(next, ctx, steps) : next;
 }
 

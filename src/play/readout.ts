@@ -6,12 +6,12 @@
 // is going on (an enemy can attack during staging), the Hide numbers, otherwise willpower against threat while questing.
 // Every number is read with the engine's own functions on the current state; the picks only say whose numbers to add.
 import { attackStrength } from "../rules/combat.ts";
-import { DEFENDERS_FRAME, declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense-defenders.ts";
+import { DEFENDERS_FRAME, declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense/defenders.ts";
 import { hidePassed, hideWillpower } from "../rules/hide.ts";
-import { placedLimit } from "../rules/families/uncharted-limit.ts";
+import { placedLimit } from "../rules/families/uncharted/limit.ts";
 import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
 import { questSeat } from "./selectors.ts";
-import { viewOf } from "../rules/families/breaking-areas.ts";
+import { viewOf } from "../rules/families/breaking/areas.ts";
 import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThreat } from "../rules/quest.ts";
 import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
 import { livingSeats } from "../rules/state.ts";
@@ -65,7 +65,7 @@ function pickedInAttack(game: ScenarioState, sheet: Sheet | null, choice: Choice
   if (!item || !("intent" in item)) return null;
   if (item.intent.type === "DeclareDefender") return { id: item.id, role: "defender" };
   if (item.intent.type === "Undefended") return { id: item.id, role: "hit" };
-  // One more defender, picked in the defense family's declaration frame (Stand Together, families/defense-defenders.ts).
+  // One more defender, picked in the defense family's declaration frame (Stand Together, families/defense/defenders.ts).
   const data = topFrame(game)?.data;
   if (item.intent.type === "Choose" && data?.kind === "effect" && data.effectId === DEFENDERS_FRAME && game.cards[item.id]) return { id: item.id, role: "defender" };
   return null;

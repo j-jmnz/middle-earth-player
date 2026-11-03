@@ -1,7 +1,7 @@
 // Rules: dcce.heading (data/rules/entries.json). The Heading card's four steps as the table shows them: the dial in the top bar (an icon in a
 // disc, a ring of four quarter arcs lit clockwise from the top), what a screen reader hears, the badge that says a shift, and how the card is turned in
 // its preview (a quarter turn per step, the way the rule turns it). Pure: table-chrome.tsx draws it, the tests read it. The engine owns the step
-// (families/sea-heading.ts); nothing here changes it.
+// (families/sea/heading.ts); nothing here changes it.
 import type { IconName } from "./icon-map.ts";
 import type { ArcPart } from "./arc-spans.ts";
 import type { TableToken } from "./tokens.ts";

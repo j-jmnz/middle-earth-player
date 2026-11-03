@@ -1,5 +1,5 @@
 // The vocabulary The Caves of Nibin-Dûm (phase 33) adds to effect records: simple verbs, triggers and stat flags. effect-schema-verbs.ts,
-// effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/caves*.ts runs them.
+// effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/caves/index*.ts runs them.
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";
@@ -25,17 +25,17 @@ export const FLAGS = [
   // engagement cost as if it were 0", 41005:B:1): modifiedStat answers 0 for `engagementCost` then.
   "engagementCostZero",
   // On a location: no progress can be placed on it ("Progress cannot be placed on Cracked Pillar while it is in the staging area", 41006:B:2;
-  // 41037:A:1). Read by progressRoom (families/south-locations.ts).
+  // 41037:A:1). Read by progressRoom (families/south/locations.ts).
   "noProgressPlaced",
   // On an enemy: it loses the text "Cannot take damage." ("While there are at least 8 progress tokens on this stage, Goblin Chieftain loses
   // the text", 41007:B:1): the cannotTakeDamage it holds is not read (rules/keywords.ts).
   "losesNoDamage",
   // On an enemy: the excess of its combat damage (damage beyond the remaining hit points of the character it damages) removes that much progress
-  // from the current quest ("remove 1 progress from the current quest", 41030:A:2; families/defense-excess.ts).
+  // from the current quest ("remove 1 progress from the current quest", 41030:A:2; families/defense/excess.ts).
   "excessToQuestProgress",
   // On "table": at most this much progress can be placed on the quest each round (41035:A:1, the smallest amount held applies), and the progress
   // placed on it this round (engine use). `noQuestProgress`: none can be placed until the flag ends (41039:A:1). The active location still takes
-  // progress (families/caves-progress.ts).
+  // progress (families/caves/progress.ts).
   "questProgressCap",
   "questProgressPlaced",
   "noQuestProgress",

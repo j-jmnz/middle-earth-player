@@ -1,8 +1,8 @@
 // Rules: dcce.island-map, dcce.exploration, dcce.uncharted (data/rules/entries.json). The Island Map as the table shows it (docs/design-system-table.md, The Island Map): a chip in the top bar and a reading panel, both drawn from
 // one readout of the game. Pure, so a test reads it. Nothing here changes the game, and nothing here says what lies on the facedown side of a location: a location lying Uncharted side up is "Lost Island" (or, in the
 // Temple column, "Temple of the Deceived") and nothing else, as the staging area and the card preview show it (shown-name.ts).
-import { islandOf, TEMPLE_COLUMN, COLS, ROWS } from "../rules/families/island-map.ts";
-import { islandMayTravel } from "../rules/families/island-travel.ts";
+import { islandOf, TEMPLE_COLUMN, COLS, ROWS } from "../rules/families/island/map.ts";
+import { islandMayTravel } from "../rules/families/island/travel.ts";
 import { questPointsOf } from "../rules/quest.ts";
 import type { PrintedCard } from "../rules/printed.ts";
 import type { ScenarioState } from "../rules/state.ts";

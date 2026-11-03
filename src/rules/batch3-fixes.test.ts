@@ -4,7 +4,7 @@ import type { Effect } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
 import { placeProgress } from "./effect-verbs.ts";
-import { spentThisRound } from "./families/costs-pay.ts";
+import { spentThisRound } from "./families/costs/pay.ts";
 import { cardMap, expectOk, hero, idleScenario } from "./fixture.ts";
 import type { EngineStep } from "./intents.ts";
 import { settle } from "./machine.ts";

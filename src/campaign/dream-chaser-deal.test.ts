@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
 import { EFFECTS } from "../effects/index.ts";
-import { twinCode } from "../rules/families/nightmare-guards.ts";
-import { levelOfCard } from "../rules/families/dreamchaser-facts.ts";
+import { twinCode } from "../rules/families/nightmare/guards.ts";
+import { levelOfCard } from "../rules/families/dreamchaser/facts.ts";
 import { expectOk } from "../rules/fixture.ts";
 import { definePrinted, type PrintedCard } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";

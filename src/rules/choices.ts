@@ -1,7 +1,7 @@
 import type { LegalIntent, PlayerIntent } from "./intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { holds } from "./conditions.ts";
-import { noteOption, untakenOptions } from "./families/deck-choose.ts";
+import { noteOption, untakenOptions } from "./families/deck/choose.ts";
 import type { EffectData, QueueItem, ScenarioState } from "./state.ts";
 import { patchTop, topFrame } from "./windows.ts";
 

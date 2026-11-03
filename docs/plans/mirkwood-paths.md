@@ -202,7 +202,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 
 For each phase:
 - `pnpm effects:draft <id>`, then the `effect-author` agent, until coverage is green, including the campaign card, boons and burdens.
-- New verbs go in a mechanic family: `src/catalog/families/<f>.ts` plus `src/rules/families/<f>*.ts`, each citing a ledger line or rule span, each with its own test.
+- New verbs go in a mechanic family: `src/catalog/families/<f>.ts` plus `src/rules/families/<f>/`, each citing a ledger line or rule span, each with its own test.
 - Records go in `src/effects/authored/<scenario-id>.ts`; boon and burden pool records go in `authored/pool/RevCore.ts` and `authored/pool/TDoM.ts`.
 - Goldens: `src/campaign/golden/<id>.json` with `golden-<short>.test.ts`, `scripts/<short>-scene.ts` and `<short>-game.ts`. They cover true solo and two-handed, a win and a loss.
 - A campaign test checks that the previous part's pool reaches this part.
@@ -213,7 +213,7 @@ For each phase:
 | --- | --- | --- |
 | 29 | Passage Through Mirkwood | **Branching quest**: random choice between 3B cards (01121/01122) with the other removed, and a "stage reached" fact read by campaign card 01129's resolution (`quest.ts` `advanceStage`). Mendor (01135) as an objective ally with `leavesPlayLoses`. Mendor's Support boon (one copy per player). Ungoliant's Swarm and Lingering Venom burdens. |
 | 30 | Journey Along the Anduin | Each player reveals 1 card at setup. Hill Troll (01082): excess combat damage to threat. Stage rules: no engagement checks, skip the staging step, win when no enemies are in play, search for a Hill Troll if none is in play. Campaign card 01130: Valor and Scarred set aside and attached on triggers. Resolution picks the prisoner (most damage, random tie). Smaller lines: Banks of the Anduin, Wargs, Wolf Rider, Enchanted Stream. |
-| 31 | Escape from Dol Guldur | **Objective Guarded and claim** (01108–01110): attach the next encounter card, "free of encounters", claim and attach, return on detach. **Prisoner and rescue**: generalize `south-captive.ts`; the hero and its attachments are facedown and unusable; Mendor is captured with them; a rescued event. Orc Guard (01107/01125): a deck card as a facedown enemy. Iron Shackles (01105): attached to a player deck. Group limit of one ally per round (01123/01124). Dungeon Jailor. Campaign card 01131 Forced replacement and flip. Resolution writes the Mendor carry-over. |
+| 31 | Escape from Dol Guldur | **Objective Guarded and claim** (01108–01110): attach the next encounter card, "free of encounters", claim and attach, return on detach. **Prisoner and rescue**: generalize `south/captive.ts`; the hero and its attachments are facedown and unusable; Mendor is captured with them; a rescued event. Orc Guard (01107/01125): a deck card as a facedown enemy. Iron Shackles (01105): attached to a player deck. Group limit of one ally per round (01123/01124). Dungeon Jailor. Campaign card 01131 Forced replacement and flip. Resolution writes the Mendor carry-over. |
 | 32 | The Oath | Choose an Adaptation boon at setup (41044–41047), with once-per-campaign Actions. Stalking Goblin burden (41041): search the encounter deck, discard pile and the player's collection. The campaign card in play gains a resource each round, read at resolution (Guilty Conscience 41043). Mirkwood Paths part 4 and mini campaign part 1. |
 | 33 | The Caves of Nibin-Dûm | "No Time to Waste!" added to hand after the mulligan. Shiny Distraction burden (41042). Resolution reads the highest final threat (< 40): Ranger Sense (41049) joins the deck now, plus carry-over. "Remove from the game and from the Campaign Pool". |
 
@@ -267,7 +267,7 @@ User instructions (2026-10-27). They bind every session that runs these phases.
 - Data changes go through the source adapter, the normalizer, the templates or `data/overrides.json`, each with a reason. Never hand-edit generated files: `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules/entries.json`, `src/effects/generated`.
 - `pnpm data:sync` is the only network step. Sources are online: query the pinned PDF or scan when a line is in question, and never rely on memory. Ask the user about a scan you cannot read rather than guessing.
 - Ledger work: each read entry records `readBy`, and its scan sha256 must match the pin. Quote Setup sentences from the ledger, not from Hall of Beorn.
-- New verbs go in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), each with a test that names the rule ids or ledger lines it implements. Do not bend an existing verb to mean something else.
+- New verbs go in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), each with a test that names the rule ids or ledger lines it implements. Do not bend an existing verb to mean something else.
 - Keep the Fellowship path byte-identical:
   - every existing golden and test stays green without edits to its expectations;
   - if one must move, stop and report why.

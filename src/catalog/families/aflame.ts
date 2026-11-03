@@ -1,5 +1,5 @@
 // The aflame family (phase 42, Raid on the Grey Havens): Aflame X and The Havens Burn (dcce.aflame), the Stormcaller Elite's cards (dcce.stormcaller-elite), and the Campaign Setup and
-// Resolution of the campaign card 11182. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/aflame.ts runs them (the helpers are in aflame-*.ts). The rules are the
+// Resolution of the campaign card 11182. Simple verbs; effect-schema-verbs.ts composes them and src/rules/families/aflame/index.ts runs them (the helpers are in aflame-*.ts). The rules are the
 // Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 

@@ -6,7 +6,7 @@ import { modifiedStat } from "../rules/keywords.ts";
 import { settle } from "../rules/machine.ts";
 import { placeQuestProgress } from "../rules/quest.ts";
 import type { ScenarioState } from "../rules/state.ts";
-import { questRoom } from "../rules/families/caves-progress.ts";
+import { questRoom } from "../rules/families/caves/progress.ts";
 import { CODES, codesIn, flightTable, idOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 let world: FlightWorld;

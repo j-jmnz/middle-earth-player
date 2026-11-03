@@ -116,7 +116,7 @@ const choiceSchema = z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
   // Each option may be taken once in this effect: a later Choose of the same effect offers only the options not taken yet
-  // ("each player chooses 1 different option", src/rules/families/deck-choose.ts).
+  // ("each player chooses 1 different option", src/rules/families/deck/choose.ts).
   different: z.boolean().optional(),
   options: z
     .array(
@@ -130,7 +130,7 @@ const choiceSchema = z.strictObject({
 });
 
 // `endOfAttack`: when the player attack in progress ends (rr.step-6-8-4; "After this attack resolves, discard ~"), with the
-// attacked enemy as the frame's other card (src/rules/families/attack-flow.ts).
+// attacked enemy as the frame's other card (src/rules/families/attack/flow.ts).
 const delaySchema = z.strictObject({
   verb: z.literal("Delay"),
   // `questSucceeded`: when the players quest successfully this phase, and never if they do not ("If the players quest
@@ -169,7 +169,7 @@ const eachSchema = z.strictObject({
   // The actor chooses up to this many (`any`: any number, an amount: the number it reads, "Choose up to X characters", 11195:A:1) of the matching cards, one at a time, and may stop ("search the top
   // 10 cards for up to 4 Rohan allies"); the instructions then run for each chosen card, and the effect's X becomes how many
   // were chosen. `totalCost`: the chosen cards' printed costs add up to at most this. `taken` is engine use: the cards chosen
-  // so far (src/rules/families/deck-each.ts).
+  // so far (src/rules/families/deck/each.ts).
   upTo: z.union([z.number().int().positive(), z.literal("any"), amountExprSchema]).optional(),
   totalCost: amountSchema.optional(),
   taken: z.array(z.string()).optional(),
@@ -235,7 +235,7 @@ export const limitSchema = z.enum([
   // triggered the ability of a Steward of Orthanc this round").
   "oncePerRoundGroupEachPlayer",
   // Once a phase for each player, counting every copy of the card; on an event's Action, its play ("You can only play 1 copy
-  // of The Tree People each phase", src/rules/families/deck-play.ts).
+  // of The Tree People each phase", src/rules/families/deck/play.ts).
   "oncePerPhaseGroupEachPlayer",
 ]);
 

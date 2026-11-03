@@ -11,7 +11,7 @@ import { holds } from "../rules/conditions.ts";
 import { printedOf } from "../rules/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
 import { stagingThreat } from "../rules/quest.ts";
-import { revealsAllowed } from "../rules/families/encounter-reveal.ts";
+import { revealsAllowed } from "../rules/families/encounter/reveal.ts";
 import { ruleCause } from "../rules/cause.ts";
 import type { ScenarioState } from "../rules/state.ts";
 import { moriaStart, moriaWorld } from "../../scripts/moria-game.ts";

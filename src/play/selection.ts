@@ -4,7 +4,7 @@
 // in this window (from legalIntents, computed once per window), and when the player lifts one it asks legalTargets for that
 // card only. A drop names a zone id or a card id that list returned. A drop is a pick, like a tap: it never sends an intent.
 // The dock asks to confirm what it picked (table-choice.ts), and the card moves only when the reducer accepts that.
-import { askingToCommit } from "../rules/families/sea-sailing-legal.ts";
+import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 import { printedOf } from "../rules/printed.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
 
@@ -51,7 +51,7 @@ export function dropTargets(game: ScenarioState, ctx: ReduceContext, legal: read
   if (!instance) return [];
   if (playable(legal, cardId)) {
     const printed = printedOf(ctx.cards, instance.code);
-    // A Trap or a Guarded card is played into the staging area: the zone is its target (src/rules/families/attachments-play.ts).
+    // A Trap or a Guarded card is played into the staging area: the zone is its target (src/rules/families/attachments/play.ts).
     if (printed.type === "attachment") return legalTargets(game, { type: "PlayCard", cardId }, ctx).map((id): DropTarget => (id === "staging" ? { kind: "zone", zone: "staging" } : { kind: "card", cardId: id }));
     return [{ kind: "zone", zone: "play" }];
   }

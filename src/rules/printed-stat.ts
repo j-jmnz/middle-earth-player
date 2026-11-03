@@ -1,7 +1,7 @@
 // Rules: dcce.scalable-upgradable, dcce.campaign-mode (data/rules/entries.json). The printed value of a stat on the side a card shows.
 import type { ModifierStat } from "../catalog/boundary.ts";
 
-import { LOST_ISLAND_THREAT } from "./families/uncharted-pick.ts";
+import { LOST_ISLAND_THREAT } from "./families/uncharted/pick.ts";
 import { printedOf, type PrintedCard } from "./printed.ts";
 import { heldAmount, type CardInstance, type ScenarioState } from "./state.ts";
 

@@ -1,8 +1,8 @@
 import { isStatCondition, type Effect, type Instruction } from "../catalog/boundary.ts";
 
 import { holds } from "./conditions.ts";
-import { textBlank } from "./families/attachments-hold.ts";
-import { effectsOfCard } from "./families/misc-text.ts";
+import { textBlank } from "./families/attachments/hold.ts";
+import { effectsOfCard } from "./families/misc/text.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { inPlay } from "./state.ts";

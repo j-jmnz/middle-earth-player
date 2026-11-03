@@ -38,7 +38,7 @@ const templeSide = (code: string): Effect[] => [
 const guardianReturns: Effect["instructions"] = [{ verb: "EngageFromVictory", name: "Temple Guardian" }];
 
 // Gate Key (12071, and its reprint 110078): "If unattached, return Gate Key to the staging area and it gains: Action: Exhaust a hero to claim Gate Key and attach it to that hero" (the claimed flag AttachGuarded
-// sets does the return, families/objectives-claimed.ts), and the Action that looks at the facedown side of a Temple location for 3 resources from the hero it is attached to (side B of the reprint: for
+// sets does the return, families/objectives/claimed.ts), and the Action that looks at the facedown side of a Temple location for 3 resources from the hero it is attached to (side B of the reprint: for
 // nothing, and at a secret as well).
 const gateKey = (code: string, side: "A" | "B", lines: { claim: number; look: number }): Effect[] => {
   const claim: Effect = {

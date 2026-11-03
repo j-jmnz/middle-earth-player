@@ -5,7 +5,7 @@ import { loadCards } from "../../scripts/data/load-cards.ts";
 
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { campaignLogSchema, newSave, parseLog } from "./save.ts";
-import { dealtFace, NO_UPGRADED_SIDE } from "../rules/families/dreamchaser-facts.ts";
+import { dealtFace, NO_UPGRADED_SIDE } from "../rules/families/dreamchaser/facts.ts";
 import { NO_UPGRADED_REASON, XP_ROWS, gavinReturned, isUpgraded, levelOf, markRefusal, marksOf, pick, spendOnSave, spendXp, unpick, xpFacts, xpGainedOf, xpRowOf, xpSpentOf, xpUnspentOf } from "./xp.ts";
 import { markedLines, markedSpeech, pickSentence, xpView } from "./xp-view.ts";
 

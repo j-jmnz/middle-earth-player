@@ -1,7 +1,7 @@
 // Rules: mec109.multiple-staging-areas (data/rules/entries.json). What the table says in words about the staging area it draws once stage 2B has split the table
 // (Breaking of the Fellowship): whose area it is, the stage that area quests on, its cards and its active location. The canvas draws the same area (selectors.ts,
 // zoneIds); this is the line a screen reader hears and the one an end-to-end flow reads, since the Skia canvas has no element per card. Pure.
-import { isSeparate } from "../rules/families/breaking-areas.ts";
+import { isSeparate } from "../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../rules/state.ts";
 
 import { zoneIds } from "./selectors.ts";

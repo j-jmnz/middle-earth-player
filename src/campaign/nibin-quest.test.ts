@@ -7,7 +7,7 @@ import { runInstruction } from "../rules/interpret.ts";
 import { ruleCause } from "../rules/cause.ts";
 import { destroyCard, modifiedStat, placeDamage } from "../rules/keywords.ts";
 import { settle } from "../rules/machine.ts";
-import { questStageStart } from "../rules/families/quest-setup.ts";
+import { questStageStart } from "../rules/families/quest/setup.ts";
 import { expectOk } from "../rules/fixture.ts";
 import { reduce } from "../rules/reduce.ts";
 import type { ScenarioState } from "../rules/state.ts";

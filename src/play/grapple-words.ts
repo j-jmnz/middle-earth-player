@@ -2,8 +2,8 @@
 // location: they are facedown under it, count against nothing the players can choose, and add 2 Threat each to it; what traveling to it does; the Threat a Ship location has against the number that loses the game
 // at stage 3; where an attack of the Thing and of a detached arm comes from. The sentences the preview, the screen reader, the sheets and the log read from. Pure.
 import type { Instruction } from "../catalog/boundary.ts";
-import { GRAPPLE_THREAT, grappledWith } from "../rules/families/grapple-values.ts";
-import { grantedTravel, travelsOverActive } from "../rules/families/grapple-travel.ts";
+import { GRAPPLE_THREAT, grappledWith } from "../rules/families/grapple/values.ts";
+import { grantedTravel, travelsOverActive } from "../rules/families/grapple/travel.ts";
 import { modifiedStat } from "../rules/keywords.ts";
 import { effectsOf } from "../rules/listen.ts";
 import { printedOf, type PrintedCard } from "../rules/printed.ts";
