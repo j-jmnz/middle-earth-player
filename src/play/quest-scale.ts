@@ -10,7 +10,7 @@ import type { Readout } from "./readout.ts";
 import { questSeat } from "./selectors.ts";
 
 // `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves.
-// Outside it the scale rests, dimmed, with no numbers: a Planning "−3 Short" before anyone could commit would be a false alarm.
+// Outside it the meter is not drawn at all: a Planning "−3 Short" before anyone could commit would be a false alarm.
 // `seat`: the seat whose staging area and willpower these are once stages are separate between players (the acting seat's, whichever seat a peek draws), else null.
 export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean; seat: number | null };
 
@@ -29,10 +29,9 @@ export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: R
   return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest", seat: owner };
 }
 
-/** What a screen reader hears of the scale: the threat in staging, the willpower committed and how far ahead or short it is (only the threat outside the Quest phase). */
+/** What a screen reader hears of the scale: the threat in staging, the willpower committed and how far ahead or short it is. */
 export function scaleLabel(scale: QuestScale): string {
   const whose = scale.seat == null ? "" : `Player ${scale.seat + 1}'s `;
-  if (!scale.live) return `Quest scale, for the Quest phase. ${whose}threat in staging ${scale.threat}`;
   const marker = scaleMarker(scale.delta);
   const gap = marker.word === "Even" ? "even" : `${Math.abs(scale.delta)} ${marker.word.toLowerCase()}`;
   return `${whose}threat in staging ${scale.threat}, willpower committed ${scale.willpower}, ${gap}`;
@@ -50,9 +49,9 @@ export function scaleMarker(delta: number): { value: string; word: "Ahead" | "Sh
   return { value: "0", word: "Even", tone: "muted" };
 }
 
-/** The bars' heights as shares of the larger value (at least 1, so two zeros draw empty bars); the willpower bar rests empty outside the Quest phase. */
+/** The bars' heights as shares of the larger value (at least 1, so two zeros draw empty bars). */
 export function meterFractions(scale: QuestScale): { threat: number; willpower: number; line: number } {
   const most = Math.max(scale.threat, scale.willpower, 1);
   const threat = scale.threat / most;
-  return { threat, willpower: scale.live ? scale.willpower / most : 0, line: threat };
+  return { threat, willpower: scale.willpower / most, line: threat };
 }

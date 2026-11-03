@@ -322,11 +322,11 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
-  // The head stands in the column's room above the dock (command-head.ts). While it shows, the quest meter draws the willpower against the
-  // threat in the Quest phase, so the dock keeps only the readout's result line; with no room for it the dock keeps the numbers.
+  // The head stands in the column's room above the dock (command-head.ts). The quest meter is drawn in the Quest phase only; while it
+  // shows, the dock keeps only the readout's result line, and with no room for it (or outside the Quest phase) the dock keeps the numbers.
   const footPad = Math.max(insets.bottom, 8 * s);
   const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s);
-  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(room, 0, s).mode !== "hidden";
+  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(room, 0, s, scale.live).mode !== "hidden";
   const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
   // the left inset) and the safe insets (spotlight-stage.ts).

@@ -1,4 +1,4 @@
-// The command column's head (docs/design-system-table.md, Command column): the victory display over the quest meter, standing above the dock
+// The command column's head (docs/design-system-table.md, Command column): the victory display over the quest meter (in the Quest phase only), standing above the dock
 // in the room the dock leaves free. It is positioned from the column's top to the dock's top and never pushes the dock; command-head.ts
 // says what it draws in that room. It subscribes to the victory display alone, so a state that does not change it does not render it.
 import { View } from "react-native";
@@ -33,14 +33,18 @@ export function CommandHead({
 }) {
   const s = useUiScale();
   const display = useStore(store, (state) => select(state.game));
-  const plan = headPlan(room, display.rows.length, s);
+  const plan = headPlan(room, display.rows.length, s, scale.live);
   if (plan.mode === "hidden") return null;
   const meter = Math.min(METER_MOST * s, Math.max(0, room - plan.strip - GAP * s));
   return (
     <View testID="command-head" pointerEvents="box-none" className="absolute inset-x-0 top-0" style={{ bottom, paddingHorizontal: 12 * s, paddingTop: 2 * s }}>
       <VictoryStrip display={display} plan={plan} onPreview={onPreview} />
-      <View style={{ height: GAP * s }} />
-      <QuestMeterView scale={scale} compact={plan.mode === "compact"} height={meter} />
+      {scale.live ? (
+        <>
+          <View style={{ height: GAP * s }} />
+          <QuestMeterView scale={scale} compact={plan.mode === "compact"} height={meter} />
+        </>
+      ) : null}
     </View>
   );
 }

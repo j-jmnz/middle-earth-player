@@ -2,7 +2,7 @@
 // committed as two bars from one baseline, their heights in proportion to the larger of the two, with how far ahead or short the quest is
 // between them ("+2" in green, "−1" in red, or Even) and a line across the willpower bar at the threat's height. The bars rise and fall to
 // each new value (`meterFill`); reduced motion snaps them. It moves live as characters are committed (quest-scale.ts); the numbers are the
-// engine's. Outside the Quest phase the threat bar is live and the willpower bar rests at 40% with a dash and no marker. A screen reader
+// engine's. It is mounted only in the Quest phase (command-head-view.tsx), its bars starting at their values. A screen reader
 // hears one line: the threat in staging, the willpower committed and how far ahead or short it is, so it is never read as the player's own threat.
 import { useEffect } from "react";
 import { View } from "react-native";
@@ -68,24 +68,22 @@ function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
       <View className="items-center" style={{ width: 44 * s }}>
         <View style={{ height: NUMBER * s }} />
         <View className="min-h-0 flex-1 items-center justify-center">
-          {scale.live ? (
-            <Text testID="quest-meter-marker" className="font-display" style={{ fontSize: (even ? 15 : 22) * s, lineHeight: (even ? 18 : 26) * s, color: markerColor(marker.tone, t) }}>
-              {even ? marker.word : marker.value}
-            </Text>
-          ) : null}
+          <Text testID="quest-meter-marker" className="font-display" style={{ fontSize: (even ? 15 : 22) * s, lineHeight: (even ? 18 : 26) * s, color: markerColor(marker.tone, t) }}>
+            {even ? marker.word : marker.value}
+          </Text>
         </View>
         <View style={{ height: CAPTION * s }} />
       </View>
-      <View testID="quest-meter-willpower" className="items-center" style={{ width: 64 * s, opacity: scale.live ? 1 : 0.4 }}>
+      <View testID="quest-meter-willpower" className="items-center" style={{ width: 64 * s }}>
         <Text className="font-display" style={{ height: NUMBER * s, fontSize: 20 * s, lineHeight: NUMBER * s, color: t.bone }}>
-          {scale.live ? String(scale.willpower) : "–"}
+          {String(scale.willpower)}
         </Text>
         <View className="min-h-0 flex-1 items-center" style={{ width: 40 * s }}>
           <View style={[track, { flex: 1 }]}>
             <Animated.View style={[bar, willStyle, { backgroundColor: t.accent, backgroundImage: `linear-gradient(0deg, ${t.accentDeep}, ${t.accent})` }]} />
           </View>
           {/* The threat's height across the willpower bar, so the gap reads at a glance. */}
-          {scale.live ? <Animated.View style={[{ position: "absolute", left: -6 * s, right: -6 * s, height: 2 * s, borderRadius: s, backgroundColor: t.bone }, lineStyle]} /> : null}
+          <Animated.View style={[{ position: "absolute", left: -6 * s, right: -6 * s, height: 2 * s, borderRadius: s, backgroundColor: t.bone }, lineStyle]} />
         </View>
         <Text className="text-micro" numberOfLines={1} style={{ height: CAPTION * s, color: t.muted }}>
           willpower
@@ -128,9 +126,7 @@ function CompactMeter({ scale, height }: { scale: QuestScale; height: number }) 
   return (
     <View style={{ height }}>
       <CompactRow fill={threatFill} color={t.threat} edge={t.threatEdge} word={stagingWord(scale)} value={String(scale.threat)} trailing={null} trailingColor={t.muted} />
-      <View className="flex-1" style={{ opacity: scale.live ? 1 : 0.4 }}>
-        <CompactRow fill={willFill} color={t.accent} edge={t.accentDeep} word="willpower" value={scale.live ? String(scale.willpower) : "–"} trailing={scale.live ? (even ? "Even" : marker.value) : null} trailingColor={markerColor(marker.tone, t)} />
-      </View>
+      <CompactRow fill={willFill} color={t.accent} edge={t.accentDeep} word="willpower" value={String(scale.willpower)} trailing={even ? "Even" : marker.value} trailingColor={markerColor(marker.tone, t)} />
     </View>
   );
 }

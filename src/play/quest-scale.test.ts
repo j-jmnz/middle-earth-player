@@ -20,10 +20,8 @@ describe("scaleLabel", () => {
     expect(scaleLabel({ ...live, willpower: 4, delta: 0 })).toBe("threat in staging 4, willpower committed 4, even");
   });
 
-  it("names the seat once stages are separate, and says only the threat outside the Quest phase", () => {
+  it("names the seat once stages are separate", () => {
     expect(scaleLabel({ ...live, seat: 1 })).toBe("Player 2's threat in staging 4, willpower committed 6, 2 ahead");
-    expect(scaleLabel({ ...live, live: false })).toBe("Quest scale, for the Quest phase. threat in staging 4");
-    expect(scaleLabel({ ...live, live: false, seat: 0 })).toBe("Quest scale, for the Quest phase. Player 1's threat in staging 4");
   });
 
   it("labels the threat bar with the seat once stages are separate", () => {
@@ -52,7 +50,7 @@ describe("dockReadout", () => {
   });
 });
 
-const meter = (threat: number, willpower: number, live = true): QuestScale => ({ threat, willpower, delta: willpower - threat, live, seat: null });
+const meter = (threat: number, willpower: number): QuestScale => ({ threat, willpower, delta: willpower - threat, live: true, seat: null });
 
 describe("meterFractions", () => {
   it("sizes both bars over the larger value, and the threat line at the threat's height", () => {
@@ -60,8 +58,7 @@ describe("meterFractions", () => {
     expect(meterFractions(meter(6, 3))).toEqual({ threat: 1, willpower: 0.5, line: 1 });
   });
 
-  it("draws two zeros empty and rests the willpower bar outside the Quest phase", () => {
+  it("draws two zeros empty", () => {
     expect(meterFractions(meter(0, 0))).toEqual({ threat: 0, willpower: 0, line: 0 });
-    expect(meterFractions(meter(4, 8, false))).toEqual({ threat: 0.5, willpower: 0, line: 0.5 });
   });
 });
