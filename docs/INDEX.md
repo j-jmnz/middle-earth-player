@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 299–302 Haptics (~280)
   - 303–313 Banner (~580) ← 1
   - 314–317 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~23.2K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~23.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~560)
   - 34–44 Performance (~650) ← 4
@@ -149,7 +149,7 @@ Read the sections your task touches.
   - 206–220 Icons (~480) ← 6
   - 221–240 Card art (~780) ← 2
   - 241–255 Tablets (~510) ← 13
-  - 256–433 Screens (~12.6K)
+  - 256–433 Screens (~12.7K)
     - 260–263 Splash (~40)
     - 264–267 App icon (~80)
     - 268–283 Campaigns (campaign list) (~1.4K) ← 5
@@ -164,7 +164,7 @@ Read the sections your task touches.
     - 350–361 Resolution and standalone outcome (~980) ← 1
     - 362–369 Decks (~510) ← 1
     - 370–379 Deck builder (deck editor) (~790) ← 3
-    - 380–389 Card pool (the Cards tab) (~700) ← 3
+    - 380–389 Card pool (the Cards tab) (~770) ← 3
     - 390–395 Card (~480) ← 2
     - 396–401 Packs and pack cards (~130)
     - 402–415 Settings (~730)

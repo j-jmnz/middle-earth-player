@@ -1,4 +1,5 @@
 import { traitTokens } from "../catalog/deck-save";
+import { matchCard, searchIndexOf, searchTerms, type SearchRow } from "./card-search";
 import { sphereWord } from "./sphere-mark";
 
 export type PoolPack = {
@@ -93,7 +94,8 @@ function matchesPack(card: PoolCard, filter: PoolFilter, groups: readonly CycleG
   return card.packCodes.some((code) => cycle.has(code));
 }
 
-export function filterPool<T extends PoolCard>(
+/** The cards the search and filter keep. With search text they come best match first, ties in the order given (sortPool). */
+export function filterPool<T extends PoolCard & SearchRow>(
   cards: readonly T[],
   search: string,
   filter: PoolFilter,
@@ -101,18 +103,27 @@ export function filterPool<T extends PoolCard>(
   // Codes whose unique text is inactive (textInactive in src/catalog/active-text.ts).
   inactiveCodes: ReadonlySet<string>,
 ): T[] {
-  const query = search.trim().toLowerCase();
-  return cards.filter((card) => {
-    if (query.length > 0 && !card.name.toLowerCase().includes(query)) return false;
-    if (filter.sphere && card.sphereCode !== filter.sphere) return false;
-    if (filter.typeCode && card.typeCode !== filter.typeCode) return false;
-    if (!matchesPack(card, filter, groups)) return false;
-    if (filter.trait && !traitTokens(card.traits).includes(filter.trait)) return false;
-    if (filter.cost && shownCost(card) !== filter.cost) return false;
-    if (filter.unique && !card.isUnique) return false;
-    if (filter.activeText && inactiveCodes.has(card.code)) return false;
-    return true;
-  });
+  const terms = searchTerms(search);
+  const searching = terms.length > 0;
+  const kept: { card: T; score: number; at: number }[] = [];
+  for (const [at, card] of cards.entries()) {
+    let score = 0;
+    if (searching) {
+      const found = matchCard(searchIndexOf(card), terms);
+      if (found == null) continue;
+      score = found;
+    }
+    if (filter.sphere && card.sphereCode !== filter.sphere) continue;
+    if (filter.typeCode && card.typeCode !== filter.typeCode) continue;
+    if (!matchesPack(card, filter, groups)) continue;
+    if (filter.trait && !traitTokens(card.traits).includes(filter.trait)) continue;
+    if (filter.cost && shownCost(card) !== filter.cost) continue;
+    if (filter.unique && !card.isUnique) continue;
+    if (filter.activeText && inactiveCodes.has(card.code)) continue;
+    kept.push({ card, score, at });
+  }
+  if (searching) kept.sort((left, right) => left.score - right.score || left.at - right.at);
+  return kept.map((entry) => entry.card);
 }
 
 // An alternate printing's tag ("(MotK) Aragorn", the Messenger of the King heroes) does not sort; the name does.
