@@ -9,21 +9,19 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
-import { contextOf, deal, resume } from "../../src/campaign/session.ts";
 import { newSave, type StoredLoadout } from "../../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../../src/campaign/world.ts";
-import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
-import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { FATE_GOLDENS, playGolden as playFate, fateWorld } from "../../test/scenarios/the-fate-of-numenor/game.ts";
 import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { VOYAGE_GOLDENS, playGolden as playVoyage, voyageWorld } from "../../test/scenarios/voyage-across-belegaer/game.ts";
+import { playDealt, prebuiltDeck } from "./seed-kit.ts";
 
 const say = createLog("e2e-raid");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
@@ -48,12 +46,6 @@ export async function fateWonLog(): Promise<CampaignLog> {
   const written = applyResolution(afterVoyage, second.state.scenarioId, second.state, fateWorldLoaded.cards);
   const blank = emptyLog(2);
   return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
-}
-
-export function listed(id: string): { heroes: string[]; deck: string[] } {
-  const found = prebuilt.find((entry) => entry.id === id);
-  if (!found) throw new Error(`No prebuilt deck ${id}`);
-  return { heroes: [...found.heroes], deck: found.cards.flatMap((row) => Array.from({ length: row.count }, () => row.code)) };
 }
 
 // The auto-player's answer with what the scenario asks: damage the players assign falls on the least wounded hero, the heroes attack together (Graxar alone), and the first location the travel phase
@@ -95,26 +87,11 @@ function play(seed: number, log: CampaignLog): Game {
   const campaign = loadCampaign(CAMPAIGN);
   const scenario = loadScenario("raid-on-the-grey-havens");
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = DECKS.map((id) => ({ deckId: id, ...listed(id) }));
+  const seats = DECKS.map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
   // Neither player takes a Galdor's Counsel at the Campaign Setup.
   const loadout: StoredLoadout = { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: ["skip", "skip"], acceptPenalty: false };
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)]);
-  const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed, CATALOG_VERSION);
-  if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
-  const resumed = resume(dealt.save, world, CATALOG_VERSION);
-  if (!resumed.ok) throw new Error(resumed.reason);
-  const ctx = contextOf(world);
-  let state = resumed.state;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < 8000 && !state.lost && !state.stageCleared; turn += 1) {
-    const intent = intentFor(state, ctx, memory);
-    const result = reduce(state, intent, ctx);
-    if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
-    state = result.state;
-    intents.push(intent);
-  }
-  return { loadout, intents, state };
+  return { loadout, ...playDealt(world, { ...newSave("fixture", campaign.id, 2), log }, loadout, seed, 8000, intentFor) };
 }
 
 function firstSeed(log: CampaignLog, wanted: (state: ScenarioState) => boolean, label: string): RaidFixture | null {

@@ -10,20 +10,19 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
 import { applyResolution, type CampaignLog } from "../../src/campaign/log.ts";
-import { contextOf, deal, resume } from "../../src/campaign/session.ts";
 import { newSave, type StoredLoadout } from "../../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../../src/campaign/world.ts";
-import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { reduce, legalIntents, legalTargets, type PlayerIntent, type ScenarioState, type ReduceContext } from "../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ScenarioState, type ReduceContext } from "../../src/rules/engine/reduce.ts";
 
 import { DEPTHS_GOLDENS, depthsWorld, playGolden as playDepths } from "../../test/scenarios/the-thing-in-the-depths/game.ts";
 import { stormcallerWonLog } from "./the-thing-in-the-depths.ts";
-import { intentFor, listed } from "./raid-on-the-grey-havens.ts";
+import { intentFor } from "./raid-on-the-grey-havens.ts";
 import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { createLog } from "../log.ts";
 import { keyClaimed, templeTravel } from "../../test/scenarios/temple-of-the-deceived/game.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
+import { playDealt, prebuiltDeck } from "./seed-kit.ts";
 
 const say = createLog("e2e-temple");
 const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
@@ -82,25 +81,10 @@ function play(seed: number, log: CampaignLog): Game {
   const campaign = loadCampaign(CAMPAIGN);
   const scenario = loadScenario("temple-of-the-deceived");
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = DECKS.map((id) => ({ deckId: id, ...listed(id) }));
+  const seats = DECKS.map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
   const loadout: StoredLoadout = { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [], acceptPenalty: false };
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)]);
-  const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed, CATALOG_VERSION);
-  if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
-  const resumed = resume(dealt.save, world, CATALOG_VERSION);
-  if (!resumed.ok) throw new Error(resumed.reason);
-  const ctx = contextOf(world);
-  let state = resumed.state;
-  const intents: PlayerIntent[] = [];
-  const memory = new Set<string>();
-  for (let turn = 0; turn < 8000 && !state.lost && !state.stageCleared; turn += 1) {
-    const intent = intentForTemple(state, ctx, memory);
-    const result = reduce(state, intent, ctx);
-    if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
-    state = result.state;
-    intents.push(intent);
-  }
-  return { loadout, intents, state };
+  return { loadout, ...playDealt(world, { ...newSave("fixture", campaign.id, 2), log }, loadout, seed, 8000, intentForTemple) };
 }
 
 function firstSeed(log: CampaignLog, wanted: (state: ScenarioState) => boolean, label: string): TempleFixture | null {
