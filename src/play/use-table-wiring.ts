@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from "react";
 
 import type { Reading } from "./reading.ts";
-import { isDiscardPile, shownSeat, type PileId } from "./selectors.ts";
+import { opensList, shownSeat, type PileId } from "./selectors.ts";
 import { successOf } from "./sea-sheets.ts";
 import type { HeadingStep } from "./heading.ts";
 import type { ReduceContext, ScenarioState, TableStore } from "./store.ts";
@@ -22,12 +22,12 @@ export function useTableWiring({ store, ctx, game, setReading, setPreview }: { s
   const facts = useMemo(() => zoneFactsOf(ctx.cards), [ctx]);
   const success = useCallback((code: string) => successOf(ctx.cards, code), [ctx]);
   const onPreview = useCallback((id: string, extra: readonly string[] = []) => setPreview({ id, extra }), [setPreview]);
-  // A discard pile opens its list; a fold stack says which row it folds (row-fold.ts): its list opens on a tap or a long press; a deck with an encounter card attached to it (Iron Shackles,
+  // A discard pile or the victory display opens its list; a fold stack says which row it folds (row-fold.ts): its list opens on a tap or a long press; a deck with an encounter card attached to it (Iron Shackles,
   // 01105:A:1) opens that card, whose preview says what it does.
   const onPile = useCallback(
     (id: string) => {
       if (id === "staging" || id === "engaged") return setReading({ kind: "row", row: id });
-      if (isDiscardPile(id as PileId)) return setReading({ kind: "pile", pile: id as PileId });
+      if (opensList(id as PileId)) return setReading({ kind: "pile", pile: id as PileId });
       const { game: now, viewedSeat } = store.getState();
       const shackles = id === "deck" ? now.seats[shownSeat(now, viewedSeat)]?.deckAttached?.[0] : undefined;
       if (shackles) setPreview({ id: shackles, extra: [] });

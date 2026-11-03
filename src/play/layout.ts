@@ -10,7 +10,7 @@ import type { CardInstance } from "../rules/state.ts";
 import { unturn } from "./frame.ts";
 import { pictureKey } from "./picture-key.ts";
 import { hidesFace } from "./selectors.ts";
-import type { BasePileId, FightKind, PileId, PileView, SecondPileId, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
+import type { BasePileId, FightKind, PileId, PileView, SecondPileId, VictoryPileId, ZoneEntry, ZoneId, ZoneView } from "./selectors.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, PAIR_STEP, placeStaging, placeUnder, rowXs, slotOf, type Metrics } from "./layout-slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
 import { foldRow, groupCards, keeps, stagingRank, type FoldGroup } from "./row-fold.ts";
@@ -69,6 +69,9 @@ export type CardSlot = Rect & {
   // A card of the back row of two stacked play rows: the screen y where the front row starts. Its tokens, effects and pops are drawn
   // in the band above it, so a hero's resources are not hidden under the row in front (user request, 2026-11-01; `shownBounds`).
   coveredFrom?: number;
+  // The victory display's pile: the pictures of the cards fanned behind its top (the oldest first) and the Victory points its cards score, on its gold coin.
+  fan?: readonly string[];
+  points?: number;
 };
 
 // The mark between an engaged enemy and the characters fighting it: a defense, the hero an undefended attack hits, or an
@@ -76,8 +79,8 @@ export type CardSlot = Rect & {
 // `preview` marks a fight the player has picked but not confirmed yet.
 export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
-// The four piles every table has, and the second slot's when the scenario declares it (the Corsair pair: dcce.corsair-deck).
-export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId, T>>>;
+// The four piles every table has, the second slot's when the scenario declares it (the Corsair pair: dcce.corsair-deck), and the victory display while a card is in it.
+export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId | VictoryPileId, T>>>;
 
 /** A row's fold stack: where it stands, the cards that left the row, and the card whose face it shows (row-fold.ts). */
 export type FoldPlace = { id: string; zone: "staging" | "engaged"; rect: Rect; cards: readonly string[]; top: string; area?: true };
@@ -141,6 +144,8 @@ const MARK = 16;
 const CARD_MAX = 120;
 const CARD_MIN = 34;
 const FAN_DROP = 2;
+// How far the victory pile's fan reaches left of the pile, as a share of the pile's height (canvas-pieces.native.tsx turns the cards behind it up to 14 degrees).
+export const VICTORY_FAN = 0.25;
 
 function metricsOf(scale: number): Metrics {
   return { scale, gutter: GUTTER * scale, gap: GAP * scale, peek: PEEK * scale, handMin: touch(scale, MIN_TARGET) + (HAND_MIN - MIN_TARGET) * scale, mark: MARK * scale };
@@ -289,7 +294,9 @@ function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | und
   const chained = view.pile === "deck" && (view.attached?.length ?? 0) > 0 ? { chained: true as const } : {};
   // The Uncharted deck is drawn as its top card's Lost Island side, never the real one.
   const lostIsland = view.pile === "unchartedDeck" && top ? { picture: pictureKey(top) } : {};
-  return view.pile === "deck" && deckTop ? { ...base, ...chained, id: deckTop.id, kind: "card" } : { ...base, ...chained, ...lostIsland };
+  // The victory display: its top on the side it lies, the cards fanned behind it and its Victory points.
+  const victory = view.pile === "victory" && top ? { picture: pictureKey(top), fan: (view.fan ?? []).map(pictureKey), points: view.points ?? 0 } : {};
+  return view.pile === "deck" && deckTop ? { ...base, ...chained, id: deckTop.id, kind: "card" } : { ...base, ...chained, ...lostIsland, ...victory };
 }
 
 // The views with a picked, unconfirmed fight drawn as if it were declared: the characters leave the play area and stand
@@ -350,11 +357,14 @@ export function tableLayout(
   const ground = grow.playHand - DOWN.playHand.cap * card.h - SLACK * scale;
   const handY = restY - Math.min(Math.max(0, ground), Math.max(0, card.h - shown));
 
-  // The encounter deck and its discard pile at the right end of staging.
+  // The encounter deck and its discard pile at the right end of staging, and right of them the victory display while a card is in it, with
+  // room on its left for the cards fanned behind its top (docs/design-system-table.md, Piles).
   const encounterW = 2 * pile.w + gap;
-  const staging: Rect = { x: centerX, y: stagingY, w: Math.max(card.w, centerW - encounterW - gap), h: card.h };
+  const victoryW = piles.victory ? pile.w + Math.round(pile.h * VICTORY_FAN) + gap : 0;
+  const staging: Rect = { x: centerX, y: stagingY, w: Math.max(card.w, centerW - encounterW - victoryW - gap), h: card.h };
   const pileY = stagingY + Math.round((card.h - pile.h) / 2);
-  const encounterDeck: Rect = { x: width - rightGutter - encounterW, y: pileY, w: pile.w, h: pile.h };
+  const encounterDeck: Rect = { x: width - rightGutter - victoryW - encounterW, y: pileY, w: pile.w, h: pile.h };
+  const victory: Rect = { x: width - rightGutter - pile.w, y: pileY, w: pile.w, h: pile.h };
   const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
   // The second slot of piles (a scenario with a second deck: the Corsair pair) stands under the encounter pair, at the right end of the engagement area, as wide as the pair;
   // the engagement area narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
@@ -376,7 +386,7 @@ export function tableLayout(
   const deck: Rect = { x: leftX, y: playY + Math.round((card.h - pile.h) / 2), w: pile.w, h: pile.h };
   const discard: Rect = { x: leftX + pile.w + gap, y: deck.y, w: pile.w, h: pile.h };
 
-  const engaged: Rect = { x: centerX, y: engagedY, w: second ? Math.max(card.w, centerW - encounterW - gap) : centerW, h: engagedH };
+  const engaged: Rect = { x: centerX, y: engagedY, w: second ? Math.max(card.w, centerW - encounterW - victoryW - gap) : centerW, h: engagedH };
   const play: Rect = { x: centerX, y: playY, w: centerW, h: playH };
   const hand: Rect = { x: gutter, y: handY, w: width - 2 * gutter, h: height - handY };
 
@@ -396,13 +406,13 @@ export function tableLayout(
   placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);
-  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}) };
+  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}), ...(piles.victory ? { victory } : {}) };
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table-view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
-  for (const id of ["corsairDeck", "corsairDiscard", "unchartedDeck"] as const) {
+  for (const id of ["corsairDeck", "corsairDiscard", "unchartedDeck", "victory"] as const) {
     const view = piles[id];
     const rect = pileRects[id];
     if (view && rect) slots.push(pileSlot(view, rect, undefined));

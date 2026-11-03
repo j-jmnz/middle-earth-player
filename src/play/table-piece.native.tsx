@@ -20,9 +20,10 @@ export function drawBody(p: BodyProps, slot: CardSlot, dim: boolean) {
   const { image, name, fonts, backs, t, s } = p;
   // A pile, or the top of the deck the rules let the player play (Gandalf): face up and picked like a hand card.
   if (slot.kind === "pile" || slot.zone === "deck") {
-    const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} name={name} fonts={fonts} label backs={backs} t={t} s={s} />;
-    // A discard pile holding a card the seat may play from it (Elven-light) glows; its list plays the card.
-    return slot.kind === "pile" && p.tappable ? (
+    // A discard pile holding a card the seat may play from it (Elven-light) glows and wears the play mark; its list plays the card.
+    const playable = slot.kind === "pile" && p.tappable;
+    const pile = <Pile slot={slot.zone === "deck" && slot.kind === "card" ? { ...slot, faceDown: false } : slot} image={image} fan={p.fan} name={name} fonts={fonts} label playable={playable} backs={backs} t={t} s={s} />;
+    return playable ? (
       <Group>
         <Glow slot={slot} picked={false} t={t} s={s} />
         {pile}

@@ -532,3 +532,38 @@ describe("the second pile slot, ships and staging stacks (phase 39b)", () => {
     }
   });
 });
+
+// The victory display is a pile at staging's right end only while a card is in it (docs/design-system-table.md, Piles).
+describe("the victory pile", () => {
+  const top = card("v2", "victory");
+  const victory: PileView = { pile: "victory", seat: 0, ids: ["v0", "v1", "v2"], top, fan: [card("v0", "victory"), card("v1", "victory")], points: 5 };
+
+  it("is not laid out while the display is empty", () => {
+    const { views: v, piles } = views(5);
+    const layout = tableLayout(591, 338, v, piles);
+    expect(layout.piles.victory).toBeUndefined();
+    expect(layout.slots.some((slot) => slot.id === "pile:victory")).toBe(false);
+  });
+
+  it("stands at the right end of staging, right of the encounter pair, and staging narrows for it", () => {
+    for (const canvas of CANVASES) {
+      const { views: v, piles } = views(5);
+      const without = tableLayout(canvas.width, canvas.height, v, piles);
+      const layout = tableLayout(canvas.width, canvas.height, v, { ...piles, victory });
+      const rect = layout.piles.victory as Rect;
+      expect(rect.y).toBe(layout.piles.encounterDiscard.y);
+      expect(rect.x).toBeGreaterThan(layout.piles.encounterDiscard.x + layout.piles.encounterDiscard.w);
+      // The fan behind it has room between it and the encounter discard pile.
+      expect(rect.x - (layout.piles.encounterDiscard.x + layout.piles.encounterDiscard.w)).toBeGreaterThanOrEqual(Math.round(rect.h * 0.25));
+      expect(rect.x + rect.w).toBe(without.piles.encounterDiscard.x + without.piles.encounterDiscard.w);
+      expect(layout.zones.staging.w).toBeLessThan(without.zones.staging.w);
+      for (const slot of layout.slots.filter((s) => s.zone === "staging")) expect(slot.x + slot.w).toBeLessThanOrEqual(layout.piles.encounterDeck.x);
+    }
+  });
+
+  it("carries the fanned pictures and its Victory points", () => {
+    const { views: v, piles } = views(5);
+    const slot = tableLayout(591, 338, v, { ...piles, victory }).slots.find((s) => s.id === "pile:victory");
+    expect(slot).toMatchObject({ kind: "pile", zone: "victory", count: 3, faceDown: false, picture: "cv2", fan: ["cv0", "cv1"], points: 5 });
+  });
+});

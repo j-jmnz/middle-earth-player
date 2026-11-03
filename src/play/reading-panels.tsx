@@ -1,17 +1,23 @@
-// The reading panels (docs/design-system-table.md, Reading panels; phase 21): a discard pile's cards, this round's log, the threat
-// panel from a dial and the table settings from the menu. They open in one place, the same tray frame (tray-frame.tsx), one at a
-// time: a new one replaces the last (reading.ts). Each has a round ✕ labelled "Close" at its top right and closes on a tap outside. They
-// stay on paper: they are what gets read and recorded. The settings panel is the exception, on night like the Settings tab. Text,
-// switches and tiles that show a card large; nothing here sends an intent.
-import { ScrollView, View } from "react-native";
+// The reading panels (docs/design-system-table.md, Reading panels; phase 21): a discard pile's cards or the victory display's, a row's
+// folded cards, this round's log, the threat panel from a dial and the table settings from the menu. They open in one place, the same tray
+// frame (tray-frame.tsx), one at a time: a new one replaces the last (reading.ts). Each has a round ✕ labelled "Close" at its top right and
+// closes on a tap outside. The card lists stand on night, each card as the table draws it; the log and the threat panel stay on paper:
+// they are what gets read and recorded; the settings panel is on night like the Settings tab. Nothing here sends an intent but a playable
+// discard card's play, which the table's own pick sends.
+import { Pressable, ScrollView, View } from "react-native";
+
+import { CardImage } from "./card-image.tsx";
+import { cardCorner } from "./card-corner.ts";
+import { chipOnSurface, dropShadowOf } from "./surfaces.ts";
+import type { PictureSource } from "./table-canvas-types.ts";
+import { withAlphaHex } from "./tokens.ts";
 
 import type { LogLine } from "./log.ts";
 import { CloseButton, TextButton } from "./buttons.tsx";
-import { Tile } from "./sheet-paper.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
 import type { TableSettings } from "./table-settings.ts";
-import { useUiScale } from "./ui-scale.ts";
+import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
@@ -28,9 +34,78 @@ function PanelClose({ testID, onPress, paper = true }: { testID: string; onPress
   );
 }
 
+/** A card in a list: its name, the line under it (its type and sphere), and its picture (null for a facedown card or while none is known). */
+export type ListCard = { id: string; label: string; detail?: string | null; picture: PictureSource | null; pictureKey: string };
+
+// A list card's picture: the table's card (51 by 71 at Medium), its corners rounded like a card's. A facedown card or a missing file is a raised plate.
+const LIST_CARD = { w: 51, h: 71 };
+
 /**
- * A discard pile's cards, the one on top first. A tap shows a card large. A card the open window lets the seat play from the
- * pile (Elven-light) says so, and a tap on it opens its play, as a tap on a hand card does; a long press still shows it large.
+ * One card of a list, on the night panel (docs/design-system-table.md, Reading panels): its picture as the table draws it, its name in
+ * Marcellus SC and its type and sphere in faint under it. A tap shows it large, or, for a card the open window lets the seat play from its
+ * discard pile, opens its play (it glows as on the table, its row is washed in the accent and says "Playable now"); a long press still shows it large.
+ */
+function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListCard; playable: boolean; testID: string; onPress: () => void; onLongPress?: () => void }) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const w = LIST_CARD.w * s;
+  const h = LIST_CARD.h * s;
+  const detail = playable ? "Playable now · tap to play" : (card.detail ?? null);
+  return (
+    <Pressable
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityState={{ selected: playable }}
+      accessibilityLabel={[card.label, detail].filter(Boolean).join(". ")}
+      accessibilityHint={playable ? "Tap to play it. Hold to read the card" : "Shows the card"}
+      onPress={onPress}
+      onLongPress={onLongPress}
+    >
+      {({ pressed }) => (
+        <View
+          className="mb-1 flex-row items-center rounded-item px-1.5 py-1"
+          style={{ gap: 12 * s, minHeight: touch(s, 48), ...(pressed ? { backgroundColor: t.pressed } : playable ? chipOnSurface(t) : { backgroundColor: "transparent" }) }}
+        >
+          <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), ...(playable ? { boxShadow: `0 0 0 2px ${t.glow}, 0 0 12px 2px ${withAlphaHex(t.glow, 0.55)}` } : { boxShadow: dropShadowOf(t, 3, 8, 0.8) }) }}>
+            {card.picture ? (
+              <CardImage source={card.picture} recyclingKey={`${card.pictureKey}:list`} width={w} height={h} />
+            ) : (
+              <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), backgroundColor: t.raised }} />
+            )}
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text numberOfLines={2} className="font-display text-body" style={{ color: playable ? t.accentHigh : t.bone }}>
+              {card.label}
+            </Text>
+            {detail ? (
+              <Text numberOfLines={2} className="mt-0.5 text-label" style={{ color: playable ? t.accent : t.faint }}>
+                {detail}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
+// A list's head: the count over the title, centred clear of the round ✕.
+function ListHead({ count, title }: { count: string; title: string }) {
+  const s = useUiScale();
+  return (
+    <View style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
+      <Text className="text-center font-display text-eyebrow uppercase text-faint">{count}</Text>
+      <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-bone">
+        {title}
+      </Text>
+    </View>
+  );
+}
+
+/**
+ * A discard pile's cards or the victory display's, on the night panel: the cards the open window lets the seat play from the pile
+ * (Elven-light) first, then the rest, the one on top first. A tap shows a card large; a playable card's tap opens its play, as a tap on a
+ * hand card does, and a long press still shows it large.
  */
 export function PileList({
   title,
@@ -41,29 +116,25 @@ export function PileList({
   onClose,
 }: {
   title: string;
-  cards: readonly { id: string; label: string }[];
+  cards: readonly ListCard[];
   playable?: readonly string[];
   onRead: (cardId: string) => void;
   onPlay?: (cardId: string) => void;
   onClose: () => void;
 }) {
-  const s = useUiScale();
+  const plays = onPlay ? playable : [];
+  const ordered = [...cards.filter((card) => plays.includes(card.id)), ...cards.filter((card) => !plays.includes(card.id))];
   return (
     <View testID="pile-list" collapsable={false} style={{ flexShrink: 1 }}>
-      <View style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
-        <Text className="text-center font-display text-eyebrow uppercase text-inkLabel">{`${cards.length} ${cards.length === 1 ? "card" : "cards"}`}</Text>
-        <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-ink">
-          {title}
-        </Text>
-      </View>
-      <PanelClose testID="pile-list-close" onPress={onClose} />
+      <ListHead count={`${cards.length} ${cards.length === 1 ? "card" : "cards"}`} title={title} />
+      <PanelClose testID="pile-list-close" onPress={onClose} paper={false} />
       <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
-        {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">The pile is empty.</Text> : null}
-        {cards.map((card) =>
-          playable.includes(card.id) && onPlay ? (
-            <Tile key={card.id} label={card.label} detail="Playable now" hint="Tap to play it" selected testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
+        {cards.length === 0 ? <Text className="text-center text-body text-muted">The pile is empty.</Text> : null}
+        {ordered.map((card) =>
+          plays.includes(card.id) && onPlay ? (
+            <CardRow key={card.id} card={card} playable testID={`pile-card-${card.id}`} onPress={() => onPlay(card.id)} onLongPress={() => onRead(card.id)} />
           ) : (
-            <Tile key={card.id} label={card.label} selected={false} testID={`pile-card-${card.id}`} onPress={() => onRead(card.id)} />
+            <CardRow key={card.id} card={card} playable={false} testID={`pile-card-${card.id}`} onPress={() => onRead(card.id)} />
           ),
         )}
       </ScrollView>
@@ -72,24 +143,18 @@ export function PileList({
 }
 
 /**
- * A row's folded cards (row-fold.ts): the cards that left staging or the engagement area for the fold stack, left to right. A tile shows the card large and sends nothing. It stands in the
- * reading panels' frame, like a discard pile's list.
+ * A row's folded cards (row-fold.ts): the cards that left staging or the engagement area for the fold stack, left to right, on the night
+ * panel like a discard pile's list. A row shows the card large and sends nothing.
  */
-export function RowList({ title, cards, onRead, onClose }: { title: string; cards: readonly { id: string; label: string; detail?: string | null }[]; onRead: (cardId: string) => void; onClose: () => void }) {
-  const s = useUiScale();
+export function RowList({ title, cards, onRead, onClose }: { title: string; cards: readonly ListCard[]; onRead: (cardId: string) => void; onClose: () => void }) {
   return (
     <View testID="row-list" collapsable={false} style={{ flexShrink: 1 }}>
-      <View style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
-        <Text className="text-center font-display text-eyebrow uppercase text-inkLabel">{`${cards.length} more ${cards.length === 1 ? "card" : "cards"}`}</Text>
-        <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-ink">
-          {title}
-        </Text>
-      </View>
-      <PanelClose testID="row-list-close" onPress={onClose} />
+      <ListHead count={`${cards.length} more ${cards.length === 1 ? "card" : "cards"}`} title={title} />
+      <PanelClose testID="row-list-close" onPress={onClose} paper={false} />
       <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
-        {cards.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing is folded away.</Text> : null}
+        {cards.length === 0 ? <Text className="text-center text-body text-muted">Nothing is folded away.</Text> : null}
         {cards.map((card) => (
-          <Tile key={card.id} label={card.label} detail={card.detail} selected={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
+          <CardRow key={card.id} card={card} playable={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
         ))}
       </ScrollView>
     </View>

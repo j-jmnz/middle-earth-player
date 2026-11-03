@@ -6,9 +6,11 @@ import { useStore } from "zustand";
 
 import { SPHERE_TINT } from "./icon-map.ts";
 import type { CardSlot, LayoutViews, PileViews } from "./layout.ts";
-import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector, type BasePileId, type PileView, type ZoneFacts, type ZoneId } from "./selectors.ts";
+import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, victoryPileSelector, zoneSelector, type BasePileId, type PileView, type ZoneFacts, type ZoneId } from "./selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens, type TableTokens } from "./tokens.ts";
+
+const noPoints = () => 0;
 
 export function useViews(store: TableCanvasProps["store"], seat: number, facts: ZoneFacts): { views: LayoutViews; piles: PileViews } {
   const zones = useMemo(() => Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat, facts)])) as Record<ZoneId, ReturnType<typeof zoneSelector>>, [seat, facts]);
@@ -16,6 +18,8 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   // The second slot's piles (the Corsair pair), only while the game has a Corsair deck: they are shared, so a peek leaves them where they are.
   const corsair = useMemo(() => ({ deck: pileSelector("corsairDeck", seat), discard: pileSelector("corsairDiscard", seat) }), [seat]);
   const uncharted = useMemo(() => pileSelector("unchartedDeck", seat), [seat]);
+  // The victory display, shared by the seats, drawn only while a card is in it.
+  const victoryOf = useMemo(() => victoryPileSelector(facts.pointsOf ?? noPoints), [facts]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
   const staging = useStore(store, (state) => zones.staging(state.game));
   const activeLocation = useStore(store, (state) => zones.activeLocation(state.game));
@@ -30,12 +34,13 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const corsairDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDeck") ? corsair.deck(state.game) : null));
   const corsairDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDiscard") ? corsair.discard(state.game) : null));
   const unchartedDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("unchartedDeck") ? uncharted(state.game) : null));
+  const victory = useStore(store, (state) => victoryOf(state.game));
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
-      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}) },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(victory ? { victory } : {}) },
     }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck],
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, victory],
   );
 }
 
