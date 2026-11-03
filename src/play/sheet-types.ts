@@ -1,7 +1,7 @@
 // The shapes of the choice sheets the table shows, and the words for an effect's timing. Data only: sheets.ts maps the
 // engine's open window to one of these, bar-sheets.ts builds the sheets the bar opens and the intents a sheet sends.
 import type { Effect } from "../catalog/boundary.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
 
 import type { IconName } from "./icon-map.ts";
 import type { PlaceMark } from "./island-place.ts";

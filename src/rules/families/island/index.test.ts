@@ -3,7 +3,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { CODES, loadTempleWorld, templeTable, type TempleWorld } from "../../../../scripts/temple-scene.ts";
-import { blankScenario } from "../../state.ts";
+import { blankScenario } from "../../core/state.ts";
 import { dealUnchartedDeck } from "../uncharted/deal.ts";
 import { cardAt, cellOf, leftOf, neighbors, prepareMap, revealCorners, setActive, startCells, stagingCells, syncIsland, within } from "./map.ts";
 import type { IslandState } from "../uncharted/types.ts";

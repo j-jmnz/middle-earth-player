@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { expectOk } from "../../fixture.ts";
-import { reduce } from "../../reduce.ts";
-import { engageWith } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { moveCard, spawn } from "../../zones.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { engageWith } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { board, boardNow, boardingOf } from "./boarding.ts";
 import { enemy, hero, seaTable, send, shipEnemy, until, type Table } from "./table.ts";
 

@@ -3,10 +3,10 @@
 // loses the game, where an attack of the Thing and of a detached arm comes from, the beats of the stage swap, and the fold list's reading of a location.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, depthsTable, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
 
 import { slotNumbers } from "./card-effects.ts";

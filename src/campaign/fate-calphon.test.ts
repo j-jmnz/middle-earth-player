@@ -3,12 +3,12 @@
 // (data/printed/dream-chaser.json) run on a table of plain-number heroes (scripts/fate-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { legalIntents, type PlayerIntent } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, codesIn, fateTable, finish, idOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../scripts/fate-scene.ts";
 
 let world: FateWorld;

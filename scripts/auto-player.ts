@@ -1,12 +1,12 @@
 import { costOfKind } from "../src/catalog/costs.ts";
-import { playCost } from "../src/rules/attach.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import { heroPays } from "../src/rules/payments.ts";
-import { printedOf } from "../src/rules/printed.ts";
-import { costPayer } from "../src/rules/usage.ts";
-import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/intents.ts";
+import { playCost } from "../src/rules/player/attach.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import { heroPays } from "../src/rules/player/payments.ts";
+import { printedOf } from "../src/rules/core/printed.ts";
+import { costPayer } from "../src/rules/player/usage.ts";
+import type { EngineStep, LegalIntent, PlayerIntent } from "../src/rules/core/intents.ts";
 import { hideCommitLimit } from "../src/rules/families/nightmare/guards.ts";
-import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
+import { legalIntents, legalTargets, reduce, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
 
 // Test helper. A fixed policy that answers every window from the legal intents the reducer offers, so a
 // whole scenario can run in Vitest. It never types a number: it only sends intents the reducer listed.

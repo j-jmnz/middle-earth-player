@@ -5,11 +5,11 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { ruleCause } from "../../cause.ts";
-import { modifiedStat, placeDamage } from "../../keywords.ts";
-import { reduce } from "../../reduce.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
-import { attachTo, spawn } from "../../zones.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import { crossTo, inVictory, offered, passQuestWindow, play, put, questArea, questing, run, seat, send, sideCtx, synced, toVictory, trigger, triggers } from "./fixture.ts";
 
 // A treachery whose When Revealed does something, so a cancel has an effect to cancel.

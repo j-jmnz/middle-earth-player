@@ -3,12 +3,12 @@
 // locations, the treacheries and the shadow effects.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { withMode, type ScenarioState } from "../rules/state.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { withMode, type ScenarioState } from "../rules/core/state.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
-import { spawn } from "../rules/zones.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { CODES, codesIn, finish, flightFight, flightTable, idOf, idsOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 let world: FlightWorld;

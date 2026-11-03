@@ -11,7 +11,7 @@ import { cancelAnimation, useAnimatedReaction, useDerivedValue, useSharedValue, 
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import type { Clash } from "./clash.ts";
 import { cardFrame } from "./frame.ts";
 import { tickLand } from "./haptics.ts";

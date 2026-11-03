@@ -3,24 +3,24 @@
 // 900209:A:1, 900209:A:2.
 import type { CardRef, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import { beginEnemyAttack } from "../../combat.ts";
-import { hasTrait } from "../../conditions.ts";
-import { attackBarred } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat, placeDamage, raiseThreat } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { matchesPick } from "../../pick.ts";
-import { printedOf } from "../../printed.ts";
-import { engageEnemy, engageWith } from "../../quest.ts";
-import { queueEvent } from "../../queue.ts";
-import type { GameEvent, ResponseOffer, ScenarioState } from "../../state.ts";
-import { flagged, inPlay, livingSeats, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope, refCard } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { beginEnemyAttack } from "../../combat/combat.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import { attackBarred } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import { printedOf } from "../../core/printed.ts";
+import { engageEnemy, engageWith } from "../../quest/quest.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { GameEvent, ResponseOffer, ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import { dealAttackShadow } from "../defense/listen.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -164,7 +164,7 @@ export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, eff
   return traits.some((trait) => hasTrait(state, offer.cardId, trait, ctx));
 }
 
-// A Response canceled the "when revealed" effects of an encounter card being revealed (cancelAnswered, rules/player-verbs.ts): a card that
+// A Response canceled the "when revealed" effects of an encounter card being revealed (cancelAnswered, rules/interpret/player-verbs.ts): a card that
 // listens hears it ("Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1", 906304:A:1; rr.cancel). `before`
 // is the state the cancel was made in: the event is announced only when the cancel changed it, and only while a card that listens is in play.
 export function announceCanceled(state: ScenarioState, before: ScenarioState, ctx: ReduceContext): ScenarioState {

@@ -2,12 +2,12 @@
 // Stormcaller puts out, on both sides: what Black Key does to the enemy it is attached to, and Calaerion's Actions and Response.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { settle } from "../rules/machine.ts";
-import { withMode, type ScenarioState } from "../rules/state.ts";
-import { attachTo, moveCard, spawn } from "../rules/zones.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { withMode, type ScenarioState } from "../rules/core/state.ts";
+import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
 import { CODES, flightTable, idOf, loadFlightWorld, send, start, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 let world: FlightWorld;

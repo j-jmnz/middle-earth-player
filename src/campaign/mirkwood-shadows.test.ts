@@ -2,7 +2,7 @@
 // The Shadow lines of the Passage Through Mirkwood encounter cards, played through a real attack (scripts/mirkwood-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../rules/keywords.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { fight, loadMirkwoodWorld, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
 import { codesOf, first } from "../../scripts/past-scene.ts";

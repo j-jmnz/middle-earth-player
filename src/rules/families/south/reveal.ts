@@ -5,20 +5,20 @@
 // area with the highest engagement cost.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import { startReveal } from "../../frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { hasTrait } from "../../conditions.ts";
-import { stagingThreat } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { fireForced } from "../../triggers.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { startReveal } from "../../windows/frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import { stagingThreat } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { fireForced } from "../../windows/triggers.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { announceEntered } from "../encounter/reveal.ts";
 import { markPicked, queueFront } from "../play/refs.ts";

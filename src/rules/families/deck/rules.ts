@@ -3,10 +3,10 @@
 // Small rules of the deck family that the engine reads where cards move or are played; this module imports almost nothing,
 // so keywords.ts, actions.ts and effect-frames.ts can call it.
 
-import { cardTypeOf, type PrintedCard } from "../../printed.ts";
-import type { CardInstance, EffectData, ScenarioState } from "../../state.ts";
-import { inPlay, modifierActive } from "../../state.ts";
-import type { Destination } from "../../zones.ts";
+import { cardTypeOf, type PrintedCard } from "../../core/printed.ts";
+import type { CardInstance, EffectData, ScenarioState } from "../../core/state.ts";
+import { inPlay, modifierActive } from "../../core/state.ts";
+import type { Destination } from "../../core/zones.ts";
 
 /** Where an ally that leaves play goes while a lasting effect says it goes to its owner's hand instead of the discard pile
  * ("Until the end of the phase, add each ally that leaves play to its owner's hand", Rallying Cry 10003), or null. */

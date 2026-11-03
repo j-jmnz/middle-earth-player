@@ -42,10 +42,10 @@ import type { CampaignLog } from "../src/campaign/log.ts";
 import { newSave, type Save, type StoredLoadout } from "../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
-import { ENGINE_VERSION } from "../src/rules/version.ts";
+import { ENGINE_VERSION } from "../src/rules/engine/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
 import { hideCommitLimit } from "../src/rules/families/nightmare/guards.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
+import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "./auto-player.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";

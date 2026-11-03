@@ -2,7 +2,7 @@
 // (src/catalog/families/breaking.ts) inside a choice: the stage each player advances to at stage 2B, the Hunter's two branches, Growing Threat's two,
 // and the burden card the Seat of Seeing removes from the game.
 import type { Instruction } from "../catalog/boundary.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 type Names = { code: (code: string) => string; card: (cardId: string) => string };
 

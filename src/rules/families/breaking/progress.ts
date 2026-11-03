@@ -1,12 +1,12 @@
 // Rules: mec109.multiple-staging-areas, rr.quest-advancement (data/rules/entries.json); stage 3B of Breaking of the Fellowship (142063:B:1 to 142066:B:1) and Frodo's
 // Choice (142068:A:1).
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { startReveal } from "../../frames.ts";
-import { moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { startReveal } from "../../windows/frames.ts";
+import { moveCard } from "../../core/zones.ts";
 
 // Progress that would be placed on a stage 3B is owed as cards discarded from the encounter deck instead ("any time players would place progress on this quest,
 // discard an equal number of cards from the encounter deck instead"): the seat whose stage it is and how many. quest.ts notes it, `payOwed` discards the cards once

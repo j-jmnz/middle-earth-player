@@ -1,9 +1,9 @@
 import path from "node:path";
 
 import type { Effect } from "../src/catalog/boundary.ts";
-import { printedOf } from "../src/rules/printed.ts";
-import { legalIntents, reduce, type EngineStep, type PlayerIntent, type ScenarioState } from "../src/rules/reduce.ts";
-import { spawn } from "../src/rules/zones.ts";
+import { printedOf } from "../src/rules/core/printed.ts";
+import { legalIntents, reduce, type EngineStep, type PlayerIntent, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import { spawn } from "../src/rules/core/zones.ts";
 
 import { nextIntent } from "./auto-player.ts";
 import { dice, seedOf, smokeIntent, type Preference, type Smoked } from "./card-smoke-policy.ts";

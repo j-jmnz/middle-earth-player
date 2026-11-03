@@ -1,18 +1,18 @@
 // Rules: rr.encounter-deck, rr.reveal, rr.removed-from-game, rr.setup (data/rules/entries.json); ledger lines 41006:A:1, 41034:A:2, 41048:A:2, 41049:A:2.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, moveCard } from "../../zones.ts";
-import { updateCard } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, moveCard } from "../../core/zones.ts";
+import { updateCard } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { lookedOnTop } from "../encounter/items.ts";
 import { leavePlay } from "../encounter/moves.ts";
 
 // The verbs src/catalog/families/caves.ts adds. The progress rules of the quest card (families/caves/progress.ts), the engagement cost 0 and the
-// damage flags are read where they apply (rules/keywords.ts, rules/quest.ts); only the verbs run here. Null when the verb is not one of them.
+// damage flags are read where they apply (rules/core/keywords.ts, rules/quest/quest.ts); only the verbs run here. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "BottomOtherLooked":

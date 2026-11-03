@@ -1,7 +1,7 @@
 // The pieces every sheet builder uses: the step's words, a card's stat as the engine reads it, an option's label, and
 // whether an intent type is legal now.
-import type { LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { modifiedStat } from "../rules/keywords.ts";
+import type { LegalIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
 
 import { pictureKey } from "./picture-key.ts";
 import { islandTell } from "./uncharted-words.ts";

@@ -1,9 +1,9 @@
 import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { loadCampaign } from "./data/load-scenarios.ts";
-import { type PrintedCard, definePrinted } from "../src/rules/printed.ts";
-import { playCost } from "../src/rules/attach.ts";
-import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import { updateCard } from "../src/rules/state.ts";
+import { type PrintedCard, definePrinted } from "../src/rules/core/printed.ts";
+import { playCost } from "../src/rules/player/attach.ts";
+import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import { updateCard } from "../src/rules/core/state.ts";
 
 import { paymentsFor } from "./auto-player.ts";
 import { sceneCards } from "./test-scene.ts";

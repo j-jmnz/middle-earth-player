@@ -4,11 +4,11 @@
 // on the stage or on a card in play or in staging (The Ringwraiths Attack, 141027:B:1; Bucklebury Ferry, 141035:A:4). The
 // line is the card's printed text from the ledger, never booklet prose.
 import type { Instruction } from "../catalog/boundary.ts";
-import { effectsOf } from "../rules/listen.ts";
-import { questPointsOf } from "../rules/quest.ts";
-import { restricted } from "../rules/restrictions.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { inPlay, type CardInstance } from "../rules/state.ts";
+import { effectsOf } from "../rules/windows/listen.ts";
+import { questPointsOf } from "../rules/quest/quest.ts";
+import { restricted } from "../rules/interpret/restrictions.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { inPlay, type CardInstance } from "../rules/core/state.ts";
 
 /**
  * The quest points progress fills on this quest stage, or null when progress never defeats it: it prints none, or has 0 and the

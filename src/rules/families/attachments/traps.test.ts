@@ -6,15 +6,15 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { legalTargets } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { reduce } from "../../reduce.ts";
-import { stagingThreat } from "../../quest.ts";
-import { declarableEnemies } from "../../combat.ts";
-import { updateCard, withMode, type ScenarioState } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { legalTargets } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { stagingThreat } from "../../quest/quest.ts";
+import { declarableEnemies } from "../../combat/combat.ts";
+import { updateCard, withMode, type ScenarioState } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { attachmentCtx, deck, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
 
 const ctx = attachmentCtx(EFFECTS);

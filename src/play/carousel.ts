@@ -4,7 +4,7 @@
 // turn reference (reference.ts: the rule titles from data/rules and what the player decides), the step the engine is in, and the
 // action windows the player can stop at. Pure and read-only: every word comes from `turnReference`, `STEP_WORDS` and the
 // window points through it, none is written here, and nothing here sends an intent.
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import { phaseIndex, ROUND_PHASES, windowPoint } from "./rail.ts";
 import { turnReference, type ReferencePhase } from "./reference.ts";

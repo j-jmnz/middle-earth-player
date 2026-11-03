@@ -39,7 +39,7 @@ import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { SpotlightScrim } from "./spotlight-scrim.tsx";
 import type { ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { PictureSource } from "./table-canvas-types.ts";
-import { victoryPointsOf } from "../rules/printed-stat.ts";
+import { victoryPointsOf } from "../rules/core/printed-stat.ts";
 import { settingsPanelWidth } from "./settings-panel-width.ts";
 import { tableSettings } from "./table-settings.ts";
 import { TrayFrame, useHeld } from "./tray-frame.tsx";

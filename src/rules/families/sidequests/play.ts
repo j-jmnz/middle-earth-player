@@ -2,14 +2,14 @@
 // A player side quest is played in the planning phase like an ally (rr.step-2-2), paying its cost, and enters its player's quest
 // area. A player has one side quest in their quest area at a time (the engine's decision: the Rules Reference in data/rules has
 // no side quest span, and the quest area is one slot per seat, Seat.questStage).
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 
 // Why the active seat cannot play a side quest now, or null.
 export function sideQuestPlayReason(state: ScenarioState, seat: number): string | null {

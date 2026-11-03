@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { FORD_GOLDENS, fordIntent, fordStart, fordWorld, type FordGolden } from "../../scripts/ford-game.ts";
 import { intentsOf } from "../../scripts/sheet-intents.ts";
 

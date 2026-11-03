@@ -78,7 +78,7 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
   - `src/screens/briefing-parts.tsx:82`
 - `src/campaign/start.ts`: only `AttachToRingBearer` and `AddToStaging` campaign-setup verbs are dealt.
 - `src/campaign/resolution.ts` `earn()` and `log.ts` `applyResolution`: the pool is deduplicated by code, but "each player earns 1 copy" needs several copies of one code.
-- `src/rules/quest.ts` `advanceStage()` is linear, so Passage Through Mirkwood's random 3B branch can't be expressed.
+- `src/rules/quest/quest.ts` `advanceStage()` is linear, so Passage Through Mirkwood's random 3B branch can't be expressed.
 - Booklets: `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules-glossary.ts` `DOC_NAMES`/`BOOKS`.
 
 ## Approach: seven new phases (27–33)
@@ -227,7 +227,7 @@ For each phase:
 - `scripts/data/effects/{draft,open}`, `data/overrides.json`, `data/rules/{index,columns}.json`, `data/printed/mirkwood-paths.json` (new)
 - `src/catalog/{scenario-data,printed-ledger}.ts`, `scripts/build-catalog.ts`, `src/catalog/version.ts`
 - `src/campaign/{save,start,checklist,loadout,briefing,log,resolution,path,playable}.ts`
-- `src/rules/quest.ts`, `src/rules/families/*`, `src/catalog/families/*`
+- `src/rules/quest/quest.ts`, `src/rules/families/*`, `src/catalog/families/*`
 - `src/effects/index.ts`, `src/effects/authored/*`
 - `src/screens/{campaign-data,seat-picker,briefing-parts,rules-glossary}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts`
 - `docs/brief.md`, `docs/architecture.md` (registry note), `docs/phases/phase-27…33-*.md`, `docs/phases/STATUS.md`

@@ -6,10 +6,10 @@
 // engine files can call it without importing the family's verbs.
 import type { Effect } from "../../../catalog/boundary.ts";
 import { stageNumber } from "../caves/progress.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import type { HideResult, ScenarioState } from "../../state.ts";
-import { inPlay, modifierActive } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import type { HideResult, ScenarioState } from "../../core/state.ts";
+import { inPlay, modifierActive } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -68,7 +68,7 @@ export function lastHideFailed(state: ScenarioState): boolean {
 // dealt card with the same printed title stands in for it. Off Nightmare, or when the named card is dealt, the code is kept.
 export function twinCode(state: ScenarioState, code: string, cards: Cards): string {
   const all = Object.values(state.cards);
-  // On Nightmare only: the setup card is in play next to the quest deck (rules/setup.ts).
+  // On Nightmare only: the setup card is in play next to the quest deck (rules/setup/setup.ts).
   if (!all.some((card) => card.zone === "nightmare")) return code;
   if (all.some((card) => card.code === code)) return code;
   const title = cards.get(code)?.name;

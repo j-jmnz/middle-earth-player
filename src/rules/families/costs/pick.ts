@@ -5,10 +5,10 @@
 // `paidFor` ("if you paid all of its cost from a single hero's resource pool, that hero ...").
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import type { ScenarioState } from "../../state.ts";
-import { topFrame } from "../../windows.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { topFrame } from "../../windows/windows.ts";
 import { threatCostOf } from "./stats.ts";
 
 const VALOUR = new WeakMap<readonly unknown[], Map<string, boolean>>();

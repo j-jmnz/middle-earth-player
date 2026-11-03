@@ -6,7 +6,7 @@
 // nothing, so its uses do not stay.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../state.ts";
+import type { ScenarioState } from "../../core/state.ts";
 
 // The code of the card the ability is on has been recorded as used, by an earlier scenario of the campaign or earlier in this game.
 export function campaignUsed(state: ScenarioState, sourceId: string): boolean {

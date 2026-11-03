@@ -123,7 +123,7 @@ touches what it says (Performance, State, Persistence).
    keyed by state and code. `syncConstants` (`constants.ts:116-122`): compare old and new modifiers field by field instead of
    comparing two `JSON.stringify` strings. Also cache `slotNumbers`/`cardEffects` per `(game, seat)` → `Map<cardId, numbers>`
    (`src/play/card-effects.ts:184-198`, the same pattern as `foresight.ts:90`).
-2. **Effects by id**: add an `effectById(effects, id)` WeakMap index next to `effectsOf` (`rules/listen.ts:12-23`), and use it
+2. **Effects by id**: add an `effectById(effects, id)` WeakMap index next to `effectsOf` (`rules/windows/listen.ts:12-23`), and use it
    in `responses.ts:91/98/131/140`, `constants.ts:129`, `sheets.ts:30/81/331`, `objective.ts:31/40`, `stops.ts:88`,
    `table-hooks.ts:36`, `use-table-choice.ts:135` and `table-view.tsx:146`. The `src/play` callers import it from
    `src/effects` or `src/rules` according to the lint zones.

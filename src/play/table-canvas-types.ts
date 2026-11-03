@@ -1,4 +1,4 @@
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import type { BeatStore } from "./beat-store.ts";
 import type { SlotNumbers } from "./card-effects.ts";
 import type { OptionMark } from "./sheet-types.ts";

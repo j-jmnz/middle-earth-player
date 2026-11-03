@@ -169,7 +169,7 @@ export const scenarioDefinitionSchema = z.strictObject({
   // The part number of the scenario's campaign card (its place in a campaign with XP, counting from 1): "X is the campaign card's part number".
   part: z.number().int().positive().optional(),
   // The campaign card's Setup instructions that need the quest card's Setup done first (a Dream-chaser Setup that names the ship-objectives the quest
-  // card's Setup prepares): they resolve in a frame after it (rules/setup.ts).
+  // card's Setup prepares): they resolve in a frame after it (rules/setup/setup.ts).
   afterSetup: z.array(instructionSchema).optional(),
 });
 

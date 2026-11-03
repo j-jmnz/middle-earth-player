@@ -3,10 +3,10 @@
 // Engagement for the quest family: an enemy that makes no engagement checks against one player, or cannot engage one player
 // (the modifier's seat), the mark an engagement leaves on the encounter phase, and optional engagements (an additional one,
 // and the event "After you optionally engage an enemy").
-import type { ReduceContext } from "../../interpret.ts";
-import { optionalEnemies } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, heldAmount, modifierActive } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { optionalEnemies } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount, modifierActive } from "../../core/state.ts";
 import { queueHeard } from "./events.ts";
 
 // The enemy is barred from this seat: it cannot engage it (`engage`), or, for an engagement check, it also makes none against

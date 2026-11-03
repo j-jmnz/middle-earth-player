@@ -4,9 +4,9 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { doRefresh } from "../../refresh.ts";
-import { updateCard } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { doRefresh } from "../../engine/refresh.ts";
+import { updateCard } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { attach, damage, miscCtx } from "./fixture.ts";
 import { offered, passResponses, play, put, run, seat, send, trigger, triggers } from "../play/fixture.ts";
 

@@ -2,8 +2,8 @@
 // in play gains: Travel: Each player must exhaust a character he controls to travel here") and the quest stage that lets the players travel while another location is active.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../state.ts";
-import { flagged, heldAmount } from "../../state.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount } from "../../core/state.ts";
 
 // "Each player must exhaust a character he controls to travel here" (12044:A:1): the cost of a Travel line, which the players cannot pay without a ready character each (rr.travel).
 const EXHAUST_COST: Instruction = { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } }] };

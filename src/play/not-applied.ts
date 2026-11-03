@@ -61,7 +61,7 @@ export function notAppliedCodes(texts: Iterable<readonly [string, string | null]
 /**
  * What playing a card the app does not fully apply costs, said before it is confirmed: an attachment with no record attaches
  * and does nothing (the confirm arms on its first tap); an ally plays with its printed numbers. Null when every line is
- * applied. Events with no record are never offered (src/rules/planning.ts), so they have no caution.
+ * applied. Events with no record are never offered (src/rules/player/planning.ts), so they have no caution.
  */
 export function playCaution(code: string, type: string, text: string | null, cost: number, against: TextCheck = shippedCheck()): { words: string; armed: string | null } | null {
   const lines = unappliedLines(code, text, against);

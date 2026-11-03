@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/costs.ts";
 
-import { playCost } from "../../attach.ts";
-import { syncConstants } from "../../constants.ts";
-import { expectOk } from "../../fixture.ts";
-import { flagged, updateCard, withMode, withThreat, type ScenarioState } from "../../state.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import { attachTo } from "../../zones.ts";
+import { playCost } from "../../player/attach.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { flagged, updateCard, withMode, withThreat, type ScenarioState } from "../../core/state.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { attachTo } from "../../core/zones.ts";
 import { card, put, table } from "./fixture.ts";
 
 // Rules: rr.resource-match, rr.cost, rr.doomed-x, rr.keywords, rr.lasting-effects, rr.limits, rr.modifiers, rr.qualifiers

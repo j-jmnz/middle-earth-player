@@ -21,20 +21,20 @@ export const pickSchema = z.strictObject({
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
-  // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/pick.ts.
+  // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/interpret/pick.ts.
   inStormcallerArea: z.literal(true).optional(),
   // Which staging area the staging cards of the filter are in once stages are separate (Breaking of the Fellowship, mec109.multiple-staging-areas):
   // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
-  // "in any staging area"). Read by src/rules/pick.ts; a game with one staging area ignores it.
+  // "in any staging area"). Read by src/rules/interpret/pick.ts; a game with one staging area ignores it.
   stagingArea: z.enum(["own", "shared", "any"]).optional(),
   // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
-  // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/pick.ts.
+  // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/interpret/pick.ts.
   atStage: z.literal(true).optional(),
   // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
   // points than the attacking enemy", 142079:A:2). Read by src/rules/families/breaking/attack.ts.
   fewerHitPointsThan: z.literal("attackingEnemy").optional(),
   // A burden card (Campaign Mode) in play, in the encounter deck or in the encounter discard pile ("choose a burden card in play, in the encounter deck, or
-  // in the discard pile", 142074:A:2). Read by src/rules/pick.ts.
+  // in the discard pile", 142074:A:2). Read by src/rules/interpret/pick.ts.
   burden: z.literal(true).optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
@@ -200,7 +200,7 @@ export const pickSchema = z.strictObject({
   minAttack: z.number().int().min(0).optional(),
   drawn: z.boolean().optional(),
   // Of the cards that match every other filter, only those with the most damage on them (all of them when tied): "the hero you control
-  // with the most damage on it" (01137:A:2). Read by pickCandidates (src/rules/pick.ts).
+  // with the most damage on it" (01137:A:2). Read by pickCandidates (src/rules/interpret/pick.ts).
   mostDamaged: z.literal(true).optional(),
   // A card with at most this many attachments on it ("a Dale character without an attachment" is read after the attachment arrived: 1).
   maxAttachments: z.number().int().min(0).optional(),
@@ -215,7 +215,7 @@ export const pickSchema = z.strictObject({
   guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),
-  // The nightmare family's filters (read in src/rules/pick.ts): a character whose current Willpower is at most this, a value below 0
+  // The nightmare family's filters (read in src/rules/interpret/pick.ts): a character whose current Willpower is at most this, a value below 0
   // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
   maxWillpower: z.number().int().min(0).optional(),
   // A card a player controls with a copy (a card of the same title) in that player's discard pile ("Discard each card you control that has at

@@ -2,13 +2,13 @@
 // and the numbers a record asks for ("the number of enemies grappled with locations in the staging area", "each resource token on a Raider enemy", "the total Threat of any one Ship location").
 import type { Condition, PickSpec } from "../../../catalog/boundary.ts";
 
-import type { AmountScope } from "../../amounts.ts";
-import { pickCandidates } from "../../pick.ts";
-import { printedOf } from "../../printed.ts";
-import type { ReduceContext } from "../../interpret.ts";
+import type { AmountScope } from "../../interpret/amounts.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shownSide } from "../dreamchaser/faces.ts";
-import type { ScenarioState } from "../../state.ts";
-import { modifiedStat } from "../../keywords.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
 import { isElite } from "../sea/routes.ts";
 
 const CHANGE_OF_PLANS = "12040";

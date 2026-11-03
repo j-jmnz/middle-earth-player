@@ -4,9 +4,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../catalog/boundary.ts";
-import { moveCard } from "../rules/zones.ts";
-import { withSeat } from "../rules/state.ts";
-import { printedOf } from "../rules/printed.ts";
+import { moveCard } from "../rules/core/zones.ts";
+import { withSeat } from "../rules/core/state.ts";
+import { printedOf } from "../rules/core/printed.ts";
 import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../scripts/breaking-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 

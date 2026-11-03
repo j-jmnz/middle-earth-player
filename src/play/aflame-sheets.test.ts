@@ -3,13 +3,13 @@
 // and the Campaign Expansion's cards (scripts/raid-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import { reduce } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
 
 import { fireRow } from "./aflame-sheets.ts";

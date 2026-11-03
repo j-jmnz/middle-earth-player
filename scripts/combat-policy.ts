@@ -1,7 +1,7 @@
-import { expectOk } from "../src/rules/fixture.ts";
-import type { EngineStep } from "../src/rules/intents.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import { modifiedStat } from "../src/rules/keywords.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import type { EngineStep } from "../src/rules/core/intents.ts";
+import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import { modifiedStat } from "../src/rules/core/keywords.ts";
 
 import { nextIntent } from "./auto-player.ts";
 import { RING_BEARER } from "./starter-game.ts";

@@ -3,11 +3,11 @@
 // Engagements the attack family remembers or announces: a seat that engaged an enemy this round (the `engagedThisRound`
 // condition, "If you have not engaged an enemy this round", 08056:A:2), and an optional engagement ("After you optionally engage
 // an enemy", 145012:A:3). Both only in a game with a card that reads them, so a game without one is unchanged.
-import type { GameEvent } from "../../frame-types.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { heldAmount } from "../../state.ts";
-import { gameReads } from "../../game-reads.ts";
+import type { GameEvent } from "../../windows/frame-types.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { heldAmount } from "../../core/state.ts";
+import { gameReads } from "../../core/game-reads.ts";
 
 // Whether some card in the game hears this trigger: the attack family's own events are queued only then (attackDamaged,
 // attackDestroyedEngaged, attacked).

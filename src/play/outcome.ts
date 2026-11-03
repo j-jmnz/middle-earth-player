@@ -6,8 +6,8 @@
 // travel, the cards revealed and the enemies that engaged. Every number is one the engine put in a step. The log keeps
 // the whole round; the banner keeps what changed the table.
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
-import type { EngineStep, PlayerIntent } from "../rules/intents.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import type { EngineStep, PlayerIntent } from "../rules/core/intents.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import type { LogMark } from "./log.ts";
 import { detachLine, grappleLine } from "./grapple-words.ts";

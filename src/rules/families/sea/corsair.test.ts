@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
-import { definePrinted } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { endCorsairDeck, refillCorsairDeck } from "./corsair.ts";
 import { deckOf, enemy, hero, seaTable, send, shipEnemy, until, type Table } from "./table.ts";
 

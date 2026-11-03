@@ -5,8 +5,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../scripts/breaking-game.ts";
 import { breaking, campaign } from "../../scripts/breaking-scene.ts";
 

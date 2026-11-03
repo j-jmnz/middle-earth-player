@@ -16,7 +16,7 @@ Agents read `CLAUDE.md`, the rules, the agent files, `docs/phases/STATUS.md`, th
 
 ## Facts the code owns
 
-- Do not write down a number or a list the code holds: the engine version, how many scenarios are playable, how many lines are open, the families, branch names, test counts. Point to the file (`src/rules/version.ts`, `src/campaign/playable.ts`, `src/effects/open-lines.ts`, `src/catalog/families/index.ts`).
+- Do not write down a number or a list the code holds: the engine version, how many scenarios are playable, how many lines are open, the families, branch names, test counts. Point to the file (`src/rules/engine/version.ts`, `src/campaign/playable.ts`, `src/effects/open-lines.ts`, `src/catalog/families/index.ts`).
 - Cite a doc by file and section heading, never by line number: lines move with every edit. Write the heading's words (`docs/brief.md, Core round`); `scripts/docs-index.test.ts` fails when a citation in code or a live doc names no heading, so rename a heading and its citations together.
 
 ## The index

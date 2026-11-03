@@ -3,18 +3,18 @@
 // attack, a canceled attack, and what the end of an attack announces about its defenders.
 import type { Instruction, PickSpec, SimpleInstruction } from "../../../catalog/boundary.ts";
 
-import { canDefend } from "../../combat.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import { ruleCause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { defenseAsDefender, modifiedStat } from "../../keywords.ts";
-import { pickCandidates } from "../../pick.ts";
-import { readyCard } from "../../player-verbs.ts";
-import { isCharacterType, printedOf, type PrintedCard, type Sphere } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { GameEvent, PendingAttack, ScenarioState } from "../../state.ts";
-import { flagged, inPlay, livingSeats, updateCard } from "../../state.ts";
+import { canDefend } from "../../combat/combat.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { defenseAsDefender, modifiedStat } from "../../core/keywords.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { readyCard } from "../../interpret/player-verbs.ts";
+import { isCharacterType, printedOf, type PrintedCard, type Sphere } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { groupResources } from "./conditions.ts";
 import { noteAttackDamage } from "./damage.ts";
 import { combatDamage } from "./excess.ts";

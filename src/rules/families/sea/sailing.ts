@@ -5,15 +5,15 @@
 // chooses; discard the cards looked at. The cards looked at wait for the first player's Done (or the last symbol's answer) before they are discarded.
 // Players may use Actions before and after the test, but not during it. The Dream-chaser can be committed to any test and counts as more than one
 // character (the flags sailsAnyTest and sailingExtra). The symbols are the ledger's `sailingSuccess`, a keyword flag of the card.
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { stepWindow } from "../../step-window.ts";
-import type { ScenarioState } from "../../state.ts";
-import { heldAmount, markReached, reached, updateCard } from "../../state.ts";
-import { ruleCause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { stepWindow } from "../../engine/step-window.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { heldAmount, markReached, reached, updateCard } from "../../core/state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { shuffleDiscardIn } from "../encounter/moves.ts";
-import { moveCard } from "../../zones.ts";
+import { moveCard } from "../../core/zones.ts";
 import { committedTo, committedToSailing } from "../stormcaller/commit.ts";
 import { headingIs, shiftHeading } from "./heading.ts";
 import { tester } from "./sailing-legal.ts";

@@ -4,16 +4,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
 import { EFFECTS } from "../effects/index.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce } from "../rules/reduce.ts";
-import { stagingThreat } from "../rules/quest.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { DOORS, GREAT_WARG_CHIEF, LUST, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../scripts/south-scene.ts";
 import { codesOf, first } from "../../scripts/past-scene.ts";
 

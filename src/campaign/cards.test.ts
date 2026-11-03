@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import { cards } from "../catalog/schema.ts";
-import { printedFromCard } from "../rules/printed.ts";
+import { printedFromCard } from "../rules/core/printed.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 

@@ -4,8 +4,8 @@
 // spends it to ready.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, send, type Table } from "../../scripts/test-scene.ts";
 

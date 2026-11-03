@@ -6,7 +6,7 @@
 // video's "keep a round summary nearby".
 import steps from "../../data/rules/steps.json";
 
-import type { ModeName, ScenarioState } from "../rules/state.ts";
+import type { ModeName, ScenarioState } from "../rules/core/state.ts";
 
 import { pointNote, pointTitle } from "./rail.ts";
 

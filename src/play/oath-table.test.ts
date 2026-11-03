@@ -2,9 +2,9 @@
 // the campaign card, and an Adaptation whose Action is used for the campaign. The engine decides both; nothing here changes a card.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 

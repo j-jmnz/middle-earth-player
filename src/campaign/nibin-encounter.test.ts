@@ -3,14 +3,14 @@
 // plain-number heroes (scripts/nibin-dum-scene.ts). The Cave Torch cards are in nibin-torch.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import { seatThreat } from "../rules/families/play/hooks.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";

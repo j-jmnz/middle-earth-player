@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 
@@ -19,7 +19,7 @@ import { campaignPath, nextStep, openNode } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
-import { reduce } from "../rules/reduce.ts";
+import { reduce } from "../rules/engine/reduce.ts";
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
 // The Maestro fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each

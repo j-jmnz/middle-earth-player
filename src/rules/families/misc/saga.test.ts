@@ -4,12 +4,12 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { syncConstants } from "../../constants.ts";
-import { cardMap, codes, expectOk, fixtureDefinition } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { legalIntents, reduce, startScenario } from "../../reduce.ts";
-import { updateCard } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { cardMap, codes, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { legalIntents, reduce, startScenario } from "../../engine/reduce.ts";
+import { updateCard } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { MISC_CARDS, miscCtx } from "./fixture.ts";
 import { play, put, run, seat, send, trigger } from "../play/fixture.ts";
 

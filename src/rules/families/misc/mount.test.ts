@@ -3,13 +3,13 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { characters } from "../../combat.ts";
-import { syncConstants } from "../../constants.ts";
-import { hasTrait } from "../../conditions.ts";
-import { enforceRestricted } from "../../attach.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { restrictedLoad } from "../../restrictions.ts";
-import { attachTo } from "../../zones.ts";
+import { characters } from "../../combat/combat.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import { enforceRestricted } from "../../player/attach.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { restrictedLoad } from "../../interpret/restrictions.ts";
+import { attachTo } from "../../core/zones.ts";
 import { miscCtx } from "./fixture.ts";
 import { put, run, seat, send, trigger, triggers } from "../play/fixture.ts";
 

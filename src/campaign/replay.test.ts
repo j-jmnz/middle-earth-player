@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { definePrinted } from "../rules/printed.ts";
-import { reduce } from "../rules/reduce.ts";
-import { startScenario } from "../rules/setup.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import { startScenario } from "../rules/setup/setup.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { playOut } from "../../scripts/auto-player.ts";
 import { campaign, loadWorld, scenario } from "../../scripts/past-scene.ts";
 import { playStarter, starterWorld } from "../../scripts/starter-game.ts";

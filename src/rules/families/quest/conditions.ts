@@ -3,10 +3,10 @@
 // whether an enemy was engaged this encounter phase, and the current quest card's keywords.
 import type { Condition } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, reached } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, reached } from "../../core/state.ts";
 
 type Step = Extract<Condition, { kind: "step" }>["is"];
 

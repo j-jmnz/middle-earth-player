@@ -4,9 +4,9 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS as DECK } from "../effects/authored/families/deck.ts";
 import { RECORDS as TDR } from "../effects/authored/pool/TDR.ts";
-import { expectOk } from "../rules/fixture.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
 import { card, put, table } from "../rules/families/costs/fixture.ts";
-import { legalIntents, reduce } from "../rules/reduce.ts";
+import { legalIntents, reduce } from "../rules/engine/reduce.ts";
 
 import { windowSheet } from "./bar-sheets.ts";
 import { highlightKeys } from "./highlight-of.ts";

@@ -1,7 +1,7 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, dcce.sailing-tests (data/rules/entries.json). The smallest reads and writes of the Stormcaller's area (sea.stormcaller), with
 // state types only, so zones.ts can use them: which card belongs to the area, and the events a card moving between zones announces in a game with ships.
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { StormcallerArea } from "../sea/types.ts";
 
 /** The Stormcaller's area of the game, or undefined when no Setup has prepared one. */

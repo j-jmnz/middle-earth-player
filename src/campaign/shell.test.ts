@@ -5,8 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { encounterCodes } from "../catalog/scenario-data.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
-import { reduce, type PlayerIntent, type ScenarioState } from "../rules/reduce.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import { reduce, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 

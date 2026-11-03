@@ -3,7 +3,7 @@ import { z } from "zod";
 import { printedKeywordsSchema } from "./boundary.ts";
 
 // One card as data/cards stores it. The sync adapters feed it, scripts/data/normalize/ builds it, and
-// the engine reads the subset it needs through src/rules/printed.ts.
+// the engine reads the subset it needs through src/rules/core/printed.ts.
 export const printingSchema = z.strictObject({
   pack: z.string().min(1),
   number: z.number().int(),

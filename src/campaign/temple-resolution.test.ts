@@ -4,8 +4,8 @@
 // player the first player chooses.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { applyResolution, openResolution, resolutionIntents, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { applyResolution, openResolution, resolutionIntents, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, idOf, templeTable, loadTempleWorld, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 
 let world: TempleWorld;

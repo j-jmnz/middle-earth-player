@@ -2,12 +2,12 @@
 // (scripts/raid-scene.ts): the keyword, the end of the round, the destruction under The Havens Burn and what that costs, the Setup's discards, the quest cards' effects and the encounter cards that burn.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { holds, outOfPlayCopies } from "../../conditions.ts";
-import { settle } from "../../machine.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ScenarioState } from "../../state.ts";
-import { legalTargets } from "../../legal.ts";
-import { showedHidden } from "../../undo.ts";
+import { holds, outOfPlayCopies } from "../../interpret/conditions.ts";
+import { settle } from "../../engine/machine.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { legalTargets } from "../../engine/legal.ts";
+import { showedHidden } from "../../engine/undo.ts";
 import { AFLAME, CODES, codesIn, finish, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../../scripts/raid-scene.ts";
 import { aflameOf } from "./values.ts";
 import { progressRoom } from "../south/locations.ts";

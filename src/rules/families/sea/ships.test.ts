@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { legalIntents, legalTargets, reduce } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
+import { legalIntents, legalTargets, reduce } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { enemy, hero, seaTable, send, ship, shipEnemy, until, type Table } from "./table.ts";
 
 // Rules: dcce.ships, dcce.ship-enemies, dcce.ship-objectives (data/rules/entries.json). Who attacks and defends whom: a ship-enemy's attack is

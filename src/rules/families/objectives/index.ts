@@ -8,18 +8,18 @@
 // is over) it returns to the staging area.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard } from "../../amounts.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { enforceRestricted } from "../../attach.ts";
-import { startReveal } from "../../frames.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, updateCard } from "../../state.ts";
-import { resetEncounterDeck } from "../../verbs.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope, refCard } from "../../interpret/amounts.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { enforceRestricted } from "../../player/attach.ts";
+import { startReveal } from "../../windows/frames.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import { resetEncounterDeck } from "../../interpret/verbs.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 // An objective in the staging area with no encounter card attached to it is free of encounters, so it can be claimed (rr.guarded).

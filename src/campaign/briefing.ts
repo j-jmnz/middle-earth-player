@@ -5,8 +5,8 @@
 import { deckRulesOf, heroLimit } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, formatDeckRefusal } from "../catalog/deck-save.ts";
 import { placementsAt, recordInstructions, type Difficulty } from "../catalog/scenario-data.ts";
-import { printedOf } from "../rules/printed.ts";
-import type { StartScenario } from "../rules/setup.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import type { StartScenario } from "../rules/setup/setup.ts";
 
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat } from "./loadout.ts";

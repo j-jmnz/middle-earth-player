@@ -2,7 +2,7 @@
 // stage number, and whether defeating the current quest stage catches up to it.
 import type { Condition } from "../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../state.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { stageNumber } from "../caves/progress.ts";
 import { areaOf } from "./zone.ts";
 

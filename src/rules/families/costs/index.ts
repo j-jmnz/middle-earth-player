@@ -1,7 +1,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { payToPlay, playFromHand } from "./play.ts";
 import { chooseX, discardResources, heroesGain, reattach, reduceNextCost, setX, spendResources } from "./verbs.ts";
 import type { Focus } from "../index.ts";

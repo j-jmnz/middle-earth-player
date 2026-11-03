@@ -7,15 +7,15 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
-import { pushCardEffects } from "../../effect-frames.ts";
-import { cardMap, expectOk, hero, idleScenario } from "../../fixture.ts";
-import type { EngineStep } from "../../intents.ts";
-import { committedWillpower } from "../../quest.ts";
-import { legalTargets, reduce } from "../../reduce.ts";
-import { settle } from "../../machine.ts";
-import { definePrinted } from "../../printed.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { cardMap, expectOk, hero, idleScenario } from "../../core/test-fixture.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { committedWillpower } from "../../quest/quest.ts";
+import { legalTargets, reduce } from "../../engine/reduce.ts";
+import { settle } from "../../engine/machine.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { recordStartingThreat } from "./threat.ts";
 
 const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 20 });

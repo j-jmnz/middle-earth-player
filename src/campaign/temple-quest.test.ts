@@ -3,13 +3,13 @@
 // line of the ledger (data/printed/dream-chaser.json) has a record, run on a table that makes it true (scripts/temple-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { settle } from "../rules/machine.ts";
-import { hasKeyword, modifiedStat } from "../rules/keywords.ts";
-import { placeQuestProgress } from "../rules/quest.ts";
-import { reduce } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { legalIntents } from "../rules/legal.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { hasKeyword, modifiedStat } from "../rules/core/keywords.ts";
+import { placeQuestProgress } from "../rules/quest/quest.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
 import { CODES, answer, finish, idOf, loadTempleWorld, send, start, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 
 let world: TempleWorld;

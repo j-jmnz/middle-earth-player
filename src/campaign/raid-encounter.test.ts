@@ -2,13 +2,13 @@
 // Stormcaller Elite's enemy sides: the Raiders that grow with resources, the shadow effects, the treacheries, on a table of plain-number heroes and the Campaign Expansion's cards (scripts/raid-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { fireForced } from "../rules/triggers.ts";
-import { moveCard, shadowCards } from "../rules/zones.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { fireForced } from "../rules/windows/triggers.ts";
+import { moveCard, shadowCards } from "../rules/core/zones.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
 
 let world: RaidWorld;

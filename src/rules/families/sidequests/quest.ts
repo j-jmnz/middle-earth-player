@@ -3,15 +3,15 @@
 // quest cards and the Learn to Play: a side quest sits in its player's quest area, a character commits to it instead of the
 // current quest, the Willpower committed to it is placed on it as progress (it is not compared with the Threat in the staging
 // area), and it is defeated when its progress reaches its quest points.
-import { ruleCause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat, releaseAttachments } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { queueEvent } from "../../queue.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, releaseAttachments } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { questCardDefeatedHeard } from "../quest/branch.ts";
 import { addToVictory } from "./victory.ts";

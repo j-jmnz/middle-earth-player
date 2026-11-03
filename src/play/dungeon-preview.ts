@@ -2,14 +2,14 @@
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck. The engine decided each; nothing here changes one.
 import { freeOfEncounters } from "../rules/families/objectives/index.ts";
-import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 import { prisonerWords } from "./widgets.ts";
 
 /**
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
- * is blank), from their printed definitions (rules/printed.ts): the stats a real card would print. Null for any other code.
+ * is blank), from their printed definitions (rules/core/printed.ts): the stats a real card would print. Null for any other code.
  */
 export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: string): string | null {
   const fallen = code.endsWith(FALLEN_SUFFIX);

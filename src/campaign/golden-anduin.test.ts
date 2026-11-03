@@ -3,9 +3,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { encounterCodes } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinDecks, type AnduinGame } from "../../scripts/anduin-game.ts";
 import { anduin, campaign } from "../../scripts/anduin-scene.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";

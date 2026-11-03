@@ -2,12 +2,12 @@
 // Phase 9 batch 5: the hero and attachment lines of the starter decks that the earlier batches did not cover.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/reduce.ts";
-import { updateCard, withMode } from "../rules/state.ts";
-import { definePrinted } from "../rules/printed.ts";
-import { spawn } from "../rules/zones.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import { updateCard, withMode } from "../rules/core/state.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { CHEAP, DEAR, fund, refusal, starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
 

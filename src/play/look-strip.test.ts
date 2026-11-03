@@ -1,7 +1,7 @@
 // Rules: dcce.sailing, dcce.sailing-tests (data/rules/entries.json). The Sailing test's look strip (docs/design-system-table.md, The Sailing test).
 import { describe, expect, it } from "vitest";
 
-import { definePrinted, type PrintedCard } from "../rules/printed.ts";
+import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
 import { loadLedger } from "../../scripts/data/printed/ledger.ts";
 

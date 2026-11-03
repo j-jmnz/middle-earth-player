@@ -1,12 +1,12 @@
 // Rules: dcce.aflame (data/rules/entries.json); ledger lines 11038:A:1, 11038:A:2, 11039:A:4. Aflame X: at the end of each round every Aflame location in the staging area takes 1 damage, and an Aflame
 // location with damage equal to its Aflame value, wherever it is in play, is destroyed: it is placed facedown underneath The Havens Burn, out of play, and the cards that hear it are told.
-import type { ReduceContext } from "../../interpret.ts";
-import type { EngineStep } from "../../intents.ts";
-import { ruleCause } from "../../cause.ts";
-import { placeDamage, releaseAttachments } from "../../keywords.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { placeDamage, releaseAttachments } from "../../core/keywords.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { leavePlay } from "../encounter/moves.ts";
 import { aflameOf, burnId } from "./values.ts";
 

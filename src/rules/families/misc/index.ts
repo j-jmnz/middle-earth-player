@@ -1,17 +1,17 @@
 // Rules: rr.damage, rr.hit-points, rr.first-player (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import { drawMany, type ReduceContext } from "../../interpret.ts";
-import { placeDamage } from "../../keywords.ts";
-import { printedOf } from "../../printed.ts";
-import { shuffleEncounterDeck } from "../../verbs.ts";
-import { spawn } from "../../zones.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { pickedList } from "../../player-verbs.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { drawMany, type ReduceContext } from "../../interpret/interpret.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { printedOf } from "../../core/printed.ts";
+import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
+import { spawn } from "../../core/zones.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { pickedList } from "../../interpret/player-verbs.ts";
 
 import type { Focus } from "../index.ts";
 import { attachCollectionHero, swapHero } from "./collection.ts";

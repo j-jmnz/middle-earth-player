@@ -74,7 +74,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("subjectExplored") }),
   // Another player is still in the game.
   z.strictObject({ kind: z.literal("otherPlayer") }),
-  // The actor holds the first player token ("Each other player searches ...", 41003:A:1, is `not` this one; src/rules/conditions.ts).
+  // The actor holds the first player token ("Each other player searches ...", 41003:A:1, is `not` this one; src/rules/interpret/conditions.ts).
   z.strictObject({ kind: z.literal("firstPlayer") }),
   // The card with this code, in play, holds at least `min` resource tokens ("If there are 6 or more resource tokens here", 41050:B:1): read at a
   // campaign card's Resolution (campaign family, src/rules/families/campaign/index.ts).
@@ -82,7 +82,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("tokens"), code: z.string().min(1), min: z.number().int().min(0), perPlayer: z.boolean().optional() }),
   // The total Threat of the encounter cards in the actor's staging area is at most `max` ("if the total Threat of encounter cards in this staging
   // area is less than 4", 142063:A:1: max 3). Once stages are separate that is the actor's own area (mec109.multiple-staging-areas); read by
-  // src/rules/conditions.ts.
+  // src/rules/interpret/conditions.ts.
   z.strictObject({ kind: z.literal("stagingThreat"), max: z.number().int().min(0) }),
   // The source card holds at most `max` damage tokens (0: none, "if there are no damage tokens here", 142043:A:1). Read by the moria family
   // (src/rules/families/moria/index.ts).
@@ -117,7 +117,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // A card with this code is in play (`is`) or is not. Read at the end of a scenario, for a resolution.
   z.strictObject({ kind: z.literal("inPlay"), code: z.string().min(1), is: z.boolean() }),
   // The quest advanced to the stage with this code (`is`) or did not. Kept only by a quest that branches (BranchStage), read by the
-  // Resolution of 01129 ("If stage 3B was Beorn's Path"): src/rules/conditions.ts, state.stagesReached.
+  // Resolution of 01129 ("If stage 3B was Beorn's Path"): src/rules/interpret/conditions.ts, state.stagesReached.
   z.strictObject({ kind: z.literal("stageReached"), code: z.string().min(1), is: z.boolean() }),
   // The source objective has no encounter card attached to it: it is "free of encounters" (rr.guarded; 01108:A:2). Read for a Guarded
   // objective in the staging area.
@@ -131,7 +131,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
-  // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/keywords.ts).
+  // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/keywords.ts).
   // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2).
   z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
   // The source card is attached to a card with this name.
@@ -140,7 +140,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("controls"), code: z.string().min(1) }),
   // A copy of this card is out of play where an effect can take it from ("shuffle 1 out of play Ringwraith into the encounter
   // deck" on 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2): set aside, in the encounter discard pile or the victory display
-  // (rr.in-play-and-out-of-play), or under a location (141049:A:1). See outOfPlayCopies in src/rules/conditions.ts.
+  // (rr.in-play-and-out-of-play), or under a location (141049:A:1). See outOfPlayCopies in src/rules/interpret/conditions.ts.
   z.strictObject({ kind: z.literal("outOfPlay"), code: z.string().min(1) }),
   // The current quest card has progress on it (141026:B:2: removing progress is an effect that changes the game, rr.effects).
   z.strictObject({ kind: z.literal("questProgress") }),

@@ -1,9 +1,9 @@
 // Rules: dcce.sailing, dcce.sailing-tests (data/rules/entries.json). What the table may do while a Sailing test is being asked: who is the tester,
 // the characters that can be committed, the intents open, and what is refused. legal.ts and machine.ts ask these; sea/sailing.ts performs the test.
-import type { ReduceContext } from "../../interpret.ts";
-import { characters } from "../../combat.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, livingSeats } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { characters } from "../../combat/combat.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, livingSeats } from "../../core/state.ts";
 
 /** The first player, or the first seat still in the game, who performs the test. */
 export function tester(state: ScenarioState): number {

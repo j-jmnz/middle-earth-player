@@ -3,13 +3,13 @@
 // follows is played with separate staging (src/rules/families/breaking/areas.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../../fixture.ts";
-import type { EngineStep } from "../../intents.ts";
-import { reduce, type ScenarioState } from "../../reduce.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { stagingThreat } from "../../quest.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { reduce, type ScenarioState } from "../../engine/reduce.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { stagingThreat } from "../../quest/quest.ts";
 import { areaOf, sharedStaging, stageOf, stagingOf, viewOf } from "./areas.ts";
-import { moveCard } from "../../zones.ts";
+import { moveCard } from "../../core/zones.ts";
 import { causeProblems } from "../../../../scripts/cause-check.ts";
 import { DIVIDED, FRODOS_CHOICE, SEAT_OF_SEEING, codes, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
 import { first } from "../../../../scripts/past-scene.ts";

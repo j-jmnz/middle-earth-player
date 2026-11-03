@@ -5,11 +5,11 @@
 // imported here, so the lowest engine files (zones.ts, keywords.ts, listen.ts) can call it.
 import type { Instruction, Trigger } from "../../../catalog/boundary.ts";
 
-import type { Cause } from "../../cause.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { livingSeats, modifierActive } from "../../state.ts";
+import type { Cause } from "../../core/cause.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { livingSeats, modifierActive } from "../../core/state.ts";
 
 // Whether an effect's trigger hears an event: its own trigger, or either half of "enters or leaves play" (Gwaihir, 22108:A:3).
 export function triggerHears(trigger: Trigger | undefined, heard: Trigger): boolean {

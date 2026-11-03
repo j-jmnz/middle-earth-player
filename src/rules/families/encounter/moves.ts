@@ -5,22 +5,22 @@
 // area, the active location.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { hasTrait } from "../../conditions.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { releaseAttachments } from "../../keywords.ts";
-import { pickedList, seatOf } from "../../player-verbs.ts";
-import { printedOf, type CardType } from "../../printed.ts";
-import { engageWith } from "../../quest.ts";
-import { queueEvent } from "../../queue.ts";
-import { travelBlocked } from "../../restrictions.ts";
-import type { EffectData, ScenarioState } from "../../state.ts";
-import { inPlay, updateCard } from "../../state.ts";
-import { travelNow } from "../../travel.ts";
-import { shuffleEncounterDeck, shuffleIntoEncounterDeck } from "../../verbs.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { moveCard } from "../../zones.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { releaseAttachments } from "../../core/keywords.ts";
+import { pickedList, seatOf } from "../../interpret/player-verbs.ts";
+import { printedOf, type CardType } from "../../core/printed.ts";
+import { engageWith } from "../../quest/quest.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { travelBlocked } from "../../interpret/restrictions.ts";
+import type { EffectData, ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import { travelNow } from "../../quest/travel.ts";
+import { shuffleEncounterDeck, shuffleIntoEncounterDeck } from "../../interpret/verbs.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { addedToStaging, announceEntered } from "./reveal.ts";
 import { stagingDest } from "../breaking/areas.ts";

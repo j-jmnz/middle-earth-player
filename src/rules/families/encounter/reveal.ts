@@ -1,26 +1,26 @@
 // Rules: rr.step-3-3, rr.staging, rr.reveal, rr.lasting-effects, rr.modifiers, rr.cancel, rr.running-out-of-cards,
 // mec109.peril (data/rules/entries.json).
 //
-// What the encounter family adds to the staging of encounter cards (src/rules/frames.ts calls these): the number of cards the
+// What the encounter family adds to the staging of encounter cards (src/rules/windows/frames.ts calls these): the number of cards the
 // staging step reveals, the lasting effects that watch the cards revealed (WatchReveals), the first location revealed each
 // round, an encounter card entering play, and a threat raise by an encounter card effect.
 import type { Effect, Instruction, Trigger } from "../../../catalog/boundary.ts";
 
-import { effectCause, ruleCause, type Cause } from "../../cause.ts";
-import { holds } from "../../conditions.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { placeDamage } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { exhaustCard, readyCard } from "../../player-verbs.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { Frame, Modifier, ScenarioState } from "../../state.ts";
-import { inPlay, modifierActive, updateCard } from "../../state.ts";
-import { resetEncounterDeck } from "../../verbs.ts";
+import { effectCause, ruleCause, type Cause } from "../../core/cause.ts";
+import { holds } from "../../interpret/conditions.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { exhaustCard, readyCard } from "../../interpret/player-verbs.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { Frame, Modifier, ScenarioState } from "../../core/state.ts";
+import { inPlay, modifierActive, updateCard } from "../../core/state.ts";
+import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { stageSeat } from "../breaking/areas.ts";
-import { popFrame } from "../../windows.ts";
-import { moveCard } from "../../zones.ts";
+import { popFrame } from "../../windows/windows.ts";
+import { moveCard } from "../../core/zones.ts";
 
 const ENCOUNTER_TYPES: ReadonlySet<string> = new Set(["enemy", "location", "treachery", "objective"]);
 

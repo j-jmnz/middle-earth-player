@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ScenarioState } from "../rules/reduce.ts";
+import type { ScenarioState } from "../rules/engine/reduce.ts";
 
 import type { TriggerSheet } from "./sheet-types.ts";
 import { headerOf } from "./table-choice.ts";

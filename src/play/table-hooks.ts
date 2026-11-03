@@ -10,7 +10,7 @@ import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } 
 import { guideLine } from "./reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "./stops.ts";
-import { effectsOf } from "../rules/listen.ts";
+import { effectsOf } from "../rules/windows/listen.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "./store.ts";
 import { tableSettings, type TableSettings } from "./table-settings.ts";
 import { useSpotlightHold } from "./use-spotlight.ts";

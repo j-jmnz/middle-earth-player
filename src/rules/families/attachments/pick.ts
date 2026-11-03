@@ -4,9 +4,9 @@
 // unattached"), a card with the Guarded keyword, a card with or without progress tokens.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
 import { guardedRule } from "./play.ts";
 
 export function attachmentsPickMatches(state: ScenarioState, id: string, spec: PickSpec, ctx: ReduceContext): boolean {

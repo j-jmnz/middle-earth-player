@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { headingOf } from "./heading.ts";
 import { fleetChoice } from "./fleet.ts";
 import { hero, navigation, seaTable, send, ship, type Table } from "./table.ts";

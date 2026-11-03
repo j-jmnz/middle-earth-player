@@ -2,15 +2,15 @@
 // (data/rules/entries.json); the cards of Journey in the Dark (142040 to 142059, 142087, 142088).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope } from "../../amounts.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { destroyCard, destroyOverwhelmed, placeDamage } from "../../keywords.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, updateCard } from "../../state.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope } from "../../interpret/amounts.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { destroyCard, destroyOverwhelmed, placeDamage } from "../../core/keywords.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { threatCostOf } from "../costs/stats.ts";
 

@@ -2,12 +2,12 @@
 // mec109.immune-to-player-card-effects (data/rules/entries.json). The shadow effects of Journey in the Dark.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { playerCardEffectCanChoose } from "../rules/keywords.ts";
-import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { definePrinted } from "../rules/printed.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { playerCardEffectCanChoose } from "../rules/core/keywords.ts";
+import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { definePrinted } from "../rules/core/printed.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { BALROG, loadMoriaWorld, moriaTable, settled, type MoriaLayout, type MoriaWorld } from "../../scripts/moria-scene.ts";

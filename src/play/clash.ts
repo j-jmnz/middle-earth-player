@@ -7,9 +7,9 @@
 // Archery, damage from a card effect, an attack that was canceled and an attack that placed no damage step (a card said the
 // target takes none, or the damage went to the Ring-bearer's life) have no `strike` followed by its `damage`, and so no clash:
 // the banner covers them.
-import type { EngineStep } from "../rules/intents.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { shadowCards } from "../rules/zones.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { shadowCards } from "../rules/core/zones.ts";
 
 /**
  * One attack in a new state.

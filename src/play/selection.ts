@@ -5,8 +5,8 @@
 // card only. A drop names a zone id or a card id that list returned. A drop is a pick, like a tap: it never sends an intent.
 // The dock asks to confirm what it picked (table-choice.ts), and the card moves only when the reducer accepts that.
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
-import { printedOf } from "../rules/printed.ts";
-import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 
 import type { DropRect, TableLayout } from "./layout.ts";
 import { TABLE_ZONES, type ZoneId } from "./selectors.ts";

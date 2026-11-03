@@ -3,7 +3,7 @@
 // nothing (docs/brief.md, Table). Pure, and not engine state: the store keeps a UI-only `viewedSeat` (store.ts) that is never in the
 // save, and who acts never changes by a peek. Whatever picks, pays or sends reads `actingSeat` (selectors.ts); only what is drawn
 // reads `shownSeat`.
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import { actingSeat, shownSeat } from "./selectors.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";

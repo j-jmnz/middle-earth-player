@@ -7,16 +7,16 @@
 // are noted for "each hero that did not spend any resources this round".
 import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import type { Cause } from "../../cause.ts";
-import { holds } from "../../conditions.ts";
-import { gameReads } from "../../game-reads.ts";
-import type { EngineStep, Payment } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import { matchesPick } from "../../pick.ts";
-import type { Sphere } from "../../printed.ts";
-import type { GameEvent, ScenarioState } from "../../state.ts";
-import { heldAmount, inPlay, updateCard } from "../../state.ts";
+import type { Cause } from "../../core/cause.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { gameReads } from "../../core/game-reads.ts";
+import type { EngineStep, Payment } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import type { Sphere } from "../../core/printed.ts";
+import type { GameEvent, ScenarioState } from "../../core/state.ts";
+import { heldAmount, inPlay, updateCard } from "../../core/state.ts";
 import { openPool } from "../misc/guards.ts";
 
 const ICON_FLAGS = [

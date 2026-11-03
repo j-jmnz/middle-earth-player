@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalTargets } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalTargets } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { hero, seaTable, send, ship, type Table } from "./table.ts";
-import { syncConstants } from "../../constants.ts";
+import { syncConstants } from "../../interpret/constants.ts";
 
 // Rules: dcce.sailing-tests (data/rules/entries.json); ledger lines 11050:A:1, 11053:A:1. A card in play can add cards to the Sailing test's look ("look at 2 additional cards from the top
 // of the encounter deck during each Sailing test", the table's `sailingLook`) and cancel Sailing success symbols found ("cancel the first Sailing success symbol", `sailingCancel`).

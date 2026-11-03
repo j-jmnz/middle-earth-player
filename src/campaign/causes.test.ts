@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { definePrinted } from "../rules/printed.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
-import { type Cause } from "../rules/cause.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
+import { type Cause } from "../rules/core/cause.ts";
 import { playOut } from "../../scripts/auto-player.ts";
 import { causeProblems, NUMBER_STEPS, verified } from "../../scripts/cause-check.ts";
 import { campaign, loadWorld, reveal, scenario, send, table } from "../../scripts/past-scene.ts";

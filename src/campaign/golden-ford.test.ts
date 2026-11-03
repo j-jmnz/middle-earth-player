@@ -1,10 +1,10 @@
 // Rules: mec109.burden-deck, mec109.ringbearers-life, rr.burdens, rr.campaign-cards, ltp.campaign-cards (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { inPlay } from "../rules/state.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { inPlay } from "../rules/core/state.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { FORD_GOLDENS, fordLoadout, fordWorld, playGolden, type FordDecks, type FordGame } from "../../scripts/ford-game.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { BURDENS } from "../../scripts/ford-scene.ts";

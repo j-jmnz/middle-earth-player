@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { syncConstants } from "../../constants.ts";
-import { grantedIcons } from "../../conditions.ts";
-import { cardMap } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { updateCard } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { grantedIcons } from "../../interpret/conditions.ts";
+import { cardMap } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { updateCard } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { choices } from "./fixture.ts";
 import { play, put, run, seat, send, trigger, triggers } from "../play/fixture.ts";
 

@@ -1,7 +1,7 @@
 import { EFFECTS } from "../src/effects/index.ts";
 import { scenarioDefinition } from "../src/catalog/scenario-data.ts";
 import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
-import { printedFromCard, type PrintedCard } from "../src/rules/printed.ts";
+import { printedFromCard, type PrintedCard } from "../src/rules/core/printed.ts";
 
 import { loadCards } from "./data/load-cards.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";

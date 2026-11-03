@@ -27,7 +27,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `passage-through-mirkwood`:
 
 ## Cards
 
-- **Branching quest.** Stage 3 has two B sides, 01121 and 01122: one is chosen at random and the other removed from the game. `advanceStage` in `src/rules/quest.ts` is linear today; the branch is engine work, and the engine records a "stage reached" fact.
+- **Branching quest.** Stage 3 has two B sides, 01121 and 01122: one is chosen at random and the other removed from the game. `advanceStage` in `src/rules/quest/quest.ts` is linear today; the branch is engine work, and the engine records a "stage reached" fact.
 - Campaign card 01129: its resolution reads the stage-reached fact.
 - Mendor (01135): an objective ally with `leavesPlayLoses` (the Gildor pattern).
 - Mendor's Support boon: one copy per player (the multi-copy pool from phase 28).

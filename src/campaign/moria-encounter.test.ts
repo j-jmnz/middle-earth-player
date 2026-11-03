@@ -2,16 +2,16 @@
 // rr.first-player, rr.in-player-order, rr.modifiers (data/rules/entries.json). The enemies, locations and treacheries of Journey in the Dark.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { defenseBlocked } from "../rules/restrictions.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { flagged } from "../rules/state.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { defenseBlocked } from "../rules/interpret/restrictions.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { flagged } from "../rules/core/state.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
 import { BALROG, CHAMBER, CHIEFTAIN, DOOM, fire, loadMoriaWorld, makeTable, runOne, settled, type MoriaLayout, type MoriaWorld } from "../../scripts/moria-scene.ts";
 import { codesOf, first, send, start, type Run } from "../../scripts/past-scene.ts";
-import { spawn } from "../rules/zones.ts";
+import { spawn } from "../rules/core/zones.ts";
 
 let world: MoriaWorld;
 

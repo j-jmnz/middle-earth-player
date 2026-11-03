@@ -3,8 +3,8 @@
 // What the end of a scenario shows beyond Victory or Defeat, read from the final game state: when it ended, how far the quest
 // got, each player's threat and heroes, the victory display, and for a win the parts of the score. Pure, so a test reads it.
 import { stagePlace } from "../rules/families/quest/branch.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import { scoreParts, scoreTotal } from "./score.ts";
 

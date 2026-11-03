@@ -3,8 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { AUTHORED_EFFECTS } from "../effects/authored/flight-of-the-stormcaller.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { updateCard } from "../rules/state.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { updateCard } from "../rules/core/state.ts";
 import { CODES, flightTable, idOf, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 import { branchWords } from "./choice-words.ts";

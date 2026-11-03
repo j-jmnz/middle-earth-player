@@ -7,12 +7,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { campaignScenario } from "../catalog/scenario-data.ts";
 import { checklist } from "./checklist.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { advanceFreed } from "../rules/stage-reveal.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { advanceFreed } from "../rules/quest/stage-reveal.ts";
 import { UPGRADED_CODES, RAID_GOLDENS, afterFate, playGolden, raidLoadout, raidPlan, raidStart, raidWorld } from "../../scripts/raid-game.ts";
 import { CODES, campaign, idOf, raid, raidTable, loadRaidWorld, type RaidWorld } from "../../scripts/raid-scene.ts";
 

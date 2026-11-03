@@ -2,12 +2,12 @@
 // (data/rules/entries.json). The burden family's verbs and conditions, run one at a time on a table of Flight to the Ford.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { holds } from "../../conditions.ts";
-import type { EngineStep } from "../../intents.ts";
-import { runInstruction } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
+import { holds } from "../../interpret/conditions.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
-import { expireModifiers, type ScenarioState } from "../../state.ts";
+import { expireModifiers, type ScenarioState } from "../../core/state.ts";
 import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../../../scripts/ford-scene.ts";
 import { first, SAM } from "../../../../scripts/past-scene.ts";
 

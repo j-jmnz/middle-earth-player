@@ -7,7 +7,7 @@
 // field that cannot be compared with `===` is compared by its contents, and a field this file does not know how to compare is a type error.
 import type { SkImage } from "@shopify/react-native-skia";
 
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import type { SlotNumbers } from "./card-effects.ts";
 import type { Clock } from "./card-motion.native.tsx";
 import type { BackImages, Fonts, TokenImages } from "./canvas-pieces.native.tsx";

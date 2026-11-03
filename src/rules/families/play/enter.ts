@@ -7,19 +7,19 @@
 // in play to their owners' hands").
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import { askTarget } from "../../choices.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { uniqueBlocked } from "../../keywords.ts";
-import { matchesPick } from "../../pick.ts";
-import { entersExhausted } from "../../planning.ts";
-import { seatOf } from "../../player-verbs.ts";
-import { isAllyLike, printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { askTarget } from "../../windows/choices.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { uniqueBlocked } from "../../core/keywords.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import { entersExhausted } from "../../player/planning.ts";
+import { seatOf } from "../../interpret/player-verbs.ts";
+import { isAllyLike, printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { putAttachmentIntoPlay } from "../attachments/play.ts";
 import { playBlocked } from "../sidequests/contract.ts";
 import type { Focus } from "../index.ts";

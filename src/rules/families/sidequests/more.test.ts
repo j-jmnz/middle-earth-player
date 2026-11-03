@@ -3,11 +3,11 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { queueEvent } from "../../queue.ts";
-import { reduce } from "../../reduce.ts";
-import { updateCard, withThreat } from "../../state.ts";
-import { attachTo, spawn } from "../../zones.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { updateCard, withThreat } from "../../core/state.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import { offered, play, put, questArea, run, seat, send, sideCtx, trigger } from "./fixture.ts";
 import { defeatSideQuest } from "./quest.ts";
 

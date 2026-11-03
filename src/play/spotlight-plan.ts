@@ -2,7 +2,7 @@
 // clashes (clash.ts) say who fought and every number; this adds where each card stands on the table now (so it can fly from its slot
 // and back to it), its picture's code, and the target's damage count before and after (the engine's, read from the two states). The
 // canvas holds the pictures; the plan names the codes it needs.
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import type { Clash } from "./clash.ts";
 import type { Rect, TableLayout } from "./layout.ts";

@@ -1,13 +1,13 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json); ledger line 12026:A:1. The travel row of a location whose Travel line moves progress onto the Stormcaller's
 // quest stage (Hidden Cove), as the Aflame rows state the damage they would deal: the numbers the move leaves on the stage, and a caution that arms the confirm when it advances the Stormcaller or
 // fills its last stage and loses the game. Pure; every number is one the engine would place.
-import { effectsOf } from "../rules/listen.ts";
+import { effectsOf } from "../rules/windows/listen.ts";
 import type { Effect, Instruction } from "../catalog/boundary.ts";
-import { holds } from "../rules/conditions.ts";
+import { holds } from "../rules/interpret/conditions.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
 import { stormcallerLastStage } from "../rules/families/stormcaller/values.ts";
-import { committedWillpower, questPointsOf } from "../rules/quest.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { committedWillpower, questPointsOf } from "../rules/quest/quest.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 
 /** What the travel row of a location adds: the words after its label, and the caution that arms the confirm. */

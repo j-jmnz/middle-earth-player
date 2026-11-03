@@ -2,12 +2,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { recordInstructions } from "../catalog/scenario-data.ts";
-import { holds } from "../rules/conditions.ts";
-import { legalIntents, reduce } from "../rules/reduce.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { attachTo, moveCard, spawn } from "../rules/zones.ts";
+import { holds } from "../rules/interpret/conditions.ts";
+import { legalIntents, reduce } from "../rules/engine/reduce.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { first, loadWorld, send, start, table, type World } from "../../scripts/past-scene.ts";
 import { applyResolution as writeLog, emptyLog } from "./log.ts";

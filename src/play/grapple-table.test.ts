@@ -2,10 +2,10 @@
 // the location's Threat with the 2 each adds, the line the round summary and the log tell, and the detached enemy turning over as it joins the staging area. The geometry on every screen down to 667 x 375.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, depthsTable, idOf, idsOf, loadDepthsWorld, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
 
 import { logLines } from "./log.ts";

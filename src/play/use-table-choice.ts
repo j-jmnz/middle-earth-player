@@ -25,7 +25,7 @@ import { useStable } from "./use-stable.ts";
 import { fightOf, highlightKeys, highlightOf, playedCard } from "./highlight-of.ts";
 import { listsResponses, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
-import { effectById } from "../rules/listen.ts";
+import { effectById } from "../rules/windows/listen.ts";
 import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState, TableStore } from "./store.ts";
 import type { LayoutOptions } from "./layout.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";

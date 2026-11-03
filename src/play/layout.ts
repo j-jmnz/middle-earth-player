@@ -5,7 +5,7 @@
 // The quest stage, the active location and the player's deck and discard pile make a column at the left. To its right, top
 // to bottom: staging (the encounter deck and its discard pile at its right end), the engagement area (each engaged enemy
 // with its shadow cards and the characters fighting it), the play area, and the hand, which peeks up from the bottom edge.
-import type { CardInstance } from "../rules/state.ts";
+import type { CardInstance } from "../rules/core/state.ts";
 
 import { unturn } from "./frame.ts";
 import { pictureKey } from "./picture-key.ts";

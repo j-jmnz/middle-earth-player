@@ -2,15 +2,15 @@
 // Nibin-Dûm (41004 to 41007) on a table of plain-number heroes (scripts/nibin-dum-scene.ts): their When Revealed, the constants and what advances each stage.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { ruleCause } from "../rules/cause.ts";
-import { destroyCard, modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { destroyCard, modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
 import { questStageStart } from "../rules/families/quest/setup.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { codesIn, loadCavesWorld, cavesTable, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 

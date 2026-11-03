@@ -1,9 +1,9 @@
 // Rules: mec109.stage-4, rr.active-location, rr.engaged, rr.in-player-order (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { captureRingBearer, releaseRingBearer } from "./captive.ts";
 import { assignDamage, discardEach } from "./damage.ts";

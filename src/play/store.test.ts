@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { printedOf } from "../rules/printed.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { withThreat } from "../rules/state.ts";
-import { moveCard } from "../rules/zones.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { legalIntents, legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { withThreat } from "../rules/core/state.ts";
+import { moveCard } from "../rules/core/zones.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 

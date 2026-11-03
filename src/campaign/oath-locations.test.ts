@@ -3,15 +3,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../catalog/boundary.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { pushEffectFrame } from "../rules/effect-frames.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import { offerResponses } from "../rules/responses.ts";
-import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
-import { flagged, type ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { pushEffectFrame } from "../rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { offerResponses } from "../rules/windows/responses.ts";
+import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
+import { flagged, type ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, loadOathWorld, oathTable, settleChoices, travelTo, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";

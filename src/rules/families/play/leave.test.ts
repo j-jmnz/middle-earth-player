@@ -7,10 +7,10 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/play.ts";
 
-import { ruleCause } from "../../cause.ts";
-import { placeDamage } from "../../keywords.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
-import { attachTo, cardsUnder, moveCard } from "../../zones.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { attachTo, cardsUnder, moveCard } from "../../core/zones.ts";
 import { crossTo, offered, passResponses, play, playCtx, put, run, seat, send, trigger, triggers } from "./fixture.ts";
 
 const ctx = playCtx(RECORDS);

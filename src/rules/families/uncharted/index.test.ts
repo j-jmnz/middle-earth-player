@@ -3,14 +3,14 @@
 // no player card attachments), the deck and its top cards, flipping on travel, the shuffle back, the quest card's progress, the stage that ends the game, and the Action that looks.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../../constants.ts";
-import { runInstruction } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { settle } from "../../machine.ts";
-import { holds } from "../../conditions.ts";
-import { attachBlocked } from "../../restrictions.ts";
-import { questPointsOf, stagingThreat } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { attachBlocked } from "../../interpret/restrictions.ts";
+import { questPointsOf, stagingThreat } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { CODES, codesIn, fateTable, finish, idOf, idsOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../../../scripts/fate-scene.ts";
 import { AUTHORED_EFFECTS } from "../../../effects/authored/the-fate-of-numenor.ts";
 import { isLostIsland } from "./pick.ts";

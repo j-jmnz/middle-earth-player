@@ -3,16 +3,16 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../../../catalog/boundary.ts";
-import { ruleCause } from "../../cause.ts";
-import { nextEnemyGroup } from "../../combat.ts";
-import { syncConstants } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import { runInstruction } from "../../interpret.ts";
-import { placeDamage } from "../../keywords.ts";
-import { legalIntents, legalTargets } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { reduce } from "../../reduce.ts";
-import { flagged, type ScenarioState } from "../../state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { nextEnemyGroup } from "../../combat/combat.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { legalIntents, legalTargets } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { flagged, type ScenarioState } from "../../core/state.ts";
 import { DOORS, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../../../scripts/south-scene.ts";
 import { codesOf, first, send } from "../../../../scripts/past-scene.ts";
 

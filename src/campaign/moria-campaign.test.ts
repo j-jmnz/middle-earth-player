@@ -4,10 +4,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { encounterCodes, recordInstructions } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { printedOf } from "../rules/printed.ts";
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { MORIA_GOLDENS, moriaWorld, playGolden } from "../../scripts/moria-game.ts";
 import { BALROG, campaign, loadMoriaWorld, makeTable, moria, type MoriaWorld } from "../../scripts/moria-scene.ts";
 import { first } from "../../scripts/past-scene.ts";

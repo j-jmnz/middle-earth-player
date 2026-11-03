@@ -6,13 +6,13 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/quest.ts";
 
-import { pushCardEffects } from "../../effect-frames.ts";
-import { cardMap, idleScenario } from "../../fixture.ts";
-import { settle } from "../../machine.ts";
-import { definePrinted } from "../../printed.ts";
-import { committedWillpower, questStatOf } from "../../quest.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { cardMap, idleScenario } from "../../core/test-fixture.ts";
+import { settle } from "../../engine/machine.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { committedWillpower, questStatOf } from "../../quest/quest.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 
 const plain = definePrinted({ code: "plain", name: "Plain", type: "quest", questPoints: 20 });
 const battleQuest = definePrinted({ code: "battleQuest", name: "Battle Quest", type: "quest", questPoints: 20, keywords: { battle: true } });

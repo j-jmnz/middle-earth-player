@@ -2,11 +2,11 @@
 // mec109.stage-4 (data/rules/entries.json). The shadow effects of The Ring Goes South, and the Watcher in the Water attacking.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { DOORS, loadSouthWorld, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../scripts/south-scene.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";

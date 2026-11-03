@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { pushDue } from "../rules/delayed.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import { advanceFrame } from "../rules/frames.ts";
-import { settle } from "../rules/machine.ts";
-import { topFrame } from "../rules/windows.ts";
-import { spawn } from "../rules/zones.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { pushDue } from "../rules/windows/delayed.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import { advanceFrame } from "../rules/windows/frames.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { topFrame } from "../rules/windows/windows.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { first, loadWorld, RIDER, RING, send, start, table, type Layout, type World } from "../../scripts/past-scene.ts";
 
 let world: World;

@@ -68,7 +68,7 @@ export const VERBS = [
   // was dealt to is made against, once that attack has ended, and goes to the top of the encounter deck at the end of the combat phase.
   z.strictObject({ verb: z.literal("ShadowAttacks"), ...when }),
   // Engine use: the first of these shadow cards attacks the defending player, once the instructions before it have run (the "after" of
-  // the attack the shadow cards were dealt to, src/rules/shadow.ts finishAttack).
+  // the attack the shadow cards were dealt to, src/rules/combat/shadow.ts finishAttack).
   z.strictObject({ verb: z.literal("StartShadowAttack"), attackers: z.array(z.string().min(1)).min(1), ...when }),
   // A stat change that holds only while the card (`target`) attacks the enemy `versus` ("+2 Attack while attacking that enemy").
   z.strictObject({

@@ -6,7 +6,7 @@ tags:
 # parked on its win, dealt from the log of two scenarios no win has been found for.
 # Phase 13. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json).
 # 141056's Resolution asks nothing: the burden cards in play, in the encounter deck and in the discard pile are added to the
-# campaign pool, the ones still in the burden deck are not (src/rules/resolution.ts, EarnAllBurdens). Confirming writes them
+# campaign pool, the ones still in the burden deck are not (src/rules/setup/resolution.ts, EarnAllBurdens). Confirming writes them
 # and unlocks The Ring Goes South.
 - launchApp:
     clearState: true

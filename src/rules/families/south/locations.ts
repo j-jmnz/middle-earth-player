@@ -4,14 +4,14 @@
 // `extraActiveLocation` while a card in play says there can be 2 active locations; `mustTravel` while the players must travel if
 // able. A location holds `progressAfterOthers` / `progressNeedsRingBearer` (Doors of Durin), and `progressCap` (Snowdrifts) with the
 // progress it took this round in `progressPlaced`. These are flags the constant records set, so they are read from the state alone.
-import type { EngineStep } from "../../intents.ts";
-import { ruleCause } from "../../cause.ts";
-import { destroyCard } from "../../keywords.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { questPointsOf } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, heldAmount, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { destroyCard } from "../../core/keywords.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { questPointsOf } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { exploring } from "../island/map.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;

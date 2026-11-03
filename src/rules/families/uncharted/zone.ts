@@ -1,9 +1,9 @@
 // Rules: dcce.uncharted, dcce.uncharted-deck (data/rules/entries.json). The Uncharted deck as a zone: moveCard (zones.ts) asks for the route of every card that would be discarded and
 // for the deck's own detaching and attaching. Types and pure helpers only, so zones.ts can use them.
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { Destination } from "../../zones.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { Destination } from "../../core/zones.ts";
 
 /** Where a double-sided location that would be discarded, or put into the encounter deck, really goes: shuffled back into the Uncharted deck, Lost Island side faceup
  * ("Double-sided locations cannot enter the encounter deck. If a double-sided location would enter the discard pile, it is instead shuffled back into the Uncharted deck", dcce.uncharted). */

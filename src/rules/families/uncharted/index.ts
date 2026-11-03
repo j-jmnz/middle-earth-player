@@ -2,9 +2,9 @@
 // its locations are in uncharted/deck.ts, the cards beyond them in uncharted/cards.ts; the deck as a zone (the route of a discarded double-sided location) is uncharted/zone.ts.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { addCampaignResource, attachSetAsideTo, discardBottom, discardCostlier, discardEncounterTop, eachExhaustsOne, lookAtBottom, mayDiscardShadow, putSetAsideInPlay, removeWillpowerFromQuest, stageLooked, tradeDamageForThreat } from "./cards.ts";
 import { addLostIslands, addSetAside, addStageProgress, flip, lookAtFacedown, prepareDeck, scramble } from "./deck.ts";

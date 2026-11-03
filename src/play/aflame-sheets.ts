@@ -3,7 +3,7 @@
 // the location (it goes underneath The Havens Burn) or loses the game, so the confirm asks twice. Only the number of cards under the Burn is ever used, never which.
 import type { Instruction } from "../catalog/boundary.ts";
 import { burnOutcome } from "../rules/families/aflame/values.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 import { damageOutcome } from "./foresight.ts";
 import type { OptionMark, SheetNames } from "./sheet-types.ts";

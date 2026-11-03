@@ -3,13 +3,13 @@
 // there are taken from the highest Threat down, one after the other. Of cards tied that are not copies of one card the first player chooses.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";

@@ -2,11 +2,11 @@
 // records the family authored, a few encounter cards, and helpers that seat the players and build the encounter deck.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { cardMap, expectOk, idleScenario } from "../../fixture.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { legalIntents, reduce, type PlayerIntent } from "../../reduce.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { cardMap, expectOk, idleScenario } from "../../core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { legalIntents, reduce, type PlayerIntent } from "../../engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 
 const ally = (code: string, name: string, sphere: PrintedCard["sphere"], traits: string[] = []) =>
   definePrinted({ code, name, type: "ally", sphere, cost: 0, willpower: 1, attack: 1, defense: 1, health: 2, traits });

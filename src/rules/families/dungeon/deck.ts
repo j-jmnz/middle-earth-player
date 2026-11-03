@@ -3,9 +3,9 @@
 // Iron Shackles: an encounter card attached to the top of a player's deck, in play, controlled by nobody. "The next time a player would draw
 // 1 or more cards from attached deck, discard Iron Shackles instead": the draw does not happen, and the card is discarded. The card is in
 // the seat's `deckAttached` list; nothing else knows it is there.
-import type { ScenarioState } from "../../state.ts";
-import { updateCard, withSeat } from "../../state.ts";
-import { moveCard, unhost } from "../../zones.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard, withSeat } from "../../core/state.ts";
+import { moveCard, unhost } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 // AttachToDeck: the source card goes onto the first player's deck.

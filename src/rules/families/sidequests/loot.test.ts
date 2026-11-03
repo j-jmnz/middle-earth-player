@@ -4,12 +4,12 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
 import { deckRulesOf } from "../../../catalog/deck-rules.ts";
-import { codes, fixtureDefinition } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted } from "../../printed.ts";
-import { reduce, startScenario } from "../../reduce.ts";
-import { queueEvent } from "../../queue.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
+import { codes, fixtureDefinition } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { reduce, startScenario } from "../../engine/reduce.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { put, run, send, SIDE_CARDS, synced } from "./fixture.ts";
 import { lootUnder } from "./loot.ts";
 

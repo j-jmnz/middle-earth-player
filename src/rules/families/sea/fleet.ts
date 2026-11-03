@@ -7,18 +7,18 @@
 // legal ship takes it. The choice is the seat's own, in player order from the first player.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
 import { dealtFace } from "../dreamchaser/facts.ts";
 import { recordsOfFace } from "../dreamchaser/faces.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { effectsOf } from "../../listen.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { FLEET_SET } from "./routes.ts";

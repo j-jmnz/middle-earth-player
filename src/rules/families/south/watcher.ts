@@ -5,17 +5,17 @@
 // player, so it attacks every player once in the combat phase; Storm of Howls makes the enemy in the staging area with the highest
 // engagement cost attack the player who revealed it. The combat code asks `attackHere` instead of reading the enemy's zone.
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../intents.ts";
-import { ruleCause } from "../../cause.ts";
-import { attackBarred } from "../../constants.ts";
-import { beginEnemyAttack } from "../../combat.ts";
-import { dealOneShadow, type ReduceContext } from "../../interpret.ts";
-import { modifiedStat, placeDamage } from "../../keywords.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import type { PendingAttack, ScenarioState } from "../../state.ts";
-import { flagged } from "../../state.ts";
-import { discardShadowOf } from "../../shadow.ts";
-import { patchTop } from "../../windows.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { attackBarred } from "../../interpret/constants.ts";
+import { beginEnemyAttack } from "../../combat/combat.ts";
+import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { PendingAttack, ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
+import { discardShadowOf } from "../../combat/shadow.ts";
+import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { activeLocations } from "./locations.ts";

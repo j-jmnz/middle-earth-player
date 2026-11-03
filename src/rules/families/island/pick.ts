@@ -3,10 +3,10 @@
 // travel went, and how many locations are flipped or still lie Uncharted side up.
 import type { Condition, PickSpec } from "../../../catalog/boundary.ts";
 
-import { modifiedStat } from "../../keywords.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { cardsUnder } from "../../zones.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { cardsUnder } from "../../core/zones.ts";
 import { cellOf, islandOf, leftOf, neighbors, startCells, templeCells } from "./map.ts";
 
 /** The cards an `island` filter starts from. `start`: the faceup left corners, before one is the active location; `temple`: the Temple

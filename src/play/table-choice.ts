@@ -12,7 +12,7 @@
 // table holds the buttons. Otherwise (an either/or of an effect, a seat, a card out of play, an attachment that only peeks
 // out under its host) the sheet opens as a paper panel whose tiles are picked the same way. The numbers beside the choice
 // are readout.ts.
-import type { PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 import { cardTriggerSheet, distributeIntent, multiIntent, paySheet, playSheet, sheetSendsPass } from "./bar-sheets.ts";
 import type { CombatMark } from "./layout.ts";

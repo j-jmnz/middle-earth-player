@@ -6,11 +6,11 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import { settle } from "../rules/machine.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import { settle } from "../rules/engine/machine.ts";
 import { announceStageRevealed } from "../rules/families/nightmare/setup.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { playOut } from "../../scripts/auto-player.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";

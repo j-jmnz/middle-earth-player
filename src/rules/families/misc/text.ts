@@ -5,9 +5,9 @@
 // lends, so the text goes with Thorongil.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { effectsOf } from "../../listen.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { recordsOfFace } from "../dreamchaser/faces.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 
 // The hero card an attachment of this card lends it, or null.
 export function lentCard(state: ScenarioState, instance: CardInstance): CardInstance | null {

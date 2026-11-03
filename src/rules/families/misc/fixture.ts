@@ -2,10 +2,10 @@
 // the cards whose records the misc family authored.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { PLAY_CARDS } from "../play/fixture.ts";
 
 type Sphere = PrintedCard["sphere"];

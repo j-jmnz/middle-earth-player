@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { PrintedCard } from "../rules/printed.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
 import { KNIFE_GOLDENS, knifeLoadout, knifeWorld, playGolden, type KnifeGame } from "../../scripts/knife-game.ts";
 
 import { validateLoadout } from "./loadout.ts";

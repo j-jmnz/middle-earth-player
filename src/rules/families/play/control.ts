@@ -5,14 +5,14 @@
 // player gains control of attached ally"); the first player token taken; the rest of an effect handed to another player.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { currentCause, ruleCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import { raiseThreat } from "../../keywords.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { raiseThreat } from "../../core/keywords.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { eventSeat, lastPickedSeat, namedCard, scheduleFor } from "./refs.ts";
 

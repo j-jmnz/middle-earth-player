@@ -3,11 +3,11 @@
 // declare neither.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { ruleCause } from "../rules/cause.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { placeDamage } from "../rules/keywords.ts";
-import { spawn } from "../rules/zones.ts";
-import type { EngineStep } from "../rules/intents.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { placeDamage } from "../rules/core/keywords.ts";
+import { spawn } from "../rules/core/zones.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
 import { fordTable, loadFordWorld, type FordWorld } from "../../scripts/ford-scene.ts";
 import { loadWorld, table, type World } from "../../scripts/past-scene.ts";
 

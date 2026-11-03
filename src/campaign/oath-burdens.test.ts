@@ -2,11 +2,11 @@
 // Goblin (41041) searches the encounter deck, the discard pile and the collection, Guilty Conscience (41043) attaches to the hero with the highest threat cost.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents } from "../rules/legal.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";

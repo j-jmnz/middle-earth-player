@@ -1,16 +1,16 @@
 import { EFFECTS } from "../src/effects/index.ts";
-import { syncConstants } from "../src/rules/constants.ts";
-import { pushCardEffects } from "../src/rules/effect-frames.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import type { EngineStep } from "../src/rules/intents.ts";
-import { settle } from "../src/rules/machine.ts";
-import { reduce } from "../src/rules/reduce.ts";
+import { syncConstants } from "../src/rules/interpret/constants.ts";
+import { pushCardEffects } from "../src/rules/interpret/effect-frames.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import type { EngineStep } from "../src/rules/core/intents.ts";
+import { settle } from "../src/rules/engine/machine.ts";
+import { reduce } from "../src/rules/engine/reduce.ts";
 import type { Effect, ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData } from "../src/catalog/scenario-data.ts";
-import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
-import type { ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
-import { blankScenario, updateCard, withSeat, withThreat } from "../src/rules/state.ts";
-import { attachTo, spawn } from "../src/rules/zones.ts";
+import { definePrinted, type PrintedCard } from "../src/rules/core/printed.ts";
+import type { ReduceContext, ScenarioState } from "../src/rules/engine/reduce.ts";
+import { blankScenario, updateCard, withSeat, withThreat } from "../src/rules/core/state.ts";
+import { attachTo, spawn } from "../src/rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { FRODO, MERRY, RING, SAM } from "./past-scene.ts";

@@ -4,10 +4,10 @@
 // by `ReduceLife`, and each reduction is a step with its cause. Healing a character never raises it, and a hero that An Evil
 // Wound is attached to takes the damage it would be dealt as a reduction of the life instead (the `damageToLife` flag). At 0 the
 // players lose the game. Kept free of engine imports beyond the state, so keywords.ts and player-verbs.ts can call it.
-import type { Cause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged } from "../../state.ts";
+import type { Cause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 
 // The life of the Ring-bearer goes down by `amount`, to a minimum of 0. The step records what it actually dropped. A game with no
 // life number is not changed.

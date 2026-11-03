@@ -3,8 +3,8 @@
 // The table's quest scale (docs/design-system-table.md, Quest scale): the threat in the staging area against the willpower committed to the
 // quest, and how far apart they are. While the players commit, the dock's readout already adds the picked characters' willpower
 // (readout.ts), so the scale moves as each one is picked; otherwise it reads the engine's own totals. Pure, so a test reads it.
-import { committedWillpower, stagingThreat } from "../rules/quest.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { committedWillpower, stagingThreat } from "../rules/quest/quest.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 import type { Readout } from "./readout.ts";
 import { questSeat } from "./selectors.ts";

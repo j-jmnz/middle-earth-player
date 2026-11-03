@@ -3,10 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { ruleCause } from "../../cause.ts";
-import { lowerThreat, raiseThreat } from "../../keywords.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { lowerThreat, raiseThreat } from "../../core/keywords.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";
-import { updateCard, withThreat } from "../../state.ts";
+import { updateCard, withThreat } from "../../core/state.ts";
 import { put, run, seat, send, sideCtx, synced, trigger, withContract } from "./fixture.ts";
 
 const ctx = sideCtx(RECORDS);

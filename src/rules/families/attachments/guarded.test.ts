@@ -7,10 +7,10 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 
-import { legalTargets } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { reduce } from "../../reduce.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
+import { legalTargets } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachmentCtx, deck, offered, play, put, seat, send } from "./fixture.ts";
 
 const ctx = attachmentCtx(EFFECTS);

@@ -5,10 +5,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { campaignScenario } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { UPGRADED_CODES, afterDepths, templeLoadout, templePlan, templeStart, templeWorld } from "../../scripts/temple-game.ts";
 import { CODES, campaign, temple } from "../../scripts/temple-scene.ts";
 

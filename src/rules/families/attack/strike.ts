@@ -4,15 +4,15 @@
 // its Defense, and what the attack's damage leads to (excess damage, the events its attackers hear, cards drawn).
 import type { Condition } from "../../../catalog/boundary.ts";
 
-import { effectCause, ruleCause, type Cause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import { drawMany, type ReduceContext } from "../../interpret.ts";
-import { modifiedStat, placeDamage, placedAmount } from "../../keywords.ts";
-import { effectsOf, subjectMatches } from "../../listen.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { CardInstance, PendingStrike, ScenarioState } from "../../state.ts";
-import { flagged, inPlay } from "../../state.ts";
+import { effectCause, ruleCause, type Cause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { drawMany, type ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, placeDamage, placedAmount } from "../../core/keywords.ts";
+import { effectsOf, subjectMatches } from "../../windows/listen.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { CardInstance, PendingStrike, ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay } from "../../core/state.ts";
 import { heard } from "./events.ts";
 
 type Attacking = Extract<Condition, { kind: "attacking" }>;

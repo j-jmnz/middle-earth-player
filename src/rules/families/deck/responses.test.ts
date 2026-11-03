@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/deck.ts";
 
-import { expectOk } from "../../fixture.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { card, put, table } from "../costs/fixture.ts";
 
 // Rules: rr.response, rr.mulligan, rr.play-and-put-into-play, rr.cost, rr.limits, rr.search (data/rules/entries.json).

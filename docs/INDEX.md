@@ -42,7 +42,7 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.1K)
     - 157–160 Maestro (~120)
-- `docs/architecture.md` — Architecture (~16.7K tok)
+- `docs/architecture.md` — Architecture (~16.8K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~650)
   - 78–120 Modules (~1.0K) ← 3
@@ -179,7 +179,7 @@ Read the sections your task touches.
 STATUS.md, then the active phase file.
 
 - `docs/phases/STATUS.md` — Phase status (~6.8K tok)
-  - 5–16 Rules (~540)
+  - 5–16 Rules (~550)
   - 17–75 Phases (~2.1K)
   - 76–156 Open items (~3.7K)
     - 78–90 Fixtures and Maestro (~500)

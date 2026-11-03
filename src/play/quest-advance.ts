@@ -9,10 +9,10 @@
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
 import { isSeparate, stageSeat, viewOf } from "../rules/families/breaking/areas.ts";
 import { stagePlace } from "../rules/families/quest/branch.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import type { CardFace } from "../rules/state.ts";
-import { isOver } from "../rules/undo.ts";
-import { topFrame } from "../rules/windows.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import type { CardFace } from "../rules/core/state.ts";
+import { isOver } from "../rules/engine/undo.ts";
+import { topFrame } from "../rules/windows/windows.ts";
 
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
 import { STAGE_LOSS } from "./stormcaller-words.ts";

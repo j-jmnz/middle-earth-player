@@ -2,12 +2,12 @@
 // family authored, a few heroes and encounter cards, and helpers that seat the players and drive the reducer.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { cardMap, expectOk, idleScenario } from "../../fixture.ts";
-import { settle } from "../../machine.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { legalIntents, reduce, type PlayerIntent } from "../../reduce.ts";
-import { expireModifiers, updateCard, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { cardMap, expectOk, idleScenario } from "../../core/test-fixture.ts";
+import { settle } from "../../engine/machine.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { legalIntents, reduce, type PlayerIntent } from "../../engine/reduce.ts";
+import { expireModifiers, updateCard, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 
 type Sphere = PrintedCard["sphere"];
 

@@ -3,13 +3,13 @@
 // locations of the map and Starla and Recurring Nightmare on a table of plain-number heroes (scripts/temple-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { ruleCause } from "../rules/cause.ts";
-import { stagingThreat } from "../rules/quest.ts";
-import { settle } from "../rules/machine.ts";
-import { moveCard, shadowCards } from "../rules/zones.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { moveCard, shadowCards } from "../rules/core/zones.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import type { Effect } from "../catalog/boundary.ts";
 import { CODES, finish, idOf, idsOf, legalIntents, loadTempleWorld, resolveRecords, send, start, templeFight, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 

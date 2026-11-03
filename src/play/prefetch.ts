@@ -6,7 +6,7 @@
 // the table asks for it where it lies. Never the whole cache (docs/architecture.md, Images). Text is drawn while a file is
 // still downloading. Each is a picture key (picture-key.ts): a card lying on its B side (a quest stage after setup) is asked for by
 // `<code>.B`, the picture of the side it shows.
-import { inPlay, type ScenarioState } from "../rules/state.ts";
+import { inPlay, type ScenarioState } from "../rules/core/state.ts";
 
 import { pictureKey } from "./picture-key.ts";
 

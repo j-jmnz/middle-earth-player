@@ -3,18 +3,18 @@
 // hero, characters an undefended attack may land on, and quest progress assigned as damage.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { characters } from "../../combat.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat, placeDamage } from "../../keywords.ts";
-import { isCharacterType, printedOf, type PrintedCard } from "../../printed.ts";
-import { placeQuestProgress, questPointsOf } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, inPlay, modifierActive, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { queueEvent } from "../../queue.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { characters } from "../../combat/combat.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
+import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;

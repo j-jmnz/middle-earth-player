@@ -3,9 +3,9 @@
 import { describe, expect, it } from "vitest";
 
 import { lookedIds, sailingSymbols } from "../rules/families/sea/sailing.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { spawn } from "../rules/zones.ts";
-import { reduce, type PlayerIntent, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { spawn } from "../rules/core/zones.ts";
+import { reduce, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
 
 import { sailingTable } from "./sea-fixture.ts";
 import { sailingReadout } from "./sea-readout.ts";

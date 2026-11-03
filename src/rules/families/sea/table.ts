@@ -1,7 +1,7 @@
 // A table for the sea family's tests: ships, heroes, a Heading card, Corsair enemies and the Stormcaller Elite, on the defense table's footing
 // (parked at the optional engagement of the encounter phase). Not used by the engine.
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { FLEET_SET, stampRoutes } from "./routes.ts";
 import { enemy, table as defenseTable, type Table, type TableSpec } from "../defense/table.ts";
 

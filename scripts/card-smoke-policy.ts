@@ -1,9 +1,9 @@
 import { firstShares, playRequest, sharesReady, toPayments, triggerRequest, type PayRequest } from "../src/play/pay.ts";
-import type { Payment } from "../src/rules/intents.ts";
-import { printedOf } from "../src/rules/printed.ts";
-import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import { nextUint } from "../src/rules/seed.ts";
-import { topFrame } from "../src/rules/windows.ts";
+import type { Payment } from "../src/rules/core/intents.ts";
+import { printedOf } from "../src/rules/core/printed.ts";
+import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import { nextUint } from "../src/rules/core/seed.ts";
+import { topFrame } from "../src/rules/windows/windows.ts";
 
 // Test helper for scripts/card-smoke.ts. Turns an intent the engine offers for the smoked card (a PlayCard, a Trigger, an
 // attack or a defense it can take part in, a choice its own effect opened) into the whole intent the reducer takes, the way

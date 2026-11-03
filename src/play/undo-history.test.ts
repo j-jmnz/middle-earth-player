@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type EngineStep, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type EngineStep, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 
-import { isOver, showedHidden } from "../rules/undo.ts";
+import { isOver, showedHidden } from "../rules/engine/undo.ts";
 
 import { createTableStore, keepIntent, type Kept } from "./store.ts";
 import { nextUndoable } from "./undo-history.ts";

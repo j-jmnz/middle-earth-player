@@ -2,18 +2,18 @@
 // location, an enemy that engages the first player, the stage that turns progress into healing, and the cards a Resolution earns by being in the game.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { pickCandidates } from "../../pick.ts";
-import { engageEnemy } from "../../quest.ts";
-import type { Earned } from "../../campaign-state.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { printedOf } from "../../printed.ts";
-import { moveCard } from "../../zones.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { engageEnemy } from "../../quest/quest.ts";
+import type { Earned } from "../../core/campaign-state.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { printedOf } from "../../core/printed.ts";
+import { moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter, setAsideNamed } from "../encounter/moves.ts";
 import { healBlocked } from "../burden/life.ts";
 import type { Focus } from "../index.ts";

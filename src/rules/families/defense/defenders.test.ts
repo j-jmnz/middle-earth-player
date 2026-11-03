@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
 
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until, type TableSpec } from "./table.ts";
 
 // Rules: rr.multiple-defenders, rr.step-6-4-1, rr.step-6-4-3, rr.step-6-4-4, rr.defending-player, rr.cancel

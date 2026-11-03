@@ -6,11 +6,11 @@ import { describe, expect, it } from "vitest";
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
 import { deckRulesOf, heroLimit } from "../../../catalog/deck-rules.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../../../catalog/deck-save.ts";
-import { codes, fixtureDefinition } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted } from "../../printed.ts";
-import { reduce, startScenario } from "../../reduce.ts";
-import { moveCard } from "../../zones.ts";
+import { codes, fixtureDefinition } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { reduce, startScenario } from "../../engine/reduce.ts";
+import { moveCard } from "../../core/zones.ts";
 import { offered, play, put, run, seat, SIDE_CARDS, sideCtx, synced, withContract } from "./fixture.ts";
 
 const ctx = sideCtx(RECORDS);

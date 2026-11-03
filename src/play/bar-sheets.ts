@@ -1,13 +1,13 @@
 // The sheets of an ordinary action window (the window itself, the quest commit, the Actions list) and those a tap on a card
 // opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
 // player picked. The reducer still checks every intent.
-import { legalAttackEnemies } from "../rules/combat.ts";
+import { legalAttackEnemies } from "../rules/combat/combat.ts";
 import { sideQuestIds } from "../rules/families/sidequests/quest.ts";
-import { printedOf } from "../rules/printed.ts";
+import { printedOf } from "../rules/core/printed.ts";
 import { questSeat } from "./selectors.ts";
-import { stagingThreat } from "../rules/quest.ts";
-import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { legalTargets } from "../rules/reduce.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
+import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { legalTargets } from "../rules/engine/reduce.ts";
 
 import { checkFor, playCaution } from "./not-applied.ts";
 import { playRequest, type PayRequest, type Share } from "./pay.ts";

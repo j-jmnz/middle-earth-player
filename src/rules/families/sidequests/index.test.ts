@@ -4,8 +4,8 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { reduce } from "../../reduce.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
 import { offered, passQuestWindow as passWindow, play, put, questArea, questing, run, seat, send, sideCtx, trigger } from "./fixture.ts";
 
 const ctx = sideCtx(RECORDS);

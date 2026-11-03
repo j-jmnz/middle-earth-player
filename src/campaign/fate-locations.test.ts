@@ -3,12 +3,12 @@
 // travelling to it, and its Forced effect "After X is flipped over while active" resolves (scripts/fate-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { hasKeyword, modifiedStat } from "../rules/keywords.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { hasKeyword, modifiedStat } from "../rules/core/keywords.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, codesIn, fateTable, finish, idOf, loadFateWorld, send, start, type FateLayout, type FateWorld, type Run } from "../../scripts/fate-scene.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { doRefresh } from "../rules/refresh.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { doRefresh } from "../rules/engine/refresh.ts";
 
 let world: FateWorld;
 

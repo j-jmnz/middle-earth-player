@@ -4,13 +4,13 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { playCost } from "../../attach.ts";
-import { codes, fixtureDefinition } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted } from "../../printed.ts";
-import { reduce, startScenario } from "../../reduce.ts";
-import { heldAmount, updateCard, type ScenarioState } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import { playCost } from "../../player/attach.ts";
+import { codes, fixtureDefinition } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { reduce, startScenario } from "../../engine/reduce.ts";
+import { heldAmount, updateCard, type ScenarioState } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { crossTo, offered, play, put, run, seat, send, SIDE_CARDS, sideCtx, synced, trigger, withContract } from "./fixture.ts";
 
 // The fixture event has an Action that does nothing: an event with no record at all cannot be played (rr.triggered-ability).

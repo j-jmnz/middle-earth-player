@@ -6,16 +6,16 @@
 // aside, the actor chooses one, and the others are dropped again.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { attachmentHostIds } from "../../attach.ts";
-import { askTarget } from "../../choices.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { releaseAttachments } from "../../keywords.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard, withSeat } from "../../state.ts";
-import { attachTo, moveCard, spawn } from "../../zones.ts";
+import { attachmentHostIds } from "../../player/attach.ts";
+import { askTarget } from "../../windows/choices.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { releaseAttachments } from "../../core/keywords.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard, withSeat } from "../../core/state.ts";
+import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { lastPickedCard } from "../play/refs.ts";
 

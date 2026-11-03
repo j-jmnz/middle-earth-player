@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { ruleCause } from "../../cause.ts";
-import { archeryRecipients, archeryTotal } from "../../combat.ts";
-import { placeDamage } from "../../keywords.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { archeryRecipients, archeryTotal } from "../../combat/combat.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { hero, seaTable, send, ship, shipEnemy, type Table } from "./table.ts";
 
 // Rules: dcce.archery, dcce.immune, dcce.indestructible (data/rules/entries.json). The keywords the Dream-chaser box prints, read against the engine:

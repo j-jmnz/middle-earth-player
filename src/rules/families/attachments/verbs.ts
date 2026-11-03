@@ -5,17 +5,17 @@
 // effect declares against one enemy (Ambush), and a look at the top X cards of the encounter deck (Interrogation).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { canAttack, characters } from "../../combat.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { destroyCard } from "../../keywords.ts";
-import { pickCandidates } from "../../pick.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, inPlay, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { canAttack, characters } from "../../combat/combat.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { destroyCard } from "../../core/keywords.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 import { openStrike } from "../attack/index.ts";
 import { healBlocked } from "../burden/life.ts";
 import { effectData } from "../encounter/moves.ts";

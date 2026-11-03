@@ -1,9 +1,9 @@
 // A Shadow of the Past played by the auto-player on the seeds the run tests pin (seed 2 wins, seed 1 loses), for tests under
 // src/screens, which may not import src/rules.
 import { EFFECTS } from "../src/effects/index.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../src/rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
 import { buildStart } from "../src/campaign/start.ts";
 
 import { playOut } from "./auto-player.ts";

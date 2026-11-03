@@ -3,7 +3,7 @@
 // of a distribute sheet, Pass and each free trigger. The sheet tests send each one to the reducer.
 import { distributeIntent, multiIntent } from "../src/play/bar-sheets.ts";
 import type { Sheet } from "../src/play/sheet-types.ts";
-import type { PlayerIntent, ScenarioState } from "../src/rules/reduce.ts";
+import type { PlayerIntent, ScenarioState } from "../src/rules/engine/reduce.ts";
 
 export function intentsOf(state: ScenarioState, sheet: Sheet): PlayerIntent[] {
   switch (sheet.kind) {

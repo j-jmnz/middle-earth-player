@@ -1,7 +1,7 @@
 // Rules: ltp.scoring, rr.scoring, faq.scoring (data/rules/entries.json).
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { victoryPointsOf } from "../rules/printed-stat.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import { victoryPointsOf } from "../rules/core/printed-stat.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 export type ScenarioScore = { rounds: number; victoryPoints: number; score: number };
 

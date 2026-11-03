@@ -5,20 +5,20 @@
 // enemy's own card makes it (effect-frames.ts), against the player the enemy is engaged with.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { beginEnemyAttack } from "../../combat.ts";
-import { attackBarred } from "../../constants.ts";
-import { hasTrait } from "../../conditions.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { PendingAttack, QueueItem, ScenarioState } from "../../state.ts";
-import { livingSeats } from "../../state.ts";
-import { queueEvent } from "../../queue.ts";
-import { patchTop } from "../../windows.ts";
+import { beginEnemyAttack } from "../../combat/combat.ts";
+import { attackBarred } from "../../interpret/constants.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { PendingAttack, QueueItem, ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { declaredDefenders } from "../defense/defenders.ts";
 import { damageGoesTo } from "../defense/damage.ts";
-import { gameReads } from "../../game-reads.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { dealAttackShadow } from "../defense/listen.ts";
 import { effectData } from "../encounter/moves.ts";
 

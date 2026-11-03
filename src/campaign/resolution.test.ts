@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents, reduce } from "../rules/reduce.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
+import { legalIntents, reduce } from "../rules/engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Run, type Table } from "../../scripts/test-scene.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";

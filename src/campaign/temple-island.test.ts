@@ -5,10 +5,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { islandMayTravel, islandReach } from "../rules/families/island/travel.ts";
 import { cellOf, neighbors, stagingCells, within } from "../rules/families/island/map.ts";
-import { placeQuestProgress, stagingThreat } from "../rules/quest.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { reduce } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { placeQuestProgress, stagingThreat } from "../rules/quest/quest.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { finish, send, start, templeTable, loadTempleWorld, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 
 let world: TempleWorld;

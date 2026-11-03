@@ -3,7 +3,7 @@
 // new objects for every card on every state.
 import { describe, expect, it } from "vitest";
 
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import type { SlotNumbers } from "./card-effects.ts";
 import type { Clock } from "./card-motion.native.tsx";
 import type { BackImages, Fonts, TokenImages } from "./canvas-pieces.native.tsx";

@@ -2,17 +2,17 @@
 // (data/rules/entries.json).
 import type { CardRef, Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { strikeEnemy } from "../../combat.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { lastPicked, seatOf } from "../../player-verbs.ts";
-import { isCharacterType, printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { Frame, Modifier, QueueItem, ScenarioState } from "../../state.ts";
-import { flagged, inPlay, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { strikeEnemy } from "../../combat/combat.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
+import { isCharacterType, printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { Frame, Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 import { redirectDamage } from "./damage.ts";
 import { addDefender, addEndReady, assignAttackDamage, cancelAttack, readyUnharmed } from "./defenders.ts";
 import { dealShadowTo, discardShadowOf, lookAtShadow, redirectAttack } from "./shadow.ts";

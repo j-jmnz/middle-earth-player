@@ -2,10 +2,10 @@
 // titles and readouts, the pile words and the web list's lines. Every sentence is read here; every number in them is the engine's.
 import { describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
 import { enemy, hero, seaTable, shipEnemy } from "../rules/families/sea/table.ts";
-import { spawn } from "../rules/zones.ts";
+import { spawn } from "../rules/core/zones.ts";
 
 import { intentWords, momentOf } from "./outcome.ts";
 import { sailingTable } from "./sea-fixture.ts";

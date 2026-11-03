@@ -3,12 +3,12 @@
 // (sea/boarding.ts) and the routes of the Corsair deck and the Stormcaller Elite (sea/routes.ts) work inside the engine's own steps and are not verbs.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { engageEnemy } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats } from "../../state.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { engageEnemy } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { endCorsairDeck, prepareCorsairDeck, revealCorsair } from "./corsair.ts";
 import { prepareFleet } from "./fleet.ts";

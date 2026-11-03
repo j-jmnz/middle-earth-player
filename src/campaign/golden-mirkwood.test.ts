@@ -3,9 +3,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { encounterCodes } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { MIRKWOOD_GOLDENS, mirkwoodLoadout, mirkwoodWorld, playGolden, type MirkwoodDecks, type MirkwoodGame } from "../../scripts/mirkwood-game.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { campaign, passage } from "../../scripts/mirkwood-scene.ts";

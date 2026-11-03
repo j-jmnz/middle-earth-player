@@ -8,15 +8,15 @@ import { EFFECTS } from "../../../effects/index.ts";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { legalTargets } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { placeQuestProgress, stagingThreat } from "../../quest.ts";
-import { reduce } from "../../reduce.ts";
-import { flagged, updateCard, withMode, type ScenarioState } from "../../state.ts";
-import { travelIntent } from "../../travel.ts";
-import { attachTo, spawn } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { legalTargets } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { placeQuestProgress, stagingThreat } from "../../quest/quest.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { flagged, updateCard, withMode, type ScenarioState } from "../../core/state.ts";
+import { travelIntent } from "../../quest/travel.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import { attachmentCtx, deck, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
 
 // Bog (a fixture): "While Bog is in play, it gets +2 Threat." "Travel: Raise each player's threat by 3."

@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents } from "../rules/reduce.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
 import { buildTable, begin, FRODO, idsOf, RIDER, sceneCards, send } from "../../scripts/test-scene.ts";
 
 import { sheetFor } from "./sheets.ts";

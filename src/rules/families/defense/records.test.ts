@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
 
-import { attackBarred } from "../../constants.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents } from "../../reduce.ts";
-import { flagged, type ScenarioState } from "../../state.ts";
+import { attackBarred } from "../../interpret/constants.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents } from "../../engine/reduce.ts";
+import { flagged, type ScenarioState } from "../../core/state.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until, type TableSpec } from "./table.ts";
 
 // Rules: rr.defending-player, rr.step-6-4-4, rr.ownership-and-control, rr.forced, rr.combat-phase, rr.lasting-effects

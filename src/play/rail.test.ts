@@ -2,8 +2,8 @@
 // games is named by what comes next, never the bare "Action window".
 import { describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { legalIntents, reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { legalIntents, reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld } from "../../scripts/starter-game.ts";
 

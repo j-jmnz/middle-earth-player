@@ -1,17 +1,17 @@
 // Rules: dcce.grapple (data/rules/entries.json); ledger lines 12051:A:1, 12052:A:2, 12052:A:3, 12053:A:1, 12054:A:1. Grapple X: a revealed enemy with the keyword attaches facedown to the location in the staging area the keyword names.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { destroyCard, modifiedStat, printedStat } from "../../keywords.ts";
-import { legalIntents } from "../../legal.ts";
-import type { ScenarioState } from "../../state.ts";
+import { destroyCard, modifiedStat, printedStat } from "../../core/keywords.ts";
+import { legalIntents } from "../../engine/legal.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { grappledWith } from "./values.ts";
 import { resolveGrapple } from "./attach.ts";
-import { holds } from "../../conditions.ts";
-import { moveCard, spawn } from "../../zones.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { moveEncounter } from "../encounter/moves.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import { settle } from "../../machine.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { settle } from "../../engine/machine.ts";
 import { CODES, depthsTable, finish, idOf, idsOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../../../scripts/depths-scene.ts";
 
 const resolveRecordsOf = (made: ReturnType<typeof depthsTable>, code: string) => resolveRecords(made.state, made.ctx, code, "whenRevealed", idOf(made.state, code));

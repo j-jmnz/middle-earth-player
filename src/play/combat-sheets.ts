@@ -4,8 +4,8 @@
 // The combat sheets: the defender pick (several with Stand Together), the hero an undefended attack hits, archery, and the
 // players' attack. Each option carries what the engine says it would do (foresight.ts), and a choice that loses the game
 // asks twice.
-import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
-import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { defenseAsDefender, modifiedStat } from "../rules/core/keywords.ts";
+import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 
 import { attackSource } from "./grapple-words.ts";
 import { damageOutcome, defenseDamage, undefendedDamage } from "./foresight.ts";

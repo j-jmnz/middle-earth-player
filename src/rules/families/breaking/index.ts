@@ -2,17 +2,17 @@
 // rr.player-elimination, rr.travel, rr.engagement-check (data/rules/entries.json); the cards of Breaking of the Fellowship (142061 to 142067).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { eliminateEmpties, releaseAttachments } from "../../keywords.ts";
-import { afterProgress } from "../../stage-reveal.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { eliminateEmpties, releaseAttachments } from "../../core/keywords.ts";
+import { afterProgress } from "../../quest/stage-reveal.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import { queueEvent } from "../../queue.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { VERBS } from "../../../catalog/families/breaking.ts";
 import { areaOf, mergeView, viewOf } from "./areas.ts";
@@ -52,7 +52,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 // The verbs that work on the areas themselves, the whole state: all of them but AdvanceToStage, which is the acting seat's stage like the quest's own advance.
 const BREAKING_VERBS: ReadonlySet<string> = new Set(VERBS.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage"));
 
-// Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret.ts runInstruction).
+// Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret/interpret.ts runInstruction).
 export function isBreakingVerb(verb: string): boolean {
   return BREAKING_VERBS.has(verb);
 }
@@ -108,7 +108,7 @@ function placeDiscardUnderDeck(state: ScenarioState): ScenarioState {
 }
 
 // StartSeparateStage (142062:B:1): stages are separate from here on, and the quest deck's card with the code is the acting seat's stage, side B up as an
-// advanced stage is (rules/quest.ts advanceStage). The seat's staging area starts empty.
+// advanced stage is (rules/quest/quest.ts advanceStage). The seat's staging area starts empty.
 function startSeparateStage(state: ScenarioState, code: string, seat: number): ScenarioState {
   const id = state.questDeck.find((candidate) => state.cards[candidate]?.code === code);
   if (!id || !state.seats[seat]) return state;

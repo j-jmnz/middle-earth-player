@@ -4,12 +4,12 @@
 // point, 1 Attack and 1 Defense. The engine makes an enemy stand-in (printed.ts ORC_GUARD_CODE) engaged with the player and holds the
 // deck card facedown under it. When the stand-in leaves play the deck card goes to its owner's discard pile, and the stand-in leaves the
 // game, so no copy of it can ever be shuffled into a deck.
-import type { EngineStep } from "../../intents.ts";
-import { ORC_GUARD_CODE } from "../../printed.ts";
-import { engageWith } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { cardsUnder, moveCard, spawn } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { ORC_GUARD_CODE } from "../../core/printed.ts";
+import { engageWith } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { cardsUnder, moveCard, spawn } from "../../core/zones.ts";
 
 // PlaceOrcGuard: nothing happens when the seat's deck is empty (or the seat is out of the game).
 export function placeOrcGuard(state: ScenarioState, seat: number, steps: EngineStep[]): ScenarioState {

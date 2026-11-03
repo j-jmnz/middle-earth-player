@@ -5,16 +5,16 @@
 // the Dol Guldur locations' resource tokens. Dispatched by families/nightmare.ts run.
 import type { Amount, CardRef } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { releaseAttachments } from "../../keywords.ts";
-import { printedOf } from "../../printed.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { patchTop } from "../../windows.ts";
-import { moveCard } from "../../zones.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { releaseAttachments } from "../../core/keywords.ts";
+import { printedOf } from "../../core/printed.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop } from "../../windows/windows.ts";
+import { moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { twinCode } from "./guards.ts";

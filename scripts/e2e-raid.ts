@@ -14,8 +14,8 @@ import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../src/rules/combat.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
+import { characters, legalAttackEnemies } from "../src/rules/combat/combat.ts";
+import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
 
 import prebuilt from "../data/decks/prebuilt.json" with { type: "json" };
 import { nextIntent } from "./auto-player.ts";

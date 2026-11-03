@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
 
-import { legalIntents, legalTargets } from "../../reduce.ts";
-import { definePrinted } from "../../printed.ts";
-import { syncConstants } from "../../constants.ts";
+import { legalIntents, legalTargets } from "../../engine/reduce.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { syncConstants } from "../../interpret/constants.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until } from "./table.ts";
 
 // Rules: rr.cancel, rr.damage, rr.response, rr.step-6-4-3, rr.timing-of-ability-resolution (data/rules/entries.json).

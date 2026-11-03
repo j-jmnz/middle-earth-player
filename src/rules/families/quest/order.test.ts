@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { hero, send, table, type Table } from "../defense/table.ts";
 
 // Rules: rr.quest-cards-quest-deck, rr.quest-advancement, dcce.heading, ltp.victory-display (data/rules/entries.json); ledger lines 11016:A:1, 11016:B:3,

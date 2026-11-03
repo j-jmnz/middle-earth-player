@@ -3,15 +3,15 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/costs.ts";
 
-import { syncConstants } from "../../constants.ts";
-import { expectOk } from "../../fixture.ts";
-import { gainSeatResources } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { hasResourceMatch, heroPays } from "../../payments.ts";
-import { qualifyingEnemies } from "../../quest.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import { ruleCause } from "../../cause.ts";
-import { updateCard, withThreat } from "../../state.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { gainSeatResources } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { hasResourceMatch, heroPays } from "../../player/payments.ts";
+import { qualifyingEnemies } from "../../quest/quest.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { updateCard, withThreat } from "../../core/state.ts";
 import { card, put, table } from "./fixture.ts";
 import { threatCostCut, threatCostOf } from "./stats.ts";
 

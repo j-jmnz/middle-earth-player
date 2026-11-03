@@ -9,7 +9,7 @@ import { RECORDS as DCCE_RECORDS } from "../effects/authored/pool/DCCE.ts";
 import { loadVoyageWorld, voyageTable, type VoyageWorld } from "../../scripts/voyage-scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";
-import { pushEffectFrame } from "../rules/effect-frames.ts";
+import { pushEffectFrame } from "../rules/interpret/effect-frames.ts";
 import { seaAsk, seaOptionLabel } from "./sea-words.ts";
 
 let world: VoyageWorld;

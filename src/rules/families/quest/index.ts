@@ -2,29 +2,29 @@
 // rr.attachment-cards, rr.the-word-choose (data/rules/entries.json).
 import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import { openBranch, askTarget } from "../../choices.ts";
-import { characters } from "../../combat.ts";
-import { hasTrait } from "../../conditions.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { addModifier, placeDamage, playerCardEffectCanChoose } from "../../keywords.ts";
-import { pickCandidates } from "../../pick.ts";
-import { exhaustCard, lastPicked, placePlayerDamage, readyCard, seatOf } from "../../player-verbs.ts";
-import { isCharacterType, isPlayerType, printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { Modifier, QueueItem, ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { topFrame } from "../../windows.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { openBranch, askTarget } from "../../windows/choices.ts";
+import { characters } from "../../combat/combat.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { addModifier, placeDamage, playerCardEffectCanChoose } from "../../core/keywords.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { exhaustCard, lastPicked, placePlayerDamage, readyCard, seatOf } from "../../interpret/player-verbs.ts";
+import { isCharacterType, isPlayerType, printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { topFrame } from "../../windows/windows.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { lowerCardThreat, makeActive, moveProgress, removeProgressFromQuest } from "./places.ts";
 import { playerSource, raiseQuestThreat, resetThreat } from "./threat.ts";
-import { advanceStage } from "../../quest.ts";
+import { advanceStage } from "../../quest/quest.ts";
 import { keepStage, lookedStages, shuffleStages } from "./order.ts";
-import { restricted } from "../../restrictions.ts";
-import { afterProgress } from "../../stage-reveal.ts";
+import { restricted } from "../../interpret/restrictions.ts";
+import { afterProgress } from "../../quest/stage-reveal.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 

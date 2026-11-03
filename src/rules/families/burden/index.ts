@@ -1,11 +1,11 @@
 // Rules: mec109.burden-deck, mec109.ringbearers-life, rr.burdens (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { immediateAttackEach } from "./attack.ts";
 import { attachSelfToRingBearer, moveBurden, revealBurden, shuffleBurdenDeck } from "./deck.ts";

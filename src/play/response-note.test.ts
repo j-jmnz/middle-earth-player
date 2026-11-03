@@ -2,7 +2,7 @@
 // for a cost another Response may pay (Aragorn's ready waits for Théodred's resource).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/reduce.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
 import { starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, send } from "../../scripts/test-scene.ts";
 

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { fixtureDefinition } from "../rules/fixture.ts";
-import { blankScenario, withSeat } from "../rules/state.ts";
+import { fixtureDefinition } from "../rules/core/test-fixture.ts";
+import { blankScenario, withSeat } from "../rules/core/state.ts";
 
 import { dialName, dialTap, NO_DRAG, NO_HIGHLIGHT, NO_TARGETS, peekSeat, peekWords, seatDial } from "./peek.ts";
 import { onScrubCancel, scrubMoved, scrubOpen } from "./scrub-open.ts";

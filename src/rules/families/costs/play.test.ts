@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/costs.ts";
 
-import { holds } from "../../conditions.ts";
-import { expectOk } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import { flagged, updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { flagged, updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { card, put, table } from "./fixture.ts";
 import { noteEvent } from "./pay.ts";
 

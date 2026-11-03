@@ -1,6 +1,6 @@
 // The line under a card's name in a card list (docs/design-system-table.md, Reading panels): its type and its sphere, "Event · Tactics", from its
 // printing. A side quest reads "Side quest"; an encounter card has no sphere ("Enemy"). Pure.
-import type { PrintedCard } from "../rules/printed.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
 
 const capital = (word: string) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`;
 

@@ -3,12 +3,12 @@
 // tests run them on a table of plain-number heroes and the campaign's ships (scripts/voyage-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalAttackEnemies, canAttack } from "../rules/combat.ts";
-import { stagingThreat } from "../rules/quest.ts";
-import { legalIntents, legalTargets } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalAttackEnemies, canAttack } from "../rules/combat/combat.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
+import { legalIntents, legalTargets } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 import {

@@ -3,11 +3,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../catalog/boundary.ts";
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
-import { characters } from "../rules/combat.ts";
-import { byCode, expectOk, hero } from "../rules/fixture.ts";
-import { definePrinted, type PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { moveCard } from "../rules/zones.ts";
+import { characters } from "../rules/combat/combat.ts";
+import { byCode, expectOk, hero } from "../rules/core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { moveCard } from "../rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";

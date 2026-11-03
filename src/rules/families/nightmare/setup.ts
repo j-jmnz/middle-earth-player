@@ -2,15 +2,15 @@
 //
 // The Nightmare setup card's own lines: its Setup lines and its "During setup" Forced effects (setup.ts finishSetup), and the stage reveal
 // it hears (stage-reveal.ts). A named card read as its Nightmare twin is `twinCode` (families/nightmare/guards.ts).
-import type { EngineStep } from "../../intents.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { runEffect, type ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { fireForced } from "../../triggers.ts";
-import { withFrame } from "../../windows.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { runEffect, type ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { fireForced } from "../../windows/triggers.ts";
+import { withFrame } from "../../windows/windows.ts";
 import { listenerInPlay } from "./guards.ts";
 
-// A quest card became the current stage (afterProgress, rules/stage-reveal.ts): Forced effects that listen for it resolve
+// A quest card became the current stage (afterProgress, rules/quest/stage-reveal.ts): Forced effects that listen for it resolve
 // ("Forced: When stage 3A is revealed", 906101:A:2). The event is about no card, so the setup card next to the quest deck hears it; its
 // `subject` names the stage. It is announced only while a card that listens is in play.
 // `afterStageRevealed` ("Forced: After stage 2B is revealed", 11182:A:3) is announced before the stage's When Revealed frames are pushed, so it resolves once they have.

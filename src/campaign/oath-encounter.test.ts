@@ -3,11 +3,11 @@
 // heroes (scripts/oath-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, engageStaged, fight, loadOathWorld, oathTable, resolveReveal, settleChoices, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first, reveal, send, start, type Run } from "../../scripts/past-scene.ts";

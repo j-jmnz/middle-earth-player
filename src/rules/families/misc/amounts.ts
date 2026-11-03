@@ -4,10 +4,10 @@
 // tokens the other copies of the source card hold above the number on this one.
 import type { AmountExpr } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
 
 // The facedown attachments of a card (AttachFacedown) are out of play under it: zone "under", hosted by the card.
 export function facedownCount(state: ScenarioState, hostId: string | null): number {

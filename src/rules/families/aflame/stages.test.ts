@@ -2,12 +2,12 @@
 // and objective ally sides on a table of plain-number heroes and the Campaign Expansion's cards (scripts/raid-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { ruleCause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import { placeDamage } from "../../keywords.ts";
-import { settle } from "../../machine.ts";
-import { placeQuestProgress } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
+import { placeQuestProgress } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { CODES, idOf, idsOf, loadRaidWorld, raidTable, resolveRecords, send, start, type RaidLayout, type RaidWorld } from "../../../../scripts/raid-scene.ts";
 
 let world: RaidWorld;

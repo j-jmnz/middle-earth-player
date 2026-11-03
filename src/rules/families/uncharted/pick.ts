@@ -2,10 +2,10 @@
 // with enough progress, the bottom cards of a deck, a card costlier than the first card picked, and the decks a card forbids searching.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { heldAmount } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { heldAmount } from "../../core/state.ts";
 
 /** The Threat the Lost Island side prints on every copy (the scan, read into the ledger's notes of each Uncharted card: "Threat 2, no quest points"). */
 export const LOST_ISLAND_THREAT = 2;

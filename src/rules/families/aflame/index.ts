@@ -2,9 +2,9 @@
 // (the end of the round and the sweep that places a burnt location underneath The Havens Burn) in aflame/sweep.ts, what a record reads in aflame/values.ts, aflame/pick.ts and aflame/attack.ts.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { discardUntilAflame, engageFirstPlayer, healLocations, removeNamedFromGame, searchAflame, stageSetAside } from "./cards.ts";
 import type { Focus } from "../index.ts";
 
@@ -22,7 +22,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return removeNamedFromGame(state, instruction, ctx);
     case "HealLocations":
       return healLocations(state, instruction, focus, ctx, steps);
-    // A Resolution verb: rules/resolution.ts earns the cards.
+    // A Resolution verb: rules/setup/resolution.ts earns the cards.
     case "EarnDealt":
       return state;
     default:

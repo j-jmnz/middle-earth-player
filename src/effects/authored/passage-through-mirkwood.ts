@@ -5,7 +5,7 @@ import type { Effect } from "../../catalog/boundary.ts";
 // Rules: rr.step-3-3, rr.travel, rr.search, rr.first-player, rr.quest-advancement, rr.campaign-cards (data/rules/entries.json).
 const READY_CHARACTER = {"type":"character","control":"you","state":"ready"} as const;
 const NOT_UNDEFENDED = {"kind":"not","condition":{"kind":"undefended"}} as const;
-// The treachery being revealed waits in the staging area while it resolves (rules/frames.ts): "the staging area" here is the other cards.
+// The treachery being revealed waits in the staging area while it resolves (rules/windows/frames.ts): "the staging area" here is the other cards.
 const STAGING = {"type":"card","control":"any","stagingOnly":true,"other":true} as const;
 // The cards that take Driven by Shadow's +1 Threat: the enemies and locations in the staging area (01092:A:1), not the other cards there.
 const STAGING_ENEMIES = {"type":"enemy","control":"any","stagingOnly":true} as const;

@@ -6,11 +6,11 @@
 // (OfferAttacks: "You may declare and resolve an attack against each non-unique enemy in the staging area as if it were engaged
 // with you"). combat.ts and legal.ts ask these.
 import { attackerLimitReason } from "../aflame/attack.ts";
-import type { PlayerIntent } from "../../intents.ts";
-import { hasKeyword } from "../../keywords.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged } from "../../state.ts";
+import type { PlayerIntent } from "../../core/intents.ts";
+import { hasKeyword } from "../../core/keywords.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 

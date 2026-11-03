@@ -2,7 +2,7 @@
 // dcce.stormcallers-area-stages). Every sentence names what it does and leads with it; the numbers are the engine's.
 import type { Instruction } from "../catalog/boundary.ts";
 
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import type { ChoiceNames } from "./choice-words.ts";
 

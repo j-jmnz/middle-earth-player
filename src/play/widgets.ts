@@ -3,7 +3,7 @@
 // A Shadow of the Past or A Knife in the Dark shows neither. The engine wrote both numbers; nothing here changes one.
 import type { Effect } from "../catalog/boundary.ts";
 import { stageOf } from "../rules/families/breaking/areas.ts";
-import type { ScenarioState } from "../rules/reduce.ts";
+import type { ScenarioState } from "../rules/engine/reduce.ts";
 
 import { headingStepOf, type HeadingStep } from "./heading.ts";
 

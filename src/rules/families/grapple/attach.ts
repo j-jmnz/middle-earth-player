@@ -4,17 +4,17 @@
 // explored from the staging area, the enemies grappled with it are detached, flipped faceup and added to the staging area (zones.ts releaseGrappled); any other exit discards them with it (discardGrappled).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { askTarget } from "../../choices.ts";
-import { currentCause, ruleCause, UNATTRIBUTED } from "../../cause.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { printedStat } from "../../printed-stat.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { printedStat } from "../../core/printed-stat.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 

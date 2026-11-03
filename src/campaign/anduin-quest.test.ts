@@ -4,17 +4,17 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { questStageStart } from "../rules/families/quest/setup.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { syncConstants } from "../rules/constants.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
 import { revealsAllowed } from "../rules/families/encounter/reveal.ts";
-import { qualifyingEnemies, engagementStep } from "../rules/quest.ts";
-import { restricted } from "../rules/restrictions.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
-import { moveCard } from "../rules/zones.ts";
+import { qualifyingEnemies, engagementStep } from "../rules/quest/quest.ts";
+import { restricted } from "../rules/interpret/restrictions.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
+import { moveCard } from "../rules/core/zones.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { anduinStart, anduinWorld } from "../../scripts/anduin-game.ts";
 import { anduinTable, loadAnduinWorld, type AnduinLayout, type AnduinWorld } from "../../scripts/anduin-scene.ts";

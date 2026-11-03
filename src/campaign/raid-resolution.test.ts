@@ -3,8 +3,8 @@
 // (11182:B:1, 11182:B:2).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
 
 let world: RaidWorld;
@@ -95,7 +95,7 @@ describe("the cards the Resolution earns (11182:B:1, 11182:B:2)", () => {
   });
 
   it("lets the first player give the weapon to a hero of any seat, and earns it for the seat that hero is controlled by (B:1)", async () => {
-    const { applyResolution, resolutionIntents } = await import("../rules/resolution.ts");
+    const { applyResolution, resolutionIntents } = await import("../rules/setup/resolution.ts");
     const run = resolved({ seats: 2, threat: [45, 45], victory: [CODES.graxar] });
     const intents = resolutionIntents(run.state, run.made.ctx).map((intent) => (intent.type === "ChooseResolution" ? intent.optionId : ""));
     const second = idOf(run.state, "dh3");

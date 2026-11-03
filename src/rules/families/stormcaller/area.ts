@@ -3,11 +3,11 @@
 // them and no player card effect can choose one (they are immune); at the same stage they stand in the staging area and are cards of the game as any other (syncStormcallerArea, run by settle).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { atStormcallersStage } from "./values.ts";
 import { areaOf } from "./zone.ts";
 

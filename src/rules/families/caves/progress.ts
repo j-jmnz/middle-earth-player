@@ -4,10 +4,10 @@
 // can be placed on the quest card each round, `noQuestProgress` (Lost in the Dark) stops it until the end of the phase: the active location still
 // takes its progress first (rr.active-location), so only the share that would reach the quest card is held back. Both are flags the constant and
 // lasting records hold on "table", read from the state alone. The progress placed on the quest this round is a `questProgressPlaced` modifier.
-import type { Cause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, modifierActive, updateCard } from "../../state.ts";
+import type { Cause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, modifierActive, updateCard } from "../../core/state.ts";
 
 // The stage number of the current quest card: its place in the quest deck, counting from 1 (0 with no quest card). It is the position in the quest definition's
 // `stages`, not the number printed on the card: a quest whose stages come in another order (Voyage Across Belegaer's stage 2 cards) is counted by its definition.

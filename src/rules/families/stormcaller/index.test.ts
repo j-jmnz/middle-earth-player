@@ -2,16 +2,16 @@
 // heroes and the Campaign Expansion's cards (scripts/stormcaller-scene.ts): where its cards stand, the end of the round, the stage advance, catching up, and the progress that moves onto its stage.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { holds } from "../../conditions.ts";
-import { ruleCause } from "../../cause.ts";
-import { modifiedStat, placeDamage } from "../../keywords.ts";
-import { settle } from "../../machine.ts";
-import type { EngineStep } from "../../intents.ts";
-import { legalTargets } from "../../legal.ts";
-import { moveCard } from "../../zones.ts";
-import { placeQuestProgress } from "../../quest.ts";
-import { travelCostUnpayable } from "../../restrictions.ts";
-import type { ScenarioState } from "../../state.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { legalTargets } from "../../engine/legal.ts";
+import { moveCard } from "../../core/zones.ts";
+import { placeQuestProgress } from "../../quest/quest.ts";
+import { travelCostUnpayable } from "../../interpret/restrictions.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { CODES, codesIn, finish, idOf, loadFlightWorld, flightTable, resolveRecords, type FlightLayout, type FlightWorld } from "../../../../scripts/stormcaller-scene.ts";
 import { areaOf } from "./zone.ts";
 

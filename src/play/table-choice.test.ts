@@ -2,8 +2,8 @@ import { readFileSync } from "node:fs";
 
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { legalIntents, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { nextIntent } from "../../scripts/auto-player.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 

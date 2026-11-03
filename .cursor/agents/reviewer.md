@@ -85,7 +85,7 @@ Lead with the blocks. Then the changes worth making. Then short notes. Skip a se
 A bug names the file, the input, and the wrong result. Any other finding names the file, the repeated or misplaced code, and the module or function that should own it. One sentence on why. Do not propose a product change, a new architecture, or a drive-by refactor outside the duplication you cited.
 
 ```
-Block: src/rules/quest.ts places progress on the quest while Bag End is active
+Block: src/rules/quest/quest.ts places progress on the quest while Bag End is active
 Committed willpower 4 against staging threat 1 puts 3 progress on the quest. That progress belongs on the active location first.
 
 Block: src/screens/table.tsx applies damage

@@ -3,8 +3,8 @@
 // player a Recurring Nightmare goes to) and that none of them says what lies on a facedown side.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/legal.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, loadTempleWorld, send, start, templeTable, type TempleLayout, type TempleWorld } from "../../scripts/temple-scene.ts";
 
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandPickWords, islandTravelNote, islandTravelRow, islandWords } from "./island-words.ts";

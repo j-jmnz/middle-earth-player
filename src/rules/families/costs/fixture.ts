@@ -2,11 +2,11 @@
 // cards made by code. The tests pass the effect records in.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { cardMap, fixtureDefinition, hero } from "../../fixture.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { blankScenario, updateCard, type ScenarioState, type ZoneName } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { cardMap, fixtureDefinition, hero } from "../../core/test-fixture.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { blankScenario, updateCard, type ScenarioState, type ZoneName } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 
 export const BASE: readonly PrintedCard[] = [
   hero("lead", "leadership", 9),

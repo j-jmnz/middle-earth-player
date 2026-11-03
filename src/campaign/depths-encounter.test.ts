@@ -2,12 +2,12 @@
 // heroes and the Campaign Expansion's cards (scripts/depths-scene.ts): the locations, the treacheries, the enemies and their shadow effects.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { holds } from "../rules/conditions.ts";
+import { holds } from "../rules/interpret/conditions.ts";
 import { grappledWith } from "../rules/families/grapple/values.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, codesIn, depthsFight, depthsTable, finish, idOf, idsOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
 
 let world: DepthsWorld;

@@ -3,7 +3,7 @@
 // from another seat, a new state is the pair (the state before it, the state after it). A layout can move without a new update (a
 // resize, a pick), and an update can move the game without moving the shown layout (a change that only touched the other seat's
 // counts), so each update is used by the first new layout after it and by no other: a later peek never pops a stale change.
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 export type StoreUpdate = { n: number; prev: ScenarioState; next: ScenarioState };
 

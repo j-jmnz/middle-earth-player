@@ -2,8 +2,8 @@
 // makes that line true, against a baseline that makes every other line false: off-course, a Ship enemy in play, one surviving player (1 XP).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CORSAIR_WARSHIP, CROWLEY, OMINOUS_FATE, SCOUTING_SHIP, THUNDERSTRUCK, loadVoyageWorld, voyageTable, type VoyageLayout, type VoyageWorld } from "../../scripts/voyage-scene.ts";
 
 let world: VoyageWorld;

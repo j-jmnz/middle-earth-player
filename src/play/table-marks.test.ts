@@ -4,8 +4,8 @@
 // won, and why a hand card does not glow.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/reduce.ts";
-import { updateCard, withThreat, type ScenarioState } from "../rules/state.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import { updateCard, withThreat, type ScenarioState } from "../rules/core/state.ts";
 import { buildTable, FRODO, idsOf, RIDER, SAM, sceneCards } from "../../scripts/test-scene.ts";
 
 import { delayedLines, slotNumbers } from "./card-effects.ts";

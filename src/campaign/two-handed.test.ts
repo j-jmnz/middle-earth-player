@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { EngineStep } from "../rules/intents.ts";
-import { settle } from "../rules/machine.ts";
-import { livingSeats, updateCard, type ScenarioState } from "../rules/state.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { livingSeats, updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { buildTable, FRODO, idsOf, MERRY, RING, SAM, sceneCards, type Table } from "../../scripts/test-scene.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;

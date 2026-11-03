@@ -3,12 +3,12 @@
 // stage 3A cards (142063 to 142066:A:1), with the engine reads around them.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../../fixture.ts";
-import type { EngineStep } from "../../intents.ts";
-import { restricted } from "../../restrictions.ts";
-import { reduce, type ScenarioState } from "../../reduce.ts";
-import { engagementCostOf } from "../../quest.ts";
-import { modifiedStat } from "../../keywords.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { restricted } from "../../interpret/restrictions.ts";
+import { reduce, type ScenarioState } from "../../engine/reduce.ts";
+import { engagementCostOf } from "../../quest/quest.ts";
+import { modifiedStat } from "../../core/keywords.ts";
 import { causeProblems } from "../../../../scripts/cause-check.ts";
 import { ARGONATH, DIVIDED, FRODOS_CHOICE, GREAT_RIVER, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A, codes, fire, ids, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
 import { first } from "../../../../scripts/past-scene.ts";

@@ -5,10 +5,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { recordInstructions } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { printedOf } from "../rules/printed.ts";
-import { openResolution } from "../rules/resolution.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { openResolution } from "../rules/setup/resolution.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { BREAKING_GOLDENS, breakingGameWorld, playGolden } from "../../scripts/breaking-game.ts";
 import { breaking, campaign } from "../../scripts/breaking-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";

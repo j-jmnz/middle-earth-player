@@ -3,17 +3,17 @@
 // resolves, then to its D side.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { currentCause, UNATTRIBUTED, type Cause } from "../../cause.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { heldAmount, livingSeats, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { currentCause, UNATTRIBUTED, type Cause } from "../../core/cause.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { heldAmount, livingSeats, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 import type { Focus } from "../index.ts";
 import { areaOf } from "./zone.ts";

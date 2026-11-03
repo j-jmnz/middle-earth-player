@@ -2,10 +2,10 @@
 // attack enemies before enemy attacks are resolved (Oath of Eorl, 17085): the seat holds attacksFirst for the phase; its
 // attack windows open before the first enemy attack, and once it is done (attackedFirst) the combat phase goes on as normal
 // and the player attack step leaves that seat out.
-import { hasLegalAttack } from "../../combat.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { Modifier, ScenarioState } from "../../state.ts";
-import { flagged, livingSeats } from "../../state.ts";
+import { hasLegalAttack } from "../../combat/combat.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { Modifier, ScenarioState } from "../../core/state.ts";
+import { flagged, livingSeats } from "../../core/state.ts";
 
 export function attackedEarly(state: ScenarioState, seat: number): boolean {
   return flagged(state, `seat:${seat}`, "attackedFirst");

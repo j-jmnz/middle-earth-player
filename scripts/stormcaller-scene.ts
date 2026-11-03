@@ -1,16 +1,16 @@
 import { EFFECTS } from "../src/effects/index.ts";
 import type { Effect } from "../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, type CampaignData, type ScenarioData } from "../src/catalog/scenario-data.ts";
-import { syncConstants } from "../src/rules/constants.ts";
-import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
-import type { PlayerIntent, ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
-import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
-import { attachTo, spawn } from "../src/rules/zones.ts";
+import { syncConstants } from "../src/rules/interpret/constants.ts";
+import { definePrinted, type PrintedCard } from "../src/rules/core/printed.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../src/rules/engine/reduce.ts";
+import { blankScenario, updateCard, withThreat } from "../src/rules/core/state.ts";
+import { attachTo, spawn } from "../src/rules/core/zones.ts";
 import { stampRoutes } from "../src/rules/families/sea/routes.ts";
-import { pushCardEffects } from "../src/rules/effect-frames.ts";
-import type { EngineStep } from "../src/rules/intents.ts";
-import { settle } from "../src/rules/machine.ts";
-import { legalIntents, legalTargets } from "../src/rules/legal.ts";
+import { pushCardEffects } from "../src/rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../src/rules/core/intents.ts";
+import { settle } from "../src/rules/engine/machine.ts";
+import { legalIntents, legalTargets } from "../src/rules/engine/legal.ts";
 
 import { loadCampaign, loadScenario, gameCodes } from "./data/load-scenarios.ts";
 import { loadPrinted } from "./test-catalog.ts";

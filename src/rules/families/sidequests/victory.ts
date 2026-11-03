@@ -2,11 +2,11 @@
 //
 // The victory display: a card added to it by an effect (a side quest defeated, an event or attachment that adds itself, a
 // card searched out of the encounter deck) goes there unless its own text limits the copies the display may hold.
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import { fromEncounterDeck, printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { fromEncounterDeck, printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 
 // "Limit 3 copies of ~ in the victory display": the most copies of the card's title the display holds, or null.
 export function victoryLimit(ctx: Pick<ReduceContext, "effects">, code: string): number | null {

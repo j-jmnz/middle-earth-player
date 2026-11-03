@@ -1,12 +1,12 @@
 // Rules: dcce.island-map, dcce.exploration (data/rules/entries.json); ledger lines 12067:A:1, 12067:B:1, 12072:A:1, 12074:A:1. The Island Map: fifteen double-sided locations in a grid of three rows by five columns, the
 // active location marked where it lies, and the locations next to it (orthogonally, not diagonally) standing in the staging area. Which card stands where is read from the state (`uncharted.island` and
 // the active location), never from the zone a card happens to be in: the zones follow it (syncIsland, run by settle), as the Stormcaller's area follows the stage (stormcaller/area.ts).
-import type { ReduceContext } from "../../interpret.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { heldAmount, updateCard } from "../../state.ts";
-import { syncConstants } from "../../constants.ts";
-import { moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { heldAmount, updateCard } from "../../core/state.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { IslandState } from "../uncharted/types.ts";
 
 export const ROWS = 3;

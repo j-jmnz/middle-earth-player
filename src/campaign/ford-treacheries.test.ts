@@ -3,11 +3,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { hasKeyword } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/legal.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { expireModifiers, flagged, updateCard, type ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { hasKeyword } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { expireModifiers, flagged, updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
 import { codesOf, first, FRODO, reveal, RING, SAM, send, start, type Run } from "../../scripts/past-scene.ts";

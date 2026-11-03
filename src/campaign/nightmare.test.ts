@@ -4,8 +4,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { encounterCodes, type Difficulty } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 

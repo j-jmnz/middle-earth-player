@@ -4,11 +4,11 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { codes, fixtureDefinition } from "../../fixture.ts";
-import { definePrinted } from "../../printed.ts";
-import { startScenario } from "../../reduce.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { codes, fixtureDefinition } from "../../core/test-fixture.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { startScenario } from "../../engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { crossTo, inVictory, offered, passQuestWindow, play, put, questing, run, seat, send, SIDE_CARDS, sideCtx } from "./fixture.ts";
 
 const ctx = sideCtx(RECORDS);

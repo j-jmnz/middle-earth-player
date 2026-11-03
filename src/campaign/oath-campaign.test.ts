@@ -4,14 +4,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { settle } from "../rules/machine.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "../rules/reduce.ts";
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "../rules/engine/reduce.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../scripts/anduin-game.ts";
 import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden as playDolGuldur } from "../../scripts/dol-guldur-game.ts";

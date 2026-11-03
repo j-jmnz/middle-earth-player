@@ -4,8 +4,8 @@
 // `encounterUncancelable` while it is: no cancel Response is offered against a When Revealed or Shadow effect (A Test of Will, Hasty Stroke), while a Response that does not cancel is, and the
 // paid cancel an encounter card's own Forced effect offers (141077:A:2) is not offered either.
 import type { Effect } from "../../../catalog/boundary.ts";
-import type { GameEvent, ScenarioState } from "../../state.ts";
-import { flagged } from "../../state.ts";
+import type { GameEvent, ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 
 export function encounterUncancelable(state: ScenarioState): boolean {
   return flagged(state, "table", "encounterUncancelable");

@@ -2,12 +2,12 @@
 //
 // What the misc family protects a card from: immunity to the effects of cards that lack a Trait ("Immune to non-Master card
 // effects", "Immune to non-Gollum card effects"), and a hero that gains no resources from some cards' effects (Bilbo Baggins).
-import type { ReduceContext } from "../../interpret.ts";
-import { hasTrait } from "../../conditions.ts";
-import { effectsOf } from "../../listen.ts";
-import { isPlayerType, printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 
 // Whether the effect of the source card may not choose or affect the target: the target is immune to cards without a Trait and
 // the source has none of it. A rule (no source card) is not a card effect.

@@ -2,13 +2,13 @@
 // Oath (41001, 41002, 41003) on a table of plain-number heroes (scripts/oath-scene.ts): their Setup, When Revealed and what keeps a stage from advancing.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { destroyCard } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { destroyCard } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { codesIn, loadOathWorld, oathTable, type OathLayout, type OathWorld } from "../../scripts/oath-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 

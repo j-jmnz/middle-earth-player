@@ -1,12 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { cardMap, expectOk, fixtureDefinition } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { definePrinted, type PrintedCard } from "../rules/printed.ts";
-import { legalIntents, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { blankScenario, withThreat } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { cardMap, expectOk, fixtureDefinition } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
+import { legalIntents, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { blankScenario, withThreat } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 
 const RIDER = "141039";

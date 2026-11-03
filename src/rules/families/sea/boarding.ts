@@ -2,13 +2,13 @@
 // cards of the Corsair deck are revealed and the enemies put into play engaged with that player. It does not resolve when the ship-enemy engages a
 // player from another player's play area, the encounter deck or its discard pile. X is the printed value, plus what a card gives ("gains Boarding 1")
 // and less what a card takes ("reduce that enemy's Boarding value by 1"), never below 0.
-import { ruleCause } from "../../cause.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { GameEvent, ScenarioState } from "../../state.ts";
-import { heldAmount, updateCard } from "../../state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { GameEvent, ScenarioState } from "../../core/state.ts";
+import { heldAmount, updateCard } from "../../core/state.ts";
 import { revealCorsair } from "./corsair.ts";
 
 /** The Boarding value the enemy has now (0 for a card with none). */

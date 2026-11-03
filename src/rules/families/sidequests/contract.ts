@@ -3,14 +3,14 @@
 // game in their play area (it is no part of the deck they draw from), shows its side A, and is flipped over by its own abilities.
 // Each side's abilities are records whose line ids name the side (`21074:B:1`) and which carry a `faceUp` condition for it.
 import type { Condition, PickSpec } from "../../../catalog/boundary.ts";
-import { constantInstructions } from "../../constant-records.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { matchesPick } from "../../pick.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { Modifier, ScenarioState } from "../../state.ts";
-import { heldAmount, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { constantInstructions } from "../../interpret/constant-records.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { Modifier, ScenarioState } from "../../core/state.ts";
+import { heldAmount, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { lootUnder } from "./loot.ts";
 
 // The `faceUp` condition: the card shows this side. A card dealt face up shows its side A.

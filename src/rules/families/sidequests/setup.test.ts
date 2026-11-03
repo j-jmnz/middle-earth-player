@@ -3,10 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { codes, expectOk, fixtureDefinition } from "../../fixture.ts";
-import { definePrinted } from "../../printed.ts";
-import { reduce, startScenario } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
+import { codes, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { reduce, startScenario } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { SIDE_CARDS } from "./fixture.ts";
 
 const filler = codes("f", 20);

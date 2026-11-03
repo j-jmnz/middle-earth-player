@@ -4,9 +4,9 @@
 import type { Instruction } from "../catalog/boundary.ts";
 import { cellOf, distance, exploring, islandOf, TEMPLE_COLUMN } from "../rules/families/island/map.ts";
 import { seatThreat } from "../rules/families/play/hooks.ts";
-import { effectsOf } from "../rules/listen.ts";
-import { printedOf } from "../rules/printed.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { effectsOf } from "../rules/windows/listen.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
 import { directionWords, type PlaceMark } from "./island-place.ts";

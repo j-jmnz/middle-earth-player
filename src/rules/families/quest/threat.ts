@@ -4,18 +4,18 @@
 // a failed quest raises (waived by Doom Hangs Still and Ever Onward, and held back while a Response to the failed quest could
 // still waive it), threat raised by encounter and quest cards (Elfhelm), the starting threat level (Aragorn) and a card that
 // keeps its player in the game at the threat elimination level (Favor of the Valar).
-import type { Cause } from "../../cause.ts";
-import { currentCause, ruleCause, UNATTRIBUTED } from "../../cause.ts";
-import { holds } from "../../conditions.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { eliminateEmpties, lowerThreat, raiseThreat } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { isPlayerType, printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, heldAmount, inPlay, livingSeats } from "../../state.ts";
+import type { Cause } from "../../core/cause.ts";
+import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { eliminateEmpties, lowerThreat, raiseThreat } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats } from "../../core/state.ts";
 import { heard, queueHeard } from "./events.ts";
 
 const QUEST_FAILURE: Cause = ruleCause("rr.step-3-4");

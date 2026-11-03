@@ -1,11 +1,11 @@
 import { EFFECTS } from "../src/effects/index.ts";
 import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData } from "../src/catalog/scenario-data.ts";
-import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
-import type { ReduceContext, ScenarioState } from "../src/rules/reduce.ts";
-import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
+import { definePrinted, type PrintedCard } from "../src/rules/core/printed.ts";
+import type { ReduceContext, ScenarioState } from "../src/rules/engine/reduce.ts";
+import { blankScenario, updateCard, withThreat } from "../src/rules/core/state.ts";
 import { captureRingBearer } from "../src/rules/families/south/captive.ts";
-import { attachTo, spawn } from "../src/rules/zones.ts";
+import { attachTo, spawn } from "../src/rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";
 import { FRODO, MERRY, RING, SAM } from "./past-scene.ts";

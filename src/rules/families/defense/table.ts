@@ -2,12 +2,12 @@
 // optional engagement of the encounter phase so a DeclineEngage plays the combat phase. Not used by the engine.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { cardMap, expectOk, fixtureDefinition } from "../../fixture.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { legalIntents, reduce, type LegalIntent, type PlayerIntent } from "../../reduce.ts";
-import { blankScenario, updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo, spawn } from "../../zones.ts";
-import type { ReduceContext } from "../../interpret.ts";
+import { cardMap, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { legalIntents, reduce, type LegalIntent, type PlayerIntent } from "../../engine/reduce.ts";
+import { blankScenario, updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
 
 export type Placed = { code: string; seat?: number; key?: string };
 

@@ -1,9 +1,9 @@
 // Rules: mec109.multiple-staging-areas (data/rules/entries.json); 142062:B:1.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { QueueItem, ScenarioState } from "../../state.ts";
-import { livingSeats } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import type { QueueItem, ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 import { sharedStaging } from "./areas.ts";
 
 const PICK_SHARED: Instruction = { verb: "Pick", pick: { type: "card", control: "any", stagingOnly: true, stagingArea: "shared" } };
@@ -12,7 +12,7 @@ const MOVE_OWN: Instruction = { verb: "MovePickedToOwnStaging" };
 // DealOutStaging (142062:B:1): "In player order, each player moves 1 encounter card from this staging area to theirs. When there are no encounter cards
 // left at this stage, discard it." The running effect's queue gets one pick and one move for each seat in each round, as many rounds as the shared area
 // has cards: a pick that finds the area empty records nothing and its move does nothing. A seat that has several cards to choose from chooses; the
-// last card is taken without asking (rules/effect-frames.ts pick).
+// last card is taken without asking (rules/interpret/effect-frames.ts pick).
 export function dealOut(state: ScenarioState, item: QueueItem): ScenarioState {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect" || !state.separate) return state;

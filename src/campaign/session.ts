@@ -1,11 +1,11 @@
 // Rules: ltp.campaign-log, rr.campaign-log, ltp.campaign-pool, rr.campaign-pool, ltp.campaign-setup-checklist
 // (data/rules/entries.json). The life of the open scenario of a save: deal it from a briefing, replay it on load, write
 // each intent as it commits, and at the end write the log (a win) or nothing (a loss). Pure.
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { resolutionResult } from "../rules/resolution.ts";
-import type { PlayerIntent } from "../rules/intents.ts";
-import type { StartScenario } from "../rules/setup.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { resolutionResult } from "../rules/setup/resolution.ts";
+import type { PlayerIntent } from "../rules/core/intents.ts";
+import type { StartScenario } from "../rules/setup/setup.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";

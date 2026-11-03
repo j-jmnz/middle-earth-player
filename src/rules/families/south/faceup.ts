@@ -5,14 +5,14 @@
 // its owner's deck until its outcome moves it (to its owner's hand or discard pile, shuffled into its deck, or played for no cost).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { putOnDeck } from "../../player-verbs.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { putOnDeck } from "../../interpret/player-verbs.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { runEncounterItem } from "../encounter/items.ts";
 import { markPicked, queueFront } from "../play/refs.ts";

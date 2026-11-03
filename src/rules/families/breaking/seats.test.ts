@@ -3,15 +3,15 @@
 // back, the first player lock and the slots a card takes.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { definePrinted } from "../../printed.ts";
-import { refCard } from "../../amounts.ts";
-import { attachmentHostIds } from "../../attach.ts";
-import { holds } from "../../conditions.ts";
-import { failQuest } from "../../quest.ts";
-import { offerResponses } from "../../responses.ts";
-import { flagged, updateCard, withSeat } from "../../state.ts";
-import { syncConstants } from "../../constants.ts";
-import { moveCard } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { refCard } from "../../interpret/amounts.ts";
+import { attachmentHostIds } from "../../player/attach.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { failQuest } from "../../quest/quest.ts";
+import { offerResponses } from "../../windows/responses.ts";
+import { flagged, updateCard, withSeat } from "../../core/state.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { moveCard } from "../../core/zones.ts";
 import { activeOf, mergeView, stageOf, viewOf } from "./areas.ts";
 import { revealSeat } from "../encounter/reveal.ts";
 import { FRODOS_CHOICE, fire, loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";

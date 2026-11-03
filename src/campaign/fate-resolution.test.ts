@@ -2,8 +2,8 @@
 // baseline that makes every other line false: threat over 40, nothing in the victory display, no resource on the campaign card, one surviving player (1 XP).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, fateTable, loadFateWorld, type FateLayout, type FateWorld } from "../../scripts/fate-scene.ts";
 
 let world: FateWorld;

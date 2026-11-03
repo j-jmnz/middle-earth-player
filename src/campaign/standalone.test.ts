@@ -5,9 +5,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
 import { encounterCodes } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
 
@@ -68,7 +68,7 @@ function opening(scenarioId: string, loadout: StandaloneLoadout = loadoutOf({ sc
   return startScenario(standaloneStart(world, 1, loadout, SEED), contextOf(world));
 }
 
-// After Keep, the quest card's Setup and the saga's (The One Ring) have run (src/rules/setup.ts finishSetup).
+// After Keep, the quest card's Setup and the saga's (The One Ring) have run (src/rules/setup/setup.ts finishSetup).
 function kept(scenarioId: string): ScenarioState {
   return expectOk(reduce(opening(scenarioId), { type: "Keep" }, contextOf(worldOf(scenarioId)))).state;
 }

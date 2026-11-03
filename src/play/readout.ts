@@ -5,17 +5,17 @@
 // The engine's numbers for the open moment, as the dock shows them beside the choice: attack against defense while an attack
 // is going on (an enemy can attack during staging), the Hide numbers, otherwise willpower against threat while questing.
 // Every number is read with the engine's own functions on the current state; the picks only say whose numbers to add.
-import { attackStrength } from "../rules/combat.ts";
+import { attackStrength } from "../rules/combat/combat.ts";
 import { DEFENDERS_FRAME, declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense/defenders.ts";
-import { hidePassed, hideWillpower } from "../rules/hide.ts";
+import { hidePassed, hideWillpower } from "../rules/quest/hide.ts";
 import { placedLimit } from "../rules/families/uncharted/limit.ts";
-import { defenseAsDefender, modifiedStat } from "../rules/keywords.ts";
+import { defenseAsDefender, modifiedStat } from "../rules/core/keywords.ts";
 import { questSeat } from "./selectors.ts";
 import { viewOf } from "../rules/families/breaking/areas.ts";
-import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThreat } from "../rules/quest.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { livingSeats } from "../rules/state.ts";
-import { topFrame } from "../rules/windows.ts";
+import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThreat } from "../rules/quest/quest.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { livingSeats } from "../rules/core/state.ts";
+import { topFrame } from "../rules/windows/windows.ts";
 
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "./foresight.ts";
 import { sailingReadout } from "./sea-readout.ts";

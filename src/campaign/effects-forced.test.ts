@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { reduce, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import { updateCard } from "../rules/state.ts";
-import { fireForced } from "../rules/triggers.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { reduce, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { updateCard } from "../rules/core/state.ts";
+import { fireForced } from "../rules/windows/triggers.ts";
 import {
   first, frames, FRODO, loadWorld, reveal, RIDER, SAM, send, table,
   type Layout, type World,

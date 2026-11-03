@@ -5,19 +5,19 @@
 // GivePicked, SwapPicked, ShuffleDiscardIntoDeck, ShuffleHandIntoDeck, DiscardFromDeck, AddToX and ActAs.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { releaseAttachments } from "../../keywords.ts";
-import { matchesPick } from "../../pick.ts";
-import { lastPicked, pickedList, putOnDeck, seatOf } from "../../player-verbs.ts";
-import { cardTypeOf, isPlayerType, printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { CardInstance, EffectData, ScenarioState } from "../../state.ts";
-import { inPlay, updateCard, withSeat } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { moveCard } from "../../zones.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { releaseAttachments } from "../../core/keywords.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import { lastPicked, pickedList, putOnDeck, seatOf } from "../../interpret/player-verbs.ts";
+import { cardTypeOf, isPlayerType, printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { CardInstance, EffectData, ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard, withSeat } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;

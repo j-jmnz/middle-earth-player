@@ -2,12 +2,12 @@
 // records the family authored, and helpers that put side quests and cards in the victory display.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { syncConstants } from "../../constants.ts";
-import { cardMap } from "../../fixture.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { cardMap } from "../../core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { PLAY_CARDS, put, run, send } from "../play/fixture.ts";
 
 export { crossTo, offered, passResponses, play, put, run, seat, send, trigger, triggers, type Table } from "../play/fixture.ts";

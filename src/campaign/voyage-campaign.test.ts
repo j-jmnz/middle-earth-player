@@ -7,9 +7,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { campaignScenario } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { UPGRADED_CODES, VOYAGE_GOLDENS, playGolden, voyageLoadout, voyagePlan, voyageStart, voyageWorld } from "../../scripts/voyage-game.ts";
 import { campaign, SHIP_CODES, voyage } from "../../scripts/voyage-scene.ts";
 

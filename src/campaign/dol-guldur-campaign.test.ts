@@ -6,9 +6,9 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { prisonerHero } from "../rules/families/prisoner/index.ts";
 import { textBlank } from "../rules/families/attachments/hold.ts";
 import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../scripts/anduin-game.ts";

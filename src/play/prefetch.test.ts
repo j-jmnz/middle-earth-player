@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
-import { updateCard } from "../rules/state.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
+import { updateCard } from "../rules/core/state.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 
 import { prefetchCodes, resolutionCodes } from "./prefetch.ts";

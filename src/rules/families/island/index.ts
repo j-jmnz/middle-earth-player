@@ -2,10 +2,10 @@
 // the secrets and the Temple Guardian island/cards.ts, and what a pick or an amount reads of the map island/pick.ts.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { lastPicked } from "../../player-verbs.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { attachGuarded, engageFromVictory, flipSecret, lookAtSecret, placeProgressInStaging, placeSecrets, raiseThreatToAttach, shuffleIntoPlayerDeck } from "./cards.ts";
 import { prepareMap, revealCorners, setActive } from "./map.ts";

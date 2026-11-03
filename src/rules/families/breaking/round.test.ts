@@ -4,15 +4,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { expectOk } from "../../fixture.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../reduce.ts";
-import { archeryRecipients, archeryTotal } from "../../combat.ts";
-import { optionalEnemies, qualifyingEnemies, stagingThreat } from "../../quest.ts";
-import { clearEliminated } from "../../keywords.ts";
-import { withSeat, withThreat } from "../../state.ts";
-import { runInstruction } from "../../interpret.ts";
-import { settle } from "../../machine.ts";
-import type { EngineStep } from "../../intents.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../engine/reduce.ts";
+import { archeryRecipients, archeryTotal } from "../../combat/combat.ts";
+import { optionalEnemies, qualifyingEnemies, stagingThreat } from "../../quest/quest.ts";
+import { clearEliminated } from "../../core/keywords.ts";
+import { withSeat, withThreat } from "../../core/state.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { settle } from "../../engine/machine.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { codes, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
 import { first } from "../../../../scripts/past-scene.ts";
 

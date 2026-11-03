@@ -3,10 +3,10 @@
 // leads with the decision.
 import type { Instruction } from "../catalog/boundary.ts";
 import { cellOf } from "../rules/families/island/map.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import type { CardInstance, ScenarioState } from "../rules/state.ts";
-import { topFrame } from "../rules/windows.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import type { CardInstance, ScenarioState } from "../rules/core/state.ts";
+import { topFrame } from "../rules/windows/windows.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
 

@@ -54,7 +54,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ReattachSelf"), target: cardRefSchema.optional(), ...when }),
   // On a quest card's Forced effect "When you defeat this stage, proceed to one of the 2 \"A Chosen Path\" stages, at random" (01120:B:1):
   // the stage's defeat proceeds to one of `codes`, chosen with the scenario's seed, and the others are removed from the game. The
-  // scenario definition copies it onto the stage (`stages[i].branch`) and advanceStage (rules/quest.ts) takes the branch, so running
+  // scenario definition copies it onto the stage (`stages[i].branch`) and advanceStage (rules/quest/quest.ts) takes the branch, so running
   // it does nothing. A stage reached by a branch is the last one: defeating it wins the game.
   z.strictObject({ verb: z.literal("BranchStage"), codes: z.array(z.string().min(1)).min(2) }),
   // Setup: "Shuffle each stage 2 card in the quest deck so that their order is random, leaving stage 3 on the bottom" (11016:A:1). The quest cards
@@ -64,7 +64,7 @@ export const VERBS = [
   // On a quest stage: "When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of
   // your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck" (11016:B:3,
   // 11017:B:3). The scenario definition copies `count` onto the stage (`stages[i].look`), and a quest with one advances in the order of its
-  // quest deck (rules/quest.ts): off-course, to the top stage; on-course, the first player chooses one of the top `count` stages (the choice
+  // quest deck (rules/quest/quest.ts): off-course, to the top stage; on-course, the first player chooses one of the top `count` stages (the choice
   // runs this record, so a choice is a frame like any other) and the others go to the bottom. Defeating the last stage wins the game.
   z.strictObject({ verb: z.literal("LookAtStages"), count: z.number().int().min(2) }),
   // Removes `amount` progress tokens from the current quest card, no more than it holds ("Remove 4 progress tokens from the current quest

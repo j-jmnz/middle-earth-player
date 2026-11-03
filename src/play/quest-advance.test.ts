@@ -3,13 +3,13 @@
 // The Caves of Nibin-Dûm (scripts/nibin-dum-scene.ts): Surprise Attack has each player search for an enemy as it is revealed (41005:A:1).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { settle } from "../rules/machine.ts";
-import { reduce } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { cavesTable, loadCavesWorld, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 
 import { ledgerLine } from "./ledger.ts";

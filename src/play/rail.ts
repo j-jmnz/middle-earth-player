@@ -4,7 +4,7 @@
 // The phase rail names, in words, the step the engine is in, with the step before and the step after. It reads the
 // engine's mode and phase and nothing else, so it cannot skip a step the engine runs. The pill also names the phase and the
 // phases beside it (carousel.ts lays the whole round out for the strip a tap on the pill opens).
-import type { ModeName, ScenarioState } from "../rules/state.ts";
+import type { ModeName, ScenarioState } from "../rules/core/state.ts";
 
 // `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
 // the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step.

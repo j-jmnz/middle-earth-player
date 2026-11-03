@@ -6,9 +6,9 @@
 // so the scenarios without such an ability play as they always did.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 
 const DURING_PLAY: ReadonlySet<Effect["timing"]> = new Set(["response", "forced", "triggered", "action", "constant"]);
 

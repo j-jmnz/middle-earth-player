@@ -2,15 +2,15 @@
 // rr.step-6-2, rr.modifiers, rr.blank, rr.surge, rr.first-player, rr.step-3-3 (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { dealOneShadow, runInstruction } from "../rules/interpret.ts";
-import { dealShadows } from "../rules/combat.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { flagged, type ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { dealOneShadow, runInstruction } from "../rules/interpret/interpret.ts";
+import { dealShadows } from "../rules/combat/combat.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { flagged, type ScenarioState } from "../rules/core/state.ts";
 import { FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, WITCH_KING, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
 import { codesOf, first, FRODO, SAM, send } from "../../scripts/past-scene.ts";
 

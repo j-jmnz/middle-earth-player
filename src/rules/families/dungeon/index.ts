@@ -1,11 +1,11 @@
 // Rules: rr.engaged, rr.attachment-cards, rr.drawing-cards, rr.shadow-effects (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { attachToDeck } from "./deck.ts";
 import { placeOrcGuard } from "./guard.ts";

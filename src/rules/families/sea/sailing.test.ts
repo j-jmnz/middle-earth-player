@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents, legalTargets, reduce } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents, legalTargets, reduce } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { headingOf } from "./heading.ts";
 import { askingToCommit, sailingBlocks } from "./sailing-legal.ts";
 import { RECORDS as SEA_RECORDS } from "../../../effects/authored/families/sea.ts";

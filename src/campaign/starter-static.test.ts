@@ -2,11 +2,11 @@
 // Phase 9 batch 1: static modifiers, attach rules and Restricted on the starter attachments and allies.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/reduce.ts";
-import { hasTrait } from "../rules/conditions.ts";
-import { ruleCause } from "../rules/cause.ts";
-import { updateCard } from "../rules/state.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import { hasTrait } from "../rules/interpret/conditions.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { updateCard } from "../rules/core/state.ts";
 import { ARAGORN, CHEAP, DEAR, refusal, starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, send, type Scene, type Table } from "../../scripts/test-scene.ts";
 

@@ -4,17 +4,17 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { syncConstants } from "../../constants.ts";
-import { cardMap, codes, expectOk, fixtureDefinition } from "../../fixture.ts";
-import { eliminateEmpties, placeDamage } from "../../keywords.ts";
-import { ruleCause } from "../../cause.ts";
-import { legalIntents, reduce, startScenario } from "../../reduce.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo, spawn } from "../../zones.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { cardMap, codes, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
+import { eliminateEmpties, placeDamage } from "../../core/keywords.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { legalIntents, reduce, startScenario } from "../../engine/reduce.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import { MISC_CARDS, choices, miscCtx } from "./fixture.ts";
 import { play, put, run, seat, send, triggers } from "../play/fixture.ts";
 import { enemy, hero, offered, send as sendIntent, table as defenseTable, until } from "../defense/table.ts";
-import { definePrinted } from "../../printed.ts";
+import { definePrinted } from "../../core/printed.ts";
 
 const ctx = miscCtx(RECORDS);
 const filler = codes("f", 8);

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/legal.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
 import { fight, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 
 import type { SheetNames } from "./sheet-types.ts";

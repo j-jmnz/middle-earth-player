@@ -2,8 +2,8 @@
 // in spotlight-gate.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { playUntil, type Reduced } from "../../scripts/combat-policy.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 

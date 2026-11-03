@@ -7,24 +7,24 @@
 // the enemy that enters the staging area, Thrór's Key to a location), and putting an attachment into play.
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard } from "../../amounts.ts";
-import { attachmentHostIds, enforceRestricted } from "../../attach.ts";
-import { effectCause } from "../../cause.ts";
-import { askTarget } from "../../choices.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { playerCardEffectCanChoose, uniqueBlocked } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { matchesPick } from "../../pick.ts";
-import { lastPicked, seatOf } from "../../player-verbs.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import { attachBlocked } from "../../restrictions.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { patchTop } from "../../windows.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope, refCard } from "../../interpret/amounts.ts";
+import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
+import { effectCause } from "../../core/cause.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { playerCardEffectCanChoose, uniqueBlocked } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { attachBlocked } from "../../interpret/restrictions.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop } from "../../windows/windows.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter, shuffleDiscardIn } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 

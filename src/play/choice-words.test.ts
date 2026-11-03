@@ -13,7 +13,7 @@ import { RECORDS as POOL_RECORDS } from "../effects/authored/pool/RevCore.ts";
 import { stageNumber } from "../rules/families/caves/progress.ts";
 import { alternativeActions } from "../rules/families/deck/play.ts";
 import { readyPaymentChoice } from "../rules/families/attachments/ready.ts";
-import { attachTo, spawn } from "../rules/zones.ts";
+import { attachTo, spawn } from "../rules/core/zones.ts";
 import { HERO, loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
 import { anduinTable, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
@@ -21,7 +21,7 @@ import { loadOathWorld, oathTable, type OathWorld } from "../../scripts/oath-sce
 import { AUTHORED_EFFECTS as CAVES_EFFECTS } from "../effects/authored/the-caves-of-nibin-dum.ts";
 import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 
-import { legalIntents } from "../rules/legal.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice-words.ts";

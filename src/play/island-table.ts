@@ -3,10 +3,10 @@
 // Temple column, "Temple of the Deceived") and nothing else, as the staging area and the card preview show it (shown-name.ts).
 import { islandOf, TEMPLE_COLUMN, COLS, ROWS } from "../rules/families/island/map.ts";
 import { islandMayTravel } from "../rules/families/island/travel.ts";
-import { questPointsOf } from "../rules/quest.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { cardsUnder } from "../rules/zones.ts";
+import { questPointsOf } from "../rules/quest/quest.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { cardsUnder } from "../rules/core/zones.ts";
 
 import { LOST_ISLAND_NAME, TEMPLE_NAME } from "./uncharted-words.ts";
 import { touch } from "./ui-scale.ts";

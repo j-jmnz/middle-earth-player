@@ -6,10 +6,10 @@
 // Ring-bearer exhausted with damage on it.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { inPlay, updateCard } from "../../state.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { ringBearerId } from "../burden/deck.ts";
 

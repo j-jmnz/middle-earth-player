@@ -227,7 +227,7 @@ export const limitSchema = z.enum([
   "oncePerAttack",
   "oncePerGame",
   // Once per campaign: the use is recorded in the Campaign Log's `usedOnce` facts, by the card's code, so a later scenario's copy
-  // of the card cannot use it again ("Limit once per campaign. Record in Campaign Log when used.", 41044:A:3; rules/usage.ts).
+  // of the card cannot use it again ("Limit once per campaign. Record in Campaign Log when used.", 41044:A:3; rules/player/usage.ts).
   "oncePerCampaign",
   "oncePerGameGroup",
   "thricePerGameGroup",

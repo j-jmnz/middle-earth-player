@@ -1,12 +1,12 @@
 import type { Card } from "../src/catalog/card-facts.ts";
 import type { Effect } from "../src/catalog/boundary.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import { hasResourceMatch } from "../src/rules/payments.ts";
-import { printedOf, type Sphere } from "../src/rules/printed.ts";
-import { legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import { updateCard } from "../src/rules/state.ts";
-import { spawn } from "../src/rules/zones.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import { hasResourceMatch } from "../src/rules/player/payments.ts";
+import { printedOf, type Sphere } from "../src/rules/core/printed.ts";
+import { legalTargets, reduce, startScenario, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import { updateCard } from "../src/rules/core/state.ts";
+import { spawn } from "../src/rules/core/zones.ts";
 
 import { nextIntent, type PolicyOptions } from "./auto-player.ts";
 import { loadCards } from "./data/load-cards.ts";

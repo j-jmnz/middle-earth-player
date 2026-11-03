@@ -3,9 +3,9 @@
 // questing progress goes on its own active location first.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../../fixture.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../reduce.ts";
-import { moveCard } from "../../zones.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../engine/reduce.ts";
+import { moveCard } from "../../core/zones.ts";
 import { areaOf, discardArea, viewOf, withView } from "./areas.ts";
 import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
 

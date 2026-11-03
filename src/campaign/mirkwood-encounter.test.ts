@@ -3,16 +3,16 @@
 // run them on a table of plain-number heroes (scripts/mirkwood-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
-import { flagged, type ScenarioState } from "../rules/state.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { settle } from "../rules/machine.ts";
-import { spawn } from "../rules/zones.ts";
-import { pickCandidates } from "../rules/pick.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
+import { flagged, type ScenarioState } from "../rules/core/state.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { spawn } from "../rules/core/zones.ts";
+import { pickCandidates } from "../rules/interpret/pick.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { HERO, HERO2, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";

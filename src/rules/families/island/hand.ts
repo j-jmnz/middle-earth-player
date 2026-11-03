@@ -2,12 +2,12 @@
 // Nightmare enters your hand, add it to the staging area" (the draw announces it) and "When Recurring Nightmare leaves play, shuffle it into any player's deck" (settle announces every way out of play).
 import type { Effect, Trigger } from "../../../catalog/boundary.ts";
 
-import { gameReads } from "../../game-reads.ts";
-import type { ReduceContext } from "../../interpret.ts";
+import { gameReads } from "../../core/game-reads.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOfCard } from "../misc/text.ts";
-import { queueEvent } from "../../queue.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { inPlay } from "../../state.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
 
 function listens(state: ScenarioState, instance: CardInstance, trigger: Trigger, ctx: ReduceContext): boolean {
   return effectsOfCard(state, ctx, instance).some((effect: Effect) => effect.trigger === trigger);

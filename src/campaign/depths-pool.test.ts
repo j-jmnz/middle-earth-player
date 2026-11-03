@@ -2,12 +2,12 @@
 // card of The Thing in the Depths adds: Come Together (an event) and Sea Serpent (a burden, on its Menacing and its Enraged side), on a table of plain-number heroes (scripts/depths-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { settle } from "../rules/machine.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { updateCard } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { updateCard } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { CODES, depthsFight, depthsTable, finish, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../scripts/depths-scene.ts";
 
 let world: DepthsWorld;

@@ -2,9 +2,9 @@
 // Surprise Attack as the engine reads them, and the Pillar among the cards the players may attack. The engine decides both; nothing here changes a card.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents } from "../rules/legal.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { syncConstants } from "../rules/constants.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
 import { cavesTable, loadCavesWorld, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";
 

@@ -2,10 +2,10 @@
 // stormcaller/area.ts, the Stormcaller's quest stage in stormcaller/stage.ts, what a record reads in stormcaller/values.ts.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { lastPicked } from "../../player-verbs.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { flipStormcaller, moveToStormcallerArea, prepareStormcallerArea } from "./area.ts";
 import { moveProgressToStormcaller, stormcallerProgress } from "./stage.ts";

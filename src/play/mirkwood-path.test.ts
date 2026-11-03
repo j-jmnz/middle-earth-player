@@ -3,10 +3,10 @@
 // which prints 0 quest points and is won by defeating Ungoliant's Spawn (01121:B:2), shows no "25 / 0" progress target.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { EngineStep } from "../rules/intents.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { settle } from "../rules/machine.ts";
-import { updateCard } from "../rules/state.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { updateCard } from "../rules/core/state.ts";
 import { loadMirkwoodWorld, mirkwoodTable, SPAWN, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
 
 import { slotNumbers } from "./card-effects.ts";

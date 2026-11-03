@@ -230,7 +230,7 @@ family owns files that are composed by the `index.ts` next to them, so families 
 
 Adding a family is therefore: the three files, its entries in the three `index.ts` files (catalog, rules, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run`, and a test. Adding a
-verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/version.ts`) when the change can move a game replayed from its intents.
+verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
 
 ## Not expressible yet: leave open, report
 
@@ -244,7 +244,7 @@ the two below.
   side's data from a source or an override, then a hero-to-enemy `FlipCard`.
 
 - **Engine gap: `usage.ts` does not announce an exhausted cost.** A Forced or Response effect that listens for "after this card
-  exhausts" does not hear a card that was exhausted as the cost of an Action (`src/rules/usage.ts` pays the cost without an
+  exhausts" does not hear a card that was exhausted as the cost of an Action (`src/rules/player/usage.ts` pays the cost without an
   `exhausted` event). Changing that would move The Ring Goes South's golden, so Cave Torch (41029:A:2) and Cavern Warg
   (41031:A:1) exhaust as the first instruction of the record, where `Exhaust` announces the event and the Torch's Forced effect
   (41029:A:3) hears it. A new card whose Forced effect listens for an exhaust does the same; the gap closes only with an

@@ -3,13 +3,13 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
 
-import { holds } from "../../conditions.ts";
-import { syncConstants } from "../../constants.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted } from "../../printed.ts";
-import { resolveQuest } from "../../quest.ts";
-import { legalIntents } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { resolveQuest } from "../../quest/quest.ts";
+import { legalIntents } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until, type TableSpec } from "./table.ts";
 
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, rr.cancel, rr.combat-phase, rr.step-3-4, rr.modifiers

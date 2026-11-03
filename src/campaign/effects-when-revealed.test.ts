@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { characters } from "../rules/combat.ts";
-import { legalIntents } from "../rules/reduce.ts";
+import { characters } from "../rules/combat/combat.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
 import {
   codeOf, codesOf, first, FRODO, loadWorld, reveal, RIDER, RING, SAM, send, start, table, frames,
   type Layout, type World,

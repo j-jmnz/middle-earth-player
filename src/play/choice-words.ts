@@ -3,8 +3,8 @@
 // Pick is for (the heroes Unwanted Attention removes from the quest, 141054:A:2). The words describe the effect record's
 // instructions; the reducer still decides what each one does.
 import type { Amount, Instruction } from "../catalog/boundary.ts";
-import { questProgressMoved } from "../rules/verbs.ts";
-import type { ScenarioState } from "../rules/reduce.ts";
+import { questProgressMoved } from "../rules/interpret/verbs.ts";
+import type { ScenarioState } from "../rules/engine/reduce.ts";
 import { attachmentPickWords, attachmentWords } from "./attachment-words.ts";
 import { deckPickWords, deckWords } from "./deck-words.ts";
 import { encounterPickWords, encounterWords } from "./encounter-words.ts";

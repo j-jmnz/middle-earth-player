@@ -7,10 +7,10 @@
 // effects resolve (01126:B:1, "Search the encounter deck for 1 Hill Troll (if one is not already in play)"), after the Setup's reveals.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import { pushCardEffects } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 
 // A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective), or has the
 // first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet), or prepares the Uncharted deck (PrepareUnchartedDeck): the Setup the piles cannot place.

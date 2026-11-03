@@ -2,12 +2,12 @@
 // from Dol Guldur (01123, 01124, 01125) on a table of plain-number heroes (scripts/dol-guldur-scene.ts): what keeps a stage from advancing.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { destroyCard } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { attachTo, spawn } from "../rules/zones.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { destroyCard } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { attachTo, spawn } from "../rules/core/zones.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 

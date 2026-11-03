@@ -2,10 +2,10 @@
 //
 // "The players, as a group, cannot play more than 1 ally card each round" (LimitPlays): a constant of a card in play. The cards played this
 // round are the ones the reducer recorded (state.played); a card put into play without being played is not among them.
-import { constantInstructions } from "../../constant-records.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
+import { constantInstructions } from "../../interpret/constant-records.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
 
 // The card in play whose LimitPlays has been used up for this card (the first one, oldest first), with its limit; null when none has.
 export function playLimit(state: ScenarioState, cardId: string, ctx: ReduceContext): { source: string; cardType: string; max: number } | null {

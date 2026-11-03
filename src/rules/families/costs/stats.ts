@@ -4,14 +4,14 @@
 // resource icon gets -1 threat cost"), which setup adds up for the starting threat, and the engagement cost an enemy has while
 // it makes an engagement check with one player ("While an Orc is making an engagement check with you, it gets +5 engagement
 // cost").
-import { resolveAmount } from "../../amounts.ts";
-import { constantInstructions } from "../../constant-records.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { pickCandidates } from "../../pick.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { engagementCostOf } from "../../quest.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { modifierActive } from "../../state.ts";
+import { resolveAmount } from "../../interpret/amounts.ts";
+import { constantInstructions } from "../../interpret/constant-records.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { engagementCostOf } from "../../quest/quest.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { modifierActive } from "../../core/state.ts";
 
 // A hero's threat cost: its printed threat less each ThreatCost that applies to it, not below 0 (rr.modifiers).
 export function threatCostOf(state: ScenarioState, heroId: string, ctx: ReduceContext): number {

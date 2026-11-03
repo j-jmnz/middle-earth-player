@@ -3,9 +3,9 @@
 // without those cards keeps the same pending events and steps as before (the golden games pin them).
 import type { Effect, Trigger } from "../../../catalog/boundary.ts";
 
-import type { GameEvent } from "../../frame-types.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { GameEvent } from "../../windows/frame-types.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
 
 // The codes of the cards with a record on each trigger, built once per effect list.
 const LISTENERS = new WeakMap<readonly Effect[], ReadonlyMap<string, ReadonlySet<string>>>();

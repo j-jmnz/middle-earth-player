@@ -6,13 +6,13 @@
 // placed on a card.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { pickCandidates } from "../../pick.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, inPlay, updateCard, withMode } from "../../state.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, updateCard, withMode } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { listens } from "../encounter/reveal.ts";
 

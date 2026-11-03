@@ -4,11 +4,11 @@
 // `drawn`. Each reads the card itself and what the running effect has picked.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { isPlayerType, printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { topFrame } from "../../windows.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { topFrame } from "../../windows/windows.ts";
 
 export type MiscPickContext = { seat: number; sourceId: string | null; picked?: readonly string[] };
 

@@ -2,9 +2,9 @@
 // is in grapple/attach.ts, the cards the verbs move in grapple/cards.ts, what a record reads in grapple/values.ts.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { resolveGrapple } from "./attach.ts";
 import { addResourcesSetAside, addSetAsideToHand, attackFirstPlayer, discardAndGrapple, engageOrGrapple, flipElite, flipSetAside, gainChosenTrait, removeCodeFromGame, removeEncounterSet, shuffleSetAsideSet } from "./cards.ts";
 import type { Focus } from "../index.ts";

@@ -2,9 +2,9 @@
 // Phase 9 batch 3: cancels, looking at the encounter deck, and searching a deck, played through the reducer.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { settle } from "../rules/machine.ts";
-import { legalIntents } from "../rules/reduce.ts";
-import { withMode } from "../rules/state.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import { withMode } from "../rules/core/state.ts";
 import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";

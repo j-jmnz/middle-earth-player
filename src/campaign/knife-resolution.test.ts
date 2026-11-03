@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { campaign, knife, knifeIntent, knifeStart, knifeWorld } from "../../scripts/knife-game.ts";
 
 import { choiceSentence, consequenceSentence, declineSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";

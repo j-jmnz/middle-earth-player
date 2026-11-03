@@ -2,12 +2,12 @@
 // Phase 9 batch 2: the simple Actions and Responses of the starter decks, played through the reducer.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { ruleCause } from "../rules/cause.ts";
-import { attackBarred, syncConstants } from "../rules/constants.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { legalIntents, type PlayerIntent } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import { updateCard, withMode, withThreat } from "../rules/state.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { attackBarred, syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { updateCard, withMode, withThreat } from "../rules/core/state.ts";
 import { CHEAP, fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, FRODO, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
 

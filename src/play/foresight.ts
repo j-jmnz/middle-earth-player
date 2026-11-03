@@ -5,13 +5,13 @@
 // damage an attack would place and whether it destroys the card (toughness, indestructible and "cannot take damage"
 // included), whether that loses the game (The One Ring leaves play with its bearer; no seat remains) or eliminates a seat,
 // and how much more damage the card can take. Nothing here changes the game: the copy is dropped.
-import { ruleCause } from "../rules/cause.ts";
+import { ruleCause } from "../rules/core/cause.ts";
 import { stagingOf } from "../rules/families/breaking/areas.ts";
 import { declaredDefenders, pooledDefense, standingDefenders } from "../rules/families/defense/defenders.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { engagementCostOf, engagementForecast } from "../rules/quest.ts";
-import type { EngineStep, ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { flagged, inPlay, livingSeats } from "../rules/state.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { engagementCostOf, engagementForecast } from "../rules/quest/quest.ts";
+import type { EngineStep, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { flagged, inPlay, livingSeats } from "../rules/core/state.ts";
 
 export type DamageOutcome = {
   damage: number;

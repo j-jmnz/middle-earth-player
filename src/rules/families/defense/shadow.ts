@@ -1,15 +1,15 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json). Shadow cards in
 // the defense family: looking at one, discarding one, dealing another, dealing them face up, and telling when one raised the
 // attacking enemy's Attack.
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { dealAdditionalShadow } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import type { CardFace, ScenarioState } from "../../state.ts";
-import { flagged, livingSeats, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { moveCard, shadowCards } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { dealAdditionalShadow } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import type { CardFace, ScenarioState } from "../../core/state.ts";
+import { flagged, livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { moveCard, shadowCards } from "../../core/zones.ts";
 import { withDefense } from "./defenders.ts";
 import { listened, queueHeard } from "./listen.ts";
 

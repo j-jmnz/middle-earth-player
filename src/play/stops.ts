@@ -7,8 +7,8 @@
 // - a free Response (no cost, nothing to choose) the player set to Always is used when it is offered.
 // Every answer is an ordinary intent in the save: Undo takes it back, and the table then asks at that window.
 import type { Effect, Instruction } from "../catalog/boundary.ts";
-import { effectById } from "../rules/listen.ts";
-import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { effectById } from "../rules/windows/listen.ts";
+import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 import type { TableStore } from "./store.ts";
 
 import { windowPoint } from "./rail.ts";

@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
 
-import { definePrinted } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
+import { definePrinted } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { ally, enemy, hero, recordsOf, send, table, treachery, until, type TableSpec } from "./table.ts";
 
 // Rules: rr.damage, rr.hit-points, rr.step-6-4-3, rr.multiple-defenders (data/rules/entries.json); ledger line 01082:A:1.

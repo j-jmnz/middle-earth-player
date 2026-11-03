@@ -1,8 +1,8 @@
 // Rules: rr.attachment-cards, rr.guarded, rr.blank, rr.step-6-8-1 (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { attachSourceTo, guardWith } from "./play.ts";
 import { answerQuestProgress } from "./quest.ts";

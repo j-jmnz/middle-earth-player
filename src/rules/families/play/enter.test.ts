@@ -5,9 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/play.ts";
 
-import { placeDamage } from "../../keywords.ts";
-import { ruleCause } from "../../cause.ts";
-import { updateCard, withMode, type ScenarioState } from "../../state.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { updateCard, withMode, type ScenarioState } from "../../core/state.ts";
 import { crossTo, offered, passResponses, play, playCtx, put, run, seat, send, trigger, triggers } from "./fixture.ts";
 
 const ctx = playCtx(RECORDS);

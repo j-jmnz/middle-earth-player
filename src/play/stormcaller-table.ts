@@ -3,7 +3,7 @@
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
 import { stageNumber } from "../rules/families/caves/progress.ts";
 import { areaPlace, atStormcallersStage, stormcallerLastStage } from "../rules/families/stormcaller/values.ts";
-import type { CardInstance, ScenarioState } from "../rules/state.ts";
+import type { CardInstance, ScenarioState } from "../rules/core/state.ts";
 
 import { memberSpeech, stageSpeech, type StageFacts } from "./stormcaller-words.ts";
 

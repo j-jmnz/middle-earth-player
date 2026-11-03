@@ -2,20 +2,20 @@
 // faq.limitations-on-attacks (data/rules/entries.json).
 import { announceEnemyAttacked } from "../aflame/attack.ts";
 import type { CardRef, Instruction } from "../../../catalog/boundary.ts";
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { continueStrike } from "../../combat.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { pickCandidates } from "../../pick.ts";
-import { isCharacterType, printedOf } from "../../printed.ts";
-import { placeQuestProgress } from "../../quest.ts";
-import { queueEvent } from "../../queue.ts";
-import { restricted } from "../../restrictions.ts";
-import { afterProgress } from "../../stage-reveal.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, updateCard } from "../../state.ts";
-import { playerAttackWindow } from "../../step-window.ts";
-import { topFrame } from "../../windows.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { continueStrike } from "../../combat/combat.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { isCharacterType, printedOf } from "../../core/printed.ts";
+import { placeQuestProgress } from "../../quest/quest.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { restricted } from "../../interpret/restrictions.ts";
+import { afterProgress } from "../../quest/stage-reveal.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, updateCard } from "../../core/state.ts";
+import { playerAttackWindow } from "../../engine/step-window.ts";
+import { topFrame } from "../../windows/windows.ts";
 import { awaitStrike, declareStrike, discardPlayedEvent, pickAttacker } from "./flow.ts";
 import type { Focus } from "../index.ts";
 

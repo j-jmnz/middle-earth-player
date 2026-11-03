@@ -2,10 +2,10 @@
 // family adds: where the combat phase is, and the resources the players hold.
 import type { Condition } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { heroPays } from "../../payments.ts";
-import type { Sphere } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { heroPays } from "../../player/payments.ts";
+import type { Sphere } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
 
 type CombatStep = Extract<Condition, { kind: "combatStep" }>["is"];
 

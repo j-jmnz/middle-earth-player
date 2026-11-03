@@ -2,11 +2,11 @@
 // staging only in its scenario, the night veil is on while the players are at another stage, the reader labels, the fold, the pop, and the geometry on every screen down to 667 x 375 at the three UI scales.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { settle } from "../rules/machine.ts";
-import type { EngineStep } from "../rules/intents.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
 import { momentOf } from "./outcome.ts";
 import { advanceFace, advanceWords, advancedTo, callerLastStage, questView } from "./quest-advance.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { areaOf } from "../rules/families/stormcaller/zone.ts";
 import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 

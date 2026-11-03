@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { ruleCause } from "../rules/cause.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { shadowCards } from "../rules/zones.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { shadowCards } from "../rules/core/zones.ts";
 import { hero, seaTable, send, ship, shipEnemy, until } from "../rules/families/sea/table.ts";
 import { attackOrPolicy, playUntil, type Reduced } from "../../scripts/combat-policy.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";

@@ -2,17 +2,17 @@
 // (data/rules/entries.json). The burdens Journey in the Dark's campaign card (142039) deals: Overcome by Grief, Grievous Wound, Shadow of Fear, Pursued by the Enemy.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { countsAsAttachment, hasTrait } from "../rules/conditions.ts";
-import { ruleCause } from "../rules/cause.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { placeDamage } from "../rules/keywords.ts";
-import { exhaustCard } from "../rules/player-verbs.ts";
-import { reduce } from "../rules/reduce.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { flagged, type ScenarioState } from "../rules/state.ts";
+import { countsAsAttachment, hasTrait } from "../rules/interpret/conditions.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { placeDamage } from "../rules/core/keywords.ts";
+import { exhaustCard } from "../rules/interpret/player-verbs.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { flagged, type ScenarioState } from "../rules/core/state.ts";
 import { BALROG, GRIEF, WOUND, fire, loadMoriaWorld, makeTable, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
-import { attachTo, spawn } from "../rules/zones.ts";
+import { attachTo, spawn } from "../rules/core/zones.ts";
 
 let world: MoriaWorld;
 

@@ -4,11 +4,11 @@
 // Aragorn, Glóin, Son of Arnor, Longbeard Orc Slayer, Brok Ironfist and For Gondor!
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { destroyCard, modifiedStat } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { definePrinted } from "../rules/printed.ts";
-import { legalIntents } from "../rules/reduce.ts";
-import { withMode, type ScenarioState } from "../rules/state.ts";
+import { destroyCard, modifiedStat } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import { withMode, type ScenarioState } from "../rules/core/state.ts";
 import { fund, payFor, starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";

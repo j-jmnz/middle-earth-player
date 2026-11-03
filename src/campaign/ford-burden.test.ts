@@ -2,12 +2,12 @@
 // rr.step-3-3 (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import { reduce } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { withMode, type ScenarioState } from "../rules/state.ts";
-import { fireForced } from "../rules/triggers.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { withMode, type ScenarioState } from "../rules/core/state.ts";
+import { fireForced } from "../rules/windows/triggers.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { CAMPAIGN_CARD, FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
 import { codesOf, first, RING, reveal, send, start } from "../../scripts/past-scene.ts";

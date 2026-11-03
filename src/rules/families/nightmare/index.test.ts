@@ -9,21 +9,21 @@ import { AUTHORED_EFFECTS } from "../../../effects/authored/nightmare/a-shadow-o
 import { AUTHORED_EFFECTS as FORD_EFFECTS } from "../../../effects/authored/nightmare/flight-to-the-ford.ts";
 import { AUTHORED_EFFECTS as KNIFE_EFFECTS } from "../../../effects/authored/nightmare/a-knife-in-the-dark.ts";
 
-import { syncConstants } from "../../constants.ts";
-import { pushCardEffects, pushEffectFrame } from "../../effect-frames.ts";
-import { byCode, cardMap, expectOk, hero, idleScenario } from "../../fixture.ts";
-import { hideWillpower } from "../../hide.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat, playerCardEffectCanChoose } from "../../keywords.ts";
-import { settle } from "../../machine.ts";
-import { definePrinted } from "../../printed.ts";
-import { readyCard } from "../../player-verbs.ts";
-import { reduce } from "../../reduce.ts";
-import { doRefresh } from "../../refresh.ts";
-import { flagged, updateCard, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
-import { finishSetup } from "../../setup.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { pushCardEffects, pushEffectFrame } from "../../interpret/effect-frames.ts";
+import { byCode, cardMap, expectOk, hero, idleScenario } from "../../core/test-fixture.ts";
+import { hideWillpower } from "../../quest/hide.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, playerCardEffectCanChoose } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { readyCard } from "../../interpret/player-verbs.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { doRefresh } from "../../engine/refresh.ts";
+import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
+import { finishSetup } from "../../setup/setup.ts";
 import { announceCanceled, cancelNotAllowed, run as runNightmare } from "./index.ts";
 import { hideCommitLimit, twinCode } from "./guards.ts";
 import { announceStageRevealed } from "./setup.ts";
@@ -111,7 +111,7 @@ describe("the setup card next to the quest deck (zone nightmare) hears the stage
     state = put(state, KHAMUL, { zone: "victory" }).state;
     state = deck(state, ["mist", "mist"]);
     const steps: EngineStep[] = [];
-    // A full stage advances as soon as nothing holds it (advanceFreed, rules/stage-reveal.ts).
+    // A full stage advances as soon as nothing holds it (advanceFreed, rules/quest/stage-reveal.ts).
     const advanced = settle(updateCard(state, stageId, { progress: 6 }), ctx, steps);
     expect(advanced.cards[advanced.questStage ?? ""]?.code).toBe("141024");
     const khamul = byCode(advanced, KHAMUL)[0] ?? "";

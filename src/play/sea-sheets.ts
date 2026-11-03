@@ -2,9 +2,9 @@
 // the first player's commit (a pick of characters on the play area, no willpower pill: this is not the quest commit) and, for each success symbol among the cards looked at,
 // shift the heading on-course or keep it. Every card, symbol and number comes from the engine; the sheets only name them.
 import { lookedIds, sailingSymbols, sailingTest, successSymbols } from "../rules/families/sea/sailing.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { modifierActive } from "../rules/state.ts";
-import { legalTargets } from "../rules/reduce.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { modifierActive } from "../rules/core/state.ts";
+import { legalTargets } from "../rules/engine/reduce.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../rules/families/sea/sailing-legal.ts";
 
 import { SAILING_COMMIT_NOTE, SAILING_COMMIT_TITLE, SAILING_PASS_ARMED, sailingTitle } from "./sea-words.ts";

@@ -2,8 +2,8 @@
 // against a baseline that makes every other line false: off-course, the players beyond stage 2B, the Stormcaller alive, a damaged hero, nothing in the victory display, one surviving player (1 XP).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, flightTable, loadFlightWorld, type FlightLayout, type FlightWorld } from "../../scripts/stormcaller-scene.ts";
 
 let world: FlightWorld;

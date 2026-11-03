@@ -5,17 +5,17 @@
 // location before it is placed on the current quest" (the takesProgressFirst flag, answered once each quest phase).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { effectCause, ruleCause } from "../../cause.ts";
+import { effectCause, ruleCause } from "../../core/cause.ts";
 import { stageOf } from "../breaking/areas.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { destroyCard, modifiedStat } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { committedWillpower, stagingThreat } from "../../quest.ts";
-import type { Modifier, ScenarioState } from "../../state.ts";
-import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../state.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { destroyCard, modifiedStat } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
+import type { Modifier, ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 
 // The quest cards in play an attachment may go on: the playing seat's current quest card (its own stage once stages are separate), and any other
 // quest card in play (a side quest).

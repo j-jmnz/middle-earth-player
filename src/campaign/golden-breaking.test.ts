@@ -3,9 +3,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { encounterCodes } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, playGolden, type BreakingDecks, type BreakingGame } from "../../scripts/breaking-game.ts";
 import { ARGONATH, breaking, campaign, FRODOS_CHOICE, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A } from "../../scripts/breaking-scene.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";

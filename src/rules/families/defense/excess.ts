@@ -6,15 +6,15 @@
 // your threat." The damage still goes on the character; the excess is read before it lands, and a card that cancels the damage
 // afterwards does not call the threat back (it was assigned as it was dealt). Great Cave-troll (`excessToQuestProgress`) takes that many progress
 // tokens off the current quest instead.
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { modifiedStat, placeDamage, raiseThreat } from "../../keywords.ts";
-import { effectsOf } from "../../listen.ts";
-import { effectCause, ruleCause } from "../../cause.ts";
-import { isCharacterType, printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, inPlay } from "../../state.ts";
-import { readsAmount, readsCondition } from "../../amounts.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { effectCause, ruleCause } from "../../core/cause.ts";
+import { isCharacterType, printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay } from "../../core/state.ts";
+import { readsAmount, readsCondition } from "../../interpret/amounts.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 import { damageGoesTo } from "./damage.ts";
 

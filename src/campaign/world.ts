@@ -7,7 +7,7 @@ import type { Effect } from "../catalog/boundary.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
 import { campaignGameCodes, recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
-import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/printed.ts";
+import { ORC_GUARD_CODE, printedOf, type PrintedCard } from "../rules/core/printed.ts";
 
 import type { CampaignLog } from "./log.ts";
 

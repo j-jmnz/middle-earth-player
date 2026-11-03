@@ -4,10 +4,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { encounterCodes } from "../catalog/scenario-data.ts";
-import { byCode, expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { printedOf } from "../rules/printed.ts";
-import { modifiedStat } from "../rules/keywords.ts";
+import { byCode, expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
 import { FORD_GOLDENS, fordWorld, playGolden } from "../../scripts/ford-game.ts";
 import { BURDENS, campaign, ford, loadFordWorld, type FordWorld } from "../../scripts/ford-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";

@@ -3,9 +3,9 @@
 // The attachments family's hooks in the engine's lowest layers (keywords.ts, quest.ts, listen.ts, constant-records.ts): what
 // happens to the cards attached to a host that is destroyed or defeated, a Guarded attachment whose guard leaves play, and a
 // card whose text box is blank. Kept free of engine imports beyond the state, so those modules can call it.
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, heldAmount, inPlay, updateCard } from "../../state.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, updateCard } from "../../core/state.ts";
 
 // The cards attached to a host that an enemy's destruction or a quest card's defeat is announced to: the player cards in play
 // (a Guarded attachment it guarded hears `unguarded` instead; an encounter card attached to it has no such ability).

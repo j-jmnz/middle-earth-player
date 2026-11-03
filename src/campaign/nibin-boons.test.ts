@@ -2,10 +2,10 @@
 // boon events of The Caves of Nibin-Dûm (ledger data/printed/mirkwood-paths.json): "choose one" of two Actions, one that removes the card from the game and from the Campaign Pool.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents } from "../rules/legal.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
 import { seatThreat } from "../rules/families/play/hooks.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, loadCavesWorld, cavesTable, settleChoices, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";

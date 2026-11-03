@@ -9,17 +9,17 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
-import { holds } from "../../conditions.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { cardMap, expectOk, hero, idleScenario } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { settle } from "../../machine.ts";
-import { pickCandidates } from "../../pick.ts";
-import { definePrinted } from "../../printed.ts";
-import { engageEnemy, qualifyingEnemies } from "../../quest.ts";
-import { reduce } from "../../reduce.ts";
-import { markReached, updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo, moveCard, spawn } from "../../zones.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { cardMap, expectOk, hero, idleScenario } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { engageEnemy, qualifyingEnemies } from "../../quest/quest.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { markReached, updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 
 const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 20 });
 const goblin = definePrinted({ code: "goblin", name: "Goblin", type: "enemy", traits: ["Orc"], engagementCost: 30, threat: 2, attack: 2, defense: 1, health: 5 });

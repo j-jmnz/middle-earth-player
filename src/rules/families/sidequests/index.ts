@@ -1,9 +1,9 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, withSeat } from "../../state.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, withSeat } from "../../core/state.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import { flipCard } from "./contract.ts";
 import { attachLoot, buildLootDeck } from "./loot.ts";
 import { shuffleSetAside, takeRevealed } from "./encounter.ts";
@@ -16,7 +16,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "EliminatePlayer":
       return eliminate(state, focus.seat, steps);
-    // "Setup: Attach to a hero in play." run by the Setup search (setup-search.ts), where nobody can be asked: the card found in a
+    // "Setup: Attach to a hero in play." run by the Setup search (setup/search.ts), where nobody can be asked: the card found in a
     // player's deck goes on the first hero of that player that has no copy of it (effect frames attach an encounter card themselves).
     case "AttachSelf":
       return instruction.to.kind === "hero" ? attachSetupCard(state, focus) : null;

@@ -3,11 +3,11 @@
 // deck builder supplies the codes: StartSeat.loot), set facedown under the contract, whose top card is attached faceup to a location
 // the players travel to as a guarded objective: out of play, under the location, still the player's card, until the location is
 // explored and the player puts it into play or adds it to their hand.
-import { frameScope, refCard } from "../../amounts.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { moveCard, spawn } from "../../zones.ts";
+import { frameScope, refCard } from "../../interpret/amounts.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 // BuildLootDeck: the seat's loot deck is made from the 14 cards it chose, shuffled together and set aside under the contract.

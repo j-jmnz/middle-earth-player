@@ -1,13 +1,13 @@
 // Rules: dcce.exploration, rr.travel, rr.active-location (data/rules/entries.json); ledger lines 12067:B:1, 12073:A:2, 12068:B:3. Traveling on the Island Map: the active location stays where it lies, and the
 // players may travel from it once it has progress equal to its quest points, to a location in the staging area (an adjacent one) or, from Winding Caverns, to one up to 3 locations away. All the progress
-// leaves the location they traveled from, which is "explored" and stays in place. This file holds what Exploration changes about traveling; the Travel intent itself is rules/travel.ts.
-import { ruleCause } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { PrintedCard } from "../../printed.ts";
-import { questPointsOf } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { heldAmount, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+// leaves the location they traveled from, which is "explored" and stays in place. This file holds what Exploration changes about traveling; the Travel intent itself is rules/quest/travel.ts.
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { PrintedCard } from "../../core/printed.ts";
+import { questPointsOf } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { heldAmount, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { exploring, islandOf, setActive, within } from "./map.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;

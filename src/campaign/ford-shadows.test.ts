@@ -2,10 +2,10 @@
 // (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import type { PlayerIntent, ReduceContext } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import type { PlayerIntent, ReduceContext } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
 import { first, SAM, send, start, type Run } from "../../scripts/past-scene.ts";

@@ -4,10 +4,10 @@
 // order (ShuffleStages), and the stage defeated moves the quest to the top stage of the deck, or, on-course (Sun), to one of the top two the first player
 // looks at and chooses, the other going to the bottom. This is the quest-order half beside `branch` (quest/branch.ts): a quest that branches never
 // holds a `look`, and a quest that holds one never branches.
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { printedOf, type PrintedCard } from "../../printed.ts";
-import { moveCard } from "../../zones.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { moveCard } from "../../core/zones.ts";
 import { headingIs } from "../sea/heading.ts";
 
 /** The quest advances in the order of its quest deck: some stage of it names LookAtStages. */

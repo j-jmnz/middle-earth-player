@@ -2,18 +2,18 @@
 // 01124:B:1, 01131:A:3, 01131:B:1, 01102:A:2. The prisoner family's verbs on a table of Escape from Dol Guldur.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import { legalIntents } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { runInstruction } from "../../interpret.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { pickCandidates } from "../../pick.ts";
-import { reduce, startScenario } from "../../reduce.ts";
-import { expectOk } from "../../fixture.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { legalIntents } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { reduce, startScenario } from "../../engine/reduce.ts";
+import { expectOk } from "../../core/test-fixture.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { prisonerHero } from "./index.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../../scripts/dol-guldur-scene.ts";
 import { dolGuldurWorld, dolGuldurStart, LOGGED_PRISONER, STRONG_HEROES } from "../../../../scripts/dol-guldur-game.ts";
 import { send, start, type Run } from "../../../../scripts/past-scene.ts";

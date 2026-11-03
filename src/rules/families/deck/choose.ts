@@ -5,8 +5,8 @@
 // same effect offers the others.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 
 type ChooseInstruction = Extract<Instruction, { verb: "Choose" }>;
 

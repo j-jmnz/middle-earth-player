@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/attack.ts";
-import { cardMap, expectOk, fixtureDefinition } from "../../fixture.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
-import { blankScenario, updateCard, withThreat } from "../../state.ts";
-import { spawn, type Destination } from "../../zones.ts";
+import { cardMap, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { blankScenario, updateCard, withThreat } from "../../core/state.ts";
+import { spawn, type Destination } from "../../core/zones.ts";
 import { fighter, foe } from "./fixture.ts";
 
 // Rules: rr.attacks-outside-the-combat-phase, rr.step-6-8-4, rr.lasting-effects, rr.ranged, faq.limitations-on-attacks

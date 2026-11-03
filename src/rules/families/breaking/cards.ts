@@ -2,15 +2,15 @@
 // locations of Breaking of the Fellowship (142063 to 142083).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { eliminateEmpties } from "../../keywords.ts";
-import { lastPicked } from "../../player-verbs.ts";
-import { fallenBase, FALLEN_SUFFIX } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { raiseFor } from "../../verbs.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { eliminateEmpties } from "../../core/keywords.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { raiseFor } from "../../interpret/verbs.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { areaOf, stagingDest } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";

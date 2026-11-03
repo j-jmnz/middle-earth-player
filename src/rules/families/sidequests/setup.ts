@@ -5,13 +5,13 @@
 // order. (The Rules Reference in data/rules does not say when a hero's Setup resolves; mec109.setup says a card in a deck is
 // searched out before the opening hand is drawn. Resolving after the mulligan lets a Setup that searches the deck work on the
 // deck that remains, and was chosen for that.)
-import { pushCardEffects } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats } from "../../state.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
 
 // The Setup records of each hero and contract the players start with, as effect frames; the state is returned as it is when no
 // such card has one, or once they have been pushed.

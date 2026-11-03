@@ -12,7 +12,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Phases 37 to 48 and 39b (Dream-chaser, plan `docs/plans/dream-chaser.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-10-30). Phases 40 to 48 have an engine half and a phone half, as phase 12 describes.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - A cloud session has no phone, simulator or Maestro. Phone checks stay open and are listed here, not marked done.
-- Current counts live in code: the engine version in `src/rules/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
+- Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
 
 ## Phases
 

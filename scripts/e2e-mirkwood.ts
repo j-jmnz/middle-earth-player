@@ -11,7 +11,7 @@ import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
 import { loadWorld } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { reduce, type PlayerIntent, type ScenarioState } from "../src/rules/reduce.ts";
+import { reduce, type PlayerIntent, type ScenarioState } from "../src/rules/engine/reduce.ts";
 
 import prebuilt from "../data/decks/prebuilt.json" with { type: "json" };
 import { nextIntent } from "./auto-player.ts";

@@ -3,12 +3,12 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { playCost } from "../../attach.ts";
-import { heldStat, NO_COUNTS } from "../../constants.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { stagingThreat } from "../../quest.ts";
-import { reduce } from "../../reduce.ts";
-import { updateCard } from "../../state.ts";
+import { playCost } from "../../player/attach.ts";
+import { heldStat, NO_COUNTS } from "../../interpret/constants.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { stagingThreat } from "../../quest/quest.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { updateCard } from "../../core/state.ts";
 import { inVictory, play, put, questArea, seat, sideCtx, synced, toVictory } from "./fixture.ts";
 import { defeatSideQuest } from "./quest.ts";
 import { addToVictory } from "./victory.ts";

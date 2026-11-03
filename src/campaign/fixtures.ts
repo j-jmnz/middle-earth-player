@@ -33,8 +33,8 @@ import depthsFixtures from "./fixtures/the-thing-in-the-depths.json";
 import templeFixtures from "./fixtures/temple-of-the-deceived.json";
 import fixtures from "./fixtures/scenario-1.json";
 
-import type { PlayerIntent } from "../rules/intents.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import type { PlayerIntent } from "../rules/core/intents.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";

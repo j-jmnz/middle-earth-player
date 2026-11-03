@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import { settle } from "../rules/machine.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { addModifier } from "../rules/keywords.ts";
-import { updateCard } from "../rules/state.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { addModifier } from "../rules/core/keywords.ts";
+import { updateCard } from "../rules/core/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { CODES, fateTable, idOf, legalIntents, loadFateWorld, send, start, type FateLayout, type FateWorld, type PlayerIntent } from "../../scripts/fate-scene.ts";
 
 import { causeKey, causeText, type LogNames } from "./log.ts";

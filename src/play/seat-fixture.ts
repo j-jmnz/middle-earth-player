@@ -1,10 +1,10 @@
 // Test helper for the peek (phase 26): a two-handed table in the planning window with each seat holding its own cards, so a test can
 // tell which seat a view, a pick or a tap belongs to. It builds the state with the rules' own spawn; no number in it is the table's.
-import { cardMap, fixtureDefinition, hero } from "../rules/fixture.ts";
-import { definePrinted } from "../rules/printed.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { blankScenario, updateCard, type ScenarioState } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { cardMap, fixtureDefinition, hero } from "../rules/core/test-fixture.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { blankScenario, updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 
 /** The ids each seat holds, by zone; the last card of each hand is of a sphere no hero has, so planning mutes it. */
 export type SeatCards = { hero: string; hand: string[]; deck: string[]; discard: string[]; engaged: string[] };

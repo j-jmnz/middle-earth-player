@@ -26,7 +26,7 @@ export const VERBS = [
   // end of the attack names the shadow card and the defender, and asks the attack to keep the damage it dealt.
   z.strictObject({ verb: z.literal("AttachToDamagedDefender"), card: z.string().min(1).optional(), to: z.string().min(1).optional(), dealt: z.literal(true).optional(), ...when }),
   // A marker on a When Revealed record, which does nothing when it runs: a Response on a card with this trait cannot cancel the card's effects
-  // ("This effect cannot be canceled by the Ring-bearer's effect", 906208:A:1; rr.cancel). Read by the response window (rules/responses.ts).
+  // ("This effect cannot be canceled by the Ring-bearer's effect", 906208:A:1; rr.cancel). Read by the response window (rules/windows/responses.ts).
   z.strictObject({ verb: z.literal("NotCanceledBy"), trait: z.string().min(1), ...when }),
   // Every copy of the card with this code in the encounter deck and its discard pile is set aside, facedown, out of play ("Setup: Set each copy
   // of Pale-green Tentacle aside, out of play", 906401:A:2).
@@ -106,10 +106,10 @@ export const TRIGGERS = [
 
 export const FLAGS = [
   // On "table": no player may commit more than this many characters to a Hide test ("players cannot commit more than 2 characters to a Hide
-  // test", 906106:A:1). The smallest amount held applies. Read by hideCommitReason (rules/hide.ts) through families/nightmare.ts.
+  // test", 906106:A:1). The smallest amount held applies. Read by hideCommitReason (rules/quest/hide.ts) through families/nightmare.ts.
   "hideCommitLimit",
   // On a card: it is immune to player card effects while the flag holds ("While Bill Ferny is in the staging area, he gains: Immune to player
-  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/keywords.ts playerCardEffectCanChoose).
+  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/core/keywords.ts playerCardEffectCanChoose).
   "immuneToPlayerCards",
   // On a card: it cannot ready, by a card effect or in the refresh phase, while the flag holds ("your cards cannot ready for the remainder
   // of the round", 900103:A:1). Read wherever a card readies (player-verbs.ts readyCard, refresh.ts, effect-verbs.ts ReadyHero).

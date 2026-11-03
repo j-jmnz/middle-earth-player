@@ -4,8 +4,8 @@
 // cards to its owner's hand", "Put up to 2 allies discarded by this effect into play").
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../state.ts";
-import { topFrame } from "../../windows.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { topFrame } from "../../windows/windows.ts";
 
 /** The cards the running effect looked at (LookAtTop) or discarded (DiscardFromDeck), still in the zone the filter names
  * (a deck by default for a look, the discard pile for a discard), of the seats it names. */

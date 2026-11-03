@@ -4,14 +4,14 @@
 // deck but set aside at the start of the game, a player card effect shuffles it into the encounter deck, and it is revealed there
 // like an encounter card.
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import type { PrintedCard } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { shuffleIntoEncounterDeck } from "../../verbs.ts";
-import { moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import type { PrintedCard } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { shuffleIntoEncounterDeck } from "../../interpret/verbs.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { lastPickedSeat } from "../play/refs.ts";
 

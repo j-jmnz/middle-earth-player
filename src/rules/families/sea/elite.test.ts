@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { definePrinted } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { moveCard, spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { lastPlayer } from "./players.ts";
 import { routeDestination, stampRoutes } from "./routes.ts";
 import { enemy, hero, seaTable, send, shipEnemy, type Table } from "./table.ts";

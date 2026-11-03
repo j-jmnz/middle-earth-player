@@ -2,17 +2,17 @@
 // verbs of the Dream-chaser's fleet and the Corsair Pirates: a random discard that pays in resources, and the Glórinaith's discard of "the top cards of any deck".
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { isPlayerType, printedOf, type PrintedCard } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import { nextUint } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { topFrame, patchTop } from "../../windows.ts";
-import { moveCard } from "../../zones.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { isPlayerType, printedOf, type PrintedCard } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { nextUint } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { topFrame, patchTop } from "../../windows/windows.ts";
+import { moveCard } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 

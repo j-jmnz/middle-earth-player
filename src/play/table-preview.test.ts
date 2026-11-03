@@ -3,7 +3,7 @@
 // with no quest points is won.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { updateCard } from "../rules/state.ts";
+import { updateCard } from "../rules/core/state.ts";
 import { buildTable, idsOf, sceneCards } from "../../scripts/test-scene.ts";
 
 import { ledgerLine } from "./ledger.ts";

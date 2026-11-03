@@ -3,21 +3,21 @@
 // resource on the campaign card, and the bottom of a deck (looked at, discarded).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { characters } from "../../combat.ts";
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { lastPicked, seatOf } from "../../player-verbs.ts";
-import { hasTrait } from "../../conditions.ts";
-import { modifiedStat, placeDamage } from "../../keywords.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats, updateCard } from "../../state.ts";
-import { patchTop } from "../../windows.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { characters } from "../../combat/combat.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop } from "../../windows/windows.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import { dealtFace } from "../dreamchaser/facts.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";

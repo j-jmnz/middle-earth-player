@@ -5,14 +5,14 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { hasTrait, holds } from "../../conditions.ts";
+import { hasTrait, holds } from "../../interpret/conditions.ts";
 
-import { countMatching } from "../../pick.ts";
-import { enforceRestricted, playCost } from "../../attach.ts";
-import { syncConstants } from "../../constants.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo, spawn } from "../../zones.ts";
+import { countMatching } from "../../interpret/pick.ts";
+import { enforceRestricted, playCost } from "../../player/attach.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import { attach, miscCtx } from "./fixture.ts";
 import { offered, play, put, run, seat, send, trigger } from "../play/fixture.ts";
 

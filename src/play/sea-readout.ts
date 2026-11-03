@@ -3,8 +3,8 @@
 import { shiftHeading } from "../rules/families/sea/heading.ts";
 import { committedWeight } from "../rules/families/sea/sailing.ts";
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { modifierActive } from "../rules/state.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { modifierActive } from "../rules/core/state.ts";
 
 import type { Readout } from "./readout.ts";
 import { headingChangeWords, sailingLookWords, shiftReadoutWords } from "./sea-words.ts";

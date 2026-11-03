@@ -5,10 +5,10 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/play.ts";
 
-import { pickCandidates } from "../../pick.ts";
-import { cardTypeOf, printedOf } from "../../printed.ts";
-import { destroyCard, eliminateEmpties } from "../../keywords.ts";
-import { moveCard } from "../../zones.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { cardTypeOf, printedOf } from "../../core/printed.ts";
+import { destroyCard, eliminateEmpties } from "../../core/keywords.ts";
+import { moveCard } from "../../core/zones.ts";
 import { playCtx, put, run, seat } from "./fixture.ts";
 
 const ctx = playCtx(RECORDS);

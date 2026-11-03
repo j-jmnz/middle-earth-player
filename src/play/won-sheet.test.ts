@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { blankScenario } from "../rules/state.ts";
+import { blankScenario } from "../rules/core/state.ts";
 import { loadWorld } from "../../scripts/past-scene.ts";
 
 import { wonSheet } from "./sheets.ts";

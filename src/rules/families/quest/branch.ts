@@ -1,10 +1,10 @@
 // Rules: rr.quest-cards-quest-deck, rr.quest-advancement (data/rules/entries.json); the branch is the printed Forced effect of 01120:B:1
 // ("proceed to one of the 2 \"A Chosen Path\" stages, at random").
-import type { ReduceContext } from "../../interpret.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
-import { gameReads } from "../../game-reads.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
+import { gameReads } from "../../core/game-reads.ts";
 
 // What advancing past the stage `code` does when the quest branches: the stage a branch leads to is the last one (its defeat wins the
 // game), and a stage that names a branch proceeds to one of its codes at random, the other copies leaving the game. `next` is the

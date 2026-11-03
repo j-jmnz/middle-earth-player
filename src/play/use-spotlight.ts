@@ -8,7 +8,7 @@ import { cancelAnimation, useAnimatedReaction, useSharedValue, withTiming, type 
 import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import { tickImpact } from "./haptics.ts";
 import type { TableLayout } from "./layout.ts";

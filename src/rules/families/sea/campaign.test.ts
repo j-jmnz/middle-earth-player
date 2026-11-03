@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents } from "../../reduce.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents } from "../../engine/reduce.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { enemy, hero, seaTable, send, ship, shipEnemy, type Table } from "./table.ts";
 
 // Rules: dcce.ship-objectives, dcce.prepare-your-fleet, rr.search, rr.the-word-choose (data/rules/entries.json); ledger lines 11171:A:2, 11021:A:1, 11055:A:2. What a Dream-chaser campaign card's

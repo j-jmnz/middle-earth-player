@@ -1,9 +1,9 @@
 // Rules: rr.in-play-and-out-of-play, rr.search, rr.play-and-put-into-play, rr.ownership-and-control, rr.doomed-x,
 // rr.mulligan (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { actAs, addToX, discardFromDeck, givePicked, moveCardVerb, shuffleDiscardIn, shuffleHandIn, swapPicked } from "./moves.ts";
 import { keepOpeningHand, playFrom } from "./play.ts";
 import type { Focus } from "../index.ts";

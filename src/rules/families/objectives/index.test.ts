@@ -2,16 +2,16 @@
 // 01109:A:1-3, 01110:A:1-3, 01123:A:1, 01101:A:1, 01103:A:2. The objectives family's verbs on a table of Escape from Dol Guldur.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import { legalIntents, legalTargets } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { legalIntents, legalTargets } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { freeOfEncounters } from "./index.ts";
-import { destroyCard } from "../../keywords.ts";
-import { reduce, startScenario } from "../../reduce.ts";
-import { expectOk } from "../../fixture.ts";
-import type { ScenarioState } from "../../state.ts";
+import { destroyCard } from "../../core/keywords.ts";
+import { reduce, startScenario } from "../../engine/reduce.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { dolGuldurTable, loadDolGuldurWorld, OBJECTIVES, type DolGuldurLayout, type DolGuldurWorld } from "../../../../scripts/dol-guldur-scene.ts";
 import { dolGuldurStart, dolGuldurWorld } from "../../../../scripts/dol-guldur-game.ts";
 import { codesOf, first, send, start, type Run } from "../../../../scripts/past-scene.ts";

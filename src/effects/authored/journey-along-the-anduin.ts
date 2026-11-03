@@ -31,9 +31,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01086 Despair: 4 progress come off the quest; the Shadow sets the defender's Defense to 0 for this attack (its current Defense taken off).
   {"id":"01086:whenRevealed:1","cardCode":"01086","lines":["01086:A:1"],"timing":"whenRevealed","instructions":[{"verb":"RemoveProgressFromQuest","amount":4}]},
   {"id":"01086:shadow:1","cardCode":"01086","lines":["01086:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"stat":"defense","of":"defender","negative":true},"until":"endOfAttack","target":"defender"}]},
-  // 01087 The Brown Lands: 1 progress token on it once the players have traveled there (it becomes the active location, rules/travel.ts).
+  // 01087 The Brown Lands: 1 progress token on it once the players have traveled there (it becomes the active location, rules/quest/travel.ts).
   {"id":"01087:forced:1","cardCode":"01087","lines":["01087:A:1"],"timing":"forced","trigger":"becameActive","subject":"self","instructions":[{"verb":"PlaceProgressOn","amount":1,"target":"self"}]},
-  // 01088 The East Bight: with no active location the players must travel here (rules/restrictions.ts forcedTravel).
+  // 01088 The East Bight: with no active location the players must travel here (rules/interpret/restrictions.ts forcedTravel).
   {"id":"01088:constant:1","cardCode":"01088","lines":["01088:A:1"],"timing":"constant","instructions":[{"verb":"Restrict","what":"travelOnly"}]},
   // 01111 Misty Mountain Goblins: progress comes off the quest after it attacks; the Shadow takes 1 (3 when undefended).
   {"id":"01111:forced:1","cardCode":"01111","lines":["01111:A:1"],"timing":"forced","trigger":"attackResolved","subject":"self","instructions":[{"verb":"RemoveProgressFromQuest","amount":1}]},

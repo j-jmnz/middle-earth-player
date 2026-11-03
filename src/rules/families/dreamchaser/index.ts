@@ -2,12 +2,12 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { XpCount } from "../../../catalog/families/dreamchaser.ts";
 
-import { queueEvent } from "../../queue.ts";
-import { livingSeats, type ScenarioState } from "../../state.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { livingSeats, type ScenarioState } from "../../core/state.ts";
 import { tokensOn } from "../campaign/index.ts";
 import { flippedCount } from "../island/pick.ts";
 
-// The verbs src/catalog/families/dreamchaser.ts adds. GainXp is a Resolution verb: rules/resolution.ts runs it (xpOf below), so it changes
+// The verbs src/catalog/families/dreamchaser.ts adds. GainXp is a Resolution verb: rules/setup/resolution.ts runs it (xpOf below), so it changes
 // nothing here.
 export function run(state: ScenarioState, instruction: Instruction): ScenarioState | null {
   return instruction.verb === "GainXp" ? state : null;

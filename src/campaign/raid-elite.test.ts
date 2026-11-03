@@ -2,12 +2,12 @@
 // ally sides, on a table of plain-number heroes and the Campaign Expansion's cards (scripts/raid-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { canAttack } from "../rules/combat.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, reduce } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { canAttack } from "../rules/combat/combat.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents, reduce } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, idOf, idsOf, loadRaidWorld, raidFight, raidTable, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
 
 let world: RaidWorld;

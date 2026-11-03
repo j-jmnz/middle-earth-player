@@ -1,12 +1,12 @@
 // Test helper for the sea family's table (phase 39b): a game with ships, the Heading card on the Dream-chaser, ship-enemies and Corsair cards, built with
 // the rules' own spawn and the sea family's table (rules/families/sea/table.ts), as seat-fixture.ts builds the two-handed one. No number in it is the table's.
 import type { Effect } from "../catalog/boundary.ts";
-import { definePrinted, type PrintedCard } from "../rules/printed.ts";
+import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
 import { enemy, hero, navigation, seaTable, send, ship, shipEnemy } from "../rules/families/sea/table.ts";
 import type { Heading } from "../rules/families/sea/types.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { attachTo, spawn } from "../rules/zones.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { attachTo, spawn } from "../rules/core/zones.ts";
 
 import type { LayoutViews, PileViews } from "./layout.ts";
 import { PILES, pileSelector, secondPilesOf, TABLE_ZONES, zoneSelector, type ZoneFacts } from "./selectors.ts";

@@ -3,20 +3,20 @@
 // ledger (data/printed/dream-chaser.json) has a record, and these tests run them on a table of plain-number heroes (scripts/voyage-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { playCost } from "../rules/attach.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { legalIntents, reduce, startScenario, type PlayerIntent } from "../rules/reduce.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { playCost } from "../rules/player/attach.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { legalIntents, reduce, startScenario, type PlayerIntent } from "../rules/engine/reduce.ts";
 import { committedWeight } from "../rules/families/sea/sailing.ts";
 import { sailingCommitters } from "../rules/families/sea/sailing-legal.ts";
-import { heldAmount, updateCard, type ScenarioState } from "../rules/state.ts";
+import { heldAmount, updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { lowerThreatByEffect } from "../rules/families/quest/threat.ts";
-import { readyCard } from "../rules/player-verbs.ts";
-import { doRefresh } from "../rules/refresh.ts";
+import { readyCard } from "../rules/interpret/player-verbs.ts";
+import { doRefresh } from "../rules/engine/refresh.ts";
 import { pruneRoundCaps } from "../rules/families/dreamchaser/index.ts";
-import { expectOk } from "../rules/fixture.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { first, send, start } from "../../scripts/past-scene.ts";
 import { voyageStart, voyageWorld } from "../../scripts/voyage-game.ts";

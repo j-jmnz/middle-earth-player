@@ -12,8 +12,8 @@ Written 2026-10-24, after phase 8b. It reviews phases 9 to 16 against the new `d
 | C. Scenarios from cards | Done as written: the campaign card's and the quest card's Setup records are run by `buildStart` (`src/campaign/start.ts`); DragnCards and Hall of Beorn are cross-checks, with `data/overrides.json` for disagreements. |
 | D. Campaign is cards plus the checklist | Done: `src/campaign/checklist.ts`, `briefing.ts`, `log.ts` (`campaignPool`, `threatPenalty`, `captives`, per-scenario `rounds`), `score.ts`; the campaign cards' Setup and Resolution are records with timings `campaignSetup` and `resolution`; `authored.resolution` is gone from the campaign file. |
 | E. Rules as verified spans | Done, with the shape changed: `data/rules/index.json` (spans with `doc`, `page`, `column`, exact `from` and `to`), `data/rules/columns.json` (column boxes per document), and `data/rules/entries.json` built from them by `scripts/data/rules/`. Archery, toughness, scoring and the checklist have ids. |
-| F. Every step names its cause | Done: `src/rules/cause.ts`; `EngineStep` carries `cause`, and the golden tests refuse a step with no cause. |
-| G. A save is a seed, intents and a data hash | Done: `src/campaign/replay.ts` (`ActiveScenario`, `ENGINE_VERSION` in `src/rules/version.ts`). |
+| F. Every step names its cause | Done: `src/rules/core/cause.ts`; `EngineStep` carries `cause`, and the golden tests refuse a step with no cause. |
+| G. A save is a seed, intents and a data hash | Done: `src/campaign/replay.ts` (`ActiveScenario`, `ENGINE_VERSION` in `src/rules/engine/version.ts`). |
 | New order | Phases 8c and 8d are done. Playable scenarios (`src/campaign/playable.ts`): 1 to 4. Scenarios 5 and 6 (phases 15 and 16) still have open printed lines. Per-phase state is in `docs/phases/STATUS.md`. |
 
 ## What 8b got right
@@ -91,11 +91,11 @@ Stage 2A (142062) removes the Ring-bearer and its attachments from the game. Sta
 
 ### 8. Engine steps do not say why
 
-`EngineStep` (`src/rules/intents.ts`) records threat, damage, progress and so on, but not the rule or the record that caused them. A wrong number cannot be traced to its authority without a debugger.
+`EngineStep` (`src/rules/core/intents.ts`) records threat, damage, progress and so on, but not the rule or the record that caused them. A wrong number cannot be traced to its authority without a debugger.
 
 ### 9. Starter decks are hand-typed code
 
-(Fixed: the lists are `data/starter-decks.json`, read from the booklet spans; `Restricted` is a parsed keyword, `src/rules/keywords.ts`.) `src/screens/starter-decks.ts` held the two lists as TypeScript. The coverage test does not read them. `Restricted` appears in 79 cards (Sting, Glamdring, Andúril, and attachments in the starter decks) and is an unknown keyword token. The engine does not implement it.
+(Fixed: the lists are `data/starter-decks.json`, read from the booklet spans; `Restricted` is a parsed keyword, `src/rules/core/keywords.ts`.) `src/screens/starter-decks.ts` held the two lists as TypeScript. The coverage test does not read them. `Restricted` appears in 79 cards (Sting, Glamdring, Andúril, and attachments in the starter decks) and is an unknown keyword token. The engine does not implement it.
 
 ## Fundamental changes
 

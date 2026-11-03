@@ -15,7 +15,7 @@ import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { reduce, legalIntents, legalTargets, type PlayerIntent, type ScenarioState, type ReduceContext } from "../src/rules/reduce.ts";
+import { reduce, legalIntents, legalTargets, type PlayerIntent, type ScenarioState, type ReduceContext } from "../src/rules/engine/reduce.ts";
 
 import { DEPTHS_GOLDENS, depthsWorld, playGolden as playDepths } from "./depths-game.ts";
 import { stormcallerWonLog } from "./e2e-depths.ts";

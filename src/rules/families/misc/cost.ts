@@ -2,15 +2,15 @@
 //
 // What the misc family changes about paying for a card: a fixed X ("X is the number of players in the game"), Secrecy a card in
 // play grants the first matching card its controller plays each round, and the spheres a lasting effect lets any resource pay for.
-import { resolveAmount } from "../../amounts.ts";
-import { constantInstructions } from "../../constant-records.ts";
-import { holds } from "../../conditions.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import { matchesPick } from "../../pick.ts";
-import { printedOf, type Sphere } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { heldAmount } from "../../state.ts";
+import { resolveAmount } from "../../interpret/amounts.ts";
+import { constantInstructions } from "../../interpret/constant-records.ts";
+import { holds } from "../../interpret/conditions.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { matchesPick } from "../../interpret/pick.ts";
+import { printedOf, type Sphere } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { heldAmount } from "../../core/state.ts";
 import { seatThreat } from "../play/hooks.ts";
 
 // The X a card with a printed cost of X has fixed by a record of its own, or null when its player chooses X.

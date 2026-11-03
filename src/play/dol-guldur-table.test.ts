@@ -3,8 +3,8 @@
 // its player's play area, and Iron Shackles under the deck. The engine decides all of it; nothing here changes a card.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
 import { prisonerHero } from "../rules/families/prisoner/index.ts";
 import { dolGuldurStart, dolGuldurWorld } from "../../scripts/dol-guldur-game.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";

@@ -6,11 +6,11 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/encounter.ts";
 
-import { modifiedStat } from "../../keywords.ts";
-import { settle } from "../../machine.ts";
-import { offerResponses } from "../../responses.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
+import { offerResponses } from "../../windows/responses.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { deck, encounterCtx, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
 
 const ctx = encounterCtx(RECORDS);

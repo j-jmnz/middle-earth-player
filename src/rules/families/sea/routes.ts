@@ -2,10 +2,10 @@
 // play or would be discarded: a non-ship enemy goes to the Corsair discard pile (while a Corsair deck is in the game), and a Stormcaller Elite card,
 // which has no encounter card back and so can never be added to the encounter deck or discard pile, goes to the victory display as an enemy and out
 // of the game as an objective ally. moveCard (zones.ts) asks routeDestination for every move; the routes are stamped once, when the game is dealt.
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { inPlay } from "../../state.ts";
-import type { PrintedCard } from "../../printed.ts";
-import type { Destination } from "../../zones.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
+import type { PrintedCard } from "../../core/printed.ts";
+import type { Destination } from "../../core/zones.ts";
 import type { SeaRoute, SeaState } from "./types.ts";
 
 /** The encounter set of the two double-sided cards that have no encounter card back (dcce.stormcaller-elite). */

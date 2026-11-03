@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/deck.ts";
 
-import { expectOk } from "../../fixture.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import { destroyCard } from "../../keywords.ts";
-import { withThreat, type ScenarioState } from "../../state.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { destroyCard } from "../../core/keywords.ts";
+import { withThreat, type ScenarioState } from "../../core/state.ts";
 import { card, put, table } from "../costs/fixture.ts";
 
 // Rules: rr.search, rr.play-and-put-into-play, rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display,

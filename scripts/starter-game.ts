@@ -1,10 +1,10 @@
 import { buildStart } from "../src/campaign/start.ts";
 import type { LoadoutSeat } from "../src/campaign/loadout.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import type { PrintedCard } from "../src/rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import type { StartScenario } from "../src/rules/setup.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import type { PrintedCard } from "../src/rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import type { StartScenario } from "../src/rules/setup/setup.ts";
 
 import { playOut, type Played } from "./auto-player.ts";
 import { campaign, loadWorld, scenario } from "./past-scene.ts";

@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 
 import { EFFECTS } from "../src/effects/index.ts";
-import type { EngineStep } from "../src/rules/intents.ts";
-import { UNATTRIBUTED, type Cause } from "../src/rules/cause.ts";
+import type { EngineStep } from "../src/rules/core/intents.ts";
+import { UNATTRIBUTED, type Cause } from "../src/rules/core/cause.ts";
 
 import { keyOf, loadLedger } from "./data/printed/ledger.ts";
 

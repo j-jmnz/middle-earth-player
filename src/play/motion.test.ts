@@ -2,7 +2,7 @@
 // where a card starts, whether it flips, how long it waits, how high it rises, how it lands.
 import { describe, expect, it } from "vitest";
 
-import type { ZoneName } from "../rules/state.ts";
+import type { ZoneName } from "../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone, TableLayout } from "./layout.ts";
 import { ease } from "./motion-curves.ts";

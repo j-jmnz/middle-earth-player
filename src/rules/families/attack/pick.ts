@@ -5,11 +5,11 @@
 // read, else from the running effect.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
-import { hasTrait } from "../../conditions.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { topFrame } from "../../windows.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { topFrame } from "../../windows/windows.ts";
 
 // What the filter is read against: the chooser, the source, what the effect picked, and the answered event's cards.
 export type AttackPickContext = { seat: number; sourceId: string | null; picked?: readonly string[]; subject?: string | null; other?: string | null };

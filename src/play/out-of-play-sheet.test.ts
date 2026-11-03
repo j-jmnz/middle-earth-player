@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import { cardMap, expectOk, hero, idleScenario } from "../rules/fixture.ts";
-import { settle } from "../rules/machine.ts";
-import { definePrinted } from "../rules/printed.ts";
-import { legalIntents, reduce } from "../rules/reduce.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import { cardMap, expectOk, hero, idleScenario } from "../rules/core/test-fixture.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import { legalIntents, reduce } from "../rules/engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 
 import type { SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";

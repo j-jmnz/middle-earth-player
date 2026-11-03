@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { syncConstants } from "../../constants.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { recordSide, recordsOfFace, shownSide } from "./faces.ts";
 import { effectsOfCard } from "../misc/text.ts";
 import { hero, table } from "../defense/table.ts";

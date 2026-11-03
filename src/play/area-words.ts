@@ -2,7 +2,7 @@
 // (Breaking of the Fellowship): whose area it is, the stage that area quests on, its cards and its active location. The canvas draws the same area (selectors.ts,
 // zoneIds); this is the line a screen reader hears and the one an end-to-end flow reads, since the Skia canvas has no element per card. Pure.
 import { isSeparate } from "../rules/families/breaking/areas.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import { zoneIds } from "./selectors.ts";
 

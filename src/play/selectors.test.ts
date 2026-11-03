@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { fixtureDefinition } from "../rules/fixture.ts";
-import { blankScenario, withSeat, type ScenarioState } from "../rules/state.ts";
+import { fixtureDefinition } from "../rules/core/test-fixture.ts";
+import { blankScenario, withSeat, type ScenarioState } from "../rules/core/state.ts";
 
 import { tableLayout } from "./layout.ts";
 import { seaFixture, seaViews } from "./sea-fixture.ts";

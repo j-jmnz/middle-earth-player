@@ -3,12 +3,12 @@
 // The sidequests family's pick filters (effect-schema-pick.ts): a Trait shared with the active location or the attacking enemy,
 // the same title as another card, the quest a character is committed to.
 import type { PickSpec } from "../../../catalog/boundary.ts";
-import { grantedTraits } from "../../conditions.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { PickContext } from "../../pick.ts";
-import { printedOf } from "../../printed.ts";
-import { restrictedAttachments } from "../../restrictions.ts";
-import type { ScenarioState } from "../../state.ts";
+import { grantedTraits } from "../../interpret/conditions.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { PickContext } from "../../interpret/pick.ts";
+import { printedOf } from "../../core/printed.ts";
+import { restrictedAttachments } from "../../interpret/restrictions.ts";
+import type { ScenarioState } from "../../core/state.ts";
 
 function traitsOf(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
   const instance = state.cards[id];

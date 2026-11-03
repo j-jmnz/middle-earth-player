@@ -3,9 +3,9 @@
 // plain-number heroes (scripts/dol-guldur-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { attachBlocked } from "../rules/restrictions.ts";
-import { flagged } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { attachBlocked } from "../rules/interpret/restrictions.ts";
+import { flagged } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../scripts/dol-guldur-scene.ts";
 import { first } from "../../scripts/past-scene.ts";

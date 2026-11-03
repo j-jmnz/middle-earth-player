@@ -15,10 +15,10 @@
 // - The engine asks per seat through `viewOf`: the state as that seat sees it, with `staging` its own area and `questStage` its own stage, so
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
 //   without knowing about seats. `mergeView` writes what a view changed back. Nothing is cached on the view.
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import type { Destination } from "../../zones.ts";
-import { moveCard } from "../../zones.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import type { Destination } from "../../core/zones.ts";
+import { moveCard } from "../../core/zones.ts";
 
 export function isSeparate(state: ScenarioState): boolean {
   return state.separate === true;

@@ -1,7 +1,7 @@
 // Rules: dcce.ship-enemies, dcce.boarding (data/rules/entries.json). The crowding rule of staging and the engagement area (docs/design-system-table.md, Spacing and the play area's rows).
 import { describe, expect, it } from "vitest";
 
-import type { CardInstance } from "../rules/state.ts";
+import type { CardInstance } from "../rules/core/state.ts";
 
 import { rowXs } from "./layout-slots.ts";
 import { hitBounds, tableLayout, type LayoutViews, type PileViews } from "./layout.ts";

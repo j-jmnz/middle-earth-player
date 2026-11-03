@@ -2,14 +2,14 @@
 // pile. "Prepare the Corsair deck" takes every non-ship enemy out of the encounter deck, shuffles them into a deck of their own, and from then on a
 // non-ship enemy that would be discarded goes to the Corsair discard pile (the route sea/routes.ts gives it). The Corsair deck runs out, and its
 // discard pile is shuffled back into it at once. Its enemies are revealed only by card abilities, such as the Boarding keyword.
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { shuffleEncounterDeck } from "../../verbs.ts";
-import { moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
+import { moveCard } from "../../core/zones.ts";
 import { moveEncounter } from "../encounter/moves.ts";
 
 /** The Corsair deck has been prepared in this game: its zones exist. */

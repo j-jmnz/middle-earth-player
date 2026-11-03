@@ -2,9 +2,9 @@
 // the same objects, so a Zustand subscriber of one zone does not render when another zone changes: a threat change leaves
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
-import type { ReduceContext } from "../rules/reduce.ts";
-import type { CardInstance, ScenarioState } from "../rules/state.ts";
-import { shadowCards } from "../rules/zones.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import type { CardInstance, ScenarioState } from "../rules/core/state.ts";
+import { shadowCards } from "../rules/core/zones.ts";
 import { lookedIds } from "../rules/families/sea/sailing.ts";
 import { captiveUnder } from "../rules/families/south/captive.ts";
 import { grappledWith } from "../rules/families/grapple/values.ts";

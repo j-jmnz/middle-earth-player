@@ -2,9 +2,9 @@
 // tdom.mini-campaign (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { OATH_GOLDENS, oathPlan, oathWorld, playGolden, type OathDecks, type OathGame } from "../../scripts/oath-game.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
 import { campaign } from "../../scripts/oath-scene.ts";

@@ -1,9 +1,9 @@
 // The words of the aflame family's verbs (src/catalog/families/aflame.ts) inside a choice: what a branch of a Choose does ("Either deal 2 damage to an Aflame location in play, or search ... for the
 // Aflame location with the highest Aflame value", 11040:A:1), what a Pick or a question is for, and the damage a card is about to take. Every prompt names the card it is about and leads with the decision.
 import type { Amount, Instruction } from "../catalog/boundary.ts";
-import { frameScope, resolveAmount } from "../rules/amounts.ts";
-import type { ReduceContext } from "../rules/interpret.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { frameScope, resolveAmount } from "../rules/interpret/amounts.ts";
+import type { ReduceContext } from "../rules/interpret/interpret.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
 

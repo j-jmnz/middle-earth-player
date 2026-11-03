@@ -3,7 +3,7 @@
 // neither goes past its end.
 import type { Condition } from "../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../state.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { HEADINGS, type Heading } from "./types.ts";
 
 type HeadingTest = Extract<Condition, { kind: "heading" }>["is"];

@@ -6,15 +6,15 @@
 // attackers hear that they attacked, the effects delayed to the end of the attack resolve, and the window it came from (or
 // the attack it was declared during) goes on.
 import { noteAttackers } from "../aflame/attack.ts";
-import type { Modifier } from "../../frame-types.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { queueEvent } from "../../queue.ts";
+import type { Modifier } from "../../windows/frame-types.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { heard, strikeWaits } from "./events.ts";
-import type { PendingStrike, ScenarioState, Window } from "../../state.ts";
-import { pushFrame } from "../../windows.ts";
-import { moveCard } from "../../zones.ts";
+import type { PendingStrike, ScenarioState, Window } from "../../core/state.ts";
+import { pushFrame } from "../../windows/windows.ts";
+import { moveCard } from "../../core/zones.ts";
 
 // The attack is declared and in progress from now on. It remembers the player the enemy is engaged with, and the attack it was
 // declared during (an attack an effect makes inside another one's action window). An attacker's Attack "for its next attack

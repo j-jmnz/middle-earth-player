@@ -2,16 +2,16 @@
 // mec109.immune-to-player-card-effects, rr.destroy, rr.explored, rr.first-player (data/rules/entries.json). Doom, Doom, Doom, the Balrog and the Great Bridge.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { canAttack } from "../rules/combat.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { placeDamage } from "../rules/keywords.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { fireForced } from "../rules/triggers.ts";
-import { optionalEnemies, stagingThreat } from "../rules/quest.ts";
-import { ruleCause } from "../rules/cause.ts";
-import { reduce, type PlayerIntent, type ScenarioState } from "../rules/reduce.ts";
-import { flagged } from "../rules/state.ts";
+import { canAttack } from "../rules/combat/combat.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { placeDamage } from "../rules/core/keywords.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { fireForced } from "../rules/windows/triggers.ts";
+import { optionalEnemies, stagingThreat } from "../rules/quest/quest.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { reduce, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
+import { flagged } from "../rules/core/state.ts";
 import { BALROG, BRIDGE, DOOM, loadMoriaWorld, makeTable, runOne, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
 import { first } from "../../scripts/past-scene.ts";
 

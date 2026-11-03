@@ -1,7 +1,7 @@
 // Rules: dcce.scalable-upgradable (data/rules/entries.json). What the Dream-chaser campaign log's marks mean to a game, read from
 // `state.campaignFacts`: a scalable card's level, which its text's X reads, and the side an upgraded card is dealt on. Types only from state.ts, so
 // zones.ts can use it.
-import type { CardFace, ScenarioState } from "../../state.ts";
+import type { CardFace, ScenarioState } from "../../core/state.ts";
 
 /** A scalable card's level: the boxes marked beside it in the Campaign Log (dcce.scalable-upgradable). 0 where the log marks none, and in every
  * game with no campaign facts. A record's "X" is this number. */

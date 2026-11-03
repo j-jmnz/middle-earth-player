@@ -2,11 +2,11 @@
 //
 // A card leaving play by any path takes what is attached to it: destroyCard (keywords.ts) discards the attachments first and
 // names them; a card returned to the hand, put on a deck or moved elsewhere still holds them here, and each is discarded now.
-import { queueEvent } from "../../queue.ts";
-import type { CardInstance, ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { sendAway } from "../objectives/claimed.ts";
-import { cardsUnder, moveCard } from "../../zones.ts";
+import { cardsUnder, moveCard } from "../../core/zones.ts";
 
 // `card` is the card as it was before it left play; `released` are the attachments destroyCard already discarded. Each card
 // still attached goes to its owner's discard pile (an encounter card to the encounter discard pile), and so does a player card

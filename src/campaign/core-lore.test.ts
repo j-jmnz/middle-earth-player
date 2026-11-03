@@ -5,14 +5,14 @@
 // Secret Paths, Gandalf's Search, Beorn's Hospitality, Forest Snare, Protector of Lórien, Dark Knowledge and Self Preservation.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { attackBarred, syncConstants } from "../rules/constants.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { pushEffectFrame } from "../rules/effect-frames.ts";
-import { settle } from "../rules/machine.ts";
-import { stagingThreat } from "../rules/quest.ts";
-import { legalIntents } from "../rules/reduce.ts";
-import { updateCard, withMode, type ScenarioState } from "../rules/state.ts";
-import { attachTo, spawn } from "../rules/zones.ts";
+import { attackBarred, syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { pushEffectFrame } from "../rules/interpret/effect-frames.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
+import { legalIntents } from "../rules/engine/reduce.ts";
+import { updateCard, withMode, type ScenarioState } from "../rules/core/state.ts";
+import { attachTo, spawn } from "../rules/core/zones.ts";
 import { fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";

@@ -3,8 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Run } from "../../scripts/past-scene.ts";
-import { legalIntents } from "../rules/legal.ts";
-import type { PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { fight, loadAnduinWorld, type AnduinWorld } from "../../scripts/anduin-scene.ts";
 import { codesOf, first, send } from "../../scripts/past-scene.ts";

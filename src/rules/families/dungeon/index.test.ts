@@ -3,17 +3,17 @@
 // family's verbs on a table of Escape from Dol Guldur.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import { runInstruction } from "../../interpret.ts";
-import { legalIntents, rejectionReason } from "../../legal.ts";
-import { settle } from "../../machine.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { stagingThreat } from "../../quest.ts";
-import { fireForced } from "../../triggers.ts";
-import { ORC_GUARD_CODE, printedOf } from "../../printed.ts";
-import { updateCard, withSeat, type ScenarioState } from "../../state.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { legalIntents, rejectionReason } from "../../engine/legal.ts";
+import { settle } from "../../engine/machine.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { stagingThreat } from "../../quest/quest.ts";
+import { fireForced } from "../../windows/triggers.ts";
+import { ORC_GUARD_CODE, printedOf } from "../../core/printed.ts";
+import { updateCard, withSeat, type ScenarioState } from "../../core/state.ts";
 import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../../../scripts/dol-guldur-scene.ts";
 import { first, send, start, type Run } from "../../../../scripts/past-scene.ts";
 import { causeProblems } from "../../../../scripts/cause-check.ts";

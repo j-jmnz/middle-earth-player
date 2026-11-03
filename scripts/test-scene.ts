@@ -1,12 +1,12 @@
 import type { ScenarioDefinition } from "../src/catalog/boundary.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import type { EngineStep } from "../src/rules/intents.ts";
-import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
-import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import { blankScenario, updateCard, withThreat } from "../src/rules/state.ts";
-import { attachTo, spawn } from "../src/rules/zones.ts";
-import { topFrame } from "../src/rules/windows.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import type { EngineStep } from "../src/rules/core/intents.ts";
+import { definePrinted, type PrintedCard } from "../src/rules/core/printed.ts";
+import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import { blankScenario, updateCard, withThreat } from "../src/rules/core/state.ts";
+import { attachTo, spawn } from "../src/rules/core/zones.ts";
+import { topFrame } from "../src/rules/windows/windows.ts";
 
 import { causeProblems } from "./cause-check.ts";
 import { loadDefinition, loadPrinted } from "./test-catalog.ts";

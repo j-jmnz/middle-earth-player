@@ -1,9 +1,9 @@
 // A compact table for the attack family's tests: heroes and enemies with plain numbers, effect records made inline.
 import type { Effect } from "../../../catalog/boundary.ts";
-import { cardMap, fixtureDefinition } from "../../fixture.ts";
-import { definePrinted, type PrintedCard } from "../../printed.ts";
-import { blankScenario, withThreat, type ScenarioState } from "../../state.ts";
-import { spawn, type Destination } from "../../zones.ts";
+import { cardMap, fixtureDefinition } from "../../core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../../core/printed.ts";
+import { blankScenario, withThreat, type ScenarioState } from "../../core/state.ts";
+import { spawn, type Destination } from "../../core/zones.ts";
 
 export function fighter(code: string, patch: Partial<Parameters<typeof definePrinted>[0]> = {}): PrintedCard {
   return definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 10, willpower: 1, attack: 2, defense: 1, health: 5, ...patch });

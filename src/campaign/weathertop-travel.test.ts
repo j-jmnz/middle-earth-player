@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { legalTargets } from "../rules/legal.ts";
-import { legalIntents, reduce } from "../rules/reduce.ts";
-import { withMode, type ScenarioState } from "../rules/state.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { legalTargets } from "../rules/engine/legal.ts";
+import { legalIntents, reduce } from "../rules/engine/reduce.ts";
+import { withMode, type ScenarioState } from "../rules/core/state.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { first, loadWorld, RING, table, type Layout, type World } from "../../scripts/past-scene.ts";
 

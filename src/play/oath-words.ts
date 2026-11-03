@@ -1,8 +1,8 @@
 // The words of the choices The Oath asks (src/effects/authored/the-oath.ts, pool/TDoM.ts): the card a search offers, the hero a boon or burden goes on,
 // the cards to discard, and the verbs of the campaign and encounter families The Oath's records hold (src/catalog/families/{campaign,encounter}.ts).
 import type { Effect, Instruction } from "../catalog/boundary.ts";
-import { printedOf } from "../rules/printed.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
 
 function article(noun: string): string {
   return /^[aeiou]/i.test(noun) ? `an ${noun}` : `a ${noun}`;

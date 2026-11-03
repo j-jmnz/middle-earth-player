@@ -5,11 +5,11 @@
 // accepts. True solo has one staging area and one stage; a fallen hero is an enemy drawn with the hero's own picture.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
 import { stageOf, stagingOf, activeOf, sharedStaging } from "../rules/families/breaking/areas.ts";
-import { FALLEN_SUFFIX } from "../rules/printed.ts";
-import { stagingThreat } from "../rules/quest.ts";
-import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { FALLEN_SUFFIX } from "../rules/core/printed.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
+import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../scripts/breaking-game.ts";
 import { intentsOf } from "../../scripts/sheet-intents.ts";
 

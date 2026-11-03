@@ -1,14 +1,14 @@
 // Rules: mec109.ringbearers-life, mec109.setup-flight-to-the-ford, rr.damage, rr.forced (data/rules/entries.json).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { ruleCause } from "../rules/cause.ts";
-import { syncConstants } from "../rules/constants.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { expireModifiers, updateCard, type ScenarioState } from "../rules/state.ts";
-import { fireForced } from "../rules/triggers.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { expireModifiers, updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { fireForced } from "../rules/windows/triggers.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { fordTable, loadFordWorld, FELL_RIDER, type FordLayout, type FordWorld } from "../../scripts/ford-scene.ts";
 import { first, reveal, SAM, send } from "../../scripts/past-scene.ts";

@@ -87,7 +87,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 
 ### 2. One card model (`src/catalog/card-facts.ts`)
 - Zod `cardSchema`: code, printings[] (pack, number, octgnGuid, hobSlug, imageUrls), name, type, sphere, traits[], cost, stats, questPoints, victory, engagementCost, isUnique, quantity, easyQuantity, encounterSet, stage, keywords, timings, text, shadowText, errata, deckLegal, sides.
-- `PrintedCard` (`src/rules/printed.ts`) becomes the engine-facing subset of this type. `definePrinted` stays as the test helper.
+- `PrintedCard` (`src/rules/core/printed.ts`) becomes the engine-facing subset of this type. `definePrinted` stays as the test helper.
 - `scripts/data/normalize/`, pure functions with unit tests:
   - keyword tokens → `Keywords` (`"Hide 2."` → `{hide: 2}`). Unknown tokens go to a report.
   - timing labels from text.
@@ -104,7 +104,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
   - Group counts must equal Hall of Beorn's per-scenario Normal and Easy counts for the scenario's encounter sets, minus Nightmare.
   - Placement must agree with the template parse of the stage-1 quest card's `Setup:` text, step 5. This catches Mr. Underhill in staging.
 - Now: the scenario file holds piles, not DragnCards groups, and the start is built from the cards' Setup records (`docs/plans/done/authoritative-data.md`, C). As planned, the engine read placement from the scenario's groups:
-  - `startScenario` and `finishSetup` (`src/rules/setup.ts`) spawn each group into its zone, in the order the quest card's Setup text gives (set aside, staging, active, attach). `searchSetup` and `handSetup` (`src/rules/setup-search.ts`) are unchanged in what they compute.
+  - `startScenario` and `finishSetup` (`src/rules/setup/setup.ts`) spawn each group into its zone, in the order the quest card's Setup text gives (set aside, staging, active, attach). `searchSetup` and `handSetup` (`src/rules/setup/search.ts`) are unchanged in what they compute.
   - `sharedEncounterDeck2`, `sharedQuestDeck2` and `sharedBoons` map to the optional zones the brief already reserves (burden deck, second encounter deck). The widget flags become derived: a non-empty group turns the widget on.
 - Delete the `fixtures/` directory, `src/catalog/scenario-fixture.ts`, `scripts/join-scenario-fixtures.ts`, the authored `141022:setup:1` placement record, `src/campaign/effects-setup-records.test.ts`, `ScenarioScript`, `registry.ts` and `fellowship/a-shadow-of-the-past.ts`.
   - They're replaced by a pure `buildStart(input)` in `src/campaign/start.ts` (done; none of the deleted files exists).
@@ -143,7 +143,7 @@ Now: the heading splitter was replaced by the curated `data/rules/index.json` (`
   - the three most similar existing records.
 
   New `.claude/agents/effect-author.md`: reads a bundle, writes `src/effects/authored/`, and runs the coverage and scenario tests.
-- New verbs are still added to `effect-schema.ts` and `src/rules/interpret.ts` by hand. That's engine work, not data.
+- New verbs are still added to `effect-schema.ts` and `src/rules/interpret/interpret.ts` by hand. That's engine work, not data.
 - `scripts/effect-coverage.test.ts` reads timings from `data/cards`, iterates `data/scenarios/*.json` plus the prelude, and requires the nth record from generated plus authored. There's no manifest file and no SQLite.
 
 ### 6. Direct imports, slim catalog

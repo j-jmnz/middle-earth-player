@@ -27,7 +27,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `voyage-across-belegaer`, a
 
 - Campaign card 11171 (code after the DCCE rule in `data/overrides.json`, `productCodes`).
 - First use of the sea family. Stage 1A Setup, random stage 2 order and the look-at-two-stages advance on defeat when on-course, Corsair Pursuit (stage 3), Boarding ships, weather locations, the Heading card, the Modification boons per ship-objective and the Ominous Fate, Thunderstruck and Crowley burdens.
-- Stage 2 order and the look-at-two-stages advance are a quest-order verb beside `branch` (`src/rules/quest.ts`). Resolution adds Ominous Fate to the pool; the XP list reads stage 2B cards, heading, Ship enemies and Corsair Warships in the victory display.
+- Stage 2 order and the look-at-two-stages advance are a quest-order verb beside `branch` (`src/rules/quest/quest.ts`). Resolution adds Ominous Fate to the pool; the XP list reads stage 2B cards, heading, Ship enemies and Corsair Warships in the victory display.
 - Encounter sets, Easy removals and the extra piles come from `data/scenarios/voyage-across-belegaer.json` and `dcce.setup-voyage-across-belegaer`.
 
 ## E2E

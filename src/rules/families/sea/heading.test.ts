@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { Condition, Effect } from "../../../catalog/boundary.ts";
-import { holds } from "../../conditions.ts";
-import { syncConstants } from "../../constants.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { definePrinted } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { definePrinted } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { headingIs, headingOf, shiftHeading } from "./heading.ts";
 import { hero, seaTable, send, ship, type Table } from "./table.ts";
 

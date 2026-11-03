@@ -7,13 +7,13 @@
 // effect's X becomes how many were chosen.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { pickCandidates } from "../../pick.ts";
-import { printedOf } from "../../printed.ts";
-import type { Frame, QueueItem, ScenarioState } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { Frame, QueueItem, ScenarioState } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 
 type EachInstruction = Extract<Instruction, { verb: "Each" }>;
 

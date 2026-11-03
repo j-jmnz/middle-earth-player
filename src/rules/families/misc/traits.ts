@@ -3,12 +3,12 @@
 // A Trait a card gains from a modifier rather than from an attachment: "each Gondor card in play gains the Rohan trait" (a
 // lasting effect) and "Lothíriel gains the Rohan trait" (a constant), held as the flags traitRohan and traitGondor. And the
 // count of different Traits a player's characters have.
-import { characters } from "../../combat.ts";
-import { grantedTraits } from "../../conditions.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, modifierActive } from "../../state.ts";
+import { characters } from "../../combat/combat.ts";
+import { grantedTraits } from "../../interpret/conditions.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, modifierActive } from "../../core/state.ts";
 
 export function flaggedTrait(state: ScenarioState, id: string, trait: string): boolean {
   if (state.modifiers.length === 0) return false;

@@ -1,6 +1,6 @@
 // A crowded Fellowship or Mirkwood table for the layout tests (layout.test.ts): staging with a guarded pair and a card carrying two attachments, an engagement
 // area of six enemies with shadow cards and fighters, a play area that wraps, a long hand. Built from plain card instances, so the same file runs against an older layout.
-import type { CardInstance } from "../rules/state.ts";
+import type { CardInstance } from "../rules/core/state.ts";
 
 import type { LayoutViews, PileViews } from "./layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "./selectors.ts";

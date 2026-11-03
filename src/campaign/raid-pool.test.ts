@@ -2,12 +2,12 @@
 // the Resolution earns: Black Key (boon), the four Galdor's Counsel, Parrying Cutlass and Throwing Axe, on a table of plain-number heroes (scripts/raid-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, type PlayerIntent, type ScenarioState } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import { updateCard } from "../rules/state.ts";
-import { attachTo, moveCard, spawn } from "../rules/zones.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents, type PlayerIntent, type ScenarioState } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { updateCard } from "../rules/core/state.ts";
+import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
 import { CODES, finish, idOf, idsOf, loadRaidWorld, raidTable, send, start, type RaidLayout, type RaidWorld } from "../../scripts/raid-scene.ts";
 
 let world: RaidWorld;

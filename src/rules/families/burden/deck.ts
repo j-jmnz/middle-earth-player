@@ -3,17 +3,17 @@
 // The burden deck (Flight to the Ford): five burden cards shuffled into a deck beside the quest deck. A card of it is revealed as
 // if it came from the encounter deck, or goes into the encounter deck; a burden that is discarded goes to the encounter discard
 // pile (a revealed treachery does, once its staging is done). Burdens in the encounter deck and its discard pile are earned
-// when the scenario is won (EarnAllBurdens, src/rules/resolution.ts).
+// when the scenario is won (EarnAllBurdens, src/rules/setup/resolution.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { hasTrait } from "../../conditions.ts";
-import { startReveal } from "../../frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { shuffleIds } from "../../seed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { attachTo, moveCard } from "../../zones.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
+import { startReveal } from "../../windows/frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { moveEncounter } from "../encounter/moves.ts";
 

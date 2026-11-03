@@ -3,11 +3,11 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/misc.ts";
-import { cardMap, expectOk } from "../../fixture.ts";
-import { definePrinted } from "../../printed.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import { updateCard } from "../../state.ts";
-import { attachTo, spawn } from "../../zones.ts";
+import { cardMap, expectOk } from "../../core/test-fixture.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { updateCard } from "../../core/state.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
 import { fighter, table } from "../attack/fixture.ts";
 import { MISC_CARDS, choices, miscCtx } from "./fixture.ts";
 import { offered, play, put, run, seat, send, trigger, triggers } from "../play/fixture.ts";

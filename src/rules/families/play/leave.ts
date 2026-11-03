@@ -6,11 +6,11 @@
 // title discarded; and resources spent from one chosen pool.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { noteSpent } from "../costs/pay.ts";
 import type { Focus } from "../index.ts";
 import { namedCard } from "./refs.ts";

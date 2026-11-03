@@ -2,9 +2,9 @@
 //
 // "After a shadow effect dealt to ~ resolves": announced about the attacking enemy once for each of its shadow cards that has an effect, after the
 // shadow cards of its attack have resolved and before damage is dealt, and only when some card hears it.
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { shadowCards } from "../../zones.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { shadowCards } from "../../core/zones.ts";
 import { listened, queueHeard } from "../defense/listen.ts";
 
 export function announceShadowResolved(state: ScenarioState, ctx: ReduceContext): ScenarioState {

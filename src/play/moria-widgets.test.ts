@@ -2,7 +2,7 @@
 // tokens on stage 2, which the players need to advance, and the damage tokens on Doom, Doom, Doom. The engine decides both; nothing here changes a card.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { ScenarioState } from "../rules/state.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { tableLayout } from "./layout.ts";
 import { PILES, TABLE_ZONES, pileSelector, zoneSelector, type PileId, type PileView, type ZoneId, type ZoneView } from "./selectors.ts";
 import { DOOM, loadMoriaWorld, makeTable, type MoriaWorld } from "../../scripts/moria-scene.ts";

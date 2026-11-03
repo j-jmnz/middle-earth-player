@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { addModifier, modifiedStat } from "../rules/keywords.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { updateCard } from "../rules/state.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { addModifier, modifiedStat } from "../rules/core/keywords.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { updateCard } from "../rules/core/state.ts";
 import { starterStart, starterWorld } from "../../scripts/starter-game.ts";
 import { starterBase } from "../../scripts/starter-scene.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
@@ -81,8 +81,8 @@ describe("the numbers of the enemy attacks", () => {
 
 describe("a defender's defense", () => {
   it("counts a bonus that holds only while defending, before the defender is declared (Hobbit Cloak 141013)", async () => {
-    const { defenseAsDefender } = await import("../rules/keywords.ts");
-    const { moveCard } = await import("../rules/zones.ts");
+    const { defenseAsDefender } = await import("../rules/core/keywords.ts");
+    const { moveCard } = await import("../rules/core/zones.ts");
     const { readoutFor } = await import("./readout.ts");
     const [, sam = ""] = kept.seats[0].heroes;
     // An engaged enemy whose engagement cost is above the seat's threat attacks, and Sam holds Hobbit Cloak's +2.

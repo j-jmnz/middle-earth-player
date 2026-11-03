@@ -9,13 +9,13 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/encounter.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { expectOk } from "../../fixture.ts";
-import { settle } from "../../machine.ts";
-import { reduce } from "../../reduce.ts";
-import { updateCard, withMode, withThreat, type ScenarioState } from "../../state.ts";
-import { attachTo } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { settle } from "../../engine/machine.ts";
+import { reduce } from "../../engine/reduce.ts";
+import { updateCard, withMode, withThreat, type ScenarioState } from "../../core/state.ts";
+import { attachTo } from "../../core/zones.ts";
 import { deck, encounterCtx, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
 import { revealsAllowed } from "./reveal.ts";
 

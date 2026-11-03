@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { shadowCards } from "../rules/zones.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { shadowCards } from "../rules/core/zones.ts";
 import { attackOrPolicy } from "../../scripts/combat-policy.ts";
 import { starterStart, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
 

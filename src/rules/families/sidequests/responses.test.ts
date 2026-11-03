@@ -3,8 +3,8 @@
 import { describe, expect, it } from "vitest";
 
 import { RECORDS } from "../../../effects/authored/families/sidequests.ts";
-import { updateCard, withThreat, type ScenarioState } from "../../state.ts";
-import { spawn } from "../../zones.ts";
+import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { passQuestWindow, put, questArea, questing, run, seat, send, sideCtx, trigger } from "./fixture.ts";
 
 const ctx = sideCtx(RECORDS);

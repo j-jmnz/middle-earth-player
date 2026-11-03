@@ -6,14 +6,14 @@
 // under the Watcher uses, families/south/captive.ts). Mendor is captured with it in Campaign Mode and freed by the campaign card.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard, withSeat } from "../../state.ts";
-import { shuffleIds } from "../../seed.ts";
-import { moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard, withSeat } from "../../core/state.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { captureHero, releaseHero } from "../south/captive.ts";
 

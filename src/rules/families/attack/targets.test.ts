@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { holds } from "../../conditions.ts";
-import { expectOk } from "../../fixture.ts";
-import { legalIntents, legalTargets, reduce } from "../../reduce.ts";
-import { pickCandidates } from "../../pick.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { legalIntents, legalTargets, reduce } from "../../engine/reduce.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { strikeResumes } from "./flow.ts";
 import { noteEngaged } from "./events.ts";
 import { actionWindow, record, table } from "./fixture.ts";

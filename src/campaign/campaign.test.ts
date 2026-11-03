@@ -2,11 +2,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { legalIntents, reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { moveCard } from "../rules/zones.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import { legalIntents, reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
+import { moveCard } from "../rules/core/zones.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../scripts/test-catalog.ts";
 import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Table } from "../../scripts/test-scene.ts";

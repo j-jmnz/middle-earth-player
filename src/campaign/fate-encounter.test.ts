@@ -3,12 +3,12 @@
 // tests run them on a table of plain-number heroes (scripts/fate-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { settle } from "../rules/machine.ts";
-import { legalIntents, type PlayerIntent } from "../rules/reduce.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { CODES, codesIn, fateFight, fateTable, finish, idOf, loadFateWorld, resolveReveal, send, start, type FateLayout, type FateWorld, type Run } from "../../scripts/fate-scene.ts";
 
 let world: FateWorld;

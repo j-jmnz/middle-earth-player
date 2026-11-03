@@ -4,10 +4,10 @@
 // answered event's card, the source's host), the last picked player, and the delayed effects it schedules for a card.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import type { Cause } from "../../cause.ts";
-import { pickedList, seatOf } from "../../player-verbs.ts";
-import type { DelayedEffect, QueueItem, ScenarioState } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
+import type { Cause } from "../../core/cause.ts";
+import { pickedList, seatOf } from "../../interpret/player-verbs.ts";
+import type { DelayedEffect, QueueItem, ScenarioState } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 
 export type CardName = "self" | "picked" | "subject" | "host";

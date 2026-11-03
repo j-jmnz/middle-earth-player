@@ -5,15 +5,15 @@
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../catalog/boundary.ts";
-import { restrictedLimit } from "../rules/attach.ts";
-import { rejectionReason } from "../rules/legal.ts";
-import { effectById, effectsOf } from "../rules/listen.ts";
-import { printedOf } from "../rules/printed.ts";
-import { hideWillpower } from "../rules/hide.ts";
-import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
-import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import type { Frame, GameEvent, ResponseOffer } from "../rules/state.ts";
-import { topFrame } from "../rules/windows.ts";
+import { restrictedLimit } from "../rules/player/attach.ts";
+import { rejectionReason } from "../rules/engine/legal.ts";
+import { effectById, effectsOf } from "../rules/windows/listen.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { hideWillpower } from "../rules/quest/hide.ts";
+import { engagementCostOf, questPointsOf } from "../rules/quest/quest.ts";
+import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import type { Frame, GameEvent, ResponseOffer } from "../rules/core/state.ts";
+import { topFrame } from "../rules/windows/windows.ts";
 
 import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "./choice-words.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "./island-words.ts";

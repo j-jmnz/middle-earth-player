@@ -2,11 +2,11 @@
 // and the cards facedown underneath it, and a scalable card's level for an amount.
 import type { Condition } from "../../../catalog/boundary.ts";
 
-import { printedOf } from "../../printed.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats } from "../../state.ts";
-import { effectsOf } from "../../listen.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { levelOfCard } from "../dreamchaser/facts.ts";
 import { facedownCount, namedInPlay } from "../misc/amounts.ts";
 

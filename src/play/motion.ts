@@ -4,7 +4,7 @@
 // (docs/design-system-table.md, Motion). The rule is already resolved when a card moves; the motion only shows it. This file
 // says what each card does (flip, wait its turn, rise on an arc, land with a squash or a pop); motion-pose.ts works out the pose
 // at a moment from motion-tokens.ts, and the UI never computes a number of its own.
-import type { ZoneName } from "../rules/state.ts";
+import type { ZoneName } from "../rules/core/state.ts";
 
 import type { CardSlot, Rect, TableLayout } from "./layout.ts";
 import { MOTION, SHAPE } from "./motion-tokens.ts";

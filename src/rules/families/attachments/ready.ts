@@ -2,13 +2,13 @@
 // during the refresh phase unless you pay 2 resources from that hero's pool."
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { effectCause, ruleCause } from "../../cause.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, inPlay, modifierActive } from "../../state.ts";
+import { effectCause, ruleCause } from "../../core/cause.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, modifierActive } from "../../core/state.ts";
 
 // The question each paying card asks: pay its price from the host's pool and ready the host, or leave it exhausted.
 export function readyPaymentChoice(amount: number): Instruction {

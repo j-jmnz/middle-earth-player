@@ -6,15 +6,15 @@
 // gains control of attached ally"); a card that must be discarded at a stat ("Discard Denethor if his Willpower is 0 or less").
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
-import { constantInstructions } from "../../constant-records.ts";
-import { syncConstants } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { destroyCard, eliminateEmpties, modifiedStat } from "../../keywords.ts";
-import { printedOf } from "../../printed.ts";
-import type { ScenarioState } from "../../state.ts";
-import { flagged, inPlay, livingSeats } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import { constantInstructions } from "../../interpret/constant-records.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { destroyCard, eliminateEmpties, modifiedStat } from "../../core/keywords.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { giveControl } from "./control.ts";
 import { lastPlayer } from "../sea/players.ts";
 

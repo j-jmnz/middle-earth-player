@@ -3,17 +3,17 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { encounterCodes } from "../catalog/scenario-data.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { placeDamage } from "../rules/keywords.ts";
-import { holds } from "../rules/conditions.ts";
-import { printedOf } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { stagingThreat } from "../rules/quest.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { placeDamage } from "../rules/core/keywords.ts";
+import { holds } from "../rules/interpret/conditions.ts";
+import { printedOf } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
+import { stagingThreat } from "../rules/quest/quest.ts";
 import { revealsAllowed } from "../rules/families/encounter/reveal.ts";
-import { ruleCause } from "../rules/cause.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 import { moriaStart, moriaWorld } from "../../scripts/moria-game.ts";
 import { BALROG, BRIDGE, CHAMBER, DOOM, fire, loadMoriaWorld, makeTable, moria, recordOf, runOne, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../scripts/moria-scene.ts";
 import { codesOf, first } from "../../scripts/past-scene.ts";

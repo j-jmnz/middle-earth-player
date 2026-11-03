@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { definePrinted, printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { updateCard, withThreat } from "../rules/state.ts";
-import { moveCard, spawn } from "../rules/zones.ts";
+import { definePrinted, printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { updateCard, withThreat } from "../rules/core/state.ts";
+import { moveCard, spawn } from "../rules/core/zones.ts";
 import { first, loadWorld, table, type World } from "../../scripts/past-scene.ts";
 
 import { scoreOf } from "./score.ts";

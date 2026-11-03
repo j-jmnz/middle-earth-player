@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS as DECK } from "../../../effects/authored/families/deck.ts";
 
-import { expectOk } from "../../fixture.ts";
-import { legalIntents, reduce } from "../../reduce.ts";
-import { updateCard, type ScenarioState } from "../../state.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { card, put, table } from "../costs/fixture.ts";
 
 // Rules: rr.play-and-put-into-play, rr.search, rr.in-play-and-out-of-play, rr.attachment-cards, rr.cost (data/rules/entries.json).

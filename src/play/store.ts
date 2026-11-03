@@ -5,7 +5,7 @@
 // state before an accepted intent while that intent showed no hidden card (undo-history.ts).
 import { createStore, type StoreApi } from "zustand/vanilla";
 
-import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
+import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
 
 import { clashesOf } from "./clash.ts";
 import { finishedRoundSteps } from "./outcome.ts";
@@ -15,9 +15,9 @@ import { endGate, leaveGate, NO_SPOTLIGHT, openGate, type SpotlightGate } from "
 import { nextUndoable, type Undoable } from "./undo-history.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
-export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
+export type { EngineStep, LegalIntent, PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 // An effect record by its id (src/screens may not import src/rules).
-export { effectById } from "../rules/listen.ts";
+export { effectById } from "../rules/windows/listen.ts";
 
 // The cards a row folded into its stack (row-fold.ts), as the canvas laid the table out: the table's pick reads them (a folded card is not on the table), and the row list shows them.
 export type RowFolds = { staging: readonly string[]; engaged: readonly string[] };

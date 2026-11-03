@@ -2,12 +2,12 @@
 // Phase 9 batch 4: temporary play, play from a discard pile, and delayed triggers of the starter cards.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { placeProgress } from "../rules/effect-verbs.ts";
-import { destroyCard, modifiedStat } from "../rules/keywords.ts";
-import { settle } from "../rules/machine.ts";
-import { legalIntents, type PlayerIntent } from "../rules/reduce.ts";
-import { syncConstants } from "../rules/constants.ts";
-import { spawn } from "../rules/zones.ts";
+import { placeProgress } from "../rules/interpret/effect-verbs.ts";
+import { destroyCard, modifiedStat } from "../rules/core/keywords.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { legalIntents, type PlayerIntent } from "../rules/engine/reduce.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
 import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../scripts/test-scene.ts";
 

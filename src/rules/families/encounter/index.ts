@@ -1,20 +1,20 @@
 // Rules: rr.encounter-deck, rr.reveal, rr.staging, rr.step-3-3, rr.search, rr.lasting-effects, rr.active-location,
 // rr.travel, rr.cancel (data/rules/entries.json).
 import type { Instruction } from "../../../catalog/boundary.ts";
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import { pushCardEffects } from "../../effect-frames.ts";
-import { startReveal } from "../../frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { lowerThreat, playerCardEffectCanChoose } from "../../keywords.ts";
-import { isPlayerType, printedOf } from "../../printed.ts";
-import { placeQuestProgress } from "../../quest.ts";
-import { restricted } from "../../restrictions.ts";
-import { afterProgress } from "../../stage-reveal.ts";
-import type { Modifier, ScenarioState } from "../../state.ts";
-import { inPlay, withThreat } from "../../state.ts";
-import { patchTop } from "../../windows.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { startReveal } from "../../windows/frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { lowerThreat, playerCardEffectCanChoose } from "../../core/keywords.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
+import { placeQuestProgress } from "../../quest/quest.ts";
+import { restricted } from "../../interpret/restrictions.ts";
+import { afterProgress } from "../../quest/stage-reveal.ts";
+import type { Modifier, ScenarioState } from "../../core/state.ts";
+import { inPlay, withThreat } from "../../core/state.ts";
+import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { runEncounterItem } from "./items.ts";
 import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardIn, travelThere } from "./moves.ts";

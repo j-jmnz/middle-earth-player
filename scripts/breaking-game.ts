@@ -4,12 +4,12 @@ import { buildStart } from "../src/campaign/start.ts";
 import type { LoadoutSeat } from "../src/campaign/loadout.ts";
 import { scenarioCards, type Difficulty } from "../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { characters, legalAttackEnemies } from "../src/rules/combat.ts";
-import { expectOk } from "../src/rules/fixture.ts";
-import type { EngineStep } from "../src/rules/intents.ts";
-import { definePrinted, type PrintedCard } from "../src/rules/printed.ts";
-import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/reduce.ts";
-import type { StartScenario } from "../src/rules/setup.ts";
+import { characters, legalAttackEnemies } from "../src/rules/combat/combat.ts";
+import { expectOk } from "../src/rules/core/test-fixture.ts";
+import type { EngineStep } from "../src/rules/core/intents.ts";
+import { definePrinted, type PrintedCard } from "../src/rules/core/printed.ts";
+import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../src/rules/engine/reduce.ts";
+import type { StartScenario } from "../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "./auto-player.ts";
 import { ARGONATH, breaking, campaign, PARTH_GALEN, SARN_GEBIR, STAGES_3A } from "./breaking-scene.ts";

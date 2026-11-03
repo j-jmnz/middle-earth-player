@@ -14,7 +14,7 @@ import { newSave, type StoredLoadout } from "../src/campaign/save.ts";
 import { loadWorld, logCodes } from "../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../src/catalog/version.ts";
 import { EFFECTS } from "../src/effects/index.ts";
-import { reduce, type PlayerIntent, type ScenarioState } from "../src/rules/reduce.ts";
+import { reduce, type PlayerIntent, type ScenarioState } from "../src/rules/engine/reduce.ts";
 
 import { fateWonLog, intentFor, listed } from "./e2e-raid.ts";
 import { loadCampaign, loadScenario } from "./data/load-scenarios.ts";

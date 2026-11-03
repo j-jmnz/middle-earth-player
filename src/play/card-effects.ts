@@ -4,7 +4,7 @@
 // lowered (the engine's value against the printed one), each "cannot" an effect put on it, and the effects themselves in
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { ModifierStat, ModifierUntil } from "../catalog/boundary.ts";
-import { memoOf, type StateMemo } from "../rules/constant-records.ts";
+import { memoOf, type StateMemo } from "../rules/interpret/constant-records.ts";
 import { aflameTally, burnTally } from "../rules/families/aflame/values.ts";
 import { cellOf, islandOf } from "../rules/families/island/map.ts";
 
@@ -15,11 +15,11 @@ import { AREA_APART, AREA_TOGETHER, stageLines } from "./stormcaller-words.ts";
 import { shipLoss, type ShipLoss } from "./grapple-words.ts";
 import { areaStanding } from "../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../rules/families/uncharted/limit.ts";
-import { heldBy, modifiedStat, printedStat } from "../rules/keywords.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { engagementCostOf, questPointsOf } from "../rules/quest.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { flagged, inPlay, modifierActive, type ScenarioState } from "../rules/state.ts";
+import { heldBy, modifiedStat, printedStat } from "../rules/core/keywords.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import { engagementCostOf, questPointsOf } from "../rules/quest/quest.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { flagged, inPlay, modifierActive, type ScenarioState } from "../rules/core/state.ts";
 
 import { engagesAt } from "./foresight.ts";
 import type { IconName } from "./icon-map.ts";

@@ -5,7 +5,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useStore } from "zustand";
 
-import { isOver } from "../rules/undo.ts";
+import { isOver } from "../rules/engine/undo.ts";
 
 import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "./store.ts";

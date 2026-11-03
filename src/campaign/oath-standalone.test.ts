@@ -3,8 +3,8 @@
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
 import { oathStart, oathWorld } from "../../scripts/oath-game.ts";
 import { campaign, oath } from "../../scripts/oath-scene.ts";
 

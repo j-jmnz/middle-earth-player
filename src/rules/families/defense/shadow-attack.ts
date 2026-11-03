@@ -12,12 +12,12 @@
 // If the attack's own "after" instructions are waiting, the shadow attackers start once they have run (StartShadowAttack); the rest of
 // the list goes onto each shadow attack, so several shadow attackers attack one after the other.
 import type { Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { beginEnemyAttack } from "../../combat.ts";
-import type { ScenarioState } from "../../state.ts";
-import { updateCard } from "../../state.ts";
-import { moveCard } from "../../zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { beginEnemyAttack } from "../../combat/combat.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { dealAttackShadow } from "./listen.ts";
 import { attackKey } from "../south/watcher.ts";
 

@@ -4,7 +4,7 @@
 // both sides to both.
 import type { Effect } from "../../../catalog/boundary.ts";
 
-import type { CardInstance } from "../../state.ts";
+import type { CardInstance } from "../../core/state.ts";
 
 // Cards whose face does not choose between their sides' records: a quest stage shows its side B all game and keeps the A-side lines it
 // was revealed with, and the campaign and Nightmare cards read their sides through their own zones.

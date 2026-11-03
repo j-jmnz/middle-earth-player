@@ -3,11 +3,11 @@
 // An ally that attaches itself to another ally (Wild Stallion, 19033:A:2). It stays among its player's cards in play but, being
 // attached, it is an attachment and no character: combat.ts and pick.ts read a hosted ally that way. It counts as a Restricted
 // Mount attachment through the flags its constant record gives it.
-import { enforceRestricted } from "../../attach.ts";
-import { syncConstants } from "../../constants.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import type { ScenarioState } from "../../state.ts";
+import { enforceRestricted } from "../../player/attach.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { attachSourceTo } from "../attachments/play.ts";
 import type { Focus } from "../index.ts";
 import { lastPickedCard } from "../play/refs.ts";

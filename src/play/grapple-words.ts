@@ -4,10 +4,10 @@
 import type { Instruction } from "../catalog/boundary.ts";
 import { GRAPPLE_THREAT, grappledWith } from "../rules/families/grapple/values.ts";
 import { grantedTravel, travelsOverActive } from "../rules/families/grapple/travel.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { effectsOf } from "../rules/listen.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { ReduceContext, ScenarioState } from "../rules/reduce.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { effectsOf } from "../rules/windows/listen.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import type { ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
 
 import type { ChoiceNames, PickWords } from "./choice-words.ts";
 

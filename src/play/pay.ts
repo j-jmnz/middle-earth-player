@@ -5,19 +5,19 @@
 // The reducer still checks every payment (validatePayments) and refuses a wrong one with a reason.
 import type { Effect } from "../catalog/boundary.ts";
 import { costOfKind } from "../catalog/costs.ts";
-import { playCost } from "../rules/attach.ts";
-import type { Payment } from "../rules/intents.ts";
-import type { ReduceContext } from "../rules/interpret.ts";
+import { playCost } from "../rules/player/attach.ts";
+import type { Payment } from "../rules/core/intents.ts";
+import type { ReduceContext } from "../rules/interpret/interpret.ts";
 import { allyPools, distinctRule } from "../rules/families/costs/pay.ts";
 import { openPools } from "../rules/families/misc/guards.ts";
 import { exhaustSlack } from "../rules/families/costs/play.ts";
 import { payingSlack } from "../rules/families/deck/play.ts";
 import { chosenX } from "../rules/families/misc/cost.ts";
-import { heroPays } from "../rules/payments.ts";
-import { printedOf, type Sphere } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
-import { costPayer, costSphere } from "../rules/usage.ts";
-import { topFrame } from "../rules/windows.ts";
+import { heroPays } from "../rules/player/payments.ts";
+import { printedOf, type Sphere } from "../rules/core/printed.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
+import { costPayer, costSphere } from "../rules/player/usage.ts";
+import { topFrame } from "../rules/windows/windows.ts";
 
 export type Share = { id: string; amount: number };
 

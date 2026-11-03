@@ -7,27 +7,27 @@
 // an effect plays from the hand (PlayFromHand: "play a Tactics ally from your hand, reducing its cost by 1").
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { attachmentHostIds, playCost } from "../../attach.ts";
-import { effectCause, ruleCause } from "../../cause.ts";
-import { askTarget } from "../../choices.ts";
-import { holds } from "../../conditions.ts";
-import { discountFor } from "../../cost-rules.ts";
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep, Payment, PlayerIntent } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { addModifier, raiseThreat, uniqueBlocked } from "../../keywords.ts";
+import { attachmentHostIds, playCost } from "../../player/attach.ts";
+import { effectCause, ruleCause } from "../../core/cause.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { discountFor } from "../../player/cost-rules.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep, Payment, PlayerIntent } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { addModifier, raiseThreat, uniqueBlocked } from "../../core/keywords.ts";
 import { playBlocked } from "../sidequests/contract.ts";
-import { effectsOf } from "../../listen.ts";
-import { heroPays, hasResourceMatch } from "../../payments.ts";
-import { matchesPick, pickCandidates } from "../../pick.ts";
-import { playCard } from "../../planning.ts";
-import { pickedList } from "../../player-verbs.ts";
-import { printedOf } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { ScenarioState } from "../../state.ts";
-import { livingSeats } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { gameReads } from "../../game-reads.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { heroPays, hasResourceMatch } from "../../player/payments.ts";
+import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
+import { playCard } from "../../player/planning.ts";
+import { pickedList } from "../../interpret/player-verbs.ts";
+import { printedOf } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { allyPools, cannotPay, cardRules, distinctRule, noteSpent, payerOk } from "./pay.ts";
 
 type PlayIntent = Extract<PlayerIntent, { type: "PlayCard" }>;

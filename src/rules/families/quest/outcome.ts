@@ -2,12 +2,12 @@
 // What each committed character hears when the quest resolves ("After ~ quests successfully", "After resolving a quest to which
 // ~ was committed"), and the delayed effects that wait for the players to quest successfully (19112:A:1). The committed
 // characters are read before the quest resolves, since resolving it clears their commitment.
-import { pushEffectFrame } from "../../effect-frames.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { committedWillpower, stagingThreat } from "../../quest.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats } from "../../state.ts";
+import { pushEffectFrame } from "../../interpret/effect-frames.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats } from "../../core/state.ts";
 import { queueHeard } from "./events.ts";
 
 type Result = "success" | "failure" | "tie";

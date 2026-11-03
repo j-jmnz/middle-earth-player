@@ -4,13 +4,13 @@
 // plays exactly as before.
 import type { Trigger } from "../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../intents.ts";
-import { dealOneShadow, type ReduceContext } from "../../interpret.ts";
-import { effectsOf } from "../../listen.ts";
-import { queueEvent } from "../../queue.ts";
-import { discardShadowOf } from "../../shadow.ts";
-import type { GameEvent, PendingAttack, ScenarioState } from "../../state.ts";
-import { inPlay } from "../../state.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { discardShadowOf } from "../../combat/shadow.ts";
+import type { GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
+import { inPlay } from "../../core/state.ts";
 
 // Some card in play or in a hand has a Response, Forced or triggered effect on one of these triggers.
 export function listened(state: ScenarioState, ctx: ReduceContext, triggers: readonly Trigger[]): boolean {

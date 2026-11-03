@@ -4,11 +4,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { holds } from "../rules/conditions.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { withSeat } from "../rules/state.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { holds } from "../rules/interpret/conditions.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
+import { withSeat } from "../rules/core/state.ts";
 import { OATH_GOLDENS, oathPlan, oathWorld, playGolden as playOath } from "../../scripts/oath-game.ts";
 import { CAVES_GOLDENS, cavesLoadout, cavesWorld, playGolden } from "../../scripts/nibin-dum-game.ts";
 import { campaign, cavesTable, loadCavesWorld, caves, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";

@@ -26,8 +26,8 @@ cards have no file under `src/effects/authored/families/`.
 - Read first: `CLAUDE.md`, `.cursor/rules/authority.mdc`, `.cursor/rules/code-standards.mdc`, `.cursor/rules/docs-standards.mdc`, `docs/plans/effect-authoring.md` (the cookbook; its "Mechanic
   families" section describes the files you own), `docs/architecture.md`, the phase file for a scenario phase
   (`docs/phases/phase-NN-*.md`) and `docs/phases/STATUS.md`, and the schema files `src/catalog/effect-schema*.ts`. Skim
-  `src/rules/interpret.ts`, `src/rules/effect-frames.ts`, `src/rules/triggers.ts`, `src/rules/responses.ts` and
-  `src/rules/usage.ts` to see how records run.
+  `src/rules/interpret/interpret.ts`, `src/rules/interpret/effect-frames.ts`, `src/rules/windows/triggers.ts`, `src/rules/windows/responses.ts` and
+  `src/rules/player/usage.ts` to see how records run.
 - Card text: `pnpm effects:draft <scenario-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` per card (printed lines,
   every printing's text, DragnCards' automation as a hint, related rules text, vocabulary, nearest records). Never rely on
   memory for card text or rules.
@@ -46,7 +46,7 @@ cards have no file under `src/effects/authored/families/`.
   families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>/index.ts` and helper
   modules beside it in `src/rules/families/<F>/`.
 - `src/rules/families/<F>/index.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
-  the rule ids they implement. `src/rules/general-effects.test.ts` and the `<F>/fixture.ts` helpers of the existing families
+  the rule ids they implement. `src/rules/interpret/general-effects.test.ts` and the `<F>/fixture.ts` helpers of the existing families
   show a compact table setup.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   `src/effects/authored/<scenario-id>.ts` (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`) for a scenario.
@@ -107,7 +107,7 @@ suite once at the end, and never kill processes you did not start (no `pkill`).
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
 - Full `pnpm test` once at the end (about 10 minutes). The golden snapshots in `src/campaign/golden` (the scenario games and the
   starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
-  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e-fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
+  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e-fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
 
 ## Merge
 

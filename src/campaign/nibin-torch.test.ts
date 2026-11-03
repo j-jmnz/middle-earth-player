@@ -2,15 +2,15 @@
 // it (Cavern Warg 41031, Lightless Passage 41033, Lost in the Dark 41039), and Cracked Pillar (41028), on a table of plain-number heroes (scripts/nibin-dum-scene.ts).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { legalAttackEnemies } from "../rules/combat.ts";
-import { legalIntents, legalTargets } from "../rules/legal.ts";
-import type { PlayerIntent } from "../rules/reduce.ts";
-import { ruleCause } from "../rules/cause.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { modifiedStat, placeDamage } from "../rules/keywords.ts";
-import { placeQuestProgress } from "../rules/quest.ts";
-import { expireModifiers, type ScenarioState } from "../rules/state.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { legalAttackEnemies } from "../rules/combat/combat.ts";
+import { legalIntents, legalTargets } from "../rules/engine/legal.ts";
+import type { PlayerIntent } from "../rules/engine/reduce.ts";
+import { ruleCause } from "../rules/core/cause.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { modifiedStat, placeDamage } from "../rules/core/keywords.ts";
+import { placeQuestProgress } from "../rules/quest/quest.ts";
+import { expireModifiers, type ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, travelTo, type CavesLayout, type CavesWorld } from "../../scripts/nibin-dum-scene.ts";
 import { first, send, start, type Run } from "../../scripts/past-scene.ts";

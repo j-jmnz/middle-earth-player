@@ -5,20 +5,20 @@
 // asking) and queues itself again with one damage fewer.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../amounts.ts";
-import { askTarget } from "../../choices.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { placeDamage } from "../../keywords.ts";
-import { moveCard } from "../../zones.ts";
-import { pickCandidates } from "../../pick.ts";
-import type { ScenarioState } from "../../state.ts";
-import { inPlay, livingSeats } from "../../state.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { moveCard } from "../../core/zones.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
-import { queueEvent } from "../../queue.ts";
+import { queueEvent } from "../../windows/queue.ts";
 
 type Assign = Extract<Instruction, { verb: "AssignDamage" }>;
 

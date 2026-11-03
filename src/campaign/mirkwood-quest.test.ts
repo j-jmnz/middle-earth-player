@@ -2,15 +2,15 @@
 // (data/rules/entries.json). The Passage Through Mirkwood quest: the branching stage 3, the two stage 3B cards, and Mendor.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { pushCardEffects, pushEffectFrame } from "../rules/effect-frames.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { legalIntents } from "../rules/legal.ts";
-import { settle } from "../rules/machine.ts";
-import { runInstruction } from "../rules/interpret.ts";
-import { modifiedStat } from "../rules/keywords.ts";
+import { pushCardEffects, pushEffectFrame } from "../rules/interpret/effect-frames.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { legalIntents } from "../rules/engine/legal.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { runInstruction } from "../rules/interpret/interpret.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
 import type { Instruction } from "../catalog/boundary.ts";
-import type { ReduceContext } from "../rules/reduce.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
+import type { ReduceContext } from "../rules/engine/reduce.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { causeProblems } from "../../scripts/cause-check.ts";
 import { CAMPAIGN_CARD, HERO, loadMirkwoodWorld, MENDOR, mirkwoodTable, passage, type MirkwoodLayout, type MirkwoodWorld, SPAWN, SUPPORT } from "../../scripts/mirkwood-scene.ts";
 import { codesOf, first, send, start } from "../../scripts/past-scene.ts";

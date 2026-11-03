@@ -3,20 +3,20 @@
 // locations and the encounter cards of Breaking of the Fellowship (142063 to 142090), and the families/breaking/cards.ts verbs they use.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../../fixture.ts";
-import { archeryTotal } from "../../combat.ts";
-import { holds } from "../../conditions.ts";
-import { runInstruction } from "../../interpret.ts";
-import { modifiedStat } from "../../keywords.ts";
-import { printedOf, definePrinted } from "../../printed.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../reduce.ts";
-import { restricted, defenseBlocked, travelBlocked } from "../../restrictions.ts";
-import { flagged, updateCard } from "../../state.ts";
-import { settle } from "../../machine.ts";
-import { syncConstants } from "../../constants.ts";
-import { spawn } from "../../zones.ts";
+import { expectOk } from "../../core/test-fixture.ts";
+import { archeryTotal } from "../../combat/combat.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { runInstruction } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { printedOf, definePrinted } from "../../core/printed.ts";
+import { legalIntents, legalTargets, reduce, type PlayerIntent, type ScenarioState } from "../../engine/reduce.ts";
+import { restricted, defenseBlocked, travelBlocked } from "../../interpret/restrictions.ts";
+import { flagged, updateCard } from "../../core/state.ts";
+import { settle } from "../../engine/machine.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import { spawn } from "../../core/zones.ts";
 import { revealsAllowed } from "../encounter/reveal.ts";
-import type { EngineStep } from "../../intents.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { ARGONATH, PARTH_GALEN, SARN_GEBIR, SEAT_OF_SEEING, codes, fire, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../scripts/breaking-scene.ts";
 import { first } from "../../../../scripts/past-scene.ts";
 

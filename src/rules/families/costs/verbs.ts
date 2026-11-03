@@ -6,21 +6,21 @@
 // spend any resources this round gains 1 resource") and Reattach ("attach Dúnedain Mark to another hero").
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { frameScope, refCard, resolveAmount } from "../../amounts.ts";
-import { attachmentHostIds, enforceRestricted } from "../../attach.ts";
-import { currentCause, UNATTRIBUTED } from "../../cause.ts";
-import { askTarget, openBranch } from "../../choices.ts";
-import type { EngineStep } from "../../intents.ts";
-import type { ReduceContext } from "../../interpret.ts";
-import { heroPays } from "../../payments.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { askTarget, openBranch } from "../../windows/choices.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { heroPays } from "../../player/payments.ts";
 import { mayGainResources } from "../misc/guards.ts";
-import { lastPicked, seatOf } from "../../player-verbs.ts";
-import { printedOf, type Sphere } from "../../printed.ts";
-import { queueEvent } from "../../queue.ts";
-import type { Discount, ScenarioState } from "../../state.ts";
-import { livingSeats, updateCard } from "../../state.ts";
-import { patchTop, topFrame } from "../../windows.ts";
-import { attachTo } from "../../zones.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
+import { printedOf, type Sphere } from "../../core/printed.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { Discount, ScenarioState } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { patchTop, topFrame } from "../../windows/windows.ts";
+import { attachTo } from "../../core/zones.ts";
 import { noteSpent, spentThisRound } from "./pay.ts";
 
 type Focus = { seat: number; sourceId: string | null; chosen?: string };

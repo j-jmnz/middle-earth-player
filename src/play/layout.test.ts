@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import type { CardInstance } from "../rules/state.ts";
+import type { CardInstance } from "../rules/core/state.ts";
 
 import { cardSize, handCardSize, hitBounds, MIN_TARGET, PLAY_FLOOR, shownBounds, slotBounds, tableLayout, type CardSlot, type LayoutViews, type PileViews, type Rect } from "./layout.ts";
 import { CROWDED_CANVASES, CROWDED_SCALES, crowdedTable, slotRows } from "./crowded-table.ts";

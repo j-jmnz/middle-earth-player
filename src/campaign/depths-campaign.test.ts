@@ -5,12 +5,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { campaignScenario } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { settle } from "../rules/machine.ts";
-import { attachTo, spawn } from "../rules/zones.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { attachTo, spawn } from "../rules/core/zones.ts";
 import { UPGRADED_CODES, afterFlight, depthsLoadout, depthsPlan, depthsStart, depthsWorld } from "../../scripts/depths-game.ts";
 import { CODES, campaign, depths, depthsTable, finish, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsWorld } from "../../scripts/depths-scene.ts";
 
