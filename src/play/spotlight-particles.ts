@@ -9,13 +9,13 @@ import { burnField, burnFront } from "./spotlight-burn.ts";
 export type ParticleKind = "smoke" | "converge" | "spark" | "deflect" | "ash";
 
 /** How many sprites each kind has. Smoke runs the whole attack; a charge, a strike (sparks or deflection) and a burn come one after another. */
-export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { smoke: 20, converge: 16, spark: 28, deflect: 18, ash: 36 };
+export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { smoke: 40, converge: 16, spark: 28, deflect: 18, ash: 36 };
 
 /**
  * The most sprites visible at once (the smoke, a strike, and the ash of a kill) and the Atlas draw each kind goes in: smoke, glow, sparks,
  * ash. The smoke has a draw of its own because it is dark: it is laid over the picture, where the others are added to it.
  */
-export const PARTICLE_BUDGET = 90;
+export const PARTICLE_BUDGET = 110;
 export const PARTICLE_DRAW: Readonly<Record<ParticleKind, number>> = { smoke: 0, converge: 1, spark: 2, deflect: 2, ash: 3 };
 export const ATLAS_DRAWS = 4;
 
@@ -78,7 +78,7 @@ export function ashBirth(i: number, seed: number, burnMs: number): number {
 
 /**
  * Sprite `i` of a kind at `t` ms. `smoke` is a puff that billows up slowly from around the point, swelling and thinning as it goes,
- * looping (user request, 2026-11-01: black and grey smoke, not rising sparkles); its `shade` is how light its grey is (0 black); `converge` flies in from a ring around the point to it;
+ * looping (user request, 2026-11-01: black and grey smoke, not rising sparkles); its `shade` is how light its grey is (0 black, at most 0.6); `converge` flies in from a ring around the point to it;
  * `spark` flies out from the point with drag and gravity, its streak turned along its velocity; `deflect` is a cone of the same
  * back along `at.dir`; `ash` rises from the card cell the burn front has just passed. Alpha is 0 before the sprite is born and after it dies.
  */
@@ -98,16 +98,16 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
     // A slow sideways drift that leans one way, and a curl on top of it.
     const lean = (rnd(i, 4, seed) - 0.5) * 0.3 * size * age;
     const curl = Math.sin(TAU * (age * 0.6 + rnd(i, 5, seed))) * 0.05 * size;
-    // It eases up (fast out, slow at the top), swells from a small puff to a broad one, and thins out: half-opaque at most.
+    // It eases up (fast out, slow at the top), swells from a small puff to a broad one, and thins out: seven-tenths opaque at most.
     const rise = (1 - (1 - age) * (1 - age)) * 0.45 * size;
     const swell = 1 + 1.6 * age;
     return {
       x: at.x + x0 + lean + curl,
       y: at.y + y0 - rise,
       turn: 0,
-      scale: (1.1 + 0.8 * rnd(i, 6, seed)) * swell,
-      alpha: 0.5 * Math.sin(Math.PI * age) * (1 - 0.35 * age),
-      shade: rnd(i, 7, seed),
+      scale: (1.3 + 0.9 * rnd(i, 6, seed)) * swell,
+      alpha: 0.7 * Math.sin(Math.PI * age) * (1 - 0.35 * age),
+      shade: 0.6 * rnd(i, 7, seed),
     };
   }
   if (kind === "converge") {

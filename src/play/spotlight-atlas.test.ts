@@ -88,9 +88,9 @@ describe("spriteAt", () => {
       const slot = spriteAt(0, i, { ...OFF, smokeT: 1500 }, E);
       if (slot.a === 0) continue;
       seen += 1;
-      expect(Math.max(slot.r, slot.g, slot.b)).toBeLessThanOrEqual(0.45);
+      expect(Math.max(slot.r, slot.g, slot.b)).toBeLessThanOrEqual(0.25);
       expect(Math.abs(slot.r - slot.g)).toBeLessThan(0.03);
-      expect(slot.a).toBeLessThanOrEqual(0.5);
+      expect(slot.a).toBeLessThanOrEqual(0.7);
     }
     expect(seen).toBeGreaterThan(10);
   });
