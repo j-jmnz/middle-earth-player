@@ -18,10 +18,17 @@ import { readSections, writeSection } from "./section-store";
 import { Text } from "../play/text";
 
 /** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it. */
-export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => boolean; setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void } {
+export function useFolds(): {
+  folded: (id: string, defaultFolded?: boolean) => boolean;
+  setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void;
+} {
   const { user } = useDatabases();
   const [sections, setSections] = useState<Sections>(() => readSections(user));
-  const folded = useCallback((id: string, defaultFolded = false) => isFolded(sections, id, defaultFolded), [sections]);
+  const folded = useCallback(
+    (id: string, defaultFolded = false) =>
+      isFolded(sections, id, defaultFolded),
+    [sections],
+  );
   const setFolded = useCallback(
     (id: string, next: boolean, defaultFolded = false) => {
       try {
@@ -38,12 +45,21 @@ export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => b
 }
 
 /** A foldable section. The header's testID is `section-<id>` (`testID` overrides it) and the body's is `section-<id>-body`. */
-export function FoldSection({ children, id, ...header }: FoldHeaderProps & { children: ReactNode }) {
+export function FoldSection({
+  children,
+  id,
+  ...header
+}: FoldHeaderProps & { children: ReactNode }) {
   const { folded } = header;
   return (
     <View>
       <FoldHeader id={id} {...header} />
-      <View testID={`section-${id}-body`} style={folded ? { display: "none" } : undefined} accessibilityElementsHidden={folded} importantForAccessibility={folded ? "no-hide-descendants" : "auto"}>
+      <View
+        testID={`section-${id}-body`}
+        style={folded ? { display: "none" } : undefined}
+        accessibilityElementsHidden={folded}
+        importantForAccessibility={folded ? "no-hide-descendants" : "auto"}
+      >
         {children}
       </View>
     </View>
@@ -58,15 +74,31 @@ export type FoldHeaderProps = {
   // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
   count?: number;
   unit?: string;
+  // Words beside the title while folded, in place of the count (a seat's deck and state); `attention` sets them in danger.
+  summary?: string;
+  attention?: boolean;
   testID?: string;
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, testID }: FoldHeaderProps) {
+export function FoldHeader({
+  id,
+  title,
+  folded,
+  onFold,
+  count,
+  unit,
+  summary,
+  attention,
+  testID,
+}: FoldHeaderProps) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const counted = count == null ? null : unit ? plural(count, unit) : String(count);
+  const counted =
+    summary ??
+    (count == null ? null : unit ? plural(count, unit) : String(count));
+  const countedTone = attention ? "text-danger" : "text-muted";
   return (
     // The heading is the row, so screen-reader heading navigation lands on it and the button stays inside.
     <View accessibilityRole="header" className="flex-row items-center">
@@ -78,22 +110,41 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, testID }: F
         accessibilityLabel={foldWords(title, folded, counted)}
         onPress={() => {
           onFold(!folded);
-          AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
+          AccessibilityInfo.announceForAccessibility(
+            `${title} ${folded ? "unfolded" : "folded"}`,
+          );
         }}
         className="flex-1"
       >
         {/* The pressed fill is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
         {({ pressed }) => (
-          <View className="min-h-touch justify-center rounded-item" style={textSurface(pressed, t)}>
+          <View
+            className="min-h-touch justify-center rounded-item"
+            style={textSurface(pressed, t)}
+          >
             <View className="flex-row items-center gap-3">
               <View className="w-3 items-center">
-                <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
+                <Chevron
+                  direction={folded ? "right" : "down"}
+                  color={palette.moon}
+                  size={8}
+                />
               </View>
-              <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
+              <Text
+                className="shrink font-display text-moon"
+                style={sectionTitleStyle(s)}
+              >
                 {title}
               </Text>
               <View className="min-w-3 flex-1" />
-              {folded && counted != null ? <Text className="pr-1 text-label text-muted">{counted}</Text> : null}
+              {folded && counted != null ? (
+                <Text
+                  numberOfLines={summary != null ? 1 : undefined}
+                  className={`pr-1 text-label ${countedTone} ${summary != null ? "shrink" : ""}`}
+                >
+                  {counted}
+                </Text>
+              ) : null}
             </View>
           </View>
         )}
