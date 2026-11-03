@@ -20,15 +20,31 @@ export const TITLE_CHAR_PT = 10.6;
 export const LABEL_CHAR_PT = 6.6;
 // The "i" button's width (26 pt) and its gap beside a line or a title.
 export const PILL_PT = 32;
-// The room kept for one row of the choice, under the title, when it is open in the dock (a row is 48 pt, with its gap): the words are
-// budgeted against it whatever the screen's height.
-export const TRAY_ROOM_PX = 52;
 // A short phone's screen height under which the dock is dense; the choice tray's dense tiles use the same line.
 export const DENSE_BELOW = 400;
+// A card's picture in a card list and in the choice's rows (docs/design-system-table.md, Choice tray, Reading panels): the table's card on a
+// tablet, smaller on a phone, where a list would otherwise hold about three rows and the choice's one row would crowd the dock.
+export const LIST_PICTURE = { w: 51, h: 71 };
+export const LIST_PICTURE_SMALL = { w: 34, h: 47 };
+// The least room one row of the choice takes, its picture with the row's padding and gap (choice/tray.tsx, sheet-paper.tsx Tile: up to 3.5 pt
+// above and below and a 5.25 pt gap at the phone's rem): the words are budgeted against it while the rows are open, and the rows always keep it.
+// The small picture is sized so that one row with a detail line, the longest caution armed and one title line fit the dock at 667 x 375.
+export const TRAY_ROW_PX = 84;
+export const TRAY_ROW_SMALL_PX = 59;
 
 /** Whether a screen `height` tall is a short phone's: the logical height, at the UI scale, is under DENSE_BELOW. */
 export function isDense(height: number, scale = 1): boolean {
   return height / scale < DENSE_BELOW;
+}
+
+/** Whether a card list and the choice's rows draw the small picture: a phone, by its real height or its logical height at the UI scale. */
+export function smallPictures(height: number, scale = 1): boolean {
+  return height < DENSE_BELOW || isDense(height, scale);
+}
+
+/** The least room the choice's rows keep (Medium's points, times the scale where it is used): one row of the picture size in use. */
+export function trayRoom(small: boolean): number {
+  return small ? TRAY_ROW_SMALL_PX : TRAY_ROW_PX;
 }
 
 /** The height of the words' window: the dock's room (the column less its padding) less its measured pinned block. */

@@ -15,3 +15,9 @@ export function kindWords(printed: Pick<PrintedCard, "type" | "sphere"> | undefi
 export function victoryWords(kind: string | null, points: number): string {
   return kind ? `${kind} · ${points} VP` : `${points} VP`;
 }
+
+/** What a screen reader hears of that line: "Enemy, 4 victory points" (it would spell "VP" out). */
+export function victorySaid(kind: string | null, points: number): string {
+  const said = `${points} victory ${points === 1 ? "point" : "points"}`;
+  return kind ? `${kind}, ${said}` : said;
+}

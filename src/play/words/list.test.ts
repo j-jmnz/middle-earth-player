@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { kindWords, victoryWords } from "./list.ts";
+import { kindWords, victorySaid, victoryWords } from "./list.ts";
 
 describe("kindWords", () => {
   it("names the type and the sphere", () => {
@@ -13,5 +13,7 @@ describe("kindWords", () => {
   it("adds the Victory points on the victory list", () => {
     expect(victoryWords("Enemy", 4)).toBe("Enemy · 4 VP");
     expect(victoryWords(null, 1)).toBe("1 VP");
+    expect(victorySaid("Enemy", 4)).toBe("Enemy, 4 victory points");
+    expect(victorySaid(null, 1)).toBe("1 victory point");
   });
 });

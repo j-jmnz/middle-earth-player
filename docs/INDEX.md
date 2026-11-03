@@ -104,7 +104,7 @@ Read the sections your task touches.
   - 838–863 Persistence and shipping (~1.7K)
   - 864–904 Screens (~4.4K) ← 2
     - 890–904 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~27.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~27.2K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -116,7 +116,7 @@ Read the sections your task touches.
   - 80–85 The Sailing test (~690) ← 5
   - 86–99 The Island Map (~1.7K) ← 8
   - 100–103 Tokens and effects (~320)
-  - 104–114 Piles (~1.1K) ← 4
+  - 104–114 Piles (~1.2K) ← 4
   - 115–120 Marks of the open moment (~400) ← 1
   - 121–188 Motion (~2.7K) ← 8
   - 189–215 Spotlight (~2.2K) ← 16
@@ -128,7 +128,7 @@ Read the sections your task touches.
   - 252–255 One answer, one tap (~240)
   - 256–259 Stops and Always use (~250)
   - 260–263 Guide (~120)
-  - 264–273 Choice tray (~820) ← 2
+  - 264–273 Choice tray (~850) ← 3
   - 274–286 Reading panels (~1.2K) ← 5
   - 287–296 Phase carousel (~680)
   - 297–302 Quest advance (~530) ← 1
@@ -342,7 +342,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: architecture.md, Tests (1)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
-- `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); design-system-table.md, Reading panels (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system-table.md, Choice tray (2); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
+- `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); design-system-table.md, Reading panels (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Choice tray (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
 - `src/rules`: brief.md, The engine plays the game (2); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Components (5); design-system.md, Briefing (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `src/ui`: design-system.md, Components (3); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)

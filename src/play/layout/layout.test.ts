@@ -562,6 +562,20 @@ describe("the victory pile", () => {
     }
   });
 
+  it("leaves the second slot at the canvas's right end, so the engagement area loses only the encounter pair's width", () => {
+    for (const canvas of PHONES) {
+      const { views: v, piles } = views(5);
+      const corsair = { corsairDeck: { pile: "corsairDeck", seat: 0, ids: ["k"], top: null }, corsairDiscard: { pile: "corsairDiscard", seat: 0, ids: [], top: null } } satisfies Partial<PileViews>;
+      const without = tableLayout(canvas.width, canvas.height, v, { ...piles, ...corsair });
+      const layout = tableLayout(canvas.width, canvas.height, v, { ...piles, ...corsair, victory });
+      expect(layout.piles.corsairDeck).toEqual(without.piles.corsairDeck);
+      expect(layout.piles.corsairDiscard).toEqual(without.piles.corsairDiscard);
+      expect(layout.zones.engaged.w).toBe(without.zones.engaged.w);
+      const discard = layout.piles.corsairDiscard as Rect;
+      expect(discard.x + discard.w).toBe((layout.piles.victory as Rect).x + (layout.piles.victory as Rect).w);
+    }
+  });
+
   it("carries the fanned pictures and its Victory points", () => {
     const { views: v, piles } = views(5);
     const slot = tableLayout(591, 338, v, { ...piles, victory }).slots.find((s) => s.id === "pile:victory");

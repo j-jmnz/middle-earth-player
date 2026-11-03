@@ -365,12 +365,14 @@ export function tableLayout(
   const encounterDeck: Rect = { x: width - rightGutter - victoryW - encounterW, y: pileY, w: pile.w, h: pile.h };
   const victory: Rect = { x: width - rightGutter - pile.w, y: pileY, w: pile.w, h: pile.h };
   const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
-  // The second slot of piles (a scenario with a second deck: the Corsair pair) stands under the encounter pair, at the right end of the engagement area, as wide as the pair;
-  // the engagement area narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
+  // The second slot of piles (a scenario with a second deck: the Corsair pair) stands at the right end of the engagement area, as wide as the encounter pair and
+  // right-aligned with the canvas (under the encounter pair, or under the encounter discard pile and the victory display while that is out); the engagement area
+  // narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
   const second = piles.corsairDeck != null || piles.corsairDiscard != null || piles.unchartedDeck != null;
   const secondY = engagedY + Math.round((card.h - pile.h) / 2);
-  const corsairDeck: Rect = { x: encounterDeck.x, y: secondY, w: pile.w, h: pile.h };
-  const corsairDiscard: Rect = { x: encounterDiscard.x, y: secondY, w: pile.w, h: pile.h };
+  const secondX = width - rightGutter - encounterW;
+  const corsairDeck: Rect = { x: secondX, y: secondY, w: pile.w, h: pile.h };
+  const corsairDiscard: Rect = { x: secondX + pile.w + gap, y: secondY, w: pile.w, h: pile.h };
   const unchartedDeck = corsairDeck;
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
@@ -385,7 +387,7 @@ export function tableLayout(
   const deck: Rect = { x: leftX, y: playY + Math.round((card.h - pile.h) / 2), w: pile.w, h: pile.h };
   const discard: Rect = { x: leftX + pile.w + gap, y: deck.y, w: pile.w, h: pile.h };
 
-  const engaged: Rect = { x: centerX, y: engagedY, w: second ? Math.max(card.w, centerW - encounterW - victoryW - gap) : centerW, h: engagedH };
+  const engaged: Rect = { x: centerX, y: engagedY, w: second ? Math.max(card.w, centerW - encounterW - gap) : centerW, h: engagedH };
   const play: Rect = { x: centerX, y: playY, w: centerW, h: playH };
   const hand: Rect = { x: gutter, y: handY, w: width - 2 * gutter, h: height - handY };
 

@@ -4,10 +4,11 @@
 // closes on a tap outside. The card lists stand on night, each card as the table draws it; the log and the threat panel stay on paper:
 // they are what gets read and recorded; the settings panel is on night like the Settings tab. Nothing here sends an intent but a playable
 // discard card's play, which the table's own pick sends.
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
+import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures } from "../choice/dock/budget.ts";
 import { chipOnSurface, dropShadowOf } from "../../ui/surfaces.ts";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
@@ -34,11 +35,11 @@ function PanelClose({ testID, onPress, paper = true }: { testID: string; onPress
   );
 }
 
-/** A card in a list: its name, the line under it (its type and sphere), and its picture (null for a facedown card or while none is known). */
-export type ListCard = { id: string; label: string; detail?: string | null; picture: PictureSource | null; pictureKey: string };
-
-// A list card's picture: the table's card (51 by 71 at Medium), its corners rounded like a card's. A facedown card or a missing file is a raised plate.
-const LIST_CARD = { w: 51, h: 71 };
+/**
+ * A card in a list: its name, the line under it (its type and sphere), what a screen reader hears of that line when it differs ("4 victory
+ * points" for "4 VP"), and its picture (null for a facedown card or while none is known).
+ */
+export type ListCard = { id: string; label: string; detail?: string | null; said?: string; picture: PictureSource | null; pictureKey: string };
 
 /**
  * One card of a list, on the night panel (docs/design-system-table.md, Reading panels): its picture as the table draws it, its name in
@@ -48,15 +49,19 @@ const LIST_CARD = { w: 51, h: 71 };
 function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListCard; playable: boolean; testID: string; onPress: () => void; onLongPress?: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const w = LIST_CARD.w * s;
-  const h = LIST_CARD.h * s;
+  // The table's card on a tablet, the smaller picture on a phone, as the choice's rows (dock/budget.ts, smallPictures); a card's corners. A facedown
+  // card or a missing file is a raised plate.
+  const box = smallPictures(useWindowDimensions().height, s) ? LIST_PICTURE_SMALL : LIST_PICTURE;
+  const w = box.w * s;
+  const h = box.h * s;
   const detail = playable ? "Playable now · tap to play" : (card.detail ?? null);
+  const said = playable ? detail : (card.said ?? detail);
   return (
     <Pressable
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: playable }}
-      accessibilityLabel={[card.label, detail].filter(Boolean).join(". ")}
+      accessibilityLabel={[card.label, said].filter(Boolean).join(". ")}
       accessibilityHint={playable ? "Tap to play it. Hold to read the card" : "Shows the card"}
       onPress={onPress}
       onLongPress={onLongPress}
@@ -66,7 +71,7 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
           className="mb-1 flex-row items-center rounded-item px-1.5 py-1"
           style={{ gap: 12 * s, minHeight: touch(s, 48), ...(pressed ? { backgroundColor: t.pressed } : playable ? chipOnSurface(t) : { backgroundColor: "transparent" }) }}
         >
-          <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), ...(playable ? { boxShadow: `0 0 0 2px ${t.glow}, 0 0 12px 2px ${withAlphaHex(t.glow, 0.55)}` } : { boxShadow: dropShadowOf(t, 3, 8, 0.8) }) }}>
+          <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), ...(playable ? { boxShadow: `0 0 0 2px ${t.accent}, 0 0 12px 2px ${withAlphaHex(t.accent, 0.55)}` } : { boxShadow: dropShadowOf(t, 3, 8, 0.8) }) }}>
             {card.picture ? (
               <CardImage source={card.picture} recyclingKey={`${card.pictureKey}:list`} width={w} height={h} />
             ) : (

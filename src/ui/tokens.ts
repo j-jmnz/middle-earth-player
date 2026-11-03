@@ -45,6 +45,9 @@ export const tableTokens = {
   shade: "#000000",
   primaryTop: "#EEF5EA",
   primaryMid: "#B2C3AD",
+  // Not a palette key: the victory pile's gold coin, under ink numbers (canvas/pieces.native.tsx). Light's is paler than its bronze
+  // fellowship, so the ink number keeps 4.5:1 (5.9:1 here, 7.4:1 on Dark).
+  coin: "#C9A961",
 } as const;
 
 export type TableToken = keyof typeof tableTokens;
@@ -91,6 +94,7 @@ const lightTableTokens: TableTokens = {
   shade: "#3C3228",
   primaryTop: "#3F5A4B",
   primaryMid: "#253A2F",
+  coin: "#B8964E",
 };
 
 export const tableTokensByTheme: { readonly dark: TableTokens; readonly light: TableTokens } = { dark: tableTokens, light: lightTableTokens };

@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { armedLines, armedRoom, armedWords } from "./armed-room.ts";
-import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, PILL_PT, planWords, titleLinesOf, TITLE_PX, TRAY_ROOM_PX, wordsWindow } from "./budget.ts";
+import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, LIST_PICTURE, LIST_PICTURE_SMALL, PILL_PT, planWords, smallPictures, titleLinesOf, TITLE_PX, trayRoom, wordsWindow } from "./budget.ts";
 import { dockLines } from "./lines.ts";
 
 // The dense dock's budget (phase 22): one title line and the folded line stay in view in the worst dock at 667x375 and 844x390.
@@ -77,7 +77,7 @@ describe("the dense dock's words window", () => {
   });
 });
 
-// The choice's rows open in the dock: the words cannot shrink (the rows keep one row of room, TRAY_ROOM_PX), so the title is budgeted against
+// The choice's rows open in the dock: the words cannot shrink (the rows keep one row of room, trayRoom: the small picture on a phone), so the title is budgeted against
 // what is left on every screen, dense or not. The pinned block is the sizes the components draw: a taller screen's dock has a 46 pt primary
 // and two 44 pt rows under a readout of a 30 pt numbers row and a three-line result; the dense one's result is one line (18 pt).
 describe("the words window with the choice's rows open", () => {
@@ -86,9 +86,9 @@ describe("the words window with the choice's rows open", () => {
     const readout = dense ? 30 + LABEL_PX : 30 + 3 * LABEL_PX;
     const buttons = dense ? BUTTONS : 46 + 44 + 44;
     const pinned = readout + 2 + armedRoom(armed, dense) + buttons;
-    const space = wordsWindow({ room: column(height), block: pinned + TRAY_ROOM_PX, dense });
+    const space = wordsWindow({ room: column(height), block: pinned + trayRoom(true), dense });
     const plan = planWords({ space, dense, clamp: true, title: LONG, textWidth: 168, hasLine: false, foldable: true });
-    const used = plan.titleLines * TITLE_PX + pinned + TRAY_ROOM_PX + (dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX);
+    const used = plan.titleLines * TITLE_PX + pinned + trayRoom(true) + (dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX);
     return { plan, used, room: column(height) };
   };
 
@@ -132,5 +132,20 @@ describe("the \"i\" popover's room", () => {
     const rows = [lines.first, ...lines.rest].reduce((sum, line) => sum + Math.ceil((line?.text.length ?? 0) / chars), 0);
     const height = 2 * TITLE_PX + 3 * 4 + rows * LABEL_PX + 10;
     expect(height, `${rows} rows in ${place.width} pt`).toBeLessThanOrEqual(place.maxHeight - 12);
+  });
+});
+
+describe("the picture size of the lists and the choice's rows", () => {
+  it("is small on a phone at every scale and the table's card on a tablet", () => {
+    expect(smallPictures(390, 1)).toBe(true);
+    expect(smallPictures(390, 0.875)).toBe(true);
+    expect(smallPictures(375, 1.15)).toBe(true);
+    expect(smallPictures(700, 1)).toBe(false);
+    expect(smallPictures(440, 1.15)).toBe(true);
+  });
+
+  it("keeps one row of the picture in use, padding and gap included", () => {
+    expect(trayRoom(true)).toBeGreaterThanOrEqual(LIST_PICTURE_SMALL.h + 12);
+    expect(trayRoom(false)).toBeGreaterThanOrEqual(LIST_PICTURE.h + 12);
   });
 });

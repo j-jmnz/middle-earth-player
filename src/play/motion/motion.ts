@@ -181,7 +181,7 @@ export function motionsBetween(
       const discarded = zone != null && isDiscardPile(zone as PileId) && slot.zone !== "hand" && slot.success == null;
       ghosts.push({ slot, dx: b.x - a.x, dy: b.y - a.y, scale: pile.w / Math.max(1, slot.w), rot: 0, leave: discarded ? "shake" : "glide" });
     } else {
-      // The victory display, set aside, out of play: it fades where it stood.
+      // A place with no pile on the table (set aside, removed from the game, out of play): it fades where it stood. The victory display is a pile, so a card going there glides to it.
       ghosts.push({ slot, dx: 0, dy: 0, scale: 0.85, rot: slotRotation(slot), leave: "fade" });
     }
   }
