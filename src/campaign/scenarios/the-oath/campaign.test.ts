@@ -18,7 +18,7 @@ import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden as playDolGuldur } from 
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { OATH_GOLDENS, oathLoadout, oathWorld } from "../../../../test/scenarios/the-oath/game.ts";
 import { campaign, loadOathWorld, oathTable, type OathWorld } from "../../../../test/scenarios/the-oath/scene.ts";
-import { first, send, start } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../../test/harness/scene-kit.ts";
 
 import { checklist } from "../../checklist.ts";
 import { resolutionView, settledSentence } from "../../resolution-view.ts";

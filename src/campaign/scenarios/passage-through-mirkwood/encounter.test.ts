@@ -16,7 +16,8 @@ import { pickCandidates } from "../../../rules/interpret/pick.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { HERO, HERO2, loadMirkwoodWorld, mirkwoodTable, type MirkwoodLayout, type MirkwoodWorld } from "../../../../test/scenarios/passage-through-mirkwood/scene.ts";
-import { codesOf, first, reveal, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf, reveal } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: MirkwoodWorld;
 

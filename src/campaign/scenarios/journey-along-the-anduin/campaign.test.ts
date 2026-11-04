@@ -24,7 +24,7 @@ import { anduin, anduinTable, campaign, fight, loadAnduinWorld, MENDOR, type And
 import { MIRKWOOD_GOLDENS, mirkwoodWorld, playGolden as playPassage } from "../../../../test/scenarios/passage-through-mirkwood/game.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
-import { first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 
 import { checklist } from "../../checklist.ts";
 import { resolutionView, settledSentence } from "../../resolution-view.ts";

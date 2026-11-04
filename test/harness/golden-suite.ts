@@ -20,7 +20,7 @@ export type SuiteGolden<D extends string> = CampaignGoldenBase & { name: string;
 
 export type WonGame<G> = { state: ScenarioState; golden: G; world: SuiteWorld; log: CampaignLog; path: readonly PathNode[] };
 
-export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string> = {
+export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extends PlayedGame = PlayedGame> = {
   /** The scenario's name, as the suite's title reads it. */
   title: string;
   /** The golden.json beside the test: `new URL("./golden.json", import.meta.url).pathname`. */
@@ -29,31 +29,41 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string> = {
   scenario: ScenarioData;
   goldens: readonly G[];
   world: (decks: D) => Promise<SuiteWorld>;
-  play: (golden: G, ctx: ReduceContext) => PlayedGame;
+  play: (golden: G, ctx: ReduceContext) => P;
   /** The Setup's questions: the option each takes (the first by default) and how many it may ask (40). */
   pick?: (options: readonly string[]) => string;
   guard?: number;
   /** The opening test's title and what it asserts of the game started and its Setup played. */
   opening: { title: string; check: (state: ScenarioState, golden: G, world: SuiteWorld) => void };
   /** The tail of each won test's title, after the golden's name. */
-  wins: string;
+  wins: string | ((golden: G) => string);
   /** What a won game shows before its Resolution runs (the stage it ended on, the cards it earned). */
   won: (state: ScenarioState, golden: G, world: SuiteWorld) => void;
-  /** The XP the campaign card's list awards, counted from the final state. */
-  expectedXp: (state: ScenarioState, golden: G, world: SuiteWorld) => number;
+  /** The XP the campaign card's list awards, counted from the final state (absent in a campaign without XP). */
+  expectedXp?: (state: ScenarioState, golden: G, world: SuiteWorld) => number;
   /** The log the Resolution is written onto: the earlier parts completed, or this one when it must carry more (the pool). */
-  before?: (golden: G) => CampaignLog;
+  before?: (golden: G, game: P) => CampaignLog;
+  /** What a lost game shows besides nothing being written. */
+  lost?: (state: ScenarioState, golden: G, world: SuiteWorld, game: P) => void;
+  /** The cause test's title when it says more, and what it also checks of each game. */
+  causeTitle?: string;
+  cause?: (game: P, golden: G) => void;
   /** What the log and the path show once the Resolution is written. */
   afterWin?: (won: WonGame<G>) => void;
   /** The status of the part after this one on the path ("current" unless it is coming soon). */
   next?: "current" | "soon";
   /** The scenario's own tests, registered after the cause test. */
-  checks?: (suite: { game: (golden: G) => PlayedGame; world: (golden: G) => SuiteWorld; opened: (golden: G) => ScenarioState }) => void;
+  checks?: (suite: { game: (golden: G) => P; world: (golden: G) => SuiteWorld; opened: (golden: G) => ScenarioState }) => void;
 };
 
-export function goldenSuite<G extends SuiteGolden<D>, D extends string>(spec: GoldenSuiteSpec<G, D>): void {
+/** The log of a campaign whose parts before this scenario were won (nothing else written). */
+export function logBefore(campaign: CampaignData, scenario: ScenarioData, seatCount: 1 | 2): CampaignLog {
+  return { ...emptyLog(seatCount), completed: campaign.scenarios.slice(0, campaign.scenarios.indexOf(scenario.id)) };
+}
+
+export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extends PlayedGame = PlayedGame>(spec: GoldenSuiteSpec<G, D, P>): void {
   const worlds = new Map<D, SuiteWorld>();
-  const games = new Map<string, PlayedGame>();
+  const games = new Map<string, P>();
   const index = spec.campaign.scenarios.indexOf(spec.scenario.id);
 
   beforeAll(async () => {
@@ -65,7 +75,7 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string>(spec: Go
     }
   }, 240_000);
 
-  const game = (golden: G): PlayedGame => games.get(golden.name)!;
+  const game = (golden: G): P => games.get(golden.name)!;
   const worldOf = (golden: G): SuiteWorld => worlds.get(golden.decks)!;
 
   // The opening: the game started and the Setup played, every question answered.
@@ -93,14 +103,17 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string>(spec: Go
       for (const golden of spec.goldens) spec.opening.check(opened(golden), golden, worldOf(golden));
     });
 
-    it("names a cause for every number a step changes", () => {
-      for (const golden of spec.goldens) expect(causeProblems(game(golden).steps), golden.name).toEqual([]);
+    it(spec.causeTitle ?? "names a cause for every number a step changes", () => {
+      for (const golden of spec.goldens) {
+        expect(causeProblems(game(golden).steps), golden.name).toEqual([]);
+        spec.cause?.(game(golden), golden);
+      }
     });
 
     spec.checks?.({ game, world: worldOf, opened });
 
     for (const golden of spec.goldens.filter((item) => item.outcome === "won")) {
-      it(`${golden.name}: ${spec.wins}`, () => {
+      it(`${golden.name}: ${typeof spec.wins === "function" ? spec.wins(golden) : spec.wins}`, () => {
         const { state } = game(golden);
         const world = worldOf(golden);
         expect(state.lost).toBe(false);
@@ -108,17 +121,19 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string>(spec: Go
         expect(state.failure).toBeNull();
         expect(state.window).toBeNull();
         spec.won(state, golden, world);
-        const xp = spec.expectedXp(state, golden, world);
-        expect(state.resolutionLog.xp).toBe(xp);
+        const xp = spec.expectedXp?.(state, golden, world);
+        if (xp != null) expect(state.resolutionLog.xp).toBe(xp);
         const earlier = spec.campaign.scenarios.slice(0, index);
-        const before = spec.before ? spec.before(golden) : golden.after ? { ...emptyLog(golden.seatCount), completed: earlier } : emptyLog(golden.seatCount);
+        const before = spec.before ? spec.before(golden, game(golden)) : golden.after ? { ...emptyLog(golden.seatCount), completed: earlier } : emptyLog(golden.seatCount);
         const log = applyResolution(before, state.scenarioId, state, world.cards);
         expect(log.completed).toEqual([...before.completed, spec.scenario.id]);
-        expect(log.xpGained[spec.scenario.id]).toBe(xpAwarded(xp));
+        if (xp != null) expect(log.xpGained[spec.scenario.id]).toBe(xpAwarded(xp));
         expect(log.modes).toEqual(golden.mode ? { [spec.scenario.id]: golden.mode } : {});
         // The part after this one is the one the path offers now.
         const path = campaignPath(spec.campaign, {}, { ...log, completed: spec.campaign.scenarios.slice(0, index + 1) });
-        expect(path.map((node) => node.status).slice(0, index + 2)).toEqual([...Array.from({ length: index + 1 }, () => "completed"), spec.next ?? "current"]);
+        // The last part of a campaign has none after it.
+        const last = index + 1 >= spec.campaign.scenarios.length;
+        expect(path.map((node) => node.status).slice(0, index + 2)).toEqual([...Array.from({ length: index + 1 }, () => "completed"), ...(last ? [] : [spec.next ?? "current"])]);
         expect(path[index + 1]?.id).toBe(spec.campaign.scenarios[index + 1]);
         expect(spec.campaign.scenarios[index]).toBe(spec.scenario.id);
         spec.afterWin?.({ state, golden, world, log, path });
@@ -136,6 +151,7 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string>(spec: Go
         expect(state.resolutionLog.xp).toBeUndefined();
         const log = emptyLog(golden.seatCount);
         expect(applyResolution(log, state.scenarioId, state, cards)).toBe(log);
+        spec.lost?.(state, golden, worldOf(golden), game(golden));
       });
     }
   });

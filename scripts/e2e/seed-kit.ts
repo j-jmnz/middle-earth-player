@@ -67,6 +67,14 @@ export type SeedSpec<S extends 1 | 2> = {
   campaignId: string;
   scenarioId: string;
   seatCount: S;
+  /** The saved decklists the seats play (the first seat's, then the second's), or the loadout already built from them (heroes replaced, choices made). */
+  decks?: readonly string[];
+  loadout?: StoredLoadout;
+  /** The most intents a game takes, and the most seeds `firstSeed` tries (100) unless its environment variable says. */
+  limit?: number;
+  seeds?: number;
+  /** Cards the world loads besides the decklists' and the log's (the campaign card's pool cards). */
+  codes?: readonly string[];
   /** The log of the parts won before, when the scenario is dealt from one. */
   log?: CampaignLog;
   /** The answers the loadout gives to the Campaign Setup. */
@@ -83,11 +91,11 @@ export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Seed
   const campaign = loadCampaign(spec.campaignId);
   const scenario = loadScenario(spec.scenarioId);
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = FIXTURE_DECKS.slice(0, spec.seatCount).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
-  const loadout: StoredLoadout = { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [...(spec.choices ?? [])], acceptPenalty: false };
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...(spec.log ? logCodes(spec.log) : [])]);
+  const seats = (spec.decks ?? FIXTURE_DECKS).slice(0, spec.seatCount).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
+  const loadout: StoredLoadout = spec.loadout ?? { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [...(spec.choices ?? [])], acceptPenalty: false };
+  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...(spec.log ? logCodes(spec.log) : []), ...(spec.codes ?? [])]);
   const save = newSave("fixture", campaign.id, spec.seatCount);
-  return { loadout, ...playDealt(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed, 8000, spec.answer, spec.stop) };
+  return { loadout, ...playDealt(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed, spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
 /**
@@ -95,7 +103,7 @@ export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Seed
  * warning, when none is.
  */
 export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): SeedFixture<S> | null {
-  const limit = Number(process.env[seedsVar] ?? 100);
+  const limit = Number(process.env[seedsVar] ?? spec.seeds ?? 100);
   for (let seed = 1; seed <= limit; seed += 1) {
     const game = playSeed(spec, seed);
     const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";

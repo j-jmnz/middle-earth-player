@@ -1,25 +1,20 @@
-import { checklist } from "../../../src/campaign/checklist.ts";
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
-import { buildStart } from "../../../src/campaign/start.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts } from "../../../src/rules/core/campaign-state.ts";
 import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { caves, campaign, CHIEFTAIN, NO_TIME, PILLAR, RANGER_SENSE } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
+import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame, STRONG_HEROES as HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Caves of Nibin-Dûm in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too
 // small to quest, or too brittle to survive an attack), and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on
 // player card play. Each seat is dealt a "No Time to Waste!" after its mulligan (the campaign card's Setup), Shiny Distraction is shuffled into the encounter deck,
 // and the Cave Torch is attached to a hero by the first quest card's Setup. The policy wears Cracked Pillar down in the combat phase and travels to it (stage 3),
 // keeps the Goblin Chieftain from taking progress off the quest, and kills it once stage 4 holds 8 progress.
-export const HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
+export { HEROES };
 export const CAVES_POLICY: PolicyOptions = { scout: "", prefer: PILLAR, protect: "", play: true, act: true };
 // "strong": big-number heroes. "steady": heroes that quest for little, so the scenario takes many rounds. "weak": heroes too small to quest, so the
 // players lose on threat. "brittle": strong quest and attack with a few hit points and no Defense, so an enemy's attack destroys a hero.
@@ -28,56 +23,12 @@ export type CavesDecks = "strong" | "steady" | "weak" | "brittle" | "tense";
 
 export const cavesLoadout = fillerLoadout;
 
-const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
-const STRONG_STATS = { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-const STEADY_STATS = { threat: 3, willpower: 6, attack: 12, defense: 6, health: 100 } as const;
-const BRITTLE_STATS = { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 } as const;
-const TENSE_STATS = { threat: 14, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-const STATS = { strong: STRONG_STATS, steady: STEADY_STATS, weak: WEAK_STATS, brittle: BRITTLE_STATS, tense: TENSE_STATS } as const;
+const game = campaignGame<CavesDecks, CavesPolicy>({ campaign, scenario: caves, stats: HERO_STATS, codes: [RANGER_SENSE], intent: cavesIntent, policy: { boon: "keep" }, limit: 8000, upgraded: [] });
 
-export async function cavesWorld(decks: CavesDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [...scenarioCards(caves).map((card) => card.code), ...caves.campaignPlaced, caves.campaignCard, RANGER_SENSE];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  LOADED = cards;
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
+export const cavesWorld = (decks: CavesDecks = "strong") => game.world(decks);
+export const cavesPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
+export const cavesStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario => game.start(seatCount, seed, difficulty, facts, log);
 
-// The cards of the last world built: the checklist reads the pool cards' printed data.
-let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
-
-// The scenario dealt through the Campaign Setup Checklist: each seat's "No Time to Waste!" is added after its mulligan, Shiny Distraction joins the encounter deck,
-// and the pool a log carries is dealt with it.
-export function cavesPlan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) {
-  if (!LOADED) throw new Error("Build the world first (cavesWorld)");
-  const plan = checklist({ log, scenario: caves, seats: cavesLoadout(seatCount), effects: EFFECTS, cards: LOADED });
-  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
-  return plan;
-}
-
-export function cavesStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario {
-  const plan = cavesPlan(seatCount, log);
-  return buildStart({
-    campaign,
-    scenario: caves,
-    seatCount,
-    seed,
-    threatModifier: plan.threatModifier,
-    seats: plan.seats,
-    effects: EFFECTS,
-    difficulty,
-    poolEncounterCards: plan.poolEncounterCards,
-    poolIntoPlay: plan.poolIntoPlay,
-    ...(facts ? { facts } : {}),
-  });
-}
-
-// The auto-player's answer (test/harness/auto-player.ts), except where the auto-player alone always declines: in a player attack window every ready character that
-// can attack the target attacks together (Cracked Pillar until it holds 4 damage on stage 3, else the first enemy it can reach), and in the optional engagement
-// step the seat engages one enemy at a time. Every intent is one the reducer listed.
-// `boon: "play"`: each seat plays its "No Time to Waste!" in the quest phase, before it commits (the first Action offered: threat down by 3, a card revealed, the card
-// gone from the game and the Campaign Pool); `"keep"`: it stays in hand.
 export type CavesPolicy = { boon: "play" | "keep" };
 
 export function cavesIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: CavesPolicy = { boon: "keep" }): PlayerIntent {
@@ -143,8 +94,7 @@ export type CavesGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playCaves(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount), policy: CavesPolicy = { boon: "keep" }, limit = 8000): CavesGame {
-  const start = cavesStart(seatCount, seed, difficulty, facts, log);
-  return playToEnd(start, ctx, (state, memory) => cavesIntent(state, ctx, memory, policy), limit);
+  return game.play(seatCount, seed, difficulty, ctx, { facts, log, policy, limit });
 }
 
 // The goldens (src/campaign/scenarios/the-caves-of-nibin-dum/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a loss writes nothing.

@@ -10,7 +10,7 @@ import { openResolution, resolutionResult } from "../../../rules/setup/resolutio
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
 import { MORIA_GOLDENS, moriaWorld, playGolden } from "../../../../test/scenarios/journey-in-the-dark/game.ts";
 import { BALROG, campaign, loadMoriaWorld, makeTable, moria, type MoriaWorld } from "../../../../test/scenarios/journey-in-the-dark/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 
 import { checklist } from "../../checklist.ts";

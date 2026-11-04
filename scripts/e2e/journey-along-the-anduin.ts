@@ -24,7 +24,7 @@ import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import type { MirkwoodFixture } from "./passage-through-mirkwood.ts";
 import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
-import { playDealt } from "./seed-kit.ts";
+import { firstSeed } from "./seed-kit.ts";
 import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-anduin");
@@ -83,12 +83,6 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory);
 }
 
-function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents: PlayerIntent[]; state: ScenarioState } {
-  const scenario = loadScenario("journey-along-the-anduin");
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)]);
-  return playDealt(world, { ...newSave("fixture", campaign.id, 2), log }, loadout, seed, 6000, intentFor);
-}
-
 // A Core Set hero of each sphere, in place of a hero that fell in Passage Through Mirkwood (checklist step 2: a fallen hero cannot start; a
 // player who changes heroes takes the threat penalty, step 3).
 const REPLACEMENT: Readonly<Record<string, string>> = { leadership: "01001", tactics: "01004", spirit: "01007", lore: "01010" };
@@ -118,15 +112,8 @@ export function anduinFixtures(passage: MirkwoodFixture): Partial<Record<"anduin
   const loadout: StoredLoadout = replaced({ ...passage.loadout, scenarioId: "journey-along-the-anduin" }, log);
   const past = { fixture: "mirkwood-won", choices: [] as string[] };
   const first = (wanted: (state: ScenarioState) => boolean, label: string): AnduinFixture | null => {
-    for (let seed = 1; seed <= Number(process.env.ANDUIN_SEEDS ?? 60); seed += 1) {
-      const game = play(log, loadout, seed);
-      say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
-      if (!wanted(game.state)) continue;
-      say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : `prisoner ${game.state.resolutionLog.prisoner}`}`);
-      return { campaignId: "mirkwood-paths", seatCount: 2, loadout, seed, intents: game.intents, log, past };
-    }
-    say.warn(`no ${label} game found in ${process.env.ANDUIN_SEEDS ?? 60} seeds`);
-    return null;
+    const found = firstSeed(say, { campaignId: "mirkwood-paths", scenarioId: "journey-along-the-anduin", seatCount: 2, loadout, log, limit: 6000, seeds: 60, answer: intentFor }, "ANDUIN_SEEDS", wanted, label);
+    return found && { ...found, log, past };
   };
   const won = first((state) => state.stageCleared && !state.lost, "anduin-won");
   const lost = first((state) => state.lost && (state.lossReason ?? "").includes("Mendor left play"), "anduin-lost");

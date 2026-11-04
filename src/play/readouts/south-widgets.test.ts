@@ -3,7 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { DOORS, loadSouthWorld, southTable, WATCHER, type SouthWorld } from "../../../test/scenarios/the-ring-goes-south/scene.ts";
-import { first, loadWorld, table, type World } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { loadWorld, table, type World } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../test/harness/scene-kit.ts";
 
 import { locationReadout, ringWords } from "./widgets.ts";
 

@@ -16,7 +16,7 @@ import { prisonerHero } from "./index.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { dolGuldurTable, loadDolGuldurWorld, MENDOR, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
 import { dolGuldurWorld, dolGuldurStart, LOGGED_PRISONER, STRONG_HEROES } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
-import { send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 
 let world: DolGuldurWorld;

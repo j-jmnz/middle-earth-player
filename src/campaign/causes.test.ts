@@ -10,7 +10,8 @@ import { playOut } from "../../test/harness/auto-player.ts";
 import { causeProblems, NUMBER_STEPS, verified } from "../../test/harness/cause-check.ts";
 import { GOLDEN_REGISTRY } from "../../test/harness/golden-registry.ts";
 import { loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { campaign, loadWorld, reveal, scenario, send, table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { campaign, loadWorld, reveal, scenario, table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { send } from "../../test/harness/scene-kit.ts";
 import { playStarter, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 import { buildStart } from "./start.ts";

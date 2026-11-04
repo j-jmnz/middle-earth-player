@@ -10,7 +10,8 @@ import { flagged } from "../../../rules/core/state.ts";
 import { legalIntents, legalTargets } from "../../../rules/engine/legal.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { BALROG, CHAMBER, CHIEFTAIN, DOOM, fire, loadMoriaWorld, makeTable, runOne, settled, type MoriaLayout, type MoriaWorld } from "../../../../test/scenarios/journey-in-the-dark/scene.ts";
-import { codesOf, first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 
 let world: MoriaWorld;

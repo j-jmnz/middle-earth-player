@@ -9,7 +9,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: DolGuldurWorld;
 

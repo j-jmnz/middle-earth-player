@@ -10,7 +10,8 @@ import { withMode, type ScenarioState } from "../../../rules/core/state.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { CAMPAIGN_CARD, FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, type FordLayout, type FordWorld } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
-import { codesOf, first, RING, reveal, send, start } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf, RING, reveal } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: FordWorld;
 

@@ -18,7 +18,7 @@ import { moveCard } from "../../../rules/core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { anduinStart, anduinWorld } from "../../../../test/scenarios/journey-along-the-anduin/game.ts";
 import { anduinTable, loadAnduinWorld, type AnduinLayout, type AnduinWorld } from "../../../../test/scenarios/journey-along-the-anduin/scene.ts";
-import { first, send, start } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: AnduinWorld;
 

@@ -14,7 +14,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { anduinTable, fight, loadAnduinWorld, type AnduinLayout, type AnduinWorld } from "../../../../test/scenarios/journey-along-the-anduin/scene.ts";
-import { first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: AnduinWorld;
 

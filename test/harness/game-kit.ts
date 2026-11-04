@@ -35,6 +35,14 @@ export function fillerCard(): PrintedCard {
   return definePrinted({ code: FILLER, name: FILLER, type: "event", sphere: "neutral", cost: 0 });
 }
 
+/** The cards of `codes`, the stand-in heroes q1 to q6 of these numbers and the filler event. */
+export async function standInWorld(codes: readonly string[], stats: HeroStats): Promise<Map<string, PrintedCard>> {
+  const cards = new Map(await loadPrinted([...new Set(codes)]));
+  for (const code of STRONG_HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...stats }));
+  cards.set(FILLER, fillerCard());
+  return cards;
+}
+
 export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
 
 /**
@@ -90,7 +98,39 @@ export const HERO_STATS = {
   weak: { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 },
   brittle: { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 },
   tense: { threat: 14, willpower: 20, attack: 12, defense: 6, health: 100 },
+  // "steady": strong attackers with a willpower of 6, so the quest goes slowly.
+  steady: { threat: 3, willpower: 6, attack: 12, defense: 6, health: 100 },
 } as const satisfies Record<string, HeroStats>;
+
+/** The Mirkwood Paths and Fellowship goldens give the stand-in heroes a starting threat of 8. */
+export const HERO_STATS_8 = { strong: { ...HERO_STATS.strong, threat: 8 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 8 } } as const satisfies Record<string, HeroStats>;
+
+export const RING_BEARER = "141001";
+
+/** A starter deck of a campaign: its heroes, and its other cards one entry a copy. */
+export function starterSeat(campaign: CampaignData, id: string): LoadoutSeat {
+  const deck = campaign.starterDecks.find((entry) => entry.id === id);
+  if (!deck) throw new Error(`No starter deck ${id}`);
+  return {
+    heroes: deck.rows.filter((row) => row.type === "hero").map((row) => row.code),
+    deck: deck.rows.filter((row) => row.type !== "hero").flatMap((row) => Array.from({ length: row.count }, () => row.code)),
+  };
+}
+
+/**
+ * The seats of a Fellowship game, the saga Frodo a fourth hero of the first seat. `starter`: the seeded starter decks (Stealth and
+ * Steadfastness, then Wisdom and Wizardry). Otherwise the stand-in heroes beside Frodo and a deck of free events.
+ */
+export function fellowshipLoadout(campaign: CampaignData, seatCount: 1 | 2, starter: boolean): LoadoutSeat[] {
+  if (!starter) {
+    const deck = Array.from({ length: 30 }, () => FILLER);
+    const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck };
+    return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck }];
+  }
+  const stealth = starterSeat(campaign, "stealth-and-steadfastness");
+  const first = { heroes: [RING_BEARER, ...stealth.heroes], deck: stealth.deck };
+  return seatCount === 1 ? [first] : [first, starterSeat(campaign, "wisdom-and-wizardry")];
+}
 
 /** What every campaign golden names: the seats, the seed, the difficulty, and whether it plays after the earlier parts, on the Upgraded sides, or with a Mode card. */
 export type CampaignGoldenBase = { seatCount: 1 | 2; seed: number; difficulty: Difficulty; upgraded?: boolean; after?: boolean; mode?: ModeCard };
@@ -131,10 +171,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
 
   async function world(decks: D): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
     const dealt = campaignScenario(spec.scenario);
-    const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(spec.campaign, spec.scenario), ...spec.codes];
-    const cards = new Map(await loadPrinted([...new Set(codes)]));
-    for (const code of STRONG_HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...spec.stats[decks] }));
-    cards.set(FILLER, fillerCard());
+    const cards = await standInWorld([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(spec.campaign, spec.scenario), ...spec.codes], spec.stats[decks]);
     loaded = cards;
     return { cards, ctx: { effects: EFFECTS, cards } };
   }
@@ -191,4 +228,32 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   }
 
   return { world, after, plan, start, play, playGolden };
+}
+
+export type DealtGameSpec<D extends string> = {
+  campaign: CampaignData;
+  scenario: ScenarioData;
+  /** The numbers of the stand-in heroes q1 to q6, by deck. */
+  stats: Readonly<Record<D, HeroStats>>;
+  /** The codes loaded after the scenario's own and its campaign card's. */
+  codes: readonly string[];
+  /** The seats a game deals: each seat's heroes and deck. */
+  loadout: (seatCount: 1 | 2, decks: D) => LoadoutSeat[];
+};
+
+/**
+ * The seeded game of a scenario dealt straight from a loadout (no Campaign Setup Checklist): its world (the cards, the stand-in
+ * heroes and the filler deck) and the start of a seed. The scenario keeps its answers, its goldens and its play.
+ */
+export function dealtGame<D extends string>(spec: DealtGameSpec<D>) {
+  async function world(decks: D): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
+    const cards = await standInWorld([...spec.scenario.cards.map((card) => card.code), ...spec.scenario.campaignPlaced, spec.scenario.campaignCard, ...spec.codes], spec.stats[decks]);
+    return { cards, ctx: { effects: EFFECTS, cards } };
+  }
+
+  function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: D): StartScenario {
+    return buildStart({ campaign: spec.campaign, scenario: spec.scenario, seatCount, seed, threatModifier: 0, seats: spec.loadout(seatCount, decks), effects: EFFECTS, difficulty });
+  }
+
+  return { world, start };
 }

@@ -2,6 +2,7 @@ import type { Effect } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
+import { byCode } from "../../src/rules/core/test-fixture.ts";
 import { spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -11,7 +12,7 @@ import { pushCardEffects } from "../../src/rules/interpret/effect-frames.ts";
 import { causeProblems } from "./cause-check.ts";
 import { begin, send, type Run } from "./scene.ts";
 
-// Test helper. What the Dream-chaser scenes (test/scenarios/<scenario-id>/scene.ts) share: card and zone lookups, the answers to
+// Test helper. What the campaign scenarios' scenes (test/scenarios/<scenario-id>/scene.ts) share: card and zone lookups, the answers to
 // the choices an effect opens, a card's records resolved by themselves, an attack fought out with a Shadow card, the phase a table
 // opens on, the stand-in cards and the filler records. A scene keeps its codes, its layout and its table.
 
@@ -23,6 +24,11 @@ export function idOf(state: ScenarioState, code: string): string {
   const found = Object.values(state.cards).find((card) => card.code === code);
   if (!found) throw new Error(`no card ${code}`);
   return found.id;
+}
+
+/** The first card of a code, or an empty id when there is none. */
+export function first(state: ScenarioState, code: string): string {
+  return byCode(state, code)[0] ?? "";
 }
 
 /** The ids of the cards of a code, in id order. */
@@ -112,6 +118,9 @@ export const eventCard = (code: string, cost: number): PrintedCard => definePrin
 /** A neutral ally of this cost and 1/1/2 or the stats given. */
 export const allyCard = (code: string, cost: number, stats: PrintedStats = {}): PrintedCard => definePrinted({ code, name: code, type: "ally", sphere: "neutral", cost, willpower: 1, attack: 1, defense: 1, health: 2, ...stats });
 
+/** A stand-in hero of the plain numbers (threat 8, 2/2/2, 6 hit points). */
+export const heroCard = (code: string): PrintedCard => definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 });
+
 export const HERO = "dh1";
 export const HERO2 = "dh2";
 export const HERO3 = "dh3";
@@ -139,7 +148,7 @@ export type StandIn = keyof typeof STAND_INS | "heroes";
  */
 export function addStandIns(cards: Map<string, PrintedCard>, names: readonly StandIn[], costs: readonly number[] = []): void {
   for (const name of names) {
-    if (name === "heroes") for (const code of [HERO, HERO2, HERO3]) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 }));
+    if (name === "heroes") for (const code of [HERO, HERO2, HERO3]) cards.set(code, heroCard(code));
     else cards.set(name, STAND_INS[name]());
   }
   for (const cost of costs) cards.set(`c${cost}`, eventCard(`c${cost}`, cost));

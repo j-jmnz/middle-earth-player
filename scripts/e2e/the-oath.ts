@@ -21,11 +21,10 @@ import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { createLog } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
-import { playDealt, prebuiltDeck } from "./seed-kit.ts";
+import { firstSeed, FIXTURE_DECKS, prebuiltDeck } from "./seed-kit.ts";
 import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-oath");
-const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
 const ADAPTATIONS = ["41044", "41045"] as const;
 
 // The log The Oath's won game writes: replay the fixture and confirm it (6 or more tokens earn Guilty Conscience; the Adaptations and Stalking Goblin join the pool).
@@ -77,33 +76,23 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   return nextIntent(state, ctx, { scout: "", prefer: "41014", protect: "", play: true, act: true }, memory);
 }
 
-function play(seed: number): { loadout: StoredLoadout; intents: PlayerIntent[]; state: ScenarioState } {
-  const campaign = loadCampaign("the-dark-of-mirkwood");
-  const scenario = loadScenario("the-oath");
-  const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = DECKS.map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
-  // Each seat's Adaptation goes on its first hero (the answers to the campaign card's Setup choices, in seat order).
-  const choices = seats.map((seat, index) => `${ADAPTATIONS[index]}>${seat.heroes[0]}`);
-  const loadout: StoredLoadout = { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices, acceptPenalty: false };
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...ADAPTATIONS]);
-  return { loadout, ...playDealt(world, newSave("fixture", campaign.id, 2), loadout, seed, 8000, intentFor) };
-}
+// Each seat's Adaptation goes on its first hero (the answers to the campaign card's Setup choices, in seat order).
+const SPEC = {
+  campaignId: "the-dark-of-mirkwood",
+  scenarioId: "the-oath",
+  seatCount: 2,
+  choices: FIXTURE_DECKS.map((id, index) => `${ADAPTATIONS[index]}>${prebuiltDeck(id).heroes[0]}`),
+  codes: ADAPTATIONS,
+  seeds: 200,
+  answer: intentFor,
+} as const;
 
-function firstSeed(wanted: (state: ScenarioState) => boolean, label: string): OathFixture | null {
-  const limit = Number(process.env.OATH_SEEDS ?? 200);
-  for (let seed = 1; seed <= limit; seed += 1) {
-    const game = play(seed);
-    say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
-    if (!wanted(game.state)) continue;
-    say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : "won"}, used ${JSON.stringify(game.state.campaignFacts?.usedOnce ?? [])}`);
-    return { campaignId: "the-dark-of-mirkwood", seatCount: 2, loadout: game.loadout, seed, intents: game.intents };
-  }
-  say.warn(`no ${label} game found in ${limit} seeds`);
-  return null;
+function firstGame(wanted: (state: ScenarioState) => boolean, label: string): OathFixture | null {
+  return firstSeed(say, SPEC, "OATH_SEEDS", wanted, label);
 }
 
 export function oathFixtures(): Partial<Record<"oath-won" | "oath-lost", OathFixture>> {
-  const won = firstSeed((state) => state.stageCleared && !state.lost && (state.campaignFacts?.usedOnce.length ?? 0) > 0, "oath-won") ?? firstSeed((state) => state.stageCleared && !state.lost, "oath-won");
-  const lost = firstSeed((state) => state.lost, "oath-lost");
+  const won = firstGame((state) => state.stageCleared && !state.lost && (state.campaignFacts?.usedOnce.length ?? 0) > 0, "oath-won") ?? firstGame((state) => state.stageCleared && !state.lost, "oath-won");
+  const lost = firstGame((state) => state.lost, "oath-lost");
   return { ...(won ? { "oath-won": won } : {}), ...(lost ? { "oath-lost": lost } : {}) };
 }

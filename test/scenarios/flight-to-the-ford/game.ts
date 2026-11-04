@@ -1,71 +1,36 @@
-import { buildStart } from "../../../src/campaign/start.ts";
 import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
+import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { campaign, ford, CAMPAIGN_CARD } from "./scene.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
+import { campaign, ford } from "./scene.ts";
+import { attackTogether, dealtGame, engageOneEach, fellowshipLoadout, HERO_STATS_8, type PlayedGame, playToEnd, RING_BEARER, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Flight to the Ford played by the auto-player, true solo or two-handed. The loadouts are the ones
 // the A Knife in the Dark goldens use (test/scenarios/a-knife-in-the-dark/game.ts): the seeded starter decks with the saga Frodo as a fourth hero, or
 // big-number heroes beside the saga Frodo and a deck of free events, so the outcome depends on the engine and the seed, not on
 // card play. The scenario starts from an empty Campaign Log, in Campaign Mode, so the campaign card is in the game.
-export const RING_BEARER = "141001";
-export { STRONG_HEROES };
+export { RING_BEARER, STRONG_HEROES };
 // The Last Bridge first (stage 1B needs it in the victory display), then the Ford of Bruinen.
 export const FORD_POLICY: PolicyOptions = { scout: "", prefer: "141058", protect: RING_BEARER, play: true, act: true };
 // "strong": big-number heroes. "weak": heroes too small to quest, so the Ring-bearer's life runs out before the quest is won.
 export type FordDecks = "starter" | "strong" | "weak";
 
-function starter(id: string): LoadoutSeat {
-  const deck = campaign.starterDecks.find((entry) => entry.id === id);
-  if (!deck) throw new Error(`No starter deck ${id}`);
-  return {
-    heroes: deck.rows.filter((row) => row.type === "hero").map((row) => row.code),
-    deck: deck.rows.filter((row) => row.type !== "hero").flatMap((row) => Array.from({ length: row.count }, () => row.code)),
-  };
-}
+export const fordLoadout = (seatCount: 1 | 2, decks: FordDecks = "starter"): LoadoutSeat[] => fellowshipLoadout(campaign, seatCount, decks === "starter");
 
-export function fordLoadout(seatCount: 1 | 2, decks: FordDecks = "starter"): LoadoutSeat[] {
-  if (decks !== "starter") {
-    const filler = Array.from({ length: 30 }, () => "filler");
-    const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck: filler };
-    return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-  }
-  const stealth = starter("stealth-and-steadfastness");
-  const first = { heroes: [RING_BEARER, ...stealth.heroes], deck: stealth.deck };
-  return seatCount === 1 ? [first] : [first, starter("wisdom-and-wizardry")];
-}
+// The "weak" decks reuse the strong loadout's codes with weak stats: nobody can quest or fight.
+const game = dealtGame<FordDecks>({
+  campaign,
+  scenario: ford,
+  stats: { starter: HERO_STATS_8.strong, strong: HERO_STATS_8.strong, weak: HERO_STATS_8.weak },
+  codes: [...campaign.prelude.map((card) => card.code), ...fordLoadout(2).flatMap((seat) => [...seat.heroes, ...seat.deck])],
+  loadout: fordLoadout,
+});
 
-// The "weak" decks reuse the strong loadout's codes with these stats: nobody can quest or fight.
-const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
-const STRONG_STATS = { threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-
-export async function fordWorld(decks: FordDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [
-    ...scenarioCards(ford).map((card) => card.code),
-    ...ford.campaignPlaced,
-    CAMPAIGN_CARD,
-    ...campaign.prelude.map((card) => card.code),
-    ...fordLoadout(2).flatMap((seat) => [...seat.heroes, ...seat.deck]),
-  ];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of STRONG_HEROES) {
-    cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...(decks === "weak" ? WEAK_STATS : STRONG_STATS) }));
-  }
-  cards.set(FILLER, fillerCard());
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-export function fordStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: FordDecks = "starter"): StartScenario {
-  return buildStart({ campaign, scenario: ford, seatCount, seed, threatModifier: 0, seats: fordLoadout(seatCount, decks), effects: EFFECTS, difficulty });
-}
-
+export const fordWorld = (decks: FordDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> => game.world(decks);
+export const fordStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: FordDecks = "starter"): StartScenario => game.start(seatCount, seed, difficulty, decks);
 // With the strong loadout the last hero of each seat stays out of the quest, so it is ready to attack.
 const STRONG_QUESTERS = new Set([RING_BEARER, "q1", "q2", "q4", "q5"]);
 

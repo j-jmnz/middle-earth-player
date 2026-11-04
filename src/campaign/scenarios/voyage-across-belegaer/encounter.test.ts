@@ -10,7 +10,7 @@ import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { legalIntents, legalTargets } from "../../../rules/engine/reduce.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
-import { first, send, start } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../../test/harness/scene-kit.ts";
 import {
   BOARDING_PARTY, CALM_WATERS, CORSAIR_WARSHIP, CUNNING_PIRATE, FOG_BANK, LIGHT_CRUISER, ROLLING_SEAS, ROUGH_WATERS, SCOUTING_SHIP, SHIPS, SOUTHRON_SAILOR, STARLIT_SEA, SUDDEN_STORMS, THROWN_OFF_COURSE,
   UMBAR_CAPTAIN, VICIOUS_MARAUDER, WATERSPOUT, WINDS_OF_WRATH, codesIn, loadVoyageWorld, resolveReveal, voyageFight, voyageTable, type VoyageLayout, type VoyageWorld,

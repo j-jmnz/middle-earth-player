@@ -1,67 +1,33 @@
-import { buildStart } from "../../../src/campaign/start.ts";
 import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
+import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaign, south } from "./scene.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
+import { attackTogether, dealtGame, engageOneEach, fellowshipLoadout, HERO_STATS_8, type PlayedGame, playToEnd, RING_BEARER, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Ring Goes South played by the auto-player, true solo or two-handed. The loadouts are the ones the
 // Flight to the Ford goldens use (test/scenarios/flight-to-the-ford/game.ts): the seeded starter decks with the saga Frodo as a fourth hero, or big-number
 // heroes beside the saga Frodo and a deck of free events, so the outcome depends on the engine and the seed, not on card play.
-export const RING_BEARER = "141001";
-export { STRONG_HEROES };
+export { RING_BEARER, STRONG_HEROES };
 export const SOUTH_POLICY: PolicyOptions = { scout: "", prefer: "", protect: RING_BEARER, play: true, act: true };
 // "strong": big-number heroes. "weak": heroes too small to quest, so the players lose on threat.
 export type SouthDecks = "starter" | "strong" | "weak";
 
-function starter(id: string): LoadoutSeat {
-  const deck = campaign.starterDecks.find((entry) => entry.id === id);
-  if (!deck) throw new Error(`No starter deck ${id}`);
-  return {
-    heroes: deck.rows.filter((row) => row.type === "hero").map((row) => row.code),
-    deck: deck.rows.filter((row) => row.type !== "hero").flatMap((row) => Array.from({ length: row.count }, () => row.code)),
-  };
-}
+export const southLoadout = (seatCount: 1 | 2, decks: SouthDecks = "starter"): LoadoutSeat[] => fellowshipLoadout(campaign, seatCount, decks === "starter");
 
-export function southLoadout(seatCount: 1 | 2, decks: SouthDecks = "starter"): LoadoutSeat[] {
-  if (decks !== "starter") {
-    const filler = Array.from({ length: 30 }, () => "filler");
-    const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck: filler };
-    return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-  }
-  const stealth = starter("stealth-and-steadfastness");
-  const first = { heroes: [RING_BEARER, ...stealth.heroes], deck: stealth.deck };
-  return seatCount === 1 ? [first] : [first, starter("wisdom-and-wizardry")];
-}
+const game = dealtGame<SouthDecks>({
+  campaign,
+  scenario: south,
+  stats: { starter: HERO_STATS_8.strong, strong: HERO_STATS_8.strong, weak: HERO_STATS_8.weak },
+  codes: [...campaign.prelude.map((card) => card.code), ...southLoadout(2).flatMap((seat) => [...seat.heroes, ...seat.deck])],
+  loadout: southLoadout,
+});
 
-const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
-const STRONG_STATS = { threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-
-export async function southWorld(decks: SouthDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [
-    ...scenarioCards(south).map((card) => card.code),
-    ...south.campaignPlaced,
-    south.campaignCard,
-    ...campaign.prelude.map((card) => card.code),
-    ...southLoadout(2).flatMap((seat) => [...seat.heroes, ...seat.deck]),
-  ];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of STRONG_HEROES) {
-    cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...(decks === "weak" ? WEAK_STATS : STRONG_STATS) }));
-  }
-  cards.set(FILLER, fillerCard());
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-export function southStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: SouthDecks = "starter"): StartScenario {
-  return buildStart({ campaign, scenario: south, seatCount, seed, threatModifier: 0, seats: southLoadout(seatCount, decks), effects: EFFECTS, difficulty });
-}
+export const southWorld = (decks: SouthDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> => game.world(decks);
+export const southStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: SouthDecks = "starter"): StartScenario => game.start(seatCount, seed, difficulty, decks);
 
 // With the strong loadout the last hero of each seat stays out of the quest, so it is ready to attack.
 const STRONG_QUESTERS = new Set([RING_BEARER, "q1", "q2", "q4", "q5"]);

@@ -22,7 +22,7 @@ import { AUTHORED_EFFECTS as CAVES_EFFECTS } from "../../effects/authored/the-ca
 import { cavesTable, loadCavesWorld, type CavesWorld } from "../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 
 import { legalIntents } from "../../rules/engine/legal.ts";
-import { first, send, start } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../test/harness/scene-kit.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import type { SheetNames } from "../choice/sheet-types.ts";
