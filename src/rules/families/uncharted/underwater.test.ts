@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { faceProblems } from "../../../../test/harness/face-check.ts";
 import { addStandIns } from "../../../../test/harness/scene-kit.ts";
-import { CODES, finish, idOf, idsOf, loadRuinsWorld, resolveRecords, ruinsTable, send, start, type RuinsLayout, type RuinsWorld } from "../../../../test/scenarios/the-drowned-ruins/scene.ts";
+import { CODES, finish, idOf, idsOf, loadRuinsWorld, resolveRecords, ruinsFight, ruinsTable, send, start, type RuinsLayout, type RuinsWorld } from "../../../../test/scenarios/the-drowned-ruins/scene.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { settle } from "../../engine/machine.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -20,6 +20,7 @@ let world: RuinsWorld;
 beforeAll(async () => {
   world = await loadRuinsWorld();
   addStandIns(world.cards, ["undead", "raider"]);
+  world.cards.set("creature", definePrinted({ code: "creature", name: "creature", type: "enemy", traits: ["Creature"], engagementCost: 50, threat: 1, attack: 1, defense: 1, health: 3 }));
   world.cards.set("att", definePrinted({ code: "att", name: "att", type: "attachment", sphere: "neutral", cost: 0 }));
 });
 const make = (layout: RuinsLayout = {}) => ruinsTable(world, { phase: "Quest", ...layout });
@@ -141,6 +142,20 @@ describe("Into the Abyss (12106:A:1)", () => {
     const none = reveal(["event"], "event");
     expect(none.seats[0]?.discard).toEqual([]);
     expect(none.staging.filter((id) => none.cards[id]?.code === "f0")).toHaveLength(1);
+  });
+});
+
+describe("Into the Abyss, Shadow (12106:A:2)", () => {
+  // The shadow card asks the first player which Creature to bring: it runs in a frame, as a shadow that searches does.
+  const fight = (sided: RuinsLayout["sided"]) => ruinsFight(world, "12106", "raider", { sided, deck: ["12106", "creature", "f0"] }, { undefended: true }).run.state;
+
+  it("brings a Creature enemy from the encounter deck into the staging area when the attack is made with an Underwater location active, and does nothing otherwise", () => {
+    const underwater = fight(UNDERWATER_ACTIVE);
+    expect(underwater.failure).toBeNull();
+    expect(underwater.staging.map((id) => underwater.cards[id]?.code)).toContain("creature");
+    const grotto = fight(GROTTO_ACTIVE);
+    expect(grotto.failure).toBeNull();
+    expect(grotto.staging.map((id) => grotto.cards[id]?.code)).not.toContain("creature");
   });
 });
 

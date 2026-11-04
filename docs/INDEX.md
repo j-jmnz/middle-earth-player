@@ -104,7 +104,7 @@ Read the sections your task touches.
   - 840–865 Persistence and shipping (~1.7K)
   - 866–906 Screens (~4.4K) ← 2
     - 892–906 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~27.6K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~27.8K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -116,26 +116,26 @@ Read the sections your task touches.
   - 80–85 The Sailing test (~690) ← 5
   - 86–99 The Island Map (~1.7K) ← 8
   - 100–103 Tokens and effects (~320)
-  - 104–114 Piles (~1.2K) ← 4
-  - 115–120 Marks of the open moment (~400) ← 1
-  - 121–188 Motion (~2.7K) ← 8
-  - 189–215 Spotlight (~2.2K) ← 16
-  - 216–221 Gestures (~420) ← 5
-  - 222–225 Hold, slide and release (~940)
-  - 226–231 Peeking at the other seat (~600) ← 1
-  - 232–247 Command column (~1.9K) ← 9
-  - 248–251 Two taps (~320) ← 2
-  - 252–255 One answer, one tap (~240)
-  - 256–259 Stops and Always use (~250)
-  - 260–263 Guide (~120)
-  - 264–273 Choice tray (~850) ← 3
-  - 274–287 Reading panels (~1.5K) ← 6
-  - 288–297 Phase carousel (~680)
-  - 298–303 Quest advance (~530) ← 1
-  - 304–307 Undo (~140)
-  - 308–311 Haptics (~280)
-  - 312–322 Banner (~580) ← 1
-  - 323–326 Android Back (~90)
+  - 104–115 Piles (~1.4K) ← 5
+  - 116–121 Marks of the open moment (~400) ← 1
+  - 122–189 Motion (~2.7K) ← 8
+  - 190–216 Spotlight (~2.2K) ← 16
+  - 217–222 Gestures (~420) ← 5
+  - 223–226 Hold, slide and release (~940)
+  - 227–232 Peeking at the other seat (~600) ← 1
+  - 233–248 Command column (~1.9K) ← 9
+  - 249–252 Two taps (~320) ← 2
+  - 253–256 One answer, one tap (~240)
+  - 257–260 Stops and Always use (~250)
+  - 261–264 Guide (~120)
+  - 265–274 Choice tray (~850) ← 3
+  - 275–288 Reading panels (~1.5K) ← 6
+  - 289–298 Phase carousel (~680)
+  - 299–304 Quest advance (~530) ← 1
+  - 305–308 Undo (~140)
+  - 309–312 Haptics (~280)
+  - 313–323 Banner (~580) ← 1
+  - 324–327 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~23.9K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)

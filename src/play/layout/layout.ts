@@ -291,8 +291,8 @@ function pileSlot(view: PileView, rect: Rect, deckTop: CardInstance | null | und
   };
   // A deck whose top card can be played (Gandalf) is that card: it is picked up and played like a card in the hand.
   const chained = view.pile === "deck" && (view.attached?.length ?? 0) > 0 ? { chained: true as const } : {};
-  // The Uncharted deck is drawn as its top card's Lost Island side, never the real one.
-  const lostIsland = view.pile === "unchartedDeck" && top ? { picture: pictureKey(top) } : {};
+  // The Uncharted deck is drawn as its top card's Lost Island side, never the real one; the Grotto deck as its top card's Grotto side, the side the players may look at (it never holds the Underwater side faceup).
+  const lostIsland = (view.pile === "unchartedDeck" || view.pile === "grottoDeck") && top ? { picture: pictureKey(top) } : {};
   // The victory display: its top on the side it lies, the cards fanned behind it and its Victory points.
   const victory = view.pile === "victory" && top ? { picture: pictureKey(top), fan: (view.fan ?? []).map(pictureKey), points: view.points ?? 0 } : {};
   return view.pile === "deck" && deckTop ? { ...base, ...chained, id: deckTop.id, kind: "card" } : { ...base, ...chained, ...lostIsland, ...victory };
@@ -368,12 +368,13 @@ export function tableLayout(
   // The second slot of piles (a scenario with a second deck: the Corsair pair) stands at the right end of the engagement area, as wide as the encounter pair and
   // right-aligned with the canvas (under the encounter pair, or under the encounter discard pile and the victory display while that is out); the engagement area
   // narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
-  const second = piles.corsairDeck != null || piles.corsairDiscard != null || piles.unchartedDeck != null;
+  const second = piles.corsairDeck != null || piles.corsairDiscard != null || piles.unchartedDeck != null || piles.grottoDeck != null;
   const secondY = engagedY + Math.round((card.h - pile.h) / 2);
   const secondX = width - rightGutter - encounterW;
   const corsairDeck: Rect = { x: secondX, y: secondY, w: pile.w, h: pile.h };
   const corsairDiscard: Rect = { x: secondX + pile.w + gap, y: secondY, w: pile.w, h: pile.h };
   const unchartedDeck = corsairDeck;
+  const grottoDeck = corsairDeck;
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
   // player's deck and discard pile level with the play area.
@@ -407,13 +408,13 @@ export function tableLayout(
   placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);
-  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}), ...(piles.victory ? { victory } : {}) };
+  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}), ...(piles.grottoDeck ? { grottoDeck } : {}), ...(piles.victory ? { victory } : {}) };
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table/view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
-  for (const id of ["corsairDeck", "corsairDiscard", "unchartedDeck", "victory"] as const) {
+  for (const id of ["corsairDeck", "corsairDiscard", "unchartedDeck", "grottoDeck", "victory"] as const) {
     const view = piles[id];
     const rect = pileRects[id];
     if (view && rect) slots.push(pileSlot(view, rect, undefined));

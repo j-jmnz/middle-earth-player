@@ -28,7 +28,7 @@ export function dealDoubleSided(state: ScenarioState, cards: readonly DoubleSide
   const pairs = { ...before?.pairs, ...Object.fromEntries(aside.map((card) => [card.code, card.back])) };
   let next: ScenarioState = {
     ...state,
-    uncharted: { deck: before?.deck ?? [], codes: [...new Set([...(before?.codes ?? []), ...deck.map((card) => card.code), ...aside.map((card) => card.code)])], ...(before?.island ? { island: before.island } : {}), ...(Object.keys(pairs).length > 0 ? { pairs } : {}) },
+    uncharted: { deck: before?.deck ?? [], codes: [...new Set([...(before?.codes ?? []), ...deck.map((card) => card.code), ...aside.map((card) => card.code)])], ...(before?.island ? { island: before.island } : {}), ...(Object.keys(pairs).length > 0 ? { pairs } : {}), ...(deck.length > 0 ? { grotto: true as const } : {}) },
   };
   for (const card of deck) {
     const spawned = spawn(next, card.code, { zone: "unchartedDeck" }, "up");

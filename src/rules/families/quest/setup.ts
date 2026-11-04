@@ -13,7 +13,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 
 // A Setup record that reveals cards for each player, or attaches an encounter card to each objective (01123:A:1, GuardObjective), or has the
-// first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet), or prepares the Uncharted deck (PrepareUnchartedDeck): the Setup the piles cannot place.
+// first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet), or prepares the Uncharted deck (PrepareUnchartedDeck) or the Grotto deck (PrepareGrottoDeck): the Setup the piles cannot place.
 // A Setup that searches the encounter deck for each player (142040:A:1, "each player adds 1 different location") or puts damage tokens on a
 // card (PlaceDamageOn) is run here too.
 function revealsPerPlayer(effect: Effect): boolean {
@@ -31,6 +31,8 @@ function revealsPerPlayer(effect: Effect): boolean {
         instruction.verb === "PrepareUnchartedDeck" ||
         // The Island Map is laid out of the dealt locations, the starting location is chosen and the Gate Key is attached (families/island.ts).
         instruction.verb === "PrepareIslandMap" ||
+        // The Grotto deck is prepared, its top locations join the staging area and the objective allies come into play (families/uncharted/grotto.ts).
+        instruction.verb === "PrepareGrottoDeck" ||
         // Cards are discarded from the encounter deck until an Aflame location for each player is, and each joins the staging area (families/aflame/cards.ts).
         instruction.verb === "DiscardUntilAflame",
     )
