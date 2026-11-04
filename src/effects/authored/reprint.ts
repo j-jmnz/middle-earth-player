@@ -1,22 +1,19 @@
 import type { Ledger } from "../../catalog/active-text.ts";
 import type { Effect } from "../../catalog/boundary.ts";
 import { stripKeywords } from "../../catalog/keyword-line.ts";
-import { selfNamed } from "../../catalog/self-named.ts";
 
 // The records of a ledger line, taken again by another line with the same printed text: a card printed again in a later product (Forest Gate 01100 and 41012,
 // Calphon 11028 and 110013) or a sentence a card prints twice (the two sides of a Campaign Expansion ship). A copy keeps the source record and changes its
 // card code, its ledger line ids and its id, whose number is the one the line has on the target: the source's number moved by how far the target's line stands
 // from the source's among the records of that timing (their order is the printed order, front, side B, then the shadow). A copy is refused, when the module loads, if
 // the copy would take an id that is in use. Each copied record keeps the line pairs it was copied by (`copiedLines`), and src/effects/copies.test.ts refuses a pair
-// whose two ledger lines differ once normalized (keywords stripped, the card's name as {self}), so a ledger edit cannot keep a stale copy. The check is a test, not
+// whose two ledger lines differ once normalized (keywords stripped), so a ledger edit cannot keep a stale copy. The check is a test, not
 // a load-time throw, so this module does not import the ledger JSON and the Node scripts that load the effects (effects:open, card-smoke, the fixture writer) run.
 export type Copy = { readonly copy: readonly (readonly [from: string, to: string])[] };
 
 type Options = {
   // Records the sources are found in besides the list itself (another file's, when the source card is written there).
   readonly pool?: readonly Effect[];
-  // Card names by code, for a copy between cards that print their own name in the line.
-  readonly names?: Readonly<Record<string, string>>;
 };
 
 /** One line's records taken by another line: `copyLine("11081:A:5", "110137:A:5")`. */
@@ -52,8 +49,8 @@ export function printedLine(ledger: Ledger, lineId: string): string | undefined 
   return ledger.get(code)?.find((side) => side.side === part)?.lines[n - 1]?.replaceAll("`", "'").trim();
 }
 
-/** One line pair a record was copied by, with the card names the reading puts as {self} (empty: the name is not replaced). */
-export type CopiedLine = { readonly from: string; readonly to: string; readonly fromName: string; readonly toName: string };
+/** One line pair a record was copied by. */
+export type CopiedLine = { readonly from: string; readonly to: string };
 
 const COPIED = new WeakMap<Effect, readonly CopiedLine[]>();
 
@@ -67,11 +64,13 @@ export function copyMismatch(ledger: Ledger, pair: CopiedLine): string | null {
   const from = printedLine(ledger, pair.from);
   const to = printedLine(ledger, pair.to);
   if (from === undefined || to === undefined) return `The printed-text ledger has no line ${from === undefined ? pair.from : pair.to}`;
-  const reading = (name: string, text: string): string => (name ? selfNamed(name, text) : stripKeywords(text));
-  return reading(pair.fromName, from) === reading(pair.toName, to) ? null : `Cannot copy ${pair.from} to ${pair.to}: "${from}" is not "${to}"`;
+  return stripKeywords(from) === stripKeywords(to) ? null : `Cannot copy ${pair.from} to ${pair.to}: "${from}" is not "${to}"`;
 }
 
 // The record's printed place, with its position in the list as the tiebreak, as the rank of the record among its card's records of its timing.
+// A rank sees only the records of `list`: a copy's number is right only when the card's records of that timing are all in this file's list (plus
+// `pool`). A card whose records of one timing live in several files must not be copied this way; the global id-uniqueness test catches a
+// collision, not a wrong number.
 function rankIn(record: Effect, list: readonly Effect[]): number {
   const same = list.map((other, at) => ({ other, at })).filter(({ other }) => other.cardCode === record.cardCode && other.timing === record.timing);
   const place = (entry: { other: Effect }): number => Math.min(...entry.other.lines.map(placeOf));
@@ -83,7 +82,6 @@ function rankIn(record: Effect, list: readonly Effect[]): number {
 export function withCopies(items: readonly (Effect | Copy)[], options: Options = {}): Effect[] {
   const own = items.filter((item): item is Effect => !isCopy(item));
   const pool = [...(options.pool ?? []), ...own];
-  const nameOf = (lineId: string): string => options.names?.[parse(lineId, LINE).code] ?? "";
 
   const made = new Map<Copy, { source: Effect; record: Effect }[]>();
   for (const item of items) {
@@ -120,7 +118,7 @@ export function withCopies(items: readonly (Effect | Copy)[], options: Options =
   }
   for (const list of made.values()) {
     for (const { source, record } of list) {
-      COPIED.set(record, source.lines.map((from, at) => ({ from, to: record.lines[at] ?? "", fromName: nameOf(from), toName: nameOf(record.lines[at] ?? "") })));
+      COPIED.set(record, source.lines.map((from, at) => ({ from, to: record.lines[at] ?? "" })));
     }
   }
   return items.flatMap((item) => (isCopy(item) ? (made.get(item) ?? []).map(({ record }) => record) : [item]));

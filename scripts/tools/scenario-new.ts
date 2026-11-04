@@ -20,7 +20,8 @@ import { authoredFile, campaignTestFile, camel, gameFile, goldenTestFile, lossFl
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/fixtures.ts,
 // and the golden registry (test/harness/golden-registry.ts), whose two lines are written as comments because that registry's test fails
 // on an entry with no golden.json. Nothing else runs: the next commands are printed.
-// `--short` is the name the identifiers and fixture names start from (default: the id's last word, "ruins" for the-drowned-ruins).
+// `--short` is the name the identifiers and fixture names start from (lower-case letters and digits, no hyphen; default: the id's last word, "ruins" for the-drowned-ruins).
+// Every registry edit stays inside the object or array it changes (`insert`): a line follows the previous part's entry when that is in the block, else it goes before the block's closing line.
 
 export type Repo = {
   read: (file: string) => string | null;
@@ -96,15 +97,53 @@ function previousPart(id: string, repo: Repo): PreviousPart {
   };
 }
 
-// An edit inserts `line` after the first line `anchor` matches (when `after` is false, before it). The anchor must match once or the edit is refused.
-function insert(text: string, file: string, anchor: RegExp, line: string, where: "after" | "before", problems: string[]): string {
+// The object or array an edit changes, from its declaration line to its closing line.
+type Block = { start: RegExp; end: RegExp };
+const FIXTURE_ARRAY: Block = { start: /^export const FIXTURE_REGISTRY = \[/, end: /^\] as const/ };
+const FILES_MAP: Block = { start: /^const FILES\b/, end: /^};$/ };
+const WRITERS_MAP: Block = { start: /^const WRITERS\b/, end: /^};$/ };
+const GOLDEN_ARRAY: Block = { start: /^export const GOLDEN_REGISTRY\b/, end: /^\];$/ };
+
+// The line indexes strictly between the block's declaration and its closing line, or null when the block is not in the file.
+function rangeOf(lines: readonly string[], block: Block): [number, number] | null {
+  const start = lines.findIndex((one) => block.start.test(one));
+  if (start < 0) return null;
+  const end = lines.findIndex((one, index) => index > start && block.end.test(one));
+  return end < 0 ? null : [start + 1, end];
+}
+
+// Whether a line of the block matches `anchor`.
+function blockHas(text: string, block: Block, anchor: RegExp): boolean {
   const lines = text.split("\n");
-  const matches = lines.flatMap((one, index) => (anchor.test(one) ? [index] : []));
-  if (matches.length === 0) {
-    problems.push(`${file}: no line matches ${anchor} to put "${line.trim()}" ${where}`);
+  const range = rangeOf(lines, block);
+  return range != null && lines.slice(range[0], range[1]).some((one) => anchor.test(one));
+}
+
+// An edit inserts `line` into the text and nothing else. With `block` it stays inside that object: without an anchor the line goes before the
+// block's closing line; with one the anchor must match exactly one line of the block (more is refused) and the line goes after or before it.
+// Without `block` the anchor is searched in the whole file: `after` follows the last matching line, `before` precedes the first.
+function insert(text: string, file: string, place: { block?: Block; anchor?: RegExp }, line: string, where: "after" | "before", problems: string[]): string {
+  const lines = text.split("\n");
+  const range = place.block ? rangeOf(lines, place.block) : ([0, lines.length] as [number, number]);
+  if (!range) {
+    problems.push(`${file}: no block matching ${place.block?.start} to put "${line.trim()}" in`);
     return text;
   }
-  const at = where === "after" ? (matches.at(-1) as number) + 1 : (matches[0] as number);
+  let at: number;
+  if (!place.anchor) at = range[1];
+  else {
+    const anchor = place.anchor;
+    const matches = lines.flatMap((one, index) => (index >= range[0] && index < range[1] && anchor.test(one) ? [index] : []));
+    if (matches.length === 0) {
+      problems.push(`${file}: no line matches ${anchor} to put "${line.trim()}" ${where}`);
+      return text;
+    }
+    if (place.block && matches.length > 1) {
+      problems.push(`${file}: ${matches.length} lines of the block match ${anchor}; refusing to guess where "${line.trim()}" goes`);
+      return text;
+    }
+    at = where === "after" ? (matches.at(-1) as number) + 1 : (matches[0] as number);
+  }
   return [...lines.slice(0, at), line, ...lines.slice(at)].join("\n");
 }
 
@@ -117,7 +156,8 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     return { plan: null, problems: [`${id} is not in data/scenarios (the scenario files are built by pnpm data:build)`] };
   }
   const short = options.short ?? defaultShort(id);
-  if (!/^[a-z][a-z0-9-]*$/.test(short)) return { plan: null, problems: [`--short ${short} is not lower-case words joined by hyphens`] };
+  // The short name starts identifiers (`${camel}Fixtures`, `${SHORT}_SEEDS`, `import * as ${short}`), so it must be one.
+  if (!/^[a-z][a-z0-9]*$/.test(short)) return { plan: null, problems: [`--short ${short} is not a valid identifier (lower-case letters and digits, starting with a letter, no hyphen)`] };
   try {
     facts = factsOf(id, short, repo);
   } catch (error) {
@@ -158,16 +198,18 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
       return text;
     }
     const line = `  { scenarioId: "${id}", names: ["${short}-won", "${short}-lost"] },`;
-    return previous && new RegExp(`scenarioId: "${previous}"`).test(text) ? insert(text, FIXTURE_REGISTRY, new RegExp(`scenarioId: "${previous}"`), line, "after", problems) : insert(text, FIXTURE_REGISTRY, /^\] as const satisfies/, line, "before", problems);
+    const after = new RegExp(`scenarioId: "${previous}"`);
+    return previous && blockHas(text, FIXTURE_ARRAY, after) ? insert(text, FIXTURE_REGISTRY, { block: FIXTURE_ARRAY, anchor: after }, line, "after", problems) : insert(text, FIXTURE_REGISTRY, { block: FIXTURE_ARRAY }, line, "before", problems);
   });
   edit(FIXTURES, (text) => {
     if (new RegExp(`\\b${c}Fixtures\\b`).test(text)) {
       problems.push(`${FIXTURES} already has ${c}Fixtures: pass --short with another name`);
       return text;
     }
-    let next = insert(text, FIXTURES, /^import \w+ from "\.\/fixtures\/[a-z0-9-]+\.json";$/, `import ${c}Fixtures from "./fixtures/${id}.json";`, "after", problems);
+    let next = insert(text, FIXTURES, { anchor: /^import \w+ from "\.\/fixtures\/[a-z0-9-]+\.json";$/ }, `import ${c}Fixtures from "./fixtures/${id}.json";`, "after", problems);
     const entry = `  "${id}": ${c}Fixtures,`;
-    next = previous && new RegExp(`^  "${previous}": `, "m").test(next) ? insert(next, FIXTURES, new RegExp(`^  "${previous}": `), entry, "after", problems) : insert(next, FIXTURES, /^};$/, entry, "before", problems);
+    const after = new RegExp(`^  "${previous}": `);
+    next = previous && blockHas(next, FILES_MAP, after) ? insert(next, FIXTURES, { block: FILES_MAP, anchor: after }, entry, "after", problems) : insert(next, FIXTURES, { block: FILES_MAP }, entry, "before", problems);
     return next;
   });
   edit(WRITERS, (text) => {
@@ -175,9 +217,10 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
       problems.push(`${WRITERS} already has ${c}Fixtures: pass --short with another name`);
       return text;
     }
-    let next = insert(text, WRITERS, /^import \{ \w+Fixtures \} from "\.\/[a-z0-9-]+\.ts";$/, `import { ${c}Fixtures } from "./${id}.ts";`, "after", problems);
+    let next = insert(text, WRITERS, { anchor: /^import \{ \w+Fixtures \} from "\.\/[a-z0-9-]+\.ts";$/ }, `import { ${c}Fixtures } from "./${id}.ts";`, "after", problems);
     const entry = `  "${id}": () => ${c}Fixtures(),`;
-    next = previous && new RegExp(`^  "${previous}": `, "m").test(next) ? insert(next, WRITERS, new RegExp(`^  "${previous}": `), entry, "after", problems) : insert(next, WRITERS, /^};$/, entry, "before", problems);
+    const after = new RegExp(`^  "${previous}": `);
+    next = previous && blockHas(next, WRITERS_MAP, after) ? insert(next, WRITERS, { block: WRITERS_MAP, anchor: after }, entry, "after", problems) : insert(next, WRITERS, { block: WRITERS_MAP }, entry, "before", problems);
     return next;
   });
   edit(GOLDEN_REGISTRY, (text) => {
@@ -187,8 +230,8 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     }
     const imported = `// import * as ${short} from "../scenarios/${id}/game.ts";`;
     const registered = `  // entry("${id}", "${facts.name}", ${short}.${short.toUpperCase().replace(/-/g, "_")}_GOLDENS, ${short}.${c}World, ${short}.playGolden),`;
-    const next = insert(text, GOLDEN_REGISTRY, /^import \* as \w+ from "\.\.\/scenarios\/[a-z0-9-]+\/game\.ts";$/, imported, "after", problems);
-    return insert(next, GOLDEN_REGISTRY, /^\];$/, registered, "before", problems);
+    const next = insert(text, GOLDEN_REGISTRY, { anchor: /^import \* as \w+ from "\.\.\/scenarios\/[a-z0-9-]+\/game\.ts";$/ }, imported, "after", problems);
+    return insert(next, GOLDEN_REGISTRY, { block: GOLDEN_ARRAY }, registered, "before", problems);
   });
   if (problems.length > 0) return { plan: null, problems };
   return { plan: { files, edits, facts }, problems };

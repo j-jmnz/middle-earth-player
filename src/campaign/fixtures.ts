@@ -24,7 +24,7 @@ import fixtures from "./fixtures/scenario-1.json";
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 
-import { FIXTURE_ENTRIES, type FixtureName, type FixtureScenarioId } from "./fixtures/registry.ts";
+import { FIXTURE_REGISTRY, type FixtureName, type FixtureScenarioId } from "./fixtures/registry.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";
 import { FELLOWSHIP_ID, parseLoadout, parseLog, parseSeatCount, type Save, type StoredLoadout } from "./save.ts";
 
@@ -35,7 +35,7 @@ export type Fixture = { campaignId: string; seatCount: 1 | 2; loadout: StoredLoa
 
 type StoredFixture = { campaignId?: string; seatCount: number; loadout: unknown; seed: number; intents: unknown[]; log?: unknown; past?: { fixture: string; choices: string[] } };
 
-export const FIXTURE_NAMES: readonly FixtureName[] = FIXTURE_ENTRIES.flatMap((entry) => entry.names);
+export const FIXTURE_NAMES: readonly FixtureName[] = FIXTURE_REGISTRY.flatMap((entry) => entry.names);
 
 export function isFixtureName(value: string): value is FixtureName {
   return (FIXTURE_NAMES as readonly string[]).includes(value);
@@ -59,7 +59,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
-  FIXTURE_ENTRIES.flatMap((entry) => {
+  FIXTURE_REGISTRY.flatMap((entry) => {
     const saves = FILES[entry.scenarioId] as Partial<Record<FixtureName, StoredFixture>>;
     return entry.names.flatMap((name) => (saves[name] ? [[name, saves[name]] as const] : []));
   }),

@@ -15,7 +15,7 @@ import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 import { briefing } from "./briefing.ts";
 import { emptyLog } from "./log.ts";
 import { fixture, fixtureSave, FIXTURE_NAMES, hasFixture, type FixtureName } from "./fixtures.ts";
-import { FIXTURE_ENTRIES } from "./fixtures/registry.ts";
+import { FIXTURE_REGISTRY } from "./fixtures/registry.ts";
 import { campaignPath, nextStep, openNode } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
@@ -39,7 +39,7 @@ const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 // resumes it. A name whose game the seeds did not find is not committed and has nothing to check. The Campaign Setup's offers are answered in the loadout (Raid's Galdor's Counsel).
 const DREAM_CHASER = loadCampaign("dream-chaser");
 const SETUP_CHOICES: Readonly<Record<string, readonly string[]>> = { "raid-on-the-grey-havens": ["skip", "skip"] };
-const LATER_PARTS = FIXTURE_ENTRIES.flatMap((entry) => {
+const LATER_PARTS = FIXTURE_REGISTRY.flatMap((entry) => {
   const at = DREAM_CHASER.scenarios.indexOf(entry.scenarioId);
   if (at < 1) return [];
   const won = entry.names.find((name) => name.endsWith("-won"));

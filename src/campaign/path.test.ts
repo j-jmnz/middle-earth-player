@@ -42,7 +42,6 @@ describe("a scenario the app cannot deal yet (coming soon)", () => {
 
   it("lists the playable scenarios first, so the path stops at the first one the app cannot deal", () => {
     expect(order.slice(0, frontier)).toEqual(won);
-    expect(soon.length).toBeGreaterThan(0);
   });
 
   it("marks every scenario the app cannot deal coming soon, whatever is won before them, and never current", () => {
@@ -55,8 +54,13 @@ describe("a scenario the app cannot deal yet (coming soon)", () => {
 
   it("stops the path at the first scenario the app cannot deal after the last playable one: the next step is coming soon, never Begin, and it is never opened or resumed", () => {
     const path = pathAfter(won);
-    const first = soon[0] ?? "";
+    const first = soon[0];
     expect(currentNode(path)).toBeNull();
+    // Once every scenario is playable there is nothing coming soon, and the path ends with the last one won.
+    if (first === undefined) {
+      expect(soonNode(path)).toBeNull();
+      return;
+    }
     expect(soonNode(path)?.id).toBe(first);
     expect(soonWords(soonNode(path)!)).toBe(`${nameOf(first)} is coming soon`);
     expect(nextStep(path, null)).toEqual({ kind: "soon", node: path[frontier] });
@@ -68,7 +72,7 @@ describe("a scenario the app cannot deal yet (coming soon)", () => {
   it("begins the last playable scenario while it is the first one not won, and keeps the log of what is won", () => {
     const path = pathAfter(won.slice(0, frontier - 1));
     expect(nextStep(path, null)).toMatchObject({ kind: "begin", node: { id: won[frontier - 1] } });
-    expect(path.map((entry) => entry.status).slice(frontier - 2, frontier + 1)).toEqual(["completed", "current", "soon"]);
+    expect(path.map((entry) => entry.status).slice(frontier - 2, frontier + 1)).toEqual(["completed", "current", ...(soon.length > 0 ? ["soon" as const] : [])]);
     expect(pathAfter(won).filter((entry) => entry.status === "completed")).toHaveLength(frontier);
   });
 });

@@ -57,7 +57,7 @@ import { raidFixtures } from "./raid-on-the-grey-havens.ts";
 import { stormcallerFixtures } from "./flight-of-the-stormcaller.ts";
 import { depthsFixtures } from "./the-thing-in-the-depths.ts";
 import { templeFixtures } from "./temple-of-the-deceived.ts";
-import { FIXTURE_ENTRIES, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
+import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
@@ -261,10 +261,10 @@ function playDuo(): { seed: number; loadout: StoredLoadout; intents: PlayerInten
   return { seed, loadout, intents };
 }
 
-// The log the won game writes when its Resolution is answered with these cards, one choice at a time.
+// The log scenario 1's won game writes when its Resolution is answered with these cards, one choice at a time (`logOfPastResolution`; seed-kit's `wonLog` is the same step for a golden).
 const PAST_CHOICES = ["141078", "141077"];
 
-function wonLog(won: { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] }): { log: CampaignLog; choices: string[] } {
+function logOfPastResolution(won: { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] }): { log: CampaignLog; choices: string[] } {
   const codes = [FRODO, ...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
   const save: Save = { ...newSave("fixture", campaign.id, 2), active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] }, loadout: won.loadout };
@@ -383,7 +383,7 @@ void runScript("e2e-fixtures", async () => {
   // Every other scenario of the registry (src/campaign/fixtures/registry.ts), in campaign order: a part chains from the games written before it.
   const written: Partial<Record<FixtureName, unknown>> = {};
   const order = scenarioOrder();
-  const rest = FIXTURE_ENTRIES.flatMap((entry) => (isChained(entry.scenarioId) ? [{ ...entry, scenarioId: entry.scenarioId }] : [])).sort((left, right) => position(order, left.scenarioId) - position(order, right.scenarioId));
+  const rest = FIXTURE_REGISTRY.flatMap((entry) => (isChained(entry.scenarioId) ? [{ ...entry, scenarioId: entry.scenarioId }] : [])).sort((left, right) => position(order, left.scenarioId) - position(order, right.scenarioId));
   for (const entry of rest) {
     const name = loadScenario(entry.scenarioId).name;
     const games = await say.stepAsync(`play ${name}'s fixtures`, async () => WRITERS[entry.scenarioId](written));
@@ -394,7 +394,7 @@ void runScript("e2e-fixtures", async () => {
   }
 
   if (won) {
-    const past = wonLog(won);
+    const past = logOfPastResolution(won);
     const knifeOut = {
       "knife-lost": { seatCount: 2, ...say.step("play A Knife in the Dark's loss", () => playKnifeLoss(past.log)), log: past.log, past: { fixture: "won", choices: past.choices } },
     };

@@ -32,8 +32,6 @@ const bottomAttack = (code: string, line: string): Effect => ({
   instructions: [{ verb: "DiscardBottom" }, { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: CHEAP }],
 }) satisfies Effect;
 
-// "If Calphon leaves play, the players lose the game."
-
 // "Action: Exhaust Calphon to look at the bottom card (the bottom 5 cards) of your deck. Then, you may switch that card (one of them) with a card in your hand."
 const calphonAction = (code: string, line: string, id: number, count: number): Effect => ({
   id: `${code}:action:${id}`,

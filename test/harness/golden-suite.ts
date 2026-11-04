@@ -129,8 +129,8 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         expect(log.completed).toEqual([...before.completed, spec.scenario.id]);
         if (xp != null) expect(log.xpGained[spec.scenario.id]).toBe(xpAwarded(xp));
         expect(log.modes).toEqual(golden.mode ? { [spec.scenario.id]: golden.mode } : {});
-        // The part after this one is the one the path offers now.
-        const path = campaignPath(spec.campaign, {}, { ...log, completed: spec.campaign.scenarios.slice(0, index + 1) });
+        // The part after this one is the one the path offers now: the log this Resolution writes onto a campaign that won the parts before it.
+        const path = campaignPath(spec.campaign, {}, applyResolution(logBefore(spec.campaign, spec.scenario, golden.seatCount), state.scenarioId, state, world.cards));
         // The last part of a campaign has none after it.
         const last = index + 1 >= spec.campaign.scenarios.length;
         expect(path.map((node) => node.status).slice(0, index + 2)).toEqual([...Array.from({ length: index + 1 }, () => "completed"), ...(last ? [] : [spec.next ?? "current"])]);

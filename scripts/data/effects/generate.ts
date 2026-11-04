@@ -14,7 +14,8 @@ export type Segment = { card: Card; index: number; side: "front" | "back" | "sha
 
 // `number` is the place the line's record takes in its timing (`<code>:<timing>:<number>`): the number generate reserved for a
 // labelled line, and for an unlabelled one (a constant ability, reserved by nothing) the next number at that point.
-export type Unmatched = Segment & { timing: string | null; number: number };
+// `form` is set on an unlabelled line (timing null): the counter its number comes from.
+export type Unmatched = Segment & { timing: string | null; number: number; form?: "constant" | "triggered" };
 
 // The box's cards (what the scenarios deal and both starter lists) as opposed to the rest of the player pool.
 export function boxCodes(campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[]): Set<string> {
@@ -104,11 +105,13 @@ function withWrapper(drafts: Draft[], condition: Condition | null, limit: Limit 
   return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit } : {}) }));
 }
 
-// The first template that reads the whole line.
-function readLine(line: string, context: TemplateContext): { drafts: Draft[]; template: string } | null {
+// The first template that reads the whole line. `finish` shapes a template's drafts (the wrapper, the event's play cost) and returns null
+// when it cannot, in which case the next template is tried.
+function readLine(line: string, context: TemplateContext, finish?: (drafts: Draft[]) => Draft[] | null): { drafts: Draft[]; template: string } | null {
   for (const template of TEMPLATES) {
     const match = template.pattern.exec(line);
-    const drafts = match ? template.build(match, context) : null;
+    const built = match ? template.build(match, context) : null;
+    const drafts = built && finish ? finish(built) : built;
     if (drafts) return { drafts, template: template.id };
   }
   return null;
@@ -133,6 +136,11 @@ function shadowBySentence(line: string, context: TemplateContext): { drafts: Dra
 
 // How an unlabelled ability that opens so reads: a triggered one (a conditional or timed sentence), not a constant one.
 const TRIGGERED_OPENING = /^(?:If|When|After|Whenever|Each time|Before) /;
+
+/** Which counter an unlabelled line numbers from, and so which timing a record for it takes: `triggered` when it opens like one, else `constant`. */
+function unlabelledForm(line: string): "constant" | "triggered" {
+  return TRIGGERED_OPENING.test(line) ? "triggered" : "constant";
+}
 
 // A line the ledger marks as needing no record (an inert reason).
 function inertLine(ledger: Ledger, segment: Segment): boolean {
@@ -234,17 +242,14 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       const { line, condition, limit } = wrapped(selfNamed(card, segment.line));
       const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();
       if (label) inResolution = card.type === "campaign" && LABEL_TIMING.get(label) === "resolution";
-      let drafts = null;
-      for (const template of TEMPLATES) {
-        const match = template.pattern.exec(line);
-        if (!match) continue;
-        drafts = template.build(match, context);
-        if (drafts && (condition || limit)) drafts = withWrapper(drafts, condition, limit);
-        if (drafts) {
-          drafts = drafts.map((draft) => (card.type === "event" && draft.timing === "response" && !draft.cost ? { ...draft, cost: { kind: "playEvent" as const } } : draft));
-          usage[template.id] = (usage[template.id] ?? 0) + 1;
-          break;
-        }
+      let drafts: Draft[] | null = null;
+      const read = readLine(line, context, (built) => {
+        const wrappedDrafts = condition || limit ? withWrapper(built, condition, limit) : built;
+        return wrappedDrafts && wrappedDrafts.map((draft) => (card.type === "event" && draft.timing === "response" && !draft.cost ? { ...draft, cost: { kind: "playEvent" as const } } : draft));
+      });
+      if (read) {
+        drafts = read.drafts;
+        usage[read.template] = (usage[read.template] ?? 0) + 1;
       }
       if (!drafts && !condition && !limit) {
         const sentences = shadowBySentence(line, context);
@@ -269,11 +274,12 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       }
       const timing = ((label === "setup" && card.type === "campaign" ? "campaignSetup" : label ? LABEL_TIMING.get(label) : undefined)) ?? (inResolution ? "resolution" : null);
       // A labelled line that no template reads keeps its number, so the authored record that replaces it lines up.
-      const number = timing ? next(timing) : (counters.get("constant") ?? 0) + 1;
+      const form = unlabelledForm(line);
+      const number = timing ? next(timing) : (counters.get(form) ?? 0) + 1;
       if (timing === "resolution") for (let extra = 1; extra < (SPLIT_LINES[segment.lineId] ?? 1); extra += 1) next(timing);
       if (carried) unmatched.push({ ...carried, timing: "resolution", number });
-      unmatched.push({ ...segment, timing, number });
-      if (timing === null && !lineInert) unread.add(TRIGGERED_OPENING.test(line) ? "triggered" : "constant");
+      unmatched.push({ ...segment, timing, number, ...(timing === null ? { form } : {}) });
+      if (timing === null && !lineInert) unread.add(form);
     }
     if (header) unmatched.push({ ...header, timing: "resolution", number: (counters.get("resolution") ?? 0) + 1 });
   }

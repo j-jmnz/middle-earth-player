@@ -29,8 +29,6 @@ export type FixtureName = (typeof FIXTURE_REGISTRY)[number]["names"][number];
 
 export type FixtureEntry = { scenarioId: FixtureScenarioId; file?: string; names: readonly FixtureName[] };
 
-export const FIXTURE_ENTRIES: readonly FixtureEntry[] = FIXTURE_REGISTRY;
-
 /** The JSON file's name (without `.json`) under src/campaign/fixtures/. */
 export function fixtureFile(entry: FixtureEntry): string {
   return entry.file ?? entry.scenarioId;

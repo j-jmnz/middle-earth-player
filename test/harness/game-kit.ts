@@ -14,6 +14,7 @@ import type { StartScenario } from "../../src/rules/setup/setup.ts";
 
 import { gameCodes } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "./catalog.ts";
+import { FRODO } from "./scene.ts";
 
 // Test helper. The parts every scenario's seeded whole game (test/scenarios/<scenario-id>/game.ts) shares: the stand-in heroes
 // and the free-event deck, the loop that plays a game to its end, and the auto-player's extra answers most scenarios give
@@ -105,7 +106,8 @@ export const HERO_STATS = {
 /** The Mirkwood Paths and Fellowship goldens give the stand-in heroes a starting threat of 8. */
 export const HERO_STATS_8 = { strong: { ...HERO_STATS.strong, threat: 8 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 8 } } as const satisfies Record<string, HeroStats>;
 
-export const RING_BEARER = "141001";
+/** Frodo, the Ring-bearer (test/harness/scene.ts). */
+export const RING_BEARER = FRODO;
 
 /** A starter deck of a campaign: its heroes, and its other cards one entry a copy. */
 export function starterSeat(campaign: CampaignData, id: string): LoadoutSeat {

@@ -15,6 +15,34 @@ const SCENARIOS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name
 // A scenario that has no authored file yet is one the scaffold has not been run for.
 const NEW = SCENARIOS.find((id) => !exists(`src/effects/authored/${id}.ts`) && !exists(`test/scenarios/${id}`));
 
+// A view of the repo as if `ids` had none of their lines in the registries and none of their files: the planner is tested on explicit ids,
+// whether or not the real repo has scaffolded them yet. (Every registry line that names a scenario carries its id.)
+function without(...ids: string[]): { repo: Repo; exists: (file: string) => boolean } {
+  const names = (file: string): boolean => ids.some((id) => file.includes(id));
+  return {
+    repo: { read: (file) => repo.read(file)?.split("\n").filter((line) => !names(line)).join("\n") ?? null },
+    exists: (file) => !names(file) && exists(file),
+  };
+}
+
+// Where each registry's block starts and ends: an added line must land between these.
+const BLOCKS: Record<string, { start: RegExp; end: RegExp } | undefined> = {
+  "src/campaign/fixtures/registry.ts": { start: /^export const FIXTURE_REGISTRY = \[/, end: /^\] as const/ },
+  "scripts/e2e/fixtures.ts": { start: /^const WRITERS\b/, end: /^};$/ },
+  "test/harness/golden-registry.ts": { start: /^export const GOLDEN_REGISTRY\b/, end: /^\];$/ },
+};
+
+// The (0-based) index of the line `after` inserted, and the text; an edit inserts lines one at a time, so this is the index of each added line.
+function addedAt(before: string, after: string): { at: number; line: string }[] {
+  const old = before.split("\n");
+  const added: { at: number; line: string }[] = [];
+  after.split("\n").forEach((line, index) => {
+    if (old[index - added.length] === line) return;
+    added.push({ at: index, line });
+  });
+  return added;
+}
+
 function cli(...args: string[]): { status: number | null; output: string } {
   const run = spawnSync("node", ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", path.join(ROOT, "scripts", "tools", "scenario-new.ts"), ...args], { cwd: ROOT, encoding: "utf8", env: { ...process.env, LOG_LEVEL: "info" } });
   return { status: run.status, output: `${run.stdout}${run.stderr}` };
@@ -38,9 +66,64 @@ describe("pnpm scenario:new", () => {
     expect(cli("the-thing-in-the-depths", "--dry-run").status).toBe(1);
   });
 
-  it.skipIf(!NEW)("plans the skeletons and the registry lines of a scenario without files, and writes nothing on --dry-run", () => {
-    const id = NEW as string;
-    const { plan, problems } = planScenario(id, {}, repo, exists);
+  // The previous part is registered (temple-of-the-deceived), the previous part is not (the-drowned-ruins), and the first part of a campaign.
+  it.each([
+    ["the-drowned-ruins", "a registered previous part", []],
+    ["a-storm-on-cobas-haven", "an unregistered previous part", ["the-drowned-ruins"]],
+    ["passage-through-mirkwood", "no previous part", []],
+  ])("puts every added registry line of %s inside the object it edits (%s)", (id, _kind, alsoLeftOut) => {
+    const view = without(id, ...alsoLeftOut);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/fixtures.ts", "test/harness/golden-registry.ts"]);
+    for (const edit of plan?.edits ?? []) {
+      const lines = edit.after.split("\n");
+      const added = addedAt(edit.before, edit.after);
+      expect(added.length, edit.file).toBeGreaterThan(0);
+      const block = BLOCKS[edit.file];
+      // The fixtures.ts file has two: its import is outside any block, its FILES entry inside the map.
+      for (const { at, line } of added) {
+        if (line.startsWith("import ") || line.startsWith("// import ")) continue;
+        const wanted = block ?? (edit.file === "src/campaign/fixtures.ts" ? { start: /^const FILES\b/, end: /^};$/ } : undefined);
+        const start = lines.findIndex((one) => wanted?.start.test(one));
+        const end = lines.findIndex((one, index) => index > start && wanted?.end.test(one));
+        expect(start, `${edit.file}: block start`).toBeGreaterThanOrEqual(0);
+        expect(at, `${edit.file}: "${line.trim()}" is after the block's declaration`).toBeGreaterThan(start);
+        expect(at, `${edit.file}: "${line.trim()}" is before the block's closing line`).toBeLessThan(end);
+      }
+    }
+    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/fixtures.ts");
+    const writerLines = writers?.after.split("\n") ?? [];
+    const from = writerLines.findIndex((line) => /^const WRITERS\b/.test(line));
+    const to = writerLines.findIndex((line, index) => index > from && /^};$/.test(line));
+    expect(writerLines.slice(from, to).some((line) => line.startsWith(`  "${id}": () => `))).toBe(true);
+  });
+
+  it("refuses a short name that is not an identifier", () => {
+    const view = without("the-drowned-ruins");
+    const { plan, problems } = planScenario("the-drowned-ruins", { short: "dr-ruins" }, view.repo, view.exists);
+    expect(plan).toBeNull();
+    expect(problems.join(" ")).toContain("not a valid identifier");
+  });
+
+  it("refuses an anchor that matches more than once inside its block", () => {
+    const view = without("the-drowned-ruins");
+    const twice: Repo = {
+      read: (file) => {
+        const text = view.repo.read(file);
+        // Two writers for the previous part: the planner cannot tell which one the new line follows.
+        return file === "scripts/e2e/fixtures.ts" && text ? text.replace(/^(  "temple-of-the-deceived": .*)$/m, "$1\n$1") : text;
+      },
+    };
+    const { plan, problems } = planScenario("the-drowned-ruins", {}, twice, view.exists);
+    expect(plan).toBeNull();
+    expect(problems.join(" ")).toContain("refusing to guess");
+  });
+
+  it("plans the skeletons and the registry lines of the next scenario without files, and writes nothing on --dry-run", () => {
+    const id = "the-drowned-ruins";
+    const view = without(id);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
     expect(problems).toEqual([]);
     expect(plan?.files.map((item) => item.file)).toEqual([
       `test/scenarios/${id}/scene.ts`,
@@ -68,6 +151,15 @@ describe("pnpm scenario:new", () => {
     expect(scene).toContain('campaignCard: "');
     for (const code of JSON.parse(readFileSync(path.join(ROOT, "data", "scenarios", `${id}.json`), "utf8")).stages as string[]) expect(scene).toContain(`"${code}"`);
 
+    for (const item of plan?.files ?? []) expect(view.exists(item.file), item.file).toBe(false);
+    for (const edit of plan?.edits ?? []) expect(view.repo.read(edit.file), edit.file).toBe(edit.before);
+  });
+
+  // The CLI reads the real repo, so it runs on a scenario the real repo has not scaffolded yet (none, once every scenario has its files).
+  it.skipIf(!NEW)("--dry-run on the real repo lists the files and writes nothing", () => {
+    const id = NEW as string;
+    const { plan, problems } = planScenario(id, {}, repo, exists);
+    expect(problems).toEqual([]);
     const run = cli(id, "--dry-run");
     expect(run.status).toBe(0);
     expect(run.output).toContain(`test/scenarios/${id}/scene.ts`);

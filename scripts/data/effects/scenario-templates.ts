@@ -274,7 +274,10 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     build: (match) => [{ timing: "resolution", instructions: [{ verb: "GainXp", amount: count(match[1]), when: { kind: "survivorsThreat", max: count(match[2]) } }] }],
   },
   {
-    // "Is in the victory display" is one shape: a count of the victory-display cards with the name, at least one.
+    // "Is in the victory display" is written in the shapes the played goldens store: an `inVictory` condition by code when the name resolves
+    // to one code the scenario deals, `any` of one per printing when it resolves to several, and a count of the display's cards with the
+    // name (at least one) when no code is read. 11171:resolution:7/8 and 11191:resolution:5/6 keep their authored `each`/`max` form in
+    // AUTHORED_REPLACES for the same reason: their goldens store that form.
     id: "xp-named-card-in-victory",
     pattern: /^• ([-−–])?(\d+) XP if (\p{Lu}.*?) is in the victory display\.$/u,
     build: (match, context) => {

@@ -120,15 +120,16 @@ function main(log: Log): void {
       .slice(0, 3)
       .map(({ effect }) => ({ lineId: effect.lines.join(", "), text: effect.lines.map((id) => segmentById.get(id)?.line ?? "").join(" "), effect }));
   };
-  // The id a record takes: the number generate reserved for a labelled line. An unlabelled line (a constant ability) reserves
-  // none, so its record takes the first number no generated or authored record on the card uses.
+  // The id a record takes: the number generate reserved for a labelled line. An unlabelled line (a constant or triggered ability, as
+  // generate classifies it) reserves none, so its record takes the first number of that timing no generated or authored record on the card uses.
   const taken = new Set([...generated.effects, ...EFFECTS].map((effect) => effect.id));
   const suggestedId = (line: Unmatched): string => {
     if (line.timing) return `${line.card.code}:${line.timing}:${line.number}`;
+    const form = line.form ?? "constant";
     let n = line.number;
-    while (taken.has(`${line.card.code}:constant:${n}`)) n += 1;
-    taken.add(`${line.card.code}:constant:${n}`);
-    return `${line.card.code}:constant:${n}`;
+    while (taken.has(`${line.card.code}:${form}:${n}`)) n += 1;
+    taken.add(`${line.card.code}:${form}:${n}`);
+    return `${line.card.code}:${form}:${n}`;
   };
 
   const out = path.join(ROOT, ".agent", "drafts");

@@ -51,7 +51,7 @@ describe("withCopies", () => {
     const calphon: Effect = { id: "11028:triggered:1", cardCode: "11028", lines: ["11028:A:3"], timing: "triggered", instructions: [] };
     const [, copied] = withCopies([calphon, copyLine("11028:A:3", "110013:A:3")]);
     const pairs = copiedLines(copied!) ?? [];
-    expect(pairs).toEqual([{ from: "11028:A:3", to: "110013:A:3", fromName: "", toName: "" }]);
+    expect(pairs).toEqual([{ from: "11028:A:3", to: "110013:A:3" }]);
     expect(copyMismatch(shippedLedger(), pairs[0]!)).toMatch(/11028:A:3.*110013:A:3/);
     expect(copiedLines(calphon)).toBeUndefined();
   });

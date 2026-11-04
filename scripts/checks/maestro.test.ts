@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { FIXTURE_ENTRIES } from "../../src/campaign/fixtures/registry.ts";
+import { FIXTURE_REGISTRY } from "../../src/campaign/fixtures/registry.ts";
 
 // The Maestro flows (.maestro) checked without a phone: each file parses, each `runFlow` file exists and gets the env its subflow reads,
 // each fixture a flow opens is in the fixture registry, and each `id:` is a testID the app sets. A cloud session cannot run Maestro, so
@@ -148,7 +148,7 @@ function optionalEnv(flow: Flow): Set<string> {
 }
 
 const SCENARIO_IDS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
-const FIXTURE_NAMES = new Set<string>(FIXTURE_ENTRIES.flatMap((entry) => entry.names));
+const FIXTURE_NAMES = new Set<string>(FIXTURE_REGISTRY.flatMap((entry) => entry.names));
 // Names that older flows open and no script writes: the fixture route opens nothing for them, so those flows cannot run until a fixture or a change to the flow exists.
 const UNWRITTEN = new Set(["breaking-solo", "breaking-pair", "breaking-won", "breaking-lost", "ford-start", "ford-won", "ford-lost", "south-start", "south-stage-4", "south-won", "south-lost", "moria-won", "moria-lost", "moria-pairs"]);
 
@@ -158,7 +158,17 @@ function sourceFiles(dir: string): string[] {
     return statSync(full).isDirectory() ? sourceFiles(full) : /\.(tsx?|ts)$/.test(name) ? [full] : [];
   });
 }
-const SOURCE = sourceFiles(path.join(ROOT, "src")).map((file) => readFileSync(file, "utf8")).join("\n");
+// Every line of src: an id is built in one string or template literal, so its fixed parts must follow each other within one line.
+const SOURCE_LINES = sourceFiles(path.join(ROOT, "src")).flatMap((file) => readFileSync(file, "utf8").split("\n"));
+const inOrder = (line: string, parts: readonly string[]): boolean => {
+  let at = 0;
+  for (const part of parts) {
+    const found = line.indexOf(part, at);
+    if (found < 0) return false;
+    at = found + part.length;
+  }
+  return true;
+};
 
 // The static part of an id: a scenario id, a card code or a ${variable} is built at run time, so only the text around it is looked up.
 function fragments(id: string): string[] {
@@ -245,7 +255,10 @@ describe("the Maestro flows", () => {
       walk(flow.commands, (key, value) => {
         if (key === "id" && typeof value === "string") ids.add(value);
       });
-      for (const id of ids) for (const part of fragments(id)) if (!SOURCE.includes(part)) missing.push(`${flow.rel}: ${id} (${part})`);
+      for (const id of ids) {
+        const parts = fragments(id);
+        if (!SOURCE_LINES.some((line) => inOrder(line, parts))) missing.push(`${flow.rel}: ${id} (${parts.join(" ... ")} in one line of src)`);
+      }
     }
     expect(missing).toEqual([]);
   });

@@ -333,8 +333,10 @@ export async function ${logName}(): Promise<CampaignLog> {
 `;
     }
   }
-  imports.push(`import { intentFor } from "./raid-on-the-grey-havens.ts";`, `import { createLog } from "../log.ts";`, `import { ${dream ? "DREAM_CHASER, " : ""}firstSeed${withLog ? ", wonLog" : ""} } from "./seed-kit.ts";`);
+  // Dream-chaser finders share the Raid finder's answers; another campaign starts from the auto-player's default policy (a TODO to tune).
+  imports.push(dream ? `import { intentFor } from "./raid-on-the-grey-havens.ts";` : `import { nextIntent } from "../../test/harness/auto-player.ts";`, `import { createLog } from "../log.ts";`, `import { ${dream ? "DREAM_CHASER, " : ""}firstSeed${withLog ? ", wonLog" : ""} } from "./seed-kit.ts";`);
   const campaignId = dream ? "DREAM_CHASER" : `"${facts.campaignId}"`;
+  const answer = dream ? "intentFor" : "(state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: \"\", prefer: \"\", protect: \"\", play: true, act: true }, memory)";
   return `// The Maestro fixtures of ${facts.name} (${facts.campaignId} part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. \`${facts.short}-won\` is the first seed that wins, parked on the win (the Resolution waits); \`${facts.short}-lost\` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.${withLog ? "\n// The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it." : ""}
@@ -353,7 +355,7 @@ export type ${P}FixtureName = "${facts.short}-won" | "${facts.short}-lost";
 ${logFunction}export async function ${c}Fixtures(): Promise<Partial<Record<${P}FixtureName, ${P}Fixture>>> {
 ${withLog ? `  const log = await ${logName}();\n` : ""}  const find = (wanted: (state: ScenarioState) => boolean, label: string): ${P}Fixture | null => {
     // TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
-    const found = firstSeed(say, { campaignId: ${campaignId}, scenarioId: "${facts.id}", seatCount: 2,${withLog ? " log," : ""} answer: intentFor }, "${U}_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: ${campaignId}, scenarioId: "${facts.id}", seatCount: 2,${withLog ? " log," : ""} answer: ${answer} }, "${U}_SEEDS", wanted, label);
     return found && ${withLog ? "{ ...found, log }" : "found"};
   };
   const won = find((state) => state.stageCleared && !state.lost, "${facts.short}-won");
