@@ -4,6 +4,7 @@ import path from "node:path";
 import { parse as parseJsonc } from "jsonc-parser";
 
 import { EFFECTS } from "../../../src/effects/index.ts";
+import { copyLine, withCopies } from "../../../src/effects/authored/reprint.ts";
 import { splitCodes } from "../../codes.ts";
 import { runScript, type Log } from "../../log.ts";
 import type { Effect } from "../../../src/catalog/boundary.ts";
@@ -128,13 +129,52 @@ function main(log: Log): void {
   // The id a record takes: the number generate reserved for a labelled line. An unlabelled line (a constant or triggered ability, as
   // generate classifies it) reserves none, so its record takes the first number of that timing no generated or authored record on the card uses.
   const taken = new Set([...generated.effects, ...EFFECTS].map((effect) => effect.id));
+  const suggested = new Map<string, string>();
   const suggestedId = (line: Unmatched): string => {
-    if (line.timing) return `${line.card.code}:${line.timing}:${line.number}`;
-    const form = line.form ?? "constant";
-    let n = line.number;
-    while (taken.has(`${line.card.code}:${form}:${n}`)) n += 1;
-    taken.add(`${line.card.code}:${form}:${n}`);
-    return `${line.card.code}:${form}:${n}`;
+    const known = suggested.get(line.lineId);
+    if (known) return known;
+    let id = `${line.card.code}:${line.timing}:${line.number}`;
+    if (!line.timing) {
+      const form = line.form ?? "constant";
+      let n = line.number;
+      while (taken.has(`${line.card.code}:${form}:${n}`)) n += 1;
+      taken.add(`${line.card.code}:${form}:${n}`);
+      id = `${line.card.code}:${form}:${n}`;
+    }
+    suggested.set(line.lineId, id);
+    return id;
+  };
+
+  // The open lines of the batch that print the same sentence once each card's own name is {self}: the first is written, the others take its record.
+  const batchGroups = new Map<string, Unmatched[]>();
+  for (const line of open) {
+    const key = selfNamed(line.card, line.line);
+    batchGroups.set(key, [...(batchGroups.get(key) ?? []), line]);
+  }
+  const batchOf = (line: Unmatched): Unmatched[] => {
+    const group = batchGroups.get(selfNamed(line.card, line.line)) ?? [];
+    return group.length > 1 ? group : [];
+  };
+
+  // The `{ pool: ... }` import withCopies needs when the record to copy lives in another file than the copy (targetOf finds both).
+  const poolImport = (sourceCard: Card, copyCard: Card): string[] => {
+    const from = targetOf(sourceCard);
+    const to = targetOf(copyCard);
+    if (from === to) return [];
+    const stem = path.basename(from, ".ts");
+    const alias = (from.includes("/pool/") ? stem : (stem.split("-").find((word) => word !== "the" && word !== "a") ?? stem)).toUpperCase();
+    const relative = path.relative(path.dirname(to), from).replaceAll(path.sep, "/");
+    const exported = from.includes("/pool/") ? "RECORDS" : "AUTHORED_EFFECTS";
+    return [`In ${to}: \`import { ${exported} as ${alias} } from "${relative.startsWith(".") ? relative : `./${relative}`}";\` and pass \`{ pool: ${alias} }\` as the second argument of \`withCopies\`.`];
+  };
+  // The id the copy takes, as withCopies numbers it among the card's records already written.
+  const copiedIds = (twin: { lineId: string; card: Card }, line: Unmatched): string => {
+    try {
+      const made = withCopies([...EFFECTS.filter((effect) => effect.cardCode === line.card.code), copyLine(twin.lineId, line.lineId)], { pool: EFFECTS.filter((effect) => effect.cardCode === twin.card.code) });
+      return made.filter((effect) => effect.lines.includes(line.lineId)).map((effect) => effect.id).join(", ") || suggestedId(line);
+    } catch {
+      return suggestedId(line);
+    }
   };
 
   const out = path.join(ROOT, ".agent", "drafts");
@@ -173,10 +213,23 @@ function main(log: Log): void {
     sections.push(`## Vocabulary`, `[vocabulary.md](vocabulary.md)`, ``, `## Line by line`, ``);
     for (const line of lines) {
       const twins = twinsOf(line);
+      const batch = batchOf(line);
+      const [writer = line] = batch;
       sections.push(`### ${line.lineId}: ${line.line}`, ``, `Record id: \`${suggestedId(line)}\``, ``);
       if (twins.length > 0) {
         sections.push(`Exact match: the same text, with the card name as {self}, is owned elsewhere. Copy the records below, with this card's code, line id and number.`, ``);
-        for (const twin of twins) sections.push(`${twin.lineId} (card ${twin.card.name}):`, "```json", ...twin.records.map((effect) => JSON.stringify(effect)), "```", ``);
+        for (const twin of twins) {
+          sections.push(`${twin.lineId} (card ${twin.card.name}): \`${`copyLine("${twin.lineId}", "${line.lineId}")`}\`, record id \`${copiedIds(twin, line)}\``, ``, "```json", ...twin.records.map((effect) => JSON.stringify(effect)), "```", ``);
+          sections.push(...poolImport(twin.card, line.card).map((text) => `${text}`), ``);
+        }
+      } else if (batch.length > 0 && writer.lineId !== line.lineId) {
+        sections.push(`Twin in this batch: the same text, with the card name as {self}, as ${writer.lineId} (card ${writer.card.name}). Write no record here: take ${writer.lineId}'s with \`${`copyLine("${writer.lineId}", "${line.lineId}")`}\` (record id \`${suggestedId(line)}\` if the source is of that timing; withCopies numbers it).`, ``);
+        sections.push(...poolImport(writer.card, line.card), ``);
+      } else if (batch.length > 0) {
+        const copies = batch.slice(1);
+        sections.push(`Twins in this batch: the same text, with the card name as {self}, as ${copies.map((other) => other.lineId).join(", ")}. Write this line's record once; the others take it:`, ``);
+        for (const other of copies) sections.push(`- \`${`copyLine("${line.lineId}", "${other.lineId}")`}\` (card ${other.card.name}, record id \`${suggestedId(other)}\`)${poolImport(line.card, other.card).map((text) => `. ${text}`).join("")}`);
+        sections.push(``);
       } else {
         sections.push(`Nearest records for this line:`, ``);
         for (const item of nearest(line)) sections.push(`${item.lineId}: ${item.text.slice(0, 300)}`, "```json", JSON.stringify(item.effect), "```", ``);
