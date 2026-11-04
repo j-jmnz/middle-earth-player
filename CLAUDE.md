@@ -25,7 +25,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 ## Commands
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
-- While working, `pnpm test:changed` runs the tests that import a file changed since the last commit, and `pnpm test:fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`). Neither follows a file read at run time, so after a change under `data/` run `pnpm test`. The full `pnpm test` is green before a commit.
+- `pnpm test:changed` runs the tests that import a file changed since the last commit; `pnpm test:fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`). When to run which is `.cursor/rules/code-standards.mdc`, Checking a change.
 - `pnpm lint` runs Oxlint (`.oxlintrc.json`): the import boundaries and the React and Expo rules.
 - `pnpm typecheck` type-checks with tsrs (the Rust port of TypeScript 7). The `typescript` package stays for the editor and the tests that parse source.
 - `pnpm move <old> <new>` (or `pnpm move <map.json>`, `--dry-run` first) moves tracked files and folders and rewrites every relative import and every root-written path in code, docs and configs that names them; a file's `.native` variants and its test go with it. It lists what it cannot follow (paths built at run time). Move files with it, not by hand.

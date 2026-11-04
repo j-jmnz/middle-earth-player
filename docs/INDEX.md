@@ -10,7 +10,7 @@ Read whole.
 
 - `CLAUDE.md` — Claude Code (~1.9K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
-- `.cursor/rules/code-standards.mdc` — Code standards (~1.5K tok)
+- `.cursor/rules/code-standards.mdc` — Code standards (~1.8K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
 
 ## Agents
@@ -18,13 +18,13 @@ Read whole.
 Each agent reads its own file.
 
 - `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.1K tok)
-- `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.4K tok)
-- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.0K tok)
+- `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.5K tok)
+- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.1K tok)
 - `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~800 tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
-- `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~130 tok)
+- `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~140 tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~100 tok)
 
 ## Product, code and design
