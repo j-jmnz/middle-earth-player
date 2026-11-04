@@ -18,7 +18,8 @@ import { smokeCodes } from "../card-smoke/world.ts";
 //   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: causes, replay and the Maestro
 //              fixtures. A scenario with no entry skips them, except a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
 //              whole (in the tests part, as they import its scene)
-//   coverage   the effect coverage and migration checks, the copied-lines test and the golden registry's own test (COVERAGE_TESTS)
+//   coverage   the effect coverage, migration and record-route checks, the copied-lines test and the golden registry's own test (COVERAGE_TESTS), and every
+//              choice-words test (src/play/words): a record on a card another scenario's words test reads (a campaign card, a recurring ally) can break it
 //   smoke      scripts/card-smoke/run.ts on the player cards the scenario deals (skipped when it deals none)
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
 //              none), committed, staged, unstaged or untracked (changedFamilyTests)
@@ -31,7 +32,8 @@ export type Selection = {
   families: string[];
 };
 
-export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts"];
+export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts"];
+const WORDS_ROOT = "src/play/words/";
 export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -104,7 +106,8 @@ export function selectTests(id: string, changed: readonly string[], tree: readon
   const tests = scenarioTests(id, tree, read);
   // Without a title the direct goldens run whole, unless the tests part already holds them (they import the scenario's scene).
   const goldens = title === null ? present(DIRECT_GOLDENS[id] ?? []).filter((file) => !tests.includes(file)) : present(GOLDEN_TESTS);
-  const coverage = present(COVERAGE_TESTS);
+  const words = tree.filter((file) => file.startsWith(WORDS_ROOT) && file.endsWith(".test.ts") && !tests.includes(file));
+  const coverage = [...present(COVERAGE_TESTS), ...words];
   // A file runs once: in the first part that names it.
   const taken = new Set([...tests, ...goldens, ...coverage]);
   return { tests, goldens: { files: goldens, title }, coverage, families: changedFamilyTests(changed, tree).filter((file) => !taken.has(file)) };

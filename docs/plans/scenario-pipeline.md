@@ -87,7 +87,9 @@ Exit: the plan's checks (Verification), and `pnpm data:check` shows no differenc
 
 ## F. Faster feedback while authoring
 
-- `pnpm test:scenario <scenario-id>` runs the scenario's tests, its goldens, the coverage test and card-smoke on its player codes, and the pool, family and manifest tests when those changed.
+- `pnpm test:scenario <scenario-id>` runs the scenario's tests, its goldens, the coverage and record-route checks, every choice-words test, card-smoke on its player codes, and the pool, family and manifest tests when those changed.
+- `scripts/checks/record-routes.test.ts` walks every record whose route the engine picks from a verb list: a quest card's Setup (`revealsPerPlayer`), a Shadow (`runsInFrame`) and a campaign card's Setup (the setup roles, the start and the checklist). It names a record that would be skipped or fail with "Unimplemented instruction".
+- `scripts/e2e/fixtures.ts <scenario-id>` writes only that scenario's fixture file; the earlier parts' won games come from their committed files.
 
 Not built: a search-based win finder for the missing won fixtures (`docs/phases/STATUS.md`, Fixtures and Maestro).
 
@@ -104,12 +106,11 @@ Sections A to D and F are built; The Drowned Ruins (phase 46) was the first scen
 - **Mechanics.** This is the largest build cost: a scenario with a new mechanic (a deck of two-sided cards, a choice of up to N options) pays for the whole mechanic.
   - Where no hook fits, the mechanic edits the core: a zone guard, a play check, a ready check.
   - Some core lists are keyed by verb name, and a new verb must join them by hand: `revealsPerPlayer` in `src/rules/families/quest/setup.ts` (the quest card's Setup) and `runsInFrame` in `src/rules/combat/shadow.ts` (Shadow effects).
-  - When a verb is missing from one of those lists, nothing fails until a game reaches the card. Then the Setup is skipped without a word, or the Shadow throws "Unimplemented instruction".
+  - `scripts/checks/record-routes.test.ts` fails on a record that misses one of them, except a Shadow verb that runs outside a frame but pushes effects: that is first played in a golden.
 - **Goldens.** Filling the goldens is policy work on the kit. The goldens find engine bugs that unit tests miss.
   - A record that no golden reaches is found only by the reviewer. The fix pass then writes card tests for it.
   - The card smoke runs only player cards, so an encounter card's Shadow or When Revealed effect is first played in a golden.
 - **Fixtures and Maestro.** With real decks the seed finder finds a loss but no win, so the win flow cannot run (`docs/phases/STATUS.md`, Fixtures and Maestro).
-  - `scripts/e2e/fixtures.ts` rewrites every scenario's fixtures. The other scenarios' files must then be restored with `git checkout`.
 - **Review and fix.** The one fix pass is the largest single task of the phase. Its findings fall into classes the author can check before the review:
   - card readings (`docs/plans/effect-authoring.md`, Readings the review catches);
   - records with no test and no golden that reaches them;
@@ -120,10 +121,7 @@ Sections A to D and F are built; The Drowned Ruins (phase 46) was the first scen
 
 Ordered by what they save per scenario. A step that is built is deleted from this list, and its section above states what it does.
 
-1. **Verb lists become schema flags.** Not built.
-   - Give each verb a flag on its schema entry for whether a quest card's Setup runs it (`revealsPerPlayer`) and whether a Shadow runs it in a frame (`runsInFrame`), as `setupRole` does for `src/campaign/start.ts`.
-   - A test fails on a verb no flag classifies, so a new verb cannot be skipped without a word.
-   - Every golden stays byte-identical.
+1. **Verb lists become schema flags.** Not built. Give each verb a flag on its schema entry for whether a quest card's Setup runs it (`revealsPerPlayer`) and whether a Shadow runs it in a frame (`runsInFrame`), as `setupRole` does for `src/campaign/start.ts`, so a new family adds the verb in its own file, not in a core one. The record-route check already fails on a missed verb. Every golden stays byte-identical.
 2. **An encounter-card smoke.** Not built. In a seeded scene, it reveals each encounter card the scenario deals, resolves its Shadow in an attack and travels to each location. It reports any throw, refusal or stall, as `scripts/card-smoke/run.ts` does for player cards. `pnpm test:scenario` runs it.
 3. **Unreached records.** Not built.
    - `pnpm test:scenario` lists the scenario's records that no golden resolves.
@@ -132,12 +130,10 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
 4. **Twins within a batch.** Not built.
    - `effects:draft` groups the open lines of one batch whose normalized text is the same, including lines that differ only by the card's own name (`{self}`).
    - It names one line to write and the copies to take from it (`copyLine`, `copyLines`).
-5. **Choice words in `test:scenario`.** Not built. Add the `src/play/words` tests that check every new `Choose` and `Pick` reads as a sentence. They are now caught only by the full suite.
-6. **Fewer hand edits after `scenario:new`.** Not built.
+5. **Fewer hand edits after `scenario:new`.** Not built.
    - Count the Setup answers from the campaign card's Setup records.
    - Derive the previous part's "next part is soon" expectation from `src/campaign/playable.ts`, so making a part playable edits no earlier part's test.
-7. **One scenario's fixtures.** Not built. `scripts/e2e/fixtures.ts <scenario-id>` writes only that scenario's file.
-8. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run.
+6. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run.
 
 ## After each scenario phase
 
