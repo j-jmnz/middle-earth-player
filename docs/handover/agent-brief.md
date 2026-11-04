@@ -50,9 +50,10 @@ cards have no file under `src/effects/authored/families/`.
   show a compact table setup.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   `src/effects/authored/<scenario-id>.ts` (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`) for a scenario.
-- A new family is wired in at four places, each one line: `src/catalog/families/index.ts`, `src/rules/families/index.ts`
-  (its `RUNNERS`), `src/effects/authored/families/index.ts` (when it has records there), and for a new scenario file
-  `src/effects/index.ts`. `src/catalog/families/families.test.ts` fails if two families add the same trigger or flag.
+- A new family is wired in at three places, each one line: `src/catalog/families/index.ts`, `src/rules/families/index.ts`
+  (its `RUNNERS`) and `src/effects/authored/families/index.ts` (when it has records there). `src/catalog/families/families.test.ts`
+  fails if two families add the same trigger or flag. A scenario's file `src/effects/authored/<scenario-id>.ts` is picked up by
+  `pnpm data:build`, which writes the barrel `src/effects/generated/authored.ts` (`scripts/data/effects/barrel.ts`); the coverage test fails while it is stale.
 
 ## Shared files
 
@@ -83,7 +84,9 @@ work together with yours. A line that restates a rule the engine applies anyway 
 6. A line may stay open only if it is genuinely impossible to express in this engine; report it with the reason.
 7. A scenario phase also adds the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open,
    pins a whole game in a golden (`src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `src/campaign/scenarios/the-ring-goes-south/golden.json` are
-   the pattern), and leaves its phone half open in `docs/phases/STATUS.md` when you have no phone.
+   the pattern; list its `*_GOLDENS`, world and `playGolden` in `test/harness/golden-registry.ts`, which `src/campaign/causes.test.ts` and
+   `src/campaign/replay.test.ts` read), registers its Maestro fixtures in `src/campaign/fixtures/registry.ts` (with the JSON import in
+   `src/campaign/fixtures.ts` and its writer in `scripts/e2e/fixtures.ts`), and leaves its phone half open in `docs/phases/STATUS.md` when you have no phone.
 
 ## Checkpoints (API usage limits can stop you mid-task)
 

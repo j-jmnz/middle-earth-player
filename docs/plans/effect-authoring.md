@@ -34,7 +34,8 @@ belongs in a template (`scripts/data/effects/*-templates.ts`), not in more autho
 ## Where records live
 
 Generated records (`src/effects/generated`, written by `pnpm data:build` from the templates) and authored ones are merged in
-`src/effects/index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
+`src/effects/index.ts`. The authored files are listed by the barrel `src/effects/generated/authored.ts`, which `pnpm data:build` writes from
+`src/effects/authored/` (a file named for a scenario or campaign id, in campaign order); a new scenario file needs no edit to `index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
 with the reason, and the coverage test checks that no other id is replaced.
 
 - `src/effects/authored/pool/<PACK>.ts`: a player card's lines that no template reads and no family owns (`RECORDS`,

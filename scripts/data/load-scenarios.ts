@@ -23,6 +23,18 @@ export function loadCampaigns(dataDir = DATA_DIR): CampaignData[] {
     .map((name) => loadCampaign(name.replace(/\.json$/, ""), dataDir));
 }
 
+// Every built campaign in the order data/campaigns/index.json lists them (the order the app and the effect barrel use).
+export function loadCampaignsInOrder(dataDir = DATA_DIR): CampaignData[] {
+  const listed = (JSON.parse(readFileSync(path.join(dataDir, "campaigns", "index.json"), "utf8")) as { id: string }[]).map((entry) => entry.id);
+  const built = loadCampaigns(dataDir);
+  return listed.flatMap((id) => built.filter((campaign) => campaign.id === id));
+}
+
+// Every scenario id of the built campaigns in play order, each once (the Oath is in two).
+export function scenarioOrder(dataDir = DATA_DIR): string[] {
+  return [...new Set(loadCampaignsInOrder(dataDir).flatMap((campaign) => campaign.scenarios))];
+}
+
 // One campaign's scenarios in play order, or, with no id, every built campaign's, each scenario once (the Oath is in two).
 export function loadScenarios(campaignId?: string, dataDir = DATA_DIR): ScenarioData[] {
   const campaigns = campaignId === undefined ? loadCampaigns(dataDir) : [loadCampaign(campaignId, dataDir)];

@@ -1,5 +1,5 @@
-// Writes src/campaign/fixtures/scenario-1.json (saves parked on a moment of A Shadow of the Past) and
-// src/campaign/fixtures/a-knife-in-the-dark.json (A Knife in the Dark) for the Maestro flows. Run it again when
+// Writes src/campaign/fixtures/scenario-1.json (saves parked on a moment of A Shadow of the Past), a-knife-in-the-dark.json
+// (A Knife in the Dark) and the file of every other scenario in the registry, for the Maestro flows. Run it again when
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
 //   node --experimental-strip-types scripts/e2e/fixtures.ts          # `lost` and `duo`
@@ -18,13 +18,10 @@
 // first resource and the quest of nothing yet), for the flows that need two dials and a seat that is not acting (the peek,
 // `.maestro/features/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
-// `mirkwood-won` and `mirkwood-lost`: Passage Through Mirkwood (scripts/e2e/passage-through-mirkwood.ts), written to
-// src/campaign/fixtures/passage-through-mirkwood.json. `anduin-won` and `anduin-lost`: Journey Along the Anduin (scripts/e2e/journey-along-the-anduin.ts), written to
-// src/campaign/fixtures/journey-along-the-anduin.json. `dol-guldur-won` and `dol-guldur-lost`: Escape from Dol Guldur (scripts/e2e/escape-from-dol-guldur.ts), written to
-// src/campaign/fixtures/escape-from-dol-guldur.json. `oath-won` and `oath-lost`: The Oath on a blank The Dark of Mirkwood log (scripts/e2e/the-oath.ts), written to
-// src/campaign/fixtures/the-oath.json. `sea-solo`, `sea-duo`, `voyage-won` and `voyage-lost`: Voyage Across Belegaer on a blank Dream-chaser log (scripts/e2e/voyage-across-belegaer.ts), written to
-// src/campaign/fixtures/voyage-across-belegaer.json; `voyage-won` is written only when a seed wins. `nibin-dum-won` and `nibin-dum-lost`: The Caves of Nibin-Dûm from the log a real `oath-won` writes (scripts/e2e/the-caves-of-nibin-dum.ts), written to
-// src/campaign/fixtures/the-caves-of-nibin-dum.json. `fate-won` and `fate-lost`: The Fate of Númenor on the Dream-chaser log Voyage Across Belegaer's golden win writes (scripts/e2e/the-fate-of-numenor.ts), written to src/campaign/fixtures/the-fate-of-numenor.json; `fate-won` is written only when a seed wins. `raid-won` and `raid-lost`: Raid on the Grey Havens from the log the Voyage and Fate goldens' wins write (scripts/e2e/raid-on-the-grey-havens.ts), written to src/campaign/fixtures/raid-on-the-grey-havens.json; `raid-won` is written only when a seed wins. `stormcaller-won` and `stormcaller-lost`: Flight of the Stormcaller from the log the Voyage, Fate and Raid goldens' wins write (scripts/e2e/flight-of-the-stormcaller.ts), written to src/campaign/fixtures/flight-of-the-stormcaller.json; `stormcaller-won` is written only when a seed wins.
+// Every other scenario's fixtures (the names are in src/campaign/fixtures/registry.ts) are written by the scenario's own seed finder
+// in this folder, to src/campaign/fixtures/<scenario-id>.json, in campaign order (data/campaigns): a part after the first is dealt from
+// the log the earlier part's won game writes, so it takes that game from the ones written before it. A game the seeds did not find
+// is left out of its file.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
@@ -48,7 +45,7 @@ import { hideCommitLimit } from "../../src/rules/families/nightmare/guards.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
-import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
+import { loadCampaign, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { anduinFixtures } from "./journey-along-the-anduin.ts";
 import { dolGuldurFixtures } from "./escape-from-dol-guldur.ts";
 import { mirkwoodFixtures } from "./passage-through-mirkwood.ts";
@@ -60,6 +57,7 @@ import { raidFixtures } from "./raid-on-the-grey-havens.ts";
 import { stormcallerFixtures } from "./flight-of-the-stormcaller.ts";
 import { depthsFixtures } from "./the-thing-in-the-depths.ts";
 import { templeFixtures } from "./temple-of-the-deceived.ts";
+import { FIXTURE_ENTRIES, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
@@ -336,6 +334,34 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
   return { seed, loadout, intents };
 }
 
+// The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
+const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
+type Chained = Exclude<FixtureScenarioId, (typeof SCENARIO_ONE)[number]>;
+const isChained = (id: FixtureScenarioId): id is Chained => !(SCENARIO_ONE as readonly string[]).includes(id);
+
+function position(order: readonly string[], id: string): number {
+  const at = order.indexOf(id);
+  if (at < 0) throw new Error(`${id} is in the fixture registry but in no campaign of data/campaigns`);
+  return at;
+}
+
+// One writer per registry scenario. A part after the first is dealt from the log an earlier part's won game writes, so it takes
+// that game from `written`; a game the seeds did not find is absent and the writer leaves its own out.
+type Written = Partial<Record<FixtureName, unknown>>;
+const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> = {
+  "passage-through-mirkwood": () => mirkwoodFixtures(),
+  "journey-along-the-anduin": (written) => anduinFixtures(written["mirkwood-won"] as Parameters<typeof anduinFixtures>[0]),
+  "escape-from-dol-guldur": (written) => dolGuldurFixtures(written["anduin-won"] as Parameters<typeof dolGuldurFixtures>[0]),
+  "the-oath": () => oathFixtures(),
+  "the-caves-of-nibin-dum": (written) => nibinDumFixtures(written["oath-won"] as Parameters<typeof nibinDumFixtures>[0]),
+  "voyage-across-belegaer": () => voyageFixtures(),
+  "the-fate-of-numenor": () => fateFixtures(),
+  "raid-on-the-grey-havens": () => raidFixtures(),
+  "flight-of-the-stormcaller": () => stormcallerFixtures(),
+  "the-thing-in-the-depths": () => depthsFixtures(),
+  "temple-of-the-deceived": () => templeFixtures(),
+};
+
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
 // the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
@@ -354,71 +380,18 @@ void runScript("e2e-fixtures", async () => {
   writeFileSync(file, `${JSON.stringify(out)}\n`);
   say.info(`wrote ${file} (${Object.keys(out).join(", ")})`);
 
-  // Passage Through Mirkwood (Mirkwood Paths part 1): a won and a lost game of real decklists, always written.
-  const mirkwood = say.step("play Passage Through Mirkwood's win and loss", () => mirkwoodFixtures());
-  const mirkwoodFile = path.join(dir, "passage-through-mirkwood.json");
-  writeFileSync(mirkwoodFile, `${JSON.stringify(mirkwood)}\n`);
-  say.info(`wrote ${mirkwoodFile}`);
-
-  // Journey Along the Anduin (Mirkwood Paths part 2): from the log Passage Through Mirkwood's won game writes; a game not found is left out.
-  const anduin = say.step("play Journey Along the Anduin's win and loss", () => anduinFixtures(mirkwood["mirkwood-won"]));
-  const anduinFile = path.join(dir, "journey-along-the-anduin.json");
-  writeFileSync(anduinFile, `${JSON.stringify(anduin)}\n`);
-  say.info(`wrote ${anduinFile} (${Object.keys(anduin).join(", ")})`);
-
-  // Escape from Dol Guldur (Mirkwood Paths part 3): from the log a real `anduin-won` writes, so nothing is written while that win is open.
-  const dolGuldur = say.step("play Escape from Dol Guldur's win and loss", () => dolGuldurFixtures(anduin["anduin-won"]));
-  const dolGuldurFile = path.join(dir, "escape-from-dol-guldur.json");
-  writeFileSync(dolGuldurFile, `${JSON.stringify(dolGuldur)}\n`);
-  say.info(`wrote ${dolGuldurFile} (${Object.keys(dolGuldur).join(", ")})`);
-
-  // The Oath (The Dark of Mirkwood part 1): from the blank log a new mini campaign starts on, so both games are real saves and always written.
-  const oath = say.step("play The Oath's win and loss", () => oathFixtures());
-  const oathFile = path.join(dir, "the-oath.json");
-  writeFileSync(oathFile, `${JSON.stringify(oath)}\n`);
-  say.info(`wrote ${oathFile} (${Object.keys(oath).join(", ")})`);
-
-  // The Caves of Nibin-Dûm (The Dark of Mirkwood part 2): from the log a real `oath-won` writes, so nothing is written while that win is missing.
-  const nibinDum = say.step("play The Caves of Nibin-Dûm's win and loss", () => nibinDumFixtures(oath["oath-won"]));
-  const nibinDumFile = path.join(dir, "the-caves-of-nibin-dum.json");
-  writeFileSync(nibinDumFile, `${JSON.stringify(nibinDum)}\n`);
-  say.info(`wrote ${nibinDumFile} (${Object.keys(nibinDum).join(", ")})`);
-
-  // Voyage Across Belegaer (Dream-chaser part 1): from the blank log a new Dream-chaser playthrough starts on. A game not found in the seeds is left out (`voyage-won` is open).
-  const voyage = say.step("play Voyage Across Belegaer's parked games and loss", () => voyageFixtures());
-  const voyageFile = path.join(dir, "voyage-across-belegaer.json");
-  writeFileSync(voyageFile, `${JSON.stringify(voyage)}\n`);
-  say.info(`wrote ${voyageFile} (${Object.keys(voyage).join(", ")})`);
-
-  // The Fate of Númenor (Dream-chaser part 2): from the log Voyage Across Belegaer's golden win writes, so the path resumes it. A game not found in the seeds is left out.
-  const fate = await say.stepAsync("play The Fate of Númenor's win and loss", () => fateFixtures());
-  const fateFile = path.join(dir, "the-fate-of-numenor.json");
-  writeFileSync(fateFile, `${JSON.stringify(fate)}\n`);
-  say.info(`wrote ${fateFile} (${Object.keys(fate).join(", ")})`);
-
-  // Raid on the Grey Havens (Dream-chaser part 3): from the log the Voyage and Fate goldens' wins write, so the path resumes it. A game not found in the seeds is left out.
-  const raid = await say.stepAsync("play Raid on the Grey Havens' win and loss", () => raidFixtures());
-  const raidFile = path.join(dir, "raid-on-the-grey-havens.json");
-  writeFileSync(raidFile, `${JSON.stringify(raid)}\n`);
-  say.info(`wrote ${raidFile} (${Object.keys(raid).join(", ")})`);
-
-  // Flight of the Stormcaller (Dream-chaser part 4): from the log the first three parts' wins write, so the path resumes it. A game not found in the seeds is left out.
-  const stormcaller = await say.stepAsync("play Flight of the Stormcaller's win and loss", () => stormcallerFixtures());
-  const stormcallerFile = path.join(dir, "flight-of-the-stormcaller.json");
-  writeFileSync(stormcallerFile, `${JSON.stringify(stormcaller)}\n`);
-  say.info(`wrote ${stormcallerFile} (${Object.keys(stormcaller).join(", ")})`);
-
-  // The Thing in the Depths (Dream-chaser part 5): from the log the first four parts' wins write, so the path resumes it. A game not found in the seeds is left out.
-  const depths = await say.stepAsync("play The Thing in the Depths' win and loss", () => depthsFixtures());
-  const depthsFile = path.join(dir, "the-thing-in-the-depths.json");
-  writeFileSync(depthsFile, `${JSON.stringify(depths)}\n`);
-  say.info(`wrote ${depthsFile} (${Object.keys(depths).join(", ")})`);
-
-  // Temple of the Deceived (Dream-chaser part 6): from the log the first five parts' wins write, so the path resumes it. A game not found in the seeds is left out.
-  const templeGames = await say.stepAsync("play Temple of the Deceived's win and loss", () => templeFixtures());
-  const templeFile = path.join(dir, "temple-of-the-deceived.json");
-  writeFileSync(templeFile, `${JSON.stringify(templeGames)}\n`);
-  say.info(`wrote ${templeFile} (${Object.keys(templeGames).join(", ")})`);
+  // Every other scenario of the registry (src/campaign/fixtures/registry.ts), in campaign order: a part chains from the games written before it.
+  const written: Partial<Record<FixtureName, unknown>> = {};
+  const order = scenarioOrder();
+  const rest = FIXTURE_ENTRIES.flatMap((entry) => (isChained(entry.scenarioId) ? [{ ...entry, scenarioId: entry.scenarioId }] : [])).sort((left, right) => position(order, left.scenarioId) - position(order, right.scenarioId));
+  for (const entry of rest) {
+    const name = loadScenario(entry.scenarioId).name;
+    const games = await say.stepAsync(`play ${name}'s fixtures`, async () => WRITERS[entry.scenarioId](written));
+    Object.assign(written, games);
+    const file = path.join(dir, `${fixtureFile(entry)}.json`);
+    writeFileSync(file, `${JSON.stringify(games)}\n`);
+    say.info(`wrote ${file} (${Object.keys(games).join(", ")})`);
+  }
 
   if (won) {
     const past = wonLog(won);

@@ -42,22 +42,22 @@ Read the sections your task touches.
     - 76–81 Codespaces (~110)
     - 82–156 Phone builds from scratch (Mac) (~1.1K)
     - 157–160 Maestro (~170)
-- `docs/architecture.md` — Architecture (~17.8K tok)
+- `docs/architecture.md` — Architecture (~17.9K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.0K) ← 3
-    - 126–160 Repository map (~840) ← 1
+    - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
   - 209–234 Engine (~2.8K)
     - 223–234 Mechanic families (~1.9K)
-  - 235–240 Effects (~520)
+  - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–369 Tests (~880) ← 2
+  - 356–369 Tests (~880) ← 3
   - 370–385 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
@@ -281,18 +281,18 @@ Read when a task names the plan.
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~5.5K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~5.6K tok)
   - 12–33 Workflow (~480)
-  - 34–49 Where records live (~310)
-  - 50–74 The record (~500)
-  - 75–91 Which card an instruction acts on (~380)
-  - 92–112 Pick filters (~410)
-  - 113–121 Amounts (~180)
-  - 122–128 Conditions (~110)
-  - 129–148 Triggers and stat flags (~440)
-  - 149–210 Patterns (~1.4K)
-  - 211–236 Mechanic families: engine and records together (~720) ← 2
-  - 237–256 Not expressible yet: leave open, report (~390)
+  - 34–50 Where records live (~370)
+  - 51–75 The record (~500)
+  - 76–92 Which card an instruction acts on (~380)
+  - 93–113 Pick filters (~410)
+  - 114–122 Amounts (~180)
+  - 123–129 Conditions (~110)
+  - 130–149 Triggers and stat flags (~440)
+  - 150–211 Patterns (~1.4K)
+  - 212–237 Mechanic families: engine and records together (~720) ← 2
+  - 238–257 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
@@ -311,7 +311,7 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~2.7K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~2.9K tok)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
 
 ## Done plans
@@ -340,7 +340,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/tools`: architecture.md, Modules (1)
-- `src/campaign`: architecture.md, Tests (1)
+- `src/campaign`: architecture.md, Tests (2)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
 - `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); design-system-table.md, Reading panels (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Choice tray (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
