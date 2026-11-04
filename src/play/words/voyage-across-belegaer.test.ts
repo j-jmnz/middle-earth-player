@@ -11,6 +11,7 @@ import { loadVoyageWorld, voyageTable, type VoyageWorld } from "../../../test/sc
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import { pushEffectFrame } from "../../rules/interpret/effect-frames.ts";
 import { seaAsk, seaOptionLabel } from "./sea.ts";
+import { walk } from "../../../test/harness/record-walk.ts";
 
 let world: VoyageWorld;
 
@@ -20,14 +21,6 @@ beforeAll(async () => {
 
 const names: ChoiceNames = { card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code };
 const records: readonly Effect[] = [...AUTHORED_EFFECTS, ...DCCE_RECORDS];
-
-function walk(instructions: readonly Instruction[], visit: (instruction: Instruction, next: Instruction | undefined) => void): void {
-  instructions.forEach((instruction, index) => {
-    visit(instruction, instructions[index + 1]);
-    if ("instructions" in instruction && Array.isArray(instruction.instructions)) walk(instruction.instructions, visit);
-    if (instruction.verb === "Choose") for (const option of instruction.options) walk(option.instructions, visit);
-  });
-}
 
 describe("the words of the Voyage Across Belegaer choices", () => {
   it("every Choose names each branch in a sentence", () => {

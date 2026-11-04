@@ -11,6 +11,8 @@ import { smokeCodes } from "../card-smoke/world.ts";
 // The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/phases/phase-12-knife-in-the-dark.md, Scenario procedure):
 //
 //   pnpm test:scenario <scenario-id> [--list]
+//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, with WORDS_DUMP=<id>: it prints every sentence
+//                                                 the scenario's choices say (the check for a bare "Choose a player." or a fallback sentence)
 //
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
@@ -35,6 +37,7 @@ export type Selection = {
 
 export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/data/rules.test.ts"];
 const WORDS_ROOT = "src/play/words/";
+const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
 export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -140,9 +143,9 @@ function changedFiles(): string[] {
 
 type PartResult = { name: string; ok: boolean; ms: number; detail: string };
 
-function run(command: string, args: string[]): { ok: boolean; ms: number } {
+function run(command: string, args: string[], env?: Record<string, string>): { ok: boolean; ms: number } {
   const begin = performance.now();
-  const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit" });
+  const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit", env: { ...process.env, ...env } });
   return { ok: result.status === 0, ms: performance.now() - begin };
 }
 
@@ -151,9 +154,18 @@ const vitest = (files: string[], filter?: string): string[] => ["exec", "vitest"
 async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   const listOnly = process.argv.includes("--list");
+  const wordsOnly = process.argv.includes("--words");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --words]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
+
+  if (wordsOnly) {
+    if (!existsSync(path.join(ROOT, WORDS_TEST))) throw new Error(`${WORDS_TEST} does not exist`);
+    // The describe.each title of the test is "the words of <id>"; WORDS_DUMP makes it print the sentences.
+    const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, "-t", `the words of ${id}`, "--silent=false"], { WORDS_DUMP: id });
+    if (!outcome.ok) throw new Error("the words test failed");
+    return;
+  }
 
   const tree = [...git(["ls-files", "--cached", "--others", "--exclude-standard"])].filter((file) => /^(src|scripts|test)\/.*\.test\.ts$/.test(file) && existsSync(path.join(ROOT, file)));
   const changed = changedFiles();

@@ -53,3 +53,8 @@ export function attachmentPickWords(asked: Instruction): { verb: string; prompt:
       return null;
   }
 }
+
+/** What a Reattach asks (the "attach ~ to another hero" Action, the Command that moves a picked attachment): the card that moves is named, and the new host is another one. */
+export function reattachWords(instruction: Extract<Instruction, { verb: "Reattach" }>, moved: string | null): { verb: string; prompt: string } {
+  return { verb: "Attach", prompt: `Choose another ${instruction.card === "picked" ? "card" : "hero"} to attach ${moved ?? "it"} to.` };
+}

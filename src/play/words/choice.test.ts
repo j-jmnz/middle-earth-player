@@ -27,6 +27,7 @@ import { first, send, start } from "../../../test/harness/scene-kit.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import type { SheetNames } from "../choice/sheet-types.ts";
 import { sheetFor } from "../choice/sheets.ts";
+import { ASKING_VERBS, walk } from "../../../test/harness/record-walk.ts";
 
 let world: MirkwoodWorld;
 let anduinWorld: AnduinWorld;
@@ -41,15 +42,6 @@ beforeAll(async () => {
 });
 
 const names: ChoiceNames = { card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code };
-
-// Every instruction a record holds, nested ones too, each with the instruction that follows it in its list.
-function walk(instructions: readonly Instruction[], visit: (instruction: Instruction, next: Instruction | undefined) => void): void {
-  instructions.forEach((instruction, index) => {
-    visit(instruction, instructions[index + 1]);
-    if ("instructions" in instruction && Array.isArray(instruction.instructions)) walk(instruction.instructions, visit);
-    if (instruction.verb === "Choose") for (const option of instruction.options) walk(option.instructions, visit);
-  });
-}
 
 const passage: readonly Effect[] = [...AUTHORED_EFFECTS, ...POOL_RECORDS];
 
@@ -231,14 +223,12 @@ const oath: readonly Effect[] = [...OATH_EFFECTS, ...TDOM_RECORDS.filter((effect
 describe("the words of The Oath choices", () => {
   const oathNames: ChoiceNames = { card: (id) => id, code: (code) => oathWorld.cards.get(code)?.name ?? code };
 
-  // The instructions that ask a player for a card, besides Pick: the sheet words them with pickWords (src/play/choice/sheets.ts).
-  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand"]);
 
   it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
     const prompts: string[] = [];
     for (const effect of oath) {
       walk(effect.instructions, (instruction, next) => {
-        if (!ASKING.has(instruction.verb)) return;
+        if (!ASKING_VERBS.has(instruction.verb)) return;
         // Only a ReturnToStaging that lets the player choose an engaged enemy asks (the attacker goes back without a question). A choice with a single
         // possible answer is taken without asking; the words are still written.
         if (instruction.verb === "ReturnToStaging" && instruction.target.kind !== "engagedEnemies") return;
@@ -308,7 +298,7 @@ describe("the words of The Caves of Nibin-Dûm choices", () => {
     cavesWorld = await loadCavesWorld();
   });
   const cavesNames = (): ChoiceNames => ({ card: (id) => id, code: (code) => cavesWorld.cards.get(code)?.name ?? code });
-  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand", "PickEncounter", "ChooseX"]);
+  const ASKING = new Set([...ASKING_VERBS, "PickEncounter", "ChooseX"]);
 
   it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
     const prompts: string[] = [];

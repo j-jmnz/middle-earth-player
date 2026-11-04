@@ -6,6 +6,7 @@ import { moveCard } from "../../rules/core/zones.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { KNIFE_GOLDENS, knifeIntent, knifeStart, knifeWorld, type KnifeGolden } from "../../../test/scenarios/a-knife-in-the-dark/game.ts";
 import { intentsOf } from "../../../test/harness/sheet-intents.ts";
+import { walk } from "../../../test/harness/record-walk.ts";
 
 import { actionsSheet, commitSheet } from "./bar-sheets.ts";
 import { PEEK, tableLayout } from "../layout/layout.ts";
@@ -165,12 +166,11 @@ describe("the words of a choice", () => {
     const { branchWords } = await import("../words/choice.ts");
     const state = opened(2);
     const names = { card: (id: string) => id, code: (code: string) => ctx.cards.get(code)?.name ?? code };
-    const walk = (list: readonly import("../../catalog/boundary.ts").Instruction[]): string[] =>
-      list.flatMap((instruction) => {
-        if (instruction.verb === "Choose") return instruction.options.map((option) => branchWords(instruction, option.id, state, names, null)).concat(instruction.options.flatMap((option) => walk(option.instructions)));
-        return "instructions" in instruction && Array.isArray(instruction.instructions) ? walk(instruction.instructions) : [];
-      });
-    const sentences = EFFECTS.flatMap((effect) => walk(effect.instructions));
+    const walked: string[] = [];
+    for (const effect of EFFECTS) walk(effect.instructions, (instruction) => {
+      if (instruction.verb === "Choose") for (const option of instruction.options) walked.push(branchWords(instruction, option.id, state, names, null));
+    });
+    const sentences = walked;
     expect(sentences.length).toBeGreaterThan(10);
     for (const sentence of sentences) expect(sentence, sentence).toMatch(/^[A-Z][a-z]* .+/);
     expect(sentences).toContain("Each player lowers threat by 2");

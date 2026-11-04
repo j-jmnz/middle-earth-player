@@ -10,6 +10,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import { branchNow } from "./aflame.ts";
 import { unchartedNote } from "./uncharted.ts";
+import { ASKING_VERBS, walk } from "../../../test/harness/record-walk.ts";
 
 let world: RuinsWorld;
 
@@ -17,25 +18,14 @@ beforeAll(async () => {
   world = await loadRuinsWorld();
 });
 
-// Every instruction a record holds, nested ones too, each with the instruction that follows it in its list.
-function walk(instructions: readonly Instruction[], visit: (instruction: Instruction, next: Instruction | undefined) => void): void {
-  instructions.forEach((instruction, index) => {
-    visit(instruction, instructions[index + 1]);
-    if ("instructions" in instruction && Array.isArray(instruction.instructions)) walk(instruction.instructions, visit);
-    if (instruction.verb === "Choose") for (const option of instruction.options) walk(option.instructions, visit);
-  });
-}
-
 describe("the words of The Drowned Ruins choices", () => {
   const names = (): ChoiceNames => ({ card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code });
-  // The instructions that ask a player for a card: the sheet words them with pickWords (src/play/choice/sheets.ts).
-  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand"]);
 
   it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
     const prompts: string[] = [];
     for (const effect of AUTHORED_EFFECTS) {
       walk(effect.instructions, (instruction, next) => {
-        if (!ASKING.has(instruction.verb)) return;
+        if (!ASKING_VERBS.has(instruction.verb)) return;
         // Only a ReturnToStaging that lets the player choose an engaged enemy asks (Cave Eel and Drowned Cave send themselves or every Undead enemy back without a question).
         if (instruction.verb === "ReturnToStaging" && !(instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose")) return;
         const words = pickWords(instruction, next, names(), effect.cardCode);

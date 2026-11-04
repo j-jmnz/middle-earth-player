@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../../catalog/boundary.ts";
 import { RECORDS } from "../../effects/authored/pool/DCCEDrownedRuins.ts";
 import { CODES, loadRuinsWorld, ruinsTable, send, start, idOf, type RuinsWorld } from "../../../test/scenarios/the-drowned-ruins/scene.ts";
+import { walk } from "../../../test/harness/record-walk.ts";
 import { updateCard } from "../../rules/core/state.ts";
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
@@ -54,17 +55,12 @@ describe("the words of the Command choices", () => {
 
   it("every Pick inside a Command says what the card is for", () => {
     for (const effect of commands()) {
-      const walk = (instructions: readonly Instruction[]): void =>
-        instructions.forEach((instruction, index) => {
-          if (instruction.verb === "Pick") {
-            const words = pickWords(instruction, instructions[index + 1], names, effect.cardCode);
-            expect(words.prompt, effect.id).toMatch(/\.$/);
-            expect(words.prompt, effect.id).not.toBe("Choose one.");
-          }
-          if (instruction.verb === "Choose") instruction.options.forEach((option) => walk(option.instructions));
-          if (instruction.verb === "Each") walk(instruction.instructions);
-        });
-      walk(effect.instructions);
+      walk(effect.instructions, (instruction, next) => {
+        if (instruction.verb !== "Pick") return;
+        const words = pickWords(instruction, next, names, effect.cardCode);
+        expect(words.prompt, effect.id).toMatch(/\.$/);
+        expect(words.prompt, effect.id).not.toBe("Choose one.");
+      });
     }
   });
 

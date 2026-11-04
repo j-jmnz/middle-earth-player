@@ -49,8 +49,13 @@ export function breakingBranchWords(instructions: readonly Instruction[], names:
 }
 
 /** What a Pick the breaking cards make asks for: the burden card the Seat of Seeing removes, the enemy Growing Threat moves, the player the Hunter lets reveal. */
-export function breakingPickWords(pick: Instruction, next: Instruction | undefined, game?: ScenarioState): { verb: string; prompt: string } | null {
+export function breakingPickWords(pick: Instruction, next: Instruction | undefined, game?: ScenarioState, after?: readonly Instruction[]): { verb: string; prompt: string } | null {
   if (pick.verb !== "Pick") return null;
+  // The Seat of Amon Hen (142065:B:1): the player who draws 2 cards and lowers their threat by 2, both numbers the card's.
+  const [lower] = after ?? [];
+  if (pick.pick.type === "player" && next?.verb === "Draw" && next.who === "picked" && typeof next.amount === "number" && lower?.verb === "LowerThreat" && lower.who === "picked" && typeof lower.amount === "number") {
+    return { verb: "Draw", prompt: `Choose the player who draws ${next.amount} card${next.amount === 1 ? "" : "s"} and lowers their threat by ${lower.amount}.` };
+  }
   if (pick.pick.burden === true && next?.verb === "RemoveFromGame") return { verb: "Remove", prompt: "Choose a burden card, in play or in the encounter deck or discard pile, to remove from the game and from the campaign pool." };
   if (pick.pick.type === "enemy" && next?.verb === "MoveToFirstStaging") return { verb: "Move", prompt: `Choose an enemy engaged with you to move to ${firstArea(game)}.` };
   if (pick.pick.type === "player" && next?.verb === "SwitchActor") return { verb: "Choose", prompt: "Choose the player who reveals an encounter card." };
