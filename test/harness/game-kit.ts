@@ -6,6 +6,8 @@ import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../src/rules/setup/setup.ts";
 
+import { faceProblems } from "./face-check.ts";
+
 // Test helper. The parts every scenario's seeded whole game (test/scenarios/<scenario-id>/game.ts) shares: the stand-in heroes
 // and the free-event deck, the loop that plays a game to its end, and the auto-player's extra answers most scenarios give
 // (attack together, engage one enemy at a time). A scenario's game.ts keeps only what is its own: its start, its answers,
@@ -45,6 +47,9 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
     state = result.state;
     steps.push(...result.steps);
     intents.push(intent);
+    // A card in the staging area, engaged or active shows its face (face-check.ts).
+    const facedown = faceProblems(state);
+    if (facedown.length > 0) throw new Error(`After intent ${intents.length} (${JSON.stringify(intent)}): ${facedown.join("; ")}`);
   }
   return { start, kept, state, intents, steps };
 }
