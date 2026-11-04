@@ -254,15 +254,36 @@ export function burdenCodes(data: ScenarioData): string[] {
   return data.cards.filter((card) => card.pile === "burden").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
 }
 
-// The records of one timing on a card, in line order, flattened to their instructions.
+// A record's place on its card: the lowest printed line it names (side A before side B, then line number), then its record number.
+function printedPlace(effect: Effect): [number, number, number] {
+  let side = Infinity;
+  let line = Infinity;
+  for (const id of effect.lines) {
+    const [, s, n] = id.split(":");
+    const at: [number, number] = [s === "A" ? 0 : 1, Number(n)];
+    if (at[0] < side || (at[0] === side && at[1] < line)) [side, line] = at;
+  }
+  return [side, line, Number(effect.id.split(":").at(-1))];
+}
+
+// Records of one card in printed order, whatever order the list holds them in (generated records come before authored ones).
+function inPrintedOrder(effects: Effect[]): Effect[] {
+  const place = new Map(effects.map((effect) => [effect, printedPlace(effect)]));
+  return effects.sort((a, b) => {
+    const [x, y] = [place.get(a)!, place.get(b)!];
+    return x[0] - y[0] || x[1] - y[1] || x[2] - y[2];
+  });
+}
+
+// The records of one timing on a card, in printed line order, flattened to their instructions.
 export function recordInstructions(effects: readonly Effect[], code: string, timing: Effect["timing"]): Instruction[] {
-  return effects.filter((effect) => effect.cardCode === code && effect.timing === timing).flatMap((effect) => effect.instructions);
+  return inPrintedOrder(effects.filter((effect) => effect.cardCode === code && effect.timing === timing)).flatMap((effect) => effect.instructions);
 }
 
 // The same for one side of a double-sided card whose two sides are both in the game's records but only one is faceup (the Hard/Expert Mode
 // card: side A Hard, side B Expert). A record belongs to a side when every line it implements is a line of that side ("<code>:<side>:<n>").
 export function sideInstructions(effects: readonly Effect[], code: string, side: "A" | "B", timing: Effect["timing"]): Instruction[] {
-  return effects.filter((effect) => effect.cardCode === code && effect.timing === timing && effect.lines.every((line) => line.startsWith(`${code}:${side}:`))).flatMap((effect) => effect.instructions);
+  return inPrintedOrder(effects.filter((effect) => effect.cardCode === code && effect.timing === timing && effect.lines.every((line) => line.startsWith(`${code}:${side}:`)))).flatMap((effect) => effect.instructions);
 }
 
 // The Hard/Expert Mode card (collector 217, dcce.hard-expert): put next to the quest deck in a game of a campaign with XP.
