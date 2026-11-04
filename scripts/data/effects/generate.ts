@@ -11,7 +11,9 @@ import { TEMPLATES, type Draft, type TemplateContext } from "./templates.ts";
 
 export type Segment = { card: Card; index: number; side: "front" | "back" | "shadow"; line: string; lineId: string };
 
-export type Unmatched = Segment & { timing: string | null };
+// `number` is the place the line's record takes in its timing (`<code>:<timing>:<number>`): the number generate reserved for a
+// labelled line, and for an unlabelled one (a constant ability, reserved by nothing) the next number at that point.
+export type Unmatched = Segment & { timing: string | null; number: number };
 
 // The box's cards (what the scenarios deal and both starter lists) as opposed to the rest of the player pool.
 export function boxCodes(campaign: CampaignData | readonly CampaignData[], scenarios: readonly ScenarioData[]): Set<string> {
@@ -28,6 +30,12 @@ export function boxOwners(campaigns: readonly CampaignData[], scenarios: readonl
   }
   for (const code of boxCodes(campaigns, scenarios)) if (!owners.has(code)) owners.set(code, "fellowship-of-the-ring");
   return owners;
+}
+
+// A line as the templates read it: keywords stripped, the card's own name as {self}, numbers kept. Two lines with the same
+// result are the same sentence on different cards.
+export function selfNamed(card: Card, line: string): string {
+  return stripKeywords(line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
 }
 
 export type Generated = {
@@ -151,8 +159,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
     };
     const context: TemplateContext = { card, codeOf: (name) => codeOf(card, name), setAside };
     for (const segment of segmentsOf(card, ledger)) {
-      const named = stripKeywords(segment.line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
-      const { line, condition, limit } = wrapped(named);
+      const { line, condition, limit } = wrapped(selfNamed(card, segment.line));
       let drafts = null;
       for (const template of TEMPLATES) {
         const match = template.pattern.exec(line);
@@ -172,8 +179,8 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();
       const timing = ((label === "setup" && card.type === "campaign" ? "campaignSetup" : label ? LABEL_TIMING.get(label) : undefined)) ?? null;
       // A labelled line that no template reads keeps its number, so the authored record that replaces it lines up.
-      if (timing) next(timing);
-      unmatched.push({ ...segment, timing });
+      const number = timing ? next(timing) : (counters.get("constant") ?? 0) + 1;
+      unmatched.push({ ...segment, timing, number });
     }
   }
   return { effects, unmatched, usage };

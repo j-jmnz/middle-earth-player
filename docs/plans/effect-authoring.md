@@ -13,7 +13,9 @@ something else.
 
 1. `pnpm effects:draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` for each card
    with a printed line no record owns: the line ids, the card text, DragnCards' automation (a hint about intent, never a
-   rule), related rules text, the vocabulary and the nearest existing records. `--all` drafts covered lines too.
+   rule), related rules text, and for each line the id its record takes and either the records that own the same text on
+   another card or the nearest existing records. The vocabulary is one shared `.agent/drafts/vocabulary.md`. `--all` drafts
+   covered lines too.
 2. Write the records (see Where records live).
 3. `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
    compares it with the data, so run it after adding or removing records.
