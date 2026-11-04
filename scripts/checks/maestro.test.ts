@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { isPlayable } from "../../src/campaign/playable.ts";
 import { FIXTURE_REGISTRY } from "../../src/campaign/fixtures/registry.ts";
 
 // The Maestro flows (.maestro) checked without a phone: each file parses, each `runFlow` file exists and gets the env its subflow reads,
@@ -148,6 +149,7 @@ function optionalEnv(flow: Flow): Set<string> {
 }
 
 const SCENARIO_IDS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
+const CAMPAIGNS = readdirSync(path.join(ROOT, "data", "campaigns")).filter((name) => name.endsWith(".json")).map((name) => JSON.parse(readFileSync(path.join(ROOT, "data", "campaigns", name), "utf8")) as { id: string; scenarios?: string[] }).filter((item): item is { id: string; scenarios: string[] } => Array.isArray(item.scenarios));
 const FIXTURE_NAMES = new Set<string>(FIXTURE_REGISTRY.flatMap((entry) => entry.names));
 // Names that older flows open and no script writes: the fixture route opens nothing for them, so those flows cannot run until a fixture or a change to the flow exists.
 const UNWRITTEN = new Set(["breaking-solo", "breaking-pair", "breaking-won", "breaking-lost", "ford-start", "ford-won", "ford-lost", "south-start", "south-stage-4", "south-won", "south-lost", "moria-won", "moria-lost", "moria-pairs"]);
@@ -261,5 +263,22 @@ describe("the Maestro flows", () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  // The line under the road that says the next part is coming soon is true only while that part is not playable, so a part becoming playable
+  // fails here (and in the coverage check) until the flow of the part before it stops asserting it.
+  it("assert path-soon only on a part followed by one the app cannot deal, and every such part's flows assert it", () => {
+    const assertsSoon = (flow: Flow): boolean => uses(flow, "assertVisible").some((call) => asMap(call).id === "path-soon");
+    const followers = new Map<string, string | undefined>(CAMPAIGNS.flatMap((item) => item.scenarios.map((id, index) => [id, item.scenarios[index + 1]] as const)));
+    for (const flow of RUNNABLE.filter(assertsSoon)) {
+      const id = flow.rel.split("/")[1] as string;
+      const next = followers.get(id);
+      expect(next != null && !isPlayable(next), `${flow.rel} asserts path-soon, so the part after ${id} must not be playable`).toBe(true);
+    }
+    for (const [id, next] of followers) {
+      if (next == null || isPlayable(next) || !isPlayable(id)) continue;
+      const flows = RUNNABLE.filter((flow) => flow.rel.startsWith(`scenarios/${id}/`));
+      expect(flows.some(assertsSoon), `${id} is followed by ${next}, which is not playable: a flow of ${id} must assert path-soon`).toBe(true);
+    }
   });
 });

@@ -16,6 +16,7 @@ import { emptyLog, applyResolution } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
+import { partBehindCurrentStatus } from "../../../../test/harness/next-part.ts";
 import { levelOf, xpFacts } from "../../xp.ts";
 
 let ctx: ReduceContext;
@@ -44,8 +45,8 @@ describe("A Storm on Cobas Haven in the Dream-chaser campaign", () => {
     expect(PLAYABLE_SCENARIOS).toContain("a-storm-on-cobas-haven");
     const save = newSave("haven", campaign.id, 1);
     const unlocked = { ...save.log, completed: campaign.scenarios.slice(0, 7) };
-    expect(campaignPath(campaign, {}, unlocked).map((node) => [node.id, node.status]).slice(6, 9)).toEqual([["the-drowned-ruins", "completed"], ["a-storm-on-cobas-haven", "current"], ["the-city-of-corsairs", "soon"]]);
-    // The part after it is coming soon: the path stops there. Without the earlier parts this part is locked.
+    expect(campaignPath(campaign, {}, unlocked).map((node) => [node.id, node.status]).slice(6, 9)).toEqual([["the-drowned-ruins", "completed"], ["a-storm-on-cobas-haven", "current"], ["the-city-of-corsairs", partBehindCurrentStatus(campaign, haven.id)]]);
+    // The part after it is locked, or coming soon when the app cannot deal it. Without the earlier parts this part is locked.
     expect(campaignPath(campaign, {}, save.log).find((node) => node.id === "a-storm-on-cobas-haven")?.status).toBe("locked");
   });
 

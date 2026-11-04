@@ -20,10 +20,7 @@ export const havenLoadout = fillerLoadout;
 
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
 export async function havenWorld(decks: HavenDecks = "strong") {
-  const world = await game.world(decks);
-  // The "armed" ships attack as hard as the stand-in heroes do (a ship's own stats are too small for the Raider Flagship's 18 hit points and Defense 3 within the quest's rounds).
-  if (decks === "armed") for (const code of SHIP_CODES) world.cards.set(code, { ...world.cards.get(code)!, attack: 12, defense: 6, health: 40 });
-  return world;
+  return game.world(decks);
 }
 export const afterRuins = (seatCount: 1 | 2) => game.after(seatCount);
 // The campaign card's Setup (11209:A:3) through the Campaign Setup Checklist: the seats are asked in turn for the one copy of Círdan's Blessing until a player takes it ("skip" refuses); the first player does here.
@@ -160,6 +157,9 @@ const game = campaignGame<HavenDecks, HavenPolicy>({
   campaign,
   scenario: haven,
   stats: { ...HERO_STATS, armed: HERO_STATS.strong },
+  // The "armed" ships attack as hard as the stand-in heroes do (a ship's own stats are too small for the Raider Flagship's 18 hit points and Defense 3 within the quest's rounds).
+  shipStats: { armed: { attack: 12, defense: 6, health: 40 } },
+  shipCodes: SHIP_CODES,
   // The ships' reprints, the Send for Help cards' heroes and Gandalf come from the collection; Ominous Fate is in the pool the earlier parts leave.
   codes: [...haven.cards.map((card) => card.code), "11176"],
   intent: havenIntent,

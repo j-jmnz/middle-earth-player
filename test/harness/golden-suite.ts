@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
-import { campaignPath, type PathNode } from "../../src/campaign/path.ts";
+import { campaignPath, nextStep, type PathNode } from "../../src/campaign/path.ts";
 import { xpAwarded } from "../../src/campaign/xp.ts";
 import type { CampaignData, ScenarioData } from "../../src/catalog/scenario-data.ts";
 import type { PrintedCard } from "../../src/rules/core/printed.ts";
@@ -10,6 +10,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 
 import { causeProblems } from "./cause-check.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
+import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
 
 // Test helper. The suite every campaign scenario's golden test (src/campaign/scenarios/<scenario-id>/golden.test.ts) registers: the
 // snapshot of the games, the opening, the cause of every number, the won loop (the Resolution, the XP, the next part on the campaign
@@ -50,8 +51,6 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extend
   cause?: (game: P, golden: G) => void;
   /** What the log and the path show once the Resolution is written. */
   afterWin?: (won: WonGame<G>) => void;
-  /** The status of the part after this one on the path ("current" unless it is coming soon). */
-  next?: "current" | "soon";
   /** The scenario's own tests, registered after the cause test. */
   checks?: (suite: { game: (golden: G) => P; world: (golden: G) => SuiteWorld; opened: (golden: G) => ScenarioState }) => void;
 };
@@ -133,7 +132,12 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         const path = campaignPath(spec.campaign, {}, applyResolution(logBefore(spec.campaign, spec.scenario, golden.seatCount), state.scenarioId, state, world.cards));
         // The last part of a campaign has none after it.
         const last = index + 1 >= spec.campaign.scenarios.length;
-        expect(path.map((node) => node.status).slice(0, index + 2)).toEqual([...Array.from({ length: index + 1 }, () => "completed"), ...(last ? [] : [spec.next ?? "current"])]);
+        expect(path.map((node) => node.status).slice(0, index + 2)).toEqual([...Array.from({ length: index + 1 }, () => "completed"), ...(last ? [] : [nextPartStatus(spec.campaign, spec.scenario.id)])]);
+        // What the next tap offers: Begin on a playable next part, Coming soon on one that is not, nothing after the last.
+        const step = nextStep(path, null);
+        const expectedStep = nextStepKind(spec.campaign, spec.scenario.id);
+        expect(step.kind === "finished" ? null : step.kind).toBe(expectedStep);
+        if (step.kind !== "finished") expect(step.node.id).toBe(nextPartId(spec.campaign, spec.scenario.id));
         expect(path[index + 1]?.id).toBe(spec.campaign.scenarios[index + 1]);
         expect(spec.campaign.scenarios[index]).toBe(spec.scenario.id);
         spec.afterWin?.({ state, golden, world, log, path });
