@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.4K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.5K tok)
   - 5–16 Rules (~550)
-  - 17–75 Phases (~2.1K)
-  - 76–164 Open items (~4.2K)
+  - 17–75 Phases (~2.2K)
+  - 76–167 Open items (~4.3K)
     - 78–92 Fixtures and Maestro (~630)
-    - 93–120 Rules and engine (~840)
-    - 121–141 Screens and code (~1.2K)
-    - 142–164 Phone and tablet checks (~1.5K)
-  - 165–181 Standing decisions (~430)
+    - 93–123 Rules and engine (~970)
+    - 124–144 Screens and code (~1.2K)
+    - 145–167 Phone and tablet checks (~1.5K)
+  - 168–184 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
