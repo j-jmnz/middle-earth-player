@@ -184,7 +184,7 @@ For each phase:
 - `src/campaign/{log,resolution,score,loadout,start,checklist,briefing,save,playable}.ts`
 - `src/effects/index.ts`, `src/effects/authored/*`, `src/effects/authored/pool/DCCE.ts` (new)
 - `src/screens/{campaign-data,rules-glossary,rules-view,seat-picker,briefing-parts}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts`
-- `docs/brief.md`, `docs/architecture.md`, `docs/phases/phase-47 to 48-*.md` (37 to 46 in `docs/phases/done/`), `docs/phases/STATUS.md`
+- `docs/brief.md`, `docs/architecture.md`, `docs/phases/phase-48-*.md` (37 to 47 in `docs/phases/done/`), `docs/phases/STATUS.md`
 
 ## Verification
 

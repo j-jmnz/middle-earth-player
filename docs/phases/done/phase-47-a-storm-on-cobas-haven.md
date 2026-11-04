@@ -4,9 +4,7 @@ Engine half depends on: phase 46's engine half
 Phone half depends on: phase 46
 Blocks: phase 48
 
-Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
-
-Handover: [docs/handover/phase-47.md](../handover/phase-47.md).
+Plan: [docs/plans/dream-chaser.md](../../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
 
 ## Goal
 

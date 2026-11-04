@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~8.0K tok)
   - 5–16 Rules (~550)
-  - 17–75 Phases (~2.2K)
-  - 76–167 Open items (~4.3K)
-    - 78–92 Fixtures and Maestro (~630)
-    - 93–123 Rules and engine (~970)
-    - 124–144 Screens and code (~1.2K)
-    - 145–167 Phone and tablet checks (~1.5K)
-  - 168–184 Standing decisions (~430)
+  - 17–75 Phases (~2.3K)
+  - 76–170 Open items (~4.7K)
+    - 78–92 Fixtures and Maestro (~640)
+    - 93–126 Rules and engine (~1.4K)
+    - 127–147 Screens and code (~1.2K)
+    - 148–170 Phone and tablet checks (~1.5K)
+  - 171–187 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
@@ -203,7 +203,6 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
 - `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.0K tok)
 
 ## Done phases
@@ -263,6 +262,7 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
 - `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~930 tok)
 - `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~940 tok)
 - `docs/phases/done/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
+- `docs/phases/done/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
 
 ## Live plans
 
@@ -277,14 +277,14 @@ Read when a task names the plan.
     - 125–138 Phase 39 - Sea mechanics family (~740)
     - 139–152 Phase 39b - Ships on the table (~240)
     - 153–177 Phases 40-48 - one scenario each (phase 12 procedure) (~2.1K)
-  - 178–188 Critical files (~320)
+  - 178–188 Critical files (~310)
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.1K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
-  - 51–73 Templates and copied lines (~520) ← 4
+  - 51–73 Templates and copied lines (~520) ← 3
   - 74–98 The record (~500)
   - 99–115 Which card an instruction acts on (~380)
   - 116–136 Pick filters (~410)
@@ -292,8 +292,8 @@ Read when a task names the plan.
   - 146–152 Conditions (~110)
   - 153–172 Triggers and stat flags (~440)
   - 173–234 Patterns (~1.4K)
-  - 235–271 Mechanic families: engine and records together (~1.3K) ← 3
-  - 272–283 Readings the review catches (~380) ← 4
+  - 235–271 Mechanic families: engine and records together (~1.3K) ← 2
+  - 272–283 Readings the review catches (~380) ← 3
   - 284–303 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
@@ -317,8 +317,8 @@ Read when a task names the plan.
   - 80–87 E. Data: seed what can be seeded (~210)
   - 88–95 F. Faster feedback while authoring (~220)
   - 96–119 Where a scenario's cost is now (~680)
-  - 120–137 Next steps (~440) ← 1
-  - 138–147 After each scenario phase (~160) ← 1
+  - 120–137 Next steps (~440)
+  - 138–147 After each scenario phase (~160)
   - 148–151 Order (~70)
   - 152–159 Verification (~100)
 
@@ -337,7 +337,6 @@ Open work; read when a task names it.
   - 119–125 Commit (~110)
   - 126–133 Report (your final message) (~90)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
-- `docs/handover/phase-47.md` — Handover: phase 47, A Storm on Cobas Haven (~1.8K tok)
 
 ## Done plans
 
