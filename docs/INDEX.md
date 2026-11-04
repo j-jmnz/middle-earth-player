@@ -21,7 +21,7 @@ Each agent reads its own file.
 - `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.4K tok)
 - `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.0K tok)
 - `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
-- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~800 tok)
+- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~920 tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~130 tok)
@@ -190,7 +190,7 @@ STATUS.md, then the active phase file.
   - 160–176 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
-- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.1K tok)
+- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.2K tok)
 - `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~1.0K tok)
 - `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~1.1K tok)
 - `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~790 tok)
@@ -203,9 +203,9 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~940 tok)
-- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~930 tok)
-- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~950 tok)
+- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
+- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
+- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.0K tok)
 
 ## Done phases
 
@@ -311,7 +311,16 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~2.9K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.1K tok)
+  - 20–38 Setup (~440)
+  - 39–57 Files you own (edit freely) (~440)
+  - 58–71 Shared files (~300)
+  - 72–86 Approach (~700) ← 4
+  - 87–96 Checkpoints (API usage limits can stop you mid-task) (~200)
+  - 97–110 Checks before committing (~280)
+  - 111–117 Merge (~120)
+  - 118–124 Commit (~110)
+  - 125–132 Report (your final message) (~90)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
 
 ## Done plans
@@ -339,7 +348,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
-- `scripts/tools`: architecture.md, Modules (1)
+- `scripts/tools`: architecture.md, Modules (1); phases/phase-12-knife-in-the-dark.md, Scenario procedure (1)
 - `src/campaign`: architecture.md, Tests (2)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)

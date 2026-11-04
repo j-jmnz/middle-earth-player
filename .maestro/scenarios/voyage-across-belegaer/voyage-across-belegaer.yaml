@@ -6,47 +6,11 @@ tags:
 # game of Voyage Across Belegaer from the blank log of a new Dream-chaser playthrough, parked on its win. The fixture is OPEN: no win of the two starter decklists was found in 300 seeds,
 # so `voyage-won` is not committed and this flow cannot run until scripts/e2e/fixtures.ts writes one (docs/phases/STATUS.md). Confirming the win writes the XP from the campaign card
 # (1 for each surviving player, and the Thunderstruck and Ominous Fate lines) and unlocks The Fate of Númenor.
-- launchApp:
-    clearState: true
-- openLink: "middleearthlcg://e2e/voyage-won"
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-- tapOn:
-    id: begin
-- extendedWaitUntil:
-    visible:
-      id: table
-    timeout: 30000
-- tapOn:
-    id: quest-advance-progress
-    optional: true
-- assertNotVisible:
-    id: life
-- assertVisible:
-    id: rail-current
-    text: "Victory"
-- tapOn:
-    id: sheet-outcome
-- extendedWaitUntil:
-    visible:
-      id: resolution
-    timeout: 30000
-- tapOn:
-    id: resolution-confirm
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-- assertVisible:
-    id: node-voyage-across-belegaer-status
-    text: "Won.*"
-# The XP the Resolution gave is written: the line reads it and there is XP to spend.
-- assertVisible:
-    id: xp-line
-- assertVisible:
-    id: xp-open
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: voyage-won
+      SCENARIO_ID: voyage-across-belegaer
 # The Fate of Númenor is the next scenario of the path.
 - assertVisible:
     id: node-the-fate-of-numenor-status

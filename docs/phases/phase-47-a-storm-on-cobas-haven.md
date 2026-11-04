@@ -15,10 +15,10 @@ Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - on
 The phase 12 "Scenario procedure", steps 1 to 6, for `a-storm-on-cobas-haven`, and the plan's list for phases 40 to 48:
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 37).
-- `pnpm effects:draft a-storm-on-cobas-haven`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
+- `pnpm scenario:new a-storm-on-cobas-haven` writes the skeletons and the registry lines (`docs/handover/agent-brief.md`, Approach, step 7); `pnpm data:build`, then `pnpm effects:draft a-storm-on-cobas-haven` and the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
 - A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/a-storm-on-cobas-haven.ts`; boon and burden pool records in `src/effects/authored/pool/DCCE.ts`.
-- Golden: `src/campaign/scenarios/a-storm-on-cobas-haven/golden.json` with its `golden.test.ts` beside it, and `test/scenarios/a-storm-on-cobas-haven/scene.ts` and `game.ts` (the shared parts in `test/harness/game-kit.ts`): true solo and two-handed, a win and a loss, with the XP the campaign card awards.
+- Golden: `src/campaign/scenarios/a-storm-on-cobas-haven/golden.json` with its `golden.test.ts` beside it, and `test/scenarios/a-storm-on-cobas-haven/scene.ts` and `game.ts` on the shared kit (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`; the seed finder `scripts/e2e/seed-kit.ts`), listed in `test/harness/golden-registry.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add `a-storm-on-cobas-haven` to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
@@ -32,7 +32,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `a-storm-on-cobas-haven`, a
 
 ## E2E
 
-`.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven-loss.yaml` (a loss writes nothing), on the subflows in `.maestro/subflows/`, with their fixtures.
 
 ## Exit
 

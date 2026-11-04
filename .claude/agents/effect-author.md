@@ -11,10 +11,9 @@ effect record, the card's text in every printing, the DragnCards automation if t
 the lines use, the effect vocabulary, and the three most similar existing records.
 
 1. Write the records where the card belongs. A player card whose mechanic has a family goes in
-   `src/effects/authored/families/<family>.ts` (`RECORDS`, `REPLACES`; families: attack, defense, encounter, quest, play,
-   costs, deck, attachments, sidequests, misc). Any other player card goes in `src/effects/authored/pool/<PACK>.ts`. A
+   `src/effects/authored/families/<family>.ts` (`RECORDS`, `REPLACES`; the families are listed in `src/catalog/families/index.ts`). Any other player card goes in `src/effects/authored/pool/<PACK>.ts`. A
    scenario's cards (and the saga box's) go in `src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for
-   scenarios 1 and 2); the burden and south families' verbs are used by the Flight to the Ford and Ring Goes South files.
+   scenarios 1 and 2; `pnpm scenario:new <scenario-id>` writes the empty file with the scenario's other skeletons, and `pnpm data:build` adds it to the barrel `src/effects/generated/authored.ts`); the burden and south families' verbs are used by the Flight to the Ford and Ring Goes South files.
    Ids are `<code>:<timing>:<n>`, numbered in text order per timing (front, then side B, then shadow) and unique across
    every file: `grep -rn '"<code>:' src/effects`. An id a template already produces replaces the generated record; list it in
    `REPLACES` (`AUTHORED_REPLACES` in a scenario file) and say why. A line that only restates a rule the engine applies
@@ -29,6 +28,8 @@ the lines use, the effect vocabulary, and the three most similar existing record
    list down), `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
    `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for the cards you wrote. Report what is green and every
    line you could not express, with the mechanic it needs.
+
+A test of a scenario's records builds its table with the scenario's scene (`test/scenarios/<scenario-id>/scene.ts`, written by `pnpm scenario:new` on the helpers of `test/harness/scene-kit.ts`: `resolveRecords`, `finish`, `answer`, the fight) next to the scenario's other tests in `src/campaign/scenarios/<scenario-id>/`.
 
 If the same sentence pattern shows up on several cards, say so: it belongs in a template under `scripts/data/effects/`, not
 in the authored files.
