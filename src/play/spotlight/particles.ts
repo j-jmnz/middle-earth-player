@@ -6,31 +6,25 @@
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { burnField, burnFront } from "./burn.ts";
 
-export type ParticleKind = "smoke" | "converge" | "spark" | "deflect" | "ash";
+export type ParticleKind = "converge" | "spark" | "deflect" | "ash";
 
-/** How many sprites each kind has. Smoke runs the whole attack; a charge, a strike (sparks or deflection) and a burn come one after another. */
-export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { smoke: 40, converge: 16, spark: 28, deflect: 18, ash: 36 };
+/** How many sprites each kind has. A charge, a strike (sparks or deflection) and a burn come one after another. */
+export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { converge: 16, spark: 28, deflect: 18, ash: 36 };
 
-/**
- * The most sprites visible at once (the smoke, a strike, and the ash of a kill) and the Atlas draw each kind goes in: smoke, glow, sparks,
- * ash. The smoke has a draw of its own because it is dark: it is laid over the picture, where the others are added to it.
- */
-export const PARTICLE_BUDGET = 110;
-export const PARTICLE_DRAW: Readonly<Record<ParticleKind, number>> = { smoke: 0, converge: 1, spark: 2, deflect: 2, ash: 3 };
-export const ATLAS_DRAWS = 4;
+/** The most sprites visible at once (a strike and the ash of a kill) and the Atlas draw each kind goes in: glow, sparks, ash. All are added to the picture. */
+export const PARTICLE_BUDGET = 70;
+export const PARTICLE_DRAW: Readonly<Record<ParticleKind, number>> = { converge: 0, spark: 1, deflect: 1, ash: 2 };
+export const ATLAS_DRAWS = 3;
 
-// How long sprites live, as shares of the tokens that say so (src/ui/motion-tokens.ts): a puff of smoke is born within the first 0.4 of its loop
-// and lives 0.6 to 1 of it; a converging ember is born within the first 0.24 of its flight and lives 0.64 to 1 of it; a spark lives 2/3 to
+// How long sprites live, as shares of the tokens that say so (src/ui/motion-tokens.ts): a converging ember is born within the first 0.24 of its flight and lives 0.64 to 1 of it; a spark lives 2/3 to
 // 14/15 of the sparks' token and a deflection 11/15 to 1 of it; an ash lives 7/11 to 1 of the ash token.
-const SMOKE = { born: 0.4, life: 0.6, spread: 0.4 };
 const CONVERGE = { born: 0.24, life: 0.64, spread: 0.36 };
 const ASH_LIFE = { life: 7 / 11, spread: 4 / 11 };
 const SPARK_LIFE = { spark: 2 / 3, deflect: 11 / 15, spread: 4 / 15 };
 
-/** The ms (at Normal) after which no sprite of a kind shows, for an ash burn of `burnMs`; infinite for the smoke, which loops the whole attack. */
+/** The ms (at Normal) after which no sprite of a kind shows, for an ash burn of `burnMs`. */
 export function particleEnd(kind: ParticleKind, burnMs: number): number {
   "worklet";
-  if (kind === "smoke") return Infinity;
   if (kind === "converge") return MOTION.spotlightConverge.ms * (1 + CONVERGE.born);
   if (kind === "ash") return burnMs + MOTION.spotlightAsh.ms;
   return MOTION.spotlightSparks.ms;
@@ -39,8 +33,7 @@ export function particleEnd(kind: ParticleKind, burnMs: number): number {
 /** Where an effect is: its anchor point, the length it scales with, and its direction in radians (sparks and deflection; 0 points right). `w` is the width of the card the ash rises from. */
 export type Anchor = { x: number; y: number; size: number; dir?: number; w?: number };
 
-// `shade`: the smoke's grey, 0 (black) to 1 (white); absent on every other kind, which takes its draw's color.
-export type Particle = { x: number; y: number; turn: number; scale: number; alpha: number; shade?: number };
+export type Particle = { x: number; y: number; turn: number; scale: number; alpha: number };
 
 const NONE: Particle = { x: 0, y: 0, turn: 0, scale: 0, alpha: 0 };
 const TAU = Math.PI * 2;
@@ -77,8 +70,7 @@ export function ashBirth(i: number, seed: number, burnMs: number): number {
 }
 
 /**
- * Sprite `i` of a kind at `t` ms. `smoke` is a puff that billows up slowly from around the point, swelling and thinning as it goes,
- * looping (user request, 2026-11-01: black and grey smoke, not rising sparkles); its `shade` is how light its grey is (0 black, at most 0.6); `converge` flies in from a ring around the point to it;
+ * Sprite `i` of a kind at `t` ms. `converge` flies in from a ring around the point to it;
  * `spark` flies out from the point with drag and gravity, its streak turned along its velocity; `deflect` is a cone of the same
  * back along `at.dir`; `ash` rises from the card cell the burn front has just passed. Alpha is 0 before the sprite is born and after it dies.
  */
@@ -87,29 +79,6 @@ export function particleAt(kind: ParticleKind, i: number, t: number, seed: numbe
   if (t < 0 || i < 0 || i >= PARTICLE_COUNT[kind]) return NONE;
   const size = at.size;
   const dir = at.dir ?? 0;
-  if (kind === "smoke") {
-    const loop = MOTION.spotlightSmoke.ms;
-    const born = rnd(i, 0, seed) * SMOKE.born * loop;
-    const life = (SMOKE.life + SMOKE.spread * rnd(i, 1, seed)) * loop;
-    if (t < born) return NONE;
-    const age = ((t - born) % life) / life;
-    const x0 = (rnd(i, 2, seed) - 0.5) * 1.4 * size;
-    const y0 = (rnd(i, 3, seed) - 0.1) * 0.6 * size;
-    // A slow sideways drift that leans one way, and a curl on top of it.
-    const lean = (rnd(i, 4, seed) - 0.5) * 0.3 * size * age;
-    const curl = Math.sin(TAU * (age * 0.6 + rnd(i, 5, seed))) * 0.05 * size;
-    // It eases up (fast out, slow at the top), swells from a small puff to a broad one, and thins out: seven-tenths opaque at most.
-    const rise = (1 - (1 - age) * (1 - age)) * 0.45 * size;
-    const swell = 1 + 1.6 * age;
-    return {
-      x: at.x + x0 + lean + curl,
-      y: at.y + y0 - rise,
-      turn: 0,
-      scale: (1.3 + 0.9 * rnd(i, 6, seed)) * swell,
-      alpha: 0.7 * Math.sin(Math.PI * age) * (1 - 0.35 * age),
-      shade: 0.6 * rnd(i, 7, seed),
-    };
-  }
   if (kind === "converge") {
     const flight = MOTION.spotlightConverge.ms;
     const born = rnd(i, 0, seed) * CONVERGE.born * flight;

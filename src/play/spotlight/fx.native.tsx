@@ -1,5 +1,5 @@
-// The light and the shock of the combat spotlight's layer (spotlight.native.tsx; docs/plans/done/combat-spotlight-redesign.md, §5): the dark
-// with its vignette in one radial gradient, a pool of light under the cards, the attacker's rim glow, the warm-white flash over the
+// The light and the shock of the combat spotlight's layer (spotlight.native.tsx; docs/plans/done/combat-spotlight-redesign.md, §5): a pool
+// of light under the cards (the dark is black fog, spotlight/fog.native.tsx), the attacker's rim glow, the warm-white flash over the
 // target, the shockwave ring and the glint across a turned shadow card. Every glow is a gradient (no blur filter); each piece reads
 // the attack's frame (spotlight/beats.ts) through a derived value. The stage is in screen points already times the UI scale.
 import { Circle, Group, LinearGradient, RadialGradient, Rect as SkRect, RoundedRect, vec } from "@shopify/react-native-skia";
@@ -9,13 +9,10 @@ import { cardCorner } from "../../ui/card-corner.ts";
 import type { Rect } from "../layout/layout.ts";
 import type { Frame } from "./beats.ts";
 import { FX } from "./fx.ts";
-import { SPOT } from "./shape.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 
 // The warm white of the flash and the ring.
 const FLASH = "#FFF1D6";
-// The dark's opacity at the middle of the screen against its edge: the middle stays lit, the edge goes to the full night.
-const MIDDLE = 0.78;
 // The pool of light's peak opacity, and its radius in card heights.
 const POOL = 0.2;
 const POOL_REACH = 1.6;
@@ -25,17 +22,6 @@ const RIM: readonly (readonly [number, number])[] = [
   [9, 0.24],
   [3.5, 0.7],
 ];
-
-/** The dark over the whole screen with a vignette: one radial gradient, clear at the middle and full night at the edge. `dark` is 0..1 of `SPOT.dark`. */
-export function Backdrop({ width, height, dark, t }: { width: number; height: number; dark: SharedValue<number>; t: TableTokens }) {
-  const opacity = useDerivedValue(() => SPOT.dark * dark.get());
-  const c = vec(width / 2, height * SPOT.centerY);
-  return (
-    <SkRect x={0} y={0} width={width} height={height} opacity={opacity}>
-      <RadialGradient c={c} r={Math.hypot(width, height) * 0.6} colors={[withAlphaHex(t.night, MIDDLE), t.night]} />
-    </SkRect>
-  );
-}
 
 /** A pool of light on the stage, added to the dark with the screen blend. */
 export function Pool({ cx, cy, cardH, dark, t }: { cx: number; cy: number; cardH: number; dark: SharedValue<number>; t: TableTokens }) {

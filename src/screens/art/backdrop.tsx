@@ -2,7 +2,8 @@ import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { useTheme } from "../../ui/theme";
 import { useDriftRunning } from "./backdrop-drift";
-import { fogMatrix, gritTexture, rgbOf, scenesByTheme, type FogLayer, type FogTexture, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
+import { fogMatrix, gritTexture, maskStops, rgbOf, type FogLayer, type FogTexture } from "../../ui/fog/fog";
+import { scenesByTheme, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
 
 // Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS: each fog texture is an SVG feTurbulence tile
 // (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask; the morning light is gradients,
@@ -48,7 +49,9 @@ function driftName(texture: FogTexture): string {
 
 /** One fog layer as CSS: its tile repeated (moved by its offset and drifting at `rate`), faded out by its elliptical mask (fractions of the box it fills). */
 function fogStyle(layer: FogLayer, rate: number, running: boolean): WebStyle {
-  const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, #000 10%, rgba(0,0,0,0) 85%)` : undefined;
+  const stops = maskStops(layer.invert);
+  const stop = (n: number) => `rgba(0,0,0,${stops.alphas[n] ?? 0}) ${pct(stops.positions[n] ?? 0)}`;
+  const mask = layer.mask ? `radial-gradient(${pct(layer.mask.rx)} ${pct(layer.mask.ry)} at ${pct(layer.mask.cx)} ${pct(layer.mask.cy)}, ${stop(0)}, ${stop(1)})` : undefined;
   const [dx, dy] = layer.texture.offset ?? [0, 0];
   return {
     backgroundImage: tileUrl(layer.texture),
