@@ -57,7 +57,7 @@ Read the sections your task touches.
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–371 Tests (~1.3K) ← 4
+  - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
@@ -185,7 +185,7 @@ STATUS.md, then the active phase file.
   - 76–162 Open items (~4.0K)
     - 78–92 Fixtures and Maestro (~630)
     - 93–120 Rules and engine (~840)
-    - 121–141 Screens and code (~1.1K)
+    - 121–141 Screens and code (~1.2K)
     - 142–162 Phone and tablet checks (~1.4K)
   - 163–179 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
@@ -292,7 +292,7 @@ Read when a task names the plan.
   - 146–152 Conditions (~110)
   - 153–172 Triggers and stat flags (~440)
   - 173–234 Patterns (~1.4K)
-  - 235–270 Mechanic families: engine and records together (~1.1K) ← 2
+  - 235–270 Mechanic families: engine and records together (~1.2K) ← 2
   - 271–290 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
@@ -307,16 +307,6 @@ Read when a task names the plan.
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~3.0K tok)
-  - 3–14 Context (~450)
-  - 15–24 What does not move (~190)
-  - 25–45 A. Effects: draft better, template the repeats, copy identical lines (~760)
-  - 46–54 B. One registry for scenarios, fixtures and goldens (~280)
-  - 55–67 C. A shared scenario kit and `pnpm scenario:new` (~510)
-  - 68–79 D. One manifest per family (~330)
-  - 80–87 E. Data: seed what can be seeded (~210)
-  - 88–93 F. Faster feedback while authoring (~100)
-  - 94–97 Order (~70)
-  - 98–105 Verification (~100)
 
 ## Handovers
 
@@ -328,7 +318,7 @@ Open work; read when a task names it.
   - 58–71 Shared files (~300)
   - 72–86 Approach (~700) ← 4
   - 87–96 Checkpoints (API usage limits can stop you mid-task) (~200)
-  - 97–110 Checks before committing (~330)
+  - 97–110 Checks before committing (~340)
   - 111–117 Merge (~120)
   - 118–124 Commit (~110)
   - 125–132 Report (your final message) (~90)
@@ -359,7 +349,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
-- `scripts/tools`: architecture.md, Modules (1); architecture.md, Tests (1); phases/phase-12-knife-in-the-dark.md, Scenario procedure (1)
+- `scripts/tools`: phases/phase-12-knife-in-the-dark.md, Scenario procedure (2); architecture.md, Modules (1)
 - `src/campaign`: architecture.md, Tests (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)

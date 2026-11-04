@@ -258,7 +258,7 @@ family owns files that are composed by the `index.ts` next to them, so families 
   south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
 
 - A manifest may add hooks the core calls: `settle: { before, after, sweep }` (steps of `settle` in `engine/machine.ts`; list the family in `SETTLE_ORDER`
-  in `src/rules/families/index.ts` when its place among the others matters, otherwise it runs after the named ones in list order), `travel: { may, reach }`,
+  in `src/rules/families/index.ts` for each phase it has a hook for: explicit order keeps play deterministic, and an unlisted family throws at its first settle), `travel: { may, reach }`,
   `pick`, `condition` and `amount` (`src/rules/interpret/family-manifest.ts`, dispatched by `src/rules/interpret/family-hooks.ts`; `condition` and `amount` return
   `null` for what is not the family's). A hook returns a new state or the same one. `interpret/family-hooks.test.ts` shows each with a synthetic family.
 - A campaign card's Setup verb that `src/campaign/start.ts` deals in Setup (`dealt`) or resolves after the quest card's Setup (`afterSetup`) is wrapped in

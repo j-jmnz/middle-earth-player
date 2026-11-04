@@ -35,7 +35,7 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
 | `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
-| `pnpm test:scenario <scenario-id>` | Runs one scenario's tests, its goldens, the effect coverage checks and the card smoke on its player cards, and the family tests when pool or family files changed. `--list` prints the selection. The full `pnpm test` stays the gate before a commit and in CI. |
+| `pnpm test:scenario <scenario-id>` | Runs the tests that belong to one scenario (by path or by importing its scene), its goldens, the effect coverage checks and the card smoke on its player cards, and the family and manifest tests when pool, family or manifest files changed since the merge base with origin/main (committed or not). `--list` prints the selection. |
 | `pnpm scenario:new <scenario-id>` | Writes a new scenario's skeletons (scene, game, golden and campaign tests, seed finder, Maestro flows, authored effects file) on the shared test kit and adds its registry lines. `--dry-run` lists them first; it refuses a scenario that has files. The procedure around it is in [the phase 12 Scenario procedure](docs/phases/phase-12-knife-in-the-dark.md). |
 | `pnpm docs:index` | Rewrites `docs/INDEX.md`, the index of the docs agents read. A test fails while it is stale. |
 | `pnpm docs:section <file> "<heading>"` | Prints one doc section with its subsections. |

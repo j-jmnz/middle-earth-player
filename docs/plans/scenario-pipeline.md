@@ -87,7 +87,7 @@ Exit: the plan's checks (Verification), and `pnpm data:check` shows no differenc
 
 ## F. Faster feedback while authoring
 
-- `pnpm test:scenario <scenario-id>` runs the scenario's test folders, its goldens, the coverage test and card-smoke on its player codes, and the pool and family tests when those changed. The full `pnpm test` stays the gate before a commit and in CI.
+- `pnpm test:scenario <scenario-id>` runs the scenario's tests, its goldens, the coverage test and card-smoke on its player codes, and the pool, family and manifest tests when those changed.
 
 Not built: a search-based win finder for the missing won fixtures (`docs/phases/STATUS.md`, Fixtures and Maestro).
 

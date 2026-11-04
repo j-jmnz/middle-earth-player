@@ -2,15 +2,20 @@ import { describe, expect, it } from "vitest";
 
 import type { Amount, Condition, PickSpec } from "../../catalog/boundary.ts";
 import { blankScenario } from "../core/state.ts";
-import { fixtureDefinition } from "../core/test-fixture.ts";
+import { cardMap, fixtureDefinition, hero } from "../core/test-fixture.ts";
+import { spawn } from "../core/zones.ts";
+import { legalTargets } from "../engine/legal.ts";
 import type { RulesFamily } from "./family-manifest.ts";
-import { familyAmount, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks } from "./family-hooks.ts";
+import { familyAmount, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
+import { resolveAmount } from "./amounts.ts";
+import { holds } from "./conditions.ts";
+import { matchesPick } from "./pick.ts";
 import { RULES_FAMILIES, SETTLE_ORDER } from "../families/index.ts";
 
 // Each hook point of RulesFamily, with a synthetic family handed to the dispatch in place of RULES_FAMILIES.
 const state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
 const ctx = { effects: [], cards: new Map() };
-const scope = { actor: 0, sourceId: null };
+const scope = { actor: 0, sourceId: null, returned: 0 };
 const family = (name: string, hooks: Partial<RulesFamily> = {}): RulesFamily => ({ name, verbs: [], run: () => null, ...hooks });
 const marked = (log: string[], name: string) => (current: typeof state) => {
   log.push(name);
@@ -18,14 +23,20 @@ const marked = (log: string[], name: string) => (current: typeof state) => {
 };
 
 describe("settle hooks", () => {
-  it("run in the named order, then the rest in list order, each on the state the one before returned", () => {
+  it("run in the order SETTLE_ORDER names, each on the state the one before returned", () => {
     const log: string[] = [];
     const list = [family("a", { settle: { before: marked(log, "a") } }), family("b", { settle: { before: marked(log, "b") } }), family("c", { settle: { before: marked(log, "c") } }), family("d")];
-    const order = { before: ["c", "a"], after: [], sweep: [] };
+    const order = { before: ["c", "a", "b"], after: [], sweep: [] };
     const result = runSettle("before", state, ctx, [], list, order);
     expect(log).toEqual(["c", "a", "b"]);
     expect(result.round).toBe(state.round + 3);
     expect(runSettle("after", state, ctx, [], list, order)).toBe(state);
+    expect(settleHooks("before", list, order)).toBe(settleHooks("before", list, order));
+  });
+
+  it("throw, naming the family, when one with a hook for the phase is not in SETTLE_ORDER", () => {
+    const list = [family("a", { settle: { before: marked([], "a") } }), family("b", { settle: { before: marked([], "b") } })];
+    expect(() => settleHooks("before", list, { before: ["a"], after: [], sweep: [] })).toThrow(/family b .*settle\.before/);
   });
 
   it("keep the order the core's chain had", () => {
@@ -78,5 +89,46 @@ describe("amount hooks", () => {
   it("answer with the first family that owns the amount, null when none does", () => {
     expect(familyAmount(state, amount, scope, ctx, [family("a", { amount: () => null })])).toBeNull();
     expect(familyAmount(state, amount, scope, ctx, [family("a", { amount: () => null }), family("b", { amount: () => 0 }), family("c", { amount: () => 5 })])).toBe(0);
+  });
+});
+
+// The core's own call sites, with a synthetic family in the list the core walks (withFamilies).
+describe("the core's hook calls", () => {
+  const at = { seat: 0, sourceId: null };
+
+  it("holds asks a family's condition hook", () => {
+    const condition = { kind: "synthetic" } as unknown as Condition;
+    expect(withFamilies([family("a", { condition: () => true })], () => holds(state, condition, scope, ctx))).toBe(true);
+    expect(withFamilies([family("a", { condition: () => false })], () => holds(state, condition, scope, ctx))).toBe(false);
+  });
+
+  it("resolveAmount takes a family's value and applies times, plus and limit to it", () => {
+    const amount = { x: true, times: 3, plus: 1 } as Exclude<Amount, number>;
+    expect(withFamilies([family("a", { amount: () => 4 })], () => resolveAmount(state, amount, scope, ctx))).toBe(13);
+    expect(withFamilies([family("a", { amount: () => 4 })], () => resolveAmount(state, { ...amount, limit: 10 }, scope, ctx))).toBe(10);
+    expect(resolveAmount(state, amount, scope, ctx)).toBe(1);
+  });
+
+  it("matchesPick drops a card a family's pick hook rejects", () => {
+    const cards = cardMap([hero("h1", "leadership")]);
+    const { state: dealt, id } = spawn(state, "h1", { zone: "heroes", seat: 0 });
+    const spec = { type: "hero", from: "heroes" } as unknown as PickSpec;
+    const run = () => matchesPick(dealt, id, spec, at, { effects: [], cards });
+    expect(run()).toBe(true);
+    expect(withFamilies([family("a", { pick: () => false })], run)).toBe(false);
+  });
+
+  it("legalTargets lets the players travel when a family's may hook says so, and adds the locations its reach hook names", () => {
+    const traveling = { ...state, window: { kind: "travel" as const } };
+    const held = { ...traveling, activeLocation: "somewhere" };
+    expect(legalTargets(held, { type: "Travel" }, ctx)).toEqual([]);
+    expect(withFamilies([family("a", { travel: { may: () => true, reach: () => ["there"] } })], () => legalTargets(held, { type: "Travel" }, ctx))).toEqual(["there"]);
+    expect(withFamilies([family("a", { travel: { reach: () => ["there"] } })], () => legalTargets(held, { type: "Travel" }, ctx))).toEqual([]);
+    expect(withFamilies([family("a", { travel: { reach: () => ["there"] } })], () => legalTargets(traveling, { type: "Travel" }, ctx))).toEqual(["there"]);
+  });
+
+  it("withFamilies restores the list, also when the callback throws", () => {
+    expect(() => withFamilies([family("a", { travel: { may: () => true } })], () => { throw new Error("x"); })).toThrow("x");
+    expect(familyMayTravel(state, ctx)).toBe(false);
   });
 });

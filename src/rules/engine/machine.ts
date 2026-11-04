@@ -66,7 +66,9 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
     // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller/area.ts); the Island Map's locations as the active location says (families/island/map.ts).
     // Core: the constant win check, then the families' `before` hooks (burden, island, south), the encounter deck refill, the families' `after` hooks (sea, stormcaller, island): SETTLE_ORDER.
-    current = runSettle("after", refillEncounterDeck(runSettle("before", constantWin(current, ctx), ctx, steps), steps), ctx, steps);
+    const beforeRefill = runSettle("before", constantWin(current, ctx), ctx, steps);
+    const refilled = refillEncounterDeck(beforeRefill, steps);
+    current = runSettle("after", refilled, ctx, steps);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {

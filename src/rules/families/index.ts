@@ -31,6 +31,7 @@ import { manifest as aflame } from "./aflame/index.ts";
 import { manifest as stormcaller } from "./stormcaller/index.ts";
 import { manifest as grapple } from "./grapple/index.ts";
 import { manifest as island } from "./island/index.ts";
+import { registerFamilies } from "../interpret/family-hooks.ts";
 
 export type { Focus };
 
@@ -40,8 +41,8 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
   attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island,
 ];
 
-// The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle): the names listed here first, in this order, then any other
-// family with a hook for the phase, in the list above. The order is the one the core's chain had when it called the families by name, and it is not the list's.
+// The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
+// Every family with a hook for the phase is listed (settleHooks throws on one that is not). The order is the one the core's chain had when it called the families by name, and it is not the list's.
 // `before`: after the constant win check, before the core refills the encounter deck. `after`: right after that refill. `sweep`: after the core's own sweeps.
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south"],
@@ -57,3 +58,6 @@ export function runFamilyVerb(state: ScenarioState, instruction: Instruction, fo
   }
   return null;
 }
+
+// The core's hook calls (interpret/family-hooks.ts) walk these lists.
+registerFamilies(RULES_FAMILIES, SETTLE_ORDER);
