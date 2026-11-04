@@ -27,6 +27,7 @@ import { canDeclareDefender, isDefending } from "../families/defense/defenders.t
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
 import { aflamePickMatches, lowestAflame } from "../families/aflame/pick.ts";
+import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
 
@@ -129,6 +130,12 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   return raw;
 }
 
+// The most a card may cost: a number, or the X of the source scalable card (its level plus the copies the Setup chose, 11201:A:5).
+function maxCostOf(state: ScenarioState, max: NonNullable<PickSpec["maxCost"]>, sourceId: string | null, ctx: ReduceContext): number {
+  if (typeof max === "number") return max;
+  return levelAmount(state, sourceId, max.halved === true) + (max.plusChosen ? chosenCopies(state, sourceId, ctx) : 0);
+}
+
 // Whether one card matches a filter's predicates (not its zone): what the filter reads of the card itself.
 export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
@@ -207,6 +214,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
       const attachment = state.cards[attachmentId];
       if (!attachment) return false;
       if (want.trait && !hasTrait(state, attachmentId, want.trait, ctx)) return false;
+      if (want.names && !want.names.includes(printedOf(ctx.cards, attachment.code).name)) return false;
       if (want.playerCard && !isPlayerType(printedOf(ctx.cards, attachment.code))) return false;
       return true;
     });
@@ -218,7 +226,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   }
   if (spec.intoPlay && (uniqueBlocked(state, printed, ctx.cards) || playBlocked(state, id, asking, ctx, true))) return false;
   if (spec.costIsX && at.x != null && printed.cost !== at.x) return false;
-  if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
+  if (spec.maxCost != null && (printed.cost == null || printed.cost > maxCostOf(state, spec.maxCost, at.sourceId, ctx))) return false;
   if (spec.minCost != null && (printed.cost == null || printed.cost < spec.minCost)) return false;
   if (spec.oddCost && (printed.cost == null || printed.cost % 2 !== 1)) return false;
   if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;

@@ -20,6 +20,7 @@ import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote,
 import { grantedTravelWords, grappleAsk, grappleFactsOf, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
 import { seaAsk, seaOptionLabel } from "../words/sea.ts";
 import { switchNote, tradeWords, unchartedOptionLabel } from "../words/uncharted.ts";
+import { upToNote } from "../words/command.ts";
 import { branchNow, dealtNow } from "../words/aflame.ts";
 import { fireRow } from "./aflame-sheets.ts";
 import { committedNote, stormcallerTravel } from "./stormcaller-sheets.ts";
@@ -257,7 +258,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const now = branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words);
         return {
           ...base,
-          note: [`${torch?.note ?? "Choose one."}${who}`, line].filter((part) => part != null).join(" "),
+          note: [`${torch?.note ?? upToNote(game, ctx, choose, window.seat, source) ?? "Choose one."}${who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
           options: window.options.map((id): PickOption => {

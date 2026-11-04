@@ -12,6 +12,8 @@ import { topFrame } from "../../windows/windows.ts";
 export function lookedPool(state: ScenarioState, spec: PickSpec, seats: readonly number[]): string[] {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return [];
+  // The encounter deck's cards belong to no seat (11202:A:5).
+  if (spec.from === "encounterDeck") return (data.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDeck");
   const zone = spec.from === "discard" ? "discard" : "deck";
   return (data.looked ?? []).filter((id) => {
     const card = state.cards[id];

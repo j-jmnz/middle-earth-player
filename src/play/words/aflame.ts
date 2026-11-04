@@ -145,7 +145,7 @@ export function aflamePickWords(pick: Instruction, next: Instruction | undefined
   if (pick.pick.type === "hero" && pick.pick.hasResources === true && next?.verb === "DiscardResources") return { verb: "Give", prompt: `${host}: choose a hero you control whose pool gives it 1 resource.` };
   if (pick.pick.defending === true && next?.verb === "Pick") return { verb: "Take", prompt: `${host}: choose the defending character whose resources move to the attacking enemy.` };
   if (pick.pick.attackingEnemy === true && (next?.verb === "MoveResources" || next?.verb === "PlaceResourceTokens")) return { verb: "Give", prompt: `${host}: the attacking enemy gets ${next.verb === "MoveResources" ? "the resources" : `${amountOf(next.amount)} ${amountOf(next.amount) === "1" ? "resource" : "resources"}`}.` };
-  if (pick.pick.type === "enemy" && pick.pick.hasResources === true && next?.verb === "DiscardResources") return { verb: "Take", prompt: `${host}: take 1 resource from the enemy this hero defends against.` };
+  if (pick.pick.type === "enemy" && pick.pick.attackingEnemy === true && pick.pick.hasResources === true && next?.verb === "DiscardResources") return { verb: "Take", prompt: `${host}: take 1 resource from the enemy this hero defends against.` };
   if (pick.pick.looked === true && next?.verb === "Choose") return { verb: "Place", prompt: `${host}: choose a card you looked at to put on the top or the bottom of your deck.` };
   if (pick.pick.names?.includes("Dream-chaser") && deal) return { verb: "Burn", prompt: `${host}: the Dream-chaser takes ${deal}.` };
   return null;

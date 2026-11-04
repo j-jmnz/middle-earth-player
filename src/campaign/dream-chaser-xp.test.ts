@@ -298,12 +298,12 @@ describe("Na'asiyah (dcce.naasiyah)", () => {
 
   it("the briefing names the card and the rule, and a scenario from the eighth on deals her", () => {
     const seats = [{ deckId: "deck", heroes: [NAASIYAH, HERO_B, HERO_C], deck }];
-    // The scenarios from the seventh on are coming soon, so no briefing is dealable; the hero ban is the other problem on the early one, and the later one has only the coming-soon problem.
+    // The scenarios from the eighth on are coming soon, so no briefing is dealable; the early one, the seventh, is playable and has only the hero ban, and the later one has only the coming-soon problem.
     const early = briefing(inputOf(dealWorld("the-drowned-ruins"), { seats }));
     expect(early.dealable).toBe(false);
-    expect(early.problems.map((problem) => problem.rule)).toEqual(["Coming soon", "A hero the campaign refuses in this scenario"]);
-    expect(early.problems[1]?.message).toContain("Na'asiyah (12109)");
-    expect(early.problems[1]?.message).toContain("dcce.naasiyah");
+    expect(early.problems.map((problem) => problem.rule)).toEqual(["A hero the campaign refuses in this scenario"]);
+    expect(early.problems[0]?.message).toContain("Na'asiyah (12109)");
+    expect(early.problems[0]?.message).toContain("dcce.naasiyah");
     expect(briefing(inputOf(dealWorld("a-storm-on-cobas-haven"), { seats })).problems.map((problem) => problem.rule)).toEqual(["Coming soon"]);
   });
 

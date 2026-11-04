@@ -25,6 +25,7 @@ import { unchartedBranchWords, unchartedPickWords, unchartedWords } from "./unch
 import { islandPickWords, islandWords } from "./island.ts";
 import { aflameBranchWords, aflamePickWords, aflameWords, type BranchNow } from "./aflame.ts";
 import { stormcallerBranchWords, stormcallerWords } from "./stormcaller.ts";
+import { commandBranchWords } from "./command.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -320,6 +321,8 @@ function readyPaymentWords(choose: ChooseInstruction, option: ChooseInstruction[
 
 /** A branch of a Choose instruction in words: "Remove 2 progress from the quest", "Remove 2 heroes you control from the quest". */
 export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null, now?: BranchNow): string {
+  const command = commandBranchWords(choose, optionId);
+  if (command) return command;
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
@@ -410,6 +413,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Exhaust", prompt: `Choose ${one} to exhaust.` };
     case "Ready":
       return { verb: "Ready", prompt: `Choose ${one} to ready.` };
+    case "DiscardResources":
+      return { verb: "Remove", prompt: `Choose ${one} to remove ${amountWords(next.amount)} resource${next.amount === 1 ? "" : "s"} from.` };
     case "ReturnToHand":
       return { verb: "Return", prompt: `Choose ${one} to return to its owner's hand.` };
     // The objectives and dungeon families (Escape from Dol Guldur): the objective the Dungeon Jailor shuffles back (01101:A:1), the hero that

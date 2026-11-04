@@ -60,9 +60,7 @@ goldenSuite<TempleGolden, TempleDecks>({
       }
     });
   },
-  wins: "wins when the 8th progress is placed on The Grotto's Entrance, runs 11197's Resolution (the XP is awarded, the cards it earns join the pool) and the path stops at the next part, coming soon",
-  // The next part, The Drowned Ruins, is coming soon: the path stops there, with nothing to begin (user decision, 2026-11-01).
-  next: "soon",
+  wins: "wins when the 8th progress is placed on The Grotto's Entrance, runs 11197's Resolution (the XP is awarded, the cards it earns join the pool) and unlocks the next part",
   before: (golden) => (golden.after ? afterDepths(golden.seatCount) : emptyLog(golden.seatCount)),
   won(state) {
     expect(state.cards[state.questStage ?? ""]?.code).toBe("12067");
@@ -96,7 +94,7 @@ goldenSuite<TempleGolden, TempleDecks>({
     // A Recurring Nightmare in the pool is for the player the first player chose, to be shuffled into their deck after the starting hand.
     for (const card of log.campaignPool.filter((item) => item.code === CODES.nightmare)) expect(card).toMatchObject({ afterHand: true });
     expect(path[6]?.id).toBe("the-drowned-ruins");
-    expect(nextStep(path, null)).toMatchObject({ kind: "soon", node: { id: "the-drowned-ruins" } });
+    expect(nextStep(path, null)).toMatchObject({ kind: "begin", node: { id: "the-drowned-ruins" } });
     expect(UPGRADED_CODES).toEqual([CODES.blackKey, CODES.gateKey]);
   },
 });

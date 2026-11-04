@@ -28,8 +28,9 @@ const VERBS = [
   // Constant on a card in hand: as part of its cost its player may exhaust any number of ready characters that match, each
   // lowering the cost by 1. The payment says how many: the cost not paid in resources is paid by exhausting them.
   z.strictObject({ verb: z.literal("ExhaustToReduce"), pick: pickSchema, ...when }),
-  // The source attachment moves to another card it may be attached to (not its current host), chosen by the actor.
-  verb("Reattach"),
+  // The source attachment moves to another card it may be attached to (not its current host), chosen by the actor. `card: picked`: the last picked attachment moves instead ("Ready an attachment. You may move it to
+  // an eligible character.", 11204:A:5).
+  z.strictObject({ verb: z.literal("Reattach"), card: z.literal("picked").optional(), ...when }),
   // The actor chooses a number X from `min` (1 by default) up to the smallest of `max`, and the effect's X is that number.
   // Nothing happens, and the effect's X stays, when no number can be chosen.
   z.strictObject({ verb: z.literal("ChooseX"), max: z.array(amountSchema).min(1), min: z.number().int().min(0).optional(), ...when }),
@@ -78,10 +79,6 @@ const VERBS = [
     ...when,
   }),
 ] as const;
-
-function verb<const Verb extends string>(name: Verb) {
-  return z.strictObject({ verb: z.literal(name), ...when });
-}
 
 // An attachment was attached to a card: played onto it, or moved to it (the event's subject is the attachment, its other card
 // the new host). "After a Signal attachment is attached to a hero".

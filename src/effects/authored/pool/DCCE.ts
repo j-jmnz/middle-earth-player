@@ -93,6 +93,44 @@ const HALF_LEVEL_PLUS_CHOSEN: Amount = { level: true, halved: true, plusChosen: 
 const LEVEL_PLUS_CHOSEN: Amount = { level: true, plusChosen: true };
 const counselX = (halved: boolean): Amount => (halved ? HALF_LEVEL_PLUS_CHOSEN : LEVEL_PLUS_CHOSEN);
 
+// 11201 to 11204 Command (events the campaign card of The Drowned Ruins lets each player take into hand; Scalable): "Action: Add Command to the victory display to choose up to X options, where X is
+// its level" (plus 1 for each copy the Setup chose, "0 in any other game"). The actor takes options one at a time, each once, and may stop (Choose `upTo`). Every option names the cards it picks.
+const BLESSING = "Cirdan's Blessing";
+const ANY_HERO = { type: "hero", control: "any" } as const;
+const ANY_ENEMY = { type: "enemy", control: "any", staging: true } as const;
+const WITH_BLESSING: PickSpec = { type: "character", control: "any", hasAttachment: { names: [BLESSING] } };
+const heroGets = (id: string, stat: "defense" | "willpower" | "attack"): Options[number] => ({
+  id,
+  instructions: [{ verb: "Pick", pick: ANY_HERO }, { verb: "ModifyStat", stat, amount: 2, until: "endOfRound", target: "picked" }],
+});
+const enemyGets = (id: string, stat: "defense" | "attack"): Options[number] => ({
+  id,
+  requires: { kind: "canPick", pick: ANY_ENEMY },
+  instructions: [{ verb: "Pick", pick: ANY_ENEMY }, { verb: "ModifyStat", stat, amount: -2, until: "endOfRound", target: "picked" }],
+});
+const command = (code: string, options: Options): Effect => ({
+  id: `${code}:action:1`,
+  cardCode: code,
+  lines: [1, 2, 3, 4, 5].map((line) => `${code}:A:${line}`),
+  timing: "action",
+  cost: { kind: "playEvent" },
+  instructions: [{ verb: "Choose", who: "actor", upTo: LEVEL_PLUS_CHOSEN, options }, { verb: "AddSourceToVictory" }],
+});
+// 11201:A:5 "Put an ally with cost X or less in your discard pile into play. Discard it at the end of the phase."
+const CHEAP_ALLY = { type: "ally", control: "you", from: "discard", maxCost: { level: true, plusChosen: true }, intoPlay: true } as const;
+// 11202:A:3 and 11203:A:5: every copy of the player's own cards the options name.
+const SPYGLASS_FROM = (from: "hand" | "deck" | "discard"): PickSpec => ({ type: "card", control: "you", from, names: ["Spyglass"] });
+const BLESSINGS: PickSpec = { type: "attachment", control: "any", names: [BLESSING] };
+const BOTTOM_CARD = { type: "card", control: "you", from: "deck", bottom: 1 } as const;
+const ANY_LOCATION_NON_UNIQUE = { type: "location", control: "any", nonUnique: true } as const;
+const ANY_ATTACHMENT = { type: "attachment", control: "any" } as const;
+type InnerOptions = Extract<Options[number]["instructions"][number], { verb: "Choose" }>["options"];
+const putSpyglass = (from: "hand" | "deck" | "discard"): InnerOptions[number] => ({
+  id: `spyglass${from.charAt(0).toUpperCase()}${from.slice(1)}`,
+  requires: { kind: "canPick", pick: SPYGLASS_FROM(from) },
+  instructions: [{ verb: "Pick", pick: SPYGLASS_FROM(from) }, { verb: "PutIntoPlay", card: "picked", host: ANY_HERO }, ...(from === "deck" ? [{ verb: "ShuffleDeck" } as const] : [])],
+});
+
 // 11189 Parrying Cutlass and 11190 Throwing Axe (Permanent, Restricted weapons, a hero's, earned at the Resolution of Raid on the Grey Havens): the bonus grows by `extra` while the hero holds `stat` tokens.
 const weaponBonus = (code: string, line: string, id: number, stat: "defense" | "attack", base: number, extra: Amount): Effect => ({
   id: `${code}:constant:${id}`,
@@ -277,6 +315,55 @@ export const RECORDS: readonly Effect[] = [
         { verb: "Pick", pick: { type: "card", control: "you", from: "deck", looked: true, different: true } },
         { verb: "Choose", who: "actor", options: [{ id: "top", instructions: [{ verb: "PutOnDeck", position: "top" }] }, { id: "bottom", instructions: [{ verb: "PutOnDeck", position: "bottom" }] }] },
       ],
+    },
+  ]),
+
+  // 11201 Command (Leadership), 11202 (Lore), 11203 (Spirit), 11204 (Tactics).
+  command("11201", [
+    heroGets("defense", "defense"),
+    enemyGets("enemyDefense", "defense"),
+    { id: "ready", requires: { kind: "canPick", pick: WITH_BLESSING }, instructions: [{ verb: "Pick", pick: WITH_BLESSING }, { verb: "Ready", target: "picked" }] },
+    { id: "ally", requires: { kind: "canPick", pick: CHEAP_ALLY }, instructions: [{ verb: "Pick", pick: CHEAP_ALLY }, { verb: "PutIntoPlay", card: "picked", until: "endOfPhase", then: "discard" }] },
+  ]),
+  command("11202", [
+    {
+      id: "resources",
+      requires: { kind: "canPick", pick: { ...ANY_ENEMY, nonUnique: true, hasResources: true } },
+      instructions: [{ verb: "Pick", pick: { ...ANY_ENEMY, nonUnique: true, hasResources: true } }, { verb: "DiscardResources", amount: LEVEL_PLUS_CHOSEN, target: "picked" }],
+    },
+    { id: "blessings", requires: { kind: "canPick", pick: BLESSINGS }, instructions: [{ verb: "Each", pick: BLESSINGS, instructions: [{ verb: "AddResources", amount: 2, to: "picked" }] }] },
+    { id: "bottom", requires: { kind: "canPick", pick: BOTTOM_CARD }, instructions: [{ verb: "Pick", pick: BOTTOM_CARD }, { verb: "MovePicked", to: "hand" }] },
+    {
+      id: "encounter",
+      instructions: [
+        { verb: "LookAtTop", count: 10 },
+        { verb: "Each", pick: { type: "card", control: "any", from: "encounterDeck", looked: true }, upTo: "any", instructions: [{ verb: "MoveEncounterCard", to: "discard" }] },
+        { verb: "ShuffleEncounterDeck" },
+      ],
+    },
+  ]),
+  command("11203", [
+    heroGets("willpower", "willpower"),
+    { id: "noExhaust", requires: { kind: "canPick", pick: WITH_BLESSING }, instructions: [{ verb: "Each", pick: WITH_BLESSING, instructions: [{ verb: "ModifyStat", stat: "noExhaustQuest", amount: 1, until: "endOfRound", target: "picked" }] }] },
+    { id: "progress", requires: { kind: "canPick", pick: ANY_LOCATION_NON_UNIQUE }, instructions: [{ verb: "Pick", pick: ANY_LOCATION_NON_UNIQUE }, { verb: "PlaceProgressOn", amount: 2, target: "picked" }] },
+    { id: "spyglass", requires: { kind: "any", conditions: (["hand", "deck", "discard"] as const).map((from) => ({ kind: "canPick" as const, pick: SPYGLASS_FROM(from) })) }, instructions: [{ verb: "Choose", who: "actor", options: [putSpyglass("hand"), putSpyglass("deck"), putSpyglass("discard")] }] },
+  ]),
+  command("11204", [
+    heroGets("attack", "attack"),
+    enemyGets("enemyAttack", "attack"),
+    {
+      id: "damage",
+      requires: { kind: "canPick", pick: ANY_ENEMY },
+      instructions: [
+        { verb: "Pick", pick: ANY_ENEMY },
+        { verb: "DamageCard", amount: 2, target: "picked" },
+        { verb: "Choose", who: "actor", options: [{ id: "engageIt", requires: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", stagingOnly: true } }, instructions: [{ verb: "Engage", target: "picked" }] }, { id: "noEngage", instructions: [] }] },
+      ],
+    },
+    {
+      id: "attachment",
+      requires: { kind: "canPick", pick: ANY_ATTACHMENT },
+      instructions: [{ verb: "Pick", pick: ANY_ATTACHMENT }, { verb: "Ready", target: "picked" }, { verb: "Choose", who: "actor", options: [{ id: "moveIt", instructions: [{ verb: "Reattach", card: "picked" }] }, { id: "stayPut", instructions: [] }] }],
     },
   ]),
 

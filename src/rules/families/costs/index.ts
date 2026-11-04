@@ -25,7 +25,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "HeroesGainResources":
       return heroesGain(state, instruction, focus, ctx, steps);
     case "Reattach":
-      return reattach(state, focus, ctx, steps);
+      return reattach(state, instruction, focus, ctx, steps);
     case "PlayFromHand":
       return playFromHand(state, instruction, focus.seat, focus.sourceId, focus.chosen, ctx);
     case "PayToPlay":
