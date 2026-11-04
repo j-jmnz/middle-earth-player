@@ -28,14 +28,14 @@ Each point: what to check, where the code is, and the likely fix if it fails. De
 - If off: change shares in `SPOT`, never durations outside `MOTION` (`src/ui/motion-tokens.ts`). `spotlight/plan.test.ts` holds the geometry; update it with the change.
 
 ### 2. The Light theme reads dark
-- Check: on Light the stage must read as the same dark stage as on Dark, not a grey veil over the bright table. The ux review worked out about 69% night in the middle over Light's felt, which may read grey-brown.
-- Code: `SPOT.dark` (0.88) in `spotlight/shape.ts`, `MIDDLE` (0.78) in `spotlight/fx.native.tsx` (`Backdrop`).
-- If grey: raise the backdrop on Light only (for example a middle of 0.92 and a most of 0.95). The layer then needs the screen's theme passed in for that alone; it keeps drawing with the Dark tokens.
+- Check: on Light the stage must read as the same dark stage as on Dark, not a grey veil over the bright table. The middle is the flat night alone, 70% on Light (40% on Dark), which may read grey-brown over the parchment.
+- Code: `SPOT_FOG.flat` in `spotlight/fog.ts` (the layer passes the screen's theme in for that alone; it keeps drawing with the Dark tokens).
+- If grey: raise `SPOT_FOG.flat.light`.
 
 ### 3. Cost on a low-end Android
-- Check: a steady frame rate through a three-attack moment and through a burn on the cheapest Android phone at hand (the full-screen canvas over the table canvas, 90 sprites in three `Atlas` draws, the shader). Use the performance monitor or `adb shell dumpsys gfxinfo`.
-- Code: `spotlight/particles.native.tsx`, `spotlight/atlas.ts`. A sprite is still worked out twice per slot per frame (once for the transform buffer, once for the color buffer, lines 45 and 55); sharing it was left because it depends on the order the two mappers run in.
-- If it drops frames: first share the sprite between the two buffers, then lower the counts in `PARTICLE_COUNT` (`spotlight/particles.ts`; its tests keep the budget). Do not drop an effect without asking the user.
+- Check: a steady frame rate through a three-attack moment and through a burn on the cheapest Android phone at hand (the full-screen canvas over the table canvas, the black fog's six full-screen layers and three more per attack, 70 sprites in three `Atlas` draws, the shader). Use the performance monitor or `adb shell dumpsys gfxinfo`.
+- Code: `spotlight/fog.native.tsx` and `src/ui/fog/fog.native.tsx` (each layer is one draw of a baked tile, no offscreen layer), `spotlight/particles.native.tsx`, `spotlight/atlas.ts`. A sprite is still worked out twice per slot per frame (once for the transform buffer, once for the color buffer, lines 45 and 55); sharing it was left because it depends on the order the two mappers run in.
+- If it drops frames: first thin the edge fog to its inner bank (`EDGE_FOG`), then share the sprite between the two buffers, then lower the counts in `PARTICLE_COUNT` (`spotlight/particles.ts`; its tests keep the budget). Do not drop an effect without asking the user.
 
 ### 4. The burn shader
 - Check: on each GPU the destroyed target dissolves from its foot with an ember rim while ash rises where the front passes, and it lines up with the card (not offset or scaled). The rectangle uniform is in local stage points, since Skia's runtime-shader image filter follows the canvas transform.
@@ -44,7 +44,7 @@ Each point: what to check, where the code is, and the likely fix if it fails. De
 - If it is offset: log the uniforms and the card's rect from the layer and compare; the fix is in what `BurnLayer` passes, not in the SkSL.
 
 ### 5. `Atlas` additive blending
-- Check: converging embers, sparks, deflection sparks and ash glow and add up (`blendMode="plus"`, `colorBlendMode="modulate"`), and the smoke reads as soft black and grey puffs over the cards (`srcOver`), with no black squares around sprites and no color shifts between Android and iOS.
+- Check: converging embers, sparks, deflection sparks and ash glow and add up (`blendMode="plus"`, `colorBlendMode="modulate"`), with no black squares around sprites and no color shifts between Android and iOS.
 - Code: `spotlight/particles.native.tsx` (line 61, and `useSpriteTexture` built with `useTexture`).
 - If squares show: the sprite texture's alpha is not premultiplied the way `plus` expects; fix the texture, not the blend.
 

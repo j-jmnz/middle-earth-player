@@ -1,5 +1,5 @@
 // The combat spotlight (docs/design-system-table.md, Spotlight; docs/plans/done/combat-spotlight-redesign.md), drawn by the full-screen layer
-// (spotlight/layer.native.tsx) on its own canvas over the whole table. When an attack deals or blocks damage the screen goes dark, the
+// (spotlight/layer.native.tsx) on its own canvas over the whole table. When an attack deals or blocks damage black fog closes in, the
 // attacker (or a fan of attackers) and the target arc from their slots to the middle, large, side by side; the attacker draws back, charges
 // and strikes with afterimages, the stage freezes for the hit stop and then shakes, flashes and sparks, and both go back (a destroyed
 // target burns away instead). The plan (spotlight/plan.ts) says who stands where; the beats are arithmetic on one clock
@@ -15,13 +15,15 @@ import { MOTION } from "../../ui/motion-tokens.ts";
 import { rgbOf, type Emitters } from "./atlas.ts";
 import { darkAt, frameAt, punchAt, spotlightRun, windowOf, type Frame } from "./beats.ts";
 import { BurnLayer } from "./burn.native.tsx";
-import { Backdrop, Flash, Glint, Pool, RimGlow, Ring } from "./fx.native.tsx";
+import { FeetFog, FogDark } from "./fog.native.tsx";
+import { Flash, Glint, Pool, RimGlow, Ring } from "./fx.native.tsx";
 import { Chip, DamageNumber, Medallion, Note, Stamp } from "./hud.native.tsx";
 import { Particles } from "./particles.native.tsx";
 import { BurstToken, Corner, FlyingCard, StageCard, Tint, Trail, Veil } from "./pieces.native.tsx";
 import type { ClashPlan, SpotlightPlan } from "./plan.ts";
 import { SPOT } from "./shape.ts";
 import type { SpotFonts } from "../canvas/table-fonts.native.ts";
+import type { ThemeName } from "../../ui/theme.ts";
 import type { TableTokens } from "../../ui/tokens.ts";
 
 // The sparks leave the point of contact turned a little up from the target's side.
@@ -37,8 +39,12 @@ type Common = {
   // The particle sprite texture (spotlight/particles.native.tsx), and the burn shader, or null when it did not compile.
   texture: SharedValue<SkImage | null>;
   burn: SkRuntimeEffect | null;
-  // The dark theme's tokens (the layer always draws with them), and the UI scale (ui-scale.ts).
+  // The dark theme's tokens (the layer always draws with them), the screen's theme (it sets only how deep the flat dark is,
+  // spotlight/fog.ts), and the UI scale (ui-scale.ts).
   t: TableTokens;
+  theme: ThemeName;
+  // Whether the black fog drifts (the Moving fog setting).
+  drift: boolean;
   s: number;
   nameOf: (code: string) => string;
   sphereOf: (code: string) => IconName | null;
@@ -76,7 +82,6 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
     seed: plan.seed,
     burnMs: (shape.last ? MOTION.spotlightBurn : MOTION.spotlightSwap).ms,
     blocked,
-    smoke: { x: (front.x + stage.target.x + stage.target.w) / 2, y: stage.target.y + stage.cardH * 0.95, size: stage.cardH },
     converge: { x: front.x + front.w / 2, y: front.y + front.h / 2, size: stage.cardH },
     hit: { x: stage.contact.x, y: stage.contact.y, size: stage.cardH, dir: blocked ? Math.PI : SPARK_DIR },
     ash: { x: stage.target.x + stage.target.w / 2, y: stage.target.y + stage.target.h / 2, size: stage.cardH, w: stage.target.w },
@@ -95,6 +100,8 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
       {count ? <Corner stage={stage} before={plan.before} after={plan.after} image={damage} font={count} frame={frame} t={t} s={s} /> : null}
     </>
   );
+  // The feet bank spans the whole group, the turned shadow card at its left included.
+  const feet = { left: Math.min(stage.shadow?.x ?? stage.target.x, stage.target.x, ...stage.attackers.map((rect) => rect.x)), right: stage.target.x + stage.target.w, feet: stage.target.y + stage.cardH, cardH: stage.cardH };
   const centre = (rect: ClashPlan["stage"]["target"]) => ({ cx: rect.x + rect.w / 2, cy: rect.y + rect.h / 2 });
   const hit = centre(stage.target);
   return (
@@ -130,6 +137,7 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
             </FlyingCard>
           );
         })}
+        <FeetFog at={feet} width={area.width} height={area.height} frame={frame} dark={dark} drift={common.drift} />
         <Particles texture={texture} frame={frame} dark={dark} emitters={emitters} />
         {Array.from({ length: shape.damage }, (_, n) => (
           <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={damage} t={t} s={s} />
@@ -151,7 +159,7 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
 }
 
 /**
- * The spotlight on the layer's canvas while it plays: the dark with its vignette and a pool of light over the whole screen, then each
+ * The spotlight on the layer's canvas while it plays: the dark (black fog closing in from the edges) and a pool of light over the whole screen, then each
  * attack in turn. `progress` is the 0..1 clock over the whole run at the motion scale `k`.
  */
 export function Spotlight({ plan, progress, ...common }: Common & { plan: SpotlightPlan; progress: SharedValue<number> }) {
@@ -167,7 +175,7 @@ export function Spotlight({ plan, progress, ...common }: Common & { plan: Spotli
   const first = clashes[0]?.stage;
   return (
     <Group>
-      <Backdrop width={width} height={height} dark={dark} t={t} />
+      <FogDark width={width} height={height} dark={dark} now={now} drift={common.drift} theme={common.theme} t={t} />
       {first ? <Pool cx={width / 2} cy={first.target.y + first.target.h / 2} cardH={first.cardH} dark={dark} t={t} /> : null}
       {clashes.map((clash, index) => (
         <ClashView key={`${plan.seq}:${index}`} plan={clash} index={index} total={clashes.length} now={now} dark={dark} punch={punch} area={plan.area} {...common} />
