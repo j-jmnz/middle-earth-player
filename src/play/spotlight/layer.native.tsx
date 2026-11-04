@@ -5,7 +5,8 @@
 // table's pictures come from the table canvas through the handoff store (spotlight/handoff.ts); the canvas ignores touches, so the tap that
 // skips goes to the table canvas's gesture, or to the scrim over the bar and the dock (spotlight/scrim.tsx). The layer always draws with
 // the dark theme's tokens: the stage is dark on the Light theme too; the screen's theme sets only how deep its flat dark is. The black
-// fog's tiles are baked once after the table first paints, so the first spotlight does not pay for the noise.
+// fog's tiles are baked once after the table first paints, and only when a spotlight can play (`useSpotlightScale` above 0), so the
+// first spotlight does not pay for the noise and a table that plays none keeps no tiles.
 import { Canvas } from "@shopify/react-native-skia";
 import { StyleSheet } from "react-native";
 import { memo, useCallback, useEffect, useMemo } from "react";
@@ -26,6 +27,7 @@ import { useTheme } from "../../ui/theme.ts";
 import { tableTokensByTheme } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useSpotlightImages } from "./use-spotlight-images.native.ts";
+import { useSpotlightScale } from "./use-spotlight.ts";
 
 // Memoized: the table renders on every move, and the layer reads its plan and clock from the handoff store, not from props.
 export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, pictureRevision, nameOf, sphereOf }: SpotlightLayerProps) {
@@ -48,9 +50,10 @@ export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, p
   const iconOf = useCallback((code: string) => sphereIcon(sphereOf(code)), [sphereOf]);
   const theme = useTheme();
   const drift = useStore(tableSettings, (state) => state.settings.fogDrift);
+  const canPlay = useSpotlightScale() > 0;
   useEffect(() => {
-    warmFog(EDGE_FOG);
-  }, []);
+    if (canPlay) warmFog(EDGE_FOG);
+  }, [canPlay]);
   if (!playing || !plan || !progress) return null;
   return (
     <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">

@@ -21,7 +21,7 @@ describe("the atlas draws", () => {
     expect(Math.max(...Object.values(PARTICLE_DRAW)) + 1).toBe(ATLAS_DRAWS);
     expect(ATLAS_SLOTS).toEqual([PARTICLE_COUNT.converge, Math.max(PARTICLE_COUNT.spark, PARTICLE_COUNT.deflect), PARTICLE_COUNT.ash]);
     expect(ATLAS_CELL).toEqual([0, 1, 0]);
-    // Every draw is light added to the picture: the smoke is black fog (spotlight/fog.ts), not sprites.
+    // Every draw is light added to the picture.
     expect(ATLAS_BLEND).toEqual(["plus", "plus", "plus"]);
   });
 });

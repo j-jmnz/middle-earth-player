@@ -133,7 +133,7 @@ describe("a particle", () => {
 });
 
 describe("the budgets", () => {
-  it("count 16 converging, 28 sparks, 18 deflecting and 36 ash, in at most three Atlas draws (the smoke is black fog, spotlight/fog.ts)", () => {
+  it("count 16 converging, 28 sparks, 18 deflecting and 36 ash, in at most three Atlas draws", () => {
     expect(PARTICLE_COUNT).toEqual({ converge: 16, spark: 28, deflect: 18, ash: 36 });
     expect(new Set(Object.values(PARTICLE_DRAW)).size).toBeLessThanOrEqual(3);
     expect(ATLAS_DRAWS).toBeLessThanOrEqual(3);

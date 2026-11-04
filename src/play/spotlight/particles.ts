@@ -8,7 +8,7 @@ import { burnField, burnFront } from "./burn.ts";
 
 export type ParticleKind = "converge" | "spark" | "deflect" | "ash";
 
-/** How many sprites each kind has. A charge, a strike (sparks or deflection) and a burn come one after another. The smoke is black fog (spotlight/fog.ts), not sprites. */
+/** How many sprites each kind has. A charge, a strike (sparks or deflection) and a burn come one after another. */
 export const PARTICLE_COUNT: Readonly<Record<ParticleKind, number>> = { converge: 16, spark: 28, deflect: 18, ash: 36 };
 
 /** The most sprites visible at once (a strike and the ash of a kill) and the Atlas draw each kind goes in: glow, sparks, ash. All are added to the picture. */

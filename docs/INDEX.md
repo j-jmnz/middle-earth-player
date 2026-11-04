@@ -45,7 +45,7 @@ Read the sections your task touches.
 - `docs/architecture.md` — Architecture (~18.8K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
-  - 78–160 Modules (~2.0K) ← 3
+  - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)

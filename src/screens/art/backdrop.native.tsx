@@ -3,7 +3,7 @@ import { PixelRatio, StyleSheet, useWindowDimensions, View } from "react-native"
 import { useSharedValue } from "react-native-reanimated";
 
 import { gritTexture, rgbOf, type FogLayer } from "../../ui/fog/fog";
-import { EllipseGradient as Ellipse, Fog, Tile, useDriftClock } from "../../ui/fog/fog.native";
+import { EllipseGradient, Fog, Tile, useDriftClock } from "../../ui/fog/fog.native";
 import { useTheme } from "../../ui/theme";
 import { useDriftRunning } from "./backdrop-drift";
 import { scenesByTheme, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
@@ -41,7 +41,7 @@ function WashLayer({ wash, width, height }: { wash: Wash; width: number; height:
   return (
     <Group layer={<Paint blendMode="multiply" />}>
       <Rect x={0} y={0} width={width} height={height}>
-        <Ellipse cx={wash.cx * width} cy={wash.cy * height} rx={wash.rx * width} ry={wash.ry * height} positions={[0.1, 0.85]} colors={[`rgba(${rgb},${wash.alpha})`, `rgba(${rgb},0)`]} />
+        <EllipseGradient cx={wash.cx * width} cy={wash.cy * height} rx={wash.rx * width} ry={wash.ry * height} positions={[0.1, 0.85]} colors={[`rgba(${rgb},${wash.alpha})`, `rgba(${rgb},0)`]} />
       </Rect>
     </Group>
   );
@@ -65,7 +65,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
           <Rect x={0} y={0} width={width} height={height} color={ground.color} />
         ) : (
           <Rect x={0} y={0} width={width} height={height}>
-            <Ellipse
+            <EllipseGradient
               cx={ground.cx * width}
               cy={ground.cy * height}
               rx={ground.rx * width}
@@ -81,7 +81,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
         ))}
         {s.light ? <Light light={s.light} width={width} height={height} /> : null}
         <Rect x={0} y={0} width={width} height={height}>
-          <Ellipse cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
+          <EllipseGradient cx={width / 2} cy={height * 0.45} rx={width * 1.2} ry={height} positions={[vignette.from, 1]} colors={[`rgba(${vignette.rgb},0)`, `rgba(${vignette.rgb},${vignette.alpha})`]} />
         </Rect>
         <Rect x={0} y={0} width={width} height={height} opacity={grit.opacity} blendMode={grit.blend}>
           <Tile texture={gritTexture} scale={gritScale()} seconds={still} />

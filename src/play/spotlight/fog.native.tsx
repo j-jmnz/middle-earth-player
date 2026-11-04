@@ -2,10 +2,10 @@
 // whole screen, and the bank along each attack's feet. Each layer is the backdrop's fog draw (src/ui/fog/fog.native.tsx); its tiles are
 // baked once, so a frame only slides them. Both drift on the spotlight's own clocks, so the feet bank holds through the hit stop, and
 // both hold still with the Moving fog setting off (`drift` false), as the backdrop's fog does.
-import { Group, RadialGradient, Rect, vec } from "@shopify/react-native-skia";
+import { Group, Rect, vec } from "@shopify/react-native-skia";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 
-import { Fog } from "../../ui/fog/fog.native.tsx";
+import { EllipseGradient, Fog } from "../../ui/fog/fog.native.tsx";
 import type { ThemeName } from "../../ui/theme.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import type { Frame } from "./beats.ts";
@@ -19,8 +19,6 @@ import { SPOT } from "./shape.ts";
 export function FogDark({ width, height, dark, now, drift, theme, t }: { width: number; height: number; dark: SharedValue<number>; now: SharedValue<number>; drift: boolean; theme: ThemeName; t: TableTokens }) {
   const flat = useDerivedValue(() => SPOT_FOG.flat[theme] * dark.get());
   const seconds = useDerivedValue(() => (drift ? now.get() / 1000 : 0));
-  const c = vec(width / 2, height * SPOT.centerY);
-  const rx = width * 0.75;
   return (
     <>
       <Rect x={0} y={0} width={width} height={height} color={t.night} opacity={flat} />
@@ -29,7 +27,7 @@ export function FogDark({ width, height, dark, now, drift, theme, t }: { width: 
           <Fog key={index} layer={layer} width={width} height={height} seconds={seconds} />
         ))}
         <Rect x={0} y={0} width={width} height={height}>
-          <RadialGradient c={c} r={rx} origin={c} transform={[{ scaleY: (height * 0.85) / rx }]} positions={[SPOT_FOG.rimFrom, 1]} colors={[withAlphaHex(t.night, 0), withAlphaHex(t.night, SPOT_FOG.rim)]} />
+          <EllipseGradient cx={width / 2} cy={height * SPOT.centerY} rx={width * 0.75} ry={height * 0.85} positions={[SPOT_FOG.rimFrom, 1]} colors={[withAlphaHex(t.night, 0), withAlphaHex(t.night, SPOT_FOG.rim)]} />
         </Rect>
       </Group>
     </>
@@ -37,12 +35,13 @@ export function FogDark({ width, height, dark, now, drift, theme, t }: { width: 
 }
 
 /**
- * The black bank along one attack's feet, in place of smoke: it rises and swells as the dark comes in, fades with it, and drifts on the
- * attack's fog clock (`frame.fogT`, which holds through the hit stop).
+ * The black bank along one attack's feet: it rises and swells as the dark comes in, fades with it, and drifts on the attack's fog clock
+ * (`frame.fogT`, which holds through the hit stop) put back in real ms (times `k`) from the attack's `start` in the run, so it drifts as
+ * fast as the edge fog at either speed and a later attack's bank takes up where the one before it was.
  */
-export function FeetFog({ at, width, height, frame, dark, drift }: { at: Feet; width: number; height: number; frame: SharedValue<Frame>; dark: SharedValue<number>; drift: boolean }) {
+export function FeetFog({ at, width, height, frame, dark, drift, start, k }: { at: Feet; width: number; height: number; frame: SharedValue<Frame>; dark: SharedValue<number>; drift: boolean; start: number; k: number }) {
   const layers = feetFog(at, width, height);
-  const seconds = useDerivedValue(() => (drift ? Math.max(0, frame.get().fogT) / 1000 : 0));
+  const seconds = useDerivedValue(() => (drift ? (start + Math.max(0, frame.get().fogT) * k) / 1000 : 0));
   const transform = useDerivedValue(() => {
     const d = dark.get();
     return [{ translateY: -SPOT_FOG.feetRise * at.cardH * d }, { scaleY: 1 + SPOT_FOG.feetSwell * d }];

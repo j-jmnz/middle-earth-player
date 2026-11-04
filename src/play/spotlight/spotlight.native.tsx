@@ -137,7 +137,7 @@ function ClashView({ plan, index, total, now, dark, punch, ...common }: Common &
             </FlyingCard>
           );
         })}
-        <FeetFog at={feet} width={area.width} height={area.height} frame={frame} dark={dark} drift={common.drift} />
+        <FeetFog at={feet} width={area.width} height={area.height} frame={frame} dark={dark} drift={common.drift} start={run.start} k={k} />
         <Particles texture={texture} frame={frame} dark={dark} emitters={emitters} />
         {Array.from({ length: shape.damage }, (_, n) => (
           <BurstToken key={n} stage={stage} index={n} count={shape.damage} now={local} k={k} place={shape} image={damage} t={t} s={s} />

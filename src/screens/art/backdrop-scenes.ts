@@ -1,7 +1,7 @@
 /**
  * Backdrop scenes (docs/design-system.md, Backdrops): the ground, the fog or the light over it, the vignette and the grit, as data both
- * backdrops draw (Skia on a phone, CSS on the web). Coordinates are fractions of the screen (x of width, y of height). These are the
- * only colour values outside palette.js, because they are scene art. Screens pick a scene by name, and the theme picks its Dark or Light
+ * backdrops draw (Skia on a phone, CSS on the web). Coordinates are fractions of the screen (x of width, y of height). These and the
+ * combat spotlight's black fog (src/play/spotlight/fog.ts) are the only colour values outside palette.js, because they are scene art. Screens pick a scene by name, and the theme picks its Dark or Light
  * art (user request, 2026-10-29: Dark's fog as rolling banks in Morgul's light, Light as Rivendell's morning light with no fog).
  *
  * The fog itself (its textures, layers and colour matrix) is src/ui/fog/fog.ts. Ember fog, the red one, goes only where the enemy
