@@ -138,6 +138,35 @@ const ANOTHER_ALLY: PickSpec = { type: "ally", control: "any", other: true };
 // and places progress on a location when she exhausts.
 const starlaStat = (stat: "willpower" | "attack" | "defense"): Effect["instructions"][number] => ({ verb: "ModifyStat", stat, amount: { level: true, halved: true }, until: "whileSourceInPlay" });
 
+
+// 11205 to 11208 Círdan's Blessing (the boon the campaign card of The Drowned Ruins lets one player take into hand; Scalable): it enters play with X resources on it, X one more than its level in the Campaign
+// Log (dcce.scalable-upgradable). The Leadership copy adds +3 Defense to the attached character as it defends, the Tactics copy +3 Attack as it attacks (both remove a resource from the card), the Spirit copy
+// gives +3 Willpower for the phase (it exhausts and removes a resource), the Lore copy moves a resource to the attached hero's pool and heals it after the active location is explored.
+const blessingResources = (code: string): Effect => ({
+  id: `${code}:triggered:1`,
+  cardCode: code,
+  lines: [`${code}:A:2`],
+  timing: "triggered",
+  trigger: "enteredPlay",
+  subject: "self",
+  instructions: [{ verb: "AddResources", amount: { level: true, plus: 1 }, to: "self" }],
+});
+const blessingBoost = (code: string, trigger: "declaredDefender" | "declaredAttacker", stat: "defense" | "attack"): Effect => ({
+  id: `${code}:response:1`,
+  cardCode: code,
+  lines: [`${code}:A:3`],
+  timing: "response",
+  trigger,
+  subject: "host",
+  cost: { kind: "resources", amount: 1, from: "self" },
+  instructions: [{ verb: "ModifyStat", stat, amount: 3, until: "endOfAttack", target: "host" }],
+});
+
+// 11210 Gavin (objective ally; an Encounter-keyword player card): his When Revealed takes him into play under a player the first player chooses, committed to the quest, and adds a resource to Lanwyn when she is
+// in play. The other two lines (his Planning Action shuffles a random set-aside Send for Help in with him; he is removed from the game when he leaves play by anything but that) stay open.
+const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
+const LANWYN: PickSpec = { type: "hero", control: "any", names: ["Lanwyn"] };
+
 export const RECORDS: readonly Effect[] = [
   // 11198 Starla, 11199 Recurring Nightmare. Recurring Nightmare: Defense X (the number of players); when it leaves play it is shuffled into a player's deck, the first player choosing whose; when it enters a hand it is added to the staging area.
   { id: "11198:constant:1", cardCode: "11198", lines: ["11198:A:1"], timing: "constant", instructions: [starlaStat("willpower"), starlaStat("attack"), starlaStat("defense")] },
@@ -389,6 +418,35 @@ export const RECORDS: readonly Effect[] = [
   }),
   { id: "11196:forced:3", cardCode: "11196", lines: ["11196:A:4"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }, { verb: "FlipCard" }] },
   { id: "11196:forced:4", cardCode: "11196", lines: ["11196:B:4"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "AttackFirstPlayer" }] },
+  // 11205 Círdan's Blessing (Leadership), 11206 (Tactics), 11207 (Spirit), 11208 (Lore).
+  blessingResources("11205"),
+  blessingBoost("11205", "declaredDefender", "defense"),
+  blessingResources("11206"),
+  blessingBoost("11206", "declaredAttacker", "attack"),
+  blessingResources("11207"),
+  {
+    id: "11207:action:1",
+    cardCode: "11207",
+    lines: ["11207:A:3"],
+    timing: "action",
+    cost: [{ kind: "exhaustSelf" }, { kind: "resources", amount: 1, from: "self" }],
+    instructions: [{ verb: "ModifyStat", stat: "willpower", amount: 3, until: "endOfPhase", target: "host" }],
+  },
+  blessingResources("11208"),
+  {
+    id: "11208:response:1",
+    cardCode: "11208",
+    lines: ["11208:A:3"],
+    timing: "response",
+    trigger: "activeExplored",
+    instructions: [
+      { verb: "AddResources", amount: 1, to: "host", when: { kind: "matches", card: "self", pick: { type: "card", control: "any", minResources: 1 } } },
+      { verb: "DiscardResources", amount: 1, target: "self" },
+      { verb: "Heal", amount: 1, target: "host" },
+    ],
+  },
+
+  { id: "11210:whenRevealed:1", cardCode: "11210", lines: ["11210:A:5"], timing: "whenRevealed", instructions: [FIRST_PLAYER_CHOOSES, { verb: "TakeRevealedCard", who: "picked", committed: true }, { verb: "Pick", pick: LANWYN }, { verb: "AddResources", amount: 1, to: "picked", when: { kind: "canPick", pick: LANWYN } }] },
 ];
 
 export const REPLACES: readonly string[] = [];
