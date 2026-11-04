@@ -66,7 +66,7 @@ Do not do any of these.
 | Decision | Why |
 | --- | --- |
 | Expo app, one package, no monorepo | One person, one binary. A second package adds a build graph with nothing to share yet. |
-| Rules and campaign code cannot import React Native | The game has to be tested in Node. A flat-config ESLint import rule fails the build if `src/rules` or `src/campaign` imports `react-native`, `expo-*`, or anything under `src/play` or `src/screens`. `eslint-plugin-import` v2 is the wrong tool for that config. The same rule fails an `src/effects` import from `src/rules`; `src/campaign`, `src/play` and `src/screens` import `src/effects` directly, and `src/rules` receives the records as an argument. |
+| Rules and campaign code cannot import React Native | The game has to be tested in Node. An Oxlint import rule (`.oxlintrc.json`) fails the build if `src/rules` or `src/campaign` imports `react-native`, `expo-*`, or anything under `src/play` or `src/screens`. The same rule fails an `src/effects` import from `src/rules`; `src/campaign`, `src/play` and `src/screens` import `src/effects` directly, and `src/rules` receives the records as an argument. |
 | Campaign registry, not a Fellowship-named core | The next box is a folder plus a catalog rebuild. The core round and the deck builder do not mention Fellowship by name. |
 | Full official player pool from the first install | Deckbuilding is not gated on campaign progress or on effect coverage. |
 | Two SQLite files | `catalog.db` is reference data baked into the binary and replaceable. `user.db` is decks and saves and is never replaced by a catalog update. |

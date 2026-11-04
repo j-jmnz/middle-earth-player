@@ -1,0 +1,388 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "react",
+    "import"
+  ],
+  "jsPlugins": [
+    {
+      "name": "import-x-js",
+      "specifier": "eslint-plugin-import-x"
+    },
+    "eslint-plugin-expo"
+  ],
+  "categories": {
+    "correctness": "off"
+  },
+  "env": {
+    "builtin": true,
+    "es2024": true,
+    "node": true,
+    "browser": true
+  },
+  "settings": {
+    "import-x/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./tsconfig.json"
+      },
+      "node": true
+    }
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "ios/**",
+    "android/**",
+    ".expo/**",
+    "web-build/**",
+    ".claude/**",
+    "assets/booklets/**"
+  ],
+  "rules": {
+    "import/namespace": "error",
+    "import/export": "error",
+    "import/no-named-as-default": "warn",
+    "import/no-named-as-default-member": "warn",
+    "import/no-duplicates": "warn",
+    "eqeqeq": [
+      "warn",
+      "smart"
+    ],
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-empty-character-class": "warn",
+    "no-empty-pattern": [
+      "warn",
+      {
+        "allowObjectPatternsAsParameters": false
+      }
+    ],
+    "no-extend-native": [
+      "warn",
+      {
+        "exceptions": []
+      }
+    ],
+    "no-extra-bind": "warn",
+    "no-unreachable": "warn",
+    "no-unsafe-negation": [
+      "warn",
+      {
+        "enforceForOrderingRelations": false
+      }
+    ],
+    "no-unused-expressions": [
+      "warn",
+      {
+        "allowShortCircuit": true,
+        "allowTernary": false,
+        "allowTaggedTemplates": false,
+        "enforceForJSX": true,
+        "ignoreDirectives": false
+      }
+    ],
+    "no-unused-labels": "warn",
+    "no-with": "warn",
+    "unicode-bom": [
+      "warn",
+      "never"
+    ],
+    "use-isnan": [
+      "error",
+      {
+        "enforceForIndexOf": false,
+        "enforceForSwitchCase": true
+      }
+    ],
+    "valid-typeof": [
+      "error",
+      {
+        "requireStringLiterals": false
+      }
+    ],
+    "import/first": "warn",
+    "no-var": "error",
+    "typescript/array-type": [
+      "warn",
+      {
+        "default": "array"
+      }
+    ],
+    "typescript/no-empty-object-type": "warn",
+    "typescript/no-wrapper-object-types": "warn",
+    "typescript/consistent-type-assertions": [
+      "warn",
+      {
+        "assertionStyle": "as",
+        "objectLiteralTypeAssertions": "allow"
+      }
+    ],
+    "typescript/no-extra-non-null-assertion": "warn",
+    "no-dupe-class-members": "error",
+    "no-redeclare": "warn",
+    "no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "none",
+        "ignoreRestSiblings": true,
+        "caughtErrors": "all"
+      }
+    ],
+    "no-useless-constructor": "warn",
+    "react/display-name": "error",
+    "react/jsx-key": "error",
+    "react/jsx-no-comment-textnodes": "error",
+    "react/jsx-no-duplicate-props": "error",
+    "react/jsx-no-undef": "error",
+    "react/no-children-prop": "error",
+    "react/no-danger-with-children": "error",
+    "react/no-direct-mutation-state": "error",
+    "react/no-find-dom-node": "error",
+    "react/no-is-mounted": "error",
+    "react/no-render-return-value": "error",
+    "react/no-string-refs": "error",
+    "react/no-unescaped-entities": "error",
+    "react/no-unknown-property": "warn",
+    "react/require-render-return": "error",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/static-components": "error",
+    "react/use-memo": "error",
+    "react/preserve-manual-memoization": "error",
+    "react/incompatible-library": "warn",
+    "react/immutability": "error",
+    "react/globals": "error",
+    "react/refs": "error",
+    "react/set-state-in-effect": "error",
+    "react/error-boundaries": "error",
+    "react/purity": "error",
+    "react/set-state-in-render": "error",
+    "react/unsupported-syntax": "warn",
+    "react/no-this-in-sfc": "warn",
+    "expo/use-dom-exports": "error",
+    "expo/no-env-var-destructuring": "error",
+    "expo/no-dynamic-env-var": "error",
+    "import-x-js/no-restricted-paths": [
+      2,
+      {
+        "zones": [
+          {
+            "target": "./src/rules",
+            "from": "./src",
+            "except": [
+              "./catalog",
+              "./rules"
+            ],
+            "message": "src/rules may import only src/catalog."
+          },
+          {
+            "target": "./src/campaign",
+            "from": "./src",
+            "except": [
+              "./catalog",
+              "./rules",
+              "./campaign",
+              "./effects"
+            ],
+            "message": "src/campaign may import only src/catalog, src/rules and src/effects."
+          },
+          {
+            "target": "./src/play",
+            "from": "./src",
+            "except": [
+              "./rules",
+              "./catalog",
+              "./play",
+              "./ui",
+              "./effects"
+            ],
+            "message": "src/play may import only src/rules, src/catalog, src/effects and src/ui from src/."
+          },
+          {
+            "target": "./src/screens",
+            "from": "./src",
+            "except": [
+              "./play",
+              "./campaign",
+              "./catalog",
+              "./screens",
+              "./ui",
+              "./effects"
+            ],
+            "message": "src/screens may import only src/play, src/campaign, src/catalog, src/effects and src/ui."
+          },
+          {
+            "target": "./src/effects",
+            "from": "./src",
+            "except": [
+              "./catalog",
+              "./effects"
+            ],
+            "message": "src/effects may import only src/catalog."
+          },
+          {
+            "target": "./src/ui",
+            "from": "./src",
+            "except": [
+              "./ui"
+            ],
+            "message": "src/ui (the design system) may not import other modules under src/."
+          },
+          {
+            "target": "./src/catalog",
+            "from": "./src",
+            "except": [
+              "./catalog"
+            ],
+            "message": "src/catalog may not import other modules under src/."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "rules": {
+        "typescript/no-require-imports": [
+          "warn",
+          {
+            "allow": [
+              "\\.(aac|aiff|avif|bmp|caf|db|gif|heic|html|jpeg|jpg|json|m4a|m4v|mov|mp3|mp4|mpeg|mpg|otf|pdf|png|psd|svg|ttf|wav|webm|webp|xml|yaml|yml|zip)$"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/rules/**",
+        "src/campaign/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          2,
+          {
+            "paths": [
+              {
+                "name": "react-native",
+                "message": "src/rules and src/campaign cannot import react-native or expo."
+              },
+              {
+                "name": "expo",
+                "message": "src/rules and src/campaign cannot import react-native or expo."
+              }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "react-native/*",
+                  "expo-*",
+                  "expo/*"
+                ],
+                "message": "src/rules and src/campaign cannot import react-native or expo."
+              }
+            ]
+          }
+        ],
+        "typescript/no-require-imports": "error"
+      }
+    },
+    {
+      "files": [
+        "scripts/**",
+        "test/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx"
+      ],
+      "rules": {
+        "import-x-js/no-restricted-paths": [
+          2,
+          {
+            "zones": [
+              {
+                "target": "./src/rules",
+                "from": "./src",
+                "except": [
+                  "./catalog",
+                  "./rules",
+                  "./effects"
+                ],
+                "message": "src/rules may import only src/catalog."
+              },
+              {
+                "target": "./src/campaign",
+                "from": "./src",
+                "except": [
+                  "./catalog",
+                  "./rules",
+                  "./campaign",
+                  "./effects"
+                ],
+                "message": "src/campaign may import only src/catalog, src/rules and src/effects."
+              },
+              {
+                "target": "./src/play",
+                "from": "./src",
+                "except": [
+                  "./rules",
+                  "./catalog",
+                  "./play",
+                  "./ui",
+                  "./effects"
+                ],
+                "message": "src/play may import only src/rules, src/catalog, src/effects and src/ui from src/."
+              },
+              {
+                "target": "./src/screens",
+                "from": "./src",
+                "except": [
+                  "./play",
+                  "./campaign",
+                  "./catalog",
+                  "./screens",
+                  "./ui",
+                  "./effects"
+                ],
+                "message": "src/screens may import only src/play, src/campaign, src/catalog, src/effects and src/ui."
+              },
+              {
+                "target": "./src/effects",
+                "from": "./src",
+                "except": [
+                  "./catalog",
+                  "./effects"
+                ],
+                "message": "src/effects may import only src/catalog."
+              },
+              {
+                "target": "./src/ui",
+                "from": "./src",
+                "except": [
+                  "./ui"
+                ],
+                "message": "src/ui (the design system) may not import other modules under src/."
+              },
+              {
+                "target": "./src/catalog",
+                "from": "./src",
+                "except": [
+                  "./catalog",
+                  "./effects"
+                ],
+                "message": "src/catalog may not import other modules under src/."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

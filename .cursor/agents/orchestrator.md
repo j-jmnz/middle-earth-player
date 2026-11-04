@@ -26,14 +26,14 @@ Each brief stands on its own, because the agent knows only what you give it:
 - The behaviours to keep exactly, and the plan's out-of-scope list.
 - Where it must STOP and report instead of deciding: a change that alters a behaviour the plan keeps, a missing API, a test that breaks for a reason the plan did not expect. It must never work around one silently.
 - Any measurement the plan asks for (before and after, a scratch script in the session scratchpad, never committed).
-- The exit: `pnpm test`, `pnpm lint`, `npx tsc --noEmit`, plus `pnpm data:check` when the engine or `data/` could move, and the task's own checks.
+- The exit: `pnpm test`, `pnpm lint`, `pnpm typecheck`, plus `pnpm data:check` when the engine or `data/` could move, and the task's own checks.
 - Do not commit or push; do not edit `docs/phases/STATUS.md`. Report changes by file, each deviation from the plan and why, and the command results.
 
 ## After each task
 
 An agent's report is a claim. Before committing:
 - Run `git status` and look for files that must not be there: `data/` changes, goldens or step logs, `catalog.db`, scans, PDFs, scratch scripts.
-- Run `pnpm lint` and `npx tsc --noEmit` yourself. Run `pnpm test` yourself when the agent edited anything after its last full run, and the task's own tests either way.
+- Run `pnpm lint` and `pnpm typecheck` yourself. Run `pnpm test` yourself when the agent edited anything after its last full run, and the task's own tests either way.
 - Read each deviation it reports. A deviation that keeps the plan's intent goes into that task's commit message, and into Standing decisions in `docs/phases/STATUS.md` only if it constrains later work. One that changes a kept behaviour, or that the plan settled differently, goes to the user before you commit.
 - Commit with a message in the repository's voice (what changed and why, with the measured numbers), then push to the branch the user named with `git push -u origin <branch>`.
 - A repeated hand-back from a finished agent is not new work: ignore it.
@@ -52,6 +52,6 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 - Update `docs/phases/STATUS.md` as `.cursor/rules/docs-standards.mdc` says: the phase row's note, one line per item still open under Open items, and Standing decisions for a user decision that constrains later work. Do not add a dated section: what was built, the commands, test counts and measured numbers go in the commit messages and your final report.
 - In a cloud session there is no phone, simulator or Maestro. On-device checks are never marked done: list them under Open items.
 - The plan is done: move it to `docs/plans/done/` and update the paths that cite it. Delete any prompt or handover file the work consumed.
-- Before the last commit, check that `pnpm test`, `pnpm lint`, `npx tsc --noEmit` and `pnpm data:check` are green. Then commit and push.
+- Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data:check` are green. Then commit and push.
 - Do not open a pull request unless the user asks.
 - Finish with a short report: what each task changed, the measured numbers, the review findings and what was fixed or kept, and what stays open.

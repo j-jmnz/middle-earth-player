@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~1.8K tok)
+- `CLAUDE.md` — Claude Code (~1.9K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
 - `.cursor/rules/code-standards.mdc` — Code standards (~1.5K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
@@ -31,18 +31,18 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.5K tok)
+- `README.md` — Middle Earth LCG (~3.6K tok)
   - 7–17 Where it stands (~390)
   - 18–23 Rules come from the printed sources (~160)
-  - 24–51 Commands (~990)
-  - 52–61 Documents (~260)
-  - 62–65 Agents (~120)
-  - 66–160 Run it locally (~1.5K)
-    - 70–75 Mac browser (~120)
-    - 76–81 Codespaces (~110)
-    - 82–156 Phone builds from scratch (Mac) (~1.1K)
-    - 157–160 Maestro (~170)
-- `docs/architecture.md` — Architecture (~17.8K tok)
+  - 24–53 Commands (~1.1K)
+  - 54–63 Documents (~260)
+  - 64–67 Agents (~120)
+  - 68–162 Run it locally (~1.5K)
+    - 72–77 Mac browser (~120)
+    - 78–83 Codespaces (~110)
+    - 84–158 Phone builds from scratch (Mac) (~1.1K)
+    - 159–162 Maestro (~170)
+- `docs/architecture.md` — Architecture (~17.9K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.0K) ← 3
@@ -57,13 +57,13 @@ Read the sections your task touches.
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–369 Tests (~880) ← 2
+  - 356–369 Tests (~910) ← 2
   - 370–385 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
-  - 64–84 Decisions (~850)
+  - 64–84 Decisions (~830)
   - 85–113 Stack (~810)
   - 114–131 Performance and feel (~750)
   - 132–149 Repository layout (~440)

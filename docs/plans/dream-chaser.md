@@ -190,7 +190,7 @@ For each phase:
 
 After each phase:
 - `pnpm data:build` and `pnpm data:check` (deterministic); `pnpm data:build -- --verbose` (no failed cross-check)
-- `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test`
+- `pnpm typecheck`, `pnpm lint`, `pnpm test`
 - `pnpm effects:open`, which shows no line for a scenario in `playable.ts`
 - `node --experimental-strip-types scripts/card-smoke/run.ts <new codes>` (including the DCCE boons and burdens a scenario deals)
 - `pnpm catalog:build`, then commit `src/catalog/version.ts`

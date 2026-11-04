@@ -17,5 +17,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm data:check
       - run: pnpm lint
-      - run: pnpm exec tsc --noEmit
+      - run: pnpm typecheck
       - run: pnpm test

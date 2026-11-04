@@ -3,8 +3,9 @@
 // the ash of a burn. Four draws of one sprite texture: the smoke laid over the picture, the others added to it with the "plus" blend
 // (ATLAS_BLEND). The UI thread fills each draw's buffers from the attack's frame
 // (useRSXformBuffer, useColorBuffer; the layout of a slot is spotlight/atlas.ts), so nothing here renders again while the spotlight plays.
-import { Atlas, Circle, Group, LinearGradient, RadialGradient, RoundedRect, Skia, vec, type SkImage } from "@shopify/react-native-skia";
-import { useRSXformBuffer, useColorBuffer, useTexture } from "@shopify/react-native-skia";
+import {
+  Atlas, Circle, Group, LinearGradient, RadialGradient, RoundedRect, Skia, vec, type SkImage, useRSXformBuffer, useColorBuffer, useTexture,
+} from "@shopify/react-native-skia";
 import { useMemo } from "react";
 import { useDerivedValue, type SharedValue } from "react-native-reanimated";
 

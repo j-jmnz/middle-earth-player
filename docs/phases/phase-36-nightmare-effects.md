@@ -20,7 +20,7 @@ Order: A Shadow of the Past, A Knife in the Dark, Flight to the Ford, The Ring G
 ## Exit
 
 - Coverage is green for every line of the deck and the setup card.
-- `pnpm test`, `pnpm lint`, `tsc` and `pnpm data:check` are green.
+- `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data:check` are green.
 - Phone check, open: one Nightmare game per scenario on a phone.
 
 ## Progress

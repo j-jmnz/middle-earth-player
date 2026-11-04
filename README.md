@@ -27,8 +27,10 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | --- | --- |
 | `pnpm install` | Installs dependencies. A Claude Code cloud session runs it from `.claude/hooks/session-start.sh`. |
 | `pnpm test` | Runs Vitest. No network, no prebuilt database. |
-| `pnpm lint` | Checks import boundaries. |
-| `pnpm exec tsc --noEmit` | Type-checks. |
+| `pnpm test:fast` | Runs Vitest without the slow whole-game and compiler files (`slowFiles` in `vitest.config.mts`). |
+| `pnpm test:changed` | Runs only the tests that import a file changed since the last commit. |
+| `pnpm lint` | Runs Oxlint (`.oxlintrc.json`): import boundaries and the React and Expo rules. |
+| `pnpm typecheck` | Type-checks with tsrs. |
 | `pnpm data:check` | Rebuilds `data/` into a temporary directory and fails on any difference. |
 | `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes the raw sources. It is the only command that uses the network. `scans` and `pictures` run only when named, after `data:build`. |
 | `pnpm data:build` | Builds cards, scenarios, rules, generated effect records and the game icons from `data/raw`, offline and deterministic. |
@@ -45,7 +47,7 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 
 The scripts log to stderr through `scripts/log.ts`: each line has the time since the start, the script and source (`data:sync › ringsdb`), and progress through long fetches. A failure prints its causes (a dropped connection's `ECONNRESET`, the URL and status of a bad response). Add `--verbose` for every request, file and stack (`pnpm data:sync ringsdb -- --verbose`), `--quiet` for warnings and errors only, or set `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`). Data stays on stdout: `data:query` prints only rows there.
 
-CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `tsc`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
+CI (`.github/workflows/test.yml`) runs `data:check`, `lint`, `typecheck`, and `test` on every push and pull request. [CLAUDE.md](CLAUDE.md) has the data commands in more detail.
 
 Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is generated from `data/` and shipped inside the binary. The two booklet PDFs and every card's picture ship in the binary too (`pnpm scans:pack`, run by `pnpm start`, `pnpm ios`, `pnpm android` and `eas-build-post-install`, so every local bundle and release takes the pictures `data/sources.json` pins; the same Metro rule below applies to it). `pnpm booklets:pack` copies the pinned PDFs and a map that requires them into `assets/booklets/` (gitignored), and Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules`, `pnpm android` and the EAS `eas-build-post-install` hook run it. A development-client APK takes its JavaScript and assets from your local Metro, so pack on the machine that runs `pnpm start`; the books show after a Metro restart (`--clear` if it cached the stub).
 

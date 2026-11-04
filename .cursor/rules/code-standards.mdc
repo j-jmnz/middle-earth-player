@@ -10,7 +10,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 ## The React Compiler
 
 - `src/play/compiler.test.ts` stays at zero bailouts. A component or hook it cannot compile gets no memoization, and the miss spreads to whatever depends on it.
-- No `eslint-disable` of `react-hooks/exhaustive-deps`. An effect that must run only when X changes lists X and reads the rest through `useEffectEvent`.
+- No `oxlint-disable` or `eslint-disable` of `react/exhaustive-deps`. An effect that must run only when X changes lists X and reads the rest through `useEffectEvent`.
 - No `try/catch` or `try/finally` in a component or hook body: put it in a module-level helper.
 - No default parameter that is not a plain literal (`color = t.bone`): take `color?: string` and write `color ?? t.bone` in the body. No computed object keys, and no ternary inside a `||`/`&&` chain: name it in a `const` first.
 - No read of the store (`getState()`), of a mutable log or of module state during a render. Pass the value in, or subscribe with a selector. The compiler caches a call by its arguments, so such a read goes stale.
@@ -48,5 +48,5 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 - `src/screens` imports nothing from `src/rules`. The lint zones (`pnpm lint`) decide where a new helper lives.
 - Match the surrounding code: dense `//` comments that say what the code does now, sentence case, rule ids and docs cited, the same naming. A comment cites a doc by file and section heading, never by line number, and does not narrate what the code used to do. Update `docs/architecture.md` (and `docs/design-system.md`, or `docs/design-system-table.md` for the table, for anything visible) wherever the change touches what they say, following `.cursor/rules/docs-standards.mdc`.
 - A hook or script an agent runs prints only what the agent needs to act on. Progress bars, banners and success chatter go behind `--verbose` (scripts log through `scripts/log.ts`); a failure prints its full output.
-- `pnpm test`, `pnpm lint` and `npx tsc --noEmit` are green before a commit; `pnpm data:check` too when the engine or `data/` could move.
+- `pnpm test`, `pnpm lint` and `pnpm typecheck` are green before a commit; `pnpm data:check` too when the engine or `data/` could move.
 - A cloud session has no phone, simulator or Maestro. On-device checks (frame timing, the look in both themes, hidden-screen behaviour, haptic feel) are never marked done there. List them under Open in `docs/phases/STATUS.md`.

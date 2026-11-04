@@ -100,7 +100,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
 Other agents share this 4-core machine: use generous timeouts, run targeted test files while developing and the full
 suite once at the end, and never kill processes you did not start (no `pkill`).
 
-- `pnpm exec tsc --noEmit`
+- `pnpm typecheck`
 - `pnpm lint`
 - `pnpm effects:open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
 - `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for every card you wrote records for: no problems reported.

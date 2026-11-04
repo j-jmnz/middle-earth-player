@@ -18,7 +18,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["dbaeumer.vscode-eslint", "vitest.explorer"]
+      "extensions": ["oxc.oxc-vscode", "vitest.explorer"]
     }
   }
 }

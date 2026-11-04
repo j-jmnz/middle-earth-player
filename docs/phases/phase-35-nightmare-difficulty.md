@@ -21,5 +21,5 @@ A third difficulty, Nightmare, deals a scenario's Nightmare deck and places its 
 ## Exit
 
 - `src/campaign/nightmare.test.ts` green. The effect coverage test keeps `NIGHTMARE_PLAYABLE` honest.
-- `pnpm test`, `pnpm lint` and `tsc` green.
+- `pnpm test`, `pnpm lint` and `pnpm typecheck` green.
 - Phone check, open: the switch with three segments on a phone and a tablet, and the Eye in the switch, in the list and in the top bar, on Dark and Light.
