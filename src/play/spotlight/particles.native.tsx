@@ -1,7 +1,6 @@
-// The combat spotlight's particles as Skia Atlas draws (docs/plans/done/combat-spotlight-redesign.md, §4 and §5): the black and grey smoke
-// that billows up around the attack, the glow (the charge's converging embers), the streaks (sparks, or a block's silver deflection) and
-// the ash of a burn. Four draws of one sprite texture: the smoke laid over the picture, the others added to it with the "plus" blend
-// (ATLAS_BLEND). The UI thread fills each draw's buffers from the attack's frame
+// The combat spotlight's particles as Skia Atlas draws (docs/plans/done/combat-spotlight-redesign.md, §4 and §5): the glow (the charge's
+// converging embers), the streaks (sparks, or a block's silver deflection) and the ash of a burn. Three draws of one sprite texture,
+// each added to the picture with the "plus" blend (ATLAS_BLEND). The UI thread fills each draw's buffers from the attack's frame
 // (useRSXformBuffer, useColorBuffer; the layout of a slot is spotlight/atlas.ts), so nothing here renders again while the spotlight plays.
 import {
   Atlas, Circle, Group, LinearGradient, RadialGradient, RoundedRect, Skia, vec, type SkImage, useRSXformBuffer, useColorBuffer, useTexture,
@@ -33,7 +32,7 @@ export function useSpriteTexture(): SharedValue<SkImage | null> {
 // One draw: `ATLAS_SLOTS[draw]` slots of the texture's dot or streak cell, placed and colored by the clocks on the UI thread. A draw with
 // nothing that can show (outside its attack's window, before the strike, after the last spark or ash) fills its slots with zeros and works
 // no sprite out, so only the attack on stage pays for its particles.
-function Draw({ draw, texture, times, emitters }: { draw: 0 | 1 | 2 | 3; texture: SharedValue<SkImage | null>; times: SharedValue<Times>; emitters: Emitters }) {
+function Draw({ draw, texture, times, emitters }: { draw: 0 | 1 | 2; texture: SharedValue<SkImage | null>; times: SharedValue<Times>; emitters: Emitters }) {
   const size = ATLAS_SLOTS[draw];
   const cell = ATLAS_CELL[draw];
   const sprites = useMemo(() => Array.from({ length: size }, () => Skia.XYWHRect(cell * CELL, 0, CELL, CELL)), [size, cell]);
@@ -64,20 +63,19 @@ function Draw({ draw, texture, times, emitters }: { draw: 0 | 1 | 2 | 3; texture
 }
 
 /**
- * The particles of one attack: four Atlas draws (`ATLAS_DRAWS`), at most the budget of sprites alive at once (spotlight/particles.ts).
- * `dark` is the run's dark ramp: the smoke and the glow fade with it.
+ * The particles of one attack: three Atlas draws (`ATLAS_DRAWS`), at most the budget of sprites alive at once (spotlight/particles.ts).
+ * `dark` is the run's dark ramp: the glow fades with it.
  */
 export function Particles({ texture, frame, dark, emitters }: { texture: SharedValue<SkImage | null>; frame: SharedValue<Frame>; dark: SharedValue<number>; emitters: Emitters }) {
   const times = useDerivedValue((): Times => {
     const f = frame.get();
-    return { smokeT: f.smokeT, convergeT: f.convergeT, sparkT: f.sparkT, ashT: f.ashT, dark: dark.get() };
+    return { convergeT: f.convergeT, sparkT: f.sparkT, ashT: f.ashT, dark: dark.get() };
   });
   return (
     <>
       <Draw draw={0} texture={texture} times={times} emitters={emitters} />
       <Draw draw={1} texture={texture} times={times} emitters={emitters} />
       <Draw draw={2} texture={texture} times={times} emitters={emitters} />
-      <Draw draw={3} texture={texture} times={times} emitters={emitters} />
     </>
   );
 }

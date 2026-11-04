@@ -44,6 +44,4 @@ export const SPOT = {
   numberPeak: 1.4,
   // The number floats up this share of a card's height while it shows.
   numberRise: 0.08,
-  // The most the backdrop darkens the screen (the layer draws it, always dark, with the Dark theme's tokens, on either theme).
-  dark: 0.88,
 } as const;

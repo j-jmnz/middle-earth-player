@@ -1,50 +1,19 @@
 /**
  * Backdrop scenes (docs/design-system.md, Backdrops): the ground, the fog or the light over it, the vignette and the grit, as data both
- * backdrops draw (Skia on a phone, CSS on the web). Coordinates are fractions of the screen (x of width, y of height). These are the
- * only colour values outside palette.js, because they are scene art. Screens pick a scene by name, and the theme picks its Dark or Light
+ * backdrops draw (Skia on a phone, CSS on the web). Coordinates are fractions of the screen (x of width, y of height). These and the
+ * combat spotlight's black fog (src/play/spotlight/fog.ts) are the only colour values outside palette.js, because they are scene art. Screens pick a scene by name, and the theme picks its Dark or Light
  * art (user request, 2026-10-29: Dark's fog as rolling banks in Morgul's light, Light as Rivendell's morning light with no fog).
  *
- * Fog is fractal noise (the SVG feTurbulence algorithm, which Skia's FractalNoise shares) turned into a colour by a matrix that keeps
- * one hue and takes its alpha from the noise's own alpha, so the clouds are the noise and the hue is the fog's. A bank of fog is three
- * layers of it: a soft haze, the banks themselves (a steep alpha, so they have edges), and their lit crests (the same noise, paler, a
- * steeper alpha and nudged up). The banks keep to three octaves, since their steep alpha turns finer octaves into grain (user
- * request, 2026-10-29). Each layer is faded out at its edges by an elliptical mask. Ember fog, the red one, goes only where the enemy
+ * The fog itself (its textures, layers and colour matrix) is src/ui/fog/fog.ts. Ember fog, the red one, goes only where the enemy
  * lives.
  *
  * Fog drifts sideways, very slowly, like a bank in a light wind (user request, 2026-10-30): each texture moves at its own speed (the
  * haze slower than the banks, so they part a little; the ember the other way), its mask stays put, and a scene can slow it all
  * (`drift`). Reduced motion holds it still.
  */
+import { banks, type Ellipse, type FogLayer, type FogTexture } from "../../ui/fog/fog";
+
 export type SceneName = "moon" | "hero" | "path" | "ember" | "calm" | "victory" | "table";
-
-/** A fog texture: the noise and the colour it is mapped to. `freq` is cycles per point across and down. */
-export type FogTexture = {
-  freq: readonly [x: number, y: number];
-  octaves: number;
-  seed: number;
-  rgb: readonly [number, number, number];
-  // alpha = gain × noise alpha + bias (the noise alpha is about 0.5 on average), clamped to 0..1 by the renderer
-  gain: number;
-  bias: number;
-  // The size of one tile on the web, where the noise is an SVG drawn as a repeating background (its tiles are stitched).
-  tile: readonly [w: number, h: number];
-  // Points the noise is moved by: a crest sits a little above the bank it lights.
-  offset?: readonly [dx: number, dy: number];
-  // Points a second it drifts across (negative is leftward); 0 holds it still.
-  drift: number;
-  // Pixels per point the phone draws its tile at once, before it drifts: the haze is soft enough for half.
-  bake?: number;
-};
-
-export type Ellipse = { cx: number; cy: number; rx: number; ry: number };
-
-/** One fog layer: a texture, how strong, and the ellipse it fades out from (rx and ry as fractions of width and height). */
-export type FogLayer = {
-  texture: FogTexture;
-  opacity: number;
-  mask: Ellipse | null;
-  blend?: "multiply";
-};
 
 /** A shaft of light: a quadrilateral in fractions of the box, lit at its top and gone at its foot, blurred soft. */
 export type Beam = { points: readonly (readonly [x: number, y: number])[]; opacity: number };
@@ -82,19 +51,9 @@ const moonCrest: FogTexture = { ...moonBank, rgb: [201, 222, 204], gain: 6, bias
 const emberHaze: FogTexture = { freq: [0.003, 0.004], octaves: 2, seed: 9, rgb: [150, 38, 22], gain: 1.4, bias: -0.3, tile: [1200, 900], drift: -1.7, bake: 0.5 };
 const emberBank: FogTexture = { freq: [0.008, 0.012], octaves: 3, seed: 11, rgb: [150, 38, 22], gain: 3, bias: -1.18, tile: [1000, 700], drift: -4 };
 const emberCrest: FogTexture = { ...emberBank, rgb: [219, 107, 77], gain: 6, bias: -3.8, offset: [0, -3] };
-export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260], drift: 0 };
 
 const MOON = { haze: moonHaze, bank: moonBank, crest: moonCrest };
 const EMBER = { haze: emberHaze, bank: emberBank, crest: emberCrest };
-
-/** A bank of fog in one ellipse: its haze, the banks and their crests, at `opacity` and in proportion to it. */
-function banks(fog: typeof MOON, opacity: number, mask: Ellipse): FogLayer[] {
-  return [
-    { texture: fog.haze, opacity: opacity * 0.6, mask },
-    { texture: fog.bank, opacity, mask },
-    { texture: fog.crest, opacity: opacity * 0.7, mask },
-  ];
-}
 
 const darkVignette = { rgb: "3,4,5", alpha: 0.92, from: 0.45 };
 const darkGrit = { opacity: 0.18, blend: "overlay" } as const;
@@ -219,19 +178,3 @@ export const heroVeil = {
     ],
   } satisfies SceneLight,
 };
-
-/**
- * A fog texture's colour matrix, row by row (feColorMatrix's values and Skia's ColorMatrix alike): the hue in the first three rows
- * as constant offsets, the alpha from the noise's alpha. Offsets are fractions of 1.
- */
-export function fogMatrix(texture: FogTexture): number[] {
-  const [r, g, b] = texture.rgb.map((channel) => channel / 255) as [number, number, number];
-  if (texture === gritTexture) {
-    // Grit is grey noise: each channel the noise's red, fully opaque.
-    return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1];
-  }
-  return [0, 0, 0, 0, r, 0, 0, 0, 0, g, 0, 0, 0, 0, b, 0, 0, 0, texture.gain, texture.bias];
-}
-
-/** "r,g,b" for a CSS or Skia rgba(). */
-export const rgbOf = (rgb: readonly [number, number, number]) => rgb.join(",");

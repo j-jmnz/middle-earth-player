@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ease, springStep } from "./curves.ts";
-import { SPOT } from "../spotlight/shape.ts";
+import { SPOT_FOG } from "../spotlight/fog.ts";
 import { ARM_BAR_EASING, LONG_TOKENS, MAX_TOKEN_MS, MOTION, ms, motionScale, SHAPE, SPOTLIGHT_AGAIN, SPOTLIGHT_AGAIN_BEATS, SPOTLIGHT_BEATS, springTune, timed, type EasingName, type Spring, type Tween } from "../../ui/motion-tokens.ts";
 
 const entries = Object.entries(MOTION) as [string, Tween | Spring][];
@@ -42,9 +42,9 @@ describe("the tokens", () => {
     expect(MOTION.sweep.ms).toBe(900);
   });
 
-  it("let only the sweep, the whole spotlight run and the lives of its smoke and ash pass 500 ms", () => {
-    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "spotlightSmoke", "sweep"]);
-    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "spotlightSmoke", "sweep"]);
+  it("let only the sweep, the whole spotlight run and the life of its ash pass 500 ms", () => {
+    expect(entries.filter(([, token]) => token.ms > MAX_TOKEN_MS).map(([name]) => name).sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
+    expect([...LONG_TOKENS].sort()).toEqual(["spotlight", "spotlightAsh", "spotlightHold", "sweep"]);
   });
 
   it("make a spotlight of 3200 ms at Normal and 1920 at Quick, each beat at most 500 ms apart from the hold", () => {
@@ -69,7 +69,7 @@ describe("the tokens", () => {
     // A kill stops for 160 ms, the extra 60 coming out of the impact.
     expect(MOTION.spotlightStopKill.ms).toBe(160);
     expect(MOTION.spotlightStopKill.ms - MOTION.spotlightStop.ms).toBeLessThan(MOTION.spotlightImpact.ms);
-    expect([MOTION.spotlightSmoke.ms, MOTION.spotlightConverge.ms, MOTION.spotlightAsh.ms]).toEqual([2000, 500, 1100]);
+    expect([MOTION.spotlightConverge.ms, MOTION.spotlightAsh.ms]).toEqual([500, 1100]);
     expect([MOTION.spotlightFlash.ms, MOTION.spotlightRing.ms, MOTION.spotlightSparks.ms, MOTION.spotlightShake.ms]).toEqual([160, 360, 450, 420]);
     expect(MOTION.spotlightNumberRise.ms).toBe(140);
     expect(MOTION.spotlightNumberSettle).toEqual({ ms: 260, zeta: 0.5 });
@@ -160,7 +160,7 @@ describe("the hand scrub's tokens (phase 25)", () => {
     expect(SHAPE.scrubLiftScale).toBe(1.55);
     expect(SHAPE.scrubLiftRise).toBe(0.25);
     expect(SHAPE.scrubNight).toBe(0.35);
-    expect(SHAPE.scrubNight).toBeLessThan(SPOT.dark);
+    expect(SHAPE.scrubNight).toBeLessThan(SPOT_FOG.flat.dark);
   });
 });
 
