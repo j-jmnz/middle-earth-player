@@ -17,11 +17,11 @@ Read whole.
 
 Each agent reads its own file.
 
-- `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.1K tok)
+- `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
 - `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.4K tok)
-- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.0K tok)
+- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.2K tok)
 - `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
-- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~920 tok)
+- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.0K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~130 tok)
@@ -31,18 +31,18 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.5K tok)
+- `README.md` — Middle Earth LCG (~3.7K tok)
   - 7–17 Where it stands (~390)
   - 18–23 Rules come from the printed sources (~160)
-  - 24–51 Commands (~990)
-  - 52–61 Documents (~260)
-  - 62–65 Agents (~120)
-  - 66–160 Run it locally (~1.5K)
-    - 70–75 Mac browser (~120)
-    - 76–81 Codespaces (~110)
-    - 82–156 Phone builds from scratch (Mac) (~1.1K)
-    - 157–160 Maestro (~170)
-- `docs/architecture.md` — Architecture (~17.9K tok)
+  - 24–52 Commands (~1.1K)
+  - 53–62 Documents (~260)
+  - 63–66 Agents (~170)
+  - 67–161 Run it locally (~1.5K)
+    - 71–76 Mac browser (~120)
+    - 77–82 Codespaces (~110)
+    - 83–157 Phone builds from scratch (Mac) (~1.1K)
+    - 158–161 Maestro (~170)
+- `docs/architecture.md` — Architecture (~18.3K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.0K) ← 3
@@ -57,8 +57,8 @@ Read the sections your task touches.
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–369 Tests (~880) ← 3
-  - 370–385 Performance (~1.2K) ← 3
+  - 356–371 Tests (~1.3K) ← 3
+  - 372–387 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
@@ -281,18 +281,19 @@ Read when a task names the plan.
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~5.6K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~6.1K tok)
   - 12–33 Workflow (~480)
   - 34–50 Where records live (~370)
-  - 51–75 The record (~500)
-  - 76–92 Which card an instruction acts on (~380)
-  - 93–113 Pick filters (~410)
-  - 114–122 Amounts (~180)
-  - 123–129 Conditions (~110)
-  - 130–149 Triggers and stat flags (~440)
-  - 150–211 Patterns (~1.4K)
-  - 212–237 Mechanic families: engine and records together (~720) ← 2
-  - 238–257 Not expressible yet: leave open, report (~390)
+  - 51–73 Templates and copied lines (~520) ← 3
+  - 74–98 The record (~500)
+  - 99–115 Which card an instruction acts on (~380)
+  - 116–136 Pick filters (~410)
+  - 137–145 Amounts (~180)
+  - 146–152 Conditions (~110)
+  - 153–172 Triggers and stat flags (~440)
+  - 173–234 Patterns (~1.4K)
+  - 235–260 Mechanic families: engine and records together (~720) ← 2
+  - 261–280 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)

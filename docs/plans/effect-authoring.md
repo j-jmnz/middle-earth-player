@@ -48,6 +48,29 @@ with the reason, and the coverage test checks that no other id is replaced.
 Family and scenario files are TypeScript, so local constants for a repeated filter or a small builder are fine; pool files
 are one JSON-shaped record per line. Record ids are unique across every file.
 
+## Templates and copied lines
+
+A sentence printed on several cards is a template (`scripts/data/effects/*-templates.ts`), not more authored records. A line
+printed the same as a line another card's record already owns is a copy, not a record typed again.
+
+- A template that comes to read a line an authored record owns writes that record itself. `scripts/checks/effect-migration.test.ts`
+  fails while an authored record is deep-equal to the generated record of its id (delete the authored one), differs from it
+  without a `REPLACES` entry, or shares a line with a generated record of another id.
+- The golden games store parts of the records they play: a won game's `state.resolution` holds the campaign card's Resolution
+  instructions. So a template writes the shape the playable scenarios' records already use, key order included, and a
+  played record whose shape it cannot match stays authored, in `REPLACES` with the reason. A golden that moves means the two
+  shapes differ in meaning.
+- A constant or triggered template reads a line only when no earlier unread line of that timing comes before it on the card
+  (`unreadBefore` in the template context): `generate.ts` does not reserve numbers for unread unlabelled lines, so a template
+  there could take an authored record's id. A line the ledger marks `inert` is not read either.
+- A card's records of one timing resolve in printed order (`recordInstructions` in `src/catalog/scenario-data.ts`), whether
+  they are generated or authored.
+- A copy is `copyLine(from, to)` or `copyLines(fromCode, toCode, ...positions)` inside `withCopies([...])`
+  (`src/effects/authored/reprint.ts`); a whole reprinted card is `reprint(records, from, to)`. The copy takes the target's
+  card code, line ids and the number its line has on the target, from printed order. The source must be an authored record
+  in the same list or in `pool`, and a card whose records of one timing live in several files is not copied this way.
+  `src/effects/copies.test.ts` fails when a copied pair's two ledger lines no longer read the same.
+
 ## The record
 
 ```ts
