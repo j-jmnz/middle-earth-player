@@ -1,7 +1,7 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
 // Authored records for the quest phase, locations, travel, progress, threat and engagement (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
-// The vocabulary they use is src/catalog/families/quest.ts; the engine behind it is src/rules/families/quest*.ts.
+// The vocabulary they use is src/catalog/families/quest.ts; the engine behind it is src/rules/families/quest/.
 
 const STAGING_ENEMY = { type: "enemy", control: "any", stagingOnly: true } as const;
 const STAGING_NON_UNIQUE_ENEMY = { type: "enemy", control: "any", stagingOnly: true, nonUnique: true } as const;
@@ -27,7 +27,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"02100:response:1","cardCode":"02100","lines":["02100:A:1"],"timing":"response","trigger":"threatRaisedByEncounter","eventSeat":"you","condition":{"kind":"matches","card":"self","pick":{"type":"character","control":"any","state":"ready"}},"instructions":[{"verb":"LowerThreat","amount":1,"who":"actor"}]},
   // 02121 West Road Traveller: switching needs an active location.
   {"id":"02121:response:1","cardCode":"02121","lines":["02121:A:1"],"timing":"response","trigger":"played","subject":"self","eventSeat":"you","condition":{"kind":"all","conditions":[{"kind":"matches","card":"activeLocation"},{"kind":"canPick","pick":STAGING_LOCATION}]},"instructions":[{"verb":"Pick","pick":STAGING_LOCATION},{"verb":"MakeActive"}]},
-  // 03005 Ever Onward: the failed quest's threat waits for this Response (families/quest-threat.ts).
+  // 03005 Ever Onward: the failed quest's threat waits for this Response (families/quest/threat.ts).
   {"id":"03005:response:1","cardCode":"03005","lines":["03005:A:1"],"timing":"response","trigger":"questFailed","eventSeat":"you","cost":{"kind":"playEvent"},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"WaiveQuestThreat","who":"picked","until":"endOfPhase"}]},
   // 04007 Renewed Friendship: "that player" is the player who played the attachment.
   {"id":"04007:response:1","cardCode":"04007","lines":["04007:A:1"],"timing":"response","trigger":"played","eventSeat":"other","subject":{"type":"attachment","control":"other","on":{"type":"hero","control":"you"}},"cost":{"kind":"playEvent"},"instructions":[{"verb":"Choose","who":"actor","options":[
@@ -69,7 +69,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"10117:action:1","cardCode":"10117","lines":["10117:A:1","10117:A:2"],"timing":"action","condition":{"kind":"phase","is":"Planning"},"instructions":[{"verb":"Choose","who":"actor","options":[
     {"id":"waive","instructions":[{"verb":"WaiveQuestThreat","who":"eachSeat","until":"endOfRound"}]},
     {"id":"valour","requires":{"kind":"threat","min":40},"instructions":[{"verb":"RaiseThreat","amount":2,"who":"eachSeat"},{"verb":"SkipQuestPhase"}]}]}]},
-  // 10124 Favor of the Valar: settle keeps its seat from elimination until this resolves (families/quest-threat.ts).
+  // 10124 Favor of the Valar: settle keeps its seat from elimination until this resolves (families/quest/threat.ts).
   {"id":"10124:forced:1","cardCode":"10124","lines":["10124:A:2"],"timing":"forced","trigger":"wouldBeEliminated","eventSeat":"you","instructions":[{"verb":"SetThreat","value":45},{"verb":"Discard","target":{"kind":"self"}}]},
   // 11005 Grappling Hook: the hook is discarded once its character is committed.
   {"id":"11005:action:1","cardCode":"11005","lines":["11005:A:2"],"timing":"action","cost":{"kind":"exhaustHost"},"condition":{"kind":"all","conditions":[{"kind":"step","is":"beforeResolution"},{"kind":"matches","card":"host","pick":{"type":"character","control":"any","committed":false}}]},"instructions":[{"verb":"CommitToQuest","target":"host","stat":"attack"},{"verb":"Discard","target":{"kind":"self"}}]},

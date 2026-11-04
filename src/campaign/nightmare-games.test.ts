@@ -6,14 +6,14 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import { settle } from "../rules/machine.ts";
-import { announceStageRevealed } from "../rules/families/nightmare-setup.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { announceStageRevealed } from "../rules/families/nightmare/setup.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { playOut } from "../../scripts/auto-player.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { playOut } from "../../test/harness/auto-player.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
 
 import { NIGHTMARE_PLAYABLE } from "./playable.ts";
@@ -69,7 +69,7 @@ describe("a seeded Nightmare game of each scenario on NIGHTMARE_PLAYABLE", () =>
   }
 });
 
-// A record that names a card the recipe replaced reads the dealt card of the same title (twinCode, src/rules/families/nightmare-guards.ts): The
+// A record that names a card the recipe replaced reads the dealt card of the same title (twinCode, src/rules/families/nightmare/guards.ts): The
 // Ringwraiths Attack adds Weathertop (141046) to the staging area, which on Nightmare is Nightmare Weathertop (906204), set aside by the piles.
 describe("the quest's records on Nightmare", () => {
   it("add Nightmare Weathertop when The Ringwraiths Attack is revealed (141027:A:1)", () => {

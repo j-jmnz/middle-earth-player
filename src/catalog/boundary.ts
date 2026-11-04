@@ -60,17 +60,17 @@ export const printedKeywordsSchema = z.strictObject({
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).
   leavesPlayLoses: z.boolean().optional(),
-  // The sea family's keywords (src/rules/families/sea*.ts). Sailing on a quest stage: the first player performs a Sailing test at the beginning
+  // The sea family's keywords (src/rules/families/sea/). Sailing on a quest stage: the first player performs a Sailing test at the beginning
   // of each quest phase (dcce.sailing). Boarding X on a ship-enemy: it brings X Corsair enemies when it engages a player from the staging area
   // (dcce.boarding).
   sailing: z.boolean().optional(),
   boarding: z.number().int().positive().optional(),
   // Uncharted on the Lost Island side of a double-sided location (dcce.uncharted): read from the ledger's side B, so a card shows the keyword only
-  // while it lies on that side (src/rules/families/uncharted.ts).
+  // while it lies on that side (src/rules/families/uncharted/index.ts).
   uncharted: z.boolean().optional(),
-  // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame*.ts). A numbered keyword with a value of 0 does not exist.
+  // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame/). A numbered keyword with a value of 0 does not exist.
   aflame: z.number().int().positive().optional(),
-  // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple*.ts).
+  // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple/).
   grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
@@ -169,7 +169,7 @@ export const scenarioDefinitionSchema = z.strictObject({
   // The part number of the scenario's campaign card (its place in a campaign with XP, counting from 1): "X is the campaign card's part number".
   part: z.number().int().positive().optional(),
   // The campaign card's Setup instructions that need the quest card's Setup done first (a Dream-chaser Setup that names the ship-objectives the quest
-  // card's Setup prepares): they resolve in a frame after it (rules/setup.ts).
+  // card's Setup prepares): they resolve in a frame after it (rules/setup/setup.ts).
   afterSetup: z.array(instructionSchema).optional(),
 });
 

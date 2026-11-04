@@ -96,7 +96,7 @@ function main(log: Log): void {
     const sections: string[] = [
       `# ${code} ${card.name}`,
       ``,
-      `Scenario: ${scenarioId}. Write the records into ${targetOf(card)}, each with \`lines\` naming the line ids above, then run \`pnpm effects:open\`, \`pnpm vitest run scripts/effect-coverage.test.ts\` and the scenario tests.`,
+      `Scenario: ${scenarioId}. Write the records into ${targetOf(card)}, each with \`lines\` naming the line ids above, then run \`pnpm effects:open\`, \`pnpm vitest run scripts/checks/effect-coverage.test.ts\` and the scenario tests.`,
       ``,
       `## Lines without a record`,
       ...lines.map((line) => `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),

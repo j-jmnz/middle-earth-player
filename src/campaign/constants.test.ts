@@ -1,13 +1,13 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { syncConstants } from "../rules/constants.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { legalIntents, legalTargets, reduce } from "../rules/reduce.ts";
-import { qualifyingEnemies, resolveQuest } from "../rules/quest.ts";
-import { attachBlocked, heroLimitExempt, restricted } from "../rules/restrictions.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { attachTo, moveCard, spawn } from "../rules/zones.ts";
-import { buildTable, begin, FRODO, idsOf, RIDER, SAM, sceneCards, send, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { syncConstants } from "../rules/interpret/constants.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { legalIntents, legalTargets, reduce } from "../rules/engine/reduce.ts";
+import { qualifyingEnemies, resolveQuest } from "../rules/quest/quest.ts";
+import { attachBlocked, heroLimitExempt, restricted } from "../rules/interpret/restrictions.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
+import { buildTable, begin, FRODO, idsOf, RIDER, SAM, sceneCards, send, type Scene, type Table } from "../../test/harness/scene.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
 

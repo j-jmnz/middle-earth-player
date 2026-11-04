@@ -32,7 +32,7 @@ Each task updates the tests and the `.maestro/*.yaml` flows that read a string, 
 
 ### 1. Shared hub parts
 
-New `src/screens/hub-parts.tsx`, moved from the existing screens and not redesigned. No screen changes visibly.
+New `src/screens/campaign/hub-parts.tsx`, moved from the existing screens and not redesigned. No screen changes visibly.
 
 - **`RunHero`**: `SaveHero` from `save-panels.tsx`, taking `{ overline, title, detail?, seats, testID }` instead of `SaveLine`.
   - `SaveHero` reads only the line's seats and name. Every size, overlap, shadow, Light glow and accessibility label stays exactly as it is.
@@ -46,7 +46,7 @@ New `src/screens/hub-parts.tsx`, moved from the existing screens and not redesig
   - The catalog and Coming later go full width below.
   - With no hero it uses `scene="moon"` and no art. With a hero, `scene="hero"`.
 
-Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
+Pure helpers in `src/screens/campaign/hub-runs.ts`, with `hub-runs.test.ts`:
 
 - **`splitRuns(runs, unfinished)`**: returns `{ hero, others }`. The hero is the first unfinished run in list order; the others are the remaining unfinished runs.
 - **`comingScenarios(boxes, isPlayable)`**: the unplayable scenarios, each as `{ id, name, caption: "<box> · <n>" }` in book order.
@@ -79,7 +79,7 @@ Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
 
 ### 3. Campaign setup screen (new `routes/campaign/[campaignId].tsx`)
 
-- It is built on `BriefingScreen` (`briefing-parts.tsx`).
+- It is built on `BriefingScreen` (`briefing/parts.tsx`).
   - `testID="campaign-setup"`, `backLabel="Campaigns"`, `onBack: goBack(router, "/")`, no booklet.
   - The scene is the campaign's first scenario.
 - Banner: overline "Campaign · N scenarios" and the name. It uses the `ScenarioBanner` styles without stage chips: a `chips?` opt-out or a small sibling banner.
@@ -113,10 +113,10 @@ Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
   - the `standalone-games` and `archived-games` blocks and `DELETE_SENTENCE` (it moves to History).
 - `standing(id)` keeps reading open games, so "Won · 87" shows on the tile.
 
-### 5. History becomes the library (`history-view.tsx`, `history-list.ts`, `history-words.ts`)
+### 5. History becomes the library (`history/view.tsx`, `history/list.ts`, `history/words.ts`)
 
 - The route, the `kind` param, `history-open`, the Campaign / Standalone switch and the scope and result filters stay.
-- **New pure builder** in `history-list.ts`: `libraryItems({ kind, saves, archivedSaves, games, archivedGames, runs, filter, folded })`, which returns flat FlashList items.
+- **New pure builder** in `history/list.ts`: `libraryItems({ kind, saves, archivedSaves, games, archivedGames, runs, filter, folded })`, which returns flat FlashList items.
   - Items are a section heading ("In progress", "Finished", "Archived", "Deleted", with testIDs `library-in-progress`, `library-finished`, `library-archived` and `library-deleted`), a ref header (one playthrough or game) and a run.
   - Refs come from the stores, so a playthrough or game with no run is listed. Runs attach by `refId`.
   - Runs whose ref is gone go under "Deleted", grouped as before.
@@ -130,7 +130,7 @@ Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
     - Archived = archived games.
   - Each standalone game holds at most one run (`standalone:<gameId>`), so a game's header is its row. Its run details render inline, with no fold.
   - With a filter on, only refs that have a matching run show.
-  - Unit tests in `history-list.test.ts`.
+  - Unit tests in `history/list.test.ts`.
 - **Ref header**:
   - Campaign: a `FoldHeader` with title, detail and run count, without the Current/Archived badge, since the section says it.
   - Standalone: a `RunRow`-like line.
@@ -142,13 +142,13 @@ Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
   - Campaign delete calls `recordUnclosedRun` when `save.active`.
   - Each action announces for accessibility, then refreshes and closes the sheet.
 - `emptyWords`: History is empty only with no refs and no runs. The sentences read "No playthrough yet. Start one from Campaigns." and the standalone equivalent.
-- `history-view.tsx` is near its size limit; the sheet goes in `history-sheet.tsx`.
+- `history/view.tsx` is near its size limit; the sheet goes in `history-sheet.tsx`.
 
 ### 6. Docs, flows, tests
 
 - `docs/design-system.md`: rewrite the Campaigns (campaign list), Scenarios and History screen sections to match. Add a Campaign setup screen section next to Briefing. Update the Navigation hub-head line (no Manage). Then run `pnpm docs:index`.
 - `docs/brief.md`: rewrite what it says about the start panel (`start-<id>`), Manage and Archived on the hubs, and the Screens table rows for Campaign list, History and Scenarios, to the new shape.
-- Doc citations in code name real headings, or `scripts/docs-index.test.ts` fails. The headings "Campaigns (campaign list)", "Scenarios", "History" and "Tablets" stay; "Campaign setup" is added. The comments that cite "Campaigns, tablet landscape" (`index.tsx`), "Campaigns" (`save-panels.tsx`) and Tablets (`split-columns.ts`) match the new text.
+- Doc citations in code name real headings, or `scripts/docs/index.test.ts` fails. The headings "Campaigns (campaign list)", "Scenarios", "History" and "Tablets" stay; "Campaign setup" is added. The comments that cite "Campaigns, tablet landscape" (`index.tsx`), "Campaigns" (`save-panels.tsx`) and Tablets (`split-columns.ts`) match the new text.
 - Maestro flows (`.maestro/`), written but not run in a cloud session:
   - **`briefing.yaml`, `booklet.yaml`**: tap `new-fellowship-of-the-ring`, assert `campaign-setup`, then tap `start-fellowship`.
   - **`mirkwood-start.yaml`**: tap `new-mirkwood-paths`, then `start-mirkwood-paths`. Its comment about one start panel with a campaign chooser is rewritten.
@@ -191,14 +191,14 @@ Pure helpers in `src/screens/hub-runs.ts`, with `hub-runs.test.ts`:
   - The sheet has a `scrimLabel`.
   - Archived, Restored and Deleted are announced as the hubs announce them.
 - **Deleting a standalone game** that ended but whose outcome screen was never opened loses its run. This plan leaves that alone; note it in the doc if it is touched.
-- **Size** (`.cursor/agents/reviewer.md`): past about 300 lines a file needs one reason to stay together, and past about 500 it is a blocker. `index.tsx` and `scenarios.tsx` shrink a lot, since `HubPage` does the layout. The History sheet is split out of `history-view.tsx`.
+- **Size** (`.cursor/agents/reviewer.md`): past about 300 lines a file needs one reason to stay together, and past about 500 it is a blocker. `index.tsx` and `scenarios.tsx` shrink a lot, since `HubPage` does the layout. The History sheet is split out of `history/view.tsx`.
 - **Code standards** (`.cursor/rules/code-standards.mdc`):
   - React Compiler with zero bailouts: no hand-written `useMemo`, no try/catch in components, no non-literal default parameters. The hubs use `useMemo` now; drop it in code you move.
   - List screens select only the columns their rows read.
   - `src/screens` imports nothing from `src/rules`.
   - `//` comments say what the code does now, in sentence case, and cite docs by heading.
 - **Fold ids are global** (`useFolds`, stored in `settings`): Scenarios' Coming later has the id `scenarios-coming`, so it does not share Campaigns' `coming`.
-- **Unchanged modules**: `standalone-words.ts` (`gameCaption`, `statusWord`) is also used by the outcome and table screens. History's standalone rows reuse `gameCaption`. `campaign-list.ts` / `lockedTiles` stay (`campaign-list.test.ts` covers them). `section-store.test.ts` uses literal fold ids only.
+- **Unchanged modules**: `standalone-words.ts` (`gameCaption`, `statusWord`) is also used by the outcome and table screens. History's standalone rows reuse `gameCaption`. `campaign/list.ts` / `lockedTiles` stay (`campaign/list.test.ts` covers them). `section-store.test.ts` uses literal fold ids only.
 - **Stores stay as they are.** `archiveSave`, `restoreSave`, `deleteSave`, `archiveStandalone`, `restoreStandalone` and `deleteStandalone` are called from History; their tests are unchanged.
 - **Before each commit** run `pnpm test`, `pnpm lint`, `pnpm docs:index` and `npx tsc --noEmit`.
 

@@ -15,7 +15,7 @@ const GOBLIN_ENEMY = {"type":"enemy","control":"any","trait":"Goblin"} as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41004 The Dark of Nibin-Dûm. Setup: Goblin Chieftain and Cracked Pillar are set aside by the piles (the scenario data); the Cave Torch is dealt
-  // here: out of the encounter deck, then attached to a hero of the first player's choice (rules/families/quest-setup.ts runs this record).
+  // here: out of the encounter deck, then attached to a hero of the first player's choice (rules/families/quest/setup.ts runs this record).
   {"id":"41004:setup:1","cardCode":"41004","lines":["41004:A:1"],"timing":"setup","instructions":[{"verb":"SetAside","code":TORCH},{"verb":"Pick","pick":{"type":"hero","control":"you","attachable":TORCH}},{"verb":"AttachSetAside","code":TORCH},{"verb":"ShuffleEncounterDeck"}]},
   {"id":"41004:whenRevealed:1","cardCode":"41004","lines":["41004:B:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"SearchMove","type":"location","to":"staging","different":true}]},{"verb":"ShuffleEncounterDeck"}]},
   // 41005 Surprise Attack: Goblin Chieftain comes from the set-aside cards, each player finds an enemy in the deck or the discard pile; every enemy costs 0 to
@@ -44,7 +44,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41028:constant:1","cardCode":"41028","lines":["41028:A:1"],"timing":"constant","condition":IN_STAGING,"instructions":[{"verb":"ModifyStat","stat":"attackableAsEngaged","amount":1,"until":"whileSourceInPlay","target":"self"},{"verb":"ModifyStat","stat":"defense","amount":{"stat":"threat","of":"self"},"until":"whileSourceInPlay","target":"self"}]},
   {"id":"41028:travel:1","cardCode":"41028","lines":["41028:A:2"],"timing":"travel","instructions":[{"verb":"Heal","amount":4,"target":"self"}]},
   // 41029 Cave Torch (the Setup attaches it): exhausting it places up to 3 progress on a Dark location (at least 1: placing none is no use; the exhaust is the first
-  // instruction, not a paid cost, so the Forced effect hears it: rules/usage.ts does not announce an exhausted cost); after it exhausts,
+  // instruction, not a paid cost, so the Forced effect hears it: rules/player/usage.ts does not announce an exhausted cost); after it exhausts,
   // the top encounter card is discarded and an enemy goes to the staging area (as 41015:travel:1).
   {"id":"41029:action:1","cardCode":TORCH,"lines":["41029:A:2"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"exhausted","code":TORCH,"is":false},{"kind":"canPick","pick":DARK_LOCATION}]},"instructions":[{"verb":"Exhaust"},{"verb":"ChooseX","max":[3]},{"verb":"Pick","pick":DARK_LOCATION},{"verb":"PlaceProgressOn","amount":{"x":true},"target":"picked"}]},
   {"id":"41029:forced:1","cardCode":TORCH,"lines":["41029:A:3"],"timing":"forced","trigger":"exhausted","subject":"self","instructions":[{"verb":"MoveEncounterCard","card":"deckTop","to":"discard"},{"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]},
@@ -58,7 +58,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41032 Goblin Tunnels: while in the staging area a Goblin revealed from the encounter deck takes a progress token off the quest; the Shadow adds 1 Attack, 3 to a Goblin.
   {"id":"41032:forced:1","cardCode":"41032","lines":["41032:A:1"],"timing":"forced","trigger":"revealed","byEncounterDeck":true,"subject":GOBLIN_ENEMY,"condition":IN_STAGING,"instructions":[{"verb":"RemoveProgressFromQuest","amount":1}]},
   {"id":"41032:shadow:1","cardCode":"41032","lines":["41032:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"not","condition":{"kind":"matches","card":"attacker","pick":GOBLIN_ENEMY}}},{"verb":"ModifyStat","stat":"attack","amount":3,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"attacker","pick":GOBLIN_ENEMY}}]},
-  // 41033 Lightless Passage: the Cave Torch must be exhausted to travel here (rules/restrictions.ts reads the cost); the Shadow cancels the combat damage dealt to the attacker.
+  // 41033 Lightless Passage: the Cave Torch must be exhausted to travel here (rules/interpret/restrictions.ts reads the cost); the Shadow cancels the combat damage dealt to the attacker.
   {"id":"41033:travel:1","cardCode":"41033","lines":["41033:A:1"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":TORCH}}]},
   {"id":"41033:shadow:1","cardCode":"41033","lines":["41033:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"combatDamageCanceled","amount":1,"until":"endOfAttack","target":"attacker"}]},
   // 41034 Branching Paths: in the staging area every Dark location gets +1 Threat; explored, the players look at the top 3 encounter cards, choose 1 to reveal and

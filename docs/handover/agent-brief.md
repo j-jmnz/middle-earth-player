@@ -26,8 +26,8 @@ cards have no file under `src/effects/authored/families/`.
 - Read first: `CLAUDE.md`, `.cursor/rules/authority.mdc`, `.cursor/rules/code-standards.mdc`, `.cursor/rules/docs-standards.mdc`, `docs/plans/effect-authoring.md` (the cookbook; its "Mechanic
   families" section describes the files you own), `docs/architecture.md`, the phase file for a scenario phase
   (`docs/phases/phase-NN-*.md`) and `docs/phases/STATUS.md`, and the schema files `src/catalog/effect-schema*.ts`. Skim
-  `src/rules/interpret.ts`, `src/rules/effect-frames.ts`, `src/rules/triggers.ts`, `src/rules/responses.ts` and
-  `src/rules/usage.ts` to see how records run.
+  `src/rules/interpret/interpret.ts`, `src/rules/interpret/effect-frames.ts`, `src/rules/windows/triggers.ts`, `src/rules/windows/responses.ts` and
+  `src/rules/player/usage.ts` to see how records run.
 - Card text: `pnpm effects:draft <scenario-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` per card (printed lines,
   every printing's text, DragnCards' automation as a hint, related rules text, vocabulary, nearest records). Never rely on
   memory for card text or rules.
@@ -42,11 +42,11 @@ cards have no file under `src/effects/authored/families/`.
   `../effect-schema-conditions.ts`), `TRIGGERS` (event names), `FLAGS` (stat flags `ModifyStat` can set). Keep the
   `as const`. They are spread into the verb union, the trigger enum and the stat enum. Every verb carries a comment saying
   what the engine does with it.
-- `src/rules/families/<F>.ts`: `run()` resolves your verbs (`runFamilyVerb` in `src/rules/families/index.ts` asks the
-  families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>.ts` and helper
-  modules `src/rules/families/<F>-*.ts`.
-- `src/rules/families/<F>.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
-  the rule ids they implement. `src/rules/general-effects.test.ts` and the `<F>-fixture.ts` helpers of the existing families
+- `src/rules/families/<F>/index.ts`: `run()` resolves your verbs (`runFamilyVerb` in `src/rules/families/index.ts` asks the
+  families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>/index.ts` and helper
+  modules beside it in `src/rules/families/<F>/`.
+- `src/rules/families/<F>/index.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
+  the rule ids they implement. `src/rules/interpret/general-effects.test.ts` and the `<F>/fixture.ts` helpers of the existing families
   show a compact table setup.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   `src/effects/authored/<scenario-id>.ts` (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`) for a scenario.
@@ -56,7 +56,7 @@ cards have no file under `src/effects/authored/families/`.
 
 ## Shared files
 
-`src/rules/*.ts`, `src/catalog/effect-schema*.ts`, `src/play/*`, `scripts/*` are shared with the other agents, who may edit
+`src/rules/{core,engine,windows,interpret,combat,quest,setup,player}/`, `src/catalog/effect-schema*.ts`, `src/play/`, `scripts/` are shared with the other agents, who may edit
 them too; the main session merges every branch afterwards. Keep your edits there minimal and surgical: a hook call into
 your family module, an optional field, a new case, a new event emitted. Do not reformat, reorder, rename or move code in
 shared files. Do not edit other families' files. Do not edit `src/effects/authored/pool/*.ts` except to fix a record that is
@@ -79,10 +79,10 @@ work together with yours. A line that restates a rule the engine applies anyway 
 4. The engine supports 1 to 4 seats. "Choose a player", control changes and "each player" must work with several seats.
 5. Choices: the reducer never takes a number or a card the engine did not offer; choices are frames with options (see
    `Pick`, `Choose`, `effect-frames.ts`). If you add a verb that can appear inside a `Choose` option, give it words in
-   `src/play/choice-words.ts` (`instructionWords`): a test checks every branch reads as a sentence.
+   `src/play/words/choice.ts` (`instructionWords`): a test checks every branch reads as a sentence.
 6. A line may stay open only if it is genuinely impossible to express in this engine; report it with the reason.
 7. A scenario phase also adds the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open,
-   pins a whole game in a golden (`src/campaign/golden-south.test.ts` and `src/campaign/golden/the-ring-goes-south.json` are
+   pins a whole game in a golden (`src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `src/campaign/scenarios/the-ring-goes-south/golden.json` are
    the pattern), and leaves its phone half open in `docs/phases/STATUS.md` when you have no phone.
 
 ## Checkpoints (API usage limits can stop you mid-task)
@@ -102,12 +102,12 @@ suite once at the end, and never kill processes you did not start (no `pkill`).
 
 - `pnpm exec tsc --noEmit`
 - `pnpm lint`
-- `pnpm effects:open`, then `pnpm vitest run scripts/effect-coverage.test.ts src/effects src/rules/families`
-- `node --experimental-strip-types scripts/card-smoke.ts <codes>` for every card you wrote records for: no problems reported.
+- `pnpm effects:open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
+- `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for every card you wrote records for: no problems reported.
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
-- Full `pnpm test` once at the end (about 10 minutes). The golden snapshots in `src/campaign/golden` (the scenario games and the
+- Full `pnpm test` once at the end (about 10 minutes). The golden snapshots (`src/campaign/scenarios/<scenario-id>/golden.json` for the scenario games, `src/campaign/starter/golden/` for the
   starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
-  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e-fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
+  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e/fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
 
 ## Merge
 

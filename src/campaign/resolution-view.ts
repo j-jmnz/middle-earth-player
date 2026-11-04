@@ -7,8 +7,8 @@
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
-import { legalIntents, type ScenarioState } from "../rules/reduce.ts";
-import { answeredSeats, resolutionResult, SKIP } from "../rules/resolution.ts";
+import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
+import { answeredSeats, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";

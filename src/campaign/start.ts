@@ -1,7 +1,7 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
 import { burdenCodes, campaignScenario, corsairCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
-import type { CampaignFacts } from "../rules/campaign-state.ts";
-import type { StartScenario, StartSeat } from "../rules/setup.ts";
+import type { CampaignFacts } from "../rules/core/campaign-state.ts";
+import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
 import { MODE_CARD_CODE, MODE_CARD_SIDE, type ModeCard } from "./xp.ts";
 

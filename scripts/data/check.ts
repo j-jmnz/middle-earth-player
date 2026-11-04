@@ -42,7 +42,7 @@ void runScript("data:check", (log) => {
     ...compare("data/rules", path.join(DATA_DIR, "rules"), path.join(scratch, "data", "rules"), (name) => name.endsWith(".json") || name.endsWith(".md")),
     ...compare("src/effects/generated", path.join(ROOT, "src", "effects", "generated"), path.join(scratch, "effects")),
     ...compare("assets/icons", path.join(ROOT, "assets", "icons"), path.join(scratch, "icons")),
-    ...compare("src/play/icons", path.join(ROOT, "src", "play", "icons"), path.join(scratch, "icon-modules")),
+    ...compare("src/ui/icons", path.join(ROOT, "src", "ui", "icons"), path.join(scratch, "icon-modules")),
   ]);
   if (problems.length > 0) {
     log.error(`${problems.length} difference(s). Run pnpm data:build and commit the result.\n  ${problems.join("\n  ")}`);

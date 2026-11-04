@@ -56,18 +56,18 @@ touches what it says (Performance, State, Persistence).
   - `hand-gestures.native.ts:77`: pass `canvas` as a value made from its three numbers.
   - `arc-ring.native.tsx:24`: depend on the `shape` key and let the compiler handle the rest.
   - `table-images.native.ts:114`
-  - `rules-view.tsx:93`
+  - `rules/view.tsx:93`
 - **Before `Table` is compiled:** `info(slot.id)` reads `store.getState()` during render, and fresh numbers are forced today
   only by `void modifiers; void threat; void delayed` (`table-canvas.native.tsx:180-182`). Change `info`/`slotNumbers` to take
   the game, or a numbers map built in a memo from `game` and `seat` (see 4.1), so the compiler sees the real dependency.
   Check the other compiled pieces for the same pattern.
 - `use-table-choice.ts:136-139`: remove the hand-written `dock` `useMemo`, or make its dependencies exact. Once the hook is
   compiled, `fold`, `extras`, `header` and the returned object stay stable, which stops the BackHandler re-subscribing in
-  `table-view.tsx:202-226`, keeps `dockPills` stable, and stops `TableDock`, `DockButtons`, `TableLayers` and `ChoiceTray`
+  `table/view.tsx:202-226`, keeps `dockPills` stable, and stops `TableDock`, `DockButtons`, `TableLayers` and `ChoiceTray`
   re-rendering.
 - Smaller fixes:
-  - `canvas-pieces.native.tsx:60` `Outlined`: `color?: string`, then `color ?? t.bone` in the body.
-  - `dock-buttons.tsx:133`: move the ternary in the `||` chain into a `const`.
+  - `canvas/pieces.native.tsx:60` `Outlined`: `color?: string`, then `color ?? t.bone` in the body.
+  - `dock/buttons.tsx:133`: move the ternary in the `||` chain into a `const`.
   - `phase-rail.tsx:64`: replace the computed key with two plain style objects.
   - `spotlight.native.tsx:57/87/164`: memos the compiler cannot keep, and the method call that triggers the codegen error.
   - `popover-frame.tsx:103`, `routes/_layout.tsx:42`, `briefing/[saveId]/[scenarioId].tsx:123` (`onDeal`),
@@ -76,7 +76,7 @@ touches what it says (Performance, State, Persistence).
 
 ## 3. Table: fewer canvas commits per interaction (src/play, table-view)
 1. **Card pickup**
-   - `table-view.tsx:97`: drop the `selected` subscription. Prefetch the picture from a `store.subscribe` inside an effect.
+   - `table/view.tsx:97`: drop the `selected` subscription. Prefetch the picture from a `store.subscribe` inside an effect.
    - `hand-gestures.native.ts:79-88`: sync the shared values in `useLayoutEffect`, so a fast flick already has drop targets.
    - Keep the lifted-card render as it is unless a UI-thread lift is simple to add. Measure first.
 2. **Whole-object subscriptions** → narrow selectors that return primitives or stable values:
@@ -84,13 +84,13 @@ touches what it says (Performance, State, Persistence).
    - `use-peek.ts:36`
    - `use-quest-advance.ts:24`
    - `table-layers.tsx:96`
-   - `settings` at `table-view.tsx:109` and `use-table-choice.ts:109`: select the fields each one uses.
+   - `settings` at `table/view.tsx:109` and `use-table-choice.ts:109`: select the fields each one uses.
    - `TableView` keeps `game`, but `widgets`, `tokens` and `held` (`:241-243`) become memoized derived values.
    - Build `phaseCarousel` (`:144`) only while the carousel is open; read `stopAhead` cheaply.
 3. **Selectors that allocate on every `set`**
    - `selectors.ts:166-206`: return the previous result straight away when `game` (and `seat`) are the same objects.
-   - `table-view.tsx:96` `threatSelector`: same check.
-   - `table-view.tsx:234-239` `tickKey`: same check.
+   - `table/view.tsx:96` `threatSelector`: same check.
+   - `table/view.tsx:234-239` `tickKey`: same check.
 4. **Picture decodes** (`table-images.native.ts:44-110`)
    - Batch `publish` into one `setImages` per frame, using `requestAnimationFrame`.
    - Decode one picture per idle slot, nearest or visible cards first, so a draw does not stall the next frame.
@@ -106,26 +106,26 @@ touches what it says (Performance, State, Persistence).
    - `card-motion.native.tsx:137`: replace the landing `setTimeout` with a `useAnimatedReaction` on `progress` crossing the
      landing fraction (the same pattern as `use-spotlight.ts:102-110`) plus `scheduleOnRN(tickLand)`.
 7. **Smaller items**
-   - `useImageSnapshot` (`table-view.tsx:92`): hand the revision only to the canvas and the preview, and fix the preview's
+   - `useImageSnapshot` (`table/view.tsx:92`): hand the revision only to the canvas and the preview, and fix the preview's
      missing `images.revision` dependency (`:257-264`).
-   - Icon paths (`canvas-pieces.native.tsx:54`): parse each glyph once into a module `Map<IconName, SkPath>` instead of
+   - Icon paths (`canvas/pieces.native.tsx:54`): parse each glyph once into a module `Map<IconName, SkPath>` instead of
      passing the SVG string on every re-record.
    - One module-level AccessibilityInfo store (reduce motion and screen reader) read through `useSyncExternalStore` by
-     `useReduceMotion`, `useScreenReader` and `useMotionScale` (`motion-run.ts:53-71`, `screen-reader.ts`), instead of one
+     `useReduceMotion`, `useScreenReader` and `useMotionScale` (`src/ui/motion-run.ts:53-71`, `screen-reader.ts`), instead of one
      listener per hook call.
-   - Cancel the animations on unmount: `dock-buttons.tsx:80` and `phase-sweep.tsx:39-43` (`cancelAnimation`).
+   - Cancel the animations on unmount: `dock/buttons.tsx:80` and `phase-sweep.tsx:39-43` (`cancelAnimation`).
    - Load each table font and icon once, shared by the canvas and the spotlight layer
-     (`table-fonts.native.ts`, `token-fx.native.tsx:104`, `spotlight-layer.native.tsx:32-36`).
+     (`table-fonts.native.ts`, `token-fx.native.tsx:104`, `spotlight/layer.native.tsx:32-36`).
 
 ## 4. Engine hot path (src/rules; golden games must stay identical)
 1. **`constantInstructions`** (`constant-records.ts:20-23`): cache the result in a `WeakMap<ScenarioState, …>`. The state is
    immutable, so the same state always gives the same result. Do the same for `restricted()` (`restrictions.ts:16-28`),
    keyed by state and code. `syncConstants` (`constants.ts:116-122`): compare old and new modifiers field by field instead of
    comparing two `JSON.stringify` strings. Also cache `slotNumbers`/`cardEffects` per `(game, seat)` → `Map<cardId, numbers>`
-   (`src/play/card-effects.ts:184-198`, the same pattern as `foresight.ts:90`).
-2. **Effects by id**: add an `effectById(effects, id)` WeakMap index next to `effectsOf` (`rules/listen.ts:12-23`), and use it
+   (`src/play/cards/card-effects.ts:184-198`, the same pattern as `foresight.ts:90`).
+2. **Effects by id**: add an `effectById(effects, id)` WeakMap index next to `effectsOf` (`rules/windows/listen.ts:12-23`), and use it
    in `responses.ts:91/98/131/140`, `constants.ts:129`, `sheets.ts:30/81/331`, `objective.ts:31/40`, `stops.ts:88`,
-   `table-hooks.ts:36`, `use-table-choice.ts:135` and `table-view.tsx:146`. The `src/play` callers import it from
+   `table-hooks.ts:36`, `use-table-choice.ts:135` and `table/view.tsx:146`. The `src/play` callers import it from
    `src/effects` or `src/rules` according to the lint zones.
 3. **`state.undo` snapshot** (`undo.ts:31-41`, `setup.ts:117-121`): the snapshot stays, because `docs/brief.md:268` requires
    one at each phase boundary. It stops being a deep copy: the state is immutable, so the snapshot keeps the reference
@@ -160,14 +160,14 @@ touches what it says (Performance, State, Persistence).
    defers renders; it does not drop them.
 4. **Deck draft**: give `useDeckDraft` a selector, so the pool and grid listen only to `heroes` and `cards`, not to `name`.
    `deck/[id].tsx:257`: replace the inline `renderItem`'s dependency on `draft` with `cards` and `heroes`, and wrap
-   `DeckCardCell` (`deck-grid.tsx:64`) in `memo`, with the refused-card set computed once.
+   `DeckCardCell` (`deck/grid.tsx:64`) in `memo`, with the refused-card set computed once.
 5. **Card pool cache** (`card-pool.tsx:199-240`, `routes/deck-import.tsx:53-73`): a module-level cache, a `WeakMap` keyed by
    the catalog db, of the sorted pool rows and `notAppliedCodes`, shared by the Cards tab, `/pool`, the deck pane and import.
    Sort with precomputed keys.
 6. **Startup parsing**: make module-level parses lazy (on first call, memoized):
-   - `rules-glossary.ts:62/78`: parse once, and precompute each entry's sort key and the folded search fields, so
-     `rankOf`/`seeAlso` do not fold again. `rules-view.tsx:80`: run the search on `useDeferredValue(query)`.
-   - `deck-import.ts:131` and `routes/deck-import.tsx:24-26`
+   - `rules/glossary.ts:62/78`: parse once, and precompute each entry's sort key and the folded search fields, so
+     `rankOf`/`seeAlso` do not fold again. `rules/view.tsx:80`: run the search on `useDeferredValue(query)`.
+   - `deck/import.ts:131` and `routes/deck-import.tsx:24-26`
    - `campaign-data.ts:21-33`, and `starter-decks.ts:41` reuses that parse.
 7. **Toast and list height** (`card-pool.tsx:426`, `deck/[id].tsx:335-340`): position the toast absolutely, so it does not
    resize the FlashList twice per +/− tap.
@@ -204,7 +204,7 @@ After the work, run the `reviewer` agent on the diff, and the `ux` agent because
 - A timing script in the scratchpad (not committed): replay each golden game through `reduce` and time the total, before
   and after section 4, and time `writeSave` against `writeActive` on a 500-intent save with better-sqlite3. Report the
   numbers.
-- `node --experimental-strip-types scripts/card-smoke.ts --all` passes, so no throw, refusal or stall comes from the engine
+- `node --experimental-strip-types scripts/card-smoke/run.ts --all` passes, so no throw, refusal or stall comes from the engine
   changes.
 - `pnpm data:check` passes; nothing under `data/` should change.
 - This cloud session has no phone, simulator or Maestro, so on-device feel (React DevTools Profiler, Perf Monitor, frame

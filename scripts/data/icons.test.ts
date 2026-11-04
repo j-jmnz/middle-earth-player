@@ -4,9 +4,9 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { CARD_BACKS as BACK_RECORDS, ICONS } from "../../src/play/icons/generated.ts";
-import { SPHERE_TINT, sphereIcon, typeIcon } from "../../src/play/icon-map.ts";
-import { tableTokens } from "../../src/play/tokens.ts";
+import { CARD_BACKS as BACK_RECORDS, ICONS } from "../../src/ui/icons/generated.ts";
+import { SPHERE_TINT, sphereIcon, typeIcon } from "../../src/ui/icon-map.ts";
+import { tableTokens } from "../../src/ui/tokens.ts";
 import { backAsset, buildIcons, CARD_BACK_BAR, cardBackRecords, flipPathY, flippedViewBox, iconRecords, MEC111_ICONS, parseIconCss, RASTER_ICONS, VECTOR_ICONS } from "./icons.ts";
 import { ROOT } from "./paths.ts";
 
@@ -26,8 +26,8 @@ describe("icons", () => {
     const committed = readdirSync(ASSETS).sort();
     const backs = Object.values(BACK_RECORDS).map((back) => backAsset(back.name));
     expect(committed).toEqual([...names.map((name) => `${name}.${ICONS[name as keyof typeof ICONS].kind === "vector" ? "svg" : "png"}`), ...backs].sort());
-    const requires = readFileSync(path.join(ROOT, "src", "play", "icons", "files.generated.ts"), "utf8").matchAll(/require\("([^"]+)"\)/g);
-    for (const match of requires) expect(existsSync(path.resolve(ROOT, "src", "play", "icons", match[1] ?? "")), match[1]).toBe(true);
+    const requires = readFileSync(path.join(ROOT, "src", "ui", "icons", "files.generated.ts"), "utf8").matchAll(/require\("([^"]+)"\)/g);
+    for (const match of requires) expect(existsSync(path.resolve(ROOT, "src", "ui", "icons", match[1] ?? "")), match[1]).toBe(true);
   });
 
   it("clear the bar: vectors with a real box, rasters at their bar on the short side, each with its source", () => {
@@ -65,7 +65,7 @@ describe("icons", () => {
     expect(files(path.join(one, "assets"))).toEqual(files(path.join(two, "assets")));
     expect(files(path.join(one, "modules"))).toEqual(files(path.join(two, "modules")));
     expect(files(path.join(one, "assets"))).toEqual(files(ASSETS));
-    expect(files(path.join(one, "modules"))).toEqual(files(path.join(ROOT, "src", "play", "icons")));
+    expect(files(path.join(one, "modules"))).toEqual(files(path.join(ROOT, "src", "ui", "icons")));
     expect(iconRecords().length).toBe(Object.keys(ICONS).length);
     // Two full icon builds (font glyphs and rasters): about 2 s alone, past the 5 s default when the whole suite runs at once.
   }, 30_000);

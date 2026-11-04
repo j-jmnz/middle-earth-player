@@ -1,0 +1,6 @@
+# The flows `maestro test .maestro` runs. Without this file Maestro reads only the top level of .maestro, so every flow
+# lives one level down: scenarios/<scenario-id>/ (each scenario's play, win and loss flows, named by scenario id as
+# data/scenarios is) and features/ (the screens and table features no single scenario owns).
+flows:
+  - "scenarios/*/*"
+  - "features/*"

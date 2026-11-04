@@ -1,7 +1,7 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
 // Passage Through Mirkwood Nightmare (deck 9001, data/printed/nightmare.json). Nightmare Ungoliant's Spawn (900102) takes the place of the
-// standard one (01076): the quest's records that name it by title or by code read it (twinCode, src/rules/families/nightmare-guards.ts).
+// standard one (01076): the quest's records that name it by title or by code read it (twinCode, src/rules/families/nightmare/guards.ts).
 // Rules: rr.setup, rr.forced, rr.reveal, rr.step-6-4-2, rr.attachment-cards (data/rules/entries.json).
 const UNDEFENDED = { kind: "undefended" } as const;
 const NOT_UNDEFENDED = { kind: "not", condition: UNDEFENDED } as const;

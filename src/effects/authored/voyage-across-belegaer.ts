@@ -29,7 +29,7 @@ const stageSearch = (code: string, find: string): Effect => ({
 });
 
 // "When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the
-// bottom of the quest deck. Otherwise, advance to the top stage of the quest deck." (rules/families/quest-order.ts reads it from the stage's definition)
+// bottom of the quest deck. Otherwise, advance to the top stage of the quest deck." (rules/families/quest/order.ts reads it from the stage's definition)
 // The record has the `constant` timing only because every record needs one: nothing runs it, the stage definition carries the verb.
 const lookAtStages = (code: string, line: string, id = 1): Effect => ({ id: `${code}:constant:${id}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "LookAtStages", count: 2 }] });
 
@@ -50,7 +50,7 @@ const eliminated = (code: string, line: string, id: number, lose = false): Effec
 // "Draw 1 additional card during the resource phase."
 const extraCard = (code: string, line: string): Effect => ({ id: `${code}:constant:2`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "extraDraw", amount: 1, until: "whileSourceInPlay", target: "actorSeat" }] });
 
-// "Raise your starting threat by 3." / "Reduce your starting threat by 3": resolved when the fleet is prepared (rules/families/sea-fleet.ts).
+// "Raise your starting threat by 3." / "Reduce your starting threat by 3": resolved when the fleet is prepared (rules/families/sea/fleet.ts).
 const startingThreat = (code: string, line: string, id: number, raise: boolean, amount: number): Effect => ({
   id: `${code}:setup:${id}`,
   cardCode: code,
@@ -392,7 +392,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   eliminated("110141", "110141:B:7", 4),
 
   // 11171 Voyage Across Belegaer (campaign card). Setup (Campaign Mode): the four Modification boons are set aside and the ships are fitted once the fleet is prepared
-  // (rules/families/sea-campaign.ts, ScenarioDefinition.afterSetup); a player may trade 2 damage on a ship for a resource; Ominous Fate and Thunderstruck are shuffled into the
+  // (rules/families/sea/campaign.ts, ScenarioDefinition.afterSetup); a player may trade 2 damage on a ship for a resource; Ominous Fate and Thunderstruck are shuffled into the
   // encounter deck and Crowley into the Corsair deck. Resolution: Ominous Fate joins the Campaign Pool, and the XP list.
   {
     id: "11171:campaignSetup:1",

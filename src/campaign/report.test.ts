@@ -3,9 +3,9 @@
 // that add up to scoreOf.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { moveCard } from "../rules/zones.ts";
-import { updateCard } from "../rules/state.ts";
-import { loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../scripts/mirkwood-scene.ts";
+import { moveCard } from "../rules/core/zones.ts";
+import { updateCard } from "../rules/core/state.ts";
+import { loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 
 import { gameReport } from "./report.ts";
 import { scoreOf } from "./score.ts";

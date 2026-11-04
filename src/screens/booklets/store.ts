@@ -1,4 +1,4 @@
-import type { BookletRow } from "../campaign-store";
+import type { BookletRow } from "../data/campaign-store";
 
 // Web has no document directory to store a book in. The reader says so; the native file is store.native.ts.
 export type ImportResult = { ok: true; row: BookletRow } | { ok: false; reason: "cancelled" | "notPdf" | "unavailable" | "failed"; message: string };

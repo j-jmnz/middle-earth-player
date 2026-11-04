@@ -2,7 +2,7 @@ import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts
 
 // Escape from Dol Guldur Nightmare (deck 9003, data/printed/nightmare.json). The quest is The Necromancer's Tower (01123), Through the Caverns
 // (01124) and Out of the Dungeons (01125); the Nazgûl of Dol Guldur (01102) waits out of play. Several heroes may be "the prisoner" at once
-// (src/rules/families/prisoner.ts). Rules: rr.objective-cards, rr.step-3-4, rr.delayed-effects, rr.in-play-and-out-of-play, rr.doomed-x
+// (src/rules/families/prisoner/index.ts). Rules: rr.objective-cards, rr.step-3-4, rr.delayed-effects, rr.in-play-and-out-of-play, rr.doomed-x
 // (data/rules/entries.json).
 const UNDEFENDED = { kind: "undefended" } as const;
 // TakeHeroPrisoner leaves X at 1 when it captured a hero: the part after "Then" resolves only if it did (rr.then).

@@ -1,6 +1,6 @@
 # Plan: a local game-data store, fetched once, generated wherever possible
 
-**Status, 2026-10-26: carried out (phase 8b, `docs/phases/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/done/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
+**Status, 2026-10-26: carried out (phase 8b, `docs/phases/done/phase-08b-data-store.md`), then extended.** This file is the plan as written. Where the repository has moved on, the step carries a note marked "Now". `docs/plans/done/authoritative-data.md` changed the card text and rules parts, and the current commands are in `CLAUDE.md`.
 
 ## Context
 
@@ -78,7 +78,7 @@ Add a temporary `scripts/refactor-golden.test.ts` that dumps three things:
 Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per-scenario golden.
 
 ### 1. Sync framework and raw snapshots (`scripts/data/`)
-- `sources/ringsdb.ts`: move `loadPayload`, the manifest, `mergeCopy`, `assertRulesMatch` and the `ALeP` filter out of `scripts/build-catalog.ts`.
+- `sources/ringsdb.ts`: move `loadPayload`, the manifest, `mergeCopy`, `assertRulesMatch` and the `ALeP` filter out of `scripts/build/catalog.ts`.
 - `sources/hallofbeorn.ts`: the five export endpoints, a 120-second timeout, and a Zod schema over the fields read.
 - `sources/dragncards.ts`: fetch `cardDb.tsv`, `preBuiltDecks.json`, `steps.json`, `phases.json`, `imageUrlPrefix.json`, `playerCards.json` and `encounterCards.json` from `raw.githubusercontent.com/seastan/dragncards-lotrlcg-plugin/<sha>/…`.
   - `preBuiltDecks.json` and `playerCards.json` contain `//` comments, so parse them with `jsonc-parser`.
@@ -87,7 +87,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
 
 ### 2. One card model (`src/catalog/card-facts.ts`)
 - Zod `cardSchema`: code, printings[] (pack, number, octgnGuid, hobSlug, imageUrls), name, type, sphere, traits[], cost, stats, questPoints, victory, engagementCost, isUnique, quantity, easyQuantity, encounterSet, stage, keywords, timings, text, shadowText, errata, deckLegal, sides.
-- `PrintedCard` (`src/rules/printed.ts`) becomes the engine-facing subset of this type. `definePrinted` stays as the test helper.
+- `PrintedCard` (`src/rules/core/printed.ts`) becomes the engine-facing subset of this type. `definePrinted` stays as the test helper.
 - `scripts/data/normalize/`, pure functions with unit tests:
   - keyword tokens → `Keywords` (`"Hide 2."` → `{hide: 2}`). Unknown tokens go to a report.
   - timing labels from text.
@@ -104,7 +104,7 @@ Steps 1–8 keep it green. The full-game log stays afterwards as a permanent per
   - Group counts must equal Hall of Beorn's per-scenario Normal and Easy counts for the scenario's encounter sets, minus Nightmare.
   - Placement must agree with the template parse of the stage-1 quest card's `Setup:` text, step 5. This catches Mr. Underhill in staging.
 - Now: the scenario file holds piles, not DragnCards groups, and the start is built from the cards' Setup records (`docs/plans/done/authoritative-data.md`, C). As planned, the engine read placement from the scenario's groups:
-  - `startScenario` and `finishSetup` (`src/rules/setup.ts`) spawn each group into its zone, in the order the quest card's Setup text gives (set aside, staging, active, attach). `searchSetup` and `handSetup` (`src/rules/setup-search.ts`) are unchanged in what they compute.
+  - `startScenario` and `finishSetup` (`src/rules/setup/setup.ts`) spawn each group into its zone, in the order the quest card's Setup text gives (set aside, staging, active, attach). `searchSetup` and `handSetup` (`src/rules/setup/search.ts`) are unchanged in what they compute.
   - `sharedEncounterDeck2`, `sharedQuestDeck2` and `sharedBoons` map to the optional zones the brief already reserves (burden deck, second encounter deck). The widget flags become derived: a non-empty group turns the widget on.
 - Delete the `fixtures/` directory, `src/catalog/scenario-fixture.ts`, `scripts/join-scenario-fixtures.ts`, the authored `141022:setup:1` placement record, `src/campaign/effects-setup-records.test.ts`, `ScenarioScript`, `registry.ts` and `fellowship/a-shadow-of-the-past.ts`.
   - They're replaced by a pure `buildStart(input)` in `src/campaign/start.ts` (done; none of the deleted files exists).
@@ -143,25 +143,25 @@ Now: the heading splitter was replaced by the curated `data/rules/index.json` (`
   - the three most similar existing records.
 
   New `.claude/agents/effect-author.md`: reads a bundle, writes `src/effects/authored/`, and runs the coverage and scenario tests.
-- New verbs are still added to `effect-schema.ts` and `src/rules/interpret.ts` by hand. That's engine work, not data.
-- `scripts/effect-coverage.test.ts` reads timings from `data/cards`, iterates `data/scenarios/*.json` plus the prelude, and requires the nth record from generated plus authored. There's no manifest file and no SQLite.
+- New verbs are still added to `effect-schema.ts` and `src/rules/interpret/interpret.ts` by hand. That's engine work, not data.
+- `scripts/checks/effect-coverage.test.ts` reads timings from `data/cards`, iterates `data/scenarios/*.json` plus the prelude, and requires the nth record from generated plus authored. There's no manifest file and no SQLite.
 
 ### 6. Direct imports, slim catalog
 - `src/effects/index.ts` exports generated plus authored. `src/screens`, `src/play` and `src/campaign` import it. `src/rules` still receives effects as an argument; `eslint.config.js` keeps `allowEffects` only for tests and scripts, which may import `src/effects` into `src/rules` and `src/catalog`.
 - `scripts/validate-effects.ts` moves into a Vitest schema test. Delete the `effects` and `scenarios` tables, `scripts/effects-roundtrip.test.ts`, and the readers in `src/screens/routes/{pool,card/[code],debug}.tsx`. `activeCardCodes` (`src/catalog/active-text.ts`) takes the effect list.
-- `scripts/build-catalog.ts` becomes an offline `data/` → `catalog.db` transform (`cards` with text and image URLs, `packs`, `campaigns`, `meta`).
-  - The version is a content hash. `src/screens/applied-catalog-version.ts` compares for equality.
+- `scripts/build/catalog.ts` becomes an offline `data/` → `catalog.db` transform (`cards` with text and image URLs, `packs`, `campaigns`, `meta`).
+  - The version is a content hash. `src/screens/data/applied-catalog-version.ts` compares for equality.
   - Delete `scripts/catalog-snapshot.ts`'s `nextVersion` and `scripts/ensure-catalog.ts`.
 - Images: encounter and quest art comes from DragnCards (`imageUrlPrefix` plus `imageUrl`), falling back to Hall of Beorn `ImagePath`. This fills the gap RingsDB leaves for `src/screens/images/`.
 
 ### 7. Offline tests and CI
-- `scripts/test-catalog.ts` becomes `loadCards()` over `data/cards`.
+- `test/harness/catalog.ts` becomes `loadCards()` over `data/cards`.
 - No test needs the network or a prebuilt database. Display tests build `catalog.db` in a temporary directory from `data/`.
 - `.claude/hooks/session-start.sh` drops the catalog build.
 - `.github/workflows/test.yml` runs `data:check`, then `pnpm test` and `pnpm lint`.
 
 ### 8. Query helper for agents
-`pnpm data:query "<sql>"` loads `data/cards`, `data/scenarios` and `data/rules/entries.json` into an in-memory `node:sqlite` database (Node 22 is already used by `scripts/effect-coverage.test.ts`) and prints rows. Example: `select code,name,text from cards where encounterSet='Hunted'`. There's no committed database file, because the JSON stays canonical and diffable.
+`pnpm data:query "<sql>"` loads `data/cards`, `data/scenarios` and `data/rules/entries.json` into an in-memory `node:sqlite` database (Node 22 is already used by `scripts/checks/effect-coverage.test.ts`) and prints rows. Example: `select code,name,text from cards where encounterSet='Hunted'`. There's no committed database file, because the JSON stays canonical and diffable.
 
 ### 9. Governance and docs rewrite
 - Rewrite `.cursor/rules/authority.mdc` and `CLAUDE.md`:
@@ -172,7 +172,7 @@ Now: the heading splitter was replaced by the curated `data/rules/index.json` (`
 - `docs/brief.md` keeps product decisions only (screens, seats, saves, non-goals). The Core round, Keywords, Hide and Setup-order prose is replaced by rule ids from `data/rules/entries.json`. The Data sources table is replaced by a pointer to `data/sources.json`.
 - `docs/architecture.md`: update Processes, Modules, Persistence, Catalog build and Tests. Point at Zod schemas instead of restating types.
 - Strip the "MEC109/TFotR printing read via Hall of Beorn … Confirm on the card" comments throughout `src/effects` and `src/rules`. Provenance lives in `data/sources.json` and `data/overrides.json`.
-- Add `docs/phases/phase-08b-data-store.md` and a STATUS row. Update `.claude/agents/*` to point at `data/`. Delete the step 0 scaffolding, keeping the full-game golden.
+- Add `docs/phases/done/phase-08b-data-store.md` and a STATUS row. Update `.claude/agents/*` to point at `data/`. Delete the step 0 scaffolding, keeping the full-game golden.
 
 ## Adding scenario 2 afterwards
 1. `pnpm data:build` already emits `data/scenarios/a-knife-in-the-dark.json` from `Q0C.02`. Review the cross-check report.

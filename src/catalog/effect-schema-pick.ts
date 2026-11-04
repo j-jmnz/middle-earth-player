@@ -21,20 +21,20 @@ export const pickSchema = z.strictObject({
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
-  // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/pick.ts.
+  // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/interpret/pick.ts.
   inStormcallerArea: z.literal(true).optional(),
   // Which staging area the staging cards of the filter are in once stages are separate (Breaking of the Fellowship, mec109.multiple-staging-areas):
   // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
-  // "in any staging area"). Read by src/rules/pick.ts; a game with one staging area ignores it.
+  // "in any staging area"). Read by src/rules/interpret/pick.ts; a game with one staging area ignores it.
   stagingArea: z.enum(["own", "shared", "any"]).optional(),
   // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
-  // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/pick.ts.
+  // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/interpret/pick.ts.
   atStage: z.literal(true).optional(),
   // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
-  // points than the attacking enemy", 142079:A:2). Read by src/rules/families/breaking-attack.ts.
+  // points than the attacking enemy", 142079:A:2). Read by src/rules/families/breaking/attack.ts.
   fewerHitPointsThan: z.literal("attackingEnemy").optional(),
   // A burden card (Campaign Mode) in play, in the encounter deck or in the encounter discard pile ("choose a burden card in play, in the encounter deck, or
-  // in the discard pile", 142074:A:2). Read by src/rules/pick.ts.
+  // in the discard pile", 142074:A:2). Read by src/rules/interpret/pick.ts.
   burden: z.literal(true).optional(),
   // An enemy engaged with the chooser (`you`) or with another player (`other`). `control` is ignored for enemies.
   engaged: z.enum(["you", "other"]).optional(),
@@ -52,14 +52,14 @@ export const pickSchema = z.strictObject({
   // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
   // Only the cards the running effect looked at (LookAtTop) or discarded (DiscardFromDeck), still in a deck or a discard pile
-  // ("add 1 of those cards to its owner's hand", "Put up to 2 allies discarded by this effect into play"; src/rules/families/deck-each.ts).
+  // ("add 1 of those cards to its owner's hand", "Put up to 2 allies discarded by this effect into play"; src/rules/families/deck/each.ts).
   looked: z.boolean().optional(),
   // A card that shares at least one Trait with the source card (`self`: "an ally who shares at least 1 Trait with him"), the
   // source's host (`host`: "if that character shares at least one trait with the attached hero"), or the answered event's
   // other card (`other`: "another enemy that shares a Trait with the enemy just destroyed"), the active location
   // (`activeLocation`: "a location in the victory display that shares a Trait with the active location") or the enemy of the
   // attack in progress (`attackingEnemy`); never that card itself. A Trait gained from an attachment counts
-  // (src/rules/families/play-pick.ts, src/rules/families/attack-pick.ts, src/rules/families/sidequests-pick.ts).
+  // (src/rules/families/play/pick.ts, src/rules/families/attack/pick.ts, src/rules/families/sidequests/pick.ts).
   sharesTrait: z.enum(["self", "host", "other", "activeLocation", "attackingEnemy"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
@@ -150,7 +150,7 @@ export const pickSchema = z.strictObject({
   facedownShadow: z.boolean().optional(),
   // The enemy making the attack in progress (`false`: any other enemy, "another enemy engaged with you").
   attackingEnemy: z.boolean().optional(),
-  // The attachments family's filters (src/rules/families/attachments-pick.ts): a card attached to another card (`false`: one attached
+  // The attachments family's filters (src/rules/families/attachments/pick.ts): a card attached to another card (`false`: one attached
   // to nothing, "If unattached"), a card with the Guarded keyword (a Guarded record), a card with progress tokens on it
   // (`false`: with none, "a location with no progress tokens on it").
   attached: z.boolean().optional(),
@@ -159,16 +159,16 @@ export const pickSchema = z.strictObject({
   attachable: z.string().min(1).optional(),
   guarded: z.boolean().optional(),
   progress: z.boolean().optional(),
-  // The uncharted family's filters (src/rules/families/uncharted-pick.ts). `uncharted`: a double-sided location lying on its Lost Island side, the keyword Uncharted (dcce.uncharted),
+  // The uncharted family's filters (src/rules/families/uncharted/pick.ts). `uncharted`: a double-sided location lying on its Lost Island side, the keyword Uncharted (dcce.uncharted),
   // `false`: any other card. `minProgress`: a card with at least this many progress tokens ("Remove 4 progress from Lost Island"). `bottom`: from the deck, only its bottom cards
   // ("the bottom 5 cards of your deck").
   uncharted: z.boolean().optional(),
   minProgress: z.number().int().positive().optional(),
   bottom: z.number().int().positive().optional(),
-  // The island family's filter (src/rules/families/island-pick.ts, dcce.island-map): `start`, the faceup left corners of the Island Map at Setup, before one is the active location; `temple`, the Temple column's
+  // The island family's filter (src/rules/families/island/pick.ts, dcce.island-map): `start`, the faceup left corners of the Island Map at Setup, before one is the active location; `temple`, the Temple column's
   // locations that lie facedown, wherever they are on the map; `secret`, the cards facedown under those locations; `here`, the secret under the active location; `adjacent`, the copies of Lost Island (not Temple of the Deceived) next to the active location.
   island: z.enum(["start", "temple", "secret", "here", "adjacent"]).optional(),
-  // The attack family's filters (src/rules/families/attack-pick.ts). A card that prints this keyword, not one it gained ("a hero with the
+  // The attack family's filters (src/rules/families/attack/pick.ts). A card that prints this keyword, not one it gained ("a hero with the
   // printed Ranged keyword").
   printedKeyword: z.enum(["ranged", "sentinel"]).optional(),
   // An enemy engaged with the player the effect last picked (`picked`: "each enemy engaged with that player"), or one not engaged
@@ -180,7 +180,7 @@ export const pickSchema = z.strictObject({
   minHitPoints: z.number().int().positive().optional(),
   // The top card of its discard pile ("While the top card of your discard pile is an ally").
   topOfDiscard: z.boolean().optional(),
-  // The misc family's filters (src/rules/families/misc-pick.ts). A card controlled by the player the effect last picked ("each hero
+  // The misc family's filters (src/rules/families/misc/pick.ts). A card controlled by the player the effect last picked ("each hero
   // controlled by that player"); an attachment attached to the last picked card; a player card (not an encounter card); a
   // character whose current Defense is at most this ("an enemy with 0 Defense"); a card in the hand that was drawn by the
   // resource phase's draw step this round ("choose and discard 1 of those cards"). `controlledBy: host`: a card controlled by the player who
@@ -200,13 +200,13 @@ export const pickSchema = z.strictObject({
   minAttack: z.number().int().min(0).optional(),
   drawn: z.boolean().optional(),
   // Of the cards that match every other filter, only those with the most damage on them (all of them when tied): "the hero you control
-  // with the most damage on it" (01137:A:2). Read by pickCandidates (src/rules/pick.ts).
+  // with the most damage on it" (01137:A:2). Read by pickCandidates (src/rules/interpret/pick.ts).
   mostDamaged: z.literal(true).optional(),
   // A card with at most this many attachments on it ("a Dale character without an attachment" is read after the attachment arrived: 1).
   maxAttachments: z.number().int().min(0).optional(),
   // Not a card with one of these titles ("a character in play (other than Bilbo Baggins)").
   exceptNames: z.array(z.string().min(1)).min(1).optional(),
-  // The sidequests family's filters (src/rules/families/sidequests-pick.ts).
+  // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
   sameTitleAs: z.literal("activeLocation").optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
@@ -215,15 +215,15 @@ export const pickSchema = z.strictObject({
   guardsSubject: z.boolean().optional(),
   // A card with at least this many Restricted attachments on it ("each of your heroes has at least 2 restricted attachments").
   restrictedAttachments: z.number().int().positive().optional(),
-  // The nightmare family's filters (read in src/rules/pick.ts): a character whose current Willpower is at most this, a value below 0
+  // The nightmare family's filters (read in src/rules/interpret/pick.ts): a character whose current Willpower is at most this, a value below 0
   // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
   maxWillpower: z.number().int().min(0).optional(),
   // A card a player controls with a copy (a card of the same title) in that player's discard pile ("Discard each card you control that has at
   // least 1 copy of itself in your discard pile", 900309:A:2).
   copyInDiscard: z.literal(true).optional(),
-  // The grapple family's filter (src/rules/families/grapple-values.ts): a card that shows this side ("if Sea Serpent (Enraged side) is in play", side B, 11194:B:6).
+  // The grapple family's filter (src/rules/families/grapple/values.ts): a card that shows this side ("if Sea Serpent (Enraged side) is in play", side B, 11194:B:6).
   side: z.enum(["A", "B"]).optional(),
-  // The aflame family's filters (src/rules/families/aflame-pick.ts). `aflame`: a location that prints the Aflame keyword (`false`: any other card). `lowestAflame`: of the cards that match, only
+  // The aflame family's filters (src/rules/families/aflame/pick.ts). `aflame`: a location that prints the Aflame keyword (`false`: any other card). `lowestAflame`: of the cards that match, only
   // those whose Aflame value is the lowest ("the Aflame location in play with the lowest Aflame value", 11036:B:1); every one of them when tied, and then the chooser decides.
   aflame: z.boolean().optional(),
   lowestAflame: z.literal(true).optional(),

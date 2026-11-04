@@ -16,9 +16,9 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `a-storm-on-cobas-haven`, a
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 37).
 - `pnpm effects:draft a-storm-on-cobas-haven`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
-- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
+- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/a-storm-on-cobas-haven.ts`; boon and burden pool records in `src/effects/authored/pool/DCCE.ts`.
-- Golden: `src/campaign/golden/a-storm-on-cobas-haven.json` with its `golden-*.test.ts`, scene and game scripts: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
+- Golden: `src/campaign/scenarios/a-storm-on-cobas-haven/golden.json` with its `golden.test.ts` beside it, and `test/scenarios/a-storm-on-cobas-haven/scene.ts` and `game.ts` (the shared parts in `test/harness/game-kit.ts`): true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add `a-storm-on-cobas-haven` to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
@@ -32,11 +32,11 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `a-storm-on-cobas-haven`, a
 
 ## E2E
 
-`.maestro/a-storm-on-cobas-haven.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/a-storm-on-cobas-haven-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/a-storm-on-cobas-haven/a-storm-on-cobas-haven-loss.yaml` (a loss writes nothing), with their fixtures.
 
 ## Exit
 
-**Engine half:** coverage and the goldens green in Node. A win runs the Resolution, awards its XP and unlocks the next part in Dream-chaser; a loss writes nothing. The plan's Verification list is green (`data:build`, `data:check`, `--verbose`, `tsc`, `lint`, `test`, `effects:open` with no line for this scenario, `card-smoke.ts` on the new codes, `catalog:build`, `booklets:pack`, the golden). Every Fellowship and Mirkwood golden and test passes without edits to its expectations.
+**Engine half:** coverage and the goldens green in Node. A win runs the Resolution, awards its XP and unlocks the next part in Dream-chaser; a loss writes nothing. The plan's Verification list is green (`data:build`, `data:check`, `--verbose`, `tsc`, `lint`, `test`, `effects:open` with no line for this scenario, `card-smoke/run.ts` on the new codes, `catalog:build`, `booklets:pack`, the golden). Every Fellowship and Mirkwood golden and test passes without edits to its expectations.
 
 **Phone half:** as in phase 12: a person can win and lose the scenario on the phone, the log matches the engine, and no control types damage, resources, threat, progress, life or XP. In a cloud session the phone checks and Maestro runs stay open in `STATUS.md`.
 

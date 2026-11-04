@@ -2,21 +2,21 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useRef, useState, type ComponentRef } from "react";
 import { ScrollView, View } from "react-native";
 
-import { PillButton } from "../../chrome";
-import { FoldSection, useFolds } from "../../fold-section";
-import { heroFace } from "../../hero-tile";
-import { deckFaces } from "../../deck-store";
-import { campaignListQueries, lockedTiles } from "../../campaign-list";
-import { campaignOf } from "../../campaign-data";
-import { listSaves, type ListedSave } from "../../campaign-store";
-import { useDatabases } from "../../databases";
-import { usePalette } from "../../palette-hook";
-import { describe, nextSummary, partyCodes, partySeats, saveLine, type SaveLine } from "../../save-line";
-import { NextStop } from "../../save-panels";
-import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, RunHero, RunRow } from "../../hub-parts";
-import { splitRuns } from "../../hub-runs";
-import { nextStepHref, pathHref } from "../../scenario-links";
-import { useSizeClass } from "../../../play/use-size-class";
+import { PillButton } from "../../kit/chrome";
+import { FoldSection, useFolds } from "../../kit/fold-section";
+import { heroFace } from "../../art/hero-tile";
+import { deckFaces } from "../../deck/store";
+import { campaignListQueries, lockedTiles } from "../../campaign/list";
+import { campaignOf } from "../../data/campaign-data";
+import { listSaves, type ListedSave } from "../../data/campaign-store";
+import { useDatabases } from "../../data/databases";
+import { usePalette } from "../../kit/palette-hook";
+import { describe, nextSummary, partyCodes, partySeats, saveLine, type SaveLine } from "../../history/save-line";
+import { NextStop } from "../../campaign/save-panels";
+import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, RunHero, RunRow } from "../../campaign/hub-parts";
+import { splitRuns } from "../../campaign/hub-runs";
+import { nextStepHref, pathHref } from "../../campaign/scenario-links";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 // The Campaigns hub (docs/design-system.md, Campaigns (campaign list)): the unfinished playthrough written last as the hero over its
 // next scenario's scene, the other unfinished ones as rows, New playthrough (one tile per startable campaign), then Coming later.

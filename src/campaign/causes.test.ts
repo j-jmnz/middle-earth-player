@@ -1,24 +1,24 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { expectOk } from "../rules/fixture.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { definePrinted } from "../rules/printed.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
-import { type Cause } from "../rules/cause.ts";
-import { playOut } from "../../scripts/auto-player.ts";
-import { causeProblems, NUMBER_STEPS, verified } from "../../scripts/cause-check.ts";
-import { campaign, loadWorld, reveal, scenario, send, table } from "../../scripts/past-scene.ts";
-import { playStarter, starterWorld, STARTER_SEEDS } from "../../scripts/starter-game.ts";
-import { knife, KNIFE_GOLDENS, knifeWorld, playGolden } from "../../scripts/knife-game.ts";
-import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../scripts/ford-game.ts";
-import { ford } from "../../scripts/ford-scene.ts";
-import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../scripts/south-game.ts";
-import { south } from "../../scripts/south-scene.ts";
-import { MORIA_GOLDENS, moriaWorld, playGolden as playMoriaGolden } from "../../scripts/moria-game.ts";
-import { moria } from "../../scripts/moria-scene.ts";
-import { BREAKING_GOLDENS, breakingGameWorld, playGolden as playBreakingGolden } from "../../scripts/breaking-game.ts";
-import { breaking } from "../../scripts/breaking-scene.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { definePrinted } from "../rules/core/printed.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
+import { type Cause } from "../rules/core/cause.ts";
+import { playOut } from "../../test/harness/auto-player.ts";
+import { causeProblems, NUMBER_STEPS, verified } from "../../test/harness/cause-check.ts";
+import { campaign, loadWorld, reveal, scenario, send, table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { playStarter, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
+import { knife, KNIFE_GOLDENS, knifeWorld, playGolden } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
+import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../test/scenarios/flight-to-the-ford/game.ts";
+import { ford } from "../../test/scenarios/flight-to-the-ford/scene.ts";
+import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../test/scenarios/the-ring-goes-south/game.ts";
+import { south } from "../../test/scenarios/the-ring-goes-south/scene.ts";
+import { MORIA_GOLDENS, moriaWorld, playGolden as playMoriaGolden } from "../../test/scenarios/journey-in-the-dark/game.ts";
+import { moria } from "../../test/scenarios/journey-in-the-dark/scene.ts";
+import { BREAKING_GOLDENS, breakingGameWorld, playGolden as playBreakingGolden } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
+import { breaking } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 import { buildStart } from "./start.ts";
 

@@ -29,7 +29,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // defending player raises his threat by the number of enemies he is engaged with.
   {"id":"01104:whenRevealed:1","cardCode":"01104","lines":["01104:A:1"],"timing":"whenRevealed","instructions":[{"verb":"RaiseStagingThreat","amount":{"players":true},"until":"endOfPhase"}]},
   {"id":"01104:shadow:1","cardCode":"01104","lines":["01104:A:2"],"timing":"shadow","instructions":[{"verb":"RaiseThreat","amount":{"count":{"type":"enemy","control":"any","engaged":"you"}},"who":"actor"}]},
-  // 01105 Iron Shackles: attached to the top of the first player's deck (the next draw from it discards Iron Shackles instead, families/dungeon-deck.ts);
+  // 01105 Iron Shackles: attached to the top of the first player's deck (the next draw from it discards Iron Shackles instead, families/dungeon/deck.ts);
   // as a Shadow card its When Revealed effect resolves.
   {"id":"01105:whenRevealed:1","cardCode":"01105","lines":["01105:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AttachToDeck","who":"firstPlayer"}]},
   {"id":"01105:constant:1","cardCode":"01105","lines":["01105:A:1"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]},

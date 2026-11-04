@@ -37,11 +37,11 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
 | `pnpm docs:index` | Rewrites `docs/INDEX.md`, the index of the docs agents read. A test fails while it is stale. |
 | `pnpm docs:section <file> "<heading>"` | Prints one doc section with its subsections. |
-| `node --experimental-strip-types scripts/card-smoke.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
+| `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `assets/booklets/` (gitignored) for Metro. |
 | `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. A picture whose pin has not moved since the last pack is kept (`assets/scans/.packed.json`), so a run after a pull packs only the new pins. `--optional` (`pnpm start`) warns instead of failing, keeping the last pack. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
-| `node --experimental-strip-types scripts/e2e-fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
+| `node --experimental-strip-types scripts/e2e/fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
 
 The scripts log to stderr through `scripts/log.ts`: each line has the time since the start, the script and source (`data:sync › ringsdb`), and progress through long fetches. A failure prints its causes (a dropped connection's `ECONNRESET`, the URL and status of a bad response). Add `--verbose` for every request, file and stack (`pnpm data:sync ringsdb -- --verbose`), `--quiet` for warnings and errors only, or set `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`). Data stays on stdout: `data:query` prints only rows there.
 
@@ -156,4 +156,4 @@ When Android Studio is unwelcome, the `development` profile in `eas.json` builds
 
 ### Maestro
 
-Maestro launches the installed `com.middleearth.lcg`; it does not attach to Expo Go. The flows in `.maestro/` that open a save fixture need a build with `EXPO_PUBLIC_E2E_SEED` set, such as the `e2e-test` profile in `eas.json`; without it the fixture route writes nothing. `maestro test .maestro` runs once, after the last phase; it is not an earlier phase's exit. `.eas/workflows/e2e.yml` runs the same flows as an EAS job on the `e2e-test` build.
+Maestro launches the installed `com.middleearth.lcg`; it does not attach to Expo Go. The flows sit in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`; `.maestro/config.yaml` lists both, so `maestro test .maestro` (and the EAS `e2e` workflow, `flow_path: .maestro`) runs every flow. The flows in `.maestro/` that open a save fixture need a build with `EXPO_PUBLIC_E2E_SEED` set, such as the `e2e-test` profile in `eas.json`; without it the fixture route writes nothing. `maestro test .maestro` runs once, after the last phase; it is not an earlier phase's exit. `.eas/workflows/e2e.yml` runs the same flows as an EAS job on the `e2e-test` build.

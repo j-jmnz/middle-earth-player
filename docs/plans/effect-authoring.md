@@ -17,13 +17,13 @@ something else.
 2. Write the records (see Where records live).
 3. `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
    compares it with the data, so run it after adding or removing records.
-4. Check: `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
+4. Check: `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
+   `node --experimental-strip-types scripts/card-smoke/run.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
    seeded game with the card in hand or on the table and fails on a throw, a refusal or `state.failure`; it shows the
    records run, not that they do what the card says. For that, write a test next to the family
-   (`src/rules/families/<family>.test.ts`) that names the rule ids it implements.
+   (`src/rules/families/<family>/index.test.ts`) that names the rule ids it implements.
 
-`scripts/effect-coverage.test.ts` is the gate: every printed line of a card a playable scenario deals (`src/campaign/playable.ts`)
+`scripts/checks/effect-coverage.test.ts` is the gate: every printed line of a card a playable scenario deals (`src/campaign/playable.ts`)
 or of a deck-legal player card is owned by a record that names it in `lines`, by a keyword the engine reads (a line that is
 only keywords needs no record), or by an `inert` entry in the printed-text ledger (`data/printed`). A record names lines of
 its own card, and the timing of the record matches the line's label. If one sentence pattern repeats on many cards, it
@@ -221,16 +221,16 @@ family owns files that are composed by the `index.ts` next to them, so families 
   the trigger enum and the stat enum. `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb
   or condition kind fails when the schema loads. A new pick filter, condition kind or amount field goes in the shared
   `effect-schema-*.ts` file, with a comment naming the family file that reads it.
-- `src/rules/families/<family>.ts` exports `run`, which resolves the family's verbs and returns `null` for any other.
+- `src/rules/families/<family>/index.ts` exports `run`, which resolves the family's verbs and returns `null` for any other.
   `src/rules/families/index.ts` lists the runners; `interpret.ts` asks the families before the player verbs and the core
-  switch. Bigger families split into `<family>-<part>.ts` files. Tests go next to them (`<family>.test.ts`) and name the
+  switch. Bigger families split into part files in the family's folder (`<family>/<part>.ts`). Tests go next to them (`<family>/index.test.ts`) and name the
   rule ids they implement.
 - `src/effects/authored/families/<family>.ts` exports `RECORDS` and `REPLACES`, composed by that folder's `index.ts` (burden and
   south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
 
 Adding a family is therefore: the three files, its entries in the three `index.ts` files (catalog, rules, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run`, and a test. Adding a
-verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/version.ts`) when the change can move a game replayed from its intents.
+verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
 
 ## Not expressible yet: leave open, report
 
@@ -244,7 +244,7 @@ the two below.
   side's data from a source or an override, then a hero-to-enemy `FlipCard`.
 
 - **Engine gap: `usage.ts` does not announce an exhausted cost.** A Forced or Response effect that listens for "after this card
-  exhausts" does not hear a card that was exhausted as the cost of an Action (`src/rules/usage.ts` pays the cost without an
+  exhausts" does not hear a card that was exhausted as the cost of an Action (`src/rules/player/usage.ts` pays the cost without an
   `exhausted` event). Changing that would move The Ring Goes South's golden, so Cave Torch (41029:A:2) and Cavern Warg
   (41031:A:1) exhaust as the first instruction of the record, where `Exhaust` announces the event and the Torch's Forced effect
   (41029:A:3) hears it. A new card whose Forced effect listens for an exhaust does the same; the gap closes only with an

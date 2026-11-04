@@ -1,5 +1,5 @@
 // The vocabulary the Dream-chaser campaign cards add to effect records (phase 38): the XP a Resolution awards (dcce.gaining-xp). Simple
-// verbs; effect-schema-verbs.ts composes them. src/rules/resolution.ts runs them (src/rules/families/dreamchaser.ts counts what a line is for).
+// verbs; effect-schema-verbs.ts composes them. src/rules/setup/resolution.ts runs them (src/rules/families/dreamchaser/index.ts counts what a line is for).
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";

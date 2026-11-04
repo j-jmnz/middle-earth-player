@@ -1,0 +1,202 @@
+// The hand scrub (docs/design-system-table.md, Gestures; phase 25): pressed and held, the hand rises and spreads across the
+// canvas, and a finger sliding along it lifts one card at a time; letting go on a card opens its preview, and pushing forward
+// (up, toward the table) picks the lifted card up into the drag, which plays it only when dropped on its target. Pure geometry:
+// the canvas animates between the hand layout.ts gives (the peeking, fanned strip) and the spread this works out, and the
+// gesture's worklets ask `cardAt`, `cancelled`, `pick`, `pushMove` and `pushed` on the UI thread. Nothing here sends an intent.
+//
+// The hold (150 ms), the slop (6 pt) and the push (0.3 of the touch reach) are gesture thresholds, not motion: they stay out of
+// motionScale, as the dock's ARM_MS does.
+import { MIN_TARGET, type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
+import { contains, hitSlot } from "../layout/hits.ts";
+import { SHAPE } from "../../ui/motion-tokens.ts";
+import type { ScrubRoom } from "./scrub-pose.ts";
+import { touch } from "../../ui/ui-scale.ts";
+
+/** How long a press on the hand is held still before the scrub starts, in ms. */
+export const SCRUB_HOLD_MS = 150;
+
+/** How far the finger may move in that time, in pt; a move before it is a drag, which plays a card as always. */
+export const SCRUB_SLOP = 6;
+
+/** How far a forward push picks the card up, as a share of the touch reach (13 pt at Medium). */
+export const SCRUB_PUSH = 0.3;
+
+// The risen hand keeps this far from the canvas's edges, and its cards this far apart when there is room. These are Medium's sizes;
+// the layout's UI scale (layout.scale) multiplies them.
+const EDGE = 8;
+const GAP = 6;
+
+/** A spread slot: the rectangle a card reaches and the turn (radians, clockwise) it takes there, so the risen hand is fanned. */
+export type SpreadSlot = Rect & { tilt: number };
+
+/**
+ * The risen, spread hand. `slots` are the rectangles the cards reach (already at the scrub's scale and unlifted, each with its fan
+ * `tilt`), one per card in hand order; `centers` their x centers; `top` the y of the risen hand's top edge (the fan's highest card,
+ * the middle one); `ceiling` the top of the lifted card over the highest one (where it is drawn, grown and risen), above which (less the reach) a release
+ * cancels; `left` and `right` its extent; `strip` the normal hand's rectangle, where a press can start a scrub; `reach` the slice of each card a finger is
+ * guaranteed and the distance above the hand where it cancels (44 pt, more at Large), carried here so the worklets read it from the
+ * spread rather than a module constant. Absent means 44. `room` is where a grown card stays (the canvas less its edge) and the lifted
+ * card's grow, `SHAPE.scrubLiftScale` unless the canvas is too small for it.
+ */
+export type Spread = { ids: readonly string[]; slots: readonly SpreadSlot[]; centers: readonly number[]; scale: number; top: number; ceiling: number; left: number; right: number; strip: Rect; reach?: number; room: ScrubRoom };
+
+export const NO_SPREAD: Spread = { ids: [], slots: [], centers: [], scale: 1, top: 0, ceiling: 0, left: 0, right: 0, strip: { x: 0, y: 0, w: 0, h: 0 }, room: { left: 0, right: 0, top: 0, lift: 1 } };
+
+/** The hand's slots in order. */
+export function handSlots(layout: TableLayout): CardSlot[] {
+  return layout.slots.filter((slot) => slot.zone === "hand" && slot.kind === "card");
+}
+
+/**
+ * The angle of each card in the risen fan, in hand order: symmetric about the middle, `SHAPE.fanStep` apart but never spanning more
+ * than `SHAPE.fanMax` in all. One card stands straight.
+ */
+export function fanTilts(count: number): number[] {
+  const turn = count > 1 ? Math.min(SHAPE.fanStep, SHAPE.fanMax / (count - 1)) : 0;
+  return Array.from({ length: count }, (_, index) => (index - (count - 1) / 2) * turn);
+}
+
+/**
+ * The hand risen and spread across the canvas: whole cards at the scrub's size, the table's card times `SHAPE.scrubScale` whatever the
+ * hand's length (user request, 2026-11-01: the risen cards never change size with the number of cards; a long hand's cards are narrowed
+ * on the table, not here), smaller only where the canvas is narrower than one card. Centered, a gap apart when they fit and overlapping
+ * evenly when they do not: a long hand gets a thinner slice of each card, where the nearest center still picks and the lifted copy shows
+ * which card it is. The cards are fanned: each turns by its `fanTilts` angle and drops by R(1 - cos) on an arc of `SHAPE.fanRadius`
+ * card heights, so the middle stands highest; the x spacing is that of a flat row, and the margins and the bottom leave room for the
+ * cards' turned corners. `canvas.bottom` is the bottom safe-area inset the hand stays above.
+ */
+export function spreadLayout(layout: TableLayout, canvas: { width: number; height: number; bottom: number }): Spread {
+  const cards = handSlots(layout);
+  const first = cards[0];
+  if (!first) return { ...NO_SPREAD, strip: layout.zones.hand };
+  const count = cards.length;
+  const ui = layout.scale ?? 1;
+  const edge = EDGE * ui;
+  const gap = GAP * ui;
+  const reach = touch(ui, MIN_TARGET);
+  const tilts = fanTilts(count);
+  const widest = Math.max(0, ...tilts.map(Math.abs));
+  // The risen card's size: the table's card at the scrub's scale, held to the canvas's width.
+  const base = layout.card.w > 0 ? layout.card : first;
+  const size = Math.min(base.w * SHAPE.scrubScale, canvas.width - 2 * edge);
+  const w = size;
+  const h = (base.h / base.w) * size;
+  // How far a turned card's corner reaches past its flat edge, sideways: the margin the row keeps from the canvas's sides.
+  const cornerOverhang = (h * Math.sin(widest)) / 2 - (w * (1 - Math.cos(widest))) / 2;
+  const room = canvas.width - 2 * Math.max(edge, cornerOverhang);
+  // The scale from the card's place in the hand to its place in the spread.
+  const scale = w / first.w;
+  const step = count > 1 ? Math.min(w + gap, (room - w) / (count - 1)) : 0;
+  const x0 = (canvas.width - ((count - 1) * step + w)) / 2;
+  const radius = SHAPE.fanRadius * h;
+  const fan = tilts.map((tilt) => ({ tilt, drop: radius * (1 - Math.cos(tilt)) }));
+  // The lowest reach of any turned card (its center's drop plus its turned half height) sits at the bottom line; the middle row
+  // is raised by the rest.
+  const reachDown = Math.max(...fan.map(({ tilt, drop }) => drop + (h / 2) * Math.cos(tilt) + (w / 2) * Math.sin(Math.abs(tilt))));
+  const centerY = canvas.height - canvas.bottom - gap - reachDown;
+  const slots = fan.map(({ tilt, drop }, index) => ({ x: x0 + index * step, y: centerY + drop - h / 2, w, h, tilt }));
+  const top = Math.min(...slots.map((slot) => slot.y));
+  // The lifted card grows from its foot: at most as tall as the room above the highest card's foot, and as wide as the canvas.
+  const lift = Math.max(1, Math.min(SHAPE.scrubLiftScale, (top + h - edge) / h, (canvas.width - 2 * edge) / w));
+  // The lifted card's top over the highest card: its foot raised as scrub-pose.ts raises it, less where the top edge would cut it.
+  const rise = Math.min(h * SHAPE.scrubLiftRise, Math.max(0, top + h - h * lift - edge));
+  return {
+    ids: cards.map((card) => card.id),
+    slots,
+    centers: slots.map((slot) => slot.x + slot.w / 2),
+    scale,
+    top,
+    ceiling: top + h - rise - h * lift,
+    left: x0,
+    right: x0 + (count - 1) * step + w,
+    strip: layout.zones.hand,
+    reach,
+    room: { left: edge, right: canvas.width - edge, top: edge, lift },
+  };
+}
+
+/** The index of the card whose center is nearest `x`, or -1 for an empty hand. */
+export function cardAt(spread: Spread, x: number): number {
+  "worklet";
+  let best = -1;
+  let gap = Infinity;
+  for (let index = 0; index < spread.centers.length; index += 1) {
+    const away = Math.abs((spread.centers[index] ?? 0) - x);
+    if (away < gap) {
+      gap = away;
+      best = index;
+    }
+  }
+  return best;
+}
+
+/** Whether the finger is more than 44 pt above the top of the lifted card: a release there cancels. A finger on the lifted card never does. */
+export function cancelled(spread: Spread, y: number): boolean {
+  "worklet";
+  return y < spread.ceiling - (spread.reach ?? MIN_TARGET);
+}
+
+/**
+ * The card a release or a move lands on: the nearest center, or -1 when the finger is above the hand or off its ends (by half of
+ * the slice a card is guaranteed). -1 lifts nothing, and a release on it cancels.
+ */
+export function pick(spread: Spread, x: number, y: number): number {
+  "worklet";
+  const margin = (spread.reach ?? MIN_TARGET) / 2;
+  if (spread.ids.length === 0 || cancelled(spread, y) || x < spread.left - margin || x > spread.right + margin) return -1;
+  return cardAt(spread, x);
+}
+
+/** Whether a press at a point starts a scrub: on a hand card, or on the hand strip between cards, and not on another card. */
+export function startsScrub(spread: Spread, slots: readonly CardSlot[], x: number, y: number, hit: number): boolean {
+  "worklet";
+  if (spread.ids.length === 0) return false;
+  const slot = hit >= 0 ? slots[hit] : undefined;
+  if (slot) return slot.zone === "hand";
+  return contains(spread.strip, x, y);
+}
+
+/** The card the scrub starts on: the hand card that was pressed, else (the strip between cards) the one nearest the finger. */
+export function startCard(spread: Spread, slots: readonly CardSlot[], x: number, y: number): number {
+  "worklet";
+  const slot = slots[hitSlot(slots, x, y)];
+  const pressed = slot && slot.zone === "hand" ? spread.ids.indexOf(slot.id) : -1;
+  return pressed >= 0 ? pressed : cardAt(spread, x);
+}
+
+/** The selection tick: when the scrub starts on a card and each time the card under the finger changes to another, nothing else. */
+export function ticksOn(previous: number, next: number): boolean {
+  return next >= 0 && next !== previous;
+}
+
+/** Where the finger's current forward run started: the point it last moved from other than forward. */
+export type Push = { x: number; y: number };
+
+/** Whether the finger has gone more up than sideways from a point: toward the table. */
+function forward(ax: number, ay: number, x: number, y: number): boolean {
+  "worklet";
+  return ay - y > Math.abs(x - ax);
+}
+
+/**
+ * The push after a move. It keeps its start while the finger goes on more up than sideways from there, or stays within the slop of
+ * it (a jitter); any other move (sideways, down) starts it again where the finger is. No rest is needed: the run starts wherever the
+ * finger turns forward, on any part of the card.
+ */
+export function pushMove(push: Push, x: number, y: number): Push {
+  "worklet";
+  if (forward(push.x, push.y, x, y) || Math.hypot(x - push.x, y - push.y) <= SCRUB_SLOP) return push;
+  return { x, y };
+}
+
+/** Whether a push is under way: the finger is going forward from the run's start. The card under it stays lifted meanwhile. */
+export function pushing(push: Push, x: number, y: number): boolean {
+  "worklet";
+  return forward(push.x, push.y, x, y);
+}
+
+/** Whether the lifted card is picked up now: the finger has pushed forward `SCRUB_PUSH` of the touch reach from the run's start. */
+export function pushed(push: Push, spread: Spread, x: number, y: number): boolean {
+  "worklet";
+  return forward(push.x, push.y, x, y) && push.y - y >= (spread.reach ?? MIN_TARGET) * SCRUB_PUSH;
+}

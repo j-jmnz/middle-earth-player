@@ -1,5 +1,5 @@
 import type { CampaignData } from "../catalog/scenario-data.ts";
-import type { PrintedCard } from "../rules/printed.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
 
 // The loadout rules of a briefing: one deck and its heroes per seat. Pure. Each error names the card and the rule. In a saga
 // campaign (the Fellowship of the Ring) the Fellowship saga rules apply: a Ring-bearer from the player's own heroes, one

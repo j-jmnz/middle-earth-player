@@ -52,20 +52,20 @@ Each task updates the passage of `docs/design-system.md` that it supersedes, fol
 ### 1. Tokens and the button system
 
 - `tailwind.config.js`: the radius scale becomes `control` (999px), `item` (rem 12) and `container` (rem 20), plus `sheet` (rem 24) for the top of a parchment sheet. Move every use of `rounded-button`, `rounded-chip`, `rounded-tile`, `rounded-card`, `rounded-hero`, `rounded-pill`, Tailwind's bare `rounded` and `rounded-sm` onto them, then delete the old keys. Do the same for literal `borderRadius` numbers in chrome views (`20*s`, `16*s`, `18*s`, `14*s`, `10*s`, `6*s`, 3, 4). The 2.3 pt corner of a canvas card, and `cardCorner()`, are not chrome.
-- `src/play/surfaces.ts`:
+- `src/ui/surfaces.ts`:
   - `accentPlate` loses its glow, its lit and dark inset edges and its night ring.
   - `slateSurface` becomes the flat tonal secondary fill, with no shadow.
   - `glassSurface` loses its shadow.
   - `segmentSurface` and `sunkSurface` go flat: a tonal track and a lighter thumb, with no inset shadow.
   - Panels, tiles and parchment keep their depth.
   - Nothing in the backdrop changes.
-- `src/screens/chrome-buttons.tsx`:
+- `src/screens/kit/chrome-buttons.tsx`:
   - `PrimaryButton`, `SecondaryButton`, `TextButton`, `IconButton` and `PillButton` (44 tall, `rounded-control`) follow the four styles. `ToggleChip` becomes a 36 pt capsule in a 44 pt target: tinted when on, with its foot bar gone.
-  - `SearchField` and `Segmented` (`src/play/segmented.tsx`) become capsules.
+  - `SearchField` and `Segmented` (`src/ui/segmented.tsx`) become capsules.
   - Disabled takes the one look described above.
 - Fold the duplicates into the four styles:
-  - `ChromeButton` and `ChromePrimary` (`src/play/sheet-paper.tsx`) draw the same shapes and fills as Secondary, Text and Primary. `src/play` cannot import screens, so the shared surface or style lives in `src/play`, and the screens' components read it there.
-  - `SettingTextButton` (`src/play/setting-rows.tsx`) becomes the Text style.
+  - `ChromeButton` and `ChromePrimary` (`src/play/choice/sheet-paper.tsx`) draw the same shapes and fills as Secondary, Text and Primary. `src/play` cannot import screens, so the shared surface or style lives in `src/play`, and the screens' components read it there.
+  - `SettingTextButton` (`src/play/chrome/setting-rows.tsx`) becomes the Text style.
   - `NewDeckButton` (Decks) becomes a round glass `IconButton` labelled "New deck". This removes the second primary.
   - The Cards tab's `FilterButton` becomes a Secondary with its count badge.
   - "Applied only" becomes a `ToggleChip`.

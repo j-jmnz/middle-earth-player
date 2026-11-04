@@ -133,6 +133,6 @@ export const FLAGS = [
   // Held by the table until the end of the round: a location has been revealed by the encounter deck this round.
   "locationRevealed",
   // Held by the table while the source is the active location: "encounter card effects cannot be canceled" (41010:A:1). No Response cancels a
-  // When Revealed or Shadow effect, and no paid cancel is offered against one (src/rules/families/encounter-cancel.ts).
+  // When Revealed or Shadow effect, and no paid cancel is offered against one (src/rules/families/encounter/cancel.ts).
   "encounterUncancelable",
 ] as const;

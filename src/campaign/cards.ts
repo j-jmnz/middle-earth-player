@@ -1,7 +1,7 @@
 // Rules: rr.campaign-cards, rr.boons, rr.burdens (data/rules/entries.json).
 import { traitTokens } from "../catalog/deck-save.ts";
 import type { cards } from "../catalog/schema.ts";
-import { printedFromCard, type PrintedCard } from "../rules/printed.ts";
+import { printedFromCard, type PrintedCard } from "../rules/core/printed.ts";
 
 // A catalog.db row, as the phone reads it. The screens query the codes a screen needs and build the engine's cards here,
 // so the phone never reads data/cards at runtime. The catalog keeps the same fields as data/cards that the engine reads.

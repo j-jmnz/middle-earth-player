@@ -7,17 +7,17 @@ import { effectSchema } from "../catalog/boundary.ts";
 import { cards as cardTable } from "../catalog/schema.ts";
 import { campaignGameCodes, campaignScenario, recordInstructions, sideInstructions } from "../catalog/scenario-data.ts";
 import { EFFECTS } from "../effects/index.ts";
-import { holds } from "../rules/conditions.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import { openResolution, resolutionResult } from "../rules/resolution.ts";
-import { reduce, startScenario, type ScenarioState } from "../rules/reduce.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { inPlay, updateCard, withSeat, withThreat } from "../rules/state.ts";
-import { spawn } from "../rules/zones.ts";
+import { holds } from "../rules/interpret/conditions.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import { reduce, startScenario, type ScenarioState } from "../rules/engine/reduce.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { inPlay, updateCard, withSeat, withThreat } from "../rules/core/state.ts";
+import { spawn } from "../rules/core/zones.ts";
 import { dealtCodes, gameCodes, loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { loadWorld as loadTable, table, type World as Table } from "../../scripts/past-scene.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { loadWorld as loadTable, table, type World as Table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import prebuilt from "../../data/decks/prebuilt.json";
 
 import { briefing, loadoutProblems, startFor, type BriefingInput } from "./briefing.ts";
@@ -26,8 +26,8 @@ import { applyResolution, emptyLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { buildStart } from "./start.ts";
 import { worldCodes, worldFrom, type World } from "./world.ts";
-import { mirkwoodLoadout, mirkwoodWorld } from "../../scripts/mirkwood-game.ts";
-import { campaign as mirkwoodCampaign, passage } from "../../scripts/mirkwood-scene.ts";
+import { mirkwoodLoadout, mirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { campaign as mirkwoodCampaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 import { gavinReturned, MODE_CARD_CODE, modeXp, spendXp, xpUnspentOf } from "./xp.ts";
 
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable, dcce.hard-expert, dcce.naasiyah (data/rules/entries.json). The Dream-chaser campaign shell: a

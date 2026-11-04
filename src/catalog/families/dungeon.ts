@@ -1,7 +1,7 @@
 // The vocabulary the dungeon of Escape from Dol Guldur adds to effect records: deck cards that become facedown enemies (the Orc
 // Guard), an encounter card attached to a player's deck (Iron Shackles), a limit on the cards the players play each round and a
 // shadow effect that has just resolved. Simple verbs, triggers and a stat flag; effect-schema-verbs.ts, effect-schema.ts and
-// effect-schema-stats.ts compose them. src/rules/families/dungeon*.ts runs them.
+// effect-schema-stats.ts compose them. src/rules/families/dungeon/ runs them.
 import { z } from "zod";
 
 import { positiveAmountSchema } from "../effect-schema-amount.ts";

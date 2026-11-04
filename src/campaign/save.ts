@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data.ts";
-import type { PlayerIntent } from "../rules/intents.ts";
+import type { PlayerIntent } from "../rules/core/intents.ts";
 
 import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
 import type { ActiveScenario } from "./replay.ts";

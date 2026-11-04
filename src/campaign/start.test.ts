@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import { startScenario } from "../rules/reduce.ts";
-import { loadWorld } from "../../scripts/past-scene.ts";
+import { startScenario } from "../rules/engine/reduce.ts";
+import { loadWorld } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 
 import { buildStart } from "./start.ts";

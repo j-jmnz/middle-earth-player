@@ -1,6 +1,6 @@
 // Offline: cuts the game's icons out of the snapshots `pnpm data:sync icons` keeps under data/raw/icons, and writes
 // assets/icons (one standalone SVG per vector glyph, the PNG tokens and the JPEG card backs copied as they are) and two
-// modules under src/play/icons: `generated.ts` (each icon's and card back's source, size and, for a vector, its path for the
+// modules under src/ui/icons: `generated.ts` (each icon's and card back's source, size and, for a vector, its path for the
 // Skia canvas) and `files.generated.ts` (the asset requires for expo-image and Skia images). Deterministic: the same
 // snapshots write the same bytes. docs/design-system.md, Icons, lists them.
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";

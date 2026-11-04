@@ -2,15 +2,15 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../catalog/boundary.ts";
 import { EFFECTS } from "../effects/index.ts";
-import { twinCode } from "../rules/families/nightmare-guards.ts";
-import { levelOfCard } from "../rules/families/dreamchaser-facts.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { definePrinted, type PrintedCard } from "../rules/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/reduce.ts";
-import { spawn } from "../rules/zones.ts";
-import { mirkwoodLoadout, mirkwoodWorld } from "../../scripts/mirkwood-game.ts";
-import { campaign, passage } from "../../scripts/mirkwood-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { twinCode } from "../rules/families/nightmare/guards.ts";
+import { levelOfCard } from "../rules/families/dreamchaser/facts.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../rules/engine/reduce.ts";
+import { spawn } from "../rules/core/zones.ts";
+import { mirkwoodLoadout, mirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/game.ts";
+import { campaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { checklist } from "./checklist.ts";
 import { emptyLog, poolCard, type CampaignLog } from "./log.ts";

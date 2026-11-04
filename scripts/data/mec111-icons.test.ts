@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { ICONS } from "../../src/play/icons/generated.ts";
+import { ICONS } from "../../src/ui/icons/generated.ts";
 import { MEC111_ICONS, parseToUnicode } from "./icons.ts";
 import { RAW_DIR } from "./paths.ts";
 import { sha256 } from "./sources/fetch.ts";

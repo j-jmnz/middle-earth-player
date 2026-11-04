@@ -1,7 +1,7 @@
 # Combat spotlight redesign
 
 ## Context
-The combat spotlight (phase 24) plays an attack large when it deals or blocks damage. Today it is drawn inside the table's Skia canvas (`src/play/spotlight.native.tsx`), so the cards sit at 42% of the *canvas* height (about 142 pt on an 844×390 phone), off-centre: left of the dock and under the top bar. The motion is small too: a 10 pt draw-back, an 80 ms hold, a 5 pt shake, small flying tokens and flat pills. It reads as underwhelming.
+The combat spotlight (phase 24) plays an attack large when it deals or blocks damage. Today it is drawn inside the table's Skia canvas (`src/play/spotlight/spotlight.native.tsx`), so the cards sit at 42% of the *canvas* height (about 142 pt on an 844×390 phone), off-centre: left of the dock and under the top bar. The motion is small too: a 10 pt draw-back, an 80 ms hold, a 5 pt shake, small flying tokens and flat pills. It reads as underwhelming.
 
 User request (2026-10-29): a full redesign. Bigger cards in the middle of the screen; modern, smooth and impactful; particles and effects; dark and gritty.
 
@@ -10,7 +10,7 @@ Answers to the clarifying questions:
 - The stage is **always dark**, on the Light theme too.
 - A destroyed target **burns away**.
 
-**What stays.** All the engine numbers (`clash.ts`), the gate, skip, Back and banner-wait behaviour (`spotlight-gate.ts`, `use-spotlight.ts`), Quick at ×0.6, reduced motion, the screen reader and the setting turned off (none of these plays a spotlight), and the "one clock, pure worklet arithmetic, no idle loop" architecture.
+**What stays.** All the engine numbers (`clash.ts`), the gate, skip, Back and banner-wait behaviour (`spotlight/gate.ts`, `use-spotlight.ts`), Quick at ×0.6, reduced motion, the screen reader and the setting turned off (none of these plays a spotlight), and the "one clock, pure worklet arithmetic, no idle loop" architecture.
 
 ## Game-feel rules applied (from the online research)
 - **Anticipation.** A real wind-up before the strike: draw back, a charge glow, embers drawn toward the attacker. The wind-up promises the hit, so the payoff must be as big as the wind-up.
@@ -31,26 +31,26 @@ Answers to the clarifying questions:
 ## Approach
 
 ### 1. Full-screen layer (mounting)
-- **New layer** `src/play/spotlight-layer.native.tsx`, with a web stub `spotlight-layer.tsx` that returns null (the `table-canvas(.native).tsx` pattern).
-  - `src/screens/table-view.tsx` renders it right after `<TableLayers>`, before the banner, the preview and the menu.
+- **New layer** `src/play/spotlight/layer.native.tsx`, with a web stub `spotlight/layer.tsx` that returns null (the `table-canvas(.native).tsx` pattern).
+  - `src/screens/table/view.tsx` renders it right after `<TableLayers>`, before the banner, the preview and the menu.
   - It is always mounted and holds the fonts, token icons, backs, particle sprite texture (`useTexture`) and its own stage-size decodes.
   - It mounts a `<Canvas pointerEvents="none">` (not opaque, so it is a TextureView on Android and stacks correctly) only while a spotlight plays.
-- **Handoff** `src/play/spotlight-handoff.ts`: a small vanilla zustand store `{ plan, progress, k, playing, tableImages }`.
+- **Handoff** `src/play/spotlight/handoff.ts`: a small vanilla zustand store `{ plan, progress, k, playing, tableImages }`.
   - `TableView` creates it once and passes it to `TableCanvas` and to the layer.
   - `TableCanvas` publishes it from a `useLayoutEffect` keyed on `[plan, playing, k]`.
   - Only the layer subscribes, so neither `TableView` nor the memoized canvas renders again.
   - The `progress` SharedValue is shared by both canvases.
-- **Coordinates.** `buildPlan` takes a stage area `{ width, height, origin: { x: insets.left + canvasLayoutX, y: barBottom }, safe: insets }` through a new `TableCanvasProps.stageArea`, memoized in `table-view.tsx`.
+- **Coordinates.** `buildPlan` takes a stage area `{ width, height, origin: { x: insets.left + canvasLayoutX, y: barBottom }, safe: insets }` through a new `TableCanvasProps.stageArea`, memoized in `table/view.tsx`.
   - `canvasLayoutX` comes from the wrapper's existing `onLayout`; it is non-zero when the quest scale shows.
   - `placeOf` adds `origin` to each slot rect.
   - `useSpotlight`'s `sameSize` check also compares the area.
 - **What is removed.**
   - The night `RoundedRect` in `Spotlight` goes; the layer draws the backdrop.
-  - `SpotlightScrim` (`spotlight-scrim.tsx`) loses its fill, fade and `lingers`. It stays only as the transparent press-in skip catcher over the bar and dock.
+  - `SpotlightScrim` (`spotlight/scrim.tsx`) loses its fill, fade and `lingers`. It stays only as the transparent press-in skip catcher over the bar and dock.
   - The canvas's hurry, `live` and `swallow` skip is unchanged.
-- **Theme.** The layer always draws with `tableTokensByTheme.dark` (`src/play/tokens.ts`).
+- **Theme.** The layer always draws with `tableTokensByTheme.dark` (`src/ui/tokens.ts`).
 
-### 2. Stage geometry: `src/play/spotlight-stage.ts`, rewritten for the screen
+### 2. Stage geometry: `src/play/spotlight/stage.ts`, rewritten for the screen
 - **Card height:** `h = min(round(0.60·H), 340)` (340 caps it on tablets). That is about 234 pt on a 390 pt phone, against 142 today. The width keeps the table card's aspect.
 - **Shrinking:** the stage shrinks when the whole group is wider than the screen less the safe insets less 32 pt.
 - **Card centres** are at 0.47·H.
@@ -66,7 +66,7 @@ Answers to the clarifying questions:
 - **Scaling:** lengths stay in logical points ×s, as `scaledStage` does today.
 - **Decode size:** `use-spotlight-images.native.ts` moves into the layer and decodes at the target size × the 1.06 punch-in.
 
-### 3. Beats: `src/play/motion-tokens.ts` and `src/play/spotlight-beats.ts`
+### 3. Beats: `src/ui/motion-tokens.ts` and `src/play/spotlight/beats.ts`
 - **One attack** (`SPOTLIGHT_BEATS`, 3200 ms; the `spotlight` long token is 3200). The 1000 ms hold after the impact was added by user request, 2026-10-30, so the result can be read; the beats before it are the redesign's.
 
 | Beat | ms | Easing | What happens |
@@ -91,15 +91,15 @@ Answers to the clarifying questions:
 - **Removed tokens:** Dim, Draw, DrawAgain, Fall, Scrim, BounceRise and BounceSettle. `spotlightHold` is the result's pause, added 2026-10-30.
 - **Timing hooks:** `hitTime` points to `stopAt`, `leaveTime` to `retAt`, and every length goes through `length(token, k)`.
 - **New `Frame` fields:** `dark`, `badgeA`/`badgeD`, `charge`, `punch`, `trail`, `flash`, `ring`, `sparkT`, `shakeX`/`shakeY`/`shakeTurn`, `number {scale, alpha, rise}`, `stamp`, `recoil`, `flipAngle`, `glint`, `dissolve`.
-- **Spatial constants:** these move out of `SHAPE` into a new `spotlight-shape.ts` if `motion-tokens.ts` grows too large. Durations stay in `MOTION`.
+- **Spatial constants:** these move out of `SHAPE` into a new `spotlight/shape.ts` if `src/ui/motion-tokens.ts` grows too large. Durations stay in `MOTION`.
 
 ### 4. Pure effect math (new, worklet, Vitest-testable)
-- **`src/play/spotlight-fx.ts`:**
+- **`src/play/spotlight/fx.ts`:**
   - flash, ring and stamp curves;
   - the trauma shake: `T = max(0, T0 − u)`, offset `max·T²·n(t)`, where n is a sum of seeded sines;
-  - the number pop, reusing `popScale` from `motion-curves.ts`;
+  - the number pop, reusing `popScale` from `motion/curves.ts`;
   - the camera push-in.
-- **`src/play/spotlight-particles.ts`:**
+- **`src/play/spotlight/particles.ts`:**
   - `hash(i, seed)` uses `Math.imul`.
   - `particleAt(kind, i, t, seed, at)` returns `{x, y, turn, scale, alpha}` in closed form, with no per-frame state.
   - The kinds:
@@ -109,19 +109,19 @@ Answers to the clarifying questions:
     - `deflect`: a silver cone back toward the attacker; 18.
     - `ash`: spawns where the burn front passes; 36.
   - The seed is `seq·31 + index`, stored on `ClashPlan`.
-- **`src/play/spotlight-burn.ts`:** the `burnField` value noise (2 octaves) in TS. The SkSL string is generated from the same constants, so the ash spawn order can be tested.
+- **`src/play/spotlight/burn.ts`:** the `burnField` value noise (2 octaves) in TS. The SkSL string is generated from the same constants, so the ash spawn order can be tested.
 
 ### 5. Native pieces (Skia; each file kept small)
 - **`spotlight.native.tsx`:** the root, the shake/camera group (stage only; the HUD is outside it) and the clash windows.
-- **`spotlight-pieces.native.tsx`:** the flying card (arc, punch, perspective flip), the afterimage trail, the damage corner and the flying tokens. `StageCard` and `CardBody` are reused from `canvas-pieces.native.tsx`.
-- **`spotlight-fx.native.tsx`:**
+- **`spotlight/pieces.native.tsx`:** the flying card (arc, punch, perspective flip), the afterimage trail, the damage corner and the flying tokens. `StageCard` and `CardBody` are reused from `canvas/pieces.native.tsx`.
+- **`spotlight/fx.native.tsx`:**
   - full-screen dark and vignette in one radial gradient;
   - pool of light in `blendMode="screen"`;
   - rim glow as a gradient stroke, with no `BlurMask`;
   - the localized flash, the shockwave ring (a stroked circle) and the glint.
-- **`spotlight-particles.native.tsx`:** `<Atlas>` emitters through `useRSXformBuffer` / `useColorBuffer` with `blendMode="plus"`, and one sprite texture built with `useTexture`.
-- **`spotlight-burn.native.tsx`:** `Skia.RuntimeEffect.Make` as a `<RuntimeShader>` image filter on the target's layer (`uniform shader image`, a threshold uniform and an ember-rim band). If the effect fails to compile (null), it falls back to fade and drop.
-- **`spotlight-hud.native.tsx`:** the attack and defense medallions (Marcellus SC numbers and the game icons from `CanvasIcon`), the damage number with a dark outline (`Outlined`), the stamps, the `+n` chip and the "n of m · Tap to skip" / "Tap to skip" note.
+- **`spotlight/particles.native.tsx`:** `<Atlas>` emitters through `useRSXformBuffer` / `useColorBuffer` with `blendMode="plus"`, and one sprite texture built with `useTexture`.
+- **`spotlight/burn.native.tsx`:** `Skia.RuntimeEffect.Make` as a `<RuntimeShader>` image filter on the target's layer (`uniform shader image`, a threshold uniform and an ember-rim band). If the effect fails to compile (null), it falls back to fade and drop.
+- **`spotlight/hud.native.tsx`:** the attack and defense medallions (Marcellus SC numbers and the game icons from `CanvasIcon`), the damage number with a dark outline (`Outlined`), the stamps, the `+n` chip and the "n of m · Tap to skip" / "Tap to skip" note.
 - **`table-fonts.native.ts`:** adds the number (64), stamp (34) and note (Barlow Bold 15) fonts to `SpotFonts`.
 
 ### 6. Docs
@@ -129,7 +129,7 @@ Answers to the clarifying questions:
   - Rewrite the Spotlight paragraph and its beats table, and the Motion table rows.
   - Amend "Carved Stone designs no new motion" to name this as a user-request exception (2026-10-29).
   - Record the always-dark stage and the flash and particle budgets.
-- **`docs/phases/phase-24-combat-spotlight.md`:** add a "superseded by the 2026-10-29 redesign" note.
+- **`docs/phases/done/phase-24-combat-spotlight.md`:** add a "superseded by the 2026-10-29 redesign" note.
 - **`docs/phases/STATUS.md`:** add a section "Combat spotlight redesign, 2026-10-29 (user request)" with Built, Decided, Checked and Open. The phone, Android low-end cost and Maestro checks stay **Open**, since a cloud session has no device.
 
 ## Notes for the orchestrating agent
@@ -154,18 +154,18 @@ Answers to the clarifying questions:
 ## Verification
 - **Checks:** `pnpm test`, `pnpm lint`, `tsc --noEmit` and `pnpm data:check` (unaffected, but CI runs it).
 - **Rewritten tests:**
-  - `motion-tokens.test.ts`: beats sum to 3200 and 2200, Quick is 1920, every token is ≤ 500 except `spotlight`, `spotlightHold` and the particle lives, the burst fits inside the impact.
-  - `spotlight-beats.test.ts`:
+  - `src/play/motion/tokens.test.ts`: beats sum to 3200 and 2200, Quick is 1920, every token is ≤ 500 except `spotlight`, `spotlightHold` and the particle lives, the burst fits inside the impact.
+  - `spotlight/beats.test.ts`:
     - the hit-stop is frozen for 100 ms;
     - the trauma envelope stays ≤ max·T0², never increases, and reaches 0;
     - Quick at 0.6t equals Normal at t for every field;
     - the trail shows only during the lunge;
     - the dissolve runs only when the target is destroyed;
     - one flash per attack.
-  - `spotlight-plan.test.ts`: the 0.6·H height and the 340 cap, the stage centred on the screen and inside the safe area, the origin offset applied, the fan, the shadow card and narrow-screen shrinking.
+  - `spotlight/plan.test.ts`: the 0.6·H height and the 340 cap, the stage centred on the screen and inside the safe area, the origin offset applied, the fan, the shadow card and narrow-screen shrinking.
   - `scale-budgets.test.ts`: the new `stageOf` signature.
 - **New tests:**
-  - `spotlight-particles.test.ts`: deterministic for a seed, alpha 0 outside a particle's life, sparks start at the contact point, converge reaches the attacker, counts within budget.
-  - `spotlight-burn.test.ts`: the field stays in [0, 1], and ash spawns in the order of the burn front.
-- **Unchanged and still green:** `spotlight-gate.test.ts`, `clash.test.ts`, `back.test.ts`, `stops.test.ts`.
+  - `spotlight/particles.test.ts`: deterministic for a seed, alpha 0 outside a particle's life, sparks start at the contact point, converge reaches the attacker, counts within budget.
+  - `spotlight/burn.test.ts`: the field stays in [0, 1], and ash spawns in the order of the burn front.
+- **Unchanged and still green:** `spotlight/gate.test.ts`, `clash.test.ts`, `back.test.ts`, `stops.test.ts`.
 - **Visual check:** the web build has no canvas. The real look needs a phone or dev build (`pnpm android` / `pnpm android:usb --device`): play scenario 1 to an enemy attack, a blocked attack, a hero kill and a three-attack moment, at Normal and Quick, in Dark and Light, and tap to skip mid-run. This stays Open in STATUS.md from a cloud session.

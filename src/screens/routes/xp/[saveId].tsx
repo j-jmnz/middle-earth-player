@@ -6,16 +6,16 @@ import { Pressable, View } from "react-native";
 
 import { spendOnSave, pick, unpick, type Picks } from "../../../campaign/xp";
 import { pickSentence, xpView, type XpRowView } from "../../../campaign/xp-view";
-import { rowSurface } from "../../../play/surfaces";
-import { useTableTokens } from "../../../play/use-table-tokens";
-import { ActionBar, BodyText, IconButton, Label, NavBar, PrimaryButton, Screen, ScreenScroll, Section, StatTile, TextButton } from "../../chrome";
-import { campaignOf, scenarioNames } from "../../campaign-data";
-import { goBack } from "../../go-back";
-import { usePalette } from "../../palette-hook";
-import { routeCode } from "../../route-code";
-import { useSave } from "../../use-save";
-import { useUiScale } from "../../../play/ui-scale";
-import { Text } from "../../../play/text";
+import { rowSurface } from "../../../ui/surfaces";
+import { useTableTokens } from "../../../ui/use-table-tokens";
+import { ActionBar, BodyText, IconButton, Label, NavBar, PrimaryButton, Screen, ScreenScroll, Section, StatTile, TextButton } from "../../kit/chrome";
+import { campaignOf, scenarioNames } from "../../data/campaign-data";
+import { goBack } from "../../nav/go-back";
+import { usePalette } from "../../kit/palette-hook";
+import { routeCode } from "../../nav/route-code";
+import { useSave } from "../../data/use-save";
+import { useUiScale } from "../../../ui/ui-scale";
+import { Text } from "../../../ui/text";
 
 // The boxes beside a card: marked ones filled in the accent, picked ones a thick ring with a dot inside, the rest a thin faint ring. The shapes differ,
 // not only the colours. Drawn for the eye; the row's label says the counts.

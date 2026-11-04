@@ -2,8 +2,8 @@
 // rr.fellowship-of-heroes, mec109.setup (data/rules/entries.json).
 import type { Effect, Instruction } from "../catalog/boundary.ts";
 import { recordInstructions, type ScenarioData } from "../catalog/scenario-data.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { AFTER_HAND, type StartSeat } from "../rules/setup.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import { AFTER_HAND, type StartSeat } from "../rules/setup/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
 import { xpRowOf } from "./xp.ts";

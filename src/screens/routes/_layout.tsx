@@ -9,17 +9,17 @@ import * as SplashScreen from "expo-splash-screen";
 import { colorScheme, rem, vars } from "nativewind";
 import { useStore } from "zustand";
 
-import { DatabaseBoundary, DatabaseError } from "../database-error";
-import { DatabaseProvider } from "../databases";
-import { bindTableSettings, readTableSettings } from "../settings-store";
+import { DatabaseBoundary, DatabaseError } from "../data/database-error";
+import { DatabaseProvider } from "../data/databases";
+import { bindTableSettings, readTableSettings } from "../settings/store";
 import { startImageDownloads } from "../images/queue";
-import { completeStarterInsert, insertStarterDecks } from "../starter-decks";
-import { openDatabases, type AppDatabases } from "../open-databases";
-import { palettes, themeVars } from "../palette.js";
-import { tableSettings, type ThemeOption } from "../../play/table-settings";
-import { ThemeContext, useResolvedTheme, type ThemeName } from "../../play/theme";
-import { REM_BASE, UiScaleContext, uiFactor } from "../../play/ui-scale";
-import { useIsTablet } from "../../play/use-size-class";
+import { completeStarterInsert, insertStarterDecks } from "../deck/starter-decks";
+import { openDatabases, type AppDatabases } from "../data/open-databases";
+import { palettes, themeVars } from "../kit/palette.js";
+import { tableSettings, type ThemeOption } from "../../ui/table-settings";
+import { ThemeContext, useResolvedTheme, type ThemeName } from "../../ui/theme";
+import { REM_BASE, UiScaleContext, uiFactor } from "../../ui/ui-scale";
+import { useIsTablet } from "../../ui/use-size-class";
 
 void SplashScreen.preventAutoHideAsync();
 

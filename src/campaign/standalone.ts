@@ -11,9 +11,9 @@
 // multiple times" (ltp.scoring). Pure.
 import { z } from "zod";
 
-import type { ScenarioState } from "../rules/reduce.ts";
-import { resolutionResult } from "../rules/resolution.ts";
-import type { StartScenario } from "../rules/setup.ts";
+import type { ScenarioState } from "../rules/engine/reduce.ts";
+import { resolutionResult } from "../rules/setup/resolution.ts";
+import type { StartScenario } from "../rules/setup/setup.ts";
 
 import { comingSoonProblems, difficultyProblems, loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
 import type { LoadoutSeat } from "./loadout.ts";

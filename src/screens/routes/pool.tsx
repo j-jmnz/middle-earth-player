@@ -1,9 +1,9 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { CardPool } from "../card-pool";
-import { NavBar } from "../chrome";
-import { useDeckDraft } from "../deck-draft";
-import { goBack } from "../go-back";
+import { CardPool } from "../pool/card-pool";
+import { NavBar } from "../kit/chrome";
+import { useDeckDraft } from "../deck/draft";
+import { goBack } from "../nav/go-back";
 
 // The pool the deck editor opens to add cards (`adding=1`). Browsing alone is the Cards tab.
 export default function DeckPool() {

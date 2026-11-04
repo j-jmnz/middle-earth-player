@@ -2,13 +2,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
-import { hasTrait } from "../rules/conditions.ts";
-import { byCode, expectOk } from "../rules/fixture.ts";
-import { modifiedStat } from "../rules/keywords.ts";
-import { reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
+import { hasTrait } from "../rules/interpret/conditions.ts";
+import { byCode, expectOk } from "../rules/core/test-fixture.ts";
+import { modifiedStat } from "../rules/core/keywords.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { campaign, codesOf, FRODO, loadWorld, MERRY, RING, SAM, scenario, type World } from "../../scripts/past-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { campaign, codesOf, FRODO, loadWorld, MERRY, RING, SAM, scenario, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { buildStart } from "./start.ts";
 
 let world: World;

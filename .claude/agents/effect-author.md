@@ -23,11 +23,11 @@ the lines use, the effect vocabulary, and the three most similar existing record
    parts `effect-schema-verbs.ts`, `effect-schema-pick.ts`, `effect-schema-conditions.ts`, `effect-schema-stats.ts` and
    `effect-schema-amount.ts`, and each family's `VERBS`, `TRIGGERS` and `FLAGS` in `src/catalog/families/`. If a line needs
    something that is not there, leave it open and report it. Adding a verb is engine work in the schema and in
-   `src/rules` (`src/rules/families/<family>.ts`), not data.
+   `src/rules` (`src/rules/families/<family>/index.ts`), not data.
 3. Take rule wording from `data/rules/entries.json` (`pnpm data:query`), not from memory. Rule ids you cite must exist there.
 4. Run `pnpm effects:open` (it rewrites `src/effects/open-lines.ts`; commit the change only when the task is to burn the
-   list down), `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke.ts <codes>` for the cards you wrote. Report what is green and every
+   list down), `pnpm exec tsc --noEmit`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
+   `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for the cards you wrote. Report what is green and every
    line you could not express, with the mechanic it needs.
 
 If the same sentence pattern shows up on several cards, say so: it belongs in a template under `scripts/data/effects/`, not

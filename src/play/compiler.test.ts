@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 // The React Compiler (app.json experiments.reactCompiler) silently skips a component or hook it cannot compile, and a skipped
-// one gets no automatic memoization. This runs it in memory over every non-test .ts/.tsx file in src/play and src/screens
+// one gets no automatic memoization. This runs it in memory over every non-test .ts/.tsx file in src/ui, src/play and src/screens
 // (it only compiles components and hooks, so a file with no hook call and no JSX is skipped unread) and fails on any CompileError, listing file:line and the reason.
 // Babel ships no types and the repo adds none, so the two calls this uses are typed here.
 const load = createRequire(import.meta.url);
@@ -62,8 +62,8 @@ function bailouts(file: string): string[] {
 }
 
 describe("React Compiler coverage", () => {
-  it("compiles every component and hook in src/play and src/screens", () => {
-    const files = [...sources(path.join(src, "play")), ...sources(path.join(src, "screens"))];
+  it("compiles every component and hook in src/ui, src/play and src/screens", () => {
+    const files = [...sources(path.join(src, "ui")), ...sources(path.join(src, "play")), ...sources(path.join(src, "screens"))];
     expect(files.length).toBeGreaterThan(50);
     const failures = files.flatMap(bailouts);
     expect(failures).toEqual([]);

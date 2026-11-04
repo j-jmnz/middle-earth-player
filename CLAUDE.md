@@ -13,12 +13,12 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 - `data/rules/index.json` is the hand-checked list of rule spans (exact `from` and `to` quotes per page column); `data/rules/columns.json` holds the per-document column boxes. `data/rules/entries.json` is built from them.
 - `data/prebuilt-decks.json` names the pre-built player decks: the Learn to Play's four core decks (`ltp.starter-decks`) and every decklist an official product prints (`decklist.*` spans, read from the product PDFs that `data:sync rules` pins). The build resolves each row through Hall of Beorn and writes `data/decks/prebuilt.json`; a printed misspelling is an alias with its reason, a wrong heading total a recorded misprint.
 - Every script logs through `scripts/log.ts` to stderr; `--verbose` adds each request, file and stack, `--quiet` keeps warnings and errors, `LOG_LEVEL` sets either. A new script calls `runScript(tag, main)` and logs with the `Log` it is handed, not `console`.
-- `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, `src/effects/generated`, and the game icons (`assets/icons`, `src/play/icons`). `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
+- `pnpm data:build` is offline and deterministic: raw to `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules`, `src/effects/generated`, and the game icons (`assets/icons`, `src/ui/icons`). `pnpm data:build -- --verbose` lists the scenarios whose cross-checks failed.
 - `pnpm data:check` rebuilds into a temporary directory and fails on any difference. CI runs it.
 - `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
 - `pnpm effects:draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` (not committed) for each card with a printed ledger line no effect record owns. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
 - `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the printed lines no record owns. A test compares it, so run it after adding or changing records. `src/campaign/playable.ts` lists the scenarios whose lines are all covered.
-- `node --experimental-strip-types scripts/card-smoke.ts <codes>` plays a seeded game with a player card's records and reports any throw, refusal or stall (`--all` runs every card).
+- `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` plays a seeded game with a player card's records and reports any throw, refusal or stall (`--all` runs every card).
 
 **Sources are online.** Any resource a task needs (rules PDFs, booklets, card scans, card text) comes from an online source, fetched through `pnpm data:sync` and recorded in `data/sources.json`. Query the PDF when a rule or card line is in question; do not ask for a physical card, do not rely on memory, and do not paste a PDF into the repo. (User instruction, 2026-10-24.)
 
@@ -26,7 +26,8 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm lint` checks import boundaries.
-- `node --experimental-strip-types scripts/e2e-fixtures.ts` rewrites the Maestro save fixtures (`src/campaign/fixtures/`) when `fixtures.test.ts` says a fixture no longer reaches its moment. `--won` also searches for scenario 1's won game, which is open (`docs/phases/STATUS.md`).
+- `pnpm move <old> <new>` (or `pnpm move <map.json>`, `--dry-run` first) moves tracked files and folders and rewrites every relative import and every root-written path in code, docs and configs that names them; a file's `.native` variants and its test go with it. It lists what it cannot follow (paths built at run time). Move files with it, not by hand.
+- `node --experimental-strip-types scripts/e2e/fixtures.ts` rewrites the Maestro save fixtures (`src/campaign/fixtures/`) when `fixtures.test.ts` says a fixture no longer reaches its moment. `--won` also searches for scenario 1's won game, which is open (`docs/phases/STATUS.md`).
 - `pnpm android:usb --device` runs the app on a phone plugged in by USB when the phone cannot reach Metro over the network (a VPN or isolated Wi-Fi shows a blank screen and `ConnectException` to the Mac's LAN address): it forwards port 8081 with `adb reverse` and points the app at `localhost`.
 - `pnpm catalog:build` writes `assets/catalog.db` and `src/catalog/version.ts` from `data/`. Do not commit `catalog.db`. Commit `version.ts` when it changes; a test checks it.
 

@@ -67,7 +67,7 @@ Do not demand a shared abstraction for two lines that happen to look similar and
 
 Judge the diff against the module table in `docs/architecture.md`. A new top-level folder, or a file outside those homes, is a block.
 
-Flag a rule implemented in `src/play` or `src/screens`. Flag a React component under `src/rules`. Flag an import the architecture forbids. Flag `catalog.db`, card scans, PDFs, or image bytes committed to the repo. Flag a hand edit to a generated file (`data/cards`, `data/scenarios`, `data/rules`, `src/effects/generated`, `assets/icons`, `src/play/icons/generated.ts`): the fix belongs in the adapter, the normalizer, a template or `data/overrides.json`. Flag a rule implemented without naming its rule id from `data/rules/entries.json`. A new verb, trigger or flag belongs to a mechanic family (`src/catalog/families/<family>.ts`, engine in `src/rules/families/<family>.ts`, records in `src/effects/authored/families/<family>.ts` or the scenario's file) and is added to that family's lists, not to a shared engine file; a family verb that appears inside a `Choose` option has words in `src/play/choice-words.ts`. Records added or changed without `pnpm effects:open` leave `src/effects/open-lines.ts` stale and fail the coverage test.
+Flag a rule implemented in `src/play` or `src/screens`. Flag a React component under `src/rules`. Flag an import the architecture forbids. Flag `catalog.db`, card scans, PDFs, or image bytes committed to the repo. Flag a hand edit to a generated file (`data/cards`, `data/scenarios`, `data/rules`, `src/effects/generated`, `assets/icons`, `src/ui/icons/generated.ts`): the fix belongs in the adapter, the normalizer, a template or `data/overrides.json`. Flag a rule implemented without naming its rule id from `data/rules/entries.json`. A new verb, trigger or flag belongs to a mechanic family (`src/catalog/families/<family>.ts`, engine in `src/rules/families/<family>/index.ts`, records in `src/effects/authored/families/<family>.ts` or the scenario's file) and is added to that family's lists, not to a shared engine file; a family verb that appears inside a `Choose` option has words in `src/play/words/choice.ts`. Records added or changed without `pnpm effects:open` leave `src/effects/open-lines.ts` stale and fail the coverage test.
 
 ## Coding practices
 
@@ -85,16 +85,16 @@ Lead with the blocks. Then the changes worth making. Then short notes. Skip a se
 A bug names the file, the input, and the wrong result. Any other finding names the file, the repeated or misplaced code, and the module or function that should own it. One sentence on why. Do not propose a product change, a new architecture, or a drive-by refactor outside the duplication you cited.
 
 ```
-Block: src/rules/quest.ts places progress on the quest while Bag End is active
+Block: src/rules/quest/quest.ts places progress on the quest while Bag End is active
 Committed willpower 4 against staging threat 1 puts 3 progress on the quest. That progress belongs on the active location first.
 
-Block: src/screens/table.tsx applies damage
+Block: src/screens/table/view.tsx applies damage
 The screen adds `attack - defense` itself. That result belongs in the reducer. The screen can only dispatch the defender the player chose.
 
-Change: src/campaign/fellowship/shadow.ts duplicates staging
-The same reveal-and-surge loop is in src/rules/staging.ts. Call that function.
+Change: src/rules/families/south/reveal.ts duplicates staging
+The same reveal-and-surge loop is in src/rules/quest/stage-reveal.ts. Call that function.
 
-Note: src/play/Hand.tsx is 180 lines and still one job
+Note: src/play/canvas/hand-scrub.native.tsx is 180 lines and still one job
 No split.
 ```
 

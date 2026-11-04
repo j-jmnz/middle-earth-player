@@ -4,7 +4,7 @@ import { Directory, File, Paths } from "expo-file-system";
 import { pdfPageCount } from "booklet-pdf";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import { writeBooklet, type BookletRow } from "../campaign-store";
+import { writeBooklet, type BookletRow } from "../data/campaign-store";
 import { BOOKLET_DIRECTORY, bookletPath } from "./books";
 import { bundledBooklets } from "./bundled-map";
 
@@ -86,7 +86,7 @@ async function storeBooklet<TRun>(user: BaseSQLiteDatabase<"sync", TRun>, id: st
   }
 }
 
-/** True when this build carries the book's PDF (scripts/pack-booklets.ts filled the map). */
+/** True when this build carries the book's PDF (scripts/build/pack-booklets.ts filled the map). */
 export function hasBundledBooklet(id: string): boolean {
   return bundledBooklets[id] != null;
 }

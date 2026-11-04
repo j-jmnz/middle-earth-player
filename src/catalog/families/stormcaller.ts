@@ -1,6 +1,6 @@
 // The stormcaller family (phase 43, Flight of the Stormcaller): the Stormcaller's area, a second quest deck of stages 2C to 4C beside the Stormcaller (dcce.stormcallers-area,
 // dcce.stormcallers-area-stages), the stage the players must catch up to, and the commitments the ships and Corsairs of the scenario hear (dcce.sailing-tests). Simple verbs;
-// effect-schema-verbs.ts composes them and src/rules/families/stormcaller.ts runs them (the helpers are in stormcaller-*.ts). The rules are the Dream-chaser Campaign Expansion
+// effect-schema-verbs.ts composes them and src/rules/families/stormcaller/index.ts runs them (the helpers are beside it in src/rules/families/stormcaller/). The rules are the Dream-chaser Campaign Expansion
 // rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 

@@ -1,7 +1,7 @@
-import type { EngineStep, PlayerIntent, ReduceContext, ScenarioState } from "../rules/reduce.ts";
-import { reduce } from "../rules/reduce.ts";
-import { startScenario, type StartScenario } from "../rules/setup.ts";
-import { ENGINE_VERSION } from "../rules/version.ts";
+import type { EngineStep, PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
+import { reduce } from "../rules/engine/reduce.ts";
+import { startScenario, type StartScenario } from "../rules/setup/setup.ts";
+import { ENGINE_VERSION } from "../rules/engine/version.ts";
 
 export { ENGINE_VERSION };
 

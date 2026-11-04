@@ -20,7 +20,7 @@ Finish the current phase and stop. Do not scaffold the next phase. Do not port t
 
 `src/rules` and `src/campaign` are pure TypeScript. They do not import `react-native`, `expo-*`, `src/play`, or `src/screens`. The reducer is the only writer of those numbers. The UI sends an intent from `legalIntents` and renders the state that comes back. A rejected intent carries a reason.
 
-A scenario phase's engine half is its records plus whatever the engine lacks. Write the records in `src/effects/authored/<scenario-id>.ts`, add the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once `pnpm effects:open` leaves none of its lines open, and pin a whole game in a golden (`src/campaign/golden-south.test.ts` and `golden/the-ring-goes-south.json` are the pattern). A new mechanic is a verb, trigger or flag in a family: `src/catalog/families/<family>.ts` with its engine in `src/rules/families/<family>.ts` (`docs/plans/effect-authoring.md`, Mechanic families), tested next to it. `pnpm effects:draft <scenario-id>` writes the bundle of lines to cover.
+A scenario phase's engine half is its records plus whatever the engine lacks. Write the records in `src/effects/authored/<scenario-id>.ts`, add the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once `pnpm effects:open` leaves none of its lines open, and pin a whole game in a golden (`src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `scenarios/the-ring-goes-south/golden.json` are the pattern). A new mechanic is a verb, trigger or flag in a family: `src/catalog/families/<family>.ts` with its engine in `src/rules/families/<family>/index.ts` (`docs/plans/effect-authoring.md`, Mechanic families), tested next to it. `pnpm effects:draft <scenario-id>` writes the bundle of lines to cover.
 
 Effect records are an argument to the reducer. `src/rules` does not import `src/effects`; `src/campaign`, `src/play` and `src/screens` do and pass the records in. Rule text is `data/rules/entries.json`: name the rule ids you implement in the module header and the test. Card, scenario and rules data come from `data/`; change them through the sync, the normalizer, the templates or `data/overrides.json`, never by hand-editing generated files. Do not commit a booklet PDF.
 
@@ -40,6 +40,6 @@ Match existing names and types. Keep the diff inside the phase. No drive-by refa
 
 If a timing is not on the booklet, the quest card, the Learn to Play, the Rules Reference or the FAQ, leave the test red and name the card. Add the test in the same change as the behavior. The simulator does not close a fling or drag exit.
 
-A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/version.ts`) and regenerates the goldens it moves; when `src/campaign/fixtures.test.ts` fails, run `scripts/e2e-fixtures.ts` again. A golden or fixture outcome that changes is named in the phase note, not relabeled silently.
+A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and regenerates the goldens it moves; when `src/campaign/fixtures.test.ts` fails, run `scripts/e2e/fixtures.ts` again. A golden or fixture outcome that changes is named in the phase note, not relabeled silently.
 
 Write the Maestro flow the phase file names. Do not run `maestro test` until the last phase is done. A missing simulator does not keep an earlier phase open.

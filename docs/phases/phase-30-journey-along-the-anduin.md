@@ -18,9 +18,9 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `journey-along-the-anduin`:
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 27).
 - `pnpm effects:draft journey-along-the-anduin`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution and the boons and burdens below.
-- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
+- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/journey-along-the-anduin.ts`; boon and burden pool records in `src/effects/authored/pool/RevCore.ts`.
-- Golden: `src/campaign/golden/journey-along-the-anduin.json` with `golden-anduin.test.ts`, `scripts/anduin-scene.ts` and `scripts/anduin-game.ts`: true solo and two-handed, a win and a loss.
+- Golden: `src/campaign/scenarios/journey-along-the-anduin/golden.json` with `journey-along-the-anduin/golden.test.ts`, `test/scenarios/journey-along-the-anduin/scene.ts` and `test/scenarios/journey-along-the-anduin/game.ts`: true solo and two-handed, a win and a loss.
 - A campaign test checks that Passage Through Mirkwood's earned pool reaches this scenario through the Campaign Setup Checklist.
 - Add `journey-along-the-anduin` to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
@@ -36,11 +36,11 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `journey-along-the-anduin`:
 
 ## E2E
 
-`.maestro/journey-along-the-anduin.yaml` (a win records the prisoner and unlocks `escape-from-dol-guldur`) and `.maestro/journey-along-the-anduin-loss.yaml`, with their fixtures.
+`.maestro/scenarios/journey-along-the-anduin/journey-along-the-anduin.yaml` (a win records the prisoner and unlocks `escape-from-dol-guldur`) and `.maestro/scenarios/journey-along-the-anduin/journey-along-the-anduin-loss.yaml`, with their fixtures.
 
 ## Exit
 
-**Engine half:** coverage and the goldens green in Node. A win runs the resolution and unlocks the next part in Mirkwood Paths; a loss writes nothing. The plan's Verification list is green (`data:build`, `data:check`, `--verbose`, `tsc`, `lint`, `test`, `effects:open` with no line for this scenario, `card-smoke.ts` on the new codes, `catalog:build`, `booklets:pack`, the golden). Every Fellowship golden and test passes without edits to its expectations.
+**Engine half:** coverage and the goldens green in Node. A win runs the resolution and unlocks the next part in Mirkwood Paths; a loss writes nothing. The plan's Verification list is green (`data:build`, `data:check`, `--verbose`, `tsc`, `lint`, `test`, `effects:open` with no line for this scenario, `card-smoke/run.ts` on the new codes, `catalog:build`, `booklets:pack`, the golden). Every Fellowship golden and test passes without edits to its expectations.
 
 **Phone half:** as in phase 12: a person can win and lose the scenario on the phone, the log matches the engine, and no control types damage, resources, threat, progress or life. In a cloud session the phone checks and Maestro runs stay open in `STATUS.md`.
 

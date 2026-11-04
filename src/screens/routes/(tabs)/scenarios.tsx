@@ -4,21 +4,21 @@ import { View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
 import { standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
-import { BOXES, boxOf, scenarioName, scenarioOf } from "../../campaign-data";
-import { campaignListQueries, lockedTiles } from "../../campaign-list";
-import { PillButton, PrimaryButton } from "../../chrome";
-import { deckFaces } from "../../deck-store";
-import { useDatabases } from "../../databases";
-import { FoldSection, useFolds } from "../../fold-section";
-import { heroFace } from "../../hero-tile";
-import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../hub-parts";
-import { comingScenarios, splitRuns } from "../../hub-runs";
-import { usePalette } from "../../palette-hook";
-import { seatWord } from "../../seats";
-import { gameCaption, statusWord } from "../../standalone-words";
-import { listStandaloneFresh } from "../../standalone-store";
-import { useUiScale } from "../../../play/ui-scale";
-import { useSizeClass } from "../../../play/use-size-class";
+import { BOXES, boxOf, scenarioName, scenarioOf } from "../../data/campaign-data";
+import { campaignListQueries, lockedTiles } from "../../campaign/list";
+import { PillButton, PrimaryButton } from "../../kit/chrome";
+import { deckFaces } from "../../deck/store";
+import { useDatabases } from "../../data/databases";
+import { FoldSection, useFolds } from "../../kit/fold-section";
+import { heroFace } from "../../art/hero-tile";
+import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../campaign/hub-parts";
+import { comingScenarios, splitRuns } from "../../campaign/hub-runs";
+import { usePalette } from "../../kit/palette-hook";
+import { seatWord } from "../../data/seats";
+import { gameCaption, statusWord } from "../../history/standalone-words";
+import { listStandaloneFresh } from "../../data/standalone-store";
+import { useUiScale } from "../../../ui/ui-scale";
+import { useSizeClass } from "../../../ui/use-size-class";
 
 // Standalone play (mec109.campaign-mode: "players can still play the scenarios as standalone adventures"). The Scenarios hub
 // (docs/design-system.md, Scenarios): the game in progress dealt last as the hero over its scenario's scene, the

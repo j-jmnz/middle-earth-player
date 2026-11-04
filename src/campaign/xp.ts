@@ -3,8 +3,8 @@
 // card's level, an upgraded card's Upgraded side). Pure. The players choose where each XP goes: nothing here spends XP for them.
 import type { Effect } from "../catalog/boundary.ts";
 import { MODE_CARD_CODE, sideInstructions } from "../catalog/scenario-data.ts";
-import type { ModeCard } from "../rules/campaign-state.ts";
-import { NO_UPGRADED_SIDE } from "../rules/families/dreamchaser-facts.ts";
+import type { ModeCard } from "../rules/core/campaign-state.ts";
+import { NO_UPGRADED_SIDE } from "../rules/families/dreamchaser/facts.ts";
 
 import type { CampaignLog } from "./log.ts";
 import type { Save } from "./save.ts";

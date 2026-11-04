@@ -1,0 +1,89 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 32. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `oath-won` is a real
+# two-handed game of The Oath (the Defenders of Gondor and Swords of the Noldor lists, each seat with an Adaptation) from the blank log a new The Dark of Mirkwood
+# playthrough starts on (tdom.mini-campaign), parked on its win. 41050's Resolution asks nothing: 6 or more tokens on the campaign card earn Guilty
+# Conscience. Confirming writes the log and unlocks The Caves of Nibin-Dûm. The same win in Mirkwood Paths (part 4, from Escape from Dol
+# Guldur's log) unlocks the same scenario there: that is checked in Node (src/campaign/scenarios/the-oath/golden.test.ts) and stays open on the phone until a real
+# `dol-guldur-won` fixture exists (it needs `anduin-won`, docs/phases/STATUS.md). The path screen has no table-menu: the log is opened from `log-open`.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://e2e/oath-won"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch); a game that is over opens on the table.
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- assertNotVisible:
+    id: life
+- assertNotVisible:
+    id: burden-deck
+# The campaign card's resource tokens are on the top bar (41050:A:3); the Response placed one at the end of each round the first player took it.
+- assertVisible:
+    id: campaign-tokens
+- assertVisible:
+    id: rail-current
+    text: "Victory"
+- tapOn:
+    id: sheet-outcome
+- extendedWaitUntil:
+    visible:
+      id: resolution
+    timeout: 30000
+- assertVisible:
+    id: resolution-consequence
+    text: "Confirming records the win and unlocks The Caves of Nibin-Dûm\\..*"
+- tapOn:
+    id: resolution-confirm
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-oath-status
+    text: "Won.*"
+- assertVisible:
+    id: node-the-caves-of-nibin-dum-status
+    text: "Next"
+# Kill and relaunch: the scenario is on the log with the Adaptations, Stalking Goblin and the facts, and The Caves of Nibin-Dûm is unlocked.
+- stopApp
+- launchApp
+- tapOn:
+    id: continue-path
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-caves-of-nibin-dum-status
+    text: "Next"
+- tapOn:
+    id: log-open
+- extendedWaitUntil:
+    visible:
+      id: log
+    timeout: 15000
+- assertVisible:
+    id: log-scenario-the-oath
+    text: ".*rounds.*"
+- assertVisible:
+    id: log-boons
+    text: ".*The Fervor of Lore.*The Might of Tactics.*"
+- assertVisible:
+    id: log-burdens
+    text: ".*Stalking Goblin.*"
+# The Adaptation used once is recorded (41044:A:3).
+- assertVisible:
+    id: log-used-once
+    text: ".*The Fervor of Lore.*"

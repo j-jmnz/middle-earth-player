@@ -1,7 +1,7 @@
 // The vocabulary Breaking of the Fellowship (phase 16) adds to effect records: removing the Ring-bearer from the game, skipping the travel phase, the
 // shared staging area stage 2B deals out to a staging area for each player, and the stage each player is on after it. Simple verbs, triggers and
-// stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/breaking*.ts runs them. The state
-// they work on (`ScenarioState.separate`, `Seat.staging`, `Seat.stage`) is described in src/rules/families/breaking-areas.ts.
+// stat flags; effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/breaking/ runs them. The state
+// they work on (`ScenarioState.separate`, `Seat.staging`, `Seat.stage`) is described in src/rules/families/breaking/areas.ts.
 import { z } from "zod";
 
 import { when } from "../effect-schema-conditions.ts";
@@ -54,7 +54,7 @@ export const VERBS = [
   // the first player's staging area", 142080:A:2; "move attacking enemy to the first player's staging area", 142080:A:3). With one staging area it goes to it.
   z.strictObject({ verb: z.literal("MoveToFirstStaging"), target: z.enum(["self", "picked"]).optional(), ...when }),
   // Fallen Into Evil (142083:A:1), attached to a non-Fellowship hero: the hero moves to the first player's staging area as an enemy (its Threat is its Willpower, its
-  // engagement cost its threat cost) and leaves its player's control. It is the same card with the code `<code>~enemy` (src/rules/printed.ts); its game text is
+  // engagement cost its threat cost) and leaves its player's control. It is the same card with the code `<code>~enemy` (src/rules/core/printed.ts); its game text is
   // blank while it is one.
   z.strictObject({ verb: z.literal("FallIntoEvil"), ...when }),
   // "If Fallen Into Evil is discarded, return attached hero to its owner's control" (142083:A:1): each fallen hero in play goes back among its owner's heroes with
@@ -78,22 +78,22 @@ export const TRIGGERS = [
 
 export const FLAGS = [
   // On a stage: progress that would be placed on the quest discards that many cards from the top of the encounter deck instead (142063:B:1 to 142066:B:1;
-  // rules/families/breaking-progress.ts).
+  // rules/families/breaking/progress.ts).
   "progressDiscards",
   // On an enemy: Archery X, X the number of players at its stage (142070:A:1), the players in the game before stages are separate, one after. A number on an
   // enemy or a location in a staging area: archery added to the total at its stage ("gains archery 2", 142078:A:1). On a seat: archery added to the total at
-  // that seat's stage until the modifier ends (142082:A:1). Read by rules/combat.ts archeryTotal.
+  // that seat's stage until the modifier ends (142082:A:1). Read by rules/combat/combat.ts archeryTotal.
   "archeryPlayers",
   "archeryBonus",
   // On "table": the player who holds the first player token cannot lose it for the rest of the game (LockFirstPlayer, 142068:A:2); the token does not pass at the end
-  // of the refresh phase (rules/refresh.ts).
+  // of the refresh phase (rules/engine/refresh.ts).
   "firstPlayerLocked",
   // On "table", while a card holds it: the combat phase is skipped ("While The Argonath is the active location, skip the combat phase", 142075:A:2;
-  // rules/machine.ts).
+  // rules/engine/machine.ts).
   "skipCombat",
-  // On "table": the travel phase is skipped (SkipTravelPhase, 142062:A:1; rules/machine.ts).
+  // On "table": the travel phase is skipped (SkipTravelPhase, 142062:A:1; rules/engine/machine.ts).
   "skipTravel",
   // On "table", while a card holds it: the encounter phase is skipped, with its optional engagements and engagement checks ("Skip the encounter phase",
-  // 142061:B:1; rules/machine.ts). The combat phase still follows.
+  // 142061:B:1; rules/engine/machine.ts). The combat phase still follows.
   "skipEncounter",
 ] as const;

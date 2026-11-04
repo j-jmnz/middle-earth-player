@@ -73,17 +73,17 @@ The standing decisions in `docs/phases/STATUS.md` bind this plan.
 - The campaign ends when The City of Corsairs is won ("The players win the campaign!").
 
 **Engine that already exists** (re-read before use)
-- Keywords surge, doomed, archery, indestructible, immune to player card effects (`src/rules/keywords.ts`), victory display zone, `under` zone (cards under a location), `captive` zone, `secondActiveLocation` zone, `FlipCard`, `RevealMore`, `BarEngagement` verbs.
-- Objective allies and the Guarded/claim objectives (`src/catalog/families/objectives.ts`), the campaign family's Setup verbs (`PutIntoPlay`, `SetAside`, `AttachChosen`, `ShuffleInto`, `AddToHandAfterMulligan`; `src/catalog/families/campaign.ts`, dealt by `src/campaign/start.ts` and `checklist.ts`), multi-copy pool entries (`perPlayer`), `usedOnce`, `counters`, `prisoner`, `carryOver` in the log (`src/campaign/log.ts`), branching quest stages (`stages[i].branch`, `src/rules/quest.ts`), searches of the encounter deck and discard pile.
+- Keywords surge, doomed, archery, indestructible, immune to player card effects (`src/rules/core/keywords.ts`), victory display zone, `under` zone (cards under a location), `captive` zone, `secondActiveLocation` zone, `FlipCard`, `RevealMore`, `BarEngagement` verbs.
+- Objective allies and the Guarded/claim objectives (`src/catalog/families/objectives.ts`), the campaign family's Setup verbs (`PutIntoPlay`, `SetAside`, `AttachChosen`, `ShuffleInto`, `AddToHandAfterMulligan`; `src/catalog/families/campaign.ts`, dealt by `src/campaign/start.ts` and `checklist.ts`), multi-copy pool entries (`perPlayer`), `usedOnce`, `counters`, `prisoner`, `carryOver` in the log (`src/campaign/log.ts`), branching quest stages (`stages[i].branch`, `src/rules/quest/quest.ts`), searches of the encounter deck and discard pile.
 - Catalog type `ship-enemy` exists (`scripts/data/normalize/cards.ts` `TYPE_BY_HOB`, `src/catalog/deck-legal.ts`), added for the Nightmare decks. There is no engine behaviour for it.
-- Nothing exists for: ship-objectives; the Heading card and on-course/off-course; the Sailing keyword and test; Boarding; the Corsair deck and its discard pile (the engine has one encounter deck and one discard pile, `src/rules/state.ts`); a second encounter deck swap; Aflame; Uncharted/Grotto double-sided locations and their decks; Grapple; the Stormcaller's area (a second quest deck); the Island Map grid and Exploration keyword; two-sided encounter cards chosen per scenario (The Stormcaller Elite); XP, levels, upgrades, Hard/Expert; the per-scenario fleet choice.
+- Nothing exists for: ship-objectives; the Heading card and on-course/off-course; the Sailing keyword and test; Boarding; the Corsair deck and its discard pile (the engine has one encounter deck and one discard pile, `src/rules/core/state.ts`); a second encounter deck swap; Aflame; Uncharted/Grotto double-sided locations and their decks; Grapple; the Stormcaller's area (a second quest deck); the Island Map grid and Exploration keyword; two-sided encounter cards chosen per scenario (The Stormcaller Elite); XP, levels, upgrades, Hard/Expert; the per-scenario fleet choice.
 
 **Hard-wired spots a fourth campaign touches** (confirm each by reading before editing)
 - Definitions: `scripts/data/campaign-defs.ts` (`PRODUCTS`, `CAMPAIGNS`, `ScenarioDef`, `HOB_ONLY_PACKS`, `PACK_CAMPAIGN`, `BUILT_PRODUCTS`), `scripts/data/sources/rules.ts` (`RULE_PDFS`), `data/overrides.json` (`productCodes`, `encounterSetAliases`, `scenarioPiles`, `scenarioEasy`, `campaigns`).
 - Cards: `scripts/data/normalize/cards.ts` (`TYPE_BY_HOB`, which lacks `Ship_Objective`, and the boon/burden classification), `product-cards.ts` (`PRODUCT_TYPES`, `PRODUCT_PACK` takes `packs[0]`, `productCodeOf` pads to 2 digits), `src/catalog/card-facts.ts` and `deck-legal.ts` (type lists).
 - Scenarios and build: `normalize/scenarios.ts` (`GROUP_PILE`, the `Q0C` key regex, `easyDeck` key rewrite), `normalize/setup-text.ts` (Setup patterns: "Prepare the Corsair deck", "Players prepare their fleet", "Prepare the Uncharted deck", "Prepare the Island Map", "Prepare the Grotto deck", "Prepare the Stormcaller's area"), `normalize/setup-piles.ts`, `scripts/data/build.ts`, `load-scenarios.ts`, `printed/scope.ts`, `printed/ledger.ts`, `rules/spans.ts` (id regex lacks `dcce`), `src/catalog/scenario-data.ts` (`PILES`: no Corsair, second-deck, Stormcaller-quest, Uncharted or Grotto pile), `src/effects/index.ts` (one generated file per campaign).
-- Catalog: `src/catalog/printed-ledger.ts` (imports each ledger file by hand), `scripts/build-catalog.ts` (campaign rows from `data/campaigns/index.json`, `PACK_CAMPAIGN`).
-- Registry and screens: `src/screens/campaign-data.ts` (`RAW_CAMPAIGNS`, `RAW_SCENARIOS`, `BOXES`), `src/campaign/playable.ts`, `src/screens/booklets/books.ts` (`BOOKLETS`), `scripts/pack-booklets.ts` (`BOOKLET_SOURCES`), `src/screens/rules-glossary.ts` (`DOC_NAMES`, `BOOKS`, the `inGlossary` setup filter), `src/screens/rules-view.tsx` (`BOOK_TEST_IDS`, `BOOK_SCENE`), `src/campaign/save.ts` (`FELLOWSHIP_ID`), the campaign list, scenarios tab, briefing, path and log screens, `src/campaign/loadout.ts` (`saga` gating; add the Na'asiyah rule), `src/campaign/briefing.ts`.
+- Catalog: `src/catalog/printed-ledger.ts` (imports each ledger file by hand), `scripts/build/catalog.ts` (campaign rows from `data/campaigns/index.json`, `PACK_CAMPAIGN`).
+- Registry and screens: `src/screens/data/campaign-data.ts` (`RAW_CAMPAIGNS`, `RAW_SCENARIOS`, `BOXES`), `src/campaign/playable.ts`, `src/screens/booklets/books.ts` (`BOOKLETS`), `scripts/build/pack-booklets.ts` (`BOOKLET_SOURCES`), `src/screens/rules/glossary.ts` (`DOC_NAMES`, `BOOKS`, the `inGlossary` setup filter), `src/screens/rules/view.tsx` (`BOOK_TEST_IDS`, `BOOK_SCENE`), `src/campaign/save.ts` (`FELLOWSHIP_ID`), the campaign list, scenarios tab, briefing, path and log screens, `src/campaign/loadout.ts` (`saga` gating; add the Na'asiyah rule), `src/campaign/briefing.ts`.
 - Docs: `docs/brief.md` (a "Dream-chaser" section modelled on Mirkwood Paths; the booklet ids and "booklet PDFs" lines), `docs/architecture.md` registry note, `docs/phases/`, `docs/INDEX.md` (`pnpm docs:index`).
 
 ## Approach: thirteen new phases (37-48 and 39b)
@@ -104,27 +104,27 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 4. **Setup parser** (`normalize/setup-text.ts`): the nine campaign cards' and nine stage 1A Setup sentences, quoted from the ledger rather than Hall of Beorn's typos ("Prepare the Corsair deck", "Players prepare their fleet", "Each player chooses a Modification boon for each of their ship-objectives and attaches it", "One player may raise their threat by 4 to attach Spyglass to a hero", "Put Calaerion into play under the control of the player with the Dream-chaser", "Shuffle X into the Corsair deck", "Flip the Stormcaller to its 'Campaign Mode only' side", …). A sentence no pattern reads is listed by `data:build -- --verbose`.
 5. **Rules.** `scripts/data/rules/spans.ts` regex admits `dcce`; `data/rules/columns.json` gets the MEC111 boxes (two columns, 619 x 800 pt pages); hand-checked spans in `data/rules/index.json`: `dcce.setup-<scenario-id>` (nine), `dcce.ships`, `dcce.ship-enemies`, `dcce.ship-objectives`, `dcce.corsair-deck`, `dcce.boarding`, `dcce.prepare-your-fleet`, `dcce.heading`, `dcce.sailing`, `dcce.sailing-tests`, `dcce.stormcaller-elite`, `dcce.campaign-mode`, `dcce.uncharted`, `dcce.uncharted-deck`, `dcce.aflame`, `dcce.stormcallers-area`, `dcce.grapple`, `dcce.island-map`, `dcce.exploration`, `dcce.grotto-deck`, `dcce.from-sea-to-land`, `dcce.indestructible`, `dcce.archery`, `dcce.last-player`, `dcce.gaining-xp`, `dcce.scalable-upgradable`, `dcce.hard-expert`. `scripts/data/rules.test.ts` updated.
 6. **Ledger.** `data/printed/dream-chaser.json`, read by an agent from the DCCE and original scans (`docs/plans/done/authoritative-data.md` section A; order: `pnpm data:build`, `pnpm data:sync scans pictures` (CLAUDE.md, Data), read): every dealt, campaign, boon and burden card of the box, both sides, including each encounter card's Sailing success symbol. A scan the agent cannot read is a question for the user. `src/catalog/printed-ledger.ts` imports it; `printed/scope.ts` takes the campaign's scope. Player cards of the seven packs are already ledgered.
-7. **Tests.** Generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `catalog-exit.test.ts` and `build-catalog.test.ts` for the fourth campaign; Fellowship and Mirkwood assertions stay.
+7. **Tests.** Generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `catalog-exit.test.ts` and `build/catalog.test.ts` for the fourth campaign; Fellowship and Mirkwood assertions stay.
 8. **Effects tooling.** `effects:draft` and `effects:open` read the fourth campaign; the draft target for non-pool cards is `src/effects/authored/<scenario-id>.ts`; `src/effects/index.ts` imports the new files. The 37 DCCE boon and burden rows get records in `src/effects/authored/pool/DCCE.ts` as each scenario phase uses them.
 
 **Exit:** `pnpm data:build` and `pnpm data:check` green and deterministic, the nine scenario JSONs pass their cross-checks (`--verbose` shows none failed), `pnpm test` green, `open-lines.ts` lists the new cards' lines.
 
 ### Phase 38 - Dream-chaser campaign shell and XP
 
-1. **Registry.** `src/screens/campaign-data.ts` (campaign, nine scenarios, one box `dream-chaser` holding all nine (user decision)), `campaignIds`, the Scenarios tab section, `start-dream-chaser`, `src/campaign/playable.ts` stays empty until phase 40, the registry test against `data/campaigns/index.json`, `scripts/build-catalog.ts` and `PACK_CAMPAIGN`. `saga` is false, so the Ring-bearer rules do not run.
-2. **Booklet.** `BOOKLETS` id `dream-chaser`, `BOOKLET_SOURCES` file for the pinned MEC111 PDF, `rules-glossary.ts` (`DOC_NAMES`, `BOOKS`, the `dcce.setup-` filter), `rules-view.tsx` tile and scene, `bookletParams`. The pinned file is 31 MB; it is bundled (user decision).
+1. **Registry.** `src/screens/data/campaign-data.ts` (campaign, nine scenarios, one box `dream-chaser` holding all nine (user decision)), `campaignIds`, the Scenarios tab section, `start-dream-chaser`, `src/campaign/playable.ts` stays empty until phase 40, the registry test against `data/campaigns/index.json`, `scripts/build/catalog.ts` and `PACK_CAMPAIGN`. `saga` is false, so the Ring-bearer rules do not run.
+2. **Booklet.** `BOOKLETS` id `dream-chaser`, `BOOKLET_SOURCES` file for the pinned MEC111 PDF, `rules/glossary.ts` (`DOC_NAMES`, `BOOKS`, the `dcce.setup-` filter), `rules/view.tsx` tile and scene, `bookletParams`. The pinned file is 31 MB; it is bundled (user decision).
 3. **Loadout.** Na'asiyah (12109) is refused in scenarios 1 to 7 of this campaign, with the rule cited (`dcce.campaign-mode`).
 4. **Campaign log: XP.** New log fields with defaults so old saves load: XP gained per scenario, XP unspent, and the marks per card (the scalable and upgradable cards of p30). Their order and columns follow the Campaign Log sheet. A `GainXp` effect verb (amount and a condition) in a new `dreamchaser` campaign-family file, run by the Resolution; the path shows XP; between scenarios a "Spend XP" screen lets the players choose where each XP goes: a level on a scalable card or an upgrade, marking one box per XP (no typing of numbers, no automatic spend). A card's level is its marks, its upgrade flips the card to its Upgraded side (side B, `dcce.scalable-upgradable`). The scenario score still follows `ltp.scoring`.
 5. **Campaign facts.** "Gavin returned" is a log fact (`dcce` campaign card 11209 Resolution, read by 11215); the Campaign Pool holds the scalable cards (several copies of one code, as Command per sphere); the checklist deals the pool cards each campaign card names.
 6. **Hard/Expert Mode card** (11217): the campaign setup and each briefing offer Hard or Expert (`dcce.hard-expert`); the log stores the choice per scenario, the deal follows it, and the Resolution adds its XP.
 7. **Bump** `ENGINE_VERSION` and the catalog version if a column changes; migration in `drizzle/` if needed.
-8. **Tests and flows.** Registry, loadout, XP round trip, spend and upgrade, old-save load; `.maestro/dream-chaser-start.yaml`, `scenarios-boxes.yaml` updated, `booklet-dream-chaser.yaml`.
+8. **Tests and flows.** Registry, loadout, XP round trip, spend and upgrade, old-save load; `.maestro/features/dream-chaser-start.yaml`, `scenarios-boxes.yaml` updated, `booklet-dream-chaser.yaml`.
 
 **Exit:** Fellowship and Mirkwood goldens unchanged and green, new tests green, `pnpm lint` green. May be split into 38 and 38b (as 28 and 28b) if the XP screen is large.
 
 ### Phase 39 - Sea mechanics family
 
-The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 8 and 9. New files `src/catalog/families/sea.ts` (schema) and `src/rules/families/sea*.ts` (engine), each verb citing a `dcce.*` span or ledger line, each with a test. Nothing is built for one scenario's card.
+The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 8 and 9. New files `src/catalog/families/sea.ts` (schema) and `src/rules/families/sea/` (engine), each verb citing a `dcce.*` span or ledger line, each with a test. Nothing is built for one scenario's card.
 - **Ships.** Ship-enemies are enemies with these exceptions: only ship-objectives defend their attacks, an undefended attack damages a ship-objective, ship-enemies can be attacked by ship-objectives and by non-ship characters. Ship-objectives are objective allies that attack only ship-enemies and defend only against ship-enemy attacks (`dcce.ship-enemies`, `dcce.ship-objectives`). The defender and attacker pickers, the legal-intent check and the "why not" refusal read the type.
 - **Fleet.** "Prepare your fleet": each player takes one of the six ships, one takes the Dream-chaser (a solo player takes the Dream-chaser and one other); unused ships leave the game (`dcce.prepare-your-fleet`). The seat picker and briefing show the choice; no control types a stat.
 - **Heading.** The Heading card on the Dream-chaser, set to on-course at the start; shift on-course / off-course one step; predicates `onCourse`, `offCourse`, `heading is worst`; the quest, location and enemy conditions the cards read (`dcce.heading`). A table widget exists only because the setup creates the card.
@@ -138,7 +138,7 @@ The ship, heading, sailing and Corsair-deck vocabulary of scenarios 1, 3, 4, 5, 
 
 ### Phase 39b - Ships on the table
 
-How the table holds the sea family in its limited room, from 667 × 375 with two seats to a tablet (user request, 2026-10-30). The design is in `docs/phases/phase-39b-ships-on-the-table.md`. In short:
+How the table holds the sea family in its limited room, from 667 × 375 with two seats to a tablet (user request, 2026-10-30). The design is in `docs/phases/done/phase-39b-ships-on-the-table.md`. In short:
 - ships stand first in their controller's play-area row;
 - the Heading card adds one top-bar dial;
 - the Corsair deck and its discard pile take a second pile slot under the encounter pair;
@@ -156,7 +156,7 @@ For each phase:
 - `pnpm data:build -- --verbose` shows no failed cross-check; every dealt card has a ledger entry (phase 37).
 - `pnpm effects:draft <id>`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
 - New verbs go in a mechanic family, never bent from an existing one. Records go in `src/effects/authored/<scenario-id>.ts`; the boon and burden records go in `src/effects/authored/pool/DCCE.ts`.
-- Golden `src/campaign/golden/<id>.json` with a `golden-<short>.test.ts`, `scripts/<short>-scene.ts` and `<short>-game.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
+- Golden `src/campaign/scenarios/<id>/golden.json` with its `golden.test.ts`, `test/scenarios/<id>/scene.ts` and `game.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add the id to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone: words and widgets only where a line creates them (cite the line in `docs/brief.md`), built from phase 39b's pieces and its "Scenario areas" section, Maestro win and loss flows, fixtures.
@@ -179,12 +179,12 @@ For each phase:
 
 - `scripts/data/campaign-defs.ts`, `scripts/data/sources/{hallofbeorn,rules,scans}.ts`, `data/sources.json`, `data/overrides.json`
 - `scripts/data/normalize/{cards,product-cards,scenarios,setup-text,setup-piles,campaigns,printed}.ts`, `scripts/data/{build,load-scenarios}.ts`, `scripts/data/printed/{scope,ledger}.ts`, `scripts/data/rules/spans.ts`, `data/rules/{index,columns}.json`, `data/printed/dream-chaser.json` (new)
-- `src/catalog/{card-facts,deck-legal,scenario-data,printed-ledger}.ts`, `src/catalog/families/{sea,dreamchaser}.ts` (new) and `index.ts`, `scripts/build-catalog.ts`, `src/catalog/version.ts`
-- `src/rules/{state,zones,quest,keywords,combat,stage-reveal}.ts`, `src/rules/families/sea*.ts` (new)
+- `src/catalog/{card-facts,deck-legal,scenario-data,printed-ledger}.ts`, `src/catalog/families/{sea,dreamchaser}.ts` (new) and `index.ts`, `scripts/build/catalog.ts`, `src/catalog/version.ts`
+- `src/rules/{state,zones,quest,keywords,combat,stage-reveal}.ts`, `src/rules/families/sea/` (new)
 - `src/campaign/{log,resolution,score,loadout,start,checklist,briefing,save,playable}.ts`
 - `src/effects/index.ts`, `src/effects/authored/*`, `src/effects/authored/pool/DCCE.ts` (new)
-- `src/screens/{campaign-data,rules-glossary,rules-view,seat-picker,briefing-parts}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts`
-- `docs/brief.md`, `docs/architecture.md`, `docs/phases/phase-37 to 48-*.md`, `docs/phases/STATUS.md`
+- `src/screens/{campaign-data,rules-glossary,rules-view,seat-picker,briefing-parts}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts`
+- `docs/brief.md`, `docs/architecture.md`, `docs/phases/phase-46 to 48-*.md` (37 to 45 in `docs/phases/done/`), `docs/phases/STATUS.md`
 
 ## Verification
 
@@ -192,7 +192,7 @@ After each phase:
 - `pnpm data:build` and `pnpm data:check` (deterministic); `pnpm data:build -- --verbose` (no failed cross-check)
 - `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test`
 - `pnpm effects:open`, which shows no line for a scenario in `playable.ts`
-- `node --experimental-strip-types scripts/card-smoke.ts <new codes>` (including the DCCE boons and burdens a scenario deals)
+- `node --experimental-strip-types scripts/card-smoke/run.ts <new codes>` (including the DCCE boons and burdens a scenario deals)
 - `pnpm catalog:build`, then commit `src/catalog/version.ts`
 - `pnpm booklets:pack` packs the books with matching sha256 (the new book after phase 38)
 - the per-scenario golden tests; every Fellowship and Mirkwood golden passes without edits to its expectations

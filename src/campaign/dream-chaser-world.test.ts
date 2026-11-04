@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { temporaryCatalog } from "../../scripts/temp-catalog.ts";
+import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { loadWorld } from "./world.ts";
 

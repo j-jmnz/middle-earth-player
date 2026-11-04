@@ -190,7 +190,7 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"Pick","pick":{"type":"enemy","control":"any","engaged":"you"}},{"verb":"AddToX","amount":{"stat":"threat","of":"picked","negative":true}},
     {"verb":"ModifyStat","stat":"attack","amount":{"x":true,"negative":true},"until":"endOfPhase","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":{"x":true,"negative":true},"until":"endOfPhase","target":"picked"}]},
 
-  // Cards from the collection (hero swaps; the collection is every deck-legal hero card: families/misc-collection.ts).
+  // Cards from the collection (hero swaps; the collection is every deck-legal hero card: families/misc/collection.ts).
   // 22090 Helm of Secrecy.
   {"id":"22090:action:1","cardCode":"22090","lines":["22090:A:2"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"hero","control":"you"}},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you"}},{"verb":"SwapHero"}]},
   // 22146 Thorongil: another version of the host is attached to it; the host has its game text and resource icon while Thorongil is in play.

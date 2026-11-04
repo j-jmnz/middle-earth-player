@@ -1,14 +1,14 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
-import type { EngineStep } from "../rules/intents.ts";
-import { pushDue } from "../rules/delayed.ts";
-import { pushCardEffects } from "../rules/effect-frames.ts";
-import { advanceFrame } from "../rules/frames.ts";
-import { settle } from "../rules/machine.ts";
-import { topFrame } from "../rules/windows.ts";
-import { spawn } from "../rules/zones.ts";
-import { first, loadWorld, RIDER, RING, send, start, table, type Layout, type World } from "../../scripts/past-scene.ts";
+import type { EngineStep } from "../rules/core/intents.ts";
+import { pushDue } from "../rules/windows/delayed.ts";
+import { pushCardEffects } from "../rules/interpret/effect-frames.ts";
+import { advanceFrame } from "../rules/windows/frames.ts";
+import { settle } from "../rules/engine/machine.ts";
+import { topFrame } from "../rules/windows/windows.ts";
+import { spawn } from "../rules/core/zones.ts";
+import { first, loadWorld, RIDER, RING, send, start, table, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 let world: World;
 
@@ -56,7 +56,7 @@ describe("141079 whenRevealed Delay", () => {
       const data = topFrame(begun)?.data;
       expect(data?.kind === "effect" && data.uncancelable).toBe(ring === "exhausted");
       // Nothing cancels a delayed frame, so the instruction runs either way. The When Revealed itself is the one a
-      // cancel could answer (src/campaign/starter-cancel-search.test.ts).
+      // cancel could answer (src/campaign/starter/cancel-search.test.ts).
       const crossed = settle({ ...scheduled, phase: "Travel" }, ctx, steps);
       expect(crossed.cards[first(crossed, RIDER)]?.zone).toBe("engaged");
     }

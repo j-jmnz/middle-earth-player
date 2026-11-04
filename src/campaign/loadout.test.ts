@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { definePrinted, type PrintedCard } from "../rules/printed.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
+import { definePrinted, type PrintedCard } from "../rules/core/printed.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
 
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
 

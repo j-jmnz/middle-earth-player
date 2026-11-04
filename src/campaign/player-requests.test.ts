@@ -2,10 +2,10 @@
 // Player cards of the player's own decks that the box does not print, ledgered on request (user request, 2026-10-25).
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { withThreat } from "../rules/state.ts";
-import { fund, payFor, refusal, starterBase } from "../../scripts/starter-scene.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { begin, buildTable, idsOf, send, type Scene, type Table } from "../../scripts/test-scene.ts";
+import { withThreat } from "../rules/core/state.ts";
+import { fund, payFor, refusal, starterBase } from "../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { begin, buildTable, idsOf, send, type Scene, type Table } from "../../test/harness/scene.ts";
 
 const SHIREFOLK = "19121";
 const SAM = "141002";

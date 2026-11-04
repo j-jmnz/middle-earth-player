@@ -64,9 +64,9 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
   - `printed/ledger.ts` (`loadLedger` default)
   - `normalize/printed.ts` (TFotR gate)
   - `rules/spans.ts:11` (closed id regex)
-- Catalog: `src/catalog/printed-ledger.ts:3`, `scripts/build-catalog.ts:18-19,151` (one campaign and pack set).
+- Catalog: `src/catalog/printed-ledger.ts:3`, `scripts/build/catalog.ts:18-19,151` (one campaign and pack set).
 - `src/catalog/scenario-data.ts`: `campaignCard`, `prelude` and `starterDecks` are required, and there is no booklet id or saga flag.
-- Every `FELLOWSHIP_ID` use, starting with `src/campaign/save.ts:11` and `src/screens/campaign-data.ts`:
+- Every `FELLOWSHIP_ID` use, starting with `src/campaign/save.ts:11` and `src/screens/data/campaign-data.ts`:
   - `(tabs)/index.tsx:73,122,247`
   - `(tabs)/scenarios.tsx:37,211`
   - `standalone/briefing/[scenarioId].tsx:43,70`
@@ -74,12 +74,12 @@ Today the pipeline, the registry and the screens are hard-wired to one campaign.
 - Saga rules always run:
   - `src/campaign/loadout.ts:44-53`
   - `src/campaign/briefing.ts:121`
-  - `src/screens/seat-picker.tsx:63,168`
-  - `src/screens/briefing-parts.tsx:82`
+  - `src/screens/briefing/seat-picker.tsx:63,168`
+  - `src/screens/briefing/parts.tsx:82`
 - `src/campaign/start.ts`: only `AttachToRingBearer` and `AddToStaging` campaign-setup verbs are dealt.
 - `src/campaign/resolution.ts` `earn()` and `log.ts` `applyResolution`: the pool is deduplicated by code, but "each player earns 1 copy" needs several copies of one code.
-- `src/rules/quest.ts` `advanceStage()` is linear, so Passage Through Mirkwood's random 3B branch can't be expressed.
-- Booklets: `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules-glossary.ts` `DOC_NAMES`/`BOOKS`.
+- `src/rules/quest/quest.ts` `advanceStage()` is linear, so Passage Through Mirkwood's random 3B branch can't be expressed.
+- Booklets: `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts` `BOOKLET_SOURCES`, `campaign-data.ts` `bookletParams` (booklet id = campaign id), `src/screens/rules/glossary.ts` `DOC_NAMES`/`BOOKS`.
 
 ## Approach: seven new phases (27–33)
 
@@ -141,7 +141,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - Drop the TFotR gate in `applyPrinted`.
    - Order: `pnpm data:build`, then `pnpm data:sync scans pictures` (CLAUDE.md, Data), then read.
    - A scan the agent cannot read is a question for the user.
-8. **Tests**: generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/catalog-exit.test.ts` and `scripts/build-catalog.test.ts` per campaign. The existing Fellowship assertions stay.
+8. **Tests**: generalize `scripts/data/{scenarios,campaigns,printed,cards}.test.ts`, `scripts/build/catalog-exit.test.ts` and `scripts/build/catalog.test.ts` per campaign. The existing Fellowship assertions stay.
 9. **Effects tooling**
    - `effects:draft` and `effects:open` read all campaigns.
    - The draft target for non-pool cards is `src/effects/authored/<campaign-scenario>.ts`.
@@ -152,9 +152,9 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 ### Phase 28 — Campaign registry, saga gating, log, booklets
 
 1. **Registry**
-   - `src/campaign/save.ts` and `src/screens/campaign-data.ts` become a map from campaign id to campaign data and scenarios. Metro needs static JSON imports, so the map is written by hand, and a test checks that it matches `data/campaigns/index.json`.
+   - `src/campaign/save.ts` and `src/screens/data/campaign-data.ts` become a map from campaign id to campaign data and scenarios. Metro needs static JSON imports, so the map is written by hand, and a test checks that it matches `data/campaigns/index.json`.
    - `campaignOf` and `nameOf` work for any id. Remove every `FELLOWSHIP_ID` fallback listed above.
-   - `scripts/build-catalog.ts` tags `cards.campaign_id` from a pack→campaign map.
+   - `scripts/build/catalog.ts` tags `cards.campaign_id` from a pack→campaign map.
 2. **Screens**
    - Campaign list: one New playthrough tile per playable campaign, opening that campaign's setup screen. `start-fellowship` keeps its testID; the new ones are `start-<id>`. Each save's progress line reads its own campaign.
    - Scenarios tab: one section per box (Fellowship, Revised Core, The Dark of Mirkwood).
@@ -164,7 +164,7 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
    - These run only when `campaign.saga`:
      - `validateLoadout`: `noRingBearer`, `twoFellowshipHeroes`, `secondFrodo`, `ringInDeck`, the fourth-hero allowance
      - `needsRingBearer`
-     - the Ring-bearer slot in `seat-picker.tsx` and `briefing-parts.tsx`
+     - the Ring-bearer slot in `seat-picker.tsx` and `briefing/parts.tsx`
    - Outside a saga, Fellowship-sphere heroes are refused, with the rule cited.
    - Standalone play follows the box's flag.
 4. **Campaign setup verbs** (`start.ts`, `checklist.ts`)
@@ -191,9 +191,9 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
      - `rules-reference` (`MEC101.pdf`, already pinned as `rr`)
      - `the-dark-of-mirkwood` (`dark_of_mirkwood_rulebook_v2.pdf`, pinned in phase 27)
    - Mirkwood Paths opens `learn-to-play`, which already holds the core campaign and setup pages. The Dark of Mirkwood opens `the-dark-of-mirkwood`.
-   - `rules-glossary.ts` `DOC_NAMES`/`BOOKS` gain `tdom` and `rr`.
+   - `rules/glossary.ts` `DOC_NAMES`/`BOOKS` gain `tdom` and `rr`.
    - `bookletParams` returns `campaign.bookletId`.
-   - Update the brief's booklet ids and the "two booklet PDFs" line, and `scripts/pack-booklets.test.ts`.
+   - Update the brief's booklet ids and the "two booklet PDFs" line, and `scripts/build/pack-booklets.test.ts`.
 7. **Tests**: registry, loadout gating (Fellowship unchanged; Mirkwood refuses a Fellowship hero and needs no Ring-bearer), multi-copy earn, carry-over round trip, booklet map. Write Maestro flows: `mirkwood-start.yaml` (start, briefing with no Ring-bearer slot), `scenarios-boxes.yaml`, `booklet-dark-of-mirkwood.yaml`.
 
 **Exit:** all Fellowship goldens unchanged and green, the new tests green, `pnpm lint` green. `/reviewer` and `/ux` report no blocks.
@@ -202,9 +202,9 @@ Each phase gets a file in `docs/phases/` in the existing style (Goal / Cards / E
 
 For each phase:
 - `pnpm effects:draft <id>`, then the `effect-author` agent, until coverage is green, including the campaign card, boons and burdens.
-- New verbs go in a mechanic family: `src/catalog/families/<f>.ts` plus `src/rules/families/<f>*.ts`, each citing a ledger line or rule span, each with its own test.
+- New verbs go in a mechanic family: `src/catalog/families/<f>.ts` plus `src/rules/families/<f>/`, each citing a ledger line or rule span, each with its own test.
 - Records go in `src/effects/authored/<scenario-id>.ts`; boon and burden pool records go in `authored/pool/RevCore.ts` and `authored/pool/TDoM.ts`.
-- Goldens: `src/campaign/golden/<id>.json` with `golden-<short>.test.ts`, `scripts/<short>-scene.ts` and `<short>-game.ts`. They cover true solo and two-handed, a win and a loss.
+- Goldens: `src/campaign/scenarios/<id>/golden.json` with its `golden.test.ts`, `test/scenarios/<id>/scene.ts` and `game.ts`. They cover true solo and two-handed, a win and a loss.
 - A campaign test checks that the previous part's pool reaches this part.
 - Add the id to `src/campaign/playable.ts`, then run `pnpm effects:open`.
 - Phone: words and widgets only where a line creates them, Maestro win and loss flows, fixtures.
@@ -213,7 +213,7 @@ For each phase:
 | --- | --- | --- |
 | 29 | Passage Through Mirkwood | **Branching quest**: random choice between 3B cards (01121/01122) with the other removed, and a "stage reached" fact read by campaign card 01129's resolution (`quest.ts` `advanceStage`). Mendor (01135) as an objective ally with `leavesPlayLoses`. Mendor's Support boon (one copy per player). Ungoliant's Swarm and Lingering Venom burdens. |
 | 30 | Journey Along the Anduin | Each player reveals 1 card at setup. Hill Troll (01082): excess combat damage to threat. Stage rules: no engagement checks, skip the staging step, win when no enemies are in play, search for a Hill Troll if none is in play. Campaign card 01130: Valor and Scarred set aside and attached on triggers. Resolution picks the prisoner (most damage, random tie). Smaller lines: Banks of the Anduin, Wargs, Wolf Rider, Enchanted Stream. |
-| 31 | Escape from Dol Guldur | **Objective Guarded and claim** (01108–01110): attach the next encounter card, "free of encounters", claim and attach, return on detach. **Prisoner and rescue**: generalize `south-captive.ts`; the hero and its attachments are facedown and unusable; Mendor is captured with them; a rescued event. Orc Guard (01107/01125): a deck card as a facedown enemy. Iron Shackles (01105): attached to a player deck. Group limit of one ally per round (01123/01124). Dungeon Jailor. Campaign card 01131 Forced replacement and flip. Resolution writes the Mendor carry-over. |
+| 31 | Escape from Dol Guldur | **Objective Guarded and claim** (01108–01110): attach the next encounter card, "free of encounters", claim and attach, return on detach. **Prisoner and rescue**: generalize `south/captive.ts`; the hero and its attachments are facedown and unusable; Mendor is captured with them; a rescued event. Orc Guard (01107/01125): a deck card as a facedown enemy. Iron Shackles (01105): attached to a player deck. Group limit of one ally per round (01123/01124). Dungeon Jailor. Campaign card 01131 Forced replacement and flip. Resolution writes the Mendor carry-over. |
 | 32 | The Oath | Choose an Adaptation boon at setup (41044–41047), with once-per-campaign Actions. Stalking Goblin burden (41041): search the encounter deck, discard pile and the player's collection. The campaign card in play gains a resource each round, read at resolution (Guilty Conscience 41043). Mirkwood Paths part 4 and mini campaign part 1. |
 | 33 | The Caves of Nibin-Dûm | "No Time to Waste!" added to hand after the mulligan. Shiny Distraction burden (41042). Resolution reads the highest final threat (< 40): Ranger Sense (41049) joins the deck now, plus carry-over. "Remove from the game and from the Campaign Pool". |
 
@@ -225,12 +225,12 @@ For each phase:
 - `scripts/data/normalize/{cards,scenarios,setup-text,campaigns,printed}.ts`
 - `scripts/data/{build,load-scenarios}.ts`, `scripts/data/printed/{scope,ledger}.ts`, `scripts/data/rules/spans.ts`
 - `scripts/data/effects/{draft,open}`, `data/overrides.json`, `data/rules/{index,columns}.json`, `data/printed/mirkwood-paths.json` (new)
-- `src/catalog/{scenario-data,printed-ledger}.ts`, `scripts/build-catalog.ts`, `src/catalog/version.ts`
+- `src/catalog/{scenario-data,printed-ledger}.ts`, `scripts/build/catalog.ts`, `src/catalog/version.ts`
 - `src/campaign/{save,start,checklist,loadout,briefing,log,resolution,path,playable}.ts`
-- `src/rules/quest.ts`, `src/rules/families/*`, `src/catalog/families/*`
+- `src/rules/quest/quest.ts`, `src/rules/families/*`, `src/catalog/families/*`
 - `src/effects/index.ts`, `src/effects/authored/*`
-- `src/screens/{campaign-data,seat-picker,briefing-parts,rules-glossary}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/pack-booklets.ts`
-- `docs/brief.md`, `docs/architecture.md` (registry note), `docs/phases/phase-27…33-*.md`, `docs/phases/STATUS.md`
+- `src/screens/{campaign-data,seat-picker,briefing-parts,rules-glossary}.ts(x)`, `src/screens/routes/(tabs)/{index,scenarios}.tsx`, `src/screens/booklets/books.ts`, `scripts/build/pack-booklets.ts`
+- `docs/brief.md`, `docs/architecture.md` (registry note), `docs/phases/phase-29…33-*.md` (27 and 28 in `docs/phases/done/`), `docs/phases/STATUS.md`
 
 ## Verification
 
@@ -239,7 +239,7 @@ After each phase:
 - `pnpm data:build -- --verbose` (no failed cross-checks)
 - `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test`
 - `pnpm effects:open`, which shows no lines for scenarios in `playable.ts`
-- `node --experimental-strip-types scripts/card-smoke.ts <new codes>`
+- `node --experimental-strip-types scripts/card-smoke/run.ts <new codes>`
 - `pnpm catalog:build`, then commit `src/catalog/version.ts`
 - `pnpm booklets:pack`, which packs four books with matching sha256
 - the per-scenario golden tests
@@ -267,7 +267,7 @@ User instructions (2026-10-27). They bind every session that runs these phases.
 - Data changes go through the source adapter, the normalizer, the templates or `data/overrides.json`, each with a reason. Never hand-edit generated files: `data/cards`, `data/scenarios`, `data/campaigns`, `data/rules/entries.json`, `src/effects/generated`.
 - `pnpm data:sync` is the only network step. Sources are online: query the pinned PDF or scan when a line is in question, and never rely on memory. Ask the user about a scan you cannot read rather than guessing.
 - Ledger work: each read entry records `readBy`, and its scan sha256 must match the pin. Quote Setup sentences from the ledger, not from Hall of Beorn.
-- New verbs go in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>*.ts`), each with a test that names the rule ids or ledger lines it implements. Do not bend an existing verb to mean something else.
+- New verbs go in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), each with a test that names the rule ids or ledger lines it implements. Do not bend an existing verb to mean something else.
 - Keep the Fellowship path byte-identical:
   - every existing golden and test stays green without edits to its expectations;
   - if one must move, stop and report why.

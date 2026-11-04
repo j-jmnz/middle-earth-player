@@ -2,9 +2,9 @@ import { Image, type ImageContentPosition } from "expo-image";
 import { useMemo } from "react";
 import { View } from "react-native";
 
-import { cardCorner } from "../../play/card-corner";
-import { CardImage } from "../../play/card-image";
-import { cachePolicyFor } from "../../play/image-cache";
+import { cardCorner } from "../../ui/card-corner";
+import { CardImage } from "../../ui/card-image";
+import { cachePolicyFor } from "../../ui/image-cache";
 
 import { cardImageUrl, shownCardImage } from "./policy";
 import { scanAssets } from "./scan-map";

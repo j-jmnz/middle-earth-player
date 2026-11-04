@@ -2,9 +2,9 @@
 // record History lists. Every number in it comes from the engine's final state (the score from scoreOf, the loss cause from
 // the state's lossReason, each seat's threat from the seat); nothing is typed. It sits beside the campaign log, not in it: the
 // log's rule that a loss writes nothing stays, and a loss writes a run. A run is written once and never rewritten. Pure.
-import { resolutionResult } from "../rules/resolution.ts";
-import type { PrintedCard } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { resolutionResult } from "../rules/setup/resolution.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import type { CampaignLog } from "./log.ts";
 import { completedRounds, scoreOf } from "./score.ts";

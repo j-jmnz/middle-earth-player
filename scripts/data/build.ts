@@ -122,7 +122,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
     writeFileSync(path.join(effectsDir, `${campaign.id}.ts`), renderGenerated(generated.effects.filter((effect) => owners.get(effect.cardCode) === campaign.id), campaign.id));
   }
   writeFileSync(path.join(effectsDir, "player-pool.ts"), renderGenerated(generated.effects.filter((effect) => !box.has(effect.cardCode)), "player pool", "POOL_GENERATED_EFFECTS"));
-  const icons = log.step("icons", () => buildIcons(process.env.ICONS_OUT ?? path.join(ROOT, "assets", "icons"), process.env.ICON_MODULES_OUT ?? path.join(ROOT, "src", "play", "icons")));
+  const icons = log.step("icons", () => buildIcons(process.env.ICONS_OUT ?? path.join(ROOT, "assets", "icons"), process.env.ICON_MODULES_OUT ?? path.join(ROOT, "src", "ui", "icons")));
   log.info(`icons: ${icons.length} (${icons.filter((icon) => icon.kind === "vector").length} vector, ${icons.filter((icon) => icon.kind === "raster").length} raster)`);
   log.info(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);
   const usage = Object.entries(generated.usage);

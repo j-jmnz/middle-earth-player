@@ -6,19 +6,19 @@ import { View } from "react-native";
 
 import { FELLOWSHIP_ID } from "../../../campaign/save";
 import type { ModeCard } from "../../../campaign/xp";
-import { BriefingScreen, CampaignBanner, ModePicker } from "../../briefing-parts";
-import { campaignListQueries } from "../../campaign-list";
-import { campaignOf } from "../../campaign-data";
-import { createSave } from "../../campaign-store";
-import { useCarryChoices } from "../../carry-choices";
-import { BodyText, Label, PrimaryButton, Section, Segmented } from "../../chrome";
-import { useDatabases } from "../../databases";
-import { goBack } from "../../go-back";
-import { RadioTile } from "../../radio-tile";
-import { routeCode } from "../../route-code";
-import { pathHref } from "../../scenario-links";
-import { SEAT_WORDS, seatCountOf, seatWord } from "../../seats";
-import { Text } from "../../../play/text";
+import { BriefingScreen, CampaignBanner, ModePicker } from "../../briefing/parts";
+import { campaignListQueries } from "../../campaign/list";
+import { campaignOf } from "../../data/campaign-data";
+import { createSave } from "../../data/campaign-store";
+import { useCarryChoices } from "../../campaign/carry-choices";
+import { BodyText, Label, PrimaryButton, Section, Segmented } from "../../kit/chrome";
+import { useDatabases } from "../../data/databases";
+import { goBack } from "../../nav/go-back";
+import { RadioTile } from "../../kit/radio-tile";
+import { routeCode } from "../../nav/route-code";
+import { pathHref } from "../../campaign/scenario-links";
+import { SEAT_WORDS, seatCountOf, seatWord } from "../../data/seats";
+import { Text } from "../../../ui/text";
 
 export default function CampaignSetup() {
   const router = useRouter();

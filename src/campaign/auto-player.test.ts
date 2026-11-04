@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { expectOk } from "../rules/fixture.ts";
-import { reduce, startScenario } from "../rules/reduce.ts";
-import { knifeStart, knifeWorld } from "../../scripts/knife-game.ts";
-import { nextIntent } from "../../scripts/auto-player.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { reduce, startScenario } from "../rules/engine/reduce.ts";
+import { knifeStart, knifeWorld } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
+import { nextIntent } from "../../test/harness/auto-player.ts";
 
 // The auto-player is a test policy, not a rule: it answers windows with intents the reducer listed. In two-handed play each
 // seat gets its own quest commit, so the policy commits per seat. Before, it looked for any committed card at the table, and

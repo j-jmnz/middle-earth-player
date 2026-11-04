@@ -10,7 +10,7 @@ Proposals for how the app shows and handles a player card's text that no effect 
 
 - **Engine.** A card with no record is paid for and played with its printed cost, numbers and implemented keywords. Its unique text does nothing.
 - **Which cards.** One check for the whole app: `inactiveCodes` in `src/catalog/active-text.ts`. A code with no record whose text holds more than implemented keywords is inactive. A code with any record counts as active in whole.
-- **Table.** A night veil at 62% covers the lower 45% of the picture, with the word Inactive in small type at its top (`Veil` in `src/play/canvas-pieces.native.tsx`). It is drawn on cards in play, hand cards and the card being dragged. It turns sideways with an exhausted card. The web canvas adds "· Inactive" to the card's label.
+- **Table.** A night veil at 62% covers the lower 45% of the picture, with the word Inactive in small type at its top (`Veil` in `src/play/canvas/pieces.native.tsx`). It is drawn on cards in play, hand cards and the card being dragged. It turns sideways with an exhausted card. The web canvas adds "· Inactive" to the card's label.
 - **Long-press preview.** No mark.
 - **Card screen.** One muted line under the text: "Inactive: no effect record reads this text yet."
 - **Card pool.** An "Active text" switch in the filter sheet. Rows carry no mark.

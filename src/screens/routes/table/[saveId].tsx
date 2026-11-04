@@ -2,14 +2,14 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 
-import { BodyText, NavBar, Screen } from "../../chrome";
-import { bookletParams } from "../../campaign-data";
-import { useDatabases } from "../../databases";
-import { goBack } from "../../go-back";
-import { routeCode } from "../../route-code";
-import { TableLoading } from "../../table-loading";
-import { TableView, type TableNav } from "../../table-view";
-import { sessionStore, useTableSessionAfterPaint } from "../../table-session";
+import { BodyText, NavBar, Screen } from "../../kit/chrome";
+import { bookletParams } from "../../data/campaign-data";
+import { useDatabases } from "../../data/databases";
+import { goBack } from "../../nav/go-back";
+import { routeCode } from "../../nav/route-code";
+import { TableLoading } from "../../table/loading";
+import { TableView, type TableNav } from "../../table/view";
+import { sessionStore, useTableSessionAfterPaint } from "../../session/table-session";
 
 export default function TableScreen() {
   const router = useRouter();

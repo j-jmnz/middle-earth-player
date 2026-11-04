@@ -1,8 +1,8 @@
 // Rules: ltp.campaign-log, rr.campaign-log, ltp.campaign-pool, rr.campaign-pool, ltp.fellowship-of-heroes
 // (data/rules/entries.json). The log is what a won scenario writes and the next scenario's checklist reads.
-import { heldCopy, holdsCopy, resolutionResult } from "../rules/resolution.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import type { ScenarioState } from "../rules/state.ts";
+import { heldCopy, holdsCopy, resolutionResult } from "../rules/setup/resolution.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import type { ScenarioState } from "../rules/core/state.ts";
 
 import { scoreOf, type ScenarioScore } from "./score.ts";
 import { xpAwarded, type ModeCard } from "./xp.ts";

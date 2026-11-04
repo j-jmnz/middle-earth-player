@@ -2,14 +2,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioCards } from "../catalog/scenario-data.ts";
-import { expectOk } from "../rules/fixture.ts";
-import { updateCard, type ScenarioState } from "../rules/state.ts";
-import { printedOf, type PrintedCard } from "../rules/printed.ts";
-import { legalIntents, reduce, startScenario, type ReduceContext } from "../rules/reduce.ts";
-import { moveCard } from "../rules/zones.ts";
+import { expectOk } from "../rules/core/test-fixture.ts";
+import { updateCard, type ScenarioState } from "../rules/core/state.ts";
+import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
+import { legalIntents, reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
+import { moveCard } from "../rules/core/zones.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../scripts/test-catalog.ts";
-import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Table } from "../../scripts/test-scene.ts";
+import { loadPrinted } from "../../test/harness/catalog.ts";
+import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Table } from "../../test/harness/scene.ts";
 
 import { checklist, type ChecklistInput } from "./checklist.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";
@@ -173,7 +173,7 @@ describe("two scenarios of the campaign", () => {
 
 // Scenario 2 set up from scenario 1's log and played to its end (rr.campaign-setup-checklist, mec109.setup, 141044:B:1).
 // The game is short-cut to stage 3B with no Nazgûl in play, so the stage's own win condition (141027:B:1) ends it; the
-// goldens (golden-knife.test.ts) play whole games.
+// goldens (a-knife-in-the-dark/golden.test.ts) play whole games.
 describe("A Knife in the Dark from the log of A Shadow of the Past", () => {
   const RING = "141085";
   const STARTER = Array.from({ length: 12 }, () => "card");

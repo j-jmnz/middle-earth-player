@@ -4,18 +4,18 @@ import { FlashList } from "@shopify/flash-list";
 import { View } from "react-native";
 
 import { formatDeckRefusal } from "../../catalog/deck-save";
-import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../chrome";
-import { editSavedDeck, startNewDeck } from "../deck-draft";
-import { savedDeckName } from "../deck-status";
-import { listDecks, readDeck, writeDeck } from "../deck-store";
-import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, type BuiltDecklist, type PrebuiltRow } from "../deck-import";
-import { useDatabases } from "../databases";
-import { poolOf } from "../pool-cache";
+import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchField, Section, SphereMark, markedSphere, type MarkedSphere } from "../kit/chrome";
+import { editSavedDeck, startNewDeck } from "../deck/draft";
+import { savedDeckName } from "../deck/status";
+import { listDecks, readDeck, writeDeck } from "../deck/store";
+import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
+import { useDatabases } from "../data/databases";
+import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
-import { useUiScale } from "../../play/ui-scale";
-import { goBack } from "../go-back";
-import { useListGutter } from "../list-gutter";
-import { showToast } from "../toast";
+import { useUiScale } from "../../ui/ui-scale";
+import { goBack } from "../nav/go-back";
+import { useListGutter } from "../nav/list-gutter";
+import { showToast } from "../kit/toast";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
 
@@ -64,11 +64,11 @@ export default function DeckImportScreen() {
   const scale = useUiScale();
   const pad = list.inset > 0 ? { paddingHorizontal: Math.max(list.inset, 24 * scale) } : undefined;
   const { catalog, user } = useDatabases();
-  // The deck-legal pool and the cards with a line the app does not apply: read once per catalog (pool-cache.ts), shared with the Cards tab and the
+  // The deck-legal pool and the cards with a line the app does not apply: read once per catalog (pool/cache.ts), shared with the Cards tab and the
   // deck editor. A pre-built deck row says how many of its cards the app does not fully apply (docs/plans/done/inactive-text.md), so the
   // player can pick a deck the app plays as printed.
   const { byCode: pool, notApplied: inactive } = poolOf(catalog);
-  // The list is built on the first look (deck-import.ts); each group heading stays at the top while its decks scroll under it.
+  // The list is built on the first look (deck/import.ts); each group heading stays at the top while its decks scroll under it.
   const { rows: prebuiltRows, sticky } = prebuiltList();
   const [value, setValue] = useState("");
   const [message, setMessage] = useState<string | null>(null);

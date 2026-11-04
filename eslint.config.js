@@ -48,7 +48,7 @@ const packageBan = {
 };
 
 // src/campaign, src/play and src/screens import src/effects directly. src/rules receives effects as an argument,
-// so only tests and scripts (allowEffects) may reach into it from there.
+// so only tests, scripts and test/ (allowEffects) may reach into it from there.
 function zones(allowEffects) {
   const effects = allowEffects ? ["./effects"] : [];
   const app = ["./effects"];
@@ -69,20 +69,26 @@ function zones(allowEffects) {
     {
       target: "./src/play",
       from: "./src",
-      except: ["./rules", "./catalog", "./play", ...app],
-      message: "src/play may import only src/rules, src/catalog and src/effects from src/.",
+      except: ["./rules", "./catalog", "./play", "./ui", ...app],
+      message: "src/play may import only src/rules, src/catalog, src/effects and src/ui from src/.",
     },
     {
       target: "./src/screens",
       from: "./src",
-      except: ["./play", "./campaign", "./catalog", "./screens", ...app],
-      message: "src/screens may import only src/play, src/campaign, src/catalog and src/effects.",
+      except: ["./play", "./campaign", "./catalog", "./screens", "./ui", ...app],
+      message: "src/screens may import only src/play, src/campaign, src/catalog, src/effects and src/ui.",
     },
     {
       target: "./src/effects",
       from: "./src",
       except: ["./catalog", "./effects"],
       message: "src/effects may import only src/catalog.",
+    },
+    {
+      target: "./src/ui",
+      from: "./src",
+      except: ["./ui"],
+      message: "src/ui (the design system) may not import other modules under src/.",
     },
     {
       target: "./src/catalog",
@@ -130,6 +136,7 @@ module.exports = defineConfig([
   {
     files: [
       "scripts/**/*.{js,jsx,ts,tsx,mjs,cjs}",
+      "test/**/*.{js,jsx,ts,tsx,mjs,cjs}",
       "**/*.{test,spec}.ts",
       "**/*.{test,spec}.tsx",
     ],
