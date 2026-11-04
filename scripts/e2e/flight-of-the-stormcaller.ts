@@ -5,69 +5,32 @@
 // Belegaer): it is the log of `scripts/e2e/raid-on-the-grey-havens.ts` (the Voyage and Fate goldens' wins), and on top of it the one of Raid on the Grey Havens' golden (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts, "two-handed, won"), each run
 // through the same `applyResolution` that writes it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, `fate-won` and `raid-won`, real-decklist
 // wins, are open (docs/phases/STATUS.md). The Campaign Setup asks no choice.
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-
-import { applyResolution, type CampaignLog } from "../../src/campaign/log.ts";
-import { newSave, type StoredLoadout } from "../../src/campaign/save.ts";
-import { loadWorld, logCodes } from "../../src/campaign/world.ts";
-import { EFFECTS } from "../../src/effects/index.ts";
+import type { CampaignLog } from "../../src/campaign/log.ts";
+import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { type PlayerIntent, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { fateWonLog, intentFor } from "./raid-on-the-grey-havens.ts";
-import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { createLog } from "../log.ts";
 import { RAID_GOLDENS, playGolden as playRaid, raidWorld } from "../../test/scenarios/raid-on-the-grey-havens/game.ts";
-import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
-import { playDealt, prebuiltDeck } from "./seed-kit.ts";
+import { DREAM_CHASER, firstSeed, wonLog } from "./seed-kit.ts";
 
 const say = createLog("e2e-stormcaller");
-const DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
-const CAMPAIGN = "dream-chaser";
 
 export type StormcallerFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog };
 export type StormcallerFixtureName = "stormcaller-won" | "stormcaller-lost";
 
 // The log of a playthrough whose first three parts were won: the Voyage and Fate goldens' wins (scripts/e2e/raid-on-the-grey-havens.ts), then the Raid golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function raidWonLog(): Promise<CampaignLog> {
-  const before = await fateWonLog();
-  const raid = RAID_GOLDENS.find((item) => item.name === "two-handed, won");
-  if (!raid) throw new Error("The Raid golden \"two-handed, won\" is gone");
-  const world = await raidWorld(raid.decks);
-  const game = playRaid(raid, world.ctx);
-  if (!game.state.stageCleared || game.state.lost) throw new Error("The Raid golden no longer wins");
-  const written = applyResolution(before, game.state.scenarioId, game.state, world.cards);
-  return { ...written, heroesBySeat: before.heroesBySeat, fallenHeroesBySeat: before.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
-}
-
-type Game = { loadout: StoredLoadout; intents: PlayerIntent[]; state: ScenarioState };
-
-function play(seed: number, log: CampaignLog): Game {
-  const campaign = loadCampaign(CAMPAIGN);
-  const scenario = loadScenario("flight-of-the-stormcaller");
-  const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = DECKS.map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
-  const loadout: StoredLoadout = { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [], acceptPenalty: false };
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)]);
-  return { loadout, ...playDealt(world, { ...newSave("fixture", campaign.id, 2), log }, loadout, seed, 8000, intentFor) };
-}
-
-function firstSeed(log: CampaignLog, wanted: (state: ScenarioState) => boolean, label: string): StormcallerFixture | null {
-  const limit = Number(process.env.STORMCALLER_SEEDS ?? 100);
-  for (let seed = 1; seed <= limit; seed += 1) {
-    const game = play(seed, log);
-    say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
-    if (!wanted(game.state)) continue;
-    say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : "won"}`);
-    return { campaignId: CAMPAIGN, seatCount: 2, loadout: game.loadout, seed, intents: game.intents, log };
-  }
-  say.warn(`no ${label} game found in ${limit} seeds`);
-  return null;
+  return wonLog({ title: "Raid", goldens: RAID_GOLDENS, world: raidWorld, play: playRaid }, await fateWonLog());
 }
 
 export async function stormcallerFixtures(): Promise<Partial<Record<StormcallerFixtureName, StormcallerFixture>>> {
   const log = await raidWonLog();
-  const won = firstSeed(log, (state) => state.stageCleared && !state.lost, "stormcaller-won");
-  const lost = firstSeed(log, (state) => state.lost, "stormcaller-lost");
+  const find = (wanted: (state: ScenarioState) => boolean, label: string): StormcallerFixture | null => {
+    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "flight-of-the-stormcaller", seatCount: 2, log, answer: intentFor }, "STORMCALLER_SEEDS", wanted, label);
+    return found && { ...found, log };
+  };
+  const won = find((state) => state.stageCleared && !state.lost, "stormcaller-won");
+  const lost = find((state) => state.lost, "stormcaller-lost");
   return { ...(won ? { "stormcaller-won": won } : {}), ...(lost ? { "stormcaller-lost": lost } : {}) };
 }

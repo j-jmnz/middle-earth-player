@@ -1,78 +1,27 @@
-import { checklist } from "../../../src/campaign/checklist.ts";
-import { emptyLog, poolCard, type CampaignLog } from "../../../src/campaign/log.ts";
-import { buildStart } from "../../../src/campaign/start.ts";
-import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
-import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { campaign, CODES, fate } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { gameCodes } from "../../../scripts/data/load-scenarios.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
+import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, STRONG_HEROES as HEROES, type PlayedGame } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Fate of Númenor in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to
 // survive an attack) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to a location whenever they can
 // and, when asked, trade no damage for threat and do not look at the facedown side of a Lost Island.
-export const HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
 export const FATE_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type FateDecks = "strong" | "weak" | "brittle";
 
 export const fateLoadout = fillerLoadout;
 
-const STATS = {
-  strong: { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 },
-  weak: { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 },
-  brittle: { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 },
-} as const;
-
-let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
-
-export async function fateWorld(decks: FateDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const dealt = campaignScenario(fate);
-  const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, fate), CODES.calphonOriginal, CODES.ominousFate];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  LOADED = cards;
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-/** The log of a campaign whose first part was won: Voyage Across Belegaer completed, with the Ominous Fate it earned in the pool and XP gained that it has marked. */
-export function afterVoyage(seatCount: 1 | 2): CampaignLog {
-  if (!LOADED) throw new Error("Build the world first (fateWorld)");
-  const base = emptyLog(seatCount);
-  return { ...base, completed: ["voyage-across-belegaer"], campaignPool: [poolCard(LOADED.get(CODES.ominousFate)!, CODES.ominousFate, null, null)], xpGained: { "voyage-across-belegaer": 4 }, marks: { "11080": 1 } };
-}
-
-export function fatePlan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) {
-  if (!LOADED) throw new Error("Build the world first (fateWorld)");
-  const plan = checklist({ log, scenario: campaignScenario(fate), seats: fateLoadout(seatCount), effects: EFFECTS, cards: LOADED });
-  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
-  return plan;
-}
-
-export function fateStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard): StartScenario {
-  const plan = fatePlan(seatCount, log);
-  return buildStart({
-    campaign,
-    scenario: fate,
-    seatCount,
-    seed,
-    threatModifier: plan.threatModifier,
-    seats: plan.seats,
-    effects: EFFECTS,
-    difficulty,
-    poolEncounterCards: plan.poolEncounterCards,
-    poolIntoPlay: plan.poolIntoPlay,
-    ...(facts ? { facts } : {}),
-    ...(modeCard ? { modeCard } : {}),
-  });
-}
+// The goldens' world, the plan and start of a game, and the log of a campaign whose first part was won (Voyage Across Belegaer completed, with the
+// Ominous Fate it earned in the pool and the XP it gained, marked): the seeded game's parts every scenario shares (test/harness/game-kit.ts).
+export const fateWorld = (decks: FateDecks = "strong") => game.world(decks);
+export const afterVoyage = (seatCount: 1 | 2) => game.after(seatCount);
+export const fatePlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
+export const fateStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
 
 export type FatePolicy = {
   // "keep" or "trade" 1 damage on each character in play for 1 threat.
@@ -107,12 +56,6 @@ export function fateIntent(state: ScenarioState, ctx: ReduceContext, memory: Set
 
 export type FateGame = PlayedGame;
 
-// Plays until the scenario is lost, or won and every Resolution choice is answered.
-export function playFate(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), policy: FatePolicy = DEFAULT_POLICY, modeCard?: ModeCard, limit = 8000): FateGame {
-  const start = fateStart(seatCount, seed, difficulty, facts, log, modeCard);
-  return playToEnd(start, ctx, (state, memory) => fateIntent(state, ctx, memory, policy), limit);
-}
-
 // The goldens (src/campaign/scenarios/the-fate-of-numenor/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first part was won (the pool, XP and marks reach this part). `upgraded`: Calphon and Spyglass on their Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type FateGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FateDecks; outcome: "won" | "lost"; policy?: Partial<FatePolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
@@ -136,8 +79,16 @@ export const FATE_GOLDENS: readonly FateGolden[] = [
   { name: "true solo, brittle heroes, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },
 ];
 
-export function playGolden(golden: FateGolden, ctx: ReduceContext): FateGame {
-  const facts = golden.upgraded ? { prisoner: null, usedOnce: [], counters: {}, upgraded: UPGRADED_CODES } : undefined;
-  const log = golden.after ? afterVoyage(golden.seatCount) : undefined;
-  return playFate(golden.seatCount, golden.seed, golden.difficulty, ctx, facts, log, { ...DEFAULT_POLICY, ...golden.policy }, golden.mode);
-}
+const game = campaignGame<FateDecks, FatePolicy>({
+  campaign,
+  scenario: fate,
+  stats: HERO_STATS,
+  codes: [CODES.calphonOriginal, CODES.ominousFate],
+  intent: fateIntent,
+  policy: DEFAULT_POLICY,
+  limit: 8000,
+  upgraded: UPGRADED_CODES,
+  earlier: { xp: [4], pool: [{ code: CODES.ominousFate }], marks: { "11080": 1 } },
+});
+
+export const playGolden = (golden: FateGolden, ctx: ReduceContext): FateGame => game.playGolden(golden, ctx);

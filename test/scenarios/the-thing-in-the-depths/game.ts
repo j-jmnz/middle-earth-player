@@ -1,84 +1,27 @@
-import { checklist } from "../../../src/campaign/checklist.ts";
-import { emptyLog, poolCard, type CampaignLog } from "../../../src/campaign/log.ts";
-import { buildStart } from "../../../src/campaign/start.ts";
-import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
-import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { campaign, CODES, depths } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { gameCodes } from "../../../scripts/data/load-scenarios.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
+import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, STRONG_HEROES as HEROES, type PlayedGame } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Thing in the Depths in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an
 // attack) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to Helm of the Stormcaller first, then to a location whenever
 // they can, engage and attack whatever the engine lets them, answer the choices (the location a Grapple keyword picks among, Come Together's player) with the first option, and let the first hero defend.
-export const HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
 export const DEPTHS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type DepthsDecks = "strong" | "weak" | "brittle";
 
 export const depthsLoadout = fillerLoadout;
 
-const STATS = {
-  strong: { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 },
-  weak: { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 },
-  brittle: { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 },
-} as const;
-
-let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
-
-export async function depthsWorld(decks: DepthsDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const dealt = campaignScenario(depths);
-  const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, depths), ...depths.cards.map((card) => card.code), CODES.ominousFate, CODES.sahirAlly, CODES.naasiyahAlly, CODES.thingOriginal];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  LOADED = cards;
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-/** The log of a campaign whose first four parts were won: Ominous Fate in the pool and the XP they gained, marked on a Galdor's Counsel and the Dream-chaser. */
-export function afterFlight(seatCount: 1 | 2): CampaignLog {
-  if (!LOADED) throw new Error("Build the world first (depthsWorld)");
-  const base = emptyLog(seatCount);
-  return {
-    ...base,
-    completed: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller"],
-    campaignPool: [poolCard(LOADED.get(CODES.ominousFate)!, CODES.ominousFate, null, null)],
-    xpGained: { "voyage-across-belegaer": 4, "the-fate-of-numenor": 3, "raid-on-the-grey-havens": 5, "flight-of-the-stormcaller": 4 },
-    marks: { "11080": 1, "11172": 2, "11184": 3 },
-  };
-}
-
-export function depthsPlan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) {
-  if (!LOADED) throw new Error("Build the world first (depthsWorld)");
-  const plan = checklist({ log, scenario: campaignScenario(depths), seats: depthsLoadout(seatCount), effects: EFFECTS, cards: LOADED });
-  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
-  return plan;
-}
-
-export function depthsStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard): StartScenario {
-  const plan = depthsPlan(seatCount, log);
-  return buildStart({
-    campaign,
-    scenario: depths,
-    seatCount,
-    seed,
-    threatModifier: plan.threatModifier,
-    seats: plan.seats,
-    effects: EFFECTS,
-    difficulty,
-    poolEncounterCards: plan.poolEncounterCards,
-    poolIntoPlay: plan.poolIntoPlay,
-    ...(facts ? { facts } : {}),
-    ...(modeCard ? { modeCard } : {}),
-  });
-}
+// The goldens' world, the plan and start of a game, and the log of a campaign whose first four parts were won (Ominous Fate in the pool and the XP they gained, marked on a
+// Galdor's Counsel and the Dream-chaser): the seeded game's parts every scenario shares (test/harness/game-kit.ts).
+export const depthsWorld = (decks: DepthsDecks = "strong") => game.world(decks);
+export const afterFlight = (seatCount: 1 | 2) => game.after(seatCount);
+export const depthsPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
+export const depthsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
 
 export type DepthsPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
@@ -120,12 +63,6 @@ export function depthsIntent(state: ScenarioState, ctx: ReduceContext, memory: S
 
 export type DepthsGame = PlayedGame;
 
-// Plays until the scenario is lost, or won and every Resolution choice is answered.
-export function playDepths(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), policy: DepthsPolicy = DEFAULT_POLICY, modeCard?: ModeCard, limit = 6000): DepthsGame {
-  const start = depthsStart(seatCount, seed, difficulty, facts, log, modeCard);
-  return playToEnd(start, ctx, (state, memory) => depthsIntent(state, ctx, memory, policy), limit);
-}
-
 // The goldens (src/campaign/scenarios/the-thing-in-the-depths/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first four parts were won (the pool, XP and marks reach this part). `upgraded`: the Upgraded sides (Black Key, Come Together's level). `mode`: the Hard or Expert Mode card.
 export type DepthsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DepthsDecks; outcome: "won" | "lost"; policy?: Partial<DepthsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
@@ -156,9 +93,18 @@ export const DEPTHS_GOLDENS: readonly DepthsGolden[] = [
   { name: "true solo, brittle heroes, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },
 ];
 
-export function playGolden(golden: DepthsGolden, ctx: ReduceContext): DepthsGame {
-  const facts = golden.upgraded ? { prisoner: null, usedOnce: [], counters: {}, upgraded: UPGRADED_CODES } : golden.after ? { prisoner: null, usedOnce: [], counters: {}, levels: { [CODES.comeTogether]: 2 } } : undefined;
-  const log = golden.after ? afterFlight(golden.seatCount) : undefined;
-  return playDepths(golden.seatCount, golden.seed, golden.difficulty, ctx, facts, log, { ...DEFAULT_POLICY, ...golden.policy }, golden.mode);
-}
+const game = campaignGame<DepthsDecks, DepthsPolicy>({
+  campaign,
+  scenario: depths,
+  stats: HERO_STATS,
+  codes: [...depths.cards.map((card) => card.code), CODES.ominousFate, CODES.sahirAlly, CODES.naasiyahAlly, CODES.thingOriginal],
+  intent: depthsIntent,
+  policy: DEFAULT_POLICY,
+  limit: 6000,
+  upgraded: UPGRADED_CODES,
+  levels: { [CODES.comeTogether]: 2 },
+  earlier: { xp: [4, 3, 5, 4], pool: [{ code: CODES.ominousFate }], marks: { "11080": 1, "11172": 2, "11184": 3 } },
+});
+
+export const playGolden = (golden: DepthsGolden, ctx: ReduceContext): DepthsGame => game.playGolden(golden, ctx);
 export { NAASIYAH_LOST, SAHIR_LOST, STORMCALLER_LOST, THREAT_LOST };
