@@ -37,3 +37,6 @@ record typed again with a hand-picked number. If the same sentence pattern shows
 template under `scripts/data/effects/`, not in the authored files. Both follow `docs/plans/effect-authoring.md`, Templates
 and copied lines: a template writes the records the played cards already have, and `scripts/checks/effect-migration.test.ts`
 must stay green.
+
+Before you report, read each new record against the card bugs reviews find (`docs/plans/effect-authoring.md`, Readings the review catches).
+Lines of your batch that read the same are written once and copied.

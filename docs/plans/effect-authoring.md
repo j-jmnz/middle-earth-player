@@ -267,6 +267,19 @@ family owns files that are composed by the `index.ts` next to them, so families 
 Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
+A new verb that a quest card's Setup uses goes in `revealsPerPlayer` (`src/rules/families/quest/setup.ts`), and one a Shadow line uses goes in `runsInFrame` (`src/rules/combat/shadow.ts`) when it asks a player or pushes effects. Nothing fails until a game reaches the card: the Setup is skipped, or the Shadow throws "Unimplemented instruction". Those two lists are keyed by verb name until they become schema flags (`docs/plans/scenario-pipeline.md`, Next steps).
+
+## Readings the review catches
+
+Read each new record against these before the review. Each one is a card bug a review has found.
+
+- **"Then".** The part after "then" resolves only if the part before it did (`rr.then`). Give the later instructions the same condition, or put them on a `then` branch.
+- **"One player" or "any player".** Either phrase lets any player take it, not the first player: use a `Pick` of a player, or `ChooseCards` `who: "onePlayer"` in a Campaign Setup. "The first player" is the only phrase that means seat order.
+- **"Attached character", "attached hero".** These hold only while the host is that card type. A host can change type, as an objective ally does when it flips to its enemy side, so put the host's type in the record's condition.
+- **"For any reason" and "cannot enter …".** The route must cover every way a card can arrive: discards made by player cards, searches, reshuffles, and both sides of a two-sided card.
+- **The trigger's scope.** "After a location is explored" hears a location explored in the staging area too (`locationExplored`), not only the active one (`activeExplored`). Check which zones the trigger's event is queued from.
+- **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
+- **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 
 ## Not expressible yet: leave open, report
 

@@ -6,6 +6,8 @@ Blocks: phase 48
 
 Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
 
+Handover: [docs/handover/phase-47.md](../handover/phase-47.md).
+
 ## Goal
 
 `a-storm-on-cobas-haven`, Dream-chaser part 8, is playable in campaign and standalone. Standalone play uses the base sides of the two-sided cards; the campaign uses the Campaign Mode sides (`dcce.campaign-mode`).

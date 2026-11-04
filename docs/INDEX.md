@@ -21,7 +21,7 @@ Each agent reads its own file.
 - `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.4K tok)
 - `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.2K tok)
 - `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
-- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.0K tok)
+- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~130 tok)
@@ -128,7 +128,7 @@ Read the sections your task touches.
   - 253–256 One answer, one tap (~240)
   - 257–260 Stops and Always use (~250)
   - 261–264 Guide (~120)
-  - 265–274 Choice tray (~940) ← 3
+  - 265–274 Choice tray (~940) ← 5
   - 275–288 Reading panels (~1.5K) ← 6
   - 289–298 Phase carousel (~680)
   - 299–304 Quest advance (~530) ← 1
@@ -203,7 +203,6 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
 - `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
 - `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.0K tok)
 
@@ -263,6 +262,7 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
 - `docs/phases/done/phase-43-flight-of-the-stormcaller.md` — Phase 43 — Flight of the Stormcaller (~930 tok)
 - `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~930 tok)
 - `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~940 tok)
+- `docs/phases/done/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
 
 ## Live plans
 
@@ -281,10 +281,10 @@ Read when a task names the plan.
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~6.5K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.0K tok)
   - 12–33 Workflow (~480)
   - 34–50 Where records live (~370)
-  - 51–73 Templates and copied lines (~520) ← 3
+  - 51–73 Templates and copied lines (~520) ← 4
   - 74–98 The record (~500)
   - 99–115 Which card an instruction acts on (~380)
   - 116–136 Pick filters (~410)
@@ -292,8 +292,9 @@ Read when a task names the plan.
   - 146–152 Conditions (~110)
   - 153–172 Triggers and stat flags (~440)
   - 173–234 Patterns (~1.4K)
-  - 235–270 Mechanic families: engine and records together (~1.2K) ← 2
-  - 271–290 Not expressible yet: leave open, report (~390)
+  - 235–271 Mechanic families: engine and records together (~1.3K) ← 3
+  - 272–283 Readings the review catches (~380) ← 4
+  - 284–303 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
@@ -306,7 +307,20 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~3.0K tok)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~4.4K tok)
+  - 3–14 Context (~450)
+  - 15–24 What does not move (~190)
+  - 25–45 A. Effects: draft better, template the repeats, copy identical lines (~760)
+  - 46–54 B. One registry for scenarios, fixtures and goldens (~280)
+  - 55–67 C. A shared scenario kit and `pnpm scenario:new` (~510)
+  - 68–79 D. One manifest per family (~330)
+  - 80–87 E. Data: seed what can be seeded (~210)
+  - 88–93 F. Faster feedback while authoring (~90)
+  - 94–118 Where a scenario's cost is now (~720)
+  - 119–141 Next steps (~510) ← 2
+  - 142–151 After each scenario phase (~160) ← 1
+  - 152–155 Order (~70)
+  - 156–163 Verification (~100)
 
 ## Handovers
 
@@ -323,6 +337,7 @@ Open work; read when a task names it.
   - 118–124 Commit (~110)
   - 125–132 Report (your final message) (~90)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
+- `docs/handover/phase-47.md` — Handover: phase 47, A Storm on Cobas Haven (~1.8K tok)
 
 ## Done plans
 
