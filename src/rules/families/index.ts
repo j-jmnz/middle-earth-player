@@ -40,6 +40,15 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
   attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island,
 ];
 
+// The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle): the names listed here first, in this order, then any other
+// family with a hook for the phase, in the list above. The order is the one the core's chain had when it called the families by name, and it is not the list's.
+// `before`: after the constant win check, before the core refills the encounter deck. `after`: right after that refill. `sweep`: after the core's own sweeps.
+export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
+  before: ["burden", "island", "south"],
+  after: ["sea", "stormcaller", "island"],
+  sweep: ["aflame"],
+};
+
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */
 export function runFamilyVerb(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   for (const family of RULES_FAMILIES) {

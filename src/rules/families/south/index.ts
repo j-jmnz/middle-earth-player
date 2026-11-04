@@ -11,6 +11,7 @@ import { assignDamage, discardEach } from "./damage.ts";
 import { assignFaceup } from "./faceup.ts";
 import { attachToActiveLocation, makeSetAsideActive, pickHighestEngagement, revealUntilThreat } from "./reveal.ts";
 import { attackFromStaging, markLocationDamage } from "./watcher.ts";
+import { damageLoss } from "./locations.ts";
 
 // The verbs src/catalog/families/south.ts adds, for The Ring Goes South: the second active location, the facedown Ring-bearer, the
 // enemy engaged with every player and the Council of Elrond's faceup cards. Null when the verb is not one of them.
@@ -43,4 +44,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "south", verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };
+export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards) }, verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };

@@ -11,7 +11,7 @@ import { engageEnemy } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { endCorsairDeck, prepareCorsairDeck, revealCorsair } from "./corsair.ts";
+import { endCorsairDeck, prepareCorsairDeck, refillCorsairDeck, revealCorsair } from "./corsair.ts";
 import { prepareFleet } from "./fleet.ts";
 import { shiftHeading } from "./heading.ts";
 import { lastPlayer } from "./players.ts";
@@ -63,4 +63,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "sea", verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck"], run };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck"], run };

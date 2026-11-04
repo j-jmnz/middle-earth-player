@@ -257,6 +257,13 @@ family owns files that are composed by the `index.ts` next to them, so families 
 - `src/effects/authored/families/<family>.ts` exports `RECORDS` and `REPLACES`, composed by that folder's `index.ts` (burden and
   south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
 
+- A manifest may add hooks the core calls: `settle: { before, after, sweep }` (steps of `settle` in `engine/machine.ts`; list the family in `SETTLE_ORDER`
+  in `src/rules/families/index.ts` when its place among the others matters, otherwise it runs after the named ones in list order), `travel: { may, reach }`,
+  `pick`, `condition` and `amount` (`src/rules/interpret/family-manifest.ts`, dispatched by `src/rules/interpret/family-hooks.ts`; `condition` and `amount` return
+  `null` for what is not the family's). A hook returns a new state or the same one. `interpret/family-hooks.test.ts` shows each with a synthetic family.
+- A campaign card's Setup verb that `src/campaign/start.ts` deals in Setup (`dealt`) or resolves after the quest card's Setup (`afterSetup`) is wrapped in
+  `setupRole(schema, role)` (`src/catalog/setup-role.ts`) in its schema entry; `setup-verbs.test.ts` pins the two sets.
+
 Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.

@@ -8,6 +8,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { discardUntilAflame, engageFirstPlayer, healLocations, removeNamedFromGame, searchAflame, stageSetAside } from "./cards.ts";
 import type { Focus } from "../index.ts";
+import { aflameSweep } from "./sweep.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -31,4 +32,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "aflame", verbs: ["DiscardUntilAflame", "SearchAflame", "EngageFirstPlayer", "StageSetAside", "RemoveNamedFromGame", "HealLocations", "EarnDealt"], run };
+export const manifest: RulesFamily = { name: "aflame", settle: { sweep: aflameSweep }, verbs: ["DiscardUntilAflame", "SearchAflame", "EngageFirstPlayer", "StageSetAside", "RemoveNamedFromGame", "HealLocations", "EarnDealt"], run };

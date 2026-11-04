@@ -9,7 +9,8 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { attachGuarded, engageFromVictory, flipSecret, lookAtSecret, placeProgressInStaging, placeSecrets, raiseThreatToAttach, shuffleIntoPlayerDeck } from "./cards.ts";
-import { prepareMap, revealCorners, setActive } from "./map.ts";
+import { prepareMap, revealCorners, setActive, syncIsland } from "./map.ts";
+import { announceExits } from "./hand.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -40,4 +41,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "island", verbs: ["PrepareIslandMap", "RevealIslandCorners", "SetIslandActive", "AttachGuarded", "PlaceSecrets", "FlipSecret", "LookAtSecret", "EngageFromVictory", "PlaceProgressInStaging", "ShuffleIntoPlayerDeck", "RaiseThreatToAttach"], run };
+export const manifest: RulesFamily = { name: "island", settle: { before: (state, ctx) => announceExits(state, ctx), after: syncIsland }, verbs: ["PrepareIslandMap", "RevealIslandCorners", "SetIslandActive", "AttachGuarded", "PlaceSecrets", "FlipSecret", "LookAtSecret", "EngageFromVictory", "PlaceProgressInStaging", "ShuffleIntoPlayerDeck", "RaiseThreatToAttach"], run };

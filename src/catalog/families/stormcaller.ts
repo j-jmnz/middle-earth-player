@@ -7,6 +7,7 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { setupRole } from "../setup-role.ts";
 
 const VERBS = [
   // Setup: "Prepare the Stormcaller's area" (12012:A:1, dcce.stormcallers-area). The quest cards with these codes (set aside, stages 2C, 3C and 4C) become the Stormcaller's quest deck in this order,
@@ -14,7 +15,7 @@ const VERBS = [
   // `number` is the stage number of the first of them (2).
   z.strictObject({ verb: z.literal("PrepareStormcallerArea"), stages: z.array(z.string().min(1)).min(1), number: z.number().int().positive(), ...when }),
   // Campaign Setup: "Flip the Stormcaller to its 'Campaign Mode only' side" (11191:A:2, dcce.campaign-mode): the Stormcaller shows its side B, with the stats and the text printed there.
-  z.strictObject({ verb: z.literal("FlipStormcaller"), ...when }),
+  setupRole(z.strictObject({ verb: z.literal("FlipStormcaller"), ...when }), "afterSetup"),
   // "Move 2 progress from Swift Departure to the Stormcaller's quest stage" / "from the main quest" (12012:B:2, 12026:A:1): up to `amount` progress comes off the current quest card and goes on the
   // Stormcaller's current quest stage, which advances when it is full. Nothing moves when the quest holds none.
   z.strictObject({ verb: z.literal("MoveProgressToStormcaller"), amount: positiveAmountSchema, ...when }),

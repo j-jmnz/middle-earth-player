@@ -8,6 +8,7 @@ import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches } from "../families/costs/pick.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
+import { familyPickMatches } from "./family-hooks.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
 import { countsExtra } from "../families/misc/traits.ts";
 import { seatThreat } from "../families/play/hooks.ts";
@@ -229,7 +230,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const attacker = picked.at(-1);
     if (!attacker || !canAttack(state, state.cards[attacker]?.controller ?? asking, attacker, id, ctx.cards, true)) return false;
   }
-  return true;
+  // The filters a family adds through its pick hook (interpret/family-hooks.ts).
+  return familyPickMatches(state, id, spec, at, ctx);
 }
 
 // An attachment's host is of the type and controlled as the filter's `on` says, from the chooser's side.

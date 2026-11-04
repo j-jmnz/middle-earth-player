@@ -4,6 +4,7 @@ import type { Amount, CardRef, Condition, Instruction } from "../../catalog/boun
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "../core/keywords.ts";
+import { familyAmount } from "./family-hooks.ts";
 import { threatCostOf } from "../families/costs/stats.ts";
 import { miscAmount, namedInPlay } from "../families/misc/amounts.ts";
 import { seatThreat } from "../families/play/hooks.ts";
@@ -129,7 +130,10 @@ export function readsCondition(instructions: readonly Instruction[], kind: Condi
 export function resolveAmount(state: ScenarioState, amount: Amount, scope: AmountScope, ctx: ReduceContext): number {
   if (typeof amount === "number") return amount;
   let value = 0;
-  if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
+  // A family's own amount (interpret/family-hooks.ts): null when it is not the family's, so the reads below stand.
+  const familial = familyAmount(state, amount, scope, ctx);
+  if (familial !== null) value = familial;
+  else if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
   else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
   else if (amount.stat) value = statOf(state, amount.ofNamed ? namedInPlay(state, amount.ofNamed, ctx) : refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
   else if (amount.x) value = scope.x ?? 0;
