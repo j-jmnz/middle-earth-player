@@ -2,7 +2,8 @@
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `haven-won` is the first seed that wins, parked on the win (the Resolution waits); `haven-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
-// TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
+// The Campaign Setup asks which player takes the Círdan's Blessing (each seat is asked in turn until one does; neither player takes one here: "skip"), and the game asks the Setup's choices (the Dol Amroth objective, the ships and
+// their Modification boons, who takes Gavin), which the saved decklists' policy answers with the first option; the Resolution asks nothing. `haven-won` is open: no starter-decklist game of this part has won in the seeds (docs/phases/STATUS.md).
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import type { PlayerIntent, ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -26,8 +27,8 @@ export async function ruinsWonLog(): Promise<CampaignLog> {
 export async function havenFixtures(): Promise<Partial<Record<HavenFixtureName, HavenFixture>>> {
   const log = await ruinsWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): HavenFixture | null => {
-    // TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
-    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "a-storm-on-cobas-haven", seatCount: 2, log, answer: intentFor }, "HAVEN_SEEDS", wanted, label);
+    // Neither player takes a Círdan's Blessing at the Campaign Setup.
+    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "a-storm-on-cobas-haven", seatCount: 2, log, choices: ["skip", "skip"], answer: intentFor }, "HAVEN_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "haven-won");

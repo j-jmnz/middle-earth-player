@@ -2,12 +2,11 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `haven-lost` (scripts/e2e/a-storm-on-cobas-haven.ts): a real two-handed
-# game of A Storm on Cobas Haven, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+# Phase 47. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `haven-lost` (scripts/e2e/a-storm-on-cobas-haven.ts): a real two-handed game of
+# A Storm on Cobas Haven (the Defenders of Gondor and Swords of the Noldor lists) from the log the first seven parts' wins write (parts 1 to 7 recorded as won, so the path resumes it), parked on its loss (the threat,
+# or the Dream-chaser destroyed). A loss has no reward screen and writes nothing: the scenario stays current, no XP reaches the log. The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:
       FIXTURE: haven-lost
       SCENARIO_ID: a-storm-on-cobas-haven
-# TODO: this scenario's own assertions on the log screen after the loss.

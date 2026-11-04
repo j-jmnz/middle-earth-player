@@ -83,7 +83,6 @@ goldenSuite<RuinsGolden, RuinsDecks>({
     });
   },
   wins: "wins when Shrine to Morgoth is explored on stage 2 (after 3 Underwater locations were explored on stage 1), runs 11200's Resolution (the XP is awarded, the Command and Círdan's Blessing copies chosen join the pool) and unlocks the next part",
-  next: "soon",
   before: (golden) => (golden.after ? afterTemple(golden.seatCount) : emptyLog(golden.seatCount)),
   won(state, golden) {
     expect(state.cards[state.questStage ?? ""]?.code).toBe(CODES.stage2);
@@ -119,9 +118,9 @@ goldenSuite<RuinsGolden, RuinsDecks>({
   afterWin({ golden, log, path }) {
     // The copies chosen at Setup join the pool, with Ominous Fate from the earlier parts.
     expect(log.campaignPool.map((card) => card.code).sort()).toEqual([...(golden.after ? ["11176"] : []), ...chosenCards(golden)].sort());
-    // The path stops at A Storm on Cobas Haven, which the app cannot deal yet: nothing begins it.
+    // A Storm on Cobas Haven is playable now: the path offers it as the current part.
     expect(path[7]?.id).toBe("a-storm-on-cobas-haven");
-    expect(nextStep(path, null)).toMatchObject({ kind: "soon", node: { id: "a-storm-on-cobas-haven" } });
+    expect(nextStep(path, null)).toMatchObject({ kind: "begin", node: { id: "a-storm-on-cobas-haven", status: "current" } });
     expect(UPGRADED_CODES).toEqual([CODES.blackKey]);
   },
 });

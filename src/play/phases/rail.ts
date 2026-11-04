@@ -4,7 +4,7 @@
 // The phase rail names, in words, the step the engine is in, with the step before and the step after. It reads the
 // engine's mode and phase and nothing else, so it cannot skip a step the engine runs. The pill also names the phase and the
 // phases beside it (carousel.ts lays the whole round out for the strip a tap on the pill opens).
-import type { ModeName, ScenarioState } from "../../rules/core/state.ts";
+import { phaseOf, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 
 // `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
 // the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step.
@@ -72,11 +72,13 @@ export const STEP_WORDS: Readonly<Record<ModeName, string>> = {
 export function railFor(game: ScenarioState): Rail {
   const phaseAt = phaseIndex(game);
   const count = ROUND_PHASES.length;
+  // An additional instance of a phase (Send for Help (Spirit), 11213:A:2) is owed: it runs next, and once the last one is running the round goes on at the phase it was added to.
+  const extraNext = game.extraPhases?.[0] ?? (game.extraResume != null ? phaseOf(game.extraResume) : undefined);
   const base = {
     phase: PILL_PHASE[game.phase] ?? game.phase,
     round: game.round,
     previousPhase: phaseAt < 0 ? "" : (ROUND_PHASES[(Math.min(phaseAt, count) + count - 1) % count] ?? ""),
-    nextPhase: ROUND_PHASES[phaseAt >= count ? 0 : (phaseAt + 1) % count] ?? "",
+    nextPhase: extraNext ?? ROUND_PHASES[phaseAt >= count ? 0 : (phaseAt + 1) % count] ?? "",
   };
   if (game.lost) return { ...base, previous: STEP_WORDS[game.mode], current: "Defeat", next: "" };
   if (game.stageCleared) return { ...base, previous: STEP_WORDS[game.mode], current: "Victory", next: "Resolution" };

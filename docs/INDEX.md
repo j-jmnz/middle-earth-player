@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~62.1K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~62.4K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -91,20 +91,20 @@ Read the sections your task touches.
     - 568–588 Escape from Dol Guldur (~2.7K)
     - 589–603 The Oath (~2.3K)
     - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–673 Dream-chaser (~12.7K)
-  - 674–682 Nightmare (~420)
-  - 683–721 Deckbuilding (~1.8K) ← 1
-  - 722–800 Effects (~3.2K)
-    - 724–782 Three layers (~2.4K)
-    - 783–792 Player side quests, contracts and saga cards (~430)
-    - 793–796 Window stack (~100)
-    - 797–800 Coverage test (~270)
-  - 801–821 Data sources (~560)
-  - 822–840 Card images (~1.1K) ← 6
-  - 841–866 Persistence and shipping (~1.7K)
-  - 867–907 Screens (~4.4K) ← 2
-    - 893–907 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~28.0K tok)
+  - 622–674 Dream-chaser (~13.0K)
+  - 675–683 Nightmare (~420)
+  - 684–722 Deckbuilding (~1.8K) ← 1
+  - 723–801 Effects (~3.2K)
+    - 725–783 Three layers (~2.4K)
+    - 784–793 Player side quests, contracts and saga cards (~430)
+    - 794–797 Window stack (~100)
+    - 798–801 Coverage test (~270)
+  - 802–822 Data sources (~560)
+  - 823–841 Card images (~1.1K) ← 6
+  - 842–867 Persistence and shipping (~1.7K)
+  - 868–908 Screens (~4.4K) ← 2
+    - 894–908 Table screen (~1.6K) ← 4
+- `docs/design-system-table.md` — Design system — Table (landscape) (~28.2K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -112,30 +112,30 @@ Read the sections your task touches.
   - 36–39 Canvas (~560) ← 1
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
-  - 58–79 Cards (~3.3K) ← 9
-  - 80–85 The Sailing test (~690) ← 5
-  - 86–99 The Island Map (~1.7K) ← 8
-  - 100–103 Tokens and effects (~320)
-  - 104–115 Piles (~1.4K) ← 5
-  - 116–121 Marks of the open moment (~400) ← 1
-  - 122–189 Motion (~2.7K) ← 8
-  - 190–216 Spotlight (~2.2K) ← 16
-  - 217–222 Gestures (~420) ← 5
-  - 223–226 Hold, slide and release (~940)
-  - 227–232 Peeking at the other seat (~600) ← 1
-  - 233–248 Command column (~1.9K) ← 9
-  - 249–252 Two taps (~320) ← 2
-  - 253–256 One answer, one tap (~240)
-  - 257–260 Stops and Always use (~250)
-  - 261–264 Guide (~120)
-  - 265–274 Choice tray (~940) ← 5
-  - 275–288 Reading panels (~1.5K) ← 6
-  - 289–298 Phase carousel (~680)
-  - 299–304 Quest advance (~530) ← 1
-  - 305–308 Undo (~140)
-  - 309–312 Haptics (~280)
-  - 313–323 Banner (~580) ← 1
-  - 324–327 Android Back (~90)
+  - 58–80 Cards (~3.6K) ← 9
+  - 81–86 The Sailing test (~690) ← 5
+  - 87–100 The Island Map (~1.7K) ← 8
+  - 101–104 Tokens and effects (~320)
+  - 105–116 Piles (~1.4K) ← 5
+  - 117–122 Marks of the open moment (~400) ← 1
+  - 123–190 Motion (~2.7K) ← 8
+  - 191–217 Spotlight (~2.2K) ← 16
+  - 218–223 Gestures (~420) ← 5
+  - 224–227 Hold, slide and release (~940)
+  - 228–233 Peeking at the other seat (~600) ← 1
+  - 234–249 Command column (~1.9K) ← 9
+  - 250–253 Two taps (~320) ← 2
+  - 254–257 One answer, one tap (~240)
+  - 258–261 Stops and Always use (~250)
+  - 262–265 Guide (~120)
+  - 266–275 Choice tray (~940) ← 5
+  - 276–289 Reading panels (~1.5K) ← 6
+  - 290–299 Phase carousel (~680)
+  - 300–305 Quest advance (~530) ← 1
+  - 306–309 Undo (~140)
+  - 310–313 Haptics (~280)
+  - 314–324 Banner (~580) ← 1
+  - 325–328 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~23.9K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)

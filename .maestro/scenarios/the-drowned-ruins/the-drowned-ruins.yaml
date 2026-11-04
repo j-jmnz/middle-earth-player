@@ -6,19 +6,12 @@ tags:
 # game of The Drowned Ruins (the Defenders of Gondor and Swords of the Noldor lists) from the log the first six parts' wins write, parked on its win (Shrine to Morgoth is in the victory display on stage 2). The
 # fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md). The Resolution asks no choice (the Command and Círdan's Blessing copies chosen at the
 # Campaign Setup join the pool); confirming writes the XP from the campaign card (1 for each surviving player, resources on the card, Na'asiyah's resources, no enemies in play, 5 or more Underwater locations in the
-# victory display, Shrine to Morgoth's Grotto side, threat 40 or less, Ominous Fate) and, with parts 1 to 6 won in the log, reaches A Storm on Cobas Haven, which the app cannot deal yet: the path stops there and its
-# node reads Coming soon, with no Begin (user decision, 2026-11-01; src/campaign/scenarios/the-drowned-ruins/golden.test.ts pins the path).
+# victory display, Shrine to Morgoth's Grotto side, threat 40 or less, Ominous Fate) and, with parts 1 to 6 won in the log, reaches A Storm on Cobas Haven, the current part (src/campaign/scenarios/the-drowned-ruins/golden.test.ts pins the path).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: ruins-won
       SCENARIO_ID: the-drowned-ruins
-# The path stops at A Storm on Cobas Haven: its node and the line under the road read Coming soon, and nothing begins it.
+# A Storm on Cobas Haven is playable now (phase 47): its node is the current one and the path offers Begin.
 - assertVisible:
-    id: node-a-storm-on-cobas-haven-status
-    text: "Coming soon"
-- assertVisible:
-    id: path-soon
-    text: "A Storm on Cobas Haven is coming soon."
-- assertNotVisible:
     id: begin

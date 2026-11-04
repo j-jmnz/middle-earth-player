@@ -74,8 +74,11 @@ export function deckWords(instruction: Instruction): string | null {
       const amount = amountWords(verb.amount);
       return `discard the top ${amount === "1" ? "card" : `${amount} cards`} of your deck`;
     }
-    case "PlayFrom":
+    case "PlayFrom": {
+      // Send for Help (Leadership, 11211:A:2) plays from the top cards of the player's own deck.
+      if (verb.pick.from === "deck") return `play a card from the top ${verb.pick.top ?? "few"} cards of your deck${verb.free ? " for no cost" : ""}`;
       return verb.free ? "play a card from a discard pile for no cost" : "play a card from your discard pile";
+    }
     case "ReduceNextDoomed":
       return `reduce the Doomed value of the next Doomed event you play ${verb.until === "endOfPhase" ? "this phase" : "this round"} by ${verb.amount}`;
     case "KeepOpeningHand":
@@ -97,7 +100,9 @@ export function deckPickWords(asked: Instruction): { verb: string; prompt: strin
       if (asked.upTo == null) return null;
       return { verb: "Choose", prompt: asked.upTo === "any" ? "Choose any number of cards, one at a time. Done stops." : `Choose up to ${asked.upTo} card${asked.upTo === 1 ? "" : "s"}, one at a time. Done stops.` };
     case "PlayFrom":
-      return asked.card ? { verb: "Attach", prompt: "Choose the card to attach it to." } : { verb: "Play", prompt: "Choose a card to play from the discard pile." };
+      if (asked.card) return { verb: "Attach", prompt: "Choose the card to attach it to." };
+      if (asked.pick.from === "deck") return { verb: "Play", prompt: `Choose a card from the top ${asked.pick.top ?? "few"} cards of your deck to play${asked.free ? " for no cost" : ""}.` };
+      return { verb: "Play", prompt: "Choose a card to play from the discard pile." };
     default:
       return null;
   }

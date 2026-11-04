@@ -45,8 +45,8 @@ describe("The Drowned Ruins in the Dream-chaser campaign", () => {
     expect(PLAYABLE_SCENARIOS).toContain("the-drowned-ruins");
     const save = newSave("ruins", campaign.id, 1);
     const unlocked = { ...save.log, completed: campaign.scenarios.slice(0, 6) };
-    expect(campaignPath(campaign, {}, unlocked).map((node) => [node.id, node.status]).slice(5, 8)).toEqual([["temple-of-the-deceived", "completed"], ["the-drowned-ruins", "current"], ["a-storm-on-cobas-haven", "soon"]]);
-    // The part after it is coming soon: the path stops there. Without the earlier parts this part is locked.
+    expect(campaignPath(campaign, {}, unlocked).map((node) => [node.id, node.status]).slice(5, 8)).toEqual([["temple-of-the-deceived", "completed"], ["the-drowned-ruins", "current"], ["a-storm-on-cobas-haven", "locked"]]);
+    // The part after it is playable now, and locked until this one is won. Without the earlier parts this part is locked.
     expect(campaignPath(campaign, {}, save.log).find((node) => node.id === "the-drowned-ruins")?.status).toBe("locked");
   });
 

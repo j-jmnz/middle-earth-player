@@ -4,9 +4,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../../effects/authored/a-storm-on-cobas-haven.ts";
-import { loadHavenWorld, type HavenWorld } from "../../../test/scenarios/a-storm-on-cobas-haven/scene.ts";
+import { RECORDS as SEND_FOR_HELP } from "../../effects/authored/pool/DCCEHaven.ts";
+import { havenTable, loadHavenWorld, type HavenWorld } from "../../../test/scenarios/a-storm-on-cobas-haven/scene.ts";
 
-import { pickWords, type ChoiceNames } from "./choice.ts";
+import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 
 let world: HavenWorld;
 
@@ -65,5 +66,40 @@ describe("the words of A Storm on Cobas Haven choices", () => {
     const tie = AUTHORED_EFFECTS.flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "MakeEngagementChecks");
     if (!tie) throw new Error("no MakeEngagementChecks record");
     expect(pickWords(tie, undefined, names(), "12122").prompt).toBe("Choose which of the enemies tied for the highest engagement cost the engagement check engages.");
+  });
+
+  // Gavin and the four Send for Help events (pool/DCCEHaven.ts): the player Send for Help (Leadership) names, the hero Send for Help (Tactics) takes from the collection and the player who takes it, and the phase Send for Help (Spirit) adds.
+  it("the Send for Help cards ask for a player, a hero, a card and a phase in sentences of their own", () => {
+    const prompts: string[] = [];
+    for (const effect of SEND_FOR_HELP) {
+      walk(effect.instructions, (instruction, next) => {
+        if (!ASKING.has(instruction.verb) && !["PutIntoPlay", "TakeHeroFromCollection", "PlayFrom"].includes(instruction.verb)) return;
+        const words = pickWords(instruction, next, names(), effect.cardCode);
+        if (instruction.verb === "PutIntoPlay" || instruction.verb === "TakeCardFromCollection") return;
+        expect(words.prompt, effect.id).toMatch(/^[A-Z].*\.$/);
+        expect(words.prompt, effect.id).not.toBe("Choose one.");
+        prompts.push(words.prompt);
+      });
+    }
+    expect(prompts).toContain("Choose a hero from your collection to put into play.");
+    expect(prompts).toContain("Choose a player.");
+    expect(prompts).toContain("Choose a card from the top 10 cards of your deck to play for no cost.");
+  });
+
+  it("every branch of a Choose a record asks says what it does: the phase Send for Help (Spirit) adds, and drawing or playing the card Send for Help (Leadership) finds", () => {
+    const state = havenTable(world).state;
+    const branches: string[] = [];
+    for (const effect of [...AUTHORED_EFFECTS, ...SEND_FOR_HELP]) {
+      walk(effect.instructions, (instruction) => {
+        if (instruction.verb !== "Choose") return;
+        for (const option of instruction.options) {
+          const words = branchWords(instruction, option.id, state, names(), null);
+          expect(words, `${effect.id} ${option.id}`).not.toBe("");
+          expect(words.toLowerCase(), `${effect.id} ${option.id}`).not.toBe(option.id.toLowerCase());
+          branches.push(`${effect.id} ${words}`);
+        }
+      });
+    }
+    expect(branches).toEqual(expect.arrayContaining(["11211:whenRevealed:1 Play a card from the top 10 cards of your deck for no cost", "11213:whenRevealed:1 An additional resource phase follows this phase", "11213:whenRevealed:1 An additional refresh phase follows this phase"]));
   });
 });

@@ -134,6 +134,16 @@ describe("the rail's words", () => {
     expect(refresh).toMatchObject({ previousPhase: "Combat", nextPhase: "Resource" });
   });
 
+  it("names an additional instance of a phase as the next phase while one is owed (Send for Help (Spirit), 11213:A:2), and the phase the round goes on at once the last one runs", async () => {
+    const planning = await parked("Planning", "planning");
+    expect(railFor(planning).nextPhase).toBe("Quest");
+    expect(railFor({ ...planning, extraPhases: ["Combat", "Resource"] }).nextPhase).toBe("Combat");
+    // The additional Combat phase is running and the round goes on at the quest commit.
+    const running = await parked("Combat", "combatStart");
+    expect(railFor({ ...running, extraResume: "questCommit" }).nextPhase).toBe("Quest");
+    expect(railFor(running).nextPhase).toBe("Refresh");
+  });
+
   it("keeps the phase beside the first and the last, and names the phases outside the round by steps.json's words", async () => {
     expect(railFor(await parked("Beginning of round", "beginRound"))).toMatchObject({ phase: "Beginning", previousPhase: "", nextPhase: "Resource" });
     expect(railFor(await parked("End of round", "endRound"))).toMatchObject({ phase: "End", previousPhase: "Refresh", nextPhase: "Resource" });

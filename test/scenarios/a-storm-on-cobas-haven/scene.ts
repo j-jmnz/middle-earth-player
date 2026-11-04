@@ -74,6 +74,9 @@ export const CODES = {
   cirdanSBlessing11208: "11208", // Cirdan's Blessing
   gavin: "11210", // Gavin
 } as const;
+// The Dream-chaser Campaign Expansion's ship-objectives a campaign game deals (the reprints of 11080 to 11083 and the two new ships) and the Modification boons fitted to them.
+export const SHIP_CODES: readonly string[] = ["110136", "110137", "110138", "110139", "110140", "110141"];
+export const MODIFICATIONS = [CODES.armorPlating, CODES.ballista, CODES.enlargedQuarters, CODES.extraSails] as const;
 export { HERO, HERO2, HERO3 };
 export type { Entry };
 
