@@ -1,13 +1,15 @@
+import type { Ledger } from "../../catalog/active-text.ts";
 import type { Effect } from "../../catalog/boundary.ts";
-import { shippedLedger } from "../../catalog/printed-ledger.ts";
 import { stripKeywords } from "../../catalog/keyword-line.ts";
 import { selfNamed } from "../../catalog/self-named.ts";
 
 // The records of a ledger line, taken again by another line with the same printed text: a card printed again in a later product (Forest Gate 01100 and 41012,
 // Calphon 11028 and 110013) or a sentence a card prints twice (the two sides of a Campaign Expansion ship). A copy keeps the source record and changes its
 // card code, its ledger line ids and its id, whose number is the one the line has on the target: the source's number moved by how far the target's line stands
-// from the source's among the records of that timing (their order is the printed order, front, side B, then the shadow). A copy is refused, when the module loads, if the
-// two ledger lines differ once normalized (keywords stripped, the card's name as {self}) or the copy would take an id that is in use, so a ledger edit cannot keep a stale copy.
+// from the source's among the records of that timing (their order is the printed order, front, side B, then the shadow). A copy is refused, when the module loads, if
+// the copy would take an id that is in use. Each copied record keeps the line pairs it was copied by (`copiedLines`), and src/effects/copies.test.ts refuses a pair
+// whose two ledger lines differ once normalized (keywords stripped, the card's name as {self}), so a ledger edit cannot keep a stale copy. The check is a test, not
+// a load-time throw, so this module does not import the ledger JSON and the Node scripts that load the effects (effects:open, card-smoke, the fixture writer) run.
 export type Copy = { readonly copy: readonly (readonly [from: string, to: string])[] };
 
 type Options = {
@@ -44,11 +46,29 @@ const placeOf = (lineId: string): number => {
   return (part === "A" ? 0 : 10_000) + n;
 };
 
-function ledgerLine(lineId: string): string {
+/** A ledger line's text, or undefined when the ledger has no such line. */
+export function printedLine(ledger: Ledger, lineId: string): string | undefined {
   const { code, part, n } = parse(lineId, LINE);
-  const text = shippedLedger().get(code)?.find((side) => side.side === part)?.lines[n - 1];
-  if (text === undefined) throw new Error(`The printed-text ledger has no line ${lineId}`);
-  return text.replaceAll("`", "'").trim();
+  return ledger.get(code)?.find((side) => side.side === part)?.lines[n - 1]?.replaceAll("`", "'").trim();
+}
+
+/** One line pair a record was copied by, with the card names the reading puts as {self} (empty: the name is not replaced). */
+export type CopiedLine = { readonly from: string; readonly to: string; readonly fromName: string; readonly toName: string };
+
+const COPIED = new WeakMap<Effect, readonly CopiedLine[]>();
+
+/** The line pairs a record was made by, when `withCopies` made it. */
+export function copiedLines(record: Effect): readonly CopiedLine[] | undefined {
+  return COPIED.get(record);
+}
+
+/** Why a pair may not be copied under this ledger, or null when its two lines read the same. */
+export function copyMismatch(ledger: Ledger, pair: CopiedLine): string | null {
+  const from = printedLine(ledger, pair.from);
+  const to = printedLine(ledger, pair.to);
+  if (from === undefined || to === undefined) return `The printed-text ledger has no line ${from === undefined ? pair.from : pair.to}`;
+  const reading = (name: string, text: string): string => (name ? selfNamed(name, text) : stripKeywords(text));
+  return reading(pair.fromName, from) === reading(pair.toName, to) ? null : `Cannot copy ${pair.from} to ${pair.to}: "${from}" is not "${to}"`;
 }
 
 // The record's printed place, with its position in the list as the tiebreak, as the rank of the record among its card's records of its timing.
@@ -64,15 +84,11 @@ export function withCopies(items: readonly (Effect | Copy)[], options: Options =
   const own = items.filter((item): item is Effect => !isCopy(item));
   const pool = [...(options.pool ?? []), ...own];
   const nameOf = (lineId: string): string => options.names?.[parse(lineId, LINE).code] ?? "";
-  const reading = (lineId: string): string => (nameOf(lineId) ? selfNamed(nameOf(lineId), ledgerLine(lineId)) : stripKeywords(ledgerLine(lineId)));
 
   const made = new Map<Copy, { source: Effect; record: Effect }[]>();
   for (const item of items) {
     if (!isCopy(item)) continue;
     const map = new Map(item.copy);
-    for (const [from, to] of item.copy) {
-      if (reading(from) !== reading(to)) throw new Error(`Cannot copy ${from} to ${to}: "${ledgerLine(from)}" is not "${ledgerLine(to)}"`);
-    }
     const sources = pool.filter((record) => record.lines.some((line) => map.has(line)));
     for (const [from] of item.copy) if (!sources.some((record) => record.lines.includes(from))) throw new Error(`No record to copy for ${from}`);
     made.set(
@@ -100,6 +116,11 @@ export function withCopies(items: readonly (Effect | Copy)[], options: Options =
       taken.add(id);
       entry.record = { ...record, id };
       everyone[everyone.indexOf(record)] = entry.record;
+    }
+  }
+  for (const list of made.values()) {
+    for (const { source, record } of list) {
+      COPIED.set(record, source.lines.map((from, at) => ({ from, to: record.lines[at] ?? "", fromName: nameOf(from), toName: nameOf(record.lines[at] ?? "") })));
     }
   }
   return items.flatMap((item) => (isCopy(item) ? (made.get(item) ?? []).map(({ record }) => record) : [item]));

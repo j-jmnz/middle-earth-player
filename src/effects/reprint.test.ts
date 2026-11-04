@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../catalog/boundary.ts";
 import ledger from "../../data/printed/mirkwood-paths.json" with { type: "json" };
 import { AUTHORED_EFFECTS as OATH } from "./authored/the-oath.ts";
-import { copyLine, reprint, withCopies } from "./authored/reprint.ts";
+import { shippedLedger } from "../catalog/printed-ledger.ts";
+import { copiedLines, copyLine, copyMismatch, reprint, withCopies } from "./authored/reprint.ts";
 
 const linesOf = (code: string): string[] => ledger.entries.filter((entry) => entry.code === code && entry.side === "A").flatMap((entry) => entry.lines);
 
@@ -46,9 +47,13 @@ describe("withCopies", () => {
     expect(copied[2]?.id).toBe("110137:triggered:4");
   });
 
-  it("refuses two lines whose printed text differs, naming both", () => {
+  it("keeps the line pairs of each copy, and the ledger check refuses two lines whose printed text differs, naming both", () => {
     const calphon: Effect = { id: "11028:triggered:1", cardCode: "11028", lines: ["11028:A:3"], timing: "triggered", instructions: [] };
-    expect(() => withCopies([calphon, copyLine("11028:A:3", "110013:A:3")])).toThrow(/11028:A:3.*110013:A:3/);
+    const [, copied] = withCopies([calphon, copyLine("11028:A:3", "110013:A:3")]);
+    const pairs = copiedLines(copied!) ?? [];
+    expect(pairs).toEqual([{ from: "11028:A:3", to: "110013:A:3", fromName: "", toName: "" }]);
+    expect(copyMismatch(shippedLedger(), pairs[0]!)).toMatch(/11028:A:3.*110013:A:3/);
+    expect(copiedLines(calphon)).toBeUndefined();
   });
 
   it("refuses a line no record owns and an id that is taken", () => {
