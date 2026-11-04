@@ -18,7 +18,9 @@ import { lastPlayer } from "./players.ts";
 import { damageShip, fitShips, tradeShipDamage } from "./campaign.ts";
 import { boardNow } from "./boarding.ts";
 import { searchShips } from "./search.ts";
-import { takeSetAsideShip } from "./takeover.ts";
+import { setAsideSelf, takeSetAsideShip } from "./takeover.ts";
+import { makeEngagementChecks } from "./checks.ts";
+import { considerOutOfPlay, releaseHeld } from "./islet.ts";
 import { discardFromAnyDeck, nameCard, plunderHand } from "./cards.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -61,9 +63,15 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return state;
     case "TakeSetAsideShip":
       return takeSetAsideShip(state, instruction, focus, ctx);
+    case "MakeEngagementChecks":
+      return makeEngagementChecks(state, instruction, focus, ctx, steps);
+    case "SetAsideSelf":
+      return setAsideSelf(state, focus);
+    case "ConsiderOutOfPlay":
+      return considerOutOfPlay(state, focus, ctx);
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "TakeSetAsideShip"], run };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state) => releaseHeld(state) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "TakeSetAsideShip", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay"], run };

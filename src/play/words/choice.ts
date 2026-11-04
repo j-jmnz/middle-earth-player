@@ -415,7 +415,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     case "SpendFromPool":
       return { verb: "Spend", prompt: `Choose ${one} to spend a resource from.` };
     case "Exhaust":
-      return { verb: "Exhaust", prompt: `Choose ${one} to exhaust.` };
+      return { verb: "Exhaust", prompt: `Choose ${pick.pick.trait === "Ship" ? "a Ship objective" : one} to exhaust.` };
     case "Ready":
       return { verb: "Ready", prompt: `Choose ${one} to ready.` };
     case "DiscardResources": {
@@ -449,7 +449,10 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return pick.pick.type === "attachment" ? { verb: "Discard", prompt: `Choose ${one} you control to discard. The enemy gets resources equal to its printed cost.` } : { verb: "Add", prompt: `Choose ${one} to add ${typeof next.amount === "number" || amountNow != null ? `${amountNow ?? next.amount} ${(amountNow ?? next.amount) === 1 ? "resource" : "resources"}` : "resources"} to.` };
     // The sea family (Voyage Across Belegaer): the Ship objective that takes the excess damage of a shadow attack (11055:A:2).
     case "DamageShip":
-      return { verb: "Assign", prompt: "Choose the Ship objective you control that takes the excess damage." };
+      return { verb: "Assign", prompt: typeof next.amount === "number" ? `Choose the Ship objective you control that takes ${next.amount} damage.` : "Choose the Ship objective you control that takes the excess damage." };
+    // Belfalas Islet (12129:A:2): the Ship enemy that is out of play while the location is the active location.
+    case "ConsiderOutOfPlay":
+      return { verb: "Out of play", prompt: `Choose a Ship enemy that is not guarding an objective. While ${sourceId ? names.card(sourceId) : "this location"} is the active location, it is considered to be out of play.` };
     // A set-aside boon or burden a campaign card attaches (01130:A:3, 01130:A:4): the hero that carries it.
     case "AttachSetAside":
       return { verb: "Attach", prompt: `Choose ${one} to carry ${names.code(next.code)}.` };

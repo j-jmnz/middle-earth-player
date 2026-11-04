@@ -49,5 +49,16 @@ describe("the words of A Storm on Cobas Haven choices", () => {
     expect(prompts).toContain("Choose a Dol Amroth objective from the encounter deck or discard pile to add to the staging area.");
     expect(prompts).toContain("Choose a Ship enemy from the encounter deck or discard pile to add to the staging area.");
     expect(prompts).toContain("Choose an enemy to take 2 damage.");
+    // The stage's Forced effect (12120:B:2), Coast of Anfalas's Travel cost (12128:A:2), Belfalas Islet's Response (12129:A:2) and the Setup's objective (12120:A:1).
+    expect(prompts).toContain("Choose the Ship objective you control that takes 2 damage.");
+    expect(prompts).toContain("Choose a Ship objective to exhaust.");
+    expect(prompts).toContain("Choose a Ship enemy that is not guarding an objective. While 12129 is the active location, it is considered to be out of play.");
+    expect(prompts).toContain("Choose a Dol Amroth objective from the encounter deck or discard pile to add to the staging area.");
+  });
+
+  it("the engagement checks that ends in a tie ask the first player which enemy engages", () => {
+    const tie = AUTHORED_EFFECTS.flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "MakeEngagementChecks");
+    if (!tie) throw new Error("no MakeEngagementChecks record");
+    expect(pickWords(tie, undefined, names(), "12122").prompt).toBe("Choose which of the enemies tied for the highest engagement cost the engagement check engages.");
   });
 });

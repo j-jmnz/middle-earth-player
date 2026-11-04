@@ -100,6 +100,11 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       if (instruction.verb === "MoveProgressToStormcaller" && typeof instruction.amount === "number") {
         return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < instruction.amount;
       }
+      // "Exhaust a Ship objective to travel here" (12128:A:2): the card to exhaust is picked, so the cost cannot be paid without one.
+      if (instruction.verb === "Exhaust" && instruction.target?.kind === "picked") {
+        const pick = instructions.find((other) => other.verb === "Pick");
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+      }
       if (instruction.verb !== "Exhaust" || (instruction.target?.kind !== "byCode" && instruction.target?.kind !== "byName")) return false;
       return readyNamedCard(state, ctx, instruction.target, instruction.who === "firstPlayer" ? state.firstPlayer : null) == null;
     });

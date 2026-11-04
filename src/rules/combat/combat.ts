@@ -24,7 +24,7 @@ import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/at
 import { countsDefense, struck } from "../families/attack/strike.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
-import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong } from "../families/sea/ships.ts";
+import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong, shipsOnlyBarred } from "../families/sea/ships.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -229,6 +229,8 @@ export function canAttack(
   if (!isCharacterType(printed) || attacker.host != null) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives).
   if (!shipMayAttack(printed, printedOf(cards, enemy.code))) return false;
+  // "Only Ship objectives can be declared as attackers against Raider Flagship" (12124:A:3).
+  if (shipsOnlyBarred(state, enemyId, printed)) return false;
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;

@@ -5,6 +5,7 @@
 // pickers) and legal.ts (the legal-intent check and its refusal) ask these.
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -50,4 +51,14 @@ export function shipEnemyAttacking(state: ScenarioState, cards: Cards): boolean 
  * rather than leave the attack with nowhere to land. */
 export function shipObjectivesAmong(ids: readonly string[], state: ScenarioState, cards: Cards): string[] {
   return ids.filter((id) => printedOf(cards, state.cards[id]?.code ?? "").ship === "objective");
+}
+
+/** "Only Ship objectives can be declared as attackers against Raider Flagship" (12124:A:3, flag shipAttackersOnly): a character that is not a ship-objective may not be declared as an attacker against the enemy. */
+export function shipsOnlyBarred(state: ScenarioState, enemyId: string, attacker: PrintedCard): boolean {
+  return flagged(state, enemyId, "shipAttackersOnly") && attacker.ship !== "objective";
+}
+
+/** Why the character may not be declared against the enemy for that card's sake, or null. */
+export function shipsOnlyReason(state: ScenarioState, enemyId: string, attacker: PrintedCard): string | null {
+  return shipsOnlyBarred(state, enemyId, attacker) ? "Only Ship objectives can be declared as attackers against that enemy" : null;
 }

@@ -21,3 +21,11 @@ export function takeSetAsideShip(state: ScenarioState, instruction: Extract<Inst
   if (!found) return state;
   return updateCard(moveCard(state, found, { zone: "play", seat: focus.seat }), found, { face: dealtFace(state, state.cards[found]?.code ?? "", "up") });
 }
+
+// Rules: dcce.ships, rr.in-play-and-out-of-play; ledger lines 12123:A:3, 110102:A:3, 110102:B:5. "Forced: When Dol Amroth Warship is destroyed, set it aside, out of play": the source card, from the discard pile it was
+// destroyed to, goes to the set-aside zone with no damage and no controller, so that The Beacon can take it again.
+export function setAsideSelf(state: ScenarioState, focus: Focus): ScenarioState {
+  const id = focus.sourceId;
+  if (!id || !state.cards[id]) return state;
+  return updateCard(moveCard(state, id, { zone: "setAside" }), id, { face: "down", controller: null, damage: 0, exhausted: false });
+}

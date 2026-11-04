@@ -30,7 +30,7 @@ import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
 import { freeSlot, mustTravel } from "../families/south/locations.ts";
 import { viewOf } from "../families/breaking/areas.ts";
-import { shipAttackReason, shipDefenseReason } from "../families/sea/ships.ts";
+import { shipAttackReason, shipDefenseReason, shipsOnlyReason } from "../families/sea/ships.ts";
 import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "../families/sea/sailing-legal.ts";
 import { printedOf } from "../core/printed.ts";
 
@@ -336,6 +336,8 @@ function attackReason(
     if (!canAttack(state, state.activeSeat, attackerId, intent.enemyId, ctx.cards)) {
       const ship = shipAttackReason(printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""), printedOf(ctx.cards, enemy.code));
       if (ship) return ship;
+      const only = shipsOnlyReason(state, intent.enemyId, printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""));
+      if (only) return only;
       if (enemy.controller !== state.activeSeat) return "Ranged is required to attack an enemy engaged with another seat";
       return "That attack is illegal";
     }

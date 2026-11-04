@@ -46,6 +46,8 @@ export function seaPickWords(instruction: Instruction): PickWords | null {
       return { verb: "Advance", prompt: "Choose the stage to advance to. The other goes to the bottom." };
     case "SearchShips":
       return { verb: "Add", prompt: "Choose which Ship enemy with the highest Threat is added to the staging area." };
+    case "MakeEngagementChecks":
+      return { verb: "Engage", prompt: "Choose which of the enemies tied for the highest engagement cost the engagement check engages." };
     case "NameCard":
       return { verb: "Name", prompt: "Name a card. If you discard it from the deck you choose next, the damage is 2 instead of 1." };
     case "DiscardFromAnyDeck":
@@ -75,6 +77,7 @@ export function seaAsk(pick: Instruction, next: Instruction | undefined, options
     return { verb: "Take", prompt: open ? "Choose a Ship objective to take control of. One player must take the Dream-chaser." : "Choose a Ship objective to take control of." };
   }
   if (pick.verb === "Pick" && next?.verb === "DamageShip") {
+    if (typeof next.amount === "number") return { verb: "Assign", prompt: `Choose the Ship objective you control that takes ${next.amount} damage.` };
     const amount = resolveAmount(game, next.amount, frameScope(game, game.activeSeat, sourceId), ctx);
     return { verb: "Assign", prompt: amount > 0 ? `Choose the Ship objective you control that takes ${amount} excess damage.` : "Choose the Ship objective you control that takes the excess damage." };
   }

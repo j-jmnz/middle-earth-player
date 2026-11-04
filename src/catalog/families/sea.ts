@@ -60,6 +60,15 @@ const VERBS = [
   // "Take control of 1 set aside copy of Dol Amroth Warship" (12136:A:3): of the ship-objectives set aside with this title (whichever printing the game deals) the first one goes into play
   // under the actor, faceup, as a ship a player prepared in the fleet does (dcce.ships). Nothing happens with none set aside.
   z.strictObject({ verb: z.literal("TakeSetAsideShip"), name: z.string().min(1), ...when }),
+  // "The players make engagement checks against each enemy in the staging area" (12122:A:1), outside the encounter phase: the engagement checks of rr.engagement-check, pass after pass, until a pass engages
+  // no enemy (the tie for the highest engagement cost is the first player's choice). `lower`: "Raider Flagship gets -50 engagement cost during these engagement checks": the enemy with this title checks
+  // with `amount` less. `ordinal` and `engaged` are engine use: the seat the checks are at and whether this pass has engaged an enemy, kept while the first player chooses among tied enemies.
+  z.strictObject({ verb: z.literal("MakeEngagementChecks"), lower: z.strictObject({ name: z.string().min(1), amount: z.number().int().positive() }).optional(), ordinal: z.number().int().min(0).optional(), engaged: z.boolean().optional(), ...when }),
+  // "Set it aside, out of play" (12123:A:3, 110102:A:3): the source card, wherever it is, goes to the set-aside zone with no damage on it and no controller, so that a set aside copy can be taken again (TakeSetAsideShip).
+  z.strictObject({ verb: z.literal("SetAsideSelf"), ...when }),
+  // "While Belfalas Islet is the active location, the chosen enemy is considered to be out of play" (12129:A:2): the last picked enemy goes facedown under the source location, out of play as any card under a location is
+  // (rr.in-play-and-out-of-play), and returns to the staging area, or to the player it was engaged with, once the source is no longer the active location (a settle sweep keeps this).
+  z.strictObject({ verb: z.literal("ConsiderOutOfPlay"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -94,6 +103,8 @@ const FLAGS = [
   "damageCap",
   // On an enemy: it has this Victory value while the flag holds ("he gains victory 3", 11178:A:1), for where it goes when it is destroyed and for the score.
   "gainsVictory",
+  // On an enemy: only a Ship objective can be declared as an attacker against it ("Only Ship objectives can be declared as attackers against Raider Flagship", 12124:A:3; families/sea/ships.ts).
+  "shipAttackersOnly",
 ] as const;
 
 export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

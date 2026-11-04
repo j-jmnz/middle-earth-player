@@ -47,7 +47,7 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south"],
   after: ["sea", "stormcaller", "island"],
-  sweep: ["aflame", "objectives"],
+  sweep: ["aflame", "objectives", "sea"],
 };
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */

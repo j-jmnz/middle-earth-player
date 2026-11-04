@@ -18,6 +18,9 @@ export type SeaRoute = "corsair" | "victory" | "removed";
 // answer, or once the heading is back on Sun, it waits at "look": the same cards, one answer ("done") before they are discarded.
 export type SailingTest = { step: "ask" } | { step: "shift"; looked: readonly string[]; left: number } | { step: "look"; looked: readonly string[] };
 
+// Where an enemy stood before a location held it out of play: the staging area, or engaged with this seat.
+export type HeldEnemy = { zone: "staging" | "engaged"; seat: number | null };
+
 export type SeaState = {
   // The Heading card's setting, or null before the fleet is prepared (no Heading card yet).
   heading: Heading | null;
@@ -27,6 +30,8 @@ export type SeaState = {
   routes: Readonly<Record<string, SeaRoute>>;
   // The first player is choosing what to commit to this round's Sailing test.
   sailing?: SailingTest;
+  // Enemies a location holds out of play, facedown under it, while it is the active location (families/sea/islet.ts): where each stood, to put it back.
+  held?: Readonly<Record<string, HeldEnemy>>;
   // The Stormcaller's area, once a Setup has prepared it (families/stormcaller/area.ts).
   stormcaller?: StormcallerArea;
 };
