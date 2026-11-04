@@ -69,7 +69,7 @@ export function PhaseRail({
   // The headline is the phase; Setup and the mulligan have none, so their step takes its place.
   const head = rail.phase || rail.current;
   const at = ROUND_PHASES.findIndex((phase) => phase.toLowerCase() === rail.phase.toLowerCase());
-  const label = [round, rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
+  const label = [round, rail.additional ? `${rail.phase} · additional` : rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
   return (
     <Pressable
       testID="rail"
@@ -141,17 +141,23 @@ export function PhaseRail({
           {ROUND_PHASES.map((phase, index) => {
             const past = at >= 0 ? index < at : rail.phase === "End";
             const current = index === at;
+            // An additional instance of a phase (11213:A:2) draws the lit tick twice.
+            const twice = current && rail.additional;
             return (
-              <View
-                key={phase}
-                style={{
-                  width: TICK * s,
-                  height: 3 * s,
-                  borderRadius: 1.5 * s,
-                  backgroundColor: current ? t.accentHigh : past ? t.accentLine : withAlphaHex(t.bone, 0.12),
-                  ...(current ? { boxShadow: `0 0 8px ${withAlphaHex(t.glow, 0.8)}` } : {}),
-                }}
-              />
+              <View key={phase} testID={twice ? "rail-additional" : undefined} style={{ flexDirection: "row", gap: TICK_GAP * s }}>
+                {(twice ? [0, 1] : [0]).map((copy) => (
+                  <View
+                    key={copy}
+                    style={{
+                      width: TICK * s,
+                      height: 3 * s,
+                      borderRadius: 1.5 * s,
+                      backgroundColor: current ? t.accentHigh : past ? t.accentLine : withAlphaHex(t.bone, 0.12),
+                      ...(current ? { boxShadow: `0 0 8px ${withAlphaHex(t.glow, 0.8)}` } : {}),
+                    }}
+                  />
+                ))}
+              </View>
             );
           })}
         </View>

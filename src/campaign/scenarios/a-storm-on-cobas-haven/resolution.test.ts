@@ -10,6 +10,9 @@ import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
+import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { havenStart, havenWorld } from "../../../../test/scenarios/a-storm-on-cobas-haven/game.ts";
 import { loadHavenWorld, havenTable, idsOf, CODES, type HavenLayout, type HavenWorld } from "../../../../test/scenarios/a-storm-on-cobas-haven/scene.ts";
 
 import { emptyLog } from "../../log.ts";
@@ -73,6 +76,16 @@ describe("11209:B:1 Resolution", () => {
     const records = EFFECTS.filter((effect) => effect.cardCode === CODES.campaignCard && effect.timing === "resolution" && effect.lines.includes("11209:B:1"));
     expect(records.flatMap((record) => record.instructions)).toEqual([{ verb: "EarnDealt", codes: ["11205", "11206", "11207", "11208"] }]);
   });
+
+  it("the Blessing a player took in Setup joins the Campaign Pool when the scenario is won, for the seat that took it", async () => {
+    const { ctx } = await havenWorld("strong");
+    let state = startScenario(havenStart(1, 1, "Normal"), ctx);
+    while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+    for (let guard = 0; guard < 40 && state.window?.kind === "choose"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
+    expect(state.chosenAtSetup).toEqual([{ code: CODES.cirdanSBlessing, seat: 0 }]);
+    const won = resolutionResult(openResolution({ ...state, window: null, stageCleared: true, resolution: LINES }, ctx));
+    expect(won?.earned.map((item) => ({ code: item.code, to: item.to, seat: item.seat }))).toEqual([{ code: CODES.cirdanSBlessing, to: "pool", seat: 0 }]);
+  }, 120_000);
 
   it("records \"Gavin returned\" for 4 XP spent on him once the scenario is won, and not before (the XP model, src/campaign/xp.ts)", () => {
     const log = { ...emptyLog(1), xpGained: { "a-storm-on-cobas-haven": 4 } };

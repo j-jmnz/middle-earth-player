@@ -25,6 +25,7 @@ import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
 import { pictureKey } from "./picture-key.ts";
 import { areaFacts, areaSpeech } from "../store/stormcaller-table.ts";
+import { controlSpeech } from "../cards/dungeon-preview.ts";
 import { grappleDetail } from "../words/grapple.ts";
 import { stagePill } from "../words/stormcaller.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
@@ -144,7 +145,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
     if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
     // The Havens Burn's count, the enemies grappled under a location, and a Ship location's Threat against the total that loses (each is a sentence of its own; none drops another).
-    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech].filter((part): part is string => part != null);
+    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech, controlSpeech(game, slot.id)].filter((part): part is string => part != null);
     return said.length > 0 ? `${nameOf(slot.picture ?? slot.code)}, ${said.join(". ")}` : null;
   };
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.

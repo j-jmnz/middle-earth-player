@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~62.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~62.5K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -91,7 +91,7 @@ Read the sections your task touches.
     - 568–588 Escape from Dol Guldur (~2.7K)
     - 589–603 The Oath (~2.3K)
     - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–674 Dream-chaser (~13.0K)
+  - 622–674 Dream-chaser (~13.1K)
   - 675–683 Nightmare (~420)
   - 684–722 Deckbuilding (~1.8K) ← 1
   - 723–801 Effects (~3.2K)
@@ -104,7 +104,7 @@ Read the sections your task touches.
   - 842–867 Persistence and shipping (~1.7K)
   - 868–908 Screens (~4.4K) ← 2
     - 894–908 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~28.2K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~28.6K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -112,7 +112,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560) ← 1
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
-  - 58–80 Cards (~3.6K) ← 9
+  - 58–80 Cards (~3.9K) ← 9
   - 81–86 The Sailing test (~690) ← 5
   - 87–100 The Island Map (~1.7K) ← 8
   - 101–104 Tokens and effects (~320)

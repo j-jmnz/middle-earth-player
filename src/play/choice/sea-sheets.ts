@@ -8,6 +8,9 @@ import { legalTargets } from "../../rules/engine/reduce.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../../rules/families/sea/sailing-legal.ts";
 
 import { SAILING_COMMIT_NOTE, SAILING_COMMIT_TITLE, SAILING_PASS_ARMED, sailingTitle } from "../words/sea.ts";
+import type { Instruction } from "../../catalog/boundary.ts";
+import { printedOf } from "../../rules/core/printed.ts";
+import { damageOutcome } from "../store/foresight.ts";
 import { option, step } from "./sheet-parts.ts";
 import type { LookRow, MultiSheet, PickSheet, Sheet, SheetNames } from "./sheet-types.ts";
 
@@ -106,4 +109,45 @@ export function sailingSheet(game: ScenarioState, ctx: ReduceContext, names: She
   if (askingToShift(game)) return sailingShiftSheet(game, ctx, names);
   if (askingToLook(game)) return sailingLookSheet(game, ctx, names);
   return null;
+}
+
+/** The damage a card attached to a Ship objective deals to it when it exhausts ("Forced: When attached objective exhausts, deal 2 damage to it", 12132:A:1), and the name of that card; null for a ship without one. */
+function exhaustDamage(game: ScenarioState, ctx: ReduceContext, ship: string, names: Pick<SheetNames, "card">): { amount: number; source: string } | null {
+  let amount = 0;
+  let source = "";
+  for (const attached of game.cards[ship]?.attachments ?? []) {
+    const code = game.cards[attached]?.code;
+    for (const effect of ctx.effects) {
+      if (effect.cardCode !== code || effect.trigger !== "shipExhausted") continue;
+      for (const instruction of effect.instructions) {
+        if (instruction.verb === "DamageCard" && instruction.target === "host" && typeof instruction.amount === "number") {
+          amount += instruction.amount;
+          source = names.card(attached);
+        }
+      }
+    }
+  }
+  return amount > 0 ? { amount, source } : null;
+}
+
+/**
+ * The row of a Ship objective in a pick that exhausts it or attaches a card to it (Taking on Water's Action and Coast of Anfalas's Travel cost, 12132:A:1, 12128:A:2; Taking on Water itself, 12132:A:1):
+ * its owner when the options hold the ships of more than one player, and a caution when the exhaust would make a card on it deal damage, with the loss when that destroys it. Null for any other row.
+ */
+export function shipRow(pick: Instruction, next: Instruction | undefined, id: string, options: readonly string[], game: ScenarioState, ctx: ReduceContext, names: Pick<SheetNames, "card">): { label?: string; caution?: string } | null {
+  const exhausts = pick.verb === "Pick" && next?.verb === "Exhaust";
+  const attaches = pick.verb === "AttachSelf" && pick.to.kind === "ship" && pick.to.defender !== true;
+  const card = game.cards[id];
+  if ((!exhausts && !attaches) || !card || printedOf(ctx.cards, card.code).ship !== "objective") return null;
+  const owners = new Set(options.map((other) => game.cards[other]?.controller));
+  const name = names.card(id);
+  const label = owners.size > 1 && card.controller != null ? `${name} · Player ${card.controller + 1}` : undefined;
+  const water = exhausts ? exhaustDamage(game, ctx, id, names) : null;
+  if (!water) return label ? { label } : null;
+  const outcome = damageOutcome(game, ctx, id, water.amount);
+  // A Ship objective destroyed loses the game (the Dream-chaser, 11080:A:4) or eliminates its controller (the other ships): its own record says which.
+  const records = ctx.effects.filter((effect) => effect.cardCode === card.code && effect.trigger === "characterDestroyed").flatMap((effect) => effect.instructions.map((instruction) => instruction.verb));
+  const consequence = outcome.loss != null || records.includes("LoseGame") ? " and the game is lost" : records.includes("EliminatePlayer") ? ` and ${card.controller != null && game.seatCount > 1 ? `Player ${card.controller + 1}` : "its player"} is eliminated` : "";
+  const caution = outcome.destroyed ? `Tap again: ${water.source}: ${water.amount} damage destroys ${name}${consequence}` : `Tap again: ${water.source}: ${water.amount} damage to ${name}`;
+  return { ...(label ? { label } : {}), caution };
 }

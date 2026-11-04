@@ -39,6 +39,9 @@ export type ConditionHook = (state: ScenarioState, condition: Condition, scope: 
 /** An amount of a family, before the amount's `times`, `plus` and `limit`: a number, or null when the amount is not the family's. Asked before the core's reads. */
 export type AmountHook = (state: ScenarioState, amount: Exclude<Amount, number>, scope: AmountScope, ctx: ReduceContext) => number | null;
 
+/** A card attached to a host by AttachSelf: the family notes what it needs about the pair (the host's state at the moment it was attached). Returns a new state or the same object. */
+export type AttachedHook = (state: ScenarioState, id: string, host: string, ctx: ReduceContext) => ScenarioState;
+
 export type RulesFamily = {
   /** The folder name, which is also the catalog file name in src/catalog/families. */
   readonly name: string;
@@ -51,4 +54,5 @@ export type RulesFamily = {
   readonly pick?: PickHook;
   readonly condition?: ConditionHook;
   readonly amount?: AmountHook;
+  readonly attached?: AttachedHook;
 };

@@ -49,6 +49,7 @@ type Hooked = {
   readonly pick: readonly RulesFamily[];
   readonly condition: readonly RulesFamily[];
   readonly amount: readonly RulesFamily[];
+  readonly attached: readonly RulesFamily[];
 };
 const hookedBy = new WeakMap<readonly RulesFamily[], Hooked>();
 
@@ -61,6 +62,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       pick: families.filter((family) => family.pick != null),
       condition: families.filter((family) => family.condition != null),
       amount: families.filter((family) => family.amount != null),
+      attached: families.filter((family) => family.attached != null),
     };
     hookedBy.set(families, found);
   }
@@ -139,4 +141,11 @@ export function familyAmount(state: ScenarioState, amount: Exclude<Amount, numbe
     if (value != null) return value;
   }
   return null;
+}
+
+/** Tells the families that AttachSelf attached `id` to `host`, each on the state the one before returned. */
+export function familyAttached(state: ScenarioState, id: string, host: string, ctx: ReduceContext, families: readonly RulesFamily[] = active()): ScenarioState {
+  let current = state;
+  for (const family of hooked(families).attached) current = family.attached?.(current, id, host, ctx) ?? current;
+  return current;
 }

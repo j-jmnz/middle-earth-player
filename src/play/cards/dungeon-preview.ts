@@ -11,12 +11,15 @@ import { prisonerWords } from "../readouts/widgets.ts";
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
  * is blank), from their printed definitions (rules/core/printed.ts): the stats a real card would print. Null for any other code.
  */
-export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: string): string | null {
+export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: string, textOf: (code: string) => string | null = () => null): string | null {
   const fallen = code.endsWith(FALLEN_SUFFIX);
-  // A Ship enemy the players took control of as a Ship objective (Corsair Skirmisher, 12125:A:3): its definition is a derived one too (printed.ts), and its card shows the enemy's art.
+  // A Ship enemy the players took control of as a Ship objective (Corsair Skirmisher, 12125:A:3): its definition is a derived one too (printed.ts), its card shows the enemy's art, and its printed lines
+  // (`textOf` the enemy's code: "Immune to player card effects" is still true of it) follow its stats.
   if (isShipObjectiveCode(code) && cards.has(fallenBase(code))) {
     const ship = printedOf(cards, code);
-    return `Ship objective now, taken from the Corsair fleet. Willpower ${ship.willpower ?? 0}, Attack ${ship.attack ?? 0}, Defense ${ship.defense ?? 0}, ${ship.health ?? 0} hit point${ship.health === 1 ? "" : "s"}.`;
+    const stats = `Ship objective. Willpower ${ship.willpower ?? 0} (its Threat), Attack ${ship.attack ?? 0}, Defense ${ship.defense ?? 0}, ${ship.health ?? 0} hit point${ship.health === 1 ? "" : "s"}.`;
+    const printed = textOf(fallenBase(code));
+    return printed ? `${stats}\n${printed}` : stats;
   }
   if (code !== ORC_GUARD_CODE && !(fallen && cards.has(fallenBase(code)))) return null;
   const printed = printedOf(cards, code);
@@ -33,10 +36,11 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   if (card.zone === "staging" && ctx.cards.get(card.code)?.type === "objective") {
     const guards = card.attachments.filter((id) => game.cards[id]?.guard === true && game.cards[id]?.host === cardId);
-    if (guards.length > 0) return `Guarded by ${guards.map(name).join(", ")}`;
+    // A tower the players control that a Ship enemy guards again (Siege Ship, The Raiders' Assault) stays theirs: control is taken once.
+    if (guards.length > 0) return `Guarded by ${guards.map(name).join(", ")}${playersControl(card) ? ". The players still control it." : ""}`;
     if (claimable(ctx, card.code) && freeOfEncounters(game, cardId)) return "Free of encounters: you can claim it";
     // A tower freed of encounters stays in the staging area, controlled by the players as a group (ControlWhenFree, 12134:A:2): it has no hero to hang on.
-    if (card.claimed === true && card.controller == null) return "Free of encounters: the players control it";
+    if (playersControl(card)) return "Free of encounters: the players control it";
   }
   // A Ship enemy a location holds out of play while it is the active location (Belfalas Islet, 12129:A:2): faceup, but not on the table.
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
@@ -47,4 +51,15 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
 // An objective with a claiming Action (the condition of which reads "free of encounters", rr.guarded).
 function claimable(ctx: ReduceContext, code: string): boolean {
   return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "action" && JSON.stringify(effect.condition ?? null).includes("freeOfEncounters"));
+}
+
+// A tower freed of encounters is controlled by the players as a group: claimed, with no hero or player to hang on (ControlWhenFree).
+function playersControl(card: ScenarioState["cards"][string]): boolean {
+  return card.zone === "staging" && card.claimed === true && card.controller == null;
+}
+
+/** What a screen reader hears of a card the table shows by its picture alone: "controlled by the players" for a tower the players control, whether or not a Ship enemy guards it again. Null for any other card. */
+export function controlSpeech(game: ScenarioState, cardId: string): string | null {
+  const card = game.cards[cardId];
+  return card && playersControl(card) ? "controlled by the players" : null;
 }

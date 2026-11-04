@@ -304,7 +304,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
     source: pictureAt(key, revision, ownSide(key)),
     landscape: session.world.cards.get(code)?.type === "quest",
     // A revealed quest stage reads its B side.
-    text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code),
+    text: (key !== code ? sideText(code, "B") : null) ?? session.facts.get(code)?.text ?? standInText(session.world.cards, code, (base) => session.facts.get(base)?.text ?? null),
     notApplied: lostIsland(key) ? null : notApplied(code, session.world.cards.get(code)?.type, session.facts.get(code)?.text ?? null),
   });
   const advancedCard = advance.shown ? game.cards[advance.shown.stageId] : undefined;

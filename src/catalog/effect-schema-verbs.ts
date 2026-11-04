@@ -203,6 +203,9 @@ export const simpleVerbs = [
       // card to one of that player's heroes", 900106:A:1) a hero of the player the effect picked, who chooses it.
       z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
+      // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
+      // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
+      z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
     ]),
     ...when,
   }),

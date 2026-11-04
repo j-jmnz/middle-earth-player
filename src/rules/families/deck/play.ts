@@ -102,7 +102,7 @@ function intoHand(state: ScenarioState, id: string, seat: number): ScenarioState
 }
 
 // An attachment played for no cost onto the host the actor chose, or an ally played for no cost (no host): a play, announced, by the actor.
-function playAttachment(state: ScenarioState, id: string, hostId: string | undefined, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+function playForFree(state: ScenarioState, id: string, hostId: string | undefined, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const data = topFrame(state)?.data;
   const marked = data?.kind === "effect" ? patchTop(state, { data: { ...data, picked: [...(data.picked ?? []), id] } }) : state;
   const before = { ...intoHand(marked, id, seat), activeSeat: seat };
@@ -121,7 +121,7 @@ export function playFrom(state: ScenarioState, instruction: PlayFrom, focus: Foc
     const hosts = attachmentHostIds(state, seat, card.code, ctx);
     const host = focus.chosen && hosts.includes(focus.chosen) ? focus.chosen : hosts.length === 1 ? hosts[0] : undefined;
     if (!host) return hosts.length > 1 ? askTarget(state, { instruction, seat, chosen: null }, hosts) : state;
-    return playAttachment(state, card.id, host, seat, ctx, steps);
+    return playForFree(state, card.id, host, seat, ctx, steps);
   }
   const data = topFrame(state)?.data;
   const frame = data?.kind === "effect" ? data : undefined;
@@ -131,7 +131,7 @@ export function playFrom(state: ScenarioState, instruction: PlayFrom, focus: Foc
   if (!chosen) return options.length > 1 ? askTarget(state, { instruction, seat, chosen: null }, options) : state;
   const printed = printedOf(ctx.cards, state.cards[chosen]?.code ?? "");
   if (printed.type === "attachment") return playFrom(state, { ...instruction, card: chosen }, { seat, sourceId: focus.sourceId }, ctx, steps);
-  if (printed.type === "ally") return playAttachment(state, chosen, undefined, seat, ctx, steps);
+  if (printed.type === "ally") return playForFree(state, chosen, undefined, seat, ctx, steps);
   // The event is the picked card, for the instructions that follow the play (Book of Eldacar puts it on the bottom of the deck).
   const marked = frame ? patchTop(state, { data: { ...frame, picked: [...(frame.picked ?? []), chosen] } }) : state;
   return queueFront(intoHand(marked, chosen, seat), seat, [{ verb: "PayToPlay", card: chosen, ...(instruction.free ? { free: true } : {}), paid: [] }]);

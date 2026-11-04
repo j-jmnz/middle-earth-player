@@ -12,6 +12,11 @@ tags:
     env:
       FIXTURE: ruins-won
       SCENARIO_ID: the-drowned-ruins
-# A Storm on Cobas Haven is playable now (phase 47): its node is the current one and the path offers Begin.
+# A Storm on Cobas Haven is playable now (phase 47): its node is the next one, the path offers Begin, and nothing says it is coming soon.
+- assertVisible:
+    id: node-a-storm-on-cobas-haven-status
+    text: "Next"
+- assertNotVisible:
+    id: path-soon
 - assertVisible:
     id: begin

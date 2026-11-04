@@ -71,7 +71,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "action",
       condition: { kind: "all", conditions: [{ kind: "phase", is: "Planning" }, { kind: "controlledByPlayers" }] },
       cost: [{ kind: "exhaustSelf" }, { kind: "resources", amount: 5 }],
-      instructions: [{ verb: "TakeSetAsideShip", name: "Dol Amroth Warship" }],
+      instructions: [{ verb: "PutSetAsideInPlay", name: "Dol Amroth Warship", to: "actor" }],
     },
 
     // 12137 Tower of the Heron: while the players control it, the archery total is 4 lower (never below 0).
@@ -241,7 +241,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 12132 Taking on Water: attaches to a Ship objective the first player chooses, as a Condition attachment; Forced: when the attached objective exhausts it takes 2 damage (an encounter card's damage, which a Ship's immunity to
     // player card effects does not stop); Action (the Ship's controller): exhaust 3 characters you control to discard it. Shadow: it attaches to the defending character if that is a Ship.
-    { id: "12132:whenRevealed:1", cardCode: "12132", lines: ["12132:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachToShip", to: "choose" }] },
+    { id: "12132:whenRevealed:1", cardCode: "12132", lines: ["12132:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "ship" } }] },
     { id: "12132:constant:1", cardCode: "12132", lines: ["12132:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
     { id: "12132:forced:1", cardCode: "12132", lines: ["12132:A:1"], timing: "forced", trigger: "shipExhausted", subject: "host", instructions: [{ verb: "DamageCard", amount: 2, target: "host" }] },
     {
@@ -252,7 +252,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "count", pick: READY_CHARACTER, min: 3 },
       instructions: [{ verb: "Repeat", times: 3, instructions: [{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" } }] }, { verb: "Discard", target: { kind: "self" } }],
     },
-    { id: "12132:shadow:1", cardCode: "12132", lines: ["12132:A:2"], timing: "shadow", instructions: [{ verb: "AttachToShip", to: "defender" }] },
+    { id: "12132:shadow:1", cardCode: "12132", lines: ["12132:A:2"], timing: "shadow", instructions: [{ verb: "AttachSelf", to: { kind: "ship", defender: true } }] },
 
     // 11209 A Storm on Cobas Haven (campaign card). Setup (Campaign Mode): the Modification boons, Black Key (burden), Calaerion, Gavin and the four Send for Help cards are set aside (each facedown); once the quest card's Setup has put the
     // Raider Flagship in the staging area and prepared the fleet (ScenarioDefinition.afterSetup) Black Key is attached to the Flagship, the ships are fitted, Calaerion comes into play under the player with the Dream-chaser and Gavin under

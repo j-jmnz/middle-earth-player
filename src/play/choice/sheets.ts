@@ -39,7 +39,8 @@ import { freeSlot } from "../../rules/families/south/locations.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
 import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
-import { sailingSheet } from "./sea-sheets.ts";
+import { sailingSheet, shipRow } from "./sea-sheets.ts";
+import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -281,15 +282,16 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const tradeAsk = trade && traded ? { verb: "Trade", prompt: tradeWords(game, ctx.cards, trade, names.card(traded.id), effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"))) } : null;
       // What the instruction after the pick deals or places, read now (the damage, progress or resources a prompt and a row state).
       const amountNow = wait?.kind === "target" ? dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source) : undefined;
-      const asked = wait?.kind === "target" ? (tradeAsk ?? (wait.item.instruction ? grappleAsk(wait.item.instruction, source, words, grappleFactsOf(game, ctx, wait.item.instruction, data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null)) : null) ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow)) : { verb: "Choose", prompt: "Choose one." };
+      const asked = wait?.kind === "target" ? (tradeAsk ?? (wait.item.instruction ? grappleAsk(wait.item.instruction, source, words, grappleFactsOf(game, ctx, wait.item.instruction, data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null)) : null) ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow, data?.queue.slice(1).map((item) => item.instruction))) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
+      const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);
       return {
         ...base,
         note: [`${asked.prompt}${who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
         ...(outOfPlay ? { confirm: asked.verb } : {}),
-        options: window.options.map((id): PickOption => {
+        options: (collection ? collectionOrder(game, ctx, window.options) : window.options).map((id): PickOption => {
           const card = option(game, names, id);
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
@@ -298,10 +300,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
-          const label = fire?.label ?? sea ?? (outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
+          // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
+          const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
+          const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ? { caution: fire.caution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

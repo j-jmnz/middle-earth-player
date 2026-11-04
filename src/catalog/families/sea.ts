@@ -59,7 +59,6 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ShuffleIntoCorsairDeck"), code: z.string().min(1), ...when }),
   // "Take control of 1 set aside copy of Dol Amroth Warship" (12136:A:3): of the ship-objectives set aside with this title (whichever printing the game deals) the first one goes into play
   // under the actor, faceup, as a ship a player prepared in the fleet does (dcce.ships). Nothing happens with none set aside.
-  z.strictObject({ verb: z.literal("TakeSetAsideShip"), name: z.string().min(1), ...when }),
   // "Shuffle ... 1 random set-aside Send for Help into the encounter deck" (11210:A:4): of the cards set aside with this title one, chosen with the game's seed, goes into the encounter deck facedown. The deck is
   // not shuffled here: the instruction after it does that (ShuffleSelfIntoEncounterDeck, ShuffleEncounterDeck). Nothing happens with none set aside.
   z.strictObject({ verb: z.literal("ShuffleRandomSetAside"), name: z.string().min(1), ...when }),
@@ -67,7 +66,7 @@ const VERBS = [
   // no enemy (the tie for the highest engagement cost is the first player's choice). `lower`: "Raider Flagship gets -50 engagement cost during these engagement checks": the enemy with this title checks
   // with `amount` less. `ordinal` and `engaged` are engine use: the seat the checks are at and whether this pass has engaged an enemy, kept while the first player chooses among tied enemies.
   z.strictObject({ verb: z.literal("MakeEngagementChecks"), lower: z.strictObject({ name: z.string().min(1), amount: z.number().int().positive() }).optional(), ordinal: z.number().int().min(0).optional(), engaged: z.boolean().optional(), ...when }),
-  // "Set it aside, out of play" (12123:A:3, 110102:A:3): the source card, wherever it is, goes to the set-aside zone with no damage on it and no controller, so that a set aside copy can be taken again (TakeSetAsideShip).
+  // "Set it aside, out of play" (12123:A:3, 110102:A:3): the source card, wherever it is, goes to the set-aside zone with no damage on it and no controller, so that a set aside copy can be taken again (PutSetAsideInPlay to the actor).
   z.strictObject({ verb: z.literal("SetAsideSelf"), ...when }),
   // "While Belfalas Islet is the active location, the chosen enemy is considered to be out of play" (12129:A:2): the last picked enemy goes facedown under the source location, out of play as any card under a location is
   // (rr.in-play-and-out-of-play), and returns to the staging area, or to the player it was engaged with, once the source is no longer the active location (a settle sweep keeps this).
@@ -80,7 +79,6 @@ const VERBS = [
   z.strictObject({ verb: z.literal("TakeControlAsShip"), ...when }),
   // "Attach to a Ship objective" (12132:A:1) and "If defending character is a Ship, attach ~ to it" (12132:A:2): the source treachery attaches to a Ship objective. `choose`: the first player chooses among the Ship
   // objectives the players control (a lone one is taken); `defender`: the Ship objective defending the attack in progress, and nothing happens if the defender is not a Ship.
-  z.strictObject({ verb: z.literal("AttachToShip"), to: z.enum(["choose", "defender"]), ...when }),
   // "The engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack" (12131:A:1): the last picked
   // enemy makes an immediate attack (counted for noneReturned like any attack made by an effect); with `raiseStagingThreat`, when the attack ends the total Threat in the staging area is raised, until the phase or the
   // round ends, by the damage the attack dealt.

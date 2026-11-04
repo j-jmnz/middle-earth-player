@@ -36,4 +36,12 @@ describe("a Dream-chaser world", () => {
     expect(world.cards.get("11016")?.keywords.sailing).toBe(true);
     expect(world.cards.get("11050")?.keywords.sailingSuccess).toBe(2);
   });
+
+  // Send for Help (Tactics) and (Spirit) name the collection (11212:A:2, 11214:A:2): Gandalf (01073) by code, and every deck-legal hero for the one chosen from it. Found by walking the parsed instructions.
+  it("a Storm on Cobas Haven loads Gandalf and the hero rows its Send for Help cards take from the collection", () => {
+    const world = loadWorld(catalog, campaign, loadScenario("a-storm-on-cobas-haven"), EFFECTS);
+    expect(world.cards.get("01073")?.name).toBe("Gandalf");
+    expect(world.cards.get("01001")).toMatchObject({ type: "hero", name: "Aragorn" });
+    expect([...world.cards.values()].filter((card) => card.type === "hero").length).toBeGreaterThan(20);
+  });
 });

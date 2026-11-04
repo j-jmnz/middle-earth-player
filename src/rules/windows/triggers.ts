@@ -120,9 +120,11 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   // Constant effects follow the cards in play, so they are brought up to date before anything else runs.
   const synced = syncConstants(state, ctx);
   if (synced !== state) return synced;
-  if (state.phase === state.boundaryPhase) return state;
+  // An additional instance of the phase in progress (phaseSeq, state.ts) ends the instance before it.
+  const instance = state.phaseSeq ?? 0;
+  if (state.phase === state.boundaryPhase && instance === (state.boundarySeq ?? 0)) return state;
   const ended = state.boundaryPhase;
-  let next: ScenarioState = { ...state, boundaryPhase: state.phase };
+  let next: ScenarioState = { ...state, boundaryPhase: state.phase, ...(instance > 0 ? { boundarySeq: instance } : {}) };
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);

@@ -4,11 +4,12 @@
 // The phase rail names, in words, the step the engine is in, with the step before and the step after. It reads the
 // engine's mode and phase and nothing else, so it cannot skip a step the engine runs. The pill also names the phase and the
 // phases beside it (carousel.ts lays the whole round out for the strip a tap on the pill opens).
-import { phaseOf, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
+import { extraPhaseMode, phaseOf, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 
 // `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
-// the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step.
-export type Rail = { previous: string; current: string; next: string; phase: string; round: number; previousPhase: string; nextPhase: string };
+// the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step. `additional`: the phase running is an additional instance (Send for Help (Spirit), 11213:A:2);
+// its previous phase is the one it followed.
+export type Rail = { previous: string; current: string; next: string; phase: string; round: number; previousPhase: string; nextPhase: string; additional: boolean };
 
 /** The round's seven phases in order (steps.json; the carousel's cards). Beginning of round and End of round are not phases of play. */
 export const ROUND_PHASES: readonly string[] = ["Resource", "Planning", "Quest", "Travel", "Encounter", "Combat", "Refresh"];
@@ -74,11 +75,13 @@ export function railFor(game: ScenarioState): Rail {
   const count = ROUND_PHASES.length;
   // An additional instance of a phase (Send for Help (Spirit), 11213:A:2) is owed: it runs next, and once the last one is running the round goes on at the phase it was added to.
   const extraNext = game.extraPhases?.[0] ?? (game.extraResume != null ? phaseOf(game.extraResume) : undefined);
+  const additional = game.extraResume != null;
   const base = {
     phase: PILL_PHASE[game.phase] ?? game.phase,
     round: game.round,
-    previousPhase: phaseAt < 0 ? "" : (ROUND_PHASES[(Math.min(phaseAt, count) + count - 1) % count] ?? ""),
+    previousPhase: additional && game.extraFollowed ? game.extraFollowed : phaseAt < 0 ? "" : (ROUND_PHASES[(Math.min(phaseAt, count) + count - 1) % count] ?? ""),
     nextPhase: extraNext ?? ROUND_PHASES[phaseAt >= count ? 0 : (phaseAt + 1) % count] ?? "",
+    additional,
   };
   if (game.lost) return { ...base, previous: STEP_WORDS[game.mode], current: "Defeat", next: "" };
   if (game.stageCleared) return { ...base, previous: STEP_WORDS[game.mode], current: "Victory", next: "Resolution" };
@@ -87,7 +90,11 @@ export function railFor(game: ScenarioState): Rail {
   }
   const at = ROUND.indexOf(game.mode === "stopped" ? "resolution" : game.mode);
   const previous = ROUND[(at + ROUND.length - 1) % ROUND.length] ?? "beginRound";
-  const next = ROUND[(at + 1) % ROUND.length] ?? "beginRound";
+  const following = ROUND[(at + 1) % ROUND.length] ?? "beginRound";
+  // The last step of a phase goes on to the additional instance owed, else to the step the round resumes at once an instance has run.
+  const leaving = phaseOf(following) !== game.phase;
+  const owed = game.extraPhases?.[0];
+  const next = leaving ? ((owed ? extraPhaseMode(owed) : undefined) ?? game.extraResume ?? following) : following;
   return { ...base, previous: STEP_WORDS[previous], current: STEP_WORDS[game.mode], next: STEP_WORDS[next] };
 }
 

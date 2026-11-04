@@ -3,6 +3,8 @@
 // verb asks for (a card to play from a discard pile, cards chosen up to a number).
 import type { Instruction } from "../../catalog/boundary.ts";
 
+import type { PickWords } from "./choice.ts";
+
 type DeckVerb = Extract<
   Instruction,
   {
@@ -106,4 +108,29 @@ export function deckPickWords(asked: Instruction): { verb: string; prompt: strin
     default:
       return null;
   }
+}
+
+type PickInstruction = Extract<Instruction, { verb: "Pick" }>;
+
+// A pick of the top cards of the picker's own deck (Send for Help (Leadership), 11211:A:2): its size, or null when the pick is not one.
+const topOfDeck = (instruction: Instruction | undefined): number | null => (instruction?.verb === "Pick" && instruction.pick.from === "deck" && instruction.pick.top != null ? instruction.pick.top : null);
+
+/** A Pick of the deck family whose use the instruction after it tells: the player who searches the top cards of their deck (a Choose after ActAs whose branches pick from the top N cards), and the card drawn from them
+ * (a Pick of the top N cards, then MovePicked to the hand). `after` is what follows `next`. Null for any other Pick. */
+export function deckPickThenWords(pick: PickInstruction, next: Instruction, after: readonly Instruction[] | undefined): PickWords | null {
+  if (next.verb === "ActAs" && pick.pick.type === "player") {
+    const choice = after?.[0];
+    const top = choice?.verb === "Choose" ? choice.options.map((option) => (option.requires?.kind === "canPick" ? topOfDeck({ verb: "Pick", pick: option.requires.pick }) : null)).find((size) => size != null) : null;
+    return top != null ? { verb: "Choose", prompt: `Choose the player who searches the top ${top} cards of their deck for a card.` } : null;
+  }
+  const top = topOfDeck(pick);
+  if (next.verb === "MovePicked" && next.to === "hand" && top != null) return { verb: "Draw", prompt: `Choose a card from the top ${top} cards of your deck to draw.` };
+  return null;
+}
+
+/** A whole branch of the deck family: drawing a card of the top N cards of your deck ("Draw a card from the top 10 cards of your deck"). Null for any other branch. */
+export function deckBranchWords(instructions: readonly Instruction[]): string | null {
+  const [pick, move, ...rest] = instructions;
+  const top = topOfDeck(pick);
+  return top != null && move?.verb === "MovePicked" && move.to === "hand" && rest.length === 0 ? `Draw a card from the top ${top} cards of your deck` : null;
 }

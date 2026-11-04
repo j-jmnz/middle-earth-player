@@ -13,6 +13,8 @@ tags:
     env:
       FIXTURE: haven-won
       SCENARIO_ID: a-storm-on-cobas-haven
+      # The Heading is on the table while the victory shows: one widget of this scenario's own table.
+      TABLE_WIDGET: heading-value
 # The path stops at The City of Corsairs: its node and the line under the road read Coming soon, and nothing begins it.
 - assertVisible:
     id: node-the-city-of-corsairs-status

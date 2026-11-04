@@ -157,7 +157,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "committedWillpower":
       return committedWillpower(state, ctx.cards, scope.actor) >= condition.min;
     case "alliesWillpower":
-      return alliesWillpowerHolds(state, scope.actor, condition.min, ctx);
+      return alliesWillpowerHolds(state, scope.actor, condition.min, scope.sourceId, ctx);
     case "survivorsThreat":
       return livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max);
     case "heroesAll": {

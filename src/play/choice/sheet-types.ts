@@ -16,6 +16,8 @@ export type SheetNames = {
   text?: (code: string) => string | null;
   // The real name of a card lying on its Lost Island side, for the look that shows its facedown side (dcce.uncharted); `card` says Lost Island.
   facedown?: (cardId: string) => string;
+  // The name of a card's first pack by code ("Core Set"), which tells apart the heroes of one title a collection offers.
+  pack?: (code: string) => string | null;
 };
 
 // A number the engine computed, shown with the game's icon beside it (willpower on a commit, defense on a defender).

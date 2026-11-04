@@ -156,13 +156,18 @@ const EXTRA_PHASES: Readonly<Partial<Record<Phase, { mode: ModeName; steps: read
 function afterExtra(state: ScenarioState, mode: ModeName): { state: ScenarioState; mode: ModeName } | null {
   const [next, ...rest] = state.extraPhases ?? [];
   if (next == null && state.extraResume == null) return null;
-  const { extraPhases: _owed, extraResume: _resume, ...plain } = state;
+  const { extraPhases: _owed, extraResume: _resume, extraFollowed: _followed, ...plain } = state;
   const resume = state.extraResume ?? mode;
   const start = next ? EXTRA_PHASES[next] : undefined;
   const reopen = [...(state.extraResume != null ? (EXTRA_PHASES[state.phase]?.steps ?? []) : []), ...(start?.steps ?? [])].map((step) => `${state.round}:${step}`);
   const stepWindows = reopen.length > 0 ? plain.stepWindows.filter((key) => !reopen.includes(key)) : plain.stepWindows;
   if (!next || !start) return { state: { ...plain, stepWindows }, mode: resume };
-  return { state: { ...plain, stepWindows, ...(rest.length > 0 ? { extraPhases: rest } : {}), extraResume: resume }, mode: start.mode };
+  return { state: { ...plain, stepWindows, ...(rest.length > 0 ? { extraPhases: rest } : {}), extraResume: resume, extraFollowed: state.phase }, mode: start.mode };
+}
+
+/** The first step of an additional instance of a phase (the mode it starts at), or undefined for a phase that cannot be added. */
+export function extraPhaseMode(phase: Phase): ModeName | undefined {
+  return EXTRA_PHASES[phase]?.mode;
 }
 
 export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
@@ -177,7 +182,8 @@ function enterMode(state: ScenarioState, mode: ModeName, crossed: boolean): Scen
   // A phase that begins is announced ("At the beginning of the quest phase"), with the phase it is.
   const entering = crossed || state.phase !== phase;
   const begun = entering ? { pendingEvents: [...(state.pendingEvents ?? []), { trigger: "beginningOfPhase" as const, seat: null, phase }] } : {};
-  const changed: ScenarioState = { ...state, mode, phase, passed: [], ...begun };
+  const instance = crossed ? { phaseSeq: (state.phaseSeq ?? 0) + 1 } : {};
+  const changed: ScenarioState = { ...state, mode, phase, passed: [], ...begun, ...instance };
   const expiring: ModifierUntil[] = [];
   if (entering) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");

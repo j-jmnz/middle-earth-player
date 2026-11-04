@@ -15,17 +15,18 @@ import { endCorsairDeck, prepareCorsairDeck, refillCorsairDeck, revealCorsair } 
 import { prepareFleet } from "./fleet.ts";
 import { shiftHeading } from "./heading.ts";
 import { lastPlayer } from "./players.ts";
-import { damageShip, fitShips, tradeShipDamage } from "./campaign.ts";
+import { attachSelf } from "../../interpret/effect-targeted.ts";
+import { damageShip, defendingShip, fitShips, tradeShipDamage } from "./campaign.ts";
 import { boardNow } from "./boarding.ts";
 import { searchShips } from "./search.ts";
 import { shuffleRandomSetAside } from "./random.ts";
-import { setAsideSelf, takeSetAsideShip } from "./takeover.ts";
+import { setAsideSelf } from "./takeover.ts";
 import { makeEngagementChecks } from "./checks.ts";
 import { considerOutOfPlay, releaseHeld } from "./islet.ts";
 import { discardFromAnyDeck, nameCard, plunderHand } from "./cards.ts";
 import { discardAlliesForWillpower, restoreShipEnemies, takeControlAsShip } from "./skirmisher.ts";
 import { attackWithPicked } from "./ramming.ts";
-import { announceShipsExhausted, attachToShip } from "./water.ts";
+import { announceShipsExhausted, noteAttachedToShip } from "./water.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -65,8 +66,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     // Dealt when the game starts (src/campaign/start.ts): the card joins the Corsair deck the quest card's Setup shuffles.
     case "ShuffleIntoCorsairDeck":
       return state;
-    case "TakeSetAsideShip":
-      return takeSetAsideShip(state, instruction, focus, ctx);
     case "ShuffleRandomSetAside":
       return shuffleRandomSetAside(state, instruction, ctx);
     case "MakeEngagementChecks":
@@ -75,12 +74,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return setAsideSelf(state, focus);
     case "ConsiderOutOfPlay":
       return considerOutOfPlay(state, focus, ctx);
+    // A Shadow card's "attach ~ to it" for the Ship objective defending (12132:A:2) needs no question, so it runs inline; every other AttachSelf is the effect frame's.
+    case "AttachSelf": {
+      if (instruction.to.kind !== "ship" || instruction.to.defender !== true) return null;
+      const [defender] = defendingShip(state, ctx);
+      return defender && focus.sourceId ? attachSelf(state, focus.sourceId, defender, ctx) : state;
+    }
     case "DiscardAlliesForWillpower":
       return discardAlliesForWillpower(state, instruction, focus, ctx, steps);
     case "TakeControlAsShip":
       return takeControlAsShip(state, focus);
-    case "AttachToShip":
-      return attachToShip(state, instruction, focus, ctx, steps);
     case "AttackWithPicked":
       return attackWithPicked(state, instruction, ctx, steps);
     default:
@@ -88,4 +91,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "TakeSetAsideShip", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttachToShip", "AttackWithPicked"], run };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked"], run, attached: noteAttachedToShip };

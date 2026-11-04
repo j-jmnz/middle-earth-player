@@ -31,6 +31,13 @@ export function controlledShips(state: ScenarioState, ctx: ReduceContext): strin
     .map((card) => card.id);
 }
 
+/** The Ship objective defending the attack in progress, as a list of one, or none when the attack is undefended or a character that is not a ship defends it. */
+export function defendingShip(state: ScenarioState, ctx: ReduceContext): string[] {
+  const attack = state.pendingAttack;
+  const defender = attack?.defenderId && !attack.undefended ? state.cards[attack.defenderId] : undefined;
+  return defender && inPlay(defender.zone) && printedOf(ctx.cards, defender.code).ship === "objective" ? [defender.id] : [];
+}
+
 type Fit = Extract<Instruction, { verb: "FitShips" }>;
 
 /** FitShips: each ship-objective without one of these boons takes one of those still set aside, chosen by its controller, in the order the seats choose. */

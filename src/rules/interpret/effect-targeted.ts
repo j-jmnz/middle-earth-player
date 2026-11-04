@@ -11,6 +11,8 @@ import type { ReduceContext } from "./interpret.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { activeOf, stagingDest } from "../families/breaking/areas.ts";
 import { attachHeroHosts, attachHostChooser } from "../families/play/hooks.ts";
+import { familyAttached } from "./family-hooks.ts";
+import { controlledShips, defendingShip } from "../families/sea/campaign.ts";
 import { discardRestricted } from "../families/objectives/claimed.ts";
 import { printedOf } from "../core/printed.ts";
 import { attachBlocked, restrictedAttachments } from "./restrictions.ts";
@@ -55,6 +57,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         const seat = attachSeat(state, instruction, item.seat, sourceId);
         return seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);
       }
+      // A Ship objective: the Limit-1 check of a hero or enemy host does not apply (a ship may carry more than one Taking on Water).
+      if (instruction.to.kind === "ship") return instruction.to.defender ? defendingShip(state, ctx) : controlledShips(state, ctx);
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
     }
@@ -142,11 +146,8 @@ function applyTargeted(
       const data = topFrame(next)?.data;
       return data?.kind === "effect" ? patchTop(next, { data: { ...data, returned: data.returned + count } }) : next;
     }
-    case "AttachSelf": {
-      if (!first || !sourceId || !state.cards[sourceId]) return state;
-      const attached = attachTo(moveCard(state, sourceId, { zone: "attached" }), sourceId, first);
-      return updateCard(attached, sourceId, { face: "up" });
-    }
+    case "AttachSelf":
+      return first && sourceId ? attachSelf(state, sourceId, first, ctx) : state;
     case "SearchMove": {
       let next = state;
       for (const id of instruction.each ? ids : ids.slice(0, 1)) {
@@ -186,6 +187,13 @@ function applyTargeted(
     default:
       return state;
   }
+}
+
+/** The card attaches to its host, faceup, and the families hear it (the Ship objective a Taking on Water attaches to is noted by the sea family). */
+export function attachSelf(state: ScenarioState, id: string, host: string, ctx: ReduceContext): ScenarioState {
+  if (!state.cards[id]) return state;
+  const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, host);
+  return familyAttached(updateCard(attached, id, { face: "up" }), id, host, ctx);
 }
 
 // The seat whose heroes an AttachSelf to a hero offers and who chooses among them: the player the effect picked for `control: "picked"`

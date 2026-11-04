@@ -14,7 +14,8 @@ import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
 import { countMatching } from "../../interpret/pick.ts";
-import { spawn } from "../../core/zones.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
+import { alliesWillpowerHolds } from "./skirmisher.ts";
 import { shipMayAttack, shipMayDefend, shipObjectivesAmong } from "./ships.ts";
 
 let world: HavenWorld;
@@ -108,6 +109,33 @@ describe("12125:A:3 Corsair Skirmisher: the Response", () => {
     const enemy = idOf(made.state, SKIRMISHER);
     expect(declined.cards[enemy]).toMatchObject({ code: SKIRMISHER, zone: "encounterDiscard" });
     expect(declined.cards[enemy]?.controller).toBeNull();
+  });
+});
+
+// dcce.ship-objectives: Ship-objectives "are considered to be allies (and characters) for all purposes". A controlled ship is offered for the discard although it prints "Immune to player card effects": the
+// Skirmisher is an encounter card, so the immunity does not apply.
+describe("12125:A:3 the discard offers controlled Ship-objectives as allies", () => {
+  it("a Dream-chaser (Willpower 5) and a Willpower 1 ally are both offered, and together hold the total of 3", () => {
+    const made = allies(make({ engaged: [SKIRMISHER], play: [CODES.dreamChaser] }), 0, ["ally1"]);
+    const ship = idOf(made.state, CODES.dreamChaser);
+    expect(alliesWillpowerHolds(made.state, 0, 3, idOf(made.state, SKIRMISHER), made.ctx)).toBe(true);
+    const used = takeResponse(destroyed(made), made);
+    const options = used.window?.kind === "choose" ? used.window.options : [];
+    expect(options).toHaveLength(2);
+    expect(options).toContain(ship);
+    expect(options.map((id) => used.cards[id]?.code)).toContain("ally1");
+  });
+
+  it("when the allies chosen cannot reach the total nothing is discarded and the Skirmisher is not taken", () => {
+    const made = allies(make({ engaged: [SKIRMISHER] }), 0, ["ally2", "ally1"]);
+    const used = takeResponse(destroyed(made), made);
+    const lost = Object.values(used.cards).find((card) => card.code === "ally1");
+    // One ally leaves play while the choice is open: Willpower 2 is all that is left to give.
+    const short = moveCard(used, lost?.id ?? "", { zone: "discard", seat: 0 });
+    const two = used.window?.kind === "choose" ? used.window.options.find((id) => used.cards[id]?.code === "ally2") ?? "" : "";
+    const done = send({ state: short, steps: [] }, { type: "Choose", optionId: two }, made.ctx).state;
+    expect(done.cards[two]?.zone).toBe("play");
+    expect(done.cards[idOf(done, SKIRMISHER)]).toMatchObject({ code: SKIRMISHER, zone: "encounterDiscard" });
   });
 });
 

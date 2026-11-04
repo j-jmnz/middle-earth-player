@@ -144,11 +144,41 @@ describe("the rail's words", () => {
     expect(railFor(running).nextPhase).toBe("Refresh");
   });
 
+  it("marks an additional instance that is running, names the phase it followed, and sends the last step before one owed to its first step (11213:A:2)", async () => {
+    const combat = await parked("Combat", "combatStart");
+    expect(railFor(combat).additional).toBe(false);
+    expect(railFor({ ...combat, extraResume: "refresh", extraFollowed: "Combat" })).toMatchObject({ additional: true, phase: "Combat", previousPhase: "Combat", nextPhase: "Refresh" });
+    // A Resource phase added in the quest phase follows the quest phase, not the phase before Resource, and its last step goes on to the travel phase.
+    const resource = { ...(await parked("Resource", "resourceActions")), extraResume: "travel" as const, extraFollowed: "Quest" as const };
+    expect(railFor(resource)).toMatchObject({ additional: true, previousPhase: "Quest", nextPhase: "Travel", next: "Travel" });
+    // The last step of the phase in progress goes on to the first step of the instance owed, and the usual step when none is.
+    const last = await parked("Combat", "playerAttacks");
+    expect(railFor(last).next).toBe("Refresh");
+    expect(railFor({ ...last, extraPhases: ["Combat"] }).next).toBe("Combat begins");
+    expect(railFor({ ...last, extraPhases: ["Planning"] }).next).toBe("Planning");
+    // A step that is not the last keeps its own next step.
+    expect(railFor({ ...(await parked("Combat", "combatActions")), extraPhases: ["Combat"] }).next).toBe("Enemy attacks");
+  });
+
   it("keeps the phase beside the first and the last, and names the phases outside the round by steps.json's words", async () => {
     expect(railFor(await parked("Beginning of round", "beginRound"))).toMatchObject({ phase: "Beginning", previousPhase: "", nextPhase: "Resource" });
     expect(railFor(await parked("End of round", "endRound"))).toMatchObject({ phase: "End", previousPhase: "Refresh", nextPhase: "Resource" });
     expect(railFor(await parked("Setup", "afterOpening", 0))).toMatchObject({ phase: "", round: 0, previousPhase: "", nextPhase: "Resource" });
     expect(phaseIndex(await parked("Setup", "afterOpening", 0))).toBe(-1);
+  });
+});
+
+describe("the carousel with an additional instance running", () => {
+  it("keeps the phases the round has not reached next, and the ones it ran past", async () => {
+    const states = (game: ScenarioState) => phaseCarousel(game, on(), noTitle).phases.map((phase) => phase.state);
+    // A Refresh phase added in the quest phase runs before the travel phase: Travel to Combat have not run yet.
+    const refresh = { ...(await parked("Refresh", "refresh")), extraResume: "travel" as const, extraFollowed: "Quest" as const };
+    expect(states(refresh)).toEqual(["past", "past", "past", "next", "next", "next", "current"]);
+    // Without an additional instance the phases before the current one are past.
+    expect(states(await parked("Refresh", "refresh"))).toEqual(["past", "past", "past", "past", "past", "past", "current"]);
+    // A Resource phase added in the quest phase: the phases after it, which the round has run, are not marked past.
+    const resource = { ...(await parked("Resource", "resourceActions")), extraResume: "travel" as const, extraFollowed: "Quest" as const };
+    expect(states(resource)).toEqual(["current", "next", "next", "next", "next", "next", "next"]);
   });
 });
 

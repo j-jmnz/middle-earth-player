@@ -278,6 +278,12 @@ export type ScenarioState = {
   // additional instance of the chosen phase", 11213:A:2). Absent in every game until a card asks for one.
   extraPhases?: readonly Phase[];
   extraResume?: ModeName;
+  // The phase the running additional instance followed (the phase that ended as it began), for the phase rail; absent when none is running.
+  extraFollowed?: Phase;
+  // Which instance of a phase is running: enterMode counts up when an additional instance begins, and the end-of-phase machinery (triggers.ts crossBoundary) compares it with `boundarySeq`, the count it last
+  // saw, so an instance of the phase in progress ends like any other phase. Absent in every game with no additional instance.
+  phaseSeq?: number;
+  boundarySeq?: number;
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];

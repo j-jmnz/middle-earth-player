@@ -2,7 +2,8 @@
 // the cards to discard, and the verbs of the campaign and encounter families The Oath's records hold (src/catalog/families/{campaign,encounter}.ts).
 import type { Effect, Instruction } from "../../catalog/boundary.ts";
 import { printedOf } from "../../rules/core/printed.ts";
-import type { ReduceContext } from "../../rules/engine/reduce.ts";
+import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
+import { topFrame } from "../../rules/windows/windows.ts";
 
 function article(noun: string): string {
   return /^[aeiou]/i.test(noun) ? `an ${noun}` : `a ${noun}`;
@@ -19,12 +20,14 @@ function searched(instruction: Extract<Instruction, { verb: "SearchMove" | "Sear
 }
 
 /** What an asking instruction wants chosen, or null when it is not one of The Oath's. `sourceName` is the card the effect is on. */
-export function oathPickWords(asked: Instruction, nameOf: (code: string) => string, sourceName: string | null): { verb: string; prompt: string } | null {
+export function oathPickWords(asked: Instruction, nameOf: (code: string) => string, sourceName: string | null, game?: ScenarioState): { verb: string; prompt: string } | null {
   switch (asked.verb) {
     case "SearchMove": {
       const kind = searched(asked, nameOf);
+      // A Setup search reads the encounter deck alone: nothing is in the discard pile before the game begins (12120:A:1).
+      const from = game != null && topFrame(game)?.frame === "setup" ? "the encounter deck" : "the encounter deck or discard pile";
       const place = asked.to === "engaged" ? "to put into play engaged with you" : asked.to === "engagedFirstPlayer" ? "to put into play engaged with the first player" : "to add to the staging area";
-      return { verb: asked.to === "engaged" ? "Engage" : "Add", prompt: `Choose ${kind} from the encounter deck or discard pile ${place}.` };
+      return { verb: asked.to === "engaged" ? "Engage" : "Add", prompt: `Choose ${kind} from ${from} ${place}.` };
     }
     // The heroes tied for the highest threat cost (41043:A:2) or the heroes a card may go on: which one carries it.
     case "AttachSelf":

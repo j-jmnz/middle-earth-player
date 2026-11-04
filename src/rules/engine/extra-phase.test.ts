@@ -30,16 +30,16 @@ const start = (): ScenarioState => {
 };
 
 // The windows the round stops at, as "<phase>/<mode>", until `until` says stop. Each is answered by the first intent that declines or passes.
-function trace(from: ScenarioState, until: (state: ScenarioState) => boolean, edit: (state: ScenarioState) => ScenarioState = (state) => state): { stops: string[]; state: ScenarioState } {
+function trace(from: ScenarioState, until: (state: ScenarioState) => boolean, edit: (state: ScenarioState) => ScenarioState = (state) => state, using: ReduceContext = ctx): { stops: string[]; state: ScenarioState } {
   const stops: string[] = [];
   let state = from;
   for (let guard = 0; guard < 80 && !until(state); guard += 1) {
     stops.push(`${state.phase}/${state.mode}`);
     state = edit(state);
-    const intents = legalIntents(state, ctx);
+    const intents = legalIntents(state, using);
     const next = intents.find((intent) => intent.type === "Pass") ?? intents.find((intent) => intent.type === "DeclineTravel") ?? intents.find((intent) => intent.type === "DeclineEngage") ?? intents.find((intent) => intent.type === "DeclineAttack");
     if (!next) throw new Error(`no way on from ${state.phase}/${state.mode}`);
-    state = expectOk(reduce(state, next, ctx)).state;
+    state = expectOk(reduce(state, next, using)).state;
   }
   return { stops, state };
 }
@@ -127,5 +127,55 @@ describe("an additional instance of a phase", () => {
     const after = stops.slice(stops.indexOf("Quest/questCommit") + 1);
     expect(after.indexOf("Planning/planning")).toBeLessThan(after.indexOf("Resource/resourceActions"));
     expect(after.indexOf("Resource/resourceActions") + 1).toBe(after.indexOf("Travel/travel"));
+  });
+});
+
+// An instance of the phase in progress ends like any phase: what is set for the end of the phase fires at the end of the first instance (the combat phase ended before the additional one, 11213:A:2) and a
+// Forced effect "at the end of the combat phase" fires at the end of each.
+describe("the end of each instance of a phase", () => {
+  const forced: Effect = { id: "lamp:forced:1", cardCode: "lamp", lines: ["fixture:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Combat" }, instructions: [{ verb: "RaiseThreat", amount: 1 }] };
+  const forcedCtx: ReduceContext = { effects: [lampAction, forced], cards };
+
+  // Lights the lamp in the quest phase, asks for a second combat phase and sets a delayed effect for the end of the first one; `seen` holds the delayed list at each combat stop.
+  function run(using: ReduceContext, withDelayed: boolean) {
+    const seen: { stop: string; delayed: number; threat: number }[] = [];
+    let asked = false;
+    let lit = false;
+    const edit = (state: ScenarioState): ScenarioState => {
+      let next = state;
+      if (state.phase === "Quest" && !lit) {
+        lit = true;
+        next = spawn(next, "lamp", { zone: "play", seat: 0 }).state;
+      }
+      if (state.phase === "Combat" && !asked) {
+        asked = true;
+        const entry = { id: "d0", until: "endOfPhase" as const, sourceId: null, seat: 0, phase: "Combat", instructions: [{ verb: "RaiseThreat" as const, amount: 5 }], uncancelable: null };
+        next = { ...next, extraPhases: ["Combat"], ...(withDelayed ? { delayed: [entry] } : {}) };
+      }
+      if (state.phase === "Combat") seen.push({ stop: `${state.phase}/${state.mode}`, delayed: next.delayed.length, threat: next.seats[0]?.threat ?? 0 });
+      return next;
+    };
+    const { state } = trace(start(), secondRound, edit, using);
+    return { seen, state };
+  }
+
+  it("a delayed effect for the end of the phase fires at the end of the first instance", () => {
+    const base = run(ctx, false).state.seats[0]?.threat ?? 0;
+    const { seen, state } = run(ctx, true);
+    const actions = seen.filter((item) => item.stop === "Combat/combatActions");
+    expect(actions).toHaveLength(2);
+    expect(actions[0]?.delayed).toBe(1);
+    expect(actions[1]?.delayed).toBe(0);
+    expect(state.seats[0]?.threat).toBe(base + 5);
+  });
+
+  it("a Forced effect at the end of the combat phase fires at the end of each instance", () => {
+    const base = run(ctx, false).state.seats[0]?.threat ?? 0;
+    const { seen, state } = run(forcedCtx, false);
+    const actions = seen.filter((item) => item.stop === "Combat/combatActions");
+    expect(actions).toHaveLength(2);
+    // The first instance's end has fired before the second opens, and the second fires its own.
+    expect(actions[1]?.threat).toBe((actions[0]?.threat ?? 0) + 1);
+    expect(state.seats[0]?.threat).toBe(base + 2);
   });
 });

@@ -49,6 +49,7 @@ export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, {
 // The seat that chooses the host of an AttachSelf card that goes to a hero: the first player when it may go to any player's hero, the
 // player with the highest threat when the card says so (a tie is the first player's to settle), and otherwise the seat the effect runs for.
 export function attachHostChooser(state: ScenarioState, instruction: Instruction, itemSeat: number): number {
+  if (instruction.verb === "AttachSelf" && instruction.to.kind === "ship") return state.firstPlayer;
   if (instruction.verb !== "AttachSelf" || instruction.to.kind !== "hero") return itemSeat;
   if (instruction.to.control === "any" || instruction.to.control === "highestThreatCost") return state.firstPlayer;
   if (instruction.to.control !== "highestThreat") return itemSeat;

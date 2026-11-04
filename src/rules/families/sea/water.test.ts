@@ -1,6 +1,6 @@
 // Rules: rr.attachment-cards, rr.forced, rr.action, rr.exhausted, dcce.ship-objectives (data/rules/entries.json); ledger lines 12132:A:1, 12132:A:2.
 // Taking on Water: When Revealed it attaches to a Ship objective, as a Condition attachment; Forced: when the attached objective exhausts, it takes 2 damage; Action: exhaust 3 characters you control to discard it;
-// Shadow: it attaches to a defending Ship. The verb AttachToShip, the trigger shipExhausted and its settle sweep, each on the table of the scenario.
+// Shadow: it attaches to a defending Ship. AttachSelf to a ship (`kind: "ship"`) and the family's `attached` hook, the trigger shipExhausted and its settle sweep, each on the table of the scenario.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
@@ -131,6 +131,18 @@ describe("12132:A:1 Taking on Water: the Action", () => {
     const { made, water } = soaked({ ...base, state: mine.state }, CODES.dawnStar);
     expect(actionsOf({ ...made, state: { ...made.state, activeSeat: 0 } }, water)).toHaveLength(0);
     expect(actionsOf({ ...made, state: { ...made.state, activeSeat: 1 } }, water).length).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe("12132:A:1 Taking on Water: the host's exhaustion before it attached", () => {
+  it("a host exhausted before the card attached did not exhaust while attached: the sweep does not announce it", () => {
+    const made = make({ play: [CODES.dreamChaser] });
+    const ship = idOf(made.state, CODES.dreamChaser);
+    const tired = updateCard(made.state, ship, { exhausted: true });
+    const run = resolveRecords(tired, made.ctx, WATER, "whenRevealed");
+    const after = settled(made, run.state);
+    expect(run.state.cards[run.id]?.host).toBe(ship);
+    expect(damage(after, ship)).toBe(0);
   });
 });
 

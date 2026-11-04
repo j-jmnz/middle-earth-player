@@ -5,8 +5,13 @@ import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { controlledShips } from "../../rules/families/sea/campaign.ts";
 import { titleDeck } from "../../rules/families/sea/cards.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../rules/core/printed.ts";
+import { lastPicked } from "../../rules/interpret/player-verbs.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
+import { livingSeats } from "../../rules/core/state.ts";
+import { topFrame } from "../../rules/windows/windows.ts";
+import { effectData } from "../../rules/families/encounter/moves.ts";
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
 
@@ -30,11 +35,55 @@ export function seaWords(instruction: Instruction): string | null {
   }
 }
 
+const article = (noun: string): string => (/^[aeiou]/i.test(noun) ? `an ${noun}` : `a ${noun}`);
+
+// A Pick whose picked card the next instruction uses, for the cards of Cobas Haven: the Ship enemy chosen to guard an objective or the objective it guards (12121:A:1, 12126:A:3, 12133:A:1), the Ship enemy
+// Belfalas Islet holds out of play (12129:A:2), the one that makes Ramming Speed!'s immediate attack (12131:A:1), the Ship enemy Tower of the Gull damages (12135:A:3), the characters Taking on Water's Action exhausts
+// (12132:A:1) and the Ship objective Coast of Anfalas's Travel cost exhausts (12128:A:2). `game` is the table (the card picked before, the frame), `after` the instructions after `next`.
+function seaPickThenWords(pick: Extract<Instruction, { verb: "Pick" }>, next: Instruction, names: ChoiceNames | undefined, sourceId: string | null, game: ScenarioState | undefined, after: readonly Instruction[] | undefined): PickWords | null {
+  // The card the effect picked last, named; null when nothing is known of it.
+  const previous = (): string | null => {
+    const id = game ? lastPicked(game) : "";
+    return id && game?.cards[id] && names ? names.card(id) : null;
+  };
+  const source = sourceId && names ? names.card(sourceId) : null;
+  switch (next.verb) {
+    case "AttachGuard": {
+      // This pick is the guard: it attaches to the objective picked before it (Battle in the Bay).
+      if (next.guard === "picked") return { verb: "Guard", prompt: `Choose ${article(`${pick.pick.nonUnique === true ? "non-unique " : ""}Ship enemy`)} to attach to ${next.to === "previous" ? (previous() ?? "the objective") : "the objective"} as its guard.` };
+      // This pick is the objective: the enemy that guards it is the one picked before it (The Raiders' Assault) or the source (Siege Ship).
+      const guard = next.guard === "previous" ? previous() : source;
+      return { verb: "Guard", prompt: guard ? `Choose the unguarded objective ${guard} guards.` : "Choose an unguarded objective in the staging area to guard." };
+    }
+    case "ReturnToStaging":
+      return { verb: "Guard", prompt: "Choose a Ship enemy to attach to an unguarded objective as its guard. An engaged enemy returns to the staging area first." };
+    case "ConsiderOutOfPlay":
+      return { verb: "Out of play", prompt: `Choose a Ship enemy that is not guarding an objective. While ${source ?? "this location"} is the active location, it is considered to be out of play.` };
+    case "AttackWithPicked":
+      return { verb: "Attack", prompt: "Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack." };
+    case "DamageCard":
+      return pick.pick.type === "enemy" && pick.pick.trait === "Ship" && typeof next.amount === "number" ? { verb: "Assign", prompt: `Choose ${article(`${pick.pick.nonUnique === true ? "non-unique " : ""}Ship enemy`)} to take ${next.amount} damage.` } : null;
+    case "Exhaust": {
+      // Taking on Water's Action: three characters, one at a time, to discard it. The count is the picks made in this effect and the picks still to come.
+      if (pick.pick.type === "character" && pick.pick.control === "you" && (after ?? []).some((item) => item.verb === "Discard" && item.target.kind === "self")) {
+        const done = game ? (effectData(game)?.picked?.length ?? 0) : 0;
+        const left = (after ?? []).filter((item) => item.verb === "Pick").length;
+        return { verb: "Exhaust", prompt: `Choose a character you control to exhaust (${done + 1} of ${done + 1 + left}) to discard ${source ?? "this card"}.` };
+      }
+      // Coast of Anfalas's Travel cost: the Ship objective that pays it.
+      return pick.pick.trait === "Ship" && game && topFrame(game)?.frame === "travel" ? { verb: "Exhaust", prompt: `Choose a Ship objective to exhaust to travel to ${source ?? "this location"}.` } : null;
+    }
+    default:
+      return null;
+  }
+}
+
 const resources = (count: number): string => `${count} ${count === 1 ? "resource" : "resources"}`;
 
 /** What a sea verb that asks a player for a card or an option says to ask (dcce.prepare-your-fleet, 11171:A:2, 11016:B:3, 11021:A:1, 110139:A:4, 110139:B:5). Null for any other verb.
  * Each prompt leads with the decision, so it reads first on a short screen. The ship a question is about is named by `seaAsk`, which reads the game. */
-export function seaPickWords(instruction: Instruction): PickWords | null {
+export function seaPickWords(instruction: Instruction, next?: Instruction, names?: ChoiceNames, sourceId?: string | null, game?: ScenarioState, after?: readonly Instruction[]): PickWords | null {
+  if (instruction.verb === "Pick" && next) return seaPickThenWords(instruction, next, names, sourceId ?? null, game, after);
   switch (instruction.verb) {
     case "PrepareFleet":
       return { verb: "Take", prompt: "Choose a Ship objective to take control of. One player must take the Dream-chaser." };
@@ -50,8 +99,8 @@ export function seaPickWords(instruction: Instruction): PickWords | null {
       const chosen = instruction.taken?.length ?? 0;
       return { verb: "Discard", prompt: `Choose ${chosen === 0 ? "an ally" : "another ally"} to discard. Discard allies you control with a total of at least ${instruction.willpower} Willpower to take control of this card as a Ship objective.` };
     }
-    case "AttachToShip":
-      return { verb: "Attach", prompt: "Choose the Ship objective this card attaches to." };
+    case "AttachSelf":
+      return instruction.to.kind === "ship" ? { verb: "Attach", prompt: "Choose the Ship objective this card attaches to." } : null;
     case "MakeEngagementChecks":
       return { verb: "Engage", prompt: "Choose which of the enemies tied for the highest engagement cost the engagement check engages." };
     case "NameCard":
@@ -81,6 +130,19 @@ export function seaAsk(pick: Instruction, next: Instruction | undefined, options
     if (game.seatCount === 1 && options.length > 0 && !options.some((id) => names.card(id) === DREAM_CHASER)) return { verb: "Take", prompt: "Choose your second ship." };
     const open = options.some((id) => names.card(id) === DREAM_CHASER);
     return { verb: "Take", prompt: open ? "Choose a Ship objective to take control of. One player must take the Dream-chaser." : "Choose a Ship objective to take control of." };
+  }
+  // Corsair Skirmisher's discard (12125:A:3): the Willpower the allies already chosen leave to reach.
+  if (pick.verb === "DiscardAlliesForWillpower") {
+    const taken = pick.taken ?? [];
+    const have = taken.reduce((sum, id) => sum + (game.cards[id] ? modifiedStat(game, game.cards[id], "willpower", ctx.cards) : 0), 0);
+    const left = Math.max(0, pick.willpower - have);
+    const host = sourceId ? names.card(sourceId) : "This card";
+    return { verb: "Discard", prompt: `${host}: choose ${taken.length === 0 ? "an ally" : "another ally"} to discard. At least ${left}${taken.length === 0 ? "" : " more"} Willpower is needed to take control of it as a Ship objective.` };
+  }
+  // The engagement checks of the second stage's end (12122:A:1): the seat whose check is tied.
+  if (pick.verb === "MakeEngagementChecks") {
+    const seat = livingSeats(game)[pick.ordinal ?? 0] ?? 0;
+    return { verb: "Engage", prompt: `Choose the enemy that engages ${game.seatCount > 1 ? `Player ${seat + 1}` : "you"}. These are tied for the highest engagement cost.` };
   }
   if (pick.verb === "Pick" && next?.verb === "DamageShip") {
     if (typeof next.amount === "number") return { verb: "Assign", prompt: `Choose the Ship objective you control that takes ${next.amount} damage.` };
@@ -180,4 +242,9 @@ export function successWords(success: number): string {
 /** The success medallion's count: "×2" with two symbols, nothing with one. */
 export function medallionCount(success: number): string | null {
   return success > 1 ? `×${success}` : null;
+}
+
+/** The pill on a location that holds Ship enemies out of play (Belfalas Islet, 12129:A:2): "1 held", with the sentence a screen reader hears after the location's name: "Corsair Warship held underneath". */
+export function heldWords(names: readonly string[]): { text: string; loses: boolean; speech: string } {
+  return { text: `${names.length} held`, loses: false, speech: `${names.join(" and ")} held underneath` };
 }

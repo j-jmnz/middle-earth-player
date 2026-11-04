@@ -6,7 +6,7 @@ import { cardMap, fixtureDefinition, hero } from "../core/test-fixture.ts";
 import { spawn } from "../core/zones.ts";
 import { legalTargets } from "../engine/legal.ts";
 import type { RulesFamily } from "./family-manifest.ts";
-import { familyAmount, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
+import { familyAmount, familyAttached, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
 import { resolveAmount } from "./amounts.ts";
 import { holds } from "./conditions.ts";
 import { matchesPick } from "./pick.ts";
@@ -89,6 +89,20 @@ describe("amount hooks", () => {
   it("answer with the first family that owns the amount, null when none does", () => {
     expect(familyAmount(state, amount, scope, ctx, [family("a", { amount: () => null })])).toBeNull();
     expect(familyAmount(state, amount, scope, ctx, [family("a", { amount: () => null }), family("b", { amount: () => 0 }), family("c", { amount: () => 5 })])).toBe(0);
+  });
+});
+
+describe("attached hooks", () => {
+  it("run for each family that has one, each on the state the one before returned", () => {
+    const seen: string[] = [];
+    const hook = (name: string) => (current: typeof state, id: string, host: string) => {
+      seen.push(`${name}:${id}>${host}`);
+      return { ...current, round: current.round + 1 };
+    };
+    const after = familyAttached(state, "c", "h", ctx, [family("a", { attached: hook("a") }), family("none"), family("b", { attached: hook("b") })]);
+    expect(seen).toEqual(["a:c>h", "b:c>h"]);
+    expect(after.round).toBe(state.round + 2);
+    expect(familyAttached(state, "c", "h", ctx, [family("none")])).toBe(state);
   });
 });
 

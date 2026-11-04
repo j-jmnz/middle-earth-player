@@ -8,7 +8,8 @@ import type { ScenarioState } from "../../rules/engine/reduce.ts";
 import { CODES, havenTable, loadHavenWorld, type HavenWorld } from "../../../test/scenarios/a-storm-on-cobas-haven/scene.ts";
 import { first } from "../../../test/harness/scene-kit.ts";
 
-import { dungeonDetail, standInText } from "../cards/dungeon-preview.ts";
+import { slotNumbers } from "../cards/card-effects.ts";
+import { controlSpeech, dungeonDetail, standInText } from "../cards/dungeon-preview.ts";
 
 let world: HavenWorld;
 
@@ -32,6 +33,22 @@ describe("the table's words for A Storm on Cobas Haven", () => {
     expect(dungeonDetail(made.state, made.ctx, gull, name)).toBeNull();
   });
 
+  it("says a tower the players control that a Ship enemy guards again is still theirs, and a screen reader hears who controls a tower (12134:A:2: control is taken once)", () => {
+    const made = havenTable(world, { staging: [CODES.towerOfTheGull, CODES.siegeShip] });
+    const name = (id: string) => made.ctx.cards.get(made.state.cards[id]?.code ?? "")?.name ?? id;
+    const gull = first(made.state, CODES.towerOfTheGull);
+    const ship = first(made.state, CODES.siegeShip);
+    let state: ScenarioState = updateCard(made.state, gull, { claimed: true });
+    expect(controlSpeech(state, gull)).toBe("controlled by the players");
+    expect(controlSpeech(made.state, gull)).toBeNull();
+    state = updateCard(updateCard(state, ship, { guard: true, host: gull }), gull, { attachments: [ship] });
+    expect(dungeonDetail(state, made.ctx, gull, name)).toBe("Guarded by Siege Ship. The players still control it.");
+    expect(controlSpeech(state, gull)).toBe("controlled by the players");
+    // A guarded tower the players do not control says only who guards it.
+    const guarded = updateCard(state, gull, { claimed: undefined });
+    expect(dungeonDetail(guarded, made.ctx, gull, name)).toBe("Guarded by Siege Ship");
+  });
+
   it("names the Ship enemy Belfalas Islet holds out of play on the Islet's card, and says nothing of a location that holds none", () => {
     const made = havenTable(world, { staging: [CODES.corsairWarship] });
     const name = (id: string) => made.ctx.cards.get(made.state.cards[id]?.code ?? "")?.name ?? id;
@@ -42,11 +59,17 @@ describe("the table's words for A Storm on Cobas Haven", () => {
     const held = moveCard(spawned.state, enemy, { zone: "under", locationId: islet });
     const state = { ...held, sea: { heading: "Sun" as const, headingCard: null, routes: {}, held: { [enemy]: { zone: "staging" as const, seat: null } } } };
     expect(dungeonDetail(state, made.ctx, islet, name)).toBe("Corsair Warship is held underneath, out of play, while this is the active location");
+    // The active Islet wears the night pill of the cards under The Havens Burn (UnderMarkView): "1 held", and the reader hears the enemy (12129:A:2).
+    expect(slotNumbers(state, made.ctx, islet).under).toEqual({ text: "1 held", loses: false, speech: "Corsair Warship held underneath" });
+    expect(slotNumbers(spawned.state, made.ctx, islet).under).toBeNull();
   });
 
   it("gives the Skirmisher taken as a Ship objective a preview text of its own", () => {
     const text = standInText(world.cards, "12125~ship");
-    expect(text).toMatch(/^Ship objective now, taken from the Corsair fleet\. Willpower 3, Attack 4, Defense 4, 6 hit points\.$/);
+    expect(text).toBe("Ship objective. Willpower 3 (its Threat), Attack 4, Defense 4, 6 hit points.");
+    // Its printed lines follow, so "Immune to player card effects" still shows: the caller gives the enemy's text by code (the catalog has no row for the derived card).
+    const printed = "Immune to player card effects.\nResponse: After Corsair Skirmisher is destroyed...";
+    expect(standInText(world.cards, "12125~ship", (code) => (code === CODES.corsairSkirmisher ? printed : null))).toBe(`Ship objective. Willpower 3 (its Threat), Attack 4, Defense 4, 6 hit points.\n${printed}`);
     expect(standInText(world.cards, CODES.corsairSkirmisher)).toBeNull();
   });
 });

@@ -9,10 +9,9 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
-import { engageEnemy, qualifyingEnemies } from "../../quest/quest.ts";
+import { engageEnemy, engagementCheck } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
-import { checkCost } from "../costs/stats.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
@@ -43,23 +42,17 @@ export function makeEngagementChecks(state: ScenarioState, instruction: Checks, 
       continue;
     }
     const seat = seats[ordinal] ?? 0;
-    const probe = reading(next, instruction, focus, ctx);
-    const options = qualifyingEnemies(probe, seat, ctx.cards);
-    const cost = (id: string): number | null => {
-      const card = probe.cards[id];
-      return card ? checkCost(probe, card, seat, ctx.cards) : null;
-    };
-    const highest = options[0];
-    if (highest == null) {
+    const check = engagementCheck(reading(next, instruction, focus, ctx), seat, ctx.cards);
+    if (check.kind === "none") {
       ordinal += 1;
       continue;
     }
-    const tied = options.filter((id) => cost(id) === cost(highest));
-    const chosen = answer && tied.includes(answer) ? answer : tied.length === 1 ? highest : undefined;
+    const chosen = check.kind === "one" ? check.enemyId : answer && check.options.includes(answer) ? answer : undefined;
     answer = undefined;
-    if (!chosen) {
-      return effectData(next) ? askTarget(next, { instruction: { ...instruction, ordinal, engaged }, seat: next.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied) : next;
+    if (!chosen && check.kind === "tied") {
+      return effectData(next) ? askTarget(next, { instruction: { ...instruction, ordinal, engaged }, seat: next.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, check.options) : next;
     }
+    if (!chosen) return next;
     const after = engageEnemy(next, seat, chosen, steps);
     if (after !== next) engaged = true;
     next = after;

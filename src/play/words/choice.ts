@@ -3,10 +3,11 @@
 // Pick is for (the heroes Unwanted Attention removes from the quest, 141054:A:2). The words describe the effect record's
 // instructions; the reducer still decides what each one does.
 import type { Amount, Instruction } from "../../catalog/boundary.ts";
+import { lastPicked } from "../../rules/interpret/player-verbs.ts";
 import { questProgressMoved } from "../../rules/interpret/verbs.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 import { attachmentPickWords, attachmentWords } from "./attachment.ts";
-import { deckPickWords, deckWords } from "./deck.ts";
+import { deckBranchWords, deckPickThenWords, deckPickWords, deckWords } from "./deck.ts";
 import { encounterPickWords, encounterWords } from "./encounter.ts";
 import { attackWords } from "./attack.ts";
 import { assignDamageWords, southWords } from "./south.ts";
@@ -335,7 +336,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
-  const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
+  const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
   if (whole) return whole;
   // A run of "pick a hero, remove it from the quest" is one decision: how many heroes leave the quest.
   const removals = option.instructions.filter((instruction) => instruction.verb === "RemoveFromQuest").length;
@@ -370,7 +371,7 @@ export function branchThreat(choose: ChooseInstruction, optionId: string): numbe
 export type PickWords = { verb: string; prompt: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */
-export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2, game?: ScenarioState, amountNow?: number): PickWords {
+export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2, game?: ScenarioState, amountNow?: number, after?: readonly Instruction[]): PickWords {
   // A hero holding one Restricted attachment too many (rr.restricted): which one leaves. A claimed objective goes back to the staging area.
   if (pick.verb === "DiscardRestricted") {
     const host = sourceId ? names.card(sourceId) : "The hero";
@@ -387,13 +388,16 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
   if (pick.verb === "AssignDamage") return assignDamageWords(pick, sourceId ? names.card(sourceId) : null);
-  const sea = seaPickWords(pick);
+  const sea = seaPickWords(pick, next, names, sourceId, game, after);
   if (sea) return sea;
-  const play = playPickWords(pick);
+  const picked = game ? lastPicked(game) : "";
+  const play = playPickWords(pick, picked && game?.cards[picked] ? names.card(picked) : null);
   if (play) return play;
+  const deck = pick.verb === "Pick" && next ? deckPickThenWords(pick, next, after) : null;
+  if (deck) return deck;
   const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null, game) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const family = aflamePickWords(pick, next, names, sourceId, amountNow, game) ?? islandPickWords(pick, next, names, sourceId, game);
   if (family) return family;
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
@@ -434,11 +438,6 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Claim", prompt: `Choose ${one} to carry ${sourceId ? names.card(sourceId) : "the objective"}.` };
     case "Discard":
       return { verb: "Discard", prompt: `Choose ${one} to discard.` };
-    // The cards of Cobas Haven that attach a Ship enemy to an objective, guarding it (12121:A:1, 12126:A:3, 12133:A:1): the enemy chosen to guard, or the objective it guards.
-    case "AttachGuard":
-      return next.guard === "picked" ? { verb: "Guard", prompt: `Choose ${article(`${pick.pick.nonUnique === true ? "non-unique " : ""}Ship enemy`)} to attach to the objective as its guard.` } : { verb: "Guard", prompt: "Choose an unguarded objective in the staging area to guard." };
-    case "ReturnToStaging":
-      return { verb: "Guard", prompt: "Choose a Ship enemy to attach to an unguarded objective as its guard. An engaged enemy returns to the staging area first." };
     // The Glórinaith's target (110139:A:4, 110139:B:5), Armor Plating's enemy (11172:B:3).
     case "DiscardFromAnyDeck":
       return { verb: "Target", prompt: `Choose ${one} to deal damage to.` };
@@ -450,12 +449,6 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     // The sea family (Voyage Across Belegaer): the Ship objective that takes the excess damage of a shadow attack (11055:A:2).
     case "DamageShip":
       return { verb: "Assign", prompt: typeof next.amount === "number" ? `Choose the Ship objective you control that takes ${next.amount} damage.` : "Choose the Ship objective you control that takes the excess damage." };
-    // Belfalas Islet (12129:A:2): the Ship enemy that is out of play while the location is the active location.
-    case "ConsiderOutOfPlay":
-      return { verb: "Out of play", prompt: `Choose a Ship enemy that is not guarding an objective. While ${sourceId ? names.card(sourceId) : "this location"} is the active location, it is considered to be out of play.` };
-    // Ramming Speed! (12131:A:1): of the engaged Ship enemies tied for the highest Attack, the one that makes the immediate attack.
-    case "AttackWithPicked":
-      return { verb: "Attack", prompt: "Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack." };
     // A set-aside boon or burden a campaign card attaches (01130:A:3, 01130:A:4): the hero that carries it.
     case "AttachSetAside":
       return { verb: "Attach", prompt: `Choose ${one} to carry ${names.code(next.code)}.` };

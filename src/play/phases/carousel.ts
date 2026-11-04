@@ -42,9 +42,10 @@ export type Carousel = {
   stopAhead: boolean;
 };
 
-/** Where `phase` sits against the game's: before it (done this round), the game's own, or after it. */
-function stateOf(index: number, here: number): CarouselPhase["state"] {
-  return index < here ? "past" : index === here ? "current" : "next";
+/** Where `phase` sits against the game's: before it (done this round), the game's own, or after it. While an additional instance of a phase runs (11213:A:2), the phases between the one it followed (`ran`) and it
+ * have not run yet: they stay next. */
+function stateOf(index: number, here: number, ran: number): CarouselPhase["state"] {
+  return index < here && index <= ran ? "past" : index === here ? "current" : "next";
 }
 
 /**
@@ -53,10 +54,11 @@ function stateOf(index: number, here: number): CarouselPhase["state"] {
  */
 export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "stopsOn" | "stops">, title: (id: string) => string | null): Carousel {
   const here = phaseIndex(game);
+  const ran = game.extraResume != null && game.extraFollowed ? ROUND_PHASES.indexOf(game.extraFollowed) : here;
   const reference = turnReference(game, title);
   const phases = ROUND_PHASES.map((name, index): CarouselPhase => {
     const steps = carouselSteps(reference.find((phase) => phase.phase === name)?.steps ?? [], stops.stops);
-    return { id: name.toLowerCase(), name, state: stateOf(index, here), steps };
+    return { id: name.toLowerCase(), name, state: stateOf(index, here, ran), steps };
   });
   return {
     round: game.round,

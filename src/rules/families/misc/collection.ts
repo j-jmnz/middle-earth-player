@@ -31,6 +31,11 @@ function collectionCodes(ctx: ReduceContext, fits: (printed: PrintedCard) => boo
   return [...ctx.cards.values()].filter((printed) => plainHero(printed) && fits(printed)).map((printed) => printed.code).sort();
 }
 
+// The titles of the heroes and allies in play: a hero of one of them is not brought in again (rr.unique-cards).
+function titlesInPlay(state: ScenarioState, ctx: ReduceContext): Set<string> {
+  return new Set(Object.values(state.cards).filter((card) => card.zone === "heroes" || card.zone === "play").map((card) => printedOf(ctx.cards, card.code).name));
+}
+
 // The cards made as candidates for `sourceId`'s choice, still set aside.
 function candidatesOf(state: ScenarioState, sourceId: string): string[] {
   return Object.values(state.cards).filter((card) => card.collection === sourceId && card.zone === "setAside").map((card) => card.id);
@@ -72,7 +77,7 @@ export function swapHero(state: ScenarioState, instruction: Verb<"SwapHero">, fo
   const seat = old.controller;
   const threat = printedOf(ctx.cards, old.code).threat ?? 0;
   // A title already in play (any player's hero or ally) cannot be brought in a second time (rr.unique-cards).
-  const inGame = new Set(Object.values(state.cards).filter((card) => card.zone === "heroes" || card.zone === "play").map((card) => printedOf(ctx.cards, card.code).name));
+  const inGame = titlesInPlay(state, ctx);
   const codes = collectionCodes(ctx, (printed) => (printed.threat ?? 0) <= threat && !inGame.has(printed.name));
   // The tokens are discarded first, as the card says, whether or not a hero can be swapped in.
   const cleared = old.damage || old.resources || old.progress ? updateCard(state, hero, { damage: 0, resources: 0, progress: 0 }) : state;
@@ -107,7 +112,7 @@ function swap(state: ScenarioState, oldId: string, newId: string, seat: number, 
 // TakeHeroFromCollection (Send for Help, Tactics) and TakeCardFromCollection (Send for Help, Lore): a card of the collection, set aside and picked for the instructions after it. A hero whose title is in play
 // is not offered (rr.unique-cards); a card named by code is made whether or not a copy is in play, as it enters play ignoring uniqueness.
 export function takeFromCollection(state: ScenarioState, instruction: Verb<"TakeHeroFromCollection"> | Verb<"TakeCardFromCollection">, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const inGame = new Set(Object.values(state.cards).filter((card) => card.zone === "heroes" || card.zone === "play").map((card) => printedOf(ctx.cards, card.code).name));
+  const inGame = titlesInPlay(state, ctx);
   const codes = instruction.verb === "TakeCardFromCollection" ? (ctx.cards.has(instruction.code) ? [instruction.code] : []) : collectionCodes(ctx, (printed) => !inGame.has(printed.name));
   const picked = choose(state, codes, instruction, focus);
   return picked.asked || !picked.chosen ? picked.state : markPicked(picked.state, picked.chosen);

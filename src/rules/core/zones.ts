@@ -320,9 +320,11 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
 }
 
 // `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
-export function moveCard(state: ScenarioState, id: string, wanted: Destination, released: readonly string[] = []): ScenarioState {
+export function moveCard(state: ScenarioState, id: string, requested: Destination, released: readonly string[] = []): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
+  // A temporary card leaves the game when it leaves play, whether it is defeated, returned to a hand or a deck or discarded ("If those heroes leave play, they are removed from the game", 11212:A:2).
+  const wanted: Destination = current.temporary && inPlay(current.zone) && !inPlay(requested.zone) ? { zone: "removed" } : requested;
   // A card with a route of its own never reaches the encounter deck or discard pile (families/sea/routes.ts); one that has no place there stays put.
   const dest = routeDestination(state, current, unchartedRoute(state, current, wanted));
   if (!dest) return state;

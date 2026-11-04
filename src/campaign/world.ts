@@ -85,9 +85,28 @@ function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>)
   return effects.some((effect) => codes.has(effect.cardCode) && /"(SwapHero|AttachCollectionHero|TakeHeroFromCollection)"/.test(JSON.stringify(effect.instructions)));
 }
 
+// Every instruction in a value, nested ones too (a Choose's options, an Each's instructions), whatever the key order.
+function walkInstructions(value: unknown, visit: (instruction: Record<string, unknown>) => void): void {
+  if (Array.isArray(value)) {
+    for (const item of value) walkInstructions(item, visit);
+    return;
+  }
+  if (value == null || typeof value !== "object") return;
+  const entry = value as Record<string, unknown>;
+  if (typeof entry.verb === "string") visit(entry);
+  for (const inner of Object.values(entry)) walkInstructions(inner, visit);
+}
+
 // The codes the records of these cards take from the collection by code (TakeCardFromCollection): they are loaded whether or not the scenario deals them.
 function collectionTaken(effects: readonly Effect[], codes: ReadonlySet<string>): string[] {
-  return effects.filter((effect) => codes.has(effect.cardCode)).flatMap((effect) => [...JSON.stringify(effect.instructions).matchAll(/"verb":"TakeCardFromCollection","code":"([^"]+)"/g)].map((found) => found[1] ?? ""));
+  const taken: string[] = [];
+  for (const effect of effects) {
+    if (!codes.has(effect.cardCode)) continue;
+    walkInstructions(effect.instructions, (instruction) => {
+      if (instruction.verb === "TakeCardFromCollection" && typeof instruction.code === "string") taken.push(instruction.code);
+    });
+  }
+  return taken;
 }
 
 // Reads the rows a scenario needs from catalog.db, read-only, and builds the world. `extra` is the heroes and deck cards

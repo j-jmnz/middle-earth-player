@@ -373,6 +373,22 @@ export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Car
   return found.map((entry) => entry.id);
 }
 
+/** What one seat's engagement check does (rr.engagement-check): no enemy qualifies, one enemy is engaged, or several are tied for the highest engagement cost and the first player chooses among `options`. */
+export type EngagementCheck = { kind: "none" } | { kind: "one"; enemyId: string } | { kind: "tied"; options: string[] };
+
+export function engagementCheck(state: ScenarioState, seat: number, cards: Cards): EngagementCheck {
+  const options = qualifyingEnemies(state, seat, cards);
+  const highestId = options[0];
+  if (highestId == null) return { kind: "none" };
+  const highest = state.cards[highestId];
+  const highestCost = highest ? checkCost(state, highest, seat, cards) : null;
+  const tied = options.filter((id) => {
+    const instance = state.cards[id];
+    return instance != null && checkCost(state, instance, seat, cards) === highestCost;
+  });
+  return tied.length > 1 ? { kind: "tied", options: tied } : { kind: "one", enemyId: highestId };
+}
+
 export function engagementStep(state: ScenarioState, cards: Cards, steps: EngineStep[]): ScenarioState {
   const seats = livingSeats(state);
   const cursor = state.engagement ?? { ordinal: 0, engagedThisPass: false };
@@ -382,26 +398,19 @@ export function engagementStep(state: ScenarioState, cards: Cards, steps: Engine
   }
   const seat = seats[cursor.ordinal];
   if (seat == null) return { ...withMode(state, "combatStart"), engagement: null };
-  const options = qualifyingEnemies(state, seat, cards);
-  if (options.length === 0) {
+  const check = engagementCheck(state, seat, cards);
+  if (check.kind === "none") {
     return { ...state, engagement: { ...cursor, ordinal: cursor.ordinal + 1 } };
   }
-  const highestId = options[0];
-  if (!highestId) return state;
-  const highest = state.cards[highestId];
-  const highestCost = highest ? checkCost(state, highest, seat, cards) : null;
-  const tied = options.filter((id) => {
-    const instance = state.cards[id];
-    return instance != null && checkCost(state, instance, seat, cards) === highestCost;
-  });
-  if (tied.length > 1) {
+  if (check.kind === "tied") {
     return {
       ...state,
       engagement: cursor,
       activeSeat: state.firstPlayer,
-      window: { kind: "chooseEnemy", reason: "engagement", seat, options: tied },
+      window: { kind: "chooseEnemy", reason: "engagement", seat, options: check.options },
     };
   }
+  const highestId = check.enemyId;
   const engaged = engageEnemy(state, seat, highestId, steps);
   return {
     ...engaged,

@@ -58,7 +58,7 @@ export function useCardLookups(session: OpenedTable, store: TableStore) {
       },
       // The real name of a Lost Island whose facedown side a look shows.
       facedown: (cardId: string) => nameOf(store.getState().game.cards[cardId]?.code ?? cardId),
-      line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null }),
+      line: ledgerLine, text: (code: string) => session.facts.get(code)?.text ?? null, pack: (code: string) => session.facts.get(code)?.pack ?? null }),
     [nameOf, store, session],
   );
   // A printed line no effect record reads is not applied: the canvas marks the card, and no control applies the line.

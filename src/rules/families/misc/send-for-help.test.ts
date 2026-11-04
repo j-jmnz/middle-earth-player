@@ -9,6 +9,7 @@ import { finish, havenTable, idOf, idsOf, legalIntents, loadHavenWorld, resolveR
 import { destroyCard } from "../../core/keywords.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
+import { moveCard } from "../../core/zones.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 
 // Aragorn (01001) and Théodred (01002) are in the collection; Gandalf is 01073.
@@ -84,6 +85,16 @@ describe("11212:A:2 Send for Help (Tactics): put a hero from the collection into
     if (!hero) throw new Error("no hero");
     const gone = settled(destroyCard(done.state, hero.id, made.ctx.cards, []), made.ctx);
     expect(gone.cards[hero.id]?.zone).toBe("removed");
+  });
+
+  it("removes the hero from the game when it leaves play by any route: to a hand, to a deck, to the discard pile", () => {
+    const made = make({ staging: ["11212"] });
+    const done = resolveRecords(made.state, made.ctx, "11212", "whenRevealed", idOf(made.state, "11212"), answers([]));
+    const hero = cardsOf(done.state, ARAGORN)[0];
+    if (!hero) throw new Error("no hero");
+    for (const destination of [{ zone: "hand", seat: 0 }, { zone: "deck", seat: 0 }, { zone: "discard", seat: 0 }] as const) {
+      expect(moveCard(done.state, hero.id, destination).cards[hero.id]?.zone, destination.zone).toBe("removed");
+    }
   });
 
   it("removes the hero from the game at the end of the round", () => {

@@ -3,7 +3,7 @@
 // What effects do to a card right now, so the table can show it on the card: each printed number an effect raised or
 // lowered (the engine's value against the printed one), each "cannot" an effect put on it, and the effects themselves in
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
-import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
+import type { Instruction, ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../../rules/interpret/constant-records.ts";
 import { aflameTally, burnTally } from "../../rules/families/aflame/values.ts";
 import { cellOf, islandOf } from "../../rules/families/island/map.ts";
@@ -13,6 +13,7 @@ import type { PlaceMark } from "../store/island-place.ts";
 import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/stormcaller.ts";
 import { shipLoss, type ShipLoss } from "../words/grapple.ts";
+import { heldWords } from "../words/sea.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../../rules/core/keywords.ts";
@@ -193,14 +194,17 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
 }
 
 // What a delayed effect will do, in words (rr.delayed-effects).
-function delayedWords(verb: string): string {
-  switch (verb) {
+function delayedWords(instruction: Instruction): string {
+  switch (instruction.verb) {
     case "ReturnToHand":
       return "returns to its owner's hand";
     case "ShuffleSelfIntoDeck":
       return "is shuffled into its owner's deck";
     case "EngageAll":
       return "each enemy in staging engages the first player";
+    // A hero Send for Help (Tactics) puts into play leaves the game at the end of the round (11212:A:2).
+    case "MoveCard":
+      return instruction.to === "removed" ? "is removed from the game" : "its effect resolves";
     default:
       return "its effect resolves";
   }
@@ -217,7 +221,7 @@ export function delayedLines(game: ScenarioState, cardId: string, cardName: (id:
     .filter((entry) => actsOn(entry, cardId))
     .map((entry) => {
       const when = entry.until === "endOfPhase" ? "At the end of this phase" : "At the end of the round";
-      const what = entry.instructions.map((instruction) => delayedWords(instruction.verb)).join(", then ");
+      const what = entry.instructions.map((instruction) => delayedWords(instruction)).join(", then ");
       const source = entry.sourceId && entry.sourceId !== cardId ? ` (${cardName(entry.sourceId)})` : "";
       return `${when}: ${what}${source}`;
     });
@@ -248,7 +252,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
-    under: card != null && inPlay(card.zone) ? underMark(burnTally(game, cardId, ctx)) : null,
+    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId)) : null,
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
@@ -288,6 +292,12 @@ export type UnderMark = { text: string; loses: boolean; speech: string };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
   return tally ? burnMark(tally) : null;
+}
+
+// The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
+function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
+  const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
+  return held.length > 0 ? heldWords(held.map((other) => printedOf(ctx.cards, other.code).name)) : null;
 }
 
 /** The mark on an Aflame location in play: "3/5" damage against its value, threat red when one more damage destroys it. */
