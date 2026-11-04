@@ -69,7 +69,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 43 | Flight of the Stormcaller | completed | 2026-10-31. Engine done, review round done. Phone checks open: the Stormcaller's area (stage pill, Apart plate, veil, fold), the banner and stage 4 advance view, Hidden Cove caution, both themes; both Maestro flows unrun; `stormcaller-won` missing, so the win flow cannot run. |
 | 44 | The Thing in the Depths | completed | 2026-10-31. Engine done, review round done. Phone checks open: grappled stacks and the ×N pill, the Ship "n/9" pill, the lowered engagement row at Large, travel cautions, the stage 2 banner, the Trait list scrolling; both Maestro flows unrun; `depths-won` missing, so the win flow cannot run. |
 | 45 | Temple of the Deceived | completed | 2026-11-01. Engine done, review round done. Phone checks open: Island Map chip and panel at three scales, travel direction rows and glyph, the coming-soon path after the win; both Maestro flows unrun; `temple-won` missing, so the win flow cannot run. |
-| 46 | The Drowned Ruins | not started | Coming soon (user decision, 2026-11-01): the campaign path shows it as coming soon and nothing can start it. |
+| 46 | The Drowned Ruins | active | 2026-11-04 (user decision: started with `pnpm scenario:new`). Skeletons written; records, goldens and the phone half open. |
 | 47 | A Storm on Cobas Haven | not started | Coming soon (user decision, 2026-11-01). |
 | 48 | The City of Corsairs | not started | Coming soon (user decision, 2026-11-01). Open: which Stormcaller card the campaign Setup flips (12151 has no Campaign Mode only side; only 110042 has one). |
 

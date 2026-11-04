@@ -1,0 +1,17 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `ruins-won` (scripts/e2e/the-drowned-ruins.ts): a real two-handed
+# game of The Drowned Ruins, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
+# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: ruins-won
+      SCENARIO_ID: the-drowned-ruins
+      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
+      # CHOICE_ID: "TODO"
+      # CHOICE_PROMPT: "TODO"
+      # CHOICE_CONSEQUENCE: "TODO"
+# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
