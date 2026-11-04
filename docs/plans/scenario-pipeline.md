@@ -67,10 +67,13 @@ Exit: the plan's checks (Verification), and `pnpm scenario:new the-drowned-ruins
 
 ## D. One manifest per family
 
-- Each catalog family exports one manifest (verbs, triggers, flags), and each rules family exports one (its runner and hooks). The hooks are settle, travel, pick, condition and amount: the places where the core calls a family by name. One ordered list in each index collects them. The order is written in that list, so play stays deterministic.
+Narrowed to what a new family needs (user decision, 2026-11-04):
+
+- Each catalog family exports one manifest (verbs, triggers, flags), and each rules family exports one (its runner and hooks). One ordered list in each index collects them. The order is written in that list, so play stays deterministic. A new family is one file per side and one line in each list.
+- The hooks are the places where the core now calls a family by name: settle, travel, pick, condition and amount. The core calls each hook through the ordered list. The settle chain in `src/rules/engine/machine.ts` moves behind the settle hook in this section; the other direct calls move behind their hooks when their family is next changed, with the goldens byte-identical each time.
 - A test fails when a verb in `FAMILY_VERBS` has no runner, or a runner answers a verb no family declares.
-- Move the core's direct family calls behind the hooks one file at a time, with the goldens byte-identical after each. Card codes the core or the table reads by number (the Burn in `src/rules/interpret/conditions.ts`, Change of Plans in the settle loop, the torch and axe in `src/play/words/aflame.ts`) become family flags where a printed line names the behaviour.
 - The verb allowlists in `src/campaign/start.ts` become a flag on each verb's schema entry.
+- Not in this section: moving every direct family import behind hooks, and turning the card codes the core or the table reads by number (the Burn in `src/rules/interpret/conditions.ts`, Change of Plans in the settle loop, the torch and axe in `src/play/words/aflame.ts`) into family flags.
 
 Exit: the plan's checks (Verification).
 
@@ -90,7 +93,7 @@ Not built: a search-based win finder for the missing won fixtures (`docs/phases/
 
 ## Order
 
-A, B and C come before phase 46 starts, so phase 46 is the first scenario built on them. D, E and F follow. Sections run one at a time with `orchestrator`, one review round (`.cursor/agents/orchestrator.md`, One review round).
+A, B and C come before phase 46 starts, so phase 46 is the first scenario built on them. F and D follow; E waits until a new campaign or pack is added. Sections run one at a time with `orchestrator`, one review round (`.cursor/agents/orchestrator.md`, One review round).
 
 ## Verification
 
