@@ -10,6 +10,7 @@ import { settle } from "../../engine/machine.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
+import { modifiedStat } from "../../core/keywords.ts";
 import { costReduction } from "../../player/cost-rules.ts";
 import { flagged, readyBarred, updateCard } from "../../core/state.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -44,13 +45,30 @@ describe("Sahír's Betrayal (12093:A:1)", () => {
     expect(sahir).toMatchObject({ code: "11076", zone: "staging", face: "up", resources: 0 });
     expect(faceProblems(done.state)).toEqual([]);
     expect(done.state.cards[idOf(done.state, "12094")]).toMatchObject({ zone: "activeLocation", face: "up" });
-    // The Undead enemy the search found joins the staging area faceup.
-    expect(done.state.staging.map((id) => done.state.cards[id]?.code)).toContain("undead");
+    // The rest of the line follows the attack, as printed: no Undead enemy has been searched out yet.
+    expect(done.state.staging.map((id) => done.state.cards[id]?.code)).not.toContain("undead");
     const over = send(done, { type: "Undefended", heroId: made.hero }, made.ctx);
     const after = finish(over, made.ctx).state;
     expect(after.cards[sahir.id]?.zone).toBe("removed");
+    // Then the Undead enemy the search found joins the staging area faceup.
+    expect(after.staging.map((id) => after.cards[id]?.code)).toContain("undead");
     expect(after.cards[made.hero]!.damage + after.cards[made.hero2]!.damage).toBeGreaterThan(0);
     expect(faceProblems(after)).toEqual([]);
+  });
+});
+
+describe("Black Key on Captain Sahír (11183:A:2, 12093:A:1)", () => {
+  it("gives Sahír +1 Attack as an objective ally, and not as the enemy he flips to", () => {
+    const made = make({ stage: "12093", doubleSided: [SHRINE], setAside: ["12094"], play: [CODES.captainSahir, CODES.blackKey] });
+    const sahir = idOf(made.state, CODES.captainSahir);
+    const attack = (state: ScenarioState, id: string) => modifiedStat(state, state.cards[id]!, "attack", made.ctx.cards);
+    const attached = syncConstants(attachTo(made.state, idOf(made.state, CODES.blackKey), sahir), made.ctx);
+    expect(attack(attached, sahir)).toBe(attack(syncConstants(made.state, made.ctx), sahir) + 1);
+    const done = resolveRecords(attached, made.ctx, "12093", "whenRevealed", attached.questStage ?? undefined, undefined, false);
+    const enemy = done.state.cards[done.state.window?.kind === "defense" ? done.state.window.enemyId : ""]!;
+    expect(enemy).toMatchObject({ code: "11076", zone: "staging" });
+    expect(done.state.cards[idOf(done.state, CODES.blackKey)]?.host).toBe(enemy.id);
+    expect(attack(done.state, enemy.id)).toBe(made.ctx.cards.get("11076")?.attack);
   });
 });
 
@@ -160,13 +178,26 @@ describe("Into the Abyss, Shadow (12106:A:2)", () => {
 });
 
 describe("Twisting Hollow (12102:A:1)", () => {
-  it("bars card effects from readying a character while it is active, but not the refresh phase", () => {
-    const active = make({ sided: [{ code: "12102", back: "12099", zone: "activeLocation" }] });
-    expect(readyBarred(active.state, active.hero)).toBe(true);
-    const ready = run(active, { verb: "Ready", target: "picked" });
-    expect(ready.state.cards[active.hero]?.exhausted).toBe(false);
-    const staging = make({ sided: [{ code: "12102", back: "12099", zone: "staging" }] });
-    expect(readyBarred(staging.state, staging.hero)).toBe(false);
+  const tired = (zone: "activeLocation" | "staging", phase: RuinsLayout["phase"] = "Quest") => {
+    const made = make({ phase, sided: [{ code: "12102", back: "12099", zone }] });
+    return { made, state: updateCard(made.state, made.hero, { exhausted: true }) };
+  };
+
+  it("bars a card effect from readying a character while it is active, but not the refresh phase", () => {
+    const active = tired("activeLocation");
+    expect(readyBarred(active.state, active.made.hero)).toBe(true);
+    // A card effect that readies every character leaves the exhausted hero exhausted...
+    const effect = run({ ...active.made, state: active.state }, { verb: "Ready", target: "allCharacters" });
+    expect(effect.state.cards[active.made.hero]?.exhausted).toBe(true);
+    // ...while with the location in the staging area the same effect readies it.
+    const idle = tired("staging");
+    expect(readyBarred(idle.state, idle.made.hero)).toBe(false);
+    expect(run({ ...idle.made, state: idle.state }, { verb: "Ready", target: "allCharacters" }).state.cards[idle.made.hero]?.exhausted).toBe(false);
+    // The refresh phase readies it with the location active (a rule, not a card effect).
+    const refresh = tired("activeLocation", "Refresh");
+    expect(refresh.state.cards[refresh.made.hero]?.exhausted).toBe(true);
+    const refreshed = settle(refresh.state, refresh.made.ctx, []);
+    expect(refreshed.cards[refresh.made.hero]?.exhausted).toBe(false);
   });
 });
 

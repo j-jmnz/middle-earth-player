@@ -1,5 +1,6 @@
 import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 
+import { MANY_PLAYERS } from "./conditions.ts";
 import { copyLine, copyLines, withCopies } from "./reprint.ts";
 
 // Records for The Fate of Númenor (Dream-chaser part 2, campaign card 11179): the two quest stages, the Fate of Númenor, Drowned Dead and Ruins of Númenor encounter cards no template or
@@ -9,7 +10,6 @@ import { copyLine, copyLines, withCopies } from "./reprint.ts";
 // rr.explored, rr.search, rr.active-location, rr.travel (data/rules/entries.json).
 const ACTIVE = { kind: "sourceIn", zone: "activeLocation" } as const;
 const IN_STAGING = { kind: "sourceIn", zone: "staging" } as const;
-const MANY_PLAYERS = { kind: "count", pick: { type: "player", control: "any" }, min: 3 } as const;
 const FEW_PLAYERS = { kind: "not", condition: MANY_PLAYERS } as const;
 // The card DiscardBottom discarded has a printed cost of 2 or less ("If that card's printed cost is 2 or less").
 const CHEAP = { kind: "discardedCost", max: 2 } as const;

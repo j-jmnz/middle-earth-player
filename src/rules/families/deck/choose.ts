@@ -39,9 +39,19 @@ export function noteOption(state: ScenarioState, instruction: ChooseInstruction,
   return patchTop(state, { data: { ...data, options: [...(data.options ?? []), optionId] } });
 }
 
+/** The most options a Choose with `upTo` may take, read now for the seat choosing. Null for a Choose without `upTo`. */
+export function upToLimit(state: ScenarioState, instruction: ChooseInstruction, seat: number, sourceId: string | null, ctx: ReduceContext): number | null {
+  if (instruction.upTo == null) return null;
+  return typeof instruction.upTo === "number" ? instruction.upTo : resolveAmount(state, instruction.upTo, frameScope(state, seat, sourceId), ctx);
+}
+
+/** How many more options a Choose with `upTo` may take (0 when it has taken as many as it may), or null for a Choose without `upTo`. */
+export function optionsLeft(state: ScenarioState, instruction: ChooseInstruction, seat: number, sourceId: string | null, ctx: ReduceContext): number | null {
+  const limit = upToLimit(state, instruction, seat, sourceId, ctx);
+  return limit == null ? null : Math.max(0, limit - taken(state).length);
+}
+
 /** Whether a Choose with `upTo` has taken as many options as it may: the limit is read now, for the seat choosing. */
 export function limitReached(state: ScenarioState, instruction: ChooseInstruction, seat: number, sourceId: string | null, ctx: ReduceContext): boolean {
-  if (instruction.upTo == null) return false;
-  const limit = typeof instruction.upTo === "number" ? instruction.upTo : resolveAmount(state, instruction.upTo, frameScope(state, seat, sourceId), ctx);
-  return taken(state).length >= limit;
+  return optionsLeft(state, instruction, seat, sourceId, ctx) === 0;
 }

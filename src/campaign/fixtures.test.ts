@@ -38,7 +38,7 @@ const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 // (the Voyage's `voyage-won` and the like, wins of real decklists, are open), so every earlier part in the campaign's order is completed, the playthrough's open scenario is this one and the path
 // resumes it. A name whose game the seeds did not find is not committed and has nothing to check. The Campaign Setup's offers are answered in the loadout (Raid's Galdor's Counsel, the Drowned Ruins' Command and Círdan's Blessing).
 const DREAM_CHASER = loadCampaign("dream-chaser");
-const SETUP_CHOICES: Readonly<Record<string, readonly string[]>> = { "raid-on-the-grey-havens": ["skip", "skip"], "the-drowned-ruins": ["skip", "skip", "skip"] };
+const SETUP_CHOICES: Readonly<Record<string, readonly string[]>> = { "raid-on-the-grey-havens": ["skip", "skip"], "the-drowned-ruins": ["skip", "skip", "skip", "skip"] };
 const LATER_PARTS = FIXTURE_REGISTRY.flatMap((entry) => {
   const at = DREAM_CHASER.scenarios.indexOf(entry.scenarioId);
   if (at < 1) return [];

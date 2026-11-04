@@ -15,7 +15,7 @@ import { nextStep } from "../../path.ts";
 // on fixed seeds. It pins the path from data/ through the Campaign Setup Checklist and buildStart, the scenario's records, the Grotto deck (the Grotto side up in the staging area, the flip to the Underwater side, the
 // Shrine to Morgoth set aside until stage 2) and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.
 const code = (state: ScenarioState, id: string): string => state.cards[id]?.code ?? "";
-const GROTTO: readonly string[] = [CODES.underseaGrotto, CODES.cursedCaverns, CODES.watterLoggedHalls];
+const GROTTO: readonly string[] = [CODES.underseaGrotto, CODES.cursedCaverns, CODES.waterLoggedHalls];
 const SHRINE: readonly string[] = [CODES.shrineToMorgoth, "12095"];
 // The Command and Círdan's Blessing copies the golden's players took ("skip" refuses a copy).
 const chosenCards = (golden: RuinsGolden): string[] => (golden.choices ?? commandChoices(golden.seatCount)).filter((item) => item !== "skip");
@@ -37,7 +37,7 @@ goldenSuite<RuinsGolden, RuinsDecks>({
       expect(inZone("staging").every((c) => GROTTO.includes(c)), golden.name).toBe(true);
       expect((state.uncharted?.deck ?? []).map((id) => code(state, id)).every((c) => GROTTO.includes(c)), golden.name).toBe(true);
       expect(state.uncharted?.deck, golden.name).toHaveLength(6);
-      expect([...(state.uncharted?.deck ?? []).map((id) => code(state, id)), ...inZone("staging")].sort(), golden.name).toEqual([CODES.underseaGrotto, CODES.underseaGrotto, CODES.underseaGrotto, CODES.cursedCaverns, CODES.cursedCaverns, CODES.cursedCaverns, CODES.watterLoggedHalls, CODES.watterLoggedHalls].sort());
+      expect([...(state.uncharted?.deck ?? []).map((id) => code(state, id)), ...inZone("staging")].sort(), golden.name).toEqual([CODES.underseaGrotto, CODES.underseaGrotto, CODES.underseaGrotto, CODES.cursedCaverns, CODES.cursedCaverns, CODES.cursedCaverns, CODES.waterLoggedHalls, CODES.waterLoggedHalls].sort());
       // The Shrine to Morgoth is out of play until stage 2 (its Underwater side is a card of its own, shown only by a flip).
       expect(Object.values(state.cards).find((card) => card.code === CODES.shrineToMorgoth), golden.name).toMatchObject({ zone: "setAside" });
       // Captain Sahír under the first player, Na'asiyah under the last, Black Key (on its Upgraded side with the Upgraded golden) on Sahír.
@@ -102,7 +102,8 @@ goldenSuite<RuinsGolden, RuinsDecks>({
     const campaignCard = Object.values(state.cards).find((card) => card.code === CODES.campaignCard);
     const naasiyah = Object.values(state.cards).find((card) => card.code === CODES.naAsiyah);
     const enemies = Object.values(state.cards).filter((card) => (card.zone === "staging" || card.zone === "engaged") && world.cards.get(card.code)?.type === "enemy");
-    const underwater = victory.filter((c) => ruins.cards.some((card) => card.back === c) && !SHRINE.includes(c)).length;
+    // 11200:B:7 counts every Underwater location in the victory display: a flipped Grotto location, Drowned Cave and the Shrine's Underwater side.
+    const underwater = victory.filter((c) => world.cards.get(c)?.traits.includes("Underwater")).length;
     return (
       survivors.length +
       Math.min(3, campaignCard?.resources ?? 0) +

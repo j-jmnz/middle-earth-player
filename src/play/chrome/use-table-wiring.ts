@@ -1,5 +1,5 @@
 // The small wiring the table view hands its pieces (src/screens/table/view.tsx), kept here beside use-table-choice.ts: the printed facts the zone selectors and the look strip read, the card
-// preview opener, what a tap on a pile does (a discard pile's list, a fold stack's row list, the Iron Shackles card on a deck), the Heading dial and the Island Map chip the top bar shows. Nothing here changes the game.
+// preview opener, what a tap on a pile does (a discard pile's list, a fold stack's row list, the Iron Shackles card on a deck, the Grotto deck's top card), the Heading dial and the Island Map chip the top bar shows. Nothing here changes the game.
 import { useCallback, useMemo } from "react";
 
 import type { Reading } from "./reading.ts";
@@ -17,6 +17,11 @@ export type PreviewTarget = { id: string; extra: readonly string[] };
 /** The Heading dial the top bar draws: the engine's step, and a tap that opens the Heading card's preview. Null while no Heading card is in play. */
 export type HeadingDialProps = { step: HeadingStep; onPress: () => void };
 
+/** The card on top of the Grotto deck, which a tap or a long press on the pile opens: read on the Grotto side it lies on, never turned (dcce.grotto-deck). */
+export function grottoTop(game: ScenarioState): string | undefined {
+  return game.uncharted?.grotto === true ? game.uncharted.deck[0] : undefined;
+}
+
 export function useTableWiring({ store, ctx, game, setReading, setPreview }: { store: TableStore; ctx: ReduceContext; game: ScenarioState; setReading: (reading: Reading) => void; setPreview: (target: PreviewTarget) => void }) {
   // What the zone selectors read of a printing (ships first, the fold order of staging) and the success symbols a look marks (the engine counts the same printed symbols).
   const facts = useMemo(() => zoneFactsOf(ctx.cards), [ctx]);
@@ -29,6 +34,9 @@ export function useTableWiring({ store, ctx, game, setReading, setPreview }: { s
       if (id === "staging" || id === "engaged") return setReading({ kind: "row", row: id });
       if (opensList(id as PileId)) return setReading({ kind: "pile", pile: id as PileId });
       const { game: now, viewedSeat } = store.getState();
+      // The Grotto deck's top card is free to read: a tap or a long press opens its preview, which shows the Grotto side it lies on and never the Underwater side behind it (dcce.grotto-deck).
+      const grotto = id === "grottoDeck" ? grottoTop(now) : undefined;
+      if (grotto) return setPreview({ id: grotto, extra: [] });
       const shackles = id === "deck" ? now.seats[shownSeat(now, viewedSeat)]?.deckAttached?.[0] : undefined;
       if (shackles) setPreview({ id: shackles, extra: [] });
     },

@@ -177,18 +177,18 @@ const delaySchema = z.strictObject({
   instructions: z.array(simpleInstructionSchema),
 });
 
-// Instructions that run, with the attacking enemy as the source, once the attack in progress ends. `when` is read as the shadow effect
-// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
-const afterAttackSchema = z.strictObject({
-  verb: z.literal("AfterAttack"),
-  instructions: z.array(simpleInstructionSchema),
-  ...when,
-});
-
 const forEachPlayerSchema = z.strictObject({
   verb: z.literal("ForEachPlayer"),
   order: z.enum(["lastFirst", "firstFirst"]),
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
+});
+
+// Instructions that run, with the attacking enemy as the source, once the attack in progress ends (a ForEachPlayer among them: "Captain Sahír makes an attack ... Each player searches ...", 12093:A:1). `when` is read as the shadow effect
+// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
+const afterAttackSchema = z.strictObject({
+  verb: z.literal("AfterAttack"),
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, forEachPlayerSchema])),
+  ...when,
 });
 
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready

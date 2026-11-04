@@ -4,13 +4,17 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../../interpret/constants.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
-import { modifiedStat } from "../../core/keywords.ts";
+import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { settle } from "../../engine/machine.ts";
 import { hasTrait, holds } from "../../interpret/conditions.ts";
 import { attachBlocked } from "../../interpret/restrictions.ts";
 import { moveCard } from "../../core/zones.ts";
+import { showedHidden } from "../../engine/undo.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { CODES, finish, idOf, loadRuinsWorld, resolveRecords, ruinsTable, send, start, type RuinsLayout, type RuinsWorld } from "../../../../test/scenarios/the-drowned-ruins/scene.ts";
+import { CODES, finish, HERO, idOf, loadRuinsWorld, resolveRecords, ruinsTable, send, start, type RuinsLayout, type RuinsWorld } from "../../../../test/scenarios/the-drowned-ruins/scene.ts";
 import { AUTHORED_EFFECTS } from "../../../effects/authored/the-drowned-ruins.ts";
 import { dealDoubleSided } from "./deal.ts";
 import { isDoubleSided, otherSideOf } from "./grotto.ts";
@@ -24,6 +28,7 @@ let world: RuinsWorld;
 
 beforeAll(async () => {
   world = await loadRuinsWorld();
+  for (const [code, printed] of await loadPrinted(["17115", "10036"])) world.cards.set(code, printed);
 });
 
 const deck = (cards: readonly { code: string; back: string }[]) => cards.map((card) => ({ ...card, pile: "grottoDeck" as const }));
@@ -202,9 +207,10 @@ describe("The Grotto, side B: after a double-sided location is explored (12092:B
     expect(explored.state.victory).not.toContain(id);
     expect(explored.state.cards[id]).toMatchObject({ zone: "unchartedDeck", code: UNDERSEA.code, other: UNDERSEA.back, face: "up", progress: 0 });
     expect(explored.state.encounterDiscard).not.toContain(id);
-    // The record added the top of the deck as it stood: one of the two that were there, the explored card having joined the bottom.
+    // The explored card was shuffled back into the deck, and the record then added the top of the shuffled deck, so any of the three may be the one now in staging (the seed decides): the three are all
+    // there, one in the staging area and two in the deck.
     expect(stagingCodes(explored.state)).toHaveLength(1);
-    expect(["12099", "12100"]).toContain(stagingCodes(explored.state)[0]);
+    expect([...stagingCodes(explored.state), ...deckCodes(explored.state)].sort()).toEqual([UNDERSEA.code, CAVERNS.code, HALLS.code].sort());
     expect(explored.state.uncharted?.deck).toHaveLength(2);
   });
 
@@ -216,6 +222,16 @@ describe("The Grotto, side B: after a double-sided location is explored (12092:B
     expect(explored.state.victory).toContain(id);
     expect(explored.state.cards[id]?.code).toBe(UNDERSEA.back);
     expect(stagingCodes(explored.state)).toEqual([CAVERNS.code]);
+  });
+
+  it("also answers a double-sided location explored in the staging area (Northern Tracker, The Evening Star)", () => {
+    const made = make({ doubleSided: deck([CAVERNS, HALLS]), sided: [{ ...UNDERSEA, zone: "staging" }] });
+    const id = idOf(made.state, UNDERSEA.code);
+    const steps: Parameters<typeof destroyCard>[3] = [];
+    const explored = finish(start(settle(syncConstants(destroyCard({ ...made.state, window: null }, id, made.ctx.cards, steps, true), made.ctx), made.ctx, steps)), made.ctx);
+    expect(explored.state.cards[id]?.zone).not.toBe("staging");
+    expect(stagingCodes(explored.state)).toHaveLength(1);
+    expect(["12099", "12100"]).toContain(stagingCodes(explored.state)[0]);
   });
 
   it("does not answer the exploration of a location that is not double-sided", () => {
@@ -263,5 +279,63 @@ describe("ResolveActiveForced (12105:A:1)", () => {
     const queued = runInstruction({ ...made.state, window: null }, { verb: "ResolveActiveForced", phase: "Quest" }, { seat: 0, sourceId: null }, made.ctx, []);
     expect(queued.pendingEvents).toEqual([{ trigger: "endOfPhase", seat: null, phase: "Quest", cardId: idOf(made.state, UNDERSEA.code) }]);
     expect(runInstruction({ ...make().state, window: null }, { verb: "ResolveActiveForced", phase: "Quest" }, { seat: 0, sourceId: null }, made.ctx, []).pendingEvents).toBeUndefined();
+  });
+});
+
+describe("The Grotto deck cannot enter the discard pile (dcce.grotto-deck)", () => {
+  // A player card's Action resolved by itself (the card is not in a scenario ledger, so the cause check does not apply).
+  const action = (made: ReturnType<typeof make>, code: string) => {
+    const id = idOf(made.state, code);
+    const pushed = pushCardEffects(made.state, "forced", id, 0, false, EFFECTS.filter((effect) => effect.cardCode === code && effect.timing === "action"), made.ctx, []);
+    return finish({ state: settle({ ...pushed, window: null }, made.ctx, []), steps: [] }, made.ctx).state;
+  };
+  const inDeck = (state: ScenarioState, id: string) => state.uncharted?.deck.includes(id) === true;
+
+  it("shuffles a Grotto location on its Underwater side back into the deck, Grotto side up, instead of the discard pile", () => {
+    const made = make({ doubleSided: deck([CAVERNS]), sided: [{ code: UNDERSEA.back, back: UNDERSEA.code, zone: "staging", progress: 1 }] });
+    const id = idOf(made.state, UNDERSEA.back);
+    const gone = moveCard(made.state, id, { zone: "encounterDiscard" });
+    expect(gone.encounterDiscard).not.toContain(id);
+    expect(inDeck(gone, id)).toBe(true);
+    expect(gone.cards[id]).toMatchObject({ zone: "unchartedDeck", code: UNDERSEA.code, other: UNDERSEA.back, face: "up", progress: 0 });
+    // Into the encounter deck is the same.
+    expect(moveCard(made.state, id, { zone: "encounterDeck" }).encounterDeck).not.toContain(id);
+  });
+
+  it("holds when Heirs of Earendil (17115:action:1) discards a non-unique location in the staging area (an Underwater side with Victory goes to the victory display)", () => {
+    const made = make({ sided: [{ code: UNDERSEA.back, back: UNDERSEA.code, zone: "staging" }], hand: ["17115"] });
+    const id = idOf(made.state, UNDERSEA.back);
+    const done = action(made, "17115");
+    expect(done.encounterDiscard).not.toContain(id);
+    expect(done.cards[id]?.zone).toBe("victory");
+    // A Grotto side without Victory shuffles back into the deck.
+    const grotto = make({ sided: [{ code: CAVERNS.code, back: CAVERNS.back, zone: "staging" }], hand: ["17115"] });
+    const back = action(grotto, "17115");
+    expect(back.cards[idOf(grotto.state, CAVERNS.code)]?.zone).toBe("unchartedDeck");
+    expect(back.encounterDiscard).toHaveLength(0);
+  });
+
+  it("holds when Distant Stars (10036:action:1) discards the active location", () => {
+    const base = make({ sided: [{ code: UNDERSEA.back, back: UNDERSEA.code, zone: "activeLocation" }], hand: ["10036"] });
+    const hero = { ...base.ctx.cards.get(HERO)!, traits: ["Ranger"] };
+    const made = { ...base, ctx: { ...base.ctx, cards: new Map(base.ctx.cards).set(HERO, hero) } };
+    const id = idOf(made.state, UNDERSEA.back);
+    const done = action(made, "10036");
+    expect(done.encounterDiscard).not.toContain(id);
+    expect(done.cards[id]).toMatchObject({ zone: "unchartedDeck", code: UNDERSEA.code, other: UNDERSEA.back });
+  });
+});
+
+describe("Undo and the Underwater side (docs/brief.md, The engine plays the game)", () => {
+  it("does not take back a flip of a Grotto location: it showed the side the card hid", () => {
+    const made = make({ doubleSided: deck([CAVERNS]), sided: [{ ...UNDERSEA, zone: "activeLocation" }] });
+    const id = idOf(made.state, UNDERSEA.code);
+    expect(showedHidden(made.state, run(made, { verb: "FlipDoubleSided" }, id).state)).toBe(true);
+    // The set-aside Shrine knows its other side by its pairing alone.
+    const shrine = make({ doubleSided: [{ code: SHRINE.grotto, back: SHRINE.underwater, pile: "setAside" }], setAside: [SHRINE.grotto] });
+    expect(showedHidden(shrine.state, run(shrine, { verb: "FlipDoubleSided" }, idOf(shrine.state, SHRINE.grotto)).state)).toBe(true);
+    // Adding the top Grotto location Grotto side up shows nothing new (it was free to read); adding it flipped (Ancient Depths) does.
+    expect(showedHidden(made.state, run(made, { verb: "AddFromGrottoDeck", count: 1 }).state)).toBe(false);
+    expect(showedHidden(made.state, run(made, { verb: "AddFromGrottoDeck", count: 1, flip: true }).state)).toBe(true);
   });
 });

@@ -24,14 +24,10 @@ import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";
 import { queueHeard } from "../quest/events.ts";
+import { lastPlayer } from "../sea/players.ts";
 import { stage } from "./deck.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
-
-/** The last player in turn order (livingSeats starts at the first player; the first player is also the last in a solo game). */
-function lastPlayer(state: ScenarioState): number {
-  return livingSeats(state).at(-1) ?? state.firstPlayer;
-}
 
 /** PutSetAsideInPlay: the set-aside copy of the card with this name comes into play, ready, under the first player, on the side the campaign deals it. */
 export function putSetAsideInPlay(state: ScenarioState, instruction: Verb<"PutSetAsideInPlay">, ctx: ReduceContext): ScenarioState {

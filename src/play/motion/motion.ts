@@ -171,8 +171,8 @@ export function motionsBetween(
     }
     if (slot.faceDown) continue;
     const zone = zoneNow(slot.id);
-    // The pile of that name, when the card went to one (a discard pile, a deck).
-    const pile = zone != null && zone in next.piles ? (next.piles[zone as PileId] ?? null) : null;
+    // The pile of that name, when the card went to one (a discard pile, a deck). The engine's Uncharted deck is the Grotto deck's pile in a Grotto game: a location shuffled back into it glides there.
+    const pile = zone === "unchartedDeck" ? (next.piles.unchartedDeck ?? next.piles.grottoDeck ?? null) : zone != null && zone in next.piles ? (next.piles[zone as PileId] ?? null) : null;
     if (pile) {
       const a = center(slot);
       const b = center(pile);

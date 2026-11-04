@@ -40,7 +40,7 @@ export const CODES = {
   naAsiyah: "11079", // Na'asiyah
   underseaGrotto: "12098", // Undersea Grotto
   cursedCaverns: "12099", // Cursed Caverns
-  watterLoggedHalls: "12100", // Watter-logged Halls
+  waterLoggedHalls: "12100", // Water-logged Halls
   revenant: "11181", // Revenant
   blackKey: "11183", // Black Key
   command: "11201", // Command
@@ -139,7 +139,7 @@ export function ruinsTable(world: RuinsWorld, layout: RuinsLayout = {}): RuinsTa
     state = updateCard(spawned.state, spawned.id, { other: row.back, progress: row.progress ?? 0 });
   }
   // A Grotto location placed by hand has its code among the deck's, as it has in a game whose deck is dealt with every copy (cards of the Grotto deck are shuffled back into it when they would be discarded).
-  const placed = (layout.sided ?? []).filter((row) => ctx.cards.get(row.code)?.traits.includes("Grotto")).map((row) => row.code);
+  const placed = (layout.sided ?? []).flatMap((row) => [row.code, row.back]).filter((code) => ctx.cards.get(code)?.traits.includes("Grotto"));
   if (placed.length > 0) state = { ...state, uncharted: { deck: state.uncharted?.deck ?? [], ...state.uncharted, codes: [...new Set([...(state.uncharted?.codes ?? []), ...placed])] } };
   for (const row of layout.engaged ?? []) {
     const item = typeof row === "string" ? { code: row, seat: 0 } : row;

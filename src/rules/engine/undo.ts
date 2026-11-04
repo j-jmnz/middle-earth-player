@@ -72,6 +72,12 @@ function unseen(state: ScenarioState, card: CardInstance): boolean {
   return UNSEEN.has(card.zone) || card.face === "down" || (card.face === "B" && state.uncharted?.codes.includes(card.code) === true);
 }
 
+// A double-sided location of two catalog cards (the Grotto deck, dcce.grotto-deck) that now shows its other side in a place the players read: the Underwater side it hid until the flip.
+function flippedSides(before: ScenarioState, was: CardInstance, now: CardInstance): boolean {
+  const twoSided = was.other != null || before.uncharted?.pairs?.[was.code] != null;
+  return twoSided && now.code !== was.code && now.zone !== "unchartedDeck";
+}
+
 // The cards the open window names, for a player to read: a Look's cards, a Choose's options (a Pick among the top of a deck,
 // a search). Option ids that are not cards are skipped.
 function windowCards(state: ScenarioState): readonly string[] {
@@ -84,7 +90,7 @@ function windowCards(state: ScenarioState): readonly string[] {
 /**
  * True when the intent from `before` to `after` showed the player something they had not seen, so the table's Undo cannot
  * take it back (docs/brief.md, The engine plays the game): a card that left a deck or turned face up (a draw, a reveal, a shadow card
- * turned), a card in a deck or face down (a Lost Island on its Lost Island side too, turned over or looked at) that the open window names (a Look, a Pick among the top cards, a search), a new
+ * turned), a card in a deck or face down (a Lost Island on its Lost Island side too, turned over or looked at) that the open window names (a Look, a Pick among the top cards, a search), a Grotto location turned to its other side, a new
  * card on top of a player's deck, a card that did not exist before, or a random result (the seed cursor moved: a shuffle, a
  * random discard).
  */
@@ -93,6 +99,7 @@ export function showedHidden(before: ScenarioState, after: ScenarioState): boole
   for (const [id, card] of Object.entries(after.cards)) {
     const was = before.cards[id];
     if (!was || (unseen(before, was) && !unseen(after, card))) return true;
+    if (flippedSides(before, was, card)) return true;
   }
   if (after.window !== before.window && windowCards(after).some((id) => after.cards[id] && unseen(after, after.cards[id]))) return true;
   // A Look at the facedown side of a Lost Island (side A) shows what the card hides.

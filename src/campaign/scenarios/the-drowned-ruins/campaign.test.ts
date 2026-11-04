@@ -80,11 +80,14 @@ describe("The Drowned Ruins in the Dream-chaser campaign", () => {
     }
   });
 
-  it("offers a Command copy to each player in turn and Círdan's Blessing to the first player, and lets each deal 1 damage to a character to lower their threat by 1 (11200:A:2)", () => {
-    // The choices are the checklist's: each seat takes one copy of Command (or refuses), the first player one copy of Círdan's Blessing.
+  it("offers a Command copy to each player in turn and Círdan's Blessing to one player (whoever takes it), and lets each deal 1 damage to a character to lower their threat by 1 (11200:A:2, 11200:A:3)", () => {
+    // The choices are the checklist's: each seat takes one copy of Command (or refuses), then the seats are asked in turn for the one copy of Círdan's Blessing until a player takes it.
     const plan = ruinsPlan(2);
     expect(plan.seats.map((seat) => seat.afterMulligan)).toEqual([[CODES.command, CODES.cirdanSBlessing], [CODES.command11202]]);
-    const refused = ruinsPlan(2, undefined, ["skip", "skip", "skip"]);
+    // The second player may take it when the first declines, and the offer ends there: a third answer is not asked for.
+    const second = ruinsPlan(2, undefined, [CODES.command, CODES.command11202, "skip", CODES.cirdanSBlessing]);
+    expect(second.seats.map((seat) => seat.afterMulligan)).toEqual([[CODES.command], [CODES.command11202, CODES.cirdanSBlessing]]);
+    const refused = ruinsPlan(2, undefined, ["skip", "skip", "skip", "skip"]);
     expect(refused.seats.map((seat) => seat.afterMulligan ?? [])).toEqual([[], []]);
     // The threat is the heroes' combined cost; each damage traded lowers it by 1.
     const kept = opened(ruinsStart(1, 1, "Normal"), ["keep"]);

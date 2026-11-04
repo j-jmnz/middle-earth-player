@@ -31,7 +31,7 @@ export type RuinsPolicy = {
 export const DEFAULT_POLICY: RuinsPolicy = { choose: "first" };
 
 const codeOf = (state: ScenarioState, id: string): string => state.cards[id]?.code ?? "";
-const GROTTO_SIDES: readonly string[] = [CODES.underseaGrotto, CODES.cursedCaverns, CODES.watterLoggedHalls];
+const GROTTO_SIDES: readonly string[] = [CODES.underseaGrotto, CODES.cursedCaverns, CODES.waterLoggedHalls];
 
 /** The location the players travel to: the Shrine to Morgoth when it is a target, else an Underwater location (the Underwater side of a Grotto location, or Drowned Cave), else a Grotto side the Response will flip, else the first. */
 export function ruinsTravel(state: ScenarioState, targets: readonly string[], ctx: ReduceContext): string | undefined {
@@ -82,7 +82,7 @@ export type RuinsGame = PlayedGame;
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides (Black Key). `mode`: the Hard or Expert Mode card.
 export type RuinsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RuinsDecks; outcome: "won" | "lost"; policy?: Partial<RuinsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string; choices?: readonly string[] };
 
-// The campaign card's Setup (11200:A:2) through the Campaign Setup Checklist: each seat in turn may take one copy of Command ("skip" refuses), then the first player one copy of Cirdan's Blessing.
+// The campaign card's Setup (11200:A:2) through the Campaign Setup Checklist: each seat in turn may take one copy of Command ("skip" refuses), then each seat in turn may take the one copy of Cirdan's Blessing until a player has (the first player does here).
 export const commandChoices = (seatCount: 1 | 2): string[] => [...(seatCount === 1 ? [CODES.command] : [CODES.command, CODES.command11202]), CODES.cirdanSBlessing];
 
 export const UPGRADED_CODES = [CODES.blackKey];
@@ -99,7 +99,7 @@ export const RUINS_GOLDENS: readonly RuinsGolden[] = [
   { name: "true solo, Hard Mode card, Upgraded Black Key, won", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", mode: "hard", upgraded: true },
   { name: "two-handed, won", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, Easy, after Temple of the Deceived, won", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
-  { name: "two-handed, no Command taken, won", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", choices: ["skip", "skip", "skip"] },
+  { name: "two-handed, no Command taken, won", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", choices: ["skip", "skip", "skip", "skip"] },
   { name: "two-handed, Expert Mode card, Upgraded Black Key, won", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", mode: "expert", upgraded: true },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },

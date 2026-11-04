@@ -164,6 +164,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
   if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
+  if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
   if (spec.nonUnique && printed.isUnique) return false;

@@ -1,5 +1,6 @@
 import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 
+import { ALWAYS } from "./conditions.ts";
 import { copyLine, copyLines, withCopies } from "./reprint.ts";
 
 // Records for Flight of the Stormcaller (Dream-chaser part 4, campaign card 11191): the four quest stages and the Stormcaller's own stages 2C to 4C, the Stormcaller on both sides, the Flight of the
@@ -16,8 +17,6 @@ const SAME_STAGE = { kind: "stormcaller", is: "sameStage" } as const;
 const IN_STAGING = { kind: "sourceIn", zone: "staging" } as const;
 const SHIP_OBJECTIVE: PickSpec = { type: "character", control: "any", trait: "Ship" };
 const SHIP_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Ship", staging: true };
-// A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one).
-const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
 const A_HERO: PickSpec = { type: "hero", control: "you" };
 const SUBJECT_HAS_RESOURCES = { kind: "matches", card: "subject", pick: { type: "hero", control: "any", hasResources: true } } as const;
 

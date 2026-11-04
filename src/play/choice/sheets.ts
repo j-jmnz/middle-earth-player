@@ -19,8 +19,9 @@ import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames 
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleAsk, grappleFactsOf, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
 import { seaAsk, seaOptionLabel } from "../words/sea.ts";
-import { switchNote, tradeWords, unchartedOptionLabel } from "../words/uncharted.ts";
-import { upToNote } from "../words/command.ts";
+import { switchNote, tradeWords, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
+import { commandDone, commandNote } from "../words/command.ts";
+import { DONE } from "../../rules/families/deck/choose.ts";
 import { branchNow, dealtNow } from "../words/aflame.ts";
 import { fireRow } from "./aflame-sheets.ts";
 import { committedNote, stormcallerTravel } from "./stormcaller-sheets.ts";
@@ -233,7 +234,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const data = frame?.data.kind === "effect" ? frame.data : null;
       const effect = data ? effectOf(ctx, data.effectId) : undefined;
       const source = frame?.cardId ?? null;
-      const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code };
+      const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code, traits: (code) => ctx.cards.get(code)?.traits ?? [] };
       const line = lineOf(effect, names);
       // Two-handed, the sheet says whose decision it is: the first player's for "the first player must either" (rr.first-player).
       const who = game.seatCount > 1 ? ` Player ${window.seat + 1} chooses.` : "";
@@ -256,12 +257,16 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const torch = cavesXChoice(choose, (data?.queue ?? []).map((item) => item.instruction));
         // The numbers a branch states are the ones the table holds now (the cards a Counsel looks at), and the card a Counsel places is named.
         const now = branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words);
+        // A Choose with `upTo` (Command) stops on the sheet's armed pass, not on a row of the list: "Done", with the options used so far.
+        const stop = commandDone(game, ctx, choose, window.seat, source, source ? names.card(source) : "This card");
+        const ask = torch?.note ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
-          note: [`${torch?.note ?? upToNote(game, ctx, choose, window.seat, source) ?? "Choose one."}${who}`, line].filter((part) => part != null).join(" "),
+          note: [`${ask}${who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
-          options: window.options.map((id): PickOption => {
+          alternative: stop ? { label: stop.label, intent: { type: "Choose", optionId: stop.optionId }, caution: stop.caution } : null,
+          options: window.options.filter((id) => !(stop && id === DONE)).map((id): PickOption => {
             // A branch that raises or lowers threat carries the threat icon with the record's amount.
             const threat = branchThreat(choose, id);
             const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];

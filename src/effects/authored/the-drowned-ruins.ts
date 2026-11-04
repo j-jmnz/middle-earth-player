@@ -1,21 +1,18 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
+import { ALWAYS, MANY_PLAYERS } from "./conditions.ts";
 import { copyLine, withCopies } from "./reprint.ts";
 import { AUTHORED_EFFECTS as RAID } from "./raid-on-the-grey-havens.ts";
 import { AUTHORED_EFFECTS as NUMENOR } from "./the-fate-of-numenor.ts";
 import { AUTHORED_EFFECTS as DEPTHS } from "./the-thing-in-the-depths.ts";
 
-// Records for The Drowned Ruins (Dream-chaser part 7, campaign card 11200): the campaign card and the encounter cards and quest/location lines that read with the vocabulary the schema has today. Every line is read
-// from the scan ledger (data/printed/dream-chaser.json). The lines that need the Grotto deck (dcce.grotto-deck: the Grotto side up on entering the staging area, the Underwater side only on a flip, Shrine to
-// Morgoth set aside), a flip that keeps or removes progress on a Grotto location, a table-wide "players cannot play", the Command events' choice of up to X options and a few other mechanics stay open:
-// pnpm effects:open lists them, and the report of this file's author says what each needs. Command and Círdan's Blessing (boons) are in pool/DCCE.ts.
+// Records for The Drowned Ruins (Dream-chaser part 7, campaign card 11200): the campaign card, the two quest stages, the Grotto and Underwater locations and the encounter cards. Every line is read from the scan
+// ledger (data/printed/dream-chaser.json) and is covered (pnpm effects:open lists none). The Grotto deck and the flip are the uncharted family's (src/rules/families/uncharted/grotto.ts), the Stormcaller Elite's
+// attack the grapple family's. The Command events and Círdan's Blessing (boons) are in pool/DCCEDrownedRuins.ts.
 // Rules: dcce.grotto-deck, dcce.setup-the-drowned-ruins, dcce.campaign-setup-the-drowned-ruins, dcce.campaign-mode, dcce.gaining-xp, dcce.scalable-upgradable, dcce.encounter-cards, rr.active-location, rr.victory,
 // rr.explored, rr.engaged, rr.cannot, rr.winning-the-game (data/rules/entries.json).
 
-const MANY_PLAYERS = { kind: "count", pick: { type: "player", control: "any" }, min: 3 } as const satisfies Condition;
 const FEW_PLAYERS = { kind: "not", condition: MANY_PLAYERS } as const satisfies Condition;
-// A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one).
-const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const satisfies Condition;
 // A double-sided location, whichever side it shows (dcce.grotto-deck).
 const DOUBLE_SIDED: PickSpec = { type: "location", control: "any", doubleSided: true };
 // "Response: After you travel to X, you may flip it to its Underwater side." (12098:A:2, 12099:A:1, 12100:A:2)
@@ -40,7 +37,7 @@ const END_OF_QUEST_ACTIVE = { kind: "all", conditions: [{ kind: "phase", is: "Qu
 const MAY_FLIP_BACK: Instruction = { verb: "Choose", who: "firstPlayer", options: [{ id: "flip", instructions: [{ verb: "FlipDoubleSided" }] }, { id: "stay", instructions: [] }] };
 // The scenario's objective allies, in play under the first and the last player (they count as allies in play, not as objectives).
 const OBJECTIVE_ALLY: PickSpec = { type: "ally", control: "any", names: ["Captain Sahír", "Na'asiyah"] };
-// "Choose a card type and discard each card in your hand that is not of the chosen type": one branch for each type a card in a hand has.
+// "Choose a card type and discard each card in your hand that is not of the chosen type": one option for each card type a player's hand can hold (a hero never is).
 const HAND_TYPES = ["ally", "attachment", "event", "player-side-quest", "treasure"] as const;
 
 const COMMAND_AND_BLESSING = ["11201", "11202", "11203", "11204", "11205", "11206", "11207", "11208"];
@@ -48,7 +45,7 @@ const COMMAND_AND_BLESSING = ["11201", "11202", "11203", "11204", "11205", "1120
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
     // 11200 The Drowned Ruins (campaign card). Setup (Campaign Mode): Black Key (boon) is set aside and attached to Captain Sahír once the quest card's Setup has put him into play (ScenarioDefinition.afterSetup),
-    // Revenant is shuffled into the encounter deck, each player may take one copy of Command into hand and one player one copy of Círdan's Blessing (the campaign checklist asks; the copies are earned at the
+    // Revenant is shuffled into the encounter deck, each player may take one copy of Command into hand and one player (whichever the players choose) one copy of Círdan's Blessing (the campaign checklist asks each seat in turn until one takes it; the copies are earned at the
     // Resolution), and each character in play may take 1 damage to lower its controller's threat by 1. The card stays in the game because Revenant places resources on it. Resolution: the chosen Command and
     // Círdan's Blessing copies join the pool; the XP list (the lines no template reads).
     {
@@ -62,7 +59,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ShuffleIntoEncounterDeck", code: "11181" },
         { verb: "AttachSetAsideTo", code: "11183", to: "Captain Sahír" },
         { verb: "ChooseCards", codes: ["11201", "11202", "11203", "11204"], who: "eachSeat", to: "hand", optional: true, unearned: true, afterMulligan: true },
-        { verb: "ChooseCards", codes: ["11205", "11206", "11207", "11208"], who: "firstPlayer", to: "hand", optional: true, unearned: true, afterMulligan: true },
+        { verb: "ChooseCards", codes: ["11205", "11206", "11207", "11208"], who: "onePlayer", to: "hand", optional: true, unearned: true, afterMulligan: true },
         { verb: "TradeDamageForThreat", damage: 1, threat: 1 },
       ],
     },
@@ -88,7 +85,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "PutSetAsideInPlay", name: "Na'asiyah", to: "lastPlayer" },
       ],
     },
-    { id: "12092:forced:2", cardCode: "12092", lines: ["12092:B:2"], timing: "forced", trigger: "activeExplored", subject: DOUBLE_SIDED, instructions: [{ verb: "AddFromGrottoDeck", count: 1 }] },
+    { id: "12092:forced:2", cardCode: "12092", lines: ["12092:B:2"], timing: "forced", trigger: "locationExplored", subject: DOUBLE_SIDED, instructions: [{ verb: "AddFromGrottoDeck", count: 1 }] },
     // 12092 The Grotto, side B: the players cannot advance unless 3 Underwater locations are in the victory display (rr.cannot).
     { id: "12092:constant:2", cardCode: "12092", lines: ["12092:B:3"], timing: "constant", condition: { kind: "count", pick: UNDERWATER_IN_VICTORY, max: 2 }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
@@ -127,10 +124,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "MakeSetAsideActive", code: "12094" },
         { verb: "FlipEliteAndAttack", name: "Captain Sahír" },
-        // The attack comes first: the removal waits for its end, or it would cancel it.
-        { verb: "AfterAttack", instructions: [{ verb: "RemoveNamedFromGame", name: "Captain Sahír" }] },
-        { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", trait: "Undead", type: "enemy", to: "staging" }] },
-        { verb: "ShuffleEncounterDeck" },
+        // The attack comes first, and the rest of the line follows it as printed: the removal, the Undead searches and the shuffle all wait for the attack's end (AfterAttack).
+        {
+          verb: "AfterAttack",
+          instructions: [
+            { verb: "RemoveNamedFromGame", name: "Captain Sahír" },
+            { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", trait: "Undead", type: "enemy", to: "staging" }] },
+            { verb: "ShuffleEncounterDeck" },
+          ],
+        },
       ],
     },
 

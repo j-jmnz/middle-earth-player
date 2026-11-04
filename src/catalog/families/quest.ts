@@ -81,6 +81,8 @@ const TRIGGERS = [
   "committedQuestResolved",
   // About the active location: it was explored. The event's amount (the effect's X) is the number of attachments it had.
   "activeExplored",
+  // About any location: it was explored, in the staging area (the event is its own) or as the active location (the activeExplored event, which this trigger also hears). "After a double-sided location is explored" (12092:B:2).
+  "locationExplored",
   // About the seat: a player card effect reduced its threat (the event's subject is that card), or its threat was raised by
   // questing unsuccessfully or by an encounter or quest card effect.
   "threatLowered",

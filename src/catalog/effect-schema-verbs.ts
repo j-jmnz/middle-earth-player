@@ -374,7 +374,8 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("ChooseCards"),
     codes: z.array(z.string().min(1)).min(1),
-    who: z.enum(["firstPlayer", "eachSeat"]),
+    // `onePlayer`: Campaign Setup only. Each seat in turn may take the card, and the offer ends once one has ("One player may choose one copy of Círdan's Blessing", 11200:A:3).
+    who: z.enum(["firstPlayer", "eachSeat", "onePlayer"]),
     // `player`: a Resolution's card for a player chosen from those at the table, earned for that player and shuffled into their deck after the starting hand in the scenarios that follow ("choose a
     // player ... that player shuffles that Recurring Nightmare into their deck after they draw their starting hand", 11197:B:1).
     to: z.enum(["pool", "hand", "hero", "player"]),

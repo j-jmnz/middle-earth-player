@@ -6,6 +6,8 @@ import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
+import { commandX } from "./command.ts";
+import { handTypes } from "./uncharted.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
@@ -65,13 +67,16 @@ export function aflameWords(instruction: Instruction): string | null {
 }
 
 /** The numbers and names a branch's words state, read when the sheet is built: the cards a Look takes (Galdor's Counsel, Lore: half its level plus the copies chosen) and the card being placed. */
-export type BranchNow = { count?: number; placing?: string };
+// `x`: Command's X (the Command options that name it, command.ts). `hand`: the cards in the choosing seat's hand and how many of each printed type (Into the Abyss' card types, uncharted.ts).
+export type BranchNow = { count?: number; placing?: string; x?: number; hand?: { total: number; byType: Readonly<Record<string, number>> } };
 
 /** The `BranchNow` of a Choose: the look count its branches carry resolved now, and the name of the card the last Pick chose (the card a Lore Counsel places). */
 export function branchNow(game: ScenarioState, ctx: ReduceContext, choose: Choose, seat: number, sourceId: string | null, picked: string | null, names: Pick<ChoiceNames, "card">): BranchNow {
   const look = choose.options.flatMap((option) => option.instructions).find((step): step is Extract<Instruction, { verb: "LookAtTop" | "LookAtBottom" }> => step.verb === "LookAtTop" || step.verb === "LookAtBottom");
   const count = look?.count == null ? undefined : typeof look.count === "number" ? look.count : resolveAmount(game, look.count, frameScope(game, seat, sourceId), ctx);
-  return { ...(count != null ? { count } : {}), ...(picked ? { placing: names.card(picked) } : {}) };
+  const x = commandX(game, ctx, choose, seat, sourceId);
+  const keeps = choose.options.some((option) => option.instructions.some((step) => step.verb === "DiscardEach" && step.pick.notCardType != null));
+  return { ...(count != null ? { count } : {}), ...(picked ? { placing: names.card(picked) } : {}), ...(x != null ? { x } : {}), ...(keeps ? { hand: handTypes(game, ctx, seat) } : {}) };
 }
 
 // Put to the Torch (11048) and Throwing Axe (11190): the cards whose picks have words of their own.
@@ -153,6 +158,7 @@ export function aflamePickWords(pick: Instruction, next: Instruction | undefined
 
 /** The amount the instruction after a Pick deals or places, read now when the record's amount depends on the table ("damage equal to the Corsair enemies in play", Galdor's Counsel's X): the number the prompt states. */
 export function dealtNow(game: ScenarioState, ctx: ReduceContext, next: Instruction | undefined, seat: number, sourceId: string | null): number | undefined {
-  if ((next?.verb !== "DamageCard" && next?.verb !== "PlaceProgressOn" && next?.verb !== "AddResources") || typeof next.amount === "number") return undefined;
+  if (next?.verb !== "DamageCard" && next?.verb !== "PlaceProgressOn" && next?.verb !== "AddResources" && next?.verb !== "DiscardResources") return undefined;
+  if (next.amount == null || typeof next.amount === "number") return undefined;
   return resolveAmount(game, next.amount, frameScope(game, seat, sourceId), ctx);
 }
