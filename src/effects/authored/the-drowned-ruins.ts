@@ -1,4 +1,4 @@
-import type { Condition, Effect } from "../../catalog/boundary.ts";
+import type { Condition, Effect, PickSpec } from "../../catalog/boundary.ts";
 
 import { copyLine, withCopies } from "./reprint.ts";
 import { AUTHORED_EFFECTS as RAID } from "./raid-on-the-grey-havens.ts";
@@ -11,6 +11,15 @@ import { AUTHORED_EFFECTS as DEPTHS } from "./the-thing-in-the-depths.ts";
 // pnpm effects:open lists them, and the report of this file's author says what each needs. Command and Círdan's Blessing (boons) are in pool/DCCE.ts.
 // Rules: dcce.grotto-deck, dcce.setup-the-drowned-ruins, dcce.campaign-setup-the-drowned-ruins, dcce.campaign-mode, dcce.gaining-xp, dcce.scalable-upgradable, dcce.encounter-cards, rr.active-location, rr.victory,
 // rr.explored, rr.engaged, rr.cannot, rr.winning-the-game (data/rules/entries.json).
+
+const MANY_PLAYERS = { kind: "count", pick: { type: "player", control: "any" }, min: 3 } as const satisfies Condition;
+const FEW_PLAYERS = { kind: "not", condition: MANY_PLAYERS } as const satisfies Condition;
+// A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one).
+const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const satisfies Condition;
+// A double-sided location, whichever side it shows (dcce.grotto-deck).
+const DOUBLE_SIDED: PickSpec = { type: "location", control: "any", doubleSided: true };
+// "Response: After you travel to X, you may flip it to its Underwater side." (12098:A:2, 12099:A:1, 12100:A:2)
+const flipOnTravel = (code: string, line: string): Effect => ({ id: `${code}:response:1`, cardCode: code, lines: [line], timing: "response", trigger: "traveled", subject: "self", instructions: [{ verb: "FlipDoubleSided" }] });
 
 // The active location is an Underwater location (the Underwater side of a double-sided location, or Drowned Cave).
 const UNDERWATER_ACTIVE = { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", trait: "Underwater" } } as const satisfies Condition;
@@ -50,11 +59,61 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "11200:resolution:7", cardCode: "11200", lines: ["11200:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: UNDERWATER_IN_VICTORY, min: 5 } }] },
     { id: "11200:resolution:10", cardCode: "11200", lines: ["11200:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 2, when: { kind: "inVictory", code: "12094", is: true } }] },
 
+    // 12092 The Grotto. Setup: Shrine to Morgoth is set aside by the scenario's piles; the Grotto deck is prepared, its top 2 locations (3 with 3 or more players) join the staging area Grotto side faceup, and the first
+    // player takes control of Captain Sahír, the last player of Na'asiyah (dcce.grotto-deck). Side B: after a double-sided location is explored the top location of the Grotto deck joins the staging area.
+    {
+      id: "12092:setup:1",
+      cardCode: "12092",
+      lines: ["12092:A:1"],
+      timing: "setup",
+      instructions: [
+        { verb: "PrepareGrottoDeck" },
+        { verb: "AddFromGrottoDeck", count: 2, when: FEW_PLAYERS },
+        { verb: "AddFromGrottoDeck", count: 3, when: MANY_PLAYERS },
+        { verb: "PutSetAsideInPlay", name: "Captain Sahír" },
+        { verb: "PutSetAsideInPlay", name: "Na'asiyah", to: "lastPlayer" },
+      ],
+    },
+    { id: "12092:forced:2", cardCode: "12092", lines: ["12092:B:2"], timing: "forced", trigger: "activeExplored", subject: DOUBLE_SIDED, instructions: [{ verb: "AddFromGrottoDeck", count: 1 }] },
     // 12092 The Grotto, side B: the players cannot advance unless 3 Underwater locations are in the victory display (rr.cannot).
     { id: "12092:constant:2", cardCode: "12092", lines: ["12092:B:3"], timing: "constant", condition: { kind: "count", pick: UNDERWATER_IN_VICTORY, max: 2 }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
     // 12094 Shrine to Morgoth (Grotto side). While it is in the victory display the players have escaped and win (rr.winning-the-game; as 11026:B:2 does for the Shrine of the Uncharted deck).
     { id: "12094:constant:2", cardCode: "12094", lines: ["12094:A:3"], timing: "constant", condition: { kind: "sourceIn", zone: "victory" }, instructions: [{ verb: "WinGame" }] },
+
+    // 12094 Shrine to Morgoth (Grotto side). It cannot have attachments and cannot enter the staging area; at the beginning of the quest phase it flips to its Underwater side, keeping its progress.
+    {
+      id: "12094:constant:1",
+      cardCode: "12094",
+      lines: ["12094:A:1"],
+      timing: "constant",
+      instructions: [
+        { verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay" },
+        { verb: "ModifyStat", stat: "cannotEnterStaging", amount: 1, until: "whileSourceInPlay" },
+      ],
+    },
+    { id: "12094:forced:1", cardCode: "12094", lines: ["12094:A:2"], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "phase", is: "Quest" }, instructions: [{ verb: "FlipDoubleSided", keepProgress: true }] },
+
+    // The Grotto sides that may flip to their Underwater side once the players travel to them (dcce.grotto-deck).
+    flipOnTravel("12098", "12098:A:2"),
+    flipOnTravel("12099", "12099:A:1"),
+    flipOnTravel("12100", "12100:A:2"),
+
+    // 12105 Powerful Undertow. When Revealed: the active location cannot be flipped this round; an Underwater active location resolves its Forced effect as if it were the end of the quest phase; with none, this card gains Doomed 3 instead.
+    {
+      id: "12105:whenRevealed:1",
+      cardCode: "12105",
+      lines: ["12105:A:1"],
+      timing: "whenRevealed",
+      instructions: [
+        { verb: "ModifyStat", stat: "noFlipActive", amount: 1, until: "endOfRound", target: "table" },
+        { verb: "ResolveActiveForced", phase: "Quest", when: UNDERWATER_ACTIVE },
+        { verb: "Doomed", amount: 3, when: NOT_UNDERWATER_ACTIVE },
+      ],
+    },
+
+    // 12108 Ancient Depths. When Revealed: the top location of the Grotto deck joins the staging area and flips to its Underwater side; this cannot be canceled.
+    { id: "12108:whenRevealed:1", cardCode: "12108", lines: ["12108:A:1"], timing: "whenRevealed", uncancelable: ALWAYS, instructions: [{ verb: "AddFromGrottoDeck", count: 1, flip: true }] },
 
     // 12096 Sea-scorpion: +2 Attack while the active location is Underwater.
     { id: "12096:constant:1", cardCode: "12096", lines: ["12096:A:1"], timing: "constant", condition: UNDERWATER_ACTIVE, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "whileSourceInPlay" }] },

@@ -19,11 +19,12 @@ export function leaveUnchartedDeck(state: ScenarioState, id: string): ScenarioSt
   return { ...state, uncharted: { ...uncharted, deck: uncharted.deck.filter((other) => other !== id) } };
 }
 
-/** The card joins the bottom of the Uncharted deck, Lost Island side up and bare of tokens. */
+/** The card joins the bottom of the Uncharted deck, Lost Island side up and bare of tokens. A double-sided card of two catalog cards (the Grotto deck, dcce.grotto-deck) lies on the side it shows, the faceup card. */
 export function joinUnchartedDeck(state: ScenarioState, id: string): ScenarioState {
   const uncharted = state.uncharted ?? { deck: [], codes: [] };
   const joined: ScenarioState = { ...state, uncharted: { ...uncharted, deck: uncharted.deck.includes(id) ? uncharted.deck : [...uncharted.deck, id] } };
-  return updateCard(joined, id, { face: "B", progress: 0, damage: 0, resources: 0, exhausted: false, controller: null });
+  const twoCards = state.cards[id]?.other != null || uncharted.pairs?.[state.cards[id]?.code ?? ""] != null;
+  return updateCard(joined, id, { face: twoCards ? "up" : "B", progress: 0, damage: 0, resources: 0, exhausted: false, controller: null });
 }
 
 /** The Uncharted deck shuffled by the seed ("shuffled back into the Uncharted deck"). */

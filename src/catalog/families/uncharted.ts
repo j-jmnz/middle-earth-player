@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
-import { when } from "../effect-schema-conditions.ts";
+import { phaseNameSchema, when } from "../effect-schema-conditions.ts";
 import { setupRole } from "../setup-role.ts";
 
 const who = z.enum(["actor", "firstPlayer", "picked"]);
@@ -31,9 +31,22 @@ const VERBS = [
   // "Add progress to Explore the Island equal to that location's printed quest points" (11025:B:2): the quest card's own effect, which puts progress on the current quest card
   // even where the quest card says no other progress can be placed on it (a quest effect, not a player card effect or the quest phase). A full stage advances.
   z.strictObject({ verb: z.literal("AddStageProgress"), amount: positiveAmountSchema, ...when }),
+  // Setup: "Prepare the Grotto deck" (12092:A:1, dcce.grotto-deck): the double-sided locations the scenario dealt as its Grotto deck are shuffled; each lies Grotto side faceup and its
+  // Underwater side is never looked at before a flip. The Shrine to Morgoth is set aside by the scenario's piles.
+  z.strictObject({ verb: z.literal("PrepareGrottoDeck"), ...when }),
+  // "Add the top 2 locations from the Grotto deck to the staging area, Grotto side faceup" (12092:A:1, 12092:B:2), and with `flip`, "and flip that location to its Underwater side" (12108:A:1): the
+  // top `count` cards of the Grotto deck join the staging area without being revealed; each is then flipped, losing the progress it has (none yet), and announced as flipped over.
+  z.strictObject({ verb: z.literal("AddFromGrottoDeck"), count: positiveAmountSchema, flip: z.boolean().optional(), ...when }),
+  // "Flip it to its Underwater side" (12098:A:2, 12099:A:1, 12100:A:2), "flip Shrine to Morgoth to its Underwater side, without removing its progress tokens" (12094:A:2): a double-sided location whose two
+  // sides are two cards (dcce.grotto-deck) shows its other side. Flipping removes all progress from it (dcce.grotto-deck) unless `keepProgress`; the flip is announced like FlipUncharted's. Nothing
+  // happens while the table holds noFlipActive and the card is the active location (12105:A:1).
+  z.strictObject({ verb: z.literal("FlipDoubleSided"), target: z.enum(["self", "picked", "subject"]).optional(), keepProgress: z.boolean().optional(), ...when }),
+  // "Resolve its Forced effect as if it is the end of the quest phase" (12105:A:1): the active location hears the end of `phase` now. Only its own Forced effects (and Responses) answer, and their conditions read `phase`.
+  z.strictObject({ verb: z.literal("ResolveActiveForced"), phase: phaseNameSchema, ...when }),
   // Setup: "The first player takes control of Calphon" (11025:A:1): the set-aside copy of the card with this name comes into play, ready, under the first player.
   // `withCard`: under the control of the player who controls the card in play with this name instead ("Put Calaerion into play under the control of the player with the Dream-chaser", 11191:A:2).
-  setupRole(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), ...when }), "afterSetup"),
+  // `to: "lastPlayer"`: the last player takes control of it instead of the first ("the last player takes control of Na'asiyah", 12092:A:1).
+  setupRole(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer"]).optional(), ...when }), "afterSetup"),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
   setupRole(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), "afterSetup"),
@@ -87,6 +100,10 @@ const FLAGS = [
   "noPlayerAttachments",
   // On a location: while it is the active location it contributes its Threat to the staging area's ("it contributes its Threat to the staging area", 11072:A:1).
   "activeThreat",
+  // On the table: the active location cannot be flipped this round ("You cannot flip the active location this round", 12105:A:1); FlipDoubleSided reads it.
+  "noFlipActive",
+  // On a card: it cannot enter the staging area ("Shrine to Morgoth cannot enter the staging area", 12094:A:1); moveCard refuses a move there.
+  "cannotEnterStaging",
 ] as const;
 
 export const manifest = { name: "uncharted", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

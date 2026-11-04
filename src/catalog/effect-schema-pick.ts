@@ -164,6 +164,8 @@ export const pickSchema = z.strictObject({
   // ("the bottom 5 cards of your deck").
   uncharted: z.boolean().optional(),
   minProgress: z.number().int().positive().optional(),
+  // `doubleSided`: a double-sided location, whichever side it shows: a Lost Island, or a card with a second side in the Grotto or Underwater pairing (dcce.grotto-deck, "After a double-sided location is explored", 12092:B:2).
+  doubleSided: z.boolean().optional(),
   bottom: z.number().int().positive().optional(),
   // The island family's filter (src/rules/families/island/pick.ts, dcce.island-map): `start`, the faceup left corners of the Island Map at Setup, before one is the active location; `temple`, the Temple column's
   // locations that lie facedown, wherever they are on the map; `secret`, the cards facedown under those locations; `here`, the secret under the active location; `adjacent`, the copies of Lost Island (not Temple of the Deceived) next to the active location.

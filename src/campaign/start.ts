@@ -1,6 +1,6 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
 import { verbsWithRole } from "../catalog/setup-verbs.ts";
-import { burdenCodes, campaignScenario, corsairCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
@@ -88,6 +88,7 @@ export function buildStart(start: StartInput): StartScenario {
   // The Corsair deck the scenario deals, and the cards the campaign card shuffles into it ("Shuffle Crowley into the Corsair deck"); the quest card's Setup shuffles it.
   const corsair = [...corsairCodes(input.scenario, input.difficulty), ...campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoCorsairDeck" ? [instruction.code] : []))];
   const uncharted = unchartedCodes(input.scenario, input.difficulty);
+  const doubleSided = doubleSidedCards(input.scenario, input.difficulty);
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
@@ -111,6 +112,7 @@ export function buildStart(start: StartInput): StartScenario {
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(corsair.length > 0 ? { corsairDeck: corsair } : {}),
     ...(uncharted.length > 0 ? { unchartedDeck: uncharted } : {}),
+    ...(doubleSided.length > 0 ? { doubleSided } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
     ...(!standalone && factsOf(input) ? { facts: factsOf(input) } : {}),
   };

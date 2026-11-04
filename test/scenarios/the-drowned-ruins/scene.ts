@@ -5,6 +5,7 @@ import { blankScenario, updateCard, withThreat } from "../../../src/rules/core/s
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { spawn } from "../../../src/rules/core/zones.ts";
+import { dealDoubleSided, type DoubleSidedCard } from "../../../src/rules/families/uncharted/deal.ts";
 
 import { gameCodes, loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
@@ -12,7 +13,7 @@ import { addStandIns, entry, fightEnemy, HERO, HERO2, HERO3, opening, sceneEffec
 
 // Shared scene for the The Drowned Ruins effect tests (dream-chaser part 7, campaign card 11200). Test-only. The heroes are plain numbers (no player card text), so what a test shows comes from
 // the scenario's records and the engine. The helpers every scene shares (id lookups, answers, the fight) are test/harness/scene-kit.ts; this file keeps the scenario's codes, its layout and its table.
-// TODO: describe the cards that need their own layout fields (a second active location, a grotto deck, an island map) and add them to the layout and the table below.
+// The Grotto deck and the double-sided locations are layout fields (`doubleSided`, `sided`): their two sides are two catalog cards, the shown one in `code` and the other in `other` (dcce.grotto-deck).
 export const ruins: ScenarioData = loadScenario("the-drowned-ruins");
 export const campaign: CampaignData = loadCampaign("dream-chaser");
 export const dealt: ScenarioData = campaignScenario(ruins);
@@ -60,7 +61,7 @@ export type RuinsWorld = { definition: ReturnType<typeof scenarioDefinition>; ca
 
 export async function loadRuinsWorld(): Promise<RuinsWorld> {
   const definition = scenarioDefinition(dealt, campaign, EFFECTS);
-  const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, ruins)])];
+  const codes = [...new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, ruins)])];
   const cards = new Map(await loadPrinted(codes));
   addStandIns(cards, ["f0", "f3", "place", "treachery", "heroes"]);
   addStandIns(cards, ["filler", "event", "ally"], [0, 1, 2, 3]);
@@ -78,7 +79,13 @@ export type RuinsLayout = {
   staging?: readonly Entry[];
   setAside?: readonly string[];
   victory?: readonly string[];
+  // A location (a code) that is the active location.
+  active?: string;
   engaged?: readonly (Entry | { code: string; seat: number; damage?: number; resources?: number })[];
+  // The Grotto deck (top first) and the Underwater side of a Grotto card set aside (the Shrine), as the start deals them.
+  doubleSided?: readonly DoubleSidedCard[];
+  // Double-sided locations already placed, `code` the side shown and `back` the other.
+  sided?: readonly { code: string; back: string; zone: "staging" | "activeLocation"; progress?: number }[];
   hand?: readonly string[];
   deckOf?: readonly string[];
   play?: readonly string[];
@@ -124,7 +131,16 @@ export function ruinsTable(world: RuinsWorld, layout: RuinsLayout = {}): RuinsTa
     const spawned = spawn(state, row.code, { zone: "staging" });
     state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources });
   }
+  if (layout.active) state = spawn(state, layout.active, { zone: "activeLocation" }).state;
   for (const code of layout.setAside ?? []) state = spawn(state, code, { zone: "setAside" }, "up").state;
+  if (layout.doubleSided) state = dealDoubleSided(state, layout.doubleSided, ctx);
+  for (const row of layout.sided ?? []) {
+    const spawned = spawn(state, row.code, { zone: row.zone });
+    state = updateCard(spawned.state, spawned.id, { other: row.back, progress: row.progress ?? 0 });
+  }
+  // A Grotto location placed by hand has its code among the deck's, as it has in a game whose deck is dealt with every copy (cards of the Grotto deck are shuffled back into it when they would be discarded).
+  const placed = (layout.sided ?? []).filter((row) => ctx.cards.get(row.code)?.traits.includes("Grotto")).map((row) => row.code);
+  if (placed.length > 0) state = { ...state, uncharted: { deck: state.uncharted?.deck ?? [], ...state.uncharted, codes: [...new Set([...(state.uncharted?.codes ?? []), ...placed])] } };
   for (const row of layout.engaged ?? []) {
     const item = typeof row === "string" ? { code: row, seat: 0 } : row;
     const tokens = entry(item);

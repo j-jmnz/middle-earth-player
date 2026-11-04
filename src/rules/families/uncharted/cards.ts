@@ -28,12 +28,17 @@ import { stage } from "./deck.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
+/** The last player in turn order (livingSeats starts at the first player; the first player is also the last in a solo game). */
+function lastPlayer(state: ScenarioState): number {
+  return livingSeats(state).at(-1) ?? state.firstPlayer;
+}
+
 /** PutSetAsideInPlay: the set-aside copy of the card with this name comes into play, ready, under the first player, on the side the campaign deals it. */
 export function putSetAsideInPlay(state: ScenarioState, instruction: Verb<"PutSetAsideInPlay">, ctx: ReduceContext): ScenarioState {
   const id = state.setAside.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name);
   if (!id) return state;
   const holder = instruction.withCard ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.controller != null && printedOf(ctx.cards, card.code).name === instruction.withCard) : undefined;
-  return updateCard(moveCard(state, id, { zone: "play", seat: holder?.controller ?? state.firstPlayer }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
+  return updateCard(moveCard(state, id, { zone: "play", seat: holder?.controller ?? (instruction.to === "lastPlayer" ? lastPlayer(state) : state.firstPlayer) }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
 }
 
 /** AttachSetAside: the set-aside copy of the card with this code is attached to the card in play with that name. */

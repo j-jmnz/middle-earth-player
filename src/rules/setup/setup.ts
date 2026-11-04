@@ -22,7 +22,7 @@ import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { stampRoutes } from "../families/sea/routes.ts";
-import { dealUnchartedDeck } from "../families/uncharted/deal.ts";
+import { dealDoubleSided, dealUnchartedDeck, type DoubleSidedCard } from "../families/uncharted/deal.ts";
 
 /** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
 export const AFTER_HAND = "deck:";
@@ -58,6 +58,8 @@ export type StartScenario = {
   corsairDeck?: readonly string[];
   // The double-sided locations the scenario deals as its Uncharted deck (dcce.uncharted-deck), Lost Island side up; "Prepare the Uncharted deck" shuffles it.
   unchartedDeck?: readonly string[];
+  // The cards with two sides that are two catalog cards: the Grotto deck the scenario deals (dcce.grotto-deck), each Grotto side up, and the Underwater side of a Grotto card the Setup sets aside; "Prepare the Grotto deck" shuffles it.
+  doubleSided?: readonly DoubleSidedCard[];
   // Easy adds one resource to each hero's resource pool in Setup step 2 (easy-mode.easy-mode). Nightmare adds nothing here: its
   // deck and setup card are in the definition and the encounter deck. Normal when absent.
   difficulty?: Difficulty;
@@ -92,6 +94,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     for (const code of input.corsairDeck) state = spawn(state, code, { zone: "corsairDeck" }).state;
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
+  if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/plans/nightmare-mode.md).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;

@@ -250,6 +250,16 @@ export function unchartedCodes(data: ScenarioData, difficulty: Difficulty = "Nor
   return placementsAt(data, difficulty).flatMap((card) => (card.pile === "unchartedDeck" || card.pile === "islandMap" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
 }
 
+// The cards of a scenario with two sides that are two catalog cards (`back`), copy by copy, for the Grotto deck (dcce.grotto-deck): the `grottoDeck` pile at the difficulty played, and the `setAside` cards with a
+// `back` once each (the engine keeps those that are Grotto locations: the Shrine to Morgoth's Underwater side).
+export function doubleSidedCards(data: ScenarioData, difficulty: Difficulty = "Normal"): { code: string; back: string; pile: "grottoDeck" | "setAside" }[] {
+  return placementsAt(data, difficulty).flatMap((card) => {
+    if (card.back == null || (card.pile !== "grottoDeck" && card.pile !== "setAside")) return [];
+    const copies = card.pile === "setAside" ? 1 : copiesAt(card, difficulty);
+    return Array.from({ length: copies }, () => ({ code: card.code, back: card.back as string, pile: card.pile as "grottoDeck" | "setAside" }));
+  });
+}
+
 export function burdenCodes(data: ScenarioData): string[] {
   return data.cards.filter((card) => card.pile === "burden").flatMap((card) => Array.from({ length: card.normal }, () => card.code));
 }

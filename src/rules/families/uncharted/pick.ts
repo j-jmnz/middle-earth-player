@@ -6,6 +6,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { heldAmount } from "../../core/state.ts";
+import { isDoubleSided } from "./grotto.ts";
 
 /** The Threat the Lost Island side prints on every copy (the scan, read into the ledger's notes of each Uncharted card: "Threat 2, no quest points"). */
 export const LOST_ISLAND_THREAT = 2;
@@ -19,6 +20,7 @@ export function unchartedPickMatches(state: ScenarioState, id: string, spec: Pic
   const instance = state.cards[id];
   if (!instance) return false;
   if (spec.uncharted != null && isLostIsland(instance, ctx) !== spec.uncharted) return false;
+  if (spec.doubleSided != null && isDoubleSided(state, instance) !== spec.doubleSided) return false;
   if (spec.minProgress != null && instance.progress < spec.minProgress) return false;
   return true;
 }

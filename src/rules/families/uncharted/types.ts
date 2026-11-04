@@ -2,7 +2,8 @@
 
 // The Uncharted deck (top card first) and the codes of the double-sided locations that are shuffled back into it when they would be discarded. Present only in a game that deals an Uncharted deck.
 // `island`: the Island Map a Setup laid out of the dealt locations (families/island/map.ts).
-export type UnchartedState = { deck: readonly string[]; codes: readonly string[]; island?: IslandState };
+// `pairs`: the Underwater side of a double-sided card dealt apart from the deck (the set-aside Shrine to Morgoth, 12094 over 12095), by the code of the side it is dealt on (dcce.grotto-deck).
+export type UnchartedState = { deck: readonly string[]; codes: readonly string[]; island?: IslandState; pairs?: Readonly<Record<string, string>> };
 
 // The Island Map (dcce.island-map): the fifteen locations in a grid of three rows by five columns, row by row from the top left, and the last travel on it (the cells it left and reached), which "when you
 // travel to the right" reads until the next one, and the cells the players have traveled from, which are explored (dcce.exploration); a cell flipped over and never left (the second corner) is only revealed.
