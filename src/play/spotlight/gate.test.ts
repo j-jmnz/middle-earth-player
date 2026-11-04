@@ -8,7 +8,7 @@ import { playUntil, type Reduced } from "../../../test/harness/combat-policy.ts"
 import { starterStart, starterWorld } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
 
 import { clashesOf } from "../store/clash.ts";
-import { endGate, leaveGate, NO_SPOTLIGHT, openGate, spotlightHolds, spotlightOpen } from "./gate.ts";
+import { endGate, leaveGate, nextGate, NO_SPOTLIGHT, openGate, spotlightHolds, spotlightOpen } from "./gate.ts";
 import { createTableStore } from "../store/store.ts";
 
 const DECK = "stealth-and-steadfastness";
@@ -30,7 +30,7 @@ describe("the gate", () => {
   it("opens for a moment with attacks and not for one without", () => {
     const reduced = attack(2, 1, () => true);
     const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
-    expect(openGate(4, clashes)).toEqual({ seq: 4, clashes, ended: null, leaving: false });
+    expect(openGate(4, clashes)).toEqual({ seq: 4, clashes, ended: null, leaving: false, before: null, after: null });
     expect(openGate(5, [])).toMatchObject({ seq: 5, ended: "done", leaving: true });
     expect(NO_SPOTLIGHT.ended).toBe("done");
   });
@@ -110,5 +110,31 @@ describe("the store's gate", () => {
     const second = createTableStore({ ctx, game: quiet.prev });
     second.getState().dispatch(quiet.intent);
     expect(second.getState().spotlight).toMatchObject({ clashes: [], ended: "done" });
+  });
+
+  it("keeps the attack's gate through the moments the table answers after it in the same tap (rr.attacks-outside-the-combat-phase)", () => {
+    const reduced = attack(2, 1, () => true);
+    const store = createTableStore({ ctx, game: reduced.prev });
+    store.getState().dispatch(reduced.intent);
+    const open = store.getState().spotlight;
+    expect(open).toMatchObject({ before: reduced.prev, after: store.getState().game });
+    // The next send with steps and no attack (the table passing on after an immediate attack) leaves the gate, and its states, be.
+    expect(store.getState().dispatch({ type: "Pass" })).toBe(true);
+    const now = store.getState();
+    expect(now.moment?.kind === "sent" ? now.moment.steps.length : 0).toBeGreaterThan(0);
+    expect(now.spotlight).toBe(open);
+  });
+});
+
+describe("nextGate", () => {
+  it("leaves an open gate be for a moment with no attacks, and opens a new one otherwise", () => {
+    const reduced = attack(2, 1, () => true);
+    const clashes = clashesOf(reduced.prev, reduced.next, reduced.steps);
+    const open = openGate(1, clashes, reduced.prev, reduced.next);
+    expect(nextGate(open, 2, [], reduced.next, reduced.next)).toBe(open);
+    // Once it ended, a quiet moment closes it as before.
+    expect(nextGate(endGate(open, "done"), 2, [], reduced.next, reduced.next)).toMatchObject({ seq: 2, clashes: [], ended: "done" });
+    // New attacks open their own gate.
+    expect(nextGate(open, 3, clashes, reduced.prev, reduced.next)).toMatchObject({ seq: 3, ended: null, before: reduced.prev });
   });
 });

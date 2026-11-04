@@ -60,16 +60,15 @@ type Track = { layout: TableLayout; area: StageArea; seq: number; plan: Spotligh
 export function useSpotlight(store: TableStore, layout: TableLayout, area: StageArea, k: number): { plan: SpotlightPlan | null; progress: SharedValue<number>; playing: boolean; live: SharedValue<boolean>; swallow: SharedValue<boolean>; warm: Warm | null } {
   const gate = useStore(store, (state) => state.spotlight);
   const gateScale = useSpotlightScale();
-  // The moment the gate was opened for, taken from the store here so the compiler sees it as a dependency.
-  const shown = useStore(store, (state) => state.shown);
   const [track, setTrack] = useState<Track>(() => ({ layout, area, seq: gate.seq, plan: null }));
   if (track.layout !== layout || !sameArea(track.area, area)) {
     const sameSize = track.layout.width === layout.width && track.layout.height === layout.height && sameArea(track.area, area);
     let plan: SpotlightPlan | null = null;
     if (gate.seq !== track.seq) {
       // A new moment's attacks fly from where the cards stood before the state, else from where they stand now.
-      if (sameSize && spotlightHolds(gate, gateScale, CANVAS) && shown?.kind === "sent" && shown.seq === gate.seq) {
-        plan = buildPlan({ seq: gate.seq, clashes: gate.clashes, canvas: { width: layout.width, height: layout.height }, area, card: layout.card, prev: shown.before, next: shown.after, layouts: [track.layout, layout], scale: layout.scale ?? 1 });
+      // The gate's own states: the moments the table answered after it in the same tap may have moved on (gate.ts, nextGate).
+      if (sameSize && spotlightHolds(gate, gateScale, CANVAS) && gate.before && gate.after) {
+        plan = buildPlan({ seq: gate.seq, clashes: gate.clashes, canvas: { width: layout.width, height: layout.height }, area, card: layout.card, prev: gate.before, next: gate.after, layouts: [track.layout, layout], scale: layout.scale ?? 1 });
       }
     } else if (sameSize) plan = track.plan;
     setTrack({ layout, area, seq: gate.seq, plan });

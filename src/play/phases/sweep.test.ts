@@ -58,6 +58,26 @@ describe("busyBetween", () => {
     expect(busyBetween(base, state({ a: card("play", true), b: card("hand", false) }))).toBe(true);
     expect(busyBetween(base, state({ a: card("play", false, 2), b: card("hand", false) }))).toBe(true);
   });
+
+  it("is false for shadow cards dealt as Combat opens, and still true when anything else moves with them", () => {
+    const deck = state({ a: card("engaged", false), s: card("encounterDeck", false) });
+    expect(busyBetween(deck, state({ a: card("engaged", false), s: card("shadow", false) }), "Combat")).toBe(false);
+    expect(busyBetween(deck, state({ a: card("engaged", true), s: card("shadow", false) }), "Combat")).toBe(true);
+    // A deal into shadow outside the Combat phase's opening still counts.
+    expect(busyBetween(deck, state({ a: card("engaged", false), s: card("shadow", false) }), "Quest")).toBe(true);
+  });
+
+  it("is false for the Resource phase's draw, resources gained and the Refresh phase's readying, and true for anything else", () => {
+    const round = state({ h: card("heroes", true), d: card("deck", false), x: card("play", false) });
+    const opened = { h: { ...card("heroes", false), resources: 1 }, d: card("hand", false) };
+    expect(busyBetween(round, state({ ...opened, x: card("play", false) }), "Resource")).toBe(false);
+    // A card discarded on the way in, a damage token or a card exhausted still counts.
+    expect(busyBetween(round, state({ ...opened, x: card("discard", false) }), "Resource")).toBe(true);
+    expect(busyBetween(round, state({ ...opened, x: card("play", false, 1) }), "Resource")).toBe(true);
+    expect(busyBetween(round, state({ ...opened, x: card("play", true) }), "Resource")).toBe(true);
+    // The same draw and gain entering another phase counts.
+    expect(busyBetween(round, state({ ...opened, x: card("play", false) }), "Planning")).toBe(true);
+  });
 });
 
 describe("sweepFrame", () => {

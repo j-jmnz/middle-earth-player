@@ -398,7 +398,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
           <View testID="command" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ width: commandWidth, paddingBottom: footPad, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
             {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
-            <CommandHead scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} />
+            <CommandHead scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onMeter={() => setReading({ kind: "stagingThreat" })} />
             <TableDock
               step={choice.header.step}
               lead={choice.header.lead}
