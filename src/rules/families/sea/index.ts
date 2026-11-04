@@ -18,6 +18,7 @@ import { lastPlayer } from "./players.ts";
 import { damageShip, fitShips, tradeShipDamage } from "./campaign.ts";
 import { boardNow } from "./boarding.ts";
 import { searchShips } from "./search.ts";
+import { shuffleRandomSetAside } from "./random.ts";
 import { setAsideSelf, takeSetAsideShip } from "./takeover.ts";
 import { makeEngagementChecks } from "./checks.ts";
 import { considerOutOfPlay, releaseHeld } from "./islet.ts";
@@ -66,6 +67,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return state;
     case "TakeSetAsideShip":
       return takeSetAsideShip(state, instruction, focus, ctx);
+    case "ShuffleRandomSetAside":
+      return shuffleRandomSetAside(state, instruction, ctx);
     case "MakeEngagementChecks":
       return makeEngagementChecks(state, instruction, focus, ctx, steps);
     case "SetAsideSelf":
@@ -85,4 +88,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "TakeSetAsideShip", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttachToShip", "AttackWithPicked"], run };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "TakeSetAsideShip", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttachToShip", "AttackWithPicked"], run };

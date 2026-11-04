@@ -60,6 +60,9 @@ const VERBS = [
   // "Take control of 1 set aside copy of Dol Amroth Warship" (12136:A:3): of the ship-objectives set aside with this title (whichever printing the game deals) the first one goes into play
   // under the actor, faceup, as a ship a player prepared in the fleet does (dcce.ships). Nothing happens with none set aside.
   z.strictObject({ verb: z.literal("TakeSetAsideShip"), name: z.string().min(1), ...when }),
+  // "Shuffle ... 1 random set-aside Send for Help into the encounter deck" (11210:A:4): of the cards set aside with this title one, chosen with the game's seed, goes into the encounter deck facedown. The deck is
+  // not shuffled here: the instruction after it does that (ShuffleSelfIntoEncounterDeck, ShuffleEncounterDeck). Nothing happens with none set aside.
+  z.strictObject({ verb: z.literal("ShuffleRandomSetAside"), name: z.string().min(1), ...when }),
   // "The players make engagement checks against each enemy in the staging area" (12122:A:1), outside the encounter phase: the engagement checks of rr.engagement-check, pass after pass, until a pass engages
   // no enemy (the tie for the highest engagement cost is the first player's choice). `lower`: "Raider Flagship gets -50 engagement cost during these engagement checks": the enemy with this title checks
   // with `amount` less. `ordinal` and `engaged` are engine use: the seat the checks are at and whether this pass has engaged an enemy, kept while the first player chooses among tied enemies.

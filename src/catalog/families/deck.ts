@@ -59,7 +59,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ActAs"), who: z.enum(["pickedPlayer", "actor"]), ...when }),
   // The actor plays a card that matches `pick` (from a discard pile, as if it were in their hand) when it could be played now:
   // an event resolves its Action and goes to its owner's discard pile, an attachment goes on a host the actor chooses. It is
-  // paid for from the actor's heroes, or costs nothing with `free` (an attachment is played only for free). Copies of one card
+  // paid for from the actor's heroes, or costs nothing with `free` (an attachment or an ally is played only for free). Copies of one card
   // are one choice. The played card is picked for the instructions after it ("Then, place that event on the bottom of your
   // deck"). `card` is engine use: the attachment chosen, waiting for its host.
   z.strictObject({ verb: z.literal("PlayFrom"), pick: pickSchema, free: z.boolean().optional(), card: z.string().optional(), ...when }),

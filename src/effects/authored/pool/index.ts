@@ -14,6 +14,7 @@ import * as packCore from "./Core.ts";
 import * as packCotW from "./CotW.ts";
 import * as packDCCE from "./DCCE.ts";
 import * as packDCCEDrownedRuins from "./DCCEDrownedRuins.ts";
+import * as packDCCEHaven from "./DCCEHaven.ts";
 import * as packDR from "./DR.ts";
 import * as packDoCG from "./DoCG.ts";
 import * as packEaAD from "./EaAD.ts";
@@ -94,6 +95,7 @@ const PACKS: readonly { RECORDS: readonly Effect[]; REPLACES: readonly string[] 
   packCotW,
   packDCCE,
   packDCCEDrownedRuins,
+  packDCCEHaven,
   packDR,
   packDoCG,
   packEaAD,

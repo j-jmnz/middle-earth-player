@@ -36,7 +36,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "AddStageProgress":
       return addStageProgress(state, instruction, focus, ctx, steps);
     case "PutSetAsideInPlay":
-      return putSetAsideInPlay(state, instruction, ctx);
+      return putSetAsideInPlay(state, instruction, focus, ctx);
     case "AttachSetAsideTo":
       return attachSetAsideTo(state, instruction, ctx);
     case "TradeDamageForThreat":

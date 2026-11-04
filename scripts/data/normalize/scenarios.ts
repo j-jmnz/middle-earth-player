@@ -349,6 +349,12 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // The Resolution on the back names its rewards: they are dealt by the campaign, never by the load list.
     // Dream-chaser's XP list ("Gain the following: 1 XP for each Corsair Warship in the victory display") names cards it only counts.
     for (const code of names.codesOf((byCode.get(campaignCard)?.back?.text ?? "").split("Gain the following")[0] ?? "")) campaignPlaced.add(code);
+    // The booklet's campaign paragraph (dcce.campaign-setup-<id>) lists the cards a campaign game needs ("all copies of Send for Help ... Set aside each Send for Help facedown"). The campaign
+    // card names most of them in its Setup; a card only the paragraph names (the Send for Help cards, which Gavin's Planning Action shuffles in) is dealt by the campaign too.
+    if (def.deck !== undefined) {
+      const paragraph = (ruleById.get(def.setupSpan.replace(".setup-", ".campaign-setup-"))?.text ?? "").replace(/\s+/g, " ");
+      for (const code of names.allCodesOf(paragraph)) if (byCode.get(code)?.campaignKind != null && byCode.get(code)?.printings.some((p) => cardPacks.includes(p.pack))) campaignPlaced.add(code);
+    }
     // The campaign card's other lines (The Thing in the Depths' Forced lines) name the Campaign Expansion's cards they deal.
     if (def.deck !== undefined) for (const code of names.codesOf(campaignLines.others.join(" "))) if (byCode.get(code)?.printings.some((p) => cardPacks.includes(p.pack))) campaignPlaced.add(code);
     // Everything the quest Setup names must be in a pile.

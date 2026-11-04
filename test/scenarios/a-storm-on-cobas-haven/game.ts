@@ -3,7 +3,7 @@ import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { campaign, haven } from "./scene.ts";
+import { CODES, campaign, haven } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
 
@@ -18,8 +18,10 @@ export const havenLoadout = fillerLoadout;
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
 export const havenWorld = (decks: HavenDecks = "strong") => game.world(decks);
 export const afterRuins = (seatCount: 1 | 2) => game.after(seatCount);
-export const havenPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const havenStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+// The campaign card's Setup (11209:A:3) through the Campaign Setup Checklist: the seats are asked in turn for the one copy of Círdan's Blessing until a player takes it ("skip" refuses); the first player does here.
+export const blessingChoices = (): string[] => [CODES.cirdanSBlessing];
+export const havenPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = blessingChoices()) => game.plan(seatCount, log, choices);
+export const havenStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices: readonly string[] = blessingChoices()) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
 
 export type HavenPolicy = {
   // The option a Choose window with these answers takes: the first or the last.

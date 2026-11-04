@@ -364,7 +364,7 @@ function engagedAs(card: { zone: string; controller: number | null }, engaged: "
   return engaged === "you" ? card.controller === seat : card.controller !== seat;
 }
 
-function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea"): boolean {
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea" | "encounterDeck"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
   // The second active location slot is an active location too (mec109.stage-4).

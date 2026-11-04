@@ -77,6 +77,8 @@ function playableFrom(state: ScenarioState, id: string, instruction: PlayFrom, s
   if (!card) return false;
   const printed = printedOf(ctx.cards, card.code);
   if (printed.type === "attachment") return instruction.free === true && !uniqueBlocked(state, printed, ctx.cards) && attachmentHostIds(state, seat, card.code, ctx).length > 0;
+  // An ally is played only for free too ("draw it or play it at no cost", 11211:A:2); a unique one with a copy in play stays where it is.
+  if (printed.type === "ally") return instruction.free === true && !uniqueBlocked(state, printed, ctx.cards);
   if (printed.type !== "event" || (printed.costX && !instruction.free)) return false;
   if (eventPlayReason(state, id, seat, ctx) || eventActionsNow(state, id, seat, ctx).length === 0) return false;
   if (instruction.free) return true;
@@ -99,8 +101,8 @@ function intoHand(state: ScenarioState, id: string, seat: number): ScenarioState
   return owner != null && owner !== seat ? updateCard(moved, id, { owner }) : moved;
 }
 
-// An attachment played for no cost onto the host the actor chose: a play, announced, by the actor.
-function playAttachment(state: ScenarioState, id: string, hostId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+// An attachment played for no cost onto the host the actor chose, or an ally played for no cost (no host): a play, announced, by the actor.
+function playAttachment(state: ScenarioState, id: string, hostId: string | undefined, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const data = topFrame(state)?.data;
   const marked = data?.kind === "effect" ? patchTop(state, { data: { ...data, picked: [...(data.picked ?? []), id] } }) : state;
   const before = { ...intoHand(marked, id, seat), activeSeat: seat };
@@ -129,6 +131,7 @@ export function playFrom(state: ScenarioState, instruction: PlayFrom, focus: Foc
   if (!chosen) return options.length > 1 ? askTarget(state, { instruction, seat, chosen: null }, options) : state;
   const printed = printedOf(ctx.cards, state.cards[chosen]?.code ?? "");
   if (printed.type === "attachment") return playFrom(state, { ...instruction, card: chosen }, { seat, sourceId: focus.sourceId }, ctx, steps);
+  if (printed.type === "ally") return playAttachment(state, chosen, undefined, seat, ctx, steps);
   // The event is the picked card, for the instructions that follow the play (Book of Eldacar puts it on the bottom of the deck).
   const marked = frame ? patchTop(state, { data: { ...frame, picked: [...(frame.picked ?? []), chosen] } }) : state;
   return queueFront(intoHand(marked, chosen, seat), seat, [{ verb: "PayToPlay", card: chosen, ...(instruction.free ? { free: true } : {}), paid: [] }]);

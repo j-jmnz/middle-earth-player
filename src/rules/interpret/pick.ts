@@ -119,6 +119,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
     if (spec.control !== "you" && !spec.controlled) raw.push(...stagingFor(state, spec, asking));
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
+    // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).
+    if (spec.controlled && spec.control !== "you") raw.push(...stagingFor(state, spec, asking).filter((id) => state.cards[id]?.claimed === true));
   } else if (spec.type === "card" && spec.stagingOnly) {
     raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "card") {

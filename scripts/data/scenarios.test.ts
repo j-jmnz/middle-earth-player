@@ -258,6 +258,14 @@ describe("Dream-chaser campaign", () => {
     expect(loadScenario("the-thing-in-the-depths").campaignPlaced).toEqual(expect.arrayContaining(["11183", "11192", "11196"]));
   });
 
+  it("deals the four Send for Help cards, which only the booklet's campaign paragraph names (dcce.campaign-setup-a-storm-on-cobas-haven), in the last two parts and no earlier one", () => {
+    const sendForHelp = ["11211", "11212", "11213", "11214"];
+    for (const id of ["a-storm-on-cobas-haven", "the-city-of-corsairs"]) expect(loadScenario(id).campaignPlaced, id).toEqual(expect.arrayContaining(sendForHelp));
+    for (const id of ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived", "the-drowned-ruins"]) {
+      expect(loadScenario(id).campaignPlaced.filter((code) => sendForHelp.includes(code)), id).toEqual([]);
+    }
+  });
+
   it("deals the campaign cards' boons and burdens through the campaign, not the encounter deck", () => {
     expect(loadScenario("voyage-across-belegaer").campaignPlaced).toEqual(expect.arrayContaining(["11172", "11173", "11174", "11175", "11176", "11177", "11178"]));
     expect(loadScenario("the-fate-of-numenor").campaignPlaced).toEqual(expect.arrayContaining(["11180", "11181"]));

@@ -151,6 +151,8 @@ export function unchartedPickWords(pick: Instruction, next: Instruction | undefi
       return { verb: "Remove", prompt: `${host}: choose a character to remove from the quest. The characters removed must have ${pick.left == null ? "a total of at least X" : `at least ${pick.left} more`} Willpower.` };
     case "MayDiscardShadow":
       return { verb: "Discard", prompt: `${host}: discard the shadow card you looked at, or keep it?` };
+    case "PutSetAsideInPlay":
+      return { verb: "Give", prompt: `Choose the player who takes control of ${pick.name}.` };
     case "Pick":
       break;
     default:

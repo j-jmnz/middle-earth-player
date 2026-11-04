@@ -253,6 +253,35 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "Repeat", times: 3, instructions: [{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" } }] }, { verb: "Discard", target: { kind: "self" } }],
     },
     { id: "12132:shadow:1", cardCode: "12132", lines: ["12132:A:2"], timing: "shadow", instructions: [{ verb: "AttachToShip", to: "defender" }] },
+
+    // 11209 A Storm on Cobas Haven (campaign card). Setup (Campaign Mode): the Modification boons, Black Key (burden), Calaerion, Gavin and the four Send for Help cards are set aside (each facedown); once the quest card's Setup has put the
+    // Raider Flagship in the staging area and prepared the fleet (ScenarioDefinition.afterSetup) Black Key is attached to the Flagship, the ships are fitted, Calaerion comes into play under the player with the Dream-chaser and Gavin under
+    // the player the first player names; Thunderstruck is shuffled into the encounter deck and Crowley into the Corsair deck, and one player (whichever the players choose) may take a copy of Círdan's Blessing that is not in the Campaign
+    // Pool into their hand (the campaign checklist asks each seat in turn until one takes it; the copy is earned at the Resolution).
+    {
+      id: "11209:campaignSetup:1",
+      cardCode: "11209",
+      lines: ["11209:A:2", "11209:A:3"],
+      timing: "campaignSetup",
+      instructions: [
+        ...["11172", "11173", "11174", "11175", "11192", "11193", "11210", "11211", "11212", "11213", "11214"].map((code): Instruction => ({ verb: "SetAside", code })),
+        { verb: "ShuffleIntoEncounterDeck", code: "11177" },
+        { verb: "ShuffleIntoCorsairDeck", code: "11178" },
+        { verb: "AttachSetAsideTo", code: "11192", to: "Raider Flagship" },
+        { verb: "FitShips", codes: ["11172", "11173", "11174", "11175"] },
+        { verb: "PutSetAsideInPlay", name: "Calaerion", withCard: "Dream-chaser" },
+        { verb: "PutSetAsideInPlay", name: "Gavin", to: "anyPlayer" },
+        { verb: "ChooseCards", codes: ["11205", "11206", "11207", "11208"], who: "onePlayer", to: "hand", optional: true, unearned: true, afterMulligan: true },
+      ],
+    },
+    // Resolution. B:1: the Círdan's Blessing chosen during setup joins the Campaign Pool (EarnDealt, as The Drowned Ruins'). Its second sentence, "The players may spend 4 XP on Gavin to record in the Campaign Log that \"Gavin returned\"",
+    // is the XP model's: Gavin's four boxes are one pick once this scenario is won (src/campaign/xp.ts, XP_ROWS, gavinReturned), made on the XP screen between scenarios, so the record has nothing to run.
+    { id: "11209:resolution:1", cardCode: "11209", lines: ["11209:B:1"], timing: "resolution", instructions: [{ verb: "EarnDealt", codes: ["11205", "11206", "11207", "11208"] }] },
+    copyLine("11171:B:5", "11209:B:4"),
+    { id: "11209:resolution:4", cardCode: "11209", lines: ["11209:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "character", control: "any", names: ["Dol Amroth Warship"] }, min: 2 } }] },
+    { id: "11209:resolution:5", cardCode: "11209", lines: ["11209:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "character", control: "any", names: ["Corsair Skirmisher"] }, min: 2 } }] },
+    { id: "11209:resolution:6", cardCode: "11209", lines: ["11209:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "objective", control: "any", trait: "Dol Amroth", controlled: true }, min: 4 } }] },
+    copyLine("11171:B:7", "11209:B:8"),
   ],
   { pool: VOYAGE },
 );
