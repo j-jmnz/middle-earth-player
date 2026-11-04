@@ -14,7 +14,7 @@ export const INDEX_PATH = "docs/INDEX.md";
 // A file at least this long gets its heading tree in the index; a shorter one is read whole.
 const SECTIONED_BYTES = 12_000;
 // Code whose comments cite a doc section.
-const CITING_ROOTS = ["src", "scripts", "tailwind.config.js"];
+const CITING_ROOTS = ["src", "scripts", "test", "tailwind.config.js"];
 const CODE_FILE = /\.(ts|tsx|js|mjs|cjs)$/;
 
 type Group = { title: string; note: string; files: string[] };
