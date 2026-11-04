@@ -59,7 +59,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142027 Howling Warg
   {"id":"142027:forced:1","cardCode":"142027","lines":["142027:A:1"],"timing":"forced","trigger":"attacks","instructions":[{"verb":"Pick","pick":ACTIVE},{"verb":"PlaceDamage","amount":1,"card":"picked"}]},
-  {"id":"142027:shadow:1","cardCode":"142027","lines":["142027:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"Pick","pick":ACTIVE,"when":{"kind":"x","min":1}},{"verb":"PlaceDamage","amount":1,"card":"picked","when":{"kind":"x","min":1}}]}]},
 
   // 142028 Crebain from Dunland (Peril is a keyword)
   {"id":"142028:whenRevealed:1","cardCode":"142028","lines":["142028:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"exhaust","requires":{"kind":"canPick","pick":{"type":"hero","control":"you","state":"ready"}},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}}]},{"id":"engage","instructions":[{"verb":"Engage","target":"self"}]}]}]},

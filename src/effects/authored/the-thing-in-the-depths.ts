@@ -141,7 +141,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 12046 Crew Quarters. Travel: 1 resource on each Raider card in play. Shadow: the attacking enemy gets +2 Attack.
   { id: "12046:travel:1", cardCode: "12046", lines: ["12046:A:1"], timing: "travel", instructions: [{ verb: "Each", pick: RAIDER_CARD, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "picked" }] }] },
-  { id: "12046:shadow:1", cardCode: "12046", lines: ["12046:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker" }] },
 
   // 12047 Quarter Deck. While it is the active location each enemy is dealt an additional shadow card in the combat phase: once the shadow cards are dealt each of the seat's engaged enemies gets one more
   // (the enemies of the player the event is about), which is the card the line adds to the one each enemy is dealt. Shadow: the defending player discards an attachment they control.
@@ -258,7 +257,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     ],
   },
   { id: "11194:resolution:1", cardCode: "11194", lines: ["11194:B:1"], timing: "resolution", instructions: [{ verb: "ChooseCards", codes: ["11195"], who: "firstPlayer", to: "pool", optional: true }] },
-  { id: "11194:resolution:2", cardCode: "11194", lines: ["11194:B:2", "11194:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11194:resolution:3", cardCode: "11194", lines: ["11194:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "card", control: "any", names: ["Captain Sahír"], minResources: 5 }, min: 1 } }] },
   { id: "11194:resolution:4", cardCode: "11194", lines: ["11194:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "card", control: "any", names: ["Na'asiyah"], minResources: 5 }, min: 1 } }] },
   {
@@ -281,13 +279,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
       { verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } },
       { verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 30 } },
     ],
-  },
-  {
-    id: "11194:resolution:8",
-    cardCode: "11194",
-    lines: ["11194:B:9"],
-    timing: "resolution",
-    instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
   },
 ]);
 

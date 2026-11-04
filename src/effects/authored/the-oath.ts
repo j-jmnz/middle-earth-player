@@ -54,13 +54,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41017 Surprising Speed: each player returns an engaged enemy to the staging area; with none returned it gains surge and doomed 1. The Shadow
   // adds Attack and returns the attacker to the staging area after the attack.
   {"id":"41017:whenRevealed:1","cardCode":"41017","lines":["41017:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"ReturnToStaging","target":{"kind":"engagedEnemies","who":"actor","pick":"choose"}}]},{"verb":"GainSurge","when":{"kind":"noneReturned"}},{"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]},
-  {"id":"41017:shadow:1","cardCode":"41017","lines":["41017:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
   // 41018 Caught in a Web: as 01080 (the highest threat player attaches it; its hero does not ready unless the pool pays 2).
   ...reprint(TWINS, "01080", "41018"),
   // 41019 Goblin Troop: no attachments; while engaged it gives each other Goblin enemy engaged with the same player +1 Attack and +1 Defense; the Shadow adds 2 Attack.
   {"id":"41019:constant:1","cardCode":"41019","lines":["41019:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"41019:constant:2","cardCode":"41019","lines":["41019:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"engaged"},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","engaged":"you","trait":"Goblin","other":true}},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","engaged":"you","trait":"Goblin","other":true}}]},
-  {"id":"41019:shadow:1","cardCode":"41019","lines":["41019:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
   // 41020 Goblin Sniper: as 01083 (cannot be optionally engaged while another enemy is in the staging area; damages a character of each player if it is still there after combat).
   ...reprint(TWINS, "01083", "41020"),
   // 41021 Goblin Runners (Surge): the Shadow makes the attacker attack again once this attack is over, with a new shadow card (as 141073:shadow:1).

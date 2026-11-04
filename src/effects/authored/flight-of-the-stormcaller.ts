@@ -255,20 +255,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
       { verb: "PutSetAsideInPlay", name: "Calaerion", withCard: "Dream-chaser" },
     ],
   },
-  { id: "11191:resolution:1", cardCode: "11191", lines: ["11191:B:1", "11191:B:2"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11191:resolution:2", cardCode: "11191", lines: ["11191:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: ON_COURSE }] },
   { id: "11191:resolution:3", cardCode: "11191", lines: ["11191:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "onStage", stage: 2 } }] },
   { id: "11191:resolution:4", cardCode: "11191", lines: ["11191:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 2, when: { kind: "inVictory", code: "110042", is: true } }] },
   { id: "11191:resolution:5", cardCode: "11191", lines: ["11191:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11178"] }, max: 1 }] },
   { id: "11191:resolution:6", cardCode: "11191", lines: ["11191:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 2, each: { kind: "inVictory", codes: ["11177"] }, max: 2 }] },
   { id: "11191:resolution:7", cardCode: "11191", lines: ["11191:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "hero", control: "any", damaged: true }, max: 0 } }] },
-  {
-    id: "11191:resolution:8",
-    cardCode: "11191",
-    lines: ["11191:B:9"],
-    timing: "resolution",
-    instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
-  },
 ]);
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store the each/max form of these XP lines; the generated twin writes a count of the victory display.
+export const AUTHORED_REPLACES: readonly string[] = ["11191:resolution:5", "11191:resolution:6"];

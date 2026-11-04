@@ -490,7 +490,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "ChooseCards", codes: ["11189", "11190"], who: "firstPlayer", to: "hero", anyHero: true, when: { kind: "inVictory", code: "11188", is: true } }],
   },
   { id: "11182:resolution:2", cardCode: "11182", lines: ["11182:B:2"], timing: "resolution", instructions: [{ verb: "EarnDealt", codes: ["11184", "11185", "11186", "11187"] }] },
-  { id: "11182:resolution:3", cardCode: "11182", lines: ["11182:B:3", "11182:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   {
     id: "11182:resolution:4",
     cardCode: "11182",
@@ -502,16 +501,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
   { id: "11182:resolution:5", cardCode: "11182", lines: ["11182:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11046"] } }] },
-  { id: "11182:resolution:6", cardCode: "11182", lines: ["11182:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "inVictory", code: "11078", is: true } }] },
   { id: "11182:resolution:7", cardCode: "11182", lines: ["11182:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "enemyInPlay", is: false } }] },
-  { id: "11182:resolution:8", cardCode: "11182", lines: ["11182:B:9"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } }] },
-  {
-    id: "11182:resolution:9",
-    cardCode: "11182",
-    lines: ["11182:B:10"],
-    timing: "resolution",
-    instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
-  },
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

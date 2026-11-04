@@ -59,7 +59,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 141066 Pain Assailed Him
   {"id":"141066:whenRevealed:1","cardCode":"141066","lines":["141066:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ReduceLife","amount":1},{"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":RING_BEARER},{"verb":"SetStatUntil","stat":"attack","value":0,"until":"endOfRound","holders":RING_BEARER},{"verb":"SetStatUntil","stat":"defense","value":0,"until":"endOfRound","holders":RING_BEARER}]},
-  {"id":"141066:shadow:1","cardCode":"141066","lines":["141066:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]}]},
 
   // 141067 The Nine are Abroad: the text boxes of the characters in play now are blank, keywords included (rr.blank); their traits stay.
   {"id":"141067:whenRevealed:1","cardCode":"141067","lines":["141067:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"blankText","amount":1,"until":"endOfRound","holders":{"type":"character","control":"any"}},{"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Nazgûl"},"min":1}}]},

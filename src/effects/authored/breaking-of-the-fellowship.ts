@@ -242,7 +242,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142079 Slopes of Amon Hen: Travel, the traveling player engages an enemy in any staging area. The Shadow gives +1 Attack, +2 against a defender with fewer printed hit points.
   { id: "142079:travel:1", cardCode: "142079", lines: ["142079:A:1"], timing: "travel", instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true, stagingArea: "any" } }, { verb: "Engage", target: "picked" }] },
-  { id: "142079:shadow:1", cardCode: "142079", lines: ["142079:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: { kind: "not", condition: DEFENDER_FEWER_HP } }, { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: DEFENDER_FEWER_HP }] },
 
   // 142080 Growing Threat (Peril is a keyword): either an enemy engaged with the revealing player goes to the first player's staging area, or this card gains Doomed 2 and
   // Surge. The Shadow moves the attacking enemy there after the attack.
@@ -288,7 +287,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142082 Black Feathered Arrows: until the end of the round the archery total at the revealing player's stage gains 1 for each ally there. The Shadow is 142079's.
   { id: "142082:whenRevealed:1", cardCode: "142082", lines: ["142082:A:1"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "archeryBonus", amount: { count: ALLIES_AT_STAGE }, until: "endOfRound", target: "actorSeat" }] },
-  { id: "142082:shadow:1", cardCode: "142082", lines: ["142082:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: { kind: "not", condition: DEFENDER_FEWER_HP } }, { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: DEFENDER_FEWER_HP }] },
 
   // 142083 Fallen Into Evil: attaches to a non-Fellowship hero, which becomes an enemy in the first player's staging area; discarded, the hero returns to its owner.
   { id: "142083:whenRevealed:1", cardCode: FALLEN_INTO_EVIL, lines: ["142083:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "any", exceptSphere: "fellowship" } }, { verb: "FallIntoEvil" }] },

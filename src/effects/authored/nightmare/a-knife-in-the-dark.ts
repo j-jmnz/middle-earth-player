@@ -24,7 +24,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 906205 Weather Hills. Stage 1 is Trouble in Bree, in play while the players are at it.
   {"id":"906205:constant:1","cardCode":"906205","lines":["906205:A:1"],"timing":"constant","condition":{"kind":"inPlay","code":STAGE_ONE,"is":true},"instructions":[{"verb":"ModifyStat","stat":"noProgressPlaced","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"906205:constant:2","cardCode":"906205","lines":["906205:A:2"],"timing":"constant","condition":RING_EXHAUSTED,"instructions":[{"verb":"ModifyStat","stat":"threat","amount":2,"until":"whileSourceInPlay","target":"self"}]},
-  {"id":"906205:shadow:1","cardCode":"906205","lines":["906205:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
   // 906206 The Old Road. "Enters play with" is not a Forced effect: it resolves as the card enters play (triggered).
   {"id":"906206:triggered:1","cardCode":"906206","lines":["906206:A:1"],"timing":"triggered","trigger":"encounterEnteredPlay","subject":"self","instructions":[{"verb":"PlaceToken","amount":3}]},
   {"id":"906206:forced:1","cardCode":"906206","lines":["906206:A:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"DiscardResources","amount":1,"target":"self"},{"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":RINGWRAITH,"when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]},

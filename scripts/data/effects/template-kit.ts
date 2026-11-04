@@ -10,6 +10,10 @@ export type TemplateContext = {
   card: Card;
   // The code of a card named in text, among the cards of the scenario or campaign being built.
   codeOf(name: string): string | null;
+  // Whether a card of that name exists, one or several (codeOf is null for a name two cards print).
+  hasName(name: string): boolean;
+  // Every code of that name among the cards the reader shares a box (or pool) with, in numeric order: a name with several printings in play.
+  codesNamed(name: string): string[];
   // Codes in the scenario's set-aside pile.
   setAside: ReadonlySet<string>;
 };

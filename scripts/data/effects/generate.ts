@@ -1,4 +1,4 @@
-import type { Condition, Effect, Limit } from "../../../src/catalog/boundary.ts";
+import type { Condition, Effect, Instruction, Limit } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { selfNamed as selfNamedBy } from "../../../src/catalog/self-named.ts";
@@ -58,6 +58,10 @@ const LABEL_TIMING: ReadonlyMap<string, string> = new Map([
   ["resolution", "resolution"],
 ]);
 
+// A campaign card's Resolution line that the authored records split into several, each with its own `resolution` number
+// (The Temple of the Deceived, 11197:B:1: the Starla sentence, then the Recurring Nightmare sentences).
+const SPLIT_LINES: Readonly<Record<string, number>> = { "11197:B:1": 2 };
+
 const PHASES = ["Resource", "Planning", "Quest", "Travel", "Encounter", "Combat", "Refresh"] as const;
 
 // The printed limits a wrapper reads, by "<times> per <round|phase>" (rr.limits).
@@ -98,6 +102,33 @@ function withWrapper(drafts: Draft[], condition: Condition | null, limit: Limit 
   if (drafts.some((draft) => draft.timing !== "action")) return null;
   if (condition && drafts.some((draft) => draft.condition)) return null;
   return drafts.map((draft) => ({ ...draft, ...(condition ? { condition } : {}), ...(limit ? { limit } : {}) }));
+}
+
+// The first template that reads the whole line.
+function readLine(line: string, context: TemplateContext): { drafts: Draft[]; template: string } | null {
+  for (const template of TEMPLATES) {
+    const match = template.pattern.exec(line);
+    const drafts = match ? template.build(match, context) : null;
+    if (drafts) return { drafts, template: template.id };
+  }
+  return null;
+}
+
+// A Shadow of several sentences, each of which is a Shadow line some template reads: one record, the sentences' instructions in
+// order ("Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.").
+function shadowBySentence(line: string, context: TemplateContext): { drafts: Draft[]; templates: string[] } | null {
+  const sentences = /^Shadow: (.+)$/.exec(line)?.[1]?.split(/(?<=\.)\s+(?=[A-Z])/);
+  if (!sentences || sentences.length < 2) return null;
+  const instructions: Instruction[] = [];
+  const templates: string[] = [];
+  for (const sentence of sentences) {
+    const read = readLine(`Shadow: ${sentence}`, context);
+    const only = read?.drafts.length === 1 ? read.drafts[0] : undefined;
+    if (!read || !only || only.timing !== "shadow" || Object.keys(only).some((key) => key !== "timing" && key !== "instructions")) return null;
+    instructions.push(...only.instructions);
+    templates.push(read.template);
+  }
+  return { drafts: [{ timing: "shadow", instructions }], templates };
 }
 
 function normalize(line: string): string {
@@ -148,6 +179,19 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
     return among(scope.filter((card) => card.printings[0]?.pack === pack)) ?? among(scope.filter((card) => !box.has(card.code)));
   };
 
+  // The codes of a name among the cards the reader's own scenario deals (its piles and the Campaign Expansion's reprints of them), in
+  // numeric order. The other face of a double-sided card is never itself in a pile (the victory display holds the front).
+  const codesNamed = (reader: Card, name: string): string[] => {
+    const own = scenarios.find((scenario) => scenario.campaignCard === reader.code);
+    if (!own) return [];
+    const backs = new Set(own.cards.flatMap((card) => (card.back ? [card.back] : [])));
+    const dealt = new Set([...own.cards.map((card) => card.code), ...Object.values(own.reprints ?? {})]);
+    return scope
+      .filter((other) => dealt.has(other.code) && !backs.has(other.code) && other.name.toLowerCase() === name.trim().toLowerCase())
+      .map((other) => other.code)
+      .sort((x, y) => Number(x) - Number(y));
+  };
+
   const effects: Effect[] = [];
   const unmatched: Unmatched[] = [];
   const usage: Record<string, number> = {};
@@ -158,9 +202,17 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       counters.set(timing, value);
       return value;
     };
-    const context: TemplateContext = { card, codeOf: (name) => codeOf(card, name), setAside };
+    const context: TemplateContext = { card, codeOf: (name) => codeOf(card, name), hasName: (name) => scope.some((other) => other.name.toLowerCase() === name.trim().toLowerCase()), codesNamed: (name) => codesNamed(card, name), setAside };
+    // A campaign card's Resolution runs from its "Resolution:" line to the next label: every line in it that no template reads
+    // reserves the next `resolution` number, as the authored records number it (one record per line, `SPLIT_LINES` for a line
+    // that takes several). A header line ("Gain the following:") reads as no record and goes onto the first record of the line
+    // after it.
+    let inResolution = false;
+    let header: Segment | null = null;
     for (const segment of segmentsOf(card, ledger)) {
       const { line, condition, limit } = wrapped(selfNamed(card, segment.line));
+      const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();
+      if (label) inResolution = card.type === "campaign" && LABEL_TIMING.get(label) === "resolution";
       let drafts = null;
       for (const template of TEMPLATES) {
         const match = template.pattern.exec(line);
@@ -173,16 +225,35 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
           break;
         }
       }
-      if (drafts) {
-        for (const draft of drafts) effects.push({ id: `${card.code}:${draft.timing}:${next(draft.timing)}`, cardCode: card.code, lines: [segment.lineId], ...draft });
+      if (!drafts && !condition && !limit) {
+        const sentences = shadowBySentence(line, context);
+        if (sentences) {
+          drafts = sentences.drafts;
+          for (const id of sentences.templates) usage[id] = (usage[id] ?? 0) + 1;
+        }
+      }
+      if (drafts && drafts.length === 0) {
+        // A header: the next line's record owns it. One header after another leaves the first unread.
+        if (header) unmatched.push({ ...header, timing: "resolution", number: (counters.get("resolution") ?? 0) + 1 });
+        header = segment;
         continue;
       }
-      const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();
-      const timing = ((label === "setup" && card.type === "campaign" ? "campaignSetup" : label ? LABEL_TIMING.get(label) : undefined)) ?? null;
+      const carried = header;
+      header = null;
+      if (drafts) {
+        const owned = carried !== null && drafts[0]?.timing === "resolution";
+        if (carried && !owned) unmatched.push({ ...carried, timing: "resolution", number: (counters.get("resolution") ?? 0) + 1 });
+        drafts.forEach((draft, at) => effects.push({ id: `${card.code}:${draft.timing}:${next(draft.timing)}`, cardCode: card.code, lines: at === 0 && owned && carried ? [carried.lineId, segment.lineId] : [segment.lineId], ...draft }));
+        continue;
+      }
+      const timing = ((label === "setup" && card.type === "campaign" ? "campaignSetup" : label ? LABEL_TIMING.get(label) : undefined)) ?? (inResolution ? "resolution" : null);
       // A labelled line that no template reads keeps its number, so the authored record that replaces it lines up.
       const number = timing ? next(timing) : (counters.get("constant") ?? 0) + 1;
+      if (timing === "resolution") for (let extra = 1; extra < (SPLIT_LINES[segment.lineId] ?? 1); extra += 1) next(timing);
+      if (carried) unmatched.push({ ...carried, timing: "resolution", number });
       unmatched.push({ ...segment, timing, number });
     }
+    if (header) unmatched.push({ ...header, timing: "resolution", number: (counters.get("resolution") ?? 0) + 1 });
   }
   return { effects, unmatched, usage };
 }

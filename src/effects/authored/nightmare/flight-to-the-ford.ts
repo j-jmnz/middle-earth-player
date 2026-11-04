@@ -31,7 +31,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"906306:forced:1","cardCode":"906306","lines":["906306:A:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"DiscardResources","amount":1,"target":"self"},{"verb":"ReduceLife","amount":3,"when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]},
   // 906307 Ettendales: a location leaves play with a leftPlay event when it is explored.
   {"id":"906307:forced:1","cardCode":"906307","lines":["906307:A:1"],"timing":"forced","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"MoveBurden","to":"encounterShuffle"}]},
-  {"id":"906307:shadow:1","cardCode":"906307","lines":["906307:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]}]},
   // 906308 Come Back! (line 1 is Peril and Doomed 1). The defending player chooses.
   {"id":"906308:whenRevealed:1","cardCode":"906308","lines":["906308:A:2"],"timing":"whenRevealed","instructions":[{"verb":"ReduceLife","amount":1},{"verb":"RemoveAllQuestProgress"}]},
   {"id":"906308:shadow:1","cardCode":"906308","lines":["906308:A:3"],"timing":"shadow","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"life","instructions":[{"verb":"ReduceLife","amount":1}]},{"id":"undefended","instructions":[{"verb":"ConsiderUndefended"}]}]}]},

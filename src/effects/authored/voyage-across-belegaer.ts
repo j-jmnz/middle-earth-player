@@ -13,7 +13,6 @@ const ACTIVE = { kind: "sourceIn", zone: "activeLocation" } as const;
 const ON_COURSE = { kind: "heading", is: "onCourse" } as const;
 const OFF_COURSE = { kind: "heading", is: "offCourse" } as const;
 const WORST = { kind: "heading", is: "worst" } as const;
-const NOT_OFF_COURSE = { kind: "not", condition: OFF_COURSE } as const;
 // A Ship objective (a ship-objective is a character that bears the Ship trait) and a Ship enemy anywhere in play.
 const SHIP_OBJECTIVE: PickSpec = { type: "character", control: "any", trait: "Ship" };
 const YOUR_SHIP: PickSpec = { type: "character", control: "you", trait: "Ship" };
@@ -136,7 +135,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 11023 Starlit Sea: off-course it gains "Travel: Raise each player's threat by 3."
   { id: "11023:travel:1", cardCode: "11023", lines: ["11023:A:1"], timing: "travel", instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat", when: OFF_COURSE }] },
-  { id: "11023:shadow:1", cardCode: "11023", lines: ["11023:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: NOT_OFF_COURSE }, { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: OFF_COURSE }] },
 
   // 11024 Fog Bank: while it is the active location, Ship enemies make no engagement checks, cannot attack and cannot be attacked. Shadow: at the worst heading the
   // attacking enemy attacks again.
@@ -414,7 +412,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     ],
   },
   { id: "11171:resolution:1", cardCode: "11171", lines: ["11171:B:1"], timing: "resolution", instructions: [{ verb: "Earn", codes: ["11176"] }] },
-  { id: "11171:resolution:2", cardCode: "11171", lines: ["11171:B:2", "11171:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   {
     id: "11171:resolution:3",
     cardCode: "11171",
@@ -427,7 +424,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "11171:resolution:6", cardCode: "11171", lines: ["11171:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11058"] } }] },
   { id: "11171:resolution:7", cardCode: "11171", lines: ["11171:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11178"] }, max: 1 }] },
   { id: "11171:resolution:8", cardCode: "11171", lines: ["11171:B:9"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 2, each: { kind: "inVictory", codes: ["11177"] }, max: 2 }] },
-  { id: "11171:resolution:9", cardCode: "11171", lines: ["11171:B:10"], timing: "resolution", instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }] },
 ]);
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store the each/max form of these XP lines; the generated twin writes a count of the victory display.
+export const AUTHORED_REPLACES: readonly string[] = ["11171:resolution:7", "11171:resolution:8"];

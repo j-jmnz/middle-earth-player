@@ -379,11 +379,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
       { verb: "TradeDamageForThreat", damage: 1, threat: 1 },
     ],
   },
-  { id: "11179:resolution:1", cardCode: "11179", lines: ["11179:B:1", "11179:B:2"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11179:resolution:2", cardCode: "11179", lines: ["11179:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11030", "11073"] } }] },
   { id: "11179:resolution:3", cardCode: "11179", lines: ["11179:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "tokens", code: "11179" }, max: 3 }] },
-  { id: "11179:resolution:4", cardCode: "11179", lines: ["11179:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } }] },
-  { id: "11179:resolution:5", cardCode: "11179", lines: ["11179:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }] },
 ]);
 
 export const AUTHORED_REPLACES: readonly string[] = [];

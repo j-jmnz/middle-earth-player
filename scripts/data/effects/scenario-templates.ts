@@ -1,5 +1,26 @@
 import { count, repeat, conditionOf, ATTACK } from "./template-kit.ts";
-import type { Template } from "./template-kit.ts";
+import type { Condition } from "../../../src/catalog/boundary.ts";
+import type { Template, TemplateContext } from "./template-kit.ts";
+
+// The conditions a Shadow's "(+M Attack instead if ...)" reads. `adds`: the record adds the difference when it holds.
+type Atom = Exclude<Condition, { kind: "not" | "all" | "any" }>;
+function shadowCondition(text: string, context: TemplateContext): { condition: Atom; adds: boolean } | null {
+  // conditionOf reads only atoms.
+  const hide = conditionOf(text, context) as Atom | null;
+  if (hide) return { condition: hide, adds: true };
+  if (text === "this attack is undefended") return { condition: { kind: "undefended" }, adds: false };
+  if (text === "you are off-course") return { condition: { kind: "heading", is: "offCourse" }, adds: false };
+  const threat = /^the defending player's threat is (\d+) or higher$/.exec(text);
+  if (threat) return { condition: { kind: "threat", min: count(threat[1]) }, adds: false };
+  const trait = /^attacking enemy is an? (\w+)$/.exec(text);
+  if (trait?.[1]) return { condition: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: trait[1] } }, adds: false };
+  if (text === "the defending character has fewer printed hit points than the attacking enemy") {
+    return { condition: { kind: "matches", card: "defender", pick: { type: "character", control: "any", fewerHitPointsThan: "attackingEnemy" } }, adds: false };
+  }
+  const location = /^the active location is (?:an? )?(\w+?)(?: location)?$/.exec(text);
+  if (location?.[1]) return { condition: { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", trait: location[1] } }, adds: true };
+  return null;
+}
 
 export const SCENARIO_TEMPLATES: readonly Template[] = [
   {
@@ -180,14 +201,58 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     ],
   },
   {
-    id: "shadow-attack-bonus",
-    pattern: /^Shadow: Attacking enemy gets \+(\d+) Attack \(\+(\d+) Attack instead if (.+?)\)\.?$/,
+    // The line before a bullet list of XP. It is no record: the first bullet's record names it as well (generate.ts).
+    id: "resolution-gain-the-following",
+    pattern: /^(?:Resolution: )?Gain the following:$/,
+    build: () => [],
+  },
+  {
+    id: "xp-each-surviving-player",
+    pattern: /^• (\d+) XP for each surviving player\.$/,
+    build: (match) => [{ timing: "resolution", instructions: [{ verb: "GainXp", amount: count(match[1]), each: { kind: "survivingPlayer" } }] }],
+  },
+  {
+    id: "xp-survivors-threat",
+    pattern: /^• (\d+) XP if each surviving player's threat is (\d+) or less\.$/,
+    build: (match) => [{ timing: "resolution", instructions: [{ verb: "GainXp", amount: count(match[1]), when: { kind: "survivorsThreat", max: count(match[2]) } }] }],
+  },
+  {
+    // "Is in the victory display" is one shape: a count of the victory-display cards with the name, at least one.
+    id: "xp-named-card-in-victory",
+    pattern: /^• ([-−–])?(\d+) XP if (\p{Lu}.*?) is in the victory display\.$/u,
     build: (match, context) => {
-      const condition = conditionOf(match[3] ?? "", context);
-      if (!condition) return null;
-      const base = count(match[1]);
-      return [{ timing: "shadow", instructions: [ATTACK(base), ATTACK(count(match[2]) - base, { when: condition })] }];
+      const name = match[3] ?? "";
+      if (!context.hasName(name)) return null;
+      const amount = count(match[2]) * (match[1] ? -1 : 1);
+      // The played scenarios' goldens store a card the name resolves to by code (`inVictory`), one condition per printing when
+      // the scenario has several; a name no code is read from (a card the scenario does not deal) stays a count of the display.
+      const codes = context.codesNamed(name);
+      const present = codes.map((code) => ({ kind: "inVictory" as const, code, is: true }));
+      const only = present.length === 1 ? present[0] : undefined;
+      const when: Condition = only ?? (present.length > 1 ? { kind: "any", conditions: present } : { kind: "count", pick: { type: "card", control: "any", from: "victory", names: [name] }, min: 1 });
+      return [{ timing: "resolution", instructions: [{ verb: "GainXp", amount, when }] }];
     },
+  },
+  {
+    // "+N Attack (+M Attack instead if C)". Two shapes are written, the ones the authored records use: a condition that holds
+    // for a trait of the active location or a Hide test adds the difference to the base (shadowCondition's `adds`); any other
+    // condition holds the base back when it is true and gives M in its place.
+    id: "shadow-attack-bonus",
+    pattern: /^Shadow: Attacking enemy gets \+(\d+) Attack\.? \(\+(\d+) Attack instead if (.+?)\.?\)\.?$/,
+    build: (match, context) => {
+      const read = shadowCondition(match[3] ?? "", context);
+      if (!read) return null;
+      const base = count(match[1]);
+      const instead = count(match[2]);
+      const when = read.condition;
+      const instructions = read.adds ? [ATTACK(base), ATTACK(instead - base, { when })] : [ATTACK(base, { when: { kind: "not" as const, condition: when } }), ATTACK(instead, { when })];
+      return [{ timing: "shadow", instructions }];
+    },
+  },
+  {
+    id: "shadow-attack-plus",
+    pattern: /^Shadow: Attacking enemy gets \+(\d+) Attack\.$/,
+    build: (match) => [{ timing: "shadow", instructions: [ATTACK(count(match[1]))] }],
   },
   {
     id: "shadow-return-to-staging",
@@ -198,6 +263,40 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     id: "shadow-additional-attack",
     pattern: /^Shadow: Attacking enemy makes an additional attack after this one\.$/,
     build: () => [{ timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }] }] }],
+  },
+  {
+    // The consequences of an attack that destroys a character read X (characters destroyed) at least 1 once the attack is over.
+    id: "shadow-destroys-character-raise-threat",
+    pattern: /^Shadow: If this attack destroys a character, raise your threat by (\d+)\.$/,
+    build: (match) => [{ timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "RaiseThreat", amount: count(match[1]), when: { kind: "x", min: 1 } }] }] }],
+  },
+  {
+    id: "shadow-destroys-character-reduce-life",
+    pattern: /^Shadow: If this attack destroys a character, reduce the Ring-bearer's life by (\d+)\.$/,
+    build: (match) => [{ timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReduceLife", amount: count(match[1]), when: { kind: "x", min: 1 } }] }] }],
+  },
+  {
+    id: "shadow-destroys-character-damage-active-location",
+    pattern: /^Shadow: If this attack destroys a character, place (\d+) damage on an active location\.$/,
+    build: (match) => [
+      {
+        timing: "shadow",
+        instructions: [
+          {
+            verb: "AfterAttack",
+            instructions: [
+              { verb: "Pick", pick: { type: "location", control: "any", active: true, who: "firstPlayer" }, when: { kind: "x", min: 1 } },
+              { verb: "PlaceDamage", amount: count(match[1]), card: "picked", when: { kind: "x", min: 1 } },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "shadow-destroys-character-additional-attack",
+    pattern: /^Shadow: If this attack destroys a character, attacking enemy makes an additional attack\.$/,
+    build: () => [{ timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", when: { kind: "x", min: 1 } }] }] }],
   },
   {
     id: "shadow-undefended-if-hide-failed",

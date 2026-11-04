@@ -189,16 +189,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 12075 Faithless Desecrator. While engaged with a player it contributes its Threat to the staging area. Shadow: the attacking enemy gets +1 Attack, +2 instead if the active location is a Ruins location.
   { id: "12075:constant:1", cardCode: "12075", lines: ["12075:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "engaged" }, instructions: [{ verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "whileSourceInPlay" }] },
-  {
-    id: "12075:shadow:1",
-    cardCode: "12075",
-    lines: ["12075:A:2"],
-    timing: "shadow",
-    instructions: [
-      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" },
-      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: ACTIVE_RUINS },
-    ],
-  },
 
   // 12076 Island Watcher. It cannot be optionally engaged. In the staging area it gains: Forced: at the beginning of the encounter phase, if the active location is a Ruins location it engages the player with the
   // highest threat, and is dealt 2 shadow cards.
@@ -358,19 +348,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
       { verb: "ChooseCards", codes: ["11199"], who: "firstPlayer", to: "player", when: { kind: "island", revealed: { code: "11199", min: 2 } } },
     ],
   },
-  { id: "11197:resolution:3", cardCode: "11197", lines: ["11197:B:2", "11197:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11197:resolution:4", cardCode: "11197", lines: ["11197:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "tokens", code: "11197" }, max: 3 }] },
   { id: "11197:resolution:5", cardCode: "11197", lines: ["11197:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "islandFaceup", code: "12069" } }] },
   { id: "11197:resolution:6", cardCode: "11197", lines: ["11197:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "island", flippedAtMost: 4 } }] },
-  { id: "11197:resolution:7", cardCode: "11197", lines: ["11197:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "any", conditions: [{ kind: "inVictory", code: "12070", is: true }, { kind: "inVictory", code: "110077", is: true }] } }] },
-  { id: "11197:resolution:8", cardCode: "11197", lines: ["11197:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } }] },
-  {
-    id: "11197:resolution:9",
-    cardCode: "11197",
-    lines: ["11197:B:9"],
-    timing: "resolution",
-    instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
-  },
 ], { pool: NUMENOR });
 
 export const AUTHORED_REPLACES: readonly string[] = [];
