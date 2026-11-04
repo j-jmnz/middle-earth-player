@@ -39,7 +39,7 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
   useEffect(() => {
     const was = before.current;
     const now = store.getState().game;
-    const name = sweepName({ phase: was.phase, round: was.round }, { phase: now.phase, round: now.round }, scale, busyBetween(was, now));
+    const name = sweepName({ phase: was.phase, round: was.round }, { phase: now.phase, round: now.round }, scale, busyBetween(was, now, now.phase));
     if (!name) return;
     const timer = setTimeout(() => {
       if (spotlitNow()) return;

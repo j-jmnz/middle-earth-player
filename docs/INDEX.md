@@ -104,7 +104,7 @@ Read the sections your task touches.
   - 838–863 Persistence and shipping (~1.7K)
   - 864–904 Screens (~4.4K) ← 2
     - 890–904 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~27.5K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~27.6K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -179,7 +179,7 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.2K tok)
   - 5–16 Rules (~550)
   - 17–75 Phases (~2.1K)
   - 76–161 Open items (~4.0K)

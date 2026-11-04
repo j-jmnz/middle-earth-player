@@ -11,7 +11,7 @@ import { clashesOf } from "./clash.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { peekSeat } from "./peek.ts";
 import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
-import { endGate, leaveGate, NO_SPOTLIGHT, openGate, type SpotlightGate } from "../spotlight/gate.ts";
+import { endGate, leaveGate, nextGate, NO_SPOTLIGHT, type SpotlightGate } from "../spotlight/gate.ts";
 import { nextUndoable, type Undoable } from "./undo-history.ts";
 
 // The engine types the screens hold. src/screens reaches the reducer only through src/play and src/campaign.
@@ -166,8 +166,9 @@ export function createTableStore(input: TableInput): TableStore {
         ...keepIntent(get(), before, result.state, result.steps, intent),
         moment,
         shown: shows ? moment : get().shown,
-        // The attacks this moment resolved play on the canvas before its banner; a pass that shows nothing leaves the last gate be.
-        spotlight: shows ? openGate(moment.seq, clashesOf(before, result.state, result.steps)) : get().spotlight,
+        // The attacks this moment resolved play on the canvas before its banner; a pass that shows nothing, or a moment with no attacks
+        // while the last one's still wait to play, leaves the last gate be (gate.ts, nextGate).
+        spotlight: shows ? nextGate(get().spotlight, moment.seq, clashesOf(before, result.state, result.steps), before, result.state) : get().spotlight,
       });
       input.onCommit?.(intent, result.state);
       return true;

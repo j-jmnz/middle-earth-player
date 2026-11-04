@@ -1,4 +1,4 @@
-// Rules: rr.step-6-2 (data/rules/entries.json).
+// Rules: rr.step-1-2, rr.step-1-3, rr.step-6-2, rr.step-7-2 (data/rules/entries.json).
 //
 // The phase title sweep (docs/design-system-table.md, Motion; phase 23): when the round moves forward into a new phase, its name
 // crosses the canvas once. Pure: whether it shows and what it says. The view is phase-sweep.tsx.
@@ -42,16 +42,26 @@ export function sweepName(before: PhasePoint, now: PhasePoint, scale: number, bu
 export type Seen = Counted & { readonly cards: Readonly<Record<string, { readonly zone: string; readonly exhausted: boolean }>> };
 
 /**
- * Whether the table moves cards or changes a count between two states: a draw, a ready, a token added or taken off. A shadow card dealt
- * is not: the deal is how the Combat phase opens (rr.step-6-2), beside the enemies and away from the player's row, so with any enemy
- * engaged the Combat title would otherwise never show.
+ * Whether the table moves cards or changes a count between two states: a draw, a ready, a token added or taken off. What opens the
+ * phase entered (`phase`) does not count, or its title would almost never show:
+ * - Combat: a shadow card dealt (rr.step-6-2), beside the enemies and away from the player's row;
+ * - Resource: the cards drawn into the hand (rr.step-1-3), the resources gained (rr.step-1-2) and the cards the Refresh phase readied
+ *   just before (rr.step-7-2), which the table passes in the same tap.
+ * Anything else that moves or counts on the way in still holds the title back.
  */
-export function busyBetween(prev: Seen, next: Seen): boolean {
-  if (tokenDeltas(prev, next).length > 0) return true;
+export function busyBetween(prev: Seen, next: Seen, phase = ""): boolean {
+  const resource = phase === "Resource";
+  const gained = tokenDeltas(prev, next).filter((delta) => !(resource && delta.token === "resources" && delta.change > 0));
+  if (gained.length > 0) return true;
   for (const [id, card] of Object.entries(next.cards)) {
     const before = prev.cards[id];
-    if (!before || (card.zone === "shadow" && before.zone !== "shadow")) continue;
-    if (before.zone !== card.zone || before.exhausted !== card.exhausted) return true;
+    if (!before) continue;
+    const moved = before.zone !== card.zone;
+    const dealt = phase === "Combat" && card.zone === "shadow" && moved;
+    const drawn = resource && before.zone === "deck" && card.zone === "hand";
+    if (dealt || drawn) continue;
+    const readied = resource && before.exhausted && !card.exhausted;
+    if (moved || (before.exhausted !== card.exhausted && !readied)) return true;
   }
   return false;
 }
