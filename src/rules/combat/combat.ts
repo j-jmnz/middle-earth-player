@@ -45,7 +45,8 @@ export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number):
   }
   // Archery a seat's stage gains until the end of the round (142082:A:1).
   for (const index of livingSeats(state)) if (seat == null || index === seat) total += heldAmount(state, `seat:${index}`, "archeryBonus");
-  return total;
+  // A card that reduces the total ("reduce the archery total by 4", 12137:A:3) leaves it at 0 at the least.
+  return Math.max(0, total);
 }
 
 // The characters archery damage may go to; once stages are separate, only the characters of the seat at that stage.

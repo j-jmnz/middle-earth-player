@@ -57,6 +57,9 @@ const VERBS = [
   // Setup: "Shuffle Crowley into the Corsair deck" (11171:A:2): the card joins the Corsair deck the scenario deals, which the quest card's Setup
   // then shuffles (dcce.corsair-deck). Dealt when the game starts (src/campaign/start.ts).
   z.strictObject({ verb: z.literal("ShuffleIntoCorsairDeck"), code: z.string().min(1), ...when }),
+  // "Take control of 1 set aside copy of Dol Amroth Warship" (12136:A:3): of the ship-objectives set aside with this title (whichever printing the game deals) the first one goes into play
+  // under the actor, faceup, as a ship a player prepared in the fleet does (dcce.ships). Nothing happens with none set aside.
+  z.strictObject({ verb: z.literal("TakeSetAsideShip"), name: z.string().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

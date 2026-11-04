@@ -124,6 +124,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The source objective has no encounter card attached to it: it is "free of encounters" (rr.guarded; 01108:A:2). Read for a Guarded
   // objective in the staging area.
   z.strictObject({ kind: z.literal("freeOfEncounters") }),
+  // The players control the source objective: a freed tower in the staging area (12134:A:2, ControlWhenFree) or an objective a player claimed and attached to a hero (`claimed`,
+  // families/objectives/claimed.ts). "If the players control Tower of the Gull" (12135:A:3).
+  z.strictObject({ kind: z.literal("controlledByPlayers") }),
   // A hero is the "prisoner" now, facedown, until it is rescued (`is`), or none is (01124:B:3; src/rules/families/prisoner/index.ts).
   z.strictObject({ kind: z.literal("prisoner"), is: z.boolean() }),
   // A card with this code is attached to a hero (`is`) or is not.

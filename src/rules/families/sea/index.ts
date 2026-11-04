@@ -18,6 +18,7 @@ import { lastPlayer } from "./players.ts";
 import { damageShip, fitShips, tradeShipDamage } from "./campaign.ts";
 import { boardNow } from "./boarding.ts";
 import { searchShips } from "./search.ts";
+import { takeSetAsideShip } from "./takeover.ts";
 import { discardFromAnyDeck, nameCard, plunderHand } from "./cards.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -58,9 +59,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     // Dealt when the game starts (src/campaign/start.ts): the card joins the Corsair deck the quest card's Setup shuffles.
     case "ShuffleIntoCorsairDeck":
       return state;
+    case "TakeSetAsideShip":
+      return takeSetAsideShip(state, instruction, focus, ctx);
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck"], run };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "TakeSetAsideShip"], run };

@@ -26,6 +26,7 @@ import { faceUp, flagHeld } from "../families/sidequests/contract.ts";
 import { copyInVictory } from "../families/sidequests/pick.ts";
 import { shadowCards } from "../core/zones.ts";
 import { freeOfEncounters } from "../families/objectives/index.ts";
+import { controlledByPlayers } from "../families/objectives/control.ts";
 import { prisonerHero } from "../families/prisoner/index.ts";
 import { tokensOn } from "../families/campaign/index.ts";
 import { headingIs } from "../families/sea/heading.ts";
@@ -116,6 +117,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // The objectives and prisoner families (families/objectives.ts, families/prisoner.ts).
     case "freeOfEncounters":
       return freeOfEncounters(state, scope.sourceId);
+    case "controlledByPlayers":
+      return controlledByPlayers(state, scope.sourceId);
     case "island":
       return islandHolds(state, condition);
     case "handSize":

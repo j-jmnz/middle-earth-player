@@ -1,5 +1,5 @@
 // Rules: rr.guarded, ltp.guarded, rr.objective-cards, ltp.objective-cards, rr.attachment-cards, rr.restricted (data/rules/entries.json);
-// ledger lines 01108:A:1-2, 01109:A:1-2, 01110:A:1-2, 01123:A:1.
+// ledger lines 01108:A:1-2, 01109:A:1-2, 01110:A:1-2, 01123:A:1, 12121:A:1, 12126:A:3, 12127:A:3, 12133:A:1 (AttachGuard, guard.ts), 12134:A:2 to 12137:A:2 (ControlWhenFree, control.ts).
 //
 // The guarded objectives of Escape from Dol Guldur. An objective with the Guarded keyword is guarded when it is revealed (even in
 // Setup): the next card of the encounter deck that is not itself an objective is revealed and attached to it, and both stay in the
@@ -18,17 +18,16 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
+import { controlSweep } from "./control.ts";
+import { freeOfEncounters } from "./free.ts";
+import { attachGuard } from "./guard.ts";
+import { objectivesPickMatches } from "./pick.ts";
 
-// An objective in the staging area with no encounter card attached to it is free of encounters, so it can be claimed (rr.guarded).
-export function freeOfEncounters(state: ScenarioState, sourceId: string | null): boolean {
-  const source = sourceId ? state.cards[sourceId] : undefined;
-  // Only an encounter card still hosted by the objective and in play guards it (Iron Shackles sent to a deck is not).
-  return source != null && !source.attachments.some((id) => state.cards[id]?.host === source.id && inPlay(state.cards[id]?.zone ?? "removed"));
-}
+export { freeOfEncounters };
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -36,6 +35,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return guardObjective(state, instruction, focus, ctx, steps);
     case "ClaimObjective":
       return claimObjective(state, focus, ctx, steps);
+    case "AttachGuard":
+      return attachGuard(state, instruction, focus, ctx);
+    // A constant kept by the settle sweep (control.ts): it does nothing when run.
+    case "ControlWhenFree":
+      return state;
     default:
       return null;
   }
@@ -67,4 +71,10 @@ function claimObjective(state: ScenarioState, focus: Focus, ctx: ReduceContext, 
   return queueEvent(enforceRestricted(claimed, heroId, ctx, steps), { trigger: "claimed", seat: hero.controller, cardId: id });
 }
 
-export const manifest: RulesFamily = { name: "objectives", verbs: ["GuardObjective", "ClaimObjective"], run };
+export const manifest: RulesFamily = {
+  name: "objectives",
+  settle: { sweep: (state, ctx) => controlSweep(state, ctx) },
+  pick: (state, id, spec) => objectivesPickMatches(state, id, spec),
+  verbs: ["GuardObjective", "ClaimObjective", "AttachGuard", "ControlWhenFree"],
+  run,
+};

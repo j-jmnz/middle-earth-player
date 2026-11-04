@@ -201,6 +201,10 @@ export const pickSchema = z.strictObject({
   objective: z.literal(true).optional(),
   // With `type: objective`: only an objective a player controls (claimed and attached to a hero), not one in the staging area or guarded ("if the players control the Gate Key", 12077:A:2).
   controlled: z.literal(true).optional(),
+  // The objectives family's filters (src/rules/families/objectives/pick.ts). `hasGuard`: an objective with an encounter card attached to it (guarded by an encounter; `false`: an unguarded objective,
+  // "each unguarded objective in the staging area", 12121:A:1). `isGuard`: an enemy attached to an objective as its guard (`false`: "an enemy that is not currently guarding an objective", 12133:A:1).
+  hasGuard: z.boolean().optional(),
+  isGuard: z.boolean().optional(),
   onPicked: z.boolean().optional(),
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),

@@ -18,6 +18,14 @@ const VERBS = [
   // last picked hero, a card its controller controls ("Counts as an attachment"). It is announced as `claimed`. A hero with more
   // restricted attachments than it can hold discards the one its controller chooses, and a discarded objective returns to the staging area.
   z.strictObject({ verb: z.literal("ClaimObjective"), ...when }),
+  // "Attach X to that objective, guarding it" (12121:A:1, 12126:A:3, 12127:A:3, 12133:A:1): the encounter card `guard` (the source by default), in the staging area or engaged
+  // (an engaged one returns to the staging area first, 12133:A:1), is attached to the objective `to` (the last picked card by default) as its guard (rr.guarded). It stays
+  // in the staging area, counts its Threat there, and leaves the objective when it leaves play. A guard that already guards another objective is moved and frees that one.
+  z.strictObject({ verb: z.literal("AttachGuard"), guard: cardRefSchema.optional(), to: cardRefSchema.optional(), ...when }),
+  // A constant (12134:A:2 to 12137:A:2, "If ~ is free of encounters, add it to the staging area, controlled by the players"): the source objective in the staging area is controlled
+  // by the players as soon as it is free of encounters and no effect is resolving (the settle sweep, families/objectives/control.ts): it is marked `claimed`, with no controller,
+  // so it stays in the staging area. It does nothing when run.
+  z.strictObject({ verb: z.literal("ControlWhenFree"), ...when }),
 ] as const;
 
 const TRIGGERS = [

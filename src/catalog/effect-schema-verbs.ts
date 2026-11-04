@@ -21,7 +21,7 @@ function codeVerb<const Verb extends string>(name: Verb) {
 const searchSelector = {
   code: z.string().min(1).optional(),
   trait: z.string().min(1).optional(),
-  type: z.enum(["enemy", "location", "treachery"]).optional(),
+  type: z.enum(["enemy", "location", "treachery", "objective"]).optional(),
 };
 
 export const simpleVerbs = [
@@ -177,6 +177,8 @@ export const simpleVerbs = [
     // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1).
     require: z.string().min(1).optional(),
+    // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
+    remember: z.literal(true).optional(),
     // The card found must have a title no card an earlier search of this effect found has: "each player searches for a different location" (41004:B:1,
     // 41005:A:1). The titles are the cards' printed names; cards that share one are the same choice.
     different: z.boolean().optional(),

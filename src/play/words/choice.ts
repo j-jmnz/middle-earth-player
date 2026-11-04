@@ -434,6 +434,11 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Claim", prompt: `Choose ${one} to carry ${sourceId ? names.card(sourceId) : "the objective"}.` };
     case "Discard":
       return { verb: "Discard", prompt: `Choose ${one} to discard.` };
+    // The cards of Cobas Haven that attach a Ship enemy to an objective, guarding it (12121:A:1, 12126:A:3, 12133:A:1): the enemy chosen to guard, or the objective it guards.
+    case "AttachGuard":
+      return next.guard === "picked" ? { verb: "Guard", prompt: `Choose ${article(`${pick.pick.nonUnique === true ? "non-unique " : ""}Ship enemy`)} to attach to the objective as its guard.` } : { verb: "Guard", prompt: "Choose an unguarded objective in the staging area to guard." };
+    case "ReturnToStaging":
+      return { verb: "Guard", prompt: "Choose a Ship enemy to attach to an unguarded objective as its guard. An engaged enemy returns to the staging area first." };
     // The Glórinaith's target (110139:A:4, 110139:B:5), Armor Plating's enemy (11172:B:3).
     case "DiscardFromAnyDeck":
       return { verb: "Target", prompt: `Choose ${one} to deal damage to.` };

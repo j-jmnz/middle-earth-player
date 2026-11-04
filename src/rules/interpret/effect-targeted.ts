@@ -170,7 +170,7 @@ function applyTargeted(
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;
       const moved = instruction.each ? ids : ids.slice(0, 1);
-      return instruction.different && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
+      return (instruction.different || instruction.remember) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
     }
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
