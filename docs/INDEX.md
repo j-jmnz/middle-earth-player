@@ -309,7 +309,7 @@ Read when a task names the plan.
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~4.4K tok)
   - 3–14 Context (~450)
-  - 15–24 What does not move (~190)
+  - 15–24 What does not move (~190) ← 1
   - 25–45 A. Effects: draft better, template the repeats, copy identical lines (~760)
   - 46–54 B. One registry for scenarios, fixtures and goldens (~280)
   - 55–67 C. A shared scenario kit and `pnpm scenario:new` (~510)
@@ -317,7 +317,7 @@ Read when a task names the plan.
   - 80–87 E. Data: seed what can be seeded (~210)
   - 88–95 F. Faster feedback while authoring (~220)
   - 96–119 Where a scenario's cost is now (~680)
-  - 120–137 Next steps (~440)
+  - 120–137 Next steps (~440) ← 1
   - 138–147 After each scenario phase (~160)
   - 148–151 Order (~70)
   - 152–159 Verification (~100)
@@ -337,6 +337,7 @@ Open work; read when a task names it.
   - 119–125 Commit (~110)
   - 126–133 Report (your final message) (~90)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
+- `docs/handover/pipeline-proposal-review.md` — Handover: review the scenario pipeline proposal from phase 47 (~2.9K tok)
 
 ## Done plans
 
