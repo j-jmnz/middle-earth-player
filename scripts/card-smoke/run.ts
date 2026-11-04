@@ -8,6 +8,7 @@ import { spawn } from "../../src/rules/core/zones.ts";
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { dice, seedOf, smokeIntent, type Preference, type Smoked } from "./policy.ts";
 import { handCopy, POLICY, SMOKE_SEED, smokeCodes, smokeWorld, type SmokeWorld } from "./world.ts";
+import { splitCodes } from "../codes.ts";
 import { describeError, runScript, type Log } from "../log.ts";
 
 // A smoke test for one player card's effect records. A seeded Stealth and Steadfastness game is played to its first planning
@@ -186,7 +187,7 @@ async function main(log: Log): Promise<void> {
     const value = args.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
     return value == null ? undefined : Number(value);
   };
-  const codes = args.includes("--all") ? smokeCodes() : args.filter((arg) => !arg.startsWith("--"));
+  const codes = args.includes("--all") ? smokeCodes() : splitCodes(args.filter((arg) => !arg.startsWith("--")));
   if (codes.length === 0) throw new Error("Name at least one card code, or --all");
   const world = await log.stepAsync(`starter game to planning, ${codes.length} cards loaded`, () => smokeWorld(codes, number("deal")));
   let failed = 0;

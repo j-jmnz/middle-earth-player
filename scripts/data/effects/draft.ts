@@ -1,9 +1,10 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { parse as parseJsonc } from "jsonc-parser";
 
 import { EFFECTS } from "../../../src/effects/index.ts";
+import { splitCodes } from "../../codes.ts";
 import { runScript, type Log } from "../../log.ts";
 import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
@@ -19,9 +20,9 @@ import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, selfNamed, type Segment, type Unmatched } from "./generate.ts";
 import { vocabulary, vocabularyMarkdown } from "./vocabulary.ts";
 
-// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,...>
+// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>
 // Writes .agent/drafts/<code>.md for every card in the scenario, the starter or pre-built deck (data/decks/prebuilt.json), the player pack (a data/cards file name,
-// "Core", "TRD"), or the list of codes, that has a printed line no record covers yet. With --all it also drafts the lines
+// "Core", "TRD"), or the list of codes (separated by commas or spaces), that has a printed line no record covers yet. With --all it also drafts the lines
 // that authored records already cover, to review or redo them.
 
 function words(text: string): Set<string> {
@@ -34,14 +35,18 @@ function overlap(a: Set<string>, b: Set<string>): number {
 }
 
 function main(log: Log): void {
-  const scenarioId = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,...>");
+  const targets = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+  const pieces = splitCodes(targets);
+  // Codes: several pieces that are all codes, or one piece of 5 or 6 digits. Anything else is one name (a scenario, deck or pack id).
+  const asCodes = pieces.length > 1 ? pieces.every((piece) => /^[0-9A-Za-z]+$/.test(piece)) : /^\d{5,6}$/.test(pieces[0] ?? "");
+  const scenarioId = asCodes ? pieces.join(",") : targets[0];
+  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>");
   const campaigns = loadCampaigns();
   const cards = loadCards();
   const prebuilt = prebuiltDecksSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as unknown).find((entry) => entry.id === scenarioId);
   const deck = campaigns.flatMap((campaign) => campaign.starterDecks).find((entry) => entry.id === scenarioId) ?? (prebuilt ? { id: prebuilt.id, rows: [...prebuilt.heroes.map((code) => ({ code })), ...prebuilt.cards] } : undefined);
   const packCodes = cards.filter((card) => isPoolCard(card) && card.printings[0]?.pack === scenarioId).map((card) => card.code);
-  const listed = /^[0-9A-Za-z]+(,[0-9A-Za-z]+)+$|^\d{5,6}$/.test(scenarioId) ? scenarioId.split(",") : [];
+  const listed = asCodes ? pieces : [];
   const chosen = deck ? deck.rows.map((row) => row.code) : packCodes.length > 0 ? packCodes : listed;
   const scenario = chosen.length > 0 ? null : loadScenario(scenarioId);
   log.info(deck ? `deck ${deck.id}: ${deck.rows.length} rows` : packCodes.length > 0 ? `pack ${scenarioId}: ${packCodes.length} player cards` : listed.length > 0 ? `${listed.length} cards` : `scenario ${scenarioId}`);
@@ -134,6 +139,10 @@ function main(log: Log): void {
 
   const out = path.join(ROOT, ".agent", "drafts");
   mkdirSync(out, { recursive: true });
+  // A draft left from an earlier run names lines that may be owned since: clear them (vocabulary.md is rewritten below).
+  const stale = readdirSync(out).filter((name) => name.endsWith(".md") && name !== "vocabulary.md");
+  for (const name of stale) rmSync(path.join(out, name));
+  log.debug(`removed ${stale.length} stale draft${stale.length === 1 ? "" : "s"} from .agent/drafts`);
   writeFileSync(path.join(out, "vocabulary.md"), vocabularyMarkdown(vocab));
   for (const [code, lines] of byCard) {
     const card = byCode.get(code) as Card;
