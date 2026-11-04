@@ -4,6 +4,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 /** What a misc instruction that asks for a card is asking, or null when it is not one of them. */
 export function miscPickWords(instruction: Instruction): { verb: string; prompt: string } | null {
   if (instruction.verb === "SwapHero") return { verb: "Swap in", prompt: "Choose the hero from your collection that takes the place of the chosen hero." };
+  if (instruction.verb === "TakeHeroFromCollection") return { verb: "Take", prompt: "Choose a hero from your collection to put into play." };
   if (instruction.verb === "AttachCollectionHero") return { verb: "Attach", prompt: "Choose the version of the hero from your collection to attach to this card." };
   return null;
 }
@@ -21,6 +22,12 @@ export function miscWords(instruction: Instruction): string | null {
       return instruction.all ? "move all its damage to the other enemy" : "move damage from one enemy to the other";
     case "SwapHero":
       return "swap it for a hero from your collection";
+    case "AddPhaseInstance":
+      return `an additional ${instruction.phase.toLowerCase()} phase follows this phase`;
+    case "TakeHeroFromCollection":
+      return "take a hero from your collection";
+    case "TakeCardFromCollection":
+      return "take the card from your collection";
     case "AttachCollectionHero":
       return "attach another version of the hero from your collection";
     case "AttachAsMount":

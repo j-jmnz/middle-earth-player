@@ -1,9 +1,6 @@
 // Written by pnpm effects:open from data/ and src/effects. Do not edit.
 // Printed lines that no effect record owns yet ("<code>:<side>:<n>"). A card with one here shows its text as inactive.
 export const OPEN_LINES: readonly string[] = [
-  "11212:A:2",
-  "11213:A:2",
-  "11214:A:2",
   "11215:A:2",
   "11215:A:3",
   "11215:B:1",

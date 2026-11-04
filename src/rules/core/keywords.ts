@@ -285,6 +285,8 @@ export function defeatedDestination(
   if ((printed.type === "enemy" || printed.type === "location") && victoryOf(instance, printed) != null) {
     return { zone: "victory" };
   }
+  // A card put into play for a time leaves the game when it leaves play (PutIntoPlay `then: removeFromGame`, 11212:A:2).
+  if (instance.temporary) return { zone: "removed" };
   // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
   const usual: Destination =
     !fromEncounterDeck(printed) && instance.controller != null

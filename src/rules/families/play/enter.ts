@@ -27,7 +27,7 @@ import { lastPickedSeat, markPicked, namedCard, queueFront, scheduleFor } from "
 
 type PutIntoPlay = Extract<Instruction, { verb: "PutIntoPlay" }>;
 type PutFromHand = Extract<Instruction, { verb: "PutIntoPlayFromHand" }>;
-type Terms = Pick<PutIntoPlay, "exhausted" | "committed" | "damage" | "until" | "then">;
+type Terms = Pick<PutIntoPlay, "exhausted" | "committed" | "damage" | "until" | "then" | "ignoreUnique">;
 
 // The answer that stops a "may put up to N" choice.
 export const NONE = "none";
@@ -42,26 +42,28 @@ function followUp(then: NonNullable<PutIntoPlay["then"]>): Instruction[] {
       return [{ verb: "PutOnDeck", position: "shuffle", target: "picked", when: stillInPlay }];
     case "discard":
       return [{ verb: "Discard", target: { kind: "picked" }, when: stillInPlay }];
+    case "removeFromGame":
+      return [{ verb: "MoveCard", card: "picked", to: "removed", when: stillInPlay }];
   }
 }
 
 // Whether a card out of play can be put into play now: a hero or an ally, and no copy of a unique card is in play already.
-export function canEnter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+export function canEnter(state: ScenarioState, id: string, ctx: ReduceContext, ignoreUnique = false): boolean {
   const card = state.cards[id];
   if (!card || inPlay(card.zone)) return false;
   const printed = printedOf(ctx.cards, card.code);
-  return (printed.type === "hero" || isAllyLike(printed)) && !uniqueBlocked(state, printed, ctx.cards) && !playBlocked(state, id, card.controller ?? card.owner ?? state.firstPlayer, ctx, true);
+  return (printed.type === "hero" || isAllyLike(printed)) && (ignoreUnique || !uniqueBlocked(state, printed, ctx.cards)) && !playBlocked(state, id, card.controller ?? card.owner ?? state.firstPlayer, ctx, true);
 }
 
 // The card enters play under `seat`: among the heroes for a hero, in the play area otherwise. It is not played (no "played"
 // event); it enters play ("enteredPlay"), ready unless it enters exhausted, and stays its owner's card.
 export function enterPlay(state: ScenarioState, id: string, seat: number, terms: Terms, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
-  if (!card || !canEnter(state, id, ctx) || state.seats[seat]?.eliminated) return state;
+  if (!card || !canEnter(state, id, ctx, terms.ignoreUnique === true) || state.seats[seat]?.eliminated) return state;
   const owner = card.owner ?? card.controller ?? seat;
   const printed = printedOf(ctx.cards, card.code);
   let next = moveCard(state, id, { zone: printed.type === "hero" ? "heroes" : "play", seat });
-  next = updateCard(next, id, { exhausted: terms.exhausted === true || entersExhausted(ctx, card.code), committed: terms.committed === true, owner: owner !== seat ? owner : undefined });
+  next = updateCard(next, id, { exhausted: terms.exhausted === true || entersExhausted(ctx, card.code), committed: terms.committed === true, owner: owner !== seat ? owner : undefined, ...(terms.then === "removeFromGame" ? { temporary: true as const } : {}) });
   if (terms.damage) {
     next = updateCard(next, id, { damage: terms.damage });
     steps.push({ kind: "damage", targetId: id, amount: terms.damage, cause: currentCause(steps, UNATTRIBUTED) });
@@ -78,6 +80,7 @@ function termsOf(instruction: PutIntoPlay | PutFromHand): Terms {
     ...("damage" in instruction && instruction.damage ? { damage: instruction.damage } : {}),
     ...(instruction.until ? { until: instruction.until } : {}),
     ...(instruction.then ? { then: instruction.then } : {}),
+    ...("ignoreUnique" in instruction && instruction.ignoreUnique ? { ignoreUnique: true as const } : {}),
   };
 }
 
@@ -92,7 +95,7 @@ export function putIntoPlay(state: ScenarioState, instruction: PutIntoPlay, focu
   const card = id ? state.cards[id] : undefined;
   // An attachment goes on a host, guarded first when it has Guarded (X) (families/attachments/play.ts).
   if (id && card && printedOf(ctx.cards, card.code).type === "attachment") return putAttachmentIntoPlay(state, instruction, id, focus, ctx, steps);
-  if (!id || !card || !canEnter(state, id, ctx)) return state;
+  if (!id || !card || !canEnter(state, id, ctx, instruction.ignoreUnique === true)) return state;
   let seat: number | null = focus.seat;
   if (instruction.who === "owner") seat = card.owner ?? card.controller ?? focus.seat;
   if (instruction.who === "picked") seat = lastPickedSeat(state);

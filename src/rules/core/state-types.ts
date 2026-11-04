@@ -100,6 +100,9 @@ export type CardInstance = {
   enteredPlay: number;
   // A hero card taken from the collection (families/misc/collection.ts): the id of the card whose effect brought it out.
   collection?: string;
+  // A card put into play for a time ("At the end of the round, or if those heroes leave play, remove them from the game", 11212:A:2): when it leaves play it is removed from the game
+  // (keywords.ts defeatedDestination). The end of the round is a delayed effect of the PutIntoPlay that set this.
+  temporary?: true;
   // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
   lends?: string;
   // A double-sided card whose two sides are two catalog cards (the Grotto and Underwater locations, dcce.grotto-deck): the code of the side it does not show. `code` is the side it shows,
@@ -271,6 +274,10 @@ export type ScenarioState = {
   viewSeat?: number;
   // The seats whose stage has dealt its archery this combat phase while stages are separate (machine.ts startCombat).
   archeryDone?: readonly number[];
+  // Phases still owed an additional instance, in the order they were asked for, and the mode the round goes on at once the additional instances are done (withMode, state.ts; "there is an
+  // additional instance of the chosen phase", 11213:A:2). Absent in every game until a card asks for one.
+  extraPhases?: readonly Phase[];
+  extraResume?: ModeName;
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];

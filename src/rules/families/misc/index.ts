@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.hit-points, rr.first-player (data/rules/entries.json).
+// Rules: rr.damage, rr.hit-points, rr.first-player, rr.search, rr.unique-cards, rr.framework-steps (data/rules/entries.json).
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -15,7 +15,7 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
 
 import type { Focus } from "../index.ts";
-import { attachCollectionHero, swapHero } from "./collection.ts";
+import { attachCollectionHero, swapHero, takeFromCollection } from "./collection.ts";
 import { attachAsMount } from "./mount.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -72,6 +72,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return swapHero(state, instruction, focus, ctx, steps);
     case "AttachCollectionHero":
       return attachCollectionHero(state, instruction, focus, ctx);
+    case "AddPhaseInstance":
+      return { ...state, extraPhases: [...(state.extraPhases ?? []), instruction.phase] };
+    case "TakeHeroFromCollection":
+    case "TakeCardFromCollection":
+      return takeFromCollection(state, instruction, focus, ctx);
     case "AttachAsMount":
       return attachAsMount(state, focus, ctx, steps);
     case "LoseGame": {
@@ -93,4 +98,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "HealQuietly", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AttachAsMount", "LoseGame", "DiscardCanceled"], run };
+export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "HealQuietly", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AddPhaseInstance", "TakeHeroFromCollection", "TakeCardFromCollection", "AttachAsMount", "LoseGame", "DiscardCanceled"], run };

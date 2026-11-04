@@ -82,7 +82,12 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
 
 // Whether a card among these codes has a record that chooses a hero card from the collection.
 function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
-  return effects.some((effect) => codes.has(effect.cardCode) && /"(SwapHero|AttachCollectionHero)"/.test(JSON.stringify(effect.instructions)));
+  return effects.some((effect) => codes.has(effect.cardCode) && /"(SwapHero|AttachCollectionHero|TakeHeroFromCollection)"/.test(JSON.stringify(effect.instructions)));
+}
+
+// The codes the records of these cards take from the collection by code (TakeCardFromCollection): they are loaded whether or not the scenario deals them.
+function collectionTaken(effects: readonly Effect[], codes: ReadonlySet<string>): string[] {
+  return effects.filter((effect) => codes.has(effect.cardCode)).flatMap((effect) => [...JSON.stringify(effect.instructions).matchAll(/"verb":"TakeCardFromCollection","code":"([^"]+)"/g)].map((found) => found[1] ?? ""));
 }
 
 // Reads the rows a scenario needs from catalog.db, read-only, and builds the world. `extra` is the heroes and deck cards
@@ -94,7 +99,8 @@ export function loadWorld<TRun>(
   effects: readonly Effect[],
   extra: Iterable<string> = [],
 ): World {
-  const codes = worldCodes(campaign, scenario, effects, extra);
+  const dealt = worldCodes(campaign, scenario, effects, extra);
+  const codes = [...new Set([...dealt, ...collectionTaken(effects, new Set(dealt))])];
   const rows = catalog.select().from(cards).where(inArray(cards.code, codes)).all();
   // A card that names the player's collection (Helm of Secrecy, Thorongil) needs every hero card the player may own: the app
   // tracks no collection, so that is every deck-legal hero (families/misc/collection.ts).

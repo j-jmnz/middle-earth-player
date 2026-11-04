@@ -29,6 +29,9 @@ const SEARCH_AND_DRAW_OR_PLAY: Effect["instructions"] = [
   { verb: "RemoveSourceFromGame" },
 ];
 
+// The phases 11213:A:2 offers.
+const PHASES = ["Resource", "Planning", "Combat", "Refresh"] as const;
+
 export const RECORDS: readonly Effect[] = withCopies([
   // 11210 Gavin. "When Gavin leaves play (other than by his ability), remove him from the game": his only ability moves him to the encounter deck, so he is removed unless that is where he went.
   { id: "11210:triggered:1", cardCode: "11210", lines: ["11210:A:3"], timing: "triggered", trigger: "leftPlay", subject: "self", condition: { kind: "not", condition: { kind: "sourceIn", zone: "encounterDeck" } }, instructions: [{ verb: "RemoveSourceFromGame" }] },
@@ -36,6 +39,14 @@ export const RECORDS: readonly Effect[] = withCopies([
   { id: "11210:action:1", cardCode: "11210", lines: ["11210:A:4"], timing: "action", condition: { kind: "phase", is: "Planning" }, instructions: [{ verb: "ShuffleRandomSetAside", name: "Send for Help" }, { verb: "ShuffleSelfIntoEncounterDeck" }] },
 
   { id: "11211:whenRevealed:1", cardCode: "11211", lines: ["11211:A:2"], timing: "whenRevealed", instructions: SEARCH_AND_DRAW_OR_PLAY as Instruction[] },
+  // 11212 Send for Help (Tactics). "Search the players' collections for a hero and put it into play under any player's control. At the end of the round, or if those heroes leave play, remove them from the game."
+  // The actor chooses the hero (one whose title is not in play) and the player who controls it; it is removed from the game at the end of the round, or as soon as it leaves play.
+  { id: "11212:whenRevealed:1", cardCode: "11212", lines: ["11212:A:2"], timing: "whenRevealed", instructions: [{ verb: "TakeHeroFromCollection" }, { verb: "PutIntoPlay", card: "picked", who: "choose", until: "endOfRound", then: "removeFromGame" }, { verb: "RemoveSourceFromGame" }] },
+  // 11213 Send for Help (Spirit). "Choose one: resource, planning, combat, or refresh. After the current phase, there is an additional instance of the chosen phase."
+  { id: "11213:whenRevealed:1", cardCode: "11213", lines: ["11213:A:2"], timing: "whenRevealed", instructions: [{ verb: "Choose", who: "actor", options: PHASES.map((phase) => ({ id: phase.toLowerCase(), instructions: [{ verb: "AddPhaseInstance" as const, phase }] })) }, { verb: "RemoveSourceFromGame" }] },
+  // 11214 Send for Help (Lore). "Search the players' collections for Gandalf ally (Core Set 73) and put him into play under any player's control, ignoring uniqueness." Gandalf's own records discard him at the end of the round
+  // and offer his Response as he enters play.
+  { id: "11214:whenRevealed:1", cardCode: "11214", lines: ["11214:A:2"], timing: "whenRevealed", instructions: [{ verb: "TakeCardFromCollection", code: "01073" }, { verb: "PutIntoPlay", card: "picked", who: "choose", ignoreUnique: true }, { verb: "RemoveSourceFromGame" }] },
   // "Shadow: Resolve this card's when revealed effect." (the four cards print it)
   { id: "11211:shadow:1", cardCode: "11211", lines: ["11211:A:3"], timing: "shadow", instructions: [{ verb: "ResolveWhenRevealed", card: "self" }] },
   copyLines("11211", "11212", "A:3"),

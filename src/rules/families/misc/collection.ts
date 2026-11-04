@@ -17,7 +17,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { updateCard, withSeat } from "../../core/state.ts";
 import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { lastPickedCard } from "../play/refs.ts";
+import { lastPickedCard, markPicked } from "../play/refs.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -102,6 +102,15 @@ function swap(state: ScenarioState, oldId: string, newId: string, seat: number, 
   next = moveCard(next, oldId, { zone: "removed" });
   steps.push({ kind: "destroy", targetId: oldId });
   return queueEvent(next, { trigger: "enteredPlay", seat, cardId: newId });
+}
+
+// TakeHeroFromCollection (Send for Help, Tactics) and TakeCardFromCollection (Send for Help, Lore): a card of the collection, set aside and picked for the instructions after it. A hero whose title is in play
+// is not offered (rr.unique-cards); a card named by code is made whether or not a copy is in play, as it enters play ignoring uniqueness.
+export function takeFromCollection(state: ScenarioState, instruction: Verb<"TakeHeroFromCollection"> | Verb<"TakeCardFromCollection">, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const inGame = new Set(Object.values(state.cards).filter((card) => card.zone === "heroes" || card.zone === "play").map((card) => printedOf(ctx.cards, card.code).name));
+  const codes = instruction.verb === "TakeCardFromCollection" ? (ctx.cards.has(instruction.code) ? [instruction.code] : []) : collectionCodes(ctx, (printed) => !inGame.has(printed.name));
+  const picked = choose(state, codes, instruction, focus);
+  return picked.asked || !picked.chosen ? picked.state : markPicked(picked.state, picked.chosen);
 }
 
 // AttachCollectionHero (Thorongil): another version of the host, attached to the source.

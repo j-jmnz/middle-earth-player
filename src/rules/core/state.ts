@@ -142,14 +142,44 @@ export function withThreat(state: ScenarioState, index: number, threat: number):
   return withSeat(state, index, { ...seat, threat });
 }
 
+// The mode an additional instance of a phase starts at, and the framework steps it opens a window at (stepWindow keys), which the instance opens again ("there is an additional instance of
+// the chosen phase", 11213:A:2).
+const EXTRA_PHASES: Readonly<Partial<Record<Phase, { mode: ModeName; steps: readonly string[] }>>> = {
+  Resource: { mode: "resourceGrant", steps: [] },
+  Planning: { mode: "planning", steps: [] },
+  Combat: { mode: "combatStart", steps: ["6.2"] },
+  Refresh: { mode: "refresh", steps: [] },
+};
+
+// Leaving a phase for `mode`: an additional instance asked for runs first, and the round goes on at `extraResume` once the last one is done. Null when no instance is owed or running. An instance that
+// ends gives its framework steps back, so the phase that comes after it (or the one it was added to) opens its windows too.
+function afterExtra(state: ScenarioState, mode: ModeName): { state: ScenarioState; mode: ModeName } | null {
+  const [next, ...rest] = state.extraPhases ?? [];
+  if (next == null && state.extraResume == null) return null;
+  const { extraPhases: _owed, extraResume: _resume, ...plain } = state;
+  const resume = state.extraResume ?? mode;
+  const start = next ? EXTRA_PHASES[next] : undefined;
+  const reopen = [...(state.extraResume != null ? (EXTRA_PHASES[state.phase]?.steps ?? []) : []), ...(start?.steps ?? [])].map((step) => `${state.round}:${step}`);
+  const stepWindows = reopen.length > 0 ? plain.stepWindows.filter((key) => !reopen.includes(key)) : plain.stepWindows;
+  if (!next || !start) return { state: { ...plain, stepWindows }, mode: resume };
+  return { state: { ...plain, stepWindows, ...(rest.length > 0 ? { extraPhases: rest } : {}), extraResume: resume }, mode: start.mode };
+}
+
 export function withMode(state: ScenarioState, mode: ModeName): ScenarioState {
+  // A phase ends: an additional instance of a phase takes its place before the next one begins (the instance's own end comes back here).
+  const extra = state.phase !== phaseOf(mode) ? afterExtra(state, mode) : null;
+  return extra ? enterMode(extra.state, extra.mode, true) : enterMode(state, mode, false);
+}
+
+function enterMode(state: ScenarioState, mode: ModeName, crossed: boolean): ScenarioState {
   const phase = phaseOf(mode);
-  if (state.mode === mode && state.phase === phase) return state;
+  if (!crossed && state.mode === mode && state.phase === phase) return state;
   // A phase that begins is announced ("At the beginning of the quest phase"), with the phase it is.
-  const begun = state.phase !== phase ? { pendingEvents: [...(state.pendingEvents ?? []), { trigger: "beginningOfPhase" as const, seat: null, phase }] } : {};
+  const entering = crossed || state.phase !== phase;
+  const begun = entering ? { pendingEvents: [...(state.pendingEvents ?? []), { trigger: "beginningOfPhase" as const, seat: null, phase }] } : {};
   const changed: ScenarioState = { ...state, mode, phase, passed: [], ...begun };
   const expiring: ModifierUntil[] = [];
-  if (state.phase !== phase) expiring.push("endOfPhase");
+  if (entering) expiring.push("endOfPhase");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
   if (expiring.length === 0) return changed;
   const discounts = (changed.discounts ?? []).filter((discount) => discount.until === "used" || !expiring.includes(discount.until));

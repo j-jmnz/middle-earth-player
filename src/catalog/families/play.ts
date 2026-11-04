@@ -7,10 +7,11 @@ import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
 // "At the end of the phase/round, if it is still in play, [return it to its owner's hand | shuffle it into its owner's deck |
-// discard it]": the engine schedules that for each card the verb put into play (rr.delayed-effects).
+// discard it | remove it from the game]": the engine schedules that for each card the verb put into play (rr.delayed-effects). `removeFromGame` also removes the card from the game if it
+// leaves play before then ("At the end of the round, or if those heroes leave play, remove them from the game", 11212:A:2).
 const temporary = {
   until: z.enum(["endOfPhase", "endOfRound"]).optional(),
-  then: z.enum(["returnToHand", "shuffleIntoDeck", "discard"]).optional(),
+  then: z.enum(["returnToHand", "shuffleIntoDeck", "discard", "removeFromGame"]).optional(),
 };
 
 // Which card a verb of this family acts on: the source, the last picked card (a player picked is skipped), the card the
@@ -36,6 +37,8 @@ const VERBS = [
     damage: z.number().int().positive().optional(),
     host: pickSchema.optional(),
     unguarded: z.boolean().optional(),
+    // "Ignoring uniqueness" (11214:A:2): the card enters play although a copy of the same unique card is in play (rr.unique-cards).
+    ignoreUnique: z.literal(true).optional(),
     ...temporary,
     ...when,
   }),
