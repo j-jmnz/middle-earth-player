@@ -454,6 +454,9 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Choose", prompt: `Choose the player who adds ${names.code(next.code)} to their hand.` };
     case "PutIntoPlay":
       return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };
+    // A revealed card that enters play under a chosen player's control (Gavin, 11210:A:5).
+    case "TakeRevealedCard":
+      return { verb: "Give", prompt: `Choose the player who takes control of ${sourceId ? names.card(sourceId) : "the revealed card"}${next.committed ? ", committed to the quest" : ""}.` };
     default:
       return unchartedPickWords(pick, next, names, sourceId) ?? { verb: "Choose", prompt: `Choose ${one}.` };
   }
