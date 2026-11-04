@@ -102,6 +102,14 @@ describe("the stage 2 cards (11017 to 11020)", () => {
     }
   });
 
+  it("each adds the card it finds faceup, though the encounter discard pile was shuffled back into the deck facedown (11019:A:1, rr.running-out-of-cards)", () => {
+    const made = make({ deck: ["f0", SCOUTING_SHIP, "f0"] });
+    const ship = first(made.state, SCOUTING_SHIP);
+    const reshuffled = { ...made.state, cards: { ...made.state.cards, [ship]: { ...made.state.cards[ship]!, face: "down" as const } } };
+    const run = resolveReveal(reshuffled, made.ctx, "11019");
+    expect(run.state.cards[ship]).toMatchObject({ zone: "staging", face: "up" });
+  });
+
   it("11017: off-course, each player distributes 5 damage among the characters he controls at the end of the quest phase (11017:B:2)", () => {
     const rain = make({ stage: "11017", heading: "Rain", phase: "Quest" });
     let run: Run = start(rain.state);
