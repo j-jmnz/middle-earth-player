@@ -50,13 +50,13 @@ Read each against its scan and the rule spans before designing anything. Check t
 
 ## Traps phase 46 hit
 
-- **The verb lists.** A Setup verb on the quest card must go in `revealsPerPlayer`, and a Shadow verb that asks a player or pushes effects must go in `runsInFrame`. Otherwise the Setup is skipped without a word, or the Shadow throws only inside a golden (`docs/plans/effect-authoring.md`, Mechanic families).
-- **Choice words.** Every new `Choose` or `Pick` gets words in `src/play/words`, or a words test fails. That test is in the full suite, not in `pnpm test:scenario`.
+- **The verb lists.** A Setup verb on the quest card must go in `revealsPerPlayer`, and a Shadow verb that asks a player or pushes effects must go in `runsInFrame`. `scripts/checks/record-routes.test.ts` names a record that misses either list, except a Shadow verb that only pushes effects (`docs/plans/effect-authoring.md`, Mechanic families).
+- **Choice words.** Every new `Choose` or `Pick` gets words in `src/play/words`, or a words test fails. A record on Gavin or another campaign card can break an earlier scenario's words test; `pnpm test:scenario` runs every words test.
 - **The full suite.** Run the full `pnpm test` before every commit, not only `pnpm test:scenario`.
 - **Making the scenario playable.** Once no line is open, `scripts/checks/effect-coverage.test.ts` wants the scenario in `src/campaign/playable.ts`. That changes the tests of The Drowned Ruins, which expect the next part to be `soon`: its `golden.test.ts` (`next: "soon"`) and its `campaign.test.ts`. Change only those expectations.
 - **Fixtures.**
   - Add the scenario's Setup answers to `SETUP_CHOICES` in `src/campaign/fixtures.test.ts`, and to the seed finder's and `game.ts`'s `choices`.
-  - `scripts/e2e/fixtures.ts` rewrites every scenario's fixtures. Restore the others with `git checkout` and commit only this scenario's file.
+  - `node --experimental-strip-types scripts/e2e/fixtures.ts a-storm-on-cobas-haven` writes only this scenario's file.
   - Expect no `haven-won`: no Dream-chaser part has one.
 - **Readings.** Check each record against `docs/plans/effect-authoring.md`, Readings the review catches, before the review. Every card bug in phase 46's review was of one of those kinds.
 - **Unreached records.** List the records no golden reaches (the XP lines especially), and give each a card test in the same task. Phase 46's fix pass had to add them.

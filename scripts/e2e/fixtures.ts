@@ -2,8 +2,11 @@
 // (A Knife in the Dark) and the file of every other scenario in the registry, for the Maestro flows. Run it again when
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
-//   node --experimental-strip-types scripts/e2e/fixtures.ts          # `lost` and `duo`
-//   node --experimental-strip-types scripts/e2e/fixtures.ts --won    # also search for `won`, then write `knife-lost`
+//   node --experimental-strip-types scripts/e2e/fixtures.ts                  # `lost` and `duo`, then every other scenario's file
+//   node --experimental-strip-types scripts/e2e/fixtures.ts --won            # also search for `won`, then write `knife-lost`
+//   node --experimental-strip-types scripts/e2e/fixtures.ts <scenario-id>    # only that scenario's file (scenario 1's block for its two ids)
+//
+// With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //
 // `won` and `knife-lost` are open (docs/phases/STATUS.md): with the rules as the sources state them, the search has found no
 // legal win of the two starter decks, so they are not committed, and the tests that replay them are skipped until they are.
@@ -27,7 +30,7 @@
 // (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
 // a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
-import { writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import Database from "better-sqlite3";
@@ -368,6 +371,24 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
 // the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
   const searching = process.argv.includes("--won");
+  const only = scenarioArgument();
+  const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
+  if (only === null || !isChained(only)) writeScenarioOne(dir, searching);
+  if (only === null || isChained(only)) await writeChained(dir, only);
+});
+
+// The scenario id named on the command line, or null for every scenario. It must be in the fixture registry.
+function scenarioArgument(): FixtureScenarioId | null {
+  const named = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won]");
+  const id = named[0];
+  if (id === undefined) return null;
+  const entry = FIXTURE_REGISTRY.find((one) => one.scenarioId === id);
+  if (!entry) throw new Error(`${id} has no fixtures in src/campaign/fixtures/registry.ts`);
+  return entry.scenarioId;
+}
+
+function writeScenarioOne(dir: string, searching: boolean): void {
   if (!searching) say.info("the won game is open: pass --won to search for it (about two hours with no result so far)");
   const lost = say.step("play scenario 1's loss", () => playLoss());
   const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
@@ -377,23 +398,9 @@ void runScript("e2e-fixtures", async () => {
     lost: { seatCount: 1, ...lost },
     duo: { seatCount: 2, ...duo },
   };
-  const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
   const file = path.join(dir, "scenario-1.json");
   writeFileSync(file, `${JSON.stringify(out)}\n`);
   say.info(`wrote ${file} (${Object.keys(out).join(", ")})`);
-
-  // Every other scenario of the registry (src/campaign/fixtures/registry.ts), in campaign order: a part chains from the games written before it.
-  const written: Partial<Record<FixtureName, unknown>> = {};
-  const order = scenarioOrder();
-  const rest = FIXTURE_REGISTRY.flatMap((entry) => (isChained(entry.scenarioId) ? [{ ...entry, scenarioId: entry.scenarioId }] : [])).sort((left, right) => position(order, left.scenarioId) - position(order, right.scenarioId));
-  for (const entry of rest) {
-    const name = loadScenario(entry.scenarioId).name;
-    const games = await say.stepAsync(`play ${name}'s fixtures`, async () => WRITERS[entry.scenarioId](written));
-    Object.assign(written, games);
-    const file = path.join(dir, `${fixtureFile(entry)}.json`);
-    writeFileSync(file, `${JSON.stringify(games)}\n`);
-    say.info(`wrote ${file} (${Object.keys(games).join(", ")})`);
-  }
 
   if (won) {
     const past = logOfPastResolution(won);
@@ -404,4 +411,24 @@ void runScript("e2e-fixtures", async () => {
     writeFileSync(knifeFile, `${JSON.stringify(knifeOut)}\n`);
     say.info(`wrote ${knifeFile}`);
   }
-});
+}
+
+// Every other scenario of the registry (src/campaign/fixtures/registry.ts), in campaign order: a part chains from the games written before it. With `only`,
+// that scenario's file alone, and the earlier parts' games are read from their committed files.
+async function writeChained(dir: string, only: Chained | null): Promise<void> {
+  const written: Written = {};
+  const order = scenarioOrder();
+  const rest = FIXTURE_REGISTRY.flatMap((entry) => (isChained(entry.scenarioId) ? [{ ...entry, scenarioId: entry.scenarioId }] : [])).sort((left, right) => position(order, left.scenarioId) - position(order, right.scenarioId));
+  for (const entry of rest) {
+    const file = path.join(dir, `${fixtureFile(entry)}.json`);
+    if (only !== null && entry.scenarioId !== only) {
+      if (existsSync(file)) Object.assign(written, JSON.parse(readFileSync(file, "utf8")) as Written);
+      continue;
+    }
+    const name = loadScenario(entry.scenarioId).name;
+    const games = await say.stepAsync(`play ${name}'s fixtures`, async () => WRITERS[entry.scenarioId](written));
+    Object.assign(written, games);
+    writeFileSync(file, `${JSON.stringify(games)}\n`);
+    say.info(`wrote ${file} (${Object.keys(games).join(", ")})`);
+  }
+}

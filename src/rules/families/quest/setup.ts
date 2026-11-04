@@ -16,7 +16,7 @@ import type { ScenarioState } from "../../core/state.ts";
 // first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet), or prepares the Uncharted deck (PrepareUnchartedDeck) or the Grotto deck (PrepareGrottoDeck): the Setup the piles cannot place.
 // A Setup that searches the encounter deck for each player (142040:A:1, "each player adds 1 different location") or puts damage tokens on a
 // card (PlaceDamageOn) is run here too.
-function revealsPerPlayer(effect: Effect): boolean {
+export function revealsPerPlayer(effect: Effect): boolean {
   return (
     effect.timing === "setup" &&
     effect.instructions.some(

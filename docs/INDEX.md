@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~1.9K tok)
+- `CLAUDE.md` — Claude Code (~2.0K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
 - `.cursor/rules/code-standards.mdc` — Code standards (~1.5K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
@@ -281,7 +281,7 @@ Read when a task names the plan.
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~7.0K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.1K tok)
   - 12–33 Workflow (~480)
   - 34–50 Where records live (~370)
   - 51–73 Templates and copied lines (~520) ← 4
@@ -315,12 +315,12 @@ Read when a task names the plan.
   - 55–67 C. A shared scenario kit and `pnpm scenario:new` (~510)
   - 68–79 D. One manifest per family (~330)
   - 80–87 E. Data: seed what can be seeded (~210)
-  - 88–93 F. Faster feedback while authoring (~90)
-  - 94–118 Where a scenario's cost is now (~720)
-  - 119–141 Next steps (~510) ← 2
-  - 142–151 After each scenario phase (~160) ← 1
-  - 152–155 Order (~70)
-  - 156–163 Verification (~100)
+  - 88–95 F. Faster feedback while authoring (~220)
+  - 96–119 Where a scenario's cost is now (~680)
+  - 120–137 Next steps (~440) ← 1
+  - 138–147 After each scenario phase (~160) ← 1
+  - 148–151 Order (~70)
+  - 152–159 Verification (~100)
 
 ## Handovers
 

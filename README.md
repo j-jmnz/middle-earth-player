@@ -35,7 +35,7 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
 | `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
-| `pnpm test:scenario <scenario-id>` | Runs the tests that belong to one scenario (by path or by importing its scene), its goldens, the effect coverage checks and the card smoke on its player cards, and the family and manifest tests when pool, family or manifest files changed since the merge base with origin/main (committed or not). `--list` prints the selection. |
+| `pnpm test:scenario <scenario-id>` | Runs the tests that belong to one scenario (by path or by importing its scene), its goldens, the effect coverage and record-route checks, every choice-words test (`src/play/words`) and the card smoke on its player cards, and the family and manifest tests when pool, family or manifest files changed since the merge base with origin/main (committed or not). `--list` prints the selection. |
 | `pnpm scenario:new <scenario-id>` | Writes a new scenario's skeletons (scene, game, golden and campaign tests, seed finder, Maestro flows, authored effects file) on the shared test kit and adds its registry lines. `--dry-run` lists them first; it refuses a scenario that has files. The procedure around it is in [the phase 12 Scenario procedure](docs/phases/phase-12-knife-in-the-dark.md). |
 | `pnpm docs:index` | Rewrites `docs/INDEX.md`, the index of the docs agents read. A test fails while it is stale. |
 | `pnpm docs:section <file> "<heading>"` | Prints one doc section with its subsections. |
@@ -43,7 +43,7 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm booklets:pack` | Copies the pinned booklet PDFs into `assets/booklets/` (gitignored) for Metro. |
 | `pnpm scans:pack` | Writes every card's pinned picture, scaled to 1200 px on the long side, into `assets/scans/` and fills `src/screens/images/scan-map.ts` (do not commit it filled). Fetches a picture missing from `.cache/pictures/` or `.cache/scans/`. A picture whose pin has not moved since the last pack is kept (`assets/scans/.packed.json`), so a run after a pull packs only the new pins. `--optional` (`pnpm start`) warns instead of failing, keeping the last pack. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
-| `node --experimental-strip-types scripts/e2e/fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. |
+| `node --experimental-strip-types scripts/e2e/fixtures.ts` | Rewrites the Maestro save fixtures. `--won` also searches for scenario 1's won game. `<scenario-id>` writes only that scenario's file. |
 
 The scripts log to stderr through `scripts/log.ts`: each line has the time since the start, the script and source (`data:sync › ringsdb`), and progress through long fetches. A failure prints its causes (a dropped connection's `ECONNRESET`, the URL and status of a bad response). Add `--verbose` for every request, file and stack (`pnpm data:sync ringsdb -- --verbose`), `--quiet` for warnings and errors only, or set `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`). Data stays on stdout: `data:query` prints only rows there.
 

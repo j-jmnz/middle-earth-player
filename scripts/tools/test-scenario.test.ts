@@ -28,6 +28,8 @@ const TREE = [
   "src/play/store/island-place.test.ts",
   "src/play/choice/stormcaller-sheets.test.ts",
   "src/play/store/unrelated.test.ts",
+  "src/play/words/sea.test.ts",
+  "src/play/words/the-oath.test.ts",
 ];
 const SOURCES: Record<string, string> = {
   "src/play/store/island-place.test.ts": 'import { templeTable } from "../../../test/scenarios/temple-of-the-deceived/scene.ts";',
@@ -38,7 +40,7 @@ const read = (file: string) => SOURCES[file] ?? "";
 
 describe("scenarioTests", () => {
   it("takes a folder named for the id and files that start with it, nothing that only contains it", () => {
-    expect(scenarioTests("the-oath", TREE, read)).toEqual(["src/campaign/scenarios/the-oath/golden.test.ts", "src/campaign/scenarios/the-oath/quest.test.ts", "src/play/scenarios/the-oath-table.test.ts"]);
+    expect(scenarioTests("the-oath", TREE, read)).toEqual(["src/campaign/scenarios/the-oath/golden.test.ts", "src/campaign/scenarios/the-oath/quest.test.ts", "src/play/scenarios/the-oath-table.test.ts", "src/play/words/the-oath.test.ts"]);
   });
 
   it("also takes the tests that import from the scenario's test or campaign folder, whatever they are called", () => {
@@ -92,7 +94,7 @@ describe("selectTests", () => {
   it("gathers the parts, and skips the golden tests for a scenario with no registry entry", () => {
     const selected = selectTests("the-oath", [], TREE, "The Oath", read);
     expect(selected.goldens).toEqual({ files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"], title: "The Oath" });
-    expect(selected.coverage).toHaveLength(4);
+    expect(selected.coverage).toEqual(["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "src/play/words/sea.test.ts"]);
     expect(selected.families).toEqual([]);
     expect(selectTests("the-oath", [], TREE, null, read).goldens.files).toEqual([]);
   });
@@ -103,6 +105,13 @@ describe("selectTests", () => {
     const selected = selectTests("a-shadow-of-the-past", [], TREE, null, imported);
     expect(selected.tests).toContain("src/campaign/replay.test.ts");
     expect(selected.goldens.files).toEqual([]);
+  });
+
+  it("runs every choice-words test, the scenario's own in tests", () => {
+    const selected = selectTests("the-oath", [], TREE, "The Oath", read);
+    expect(selected.tests).toContain("src/play/words/the-oath.test.ts");
+    expect(selected.coverage).toContain("src/play/words/sea.test.ts");
+    expect(selected.coverage).not.toContain("src/play/words/the-oath.test.ts");
   });
 
   it("runs a file once: a coverage test the families would add stays in coverage", () => {
