@@ -205,7 +205,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
         </Canvas>
       </GestureDetector>
       {/* A screen reader reaches the piles and the fold stacks through a button over each (reader-piles.tsx). */}
-      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} speak={(slot) => spoken(slot)} playable={highlight.tappable} /> : null}
+      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} speak={(slot) => spoken(slot)} playable={highlight.tappable} nameOf={(code) => nameOf(code)} /> : null}
     </>
   );
 }

@@ -18,7 +18,8 @@ import { reduce } from "../../../rules/engine/reduce.ts";
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { DOORS, GREAT_WARG_CHIEF, LUST, loadSouthWorld, REDHORN_PASS, southTable, STING, type SouthLayout, type SouthWorld } from "../../../../test/scenarios/the-ring-goes-south/scene.ts";
-import { codesOf, first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: SouthWorld;
 

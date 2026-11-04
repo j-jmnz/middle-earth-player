@@ -6,10 +6,8 @@ import { reduce, type ReduceContext, type ScenarioState } from "../rules/engine/
 import { settle } from "../rules/engine/machine.ts";
 import { updateCard } from "../rules/core/state.ts";
 import { fireForced } from "../rules/windows/triggers.ts";
-import {
-  first, frames, FRODO, loadWorld, reveal, RIDER, SAM, send, table,
-  type Layout, type World,
-} from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { frames, FRODO, loadWorld, reveal, RIDER, SAM, table, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send } from "../../test/harness/scene-kit.ts";
 
 let world: World;
 

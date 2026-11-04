@@ -18,7 +18,7 @@ import { doRefresh } from "../../../rules/engine/refresh.ts";
 import { pruneRoundCaps } from "../../../rules/families/dreamchaser/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
-import { first, send, start } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../../test/harness/scene-kit.ts";
 import { voyageStart, voyageWorld } from "../../../../test/scenarios/voyage-across-belegaer/game.ts";
 import {
   ARMOR_PLATING, BALLISTA, CROWLEY, CUNNING_PIRATE, ENLARGED_QUARTERS, EXTRA_SAILS, HARD_MODE, OMINOUS_FATE, SCOUTING_SHIP, SHIPS, THUNDERSTRUCK, codesIn, loadVoyageWorld, resolveReveal, voyageFight, voyageTable,

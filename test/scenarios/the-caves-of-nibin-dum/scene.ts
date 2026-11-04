@@ -7,14 +7,10 @@ import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../../../src/rules/core/state.ts";
 import { attachTo, spawn } from "../../../src/rules/core/zones.ts";
-import { pushCardEffects } from "../../../src/rules/interpret/effect-frames.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { settle } from "../../../src/rules/engine/machine.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { causeProblems } from "../../harness/cause-check.ts";
-import { first, send, start, type Run } from "../a-shadow-of-the-past/scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { addStandIns, allyCard, answer, codesIn, enemyCard, eventCard, first, HERO, HERO2, HERO3, opening, resolveRecords, sceneEffects, send, start, type Run } from "../../harness/scene-kit.ts";
 
 // Shared scene for The Caves of Nibin-Dûm effect tests. Test-only. The heroes are plain numbers (no player card text), so what a test
 // shows comes from the scenario's records and the engine.
@@ -29,15 +25,11 @@ export const TORCH = "41029";
 export const SHINY_DISTRACTION = "41042";
 export const NO_TIME = "41048";
 export const RANGER_SENSE = "41049";
-export const HERO = "dh1";
-export const HERO2 = "dh2";
-export const HERO3 = "dh3";
+export { HERO, HERO2, HERO3 };
 
-// The filler event has an Action that does nothing, so it can be played: an event with no record at all cannot (rr.triggered-ability).
 // The "cancel" event answers the window in which a When Revealed or Shadow effect is about to resolve, as A Test of Will does.
 const SCENE_EFFECTS: readonly Effect[] = [
-  ...EFFECTS,
-  { id: "filler:action:1", cardCode: "filler", lines: ["filler:A:1"], timing: "action", instructions: [] },
+  ...sceneEffects(),
   { id: "cancel:response:1", cardCode: "cancel", lines: ["cancel:A:1"], timing: "response", trigger: "whenRevealedPending", cost: { kind: "playEvent" }, instructions: [{ verb: "CancelEffect" }] },
 ];
 
@@ -47,19 +39,14 @@ export async function loadCavesWorld(): Promise<CavesWorld> {
   const definition = scenarioDefinition(caves, campaign, EFFECTS);
   const codes = [...new Set([...scenarioCards(caves).map((card) => card.code), ...caves.campaignPlaced, caves.campaignCard])];
   const cards = new Map(await loadPrinted(codes));
-  for (const [code, threat] of [["f0", 0], ["f3", 3]] as const) {
-    cards.set(code, definePrinted({ code, name: code, type: "enemy", threat, engagementCost: 50, attack: 1, defense: 1, health: 3 }));
-  }
-  cards.set("brute", definePrinted({ code: "brute", name: "brute", type: "enemy", threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
-  cards.set("grunt", definePrinted({ code: "grunt", name: "grunt", type: "enemy", threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
-  cards.set("gob", definePrinted({ code: "gob", name: "gob", type: "enemy", traits: ["Goblin"], threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
-  cards.set("spider", definePrinted({ code: "spider", name: "spider", type: "enemy", traits: ["Spider"], threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
-  cards.set("place", definePrinted({ code: "place", name: "place", type: "location", threat: 2, questPoints: 2 }));
-  for (const code of [HERO, HERO2, HERO3]) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
-  cards.set("cancel", definePrinted({ code: "cancel", name: "cancel", type: "event", sphere: "neutral", cost: 0 }));
-  cards.set("ally", definePrinted({ code: "ally", name: "ally", type: "ally", sphere: "neutral", cost: 0, willpower: 1, attack: 1, defense: 1, health: 2 }));
-  cards.set("costly", definePrinted({ code: "costly", name: "costly", type: "event", sphere: "neutral", cost: 6 }));
+  addStandIns(cards, ["f0", "f3", "place", "heroes", "filler"]);
+  cards.set("brute", enemyCard("brute", { threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
+  cards.set("grunt", enemyCard("grunt", { threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
+  cards.set("gob", enemyCard("gob", { traits: ["Goblin"], threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
+  cards.set("spider", enemyCard("spider", { traits: ["Spider"], threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
+  cards.set("cancel", eventCard("cancel", 0));
+  cards.set("ally", allyCard("ally", 0));
+  cards.set("costly", eventCard("costly", 6));
   cards.set("blade", definePrinted({ code: "blade", name: "blade", type: "attachment", sphere: "neutral", cost: 0 }));
   return { definition, cards };
 }
@@ -147,10 +134,7 @@ export function cavesTable(world: CavesWorld, layout: CavesLayout = {}): { state
     const id = Object.values(state.cards).find((card) => card.code === code)?.id;
     if (id) state = updateCard(state, id, { damage });
   }
-  const phase = layout.phase ?? "Quest";
-  const mode = phase === "Quest" ? "questCommit" : phase === "Encounter" ? "optionalEngage" : phase === "Travel" ? "travel" : phase === "Planning" ? "planning" : phase === "Refresh" ? "refresh" : "combatActions";
-  const window = phase === "Encounter" ? { kind: "optionalEngage" as const } : phase === "Travel" ? { kind: "travel" as const } : phase === "Refresh" ? null : { kind: "pass" as const };
-  state = { ...state, phase, boundaryPhase: phase, mode, window, activeSeat: 0 };
+  state = { ...state, ...opening(layout.phase ?? "Quest") };
   return { state, ctx: { effects: SCENE_EFFECTS, cards: world.cards }, hero: first.id, hero2: secondHero.id, seat1Hero };
 }
 
@@ -197,22 +181,12 @@ export function fight(
   return { run, ctx: made.ctx, hero: made.hero, hero2: made.hero2, seen, start: state };
 }
 
-// The first card of a code is resolved or used in a test: these helpers answer the choices the effect opens (the first option by default).
-export function settleChoices(run: Run, ctx: ReduceContext, pick: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): Run {
-  let current = run;
-  for (let guard = 0; guard < 30 && current.state.window?.kind === "choose"; guard += 1) current = send(current, { type: "Choose", optionId: pick(current.state) }, ctx);
-  return current;
-}
+// The choices an effect opens are answered (the first option by default).
+export const settleChoices = answer;
 
-// The card's When Revealed records resolve now, in the quest phase (the way a reveal resolves them), and the choices they open are answered.
+// The card's When Revealed records resolve now, in the quest phase (the way a reveal resolves them), and the look windows and choices they open are answered.
 export function resolveReveal(state: ScenarioState, ctx: ReduceContext, code: string, pick?: (state: ScenarioState) => string): Run & { id: string } {
-  const spawned = spawn(state, code, { zone: "staging" });
-  const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
-  const steps: EngineStep[] = [];
-  const pushed = pushCardEffects(spawned.state, "whenRevealed", spawned.id, spawned.state.firstPlayer, false, effects, ctx, steps);
-  const run = settleChoices({ state: settle({ ...pushed, window: null }, ctx, steps), steps }, ctx, pick);
-  if (causeProblems(run.steps).length > 0) throw new Error(`Steps without a cause: ${causeProblems(run.steps).join("; ")}`);
-  return { ...run, id: spawned.id };
+  return resolveRecords(state, ctx, code, "whenRevealed", undefined, pick, false);
 }
 
 // The first enemy of this code in the staging area is engaged by the first seat: the optional engagement step lets a player engage it.
@@ -226,7 +200,4 @@ export function travelTo(state: ScenarioState, ctx: ReduceContext, code: string)
   return settleChoices(send(start(state), { type: "Travel", locationId: first(state, code) }, ctx), ctx);
 }
 
-// The codes of the cards in a zone, sorted.
-export function codesIn(state: ScenarioState, zone: string): string[] {
-  return Object.values(state.cards).filter((card) => card.zone === zone).map((card) => card.code).sort();
-}
+export { codesIn };

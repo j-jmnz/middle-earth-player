@@ -17,6 +17,7 @@ import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState, ZoneName } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
+import type { Destination } from "../../core/zones.ts";
 import { moveCard } from "../../core/zones.ts";
 import { dealAttackShadow } from "../defense/listen.ts";
 import { effectData, moveEncounter, setAsideNamed } from "../encounter/moves.ts";
@@ -57,16 +58,27 @@ export function flipSetAside(state: ScenarioState, instruction: Verb<"FlipSetAsi
   return id ? updateCard(state, id, { face: "B" }) : state;
 }
 
+/** The Stormcaller Elite card in play with this title showing its `from` side turns to the other side, faceup and without tokens, in `dest` under `controller`; the flip is a step of `seat`. */
+function turnElite(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], name: string, from: "enemy" | "objective", dest: Destination, controller: number | null, seat: number): { state: ScenarioState; id: string } | null {
+  const card = Object.values(state.cards).find((other) => inPlay(other.zone) && isElite(printedOf(ctx.cards, other.code)) && printedOf(ctx.cards, other.code).type === from && printedOf(ctx.cards, other.code).name === name);
+  const side = [...ctx.cards.values()].find((printed) => isElite(printed) && printed.type === (from === "enemy" ? "objective" : "enemy") && printed.name === name);
+  if (!card || !side) return null;
+  const flipped = updateCard(moveCard(state, card.id, dest), card.id, { code: side.code, face: "up", damage: 0, progress: 0, resources: 0, exhausted: false, controller });
+  steps.push({ kind: "flip", cardId: card.id, seat });
+  return { state: flipped, id: card.id };
+}
+
 /** FlipElite: the Stormcaller Elite card in play with this title (its enemy side) becomes the objective ally side, without tokens, in the play area of the first or the last player. It hears that it flipped. */
 export function flipElite(state: ScenarioState, instruction: Verb<"FlipElite">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const card = Object.values(state.cards).find((other) => inPlay(other.zone) && isElite(printedOf(ctx.cards, other.code)) && printedOf(ctx.cards, other.code).type === "enemy" && printedOf(ctx.cards, other.code).name === instruction.name);
-  const side = [...ctx.cards.values()].find((printed) => isElite(printed) && printed.type === "objective" && printed.name === instruction.name);
-  if (!card || !side) return state;
   const seat = instruction.to === "lastPlayer" ? lastPlayer(state) : state.firstPlayer;
-  const moved = moveCard(state, card.id, { zone: "play", seat });
-  const flipped = updateCard(moved, card.id, { code: side.code, face: "up", damage: 0, progress: 0, resources: 0, exhausted: false, controller: seat });
-  steps.push({ kind: "flip", cardId: card.id, seat });
-  return queueEvent(flipped, { trigger: "flipped", seat, cardId: card.id, subject: card.id });
+  const turned = turnElite(state, ctx, steps, instruction.name, "enemy", { zone: "play", seat }, seat, seat);
+  return turned ? queueEvent(turned.state, { trigger: "flipped", seat, cardId: turned.id, subject: turned.id }) : state;
+}
+
+/** FlipEliteAndAttack: the Stormcaller Elite card in play with this title (its objective ally side) shows its enemy side in the staging area, faceup and without tokens, then attacks the first player (12093:A:1). */
+export function flipEliteAndAttack(state: ScenarioState, instruction: Verb<"FlipEliteAndAttack">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const turned = turnElite(state, ctx, steps, instruction.name, "objective", { zone: "staging" }, null, state.firstPlayer);
+  return turned ? attackFirstPlayer(turned.state, { seat: state.firstPlayer, sourceId: turned.id }, ctx, steps) : state;
 }
 
 /** RemoveEncounterSet: every card of the encounter set in a deck, the discard pile or a play area (and the shadow cards it dealt) leaves the game; the cards attached to those in play are discarded. */

@@ -1,14 +1,11 @@
-import { buildStart } from "../../../src/campaign/start.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
+import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { anduin, campaign } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
+import { attackTogether, dealtGame, engageOneEach, fillerLoadout, HERO_STATS_8, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Journey Along the Anduin in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are
 // big numbers (or too small to quest), and the decks free events, so the outcome depends on the engine, the seed and the encounter deck,
@@ -21,23 +18,16 @@ export type AnduinDecks = "strong" | "weak" | "brittle";
 
 export const anduinLoadout = fillerLoadout;
 
-const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
-const STRONG_STATS = { threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-const BRITTLE_STATS = { threat: 8, willpower: 20, attack: 12, defense: 0, health: 7 } as const;
+const game = dealtGame<AnduinDecks>({
+  campaign,
+  scenario: anduin,
+  stats: HERO_STATS_8,
+  codes: ["01132", "01136", "01137", "01129"],
+  loadout: fillerLoadout,
+});
 
-export async function anduinWorld(decks: AnduinDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [...scenarioCards(anduin).map((card) => card.code), ...anduin.campaignPlaced, anduin.campaignCard];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of STRONG_HEROES) {
-    cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...(decks === "weak" ? WEAK_STATS : decks === "brittle" ? BRITTLE_STATS : STRONG_STATS) }));
-  }
-  cards.set(FILLER, fillerCard());
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-export function anduinStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty): StartScenario {
-  return buildStart({ campaign, scenario: anduin, seatCount, seed, threatModifier: 0, seats: anduinLoadout(seatCount), effects: EFFECTS, difficulty });
-}
+export const anduinWorld = (decks: AnduinDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> => game.world(decks);
+export const anduinStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty): StartScenario => game.start(seatCount, seed, difficulty, "strong");
 
 // With the strong loadout the last hero of each seat stays out of the quest, so it is ready to attack.
 const STRONG_QUESTERS = new Set(["q1", "q2", "q4", "q5"]);

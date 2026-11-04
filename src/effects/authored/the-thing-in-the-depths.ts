@@ -1,5 +1,7 @@
 import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 
+import { copyLines, withCopies } from "./reprint.ts";
+
 // Records for The Thing in the Depths (Dream-chaser part 5, campaign card 11194): the three quest stages, The Thing in the Depths on both of its sides, the Stormcaller, Corsair Raiders and The Thing in the
 // Depths encounter cards, Sea Serpent (in pool/DCCE.ts with the other cards the campaign card places) and the campaign card. Captain Sahír and Na'asiyah are Raid on the Grey Havens' records. Every
 // line is read from the scan ledger (data/printed/dream-chaser.json); the keywords (Surge, Grapple, Immune to player card effects) are read by the engine.
@@ -38,7 +40,7 @@ const thing = (code: string, side: "A" | "B", cannot: number, hitPoints: number,
 ];
 
 // "Grapple" is a keyword; the Forced effects of an arm that follow it.
-export const AUTHORED_EFFECTS: readonly Effect[] = [
+export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 12039 Take the Ship!. Setup: the encounter deck is built of The Stormcaller and Corsair Raiders by the scenario's piles, The Thing in the Depths set and The Stormcaller Elite wait set aside, and Helm of the
   // Stormcaller and an Umbar Raider are added to the staging area (dcce.setup-the-thing-in-the-depths, dcce.stormcaller-and-the-thing); the encounter deck is shuffled. Side B: Captain Sahír and Na'asiyah
   // gain indestructible; at the end of the round, if neither is in play, each gets a resource while it is set aside; no progress can be placed on this stage unless Helm of the Stormcaller is in the victory display.
@@ -139,7 +141,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 12046 Crew Quarters. Travel: 1 resource on each Raider card in play. Shadow: the attacking enemy gets +2 Attack.
   { id: "12046:travel:1", cardCode: "12046", lines: ["12046:A:1"], timing: "travel", instructions: [{ verb: "Each", pick: RAIDER_CARD, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "picked" }] }] },
-  { id: "12046:shadow:1", cardCode: "12046", lines: ["12046:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker" }] },
 
   // 12047 Quarter Deck. While it is the active location each enemy is dealt an additional shadow card in the combat phase: once the shadow cards are dealt each of the seat's engaged enemies gets one more
   // (the enemies of the player the event is about), which is the card the line adds to the one each enemy is dealt. Shadow: the defending player discards an attachment they control.
@@ -176,7 +177,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 12049 The Thing in the Depths (Immune to player card effects is a keyword), and 110063 on both sides.
   ...thing("12049", "A", 2, 3, 4, { verb: "DamageCard", amount: { stat: "threat", of: "subject", printed: true }, target: "self" }),
-  ...thing("110063", "A", 2, 3, 4, { verb: "DamageCard", amount: { stat: "threat", of: "subject", printed: true }, target: "self" }),
+  copyLines("12049", "110063", "A:2", "A:3", "A:4"),
   ...thing("110063", "B", 3, 4, 5, { verb: "DamageCard", amount: 2, target: "self" }),
 
   // 12050 Eye of the Beast (Surge is a keyword). It cannot attack. While it is engaged with a player the Thing attacks that player in the combat phase, from the staging area, dealt a shadow card for each attack.
@@ -256,7 +257,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
   { id: "11194:resolution:1", cardCode: "11194", lines: ["11194:B:1"], timing: "resolution", instructions: [{ verb: "ChooseCards", codes: ["11195"], who: "firstPlayer", to: "pool", optional: true }] },
-  { id: "11194:resolution:2", cardCode: "11194", lines: ["11194:B:2", "11194:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11194:resolution:3", cardCode: "11194", lines: ["11194:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "card", control: "any", names: ["Captain Sahír"], minResources: 5 }, min: 1 } }] },
   { id: "11194:resolution:4", cardCode: "11194", lines: ["11194:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: { type: "card", control: "any", names: ["Na'asiyah"], minResources: 5 }, min: 1 } }] },
   {
@@ -280,13 +280,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 30 } },
     ],
   },
-  {
-    id: "11194:resolution:8",
-    cardCode: "11194",
-    lines: ["11194:B:9"],
-    timing: "resolution",
-    instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
-  },
-];
+]);
 
 export const AUTHORED_REPLACES: readonly string[] = [];

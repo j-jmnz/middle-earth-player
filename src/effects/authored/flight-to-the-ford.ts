@@ -34,7 +34,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 141059 Ford of Bruinen (line 1 is immune). A location leaves play with a leftPlay event only when it is explored.
   {"id":"141059:response:1","cardCode":"141059","lines":["141059:A:2"],"timing":"response","trigger":"leftPlay","subject":"self","instructions":[{"verb":"Each","pick":{"type":"enemy","control":"any"},"instructions":[{"verb":"MoveEncounterCard","card":"picked","to":"discard"}]}]},
-  {"id":"141059:travel:1","cardCode":"141059","lines":["141059:A:3"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
 
   // 141060 The Troll's Camp
   {"id":"141060:constant:1","cardCode":"141060","lines":["141060:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"activeLocation"},"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"heroes"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"heroes"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"heroes"}]},
@@ -59,7 +58,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 141066 Pain Assailed Him
   {"id":"141066:whenRevealed:1","cardCode":"141066","lines":["141066:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ReduceLife","amount":1},{"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":RING_BEARER},{"verb":"SetStatUntil","stat":"attack","value":0,"until":"endOfRound","holders":RING_BEARER},{"verb":"SetStatUntil","stat":"defense","value":0,"until":"endOfRound","holders":RING_BEARER}]},
-  {"id":"141066:shadow:1","cardCode":"141066","lines":["141066:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]}]},
 
   // 141067 The Nine are Abroad: the text boxes of the characters in play now are blank, keywords included (rr.blank); their traits stay.
   {"id":"141067:whenRevealed:1","cardCode":"141067","lines":["141067:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"blankText","amount":1,"until":"endOfRound","holders":{"type":"character","control":"any"}},{"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Nazgûl"},"min":1}}]},

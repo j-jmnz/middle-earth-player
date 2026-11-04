@@ -1,74 +1,27 @@
-import { checklist } from "../../../src/campaign/checklist.ts";
-import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
-import { buildStart } from "../../../src/campaign/start.ts";
-import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { askingToCommit } from "../../../src/rules/families/sea/sailing-legal.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
-import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { campaign, ORIGINAL_SHIPS, SHIP_CODES, voyage } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { gameCodes } from "../../../scripts/data/load-scenarios.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
+import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, STRONG_HEROES as HEROES, type PlayedGame } from "../../harness/game-kit.ts";
+import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 
 // Test helper. A whole game of Voyage Across Belegaer in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small
 // to quest, or too brittle to survive an attack) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play.
 // Each player takes a ship (the first option each choice offers), fits the Modification boon the choice offers first, and keeps or trades the damage on it as the policy
 // says; the Sailing test commits no one or the Dream-chaser, as the policy says. Ships defend, the heroes attack the Ship enemies.
-export const HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
 export const VOYAGE_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type VoyageDecks = "strong" | "weak" | "brittle" | "tense";
 
 export const voyageLoadout = fillerLoadout;
 
-const STATS = {
-  strong: { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 },
-  weak: { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 },
-  brittle: { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 },
-  tense: { threat: 14, willpower: 20, attack: 12, defense: 6, health: 100 },
-} as const;
-
-let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
-
-export async function voyageWorld(decks: VoyageDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const dealt = campaignScenario(voyage);
-  const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, voyage), ...SHIP_CODES, ...ORIGINAL_SHIPS];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  LOADED = cards;
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-export function voyagePlan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) {
-  if (!LOADED) throw new Error("Build the world first (voyageWorld)");
-  const plan = checklist({ log, scenario: campaignScenario(voyage), seats: voyageLoadout(seatCount), effects: EFFECTS, cards: LOADED });
-  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
-  return plan;
-}
-
-export function voyageStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard): StartScenario {
-  const plan = voyagePlan(seatCount, log);
-  return buildStart({
-    campaign,
-    scenario: voyage,
-    seatCount,
-    seed,
-    threatModifier: plan.threatModifier,
-    seats: plan.seats,
-    effects: EFFECTS,
-    difficulty,
-    poolEncounterCards: plan.poolEncounterCards,
-    poolIntoPlay: plan.poolIntoPlay,
-    ...(facts ? { facts } : {}),
-    ...(modeCard ? { modeCard } : {}),
-  });
-}
+// The goldens' world, the plan and start of a game and its golden (the seeded game's parts every scenario shares: test/harness/game-kit.ts).
+export const voyageWorld = (decks: VoyageDecks = "strong") => game.world(decks);
+export const voyagePlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
+export const voyageStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
 
 export type VoyagePolicy = {
   // "keep" or "trade" 2 damage on each ship for a resource; "pass" or "ship" at the Sailing test (commit no one, or the ships that can sail).
@@ -132,12 +85,6 @@ export function voyageIntent(state: ScenarioState, ctx: ReduceContext, memory: S
 
 export type VoyageGame = PlayedGame;
 
-// Plays until the scenario is lost, or won and every Resolution choice is answered.
-export function playVoyage(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), policy: VoyagePolicy = DEFAULT_POLICY, modeCard?: ModeCard, limit = 8000): VoyageGame {
-  const start = voyageStart(seatCount, seed, difficulty, facts, log, modeCard);
-  return playToEnd(start, ctx, (state, memory) => voyageIntent(state, ctx, memory, policy), limit);
-}
-
 // The goldens (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `upgraded`: the cards the log marks as upgraded (the ships and the Modification boons), dealt on their Upgraded side. `mode`: the Hard or Expert Mode card.
 export type VoyageGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: VoyageDecks; outcome: "won" | "lost"; policy?: Partial<VoyagePolicy>; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
@@ -167,7 +114,15 @@ export const VOYAGE_GOLDENS: readonly VoyageGolden[] = [
   { name: "two-handed, the Dream-chaser destroyed, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Dream-chaser", policy: { sail: "pass", engage: "ships" } },
 ];
 
-export function playGolden(golden: VoyageGolden, ctx: ReduceContext): VoyageGame {
-  const facts = golden.upgraded ? { prisoner: null, usedOnce: [], counters: {}, upgraded: UPGRADED_CODES } : undefined;
-  return playVoyage(golden.seatCount, golden.seed, golden.difficulty, ctx, facts, undefined, { ...DEFAULT_POLICY, ...golden.policy }, golden.mode);
-}
+const game = campaignGame<VoyageDecks, VoyagePolicy>({
+  campaign,
+  scenario: voyage,
+  stats: HERO_STATS,
+  codes: [...SHIP_CODES, ...ORIGINAL_SHIPS],
+  intent: voyageIntent,
+  policy: DEFAULT_POLICY,
+  limit: 8000,
+  upgraded: UPGRADED_CODES,
+});
+
+export const playGolden = (golden: VoyageGolden, ctx: ReduceContext): VoyageGame => game.playGolden(golden, ctx);

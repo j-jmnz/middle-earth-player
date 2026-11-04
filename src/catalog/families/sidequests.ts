@@ -2,6 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
@@ -18,7 +19,7 @@ export const deckRuleSchema = z.discriminatedUnion("kind", [
 ]);
 export type DeckRule = z.infer<typeof deckRuleSchema>;
 
-export const VERBS = [
+const VERBS = [
   // Constant on a card that goes to the victory display ("Limit 3 copies of ~ in the victory display"): the display holds at
   // most `copies` of its title. A copy that would be added beyond that goes to its owner's discard pile instead
   // (src/rules/families/sidequests/victory.ts).
@@ -56,7 +57,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("AttachLoot"), ...when }),
   // Constant on a card in play: its controller cannot play, or put into play, a card that matches `pick` ("You cannot play
   // non-unique allies or put non-unique allies into play"). A card in a hand, a deck or a discard pile is read from its owner's side.
-  z.strictObject({ verb: z.literal("CannotPlay"), pick: pickSchema, ...when }),
+  // `anyPlayer`: the card bars every player, whoever controls it ("players cannot play attachments or allies", 12092:B:1, 12093:B:1), from playing a matching card from their hand; a card
+  // put into play is not played (rr.play-and-put-into-play), so it is left alone. Without it only the controller is barred, from playing and from putting into play.
+  z.strictObject({ verb: z.literal("CannotPlay"), pick: pickSchema, anyPlayer: z.literal(true).optional(), ...when }),
   // Constant on a card in play: the first card that matches `pick` its controller plays on each of their heroes each round costs
   // `amount` less ("Reduce the cost of the first restricted attachment you play on each of your heroes each round by 1").
   z.strictObject({ verb: z.literal("ReduceFirstOnEachHero"), pick: pickSchema, amount: z.number().int().positive(), ...when }),
@@ -64,7 +67,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("DeckRule"), rule: deckRuleSchema, ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a side quest: its progress reached its quest points and it was defeated. A player side quest in the victory display or
   // its owner's discard pile hears it ("Response: When this stage is defeated, ...").
   "questDefeated",
@@ -72,7 +75,7 @@ export const TRIGGERS = [
   "flipped",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a seat: its threat cannot be reduced by player card effects (1), or by those of cards that are not contracts (2).
   "noThreatReduction",
   // Held by a seat until the end of the round: the option of Council of the Wise (22091:A:2) already taken this round.
@@ -81,3 +84,4 @@ export const FLAGS = [
   "councilResource",
 ] as const;
 
+export const manifest = { name: "sidequests", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

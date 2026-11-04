@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { NIGHTMARE_PLAYABLE, PLAYABLE_SCENARIOS as PLAYABLE } from "../../src/campaign/playable.ts";
@@ -12,9 +15,11 @@ import { isKeywordLine } from "../data/normalize/keywords.ts";
 import { keyOf, lineId, loadLedger } from "../data/printed/ledger.ts";
 import { isPoolCard, withPool } from "../data/printed/pool.ts";
 import { PLAYER_REQUESTS } from "../data/printed/scope.ts";
+import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "../data/effects/barrel.ts";
+import { ROOT } from "../data/paths.ts";
 import { openLines } from "../data/effects/open-lines.ts";
 import { OPEN_LINES } from "../../src/effects/open-lines.ts";
-import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios, nightmareCodes, starterCodes } from "../data/load-scenarios.ts";
+import { dealtCodes, loadCampaign, loadCampaigns, loadCampaignsInOrder, loadScenarios, nightmareCodes, starterCodes } from "../data/load-scenarios.ts";
 
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
@@ -144,6 +149,12 @@ describe("generated and authored records", () => {
 
   it("match what the templates write today", () => {
     expect([...GENERATED_EFFECTS].sort(byId)).toEqual([...regenerated.effects].sort(byId));
+  });
+
+  it("are all in the barrel pnpm data:build writes (src/effects/generated/authored.ts), in campaign order", () => {
+    const authored = path.join(ROOT, "src", "effects", "authored");
+    const fresh = renderAuthoredBarrel(authoredOrder(authoredFileNames(authored), loadCampaignsInOrder(), scenarios));
+    expect(readFileSync(path.join(ROOT, "src", "effects", "generated", "authored.ts"), "utf8"), "run pnpm data:build").toBe(fresh);
   });
 
   it("list every printed line still without a record in open-lines.ts (pnpm effects:open rewrites it)", () => {

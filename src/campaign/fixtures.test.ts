@@ -15,6 +15,7 @@ import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 import { briefing } from "./briefing.ts";
 import { emptyLog } from "./log.ts";
 import { fixture, fixtureSave, FIXTURE_NAMES, hasFixture, type FixtureName } from "./fixtures.ts";
+import { FIXTURE_REGISTRY } from "./fixtures/registry.ts";
 import { campaignPath, nextStep, openNode } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
@@ -32,6 +33,20 @@ const KNIFE = hasFixture("knife-lost");
 
 const campaign = loadCampaign();
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
+
+// Dream-chaser parts 2 on: the fixtures of each scenario in the registry (fixtures/registry.ts) are games of two decklists from the log the earlier parts' golden wins write
+// (the Voyage's `voyage-won` and the like, wins of real decklists, are open), so every earlier part in the campaign's order is completed, the playthrough's open scenario is this one and the path
+// resumes it. A name whose game the seeds did not find is not committed and has nothing to check. The Campaign Setup's offers are answered in the loadout (Raid's Galdor's Counsel, the Drowned Ruins' Command and Círdan's Blessing).
+const DREAM_CHASER = loadCampaign("dream-chaser");
+const SETUP_CHOICES: Readonly<Record<string, readonly string[]>> = { "raid-on-the-grey-havens": ["skip", "skip"], "the-drowned-ruins": ["skip", "skip", "skip", "skip"] };
+const LATER_PARTS = FIXTURE_REGISTRY.flatMap((entry) => {
+  const at = DREAM_CHASER.scenarios.indexOf(entry.scenarioId);
+  if (at < 1) return [];
+  const won = entry.names.find((name) => name.endsWith("-won"));
+  const lost = entry.names.find((name) => name.endsWith("-lost"));
+  if (!won || !lost) throw new Error(`${entry.scenarioId} needs a -won and a -lost name in the fixture registry`);
+  return [{ scenarioId: entry.scenarioId, part: at + 1, previous: DREAM_CHASER.scenarios.slice(0, at), won, lost, names: [won, lost].filter((name) => hasFixture(name)) }];
+});
 
 function worldFor(name: FixtureName) {
   const { loadout, log, campaignId } = fixture(name);
@@ -107,8 +122,9 @@ describe("Maestro fixtures", () => {
       const save = fixtureSave(name, "s", CATALOG_VERSION);
       expect(save.active?.engineVersion).toBe(ENGINE_VERSION);
       expect(save.active?.dataHash).toBe(CATALOG_VERSION);
-      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's, the Fate of Númenor ones from the log Voyage Across Belegaer's golden win writes.
-      expect(save.log.completed).toEqual(name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : name.startsWith("fate-") ? ["voyage-across-belegaer"] : name.startsWith("raid-") ? ["voyage-across-belegaer", "the-fate-of-numenor"] : name.startsWith("stormcaller-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"] : name.startsWith("depths-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller"] : name.startsWith("temple-") ? ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths"] : []);
+      // The Journey Along the Anduin fixtures start from the log Passage Through Mirkwood's won game writes, the Caves of Nibin-Dûm ones from The Oath's, each later Dream-chaser part's from the log the earlier parts' golden wins write (LATER_PARTS).
+      const later = LATER_PARTS.find((part) => part.won === name || part.lost === name);
+      expect(save.log.completed).toEqual(later ? later.previous : name.startsWith("dol-guldur-") ? ["passage-through-mirkwood", "journey-along-the-anduin"] : name.startsWith("anduin-") ? ["passage-through-mirkwood"] : name.startsWith("nibin-dum-") ? ["the-oath"] : []);
     }
   });
 
@@ -446,243 +462,39 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
   });
 });
 
-describe("The Fate of Númenor (Dream-chaser part 2, phase 41)", () => {
-  // The fixtures are games of two decklists from the log Voyage Across Belegaer's golden win writes (voyage-won, a win of real decklists, is open): part 1 is completed, so the playthrough's open
-  // scenario is the Fate and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
-  const names = (["fate-won", "fate-lost"] as const).filter((name) => hasFixture(name));
-
-  it("are games of two decklists dealt on the scenario, the Campaign Setup answered in the game", () => {
+describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioId, previous, won, lost, names }) => {
+  it("are games of two decklists dealt on the scenario, the Campaign Setup's offers answered in the loadout", () => {
     for (const name of names) {
       const found = fixture(name);
       expect(found.campaignId, name).toBe("dream-chaser");
-      expect(found.loadout.scenarioId, name).toBe("the-fate-of-numenor");
+      expect(found.loadout.scenarioId, name).toBe(scenarioId);
+      expect(found.loadout.choices, name).toEqual(SETUP_CHOICES[scenarioId] ?? []);
       expect(found.seatCount, name).toBe(2);
       expect(found.past, name).toBeNull();
       expect(found.loadout.ringBearer, name).toBeNull();
     }
   });
 
-  it("start from a log with part 1 recorded as won, so the node the path opens is the Fate, not Voyage Across Belegaer", () => {
-    const dreamChaser = loadCampaign("dream-chaser");
+  it("start from a log with the earlier parts recorded as won, so the node the path opens is this scenario, not an earlier part", () => {
     for (const name of names) {
       const found = fixture(name);
-      expect(found.log.completed, name).toEqual(["voyage-across-belegaer"]);
-      expect(found.log.xpGained["voyage-across-belegaer"], name).toBeGreaterThan(0);
+      expect(found.log.completed, name).toEqual(previous);
+      expect(found.log.xpGained[previous.at(-1) ?? ""], name).toBeGreaterThan(0);
       const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const path = campaignPath(dreamChaser, {}, save.log);
-      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("the-fate-of-numenor");
-      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "the-fate-of-numenor" } });
+      const path = campaignPath(DREAM_CHASER, {}, save.log);
+      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe(scenarioId);
+      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: scenarioId } });
     }
   });
 
-  it("fate-won replays to a win, and fate-lost to a loss that writes nothing", () => {
+  it(`${won} replays to a win, and ${lost} to a loss that writes nothing`, () => {
     for (const name of names) {
       const world = worldFor(name);
       const save = fixtureSave(name, "s", CATALOG_VERSION);
       const resumed = resume(save, world, CATALOG_VERSION);
       expect(resumed.ok, name).toBe(true);
       if (!resumed.ok) continue;
-      if (name === "fate-lost") {
-        expect(resumed.state.lost).toBe(true);
-        const after = finish(save, world, resumed.state);
-        expect(after.log).toEqual(save.log);
-        expect(after.active).toBeNull();
-      } else {
-        expect(resumed.state.stageCleared).toBe(true);
-        expect(resumed.state.lost).toBe(false);
-      }
-    }
-  });
-});
-
-describe("Raid on the Grey Havens (Dream-chaser part 3, phase 42)", () => {
-  // The fixtures are games of two decklists from the log the Voyage and Fate goldens' wins write (voyage-won and fate-won, wins of real decklists, are open): parts 1 and 2 are completed, so the playthrough's
-  // open scenario is Raid and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
-  const names = (["raid-won", "raid-lost"] as const).filter((name) => hasFixture(name));
-
-  it("are games of two decklists dealt on the scenario, the Campaign Setup's Galdor's Counsel offer answered in the loadout", () => {
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.campaignId, name).toBe("dream-chaser");
-      expect(found.loadout.scenarioId, name).toBe("raid-on-the-grey-havens");
-      expect(found.loadout.choices, name).toEqual(["skip", "skip"]);
-      expect(found.seatCount, name).toBe(2);
-      expect(found.past, name).toBeNull();
-      expect(found.loadout.ringBearer, name).toBeNull();
-    }
-  });
-
-  it("start from a log with parts 1 and 2 recorded as won, so the node the path opens is Raid, not an earlier part", () => {
-    const dreamChaser = loadCampaign("dream-chaser");
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor"]);
-      expect(found.log.xpGained["the-fate-of-numenor"], name).toBeGreaterThan(0);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const path = campaignPath(dreamChaser, {}, save.log);
-      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("raid-on-the-grey-havens");
-      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "raid-on-the-grey-havens" } });
-    }
-  });
-
-  it("raid-won replays to a win, and raid-lost to a loss that writes nothing", () => {
-    for (const name of names) {
-      const world = worldFor(name);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const resumed = resume(save, world, CATALOG_VERSION);
-      expect(resumed.ok, name).toBe(true);
-      if (!resumed.ok) continue;
-      if (name === "raid-lost") {
-        expect(resumed.state.lost).toBe(true);
-        const after = finish(save, world, resumed.state);
-        expect(after.log).toEqual(save.log);
-        expect(after.active).toBeNull();
-      } else {
-        expect(resumed.state.stageCleared).toBe(true);
-        expect(resumed.state.lost).toBe(false);
-      }
-    }
-  });
-});
-
-describe("Flight of the Stormcaller (Dream-chaser part 4, phase 43)", () => {
-  // The fixtures are games of two decklists from the log the Voyage, Fate and Raid goldens' wins write (voyage-won, fate-won and raid-won, wins of real decklists, are open): parts 1 to 3 are completed, so the
-  // playthrough's open scenario is Flight of the Stormcaller and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
-  const names = (["stormcaller-won", "stormcaller-lost"] as const).filter((name) => hasFixture(name));
-
-  it("are games of two decklists dealt on the scenario, the Campaign Setup asking nothing", () => {
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.campaignId, name).toBe("dream-chaser");
-      expect(found.loadout.scenarioId, name).toBe("flight-of-the-stormcaller");
-      expect(found.loadout.choices, name).toEqual([]);
-      expect(found.seatCount, name).toBe(2);
-      expect(found.past, name).toBeNull();
-      expect(found.loadout.ringBearer, name).toBeNull();
-    }
-  });
-
-  it("start from a log with parts 1 to 3 recorded as won, so the node the path opens is Flight of the Stormcaller, not an earlier part", () => {
-    const dreamChaser = loadCampaign("dream-chaser");
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"]);
-      expect(found.log.xpGained["raid-on-the-grey-havens"], name).toBeGreaterThan(0);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const path = campaignPath(dreamChaser, {}, save.log);
-      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("flight-of-the-stormcaller");
-      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "flight-of-the-stormcaller" } });
-    }
-  });
-
-  it("stormcaller-won replays to a win, and stormcaller-lost to a loss that writes nothing", () => {
-    for (const name of names) {
-      const world = worldFor(name);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const resumed = resume(save, world, CATALOG_VERSION);
-      expect(resumed.ok, name).toBe(true);
-      if (!resumed.ok) continue;
-      if (name === "stormcaller-lost") {
-        expect(resumed.state.lost).toBe(true);
-        const after = finish(save, world, resumed.state);
-        expect(after.log).toEqual(save.log);
-        expect(after.active).toBeNull();
-      } else {
-        expect(resumed.state.stageCleared).toBe(true);
-        expect(resumed.state.lost).toBe(false);
-      }
-    }
-  });
-});
-
-describe("The Thing in the Depths (Dream-chaser part 5, phase 44)", () => {
-  // The fixtures are games of two decklists from the log the Voyage, Fate, Raid and Flight goldens' wins write (voyage-won, fate-won, raid-won and stormcaller-won, wins of real decklists, are open): parts 1 to 4 are
-  // completed, so the playthrough's open scenario is The Thing in the Depths and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
-  const names = (["depths-won", "depths-lost"] as const).filter((name) => hasFixture(name));
-
-  it("are games of two decklists dealt on the scenario, the Campaign Setup asking nothing", () => {
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.campaignId, name).toBe("dream-chaser");
-      expect(found.loadout.scenarioId, name).toBe("the-thing-in-the-depths");
-      expect(found.loadout.choices, name).toEqual([]);
-      expect(found.seatCount, name).toBe(2);
-      expect(found.past, name).toBeNull();
-      expect(found.loadout.ringBearer, name).toBeNull();
-    }
-  });
-
-  it("start from a log with parts 1 to 4 recorded as won, so the node the path opens is The Thing in the Depths, not an earlier part", () => {
-    const dreamChaser = loadCampaign("dream-chaser");
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller"]);
-      expect(found.log.xpGained["flight-of-the-stormcaller"], name).toBeGreaterThan(0);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const path = campaignPath(dreamChaser, {}, save.log);
-      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("the-thing-in-the-depths");
-      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "the-thing-in-the-depths" } });
-    }
-  });
-
-  it("depths-won replays to a win, and depths-lost to a loss that writes nothing", () => {
-    for (const name of names) {
-      const world = worldFor(name);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const resumed = resume(save, world, CATALOG_VERSION);
-      expect(resumed.ok, name).toBe(true);
-      if (!resumed.ok) continue;
-      if (name === "depths-lost") {
-        expect(resumed.state.lost).toBe(true);
-        const after = finish(save, world, resumed.state);
-        expect(after.log).toEqual(save.log);
-        expect(after.active).toBeNull();
-      } else {
-        expect(resumed.state.stageCleared).toBe(true);
-        expect(resumed.state.lost).toBe(false);
-      }
-    }
-  });
-});
-
-describe("Temple of the Deceived (Dream-chaser part 6, phase 45)", () => {
-  // The fixtures are games of two decklists from the log the Voyage, Fate, Raid, Flight and Depths goldens' wins write (voyage-won, fate-won, raid-won, stormcaller-won, depths-won and temple-won, wins of real decklists,
-  // are open): parts 1 to 5 are completed, so the playthrough's open scenario is Temple of the Deceived and the path resumes it. A name whose game the seeds did not find is not committed and has nothing to check.
-  const names = (["temple-won", "temple-lost"] as const).filter((name) => hasFixture(name));
-
-  it("are games of two decklists dealt on the scenario, the Campaign Setup asking nothing before the game", () => {
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.campaignId, name).toBe("dream-chaser");
-      expect(found.loadout.scenarioId, name).toBe("temple-of-the-deceived");
-      expect(found.loadout.choices, name).toEqual([]);
-      expect(found.seatCount, name).toBe(2);
-      expect(found.past, name).toBeNull();
-      expect(found.loadout.ringBearer, name).toBeNull();
-    }
-  });
-
-  it("start from a log with parts 1 to 5 recorded as won, so the node the path opens is Temple of the Deceived, not an earlier part", () => {
-    const dreamChaser = loadCampaign("dream-chaser");
-    for (const name of names) {
-      const found = fixture(name);
-      expect(found.log.completed, name).toEqual(["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths"]);
-      expect(found.log.xpGained["the-thing-in-the-depths"], name).toBeGreaterThan(0);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const path = campaignPath(dreamChaser, {}, save.log);
-      expect(openNode(path, save.loadout?.scenarioId)?.id, name).toBe("temple-of-the-deceived");
-      expect(nextStep(path, save.loadout?.scenarioId), name).toMatchObject({ kind: "resume", node: { id: "temple-of-the-deceived" } });
-    }
-  });
-
-  it("temple-won replays to a win, and temple-lost to a loss that writes nothing", () => {
-    for (const name of names) {
-      const world = worldFor(name);
-      const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const resumed = resume(save, world, CATALOG_VERSION);
-      expect(resumed.ok, name).toBe(true);
-      if (!resumed.ok) continue;
-      if (name === "temple-lost") {
+      if (name === lost) {
         expect(resumed.state.lost).toBe(true);
         const after = finish(save, world, resumed.state);
         expect(after.log).toEqual(save.log);

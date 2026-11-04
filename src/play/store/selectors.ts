@@ -20,16 +20,17 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
 // The four piles every table shows, and the second slot's (docs/design-system-table.md, Piles): the Corsair deck and its discard pile while the scenario
-// has a Corsair deck (dcce.corsair-deck), or the Uncharted deck alone while it deals one (dcce.uncharted-deck). The scenario phases add the Grotto deck. The victory display is a pile
+// has a Corsair deck (dcce.corsair-deck), or the Uncharted deck alone while it deals one (dcce.uncharted-deck), or the Grotto deck alone while it deals that (dcce.grotto-deck). The victory display is a pile
 // too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck";
 export type VictoryPileId = "victory";
 export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
 export const PILES: readonly BasePileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
 export const SECOND_PILES: readonly SecondPileId[] = ["corsairDeck", "corsairDiscard"];
 const UNCHARTED_PILES: readonly SecondPileId[] = ["unchartedDeck"];
+const GROTTO_PILES: readonly SecondPileId[] = ["grottoDeck"];
 
 export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   deck: "Deck",
@@ -39,12 +40,14 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   corsairDeck: "Corsair deck",
   corsairDiscard: "Corsair discard pile",
   unchartedDeck: "Uncharted deck",
+  grottoDeck: "Grotto deck",
   victory: "Victory display",
 };
 
-/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); else the Uncharted deck, while the scenario deals one. */
+/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); else the Grotto deck while the scenario deals one (dcce.grotto-deck), else the Uncharted deck while it deals that. */
 export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted">): readonly SecondPileId[] {
   if (game.corsairDeck !== undefined) return SECOND_PILES;
+  if (game.uncharted?.grotto === true) return GROTTO_PILES;
   return game.uncharted !== undefined ? UNCHARTED_PILES : NONE_PILES;
 }
 
@@ -286,6 +289,7 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "corsairDiscard":
       return game.corsairDiscard ?? NONE;
     case "unchartedDeck":
+    case "grottoDeck":
       return game.uncharted?.deck ?? NONE;
     case "victory":
       return game.victory;
@@ -302,8 +306,8 @@ export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) 
     const ids = pileIds(game, pile, seat);
     const faceUp = opensList(pile);
     const last = ids[ids.length - 1];
-    // The Uncharted deck shows its top card's Lost Island side; every copy of it is the same picture (dcce.uncharted-deck).
-    const topId = pile === "unchartedDeck" ? ids[0] : faceUp ? last : undefined;
+    // The Uncharted deck shows its top card's Lost Island side; every copy of it is the same picture (dcce.uncharted-deck). The Grotto deck shows its top card's Grotto side, which the players may look at (dcce.grotto-deck).
+    const topId = pile === "unchartedDeck" || pile === "grottoDeck" ? ids[0] : faceUp ? last : undefined;
     const top = topId ? (game.cards[topId] ?? null) : null;
     const attached = pile === "deck" ? cardsOf(game, game.seats[seat]?.deckAttached ?? NONE) : EMPTY;
     if (previous && previous.ids === ids && previous.top === top && sameCards(previous.attached ?? EMPTY, attached)) return previous;

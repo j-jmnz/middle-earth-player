@@ -1,70 +1,41 @@
-import { buildStart } from "../../../src/campaign/start.ts";
 import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { expectOk } from "../../../src/rules/core/test-fixture.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
+import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
+import { attackTogether, dealtGame, engageOneEach, fellowshipLoadout, HERO_STATS_8, type PlayedGame, playToEnd, RING_BEARER, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of A Knife in the Dark played by the auto-player, true solo or two-handed. With the seeded
 // starter decks, true solo is Stealth and Steadfastness with the saga Frodo as a fourth hero (the Ring-bearer does not
 // count against the hero limit) and two-handed adds Wisdom and Wizardry as the second seat. The scenario starts from an
 // empty Campaign Log (no pool cards), so the game depends only on the scenario, the decks, the engine and the seed.
-export const RING_BEARER = "141001";
+export { RING_BEARER };
 export const campaign = loadCampaign();
 export const knife = loadScenario("a-knife-in-the-dark");
-
-function starter(id: string): LoadoutSeat {
-  const deck = campaign.starterDecks.find((entry) => entry.id === id);
-  if (!deck) throw new Error(`No starter deck ${id}`);
-  return {
-    heroes: deck.rows.filter((row) => row.type === "hero").map((row) => row.code),
-    deck: deck.rows.filter((row) => row.type !== "hero").flatMap((row) => Array.from({ length: row.count }, () => row.code)),
-  };
-}
 
 // "starter": the seeded starter decks. "strong": the scenario 1 golden's loadout (src/campaign/scenarios/a-shadow-of-the-past/golden.test.ts) for each
 // seat: in-memory heroes with big numbers beside the saga Frodo and a deck of free events, so the outcome depends on the
 // engine and the seed, not on card play.
 export type KnifeDecks = "starter" | "strong";
 
-export function knifeLoadout(seatCount: 1 | 2, decks: KnifeDecks = "starter"): LoadoutSeat[] {
-  if (decks === "strong") {
-    const filler = Array.from({ length: 30 }, () => "filler");
-    const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck: filler };
-    return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-  }
-  const stealth = starter("stealth-and-steadfastness");
-  const first = { heroes: [RING_BEARER, ...stealth.heroes], deck: stealth.deck };
-  return seatCount === 1 ? [first] : [first, starter("wisdom-and-wizardry")];
-}
+export const knifeLoadout = (seatCount: 1 | 2, decks: KnifeDecks = "starter"): LoadoutSeat[] => fellowshipLoadout(campaign, seatCount, decks !== "strong");
 
 export { STRONG_HEROES };
 
-export async function knifeWorld(): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [
-    ...scenarioCards(knife).map((card) => card.code),
-    ...knife.campaignPlaced,
-    ...campaign.prelude.map((card) => card.code),
-    ...knifeLoadout(2).flatMap((seat) => [...seat.heroes, ...seat.deck]),
-  ];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of STRONG_HEROES) {
-    cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 }));
-  }
-  cards.set(FILLER, fillerCard());
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
+const game = dealtGame<KnifeDecks>({
+  campaign,
+  scenario: knife,
+  stats: { starter: HERO_STATS_8.strong, strong: HERO_STATS_8.strong },
+  codes: [...campaign.prelude.map((card) => card.code), ...knifeLoadout(2).flatMap((seat) => [...seat.heroes, ...seat.deck])],
+  loadout: knifeLoadout,
+});
 
-export function knifeStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: KnifeDecks = "starter"): StartScenario {
-  return buildStart({ campaign, scenario: knife, seatCount, seed, threatModifier: 0, seats: knifeLoadout(seatCount, decks), effects: EFFECTS, difficulty });
-}
+export const knifeWorld = (): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> => game.world("strong");
+export const knifeStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: KnifeDecks = "starter"): StartScenario => game.start(seatCount, seed, difficulty, decks);
 
 export const KNIFE_POLICY: PolicyOptions = { scout: "", prefer: "", protect: RING_BEARER, play: true, act: true };
 

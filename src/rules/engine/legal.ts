@@ -24,6 +24,7 @@ import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable } from
 import { flagged, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
 import { sideQuestReason } from "../families/sidequests/quest.ts";
+import { familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
@@ -196,13 +197,15 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 // A slot is free for the traveling seat: its own active location once stages are separate (families/breaking/areas.ts).
 // Under Exploration the active location stays, and the players may travel from it once it holds progress equal to its quest points (families/island/travel.ts).
 function canTravel(state: ScenarioState, ctx: ReduceContext): boolean {
-  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards);
+  return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards) || familyMayTravel(state, ctx);
 }
 
-// The locations the players may travel to: those in the staging area, and the ones the active location lets them reach beyond it (Winding Caverns, 12073:A:2).
+// The locations the players may travel to: those in the staging area, and the ones the active location lets them reach beyond it (Winding Caverns, 12073:A:2), then any a family's travel hook adds (interpret/family-hooks.ts).
 function travelCandidates(state: ScenarioState, ctx: ReduceContext): string[] {
   const staged = stagingLocations(state, ctx.cards, state.separate ? state.activeSeat : undefined);
-  return islandMayTravel(state, ctx.cards) ? [...staged, ...islandReach(state)] : staged;
+  const reach = familyTravelReach(state, ctx);
+  const beyond = islandMayTravel(state, ctx.cards) ? [...staged, ...islandReach(state)] : staged;
+  return reach.length > 0 ? [...beyond, ...reach] : beyond;
 }
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {

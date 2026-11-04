@@ -57,6 +57,14 @@ export function levelAmount(state: ScenarioState, sourceId: string | null, halve
   return halved ? Math.ceil(level / 2) : level;
 }
 
+/** The amount `plusChosen`: the copies of the source card's own name the campaign card's Setup let the players choose ("X is plus 1 for each of those copies", 11182:A:2, 11200:A:1). A chosen card of another name (a Círdan's Blessing a Resolution earns) is not one of them. */
+export function chosenCopies(state: ScenarioState, sourceId: string | null, ctx: Pick<ReduceContext, "cards">): number {
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  if (!source) return 0;
+  const name = printedOf(ctx.cards, source.code).name;
+  return (state.chosenAtSetup ?? []).filter((chosen) => printedOf(ctx.cards, chosen.code).name === name).length;
+}
+
 /** The number of cards underneath The Havens Burn that loses the game, read from the Burn's own record (11038:A:2, `underBurn` with `min` and `players`): the one place the number lives. Null in a game
  * whose Burn has no such record. */
 export function burnLimit(state: ScenarioState, ctx: ReduceContext): number | null {

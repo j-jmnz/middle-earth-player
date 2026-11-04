@@ -6,7 +6,7 @@ import { legalIntents } from "../../rules/engine/legal.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { cavesTable, loadCavesWorld, type CavesWorld } from "../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
-import { first, send, start, type Run } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../test/harness/scene-kit.ts";
 
 import { questTitle } from "../cards/table-preview.ts";
 import { playerAttackSheet } from "../choice/combat-sheets.ts";

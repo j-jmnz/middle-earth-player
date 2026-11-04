@@ -1,4 +1,5 @@
 // Rules: rr.attachment-cards, rr.guarded, rr.blank, rr.step-6-8-1 (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -29,3 +30,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "attachments", verbs: ["PlayInto", "Guarded", "AttachSourceTo", "GuardWith", "HealAmong", "ChooseAttackers", "QuestProgressFirst"], run };

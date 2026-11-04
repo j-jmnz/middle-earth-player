@@ -8,7 +8,7 @@ import { moveCard } from "../../rules/core/zones.ts";
 import { withSeat } from "../../rules/core/state.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
-import { first } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../test/harness/scene-kit.ts";
 
 import { areaWords, seatTag, stagingWord } from "../words/area.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "../words/breaking.ts";

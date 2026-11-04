@@ -1,5 +1,6 @@
 // Rules: mec109.multiple-staging-areas, mec109.saga-staging-rules, rr.removed-from-game, rr.attachment-cards, rr.in-play-and-out-of-play,
 // rr.player-elimination, rr.travel, rr.engagement-check (data/rules/entries.json); the cards of Breaking of the Fellowship (142061 to 142067).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -14,7 +15,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { VERBS } from "../../../catalog/families/breaking.ts";
+import { manifest as catalog } from "../../../catalog/families/breaking.ts";
 import { areaOf, mergeView, viewOf } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { runCards } from "./cards.ts";
@@ -50,7 +51,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 }
 
 // The verbs that work on the areas themselves, the whole state: all of them but AdvanceToStage, which is the acting seat's stage like the quest's own advance.
-const BREAKING_VERBS: ReadonlySet<string> = new Set(VERBS.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage"));
+const BREAKING_VERBS: ReadonlySet<string> = new Set(catalog.verbs.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage"));
 
 // Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret/interpret.ts runInstruction).
 export function isBreakingVerb(verb: string): boolean {
@@ -140,3 +141,5 @@ function discardSharedStage(state: ScenarioState): ScenarioState {
   }
   return next;
 }
+
+export const manifest: RulesFamily = { name: "breaking", verbs: ["RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };

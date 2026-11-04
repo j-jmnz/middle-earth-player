@@ -43,7 +43,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41013 Spider Den: any player may use this Quest Action to bring a Spider from the deck or discard pile into play engaged with him and discard Spider Den.
   {"id":"41013:action:1","cardCode":"41013","lines":["41013:A:1"],"timing":"action","anyPlayer":true,"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Quest"},{"kind":"searchable","trait":"Spider"}]},"instructions":[{"verb":"SearchMove","trait":"Spider","type":"enemy","to":"engaged"},{"verb":"Discard","target":{"kind":"self"}}]},
   // 41014 Goblin Trail: a card is revealed to travel here (as 01078:travel:1); explored, it puts 6 progress on the current quest.
-  {"id":"41014:travel:1","cardCode":"41014","lines":["41014:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
   {"id":"41014:response:1","cardCode":"41014","lines":["41014:A:2"],"timing":"response","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"ProgressQuest","amount":6}]},
   // 41015 Abandoned Camp: the first player discards the top card of his deck after the players travel here, an ally goes into play; the Travel cost
   // discards the top card of the encounter deck, an enemy goes to the staging area.
@@ -54,13 +53,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41017 Surprising Speed: each player returns an engaged enemy to the staging area; with none returned it gains surge and doomed 1. The Shadow
   // adds Attack and returns the attacker to the staging area after the attack.
   {"id":"41017:whenRevealed:1","cardCode":"41017","lines":["41017:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"ReturnToStaging","target":{"kind":"engagedEnemies","who":"actor","pick":"choose"}}]},{"verb":"GainSurge","when":{"kind":"noneReturned"}},{"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]},
-  {"id":"41017:shadow:1","cardCode":"41017","lines":["41017:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
   // 41018 Caught in a Web: as 01080 (the highest threat player attaches it; its hero does not ready unless the pool pays 2).
   ...reprint(TWINS, "01080", "41018"),
   // 41019 Goblin Troop: no attachments; while engaged it gives each other Goblin enemy engaged with the same player +1 Attack and +1 Defense; the Shadow adds 2 Attack.
   {"id":"41019:constant:1","cardCode":"41019","lines":["41019:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"41019:constant:2","cardCode":"41019","lines":["41019:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"engaged"},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","engaged":"you","trait":"Goblin","other":true}},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","holders":{"type":"enemy","control":"any","engaged":"you","trait":"Goblin","other":true}}]},
-  {"id":"41019:shadow:1","cardCode":"41019","lines":["41019:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
   // 41020 Goblin Sniper: as 01083 (cannot be optionally engaged while another enemy is in the staging area; damages a character of each player if it is still there after combat).
   ...reprint(TWINS, "01083", "41020"),
   // 41021 Goblin Runners (Surge): the Shadow makes the attacker attack again once this attack is over, with a new shadow card (as 141073:shadow:1).
@@ -87,4 +84,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41050:resolution:1","cardCode":"41050","lines":["41050:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["41019:constant:1"];

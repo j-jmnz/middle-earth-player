@@ -1,49 +1,63 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
+import type { Focus, RulesFamily } from "../interpret/family-manifest.ts";
 import type { ScenarioState } from "../core/state.ts";
 
-import * as attack from "./attack/index.ts";
-import * as defense from "./defense/index.ts";
-import * as encounter from "./encounter/index.ts";
-import * as quest from "./quest/index.ts";
-import * as play from "./play/index.ts";
-import * as costs from "./costs/index.ts";
-import * as deck from "./deck/index.ts";
-import * as attachments from "./attachments/index.ts";
-import * as sidequests from "./sidequests/index.ts";
-import * as misc from "./misc/index.ts";
-import * as burden from "./burden/index.ts";
-import * as south from "./south/index.ts";
-import * as campaign from "./campaign/index.ts";
-import * as objectives from "./objectives/index.ts";
-import * as prisoner from "./prisoner/index.ts";
-import * as dungeon from "./dungeon/index.ts";
-import * as caves from "./caves/index.ts";
-import * as nightmare from "./nightmare/index.ts";
-import * as moria from "./moria/index.ts";
-import * as breaking from "./breaking/index.ts";
-import * as dreamchaser from "./dreamchaser/index.ts";
-import * as sea from "./sea/index.ts";
-import * as uncharted from "./uncharted/index.ts";
-import * as aflame from "./aflame/index.ts";
-import * as stormcaller from "./stormcaller/index.ts";
-import * as grapple from "./grapple/index.ts";
-import * as island from "./island/index.ts";
+import { manifest as attack } from "./attack/index.ts";
+import { manifest as defense } from "./defense/index.ts";
+import { manifest as encounter } from "./encounter/index.ts";
+import { manifest as quest } from "./quest/index.ts";
+import { manifest as play } from "./play/index.ts";
+import { manifest as costs } from "./costs/index.ts";
+import { manifest as deck } from "./deck/index.ts";
+import { manifest as attachments } from "./attachments/index.ts";
+import { manifest as sidequests } from "./sidequests/index.ts";
+import { manifest as misc } from "./misc/index.ts";
+import { manifest as burden } from "./burden/index.ts";
+import { manifest as south } from "./south/index.ts";
+import { manifest as campaign } from "./campaign/index.ts";
+import { manifest as objectives } from "./objectives/index.ts";
+import { manifest as prisoner } from "./prisoner/index.ts";
+import { manifest as dungeon } from "./dungeon/index.ts";
+import { manifest as caves } from "./caves/index.ts";
+import { manifest as nightmare } from "./nightmare/index.ts";
+import { manifest as moria } from "./moria/index.ts";
+import { manifest as breaking } from "./breaking/index.ts";
+import { manifest as dreamchaser } from "./dreamchaser/index.ts";
+import { manifest as sea } from "./sea/index.ts";
+import { manifest as uncharted } from "./uncharted/index.ts";
+import { manifest as aflame } from "./aflame/index.ts";
+import { manifest as stormcaller } from "./stormcaller/index.ts";
+import { manifest as grapple } from "./grapple/index.ts";
+import { manifest as island } from "./island/index.ts";
+import { registerFamilies } from "../interpret/family-hooks.ts";
 
-/** The seat an instruction resolves for and the card whose effect it is. `chosen`: the target a player chose when the verb
- * asked for one (askTarget in choices.ts puts the instruction back with it). */
-export type Focus = { seat: number; sourceId: string | null; chosen?: string };
+export type { Focus };
 
-type Runner = (state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]) => ScenarioState | null;
+// The mechanic families' rules, in play order: where two runners could answer one verb, the first in this list does (docs/architecture.md, Mechanic families).
+// The order is the catalog list's (src/catalog/families/index.ts).
+export const RULES_FAMILIES: readonly RulesFamily[] = [
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island,
+];
 
-const RUNNERS: readonly Runner[] = [attack.run, defense.run, encounter.run, quest.run, play.run, costs.run, deck.run, attachments.run, sidequests.run, misc.run, burden.run, south.run, campaign.run, objectives.run, prisoner.run, dungeon.run, caves.run, nightmare.run, moria.run, breaking.run, dreamchaser.run, sea.run, uncharted.run, aflame.run, stormcaller.run, grapple.run, island.run];
+// The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
+// Every family with a hook for the phase is listed (settleHooks throws on one that is not). The order is the one the core's chain had when it called the families by name, and it is not the list's.
+// `before`: after the constant win check, before the core refills the encounter deck. `after`: right after that refill. `sweep`: after the core's own sweeps.
+export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
+  before: ["burden", "island", "south"],
+  after: ["sea", "stormcaller", "island"],
+  sweep: ["aflame"],
+};
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */
 export function runFamilyVerb(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
-  for (const runner of RUNNERS) {
-    const next = runner(state, instruction, focus, ctx, steps);
+  for (const family of RULES_FAMILIES) {
+    const next = family.run(state, instruction, focus, ctx, steps);
     if (next) return next;
   }
   return null;
 }
+
+// The core's hook calls (interpret/family-hooks.ts) walk these lists.
+registerFamilies(RULES_FAMILIES, SETTLE_ORDER);

@@ -2,13 +2,14 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
 const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
 
-export const VERBS = [
+const VERBS = [
   // Constant on a hero: while it pays for a card that matches `pick`, it counts as having these resource icons (resource match
   // and payment both): "While playing an Item attachment, Bard son of Brand is considered to have the printed ... icons".
   z.strictObject({ verb: z.literal("PaysAsIcons"), pick: pickSchema, icons: z.array(icon).min(1), ...when }),
@@ -27,8 +28,9 @@ export const VERBS = [
   // Constant on a card in hand: as part of its cost its player may exhaust any number of ready characters that match, each
   // lowering the cost by 1. The payment says how many: the cost not paid in resources is paid by exhausting them.
   z.strictObject({ verb: z.literal("ExhaustToReduce"), pick: pickSchema, ...when }),
-  // The source attachment moves to another card it may be attached to (not its current host), chosen by the actor.
-  verb("Reattach"),
+  // The source attachment moves to another card it may be attached to (not its current host), chosen by the actor. `card: picked`: the last picked attachment moves instead ("Ready an attachment. You may move it to
+  // an eligible character.", 11204:A:5).
+  z.strictObject({ verb: z.literal("Reattach"), card: z.literal("picked").optional(), ...when }),
   // The actor chooses a number X from `min` (1 by default) up to the smallest of `max`, and the effect's X is that number.
   // Nothing happens, and the effect's X stays, when no number can be chosen.
   z.strictObject({ verb: z.literal("ChooseX"), max: z.array(amountSchema).min(1), min: z.number().int().min(0).optional(), ...when }),
@@ -78,16 +80,14 @@ export const VERBS = [
   }),
 ] as const;
 
-function verb<const Verb extends string>(name: Verb) {
-  return z.strictObject({ verb: z.literal(name), ...when });
-}
-
 // An attachment was attached to a card: played onto it, or moved to it (the event's subject is the attachment, its other card
 // the new host). "After a Signal attachment is attached to a hero".
-export const TRIGGERS = ["attached"] as const;
+const TRIGGERS = ["attached"] as const;
 
 // Resource icons a card has while it holds the flag (amount 1): "Amarthiúl gains the Tactics resource icon", "give attached
 // hero a Leadership icon until the end of the phase". `collectsResources`: a card that is not a hero collects this many
 // resources each resource phase (rr.step-1-2) into its own pool. `engagementCheckCost`: an enemy gets this much more
 // engagement cost while it makes an engagement check with the player who controls the modifier's source (Orc Disguise).
-export const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost"] as const;
+const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost"] as const;
+
+export const manifest = { name: "costs", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

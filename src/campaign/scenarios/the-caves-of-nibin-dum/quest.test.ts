@@ -12,7 +12,7 @@ import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce } from "../../../rules/engine/reduce.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { codesIn, loadCavesWorld, cavesTable, type CavesLayout, type CavesWorld } from "../../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
-import { first, send, start } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: CavesWorld;
 

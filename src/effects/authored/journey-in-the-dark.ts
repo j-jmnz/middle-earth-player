@@ -17,7 +17,6 @@ const BRIDGE = "142050";
 const CHIEFTAIN = "142045";
 const BALROG_IN_STAGING: PickSpec = {"type":"enemy","control":"any","stagingOnly":true,"names":["The Balrog"]};
 const THREAT_35 = {"kind":"threat","min":35} as const;
-const NOT_THREAT_35 = {"kind":"not","condition":THREAT_35} as const;
 const NOT_IN_STAGING = {"kind":"not","condition":{"kind":"sourceIn","zone":"staging"}} as const;
 const IN_STAGING = {"kind":"sourceIn","zone":"staging"} as const;
 const MY_CHARACTER = {"type":"character","control":"you"} as const;
@@ -66,7 +65,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 142047 Uruk from Mordor. It makes an attack against the first player as it is revealed, from the staging area. The Shadow adds 1 Attack, and the
   // attacker attacks again when the attack destroyed a character.
   {"id":"142047:whenRevealed:1","cardCode":"142047","lines":["142047:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AttackFromStaging","target":"self","who":"firstPlayer"}]},
-  {"id":"142047:shadow:1","cardCode":"142047","lines":["142047:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"ImmediateAttack","when":{"kind":"x","min":1}}]}]},
 
   // 142048 Moria Orc: the revealing player removes a damage token from Doom, Doom, Doom or reveals one more card; the Shadow raises the defender's threat
   // by the enemies engaged with them.
@@ -92,7 +90,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142053 Many-pillared Hall: +1 Threat for each one in play (itself too); the Shadow adds 1 Attack, 2 when the defending player's threat is 35 or more.
   {"id":"142053:constant:1","cardCode":"142053","lines":["142053:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threat","amount":{"count":{"type":"location","control":"any","names":["Many-pillared Hall"]}},"until":"whileSourceInPlay"}]},
-  {"id":"142053:shadow:1","cardCode":"142053","lines":["142053:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":NOT_THREAT_35},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker","when":THREAT_35}]},
 
   // 142054 Darkened Stairway: explored, the top card of the encounter deck is discarded, and a location goes to the staging area.
   {"id":"142054:forced:1","cardCode":"142054","lines":["142054:A:1"],"timing":"forced","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"MoveEncounterCard","card":"deckTop","to":"discard"},{"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]},
@@ -140,4 +137,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"142088:forced:2","cardCode":"142088","lines":["142088:A:2"],"timing":"forced","trigger":"exhausted","subject":"host","condition":NOT_IN_STAGING,"instructions":[{"verb":"DamageCard","amount":1,"target":"host"}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["142046:constant:1"];

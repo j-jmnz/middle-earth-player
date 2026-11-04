@@ -4,21 +4,15 @@ import { EFFECTS } from "../effects/index.ts";
 import { expectOk } from "../rules/core/test-fixture.ts";
 import type { EngineStep } from "../rules/core/intents.ts";
 import { definePrinted } from "../rules/core/printed.ts";
-import { reduce, startScenario } from "../rules/engine/reduce.ts";
+import { reduce, startScenario, type ReduceContext } from "../rules/engine/reduce.ts";
 import { type Cause } from "../rules/core/cause.ts";
 import { playOut } from "../../test/harness/auto-player.ts";
 import { causeProblems, NUMBER_STEPS, verified } from "../../test/harness/cause-check.ts";
-import { campaign, loadWorld, reveal, scenario, send, table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { GOLDEN_REGISTRY } from "../../test/harness/golden-registry.ts";
+import { loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { campaign, loadWorld, reveal, scenario, table } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { send } from "../../test/harness/scene-kit.ts";
 import { playStarter, starterWorld, STARTER_SEEDS } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
-import { knife, KNIFE_GOLDENS, knifeWorld, playGolden } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
-import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../test/scenarios/flight-to-the-ford/game.ts";
-import { ford } from "../../test/scenarios/flight-to-the-ford/scene.ts";
-import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../test/scenarios/the-ring-goes-south/game.ts";
-import { south } from "../../test/scenarios/the-ring-goes-south/scene.ts";
-import { MORIA_GOLDENS, moriaWorld, playGolden as playMoriaGolden } from "../../test/scenarios/journey-in-the-dark/game.ts";
-import { moria } from "../../test/scenarios/journey-in-the-dark/scene.ts";
-import { BREAKING_GOLDENS, breakingGameWorld, playGolden as playBreakingGolden } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
-import { breaking } from "../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 import { buildStart } from "./start.ts";
 
@@ -59,79 +53,45 @@ describe("engine step causes in the starter-deck goldens", () => {
   });
 });
 
-describe("engine step causes in the A Knife in the Dark goldens", () => {
-  it("name a verified rule or a ledger line on every number-changing step, the scenario's records included", async () => {
-    const { ctx } = await knifeWorld();
-    const all: EngineStep[] = [];
-    for (const golden of KNIFE_GOLDENS) all.push(...playGolden(golden, ctx).steps);
-    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
-    expect(causeProblems(all)).toEqual([]);
-    // The scenario's own records move numbers too (Bill Ferny's threat, an encounter card's damage).
-    const own = new Set([knife.campaignCard, ...knife.stages, ...knife.cards.map((card) => card.code)]);
-    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
-    expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
-  }, 120_000);
-});
-
-describe("engine step causes in the Flight to the Ford goldens", () => {
-  it("name a verified rule or a ledger line on every number-changing step, the Ring-bearer's life included", async () => {
-    const worlds = { starter: await fordWorld("starter"), strong: await fordWorld("strong"), weak: await fordWorld("weak") };
-    const all: EngineStep[] = [];
-    for (const golden of FORD_GOLDENS) all.push(...playFordGolden(golden, worlds[golden.decks].ctx).steps);
-    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
-    expect(causeProblems(all)).toEqual([]);
-    // The scenario's own records move the life: the quest stages, the locations, the treacheries, the Fell Riders.
-    const own = new Set([ford.campaignCard, ...ford.stages, ...ford.cards.map((card) => card.code)]);
+// Every scenario's goldens (test/harness/golden-registry.ts): the same check on each, and for a few the extra the scenario is known for.
+type Extra = (all: readonly EngineStep[], causes: readonly Cause[]) => void;
+const EXTRA: Readonly<Record<string, Extra>> = {
+  // The Ring-bearer's life moves too: the quest stages, the locations, the treacheries, the Fell Riders.
+  "flight-to-the-ford": (all, causes) => {
+    const own = ownCodes("flight-to-the-ford");
     const lives = all.filter((step) => step.kind === "life").map((step) => (step as { cause: Cause }).cause);
     expect(lives.length).toBeGreaterThan(20);
     expect(lives.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
     expect(lives.some((cause) => "rule" in cause)).toBe(true);
-  }, 120_000);
-});
-
-describe("engine step causes in The Ring Goes South goldens", () => {
-  it("name a verified rule or a ledger line on every number-changing step, the damage on locations included", async () => {
-    const worlds = { starter: await southWorld("starter"), strong: await southWorld("strong"), weak: await southWorld("weak") };
-    const all: EngineStep[] = [];
-    for (const golden of SOUTH_GOLDENS) all.push(...playSouthGolden(golden, worlds[golden.decks].ctx).steps);
-    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
-    expect(causeProblems(all)).toEqual([]);
-    const own = new Set([south.campaignCard, ...south.stages, ...south.cards.map((card) => card.code)]);
-    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
-    expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
-  }, 120_000);
-});
-
-describe("engine step causes in the Journey in the Dark goldens", () => {
-  it("name a verified rule or a ledger line on every number-changing step, the damage tokens on Doom, Doom, Doom and the Balrog's attacks included", async () => {
-    const worlds = new Map<string, Awaited<ReturnType<typeof moriaWorld>>>();
-    const all: EngineStep[] = [];
-    for (const golden of MORIA_GOLDENS) {
-      if (!worlds.has(golden.decks)) worlds.set(golden.decks, await moriaWorld(golden.decks));
-      all.push(...playMoriaGolden(golden, worlds.get(golden.decks)!.ctx).steps);
-    }
-    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
-    expect(causeProblems(all)).toEqual([]);
-    const own = new Set([moria.campaignCard, ...moria.stages, ...moria.cards.map((card) => card.code)]);
-    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
+    expect(causes.length).toBeGreaterThan(100);
+  },
+  // Doom, Doom, Doom's damage tokens and the Balrog's attacks.
+  "journey-in-the-dark": (_all, causes) => {
     expect(causes.some((cause) => "effect" in cause && cause.effect.startsWith("142043:"))).toBe(true);
-    expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
-  }, 240_000);
-});
+  },
+};
 
-describe("engine step causes in the Breaking of the Fellowship goldens", () => {
-  it("name a verified rule or a ledger line on every number-changing step, the stage 3B responses, the river's threat and the hero that fell into evil included", async () => {
-    const worlds = new Map<string, Awaited<ReturnType<typeof breakingGameWorld>>>();
+function ownCodes(scenarioId: string): Set<string> {
+  const scenario = loadScenario(scenarioId);
+  return new Set([scenario.campaignCard, ...scenario.stages, ...scenario.cards.map((card) => card.code)]);
+}
+
+describe.each(GOLDEN_REGISTRY)("engine step causes in the $title goldens", ({ scenarioId, goldens, world, play }) => {
+  it("name a verified rule or a ledger line on every number-changing step, the scenario's records included", async () => {
+    const ctxs = new Map<string, ReduceContext>();
     const all: EngineStep[] = [];
-    for (const golden of BREAKING_GOLDENS) {
-      if (!worlds.has(golden.decks)) worlds.set(golden.decks, await breakingGameWorld(golden.decks));
-      all.push(...playBreakingGolden(golden, worlds.get(golden.decks)!.ctx).steps);
+    for (const golden of goldens) {
+      if (!ctxs.has(golden.decks)) ctxs.set(golden.decks, (await world(golden.decks)).ctx);
+      all.push(...play(golden, ctxs.get(golden.decks)!).steps);
     }
-    expect(all.filter((step) => NUMBER_STEPS.has(step.kind)).length).toBeGreaterThan(100);
+    const numbered = all.filter((step) => NUMBER_STEPS.has(step.kind));
+    expect(numbered.length).toBeGreaterThan(100);
     expect(causeProblems(all)).toEqual([]);
-    const own = new Set([breaking.campaignCard, ...breaking.stages, ...breaking.cards.map((card) => card.code)]);
-    const causes = all.filter((step) => NUMBER_STEPS.has(step.kind)).map((step) => (step as { cause: Cause }).cause);
+    // The scenario's own records move numbers too.
+    const own = ownCodes(scenarioId);
+    const causes = numbered.map((step) => (step as { cause: Cause }).cause);
     expect(causes.some((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""))).toBe(true);
+    EXTRA[scenarioId]?.(all, causes);
   }, 240_000);
 });
 

@@ -43,6 +43,7 @@ import { finishMulliganChoice, finishSetup, mulliganSeat } from "../setup/setup.
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "../combat/shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "../core/state.ts";
+import { runSettle } from "../interpret/family-hooks.ts";
 import { heldByLapsedStage } from "../families/grapple/values.ts";
 import { clearEliminated, damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
 import { effectsOf } from "../windows/listen.ts";
@@ -53,14 +54,7 @@ import { announceShadowsDealt } from "../families/defense/shadow.ts";
 import { attackedEarly, earlyAttacks } from "../families/defense/order.ts";
 import { strikeResumes } from "../families/attack/flow.ts";
 import { pruneRoundCaps } from "../families/dreamchaser/index.ts";
-import { announceProgress } from "../families/burden/effects.ts";
-import { damageLoss } from "../families/south/locations.ts";
 import { refillEncounterDeck } from "../interpret/verbs.ts";
-import { refillCorsairDeck } from "../families/sea/corsair.ts";
-import { aflameSweep } from "../families/aflame/sweep.ts";
-import { syncStormcallerArea } from "../families/stormcaller/area.ts";
-import { syncIsland } from "../families/island/map.ts";
-import { announceExits } from "../families/island/hand.ts";
 import { committedTo } from "../families/stormcaller/commit.ts";
 import { announceCollected } from "../families/aflame/attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../families/sea/sailing.ts";
@@ -71,7 +65,10 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
   for (let guard = 0; guard < 400; guard += 1) {
     // The Corsair deck that ran out is refilled from its discard pile at once (dcce.corsair-deck).
     // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller/area.ts); the Island Map's locations as the active location says (families/island/map.ts).
-    current = syncIsland(syncStormcallerArea(refillCorsairDeck(refillEncounterDeck(damageLoss(announceExits(announceProgress(constantWin(current, ctx), steps, ctx), ctx), ctx.cards), steps))), ctx);
+    // Core: the constant win check, then the families' `before` hooks (burden, island, south), the encounter deck refill, the families' `after` hooks (sea, stormcaller, island): SETTLE_ORDER.
+    const beforeRefill = runSettle("before", constantWin(current, ctx), ctx, steps);
+    const refilled = refillEncounterDeck(beforeRefill, steps);
+    current = runSettle("after", refilled, ctx, steps);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
       if (asking !== current) {
@@ -101,7 +98,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // The Stormcaller Elite whose indestructible lapsed with the stage (12039:B:1) wait, lethal, for the When Revealed that flips them (12040:B:1): advancing is immediate.
     const held = (candidate: ScenarioState, id: string): boolean => ((answerable || resolving) && damageHeld(candidate, id)) || heldByLapsedStage(candidate, id, ctx);
     // The play family's constants (families/play/sweep.ts): hero card type, first player control, discard at a stat.
-    const swept = current.lost || current.failure ? current : aflameSweep(destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
+    const swept = current.lost || current.failure ? current : runSettle("sweep", destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {
       current = swept;
       continue;

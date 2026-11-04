@@ -38,11 +38,11 @@ cards have no file under `src/effects/authored/families/`.
 
 ## Files you own (edit freely)
 
-- `src/catalog/families/<F>.ts`: `VERBS` (zod `z.strictObject({ verb: z.literal("..."), ..., ...when })`, `when` from
-  `../effect-schema-conditions.ts`), `TRIGGERS` (event names), `FLAGS` (stat flags `ModifyStat` can set). Keep the
-  `as const`. They are spread into the verb union, the trigger enum and the stat enum. Every verb carries a comment saying
+- `src/catalog/families/<F>.ts`: one `manifest` with `verbs` (zod `z.strictObject({ verb: z.literal("..."), ..., ...when })`, `when` from
+  `../effect-schema-conditions.ts`), `triggers` (event names) and `flags` (stat flags `ModifyStat` can set). Keep the
+  `as const`. The index builds the verb union, the trigger enum and the stat enum from the manifests. Every verb carries a comment saying
   what the engine does with it.
-- `src/rules/families/<F>/index.ts`: `run()` resolves your verbs (`runFamilyVerb` in `src/rules/families/index.ts` asks the
+- `src/rules/families/<F>/index.ts`: a `manifest` with the `verbs` your `run()` answers and `run` (`runFamilyVerb` in `src/rules/families/index.ts` asks the
   families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>/index.ts` and helper
   modules beside it in `src/rules/families/<F>/`.
 - `src/rules/families/<F>/index.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
@@ -50,9 +50,10 @@ cards have no file under `src/effects/authored/families/`.
   show a compact table setup.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   `src/effects/authored/<scenario-id>.ts` (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`) for a scenario.
-- A new family is wired in at four places, each one line: `src/catalog/families/index.ts`, `src/rules/families/index.ts`
-  (its `RUNNERS`), `src/effects/authored/families/index.ts` (when it has records there), and for a new scenario file
-  `src/effects/index.ts`. `src/catalog/families/families.test.ts` fails if two families add the same trigger or flag.
+- A new family is wired in at three places, each one line: `src/catalog/families/index.ts` (`CATALOG_FAMILIES`), `src/rules/families/index.ts`
+  (`RULES_FAMILIES`) and `src/effects/authored/families/index.ts` (when it has records there). `src/catalog/families/families.test.ts`
+  fails if two families add the same trigger or flag; `src/rules/interpret/family-manifest.test.ts` fails if a declared verb has no runner or a runner answers an undeclared one. A scenario's file `src/effects/authored/<scenario-id>.ts` is picked up by
+  `pnpm data:build`, which writes the barrel `src/effects/generated/authored.ts` (`scripts/data/effects/barrel.ts`); the coverage test fails while it is stale.
 
 ## Shared files
 
@@ -81,9 +82,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
    `Pick`, `Choose`, `effect-frames.ts`). If you add a verb that can appear inside a `Choose` option, give it words in
    `src/play/words/choice.ts` (`instructionWords`): a test checks every branch reads as a sentence.
 6. A line may stay open only if it is genuinely impossible to express in this engine; report it with the reason.
-7. A scenario phase also adds the scenario to `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open,
-   pins a whole game in a golden (`src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `src/campaign/scenarios/the-ring-goes-south/golden.json` are
-   the pattern), and leaves its phone half open in `docs/phases/STATUS.md` when you have no phone.
+7. A scenario phase starts with `pnpm scenario:new <scenario-id>`: it writes the scene, the game, the golden test, the campaign test, the seed finder, both Maestro flows, `src/effects/authored/<scenario-id>.ts` and the empty fixture file, and adds the registry lines (the fixtures in `src/campaign/fixtures/registry.ts`, `src/campaign/fixtures.ts` and `scripts/e2e/fixtures.ts`; the golden registry's two lines as comments). Then `pnpm data:build` (the authored-file barrel), `pnpm effects:draft <scenario-id>` and the `effect-author` agent. Fill the skeletons from the shared kit, keeping only what is the scenario's own: `test/harness/scene-kit.ts` (scene helpers), `game-kit.ts` (the campaign game and its goldens), `golden-suite.ts` (the golden test's loops), `scripts/e2e/seed-kit.ts` (the seed finder) and the Maestro subflows in `.maestro/subflows/`. The skeletons keep the suite green (the golden suite is skipped and the campaign test has todos), so the golden test is finished by turning `describe.skip` into `describe`, running it to write `golden.json`, and uncommenting the golden registry's two lines in `test/harness/golden-registry.ts` (`src/campaign/causes.test.ts` and `src/campaign/replay.test.ts` read it, and its test fails on a `golden.json` that is not listed). The scenario also goes in `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open, and its phone half stays open in `docs/phases/STATUS.md` when you have no phone. `src/campaign/scenarios/the-ring-goes-south/golden.test.ts` and `golden.json` are the pattern for a golden.
 
 ## Checkpoints (API usage limits can stop you mid-task)
 
@@ -105,7 +104,8 @@ change) says, and never kill processes you did not start (no `pkill`).
 - `pnpm effects:open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
 - `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for every card you wrote records for: no problems reported.
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
-- Full `pnpm test` once at the end. The golden snapshots (`src/campaign/scenarios/<scenario-id>/golden.json` for the scenario games, `src/campaign/starter/golden/` for the
+- `pnpm test:scenario <scenario-id>` while authoring (the scenario's tests, its goldens, the coverage checks and the card smoke on its player cards).
+- Full `pnpm test` once at the end (`docs/phases/phase-12-knife-in-the-dark.md`, Scenario procedure). The golden snapshots (`src/campaign/scenarios/<scenario-id>/golden.json` for the scenario games, `src/campaign/starter/golden/` for the
   starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
   explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e/fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
 

@@ -14,7 +14,8 @@ import { expectOk } from "../../core/test-fixture.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { dolGuldurTable, loadDolGuldurWorld, OBJECTIVES, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
 import { dolGuldurStart, dolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
-import { codesOf, first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 
 let world: DolGuldurWorld;

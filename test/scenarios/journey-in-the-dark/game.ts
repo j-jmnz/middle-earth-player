@@ -1,59 +1,44 @@
-import { buildStart } from "../../../src/campaign/start.ts";
 import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
+import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { BALROG, BRIDGE, campaign, CHAMBER, moria } from "./scene.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, type PlayedGame, playToEnd, STRONG_HEROES } from "../../harness/game-kit.ts";
+import { attackTogether, dealtGame, engageOneEach, fellowshipLoadout, HERO_STATS_8, type PlayedGame, playToEnd, RING_BEARER, STRONG_HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Journey in the Dark played by the auto-player, true solo or two-handed. The loadouts are the ones the Ring Goes South
 // goldens use (test/scenarios/the-ring-goes-south/game.ts): the saga Frodo beside big-number heroes and a deck of free events, so the outcome depends on the engine and the
 // seed, not on card play. The policy engages every enemy it can (each optional engagement takes a damage token off Doom, Doom, Doom), attacks every enemy
 // engaged with the first seat, travels to Chamber of Mazarbul and the Great Bridge first, and never gives a hero up for the Bridge's damage.
-export const RING_BEARER = "141001";
-export { STRONG_HEROES };
+export { RING_BEARER, STRONG_HEROES };
 export const MORIA_POLICY: PolicyOptions = { scout: "", prefer: CHAMBER, protect: RING_BEARER, play: true, act: false };
 // "strong": big-number heroes. "weak": heroes too small to quest, so the players lose on threat. "brittle": strong quest and attack with a few hit points and no
 // Defense, so an attack destroys every hero. "slow": heroes that quest for little, so the Doom countdown runs out and the Balrog arrives. "fragile": slow
 // heroes with 30 hit points, so the Balrog's attacks destroy them.
 export type MoriaDecks = "strong" | "weak" | "brittle" | "slow" | "fragile";
 
-function slot(seatCount: 1 | 2): LoadoutSeat[] {
-  const filler = Array.from({ length: 30 }, () => "filler");
-  const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck: filler };
-  return seatCount === 1 ? [first] : [first, { heroes: ["q4", "q5", "q6"], deck: filler }];
-}
+export const moriaLoadout = (seatCount: 1 | 2): LoadoutSeat[] => fellowshipLoadout(campaign, seatCount, false);
 
-export function moriaLoadout(seatCount: 1 | 2): LoadoutSeat[] {
-  return slot(seatCount);
-}
+const game = dealtGame<MoriaDecks>({
+  campaign,
+  scenario: moria,
+  stats: {
+    strong: HERO_STATS_8.strong,
+    weak: HERO_STATS_8.weak,
+    brittle: { ...HERO_STATS_8.brittle, health: 9 },
+    slow: { ...HERO_STATS_8.strong, willpower: 5 },
+    fragile: { ...HERO_STATS_8.strong, willpower: 5, health: 30 },
+  },
+  codes: [...campaign.prelude.map((card) => card.code), RING_BEARER],
+  loadout: moriaLoadout,
+});
 
-const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
-const STRONG_STATS = { threat: 8, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-const BRITTLE_STATS = { threat: 8, willpower: 20, attack: 12, defense: 0, health: 9 } as const;
-const SLOW_STATS = { threat: 8, willpower: 5, attack: 12, defense: 6, health: 100 } as const;
-const FRAGILE_STATS = { threat: 8, willpower: 5, attack: 12, defense: 6, health: 30 } as const;
-const STATS = { strong: STRONG_STATS, weak: WEAK_STATS, brittle: BRITTLE_STATS, slow: SLOW_STATS, fragile: FRAGILE_STATS } as const;
+export const moriaWorld = (decks: MoriaDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> => game.world(decks);
+// The decks change the heroes' numbers, not the seats.
+export const moriaStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: MoriaDecks = "strong"): StartScenario => game.start(seatCount, seed, difficulty, decks);
 
-export async function moriaWorld(decks: MoriaDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [...scenarioCards(moria).map((card) => card.code), ...moria.campaignPlaced, moria.campaignCard, ...campaign.prelude.map((card) => card.code), RING_BEARER];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of STRONG_HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-export function moriaStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, decks: MoriaDecks = "strong"): StartScenario {
-  void decks;
-  return buildStart({ campaign, scenario: moria, seatCount, seed, threatModifier: 0, seats: moriaLoadout(seatCount), effects: EFFECTS, difficulty });
-}
-
-// With the strong loadout the last hero of each seat stays out of the quest, so it is ready to attack.
 const STRONG_QUESTERS = new Set([RING_BEARER, "q1", "q2", "q4", "q5"]);
 
 // The code of the location the policy travels to first: Chamber of Mazarbul while it is in play, the Great Bridge at stage 3.

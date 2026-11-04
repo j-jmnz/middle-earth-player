@@ -1,5 +1,6 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, dcce.campaign-mode (data/rules/entries.json). The verbs src/catalog/families/stormcaller.ts adds. The area and its cards are in
 // stormcaller/area.ts, the Stormcaller's quest stage in stormcaller/stage.ts, what a record reads in stormcaller/values.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -7,7 +8,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { flipStormcaller, moveToStormcallerArea, prepareStormcallerArea } from "./area.ts";
+import { flipStormcaller, moveToStormcallerArea, prepareStormcallerArea, syncStormcallerArea } from "./area.ts";
 import { moveProgressToStormcaller, stormcallerProgress } from "./stage.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -29,3 +30,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "stormcaller", settle: { after: (state) => syncStormcallerArea(state) }, verbs: ["PrepareStormcallerArea", "FlipStormcaller", "MoveProgressToStormcaller", "StormcallerProgress", "MoveToStormcallerArea", "CatchUpWins"], run };

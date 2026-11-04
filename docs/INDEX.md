@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~1.9K tok)
+- `CLAUDE.md` — Claude Code (~2.0K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
 - `.cursor/rules/code-standards.mdc` — Code standards (~1.8K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
@@ -17,11 +17,11 @@ Read whole.
 
 Each agent reads its own file.
 
-- `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.1K tok)
+- `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
 - `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.5K tok)
-- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.1K tok)
+- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.3K tok)
 - `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
-- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~800 tok)
+- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~140 tok)
@@ -31,35 +31,35 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.6K tok)
+- `README.md` — Middle Earth LCG (~3.8K tok)
   - 7–17 Where it stands (~390)
   - 18–23 Rules come from the printed sources (~160)
-  - 24–53 Commands (~1.1K)
-  - 54–63 Documents (~260)
-  - 64–67 Agents (~120)
-  - 68–162 Run it locally (~1.5K)
-    - 72–77 Mac browser (~120)
-    - 78–83 Codespaces (~110)
-    - 84–158 Phone builds from scratch (Mac) (~1.1K)
-    - 159–162 Maestro (~170)
-- `docs/architecture.md` — Architecture (~17.9K tok)
+  - 24–55 Commands (~1.3K)
+  - 56–65 Documents (~260)
+  - 66–69 Agents (~170)
+  - 70–164 Run it locally (~1.5K)
+    - 74–79 Mac browser (~120)
+    - 80–85 Codespaces (~110)
+    - 86–160 Phone builds from scratch (Mac) (~1.1K)
+    - 161–164 Maestro (~170)
+- `docs/architecture.md` — Architecture (~18.8K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.0K) ← 3
-    - 126–160 Repository map (~840) ← 1
+    - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~2.8K)
-    - 223–234 Mechanic families (~1.9K)
-  - 235–240 Effects (~520)
+  - 209–234 Engine (~3.3K)
+    - 223–234 Mechanic families (~2.4K) ← 5
+  - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–369 Tests (~910) ← 2
-  - 370–385 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
+  - 356–371 Tests (~1.3K) ← 3
+  - 372–387 Performance (~1.2K) ← 3
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~61.8K tok)
   - 17–37 Sections (~380)
   - 38–49 Product (~520)
   - 50–63 Non-goals (~560)
@@ -72,7 +72,7 @@ Read the sections your task touches.
     - 225–239 Mirkwood campaign cards and carry-over (~870)
     - 240–251 Standalone play (~800)
     - 252–263 Scenario state (~570)
-    - 264–296 The engine plays the game (~2.1K) ← 3
+    - 264–296 The engine plays the game (~2.1K) ← 4
     - 297–304 Engine steps (~180)
     - 305–333 Core round (~1.3K) ← 1
     - 334–363 Keywords implemented once (~1.6K)
@@ -91,20 +91,20 @@ Read the sections your task touches.
     - 568–588 Escape from Dol Guldur (~2.7K)
     - 589–603 The Oath (~2.3K)
     - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–670 Dream-chaser (~11.2K)
-  - 671–679 Nightmare (~420)
-  - 680–718 Deckbuilding (~1.8K) ← 1
-  - 719–797 Effects (~3.2K)
-    - 721–779 Three layers (~2.4K)
-    - 780–789 Player side quests, contracts and saga cards (~430)
-    - 790–793 Window stack (~100)
-    - 794–797 Coverage test (~270)
-  - 798–818 Data sources (~560)
-  - 819–837 Card images (~1.1K) ← 6
-  - 838–863 Persistence and shipping (~1.7K)
-  - 864–904 Screens (~4.4K) ← 2
-    - 890–904 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~27.6K tok)
+  - 622–672 Dream-chaser (~12.4K)
+  - 673–681 Nightmare (~420)
+  - 682–720 Deckbuilding (~1.8K) ← 1
+  - 721–799 Effects (~3.2K)
+    - 723–781 Three layers (~2.4K)
+    - 782–791 Player side quests, contracts and saga cards (~430)
+    - 792–795 Window stack (~100)
+    - 796–799 Coverage test (~270)
+  - 800–820 Data sources (~560)
+  - 821–839 Card images (~1.1K) ← 6
+  - 840–865 Persistence and shipping (~1.7K)
+  - 866–906 Screens (~4.4K) ← 2
+    - 892–906 Table screen (~1.6K) ← 4
+- `docs/design-system-table.md` — Design system — Table (landscape) (~28.0K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -116,26 +116,26 @@ Read the sections your task touches.
   - 80–85 The Sailing test (~690) ← 5
   - 86–99 The Island Map (~1.7K) ← 8
   - 100–103 Tokens and effects (~320)
-  - 104–114 Piles (~1.2K) ← 4
-  - 115–120 Marks of the open moment (~400) ← 1
-  - 121–188 Motion (~2.7K) ← 8
-  - 189–215 Spotlight (~2.2K) ← 16
-  - 216–221 Gestures (~420) ← 5
-  - 222–225 Hold, slide and release (~940)
-  - 226–231 Peeking at the other seat (~600) ← 1
-  - 232–247 Command column (~1.9K) ← 9
-  - 248–251 Two taps (~320) ← 2
-  - 252–255 One answer, one tap (~240)
-  - 256–259 Stops and Always use (~250)
-  - 260–263 Guide (~120)
-  - 264–273 Choice tray (~850) ← 3
-  - 274–287 Reading panels (~1.5K) ← 6
-  - 288–297 Phase carousel (~680)
-  - 298–303 Quest advance (~530) ← 1
-  - 304–307 Undo (~140)
-  - 308–311 Haptics (~280)
-  - 312–322 Banner (~580) ← 1
-  - 323–326 Android Back (~90)
+  - 104–115 Piles (~1.4K) ← 5
+  - 116–121 Marks of the open moment (~400) ← 1
+  - 122–189 Motion (~2.7K) ← 8
+  - 190–216 Spotlight (~2.2K) ← 16
+  - 217–222 Gestures (~420) ← 5
+  - 223–226 Hold, slide and release (~940)
+  - 227–232 Peeking at the other seat (~600) ← 1
+  - 233–248 Command column (~1.9K) ← 9
+  - 249–252 Two taps (~320) ← 2
+  - 253–256 One answer, one tap (~240)
+  - 257–260 Stops and Always use (~250)
+  - 261–264 Guide (~120)
+  - 265–274 Choice tray (~940) ← 5
+  - 275–288 Reading panels (~1.5K) ← 6
+  - 289–298 Phase carousel (~680)
+  - 299–304 Quest advance (~530) ← 1
+  - 305–308 Undo (~140)
+  - 309–312 Haptics (~280)
+  - 313–323 Banner (~580) ← 1
+  - 324–327 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~23.9K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -179,18 +179,18 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.2K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.5K tok)
   - 5–16 Rules (~550)
-  - 17–75 Phases (~2.1K)
-  - 76–161 Open items (~4.0K)
+  - 17–75 Phases (~2.2K)
+  - 76–167 Open items (~4.3K)
     - 78–92 Fixtures and Maestro (~630)
-    - 93–120 Rules and engine (~840)
-    - 121–138 Screens and code (~1.0K)
-    - 139–161 Phone and tablet checks (~1.5K)
-  - 162–178 Standing decisions (~430)
+    - 93–123 Rules and engine (~970)
+    - 124–144 Screens and code (~1.2K)
+    - 145–167 Phone and tablet checks (~1.5K)
+  - 168–184 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
-- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.1K tok)
+- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
 - `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~1.0K tok)
 - `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~1.1K tok)
 - `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~790 tok)
@@ -203,9 +203,8 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~940 tok)
-- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~930 tok)
-- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~950 tok)
+- `docs/phases/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
+- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.0K tok)
 
 ## Done phases
 
@@ -263,6 +262,7 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
 - `docs/phases/done/phase-43-flight-of-the-stormcaller.md` — Phase 43 — Flight of the Stormcaller (~930 tok)
 - `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~930 tok)
 - `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~940 tok)
+- `docs/phases/done/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
 
 ## Live plans
 
@@ -281,18 +281,20 @@ Read when a task names the plan.
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~5.5K tok)
-  - 12–31 Workflow (~440)
-  - 32–47 Where records live (~310)
-  - 48–72 The record (~500)
-  - 73–89 Which card an instruction acts on (~380)
-  - 90–110 Pick filters (~410)
-  - 111–119 Amounts (~180)
-  - 120–126 Conditions (~110)
-  - 127–146 Triggers and stat flags (~440)
-  - 147–208 Patterns (~1.4K)
-  - 209–234 Mechanic families: engine and records together (~720) ← 2
-  - 235–254 Not expressible yet: leave open, report (~390)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.0K tok)
+  - 12–33 Workflow (~470)
+  - 34–50 Where records live (~370)
+  - 51–73 Templates and copied lines (~520) ← 4
+  - 74–98 The record (~500)
+  - 99–115 Which card an instruction acts on (~380)
+  - 116–136 Pick filters (~410)
+  - 137–145 Amounts (~180)
+  - 146–152 Conditions (~110)
+  - 153–172 Triggers and stat flags (~440)
+  - 173–234 Patterns (~1.4K)
+  - 235–271 Mechanic families: engine and records together (~1.3K) ← 3
+  - 272–283 Readings the review catches (~380) ← 4
+  - 284–303 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
@@ -305,13 +307,37 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~4.4K tok)
+  - 3–14 Context (~450)
+  - 15–24 What does not move (~190)
+  - 25–45 A. Effects: draft better, template the repeats, copy identical lines (~760)
+  - 46–54 B. One registry for scenarios, fixtures and goldens (~280)
+  - 55–67 C. A shared scenario kit and `pnpm scenario:new` (~510)
+  - 68–79 D. One manifest per family (~330)
+  - 80–87 E. Data: seed what can be seeded (~210)
+  - 88–93 F. Faster feedback while authoring (~90)
+  - 94–118 Where a scenario's cost is now (~720)
+  - 119–141 Next steps (~510) ← 2
+  - 142–151 After each scenario phase (~160) ← 1
+  - 152–155 Order (~70)
+  - 156–163 Verification (~100)
 
 ## Handovers
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~2.7K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.2K tok)
+  - 20–38 Setup (~440)
+  - 39–57 Files you own (edit freely) (~490)
+  - 58–71 Shared files (~300)
+  - 72–86 Approach (~700) ← 4
+  - 87–96 Checkpoints (API usage limits can stop you mid-task) (~200)
+  - 97–111 Checks before committing (~330)
+  - 112–118 Merge (~120)
+  - 119–125 Commit (~110)
+  - 126–133 Report (your final message) (~90)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
+- `docs/handover/phase-47.md` — Handover: phase 47, A Storm on Cobas Haven (~1.8K tok)
 
 ## Done plans
 
@@ -338,12 +364,12 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
-- `scripts/tools`: architecture.md, Modules (1)
-- `src/campaign`: architecture.md, Tests (1)
-- `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
+- `scripts/tools`: phases/phase-12-knife-in-the-dark.md, Scenario procedure (2); architecture.md, Modules (1)
+- `src/campaign`: architecture.md, Tests (2)
+- `src/catalog`: architecture.md, Mechanic families (2); brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
 - `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Choice tray (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
-- `src/rules`: brief.md, The engine plays the game (2); architecture.md, State (1)
+- `src/rules`: architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Components (5); design-system.md, Briefing (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `src/ui`: design-system.md, Components (3); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

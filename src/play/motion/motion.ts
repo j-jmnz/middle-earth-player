@@ -149,8 +149,8 @@ export function motionsBetween(
     } else if (slot.zone === "staging" || slot.zone === "engaged") {
       const reveal = slot.kind === "card" && !slot.faceDown;
       const corsair = options.zoneWas?.(slot.id) === "corsairDeck" && next.piles.corsairDeck != null;
-      // A Lost Island comes off the Uncharted deck as a reveal does.
-      const island = options.zoneWas?.(slot.id) === "unchartedDeck" ? (next.piles.unchartedDeck ?? null) : null;
+      // A Lost Island comes off the Uncharted deck, and a Grotto location off the Grotto deck, as a reveal does.
+      const island = options.zoneWas?.(slot.id) === "unchartedDeck" ? (next.piles.unchartedDeck ?? next.piles.grottoDeck ?? null) : null;
       // Boarding: each Corsair card comes off the Corsair deck as a reveal does, then moves into the engagement row, the cards 90 ms apart.
       const delay = corsair ? Math.min(boarded, SHAPE.maxStagger) * MOTION.stagger.ms : 0;
       if (corsair) boarded += 1;
@@ -171,8 +171,8 @@ export function motionsBetween(
     }
     if (slot.faceDown) continue;
     const zone = zoneNow(slot.id);
-    // The pile of that name, when the card went to one (a discard pile, a deck).
-    const pile = zone != null && zone in next.piles ? (next.piles[zone as PileId] ?? null) : null;
+    // The pile of that name, when the card went to one (a discard pile, a deck). The engine's Uncharted deck is the Grotto deck's pile in a Grotto game: a location shuffled back into it glides there.
+    const pile = zone === "unchartedDeck" ? (next.piles.unchartedDeck ?? next.piles.grottoDeck ?? null) : zone != null && zone in next.piles ? (next.piles[zone as PileId] ?? null) : null;
     if (pile) {
       const a = center(slot);
       const b = center(pile);

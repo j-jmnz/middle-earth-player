@@ -27,7 +27,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01084:forced:1","cardCode":"01084","lines":["01084:A:1"],"timing":"forced","trigger":"attacks","instructions":[{"verb":"RaiseThreat","amount":1,"who":"actor"}]},
   // 01085 Wargs: dealt a shadow card with no effect, it returns to the staging area after it attacks; the Shadow adds Attack (+2 when undefended).
   {"id":"01085:forced:1","cardCode":"01085","lines":["01085:A:1"],"timing":"forced","trigger":"attackResolved","subject":"self","condition":{"kind":"shadowBlank"},"instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]},
-  {"id":"01085:shadow:1","cardCode":"01085","lines":["01085:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":NOT_UNDEFENDED},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker","when":{"kind":"undefended"}}]},
   // 01086 Despair: 4 progress come off the quest; the Shadow sets the defender's Defense to 0 for this attack (its current Defense taken off).
   {"id":"01086:whenRevealed:1","cardCode":"01086","lines":["01086:A:1"],"timing":"whenRevealed","instructions":[{"verb":"RemoveProgressFromQuest","amount":4}]},
   {"id":"01086:shadow:1","cardCode":"01086","lines":["01086:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"stat":"defense","of":"defender","negative":true},"until":"endOfAttack","target":"defender"}]},
@@ -76,7 +75,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01130:campaignSetup:1","cardCode":"01130","lines":["01130:A:2"],"timing":"campaignSetup","instructions":[{"verb":"PutObjectiveAllyIntoPlay","code":"01135"},{"verb":"SetAsideEachPlayer","code":"01133"},{"verb":"SetAsideEachPlayer","code":"01138"}]},
   {"id":"01130:response:1","cardCode":"01130","lines":["01130:A:3"],"timing":"response","trigger":"enemyDestroyed","subject":HILL_TROLL,"instructions":[attachCopy("01133")]},
   {"id":"01130:forced:1","cardCode":"01130","lines":["01130:A:4"],"timing":"forced","trigger":"characterDestroyedByAttack","subject":{"type":"character","control":"any"},"condition":{"kind":"matches","card":"other","pick":HILL_TROLL},"limit":"oncePerGame","instructions":[attachCopy("01138")]},
-  {"id":"01130:triggered:1","cardCode":"01130","lines":["01130:A:5"],"timing":"triggered","trigger":"leftPlay","subject":{"type":"card","control":"any","names":["Mendor"]},"instructions":[{"verb":"LoseGame"}]},
   {"id":"01130:resolution:1","cardCode":"01130","lines":["01130:B:1"],"timing":"resolution","instructions":[{"verb":"EarnAttached","codes":["01133","01138"]},{"verb":"NamePrisoner"}]},
 ];
 

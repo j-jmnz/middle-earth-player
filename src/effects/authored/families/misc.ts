@@ -161,7 +161,6 @@ export const RECORDS: readonly Effect[] = [
   // 131001 Bilbo Baggins (Over Hill and Under Hill).
   {"id":"131001:constant:1","cardCode":"131001","lines":["131001:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
   {"id":"131001:constant:2","cardCode":"131001","lines":["131001:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noPlayerCardResources","amount":1,"until":"whileSourceInPlay"}]},
-  {"id":"131001:triggered:1","cardCode":"131001","lines":["131001:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   // 132001 Bilbo Baggins (The Hobbit saga): not counted against the hero limit; no resources from non-treasure cards; searches for treasures.
   {"id":"132001:constant:1","cardCode":"132001","lines":["132001:A:1"],"timing":"constant","instructions":[{"verb":"Restrict","what":"heroLimit"},{"verb":"ModifyStat","stat":"noNonTreasureResources","amount":1,"until":"whileSourceInPlay"},{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
   {"id":"132001:action:1","cardCode":"132001","lines":["132001:A:2"],"timing":"action","cost":{"kind":"resources","amount":1,"sphere":"baggins","from":"self"},"condition":{"kind":"canPick","pick":{"type":"card","control":"you","from":"deck","cardType":"treasure"}},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","cardType":"treasure"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]},
@@ -180,7 +179,6 @@ export const RECORDS: readonly Effect[] = [
   {"id":"145001:constant:2","cardCode":"145001","lines":["145001:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
   {"id":"145001:triggered:1","cardCode":"145001","lines":["145001:A:1"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   {"id":"146002:constant:1","cardCode":"146002","lines":["146002:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
-  {"id":"146002:triggered:1","cardCode":"146002","lines":["146002:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   // 142001 Frodo Baggins: exhaust The One Ring (142091) and spend a Fellowship resource when he defends; the attack deals no damage.
   {"id":"142001:response:1","cardCode":"142001","lines":["142001:A:1"],"timing":"response","trigger":"declaredDefender","subject":"self","cost":{"kind":"resources","amount":1,"sphere":"fellowship"},"condition":{"kind":"exhausted","code":"142091","is":false},"instructions":[
     {"verb":"Exhaust","target":{"kind":"byCode","code":"142091"}},{"verb":"ModifyStat","stat":"dealsNoDamage","amount":1,"until":"endOfPhase","target":"other"},{"verb":"RaiseThreat","amount":2,"who":"eachSeat"}]},

@@ -31,9 +31,6 @@ const takesAHeroResource: Effect["instructions"] = [
   { verb: "PlaceResourceTokens", amount: 1, on: "self" },
 ];
 
-// "If ~ leaves play, the players lose" (the objective ally sides of the Stormcaller Elite).
-const losesWhenLeaving = (code: string, line: string): Effect => ({ id: `${code}:triggered:1`, cardCode: code, lines: [line], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "LoseGame" }] });
-
 // "Action: Spend 1 resource from a hero you control to place 1 resource on ~. (Limit once per round.)" (the objective ally sides).
 const resourceFromHero = (code: string, line: string): Effect => ({
   id: `${code}:action:1`,
@@ -215,7 +212,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 11045 White Ship (Aflame 4 is a keyword). Travel: search for a Corsair enemy, add it to the staging area, shuffle the encounter deck. Forced: when placed underneath The Havens Burn, 1 resource on each Raider enemy.
-  { id: "11045:travel:1", cardCode: "11045", lines: ["11045:A:2"], timing: "travel", instructions: [{ verb: "SearchMove", trait: "Corsair", type: "enemy", to: "staging" }, { verb: "ShuffleEncounterDeck" }] },
   placedUnder("11045", "11045:A:3", 1, [{ verb: "Each", pick: RAIDER, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "picked" }] }]),
 
   // 11046 Elven Wave-runner (Aflame 3 is a keyword). Response: after it is added to the victory display, each player draws 1 card. Shadow: against a Raider, a card at random is discarded from your hand and
@@ -379,7 +375,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
   resourceFromHero("11077", "11077:A:3"),
-  losesWhenLeaving("11077", "11077:A:4"),
 
   // 11078 Na'asiyah (enemy side). "Na'asiyah engages the last player" is a plain statement; `addedToStaging` stands in for it, as for Captain Sahír. Forced: when she engages you, each event in your hand is discarded and she gets 1 resource for each.
   // Forced: when she attacks or defends she gets +1 Attack and +1 Defense for each resource on her for this attack; after it 1 resource is discarded from her.
@@ -428,7 +423,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
   { ...resourceFromHero("11079", "11079:A:3"), id: "11079:action:1" },
-  losesWhenLeaving("11079", "11079:A:4"),
 
   // 11188 Graxar (Immune to player card effects is a keyword). No more than 1 character can attack him each round; +1 Attack for each damage on him and +1 Defense for each resource on him; Forced: when
   // he is dealt a shadow card, 1 resource on him.
@@ -490,7 +484,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "ChooseCards", codes: ["11189", "11190"], who: "firstPlayer", to: "hero", anyHero: true, when: { kind: "inVictory", code: "11188", is: true } }],
   },
   { id: "11182:resolution:2", cardCode: "11182", lines: ["11182:B:2"], timing: "resolution", instructions: [{ verb: "EarnDealt", codes: ["11184", "11185", "11186", "11187"] }] },
-  { id: "11182:resolution:3", cardCode: "11182", lines: ["11182:B:3", "11182:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   {
     id: "11182:resolution:4",
     cardCode: "11182",
@@ -502,16 +495,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
   { id: "11182:resolution:5", cardCode: "11182", lines: ["11182:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11046"] } }] },
-  { id: "11182:resolution:6", cardCode: "11182", lines: ["11182:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "inVictory", code: "11078", is: true } }] },
   { id: "11182:resolution:7", cardCode: "11182", lines: ["11182:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "enemyInPlay", is: false } }] },
-  { id: "11182:resolution:8", cardCode: "11182", lines: ["11182:B:9"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } }] },
-  {
-    id: "11182:resolution:9",
-    cardCode: "11182",
-    lines: ["11182:B:10"],
-    timing: "resolution",
-    instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
-  },
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

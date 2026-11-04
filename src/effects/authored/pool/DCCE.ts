@@ -1,10 +1,10 @@
 import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
 
+import { ALWAYS } from "../conditions.ts";
+
 // Records for the Dream-chaser Campaign Expansion's own cards (data/cards/DCCE.json), added as each scenario phase uses them. Read from the scan
 // ledger (data/printed/dream-chaser.json). Rules: dcce.hard-expert, dcce.gaining-xp, dcce.scalable-upgradable, dcce.encounter-cards, dcce.sailing-tests,
 // dcce.boarding (data/rules/entries.json).
-// "When X leaves play, remove it from the game." (a Modification boon, either side)
-const removedWhenLeaving = (code: string, line: string, id: number): Effect => ({ id: `${code}:triggered:${id}`, cardCode: code, lines: [line], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "RemoveSourceFromGame" }] });
 
 // "Attached Ship gets +N <stat>" (a Modification boon, either side).
 const hostGets = (code: string, line: string, id: number, stat: "defense" | "attack" | "willpower" | "hitPoints", amount: number): Effect => ({
@@ -30,8 +30,6 @@ const healedOrReadied = (id: number, trigger: "healed" | "readied"): Effect => (
 // "If you control a <sphere> hero" (11195:A:2 to A:5).
 const controlsHero = (sphere: "leadership" | "tactics" | "spirit" | "lore") => ({ kind: "count", pick: { type: "hero", control: "you", sphere }, min: 1 }) as const;
 
-// A condition that always holds, for the "cannot be canceled" of a card that prints no condition (`uncancelable` takes one; as in families/sidequests.ts).
-const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
 
 // 11180 Spyglass: "Action: Exhaust Spyglass to choose one: Look at a shadow card. / Look at the top and bottom card of your deck. / Place 1 progress on a location (2 progress instead if it is
 // Uncharted)." The Upgraded side may discard the shadow card, looks at any deck, and places 4 progress instead on an Uncharted location.
@@ -73,6 +71,8 @@ const blackKeyStats = (side: "A" | "B", id: number): Effect => ({
   cardCode: "11183",
   lines: [`11183:${side}:2`],
   timing: "constant",
+  // Only while the host is a character: Captain Sahír, who carries the Key as an objective ally, is an enemy on his stage 2 side (12093:A:1) and the text names "attached character".
+  condition: { kind: "matches", card: "host", pick: { type: "character", control: "any" } },
   instructions: [
     { verb: "ModifyStat", stat: "willpower", amount: 1, until: "whileSourceInPlay", target: "host" },
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", target: "host" },
@@ -139,6 +139,10 @@ const ANOTHER_ALLY: PickSpec = { type: "ally", control: "any", other: true };
 // 11198 Starla (the ally the campaign card of Temple of the Deceived places under a Temple location): X is half her level, rounded up (dcce.scalable-upgradable); she is played when she is discarded from a hand or a deck,
 // and places progress on a location when she exhausts.
 const starlaStat = (stat: "willpower" | "attack" | "defense"): Effect["instructions"][number] => ({ verb: "ModifyStat", stat, amount: { level: true, halved: true }, until: "whileSourceInPlay" });
+// 11210 Gavin (objective ally; an Encounter-keyword player card): his When Revealed takes him into play under a player the first player chooses, committed to the quest, and adds a resource to Lanwyn when she is
+// in play. The other two lines (his Planning Action shuffles a random set-aside Send for Help in with him; he is removed from the game when he leaves play by anything but that) stay open.
+const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
+const LANWYN: PickSpec = { type: "hero", control: "any", names: ["Lanwyn"] };
 
 export const RECORDS: readonly Effect[] = [
   // 11198 Starla, 11199 Recurring Nightmare. Recurring Nightmare: Defense X (the number of players); when it leaves play it is shuffled into a player's deck, the first player choosing whose; when it enters a hand it is added to the staging area.
@@ -161,7 +165,6 @@ export const RECORDS: readonly Effect[] = [
   { id: "11199:forced:1", cardCode: "11199", lines: ["11199:A:3"], timing: "forced", trigger: "enteredHand", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
 
   // 11192 Black Key (burden), both sides.
-  removedWhenLeaving("11192", "11192:A:1", 1),
   blackKeyBurden("A", 1),
   {
     id: "11192:forced:1",
@@ -172,12 +175,10 @@ export const RECORDS: readonly Effect[] = [
     condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "canPick", pick: BLACK_KEY_SAHIR }] },
     instructions: [{ verb: "Each", pick: BLACK_KEY_SAHIR, instructions: [{ verb: "PlaceResourceTokens", amount: { players: true }, on: "picked" }] }],
   },
-  removedWhenLeaving("11192", "11192:B:1", 2),
   blackKeyBurden("B", 2),
 
   // 11193 Calaerion, both sides. Side A: Action, spend 3 resources and exhaust him to ready the Dream-chaser and give it +1 Willpower, Attack and Defense until the end of the phase. Side B (Upgraded):
   // Response, after a card is discarded from the encounter deck, shuffle it into that deck (once a round); Action, spend 2 resources and exhaust him to ready another ally and give it the bonus until the end of the round.
-  removedWhenLeaving("11193", "11193:A:1", 1),
   {
     id: "11193:action:1",
     cardCode: "11193",
@@ -187,7 +188,6 @@ export const RECORDS: readonly Effect[] = [
     condition: { kind: "canPick", pick: DREAM_CHASER_SHIP },
     instructions: [{ verb: "Pick", pick: DREAM_CHASER_SHIP }, ...calaerionBoost("endOfPhase")],
   },
-  removedWhenLeaving("11193", "11193:B:1", 2),
   { id: "11193:response:1", cardCode: "11193", lines: ["11193:B:2"], timing: "response", trigger: "discardedFromEncounterDeck", limit: "oncePerRound", instructions: [{ verb: "MoveEncounterCard", card: "subject", to: "shuffle" }] },
   {
     id: "11193:action:2",
@@ -214,9 +214,7 @@ export const RECORDS: readonly Effect[] = [
   healedOrReadied(4, "readied"),
 
   // 11180 Spyglass (boon, attached to Calphon by the campaign card of The Fate of Númenor), both sides.
-  removedWhenLeaving("11180", "11180:A:1", 1),
   spyglass("A"),
-  removedWhenLeaving("11180", "11180:B:1", 2),
   spyglass("B"),
 
   // 11181 Revenant (burden, shuffled into the encounter deck by the campaign card of The Fate of Númenor; Immune to player card effects is a keyword): +2 Attack and +2 Defense for each resource on the
@@ -228,9 +226,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"11181:forced:1","cardCode":"11181","lines":["11181:A:4"],"timing":"forced","trigger":"enemyDestroyed","subject":"self","instructions":[{"verb":"MoveEncounterCard","card":"self","to":"shuffle"},{"verb":"AddCampaignResource","amount":1}]},
 
   // 11183 Black Key (boon), both sides.
-  removedWhenLeaving("11183", "11183:A:1", 1),
   blackKeyStats("A", 1),
-  removedWhenLeaving("11183", "11183:B:1", 2),
   blackKeyStats("B", 2),
   {
     id: "11183:response:1",
@@ -301,26 +297,18 @@ export const RECORDS: readonly Effect[] = [
 
   // 11172 Armor Plating, 11173 Ballista, 11174 Enlarged Quarters, 11175 Extra Sails: the Modification boons each ship-objective is fitted with (the campaign card's Setup),
   // on both sides. When one leaves play it is removed from the game; its Upgraded side adds a Response.
-  removedWhenLeaving("11172", "11172:A:1", 1),
   hostGets("11172", "11172:A:2", 1, "defense", 1),
-  removedWhenLeaving("11172", "11172:B:1", 2),
   hostGets("11172", "11172:B:2", 2, "defense", 1),
   {"id":"11172:response:1","cardCode":"11172","lines":["11172:B:3"],"timing":"response","trigger":"defended","subject":"host","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"hasShadow":true,"attackingEnemy":false}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"hasShadow":true,"attackingEnemy":false}},{"verb":"DiscardShadow"}]},
-  removedWhenLeaving("11173", "11173:A:1", 1),
   hostGets("11173", "11173:A:2", 1, "attack", 1),
-  removedWhenLeaving("11173", "11173:B:1", 2),
   hostGets("11173", "11173:B:2", 2, "attack", 1),
   {"id":"11173:constant:3","cardCode":"11173","lines":["11173:B:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"11173:response:1","cardCode":"11173","lines":["11173:B:3"],"timing":"response","trigger":"attacked","subject":"host","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true}},{"verb":"DamageCard","amount":1},{"verb":"DiscardResources","amount":1,"target":"picked"}]},
-  removedWhenLeaving("11174", "11174:A:1", 1),
   hostGets("11174", "11174:A:2", 1, "hitPoints", 3),
   {"id":"11174:constant:2","cardCode":"11174","lines":["11174:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"sailsAnyTest","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  removedWhenLeaving("11174", "11174:B:1", 2),
   hostGets("11174", "11174:B:2", 3, "hitPoints", 3),
   {"id":"11174:constant:4","cardCode":"11174","lines":["11174:B:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"sailsAnyTest","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"sailingExtra","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  removedWhenLeaving("11175", "11175:A:1", 1),
   hostGets("11175", "11175:A:2", 1, "willpower", 1),
-  removedWhenLeaving("11175", "11175:B:1", 2),
   hostGets("11175", "11175:B:2", 2, "willpower", 1),
   {"id":"11175:response:1","cardCode":"11175","lines":["11175:B:3"],"timing":"response","trigger":"engaged","subject":{"type":"enemy","control":"any","trait":"Ship","nonUnique":true,"staging":true},"eventSeat":"you","cost":[{"kind":"exhaustSelf"},{"kind":"resources","amount":1}],"instructions":[{"verb":"ModifyStat","stat":"boarding","amount":-1,"until":"endOfPhase","target":"subject"}]},
 
@@ -407,6 +395,7 @@ export const RECORDS: readonly Effect[] = [
   }),
   { id: "11196:forced:3", cardCode: "11196", lines: ["11196:A:4"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }, { verb: "FlipCard" }] },
   { id: "11196:forced:4", cardCode: "11196", lines: ["11196:B:4"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "AttackFirstPlayer" }] },
+  { id: "11210:whenRevealed:1", cardCode: "11210", lines: ["11210:A:5"], timing: "whenRevealed", instructions: [FIRST_PLAYER_CHOOSES, { verb: "TakeRevealedCard", who: "picked", committed: true }, { verb: "Pick", pick: LANWYN }, { verb: "AddResources", amount: 1, to: "picked", when: { kind: "canPick", pick: LANWYN } }] },
 ];
 
 export const REPLACES: readonly string[] = [];

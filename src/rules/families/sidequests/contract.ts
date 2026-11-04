@@ -73,11 +73,13 @@ export function hostDiscount(state: ScenarioState, cardId: string, seat: number,
   return total;
 }
 
-// Whether a card in play its controller has forbids this seat to play the card or put it into play (`CannotPlay`).
-export function playBlocked(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): boolean {
+// Whether a card in play its controller has forbids this seat to play the card or put it into play (`CannotPlay`). A card that bars every player (`anyPlayer`) bars
+// playing only: a card put into play is not played (rr.play-and-put-into-play), and "cannot" is absolute (rr.cannot). `putting`: the question is about putting the card into play.
+export function playBlocked(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, putting = false): boolean {
   if (!state.cards[cardId]) return false;
   for (const { source, instruction } of constantInstructions(state, ctx)) {
-    if (instruction.verb !== "CannotPlay" || (source.controller ?? state.firstPlayer) !== seat) continue;
+    if (instruction.verb !== "CannotPlay") continue;
+    if (instruction.anyPlayer ? putting : (source.controller ?? state.firstPlayer) !== seat) continue;
     if (matchesPick(state, cardId, instruction.pick, { seat, sourceId: source.id, counting: true }, ctx)) return true;
   }
   return false;

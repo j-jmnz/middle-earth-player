@@ -7,6 +7,7 @@ import { DATA_DIR, ROOT } from "./paths.ts";
 import { buildIcons } from "./icons.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
+import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "./effects/barrel.ts";
 import { boxCodes, boxOwners, generateEffects, renderGenerated } from "./effects/generate.ts";
 import { applyPrinted } from "./normalize/printed.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
@@ -122,6 +123,9 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
     writeFileSync(path.join(effectsDir, `${campaign.id}.ts`), renderGenerated(generated.effects.filter((effect) => owners.get(effect.cardCode) === campaign.id), campaign.id));
   }
   writeFileSync(path.join(effectsDir, "player-pool.ts"), renderGenerated(generated.effects.filter((effect) => !box.has(effect.cardCode)), "player pool", "POOL_GENERATED_EFFECTS"));
+  // The authored files, merged in campaign order (Metro cannot glob them).
+  const authored = authoredOrder(authoredFileNames(path.join(ROOT, "src", "effects", "authored")), built.campaigns, built.scenarios);
+  writeFileSync(path.join(effectsDir, "authored.ts"), renderAuthoredBarrel(authored));
   const icons = log.step("icons", () => buildIcons(process.env.ICONS_OUT ?? path.join(ROOT, "assets", "icons"), process.env.ICON_MODULES_OUT ?? path.join(ROOT, "src", "ui", "icons")));
   log.info(`icons: ${icons.length} (${icons.filter((icon) => icon.kind === "vector").length} vector, ${icons.filter((icon) => icon.kind === "raster").length} raster)`);
   log.info(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);

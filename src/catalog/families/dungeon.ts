@@ -4,10 +4,11 @@
 // effect-schema-stats.ts compose them. src/rules/families/dungeon/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // 01107:A:1, 01125:B:1: the actor places the top card of their deck facedown in front of them "as if it just engaged" them. The card is
   // an "Orc Guard", an enemy with 1 hit point, 1 Attack and 1 Defense that is engaged with the actor, and it is held under that enemy
   // (the enemy is a stand-in the engine makes; when it leaves play the card goes to its owner's discard pile). Nothing happens
@@ -27,14 +28,16 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("LimitPlays"), cardType: z.literal("ally"), max: z.number().int().min(0), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About the enemy whose dealt shadow card's effect has just resolved in its attack (01102:A:3, "After a shadow effect dealt to ~
   // resolves"). The event's seat is the defending player. A shadow card with no effect is not announced.
   "shadowEffectResolved",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // Held by the table: the total Threat in the staging area is raised by this much (RaiseStagingThreat, 01104:A:1). It adds to the Threat of
   // the cards there; lessStagingThreat (attachments family) takes away from the total.
   "moreStagingThreat",
 ] as const;
+
+export const manifest = { name: "dungeon", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -8,7 +8,7 @@ import { reduce, startScenario, type ScenarioState } from "../../rules/engine/re
 import { prisonerHero } from "../../rules/families/prisoner/index.ts";
 import { dolGuldurStart, dolGuldurWorld } from "../../../test/scenarios/escape-from-dol-guldur/game.ts";
 import { dolGuldurTable, loadDolGuldurWorld, type DolGuldurWorld } from "../../../test/scenarios/escape-from-dol-guldur/scene.ts";
-import { first } from "../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../test/harness/scene-kit.ts";
 
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { tableLayout } from "../layout/layout.ts";

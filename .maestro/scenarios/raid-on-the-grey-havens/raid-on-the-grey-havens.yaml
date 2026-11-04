@@ -8,45 +8,8 @@ tags:
 # surviving player, the cards under The Havens Burn, the Elven Wave-runners, Na'asiyah, no enemies in play, threat 40 or less) and, with parts 1 and 2 won in the log, unlocks Flight of the Stormcaller
 # (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts pins the path). The fixture's log has parts 1 and 2 recorded as won (the logs the Voyage and Fate goldens' wins write), so the path opens on Raid and resumes it; the
 # Raid node reads Won.
-- launchApp:
-    clearState: true
-- openLink: "middleearthlcg://e2e/raid-won"
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-- tapOn:
-    id: begin
-- extendedWaitUntil:
-    visible:
-      id: table
-    timeout: 30000
-- tapOn:
-    id: quest-advance-progress
-    optional: true
-- assertNotVisible:
-    id: life
-- assertVisible:
-    id: rail-current
-    text: "Victory"
-- tapOn:
-    id: sheet-outcome
-- extendedWaitUntil:
-    visible:
-      id: resolution
-    timeout: 30000
-# Graxar in the victory display would ask for Parrying Cutlass or Throwing Axe first; the fixture's game does not reach him.
-- tapOn:
-    id: resolution-confirm
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-- assertVisible:
-    id: node-raid-on-the-grey-havens-status
-    text: "Won.*"
-# The XP the Resolution gave is written: the line reads it and there is XP to spend.
-- assertVisible:
-    id: xp-line
-- assertVisible:
-    id: xp-open
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: raid-won
+      SCENARIO_ID: raid-on-the-grey-havens

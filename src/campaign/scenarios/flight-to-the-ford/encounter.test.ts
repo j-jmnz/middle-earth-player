@@ -12,7 +12,8 @@ import { settle } from "../../../rules/engine/machine.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { FORD_OF_BRUINEN, fordTable, LAST_BRIDGE, loadFordWorld, WITCH_KING, type FordLayout, type FordWorld } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
-import { codesOf, first, FRODO, SAM, send } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf, FRODO, SAM } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send } from "../../../../test/harness/scene-kit.ts";
 
 let world: FordWorld;
 

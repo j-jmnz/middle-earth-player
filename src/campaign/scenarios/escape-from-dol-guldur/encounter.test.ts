@@ -8,7 +8,7 @@ import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { flagged } from "../../../rules/core/state.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: DolGuldurWorld;
 

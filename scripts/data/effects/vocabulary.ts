@@ -51,3 +51,20 @@ export function vocabulary(): Vocabulary {
     statTargets,
   };
 }
+
+// The shared list every draft links to (.agent/drafts/vocabulary.md), written once per run.
+export function vocabularyMarkdown(vocab: Vocabulary): string {
+  return [
+    `# Vocabulary (src/catalog/effect-schema.ts)`,
+    ``,
+    `Verbs: ${vocab.verbs.join(", ")}`,
+    `Conditions: ${vocab.conditions.join(", ")}`,
+    `Triggers: ${vocab.triggers.join(", ")}`,
+    `Timings: ${vocab.timings.join(", ")}`,
+    `Costs: ${vocab.costs.join(", ")}`,
+    `ModifyStat stats: ${vocab.stats.join(", ")}`,
+    `ModifyStat targets: ${vocab.statTargets.join(", ")}`,
+    `ModifyStat durations: ${vocab.durations.join(", ")}`,
+    ``,
+  ].join("\n");
+}

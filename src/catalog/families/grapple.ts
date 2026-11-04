@@ -4,10 +4,12 @@
 // data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { setupRole } from "../setup-role.ts";
 
-export const VERBS = [
+const VERBS = [
   // "Immediately attach that enemy facedown to the location in the staging area specified in parentheses" (dcce.grapple): the source enemy (or the last picked card) with the Grapple keyword
   // attaches to the staging-area location the keyword names, the first player choosing among those tied; with no location in the staging area it is added to the staging area. Resolved by a
   // revealed enemy as it is revealed, and by "resolve the Grapple keyword" (12053:A:3, 12054:A:3). `card` is engine use: the enemy to resolve for (a card the effect discarded).
@@ -20,10 +22,13 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("DiscardUntilGrapple"), trait: z.string().min(1), count: positiveAmountSchema, ...when }),
   // Campaign Setup: "Use The Thing in the Depths' 'Campaign Mode only' side" (dcce.campaign-setup-the-thing-in-the-depths): the card with this title shows its side B, with the stats and the text printed there: the set-aside one, or
   // the one the scenario dealt to the staging area ("Use Temple Guardian's 'Campaign Mode only' side", dcce.campaign-setup-temple-of-the-deceived).
-  z.strictObject({ verb: z.literal("FlipSetAside"), name: z.string().min(1), ...when }),
+  setupRole(z.strictObject({ verb: z.literal("FlipSetAside"), name: z.string().min(1), ...when }), "afterSetup"),
   // "Flip Captain Sahír and Na'asiyah to their objective sides, removing all tokens from them" (12040:B:1): the card in play with this title (the enemy side of a Stormcaller Elite card) turns
   // into the objective ally side, loses its tokens and joins the play area of the first or the last player (11077:A:1, 11079:A:1). It hears that it flipped over. A card out of play stays so.
   z.strictObject({ verb: z.literal("FlipElite"), name: z.string().min(1), to: z.enum(["firstPlayer", "lastPlayer"]), ...when }),
+  // "Captain Sahír flips to his enemy side (removing all tokens) and makes an immediate attack against the first player" (12093:A:1): the Stormcaller Elite card in play with this title (its objective ally side) turns to its
+  // enemy side in the staging area, faceup and without tokens, and attacks the first player now, dealt a shadow card as an attack outside the combat phase is. The effect goes on once the attack is over.
+  z.strictObject({ verb: z.literal("FlipEliteAndAttack"), name: z.string().min(1), ...when }),
   // "Search the encounter deck, discard pile and all play areas for each encounter card from the Corsair Raiders encounter set and remove each of those cards from the game" (12040:B:1): every
   // card of the set in the encounter deck, the encounter discard pile, the staging area, a player's engaged enemies, the active location and the cards attached to them leaves the game.
   z.strictObject({ verb: z.literal("RemoveEncounterSet"), set: z.string().min(1), ...when }),
@@ -47,13 +52,13 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RemoveCodeFromGame"), code: z.string().min(1), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About an enemy: it was detached from a location it was grappled with and added to the staging area, because the location became the active location or was explored ("After Crushing Arm is
   // detached from a location", 12052:A:3). The event names the enemy as its subject.
   "grappleDetached",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a card: it counts as indestructible while the record holds ("Captain Sahír and Na'asiyah gain indestructible", 12039:B:1).
   "indestructible",
   // On a character: it has the Trait named by the modifier's `trait` (GainChosenTrait).
@@ -67,3 +72,5 @@ export const FLAGS = [
   // On a location: each player must exhaust a character they control to travel there ("each other Deck location in play gains: Travel: Each player must exhaust a character he controls", 12044:A:1).
   "travelExhaust",
 ] as const;
+
+export const manifest = { name: "grapple", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

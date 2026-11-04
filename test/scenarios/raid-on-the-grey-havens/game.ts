@@ -1,83 +1,32 @@
-import { checklist } from "../../../src/campaign/checklist.ts";
-import { emptyLog, poolCard, type CampaignLog } from "../../../src/campaign/log.ts";
-import { buildStart } from "../../../src/campaign/start.ts";
-import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
-import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { campaign, CODES, raid } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { gameCodes } from "../../../scripts/data/load-scenarios.ts";
-import { engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
+import { campaignGame, engageOneEach, fillerLoadout, HERO_STATS, STRONG_HEROES as HEROES, type PlayedGame } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of Raid on the Grey Havens in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an
 // attack) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to a location whenever they can, attack whatever the
 // engine lets them attack, answer the Campaign Setup's offer of a Galdor's Counsel as the policy says, and (the tied Aflame locations and the damage to heal) take the first option.
-export const HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
 export const RAID_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type RaidDecks = "strong" | "weak" | "brittle";
 
 export const raidLoadout = fillerLoadout;
 
-const STATS = {
-  strong: { threat: 3, willpower: 20, attack: 40, defense: 6, health: 100 },
-  weak: { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 },
-  brittle: { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 },
-} as const;
-
-let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
-
-export async function raidWorld(decks: RaidDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const dealt = campaignScenario(raid);
-  const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, raid), CODES.ominousFate, CODES.sahirAlly, CODES.naasiyahAlly, "11080", "11081", "11082", "11083"];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  LOADED = cards;
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-/** The log of a campaign whose first two parts were won: Ominous Fate in the pool and the XP they gained, marked on Galdor's Counsel and the Dream-chaser's Spyglass. */
-export function afterFate(seatCount: 1 | 2): CampaignLog {
-  if (!LOADED) throw new Error("Build the world first (raidWorld)");
-  const base = emptyLog(seatCount);
-  return { ...base, completed: ["voyage-across-belegaer", "the-fate-of-numenor"], campaignPool: [poolCard(LOADED.get(CODES.ominousFate)!, CODES.ominousFate, null, null)], xpGained: { "voyage-across-belegaer": 4, "the-fate-of-numenor": 3 }, marks: { "11080": 1, [CODES.counselLeadership]: 3, [CODES.counselTactics]: 1 } };
-}
-
 /** What each seat answers when the Campaign Setup offers a Galdor's Counsel: the code it takes, or "skip". */
 export type CounselChoice = readonly string[];
 const NO_COUNSEL: CounselChoice = ["skip", "skip"];
 
-export function raidPlan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), counsel: CounselChoice = NO_COUNSEL) {
-  if (!LOADED) throw new Error("Build the world first (raidWorld)");
-  const plan = checklist({ log, scenario: campaignScenario(raid), seats: raidLoadout(seatCount), effects: EFFECTS, cards: LOADED, choices: counsel.slice(0, seatCount) });
-  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
-  return plan;
-}
-
-export function raidStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, counsel: CounselChoice = NO_COUNSEL): StartScenario {
-  const plan = raidPlan(seatCount, log, counsel);
-  return buildStart({
-    campaign,
-    scenario: raid,
-    seatCount,
-    seed,
-    threatModifier: plan.threatModifier,
-    seats: plan.seats,
-    effects: EFFECTS,
-    difficulty,
-    poolEncounterCards: plan.poolEncounterCards,
-    poolIntoPlay: plan.poolIntoPlay,
-    ...(facts ? { facts } : {}),
-    ...(modeCard ? { modeCard } : {}),
-  });
-}
+// The goldens' world, the plan and start of a game, and the log of a campaign whose first two parts were won (Ominous Fate in the pool and the XP they gained, marked on
+// Galdor's Counsel and the Dream-chaser's Spyglass): the seeded game's parts every scenario shares (test/harness/game-kit.ts).
+export const raidWorld = (decks: RaidDecks = "strong") => game.world(decks);
+export const afterFate = (seatCount: 1 | 2) => game.after(seatCount);
+export const raidPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), counsel: CounselChoice = NO_COUNSEL) => game.plan(seatCount, log, counsel.slice(0, seatCount));
+export const raidStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, counsel: CounselChoice = NO_COUNSEL) => game.start(seatCount, seed, difficulty, facts, log, modeCard, counsel.slice(0, seatCount));
 
 export type RaidPolicy = {
   // The option a Choose window with these answers takes: "damage" or "search" (Corsair Arsonist), "damage" or "discard" (Pillaged Ship), "character" or "location" (Put to the Torch).
@@ -119,12 +68,6 @@ export function raidIntent(state: ScenarioState, ctx: ReduceContext, memory: Set
 
 export type RaidGame = PlayedGame;
 
-// Plays until the scenario is lost, or won and every Resolution choice is answered.
-export function playRaid(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), policy: RaidPolicy = DEFAULT_POLICY, modeCard?: ModeCard, counsel: CounselChoice = NO_COUNSEL, limit = 8000): RaidGame {
-  const start = raidStart(seatCount, seed, difficulty, facts, log, modeCard, counsel);
-  return playToEnd(start, ctx, (state, memory) => raidIntent(state, ctx, memory, policy), limit);
-}
-
 // The goldens (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first two parts were won (the pool, XP and marks reach this part). `upgraded`: the Upgraded sides (Calphon, Spyglass, Black Key). `counsel`: what each seat takes at the Campaign Setup.
 export type RaidGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RaidDecks; outcome: "won" | "lost"; policy?: Partial<RaidPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; counsel?: CounselChoice; lossReason?: string };
@@ -152,9 +95,19 @@ export const RAID_GOLDENS: readonly RaidGolden[] = [
   { name: "two-handed, brittle heroes, lost", seatCount: 2, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },
 ];
 
-export function playGolden(golden: RaidGolden, ctx: ReduceContext): RaidGame {
-  const facts = golden.upgraded ? { prisoner: null, usedOnce: [], counters: {}, upgraded: UPGRADED_CODES } : golden.after ? { prisoner: null, usedOnce: [], counters: {}, levels: { [CODES.counselLeadership]: 3, [CODES.counselTactics]: 1 } } : undefined;
-  const log = golden.after ? afterFate(golden.seatCount) : undefined;
-  return playRaid(golden.seatCount, golden.seed, golden.difficulty, ctx, facts, log, { ...DEFAULT_POLICY, ...golden.policy }, golden.mode, golden.counsel);
-}
+const game = campaignGame<RaidDecks, RaidPolicy>({
+  campaign,
+  scenario: raid,
+  // The strong heroes attack for 40; the other numbers are the shared ones.
+  stats: { ...HERO_STATS, strong: { ...HERO_STATS.strong, attack: 40 } },
+  codes: [CODES.ominousFate, CODES.sahirAlly, CODES.naasiyahAlly, "11080", "11081", "11082", "11083"],
+  intent: raidIntent,
+  policy: DEFAULT_POLICY,
+  limit: 8000,
+  upgraded: UPGRADED_CODES,
+  levels: { [CODES.counselLeadership]: 3, [CODES.counselTactics]: 1 },
+  earlier: { xp: [4, 3], pool: [{ code: CODES.ominousFate }], marks: { "11080": 1, [CODES.counselLeadership]: 3, [CODES.counselTactics]: 1 } },
+});
+
+export const playGolden = (golden: RaidGolden, ctx: ReduceContext): RaidGame => game.playGolden(golden, ctx, (golden.counsel ?? NO_COUNSEL).slice(0, golden.seatCount));
 export { DREAM_CHASER_LOST, FLEET_LOST, THREAT_LOST };

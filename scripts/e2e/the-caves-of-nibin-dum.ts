@@ -4,30 +4,21 @@
 // so each is a real save and nothing here builds a log by hand. Played by the auto-player, every intent one the reducer listed.
 // `nibin-dum-won`: the first seed that wins, parked on the win (41051's Resolution asks nothing: with the highest final threat under 40 each player earns a Ranger Sense
 // and a Ranger Sense for each player is kept for the next campaign). `nibin-dum-lost`: the first seed that loses, parked on the loss.
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-
 import { type CampaignLog } from "../../src/campaign/log.ts";
-import { newSave, type StoredLoadout } from "../../src/campaign/save.ts";
-import { loadWorld, logCodes } from "../../src/campaign/world.ts";
-import { EFFECTS } from "../../src/effects/index.ts";
+import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
-import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { replaced } from "./journey-along-the-anduin.ts";
 import { oathWonLog, type OathFixture } from "./the-oath.ts";
 import { createLog } from "../log.ts";
-import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
-import { playDealt } from "./seed-kit.ts";
+import { firstSeed } from "./seed-kit.ts";
 
 const say = createLog("e2e-nibin-dum");
 
 export type NibinDumFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: string; choices: string[] } };
 
-export const campaign = loadCampaign("the-dark-of-mirkwood");
-const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 const CHIEFTAIN = "41027";
 const PILLAR = "41028";
 
@@ -88,12 +79,6 @@ export function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<
   return nextIntent(state, ctx, { scout: "", prefer: PILLAR, protect: "", play: true, act: true }, memory);
 }
 
-export function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents: PlayerIntent[]; state: ScenarioState } {
-  const scenario = loadScenario("the-caves-of-nibin-dum");
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log), "41048", "41049", "41042"]);
-  return playDealt(world, { ...newSave("fixture", campaign.id, 2), log }, loadout, seed, 6000, intentFor);
-}
-
 // A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `oath-won` fixture there is no honest log for this
 // scenario to start from (docs/phases/phase-13-flight-to-the-ford.md: a fixture is a real save), so none is written.
 export function nibinDumFixtures(oath: OathFixture | undefined): Partial<Record<"nibin-dum-won" | "nibin-dum-lost", NibinDumFixture>> {
@@ -106,15 +91,8 @@ export function nibinDumFixtures(oath: OathFixture | undefined): Partial<Record<
   const loadout: StoredLoadout = { ...replaced({ ...oath.loadout, scenarioId: "the-caves-of-nibin-dum" }, log, "The Oath"), choices: [] };
   const past = { fixture: "oath-won", choices: [] as string[] };
   const first = (wanted: (state: ScenarioState) => boolean, label: string): NibinDumFixture | null => {
-    for (let seed = 1; seed <= Number(process.env.NIBIN_DUM_SEEDS ?? 60); seed += 1) {
-      const game = play(log, loadout, seed);
-      say.debug(`seed ${seed}: stage ${game.state.cards[game.state.questStage ?? ""]?.code}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
-      if (!wanted(game.state)) continue;
-      say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : "won"}`);
-      return { campaignId: "the-dark-of-mirkwood", seatCount: 2, loadout, seed, intents: game.intents, log, past };
-    }
-    say.warn(`no ${label} game found in ${process.env.NIBIN_DUM_SEEDS ?? 60} seeds`);
-    return null;
+    const found = firstSeed(say, { campaignId: "the-dark-of-mirkwood", scenarioId: "the-caves-of-nibin-dum", seatCount: 2, loadout, log, limit: 6000, seeds: 60, codes: ["41048", "41049", "41042"], answer: intentFor }, "NIBIN_DUM_SEEDS", wanted, label);
+    return found && { ...found, log, past };
   };
   const won = first((state) => state.stageCleared && !state.lost, "nibin-dum-won");
   const lost = first((state) => state.lost, "nibin-dum-lost");

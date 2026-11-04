@@ -1,5 +1,6 @@
 // Rules: rr.damage, rr.destroy, rr.attachment-cards, rr.in-play-and-out-of-play, rr.immune, mec109.immune-to-player-card-effects, rr.objective-cards
 // (data/rules/entries.json); the cards of Journey in the Dark (142040 to 142059, 142087, 142088).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope } from "../../interpret/amounts.ts";
@@ -70,3 +71,5 @@ function attachToSubject(state: ScenarioState, focus: Focus): ScenarioState {
   if (!source || source.zone !== "staging" || !host || host.zone !== "heroes") return state;
   return updateCard(attachTo(moveCard(state, source.id, { zone: "attached" }), source.id, host.id), source.id, { face: "up" });
 }
+
+export const manifest: RulesFamily = { name: "moria", verbs: ["PlaceDamageOn", "RemoveDamageFrom", "SacrificeForDamage", "AttachToSubject"], run };

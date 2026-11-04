@@ -5,7 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { fight, loadMirkwoodWorld, type MirkwoodWorld } from "../../../../test/scenarios/passage-through-mirkwood/scene.ts";
-import { codesOf, first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codesOf } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: MirkwoodWorld;
 

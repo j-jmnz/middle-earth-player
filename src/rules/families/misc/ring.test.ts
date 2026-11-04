@@ -3,7 +3,8 @@
 // The One Ring, the Master cards and the saga heroes of the misc family, run through its real records.
 import { describe, expect, it } from "vitest";
 
-import { RECORDS } from "../../../effects/authored/families/misc.ts";
+import { RECORDS as AUTHORED } from "../../../effects/authored/families/misc.ts";
+import { POOL_GENERATED_EFFECTS } from "../../../effects/generated/player-pool.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { cardMap, codes, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
 import { eliminateEmpties, placeDamage } from "../../core/keywords.ts";
@@ -16,6 +17,8 @@ import { play, put, run, seat, send, triggers } from "../play/fixture.ts";
 import { enemy, hero, offered, send as sendIntent, table as defenseTable, until } from "../defense/table.ts";
 import { definePrinted } from "../../core/printed.ts";
 
+// "If Bilbo / Aragorn leaves play, the players lose the game" (131001:A:3, 146002:A:3) is a generated record.
+const RECORDS = [...AUTHORED, ...POOL_GENERATED_EFFECTS.filter((record) => record.lines.some((line) => line === "131001:A:3" || line === "146002:A:3"))];
 const ctx = miscCtx(RECORDS);
 const filler = codes("f", 8);
 

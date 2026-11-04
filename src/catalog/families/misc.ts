@@ -2,11 +2,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // Every living player draws `amount` cards (1 by default), the first player first ("each player draws 1 card"). Unlike
   // ForEachPlayer it can be one branch of a Choose.
   z.strictObject({ verb: z.literal("DrawEach"), amount: positiveAmountSchema.optional(), ...when }),
@@ -49,7 +50,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("DiscardCanceled"), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About the seat: its draw step at the beginning of the resource phase is done (rr.step-1-3). The cards drawn are the ones a
   // Pick with `drawn` offers.
   "resourceDrawn",
@@ -61,7 +62,7 @@ export const TRIGGERS = [
 // Restricted attachments on its host (amount 2). `countsAsTwoDwarves`: the holder counts as two when Dwarf characters are counted.
 // `spendAsLeadership` (and the three others), on "seat:N": the seat's resources of any sphere pay for cards of that sphere
 // ("you can spend resources of any sphere when paying for cards that belong to the named sphere", 06010:A:1).
-export const FLAGS = [
+const FLAGS = [
   "traitRohan",
   "traitGondor",
   "traitMount",
@@ -84,3 +85,5 @@ export const FLAGS = [
   // The holder (an enemy) deals no damage in the attack it makes ("this attack deals no damage").
   "dealsNoDamage",
 ] as const;
+
+export const manifest = { name: "misc", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

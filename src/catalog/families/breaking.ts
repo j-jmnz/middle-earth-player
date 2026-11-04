@@ -4,9 +4,10 @@
 // they work on (`ScenarioState.separate`, `Seat.staging`, `Seat.stage`) is described in src/rules/families/breaking/areas.ts.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Stage 2A (142062:A:1): the Ring-bearer, the hero The One Ring is attached to, and every card attached to it are removed from the game, wherever
   // their controllers keep them. The One Ring's text is blank while this resolves, so its line "If The One Ring leaves play, the players lose the
   // game" does not fire: the cards go to the removed zone without being destroyed or discarded. A seat left with no heroes is eliminated.
@@ -69,14 +70,14 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("TakeRingBearer"), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // The shared stage was discarded as the staging areas were separated. The event is about a seat's own stage card (its `cardId`) and names the seat,
   // so that stage's Forced effect resolves for that seat ("Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging
   // area is less than 4, reveal 1 encounter card", 142063:A:1 to 142066:A:1).
   "stageDiscarded",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a stage: progress that would be placed on the quest discards that many cards from the top of the encounter deck instead (142063:B:1 to 142066:B:1;
   // rules/families/breaking/progress.ts).
   "progressDiscards",
@@ -97,3 +98,5 @@ export const FLAGS = [
   // 142061:B:1; rules/engine/machine.ts). The combat phase still follows.
   "skipEncounter",
 ] as const;
+
+export const manifest = { name: "breaking", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

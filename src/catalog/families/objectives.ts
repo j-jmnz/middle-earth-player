@@ -3,10 +3,11 @@
 // triggers; effect-schema-verbs.ts and effect-schema.ts compose them. src/rules/families/objectives/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Guarded (rr.guarded, ltp.guarded): the objective (`target`, the source by default) is in the staging area, so the next card of the
   // encounter deck that is not itself an objective is revealed and attached to it, and both stay in the staging area. A revealed
   // enemy or location counts its Threat there and stays attached until it leaves play; a treachery resolves as it is revealed and
@@ -19,9 +20,11 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ClaimObjective"), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About an objective card: a player claimed it and attached it to a hero (01131:B:1, "After the first objective is claimed").
   "claimed",
 ] as const;
 
-export const FLAGS = [] as const;
+const FLAGS = [] as const;
+
+export const manifest = { name: "objectives", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

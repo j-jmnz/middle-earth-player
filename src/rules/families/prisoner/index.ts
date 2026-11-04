@@ -4,6 +4,7 @@
 // The prisoner of Escape from Dol Guldur: one hero, chosen at random (or named by the Campaign Log), turned facedown with the cards
 // attached to it. It is in play but nobody controls it, so it is blank and unusable until it is rescued (the captive zone the Ring-bearer
 // under the Watcher uses, families/south/captive.ts). Mendor is captured with it in Campaign Mode and freed by the campaign card.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -133,3 +134,5 @@ function freeCaptive(state: ScenarioState, code: string, damage: number): Scenar
   const seat = state.firstPlayer;
   return updateCard(moveCard(state, card.id, { zone: "play", seat }), card.id, { damage, face: "up", prisoner: undefined, owner: undefined });
 }
+
+export const manifest: RulesFamily = { name: "prisoner", verbs: ["TakePrisoner", "SelectLoggedPrisoner", "CaptureWithPrisoner", "RescuePrisoner", "FreeCaptive"], run };

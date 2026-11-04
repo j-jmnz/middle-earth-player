@@ -64,6 +64,8 @@ export const amountExprSchema = z.strictObject({
   islandLeft: z.literal(true).optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),
+  // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
+  max: z.literal(true).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

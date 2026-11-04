@@ -22,7 +22,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"906403:forced:1","cardCode":"906403","lines":["906403:A:2"],"timing":"forced","trigger":"played","subject":{"type":"ally","control":"any"},"condition":{"kind":"sourceIn","zone":"staging"},"instructions":[{"verb":"Choose","who":"actor","options":[{"id":"exhaust","instructions":[{"verb":"Exhaust","target":{"kind":"ref","ref":"subject"}}]},{"id":"damage","requires":{"kind":"canPick","pick":ACTIVE},"instructions":[{"verb":"Pick","pick":ACTIVE},{"verb":"PlaceDamage","amount":1,"card":"picked"}]}]}]},
   // 906404 Misty Mountain Warg: it attacks from the staging area; the end of that attack reads the characters it destroyed.
   {"id":"906404:whenRevealed:1","cardCode":"906404","lines":["906404:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AttackActor"},{"verb":"AfterAttack","instructions":[{"verb":"Pick","pick":ACTIVE,"when":DESTROYED},{"verb":"PlaceDamage","amount":2,"card":"picked","when":DESTROYED},{"verb":"Pick","pick":OTHER_ACTIVE,"when":DESTROYED},{"verb":"PlaceDamage","amount":2,"card":"picked","when":DESTROYED}]}]},
-  {"id":"906404:shadow:1","cardCode":"906404","lines":["906404:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"Pick","pick":ACTIVE,"when":DESTROYED},{"verb":"PlaceDamage","amount":1,"card":"picked","when":DESTROYED}]}]},
   // 906405 Expanse of Hollin: its Threat is X.
   {"id":"906405:constant:1","cardCode":"906405","lines":["906405:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threat","amount":{"count":{"type":"enemy","control":"any"},"plus":1},"until":"whileSourceInPlay","target":"self"}]},
   {"id":"906405:forced:1","cardCode":"906405","lines":["906405:A:2"],"timing":"forced","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"ShuffleEncounterDiscard"},{"verb":"Repeat","times":X_DAMAGE_HERE,"instructions":[{"verb":"MoveEncounterCard","card":"deckTop","to":"discard"},{"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]}]},
@@ -37,4 +36,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"906408:shadow:1","cardCode":"906408","lines":["906408:A:3"],"timing":"shadow","instructions":[{"verb":"Each","pick":{"type":"location","control":"any","active":true},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"damage","of":"picked"},"until":"endOfAttack","target":"attacker"}]}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["906402:constant:1"];

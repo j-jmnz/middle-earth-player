@@ -8,7 +8,8 @@ import type { PlayerIntent, ReduceContext } from "../../../rules/engine/reduce.t
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
-import { first, SAM, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { SAM } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: FordWorld;
 

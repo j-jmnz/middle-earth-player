@@ -23,6 +23,18 @@ export function loadCampaigns(dataDir = DATA_DIR): CampaignData[] {
     .map((name) => loadCampaign(name.replace(/\.json$/, ""), dataDir));
 }
 
+// Every built campaign in the order data/campaigns/index.json lists them (the order the app and the effect barrel use).
+export function loadCampaignsInOrder(dataDir = DATA_DIR): CampaignData[] {
+  const listed = (JSON.parse(readFileSync(path.join(dataDir, "campaigns", "index.json"), "utf8")) as { id: string }[]).map((entry) => entry.id);
+  const built = loadCampaigns(dataDir);
+  return listed.flatMap((id) => built.filter((campaign) => campaign.id === id));
+}
+
+// Every scenario id of the built campaigns in play order, each once (the Oath is in two).
+export function scenarioOrder(dataDir = DATA_DIR): string[] {
+  return [...new Set(loadCampaignsInOrder(dataDir).flatMap((campaign) => campaign.scenarios))];
+}
+
 // One campaign's scenarios in play order, or, with no id, every built campaign's, each scenario once (the Oath is in two).
 export function loadScenarios(campaignId?: string, dataDir = DATA_DIR): ScenarioData[] {
   const campaigns = campaignId === undefined ? loadCampaigns(dataDir) : [loadCampaign(campaignId, dataDir)];
@@ -35,7 +47,11 @@ export function dealtCodes(campaign: CampaignData | readonly CampaignData[], sce
   const codes = new Set<string>(asList(campaign).flatMap((one) => one.prelude.map((card) => card.code)));
   for (const scenario of scenarios) {
     codes.add(scenario.campaignCard);
-    for (const card of scenario.cards) codes.add(card.code);
+    // A card with two sides that are two catalog cards (`back`) puts the other side in play on a flip, so both are dealt.
+    for (const card of scenario.cards) {
+      codes.add(card.code);
+      if (card.back != null) codes.add(card.back);
+    }
     for (const code of scenario.campaignPlaced) codes.add(code);
     for (const code of gameCodes(campaign, scenario)) codes.add(code);
     if (nightmare) for (const code of nightmareCodes([scenario])) codes.add(code);

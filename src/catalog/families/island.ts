@@ -3,9 +3,11 @@
 // The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { setupRole } from "../setup-role.ts";
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Prepare the Island Map" (dcce.island-map). The double-sided locations the scenario dealt as its Uncharted deck are separated: the cards with the codes in `temple` (the three Temple of the
   // Deceived locations) are shuffled and laid in the right-hand column, the others are shuffled and fill the first four columns, a grid of three rows by five. Every card lies Lost Island (or
   // Temple of the Deceived) side up, which nobody looks at.
@@ -20,7 +22,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("AttachGuarded"), name: z.string().min(1), to: z.string().min(1), ...when }),
   // Campaign Setup: "Shuffle Starla and both Recurring Nightmares together and place one facedown under each Temple of the Deceived location, as secrets" (11197:A:2): the set-aside copies of the cards
   // with these codes are shuffled and lie facedown under the Temple locations, one each, in the order the seed gives.
-  z.strictObject({ verb: z.literal("PlaceSecrets"), codes: z.array(z.string().min(1)).min(1), ...when }),
+  setupRole(z.strictObject({ verb: z.literal("PlaceSecrets"), codes: z.array(z.string().min(1)).min(1), ...when }), "afterSetup"),
   // "Flip over a secret at your location. If it is a Recurring Nightmare, it engages you. If it is Starla, you gain control of her (ready)." (11197:A:3): the secret under the active location turns
   // faceup, and the actor takes the card as that line says. Nothing happens when the active location has no secret.
   z.strictObject({ verb: z.literal("FlipSecret"), ...when }),
@@ -39,10 +41,10 @@ export const VERBS = [
   // Campaign Setup: "One player may raise their threat by 4 to attach Spyglass to a hero" (11197:A:2). In player order each player is offered it, if their threat can rise by `amount` without reaching
   // 50, and the first to accept raises their threat and chooses a hero (any player's) for the set-aside copy of the card with this code; nobody is offered it after that. `seat` and `accepted` are
   // engine use: the player being asked, and the player who said yes and now chooses the hero.
-  z.strictObject({ verb: z.literal("RaiseThreatToAttach"), code: z.string().min(1), amount: z.number().int().positive(), seat: z.number().int().min(0).optional(), accepted: z.boolean().optional(), ...when }),
+  setupRole(z.strictObject({ verb: z.literal("RaiseThreatToAttach"), code: z.string().min(1), amount: z.number().int().positive(), seat: z.number().int().min(0).optional(), accepted: z.boolean().optional(), ...when }), "afterSetup"),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a card: it was drawn into a player's hand and is not a player card ("When Recurring Nightmare enters your hand", 11199:A:3). Announced only when a card of the types that are not played from
   // a hand (an enemy) is drawn, so no other game's events change.
   "enteredHand",
@@ -51,7 +53,7 @@ export const TRIGGERS = [
   "exitedPlay",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On the table: the Exploration keyword is in force (dcce.exploration): a location that has progress equal to its quest points stays in play, the players travel from the active location when it
   // has, and the locations next to it are the staging area.
   "exploration",
@@ -64,3 +66,5 @@ export const FLAGS = [
   // (`progressReplaced`, "For each progress that would be placed on Searching the Island, you may place it on a location in the staging area, instead", 12067:B:2).
   "progressToStaging",
 ] as const;
+
+export const manifest = { name: "island", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

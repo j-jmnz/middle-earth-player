@@ -1,5 +1,4 @@
 import { EFFECTS } from "../../../src/effects/index.ts";
-import type { Effect } from "../../../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, type CampaignData, type ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
@@ -11,7 +10,7 @@ import { stampRoutes } from "../../../src/rules/families/sea/routes.ts";
 import { loadCampaign, loadScenario, gameCodes } from "../../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
 import { causeProblems } from "../../harness/cause-check.ts";
-import { send, start, type Run } from "../a-shadow-of-the-past/scene.ts";
+import { addStandIns, allyCard, answer, codesIn, enemyCard, eventCard, HERO, HERO2, HERO3, opening, sceneEffects, send, start, type Run } from "../../harness/scene-kit.ts";
 import { pushCardEffects } from "../../../src/rules/interpret/effect-frames.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import { settle } from "../../../src/rules/engine/machine.ts";
@@ -56,17 +55,9 @@ export const OMINOUS_FATE = "11176";
 export const THUNDERSTRUCK = "11177";
 export const CROWLEY = "11178";
 export const HARD_MODE = "11217";
-export const HERO = "dh1";
-export const HERO2 = "dh2";
-export const HERO3 = "dh3";
+export { HERO, HERO2, HERO3 };
 
-// The filler event has an Action that does nothing, so it can be played: an event with no record at all cannot (rr.triggered-ability).
-const SCENE_EFFECTS: readonly Effect[] = [
-  ...EFFECTS,
-  { id: "filler:action:1", cardCode: "filler", lines: ["filler:A:1"], timing: "action", instructions: [] },
-  { id: "odd:action:1", cardCode: "odd", lines: ["odd:A:1"], timing: "action", instructions: [] },
-  { id: "even:action:1", cardCode: "even", lines: ["even:A:1"], timing: "action", instructions: [] },
-];
+const SCENE_EFFECTS = sceneEffects("odd", "even");
 
 export type VoyageWorld = { definition: ReturnType<typeof scenarioDefinition>; cards: Map<string, PrintedCard> };
 
@@ -74,19 +65,15 @@ export async function loadVoyageWorld(): Promise<VoyageWorld> {
   const definition = scenarioDefinition(dealt, campaign, EFFECTS);
   const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(campaign, voyage), ...Object.values(SHIPS), ...ORIGINAL_SHIPS])];
   const cards = new Map(await loadPrinted(codes));
-  const enemy = (code: string, stats: Partial<Parameters<typeof definePrinted>[0]>): PrintedCard => definePrinted({ code, name: code, type: "enemy", engagementCost: 50, ...stats });
-  cards.set("f0", enemy("f0", { threat: 0, attack: 1, defense: 1, health: 3 }));
-  cards.set("f3", enemy("f3", { threat: 3, attack: 1, defense: 1, health: 3 }));
-  cards.set("brute", enemy("brute", { threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
+  addStandIns(cards, ["f0", "f3"]);
+  cards.set("brute", enemyCard("brute", { threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
   // 8 Attack against a hero's 2 Defense is 6 damage: exactly the hit points of a hero with none lost.
-  cards.set("bruiser", enemy("bruiser", { threat: 1, engagementCost: 10, attack: 8, defense: 1, health: 20 }));
-  cards.set("raider", enemy("raider", { traits: ["Raider"], threat: 1, engagementCost: 10, attack: 2, defense: 1, health: 3 }));
-  for (const code of [HERO, HERO2, HERO3]) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
-  cards.set("odd", definePrinted({ code: "odd", name: "odd", type: "event", sphere: "neutral", cost: 1 }));
-  cards.set("even", definePrinted({ code: "even", name: "even", type: "event", sphere: "neutral", cost: 2 }));
-  cards.set("ally", definePrinted({ code: "ally", name: "ally", type: "ally", sphere: "neutral", cost: 2, willpower: 1, attack: 1, defense: 1, health: 2 }));
-  cards.set("place", definePrinted({ code: "place", name: "place", type: "location", threat: 2, questPoints: 2 }));
+  cards.set("bruiser", enemyCard("bruiser", { threat: 1, engagementCost: 10, attack: 8, defense: 1, health: 20 }));
+  cards.set("raider", enemyCard("raider", { traits: ["Raider"], threat: 1, engagementCost: 10, attack: 2, defense: 1, health: 3 }));
+  addStandIns(cards, ["heroes", "filler", "place"]);
+  cards.set("odd", eventCard("odd", 1));
+  cards.set("even", eventCard("even", 2));
+  cards.set("ally", allyCard("ally", 2));
   cards.set("blade", definePrinted({ code: "blade", name: "blade", type: "attachment", sphere: "neutral", cost: 3 }));
   return { definition, cards };
 }
@@ -201,23 +188,16 @@ export function voyageTable(world: VoyageWorld, layout: VoyageLayout = {}): Voya
   if (layout.resources != null) state = updateCard(state, first.id, { resources: layout.resources });
   if (layout.campaign) state = spawn(state, CAMPAIGN_CARD, { zone: "campaign" }).state;
   if (layout.mode) state = spawn(state, HARD_MODE, { zone: "modeCard" }, layout.mode).state;
-  const phase = layout.phase ?? "Quest";
-  const mode = phase === "Quest" ? "questCommit" : phase === "Encounter" ? "optionalEngage" : phase === "Travel" ? "travel" : phase === "Planning" ? "planning" : phase === "Refresh" ? "refresh" : "combatActions";
-  const window = phase === "Encounter" ? { kind: "optionalEngage" as const } : phase === "Travel" ? { kind: "travel" as const } : phase === "Refresh" ? null : { kind: "pass" as const };
-  state = { ...state, phase, boundaryPhase: phase, mode, window, activeSeat: 0 };
+  state = { ...state, ...opening(layout.phase ?? "Quest") };
   const ctx = { effects: SCENE_EFFECTS, cards: world.cards };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, ships, heading: headingCard };
 }
 
-export { send, start };
+export { send, start, codesIn };
 export type { Run, PlayerIntent };
 
-// The first card of a code is resolved or used in a test: these helpers answer the choices the effect opens (the first option by default).
-export function settleChoices(run: Run, ctx: ReduceContext, pick: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): Run {
-  let current = run;
-  for (let guard = 0; guard < 30 && current.state.window?.kind === "choose"; guard += 1) current = send(current, { type: "Choose", optionId: pick(current.state) }, ctx);
-  return current;
-}
+// The first card of a code is resolved or used in a test: this answers the choices the effect opens (the first option by default).
+export const settleChoices = answer;
 
 // The card's When Revealed records resolve now, in the quest phase (the way a reveal resolves them), and the choices they open are answered.
 export function resolveReveal(state: ScenarioState, ctx: ReduceContext, code: string, pick?: (state: ScenarioState) => string): Run & { id: string } {
@@ -282,9 +262,4 @@ export function voyageFight(
     seen.push(run.state);
   }
   return { run, ctx: made.ctx, made, seen, start: state };
-}
-
-// The codes of the cards in a zone, sorted.
-export function codesIn(state: ScenarioState, zone: string): string[] {
-  return Object.values(state.cards).filter((card) => card.zone === zone).map((card) => card.code).sort();
 }

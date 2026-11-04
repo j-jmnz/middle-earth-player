@@ -5,6 +5,7 @@ import { parse as parseJsonc } from "jsonc-parser";
 
 import { EFFECTS } from "../../../src/effects/index.ts";
 import { runScript, type Log } from "../../log.ts";
+import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { MODE_CARD_CODE } from "../../../src/catalog/scenario-data.ts";
 import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
@@ -15,8 +16,8 @@ import { keyOf, loadLedger } from "../printed/ledger.ts";
 import { isPoolCard, withPool } from "../printed/pool.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
 import type { RuleEntry } from "../rules/spans.ts";
-import { generateEffects, segmentsOf, type Unmatched } from "./generate.ts";
-import { vocabulary } from "./vocabulary.ts";
+import { generateEffects, segmentsOf, selfNamed, type Segment, type Unmatched } from "./generate.ts";
+import { vocabulary, vocabularyMarkdown } from "./vocabulary.ts";
 
 // Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,...>
 // Writes .agent/drafts/<code>.md for every card in the scenario, the starter or pre-built deck (data/decks/prebuilt.json), the player pack (a data/cards file name,
@@ -27,9 +28,7 @@ function words(text: string): Set<string> {
   return new Set(text.toLowerCase().match(/[a-z]{4,}/g) ?? []);
 }
 
-function similarity(left: string, right: string): number {
-  const a = words(left);
-  const b = words(right);
+function overlap(a: Set<string>, b: Set<string>): number {
   const shared = [...a].filter((word) => b.has(word)).length;
   return shared / Math.max(1, a.size + b.size - shared);
 }
@@ -56,7 +55,8 @@ function main(log: Log): void {
     for (const [guid, rules] of Object.entries(parsed.automation?.cards ?? {})) automation.set(guid, rules);
   }
 
-  const generated = generateEffects(cards, scenario ? [scenario] : [], campaigns, ledger);
+  // A card named by code may be a scenario card (12161), which only a scenario that deals it brings into scope.
+  const generated = generateEffects(cards, scenario ? [scenario] : listed.length > 0 ? loadScenarios() : [], campaigns, ledger);
   // Every card the scenario deals: its piles, its campaign card, the cards that card places (campaignPlaced) and the prelude.
   const dealt = chosen.length > 0 ? new Set(chosen) : dealtCodes(campaigns, scenario ? [scenario] : []);
   const all = process.argv.includes("--all");
@@ -88,8 +88,53 @@ function main(log: Log): void {
     return dealer && !fellowship.has(dealer.id) ? `src/effects/authored/${dealer.id}.ts` : "src/effects/authored/fellowship-of-the-ring.ts";
   };
 
+  // Every printed line of every card, by its text as generate.ts normalizes it, and the records that own each line.
+  const segmentById = new Map<string, Segment>();
+  const byText = new Map<string, Segment[]>();
+  for (const card of cards) {
+    for (const segment of segmentsOf(card, ledger)) {
+      segmentById.set(segment.lineId, segment);
+      const key = selfNamed(card, segment.line);
+      byText.set(key, [...(byText.get(key) ?? []), segment]);
+    }
+  }
+  const ownersOf = new Map<string, Effect[]>();
+  for (const effect of EFFECTS) for (const id of effect.lines) ownersOf.set(id, [...(ownersOf.get(id) ?? []), effect]);
+  const twinsOf = (line: Unmatched): { lineId: string; card: Card; records: Effect[] }[] =>
+    (byText.get(selfNamed(line.card, line.line)) ?? [])
+      .filter((other) => other.card.code !== line.card.code && (ownersOf.get(other.lineId)?.length ?? 0) > 0)
+      .map((other) => ({ lineId: other.lineId, card: other.card, records: ownersOf.get(other.lineId) ?? [] }));
+  const effectTexts = new Map<Effect, Set<string>>();
+  const textWords = (effect: Effect): Set<string> => {
+    const known = effectTexts.get(effect);
+    if (known) return known;
+    const made = words(effect.lines.map((id) => segmentById.get(id)?.line ?? "").join(" "));
+    effectTexts.set(effect, made);
+    return made;
+  };
+  const nearest = (line: Unmatched): { lineId: string; text: string; effect: Effect }[] => {
+    const own = words(line.line);
+    return EFFECTS.filter((effect) => effect.cardCode !== line.card.code && effect.lines.length > 0)
+      .map((effect) => ({ effect, score: overlap(own, textWords(effect)) }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map(({ effect }) => ({ lineId: effect.lines.join(", "), text: effect.lines.map((id) => segmentById.get(id)?.line ?? "").join(" "), effect }));
+  };
+  // The id a record takes: the number generate reserved for a labelled line. An unlabelled line (a constant or triggered ability, as
+  // generate classifies it) reserves none, so its record takes the first number of that timing no generated or authored record on the card uses.
+  const taken = new Set([...generated.effects, ...EFFECTS].map((effect) => effect.id));
+  const suggestedId = (line: Unmatched): string => {
+    if (line.timing) return `${line.card.code}:${line.timing}:${line.number}`;
+    const form = line.form ?? "constant";
+    let n = line.number;
+    while (taken.has(`${line.card.code}:${form}:${n}`)) n += 1;
+    taken.add(`${line.card.code}:${form}:${n}`);
+    return `${line.card.code}:${form}:${n}`;
+  };
+
   const out = path.join(ROOT, ".agent", "drafts");
   mkdirSync(out, { recursive: true });
+  writeFileSync(path.join(out, "vocabulary.md"), vocabularyMarkdown(vocab));
   for (const [code, lines] of byCard) {
     const card = byCode.get(code) as Card;
     const guid = card.printings.find((printing) => printing.octgnGuid)?.octgnGuid;
@@ -116,29 +161,18 @@ function main(log: Log): void {
     const haystack = lines.map((line) => line.line.toLowerCase()).join(" ");
     const related = entries.filter((entry) => (entry.doc === "rr" || entry.doc === "mec109") && entry.terms.some((term) => term.length >= 6 && haystack.includes(term))).slice(0, 6);
     for (const entry of related) sections.push(`### ${entry.id} (${entry.doc} p${entry.page})`, entry.text.slice(0, 900), ``);
-    sections.push(
-      `## Vocabulary (src/catalog/effect-schema.ts)`,
-      `Verbs: ${vocab.verbs.join(", ")}`,
-      `Conditions: ${vocab.conditions.join(", ")}`,
-      `Triggers: ${vocab.triggers.join(", ")}`,
-      `Timings: ${vocab.timings.join(", ")}`,
-      `Costs: ${vocab.costs.join(", ")}`,
-      `ModifyStat stats: ${vocab.stats.join(", ")}`,
-      `ModifyStat targets: ${vocab.statTargets.join(", ")}`,
-      `ModifyStat durations: ${vocab.durations.join(", ")}`,
-      ``,
-      `## The three most similar existing records`,
-    );
-    const lineText = lines.map((line) => line.line).join(" ");
-    const near = EFFECTS.filter((effect) => effect.cardCode !== code)
-      .map((effect) => {
-        const other = byCode.get(effect.cardCode);
-        const text = other ? segmentsOf(other, ledger).map((segment) => segment.line).join(" ") : "";
-        return { effect, text, score: similarity(lineText, text) };
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
-    for (const item of near) sections.push(`Card ${item.effect.cardCode}: ${item.text.slice(0, 300)}`, "```json", JSON.stringify(item.effect), "```", ``);
+    sections.push(`## Vocabulary`, `[vocabulary.md](vocabulary.md)`, ``, `## Line by line`, ``);
+    for (const line of lines) {
+      const twins = twinsOf(line);
+      sections.push(`### ${line.lineId}: ${line.line}`, ``, `Record id: \`${suggestedId(line)}\``, ``);
+      if (twins.length > 0) {
+        sections.push(`Exact match: the same text, with the card name as {self}, is owned elsewhere. Copy the records below, with this card's code, line id and number.`, ``);
+        for (const twin of twins) sections.push(`${twin.lineId} (card ${twin.card.name}):`, "```json", ...twin.records.map((effect) => JSON.stringify(effect)), "```", ``);
+      } else {
+        sections.push(`Nearest records for this line:`, ``);
+        for (const item of nearest(line)) sections.push(`${item.lineId}: ${item.text.slice(0, 300)}`, "```json", JSON.stringify(item.effect), "```", ``);
+      }
+    }
     writeFileSync(path.join(out, `${code}.md`), `${sections.join("\n")}\n`);
     log.debug(`${code}.md: ${lines.length} line${lines.length === 1 ? "" : "s"} (${lines.map((line) => line.lineId).join(", ")})`);
   }

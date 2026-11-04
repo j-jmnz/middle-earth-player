@@ -13,7 +13,9 @@ something else.
 
 1. `pnpm effects:draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` for each card
    with a printed line no record owns: the line ids, the card text, DragnCards' automation (a hint about intent, never a
-   rule), related rules text, the vocabulary and the nearest existing records. `--all` drafts covered lines too.
+   rule), related rules text, and for each line the id its record takes and either the records that own the same text on
+   another card or the nearest existing records. The vocabulary is one shared `.agent/drafts/vocabulary.md`. `--all` drafts
+   covered lines too.
 2. Write the records (see Where records live).
 3. `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
    compares it with the data, so run it after adding or removing records.
@@ -32,7 +34,8 @@ belongs in a template (`scripts/data/effects/*-templates.ts`), not in more autho
 ## Where records live
 
 Generated records (`src/effects/generated`, written by `pnpm data:build` from the templates) and authored ones are merged in
-`src/effects/index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
+`src/effects/index.ts`. The authored files are listed by the barrel `src/effects/generated/authored.ts`, which `pnpm data:build` writes from
+`src/effects/authored/` (a file named for a scenario or campaign id, in campaign order); a new scenario file needs no edit to `index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
 with the reason, and the coverage test checks that no other id is replaced.
 
 - `src/effects/authored/pool/<PACK>.ts`: a player card's lines that no template reads and no family owns (`RECORDS`,
@@ -44,6 +47,29 @@ with the reason, and the coverage test checks that no other id is replaced.
 
 Family and scenario files are TypeScript, so local constants for a repeated filter or a small builder are fine; pool files
 are one JSON-shaped record per line. Record ids are unique across every file.
+
+## Templates and copied lines
+
+A sentence printed on several cards is a template (`scripts/data/effects/*-templates.ts`), not more authored records. A line
+printed the same as a line another card's record already owns is a copy, not a record typed again.
+
+- A template that comes to read a line an authored record owns writes that record itself. `scripts/checks/effect-migration.test.ts`
+  fails while an authored record is deep-equal to the generated record of its id (delete the authored one), differs from it
+  without a `REPLACES` entry, or shares a line with a generated record of another id.
+- The golden games store parts of the records they play: a won game's `state.resolution` holds the campaign card's Resolution
+  instructions. So a template writes the shape the playable scenarios' records already use, key order included, and a
+  played record whose shape it cannot match stays authored, in `REPLACES` with the reason. A golden that moves means the two
+  shapes differ in meaning.
+- A constant or triggered template reads a line only when no earlier unread line of that timing comes before it on the card
+  (`unreadBefore` in the template context): `generate.ts` does not reserve numbers for unread unlabelled lines, so a template
+  there could take an authored record's id. A line the ledger marks `inert` is not read either.
+- A card's records of one timing resolve in printed order (`recordInstructions` in `src/catalog/scenario-data.ts`), whether
+  they are generated or authored.
+- A copy is `copyLine(from, to)` or `copyLines(fromCode, toCode, ...positions)` inside `withCopies([...])`
+  (`src/effects/authored/reprint.ts`); a whole reprinted card is `reprint(records, from, to)`. The copy takes the target's
+  card code, line ids and the number its line has on the target, from printed order. The source must be an authored record
+  in the same list or in `pool`, and a card whose records of one timing live in several files is not copied this way.
+  `src/effects/copies.test.ts` fails when a copied pair's two ledger lines no longer read the same.
 
 ## The record
 
@@ -215,22 +241,45 @@ progress gates and caps; The Ring Goes South) and moria (damage tokens counting 
 first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark) and breaking (the Ring-bearer removed from the game, the staging area, quest stage and active location each seat has from stage 2B, progress that discards cards, a hero that falls into evil, skipped phases; Breaking of the Fellowship). Whoever takes a family adds the engine support and writes the records. A
 family owns files that are composed by the `index.ts` next to them, so families do not edit the same lists:
 
-- `src/catalog/families/<family>.ts` exports `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each
-  with a comment saying what the engine does), `TRIGGERS` (event names) and `FLAGS` (stat flags `ModifyStat` can set).
-  `families/index.ts` spreads them into `FAMILY_VERBS`, `FAMILY_TRIGGERS` and `FAMILY_FLAGS`, which join the verb union,
-  the trigger enum and the stat enum. `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb
-  or condition kind fails when the schema loads. A new pick filter, condition kind or amount field goes in the shared
-  `effect-schema-*.ts` file, with a comment naming the family file that reads it.
-- `src/rules/families/<family>/index.ts` exports `run`, which resolves the family's verbs and returns `null` for any other.
-  `src/rules/families/index.ts` lists the runners; `interpret.ts` asks the families before the player verbs and the core
-  switch. Bigger families split into part files in the family's folder (`<family>/<part>.ts`). Tests go next to them (`<family>/index.test.ts`) and name the
-  rule ids they implement.
+- `src/catalog/families/<family>.ts` exports one `manifest` (`src/catalog/family-manifest.ts`): its `name`, `verbs` (zod `strictObject`s with
+  `...when` from `effect-schema-conditions.ts`, each with a comment saying what the engine does), `triggers` (event names) and `flags`
+  (stat flags `ModifyStat` can set). `families/index.ts` lists the manifests in `CATALOG_FAMILIES`, in the order written there, and builds
+  `FAMILY_VERBS`, `FAMILY_TRIGGERS` and `FAMILY_FLAGS` from it; they join the verb union, the trigger enum and the stat enum.
+  `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb or condition kind fails when the schema loads. A
+  new pick filter, condition kind or amount field goes in the shared `effect-schema-*.ts` file, with a comment naming the family file that reads it.
+- `src/rules/families/<family>/index.ts` exports one `manifest` (`src/rules/interpret/family-manifest.ts`): its `name`, the `verbs` its `run`
+  answers and `run`, which resolves them and returns `null` for any other. `src/rules/families/index.ts` lists the manifests in
+  `RULES_FAMILIES`, in play order (where two runners could answer, the first does); `interpret.ts` asks the families before the player verbs and
+  the core switch. `src/rules/interpret/family-manifest.test.ts` fails when a declared verb has no runner, when a runner answers a verb no family
+  declares, or when a manifest lists a verb its `run` returns `null` for. A declared verb that no runner executes (a constant's marker read from the
+  effect records) or a runner verb the core schema declares goes in that test's two lists, with the file that handles it. Bigger families split into
+  part files in the family's folder (`<family>/<part>.ts`). Tests go next to them (`<family>/index.test.ts`) and name the rule ids they implement.
 - `src/effects/authored/families/<family>.ts` exports `RECORDS` and `REPLACES`, composed by that folder's `index.ts` (burden and
   south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
 
-Adding a family is therefore: the three files, its entries in the three `index.ts` files (catalog, rules, authored), a test, and `pnpm effects:open`.
-Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run`, and a test. Adding a
+- A manifest may add hooks the core calls: `settle: { before, after, sweep }` (steps of `settle` in `engine/machine.ts`; list the family in `SETTLE_ORDER`
+  in `src/rules/families/index.ts` for each phase it has a hook for: explicit order keeps play deterministic, and an unlisted family throws at its first settle), `travel: { may, reach }`,
+  `pick`, `condition` and `amount` (`src/rules/interpret/family-manifest.ts`, dispatched by `src/rules/interpret/family-hooks.ts`; `condition` and `amount` return
+  `null` for what is not the family's). A hook returns a new state or the same one. `interpret/family-hooks.test.ts` shows each with a synthetic family.
+- A campaign card's Setup verb that `src/campaign/start.ts` deals in Setup (`dealt`) or resolves after the quest card's Setup (`afterSetup`) is wrapped in
+  `setupRole(schema, role)` (`src/catalog/setup-role.ts`) in its schema entry; `setup-verbs.test.ts` pins the two sets.
+
+Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
+Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
+A new verb that a quest card's Setup uses goes in `revealsPerPlayer` (`src/rules/families/quest/setup.ts`), and one a Shadow line uses goes in `runsInFrame` (`src/rules/combat/shadow.ts`) when it asks a player or pushes effects. Nothing fails until a game reaches the card: the Setup is skipped, or the Shadow throws "Unimplemented instruction". Those two lists are keyed by verb name until they become schema flags (`docs/plans/scenario-pipeline.md`, Next steps).
+
+## Readings the review catches
+
+Read each new record against these before the review. Each one is a card bug a review has found.
+
+- **"Then".** The part after "then" resolves only if the part before it did (`rr.then`). Give the later instructions the same condition, or put them on a `then` branch.
+- **"One player" or "any player".** Either phrase lets any player take it, not the first player: use a `Pick` of a player, or `ChooseCards` `who: "onePlayer"` in a Campaign Setup. "The first player" is the only phrase that means seat order.
+- **"Attached character", "attached hero".** These hold only while the host is that card type. A host can change type, as an objective ally does when it flips to its enemy side, so put the host's type in the record's condition.
+- **"For any reason" and "cannot enter …".** The route must cover every way a card can arrive: discards made by player cards, searches, reshuffles, and both sides of a two-sided card.
+- **The trigger's scope.** "After a location is explored" hears a location explored in the staging area too (`locationExplored`), not only the active one (`activeExplored`). Check which zones the trigger's event is queued from.
+- **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
+- **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 
 ## Not expressible yet: leave open, report
 

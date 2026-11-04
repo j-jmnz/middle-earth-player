@@ -11,7 +11,8 @@ import { expireModifiers, updateCard, type ScenarioState } from "../../../rules/
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { fordTable, loadFordWorld, FELL_RIDER, type FordLayout, type FordWorld } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
-import { first, reveal, SAM, send } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { reveal, SAM } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send } from "../../../../test/harness/scene-kit.ts";
 
 let world: FordWorld;
 

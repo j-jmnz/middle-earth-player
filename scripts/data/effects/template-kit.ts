@@ -10,8 +10,19 @@ export type TemplateContext = {
   card: Card;
   // The code of a card named in text, among the cards of the scenario or campaign being built.
   codeOf(name: string): string | null;
+  // Whether a card of that name exists, one or several (codeOf is null for a name two cards print).
+  hasName(name: string): boolean;
+  // Every code of that name among the cards the reader shares a box (or pool) with, in numeric order: a name with several printings in play.
+  codesNamed(name: string): string[];
   // Codes in the scenario's set-aside pile.
   setAside: ReadonlySet<string>;
+  // Whether an earlier line of the card is unlabelled, needs a record, and no template reads, and would be a record of this timing. Such a line
+  // reserves no number (generate.ts), so the record it is given by hand takes the number a later template line of that timing would be numbered
+  // with. A template for an unlabelled sentence (a constant ability, a triggered one) reads the line only while this is false. An unread line is
+  // taken for a triggered ability when it opens with "If", "When", "After" and the like, else for a constant one.
+  unreadBefore(timing: "constant" | "triggered"): boolean;
+  // Whether the ledger marks the line being read as needing no record (an engine keyword owns it, or the rules do).
+  inert(): boolean;
 };
 
 export type Template = {

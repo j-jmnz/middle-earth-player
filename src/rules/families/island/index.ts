@@ -1,5 +1,6 @@
 // Rules: dcce.island-map, dcce.exploration (data/rules/entries.json). The verbs src/catalog/families/island.ts adds. The map itself is island/map.ts, traveling on it island/travel.ts, the Gate Key,
 // the secrets and the Temple Guardian island/cards.ts, and what a pick or an amount reads of the map island/pick.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -8,7 +9,8 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { attachGuarded, engageFromVictory, flipSecret, lookAtSecret, placeProgressInStaging, placeSecrets, raiseThreatToAttach, shuffleIntoPlayerDeck } from "./cards.ts";
-import { prepareMap, revealCorners, setActive } from "./map.ts";
+import { prepareMap, revealCorners, setActive, syncIsland } from "./map.ts";
+import { announceExits } from "./hand.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -38,3 +40,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "island", settle: { before: (state, ctx) => announceExits(state, ctx), after: syncIsland }, verbs: ["PrepareIslandMap", "RevealIslandCorners", "SetIslandActive", "AttachGuarded", "PlaceSecrets", "FlipSecret", "LookAtSecret", "EngageFromVictory", "PlaceProgressInStaging", "ShuffleIntoPlayerDeck", "RaiseThreatToAttach"], run };

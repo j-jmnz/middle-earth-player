@@ -213,7 +213,7 @@ describe("Dream-chaser campaign", () => {
     const grotto = loadScenario("the-drowned-ruins").cards.filter((card) => card.pile === "grottoDeck");
     const faceups = new Map<string, number>();
     for (const card of grotto) faceups.set(byCode.get(card.code)?.name ?? "", (faceups.get(byCode.get(card.code)?.name ?? "") ?? 0) + card.normal);
-    expect([...faceups]).toEqual([["Undersea Grotto", 3], ["Cursed Caverns", 3], ["Watter-logged Halls", 2]]);
+    expect([...faceups]).toEqual([["Undersea Grotto", 3], ["Cursed Caverns", 3], ["Water-logged Halls", 2]]);
     expect(grotto.every((card) => byCode.get(card.code)?.traits.includes("Grotto") && byCode.get(card.back ?? "")?.traits.includes("Underwater"))).toBe(true);
     // The pairings of dcce.grotto-deck: Dragncards' Q06.7 lines.
     expect(grotto.map((card) => `${byCode.get(card.code)?.name}/${byCode.get(card.back ?? "")?.name} ${card.normal}`).sort()).toEqual([
@@ -221,8 +221,8 @@ describe("Dream-chaser campaign", () => {
       "Cursed Caverns/Twisting Hollow 2",
       "Undersea Grotto/Dark Abyss 2",
       "Undersea Grotto/Twisting Hollow 1",
-      "Watter-logged Halls/Dark Abyss 1",
-      "Watter-logged Halls/Sunken Temple 1",
+      "Water-logged Halls/Dark Abyss 1",
+      "Water-logged Halls/Sunken Temple 1",
     ]);
     expect(loadScenario("the-drowned-ruins").cards.find((card) => card.code === "12094")?.back).toBe("12095");
   });

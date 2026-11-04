@@ -90,7 +90,7 @@ function addToPool(table: Table, instruction: Extract<Instruction, { verb: "AddT
   table.out.did.push(`${table.name(instruction.code)} joins the Campaign Pool${instruction.eachPlayer ? " (a copy for each player)" : ""}.`);
 }
 
-// ChooseCards: each seat in turn takes a card (the first player alone, or every player). The cards a choice earns join the pool, a
+// ChooseCards: each seat in turn takes a card (the first player alone, every player, or whichever one player takes it: the offer ends with the first taker). The cards a choice earns join the pool, a
 // hand or a hero; only a Permanent card stays recorded on its hero (ltp.campaign-pool): another gift goes on the hero for this
 // scenario and is shuffled into a deck in later ones.
 function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "ChooseCards" }>): void {
@@ -106,7 +106,9 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
     return same(code) && row.startsWith(name(code)) ? row.slice(name(code).length) : "";
   };
   const offered = new Set(titles).size === 1 ? (titles[0] ?? "the offer") : "the offer";
+  let offerOpen = true;
   for (const seat of instruction.who === "firstPlayer" ? order.slice(0, 1) : order) {
+    if (!offerOpen) break;
     const remaining = instruction.codes.filter((code) => !taken.includes(code));
     const options = instruction.to === "hero" ? remaining.flatMap((code) => (seats[seat]?.heroes ?? []).map((hero) => `${code}>${hero}`)) : remaining;
     const answer = takeAnswer(table, instruction.optional ? [...options, "skip"] : options, seat);
@@ -114,6 +116,7 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
     if (answer == null || answer === "skip") continue;
     const [code = "", host] = answer.split(">");
     taken.push(code);
+    if (instruction.who === "onePlayer") offerOpen = false;
     const printed = printedOf(input.cards, code);
     const hero = host ?? null;
     if (instruction.to === "hero" && hero) seats[seat]?.attachments.push({ host: hero, code });

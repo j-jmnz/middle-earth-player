@@ -8,7 +8,7 @@ import { seatThreat } from "../../../rules/families/play/hooks.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { codesIn, loadCavesWorld, cavesTable, settleChoices, type CavesLayout, type CavesWorld } from "../../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
-import { first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: CavesWorld;
 

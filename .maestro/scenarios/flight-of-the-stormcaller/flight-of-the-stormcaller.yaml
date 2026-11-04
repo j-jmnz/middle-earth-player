@@ -7,45 +7,8 @@ tags:
 # (docs/phases/STATUS.md). Confirming the win writes the XP from the campaign card (1 for each surviving player, on-course, stage 2B, the Stormcaller destroyed, Crowley, Thunderstruck, no damage on a hero) and, with
 # parts 1 to 3 won in the log, unlocks The Thing in the Depths (src/campaign/scenarios/flight-of-the-stormcaller/golden.test.ts pins the path). The fixture's log has parts 1 to 3 recorded as won (the logs the Voyage, Fate and Raid
 # goldens' wins write), so the path opens on Flight of the Stormcaller and resumes it; its node reads Won.
-- launchApp:
-    clearState: true
-- openLink: "middleearthlcg://e2e/stormcaller-won"
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-- tapOn:
-    id: begin
-- extendedWaitUntil:
-    visible:
-      id: table
-    timeout: 30000
-- tapOn:
-    id: quest-advance-progress
-    optional: true
-- assertNotVisible:
-    id: life
-- assertVisible:
-    id: rail-current
-    text: "Victory"
-- tapOn:
-    id: sheet-outcome
-- extendedWaitUntil:
-    visible:
-      id: resolution
-    timeout: 30000
-# The campaign card's Resolution asks no choice: confirming writes the XP.
-- tapOn:
-    id: resolution-confirm
-- extendedWaitUntil:
-    visible:
-      id: campaign-path
-    timeout: 15000
-- assertVisible:
-    id: node-flight-of-the-stormcaller-status
-    text: "Won.*"
-# The XP the Resolution gave is written: the line reads it and there is XP to spend.
-- assertVisible:
-    id: xp-line
-- assertVisible:
-    id: xp-open
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: stormcaller-won
+      SCENARIO_ID: flight-of-the-stormcaller

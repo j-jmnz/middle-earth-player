@@ -2,11 +2,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // Setup: the Ring-bearer's life is set to `value` (mec109.ringbearers-life). The scenario's definition already starts the
   // game with it (data/scenarios `life`); this verb is how the Setup record says so.
   z.strictObject({ verb: z.literal("SetLife"), value: z.number().int().positive(), ...when }),
@@ -49,13 +50,13 @@ export const VERBS = [
   }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a card in play (a location): progress was just placed on it and it is still in play (141061:A:2). Each placement is one
   // event, whatever the number of tokens.
   "progressPlaced",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a hero: damage that would be placed on it reduces the Ring-bearer's life by that much instead (141057:A:2).
   "damageToLife",
   // On a card: damage cannot be healed from it (141057:A:1).
@@ -63,3 +64,5 @@ export const FLAGS = [
   // On an enemy: it is not dealt a shadow card (141061:A:1).
   "noShadowDealt",
 ] as const;
+
+export const manifest = { name: "burden", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

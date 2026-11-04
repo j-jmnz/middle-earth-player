@@ -24,6 +24,7 @@ import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";
 import { queueHeard } from "../quest/events.ts";
+import { lastPlayer } from "../sea/players.ts";
 import { stage } from "./deck.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -33,7 +34,7 @@ export function putSetAsideInPlay(state: ScenarioState, instruction: Verb<"PutSe
   const id = state.setAside.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === instruction.name);
   if (!id) return state;
   const holder = instruction.withCard ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.controller != null && printedOf(ctx.cards, card.code).name === instruction.withCard) : undefined;
-  return updateCard(moveCard(state, id, { zone: "play", seat: holder?.controller ?? state.firstPlayer }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
+  return updateCard(moveCard(state, id, { zone: "play", seat: holder?.controller ?? (instruction.to === "lastPlayer" ? lastPlayer(state) : state.firstPlayer) }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
 }
 
 /** AttachSetAside: the set-aside copy of the card with this code is attached to the card in play with that name. */

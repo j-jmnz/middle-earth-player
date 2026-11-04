@@ -2,11 +2,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare/index.ts runs them (with nightmare/dungeon.ts and nightmare/setup.ts).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // The source (a treachery being revealed) attaches to the current quest card ("When Revealed: Attach to the current quest", 906107:A:2).
   // It leaves play with that stage, which discards it (rr.attachment-cards). With no quest card in play it stays where it is and goes to the
   // encounter discard pile as a revealed treachery does.
@@ -91,7 +92,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("PlaceResourceTokens"), amount: positiveAmountSchema, on: cardRefSchema, ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // A quest card became the current stage ("When stage 3A is revealed", 906101:A:2). The event names the stage as its subject, so a record with
   // no `subject` hears it from any card in play (the Nightmare setup card, zone `nightmare`); a `matches` condition on `subject` says which stage.
   "stageRevealed",
@@ -104,7 +105,7 @@ export const TRIGGERS = [
   "duringSetup",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On "table": no player may commit more than this many characters to a Hide test ("players cannot commit more than 2 characters to a Hide
   // test", 906106:A:1). The smallest amount held applies. Read by hideCommitReason (rules/quest/hide.ts) through families/nightmare.ts.
   "hideCommitLimit",
@@ -123,3 +124,5 @@ export const FLAGS = [
   // Outlaws", 900202:A:1). Read by combat.ts canAttack and the DamageCard verb (families/nightmare/guards.ts).
   "attackOnlyTitle",
 ] as const;
+
+export const manifest = { name: "nightmare", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

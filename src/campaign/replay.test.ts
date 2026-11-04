@@ -7,13 +7,9 @@ import { reduce } from "../rules/engine/reduce.ts";
 import { startScenario } from "../rules/setup/setup.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { playOut } from "../../test/harness/auto-player.ts";
+import { GOLDEN_REGISTRY } from "../../test/harness/golden-registry.ts";
 import { campaign, loadWorld, scenario } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { playStarter, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
-import { KNIFE_GOLDENS, knifeWorld, playGolden } from "../../test/scenarios/a-knife-in-the-dark/game.ts";
-import { FORD_GOLDENS, fordWorld, playGolden as playFordGolden } from "../../test/scenarios/flight-to-the-ford/game.ts";
-import { SOUTH_GOLDENS, southWorld, playGolden as playSouthGolden } from "../../test/scenarios/the-ring-goes-south/game.ts";
-import { MORIA_GOLDENS, moriaWorld, playGolden as playMoriaGolden } from "../../test/scenarios/journey-in-the-dark/game.ts";
-import { BREAKING_GOLDENS, breakingGameWorld, playGolden as playBreakingGolden } from "../../test/scenarios/breaking-of-the-fellowship/game.ts";
 
 import { buildStart } from "./start.ts";
 import { beginActive, recordIntent, replay } from "./replay.ts";
@@ -56,59 +52,14 @@ describe("saves.activeScenario replay", () => {
     if (replayed.ok) expect(replayed.state).toEqual(run.state);
   });
 
-  it.each(KNIFE_GOLDENS.map((golden) => golden.name))("replays the A Knife in the Dark golden game (%s) to the same final state", async (name) => {
-    const golden = KNIFE_GOLDENS.find((item) => item.name === name);
-    if (!golden) throw new Error(name);
-    const { ctx } = await knifeWorld();
-    const game = playGolden(golden, ctx);
-    let active = beginActive(game.start, HASH);
-    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
-    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
-    expect(replayed.ok).toBe(true);
-    if (replayed.ok) expect(replayed.state).toEqual(game.state);
-  }, 60_000);
+  // Every other scenario's goldens (test/harness/golden-registry.ts).
+  const GOLDEN_CASES = GOLDEN_REGISTRY.flatMap((entry) => entry.goldens.map((golden) => ({ title: entry.title, name: golden.name, entry })));
 
-  it.each(FORD_GOLDENS.map((golden) => golden.name))("replays the Flight to the Ford golden game (%s) to the same final state", async (name) => {
-    const golden = FORD_GOLDENS.find((item) => item.name === name);
+  it.each(GOLDEN_CASES)("replays the $title golden game ($name) to the same final state", async ({ name, entry }) => {
+    const golden = entry.goldens.find((item) => item.name === name);
     if (!golden) throw new Error(name);
-    const { ctx } = await fordWorld(golden.decks);
-    const game = playFordGolden(golden, ctx);
-    let active = beginActive(game.start, HASH);
-    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
-    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
-    expect(replayed.ok).toBe(true);
-    if (replayed.ok) expect(replayed.state).toEqual(game.state);
-  }, 60_000);
-
-  it.each(SOUTH_GOLDENS.map((golden) => golden.name))("replays The Ring Goes South golden game (%s) to the same final state", async (name) => {
-    const golden = SOUTH_GOLDENS.find((item) => item.name === name);
-    if (!golden) throw new Error(name);
-    const { ctx } = await southWorld(golden.decks);
-    const game = playSouthGolden(golden, ctx);
-    let active = beginActive(game.start, HASH);
-    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
-    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
-    expect(replayed.ok).toBe(true);
-    if (replayed.ok) expect(replayed.state).toEqual(game.state);
-  }, 60_000);
-
-  it.each(MORIA_GOLDENS.map((golden) => golden.name))("replays Journey in the Dark golden game (%s) to the same final state", async (name) => {
-    const golden = MORIA_GOLDENS.find((item) => item.name === name);
-    if (!golden) throw new Error(name);
-    const { ctx } = await moriaWorld(golden.decks);
-    const game = playMoriaGolden(golden, ctx);
-    let active = beginActive(game.start, HASH);
-    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
-    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
-    expect(replayed.ok).toBe(true);
-    if (replayed.ok) expect(replayed.state).toEqual(game.state);
-  }, 60_000);
-
-  it.each(BREAKING_GOLDENS.map((golden) => golden.name))("replays Breaking of the Fellowship golden game (%s) to the same final state", async (name) => {
-    const golden = BREAKING_GOLDENS.find((item) => item.name === name);
-    if (!golden) throw new Error(name);
-    const { ctx } = await breakingGameWorld(golden.decks);
-    const game = playBreakingGolden(golden, ctx);
+    const { ctx } = await entry.world(golden.decks);
+    const game = entry.play(golden, ctx);
     let active = beginActive(game.start, HASH);
     for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
     const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);

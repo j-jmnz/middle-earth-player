@@ -112,11 +112,11 @@ export const costSchema = z.discriminatedUnion("kind", [
 ]);
 
 
-const choiceSchema = z.strictObject({
+// A Choose whose options hold simple verbs only. It is the whole schema of a choice inside another choice's option: the "you may" in an option ("Deal 2 damage to an enemy. You may engage it.",
+// 11204:A:4).
+const simpleChoiceSchema = z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
-  // Each option may be taken once in this effect: a later Choose of the same effect offers only the options not taken yet
-  // ("each player chooses 1 different option", src/rules/families/deck/choose.ts).
   different: z.boolean().optional(),
   options: z
     .array(
@@ -124,6 +124,38 @@ const choiceSchema = z.strictObject({
         id: z.string().min(1),
         requires: conditionSchema.optional(),
         instructions: z.array(simpleInstructionSchema),
+      }),
+    )
+    .min(1),
+});
+
+// An Each inside a choice's option: the verb is run for each card that matches ("Add 2 resources to each Círdan's Blessing", 11202:A:3; "discard any number of the top 10", 11202:A:5 with `upTo`).
+// Its instructions are simple verbs or a simple choice, as in the Each of a record's own instructions.
+const optionEachSchema = z.strictObject({
+  verb: z.literal("Each"),
+  pick: pickSchema,
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, simpleChoiceSchema])),
+  upTo: z.union([z.number().int().positive(), z.literal("any"), amountExprSchema]).optional(),
+  taken: z.array(z.string()).optional(),
+  ...when,
+});
+
+const choiceSchema = z.strictObject({
+  verb: z.literal("Choose"),
+  who: whoSchema,
+  // Each option may be taken once in this effect: a later Choose of the same effect offers only the options not taken yet
+  // ("each player chooses 1 different option", src/rules/families/deck/choose.ts).
+  different: z.boolean().optional(),
+  // The actor takes options one at a time, each once, up to this many (an amount: the number it reads, "choose up to X options, where X is its level", 11201:A:1), and may stop with "done"
+  // (src/rules/windows/choices.ts). The options taken so far are kept as `different` keeps them; a Choose with `upTo` is `different`.
+  upTo: z.union([z.number().int().positive(), amountExprSchema]).optional(),
+  // An option holds simple verbs, a nested simple choice and an Each (a verb run for each matching card).
+  options: z
+    .array(
+      z.strictObject({
+        id: z.string().min(1),
+        requires: conditionSchema.optional(),
+        instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, simpleChoiceSchema, optionEachSchema])),
       }),
     )
     .min(1),
@@ -145,18 +177,18 @@ const delaySchema = z.strictObject({
   instructions: z.array(simpleInstructionSchema),
 });
 
-// Instructions that run, with the attacking enemy as the source, once the attack in progress ends. `when` is read as the shadow effect
-// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
-const afterAttackSchema = z.strictObject({
-  verb: z.literal("AfterAttack"),
-  instructions: z.array(simpleInstructionSchema),
-  ...when,
-});
-
 const forEachPlayerSchema = z.strictObject({
   verb: z.literal("ForEachPlayer"),
   order: z.enum(["lastFirst", "firstFirst"]),
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
+});
+
+// Instructions that run, with the attacking enemy as the source, once the attack in progress ends (a ForEachPlayer among them: "Captain Sahír makes an attack ... Each player searches ...", 12093:A:1). `when` is read as the shadow effect
+// resolves, while the attack is still in progress ("If undefended, move the damage to the hero damaged by this attack", 900209:A:2).
+const afterAttackSchema = z.strictObject({
+  verb: z.literal("AfterAttack"),
+  instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, forEachPlayerSchema])),
+  ...when,
 });
 
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready

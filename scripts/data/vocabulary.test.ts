@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { vocabulary } from "./effects/vocabulary.ts";
+import { vocabulary, vocabularyMarkdown } from "./effects/vocabulary.ts";
 import { ROOT } from "./paths.ts";
 
 // The draft bundles list the schema's words. A verb declared through the verb() or codeVerb() helper is a verb too.
@@ -28,6 +28,11 @@ describe("effect vocabulary for the draft bundles", () => {
     expect(vocab.verbs).toContain("AddSetAsideToStaging");
     expect(vocab.verbs).toContain("ShuffleEncounterDeck");
     expect(vocab.verbs).toContain("Choose");
+  });
+
+  it("writes every verb into the shared file the drafts link to", () => {
+    const listed = new Set((/^Verbs: (.*)$/m.exec(vocabularyMarkdown(vocab))?.[1] ?? "").split(", "));
+    expect(listed).toEqual(new Set(vocab.verbs));
   });
 
   it("lists conditions only, not cost or target kinds", () => {

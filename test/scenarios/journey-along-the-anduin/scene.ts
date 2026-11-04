@@ -1,16 +1,16 @@
 import { EFFECTS } from "../../../src/effects/index.ts";
-import type { Effect, ScenarioDefinition } from "../../../src/catalog/boundary.ts";
+import type { ScenarioDefinition } from "../../../src/catalog/boundary.ts";
 import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { legalIntents } from "../../../src/rules/engine/legal.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
+import { type PrintedCard } from "../../../src/rules/core/printed.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import { blankScenario, updateCard, withThreat } from "../../../src/rules/core/state.ts";
 import { spawn } from "../../../src/rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { send, start, type Run } from "../a-shadow-of-the-past/scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { addStandIns, allyCard, enemyCard, heroCard, opening, sceneEffects, send, start, type Run } from "../../harness/scene-kit.ts";
 
 // Shared scene for the Journey Along the Anduin effect tests. Test-only. The heroes are plain numbers (no player card text), so what a
 // test shows comes from the scenario's records and the engine.
@@ -27,8 +27,7 @@ export const HERO = "ah1";
 export const HERO2 = "ah2";
 export const HERO3 = "ah3";
 
-// The filler event has an Action that does nothing, so it can be played: an event with no record at all cannot (rr.triggered-ability).
-const SCENE_EFFECTS: readonly Effect[] = [...EFFECTS, { id: "filler:action:1", cardCode: "filler", lines: ["filler:A:1"], timing: "action", instructions: [] }];
+const SCENE_EFFECTS = sceneEffects();
 
 export type AnduinWorld = { definition: ScenarioDefinition; cards: Map<string, PrintedCard> };
 
@@ -36,14 +35,11 @@ export async function loadAnduinWorld(): Promise<AnduinWorld> {
   const definition = scenarioDefinition(anduin, campaign, EFFECTS);
   const codes = [...new Set([...scenarioCards(anduin).map((card) => card.code), ...anduin.campaignPlaced, anduin.campaignCard, "01132", "01136", "01137", "01129"])];
   const cards = new Map(await loadPrinted(codes));
-  for (const [code, threat] of [["f0", 0], ["f3", 3]] as const) {
-    cards.set(code, definePrinted({ code, name: code, type: "enemy", threat, engagementCost: 50, attack: 1, defense: 1, health: 3 }));
-  }
-  cards.set("brute", definePrinted({ code: "brute", name: "brute", type: "enemy", threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
-  cards.set("grunt", definePrinted({ code: "grunt", name: "grunt", type: "enemy", threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
-  for (const code of [HERO, HERO2, HERO3]) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
-  cards.set("ally", definePrinted({ code: "ally", name: "ally", type: "ally", sphere: "neutral", cost: 0, willpower: 1, attack: 1, defense: 1, health: 2 }));
+  addStandIns(cards, ["f0", "f3", "filler"]);
+  cards.set("brute", enemyCard("brute", { threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
+  cards.set("grunt", enemyCard("grunt", { threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
+  for (const code of [HERO, HERO2, HERO3]) cards.set(code, heroCard(code));
+  cards.set("ally", allyCard("ally", 0));
   return { definition, cards };
 }
 
@@ -116,10 +112,7 @@ export function anduinTable(world: AnduinWorld, layout: AnduinLayout = {}): { st
     const id = Object.values(state.cards).find((card) => card.code === code)?.id;
     if (id) state = updateCard(state, id, { damage });
   }
-  const phase = layout.phase ?? "Quest";
-  const mode = phase === "Quest" ? "questCommit" : phase === "Encounter" ? "optionalEngage" : phase === "Travel" ? "travel" : phase === "Refresh" ? "refresh" : "combatActions";
-  const window = phase === "Encounter" ? { kind: "optionalEngage" as const } : phase === "Travel" ? { kind: "travel" as const } : phase === "Refresh" ? null : { kind: "pass" as const };
-  state = { ...state, phase, boundaryPhase: phase, mode, window, activeSeat: 0 };
+  state = { ...state, ...opening(layout.phase ?? "Quest") };
   return { state, ctx: { effects: SCENE_EFFECTS, cards: world.cards }, hero: first.id, hero2: secondHero.id, seat1Hero };
 }
 

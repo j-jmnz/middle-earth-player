@@ -1,23 +1,18 @@
-import { checklist } from "../../../src/campaign/checklist.ts";
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
-import { buildStart } from "../../../src/campaign/start.ts";
-import { scenarioCards, type Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { EFFECTS } from "../../../src/effects/index.ts";
+import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts } from "../../../src/rules/core/campaign-state.ts";
-import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../../src/rules/setup/setup.ts";
 
 import { ADAPTATIONS, campaign, oath } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { loadPrinted } from "../../harness/catalog.ts";
-import { attackTogether, engageOneEach, FILLER, fillerCard, fillerLoadout, type PlayedGame, playToEnd } from "../../harness/game-kit.ts";
+import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame, STRONG_HEROES as HEROES } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Oath in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small
 // to quest, or too brittle to survive an attack), and the decks free events, so the outcome depends on the engine, the seed and the encounter deck,
 // not on player card play. Each seat chooses an Adaptation boon at the Campaign Setup Checklist and attaches it to its first hero; the Stalking
 // Goblin burden is shuffled into the encounter deck. The Oath's Response (a token at the end of each round) is taken or declined by the golden.
-export const HEROES = ["q1", "q2", "q3", "q4", "q5", "q6"];
+export { HEROES };
 export const OATH_POLICY: PolicyOptions = { scout: "", prefer: "41014", protect: "", play: true, act: true };
 // "strong": big-number heroes. "steady": heroes that quest for little, so the scenario takes many rounds. "weak": heroes too small to quest, so the
 // players lose on threat. "brittle": strong quest and attack with a few hit points and no Defense, so an enemy's attack destroys a hero.
@@ -25,25 +20,6 @@ export type OathDecks = "strong" | "steady" | "weak" | "brittle";
 
 export const oathLoadout = fillerLoadout;
 
-const WEAK_STATS = { threat: 8, willpower: 0, attack: 0, defense: 0, health: 100 } as const;
-const STRONG_STATS = { threat: 3, willpower: 20, attack: 12, defense: 6, health: 100 } as const;
-const STEADY_STATS = { threat: 3, willpower: 6, attack: 12, defense: 6, health: 100 } as const;
-const BRITTLE_STATS = { threat: 3, willpower: 20, attack: 12, defense: 0, health: 7 } as const;
-const STATS = { strong: STRONG_STATS, steady: STEADY_STATS, weak: WEAK_STATS, brittle: BRITTLE_STATS } as const;
-
-export async function oathWorld(decks: OathDecks = "strong"): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
-  const codes = [...scenarioCards(oath).map((card) => card.code), ...oath.campaignPlaced, oath.campaignCard, ...ADAPTATIONS];
-  const cards = new Map(await loadPrinted([...new Set(codes)]));
-  for (const code of HEROES) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", ...STATS[decks] }));
-  cards.set(FILLER, fillerCard());
-  LOADED = cards;
-  return { cards, ctx: { effects: EFFECTS, cards } };
-}
-
-// The cards of the last world built: the checklist reads the pool cards' printed data.
-let LOADED: ReadonlyMap<string, PrintedCard> | null = null;
-
-// The Adaptation each seat chooses at the checklist, in seat order (the first seat's first hero carries its card, then the second seat's).
 export type Adaptations = readonly (typeof ADAPTATIONS)[number][];
 export const DEFAULT_ADAPTATIONS: Adaptations = ["41044", "41045"];
 
@@ -53,31 +29,12 @@ export function oathChoices(seatCount: 1 | 2, adaptations: Adaptations = DEFAULT
 
 // The scenario dealt through the Campaign Setup Checklist: each seat's chosen Adaptation goes on its first hero, Stalking Goblin joins the encounter deck
 // and the pool a log carries is dealt with it.
-export function oathPlan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS) {
-  if (!LOADED) throw new Error("Build the world first (oathWorld)");
-  const plan = checklist({ log, scenario: oath, seats: oathLoadout(seatCount), effects: EFFECTS, cards: LOADED, choices: oathChoices(seatCount, adaptations) });
-  if (!plan.ok) throw new Error(plan.errors.join("; ") || "The campaign card asks for a choice");
-  return plan;
-}
+const game = campaignGame<OathDecks, OathPolicy>({ campaign, scenario: oath, stats: HERO_STATS, codes: ADAPTATIONS, intent: oathIntent, policy: { tokens: "take" }, limit: 8000, upgraded: [] });
 
-export function oathStart(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS): StartScenario {
-  const plan = oathPlan(seatCount, log, adaptations);
-  return buildStart({
-    campaign,
-    scenario: oath,
-    seatCount,
-    seed,
-    threatModifier: plan.threatModifier,
-    seats: plan.seats,
-    effects: EFFECTS,
-    difficulty,
-    poolEncounterCards: plan.poolEncounterCards,
-    poolIntoPlay: plan.poolIntoPlay,
-    ...(facts ? { facts } : {}),
-  });
-}
+export const oathWorld = (decks: OathDecks = "strong") => game.world(decks);
+export const oathPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS) => game.plan(seatCount, log, oathChoices(seatCount, adaptations));
+export const oathStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS): StartScenario => game.start(seatCount, seed, difficulty, facts, log, undefined, oathChoices(seatCount, adaptations));
 
-// What the policy does besides the auto-player's answer: `tokens` says whether the players place The Oath's resource token at the end of each round.
 export type OathPolicy = { tokens: "take" | "skip" };
 
 // The auto-player's answer (test/harness/auto-player.ts), except where the auto-player alone always declines: in a player attack window every ready
@@ -125,8 +82,7 @@ export type OathGame = PlayedGame;
 
 // Plays until the scenario is lost, or won and every Resolution choice is answered.
 export function playOath(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, facts?: CampaignFacts, policy: OathPolicy = { tokens: "take" }, adaptations: Adaptations = DEFAULT_ADAPTATIONS, limit = 8000): OathGame {
-  const start = oathStart(seatCount, seed, difficulty, facts, emptyLog(seatCount), adaptations);
-  return playToEnd(start, ctx, (state, memory) => oathIntent(state, ctx, memory, policy), limit);
+  return game.play(seatCount, seed, difficulty, ctx, { facts, policy, choices: oathChoices(seatCount, adaptations), limit });
 }
 
 // The goldens (src/campaign/scenarios/the-oath/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a loss writes

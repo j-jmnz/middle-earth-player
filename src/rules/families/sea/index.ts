@@ -1,6 +1,7 @@
 // Rules: dcce.ships, dcce.prepare-your-fleet, dcce.heading, dcce.sailing-tests, dcce.corsair-deck, dcce.boarding, dcce.last-player, dcce.archery
 // (data/rules/entries.json). The verbs src/catalog/families/sea.ts adds. The ship rules (sea/ships.ts), the Sailing test (sea/sailing.ts), Boarding
 // (sea/boarding.ts) and the routes of the Corsair deck and the Stormcaller Elite (sea/routes.ts) work inside the engine's own steps and are not verbs.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -10,7 +11,7 @@ import { engageEnemy } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { endCorsairDeck, prepareCorsairDeck, revealCorsair } from "./corsair.ts";
+import { endCorsairDeck, prepareCorsairDeck, refillCorsairDeck, revealCorsair } from "./corsair.ts";
 import { prepareFleet } from "./fleet.ts";
 import { shiftHeading } from "./heading.ts";
 import { lastPlayer } from "./players.ts";
@@ -61,3 +62,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck"], run };

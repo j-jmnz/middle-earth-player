@@ -4,10 +4,12 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 import { cellOf } from "../../rules/families/island/map.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
-import type { PrintedCard } from "../../rules/core/printed.ts";
+import { printedOf, type PrintedCard } from "../../rules/core/printed.ts";
+import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
+import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 
 /** The name every Lost Island shows, whatever its other side is called (dcce.uncharted): the side that lies face up hides which location it is. */
@@ -48,9 +50,37 @@ export function switchNote(game: ScenarioState, count: number): string | null {
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
+const KEPT_NOUNS: Readonly<Record<string, string>> = { ally: "allies", attachment: "attachments", event: "events", "player-side-quest": "side quests", treasure: "treasures" };
+
+/** The cards in a seat's hand and how many of each printed type (the card types Into the Abyss lets the player keep). */
+export function handTypes(game: ScenarioState, ctx: ReduceContext, seat: number): { total: number; byType: Readonly<Record<string, number>> } {
+  const hand = game.seats[seat]?.hand ?? [];
+  const byType: Record<string, number> = {};
+  for (const id of hand) {
+    const type = printedOf(ctx.cards, game.cards[id]?.code ?? "").type;
+    byType[type] = (byType[type] ?? 0) + 1;
+  }
+  return { total: hand.length, byType };
+}
+
+/** What Into the Abyss' card-type choice asks: the type to keep, and the surge when nothing is discarded. Null for any other Choose. */
+export function unchartedNote(choose: Choose, cardName: string): string | null {
+  const discards = choose.options.some((option) => option.instructions.some((step) => step.verb === "DiscardEach" && step.pick.notCardType != null));
+  return discards ? `Choose the card type to keep in your hand. If no card is discarded, ${cardName} gains surge.` : null;
+}
+
+/** "Flip Dark Abyss to its Grotto side": the card (the source by default) and the side its other face is, read from that face's Traits. */
+export function flipWords(instruction: Extract<Instruction, { verb: "FlipDoubleSided" }>, game: ScenarioState, names: ChoiceNames, sourceId: string | null): string {
+  const card = (instruction.target == null || instruction.target === "self") && sourceId ? game.cards[sourceId] : undefined;
+  const other = card ? (card.other ?? game.uncharted?.pairs?.[card.code]) : undefined;
+  const traits = other ? (names.traits?.(other) ?? []) : [];
+  const side = traits.includes("Underwater") ? "Underwater" : traits.includes("Grotto") ? "Grotto" : null;
+  return card && side ? `flip ${names.card(card.id)} to its ${side} side` : "flip it to its other side";
+}
+
 /** The words of a branch of the family's Choose instructions, or null: "Switch it with a card in your hand" / "Keep your hand" (Calphon), "Place 1 progress on a location (2 on a Lost Island)"
  * (Spyglass), "Raise each player's threat by 2 to look at a Lost Island's facedown side" (Aimless Wandering). */
-export function unchartedBranchWords(choose: Choose, optionId: string): string | null {
+export function unchartedBranchWords(choose: Choose, optionId: string, now?: BranchNow): string | null {
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return null;
   const swaps = (steps: readonly Instruction[]) => steps.some((step) => step.verb === "SwapPicked");
@@ -60,6 +90,18 @@ export function unchartedBranchWords(choose: Choose, optionId: string): string |
   const [plain, island] = placed;
   if (placed.length === 2 && plain && island && typeof plain.amount === "number" && typeof island.amount === "number" && plain.when != null && island.when != null) {
     return `Place ${plural(plain.amount, "progress", "progress")} on a location (${island.amount} on a Lost Island)`;
+  }
+  const keeps = option.instructions.find((step): step is Extract<Instruction, { verb: "DiscardEach" }> => step.verb === "DiscardEach" && step.pick.notCardType != null);
+  if (keeps?.pick.notCardType) {
+    const type = keeps.pick.notCardType;
+    // The count of the hand now: "Keep only events (2), discard 3".
+    if (now?.hand) {
+      const kept = now.hand.byType[type] ?? 0;
+      const lost = now.hand.total - kept;
+      return `Keep only ${KEPT_NOUNS[type] ?? `${type}s`} (${kept}), discard ${lost === 0 ? "none" : lost}`;
+    }
+    const kind = type === "player-side-quest" ? "side quest" : type;
+    return `Keep only ${kind} cards in your hand and discard the rest`;
   }
   const doomed = option.instructions.find((step): step is Extract<Instruction, { verb: "Doomed" }> => step.verb === "Doomed");
   if (doomed && option.instructions.some((step) => step.verb === "LookAtFacedown")) return `Raise each player's threat by ${typeof doomed.amount === "number" ? doomed.amount : "X"} to look at a Lost Island's facedown side`;

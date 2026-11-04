@@ -349,6 +349,8 @@ export function destroyCard(
   }
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
   if (explored && printed.type === "location" && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  // A location explored in the staging area (not the active location, which announced itself above) is heard by "after a location is explored" (Northern Tracker, The Evening Star).
+  if (explored && printed.type === "location" && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: instance.attachments.length });
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
   if (explored && printed.type === "location" && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);

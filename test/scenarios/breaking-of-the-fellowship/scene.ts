@@ -13,7 +13,7 @@ import { blankScenario, updateCard, withSeat, withThreat } from "../../../src/ru
 import { attachTo, spawn } from "../../../src/rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { FRODO, MERRY, RING, SAM } from "../a-shadow-of-the-past/scene.ts";
+import { FRODO, MERRY, RING, SAM } from "../../harness/scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
 
 // Shared scene for the Breaking of the Fellowship tests (separate staging, stages 1 and 2). Test-only.

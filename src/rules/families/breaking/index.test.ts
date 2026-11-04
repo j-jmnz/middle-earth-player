@@ -11,7 +11,7 @@ import { engagementCostOf } from "../../quest/quest.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { ARGONATH, DIVIDED, FRODOS_CHOICE, GREAT_RIVER, SARN_GEBIR, SEAT_OF_SEEING, STAGES_3A, codes, fire, ids, loadBreakingWorld, makeBreaking, settled, type BreakingLayout, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: BreakingWorld;
 

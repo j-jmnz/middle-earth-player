@@ -37,6 +37,8 @@ Code and tests name the rule ids they implement (`data/rules/entries.json`). A r
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards`, and `rules` in memory. |
 | `pnpm effects:draft <scenario \| starter deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line no effect record owns. |
 | `pnpm effects:open` | Rewrites `src/effects/open-lines.ts`, the printed lines no record owns. |
+| `pnpm test:scenario <scenario-id>` | Runs the tests that belong to one scenario (by path or by importing its scene), its goldens, the effect coverage checks and the card smoke on its player cards, and the family and manifest tests when pool, family or manifest files changed since the merge base with origin/main (committed or not). `--list` prints the selection. |
+| `pnpm scenario:new <scenario-id>` | Writes a new scenario's skeletons (scene, game, golden and campaign tests, seed finder, Maestro flows, authored effects file) on the shared test kit and adds its registry lines. `--dry-run` lists them first; it refuses a scenario that has files. The procedure around it is in [the phase 12 Scenario procedure](docs/phases/phase-12-knife-in-the-dark.md). |
 | `pnpm docs:index` | Rewrites `docs/INDEX.md`, the index of the docs agents read. A test fails while it is stale. |
 | `pnpm docs:section <file> "<heading>"` | Prints one doc section with its subsections. |
 | `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with the cards' records and reports any throw, refusal or stall. |
@@ -63,7 +65,7 @@ Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is g
 
 ## Agents
 
-`/orchestrator` runs a plan with several sections, `/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. Every agent follows `.cursor/rules/code-standards.mdc` for code and `.cursor/rules/docs-standards.mdc` for docs. `effect-author` turns a `pnpm effects:draft` bundle into effect records. The instructions of the first four are in `.cursor/agents`, with thin wrappers in `.claude/agents`; `effect-author` is in `.claude/agents` only.
+`/orchestrator` runs a plan with several sections, `/implementer` builds a phase, `/reviewer` reviews the diff, and `/ux` reviews the screens. Every agent follows `.cursor/rules/code-standards.mdc` for code and `.cursor/rules/docs-standards.mdc` for docs. `effect-author` turns a `pnpm effects:draft` bundle into effect records. The instructions of the first four are in `.cursor/agents`, with thin wrappers in `.claude/agents`; `effect-author` is in `.claude/agents` only. In Claude Code the orchestrator runs as the main session (`claude --agent orchestrator`, or ask the main session to follow its file): a subagent cannot start the implementers and reviewers it hands work to.
 
 ## Run it locally
 

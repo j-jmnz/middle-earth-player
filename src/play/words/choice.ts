@@ -21,16 +21,19 @@ import { cavesAttachWords, cavesFlagWords, cavesLeavesWords, cavesPickWords, cav
 import { nightmareWords } from "./nightmare.ts";
 import { breakingBranchWords, breakingPickWords, breakingWords } from "./breaking.ts";
 import { seaPickWords, seaWords } from "./sea.ts";
-import { unchartedBranchWords, unchartedPickWords, unchartedWords } from "./uncharted.ts";
+import { flipWords, unchartedBranchWords, unchartedPickWords, unchartedWords } from "./uncharted.ts";
 import { islandPickWords, islandWords } from "./island.ts";
 import { aflameBranchWords, aflamePickWords, aflameWords, type BranchNow } from "./aflame.ts";
 import { stormcallerBranchWords, stormcallerWords } from "./stormcaller.ts";
+import { commandBranchWords } from "./command.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
   card: (cardId: string) => string;
   // A card code.
   code: (code: string) => string;
+  // A card code's Traits, for the words that name the side a card flips to (Grotto, Underwater).
+  traits?: (code: string) => readonly string[];
 };
 
 type ChooseInstruction = Extract<Instruction, { verb: "Choose" }>;
@@ -83,6 +86,8 @@ function nextCardWords(pick: Extract<Instruction, { verb: "ReduceNextCost" }>["p
 /** One instruction in words, or null when it adds nothing the player decides on (a shuffle after a search). */
 function instructionWords(instruction: Instruction, game: ScenarioState, names: ChoiceNames, sourceId: string | null): string | null {
   switch (instruction.verb) {
+    case "FlipDoubleSided":
+      return flipWords(instruction, game, names, sourceId);
     case "RemoveQuestProgress":
       return `remove ${questProgressMoved(game, instruction)} progress from the quest`;
     case "PlaceQuestProgress":
@@ -110,7 +115,8 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     }
     case "Draw": {
       const amount = amountWords(instruction.amount);
-      const cards = amount === "1" ? "1 card" : `${amount} cards`;
+      const deck = instruction.who === "picked" || instruction.who === "eventSeat" ? "their deck" : "your deck";
+      const cards = instruction.from === "bottom" ? (amount === "1" ? `the bottom card of ${deck}` : `the bottom ${amount} cards of ${deck}`) : amount === "1" ? "1 card" : `${amount} cards`;
       return instruction.who === "picked" || instruction.who === "eventSeat" ? `that player draws ${cards}` : `draw ${cards}`;
     }
     case "DamageCard":
@@ -320,11 +326,13 @@ function readyPaymentWords(choose: ChooseInstruction, option: ChooseInstruction[
 
 /** A branch of a Choose instruction in words: "Remove 2 progress from the quest", "Remove 2 heroes you control from the quest". */
 export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null, now?: BranchNow): string {
+  const command = commandBranchWords(choose, optionId, now?.x);
+  if (command) return command;
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
@@ -410,6 +418,12 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Exhaust", prompt: `Choose ${one} to exhaust.` };
     case "Ready":
       return { verb: "Ready", prompt: `Choose ${one} to ready.` };
+    case "DiscardResources": {
+      // The number is the one the table holds now (Command's X), and a non-unique filter is said.
+      const count = amountNow ?? next.amount;
+      const which = article(`${pick.pick.nonUnique === true ? "non-unique " : ""}${noun}`);
+      return { verb: "Remove", prompt: `Choose ${which} to remove ${typeof count === "number" ? count : amountWords(next.amount)} resource${count === 1 ? "" : "s"} from.` };
+    }
     case "ReturnToHand":
       return { verb: "Return", prompt: `Choose ${one} to return to its owner's hand.` };
     // The objectives and dungeon families (Escape from Dol Guldur): the objective the Dungeon Jailor shuffles back (01101:A:1), the hero that
@@ -454,6 +468,9 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: "Choose", prompt: `Choose the player who adds ${names.code(next.code)} to their hand.` };
     case "PutIntoPlay":
       return { verb: "Put into play", prompt: `Choose ${pick.pick.cardType && pick.pick.cardType !== "player-side-quest" ? article(pick.pick.cardType) : one} to put into play.` };
+    // A revealed card that enters play under a chosen player's control (Gavin, 11210:A:5).
+    case "TakeRevealedCard":
+      return { verb: "Give", prompt: `Choose the player who takes control of ${sourceId ? names.card(sourceId) : "the revealed card"}${next.committed ? ", committed to the quest" : ""}.` };
     default:
       return unchartedPickWords(pick, next, names, sourceId) ?? { verb: "Choose", prompt: `Choose ${one}.` };
   }

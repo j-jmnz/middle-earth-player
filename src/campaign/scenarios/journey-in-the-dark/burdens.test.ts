@@ -11,7 +11,7 @@ import { reduce } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { BALROG, GRIEF, WOUND, fire, loadMoriaWorld, makeTable, settled, type MoriaLayout, type MoriaTable, type MoriaWorld } from "../../../../test/scenarios/journey-in-the-dark/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 
 let world: MoriaWorld;

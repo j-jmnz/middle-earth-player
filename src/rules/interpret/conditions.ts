@@ -1,4 +1,5 @@
 import { BURN_CODE, encounterHolds, underBurnHolds } from "../families/aflame/values.ts";
+import { familyCondition } from "./family-hooks.ts";
 import { locationThreatHolds } from "../families/grapple/values.ts";
 import { islandHolds } from "../families/island/pick.ts";
 import type { Condition } from "../../catalog/boundary.ts";
@@ -88,7 +89,13 @@ function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "m
 export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx: ReduceContext): boolean {
   // A card named by code is the Nightmare card of its title when the recipe replaced it (families/nightmare/guards.ts).
   const condition = withTwin(state, named, ctx.cards);
+  // A family's own condition kind (interpret/family-hooks.ts): asked first, null when it is not the family's, so the cases below stand.
+  const familial = familyCondition(state, condition, scope, ctx);
+  if (familial !== null) return familial;
   switch (condition.kind) {
+    // The south family's condition hook answers noneDiscarded (families/south/damage.ts) before this switch; the case only completes it.
+    case "noneDiscarded":
+      return false;
     case "hideFailed":
       return state.hideFailures.some(
         (failure) =>

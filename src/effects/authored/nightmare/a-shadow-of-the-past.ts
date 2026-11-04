@@ -32,7 +32,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"906108:shadow:1","cardCode":"906108","lines":["906108:A:2"],"timing":"shadow","instructions":[{"verb":"ConsiderUndefended","when":{"kind":"hideFailed","scope":"round"}}]},
   // 906109 Sniffing and Hissing. The first player chooses; with The One Ring already exhausted only the Hide test is left.
   {"id":"906109:whenRevealed:1","cardCode":"906109","lines":["906109:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Choose","who":"firstPlayer","options":[{"id":"ring","requires":{"kind":"exhausted","code":RING,"is":false},"instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":RING}},{"verb":"RevealEncounter"}]},{"id":"hide","instructions":[{"verb":"HideTest","x":3}]}]}]},
-  {"id":"906109:shadow:1","cardCode":"906109","lines":["906109:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"},{"verb":"AfterAttack","instructions":[{"verb":"RaiseThreat","amount":3,"when":{"kind":"x","min":1}}]}]},
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

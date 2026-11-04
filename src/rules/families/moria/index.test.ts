@@ -7,7 +7,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { BALROG, DOOM, loadMoriaWorld, makeTable, recordOf, runOne, settled, WOUND, type MoriaWorld } from "../../../../test/scenarios/journey-in-the-dark/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: MoriaWorld;
 

@@ -2,11 +2,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/attack/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // The `attacker` character (the card picked before the last by default) is declared as an attacker against the `enemy` (the
   // last picked card by default), engaged with a player or in the staging area, and the attack resolves now, outside the attack
   // step, with the steps and windows of a player attack (rr.attacks-outside-the-combat-phase, rr.step-6-8b to rr.step-6-8-4).
@@ -35,7 +36,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ExcessDamageTo"), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About each character that attacked, as the player attack it was declared in ends (rr.step-6-8-4; the other card is the
   // enemy): "After ~ attacks", "After an attack in which ~ attacked resolves".
   "attacked",
@@ -46,7 +47,7 @@ export const TRIGGERS = [
   "attackDestroyedEngaged",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a character: it can be declared as an attacker against enemies in the staging area (`attacksStaging`), or only when it
   // attacks alone (`attacksStagingAlone`, 01009:A:1).
   "attacksStaging",
@@ -62,3 +63,5 @@ export const FLAGS = [
   // On a seat (engine use): the player engaged an enemy this round, for the `engagedThisRound` condition.
   "engagedThisRound",
 ] as const;
+
+export const manifest = { name: "attack", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -1,5 +1,8 @@
 import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 
+import { MANY_PLAYERS } from "./conditions.ts";
+import { copyLine, copyLines, withCopies } from "./reprint.ts";
+
 // Records for The Fate of Númenor (Dream-chaser part 2, campaign card 11179): the two quest stages, the Fate of Númenor, Drowned Dead and Ruins of Númenor encounter cards no template or
 // earlier record reads, the Lost Island and real sides of the double-sided locations, Calphon, and the campaign card. Spyglass and Revenant, which the campaign card places, are in
 // pool/DCCE.ts. Every line is read from the scan ledger (data/printed/dream-chaser.json).
@@ -7,7 +10,6 @@ import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 // rr.explored, rr.search, rr.active-location, rr.travel (data/rules/entries.json).
 const ACTIVE = { kind: "sourceIn", zone: "activeLocation" } as const;
 const IN_STAGING = { kind: "sourceIn", zone: "staging" } as const;
-const MANY_PLAYERS = { kind: "count", pick: { type: "player", control: "any" }, min: 3 } as const;
 const FEW_PLAYERS = { kind: "not", condition: MANY_PLAYERS } as const;
 // The card DiscardBottom discarded has a printed cost of 2 or less ("If that card's printed cost is 2 or less").
 const CHEAP = { kind: "discardedCost", max: 2 } as const;
@@ -17,24 +19,6 @@ const ANY_LOCATION: PickSpec = { type: "location", control: "any" };
 // A Lost Island in the staging area, and a non-objective ally with a printed cost of 2 or less.
 const STAGED_LOST_ISLAND: PickSpec = { type: "location", control: "any", uncharted: true, stagingOnly: true };
 const CHEAP_ALLY: PickSpec = { type: "ally", control: "any", cardType: "ally", maxCost: 2 };
-
-// The Lost Island side of a double-sided location, printed the same on every copy: Uncharted (a keyword), no player card attachments, flip it over once it is the active location, and
-// the Action that looks at the facedown side for 4 progress. `ids`: the position of each record among the card's records of its timing.
-export function lostIsland(code: string, ids: { constant: number; forced: number }): Effect[] {
-  return [
-    { id: `${code}:constant:${ids.constant}`, cardCode: code, lines: [`${code}:B:2`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay" }] },
-    { id: `${code}:forced:${ids.forced}`, cardCode: code, lines: [`${code}:B:3`], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "FlipUncharted" }] },
-    {
-      id: `${code}:action:1`,
-      cardCode: code,
-      lines: [`${code}:B:4`],
-      timing: "action",
-      anyPlayer: true,
-      condition: { kind: "matches", card: "self", pick: { type: "location", control: "any", minProgress: 4 } },
-      instructions: [{ verb: "LookAtFacedown", remove: 4 }],
-    },
-  ];
-}
 
 // "Forced: After X is flipped over while active, ..." of the real side of a double-sided location.
 export const flippedActive = (code: string, line: string, id: number, instructions: Effect["instructions"]): Effect => ({ id: `${code}:forced:${id}`, cardCode: code, lines: [line], timing: "forced", trigger: "flippedOver", subject: "self", condition: ACTIVE, instructions });
@@ -47,9 +31,6 @@ const bottomAttack = (code: string, line: string): Effect => ({
   timing: "shadow",
   instructions: [{ verb: "DiscardBottom" }, { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker", when: CHEAP }],
 }) satisfies Effect;
-
-// "If Calphon leaves play, the players lose the game."
-const losesWhenLeaving = (code: string, line: string, id: number): Effect => ({ id: `${code}:triggered:${id}`, cardCode: code, lines: [line], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "LoseGame" }] });
 
 // "Action: Exhaust Calphon to look at the bottom card (the bottom 5 cards) of your deck. Then, you may switch that card (one of them) with a card in your hand."
 const calphonAction = (code: string, line: string, id: number, count: number): Effect => ({
@@ -75,7 +56,7 @@ const calphonAction = (code: string, line: string, id: number, count: number): E
   ],
 });
 
-export const AUTHORED_EFFECTS: readonly Effect[] = [
+export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 11025 Explore the Island. Setup: Shrine to Morgoth is set aside by the scenario's piles; the Uncharted deck is prepared, 2 Lost Islands (3 with 3 or 4 players) join the staging area,
   // the first player takes control of Calphon, the encounter deck is shuffled. Side B: no progress can be placed on the stage except by its own effect; an explored location adds its printed
   // quest points; an Uncharted location becoming active brings another Lost Island.
@@ -143,19 +124,27 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", trait: "Undead", type: "enemy", to: "engaged" }] },
     { verb: "ShuffleEncounterDeck" },
   ]),
-  ...lostIsland("11027", { constant: 2, forced: 2 }),
+  // The Lost Island side, printed the same on every double-sided location (Uncharted is a keyword): no player card attachments, flip it over once it is the active location, and the Action that looks at
+  // the facedown side for 4 progress. The other locations take these records by copy (copyLines, authored/reprint.ts), here and in temple-of-the-deceived.ts.
+  { id: "11027:constant:2", cardCode: "11027", lines: ["11027:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay" }] },
+  { id: "11027:forced:2", cardCode: "11027", lines: ["11027:B:3"], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "FlipUncharted" }] },
+  {
+    id: "11027:action:1",
+    cardCode: "11027",
+    lines: ["11027:B:4"],
+    timing: "action",
+    anyPlayer: true,
+    condition: { kind: "matches", card: "self", pick: { type: "location", control: "any", minProgress: 4 } },
+    instructions: [{ verb: "LookAtFacedown", remove: 4 }],
+  },
 
-  // 11028 Calphon: the first player controls him; his Action looks at the bottom card of the owner's deck and may switch it with a card in hand; the players lose when he leaves play.
+  // 11028 Calphon: the first player controls him; his Action looks at the bottom card of the owner's deck and may switch it with a card in hand; the players lose when he leaves play (a template writes it).
   { id: "11028:constant:1", cardCode: "11028", lines: ["11028:A:1"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }] },
   calphonAction("11028", "11028:A:2", 1, 1),
-  losesWhenLeaving("11028", "11028:A:3", 1),
   // 110013 Calphon (the Campaign Expansion's reprint): the same on its front side; its Upgraded side looks at the bottom 5 cards and switches one of them.
-  { id: "110013:constant:1", cardCode: "110013", lines: ["110013:A:1"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }] },
-  calphonAction("110013", "110013:A:2", 1, 1),
-  losesWhenLeaving("110013", "110013:A:3", 1),
-  { id: "110013:constant:2", cardCode: "110013", lines: ["110013:B:2"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }] },
+  copyLines("11028", "110013", "A:1", "A:2"),
+  copyLine("11028:A:1", "110013:B:2"),
   calphonAction("110013", "110013:B:3", 2, 5),
-  losesWhenLeaving("110013", "110013:B:4", 2),
 
   // 11029 Servant of the Deceiver. Forced: when it engages you, you look at the top card of your deck; at a printed cost of 2 or less it goes to the bottom and the Servant gets +2 Attack
   // until the end of the round.
@@ -197,14 +186,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       ],
     },
   ]),
-  ...lostIsland("11030", { constant: 2, forced: 2 }),
+  copyLines("11027", "11030", "B:2", "B:3", "B:4"),
 
   // 11031 Forbidden Coast. Forced: once flipped over while active each player may draw a card; then each player puts a card from their hand on the bottom of their deck.
   flippedActive("11031", "11031:A:1", 1, [
     { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Choose", who: "actor", options: [{ id: "draw", instructions: [{ verb: "Draw", amount: 1 }] }, { id: "skip", instructions: [] }] }] },
     { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "hand" } }, { verb: "MoveCard", card: "picked", to: "deckBottom", from: ["hand"] }] },
   ]),
-  ...lostIsland("11031", { constant: 1, forced: 2 }),
+  copyLines("11027", "11031", "B:3", "B:4"),
 
   // 11032 Steep Plateau. Response: after it is explored, look at the facedown side of an Uncharted location in the staging area. Shadow: the bottom card of the defending player's deck is
   // discarded; at a printed cost of 2 or less the attacker gets +2 Attack.
@@ -330,12 +319,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 11072 Flooded Ruins. While active it contributes its Threat to the staging area.
   { id: "11072:constant:1", cardCode: "11072", lines: ["11072:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "activeThreat", amount: 1, until: "whileSourceInPlay" }] },
-  ...lostIsland("11072", { constant: 2, forced: 1 }),
+  copyLines("11027", "11072", "B:2", "B:3", "B:4"),
 
   // 11073 Drowned Graves. Forced: once flipped over while active, the top X cards of the encounter deck are discarded (X is 2 more than the number of players) and each player adds an Undead
   // enemy among them to the staging area.
   flippedActive("11073", "11073:A:1", 1, [{ verb: "DiscardEncounterTop", count: { players: true, plus: 2 } }, { verb: "StageLooked", trait: "Undead", type: "enemy" }]),
-  ...lostIsland("11073", { constant: 1, forced: 2 }),
+  copyLines("11027", "11073", "B:3", "B:4"),
 
   // 11074 Cursed Temple. While active, characters with less than 2 Willpower do not ready during the refresh phase.
   {
@@ -346,7 +335,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     condition: ACTIVE,
     instructions: [{ verb: "ModifyStat", stat: "doesNotReady", amount: 1, until: "whileSourceInPlay", holders: { type: "character", control: "any", maxWillpower: 1 } }],
   },
-  ...lostIsland("11074", { constant: 2, forced: 1 }),
+  copyLines("11027", "11074", "B:2", "B:3", "B:4"),
 
   // 11075 Aimless Wandering. When Revealed: the players remove characters with a total of at least X Willpower from the quest (X is the number of Uncharted locations in the staging area).
   // The first player may give it doomed 2 to look at the facedown side of an Uncharted location in the staging area.
@@ -384,11 +373,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "TradeDamageForThreat", damage: 1, threat: 1 },
     ],
   },
-  { id: "11179:resolution:1", cardCode: "11179", lines: ["11179:B:1", "11179:B:2"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" } }] },
   { id: "11179:resolution:2", cardCode: "11179", lines: ["11179:B:3"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11030", "11073"] } }] },
   { id: "11179:resolution:3", cardCode: "11179", lines: ["11179:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "tokens", code: "11179" }, max: 3 }] },
-  { id: "11179:resolution:4", cardCode: "11179", lines: ["11179:B:5"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "survivorsThreat", max: 40 } }] },
-  { id: "11179:resolution:5", cardCode: "11179", lines: ["11179:B:6"], timing: "resolution", instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }] },
-];
+]);
 
 export const AUTHORED_REPLACES: readonly string[] = [];

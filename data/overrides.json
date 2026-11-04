@@ -100,6 +100,16 @@
     },
     {
       "match": {
+        "code": "12100"
+      },
+      "set": {
+        "name": "Water-logged Halls"
+      },
+      "reason": "Hall of Beorn spells the title 'Watter-logged Halls'. The card prints 'Water-logged Halls' in its title and in its own text (12100:A:1, 12100:A:2; ledger note of 12100).",
+      "source": "scan 12100.A (data/printed/dream-chaser.json, 12100 notes)"
+    },
+    {
+      "match": {
         "code": "141064"
       },
       "set": {

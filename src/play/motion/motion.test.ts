@@ -298,6 +298,19 @@ describe("motionsBetween: Boarding, the Corsair pair and the look strip", () => 
     expect(ghosts[0]?.dy).toBe(155 - 135);
   });
 
+  it("glides a Grotto location shuffled back into the deck to the Grotto deck's pile, not fading it where it stood", () => {
+    const grotto = { ...piles, grottoDeck: { x: 400, y: 120, w: 50, h: 70 } };
+    const withGrotto = (slots: readonly CardSlot[]): TableLayout => ({ ...layout(slots), piles: grotto });
+    const before = withGrotto([slot("g", "staging", at(180, 100))]);
+    const after = withGrotto([]);
+    // The engine calls the Grotto deck the Uncharted deck.
+    const { ghosts } = motionsBetween(before, after, (id) => (id === "g" ? "unchartedDeck" : null));
+    expect(ghosts).toHaveLength(1);
+    expect(ghosts[0]?.leave).toBe("glide");
+    expect(ghosts[0]?.dx).toBe(425 - 205);
+    expect(ghosts[0]?.dy).toBe(155 - 135);
+  });
+
   it("glides the discard pile's cards to the deck when the Corsair deck is shuffled back, and keeps both piles still", () => {
     const before = withPair([pileSlot("corsairDeck", 0, second.corsairDeck), pileSlot("corsairDiscard", 4, second.corsairDiscard)]);
     const after = withPair([pileSlot("corsairDeck", 4, second.corsairDeck), pileSlot("corsairDiscard", 0, second.corsairDiscard)]);

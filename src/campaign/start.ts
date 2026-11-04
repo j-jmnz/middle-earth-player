@@ -1,5 +1,6 @@
 import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, corsairCodes, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { verbsWithRole } from "../catalog/setup-verbs.ts";
+import { burdenCodes, campaignScenario, corsairCodes, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
@@ -43,9 +44,10 @@ export type StartInput = {
 // shuffle cards into the encounter deck (added to the deck here, before the shuffle). Its choices are made by the
 // campaign checklist (src/campaign/checklist.ts) before the scenario starts. The quest card's last Setup step is the
 // encounter deck shuffle, which the piles cannot express.
-const DEALT_VERBS: ReadonlySet<string> = new Set(["AttachToRingBearer", "AddToStaging", "SetAside", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer"]);
-// The campaign card's Setup verbs that name the ships the quest card's Setup prepares: they resolve in a frame after it (ScenarioDefinition.afterSetup).
-const AFTER_SETUP_VERBS: ReadonlySet<string> = new Set(["FitShips", "TradeShipDamage", "AttachSetAsideTo", "TradeDamageForThreat", "FlipStormcaller", "FlipSetAside", "PutSetAsideInPlay", "PlaceSecrets", "RaiseThreatToAttach"]);
+// The verbs of the campaign card's Setup the start deals itself, and those that resolve in a frame after the quest card's Setup
+// (ScenarioDefinition.afterSetup): each verb's schema entry says which (src/catalog/setup-role.ts).
+const DEALT_VERBS = verbsWithRole("dealt");
+const AFTER_SETUP_VERBS = verbsWithRole("afterSetup");
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;
@@ -86,6 +88,7 @@ export function buildStart(start: StartInput): StartScenario {
   // The Corsair deck the scenario deals, and the cards the campaign card shuffles into it ("Shuffle Crowley into the Corsair deck"); the quest card's Setup shuffles it.
   const corsair = [...corsairCodes(input.scenario, input.difficulty), ...campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoCorsairDeck" ? [instruction.code] : []))];
   const uncharted = unchartedCodes(input.scenario, input.difficulty);
+  const doubleSided = doubleSidedCards(input.scenario, input.difficulty);
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
@@ -109,6 +112,7 @@ export function buildStart(start: StartInput): StartScenario {
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(corsair.length > 0 ? { corsairDeck: corsair } : {}),
     ...(uncharted.length > 0 ? { unchartedDeck: uncharted } : {}),
+    ...(doubleSided.length > 0 ? { doubleSided } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
     ...(!standalone && factsOf(input) ? { facts: factsOf(input) } : {}),
   };

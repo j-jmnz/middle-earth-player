@@ -1,5 +1,5 @@
 import { EFFECTS } from "../../../src/effects/index.ts";
-import type { Effect, ScenarioDefinition } from "../../../src/catalog/boundary.ts";
+import type { ScenarioDefinition } from "../../../src/catalog/boundary.ts";
 import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { legalIntents } from "../../../src/rules/engine/legal.ts";
@@ -9,8 +9,8 @@ import { blankScenario, updateCard, withThreat } from "../../../src/rules/core/s
 import { attachTo, spawn } from "../../../src/rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { send, start, type Run } from "../a-shadow-of-the-past/scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { addStandIns, allyCard, enemyCard, HERO, HERO2, HERO3, opening, sceneEffects, send, start, type Run } from "../../harness/scene-kit.ts";
 
 // Shared scene for the Escape from Dol Guldur effect tests. Test-only. The heroes are plain numbers (no player card text), so what a test
 // shows comes from the scenario's records and the engine.
@@ -23,12 +23,9 @@ export const MENDOR = "01135";
 export const APPOINTED = "01134";
 export const NAZGUL = "01102";
 export const OBJECTIVES = ["01108", "01109", "01110"] as const;
-export const HERO = "dh1";
-export const HERO2 = "dh2";
-export const HERO3 = "dh3";
+export { HERO, HERO2, HERO3 };
 
-// The filler event has an Action that does nothing, so it can be played: an event with no record at all cannot (rr.triggered-ability).
-const SCENE_EFFECTS: readonly Effect[] = [...EFFECTS, { id: "filler:action:1", cardCode: "filler", lines: ["filler:A:1"], timing: "action", instructions: [] }];
+const SCENE_EFFECTS = sceneEffects();
 
 export type DolGuldurWorld = { definition: ScenarioDefinition; cards: Map<string, PrintedCard> };
 
@@ -36,15 +33,10 @@ export async function loadDolGuldurWorld(): Promise<DolGuldurWorld> {
   const definition = scenarioDefinition(dolGuldur, campaign, EFFECTS);
   const codes = [...new Set([...scenarioCards(dolGuldur).map((card) => card.code), ...dolGuldur.campaignPlaced, dolGuldur.campaignCard, "01132", "01133", "01138"])];
   const cards = new Map(await loadPrinted(codes));
-  for (const [code, threat] of [["f0", 0], ["f3", 3]] as const) {
-    cards.set(code, definePrinted({ code, name: code, type: "enemy", threat, engagementCost: 50, attack: 1, defense: 1, health: 3 }));
-  }
-  cards.set("brute", definePrinted({ code: "brute", name: "brute", type: "enemy", threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
-  cards.set("grunt", definePrinted({ code: "grunt", name: "grunt", type: "enemy", threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
-  cards.set("place", definePrinted({ code: "place", name: "place", type: "location", threat: 2, questPoints: 2 }));
-  for (const code of [HERO, HERO2, HERO3]) cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: 2, attack: 2, defense: 2, health: 6 }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
-  cards.set("ally", definePrinted({ code: "ally", name: "ally", type: "ally", sphere: "neutral", cost: 0, willpower: 1, attack: 1, defense: 1, health: 2 }));
+  addStandIns(cards, ["f0", "f3", "place", "heroes", "filler"]);
+  cards.set("brute", enemyCard("brute", { threat: 1, engagementCost: 10, attack: 9, defense: 1, health: 20 }));
+  cards.set("grunt", enemyCard("grunt", { threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
+  cards.set("ally", allyCard("ally", 0));
   cards.set("blade", definePrinted({ code: "blade", name: "blade", type: "attachment", sphere: "neutral", cost: 0 }));
   return { definition, cards };
 }
@@ -137,10 +129,7 @@ export function dolGuldurTable(world: DolGuldurWorld, layout: DolGuldurLayout = 
     const id = Object.values(state.cards).find((card) => card.code === code)?.id;
     if (id) state = updateCard(state, id, { damage });
   }
-  const phase = layout.phase ?? "Quest";
-  const mode = phase === "Quest" ? "questCommit" : phase === "Encounter" ? "optionalEngage" : phase === "Travel" ? "travel" : phase === "Planning" ? "planning" : phase === "Refresh" ? "refresh" : "combatActions";
-  const window = phase === "Encounter" ? { kind: "optionalEngage" as const } : phase === "Travel" ? { kind: "travel" as const } : phase === "Refresh" ? null : { kind: "pass" as const };
-  state = { ...state, phase, boundaryPhase: phase, mode, window, activeSeat: 0 };
+  state = { ...state, ...opening(layout.phase ?? "Quest") };
   return { state, ctx: { effects: SCENE_EFFECTS, cards: world.cards }, hero: first.id, hero2: secondHero.id, seat1Hero };
 }
 

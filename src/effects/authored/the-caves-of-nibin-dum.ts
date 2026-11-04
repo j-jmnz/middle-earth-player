@@ -57,9 +57,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41031:shadow:1","cardCode":"41031","lines":["41031:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"},"when":{"kind":"x","min":1}}]}]},
   // 41032 Goblin Tunnels: while in the staging area a Goblin revealed from the encounter deck takes a progress token off the quest; the Shadow adds 1 Attack, 3 to a Goblin.
   {"id":"41032:forced:1","cardCode":"41032","lines":["41032:A:1"],"timing":"forced","trigger":"revealed","byEncounterDeck":true,"subject":GOBLIN_ENEMY,"condition":IN_STAGING,"instructions":[{"verb":"RemoveProgressFromQuest","amount":1}]},
-  {"id":"41032:shadow:1","cardCode":"41032","lines":["41032:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":{"kind":"not","condition":{"kind":"matches","card":"attacker","pick":GOBLIN_ENEMY}}},{"verb":"ModifyStat","stat":"attack","amount":3,"until":"endOfAttack","target":"attacker","when":{"kind":"matches","card":"attacker","pick":GOBLIN_ENEMY}}]},
   // 41033 Lightless Passage: the Cave Torch must be exhausted to travel here (rules/interpret/restrictions.ts reads the cost); the Shadow cancels the combat damage dealt to the attacker.
-  {"id":"41033:travel:1","cardCode":"41033","lines":["41033:A:1"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":TORCH}}]},
   {"id":"41033:shadow:1","cardCode":"41033","lines":["41033:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"combatDamageCanceled","amount":1,"until":"endOfAttack","target":"attacker"}]},
   // 41034 Branching Paths: in the staging area every Dark location gets +1 Threat; explored, the players look at the top 3 encounter cards, choose 1 to reveal and
   // the other 2 go to the bottom of the deck.
@@ -69,7 +67,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41035:constant:1","cardCode":"41035","lines":["41035:A:1"],"timing":"constant","condition":IN_STAGING,"instructions":[{"verb":"ModifyStat","stat":"questProgressCap","amount":4,"until":"whileSourceInPlay","target":"table"}]},
   {"id":"41035:shadow:1","cardCode":"41035","lines":["41035:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[{"verb":"RaiseThreat","amount":{"dealt":true},"who":"actor"}]}]},
   // 41036 Goblin Dungeon: a card is revealed to travel here; explored, the first player may find an ally among the top 5 cards of his deck and put it into play.
-  {"id":"41036:travel:1","cardCode":"41036","lines":["41036:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
   {"id":"41036:response:1","cardCode":"41036","lines":["41036:A:2"],"timing":"response","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","top":5,"cardType":"ally"}},{"verb":"PutIntoPlay","card":"picked","who":"actor"},{"verb":"ShuffleDeck"}]},
   // 41037 Crumbling Stairs: no progress on it in the staging area; explored, the top encounter card is discarded and a location goes into play as the active location.
   {"id":"41037:constant:1","cardCode":"41037","lines":["41037:A:1"],"timing":"constant","condition":IN_STAGING,"instructions":[{"verb":"ModifyStat","stat":"noProgressPlaced","amount":1,"until":"whileSourceInPlay","target":"self"}]},
@@ -91,4 +88,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41051:resolution:1","cardCode":"41051","lines":["41051:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}},{"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["41030:constant:1"];

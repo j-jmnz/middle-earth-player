@@ -3,10 +3,11 @@
 // Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Shuffle the encounter deck and discard cards from the top of the encounter deck until X locations with the Aflame keyword are discarded, where X is the number of players in
   // the game. Add each discarded Aflame location to the staging area." (11036:A:1). `perPlayer` Aflame locations for each player: the cards above them go to the encounter discard pile,
   // each Aflame location found goes to the staging area, and the deck stops when it is empty. The line's "shuffle the encounter discard pile back" is a ShuffleEncounterDiscard after it.
@@ -31,7 +32,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("HealLocations"), amount: positiveAmountSchema, healed: z.number().int().min(0).optional(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a card: it was placed facedown underneath The Havens Burn, an Aflame location whose damage reached its Aflame value (dcce.aflame). The card hears it from where it went ("When
   // Burning Piers is placed underneath The Havens Burn"), and so does The Havens Burn ("When a card is placed underneath The Havens Burn").
   "placedUnder",
@@ -47,7 +48,7 @@ export const TRIGGERS = [
   "enemyAttacked",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a quest stage: the progress the players would place on it (after the active location) is replaced by removing that much damage from locations in play ("Any time players would
   // place progress on this quest, remove an equal amount of damage from locations in play instead", 11037:B:1).
   "progressHeals",
@@ -58,3 +59,5 @@ export const FLAGS = [
   "attackerLimit",
   "attackersThisRound",
 ] as const;
+
+export const manifest = { name: "aflame", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

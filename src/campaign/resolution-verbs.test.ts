@@ -9,7 +9,8 @@ import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../rules/core/zones.ts";
 import { loadPrinted } from "../../test/harness/catalog.ts";
-import { first, loadWorld, send, start, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { loadWorld, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../test/harness/scene-kit.ts";
 import { applyResolution as writeLog, emptyLog } from "./log.ts";
 
 

@@ -1,5 +1,7 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 
+import { ALWAYS } from "../conditions.ts";
+
 // Authored records for player side quests, contracts, encounter-keyword player cards and the victory display (docs/plans/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 
 // "While this side quest is in the victory display": the quest's constants work from there, for every seat.
@@ -20,8 +22,6 @@ const notTaken = (flag: (typeof COUNCIL)[number]) => ({ kind: "flag", stat: flag
 const taken = (flag: (typeof COUNCIL)[number]) => ({ verb: "ModifyStat", stat: flag, amount: 1, until: "endOfRound", target: "actorSeat" }) as const;
 // The first player chooses a player (rr.first-player): "The first player chooses a player to take control of ~."
 const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
-// "This effect cannot be cancelled": a condition that always holds.
-const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 } as const;
 const encounterKeyword = (code: string, line: string, n: number): Effect => ({ id: `${code}:constant:${n}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "EncounterKeyword" }] });
 // Each side quest in the victory display.
 const SIDE_QUESTS_IN_VICTORY = { type: "card", control: "any", from: "victory", cardType: "player-side-quest" } as const;

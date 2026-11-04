@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { definePrinted } from "../../../rules/core/printed.ts";
 import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import { playOut } from "../../../../test/harness/auto-player.ts";
+import { pastContext } from "../../../../test/scenarios/a-shadow-of-the-past/play.ts";
 import { campaign, loadWorld, scenario } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
 import { buildStart } from "../../start.ts";
@@ -18,12 +18,7 @@ const file = new URL("./golden.json", import.meta.url).pathname;
 describe("golden: a whole game of A Shadow of the Past", () => {
   it("plays the same intents to the same state on fixed seeds", async () => {
     const world = await loadWorld();
-    const cards = new Map(world.cards);
-    for (const code of ["scout", "q1", "q2"]) {
-      cards.set(code, definePrinted({ code, name: code, type: "hero", sphere: "tactics", threat: 8, willpower: code === "scout" ? 12 : 8, attack: 1, defense: 2, health: 100 }));
-    }
-    cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
-    const ctx = { effects: EFFECTS, cards };
+    const ctx = pastContext(world);
     const loadout = { heroes: [RING_BEARER, "scout", "q1", "q2"], deck: Array.from({ length: 30 }, () => "filler") };
     const out: unknown[] = [];
     for (const seed of [1, 2, 9]) {

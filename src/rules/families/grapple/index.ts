@@ -1,12 +1,13 @@
 // Rules: dcce.grapple, dcce.stormcaller-and-the-thing, dcce.stormcaller-elite, dcce.campaign-mode (data/rules/entries.json). The verbs src/catalog/families/grapple.ts adds. Attaching an enemy to a location
 // is in grapple/attach.ts, the cards the verbs move in grapple/cards.ts, what a record reads in grapple/values.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { resolveGrapple } from "./attach.ts";
-import { addResourcesSetAside, addSetAsideToHand, attackFirstPlayer, discardAndGrapple, engageOrGrapple, flipElite, flipSetAside, gainChosenTrait, removeCodeFromGame, removeEncounterSet, shuffleSetAsideSet } from "./cards.ts";
+import { addResourcesSetAside, addSetAsideToHand, attackFirstPlayer, discardAndGrapple, engageOrGrapple, flipElite, flipEliteAndAttack, flipSetAside, gainChosenTrait, removeCodeFromGame, removeEncounterSet, shuffleSetAsideSet } from "./cards.ts";
 import type { Focus } from "../index.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -20,6 +21,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return flipSetAside(state, instruction, ctx);
     case "FlipElite":
       return flipElite(state, instruction, ctx, steps);
+    case "FlipEliteAndAttack":
+      return flipEliteAndAttack(state, instruction, ctx, steps);
     case "RemoveEncounterSet":
       return removeEncounterSet(state, instruction, ctx, steps);
     case "ShuffleSetAsideSet":
@@ -40,3 +43,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "grapple", verbs: ["ResolveGrapple", "DiscardTopGrapple", "DiscardUntilGrapple", "FlipSetAside", "FlipElite", "FlipEliteAndAttack", "RemoveEncounterSet", "ShuffleSetAsideSet", "AddResourcesSetAside", "AddSetAsideToHand", "GainChosenTrait", "EngageOrGrapple", "AttackFirstPlayer", "RemoveCodeFromGame"], run };

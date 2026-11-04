@@ -1,4 +1,5 @@
 // Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { ScenarioState } from "../../core/state.ts";
@@ -59,3 +60,5 @@ function attachSetAside(state: ScenarioState, code: string, hostId: string): Sce
   const placed = updateCard(moveCard(state, copy, { zone: "play", seat: host.controller }), copy, { face: "up" });
   return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
 }
+
+export const manifest: RulesFamily = { name: "campaign", verbs: ["PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver"], run };

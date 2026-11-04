@@ -3,12 +3,14 @@
 // helpers are beside it in src/rules/families/uncharted/). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
-import { when } from "../effect-schema-conditions.ts";
+import { phaseNameSchema, when } from "../effect-schema-conditions.ts";
+import { setupRole } from "../setup-role.ts";
 
 const who = z.enum(["actor", "firstPlayer", "picked"]);
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Prepare the Uncharted deck" (dcce.uncharted-deck). The double-sided locations dealt as the Uncharted deck are shuffled, each Lost Island side up.
   z.strictObject({ verb: z.literal("PrepareUnchartedDeck"), ...when }),
   // "Add N copies of Lost Island from the top of the Uncharted deck to the staging area" (11025:A:1, 11025:B:3, 11026:A:1, 11035:A:2): the top `count` cards of the deck join the
@@ -29,15 +31,28 @@ export const VERBS = [
   // "Add progress to Explore the Island equal to that location's printed quest points" (11025:B:2): the quest card's own effect, which puts progress on the current quest card
   // even where the quest card says no other progress can be placed on it (a quest effect, not a player card effect or the quest phase). A full stage advances.
   z.strictObject({ verb: z.literal("AddStageProgress"), amount: positiveAmountSchema, ...when }),
+  // Setup: "Prepare the Grotto deck" (12092:A:1, dcce.grotto-deck): the double-sided locations the scenario dealt as its Grotto deck are shuffled; each lies Grotto side faceup and its
+  // Underwater side is never looked at before a flip. The Shrine to Morgoth is set aside by the scenario's piles.
+  z.strictObject({ verb: z.literal("PrepareGrottoDeck"), ...when }),
+  // "Add the top 2 locations from the Grotto deck to the staging area, Grotto side faceup" (12092:A:1, 12092:B:2), and with `flip`, "and flip that location to its Underwater side" (12108:A:1): the
+  // top `count` cards of the Grotto deck join the staging area without being revealed; each is then flipped, losing the progress it has (none yet), and announced as flipped over.
+  z.strictObject({ verb: z.literal("AddFromGrottoDeck"), count: positiveAmountSchema, flip: z.boolean().optional(), ...when }),
+  // "Flip it to its Underwater side" (12098:A:2, 12099:A:1, 12100:A:2), "flip Shrine to Morgoth to its Underwater side, without removing its progress tokens" (12094:A:2): a double-sided location whose two
+  // sides are two cards (dcce.grotto-deck) shows its other side. Flipping removes all progress from it (dcce.grotto-deck) unless `keepProgress`; the flip is announced like FlipUncharted's. Nothing
+  // happens while the table holds noFlipActive and the card is the active location (12105:A:1).
+  z.strictObject({ verb: z.literal("FlipDoubleSided"), target: z.enum(["self", "picked", "subject"]).optional(), keepProgress: z.boolean().optional(), ...when }),
+  // "Resolve its Forced effect as if it is the end of the quest phase" (12105:A:1): the active location hears the end of `phase` now. Only its own Forced effects (and Responses) answer, and their conditions read `phase`.
+  z.strictObject({ verb: z.literal("ResolveActiveForced"), phase: phaseNameSchema, ...when }),
   // Setup: "The first player takes control of Calphon" (11025:A:1): the set-aside copy of the card with this name comes into play, ready, under the first player.
   // `withCard`: under the control of the player who controls the card in play with this name instead ("Put Calaerion into play under the control of the player with the Dream-chaser", 11191:A:2).
-  z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), ...when }),
+  // `to: "lastPlayer"`: the last player takes control of it instead of the first ("the last player takes control of Na'asiyah", 12092:A:1).
+  setupRole(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer"]).optional(), ...when }), "afterSetup"),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
-  z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }),
+  setupRole(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), "afterSetup"),
   // Campaign Setup: "For each character in play, its controller may deal 1 damage to it to reduce their threat by 1" (11179:A:2). In player order, each character in play is
   // offered to its controller (trade or keep); a trade deals `damage` to it and lowers that player's threat by `threat`. `character` is engine use: the character being decided.
-  z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }),
+  setupRole(z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }), "afterSetup"),
   // The campaign card stays beside the quest deck while the scenario is played, because a card of the scenario places resources on it (Revenant, 11181:A:4) and its Resolution
   // counts them (11179:B:4). Changes nothing when it runs; rules/families/burden/campaign.ts reads it.
   z.strictObject({ verb: z.literal("KeepCampaignCard"), ...when }),
@@ -66,13 +81,13 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RemoveWillpowerFromQuest"), amount: positiveAmountSchema, left: z.number().int().min(0).optional(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a location: it was flipped over (FlipUncharted), now on its other side. "Forced: After Lush Jungle is flipped over while active" (the record's condition says
   // `sourceIn activeLocation`).
   "flippedOver",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a card: no more than this much damage is placed on it at a time, the rest is not placed ("When 3 or more damage would be placed on Revenant, place 2 damage instead",
   // 11181:A:3). The smallest limit the card holds counts; Revenant's Forced records set it when it joins the staging area and when it engages a player.
   "damageLimit",
@@ -85,4 +100,12 @@ export const FLAGS = [
   "noPlayerAttachments",
   // On a location: while it is the active location it contributes its Threat to the staging area's ("it contributes its Threat to the staging area", 11072:A:1).
   "activeThreat",
+  // On the table: the active location cannot be flipped this round ("You cannot flip the active location this round", 12105:A:1); FlipDoubleSided reads it.
+  "noFlipActive",
+  // On a card: it cannot enter the staging area ("Shrine to Morgoth cannot enter the staging area", 12094:A:1); moveCard refuses a move there.
+  "cannotEnterStaging",
+  // On a card: card effects cannot ready it ("characters cannot ready from card effects", 12102:A:1); the refresh phase still does. Read by readyBarred (rules/core/state.ts).
+  "cannotReadyByEffect",
 ] as const;
+
+export const manifest = { name: "uncharted", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

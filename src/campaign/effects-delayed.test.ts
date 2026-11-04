@@ -8,7 +8,8 @@ import { advanceFrame } from "../rules/windows/frames.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { topFrame } from "../rules/windows/windows.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { first, loadWorld, RIDER, RING, send, start, table, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { loadWorld, RIDER, RING, table, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../test/harness/scene-kit.ts";
 
 let world: World;
 

@@ -15,7 +15,7 @@ import { fireForced } from "../../windows/triggers.ts";
 import { ORC_GUARD_CODE, printedOf } from "../../core/printed.ts";
 import { updateCard, withSeat, type ScenarioState } from "../../core/state.ts";
 import { dolGuldurTable, fight, loadDolGuldurWorld, type DolGuldurLayout, type DolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
-import { first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 
 let world: DolGuldurWorld;

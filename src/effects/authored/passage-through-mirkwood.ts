@@ -24,7 +24,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01077 Great Forest Web: each player exhausts a hero to travel here (the travel is barred when some player has none to exhaust).
   {"id":"01077:travel:1","cardCode":"01077","lines":["01077:A:1"],"timing":"travel","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"you","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}}]}]},
   // 01078 Mountains of Mirkwood: the Travel cost reveals a card; explored, each player may search the top 5 cards of his deck.
-  {"id":"01078:travel:1","cardCode":"01078","lines":["01078:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
   {"id":"01078:response:1","cardCode":"01078","lines":["01078:A:2"],"timing":"response","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"search","instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","top":5}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]},{"id":"skip","instructions":[]}]}]}]},
   // 01079 Eyes of the Forest
   {"id":"01079:whenRevealed:1","cardCode":"01079","lines":["01079:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","cardType":"event"}}]}]},
@@ -34,7 +33,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01080:constant:1","cardCode":"01080","lines":["01080:A:1"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"},{"verb":"ModifyStat","stat":"doesNotReady","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"readyPayment","amount":2,"until":"whileSourceInPlay","target":"host"}]},
   // 01089 Dol Guldur Orcs: 2 damage on a committed character of the first player's choice; the Shadow adds Attack (+3 when undefended).
   {"id":"01089:whenRevealed:1","cardCode":"01089","lines":["01089:A:1"],"timing":"whenRevealed","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","committed":true,"who":"firstPlayer"}},{"verb":"DamageCard","amount":2,"target":"picked"}]},
-  {"id":"01089:shadow:1","cardCode":"01089","lines":["01089:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker","when":NOT_UNDEFENDED},{"verb":"ModifyStat","stat":"attack","amount":3,"until":"endOfAttack","target":"attacker","when":{"kind":"undefended"}}]},
   // 01090 Chieftan Ufthak (printed "Chieftain" in the lines): +2 Attack for each resource token on him, and one more after each of his attacks.
   {"id":"01090:constant:1","cardCode":"01090","lines":["01090:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"resources","of":"self","times":2},"until":"whileSourceInPlay","target":"self"}]},
   {"id":"01090:forced:1","cardCode":"01090","lines":["01090:A:2"],"timing":"forced","trigger":"attackResolved","subject":"self","instructions":[{"verb":"AddResources","amount":1,"to":"self"}]},
@@ -73,7 +71,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 01129 Passage Through Mirkwood (campaign card). Setup: Mendor enters play. He leaving play loses the game. Resolution: one Mendor's
   // Support for each player, and the burden of the stage 3B the players reached.
   {"id":"01129:campaignSetup:1","cardCode":"01129","lines":["01129:A:2"],"timing":"campaignSetup","instructions":[{"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]},
-  {"id":"01129:triggered:1","cardCode":"01129","lines":["01129:A:3"],"timing":"triggered","trigger":"leftPlay","subject":{"type":"card","control":"any","names":["Mendor"]},"instructions":[{"verb":"LoseGame"}]},
   {"id":"01129:resolution:1","cardCode":"01129","lines":["01129:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["01132"],"eachPlayer":true},{"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}},{"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]},
 ];
 

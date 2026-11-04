@@ -4,9 +4,10 @@
 // runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Damage tokens go on the card in play with this printed code, none of it dealt: nothing answers or cancels them ("place 10 damage tokens
   // on it", 142040:A:1).
   z.strictObject({ verb: z.literal("PlaceDamageOn"), code: z.string().min(1), amount: z.number().int().positive(), ...when }),
@@ -22,9 +23,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("AttachToSubject"), ...when }),
 ] as const;
 
-export const TRIGGERS = [] as const;
+const TRIGGERS = [] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On an enemy in the staging area: it cannot leave the staging area, but it is considered engaged with the first player. Only the first
   // player attacks it or declares attackers against it (ranged characters of the others may join); it attacks the first player in the combat
   // phase (src/rules/families/south/watcher.ts, which also reads `engagedWithAll`) (142044:A:2).
@@ -38,3 +39,5 @@ export const FLAGS = [
   // Mines of Moria before it can be placed on the current quest", 142052:A:1; rules/families/attachments/quest.ts).
   "progressFirstRequired",
 ] as const;
+
+export const manifest = { name: "moria", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

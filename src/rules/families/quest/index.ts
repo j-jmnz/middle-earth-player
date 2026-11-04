@@ -1,5 +1,6 @@
 // Rules: rr.step-3-2, rr.step-3-4, rr.resources, rr.engagement-check, rr.lasting-effects, rr.ownership-and-control,
 // rr.attachment-cards, rr.the-word-choose (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -163,3 +164,5 @@ function reattachSelf(state: ScenarioState, instruction: Verb<"ReattachSelf">, f
   const moved = attachTo(moveCard(state, source.id, { zone: "play", seat: host.controller }), source.id, id);
   return updateCard(moved, source.id, { owner: owner === host.controller ? undefined : owner });
 }
+
+export const manifest: RulesFamily = { name: "quest", verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest"], run };

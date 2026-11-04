@@ -4,6 +4,7 @@ import type { Amount, CardRef, Condition, Instruction } from "../../catalog/boun
 
 import type { ReduceContext } from "./interpret.ts";
 import { modifiedStat } from "../core/keywords.ts";
+import { familyAmount } from "./family-hooks.ts";
 import { threatCostOf } from "../families/costs/stats.ts";
 import { miscAmount, namedInPlay } from "../families/misc/amounts.ts";
 import { seatThreat } from "../families/play/hooks.ts";
@@ -15,7 +16,7 @@ import { activeOf } from "../families/breaking/areas.ts";
 import { stageNumber } from "../families/caves/progress.ts";
 import { topFrame } from "../windows/windows.ts";
 import { shadowCards } from "../core/zones.ts";
-import { levelAmount } from "../families/aflame/values.ts";
+import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { grappledCount, resourcesOnMatching } from "../families/grapple/values.ts";
 import { leftThreat } from "../families/island/pick.ts";
 import { stormcallerStageNumber } from "../families/stormcaller/values.ts";
@@ -129,7 +130,10 @@ export function readsCondition(instructions: readonly Instruction[], kind: Condi
 export function resolveAmount(state: ScenarioState, amount: Amount, scope: AmountScope, ctx: ReduceContext): number {
   if (typeof amount === "number") return amount;
   let value = 0;
-  if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
+  // A family's own amount (interpret/family-hooks.ts): null when it is not the family's, so the reads below stand.
+  const familial = familyAmount(state, amount, scope, ctx);
+  if (familial !== null) value = familial;
+  else if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
   else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
   else if (amount.stat) value = statOf(state, amount.ofNamed ? namedInPlay(state, amount.ofNamed, ctx) : refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
   else if (amount.x) value = scope.x ?? 0;
@@ -147,8 +151,8 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.facedown || amount.resourcesAboveCopies) value = miscAmount(state, amount, scope.sourceId);
   else if (amount.grappled) value = grappledCount(state);
   else if (amount.islandLeft) value = leftThreat(state, ctx);
-  else if (amount.resourcesOn) value = resourcesOnMatching(state, amount.resourcesOn, scope, ctx);
-  value = value * (amount.times ?? 1) + (amount.plus ?? 0) + (amount.plusChosen ? (state.chosenAtSetup?.length ?? 0) : 0);
+  else if (amount.resourcesOn) value = resourcesOnMatching(state, amount.resourcesOn, scope, ctx, amount.max === true);
+  value = value * (amount.times ?? 1) + (amount.plus ?? 0) + (amount.plusChosen ? chosenCopies(state, scope.sourceId, ctx) : 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);
   return amount.negative ? -Math.max(0, value) : Math.max(0, value);
 }

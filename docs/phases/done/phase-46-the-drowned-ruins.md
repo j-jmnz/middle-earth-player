@@ -4,7 +4,7 @@ Engine half depends on: phase 45's engine half
 Phone half depends on: phase 45
 Blocks: phase 47
 
-Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
+Plan: [docs/plans/dream-chaser.md](../../plans/dream-chaser.md), "Phases 40-48 - one scenario each" and "Notes for the orchestrator and the implementer agent".
 
 ## Goal
 
@@ -15,10 +15,10 @@ Plan: [docs/plans/dream-chaser.md](../plans/dream-chaser.md), "Phases 40-48 - on
 The phase 12 "Scenario procedure", steps 1 to 6, for `the-drowned-ruins`, and the plan's list for phases 40 to 48:
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 37).
-- `pnpm effects:draft the-drowned-ruins`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
+- `pnpm scenario:new the-drowned-ruins` writes the skeletons and the registry lines (`docs/handover/agent-brief.md`, Approach, step 7); `pnpm data:build`, then `pnpm effects:draft the-drowned-ruins` and the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup, Resolution and XP list and the boons and burdens its Setup names, on both sides where a card has two.
 - A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or a rule span, and has its own test. Do not bend an existing verb to mean something else.
 - Scenario records go in `src/effects/authored/the-drowned-ruins.ts`; boon and burden pool records in `src/effects/authored/pool/DCCE.ts`.
-- Golden: `src/campaign/scenarios/the-drowned-ruins/golden.json` with its `golden.test.ts` beside it, and `test/scenarios/the-drowned-ruins/scene.ts` and `game.ts` (the shared parts in `test/harness/game-kit.ts`): true solo and two-handed, a win and a loss, with the XP the campaign card awards.
+- Golden: `src/campaign/scenarios/the-drowned-ruins/golden.json` with its `golden.test.ts` beside it, and `test/scenarios/the-drowned-ruins/scene.ts` and `game.ts` on the shared kit (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`; the seed finder `scripts/e2e/seed-kit.ts`), listed in `test/harness/golden-registry.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add `the-drowned-ruins` to `src/campaign/playable.ts`, then `pnpm effects:open`.
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
@@ -32,7 +32,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-drowned-ruins`, and th
 
 ## E2E
 
-`.maestro/scenarios/the-drowned-ruins/the-drowned-ruins.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/the-drowned-ruins/the-drowned-ruins-loss.yaml` (a loss writes nothing), with their fixtures.
+`.maestro/scenarios/the-drowned-ruins/the-drowned-ruins.yaml` (a win runs the Resolution, awards its XP and unlocks the next part) and `.maestro/scenarios/the-drowned-ruins/the-drowned-ruins-loss.yaml` (a loss writes nothing), on the subflows in `.maestro/subflows/`, with their fixtures.
 
 ## Exit
 

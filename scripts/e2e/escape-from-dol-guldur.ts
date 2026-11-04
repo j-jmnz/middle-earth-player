@@ -5,29 +5,19 @@
 // every intent one the reducer listed.
 // `dol-guldur-won`: the first seed that wins, parked on the win (01131's Resolution asks nothing: Mendor, if he is still in play, and each
 // player's Mendor's Support are kept for the next campaign). `dol-guldur-lost`: the first seed that loses, parked on the loss.
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-
 import { type CampaignLog } from "../../src/campaign/log.ts";
-import { newSave, type StoredLoadout } from "../../src/campaign/save.ts";
-import { loadWorld, logCodes } from "../../src/campaign/world.ts";
-import { EFFECTS } from "../../src/effects/index.ts";
+import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
-import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import { anduinWonLog, replaced, type AnduinFixture } from "./journey-along-the-anduin.ts";
 import { createLog } from "../log.ts";
-import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
-import { playDealt } from "./seed-kit.ts";
+import { firstSeed } from "./seed-kit.ts";
 import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-dol-guldur");
 
 export type DolGuldurFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog; past: { fixture: string; choices: string[] } };
-
-const campaign = loadCampaign("mirkwood-paths");
-const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
 // The log a real win of Journey Along the Anduin writes (`anduin-won`, replayed and confirmed): its prisoner is the one 01130:B:1 names. The first
 // player attaches Appointed by Fate (01131:A:2) to a hero that is not the prisoner.
@@ -73,12 +63,6 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory, intents);
 }
 
-function play(log: CampaignLog, loadout: StoredLoadout, seed: number): { intents: PlayerIntent[]; state: ScenarioState } {
-  const scenario = loadScenario("escape-from-dol-guldur");
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)]);
-  return playDealt(world, { ...newSave("fixture", campaign.id, 2), log }, loadout, seed, 6000, intentFor);
-}
-
 // A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `anduin-won` fixture there is no
 // honest log for this scenario to start from (docs/phases/phase-13-flight-to-the-ford.md: a fixture is a real save), so none is written.
 export function dolGuldurFixtures(anduin: AnduinFixture | undefined): Partial<Record<"dol-guldur-won" | "dol-guldur-lost", DolGuldurFixture>> {
@@ -89,15 +73,8 @@ export function dolGuldurFixtures(anduin: AnduinFixture | undefined): Partial<Re
   const { log, loadout } = anduinLog(anduin);
   const past = { fixture: "anduin-won", choices: [] as string[] };
   const first = (wanted: (state: ScenarioState) => boolean, label: string): DolGuldurFixture | null => {
-    for (let seed = 1; seed <= Number(process.env.DOL_GULDUR_SEEDS ?? 60); seed += 1) {
-      const game = play(log, loadout, seed);
-      say.debug(`seed ${seed}: ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "stalled"}`);
-      if (!wanted(game.state)) continue;
-      say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${game.state.lost ? game.state.lossReason : "won"}`);
-      return { campaignId: "mirkwood-paths", seatCount: 2, loadout, seed, intents: game.intents, log, past };
-    }
-    say.warn(`no ${label} game found in ${process.env.DOL_GULDUR_SEEDS ?? 60} seeds`);
-    return null;
+    const found = firstSeed(say, { campaignId: "mirkwood-paths", scenarioId: "escape-from-dol-guldur", seatCount: 2, loadout, log, limit: 6000, seeds: 60, answer: intentFor }, "DOL_GULDUR_SEEDS", wanted, label);
+    return found && { ...found, log, past };
   };
   const won = first((state) => state.stageCleared && !state.lost, "dol-guldur-won");
   const lost = first((state) => state.lost, "dol-guldur-lost");

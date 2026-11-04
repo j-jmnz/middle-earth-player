@@ -10,7 +10,7 @@ import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce } from "../../../rules/engine/reduce.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { codesIn, loadOathWorld, oathTable, type OathLayout, type OathWorld } from "../../../../test/scenarios/the-oath/scene.ts";
-import { first } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first } from "../../../../test/harness/scene-kit.ts";
 
 let world: OathWorld;
 

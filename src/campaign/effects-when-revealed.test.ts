@@ -2,10 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { characters } from "../rules/combat/combat.ts";
 import { legalIntents } from "../rules/engine/reduce.ts";
-import {
-  codeOf, codesOf, first, FRODO, loadWorld, reveal, RIDER, RING, SAM, send, start, table, frames,
-  type Layout, type World,
-} from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { codeOf, codesOf, FRODO, loadWorld, reveal, RIDER, RING, SAM, table, frames, type Layout, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, send, start } from "../../test/harness/scene-kit.ts";
 
 let world: World;
 

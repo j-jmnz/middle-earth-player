@@ -9,7 +9,7 @@ import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { legalIntents, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { first, send, start, type Run } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
+import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 import { codesIn, loadVoyageWorld, resolveReveal, SHIPS, SCOUTING_SHIP, voyageTable, type VoyageLayout, type VoyageWorld } from "../../../../test/scenarios/voyage-across-belegaer/scene.ts";
 
 let world: VoyageWorld;

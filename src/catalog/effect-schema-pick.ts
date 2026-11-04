@@ -47,7 +47,8 @@ export const pickSchema = z.strictObject({
   // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
   printedIcon: sphereSchema.optional(),
   // `loot`: the loot cards of the chooser's that guard a location, under it (The Burglar's Turn, 22024).
-  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot"]).optional(),
+  // `encounterDeck`: with `looked`, the cards of the encounter deck the running effect looked at ("Look at the top 10 cards of the encounter deck, discard any number of them", 11202:A:5).
+  from: z.enum(["play", "hand", "discard", "deck", "victory", "loot", "encounterDeck"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
   // From the discard pile: only its top cards, the last put there ("While the top card of your discard pile is an event").
   top: z.number().int().positive().optional(),
@@ -63,7 +64,9 @@ export const pickSchema = z.strictObject({
   sharesTrait: z.enum(["self", "host", "other", "activeLocation", "attackingEnemy"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
   cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
-  maxCost: z.number().int().min(0).optional(),
+  // A number, or the X of a scalable card: its level in the Campaign Log (`halved`: half of it rounded up) plus 1 for each copy the campaign card's Setup let the players choose
+  // ("Put an ally with cost X or less in your discard pile into play", 11201:A:5; dcce.scalable-upgradable). Read by src/rules/interpret/pick.ts.
+  maxCost: z.union([z.number().int().min(0), z.strictObject({ level: z.literal(true), halved: z.literal(true).optional(), plusChosen: z.literal(true).optional() })]).optional(),
   minCost: z.number().int().min(0).optional(),
   // A card whose printed cost is odd ("a card with an odd printed cost", 110138:A:3): a card with no printed cost, or with X, is not.
   oddCost: z.literal(true).optional(),
@@ -106,7 +109,8 @@ export const pickSchema = z.strictObject({
   attacking: z.boolean().optional(),
   defending: z.boolean().optional(),
   // A card with an attachment on it; with `trait`, an attachment with that trait.
-  hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional() }).optional(),
+  // `names`: an attachment with one of these titles ("a character with Círdan's Blessing on it", 11201:A:4).
+  hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional(), names: z.array(z.string().min(1)).min(1).optional() }).optional(),
   // A card attached to the source (`source`), to the source's host (`host`), to the active location (`activeLocation`), or to
   // the defending character (`defender`).
   attachedTo: z.enum(["source", "host", "activeLocation", "defender"]).optional(),
@@ -164,6 +168,10 @@ export const pickSchema = z.strictObject({
   // ("the bottom 5 cards of your deck").
   uncharted: z.boolean().optional(),
   minProgress: z.number().int().positive().optional(),
+  // `doubleSided`: a double-sided location, whichever side it shows: a Lost Island, or a card with a second side in the Grotto or Underwater pairing (dcce.grotto-deck, "After a double-sided location is explored", 12092:B:2).
+  doubleSided: z.boolean().optional(),
+  // A card whose printed type is not this one ("discards each card in his hand that is not of the chosen type", 12106:A:1). Read by src/rules/families/uncharted/pick.ts.
+  notCardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
   bottom: z.number().int().positive().optional(),
   // The island family's filter (src/rules/families/island/pick.ts, dcce.island-map): `start`, the faceup left corners of the Island Map at Setup, before one is the active location; `temple`, the Temple column's
   // locations that lie facedown, wherever they are on the map; `secret`, the cards facedown under those locations; `here`, the secret under the active location; `adjacent`, the copies of Lost Island (not Temple of the Deceived) next to the active location.

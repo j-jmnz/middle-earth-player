@@ -9,7 +9,7 @@ import { grappledWith } from "../families/grapple/values.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
 import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
-import { inPlay, updateCard, updateCards, withSeat } from "./state.ts";
+import { flagged, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
@@ -326,6 +326,8 @@ export function moveCard(state: ScenarioState, id: string, wanted: Destination, 
   // A card with a route of its own never reaches the encounter deck or discard pile (families/sea/routes.ts); one that has no place there stays put.
   const dest = routeDestination(state, current, unchartedRoute(state, current, wanted));
   if (!dest) return state;
+  // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
+  if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);

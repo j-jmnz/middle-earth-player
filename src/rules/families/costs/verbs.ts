@@ -130,13 +130,14 @@ export function heroesGain(state: ScenarioState, instruction: Extract<Instructio
   return next;
 }
 
-// Reattach: the source attachment leaves its host for another card it may be attached to, which the actor chooses.
-export function reattach(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+// Reattach: the source attachment (the last picked one with `card: picked`) leaves its host for another card it may be attached to, which the actor chooses.
+export function reattach(state: ScenarioState, instruction: Extract<Instruction, { verb: "Reattach" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const movedId = instruction.card === "picked" ? lastPicked(state) : focus.sourceId;
+  const source = movedId ? state.cards[movedId] : undefined;
   if (!source?.host) return state;
   const options = attachmentHostIds(state, focus.seat, source.code, ctx).filter((id) => id !== source.host);
   const target = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
-  if (!target) return options.length > 1 ? askTarget(state, { instruction: { verb: "Reattach" }, seat: focus.seat, chosen: null }, options) : state;
+  if (!target) return options.length > 1 ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, options) : state;
   const old = state.cards[source.host];
   let next = old ? updateCard(state, old.id, { attachments: old.attachments.filter((id) => id !== source.id) }) : state;
   next = attachTo(updateCard(next, source.id, { host: null }), source.id, target);

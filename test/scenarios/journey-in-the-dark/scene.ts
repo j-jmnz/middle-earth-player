@@ -14,8 +14,9 @@ import { blankScenario, updateCard, withThreat } from "../../../src/rules/core/s
 import { attachTo, spawn } from "../../../src/rules/core/zones.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { FRODO, MERRY, RING, SAM } from "../a-shadow-of-the-past/scene.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
+import { FRODO, MERRY, RING, SAM } from "../../harness/scene.ts";
+import { addStandIns, allyCard, enemyCard, opening } from "../../harness/scene-kit.ts";
 
 // Shared scene for Journey in the Dark effect tests. Test-only.
 export const moria: ScenarioData = loadScenario("journey-in-the-dark");
@@ -36,16 +37,13 @@ export async function loadMoriaWorld(): Promise<MoriaWorld> {
   const definition = scenarioDefinition(moria, campaign, EFFECTS);
   const codes = [...new Set([...scenarioCards(moria).map((card) => card.code), ...moria.campaignPlaced, moria.campaignCard, FRODO, SAM, MERRY, RING, "141057"])];
   const cards = new Map(await loadPrinted(codes));
-  for (const [code, threat] of [["f0", 0], ["f3", 3]] as const) {
-    cards.set(code, definePrinted({ code, name: code, type: "enemy", threat, engagementCost: 50, attack: 1, defense: 1, health: 3 }));
-  }
-  cards.set("grunt", definePrinted({ code: "grunt", name: "grunt", type: "enemy", threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
+  addStandIns(cards, ["f0", "f3", "filler"]);
+  cards.set("grunt", enemyCard("grunt", { threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 20 }));
   cards.set("warg", definePrinted({ code: "warg", name: "warg", type: "enemy", traits: ["Creature", "Warg"], threat: 2, engagementCost: 33, attack: 3, defense: 1, health: 4 }));
   cards.set("orc", definePrinted({ code: "orc", name: "orc", type: "enemy", traits: ["Creature", "Orc"], threat: 1, engagementCost: 20, attack: 2, defense: 1, health: 3 }));
   cards.set("warg2", definePrinted({ code: "warg2", name: "warg2", type: "enemy", traits: ["Creature", "Warg"], threat: 2, engagementCost: 20, attack: 3, defense: 1, health: 4 }));
   cards.set("strong", definePrinted({ code: "strong", name: "strong", type: "hero", sphere: "tactics", threat: 8, willpower: 6, attack: 4, defense: 3, health: 20 }));
-  cards.set("filler", definePrinted({ code: "filler", name: "filler", type: "event", sphere: "neutral", cost: 0 }));
-  cards.set("ally", definePrinted({ code: "ally", name: "ally", type: "ally", sphere: "neutral", cost: 0, willpower: 1, attack: 1, defense: 1, health: 2 }));
+  cards.set("ally", allyCard("ally", 0));
   cards.set("gear", definePrinted({ code: "gear", name: "gear", type: "attachment", sphere: "tactics", cost: 0 }));
   cards.set("gear2", definePrinted({ code: "gear2", name: "gear2", type: "attachment", sphere: "tactics", cost: 0 }));
   cards.set("big", definePrinted({ code: "big", name: "big", type: "enemy", threat: 9, engagementCost: 50, attack: 1, defense: 1, health: 3 }));
@@ -133,9 +131,7 @@ export function moriaTable(world: MoriaWorld, layout: MoriaLayout = {}): { state
     state = updateCard(placed.state, placed.id, { damage: layout.doom });
   }
   if (layout.tokens != null) state = updateCard(state, state.questStage ?? "", { resources: layout.tokens });
-  const phase = layout.phase ?? "Quest";
-  const mode = phase === "Quest" ? "questCommit" : phase === "Encounter" ? "optionalEngage" : phase === "Travel" ? "travel" : phase === "Planning" ? "planning" : "combatActions";
-  state = { ...state, phase, boundaryPhase: phase, mode, window: phase === "Encounter" ? { kind: "optionalEngage" } : phase === "Travel" ? { kind: "travel" } : { kind: "pass" }, activeSeat: 0 };
+  state = { ...state, ...opening(layout.phase ?? "Quest") };
   return { state, ctx: { effects: EFFECTS, cards: world.cards }, frodo: frodo.id, sam: sam.id, merry };
 }
 

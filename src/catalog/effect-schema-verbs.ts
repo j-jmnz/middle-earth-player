@@ -6,6 +6,7 @@ import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.
 import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifyStatSchema } from "./effect-schema-stats.ts";
 import { FAMILY_VERBS } from "./families/index.ts";
+import { setupRole } from "./setup-role.ts";
 
 function verb<const Verb extends string>(name: Verb) {
   return z.strictObject({ verb: z.literal(name), ...when });
@@ -25,12 +26,13 @@ const searchSelector = {
 
 export const simpleVerbs = [
   // Draws `amount` cards (one by default), or that many for each Hobbit hero. `who`: the actor, the picked player, or the
-  // seat the event is about.
+  // seat the event is about. `from: "bottom"`: the cards come off the bottom of the deck, still a draw ("draw the bottom card of his deck", 12099:A:2).
   z.strictObject({
     verb: z.literal("Draw"),
     perHero: z.string().min(1).optional(),
     amount: positiveAmountSchema.optional(),
     who: z.enum(["actor", "picked", "eventSeat", "firstPlayer"]).optional(),
+    from: z.literal("bottom").optional(),
     ...when,
   }),
   verb("GainResources"),
@@ -138,10 +140,10 @@ export const simpleVerbs = [
   verb("AdvanceStep"),
   verb("ResolveEffect"),
   modifyStatSchema,
-  codeVerb("AddToStaging"),
+  setupRole(codeVerb("AddToStaging"), "dealt"),
   codeVerb("MakeActiveLocation"),
-  codeVerb("SetAside"),
-  codeVerb("AttachToRingBearer"),
+  setupRole(codeVerb("SetAside"), "dealt"),
+  setupRole(codeVerb("AttachToRingBearer"), "dealt"),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
   codeVerb("AddSetAsideToStaging"),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
@@ -310,6 +312,9 @@ export const simpleVerbs = [
     firstEachRound: z.boolean().optional(),
     onHost: z.enum(["self", "host"]).optional(),
     min: z.number().int().min(0).optional(),
+    // The discount is every player's, whoever controls the source, and `firstEachRound` counts the cards all the players play together: "reduce the cost of the first ally played by the players each
+    // round by 1" (12098:A:1). Without it only the source's controller gets it, counting their own plays.
+    anyPlayer: z.literal(true).optional(),
     ...when,
   }),
   // `firstEachPhase`: only the first such card played in the phase (the sidequests family: "The first non-unique card you play each planning phase").
@@ -369,7 +374,8 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("ChooseCards"),
     codes: z.array(z.string().min(1)).min(1),
-    who: z.enum(["firstPlayer", "eachSeat"]),
+    // `onePlayer`: Campaign Setup only. Each seat in turn may take the card, and the offer ends once one has ("One player may choose one copy of Círdan's Blessing", 11200:A:3).
+    who: z.enum(["firstPlayer", "eachSeat", "onePlayer"]),
     // `player`: a Resolution's card for a player chosen from those at the table, earned for that player and shuffled into their deck after the starting hand in the scenarios that follow ("choose a
     // player ... that player shuffles that Recurring Nightmare into their deck after they draw their starting hand", 11197:B:1).
     to: z.enum(["pool", "hand", "hero", "player"]),
