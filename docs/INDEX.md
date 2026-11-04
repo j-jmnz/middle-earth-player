@@ -305,7 +305,7 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~2.8K tok)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~2.9K tok)
 
 ## Handovers
 

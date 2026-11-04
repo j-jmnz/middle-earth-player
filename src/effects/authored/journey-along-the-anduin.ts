@@ -75,7 +75,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"01130:campaignSetup:1","cardCode":"01130","lines":["01130:A:2"],"timing":"campaignSetup","instructions":[{"verb":"PutObjectiveAllyIntoPlay","code":"01135"},{"verb":"SetAsideEachPlayer","code":"01133"},{"verb":"SetAsideEachPlayer","code":"01138"}]},
   {"id":"01130:response:1","cardCode":"01130","lines":["01130:A:3"],"timing":"response","trigger":"enemyDestroyed","subject":HILL_TROLL,"instructions":[attachCopy("01133")]},
   {"id":"01130:forced:1","cardCode":"01130","lines":["01130:A:4"],"timing":"forced","trigger":"characterDestroyedByAttack","subject":{"type":"character","control":"any"},"condition":{"kind":"matches","card":"other","pick":HILL_TROLL},"limit":"oncePerGame","instructions":[attachCopy("01138")]},
-  {"id":"01130:triggered:1","cardCode":"01130","lines":["01130:A:5"],"timing":"triggered","trigger":"leftPlay","subject":{"type":"card","control":"any","names":["Mendor"]},"instructions":[{"verb":"LoseGame"}]},
   {"id":"01130:resolution:1","cardCode":"01130","lines":["01130:B:1"],"timing":"resolution","instructions":[{"verb":"EarnAttached","codes":["01133","01138"]},{"verb":"NamePrisoner"}]},
 ];
 

@@ -11,7 +11,6 @@ export const RECORDS: readonly Effect[] = [
   {"id":"19060:constant:1","cardCode":"19060","lines":["19060:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"},"hosts":[{"type":"character","control":"any","spheres":["lore"]},{"type":"character","control":"any","trait":"Ranger"}],"limitPerHost":true}]},
   {"id":"19060:response:1","cardCode":"19060","lines":["19060:A:2"],"timing":"response","trigger":"encounterRevealed","subject":{"type":"location","control":"any"},"cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Ready","target":"host"}]},
   // 19061 Giant Bear
-  {"id":"19061:constant:1","cardCode":"19061","lines":["19061:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"19061:action:1","cardCode":"19061","lines":["19061:A:2"],"timing":"action","limit":"oncePerPhase","instructions":[{"verb":"Ready"},{"verb":"Delay","until":"endOfPhase","instructions":[{"verb":"ShuffleSelfIntoDeck"}]}]},
   // 19063 Galion
   {"id":"19063:constant:1","cardCode":"19063","lines":["19063:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"cannotDefend","amount":1,"until":"whileSourceInPlay"}]},

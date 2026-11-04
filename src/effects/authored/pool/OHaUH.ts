@@ -10,7 +10,6 @@ export const RECORDS: readonly Effect[] = [
   // 131004 Ori. The resource phase draw (rr.step-1-3) is the draw at its beginning.
   {"id":"131004:constant:1","cardCode":"131004","lines":["131004:A:1"],"timing":"constant","condition":{"kind":"count","pick":{"type":"character","control":"you","trait":"Dwarf"},"min":5},"instructions":[{"verb":"ModifyStat","stat":"extraDraw","amount":1,"until":"whileSourceInPlay","target":"actorSeat"}]},
   // 131005 Beorn (Sentinel is a printed keyword; line 2 is the immune keyword)
-  {"id":"131005:constant:1","cardCode":"131005","lines":["131005:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"131005:constant:2","cardCode":"131005","lines":["131005:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noExhaustDefend","amount":1,"until":"whileSourceInPlay"}]},
   // 131006 Fili and 131007 Kili
   {"id":"131006:response:1","cardCode":"131006","lines":["131006:A:1"],"timing":"response","trigger":"played","subject":"self","condition":{"kind":"phase","is":"Planning"},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","cardType":"ally","names":["Kili"],"intoPlay":true}},{"verb":"MovePicked","to":"play"},{"verb":"ShuffleDeck"}]},

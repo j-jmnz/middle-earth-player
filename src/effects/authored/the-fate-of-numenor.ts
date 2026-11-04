@@ -33,7 +33,6 @@ const bottomAttack = (code: string, line: string): Effect => ({
 }) satisfies Effect;
 
 // "If Calphon leaves play, the players lose the game."
-const losesWhenLeaving = (code: string, line: string, id: number): Effect => ({ id: `${code}:triggered:${id}`, cardCode: code, lines: [line], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "LoseGame" }] });
 
 // "Action: Exhaust Calphon to look at the bottom card (the bottom 5 cards) of your deck. Then, you may switch that card (one of them) with a card in your hand."
 const calphonAction = (code: string, line: string, id: number, count: number): Effect => ({
@@ -141,16 +140,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     instructions: [{ verb: "LookAtFacedown", remove: 4 }],
   },
 
-  // 11028 Calphon: the first player controls him; his Action looks at the bottom card of the owner's deck and may switch it with a card in hand; the players lose when he leaves play.
+  // 11028 Calphon: the first player controls him; his Action looks at the bottom card of the owner's deck and may switch it with a card in hand; the players lose when he leaves play (a template writes it).
   { id: "11028:constant:1", cardCode: "11028", lines: ["11028:A:1"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }] },
   calphonAction("11028", "11028:A:2", 1, 1),
-  losesWhenLeaving("11028", "11028:A:3", 1),
   // 110013 Calphon (the Campaign Expansion's reprint): the same on its front side; its Upgraded side looks at the bottom 5 cards and switches one of them.
   copyLines("11028", "110013", "A:1", "A:2"),
-  losesWhenLeaving("110013", "110013:A:3", 1),
   copyLine("11028:A:1", "110013:B:2"),
   calphonAction("110013", "110013:B:3", 2, 5),
-  copyLine("110013:A:3", "110013:B:4"),
 
   // 11029 Servant of the Deceiver. Forced: when it engages you, you look at the top card of your deck; at a printed cost of 2 or less it goes to the bottom and the Servant gets +2 Attack
   // until the end of the round.
@@ -199,7 +195,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Choose", who: "actor", options: [{ id: "draw", instructions: [{ verb: "Draw", amount: 1 }] }, { id: "skip", instructions: [] }] }] },
     { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "hand" } }, { verb: "MoveCard", card: "picked", to: "deckBottom", from: ["hand"] }] },
   ]),
-  copyLines("11027", "11031", "B:2", "B:3", "B:4"),
+  copyLines("11027", "11031", "B:3", "B:4"),
 
   // 11032 Steep Plateau. Response: after it is explored, look at the facedown side of an Uncharted location in the staging area. Shadow: the bottom card of the defending player's deck is
   // discarded; at a printed cost of 2 or less the attacker gets +2 Attack.
@@ -330,7 +326,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 11073 Drowned Graves. Forced: once flipped over while active, the top X cards of the encounter deck are discarded (X is 2 more than the number of players) and each player adds an Undead
   // enemy among them to the staging area.
   flippedActive("11073", "11073:A:1", 1, [{ verb: "DiscardEncounterTop", count: { players: true, plus: 2 } }, { verb: "StageLooked", trait: "Undead", type: "enemy" }]),
-  copyLines("11027", "11073", "B:2", "B:3", "B:4"),
+  copyLines("11027", "11073", "B:3", "B:4"),
 
   // 11074 Cursed Temple. While active, characters with less than 2 Willpower do not ready during the refresh phase.
   {

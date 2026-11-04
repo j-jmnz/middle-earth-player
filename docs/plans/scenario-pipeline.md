@@ -35,9 +35,10 @@ Every section keeps these. A task that cannot keep one stops and reports.
    - Campaign-card XP bullets: N XP for each surviving player; −N XP if Ominous Fate is in the victory display; N XP if a named card is in the victory display; each surviving player's threat is N or less. Settle on one record shape for "is in the victory display" first.
    - Shadow "Attacking enemy gets +N Attack (+M instead if …)" for the conditions the authored records already use, and a Shadow line of several sentences read sentence by sentence.
    - "Cannot have [player card] attachments." (settle on one shape first).
-   - "If ~ leaves play, the players lose", "If ~ is destroyed, its controller is eliminated", "When ~ leaves play, remove it from the game".
+   - "If ~ leaves play, the players lose", "When ~ leaves play, remove it from the game".
    - Travel costs: reveal the top card of the encounter deck; search the encounter deck and discard pile for a Trait enemy; exhaust a named card.
-   - "While ~ is in the staging area, it gains: "…"": unwrap the quote, read the inner sentence with the existing templates, and add the `sourceIn` condition.
+   - A constant or triggered template reads a line only when no earlier unread line of that timing comes before it on the card (`unreadBefore` in the template context), so it never takes a number an authored record holds.
+   - Stay authored: "If ~ is destroyed, its controller is eliminated" (the records' numbers skip slots a generated record would take) and "While ~ is in the staging area, it gains: "…"" (no template reads any of the quoted sentences).
 5. **Migration check.** A test or script under `scripts/checks/` lists every authored record whose id and lines a template now writes. An authored record is deleted only when the generated record is deep-equal to it.
 
 Exit: the plan's checks (Verification), the migration check clean, and `node --experimental-strip-types scripts/card-smoke/run.ts --all` green.

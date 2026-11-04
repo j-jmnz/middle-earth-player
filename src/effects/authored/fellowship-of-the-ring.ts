@@ -55,7 +55,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"141045:forced:1","cardCode":"141045","lines":["141045:A:2"],"timing":"forced","trigger":"leftPlay","instructions":[{"verb":"DiscardUntilEnemies","perPlayer":1}]},
   // 141046 Weathertop (line 1 is the immune keyword)
   {"id":"141046:constant:1","cardCode":"141046","lines":["141046:A:2"],"timing":"constant","condition":{"kind":"sourceIn","zone":"victory"},"instructions":[{"verb":"ModifyStat","stat":"threat","amount":-1,"until":"whileSourceInPlay","target":"enemies"}]},
-  {"id":"141046:travel:1","cardCode":"141046","lines":["141046:A:3"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":"141085"},"who":"firstPlayer"}]},
   // 141047 Chetwood
   {"id":"141047:constant:1","cardCode":"141047","lines":["141047:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"staging"},"instructions":[{"verb":"ModifyStat","stat":"threat","amount":1,"until":"whileSourceInPlay","target":"enemies","trait":"Spy"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"enemies","trait":"Spy"}]},
   {"id":"141047:shadow:1","cardCode":"141047","lines":["141047:A:2"],"timing":"shadow","instructions":[{"verb":"DiscardRandomFromHand"}]},

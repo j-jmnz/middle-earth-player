@@ -31,7 +31,6 @@ const templeImmune = (code: string): Effect => ({ id: `${code}:constant:2`, card
 // the number of the travel and forced records on the card.
 const templeSide = (code: string): Effect[] => [
   templeImmune(code),
-  { id: `${code}:travel:1`, cardCode: code, lines: [`${code}:B:3`], timing: "travel", instructions: [{ verb: "Exhaust", target: { kind: "byName", name: "Gate Key" } }] },
   { id: `${code}:forced:2`, cardCode: code, lines: [`${code}:B:4`], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "FlipUncharted" }] },
 ];
 

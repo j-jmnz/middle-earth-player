@@ -21,9 +21,6 @@ const ALWAYS = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 }
 const A_HERO: PickSpec = { type: "hero", control: "you" };
 const SUBJECT_HAS_RESOURCES = { kind: "matches", card: "subject", pick: { type: "hero", control: "any", hasResources: true } } as const;
 
-// "Cannot have attachments." of a ship-enemy.
-const noAttachments = (code: string, line: string): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay" }] });
-
 // "Forced: At the end of the round, discard the top card of the encounter deck. The Stormcaller places progress on this stage equal to its Threat plus the Threat of the discarded card."
 const stormcallerProgress = (code: string, line: string, id = 1): Effect => ({ id: `${code}:forced:${id}`, cardCode: code, lines: [line], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "StormcallerProgress" }] });
 
@@ -114,9 +111,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   },
 
   // 12019 Stormcaller, and 110042 with its Campaign Mode only side (Boarding 2 is a keyword). It cannot have attachments (player attachments, on the Campaign Expansion's side A; the campaign attaches Black Key).
-  noAttachments("12019", "12019:A:2"),
   ...stormcallerRules("12019", "12019:A:3", "12019:A:4"),
-  { id: "110042:constant:1", cardCode: "110042", lines: ["110042:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay" }] },
   copyLines("12019", "110042", "A:3", "A:4"),
   {
     id: "110042:constant:2",
@@ -129,16 +124,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   copyLine("12019:A:4", "110042:B:5"),
 
   // 12020 Sahír's Escort (Boarding 1 is a keyword). In the Stormcaller's area it contributes its Threat to the Stormcaller's progress. When Revealed: it is added to the Stormcaller's area.
-  noAttachments("12020", "12020:A:2"),
   { id: "12020:constant:2", cardCode: "12020", lines: ["12020:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "stormcallerThreat", amount: 1, until: "whileSourceInPlay", target: "self", when: { kind: "sourceIn", zone: "stormcallerArea" } }] },
   { id: "12020:whenRevealed:1", cardCode: "12020", lines: ["12020:A:4"], timing: "whenRevealed", instructions: [{ verb: "MoveToStormcallerArea", target: "self" }] },
 
   // 12021 Swift Raider (Boarding 2 is a keyword). In the staging area it engages a player who commits 4 or more characters to a Sailing test or the quest.
-  noAttachments("12021", "12021:A:2"),
   { id: "12021:forced:1", cardCode: "12021", lines: ["12021:A:3"], timing: "forced", trigger: "commitmentMade", condition: IN_STAGING, instructions: [{ verb: "Engage", target: "self", when: { kind: "x", min: 4 } }] },
 
   // 12022 Corsair Skiff (Surge is a keyword). Forced: when it engages you from the staging area, you raise your threat by 3 or it gains Boarding 1 (Boarding then resolves with the value it has).
-  noAttachments("12022", "12022:A:2"),
   {
     id: "12022:forced:1",
     cardCode: "12022",

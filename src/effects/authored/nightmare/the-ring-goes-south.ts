@@ -36,4 +36,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"906408:shadow:1","cardCode":"906408","lines":["906408:A:3"],"timing":"shadow","instructions":[{"verb":"Each","pick":{"type":"location","control":"any","active":true},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"damage","of":"picked"},"until":"endOfAttack","target":"attacker"}]}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["906402:constant:1"];

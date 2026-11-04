@@ -19,7 +19,6 @@ const ENEMIES_AT_STAGE = { type: "enemy", control: "any", staging: true, atStage
 const ALLIES_AT_STAGE = { type: "ally", control: "any", atStage: true } as const;
 // "If the defending character has fewer printed hit points than the attacking enemy" (142079:A:2, 142081:A:2, 142082:A:2).
 const DEFENDER_FEWER_HP = { kind: "matches", card: "defender", pick: { type: "character", control: "any", fewerHitPointsThan: "attackingEnemy" } } as const;
-const SEARCH_ENEMY_TO_STAGING = [{ verb: "SearchMove", type: "enemy", to: "staging" }, { verb: "ShuffleEncounterDeck" }] as const;
 
 // Each stage 3B prints the same two lines and one Response of its own. "If Frodo's Choice is not in play, any time players would place progress on this quest,
 // discard an equal number of cards from the encounter deck instead" holds the flag progressDiscards; "Forced: After Frodo's Choice is revealed at this stage, advance to
@@ -160,7 +159,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 142069 Uruk-hai Captain (Toughness 2 is a keyword; the Shadow is read by the template). No attachments; allies with fewer printed hit points cannot defend against it.
-  { id: "142069:constant:1", cardCode: "142069", lines: ["142069:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay" }] },
   { id: "142069:constant:2", cardCode: "142069", lines: ["142069:A:2"], timing: "constant", instructions: [{ verb: "Restrict", what: "defend", belowSourceHitPoints: true }] },
 
   // 142070 Uruk-hai Archer (Peril and Toughness 1 are keywords). Archery X, X the players at its stage; when revealed its player discards an ally they control.
@@ -191,7 +189,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 142073 Parth Galen (immune is a keyword): Travel adds an enemy found in the encounter deck or discard pile to the staging area; the players cannot win while it is in play.
-  { id: "142073:travel:1", cardCode: PARTH_GALEN, lines: ["142073:A:2"], timing: "travel", instructions: [...SEARCH_ENEMY_TO_STAGING] },
   { id: "142073:constant:1", cardCode: PARTH_GALEN, lines: ["142073:A:3"], timing: "constant", instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 142074 Seat of Seeing (immune is a keyword): once explored, a burden card in play or in the encounter deck or discard pile leaves the game and the campaign pool.
@@ -238,7 +235,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142078 Wooded Shoreline: archery 2 in the staging area. Travel adds an enemy found in the encounter deck or discard pile to the staging area.
   { id: "142078:constant:1", cardCode: "142078", lines: ["142078:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "ModifyStat", stat: "archeryBonus", amount: 2, until: "whileSourceInPlay" }] },
-  { id: "142078:travel:1", cardCode: "142078", lines: ["142078:A:2"], timing: "travel", instructions: [...SEARCH_ENEMY_TO_STAGING] },
 
   // 142079 Slopes of Amon Hen: Travel, the traveling player engages an enemy in any staging area. The Shadow gives +1 Attack, +2 against a defender with fewer printed hit points.
   { id: "142079:travel:1", cardCode: "142079", lines: ["142079:A:1"], timing: "travel", instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true, stagingArea: "any" } }, { verb: "Engage", target: "picked" }] },

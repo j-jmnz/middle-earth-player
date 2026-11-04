@@ -131,6 +131,16 @@ function shadowBySentence(line: string, context: TemplateContext): { drafts: Dra
   return { drafts: [{ timing: "shadow", instructions }], templates };
 }
 
+// How an unlabelled ability that opens so reads: a triggered one (a conditional or timed sentence), not a constant one.
+const TRIGGERED_OPENING = /^(?:If|When|After|Whenever|Each time|Before) /;
+
+// A line the ledger marks as needing no record (an inert reason).
+function inertLine(ledger: Ledger, segment: Segment): boolean {
+  const [, side, at] = segment.lineId.split(":");
+  const entry = ledger.byKey.get(keyOf(segment.card.code, side ?? "A"));
+  return entry?.inert.some((mark) => mark.line === Number(at)) ?? false;
+}
+
 function normalize(line: string): string {
   return line.replaceAll("`", "'").trim();
 }
@@ -202,7 +212,17 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       counters.set(timing, value);
       return value;
     };
-    const context: TemplateContext = { card, codeOf: (name) => codeOf(card, name), hasName: (name) => scope.some((other) => other.name.toLowerCase() === name.trim().toLowerCase()), codesNamed: (name) => codesNamed(card, name), setAside };
+    const unread = new Set<"constant" | "triggered">();
+    let lineInert = false;
+    const context: TemplateContext = {
+      card,
+      codeOf: (name) => codeOf(card, name),
+      hasName: (name) => scope.some((other) => other.name.toLowerCase() === name.trim().toLowerCase()),
+      codesNamed: (name) => codesNamed(card, name),
+      setAside,
+      unreadBefore: (timing) => unread.has(timing),
+      inert: () => lineInert,
+    };
     // A campaign card's Resolution runs from its "Resolution:" line to the next label: every line in it that no template reads
     // reserves the next `resolution` number, as the authored records number it (one record per line, `SPLIT_LINES` for a line
     // that takes several). A header line ("Gain the following:") reads as no record and goes onto the first record of the line
@@ -210,6 +230,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
     let inResolution = false;
     let header: Segment | null = null;
     for (const segment of segmentsOf(card, ledger)) {
+      lineInert = inertLine(ledger, segment);
       const { line, condition, limit } = wrapped(selfNamed(card, segment.line));
       const label = /^([A-Z][A-Za-z ]+?):\s/.exec(line)?.[1]?.toLowerCase();
       if (label) inResolution = card.type === "campaign" && LABEL_TIMING.get(label) === "resolution";
@@ -252,6 +273,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       if (timing === "resolution") for (let extra = 1; extra < (SPLIT_LINES[segment.lineId] ?? 1); extra += 1) next(timing);
       if (carried) unmatched.push({ ...carried, timing: "resolution", number });
       unmatched.push({ ...segment, timing, number });
+      if (timing === null && !lineInert) unread.add(TRIGGERED_OPENING.test(line) ? "triggered" : "constant");
     }
     if (header) unmatched.push({ ...header, timing: "resolution", number: (counters.get("resolution") ?? 0) + 1 });
   }

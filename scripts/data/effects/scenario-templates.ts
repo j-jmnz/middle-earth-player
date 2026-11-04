@@ -22,6 +22,12 @@ function shadowCondition(text: string, context: TemplateContext): { condition: A
   return null;
 }
 
+// A template for an unlabelled sentence (a constant or triggered ability) reads the line only when its number is the one an authored record would
+// take (no earlier unlabelled line is left unread) and the ledger does not mark the line as owned by an engine keyword.
+function unlabelledBlocked(context: TemplateContext, timing: "constant" | "triggered"): boolean {
+  return context.unreadBefore(timing) || context.inert();
+}
+
 export const SCENARIO_TEMPLATES: readonly Template[] = [
   {
     id: "quest-setup",
@@ -181,6 +187,57 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     id: "restrict-attachments-except-trait",
     pattern: /^Cannot have non-(.+?) attachments\.$/,
     build: (match) => [{ timing: "constant", condition: { kind: "sourceIn", zone: "play" }, instructions: [{ verb: "Restrict", what: "attach", exceptTrait: match[1] ?? "" }] }],
+  },
+  {
+    // Authored records write this sentence two ways, with and without `target: "self"`; the template writes the one most played cards use (the
+    // others stay authored, AUTHORED_REPLACES).
+    id: "cannot-have-attachments",
+    pattern: /^Cannot have attachments\.$/,
+    build: (_match, context) => (unlabelledBlocked(context, "constant") ? null : [{ timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay" }] }]),
+  },
+  {
+    id: "cannot-have-player-attachments",
+    pattern: /^Cannot have player(?: card)? attachments\.$/,
+    build: (_match, context) => (unlabelledBlocked(context, "constant") ? null : [{ timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay" }] }]),
+  },
+  {
+    // "If Calphon leaves play, the players lose the game." / "If Mendor leaves play, ..." (a card the line names, not its own).
+    id: "leaves-play-players-lose",
+    pattern: /^If (?:the )?(.+?) leaves play, the players lose(?: the game)?\.$/,
+    build: (match, context) => {
+      if (unlabelledBlocked(context, "triggered")) return null;
+      const name = match[1] ?? "";
+      const subject = name === "{self}" ? ("self" as const) : { type: "card" as const, control: "any" as const, names: [name] };
+      return [{ timing: "triggered", trigger: "leftPlay", subject, instructions: [{ verb: "LoseGame" }] }];
+    },
+  },
+  {
+    id: "leaves-play-remove-from-game",
+    pattern: /^When (?:the )?\{self\} leaves play, remove (?:it|him|her) from the game\.$/,
+    build: (_match, context) => (unlabelledBlocked(context, "triggered") ? null : [{ timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "RemoveSourceFromGame" }] }]),
+  },
+  {
+    id: "travel-reveal-encounter",
+    pattern: /^Travel: (?:The first player must )?[Rr]eveal the top card of the encounter deck(?: and add it to the staging area)? to travel here\.$/,
+    build: () => [{ timing: "travel", instructions: [{ verb: "RevealEncounter" }] }],
+  },
+  {
+    // "this staging area" is printed on Wooded Shoreline (142078).
+    id: "travel-search-enemy",
+    pattern: /^Travel: Search the encounter deck and discard pile for an? (?:(\w+) )?enemy and add it to (?:the|this) staging area(?: to travel here)?\. Shuffle the encounter deck\.$/,
+    build: (match) => [{ timing: "travel", instructions: [{ verb: "SearchMove", ...(match[1] ? { trait: match[1] } : {}), type: "enemy", to: "staging" }, { verb: "ShuffleEncounterDeck" }] }],
+  },
+  {
+    // A card the scenario names: by its code when one card has the name, else by its title (two printings, the Gate Key).
+    id: "travel-exhaust-named",
+    pattern: /^Travel: (?:(The first player|Players|Each player) must )?[Ee]xhaust (?:the |an? )?(.+?)(?: to travel here)?\.$/,
+    build: (match, context) => {
+      const name = match[2] ?? "";
+      const code = context.codeOf(name);
+      const target = code ? { kind: "byCode" as const, code } : context.hasName(name) ? { kind: "byName" as const, name } : null;
+      if (!target || match[1] === "Each player") return null;
+      return [{ timing: "travel", instructions: [{ verb: "Exhaust", target, ...(match[1] === "The first player" ? { who: "firstPlayer" as const } : {}) }] }];
+    },
   },
   {
     id: "forced-engaged-hide-failed-immediate-attack",

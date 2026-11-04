@@ -50,7 +50,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"142024:forced:1","cardCode":"142024","lines":["142024:A:3"],"timing":"forced","trigger":"damaged","subject":"self","condition":{"kind":"damageReached","nth":6},"instructions":[{"verb":"ReleaseRingBearer","damage":1}]},
 
   // 142025 Great Warg Chief
-  {"id":"142025:constant:1","cardCode":"142025","lines":["142025:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"142025:forced:1","cardCode":"142025","lines":["142025:A:2"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"DiscardUntil","type":"enemy","trait":"Warg"},{"verb":"MoveEncounterCard","to":"engaged"}]},
 
   // 142026 Hound of Sauron (Surge is a keyword)

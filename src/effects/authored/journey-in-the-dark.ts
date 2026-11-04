@@ -137,4 +137,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"142088:forced:2","cardCode":"142088","lines":["142088:A:2"],"timing":"forced","trigger":"exhausted","subject":"host","condition":NOT_IN_STAGING,"instructions":[{"verb":"DamageCard","amount":1,"target":"host"}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["142046:constant:1"];

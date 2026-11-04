@@ -43,7 +43,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 41013 Spider Den: any player may use this Quest Action to bring a Spider from the deck or discard pile into play engaged with him and discard Spider Den.
   {"id":"41013:action:1","cardCode":"41013","lines":["41013:A:1"],"timing":"action","anyPlayer":true,"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Quest"},{"kind":"searchable","trait":"Spider"}]},"instructions":[{"verb":"SearchMove","trait":"Spider","type":"enemy","to":"engaged"},{"verb":"Discard","target":{"kind":"self"}}]},
   // 41014 Goblin Trail: a card is revealed to travel here (as 01078:travel:1); explored, it puts 6 progress on the current quest.
-  {"id":"41014:travel:1","cardCode":"41014","lines":["41014:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
   {"id":"41014:response:1","cardCode":"41014","lines":["41014:A:2"],"timing":"response","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"ProgressQuest","amount":6}]},
   // 41015 Abandoned Camp: the first player discards the top card of his deck after the players travel here, an ally goes into play; the Travel cost
   // discards the top card of the encounter deck, an enemy goes to the staging area.
@@ -85,4 +84,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41050:resolution:1","cardCode":"41050","lines":["41050:B:1"],"timing":"resolution","instructions":[{"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]},
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// The played goldens store this shape of "Cannot have attachments." (the card as target); the generated twin writes it without a target.
+export const AUTHORED_REPLACES: readonly string[] = ["41019:constant:1"];

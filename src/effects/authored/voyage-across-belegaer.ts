@@ -34,9 +34,6 @@ const stageSearch = (code: string, find: string): Effect => ({
 // The record has the `constant` timing only because every record needs one: nothing runs it, the stage definition carries the verb.
 const lookAtStages = (code: string, line: string, id = 1): Effect => ({ id: `${code}:constant:${id}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "LookAtStages", count: 2 }] });
 
-// "Cannot have attachments." of a ship-enemy.
-const noAttachments = (code: string, line: string): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay" }] });
-
 // "If the X is destroyed, its controller is eliminated from the game" / "the players lose the game" of a ship-objective: the ship leaves play destroyed.
 const eliminated = (code: string, line: string, id: number, lose = false): Effect => ({
   id: `${code}:triggered:${id}`,
@@ -130,7 +127,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "11021:constant:3", cardCode: "11021", lines: ["11021:B:4"], timing: "constant", condition: { kind: "stageProgress", min: 10 }, instructions: [{ verb: "WinGame" }] },
 
   // 11022 Scouting Ship: no attachments; -15 engagement cost off-course.
-  noAttachments("11022", "11022:A:2"),
   { id: "11022:constant:2", cardCode: "11022", lines: ["11022:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -15, until: "whileSourceInPlay", target: "self", when: OFF_COURSE }] },
 
   // 11023 Starlit Sea: off-course it gains "Travel: Raise each player's threat by 3."
@@ -251,11 +247,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   },
 
   // 11057 Light Cruiser: no attachments; a Raider its Boarding reveals enters play with 1 resource.
-  noAttachments("11057", "11057:A:2"),
   { id: "11057:constant:2", cardCode: "11057", lines: ["11057:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "boardingResource", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 
   // 11058 Corsair Warship: no attachments; in the staging area it cannot be damaged and gains archery 4.
-  noAttachments("11058", "11058:A:2"),
   {
     id: "11058:constant:2",
     cardCode: "11058",
