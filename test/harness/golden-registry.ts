@@ -17,6 +17,7 @@ import * as flight from "../scenarios/flight-of-the-stormcaller/game.ts";
 import * as depths from "../scenarios/the-thing-in-the-depths/game.ts";
 import * as temple from "../scenarios/temple-of-the-deceived/game.ts";
 import * as ruins from "../scenarios/the-drowned-ruins/game.ts";
+// import * as haven from "../scenarios/a-storm-on-cobas-haven/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -59,4 +60,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-thing-in-the-depths", "The Thing in the Depths", depths.DEPTHS_GOLDENS, depths.depthsWorld, depths.playGolden),
   entry("temple-of-the-deceived", "Temple of the Deceived", temple.TEMPLE_GOLDENS, temple.templeWorld, temple.playGolden),
   entry("the-drowned-ruins", "The Drowned Ruins", ruins.RUINS_GOLDENS, ruins.ruinsWorld, ruins.playGolden),
+  // entry("a-storm-on-cobas-haven", "A Storm on Cobas Haven", haven.HAVEN_GOLDENS, haven.havenWorld, haven.playGolden),
 ];
