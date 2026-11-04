@@ -58,6 +58,12 @@ describe("busyBetween", () => {
     expect(busyBetween(base, state({ a: card("play", true), b: card("hand", false) }))).toBe(true);
     expect(busyBetween(base, state({ a: card("play", false, 2), b: card("hand", false) }))).toBe(true);
   });
+
+  it("is false for shadow cards dealt as Combat opens, and still true when anything else moves with them", () => {
+    const deck = state({ a: card("engaged", false), s: card("encounterDeck", false) });
+    expect(busyBetween(deck, state({ a: card("engaged", false), s: card("shadow", false) }))).toBe(false);
+    expect(busyBetween(deck, state({ a: card("engaged", true), s: card("shadow", false) }))).toBe(true);
+  });
 });
 
 describe("sweepFrame", () => {

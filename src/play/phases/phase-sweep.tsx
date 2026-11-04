@@ -1,7 +1,7 @@
 // The phase title sweep (phase 23): the new phase's name in large display type crosses the screen's center once when the round moves
 // into it (user request, 2026-11-01: larger, and centered on the screen, not the canvas). Taps pass through it (pointerEvents none), it never gates a rule, and it is skipped under Quick, under reduced motion and
-// when the table passes the whole phase for the player (sweep.ts).
-import { useEffect, useRef, useState } from "react";
+// when the table passes the whole phase for the player (sweep.ts), or while a combat spotlight plays.
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -11,6 +11,7 @@ import { timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION, SHAPE } from "../../ui/motion-tokens.ts";
 import { busyBetween, SETTLE_MS, sweepFrame, sweepName } from "./sweep.ts";
 import type { TableStore } from "../store/store.ts";
+import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
@@ -30,6 +31,9 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
   const before = useRef(store.getState().game);
   const [shown, setShown] = useState<string | null>(null);
   const progress = useSharedValue(0);
+  // A combat spotlight playing when the title is due holds the stage: the title is dropped, never run under it.
+  const spotlit = useSpotlightHold(store);
+  const spotlitNow = useEffectEvent(() => spotlit);
   // On a change of phase (or round): sweep unless the state moves cards, changes a count, or took the phase back. The game before is
   // the one just before that change (kept by the listener below, which runs when the store sets, before this renders).
   useEffect(() => {
@@ -38,6 +42,7 @@ export function PhaseSweep({ store, area }: { store: TableStore; area: { left: n
     const name = sweepName({ phase: was.phase, round: was.round }, { phase: now.phase, round: now.round }, scale, busyBetween(was, now));
     if (!name) return;
     const timer = setTimeout(() => {
+      if (spotlitNow()) return;
       setShown(name);
       progress.set(0);
       progress.set(

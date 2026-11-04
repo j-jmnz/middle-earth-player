@@ -1,3 +1,5 @@
+// Rules: rr.step-6-2 (data/rules/entries.json).
+//
 // The phase title sweep (docs/design-system-table.md, Motion; phase 23): when the round moves forward into a new phase, its name
 // crosses the canvas once. Pure: whether it shows and what it says. The view is phase-sweep.tsx.
 import { clamp01 } from "../motion/curves.ts";
@@ -39,12 +41,17 @@ export function sweepName(before: PhasePoint, now: PhasePoint, scale: number, bu
 /** The part of a state `busyBetween` reads: each card's counts, where it lies and whether it is turned. */
 export type Seen = Counted & { readonly cards: Readonly<Record<string, { readonly zone: string; readonly exhausted: boolean }>> };
 
-/** Whether the table moves cards or changes a count between two states: a draw, a ready, a token added or taken off. */
+/**
+ * Whether the table moves cards or changes a count between two states: a draw, a ready, a token added or taken off. A shadow card dealt
+ * is not: the deal is how the Combat phase opens (rr.step-6-2), beside the enemies and away from the player's row, so with any enemy
+ * engaged the Combat title would otherwise never show.
+ */
 export function busyBetween(prev: Seen, next: Seen): boolean {
   if (tokenDeltas(prev, next).length > 0) return true;
   for (const [id, card] of Object.entries(next.cards)) {
     const before = prev.cards[id];
-    if (before && (before.zone !== card.zone || before.exhausted !== card.exhausted)) return true;
+    if (!before || (card.zone === "shadow" && before.zone !== "shadow")) continue;
+    if (before.zone !== card.zone || before.exhausted !== card.exhausted) return true;
   }
   return false;
 }
