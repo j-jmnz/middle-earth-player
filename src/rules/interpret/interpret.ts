@@ -171,15 +171,15 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 }
 
 // A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon/deck.ts).
-// An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either.
-export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext): ScenarioState {
+// An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either. `bottom`: the cards come off the bottom of the deck.
+export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
-  const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback));
+  const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
   return announceEnteredHand(state, announceDraw(state, drawn, seat), seat, ctx);
 }
 
-function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
-  const id = state.seats[seat]?.deck[0];
+function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause, bottom: boolean): ScenarioState {
+  const id = bottom ? state.seats[seat]?.deck.at(-1) : state.seats[seat]?.deck[0];
   if (!id) return state;
   const next = moveCard(state, id, { zone: "hand", seat });
   steps.push({ kind: "draw", seat, cardId: id, cause: currentCause(steps, fallback) });

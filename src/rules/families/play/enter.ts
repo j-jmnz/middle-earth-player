@@ -50,7 +50,7 @@ export function canEnter(state: ScenarioState, id: string, ctx: ReduceContext): 
   const card = state.cards[id];
   if (!card || inPlay(card.zone)) return false;
   const printed = printedOf(ctx.cards, card.code);
-  return (printed.type === "hero" || isAllyLike(printed)) && !uniqueBlocked(state, printed, ctx.cards) && !playBlocked(state, id, card.controller ?? card.owner ?? state.firstPlayer, ctx);
+  return (printed.type === "hero" || isAllyLike(printed)) && !uniqueBlocked(state, printed, ctx.cards) && !playBlocked(state, id, card.controller ?? card.owner ?? state.firstPlayer, ctx, true);
 }
 
 // The card enters play under `seat`: among the heroes for a hero, in the play area otherwise. It is not played (no "played"

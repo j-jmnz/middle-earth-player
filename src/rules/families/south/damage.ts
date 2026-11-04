@@ -3,7 +3,7 @@
 // AssignDamage: "each player assigns X damage among characters he controls". The first call queues one assignment for each player
 // in player order; each assignment places one damage at a time on the card its player chooses (one candidate is taken without
 // asking) and queues itself again with one damage fewer.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { askTarget } from "../../windows/choices.ts";
@@ -19,6 +19,7 @@ import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { patchTop } from "../../windows/windows.ts";
 
 type Assign = Extract<Instruction, { verb: "AssignDamage" }>;
 
@@ -40,16 +41,24 @@ export function assignDamage(state: ScenarioState, instruction: Assign, focus: F
   return queueFront(dealt, [{ instruction: { ...instruction, left: instruction.left - 1 }, seat: focus.seat, chosen: null, cause }]);
 }
 
-// DiscardEach: each card that matches goes to its owner's discard pile, as DiscardPicked sends one.
+// DiscardEach: each card that matches goes to its owner's discard pile, as DiscardPicked sends one. The effect counts the cards it discarded (the `noneDiscarded` condition).
 export function discardEach(state: ScenarioState, instruction: Extract<Instruction, { verb: "DiscardEach" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   let next = state;
+  let count = 0;
   for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx)) {
     const card = next.cards[id];
     const seat = card?.owner ?? card?.controller;
     if (!card || seat == null) continue;
     next = moveCard(next, id, { zone: "discard", seat });
+    count += 1;
     // A card from a hand is "discarded from your hand" (01079:A:1, Eyes of the Forest, makes each player discard the events in his).
     if (card.zone === "hand") next = queueEvent(next, { trigger: "discardedFromHand", seat, cardId: id });
   }
-  return next;
+  const data = count > 0 ? effectData(next) : undefined;
+  return data ? patchTop(next, { data: { ...data, discardedCount: (data.discardedCount ?? 0) + count } }) : next;
+}
+
+/** The `noneDiscarded` condition: the running effect's DiscardEach has discarded no card. Null for any other condition. */
+export function noneDiscarded(state: ScenarioState, condition: Condition): boolean | null {
+  return condition.kind === "noneDiscarded" ? (effectData(state)?.discardedCount ?? 0) === 0 : null;
 }

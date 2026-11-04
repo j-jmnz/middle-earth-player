@@ -57,7 +57,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachLoot"), ...when }),
   // Constant on a card in play: its controller cannot play, or put into play, a card that matches `pick` ("You cannot play
   // non-unique allies or put non-unique allies into play"). A card in a hand, a deck or a discard pile is read from its owner's side.
-  z.strictObject({ verb: z.literal("CannotPlay"), pick: pickSchema, ...when }),
+  // `anyPlayer`: the card bars every player, whoever controls it ("players cannot play attachments or allies", 12092:B:1, 12093:B:1), from playing a matching card from their hand; a card
+  // put into play is not played (rr.play-and-put-into-play), so it is left alone. Without it only the controller is barred, from playing and from putting into play.
+  z.strictObject({ verb: z.literal("CannotPlay"), pick: pickSchema, anyPlayer: z.literal(true).optional(), ...when }),
   // Constant on a card in play: the first card that matches `pick` its controller plays on each of their heroes each round costs
   // `amount` less ("Reduce the cost of the first restricted attachment you play on each of your heroes each round by 1").
   z.strictObject({ verb: z.literal("ReduceFirstOnEachHero"), pick: pickSchema, amount: z.number().int().positive(), ...when }),

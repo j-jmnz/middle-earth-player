@@ -7,7 +7,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { resolveGrapple } from "./attach.ts";
-import { addResourcesSetAside, addSetAsideToHand, attackFirstPlayer, discardAndGrapple, engageOrGrapple, flipElite, flipSetAside, gainChosenTrait, removeCodeFromGame, removeEncounterSet, shuffleSetAsideSet } from "./cards.ts";
+import { addResourcesSetAside, addSetAsideToHand, attackFirstPlayer, discardAndGrapple, engageOrGrapple, flipElite, flipEliteAndAttack, flipSetAside, gainChosenTrait, removeCodeFromGame, removeEncounterSet, shuffleSetAsideSet } from "./cards.ts";
 import type { Focus } from "../index.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -21,6 +21,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return flipSetAside(state, instruction, ctx);
     case "FlipElite":
       return flipElite(state, instruction, ctx, steps);
+    case "FlipEliteAndAttack":
+      return flipEliteAndAttack(state, instruction, ctx, steps);
     case "RemoveEncounterSet":
       return removeEncounterSet(state, instruction, ctx, steps);
     case "ShuffleSetAsideSet":
@@ -42,4 +44,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "grapple", verbs: ["ResolveGrapple", "DiscardTopGrapple", "DiscardUntilGrapple", "FlipSetAside", "FlipElite", "RemoveEncounterSet", "ShuffleSetAsideSet", "AddResourcesSetAside", "AddSetAsideToHand", "GainChosenTrait", "EngageOrGrapple", "AttackFirstPlayer", "RemoveCodeFromGame"], run };
+export const manifest: RulesFamily = { name: "grapple", verbs: ["ResolveGrapple", "DiscardTopGrapple", "DiscardUntilGrapple", "FlipSetAside", "FlipElite", "FlipEliteAndAttack", "RemoveEncounterSet", "ShuffleSetAsideSet", "AddResourcesSetAside", "AddSetAsideToHand", "GainChosenTrait", "EngageOrGrapple", "AttackFirstPlayer", "RemoveCodeFromGame"], run };

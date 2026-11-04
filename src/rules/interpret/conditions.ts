@@ -93,6 +93,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   const familial = familyCondition(state, condition, scope, ctx);
   if (familial !== null) return familial;
   switch (condition.kind) {
+    // The south family's condition hook answers noneDiscarded (families/south/damage.ts) before this switch; the case only completes it.
+    case "noneDiscarded":
+      return false;
     case "hideFailed":
       return state.hideFailures.some(
         (failure) =>

@@ -216,7 +216,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const threat = seatThreat(state, asking);
     if (printed.engagementCost == null || modifiedStat(state, instance, "engagementCost", ctx.cards) <= threat) return false;
   }
-  if (spec.intoPlay && (uniqueBlocked(state, printed, ctx.cards) || playBlocked(state, id, asking, ctx))) return false;
+  if (spec.intoPlay && (uniqueBlocked(state, printed, ctx.cards) || playBlocked(state, id, asking, ctx, true))) return false;
   if (spec.costIsX && at.x != null && printed.cost !== at.x) return false;
   if (spec.maxCost != null && (printed.cost == null || printed.cost > spec.maxCost)) return false;
   if (spec.minCost != null && (printed.cost == null || printed.cost < spec.minCost)) return false;

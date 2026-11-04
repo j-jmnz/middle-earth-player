@@ -7,7 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { captureRingBearer, releaseRingBearer } from "./captive.ts";
-import { assignDamage, discardEach } from "./damage.ts";
+import { assignDamage, discardEach, noneDiscarded } from "./damage.ts";
 import { assignFaceup } from "./faceup.ts";
 import { attachToActiveLocation, makeSetAsideActive, pickHighestEngagement, revealUntilThreat } from "./reveal.ts";
 import { attackFromStaging, markLocationDamage } from "./watcher.ts";
@@ -44,4 +44,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards) }, verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };
+export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards) }, condition: (state, condition) => noneDiscarded(state, condition), verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };

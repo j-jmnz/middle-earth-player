@@ -205,6 +205,11 @@ export function flagged(state: ScenarioState, id: string, stat: Modifier["stat"]
   return state.modifiers.some((modifier) => modifier.stat === stat && modifier.instanceId === id && modifier.amount > 0 && modifierActive(state, modifier));
 }
 
+// A card effect cannot ready the card: it cannot ready at all (cannotReady), or only not by card effects (cannotReadyByEffect, "characters cannot ready from card effects", 12102:A:1; the refresh phase readies it).
+export function readyBarred(state: ScenarioState, id: string): boolean {
+  return flagged(state, id, "cannotReady") || flagged(state, id, "cannotReadyByEffect");
+}
+
 // The sum of a number modifier held by one card ("collects 1 additional resource", extraResource).
 export function heldAmount(state: ScenarioState, id: string, stat: Modifier["stat"]): number {
   let total = 0;

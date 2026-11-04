@@ -69,6 +69,17 @@ export function flipElite(state: ScenarioState, instruction: Verb<"FlipElite">, 
   return queueEvent(flipped, { trigger: "flipped", seat, cardId: card.id, subject: card.id });
 }
 
+/** FlipEliteAndAttack: the Stormcaller Elite card in play with this title (its objective ally side) shows its enemy side in the staging area, faceup and without tokens, then attacks the first player (12093:A:1). */
+export function flipEliteAndAttack(state: ScenarioState, instruction: Verb<"FlipEliteAndAttack">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const card = Object.values(state.cards).find((other) => inPlay(other.zone) && isElite(printedOf(ctx.cards, other.code)) && printedOf(ctx.cards, other.code).type === "objective" && printedOf(ctx.cards, other.code).name === instruction.name);
+  const side = [...ctx.cards.values()].find((printed) => isElite(printed) && printed.type === "enemy" && printed.name === instruction.name);
+  if (!card || !side) return state;
+  const moved = moveCard(state, card.id, { zone: "staging" });
+  const flipped = updateCard(moved, card.id, { code: side.code, face: "up", damage: 0, progress: 0, resources: 0, exhausted: false, controller: null });
+  steps.push({ kind: "flip", cardId: card.id, seat: state.firstPlayer });
+  return attackFirstPlayer(flipped, { seat: state.firstPlayer, sourceId: card.id }, ctx, steps);
+}
+
 /** RemoveEncounterSet: every card of the encounter set in a deck, the discard pile or a play area (and the shadow cards it dealt) leaves the game; the cards attached to those in play are discarded. */
 export function removeEncounterSet(state: ScenarioState, instruction: Verb<"RemoveEncounterSet">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;

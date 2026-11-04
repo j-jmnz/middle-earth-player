@@ -65,9 +65,10 @@ export function locationThreatHolds(state: ScenarioState, condition: Extract<Con
   });
 }
 
-/** The `resourcesOn` amount: the resource tokens on the cards that match, added up. */
-export function resourcesOnMatching(state: ScenarioState, pick: PickSpec, scope: AmountScope, ctx: ReduceContext): number {
-  return pickCandidates(state, pick, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0);
+/** The `resourcesOn` amount: the resource tokens on the cards that match, added up, or with `most` the most on any one of them. */
+export function resourcesOnMatching(state: ScenarioState, pick: PickSpec, scope: AmountScope, ctx: ReduceContext, most = false): number {
+  const held = pickCandidates(state, pick, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => state.cards[id]?.resources ?? 0);
+  return most ? Math.max(0, ...held) : held.reduce((sum, count) => sum + count, 0);
 }
 
 /** The `side` Pick filter: the card shows that side. */

@@ -13,7 +13,7 @@ import { questPointsOf } from "../quest/quest.ts";
 import { notePlaced, progressRoom } from "../families/south/locations.ts";
 import { announceLeftPlay } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { flagged, livingSeats, updateCard } from "../core/state.ts";
+import { readyBarred, livingSeats, updateCard } from "../core/state.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
@@ -48,7 +48,7 @@ export function drawVerb(
   const trait = instruction.perHero;
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
-  return drawMany(state, target, count, steps, UNATTRIBUTED, ctx);
+  return drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom");
 }
 
 // The cards a player may pick for the verb.
@@ -87,7 +87,7 @@ export function applyTargetVerb(
   if (!id || !state.cards[id]) return state;
   switch (instruction.verb) {
     case "ReadyHero":
-      return flagged(state, id, "cannotReady") ? state : updateCard(state, id, { exhausted: false });
+      return readyBarred(state, id) ? state : updateCard(state, id, { exhausted: false });
     case "BarAttack": {
       const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
       if (!sourceId) return state;

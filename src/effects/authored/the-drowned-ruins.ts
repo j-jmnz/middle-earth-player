@@ -1,4 +1,4 @@
-import type { Condition, Effect, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { copyLine, withCopies } from "./reprint.ts";
 import { AUTHORED_EFFECTS as RAID } from "./raid-on-the-grey-havens.ts";
@@ -28,6 +28,20 @@ const ACTIVE = { kind: "sourceIn", zone: "activeLocation" } as const satisfies C
 const UNDEAD_ENEMY = { type: "enemy", control: "any", staging: true, trait: "Undead" } as const;
 // An Underwater location in the victory display.
 const UNDERWATER_IN_VICTORY = { type: "card", control: "any", from: "victory", trait: "Underwater" } as const;
+
+// "Players cannot play attachments or allies" while an Underwater location is active (12092:B:1, 12093:B:1): every player is barred from playing, whoever controls the stage; a card put into play is not played (rr.play-and-put-into-play).
+const NO_ALLIES_OR_ATTACHMENTS: Instruction[] = [
+  { verb: "CannotPlay", pick: { type: "card", control: "you", cardType: "ally" }, anyPlayer: true },
+  { verb: "CannotPlay", pick: { type: "card", control: "you", cardType: "attachment" }, anyPlayer: true },
+];
+// "If X is the active location at the end of the quest phase": the Forced effect of an Underwater side.
+const END_OF_QUEST_ACTIVE = { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, ACTIVE] } as const satisfies Condition;
+// "Then, you may flip X to its Grotto side": the first player decides.
+const MAY_FLIP_BACK: Instruction = { verb: "Choose", who: "firstPlayer", options: [{ id: "flip", instructions: [{ verb: "FlipDoubleSided" }] }, { id: "stay", instructions: [] }] };
+// The scenario's objective allies, in play under the first and the last player (they count as allies in play, not as objectives).
+const OBJECTIVE_ALLY: PickSpec = { type: "ally", control: "any", names: ["Captain Sahír", "Na'asiyah"] };
+// "Choose a card type and discard each card in your hand that is not of the chosen type": one branch for each type a card in a hand has.
+const HAND_TYPES = ["ally", "attachment", "event", "player-side-quest", "treasure"] as const;
 
 const COMMAND_AND_BLESSING = ["11201", "11202", "11203", "11204", "11205", "11206", "11207", "11208"];
 
@@ -98,6 +112,108 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     flipOnTravel("12098", "12098:A:2"),
     flipOnTravel("12099", "12099:A:1"),
     flipOnTravel("12100", "12100:A:2"),
+
+    // 12092 The Grotto, side B, and 12093 Sahír's Betrayal, side B: while an Underwater location is the active location the players cannot play attachments or allies.
+    { id: "12092:constant:1", cardCode: "12092", lines: ["12092:B:1"], timing: "constant", condition: UNDERWATER_ACTIVE, instructions: NO_ALLIES_OR_ATTACHMENTS },
+    copyLine("12092:B:1", "12093:B:1"),
+
+    // 12093 Sahír's Betrayal. When Revealed: the set aside Shrine to Morgoth becomes the active location; Captain Sahír flips to his enemy side and attacks the first player at once, then leaves the game; each player
+    // searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area; the encounter deck is shuffled.
+    {
+      id: "12093:whenRevealed:1",
+      cardCode: "12093",
+      lines: ["12093:A:1"],
+      timing: "whenRevealed",
+      instructions: [
+        { verb: "MakeSetAsideActive", code: "12094" },
+        { verb: "FlipEliteAndAttack", name: "Captain Sahír" },
+        // The attack comes first: the removal waits for its end, or it would cancel it.
+        { verb: "AfterAttack", instructions: [{ verb: "RemoveNamedFromGame", name: "Captain Sahír" }] },
+        { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", trait: "Undead", type: "enemy", to: "staging" }] },
+        { verb: "ShuffleEncounterDeck" },
+      ],
+    },
+
+    // 12095 Shrine to Morgoth (Underwater side): the same restrictions and victory as the Grotto side; Forced: at the end of the quest phase while it is the active location each player raises their threat by 5.
+    copyLine("12094:A:1", "12095:A:1"),
+    { id: "12095:forced:1", cardCode: "12095", lines: ["12095:A:2"], timing: "forced", trigger: "endOfPhase", condition: END_OF_QUEST_ACTIVE, instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RaiseThreat", amount: 5, who: "actor" }] }] },
+    copyLine("12094:A:3", "12095:A:3"),
+
+    // 12098 Undersea Grotto, Grotto side: while it is the active location the first ally the players play each round costs 1 less.
+    { id: "12098:constant:1", cardCode: "12098", lines: ["12098:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ReduceCostOf", pick: { type: "card", control: "you", cardType: "ally" }, amount: 1, firstEachRound: true, anyPlayer: true }] },
+
+    // 12099 Cursed Caverns, Grotto side: after the players explore it as the active location each player may raise their threat by 2 to draw the bottom card of their deck.
+    {
+      id: "12099:response:2",
+      cardCode: "12099",
+      lines: ["12099:A:2"],
+      timing: "response",
+      trigger: "activeExplored",
+      subject: "self",
+      instructions: [
+        {
+          verb: "ForEachPlayer",
+          order: "firstFirst",
+          instructions: [{ verb: "Choose", who: "actor", options: [{ id: "draw", instructions: [{ verb: "RaiseThreat", amount: 2, who: "actor" }, { verb: "Draw", from: "bottom" }] }, { id: "decline", instructions: [] }] }],
+        },
+      ],
+    },
+
+    // 12101 Dark Abyss (Underwater side): characters cannot attack while it is the active location. Forced: at the end of the quest phase while it is active, 1 damage to each character in play; then the first player may flip it to its Grotto side.
+    { id: "12101:constant:1", cardCode: "12101", lines: ["12101:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "cannotAttack", amount: 1, until: "whileSourceInPlay", holders: { type: "character", control: "any" } }] },
+    {
+      id: "12101:forced:1",
+      cardCode: "12101",
+      lines: ["12101:A:2"],
+      timing: "forced",
+      trigger: "endOfPhase",
+      condition: END_OF_QUEST_ACTIVE,
+      instructions: [{ verb: "Each", pick: { type: "character", control: "any" }, instructions: [{ verb: "DamageCard", amount: 1, target: "picked" }] }, MAY_FLIP_BACK],
+    },
+
+    // 12102 Twisting Hollow (Underwater side): characters cannot ready from card effects while it is the active location. Forced: at the end of the quest phase while it is active each player discards a character; then the first player may flip it.
+    { id: "12102:constant:1", cardCode: "12102", lines: ["12102:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "cannotReadyByEffect", amount: 1, until: "whileSourceInPlay", holders: { type: "character", control: "any" } }] },
+    {
+      id: "12102:forced:1",
+      cardCode: "12102",
+      lines: ["12102:A:2"],
+      timing: "forced",
+      trigger: "endOfPhase",
+      condition: END_OF_QUEST_ACTIVE,
+      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "character", control: "you" } }, { verb: "Discard", target: { kind: "picked" } }] }, MAY_FLIP_BACK],
+    },
+
+    // 12103 Sunken Temple (Underwater side): attachments are blank (except for Traits) while it is the active location. Forced: at the end of the quest phase while it is active, 1 resource is discarded from each objective ally and each hero's pool; then the first player may flip it.
+    { id: "12103:constant:1", cardCode: "12103", lines: ["12103:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", holders: { type: "attachment", control: "any" } }] },
+    {
+      id: "12103:forced:1",
+      cardCode: "12103",
+      lines: ["12103:A:2"],
+      timing: "forced",
+      trigger: "endOfPhase",
+      condition: END_OF_QUEST_ACTIVE,
+      instructions: [
+        { verb: "Each", pick: OBJECTIVE_ALLY, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }] },
+        { verb: "Each", pick: { type: "hero", control: "any" }, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }] },
+        MAY_FLIP_BACK,
+      ],
+    },
+
+    // 12106 Into the Abyss. When Revealed: each player chooses a card type and discards each card in their hand that is not of that type; with no card discarded it gains surge.
+    {
+      id: "12106:whenRevealed:1",
+      cardCode: "12106",
+      lines: ["12106:A:1"],
+      timing: "whenRevealed",
+      instructions: [
+        {
+          verb: "ForEachPlayer",
+          order: "firstFirst",
+          instructions: [{ verb: "Choose", who: "actor", options: HAND_TYPES.map((type) => ({ id: type, instructions: [{ verb: "DiscardEach", pick: { type: "card", control: "you", from: "hand", notCardType: type } }] })) }],
+        },
+        { verb: "GainSurge", when: { kind: "noneDiscarded" } },
+      ],
+    },
 
     // 12105 Powerful Undertow. When Revealed: the active location cannot be flipped this round; an Underwater active location resolves its Forced effect as if it were the end of the quest phase; with none, this card gains Doomed 3 instead.
     {

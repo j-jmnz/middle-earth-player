@@ -26,12 +26,13 @@ const searchSelector = {
 
 export const simpleVerbs = [
   // Draws `amount` cards (one by default), or that many for each Hobbit hero. `who`: the actor, the picked player, or the
-  // seat the event is about.
+  // seat the event is about. `from: "bottom"`: the cards come off the bottom of the deck, still a draw ("draw the bottom card of his deck", 12099:A:2).
   z.strictObject({
     verb: z.literal("Draw"),
     perHero: z.string().min(1).optional(),
     amount: positiveAmountSchema.optional(),
     who: z.enum(["actor", "picked", "eventSeat", "firstPlayer"]).optional(),
+    from: z.literal("bottom").optional(),
     ...when,
   }),
   verb("GainResources"),
@@ -311,6 +312,9 @@ export const simpleVerbs = [
     firstEachRound: z.boolean().optional(),
     onHost: z.enum(["self", "host"]).optional(),
     min: z.number().int().min(0).optional(),
+    // The discount is every player's, whoever controls the source, and `firstEachRound` counts the cards all the players play together: "reduce the cost of the first ally played by the players each
+    // round by 1" (12098:A:1). Without it only the source's controller gets it, counting their own plays.
+    anyPlayer: z.literal(true).optional(),
     ...when,
   }),
   // `firstEachPhase`: only the first such card played in the phase (the sidequests family: "The first non-unique card you play each planning phase").

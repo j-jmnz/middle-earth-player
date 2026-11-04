@@ -26,6 +26,9 @@ const VERBS = [
   // "Flip Captain Sahír and Na'asiyah to their objective sides, removing all tokens from them" (12040:B:1): the card in play with this title (the enemy side of a Stormcaller Elite card) turns
   // into the objective ally side, loses its tokens and joins the play area of the first or the last player (11077:A:1, 11079:A:1). It hears that it flipped over. A card out of play stays so.
   z.strictObject({ verb: z.literal("FlipElite"), name: z.string().min(1), to: z.enum(["firstPlayer", "lastPlayer"]), ...when }),
+  // "Captain Sahír flips to his enemy side (removing all tokens) and makes an immediate attack against the first player" (12093:A:1): the Stormcaller Elite card in play with this title (its objective ally side) turns to its
+  // enemy side in the staging area, faceup and without tokens, and attacks the first player now, dealt a shadow card as an attack outside the combat phase is. The effect goes on once the attack is over.
+  z.strictObject({ verb: z.literal("FlipEliteAndAttack"), name: z.string().min(1), ...when }),
   // "Search the encounter deck, discard pile and all play areas for each encounter card from the Corsair Raiders encounter set and remove each of those cards from the game" (12040:B:1): every
   // card of the set in the encounter deck, the encounter discard pile, the staging area, a player's engaged enemies, the active location and the cards attached to them leaves the game.
   z.strictObject({ verb: z.literal("RemoveEncounterSet"), set: z.string().min(1), ...when }),

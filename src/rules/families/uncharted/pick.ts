@@ -21,6 +21,7 @@ export function unchartedPickMatches(state: ScenarioState, id: string, spec: Pic
   if (!instance) return false;
   if (spec.uncharted != null && isLostIsland(instance, ctx) !== spec.uncharted) return false;
   if (spec.doubleSided != null && isDoubleSided(state, instance) !== spec.doubleSided) return false;
+  if (spec.notCardType != null && printedOf(ctx.cards, instance.code).type === spec.notCardType) return false;
   if (spec.minProgress != null && instance.progress < spec.minProgress) return false;
   return true;
 }

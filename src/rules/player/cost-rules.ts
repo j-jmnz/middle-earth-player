@@ -24,8 +24,12 @@ function fits(state: ScenarioState, cardId: string, pick: PickSpec, seat: number
 
 // The seat already played a card this round that matched (so "the first ... each round" is spent).
 // `thisPhase`: only the plays of the current phase count ("the first ... each planning phase").
-function playedMatching(state: ScenarioState, seat: number, pick: PickSpec, cardId: string, ctx: ReduceContext, thisPhase = false): boolean {
-  return (state.played ?? []).some((entry) => entry.round === state.round && (!thisPhase || (entry.phase ?? "Planning") === state.phase) && entry.seat === seat && entry.id !== cardId && state.cards[entry.id] != null && fits(state, entry.id, pick, seat, ctx));
+// `anySeat`: the plays of every seat count, each read from its own seat ("the first ally played by the players each round", 12098:A:1).
+function playedMatching(state: ScenarioState, seat: number, pick: PickSpec, cardId: string, ctx: ReduceContext, thisPhase = false, anySeat = false): boolean {
+  return (state.played ?? []).some(
+    (entry) =>
+      entry.round === state.round && (!thisPhase || (entry.phase ?? "Planning") === state.phase) && (anySeat || entry.seat === seat) && entry.id !== cardId && state.cards[entry.id] != null && fits(state, entry.id, pick, anySeat ? entry.seat : seat, ctx),
+  );
 }
 
 // The first discount of the seat the card would spend.
@@ -40,10 +44,11 @@ function rules(state: ScenarioState, verb: CostRule["verb"], cardId: string, sea
   const found: { sourceId: string; rule: CostRule }[] = [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     // A rule of a card in the victory display belongs to no player: it applies to every seat (The Storm Comes, 16013:A:2).
-    if (instruction.verb !== verb || (source.zone !== "victory" && (source.controller ?? state.firstPlayer) !== seat)) continue;
+    const anyPlayer = instruction.verb === "ReduceCostOf" && instruction.anyPlayer === true;
+    if (instruction.verb !== verb || (source.zone !== "victory" && !anyPlayer && (source.controller ?? state.firstPlayer) !== seat)) continue;
     const rule = instruction as CostRule;
     if (!fits(state, cardId, rule.pick, seat, ctx)) continue;
-    if (rule.verb !== "PaysFor" && rule.firstEachRound && playedMatching(state, seat, rule.pick, cardId, ctx)) continue;
+    if (rule.verb !== "PaysFor" && rule.firstEachRound && playedMatching(state, seat, rule.pick, cardId, ctx, false, anyPlayer)) continue;
     if (rule.verb === "IgnoreResourceMatch" && rule.firstEachPhase && playedMatching(state, seat, rule.pick, cardId, ctx, true)) continue;
     found.push({ sourceId: source.id, rule });
   }

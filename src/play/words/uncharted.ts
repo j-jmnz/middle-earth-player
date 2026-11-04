@@ -61,6 +61,11 @@ export function unchartedBranchWords(choose: Choose, optionId: string): string |
   if (placed.length === 2 && plain && island && typeof plain.amount === "number" && typeof island.amount === "number" && plain.when != null && island.when != null) {
     return `Place ${plural(plain.amount, "progress", "progress")} on a location (${island.amount} on a Lost Island)`;
   }
+  const keeps = option.instructions.find((step): step is Extract<Instruction, { verb: "DiscardEach" }> => step.verb === "DiscardEach" && step.pick.notCardType != null);
+  if (keeps?.pick.notCardType) {
+    const kind = keeps.pick.notCardType === "player-side-quest" ? "side quest" : keeps.pick.notCardType;
+    return `Keep only ${kind} cards in your hand and discard the rest`;
+  }
   const doomed = option.instructions.find((step): step is Extract<Instruction, { verb: "Doomed" }> => step.verb === "Doomed");
   if (doomed && option.instructions.some((step) => step.verb === "LookAtFacedown")) return `Raise each player's threat by ${typeof doomed.amount === "number" ? doomed.amount : "X"} to look at a Lost Island's facedown side`;
   return null;
@@ -82,6 +87,8 @@ export function unchartedWords(instruction: Instruction): string | null {
       return `add ${typeof instruction.count === "number" ? plural(instruction.count, "Lost Island", "Lost Islands") : "Lost Islands"} from the Uncharted deck to the staging area`;
     case "FlipUncharted":
       return "flip it over";
+    case "FlipDoubleSided":
+      return "flip it to its other side";
     case "LookAtFacedown":
       return "look at the facedown side of a Lost Island";
     case "ScrambleUncharted":

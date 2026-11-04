@@ -110,7 +110,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
     }
     case "Draw": {
       const amount = amountWords(instruction.amount);
-      const cards = amount === "1" ? "1 card" : `${amount} cards`;
+      const cards = instruction.from === "bottom" ? (amount === "1" ? "the bottom card of the deck" : `the bottom ${amount} cards of the deck`) : amount === "1" ? "1 card" : `${amount} cards`;
       return instruction.who === "picked" || instruction.who === "eventSeat" ? `that player draws ${cards}` : `draw ${cards}`;
     }
     case "DamageCard":
