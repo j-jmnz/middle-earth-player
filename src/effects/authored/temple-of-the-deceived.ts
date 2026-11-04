@@ -1,6 +1,7 @@
 import type { Condition, Effect, PickSpec } from "../../catalog/boundary.ts";
 
-import { flippedActive, lostIsland } from "./the-fate-of-numenor.ts";
+import { copyLine, copyLines, withCopies } from "./reprint.ts";
+import { AUTHORED_EFFECTS as NUMENOR, flippedActive } from "./the-fate-of-numenor.ts";
 
 // Records for Temple of the Deceived (Dream-chaser part 6, campaign card 11197): the quest card, the fifteen double-sided locations of the Island Map (Jagged Cliffs, Winding Caverns, Jungle Path, the Temple
 // of the Deceived side of Temple Halls and The Grotto's Entrance; Flooded Ruins, Drowned Graves and Cursed Temple are The Fate of Númenor's), Temple Guardian and Gate Key with their Campaign Expansion reprints, the
@@ -40,68 +41,68 @@ const guardianReturns: Effect["instructions"] = [{ verb: "EngageFromVictory", na
 // Gate Key (12071, and its reprint 110078): "If unattached, return Gate Key to the staging area and it gains: Action: Exhaust a hero to claim Gate Key and attach it to that hero" (the claimed flag AttachGuarded
 // sets does the return, families/objectives/claimed.ts), and the Action that looks at the facedown side of a Temple location for 3 resources from the hero it is attached to (side B of the reprint: for
 // nothing, and at a secret as well).
-const gateKey = (code: string, side: "A" | "B", lines: { claim: number; look: number }): Effect[] => {
-  const claim: Effect = {
-    id: `${code}:action:${side === "A" ? 1 : 3}`,
-    cardCode: code,
-    lines: [`${code}:${side}:${lines.claim}`],
-    timing: "action",
-    condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "canPick", pick: READY_HERO }] },
-    instructions: [{ verb: "Pick", pick: READY_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
-  };
+const gateKeyClaim = (code: string): Effect => ({
+  id: `${code}:action:1`,
+  cardCode: code,
+  lines: [`${code}:A:1`],
+  timing: "action",
+  condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "canPick", pick: READY_HERO }] },
+  instructions: [{ verb: "Pick", pick: READY_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
+});
+
+const gateKeyLook = (code: string, side: "A" | "B", line: number): Effect => {
   const holds: Condition = { kind: "all", conditions: [HERO_HOLDS_KEY, { kind: "canPick", pick: TEMPLE_FACEDOWN }] };
-  const look: Effect =
-    side === "A"
-      ? {
-          id: `${code}:action:2`,
-          cardCode: code,
-          lines: [`${code}:A:${lines.look}`],
-          timing: "action",
-          cost: [{ kind: "exhaustSelf" }, { kind: "exhaustHost" }, { kind: "resources", amount: 3, from: "host" }],
-          condition: holds,
-          instructions: [{ verb: "Pick", pick: TEMPLE_FACEDOWN }, { verb: "LookAtFacedown", target: "picked" }],
-        }
-      : {
-          id: `${code}:action:4`,
-          cardCode: code,
-          lines: [`${code}:B:${lines.look}`],
-          timing: "action",
-          cost: [{ kind: "exhaustSelf" }, { kind: "exhaustHost" }],
-          condition: HERO_HOLDS_KEY,
-          instructions: [
-            {
-              verb: "Choose",
-              who: "actor",
-              options: [
-                { id: "temple", requires: { kind: "canPick", pick: TEMPLE_FACEDOWN }, instructions: [{ verb: "Pick", pick: TEMPLE_FACEDOWN }, { verb: "LookAtFacedown", target: "picked" }] },
-                { id: "secret", requires: { kind: "canPick", pick: SECRET }, instructions: [{ verb: "Pick", pick: SECRET }, { verb: "LookAtSecret" }] },
-              ],
-            },
-          ],
-        };
-  return [claim, look];
+  return side === "A"
+    ? {
+        id: `${code}:action:2`,
+        cardCode: code,
+        lines: [`${code}:A:${line}`],
+        timing: "action",
+        cost: [{ kind: "exhaustSelf" }, { kind: "exhaustHost" }, { kind: "resources", amount: 3, from: "host" }],
+        condition: holds,
+        instructions: [{ verb: "Pick", pick: TEMPLE_FACEDOWN }, { verb: "LookAtFacedown", target: "picked" }],
+      }
+    : {
+        id: `${code}:action:4`,
+        cardCode: code,
+        lines: [`${code}:B:${line}`],
+        timing: "action",
+        cost: [{ kind: "exhaustSelf" }, { kind: "exhaustHost" }],
+        condition: HERO_HOLDS_KEY,
+        instructions: [
+          {
+            verb: "Choose",
+            who: "actor",
+            options: [
+              { id: "temple", requires: { kind: "canPick", pick: TEMPLE_FACEDOWN }, instructions: [{ verb: "Pick", pick: TEMPLE_FACEDOWN }, { verb: "LookAtFacedown", target: "picked" }] },
+              { id: "secret", requires: { kind: "canPick", pick: SECRET }, instructions: [{ verb: "Pick", pick: SECRET }, { verb: "LookAtSecret" }] },
+            ],
+          },
+        ],
+      };
 };
 
-// Temple Guardian: Threat X (side A), Immune to player card effects (a keyword), cannot be optionally engaged, and -50 engagement cost while Cursed Temple is the active location.
-const guardian = (code: string, side: "A" | "B", lines: { threat: number; optional: number; cheap: number }): Effect[] => {
-  const n = side === "A" ? 0 : 3;
-  return [
-    {
-      id: `${code}:constant:${n + 1}`,
-      cardCode: code,
-      lines: [`${code}:${side}:${lines.threat}`],
-      timing: "constant",
-      instructions: [
-        { verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay" },
-        ...(side === "B" ? ([{ verb: "ModifyStat", stat: "defense", amount: { players: true }, until: "whileSourceInPlay" }, { verb: "ModifyStat", stat: "archery", amount: { players: true }, until: "whileSourceInPlay" }] as const) : []),
-      ],
-    },
-    { id: `${code}:constant:${n + 2}`, cardCode: code, lines: [`${code}:${side}:${lines.optional}`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotBeOptionallyEngaged", amount: 1, until: "whileSourceInPlay" }] },
-    { id: `${code}:constant:${n + 3}`, cardCode: code, lines: [`${code}:${side}:${lines.cheap}`], timing: "constant", condition: CURSED_TEMPLE_ACTIVE, instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -50, until: "whileSourceInPlay" }] },
-  ];
+// Temple Guardian: Threat X, Immune to player card effects (a keyword), cannot be optionally engaged, and -50 engagement cost while Cursed Temple is the active location (side A of 12070).
+const guardian = (code: string): Effect[] => [
+  { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay" }] },
+  { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:3`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotBeOptionallyEngaged", amount: 1, until: "whileSourceInPlay" }] },
+  { id: `${code}:constant:3`, cardCode: code, lines: [`${code}:A:4`], timing: "constant", condition: CURSED_TEMPLE_ACTIVE, instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -50, until: "whileSourceInPlay" }] },
+];
+
+// The Campaign Expansion's side B adds Archery X and Defense X to the Threat X: the one line of its that no line of side A repeats.
+const guardianBack: Effect = {
+  id: "110077:constant:4",
+  cardCode: "110077",
+  lines: ["110077:B:2"],
+  timing: "constant",
+  instructions: [
+    { verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay" },
+    { verb: "ModifyStat", stat: "defense", amount: { players: true }, until: "whileSourceInPlay" },
+    { verb: "ModifyStat", stat: "archery", amount: { players: true }, until: "whileSourceInPlay" },
+  ],
 };
 
-export const AUTHORED_EFFECTS: readonly Effect[] = [
+export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 12067 Searching the Island. Setup: the Island Map is prepared, the top-left and bottom-left locations are flipped without their Forced effects and the first player chooses one as the starting active location,
   // Captain Sahír and Na'asiyah (objective ally sides) come into play (the first and the last player control them), Gate Key is attached to Temple Guardian, guarded, and the encounter deck is shuffled. Side B:
   // Exploration (the table holds it; the engine reads it where a location is explored, the players travel and the locations stand in the staging area), and each progress that would be placed on the stage
@@ -157,29 +158,34 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   ...templeSide("12069"),
 
   // 12070 Temple Guardian (Immune to player card effects is a keyword), and the Campaign Expansion's 110077, whose side B is Campaign Mode only (dcce.campaign-mode): Archery X, Threat X and Defense X.
-  ...guardian("12070", "A", { threat: 1, optional: 3, cheap: 4 }),
-  ...guardian("110077", "A", { threat: 1, optional: 3, cheap: 4 }),
-  ...guardian("110077", "B", { threat: 2, optional: 4, cheap: 5 }),
+  ...guardian("12070"),
+  copyLines("12070", "110077", "A:1", "A:3", "A:4"),
+  guardianBack,
+  copyLine("12070:A:3", "110077:B:4"),
+  copyLine("12070:A:4", "110077:B:5"),
 
   // 12071 Gate Key, and the reprint 110078 on both sides.
-  ...gateKey("12071", "A", { claim: 1, look: 2 }),
-  ...gateKey("110078", "A", { claim: 1, look: 2 }),
-  ...gateKey("110078", "B", { claim: 2, look: 3 }),
+  gateKeyClaim("12071"),
+  gateKeyLook("12071", "A", 2),
+  copyLine("12071:A:1", "110078:A:1"),
+  gateKeyLook("110078", "A", 2),
+  copyLine("12071:A:1", "110078:B:2"),
+  gateKeyLook("110078", "B", 3),
 
   // 12072 Jagged Cliffs. While active the location to its right is not in the staging area. Forced: once flipped over while active, look at the facedown side of each adjacent copy of Lost Island.
   { id: "12072:constant:1", cardCode: "12072", lines: ["12072:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "islandBlock", amount: 1, until: "whileSourceInPlay" }] },
   flippedActive("12072", "12072:A:2", 1, [{ verb: "Each", pick: LOST_ISLAND_NEXT, instructions: [{ verb: "LookAtFacedown", target: "picked" }] }]),
-  ...lostIsland("12072", { constant: 2, forced: 2 }),
+  copyLines("11027", "12072", "B:2", "B:3", "B:4"),
 
   // 12073 Winding Caverns. While active each enemy gets +10 engagement cost, and the players may travel up to 3 locations away.
   { id: "12073:constant:1", cardCode: "12073", lines: ["12073:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: 10, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true } }] },
   { id: "12073:constant:2", cardCode: "12073", lines: ["12073:A:2"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "islandReach", amount: 3, until: "whileSourceInPlay" }] },
-  ...lostIsland("12073", { constant: 3, forced: 1 }),
+  copyLines("11027", "12073", "B:2", "B:3", "B:4"),
 
   // 12074 Jungle Path. While active the locations above and below it are not in the staging area. Forced: once flipped over while active, each player exhausts a character with at least 2 Attack.
   { id: "12074:constant:1", cardCode: "12074", lines: ["12074:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "islandBlock", amount: 2, until: "whileSourceInPlay" }] },
   flippedActive("12074", "12074:A:2", 1, [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { ...READY_CHARACTER, minAttack: 2 } }, { verb: "Exhaust", target: { kind: "picked" } }] }]),
-  ...lostIsland("12074", { constant: 2, forced: 2 }),
+  copyLines("11027", "12074", "B:2", "B:3", "B:4"),
 
   // 12075 Faithless Desecrator. While engaged with a player it contributes its Threat to the staging area. Shadow: the attacking enemy gets +1 Attack, +2 instead if the active location is a Ruins location.
   { id: "12075:constant:1", cardCode: "12075", lines: ["12075:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "engaged" }, instructions: [{ verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "whileSourceInPlay" }] },
@@ -365,6 +371,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "resolution",
     instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }],
   },
-];
+], { pool: NUMENOR });
 
 export const AUTHORED_REPLACES: readonly string[] = [];

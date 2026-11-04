@@ -1,6 +1,7 @@
 import type { Condition, Effect, Limit } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import { selfNamed as selfNamedBy } from "../../../src/catalog/self-named.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
 import { productOf, scenarioDefs } from "../campaign-defs.ts";
@@ -35,7 +36,7 @@ export function boxOwners(campaigns: readonly CampaignData[], scenarios: readonl
 // A line as the templates read it: keywords stripped, the card's own name as {self}, numbers kept. Two lines with the same
 // result are the same sentence on different cards.
 export function selfNamed(card: Card, line: string): string {
-  return stripKeywords(line).replaceAll(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "{self}");
+  return selfNamedBy(card.name, line);
 }
 
 export type Generated = {

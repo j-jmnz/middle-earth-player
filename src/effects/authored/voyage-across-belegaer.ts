@@ -1,5 +1,7 @@
 import type { Effect, PickSpec } from "../../catalog/boundary.ts";
 
+import { copyLine, withCopies } from "./reprint.ts";
+
 // Records for Voyage Across Belegaer (Dream-chaser part 1, campaign card 11171): the six quest stages, the Voyage, Vast Oceans, Stormy Weather, Umbar Fleet and
 // Corsair Pirates encounter cards no template or earlier record reads, the six ship-objectives of The Dream-chaser's Fleet on both sides, and the campaign card. The
 // Modification boons it fits and the burdens it shuffles in are in pool/DCCE.ts. Every line is read from the scan ledger (data/printed/dream-chaser.json).
@@ -83,7 +85,7 @@ const oddCostResource = (code: string, line: string, limit: "oncePerRound" | "tw
   instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "AddResources", amount: 1, to: "picked" }],
 });
 
-export const AUTHORED_EFFECTS: readonly Effect[] = [
+export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 11016 Departure from the Havens. Setup: the Corsair deck is prepared, each player takes a ship, the four stage 2 cards are put in a random order above stage 3,
   // and the encounter deck is shuffled. Rolling Seas and Scouting Ship are added to the staging area by the scenario's staging pile (data/scenarios), as the
   // Setup's search finds them. On-course (Sun) each Ship objective gets +2 Willpower.
@@ -324,9 +326,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 11080 Dream-chaser (the Sailing line is in authored/families/sea.ts).
   eliminated("11080", "11080:A:4", 2, true),
   // 110136 Dream-chaser: A:3 is in authored/families/sea.ts; the Upgraded side can be committed to any Sailing test and counts as 3 characters.
-  eliminated("110136", "110136:A:4", 2, true),
+  copyLine("11080:A:4", "110136:A:4"),
   { id: "110136:constant:2", cardCode: "110136", lines: ["110136:B:4"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "sailsAnyTest", amount: 1, until: "whileSourceInPlay" }, { verb: "ModifyStat", stat: "sailingExtra", amount: 2, until: "whileSourceInPlay" }] },
-  eliminated("110136", "110136:B:5", 3, true),
+  copyLine("11080:A:4", "110136:B:5"),
 
   // 11081 Dawn Star, and 110137 with its Upgraded side (which drops the starting threat line).
   startingThreat("11081", "11081:A:3", 1, true, 3),
@@ -334,15 +336,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   eliminated("11081", "11081:A:5", 3),
   startingThreat("110137", "110137:A:3", 1, true, 3),
   extraCard("110137", "110137:A:4"),
-  eliminated("110137", "110137:A:5", 3),
+  copyLine("11081:A:5", "110137:A:5"),
   { id: "110137:constant:3", cardCode: "110137", lines: ["110137:B:4"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "extraDraw", amount: 1, until: "whileSourceInPlay", target: "actorSeat" }] },
-  eliminated("110137", "110137:B:5", 4),
+  copyLine("11081:A:5", "110137:B:5"),
 
   // 110138 Duskbringer (new in the Campaign Expansion).
   oddCostResource("110138", "110138:A:3", "oncePerRound"),
   eliminated("110138", "110138:A:4", 2),
   { ...oddCostResource("110138", "110138:B:4", "twicePerRound"), id: "110138:response:2" },
-  eliminated("110138", "110138:B:5", 3),
+  copyLine("110138:A:4", "110138:B:5"),
 
   // 110139 Glórinaith (new): discard the top cards of any deck to deal damage to a non-unique enemy; the Upgraded side names a card first.
   {
@@ -370,15 +372,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "DamageCard", amount: 2, target: "picked", when: { kind: "x", min: 1 } },
     ],
   },
-  eliminated("110139", "110139:B:6", 3),
+  copyLine("110139:A:5", "110139:B:6"),
 
   // 11082 Nárelenya, and 110140 with its Upgraded side (the first card, not only the first ally).
   firstCheaper("11082", "11082:A:3", "ally"),
   eliminated("11082", "11082:A:4", 3),
   firstCheaper("110140", "110140:A:3", "ally"),
-  eliminated("110140", "110140:A:4", 3),
+  copyLine("11082:A:4", "110140:A:4"),
   { ...firstCheaper("110140", "110140:B:4"), id: "110140:constant:3" },
-  eliminated("110140", "110140:B:5", 4),
+  copyLine("11082:A:4", "110140:B:5"),
 
   // 11083 Silver Wing, and 110141 with its Upgraded side (the starting threat falls by 6).
   startingThreat("11083", "11083:A:4", 1, false, 3),
@@ -386,10 +388,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   eliminated("11083", "11083:A:6", 3),
   startingThreat("110141", "110141:A:4", 1, false, 3),
   heroesAttack("110141", "110141:A:5"),
-  eliminated("110141", "110141:A:6", 3),
+  copyLine("11083:A:6", "110141:A:6"),
   startingThreat("110141", "110141:B:5", 2, false, 6),
   { ...heroesAttack("110141", "110141:B:6"), id: "110141:constant:3" },
-  eliminated("110141", "110141:B:7", 4),
+  copyLine("11083:A:6", "110141:B:7"),
 
   // 11171 Voyage Across Belegaer (campaign card). Setup (Campaign Mode): the four Modification boons are set aside and the ships are fitted once the fleet is prepared
   // (rules/families/sea/campaign.ts, ScenarioDefinition.afterSetup); a player may trade 2 damage on a ship for a resource; Ominous Fate and Thunderstruck are shuffled into the
@@ -426,6 +428,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "11171:resolution:7", cardCode: "11171", lines: ["11171:B:8"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11178"] }, max: 1 }] },
   { id: "11171:resolution:8", cardCode: "11171", lines: ["11171:B:9"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 2, each: { kind: "inVictory", codes: ["11177"] }, max: 2 }] },
   { id: "11171:resolution:9", cardCode: "11171", lines: ["11171:B:10"], timing: "resolution", instructions: [{ verb: "GainXp", amount: -1, when: { kind: "count", pick: { type: "card", control: "any", from: "victory", names: ["Ominous Fate"] }, min: 1 } }] },
-];
+]);
 
 export const AUTHORED_REPLACES: readonly string[] = [];
