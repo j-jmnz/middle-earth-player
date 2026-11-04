@@ -3,11 +3,12 @@
 // them. src/campaign/start.ts and checklist.ts deal the Setup ones; src/rules/families/campaign/index.ts and resolution.ts run the rest.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
 const code = z.string().min(1);
 
-export const VERBS = [
+const VERBS = [
   // Campaign Setup: the objective ally enters play under the first player ("Put Mendor into play", 01129:A:2). It is put there, not
   // played: nothing is revealed and no cost is paid. A pool card with this record for itself is put into play at the start of each
   // scenario instead of being shuffled into the encounter deck (Campaign Setup Checklist step 8).
@@ -45,5 +46,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("PlaceToken"), amount: z.number().int().positive().optional(), ...when }),
 ] as const;
 
-export const TRIGGERS = [] as const;
-export const FLAGS = [] as const;
+const TRIGGERS = [] as const;
+const FLAGS = [] as const;
+
+export const manifest = { name: "campaign", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

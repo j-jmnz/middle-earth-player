@@ -1,3 +1,4 @@
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -57,3 +58,5 @@ function eliminate(state: ScenarioState, seatIndex: number, steps: EngineStep[])
   const next = withSeat(state, seatIndex, { ...seat, eliminated: true });
   return livingSeats(next).length === 0 && !next.lost ? { ...next, lost: true, lossReason: "No seats remain" } : next;
 }
+
+export const manifest: RulesFamily = { name: "sidequests", verbs: ["EliminatePlayer", "AttachSelf", "ShuffleSetAsideIntoEncounterDeck", "FlipCard", "BuildLootDeck", "AttachLoot", "TakeRevealedCard", "RemoveFromCampaignPool"], run };

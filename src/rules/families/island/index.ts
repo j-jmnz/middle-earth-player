@@ -1,5 +1,6 @@
 // Rules: dcce.island-map, dcce.exploration (data/rules/entries.json). The verbs src/catalog/families/island.ts adds. The map itself is island/map.ts, traveling on it island/travel.ts, the Gate Key,
 // the secrets and the Temple Guardian island/cards.ts, and what a pick or an amount reads of the map island/pick.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -38,3 +39,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "island", verbs: ["PrepareIslandMap", "RevealIslandCorners", "SetIslandActive", "AttachGuarded", "PlaceSecrets", "FlipSecret", "LookAtSecret", "EngageFromVictory", "PlaceProgressInStaging", "ShuffleIntoPlayerDeck", "RaiseThreatToAttach"], run };

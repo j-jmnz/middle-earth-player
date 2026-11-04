@@ -4,10 +4,11 @@
 // rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Prepare the Stormcaller's area" (12012:A:1, dcce.stormcallers-area). The quest cards with these codes (set aside, stages 2C, 3C and 4C) become the Stormcaller's quest deck in this order,
   // the top one is the Stormcaller's current quest stage, side D up (the Setup of a stage does not reveal it), and the set-aside Stormcaller is placed beside it, in the area.
   // `number` is the stage number of the first of them (2).
@@ -28,7 +29,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("CatchUpWins"), stage: z.number().int().positive(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About the Stormcaller's quest stage: it was full and the Stormcaller advanced to the next stage ("Forced: When the Stormcaller advances to the next quest stage", 12024:A:1). The event names the
   // Stormcaller as its subject; it is announced once the new stage's C side has been revealed.
   "stormcallerAdvanced",
@@ -43,8 +44,10 @@ export const TRIGGERS = [
   "discardedFromEncounterDeck",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a card in the Stormcaller's area: it contributes its Threat to the progress the Stormcaller places on its quest stage each round ("While Sahír's Escort is in the Stormcaller's area",
   // 12020:A:3). A number: more than 0 holds.
   "stormcallerThreat",
 ] as const;
+
+export const manifest = { name: "stormcaller", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -1,5 +1,6 @@
 // Rules: rr.attacks-outside-the-combat-phase, rr.step-6-8b, rr.step-6-8-3, rr.active-location, rr.quest-advancement,
 // faq.limitations-on-attacks (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import { announceEnemyAttacked } from "../aflame/attack.ts";
 import type { CardRef, Instruction } from "../../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -88,3 +89,5 @@ export function openStrike(state: ScenarioState, seat: number, enemyId: string, 
   // 6.8.1: an action window comes before its strength; the Responses to the declaration resolve first either way.
   return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next, ctx) ?? continueStrike(next, ctx, steps);
 }
+
+export const manifest: RulesFamily = { name: "attack", verbs: ["DeclareAttack", "OfferAttacks", "QuestProgress", "ExcessDamageTo"], run };

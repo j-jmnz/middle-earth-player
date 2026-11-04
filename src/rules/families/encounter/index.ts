@@ -1,5 +1,6 @@
 // Rules: rr.encounter-deck, rr.reveal, rr.staging, rr.step-3-3, rr.search, rr.lasting-effects, rr.active-location,
 // rr.travel, rr.cancel (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
@@ -111,3 +112,5 @@ function shielded(state: ScenarioState, id: string, sourceId: string | null, ctx
 export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, "instanceId" | "sourceId">, focus: Focus): ScenarioState {
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }
+
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "SearchCollection", "ShuffleEncounterDiscard", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand"], run };

@@ -1,5 +1,6 @@
 // Rules: dcce.grapple, dcce.stormcaller-and-the-thing, dcce.stormcaller-elite, dcce.campaign-mode (data/rules/entries.json). The verbs src/catalog/families/grapple.ts adds. Attaching an enemy to a location
 // is in grapple/attach.ts, the cards the verbs move in grapple/cards.ts, what a record reads in grapple/values.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -40,3 +41,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "grapple", verbs: ["ResolveGrapple", "DiscardTopGrapple", "DiscardUntilGrapple", "FlipSetAside", "FlipElite", "RemoveEncounterSet", "ShuffleSetAsideSet", "AddResourcesSetAside", "AddSetAsideToHand", "GainChosenTrait", "EngageOrGrapple", "AttackFirstPlayer", "RemoveCodeFromGame"], run };

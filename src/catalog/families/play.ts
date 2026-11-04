@@ -2,6 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
@@ -16,7 +17,7 @@ const temporary = {
 // answered event was about, or the source's host.
 const card = z.enum(["self", "picked", "subject", "host"]);
 
-export const VERBS = [
+const VERBS = [
   // Puts the card (the source by default) into play from wherever it is out of play (hand, discard pile, deck): it is not
   // played, so no cost is paid and no play restriction applies (rr.play-and-put-into-play), and a unique card with a copy in
   // play stays where it is. A hero goes among its controller's heroes, any other card into the play area, ready unless
@@ -97,7 +98,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("DiscardSameTitle"), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a player card in play that a card effect or cost discarded to its owner's discard pile. A card destroyed by damage
   // was not discarded (rr.destroy).
   "discardedFromPlay",
@@ -113,4 +114,6 @@ export const TRIGGERS = [
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's
 // heroes while it holds the flag. `threatCeiling` (on "seat:N"): while the seat's threat is higher than the amount, it is
 // treated as the amount ("treat your threat as if it is 20"); the dial does not move.
-export const FLAGS = ["heroType", "threatCeiling"] as const;
+const FLAGS = ["heroType", "threatCeiling"] as const;
+
+export const manifest = { name: "play", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

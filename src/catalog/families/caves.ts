@@ -2,9 +2,10 @@
 // effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/caves/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // The cards LookAtTop showed that are still on top of the encounter deck, except the picked one, go to the bottom of the deck in the order they
   // were in ("Players must choose 1 of those to reveal and add to the staging area, moving the other 2 to the bottom of the deck", 41034:A:2).
   // The picked card is then the top card, and the RevealEncounter after it reveals it.
@@ -18,9 +19,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("SetAsideInPlay"), code: z.string().min(1), ...when }),
 ] as const;
 
-export const TRIGGERS = [] as const;
+const TRIGGERS = [] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On "table", while an enemy's engagement cost is read during the encounter phase it is 0 ("During the encounter phase, treat each enemy's
   // engagement cost as if it were 0", 41005:B:1): modifiedStat answers 0 for `engagementCost` then.
   "engagementCostZero",
@@ -46,3 +47,5 @@ export const FLAGS = [
   // with him (41028:A:1). Its Defense for the attack comes from a ModifyStat record (rules/combat/combat.ts canAttack).
   "attackableAsEngaged",
 ] as const;
+
+export const manifest = { name: "caves", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

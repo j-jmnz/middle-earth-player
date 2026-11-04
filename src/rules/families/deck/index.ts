@@ -1,5 +1,6 @@
 // Rules: rr.in-play-and-out-of-play, rr.search, rr.play-and-put-into-play, rr.ownership-and-control, rr.doomed-x,
 // rr.mulligan (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -41,3 +42,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost"], run };

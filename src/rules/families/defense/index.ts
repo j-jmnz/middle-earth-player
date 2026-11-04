@@ -1,5 +1,6 @@
 // Rules: rr.step-6-4-1, rr.step-6-4-3, rr.multiple-defenders, rr.cancel, rr.damage, rr.shadow-effects, rr.lasting-effects
 // (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { CardRef, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -123,3 +124,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "defense", verbs: ["ChooseAmount", "SpendFromPool", "RedirectDamage", "PreventAttacks", "DiscardShadowOf", "DealShadowTo", "LookAtShadow", "ShadowAttacks", "StartShadowAttack", "StrikeBack", "AddDefender", "EndDeclaring", "CancelAttack", "AssignAttackDamage", "ReadyUnharmed", "ReadyAfterAttack", "RedirectAttack", "ModifyStatVersus"], run };

@@ -1,4 +1,5 @@
 // Rules: rr.damage, rr.hit-points, rr.first-player (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -92,3 +93,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
+export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "HealQuietly", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AttachAsMount", "LoseGame", "DiscardCanceled"], run };

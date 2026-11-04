@@ -4,9 +4,10 @@
 // them. src/rules/families/prisoner/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // 01123:B:1: one hero of all the heroes the players control is selected at random with the game's seed and turned facedown. It and each
   // card attached to it become the "prisoner": facedown, blank, still in play but controlled by nobody, so nothing can use or damage them,
   // and the hero collects no resources. `prisonerTaken` is announced about the hero.
@@ -26,10 +27,12 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("FreeCaptive"), code: z.string().min(1), damage: z.number().int().min(0), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About the hero that was just taken prisoner (01131:A:3), and about the hero just rescued (01102:A:2, which a card out of play hears).
   "prisonerTaken",
   "prisonerRescued",
 ] as const;
 
-export const FLAGS = [] as const;
+const FLAGS = [] as const;
+
+export const manifest = { name: "prisoner", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -2,11 +2,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/defense/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { sphereSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // The actor chooses a number from 1 to the smallest of these amounts (read now): it becomes the effect's X ("Cancel X damage
   // just dealt", "Spend X resources ... to cancel X damage"). One possible number is taken without asking; none leaves X at 0.
   z.strictObject({ verb: z.literal("ChooseAmount"), upTo: z.array(amountSchema).min(1), ...when }),
@@ -82,7 +83,7 @@ export const VERBS = [
   }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About an enemy: its attack against a player (the event's seat) has begun, before defenders are declared ("After an enemy
   // is declared as an attacker against you", "When an enemy attacks a player").
   "enemyAttacks",
@@ -105,7 +106,7 @@ export const TRIGGERS = [
   "characterDestroyedByAttack",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // Damage assigned to the holder goes to the host of the modifier's source instead ("attached hero takes all damage assigned
   // to the chosen hero").
   "damageToSourceHost",
@@ -129,3 +130,5 @@ export const FLAGS = [
   // increase to its controller's threat (Hill Troll, 01082:A:1). The damage still goes on the character.
   "excessToThreat",
 ] as const;
+
+export const manifest = { name: "defense", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

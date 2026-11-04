@@ -1,4 +1,5 @@
 // Rules: mec109.burden-deck, mec109.ringbearers-life, rr.burdens (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -42,3 +43,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "burden", verbs: ["SetLife", "ReduceLife", "ShuffleBurdenDeck", "RevealBurden", "MoveBurden", "AttachSelfToRingBearer", "ImmediateAttackEach", "PassFirstPlayer", "EndQuestPhase", "SetStatUntil", "RemoveAllQuestProgress"], run };

@@ -38,11 +38,11 @@ cards have no file under `src/effects/authored/families/`.
 
 ## Files you own (edit freely)
 
-- `src/catalog/families/<F>.ts`: `VERBS` (zod `z.strictObject({ verb: z.literal("..."), ..., ...when })`, `when` from
-  `../effect-schema-conditions.ts`), `TRIGGERS` (event names), `FLAGS` (stat flags `ModifyStat` can set). Keep the
-  `as const`. They are spread into the verb union, the trigger enum and the stat enum. Every verb carries a comment saying
+- `src/catalog/families/<F>.ts`: one `manifest` with `verbs` (zod `z.strictObject({ verb: z.literal("..."), ..., ...when })`, `when` from
+  `../effect-schema-conditions.ts`), `triggers` (event names) and `flags` (stat flags `ModifyStat` can set). Keep the
+  `as const`. The index builds the verb union, the trigger enum and the stat enum from the manifests. Every verb carries a comment saying
   what the engine does with it.
-- `src/rules/families/<F>/index.ts`: `run()` resolves your verbs (`runFamilyVerb` in `src/rules/families/index.ts` asks the
+- `src/rules/families/<F>/index.ts`: a `manifest` with the `verbs` your `run()` answers and `run` (`runFamilyVerb` in `src/rules/families/index.ts` asks the
   families in turn; return null for verbs that are not yours). Engine behavior goes in `src/rules/families/<F>/index.ts` and helper
   modules beside it in `src/rules/families/<F>/`.
 - `src/rules/families/<F>/index.test.ts` (and more test files if needed): vitest tests for each engine behavior you add, naming
@@ -50,9 +50,9 @@ cards have no file under `src/effects/authored/families/`.
   show a compact table setup.
 - Your records: `src/effects/authored/families/<F>.ts` (`RECORDS`, `REPLACES`) for a family, or
   `src/effects/authored/<scenario-id>.ts` (`AUTHORED_EFFECTS`, `AUTHORED_REPLACES`) for a scenario.
-- A new family is wired in at three places, each one line: `src/catalog/families/index.ts`, `src/rules/families/index.ts`
-  (its `RUNNERS`) and `src/effects/authored/families/index.ts` (when it has records there). `src/catalog/families/families.test.ts`
-  fails if two families add the same trigger or flag. A scenario's file `src/effects/authored/<scenario-id>.ts` is picked up by
+- A new family is wired in at three places, each one line: `src/catalog/families/index.ts` (`CATALOG_FAMILIES`), `src/rules/families/index.ts`
+  (`RULES_FAMILIES`) and `src/effects/authored/families/index.ts` (when it has records there). `src/catalog/families/families.test.ts`
+  fails if two families add the same trigger or flag; `src/rules/interpret/family-manifest.test.ts` fails if a declared verb has no runner or a runner answers an undeclared one. A scenario's file `src/effects/authored/<scenario-id>.ts` is picked up by
   `pnpm data:build`, which writes the barrel `src/effects/generated/authored.ts` (`scripts/data/effects/barrel.ts`); the coverage test fails while it is stale.
 
 ## Shared files

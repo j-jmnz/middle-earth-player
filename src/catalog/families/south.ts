@@ -3,11 +3,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/south/ runs them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // The set-aside card with this code becomes the active location (not traveling: no Travel effect, nothing hears "traveled").
   // A location already active goes back to the staging area, unless a second active location slot is free (ExtraActiveLocation).
   z.strictObject({ verb: z.literal("MakeSetAsideActive"), code: z.string().min(1), ...when }),
@@ -56,9 +57,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("AttachToActiveLocation"), ...when }),
 ] as const;
 
-export const TRIGGERS = [] as const;
+const TRIGGERS = [] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On "table" (target table, while the source is in play): there can be 2 active locations (mec109.stage-4). Traveling then fills the free
   // slot (142023:B:1).
   "extraActiveLocation",
@@ -80,3 +81,5 @@ export const FLAGS = [
   "progressCap",
   "progressPlaced",
 ] as const;
+
+export const manifest = { name: "south", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

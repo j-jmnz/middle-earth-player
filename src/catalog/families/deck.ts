@@ -6,6 +6,7 @@
 // is an Each with `upTo` (effect-schema.ts).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
@@ -13,7 +14,7 @@ import { pickSchema } from "../effect-schema-pick.ts";
 // Where a player card may be when MoveCard moves it.
 const zone = z.enum(["hand", "play", "discard", "deck"]);
 
-export const VERBS = [
+const VERBS = [
   // Moves a player card (the picked card, or `card`) to its owner's hand, to the top or bottom of its owner's deck, shuffles it
   // into that deck, puts it in its owner's discard pile, or removes it from the game. With `from`, only a card that is in one
   // of those zones moves ("move that ally from the discard pile", "if the chosen card is in that player's hand or in play").
@@ -72,7 +73,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ReducePlayCost"), amount: z.number().int().positive(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About the seat: its opening hand was just drawn at setup. A Response here is offered in the mulligan window, in place of
   // the mulligan (Galdor of the Havens, 11002).
   "setupHandDrawn",
@@ -81,7 +82,7 @@ export const TRIGGERS = [
   "paying",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // Held by the table until the end of the phase: each ally that leaves play goes to its owner's hand instead of the discard
   // pile (Rallying Cry, 10003).
   "alliesToHand",
@@ -91,3 +92,5 @@ export const FLAGS = [
   // cannot draw cards", 01095:A:1). drawOne (rules/interpret/interpret.ts) reads it, so every draw is stopped, a resource phase draw included.
   "cannotDraw",
 ] as const;
+
+export const manifest = { name: "deck", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

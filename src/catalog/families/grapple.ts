@@ -4,10 +4,11 @@
 // data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // "Immediately attach that enemy facedown to the location in the staging area specified in parentheses" (dcce.grapple): the source enemy (or the last picked card) with the Grapple keyword
   // attaches to the staging-area location the keyword names, the first player choosing among those tied; with no location in the staging area it is added to the staging area. Resolved by a
   // revealed enemy as it is revealed, and by "resolve the Grapple keyword" (12053:A:3, 12054:A:3). `card` is engine use: the enemy to resolve for (a card the effect discarded).
@@ -47,13 +48,13 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RemoveCodeFromGame"), code: z.string().min(1), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About an enemy: it was detached from a location it was grappled with and added to the staging area, because the location became the active location or was explored ("After Crushing Arm is
   // detached from a location", 12052:A:3). The event names the enemy as its subject.
   "grappleDetached",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a card: it counts as indestructible while the record holds ("Captain Sahír and Na'asiyah gain indestructible", 12039:B:1).
   "indestructible",
   // On a character: it has the Trait named by the modifier's `trait` (GainChosenTrait).
@@ -67,3 +68,5 @@ export const FLAGS = [
   // On a location: each player must exhaust a character they control to travel there ("each other Deck location in play gains: Travel: Each player must exhaust a character he controls", 12044:A:1).
   "travelExhaust",
 ] as const;
+
+export const manifest = { name: "grapple", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

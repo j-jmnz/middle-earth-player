@@ -2,6 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
@@ -18,7 +19,7 @@ export const deckRuleSchema = z.discriminatedUnion("kind", [
 ]);
 export type DeckRule = z.infer<typeof deckRuleSchema>;
 
-export const VERBS = [
+const VERBS = [
   // Constant on a card that goes to the victory display ("Limit 3 copies of ~ in the victory display"): the display holds at
   // most `copies` of its title. A copy that would be added beyond that goes to its owner's discard pile instead
   // (src/rules/families/sidequests/victory.ts).
@@ -64,7 +65,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("DeckRule"), rule: deckRuleSchema, ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a side quest: its progress reached its quest points and it was defeated. A player side quest in the victory display or
   // its owner's discard pile hears it ("Response: When this stage is defeated, ...").
   "questDefeated",
@@ -72,7 +73,7 @@ export const TRIGGERS = [
   "flipped",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a seat: its threat cannot be reduced by player card effects (1), or by those of cards that are not contracts (2).
   "noThreatReduction",
   // Held by a seat until the end of the round: the option of Council of the Wise (22091:A:2) already taken this round.
@@ -81,3 +82,4 @@ export const FLAGS = [
   "councilResource",
 ] as const;
 
+export const manifest = { name: "sidequests", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

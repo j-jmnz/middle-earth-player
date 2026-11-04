@@ -1,3 +1,4 @@
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -40,3 +41,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "costs", verbs: ["ReduceNextCost", "ChooseX", "SetX", "DiscardResources", "SpendResources", "HeroesGainResources", "Reattach", "PlayFromHand", "PayToPlay", "PaysAsIcons", "PaidByIcons", "CannotPayFor", "ThreatCost", "PlayCost", "ExhaustToReduce"], run };

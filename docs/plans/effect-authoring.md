@@ -241,21 +241,24 @@ progress gates and caps; The Ring Goes South) and moria (damage tokens counting 
 first player from the staging area, a hero given up for damage, burden objectives that attach to a hero; Journey in the Dark) and breaking (the Ring-bearer removed from the game, the staging area, quest stage and active location each seat has from stage 2B, progress that discards cards, a hero that falls into evil, skipped phases; Breaking of the Fellowship). Whoever takes a family adds the engine support and writes the records. A
 family owns files that are composed by the `index.ts` next to them, so families do not edit the same lists:
 
-- `src/catalog/families/<family>.ts` exports `VERBS` (zod `strictObject`s with `...when` from `effect-schema-conditions.ts`, each
-  with a comment saying what the engine does), `TRIGGERS` (event names) and `FLAGS` (stat flags `ModifyStat` can set).
-  `families/index.ts` spreads them into `FAMILY_VERBS`, `FAMILY_TRIGGERS` and `FAMILY_FLAGS`, which join the verb union,
-  the trigger enum and the stat enum. `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb
-  or condition kind fails when the schema loads. A new pick filter, condition kind or amount field goes in the shared
-  `effect-schema-*.ts` file, with a comment naming the family file that reads it.
-- `src/rules/families/<family>/index.ts` exports `run`, which resolves the family's verbs and returns `null` for any other.
-  `src/rules/families/index.ts` lists the runners; `interpret.ts` asks the families before the player verbs and the core
-  switch. Bigger families split into part files in the family's folder (`<family>/<part>.ts`). Tests go next to them (`<family>/index.test.ts`) and name the
-  rule ids they implement.
+- `src/catalog/families/<family>.ts` exports one `manifest` (`src/catalog/family-manifest.ts`): its `name`, `verbs` (zod `strictObject`s with
+  `...when` from `effect-schema-conditions.ts`, each with a comment saying what the engine does), `triggers` (event names) and `flags`
+  (stat flags `ModifyStat` can set). `families/index.ts` lists the manifests in `CATALOG_FAMILIES`, in the order written there, and builds
+  `FAMILY_VERBS`, `FAMILY_TRIGGERS` and `FAMILY_FLAGS` from it; they join the verb union, the trigger enum and the stat enum.
+  `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb or condition kind fails when the schema loads. A
+  new pick filter, condition kind or amount field goes in the shared `effect-schema-*.ts` file, with a comment naming the family file that reads it.
+- `src/rules/families/<family>/index.ts` exports one `manifest` (`src/rules/interpret/family-manifest.ts`): its `name`, the `verbs` its `run`
+  answers and `run`, which resolves them and returns `null` for any other. `src/rules/families/index.ts` lists the manifests in
+  `RULES_FAMILIES`, in play order (where two runners could answer, the first does); `interpret.ts` asks the families before the player verbs and
+  the core switch. `src/rules/interpret/family-manifest.test.ts` fails when a declared verb has no runner, when a runner answers a verb no family
+  declares, or when a manifest lists a verb its `run` returns `null` for. A declared verb that no runner executes (a constant's marker read from the
+  effect records) or a runner verb the core schema declares goes in that test's two lists, with the file that handles it. Bigger families split into
+  part files in the family's folder (`<family>/<part>.ts`). Tests go next to them (`<family>/index.test.ts`) and name the rule ids they implement.
 - `src/effects/authored/families/<family>.ts` exports `RECORDS` and `REPLACES`, composed by that folder's `index.ts` (burden and
   south and moria have none: their records are in the scenario files). A card's other lines may have records in `pool/<PACK>.ts`.
 
-Adding a family is therefore: the three files, its entries in the three `index.ts` files (catalog, rules, authored), a test, and `pnpm effects:open`.
-Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run`, and a test. Adding a
+Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
+Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
 
 ## Not expressible yet: leave open, report

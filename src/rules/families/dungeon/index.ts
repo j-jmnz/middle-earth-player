@@ -1,4 +1,5 @@
 // Rules: rr.engaged, rr.attachment-cards, rr.drawing-cards, rr.shadow-effects (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -33,3 +34,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "dungeon", verbs: ["PlaceOrcGuard", "AttachToDeck", "RaiseStagingThreat", "TurnFaceUp", "LimitPlays"], run };

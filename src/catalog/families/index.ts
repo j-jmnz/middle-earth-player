@@ -1,32 +1,38 @@
-import * as attack from "./attack.ts";
-import * as defense from "./defense.ts";
-import * as encounter from "./encounter.ts";
-import * as quest from "./quest.ts";
-import * as play from "./play.ts";
-import * as costs from "./costs.ts";
-import * as deck from "./deck.ts";
-import * as attachments from "./attachments.ts";
-import * as sidequests from "./sidequests.ts";
-import * as misc from "./misc.ts";
-import * as burden from "./burden.ts";
-import * as south from "./south.ts";
-import * as campaign from "./campaign.ts";
-import * as objectives from "./objectives.ts";
-import * as prisoner from "./prisoner.ts";
-import * as dungeon from "./dungeon.ts";
-import * as caves from "./caves.ts";
-import * as nightmare from "./nightmare.ts";
-import * as moria from "./moria.ts";
-import * as breaking from "./breaking.ts";
-import * as dreamchaser from "./dreamchaser.ts";
-import * as sea from "./sea.ts";
-import * as uncharted from "./uncharted.ts";
-import * as aflame from "./aflame.ts";
-import * as stormcaller from "./stormcaller.ts";
-import * as grapple from "./grapple.ts";
-import * as island from "./island.ts";
+import { collect } from "../family-manifest.ts";
+import { manifest as attack } from "./attack.ts";
+import { manifest as defense } from "./defense.ts";
+import { manifest as encounter } from "./encounter.ts";
+import { manifest as quest } from "./quest.ts";
+import { manifest as play } from "./play.ts";
+import { manifest as costs } from "./costs.ts";
+import { manifest as deck } from "./deck.ts";
+import { manifest as attachments } from "./attachments.ts";
+import { manifest as sidequests } from "./sidequests.ts";
+import { manifest as misc } from "./misc.ts";
+import { manifest as burden } from "./burden.ts";
+import { manifest as south } from "./south.ts";
+import { manifest as campaign } from "./campaign.ts";
+import { manifest as objectives } from "./objectives.ts";
+import { manifest as prisoner } from "./prisoner.ts";
+import { manifest as dungeon } from "./dungeon.ts";
+import { manifest as caves } from "./caves.ts";
+import { manifest as nightmare } from "./nightmare.ts";
+import { manifest as moria } from "./moria.ts";
+import { manifest as breaking } from "./breaking.ts";
+import { manifest as dreamchaser } from "./dreamchaser.ts";
+import { manifest as sea } from "./sea.ts";
+import { manifest as uncharted } from "./uncharted.ts";
+import { manifest as aflame } from "./aflame.ts";
+import { manifest as stormcaller } from "./stormcaller.ts";
+import { manifest as grapple } from "./grapple.ts";
+import { manifest as island } from "./island.ts";
 
-// Each mechanic family's verbs, triggers and flags, in one list each (docs/plans/effect-authoring.md).
-export const FAMILY_VERBS = [...attack.VERBS, ...defense.VERBS, ...encounter.VERBS, ...quest.VERBS, ...play.VERBS, ...costs.VERBS, ...deck.VERBS, ...attachments.VERBS, ...sidequests.VERBS, ...misc.VERBS, ...burden.VERBS, ...south.VERBS, ...campaign.VERBS, ...objectives.VERBS, ...prisoner.VERBS, ...dungeon.VERBS, ...caves.VERBS, ...nightmare.VERBS, ...moria.VERBS, ...breaking.VERBS, ...dreamchaser.VERBS, ...sea.VERBS, ...uncharted.VERBS, ...aflame.VERBS, ...stormcaller.VERBS, ...grapple.VERBS, ...island.VERBS] as const;
-export const FAMILY_TRIGGERS = [...attack.TRIGGERS, ...defense.TRIGGERS, ...encounter.TRIGGERS, ...quest.TRIGGERS, ...play.TRIGGERS, ...costs.TRIGGERS, ...deck.TRIGGERS, ...attachments.TRIGGERS, ...sidequests.TRIGGERS, ...misc.TRIGGERS, ...burden.TRIGGERS, ...south.TRIGGERS, ...campaign.TRIGGERS, ...objectives.TRIGGERS, ...prisoner.TRIGGERS, ...dungeon.TRIGGERS, ...caves.TRIGGERS, ...nightmare.TRIGGERS, ...moria.TRIGGERS, ...breaking.TRIGGERS, ...dreamchaser.TRIGGERS, ...sea.TRIGGERS, ...uncharted.TRIGGERS, ...aflame.TRIGGERS, ...stormcaller.TRIGGERS, ...grapple.TRIGGERS, ...island.TRIGGERS] as const;
-export const FAMILY_FLAGS = [...attack.FLAGS, ...defense.FLAGS, ...encounter.FLAGS, ...quest.FLAGS, ...play.FLAGS, ...costs.FLAGS, ...deck.FLAGS, ...attachments.FLAGS, ...sidequests.FLAGS, ...misc.FLAGS, ...burden.FLAGS, ...south.FLAGS, ...campaign.FLAGS, ...objectives.FLAGS, ...prisoner.FLAGS, ...dungeon.FLAGS, ...caves.FLAGS, ...nightmare.FLAGS, ...moria.FLAGS, ...breaking.FLAGS, ...dreamchaser.FLAGS, ...sea.FLAGS, ...uncharted.FLAGS, ...aflame.FLAGS, ...stormcaller.FLAGS, ...grapple.FLAGS, ...island.FLAGS] as const;
+// The mechanic families, in the order their verbs, triggers and flags join the shared enums (docs/architecture.md, Mechanic families). A new family is
+// one file here and one in src/rules/families, and one line in this list and one in the rules list.
+export const CATALOG_FAMILIES = [
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island,
+] as const;
+
+export const FAMILY_VERBS = collect(CATALOG_FAMILIES, "verbs");
+export const FAMILY_TRIGGERS = collect(CATALOG_FAMILIES, "triggers");
+export const FAMILY_FLAGS = collect(CATALOG_FAMILIES, "flags");

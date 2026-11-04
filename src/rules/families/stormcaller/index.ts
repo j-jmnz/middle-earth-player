@@ -1,5 +1,6 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, dcce.campaign-mode (data/rules/entries.json). The verbs src/catalog/families/stormcaller.ts adds. The area and its cards are in
 // stormcaller/area.ts, the Stormcaller's quest stage in stormcaller/stage.ts, what a record reads in stormcaller/values.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -29,3 +30,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "stormcaller", verbs: ["PrepareStormcallerArea", "FlipStormcaller", "MoveProgressToStormcaller", "StormcallerProgress", "MoveToStormcallerArea", "CatchUpWins"], run };

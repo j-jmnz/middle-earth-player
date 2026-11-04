@@ -3,10 +3,11 @@
 // the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Prepare the Corsair deck" (dcce.corsair-deck). Every non-ship enemy still in the encounter deck goes to the Corsair deck, which is
   // then shuffled; from now on a non-ship enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it.
   z.strictObject({ verb: z.literal("PrepareCorsairDeck"), ...when }),
@@ -57,9 +58,9 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("ShuffleIntoCorsairDeck"), code: z.string().min(1), ...when }),
 ] as const;
 
-export const TRIGGERS = [] as const;
+const TRIGGERS = [] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // The holder can be committed to any Sailing test, whoever controls it, not only the first player's ("The Dream-chaser can be committed to
   // Sailing tests (even if you are not the first player)", dcce.sailing-tests). A number: more than 0 holds.
   "sailsAnyTest",
@@ -90,3 +91,5 @@ export const FLAGS = [
   // On an enemy: it has this Victory value while the flag holds ("he gains victory 3", 11178:A:1), for where it goes when it is destroyed and for the score.
   "gainsVictory",
 ] as const;
+
+export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -2,11 +2,12 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
-export const VERBS = [
+const VERBS = [
   // Commits the card (the picked card by default) to the quest without exhausting it, and announces `committed`. `stat:
   // "attack"`: it quests with its Attack instead of its Willpower until the end of the phase (11005:A:2).
   z.strictObject({ verb: z.literal("CommitToQuest"), target: cardRefSchema.optional(), stat: z.literal("attack").optional(), ...when }),
@@ -73,7 +74,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RemoveProgressFromQuest"), amount: positiveAmountSchema, ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About each character committed to the quest when it resolved: the quest succeeded ("After ~ quests successfully"), or it
   // resolved at all ("After resolving a quest to which ~ was committed").
   "questedSuccessfully",
@@ -96,7 +97,7 @@ export const TRIGGERS = [
   "questCardDefeated",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a seat: it does not raise threat from questing unsuccessfully; a player card effect that reduces its threat reduces it by
   // at most 1 (22054:A:1); it may optionally engage this many additional enemies (09002:A:2), and the optional engagements it
   // made this phase (engine use).
@@ -122,3 +123,5 @@ export const FLAGS = [
   // On "table": the staging step of the quest phase is skipped (01128:B:2, "for the remainder of the game" while the stage is current).
   "skipStaging",
 ] as const;
+
+export const manifest = { name: "quest", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

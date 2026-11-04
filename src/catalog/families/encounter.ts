@@ -2,6 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
@@ -10,7 +11,7 @@ const encounterType = z.enum(["enemy", "location", "treachery", "objective"]);
 
 const sphere = z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]);
 
-export const VERBS = [
+const VERBS = [
   // Shows the actor the top `count` cards (1 by default) of the encounter deck, or of their own deck (`deck: "own"`), in a
   // look window they close with a pass. Nothing moves. The top card becomes the picked card ("that card", "the looked at
   // card"), and the effect remembers every card shown (for ArrangeEncounter and PickEncounter `from: "looked"`). An empty
@@ -106,7 +107,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("PlayRevealedFree"), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About an encounter card: it entered play, placed in the staging area once its staging resolved (rr.staging), or put
   // into play by a player card effect (MoveEncounterCard).
   "encounterEnteredPlay",
@@ -118,7 +119,7 @@ export const TRIGGERS = [
   "encounterThreatRaised",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // Held by the table until the end of the phase: the staging step reveals this many fewer cards, to a minimum of 0
   // (`revealFewer`) or of 1 (`revealFewerMinOne`).
   "revealFewer",
@@ -136,3 +137,5 @@ export const FLAGS = [
   // When Revealed or Shadow effect, and no paid cancel is offered against one (src/rules/families/encounter/cancel.ts).
   "encounterUncancelable",
 ] as const;
+
+export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

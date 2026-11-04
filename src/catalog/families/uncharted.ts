@@ -3,12 +3,13 @@
 // helpers are beside it in src/rules/families/uncharted/). The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 
 const who = z.enum(["actor", "firstPlayer", "picked"]);
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Prepare the Uncharted deck" (dcce.uncharted-deck). The double-sided locations dealt as the Uncharted deck are shuffled, each Lost Island side up.
   z.strictObject({ verb: z.literal("PrepareUnchartedDeck"), ...when }),
   // "Add N copies of Lost Island from the top of the Uncharted deck to the staging area" (11025:A:1, 11025:B:3, 11026:A:1, 11035:A:2): the top `count` cards of the deck join the
@@ -66,13 +67,13 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RemoveWillpowerFromQuest"), amount: positiveAmountSchema, left: z.number().int().min(0).optional(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a location: it was flipped over (FlipUncharted), now on its other side. "Forced: After Lush Jungle is flipped over while active" (the record's condition says
   // `sourceIn activeLocation`).
   "flippedOver",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On a card: no more than this much damage is placed on it at a time, the rest is not placed ("When 3 or more damage would be placed on Revenant, place 2 damage instead",
   // 11181:A:3). The smallest limit the card holds counts; Revenant's Forced records set it when it joins the staging area and when it engages a player.
   "damageLimit",
@@ -86,3 +87,5 @@ export const FLAGS = [
   // On a location: while it is the active location it contributes its Threat to the staging area's ("it contributes its Threat to the staging area", 11072:A:1).
   "activeThreat",
 ] as const;
+
+export const manifest = { name: "uncharted", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

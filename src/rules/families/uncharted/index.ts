@@ -1,5 +1,6 @@
 // Rules: dcce.uncharted, dcce.uncharted-deck, dcce.encounter-cards, dcce.scalable-upgradable (data/rules/entries.json). The verbs src/catalog/families/uncharted.ts adds. The Uncharted deck and
 // its locations are in uncharted/deck.ts, the cards beyond them in uncharted/cards.ts; the deck as a zone (the route of a discarded double-sided location) is uncharted/zone.ts.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -56,3 +57,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "uncharted", verbs: ["PrepareUnchartedDeck", "AddLostIslands", "AddSetAsideLostIsland", "ScrambleUncharted", "FlipUncharted", "LookAtFacedown", "AddStageProgress", "PutSetAsideInPlay", "AttachSetAsideTo", "TradeDamageForThreat", "KeepCampaignCard", "AddCampaignResource", "LookAtBottom", "DiscardBottom", "DiscardCostlier", "DiscardEncounterTop", "StageLooked", "RemoveWillpowerFromQuest", "EachExhaustsOne", "MayDiscardShadow"], run };

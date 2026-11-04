@@ -3,9 +3,10 @@
 // The rules are the Dream-chaser Campaign Expansion rulebook (dcce.*, data/rules/entries.json).
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 
-export const VERBS = [
+const VERBS = [
   // Setup: "Prepare the Island Map" (dcce.island-map). The double-sided locations the scenario dealt as its Uncharted deck are separated: the cards with the codes in `temple` (the three Temple of the
   // Deceived locations) are shuffled and laid in the right-hand column, the others are shuffled and fill the first four columns, a grid of three rows by five. Every card lies Lost Island (or
   // Temple of the Deceived) side up, which nobody looks at.
@@ -42,7 +43,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("RaiseThreatToAttach"), code: z.string().min(1), amount: z.number().int().positive(), seat: z.number().int().min(0).optional(), accepted: z.boolean().optional(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // About a card: it was drawn into a player's hand and is not a player card ("When Recurring Nightmare enters your hand", 11199:A:3). Announced only when a card of the types that are not played from
   // a hand (an enemy) is drawn, so no other game's events change.
   "enteredHand",
@@ -51,7 +52,7 @@ export const TRIGGERS = [
   "exitedPlay",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On the table: the Exploration keyword is in force (dcce.exploration): a location that has progress equal to its quest points stays in play, the players travel from the active location when it
   // has, and the locations next to it are the staging area.
   "exploration",
@@ -64,3 +65,5 @@ export const FLAGS = [
   // (`progressReplaced`, "For each progress that would be placed on Searching the Island, you may place it on a location in the staging area, instead", 12067:B:2).
   "progressToStaging",
 ] as const;
+
+export const manifest = { name: "island", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

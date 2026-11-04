@@ -2,6 +2,7 @@
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them.
 import { z } from "zod";
 
+import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
@@ -9,7 +10,7 @@ import { pickSchema } from "../effect-schema-pick.ts";
 // The encounter card types a Guarded keyword names: "Guarded (enemy)", "Guarded (location)", "Guarded (enemy or location)".
 const guardType = z.enum(["enemy", "location"]);
 
-export const VERBS = [
+const VERBS = [
   // Constant on an attachment: it is played (or put into play) unattached into the staging area ("Play Ranger Spikes into
   // the staging area unattached") or into its player's own play area ("Play into your play area unattached"), or onto a
   // player's threat dial ("Attach to a player's threat dial"): into that player's play area, under their control. The table
@@ -52,7 +53,7 @@ export const VERBS = [
   z.strictObject({ verb: z.literal("QuestProgressFirst"), first: z.boolean(), ...when }),
 ] as const;
 
-export const TRIGGERS = [
+const TRIGGERS = [
   // Heard by each card (the event's card) that was attached to the event's other card: an enemy that damage destroyed
   // (rr.destroy), or a quest card that was defeated (its stage advanced, rr.quest-advancement). The attachment hears it from
   // wherever it went ("When attached enemy is destroyed", "After attached quest card is defeated": that card is `other`).
@@ -61,7 +62,7 @@ export const TRIGGERS = [
   "unguarded",
 ] as const;
 
-export const FLAGS = [
+const FLAGS = [
   // On an enemy: any character may choose it as the target of an attack, in the staging area or engaged with any player
   // ("Any character may choose attached enemy as the target of an attack").
   "attackableByAny",
@@ -82,3 +83,5 @@ export const FLAGS = [
   "readyPayment",
   "readyAsked",
 ] as const;
+
+export const manifest = { name: "attachments", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

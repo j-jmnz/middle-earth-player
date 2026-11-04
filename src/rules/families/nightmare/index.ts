@@ -1,6 +1,7 @@
 // Rules: rr.attachment-cards, rr.search, rr.discard-pile-and-victory-display, rr.forced, rr.cancel, rr.step-6-4-2, rr.damage
 // (data/rules/entries.json); ledger lines 906102:A:3, 906107:A:2, 906203:A:1, 906208:A:1, 906304:A:1, 900107:A:3, 900207:A:1, 900208:A:2,
 // 900209:A:1, 900209:A:2.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { CardRef, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard } from "../../interpret/amounts.ts";
@@ -285,3 +286,5 @@ function pickMost(
   if (tied.length > 1 && !chosen) return askTarget(state, { instruction: { verb: instruction.verb }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
   return markPicked(state, chosen ?? "");
 }
+
+export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens"], run };

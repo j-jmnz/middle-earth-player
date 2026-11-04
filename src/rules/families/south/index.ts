@@ -1,4 +1,5 @@
 // Rules: mec109.stage-4, rr.active-location, rr.engaged, rr.in-player-order (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -41,3 +42,5 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return null;
   }
 }
+
+export const manifest: RulesFamily = { name: "south", verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };

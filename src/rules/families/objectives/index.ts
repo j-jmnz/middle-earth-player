@@ -6,6 +6,7 @@
 // staging area. While an encounter card is attached the objective cannot be claimed. Claiming attaches the objective to a hero its
 // claimer controls; it counts as an attachment, and when it is detached (its hero leaves play, a card discards it, a Restricted slot
 // is over) it returns to the staging area.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard } from "../../interpret/amounts.ts";
@@ -65,3 +66,5 @@ function claimObjective(state: ScenarioState, focus: Focus, ctx: ReduceContext, 
   const claimed = updateCard(attached, id, { face: "up", controller: hero.controller, claimed: true });
   return queueEvent(enforceRestricted(claimed, heroId, ctx, steps), { trigger: "claimed", seat: hero.controller, cardId: id });
 }
+
+export const manifest: RulesFamily = { name: "objectives", verbs: ["GuardObjective", "ClaimObjective"], run };

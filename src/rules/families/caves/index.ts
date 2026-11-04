@@ -1,4 +1,5 @@
 // Rules: rr.encounter-deck, rr.reveal, rr.removed-from-game, rr.setup (data/rules/entries.json); ledger lines 41006:A:1, 41034:A:2, 41048:A:2, 41049:A:2.
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -40,3 +41,5 @@ function setAsideInPlay(state: ScenarioState, code: string, ctx: ReduceContext, 
   if (!card) return state;
   return updateCard(moveCard(leavePlay(state, card.id, ctx, steps), card.id, { zone: "setAside" }), card.id, { face: "down", controller: null });
 }
+
+export const manifest: RulesFamily = { name: "caves", verbs: ["BottomOtherLooked", "RemoveSourceFromGame", "SetAsideInPlay"], run };

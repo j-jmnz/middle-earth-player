@@ -1,4 +1,5 @@
 // Rules: dcce.gaining-xp, dcce.hard-expert (data/rules/entries.json).
+import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { XpCount } from "../../../catalog/families/dreamchaser.ts";
 
@@ -41,3 +42,5 @@ export function pruneRoundCaps(state: ScenarioState): ScenarioState {
   const { roundDamage: _damage, threatLoweredBy: _lowered, ...rest } = state;
   return rest;
 }
+
+export const manifest: RulesFamily = { name: "dreamchaser", verbs: ["GainXp"], run };
