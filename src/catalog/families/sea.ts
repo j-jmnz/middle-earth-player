@@ -69,9 +69,24 @@ const VERBS = [
   // "While Belfalas Islet is the active location, the chosen enemy is considered to be out of play" (12129:A:2): the last picked enemy goes facedown under the source location, out of play as any card under a location is
   // (rr.in-play-and-out-of-play), and returns to the staging area, or to the player it was engaged with, once the source is no longer the active location (a settle sweep keeps this).
   z.strictObject({ verb: z.literal("ConsiderOutOfPlay"), ...when }),
+  // "Discard allies he controls with a total of at least 3 Willpower" (12125:A:3): the actor chooses allies they control one at a time, as many as it takes, and each is discarded as it is chosen
+  // once their Willpower adds up to `willpower`. `taken` is engine use: the allies chosen so far. The Response that uses it names the condition alliesWillpower, so the choice can always be completed.
+  z.strictObject({ verb: z.literal("DiscardAlliesForWillpower"), willpower: z.number().int().positive(), taken: z.array(z.string()).optional(), ...when }),
+  // "Take control of Corsair Skirmisher as a Ship-Objective with Willpower equal to its Threat" (12125:A:3): the source Ship enemy, from the discard pile it was destroyed to, goes into play under the actor
+  // as a Ship-objective (rules/core/printed.ts, the code `<code>~ship`): it loses the Ship-enemy card type and gains the Ship-objective card type, with its Attack, Defense and hit points and no damage.
+  z.strictObject({ verb: z.literal("TakeControlAsShip"), ...when }),
+  // "Attach to a Ship objective" (12132:A:1) and "If defending character is a Ship, attach ~ to it" (12132:A:2): the source treachery attaches to a Ship objective. `choose`: the first player chooses among the Ship
+  // objectives the players control (a lone one is taken); `defender`: the Ship objective defending the attack in progress, and nothing happens if the defender is not a Ship.
+  z.strictObject({ verb: z.literal("AttachToShip"), to: z.enum(["choose", "defender"]), ...when }),
+  // "The engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack" (12131:A:1): the last picked
+  // enemy makes an immediate attack (counted for noneReturned like any attack made by an effect); with `raiseStagingThreat`, when the attack ends the total Threat in the staging area is raised, until the phase or the
+  // round ends, by the damage the attack dealt.
+  z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
 ] as const;
 
-const TRIGGERS = [] as const;
+// About a Ship objective: it became exhausted by any means, defending, attacking, questing, Sailing or an effect ("When attached objective exhausts", 12132:A:1). Announced by a settle sweep (families/sea/water.ts) only in a game
+// whose cards hear it.
+const TRIGGERS = ["shipExhausted"] as const;
 
 const FLAGS = [
   // The holder can be committed to any Sailing test, whoever controls it, not only the first player's ("The Dream-chaser can be committed to

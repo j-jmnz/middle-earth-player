@@ -26,7 +26,7 @@ function walk(instructions: readonly Instruction[], visit: (instruction: Instruc
 describe("the words of A Storm on Cobas Haven choices", () => {
   const names = (): ChoiceNames => ({ card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code });
   // The instructions that ask a player for a card: the sheet words them with pickWords (src/play/choice/sheets.ts).
-  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand"]);
+  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand", "DiscardAlliesForWillpower", "AttachToShip"]);
 
   it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
     const prompts: string[] = [];
@@ -54,6 +54,11 @@ describe("the words of A Storm on Cobas Haven choices", () => {
     expect(prompts).toContain("Choose a Ship objective to exhaust.");
     expect(prompts).toContain("Choose a Ship enemy that is not guarding an objective. While 12129 is the active location, it is considered to be out of play.");
     expect(prompts).toContain("Choose a Dol Amroth objective from the encounter deck or discard pile to add to the staging area.");
+    // Corsair Skirmisher's Response (12125:A:3), Ramming Speed! (12131:A:1) and Taking on Water (12132:A:1, and its Action's three characters).
+    expect(prompts).toContain("Choose an ally to discard. Discard allies you control with a total of at least 3 Willpower to take control of this card as a Ship objective.");
+    expect(prompts).toContain("Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack.");
+    expect(prompts).toContain("Choose the Ship objective this card attaches to.");
+    expect(prompts).toContain("Choose a character to exhaust.");
   });
 
   it("the engagement checks that ends in a tie ask the first player which enemy engages", () => {

@@ -32,7 +32,7 @@ function engagedEnemies(state: ScenarioState): string[] {
 // One immediate attack by an enemy that is still engaged and may attack. The attack is counted before it starts (the Forced effects
 // of its start push frames over the running effect's), and it is dealt a shadow card of its own; one dealt for an earlier attack is
 // discarded first (rr.attacks-outside-the-combat-phase, faq.additional-attacks).
-function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = state.cards[enemyId];
   if (enemy?.zone !== "engaged" || enemy.controller == null || attackBarred(state, enemyId, enemy.controller)) return state;
   const data = effectData(state);

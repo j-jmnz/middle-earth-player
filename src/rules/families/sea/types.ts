@@ -32,6 +32,8 @@ export type SeaState = {
   sailing?: SailingTest;
   // Enemies a location holds out of play, facedown under it, while it is the active location (families/sea/islet.ts): where each stood, to put it back.
   held?: Readonly<Record<string, HeldEnemy>>;
+  // The Ship objectives that were exhausted when the settle sweep last looked, kept only in a game whose cards hear `shipExhausted` (families/sea/water.ts).
+  exhausted?: readonly string[];
   // The Stormcaller's area, once a Setup has prepared it (families/stormcaller/area.ts).
   stormcaller?: StormcallerArea;
 };

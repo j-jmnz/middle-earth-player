@@ -239,6 +239,9 @@ export const pickSchema = z.strictObject({
   // those whose Aflame value is the lowest ("the Aflame location in play with the lowest Aflame value", 11036:B:1); every one of them when tied, and then the chooser decides.
   aflame: z.boolean().optional(),
   lowestAflame: z.literal(true).optional(),
+  // Of the cards that match, only those with the highest Attack, as the table shows it ("the engaged Ship enemy with the highest Attack", 12131:A:1); every one of them when tied, and then the chooser decides.
+  // Read by the sea family (src/rules/families/sea/ramming.ts).
+  highestAttack: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

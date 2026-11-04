@@ -46,12 +46,15 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       // for an event about itself ("After ~ leaves play").
       const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
+      // "The engaged player may ...": the seat the event happened to answers it, whoever controls the card (12125:A:3).
+      const answering = effect.answeredBy === "eventSeat" ? event.seat : seat;
+      if (answering == null || !order.includes(answering) || (locked != null && answering !== locked)) continue;
       // `other`: the second card the event names ("After a Trap card you control is attached to an enemy": the new host).
-      const scope = { actor: seat, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };
+      const scope = { actor: answering, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.other ? { other: event.other } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // "Any player may trigger this response": each seat is offered it, the controller first.
       // While a Peril card's staging resolves the other players cannot trigger Responses, whoever "any player may" names (mec109.peril).
-      const seats = effect.anyPlayer && locked == null ? [seat, ...order.filter((other) => other !== seat)] : [seat];
+      const seats = effect.anyPlayer && locked == null ? [answering, ...order.filter((other) => other !== answering)] : [answering];
       for (const offered of seats) if (offerable(state, effect, instance.id, offered, ctx)) offers.push({ cardId: instance.id, effectId: effect.id, seat: offered, event });
     }
   }

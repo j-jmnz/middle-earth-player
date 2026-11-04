@@ -23,6 +23,9 @@ const WORST: Condition = { kind: "heading", is: "worst" };
 // A Ship objective (a character with the Ship trait) a player controls, and a ready one anyone controls; a Ship enemy in play, staging or engaged.
 const YOUR_SHIP: PickSpec = { type: "character", control: "you", trait: "Ship" };
 const READY_SHIP: PickSpec = { type: "character", control: "any", trait: "Ship", state: "ready" };
+// A ready character the actor controls (Taking on Water's Action), and the Ship enemy engaged with the actor that has the highest Attack (Ramming Speed!).
+const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
+const ENGAGED_RAMMER: PickSpec = { type: "enemy", control: "any", engaged: "you", trait: "Ship", highestAttack: true };
 const SHIP_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Ship" };
 const FLAGSHIP: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Raider Flagship"] };
 const CAN_GUARD: Condition = { kind: "canPick", pick: UNGUARDED_OBJECTIVE };
@@ -207,6 +210,49 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 12130 Cobas Haven: while it is the active location, each Ship enemy has its Boarding value reduced by 1 (never below 0, families/sea/boarding.ts).
     { id: "12130:constant:1", cardCode: "12130", lines: ["12130:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "activeLocation" }, instructions: [{ verb: "ModifyStat", stat: "boarding", amount: -1, until: "whileSourceInPlay", holders: SHIP_ENEMY }] },
+
+    // 12125 Corsair Skirmisher. Response: after it is destroyed as an enemy, the engaged player (not the first player) may discard allies with a total of at least 3 Willpower to take control of it as a Ship-objective
+    // with Willpower equal to its Threat (families/sea/skirmisher.ts). The Response is offered only while the allies total enough.
+    {
+      id: "12125:response:1",
+      cardCode: "12125",
+      lines: ["12125:A:3"],
+      timing: "response",
+      trigger: "enemyDestroyed",
+      subject: "self",
+      answeredBy: "eventSeat",
+      condition: { kind: "alliesWillpower", min: 3 },
+      instructions: [{ verb: "DiscardAlliesForWillpower", willpower: 3 }, { verb: "TakeControlAsShip" }],
+    },
+
+    // 12131 Ramming Speed!: off-course, the engaged Ship enemy with the highest Attack (the revealing player chooses among those tied) makes an immediate attack, and the total Threat in the staging area is raised until the end
+    // of the phase by the damage it dealt. No attack made (on-course, or no Ship enemy engaged with you) and the card gains doomed 2.
+    {
+      id: "12131:whenRevealed:1",
+      cardCode: "12131",
+      lines: ["12131:A:1"],
+      timing: "whenRevealed",
+      instructions: [
+        { verb: "Pick", pick: ENGAGED_RAMMER, when: OFF_COURSE },
+        { verb: "AttackWithPicked", raiseStagingThreat: "endOfPhase", when: OFF_COURSE },
+        { verb: "Doomed", amount: 2, when: { kind: "noneReturned" } },
+      ],
+    },
+
+    // 12132 Taking on Water: attaches to a Ship objective the first player chooses, as a Condition attachment; Forced: when the attached objective exhausts it takes 2 damage (an encounter card's damage, which a Ship's immunity to
+    // player card effects does not stop); Action (the Ship's controller): exhaust 3 characters you control to discard it. Shadow: it attaches to the defending character if that is a Ship.
+    { id: "12132:whenRevealed:1", cardCode: "12132", lines: ["12132:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachToShip", to: "choose" }] },
+    { id: "12132:constant:1", cardCode: "12132", lines: ["12132:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
+    { id: "12132:forced:1", cardCode: "12132", lines: ["12132:A:1"], timing: "forced", trigger: "shipExhausted", subject: "host", instructions: [{ verb: "DamageCard", amount: 2, target: "host" }] },
+    {
+      id: "12132:action:1",
+      cardCode: "12132",
+      lines: ["12132:A:1"],
+      timing: "action",
+      condition: { kind: "count", pick: READY_CHARACTER, min: 3 },
+      instructions: [{ verb: "Repeat", times: 3, instructions: [{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" } }] }, { verb: "Discard", target: { kind: "self" } }],
+    },
+    { id: "12132:shadow:1", cardCode: "12132", lines: ["12132:A:2"], timing: "shadow", instructions: [{ verb: "AttachToShip", to: "defender" }] },
   ],
   { pool: VOYAGE },
 );

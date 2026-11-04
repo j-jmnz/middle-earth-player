@@ -108,6 +108,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("heading"), is: z.enum(["onCourse", "offCourse", "worst"]) }),
   // The actor's characters committed to the quest add up to at least `min` Willpower ("Each player contributing at least 8 Willpower to the quest", 12028:A:1): the stat the quest counts, as the quest reads it.
   z.strictObject({ kind: z.literal("committedWillpower"), min: z.number().int().min(0) }),
+  // The allies the actor controls have a total Willpower of at least `min` ("discard allies he controls with a total of at least 3 Willpower", 12125:A:3). Read by the sea family (src/rules/families/sea/skirmisher.ts).
+  z.strictObject({ kind: z.literal("alliesWillpower"), min: z.number().int().positive() }),
   // The players are at the same quest stage as the Stormcaller (`sameStage`, dcce.stormcallers-area-stages: their main quest stage's number matches its current stage), or not. False in a game
   // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller/values.ts).
   z.strictObject({ kind: z.literal("stormcaller"), is: z.enum(["sameStage", "ahead"]) }),

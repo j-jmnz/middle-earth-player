@@ -27,6 +27,7 @@ import { canDeclareDefender, isDefending } from "../families/defense/defenders.t
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
 import { aflamePickMatches, lowestAflame } from "../families/aflame/pick.ts";
+import { highestAttack } from "../families/sea/ramming.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
@@ -303,7 +304,9 @@ export function pickCandidates(
     return found.filter((id) => (state.cards[id]?.damage ?? 0) === most);
   }
   // "The Aflame location in play with the lowest Aflame value" (families/aflame/pick.ts).
-  return spec.lowestAflame ? lowestAflame(state, found, ctx) : found;
+  if (spec.lowestAflame) return lowestAflame(state, found, ctx);
+  // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
+  return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }
 
 // The cards attached to the source, to the source's host, to the active location, or to the defending character.

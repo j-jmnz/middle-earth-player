@@ -453,6 +453,9 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     // Belfalas Islet (12129:A:2): the Ship enemy that is out of play while the location is the active location.
     case "ConsiderOutOfPlay":
       return { verb: "Out of play", prompt: `Choose a Ship enemy that is not guarding an objective. While ${sourceId ? names.card(sourceId) : "this location"} is the active location, it is considered to be out of play.` };
+    // Ramming Speed! (12131:A:1): of the engaged Ship enemies tied for the highest Attack, the one that makes the immediate attack.
+    case "AttackWithPicked":
+      return { verb: "Attack", prompt: "Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack." };
     // A set-aside boon or burden a campaign card attaches (01130:A:3, 01130:A:4): the hero that carries it.
     case "AttachSetAside":
       return { verb: "Attach", prompt: `Choose ${one} to carry ${names.code(next.code)}.` };

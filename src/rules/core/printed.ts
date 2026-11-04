@@ -181,9 +181,46 @@ const BUILT_IN: ReadonlyMap<string, PrintedCard> = new Map([
 export const FALLEN_SUFFIX = "~enemy";
 const FALLEN = new WeakMap<PrintedCard, PrintedCard>();
 
-// The hero's own code for the code of a fallen hero, or the code itself.
+// A Ship enemy that a player took control of as a Ship-objective (Corsair Skirmisher, 12125:A:3) keeps its card with the code `<code>~ship`: "It loses the Ship-Enemy card type and gains the Ship-Objective
+// card type ... with Willpower equal to its Threat". The printed card is made from the enemy's: its Attack, Defense, hit points, Traits and keywords stay, its Threat and engagement cost go, and its game
+// text is blank (the Response was for the enemy). The sea family turns the card back into the enemy when it leaves play (families/sea/skirmisher.ts).
+export const SHIP_SUFFIX = "~ship";
+const SHIPPED = new WeakMap<PrintedCard, PrintedCard>();
+
+// The code of a ship-objective made from a Ship enemy, and the enemy's own code for it.
+export function shipObjectiveCode(code: string): string {
+  return code + SHIP_SUFFIX;
+}
+export function isShipObjectiveCode(code: string): boolean {
+  return code.endsWith(SHIP_SUFFIX);
+}
+
+// The card's own code for the code of a derived card (a fallen hero or a Ship enemy taken as a Ship-objective), or the code itself.
 export function fallenBase(code: string): string {
+  if (code.endsWith(SHIP_SUFFIX)) return code.slice(0, -SHIP_SUFFIX.length);
   return code.endsWith(FALLEN_SUFFIX) ? code.slice(0, -FALLEN_SUFFIX.length) : code;
+}
+
+function shipObjectiveOf(enemy: PrintedCard): PrintedCard {
+  let made = SHIPPED.get(enemy);
+  if (!made) {
+    made = definePrinted({
+      code: shipObjectiveCode(enemy.code),
+      name: enemy.name,
+      type: "objective",
+      ship: "objective",
+      traits: enemy.traits,
+      willpower: enemy.threat ?? 0,
+      attack: enemy.attack,
+      defense: enemy.defense,
+      health: enemy.health,
+      isUnique: false,
+      encounterSet: enemy.encounterSet,
+      keywords: { ...enemy.keywords, boarding: null },
+    });
+    SHIPPED.set(enemy, made);
+  }
+  return made;
 }
 
 function fallenOf(hero: PrintedCard): PrintedCard {
@@ -209,6 +246,8 @@ function fallenOf(hero: PrintedCard): PrintedCard {
 export function printedOf(cards: ReadonlyMap<string, PrintedCard>, code: string): PrintedCard {
   const card = cards.get(code) ?? BUILT_IN.get(code);
   if (card) return card;
+  const enemy = code.endsWith(SHIP_SUFFIX) ? cards.get(fallenBase(code)) : undefined;
+  if (enemy) return shipObjectiveOf(enemy);
   const hero = code.endsWith(FALLEN_SUFFIX) ? cards.get(fallenBase(code)) : undefined;
   if (!hero) throw new Error(`Missing printed card ${code}`);
   return fallenOf(hero);

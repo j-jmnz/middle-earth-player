@@ -30,6 +30,7 @@ import { controlledByPlayers } from "../families/objectives/control.ts";
 import { prisonerHero } from "../families/prisoner/index.ts";
 import { tokensOn } from "../families/campaign/index.ts";
 import { headingIs } from "../families/sea/heading.ts";
+import { alliesWillpowerHolds } from "../families/sea/skirmisher.ts";
 import { corsairHolds } from "../families/sea/corsair.ts";
 import { stormcallerHolds } from "../families/stormcaller/values.ts";
 import { areaOf } from "../families/stormcaller/zone.ts";
@@ -155,6 +156,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return stormcallerHolds(state, condition);
     case "committedWillpower":
       return committedWillpower(state, ctx.cards, scope.actor) >= condition.min;
+    case "alliesWillpower":
+      return alliesWillpowerHolds(state, scope.actor, condition.min, ctx);
     case "survivorsThreat":
       return livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max);
     case "heroesAll": {
