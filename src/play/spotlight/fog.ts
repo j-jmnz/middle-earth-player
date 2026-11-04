@@ -17,10 +17,13 @@ export const SPOT_FOG = {
   // The flat dark under the fog at full dark, by the screen's theme: the Light theme's parchment needs more of it to read as the same
   // dark stage (the layer draws with the Dark tokens on either theme).
   flat: { dark: 0.4, light: 0.7 },
-  // The rim: the night from `rimFrom` of the ellipse's radius (75% of the width, 85% of the height, about the stage's middle) to
-  // `rim` at its edge.
+  // The rim: the night from `rimFrom` of the ellipse's radii (`rimWidth` of the width and `rimHeight` of the height, about the stage's
+  // middle) to `rim` at its edge and beyond, so it reaches the screen's edges (about 52% at the middle of the sides, 38% at the top
+  // and the foot, 75% in the corners) and the top bar and the dock recede.
   rim: 0.75,
   rimFrom: 0.7,
+  rimWidth: 0.55,
+  rimHeight: 0.55,
   // The feet bank: its ellipse's radii are `feetWidth` of the group's width and `feetHeight` of a card's height (the fog is gone at 85%
   // of them), its middle `feetDrop` card heights below the cards' feet; it rises `feetRise` card heights and swells by `feetSwell` of its
   // height as the dark comes in.

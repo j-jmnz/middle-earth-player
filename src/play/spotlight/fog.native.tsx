@@ -27,7 +27,7 @@ export function FogDark({ width, height, dark, now, drift, theme, t }: { width: 
           <Fog key={index} layer={layer} width={width} height={height} seconds={seconds} />
         ))}
         <Rect x={0} y={0} width={width} height={height}>
-          <EllipseGradient cx={width / 2} cy={height * SPOT.centerY} rx={width * 0.75} ry={height * 0.85} positions={[SPOT_FOG.rimFrom, 1]} colors={[withAlphaHex(t.night, 0), withAlphaHex(t.night, SPOT_FOG.rim)]} />
+          <EllipseGradient cx={width / 2} cy={height * SPOT.centerY} rx={width * SPOT_FOG.rimWidth} ry={height * SPOT_FOG.rimHeight} positions={[SPOT_FOG.rimFrom, 1]} colors={[withAlphaHex(t.night, 0), withAlphaHex(t.night, SPOT_FOG.rim)]} />
         </Rect>
       </Group>
     </>
