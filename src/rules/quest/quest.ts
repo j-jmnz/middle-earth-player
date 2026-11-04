@@ -44,15 +44,20 @@ export function engagementCostOf(state: ScenarioState, instance: CardInstance, c
 
 type Gate = (state: ScenarioState) => boolean;
 
-// The total Threat in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
-export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number): number {
+// One card's part of the total Threat in the staging area: where it stands (in staging, engaged but contributing, or the active location
+// that contributes) and the Threat it adds now.
+export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" };
+
+// The cards that make up the total Threat in the staging area, and what the table's held effects add to or take from their sum
+// (withStagingThreat; the total never falls below 0). A card that "does not contribute its Threat" is left out.
+export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: number): { sources: ThreatSource[]; adjust: number } {
   const view = viewOf(state, seat);
-  let total = 0;
+  const sources: ThreatSource[] = [];
   for (const id of view.staging) {
     const instance = view.cards[id];
     // "Does not contribute its Threat" (a flag on the card).
     if (!instance || flagged(view, id, "noThreatContribution")) continue;
-    total += modifiedStat(view, instance, "threat", cards);
+    sources.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "staging" });
   }
   // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1; "While engaged with a player, Faithless Desecrator
   // contributes its Threat", 12075:A:1). Only the games with ships (`sea`) or an Uncharted deck (`uncharted`) have such a card, so no other game reads the engaged enemies here.
@@ -61,16 +66,23 @@ export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number)
     for (const seat of view.seats) {
       for (const id of seat.engaged) {
         const instance = view.cards[id];
-        if (instance && flagged(view, id, "engagedThreat") && !flagged(view, id, "noThreatContribution")) total += modifiedStat(view, instance, "threat", cards);
+        if (instance && flagged(view, id, "engagedThreat") && !flagged(view, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
       }
     }
   }
   // An active location that contributes its Threat to the staging area's ("While Flooded Ruins is the active location, it contributes its Threat", 11072:A:1).
   for (const id of [view.activeLocation, view.secondActiveLocation]) {
     const instance = id ? view.cards[id] : undefined;
-    if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) total += modifiedStat(view, instance, "threat", cards);
+    if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) sources.push({ id: instance.id, threat: modifiedStat(view, instance, "threat", cards), from: "active" });
   }
-  return withStagingThreat(view, total);
+  const sum = sources.reduce((total, source) => total + source.threat, 0);
+  return { sources, adjust: withStagingThreat(view, sum) - sum };
+}
+
+// The total Threat in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
+export function stagingThreat(state: ScenarioState, cards: Cards, seat?: number): number {
+  const { sources, adjust } = stagingThreatSources(state, cards, seat);
+  return sources.reduce((total, source) => total + source.threat, adjust);
 }
 
 // Which stat a character counts when it is committed to the current quest: Attack for a quest with Battle (hon.battle), Defense for

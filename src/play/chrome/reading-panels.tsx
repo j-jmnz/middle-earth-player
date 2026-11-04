@@ -1,5 +1,5 @@
 // The reading panels (docs/design-system-table.md, Reading panels; phase 21): a discard pile's cards or the victory display's, a row's
-// folded cards, this round's log, the threat panel from a dial and the table settings from the menu. They open in one place, the same tray
+// folded cards, the cards that make up the staging threat from the quest meter, this round's log, the threat panel from a dial and the table settings from the menu. They open in one place, the same tray
 // frame (tray-frame.tsx), one at a time: a new one replaces the last (reading.ts). Each has a round ✕ labelled "Close" at its top right and
 // closes on a tap outside. The card lists stand on night, each card as the table draws it; the log and the threat panel stay on paper:
 // they are what gets read and recorded; the settings panel is on night like the Settings tab. Nothing here sends an intent but a playable
@@ -161,6 +161,31 @@ export function RowList({ title, cards, onRead, onClose }: { title: string; card
         {cards.map((card) => (
           <CardRow key={card.id} card={card} playable={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
         ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+/**
+ * The cards that make up the staging threat, from a tap on the quest meter (threat-sources.ts): the total over the title, then each card
+ * on the night panel like a row's list, the most Threat first, its line saying the Threat it adds; under them what held effects add or
+ * take. A row shows the card large and sends nothing.
+ */
+export function ThreatSourceList({ title, total, cards, adjust, onRead, onClose }: { title: string; total: number; cards: readonly ListCard[]; adjust: string | null; onRead: (cardId: string) => void; onClose: () => void }) {
+  return (
+    <View testID="threat-sources" collapsable={false} style={{ flexShrink: 1 }}>
+      <ListHead count={`${total} Threat`} title={title} />
+      <PanelClose testID="threat-sources-close" onPress={onClose} paper={false} />
+      <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
+        {cards.length === 0 ? <Text className="text-center text-body text-muted">No card adds Threat.</Text> : null}
+        {cards.map((card) => (
+          <CardRow key={card.id} card={card} playable={false} testID={`threat-source-${card.id}`} onPress={() => onRead(card.id)} />
+        ))}
+        {adjust ? (
+          <Text testID="threat-sources-adjust" className="mt-1 text-center text-label text-muted">
+            {adjust}
+          </Text>
+        ) : null}
       </ScrollView>
     </View>
   );

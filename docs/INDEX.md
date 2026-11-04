@@ -104,11 +104,11 @@ Read the sections your task touches.
   - 838–863 Persistence and shipping (~1.7K)
   - 864–904 Screens (~4.4K) ← 2
     - 890–904 Table screen (~1.6K) ← 4
-- `docs/design-system-table.md` — Design system — Table (landscape) (~27.2K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~27.5K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
-  - 28–35 Quest scale (~430) ← 2
+  - 28–35 Quest scale (~500) ← 2
   - 36–39 Canvas (~560) ← 1
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
@@ -129,13 +129,13 @@ Read the sections your task touches.
   - 256–259 Stops and Always use (~250)
   - 260–263 Guide (~120)
   - 264–273 Choice tray (~850) ← 3
-  - 274–286 Reading panels (~1.2K) ← 5
-  - 287–296 Phase carousel (~680)
-  - 297–302 Quest advance (~530) ← 1
-  - 303–306 Undo (~140)
-  - 307–310 Haptics (~280)
-  - 311–321 Banner (~580) ← 1
-  - 322–325 Android Back (~90)
+  - 274–287 Reading panels (~1.5K) ← 6
+  - 288–297 Phase carousel (~680)
+  - 298–303 Quest advance (~530) ← 1
+  - 304–307 Undo (~140)
+  - 308–311 Haptics (~280)
+  - 312–322 Banner (~580) ← 1
+  - 323–326 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~23.9K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.1K tok)
   - 5–16 Rules (~550)
   - 17–75 Phases (~2.1K)
-  - 76–159 Open items (~3.9K)
+  - 76–160 Open items (~3.9K)
     - 78–92 Fixtures and Maestro (~630)
     - 93–120 Rules and engine (~840)
     - 121–138 Screens and code (~1.0K)
-    - 139–159 Phone and tablet checks (~1.4K)
-  - 160–176 Standing decisions (~430)
+    - 139–160 Phone and tablet checks (~1.4K)
+  - 161–177 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.1K tok)
@@ -342,7 +342,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: architecture.md, Tests (1)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
-- `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); design-system-table.md, Reading panels (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Choice tray (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
+- `src/play`: design-system-table.md, Spotlight (12); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); design-system-table.md, Piles (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Choice tray (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
 - `src/rules`: brief.md, The engine plays the game (2); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Components (5); design-system.md, Briefing (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Campaign path (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `src/ui`: design-system.md, Components (3); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)

@@ -1,4 +1,4 @@
-// The layers over the table that read or answer (phase 21): the one reading panel (a discard pile, the log, the threat panel, the
+// The layers over the table that read or answer (phase 21): the one reading panel (a discard pile, the log, the threat panel, the staging threat's cards, the
 // table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close them on a tap outside, and the hit
 // layers that fold the choice's rows (choice/tray.tsx), which stand in the dock. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
 // a new one replaces the last.
@@ -24,9 +24,10 @@ import { carouselHeight } from "../phases/carousel-size.ts";
 import { PhaseCarousel } from "../phases/phase-carousel.tsx";
 import { PhaseSweep } from "../phases/phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
-import { kindWords, victorySaid, victoryWords } from "../words/list.ts";
+import { kindWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWords } from "../words/list.ts";
+import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
-import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, type ListCard } from "./reading-panels.tsx";
+import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, ThreatSourceList, type ListCard } from "./reading-panels.tsx";
 import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
 import { foldTitle } from "../layout/row-fold.ts";
@@ -111,6 +112,20 @@ function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { stor
     return listCard(id, code, key, names, picture, ctx.cards, grapple || null);
   });
   return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
+}
+
+// The cards that make up the staging threat the quest meter draws (threat-sources.ts), each with the Threat it adds. A card the table hides
+// the face of is not named.
+function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  const read = threatSourcesOf(game, ctx);
+  const cards = read.sources.map((source) => {
+    const card = game.cards[source.id];
+    const made = listCard(source.id, card?.code ?? "", card && !hidesFace(card) ? pictureKey(card) : "", names, picture, ctx.cards);
+    return { ...made, detail: threatSourceWords(made.detail ?? null, source.threat, source.from), said: threatSourceSaid(made.detail ?? null, source.threat, source.from) };
+  });
+  const title = read.seat == null ? "Staging threat" : `Player ${read.seat + 1}'s staging threat`;
+  return <ThreatSourceList title={title} total={read.total} cards={cards} adjust={adjustWords(read.adjust)} onRead={onRead} onClose={onClose} />;
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
@@ -209,8 +224,8 @@ export function TableLayers({
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
   const settingsOpen = held?.kind === "settings";
-  // The settings panel and the card lists (a pile's, a row's) stand on night; the log, the threat panel and the Island Map on paper.
-  const night = settingsOpen || held?.kind === "pile" || held?.kind === "row";
+  // The settings panel and the card lists (a pile's, a row's, the staging threat's) stand on night; the log, the threat panel and the Island Map on paper.
+  const night = settingsOpen || held?.kind === "pile" || held?.kind === "row" || held?.kind === "stagingThreat";
   // The settings panel is wider than the other panels, so its three-word switches fit (settings-panel-width.ts).
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
@@ -253,6 +268,7 @@ export function TableLayers({
           />
         ) : null}
         {held?.kind === "row" ? <RowReading store={store} ctx={ctx} row={held.row} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
+        {held?.kind === "stagingThreat" ? <ThreatSourceReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={shown} maxHeight={room - (trayShown ? WAITING * s : 0)} onRead={onPreview} onClose={close} /> : null}
