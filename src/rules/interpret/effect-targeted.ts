@@ -161,9 +161,11 @@ function applyTargeted(
           next = updateCard(moveCard(next, id, { zone: "stormcallerArea" }), id, { face: "up" });
           continue;
         }
-        // Into the searching seat's own staging area once stages are separate (families/breaking/areas.ts).
+        // Into the searching seat's own staging area once stages are separate (families/breaking/areas.ts). A card found facedown is turned faceup: one the
+        // encounter discard pile was shuffled back into the deck with lies facedown (rr.running-out-of-cards, resetEncounterDeck). A side it shows (A or B) stays.
+        const facedown = next.cards[id]?.face === "down";
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
-        if (instruction.each) next = updateCard(next, id, { face: "up" });
+        if (instruction.each || facedown) next = updateCard(next, id, { face: "up" });
       }
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;

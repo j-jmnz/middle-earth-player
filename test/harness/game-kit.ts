@@ -14,6 +14,7 @@ import type { StartScenario } from "../../src/rules/setup/setup.ts";
 
 import { gameCodes } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "./catalog.ts";
+import { faceProblems } from "./face-check.ts";
 import { FRODO } from "./scene.ts";
 
 // Test helper. The parts every scenario's seeded whole game (test/scenarios/<scenario-id>/game.ts) shares: the stand-in heroes
@@ -63,6 +64,9 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
     state = result.state;
     steps.push(...result.steps);
     intents.push(intent);
+    // A card in the staging area, engaged or active shows its face (face-check.ts).
+    const facedown = faceProblems(state);
+    if (facedown.length > 0) throw new Error(`After intent ${intents.length} (${JSON.stringify(intent)}): ${facedown.join("; ")}`);
   }
   return { start, kept, state, intents, steps };
 }

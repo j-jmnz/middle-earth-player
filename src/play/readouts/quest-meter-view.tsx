@@ -4,8 +4,9 @@
 // each new value (`meterFill`); reduced motion snaps them. It moves live as characters are committed (quest-scale.ts); the numbers are the
 // engine's. It is mounted only in the Quest phase (command-head-view.tsx), its bars starting at their values. A screen reader
 // hears one line: the threat in staging, the willpower committed and how far ahead or short it is, so it is never read as the player's own threat.
+// A tap on it lists the cards that make up the threat (`onPress`; threat-sources.ts); the pressed meter dims.
 import { useEffect } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 
 import { MOTION } from "../../ui/motion-tokens.ts";
@@ -131,10 +132,19 @@ function CompactMeter({ scale, height }: { scale: QuestScale; height: number }) 
   );
 }
 
-export function QuestMeterView({ scale, compact, height }: { scale: QuestScale; compact: boolean; height: number }) {
+export function QuestMeterView({ scale, compact, height, onPress }: { scale: QuestScale; compact: boolean; height: number; onPress?: () => void }) {
   return (
-    <View testID="quest-meter" accessible accessibilityLabel={scaleLabel(scale)} style={{ height }}>
+    <Pressable
+      testID="quest-meter"
+      disabled={!onPress}
+      onPress={onPress}
+      accessible
+      accessibilityRole={onPress ? "button" : undefined}
+      accessibilityLabel={scaleLabel(scale)}
+      accessibilityHint={onPress ? "Shows the cards that make up the threat" : undefined}
+      style={({ pressed }) => ({ height, opacity: pressed ? 0.7 : 1 })}
+    >
       {compact ? <CompactMeter scale={scale} height={height} /> : <FullMeter scale={scale} height={height} />}
-    </View>
+    </Pressable>
   );
 }
