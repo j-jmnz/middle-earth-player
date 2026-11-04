@@ -26,6 +26,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
 - `pnpm lint` checks import boundaries.
+- `pnpm test:scenario <scenario-id>` (`--list` first) runs one scenario's tests, its goldens, the coverage checks and the card smoke on its player cards, plus the family tests when pool or family files changed (`docs/plans/scenario-pipeline.md`, section F). Use it while authoring; the full `pnpm test` is the gate before a commit.
 - `pnpm scenario:new <scenario-id>` (`--dry-run` first) writes a scenario's skeletons (scene, game, golden and campaign tests, seed finder, Maestro flows, authored effects file) and registers it in the fixture and golden registries; it refuses a scenario that has files. The procedure around it is in `docs/phases/phase-12-knife-in-the-dark.md` (Scenario procedure).
 - `pnpm move <old> <new>` (or `pnpm move <map.json>`, `--dry-run` first) moves tracked files and folders and rewrites every relative import and every root-written path in code, docs and configs that names them; a file's `.native` variants and its test go with it. It lists what it cannot follow (paths built at run time). Move files with it, not by hand.
 - `node --experimental-strip-types scripts/e2e/fixtures.ts` rewrites the Maestro save fixtures (`src/campaign/fixtures/`) when `fixtures.test.ts` says a fixture no longer reaches its moment. `--won` also searches for scenario 1's won game, which is open (`docs/phases/STATUS.md`).

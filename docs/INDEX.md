@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~1.8K tok)
+- `CLAUDE.md` — Claude Code (~1.9K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
 - `.cursor/rules/code-standards.mdc` — Code standards (~1.5K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
@@ -31,17 +31,17 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.7K tok)
+- `README.md` — Middle Earth LCG (~3.8K tok)
   - 7–17 Where it stands (~390)
   - 18–23 Rules come from the printed sources (~160)
-  - 24–52 Commands (~1.1K)
-  - 53–62 Documents (~260)
-  - 63–66 Agents (~170)
-  - 67–161 Run it locally (~1.5K)
-    - 71–76 Mac browser (~120)
-    - 77–82 Codespaces (~110)
-    - 83–157 Phone builds from scratch (Mac) (~1.1K)
-    - 158–161 Maestro (~170)
+  - 24–53 Commands (~1.2K)
+  - 54–63 Documents (~260)
+  - 64–67 Agents (~170)
+  - 68–162 Run it locally (~1.5K)
+    - 72–77 Mac browser (~120)
+    - 78–83 Codespaces (~110)
+    - 84–158 Phone builds from scratch (Mac) (~1.1K)
+    - 159–162 Maestro (~170)
 - `docs/architecture.md` — Architecture (~18.3K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
@@ -57,7 +57,7 @@ Read the sections your task touches.
   - 295–300 Images (~1.0K) ← 6
   - 301–349 Screens (~3.7K) ← 1
   - 350–355 Catalog build (~410)
-  - 356–371 Tests (~1.3K) ← 3
+  - 356–371 Tests (~1.3K) ← 4
   - 372–387 Performance (~1.2K) ← 3
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~60.6K tok)
   - 17–37 Sections (~380)
@@ -190,7 +190,7 @@ STATUS.md, then the active phase file.
   - 163–179 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
-- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.2K tok)
+- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
 - `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~1.0K tok)
 - `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~1.1K tok)
 - `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~790 tok)
@@ -328,7 +328,7 @@ Open work; read when a task names it.
   - 58–71 Shared files (~300)
   - 72–86 Approach (~700) ← 4
   - 87–96 Checkpoints (API usage limits can stop you mid-task) (~200)
-  - 97–110 Checks before committing (~280)
+  - 97–110 Checks before committing (~330)
   - 111–117 Merge (~120)
   - 118–124 Commit (~110)
   - 125–132 Report (your final message) (~90)
@@ -359,7 +359,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
-- `scripts/tools`: architecture.md, Modules (1); phases/phase-12-knife-in-the-dark.md, Scenario procedure (1)
+- `scripts/tools`: architecture.md, Modules (1); architecture.md, Tests (1); phases/phase-12-knife-in-the-dark.md, Scenario procedure (1)
 - `src/campaign`: architecture.md, Tests (2)
 - `src/catalog`: brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
