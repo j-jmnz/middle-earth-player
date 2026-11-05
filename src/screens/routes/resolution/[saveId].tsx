@@ -81,7 +81,9 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   useEffect(() => {
     if (lost) recordCampaignRun(user, opened.save(), opened.save(), session.world, game);
   }, [lost, user, opened, session, game]);
-  const toPath = () => router.replace({ pathname: "/path/[saveId]", params: { saveId } });
+  // The path the game was opened from is usually below the outcome: pop back to it. A replace would stack a second path on it, and
+  // Back from there would open the same path again. With no path below (a cold start, Continue from the campaign list), it replaces.
+  const toPath = () => router.dismissTo({ pathname: "/path/[saveId]", params: { saveId } });
   // Back is a labelled control, never a gesture alone. Each choice is already saved, so leaving loses nothing; the
   // resolution waits on the path (Resume).
   const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
