@@ -55,7 +55,7 @@ Read the sections your task touches.
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
   - 295–300 Images (~1.0K) ← 6
-  - 301–349 Screens (~3.7K) ← 1
+  - 301–349 Screens (~3.7K) ← 2
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
@@ -335,6 +335,17 @@ Read when a task names the plan.
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
+- `docs/plans/screen-reader.md` — Plan: Screen reader parity (VoiceOver and TalkBack) (~4.1K tok)
+  - 3–68 Context (~1.0K)
+    - 11–37 What already works (reuse it, do not rebuild it) (~430)
+    - 38–55 The gaps (~250)
+    - 56–68 How the work runs (~200)
+  - 69–100 1. Card speech and one announcer (~580)
+  - 101–131 2. The reader table on the phone (~480)
+  - 132–162 3. The table's moments, refusals and chrome (~520)
+  - 163–212 4. Menus and screens (~910)
+  - 213–233 5. Parity as a test (~370)
+  - 234–247 Verification (~190)
 - `docs/plans/table-and-deck-fixes.md` — Plan: table and deck fixes (~3.0K tok)
 
 ## Handovers
