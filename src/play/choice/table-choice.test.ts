@@ -13,7 +13,7 @@ import { actionsSheet, commitSheet, windowSheet } from "./bar-sheets.ts";
 import { sailingTable, seaFixture, seaViews } from "../dream-chaser/sea-fixture.ts";
 import { dropTargets, draggableIds } from "../store/selection.ts";
 import { whyNotChosen } from "./why.ts";
-import { highlightKeys, highlightOf } from "../canvas/highlight-of.ts";
+import { boardUnlit, highlightKeys, highlightOf } from "../canvas/highlight-of.ts";
 import { momentOf } from "../store/outcome.ts";
 import { tableLayout } from "../layout/layout.ts";
 import { readoutFor } from "../readouts/readout.ts";
@@ -336,16 +336,15 @@ describe("the sea family's moments on the table", () => {
     expect(whyNotChosen({ ...state, sea: undefined }, seaCtx, ids.aragorn!, sheet)).toBeNull();
   });
 
-  it("keeps the moment's cards on the table while the tray is open or the table peeks: the fold reads the sheet, not the glow", () => {
+  it("glows and dims the moment's cards on the table while the tray is open, and keeps them from the fold: the fold reads the sheet, not the glow", () => {
     const fixture = seaFixture({ staging: 12, engaged: 0 });
     const { views, piles } = seaViews(fixture);
     const first = fixture.ids.staged0!;
     const pick: Sheet = { kind: "multi", key: "k", step: "Quest", title: "Pick", note: null, verb: "Pick", options: [{ id: first, label: "first", code: "galley" }], build: { kind: "Commit" }, allowEmpty: false, preselected: [], alternative: null };
-    const keys = highlightKeys({ game: fixture.state, seat: 0, sheet: pick, choice: { key: "k", ids: [], shares: [] }, panel: true });
-    // The tray is open: nothing glows, yet the option card is still kept.
-    expect(keys.glow).toBe("");
+    const keys = highlightKeys({ game: fixture.state, seat: 0, sheet: pick, choice: { key: "k", ids: [], shares: [] }, panel: boardUnlit(true, pick, (id) => id === first) });
+    // The tray is open and the option is on the table: it glows, the rest dims, and it is kept.
+    expect([keys.glow, keys.dim]).toEqual([first, true]);
     const highlight = highlightOf(keys);
-    expect(highlight.tappable.size).toBe(0);
     expect([...highlight.keep]).toEqual([first]);
     const folded = (keep: ReadonlySet<string>) => (tableLayout(591, 338, views, piles, { scale: 1.15, keep }).folds ?? []).flatMap((fold) => fold.cards);
     expect(folded(new Set())).toContain(first);

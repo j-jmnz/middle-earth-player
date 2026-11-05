@@ -22,7 +22,7 @@ import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock/extras.ts";
 import { usePeeking } from "../store/use-peek.ts";
 import { useStable } from "../../ui/use-stable.ts";
-import { fightOf, highlightKeys, highlightOf, playedCard } from "../canvas/highlight-of.ts";
+import { boardUnlit, fightOf, highlightKeys, highlightOf, playedCard } from "../canvas/highlight-of.ts";
 import { listsResponses, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import { effectById } from "../../rules/windows/listen.ts";
@@ -152,7 +152,8 @@ export function useTableChoice({
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)) });
+  // The board glows, dims and marks the sheet's own cards whenever any of them is drawn on the table, the tray open or not (boardUnlit).
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: boardUnlit(panel, sheet, onTable) });
   const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey }), [glow, pickedKey, share, dim, markKey, mutedKey, keepKey]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
@@ -266,8 +267,10 @@ export function useTableChoice({
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      // A Response listed only so it shows beside Pass still glows on the table, and a tap on its card picks it.
-      const answers = responses && tappable(sheet).has(cardId);
+      // A card of the open sheet glows on the table while the tray lists it (a Response listed beside Pass, or any choice in the open
+      // tray), and a tap on it picks it through the same pick as its tray row, so the tray's selection and the board stay in step; a tap
+      // on any other card folds the tray.
+      const answers = (responses || panelOpen) && tappable(sheet).has(cardId);
       const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isLooked(game, cardId), answers }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
