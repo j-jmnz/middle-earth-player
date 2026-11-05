@@ -14,7 +14,7 @@ import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts"
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { resourceShield } from "../families/aflame/attack.ts";
-import { damageShield } from "../families/wilderland/shield.ts";
+import { cancelAllDamage, damageShield } from "../families/wilderland/shield.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "../families/play/hooks.ts";
 import { alliesToHandDestination } from "../families/deck/rules.ts";
 import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
@@ -212,6 +212,9 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // by Lightless Passage's Shadow (41033:A:2).
   if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
+  // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
+  const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
+  if (scaled) return scaled;
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;

@@ -17,7 +17,7 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs the start deals in Setup", () => {
-    expect(sorted(setupRoleVerbs("dealt"))).toEqual(["AddToStaging", "AttachToRingBearer", "PutObjectiveAllyIntoPlay", "SetAside", "SetAsideEachPlayer"]);
+    expect(sorted(setupRoleVerbs("dealt"))).toEqual(["AddToStaging", "AddToStagingWithResources", "AttachToRingBearer", "PutObjectiveAllyIntoPlay", "SetAside", "SetAsideEachPlayer"]);
   });
 
   it("mark exactly the verbs the start resolves after the quest card's Setup", () => {

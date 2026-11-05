@@ -32,7 +32,7 @@ export function undiscoveredTreasures(state: ScenarioState, ctx: ReduceContext):
 export function attachRandomTreasure(state: ScenarioState, instruction: Verb, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const guardId = refCard(state, instruction.to ?? "self", frameScope(state, focus.seat, focus.sourceId));
   const guard = guardId ? state.cards[guardId] : undefined;
-  if (!guardId || !guard || (guard.zone !== "staging" && guard.zone !== "engaged")) return state;
+  if (!guardId || !guard || (guard.zone !== "staging" && guard.zone !== "engaged" && guard.zone !== "activeLocation")) return state;
   const pool = undiscoveredTreasures(state, ctx);
   if (focus.chosen != null) return pool.includes(focus.chosen) ? attach(state, focus.chosen, guardId, steps) : state;
   const drawn = shuffleIds(pool, state.seed, state.seedCursor);

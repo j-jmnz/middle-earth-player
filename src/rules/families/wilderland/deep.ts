@@ -32,9 +32,15 @@ export function pushDeep(state: ScenarioState, locationId: string, ctx: ReduceCo
  * (a GuardObjective with a type, emce.guarded-x: "When a card with guarded (X) enters play") is resolved here, once the sign is in the staging area.
  */
 export function resolveDeep(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (ignoresKeyword(state, ctx, "deep")) return state;
+  return replaceFromCaves(state, focus, ctx, steps);
+}
+
+/** The source active location is discarded and the top card of the Caves deck replaces it (a Caves card that is not a location goes to the staging area). Nothing happens with the Caves deck empty or the source no longer an active location; a keyword that is ignored is the caller's. */
+export function replaceFromCaves(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;
   const top = topOf(state, "cavesDeck");
-  if (!id || top === undefined || (state.activeLocation !== id && state.secondActiveLocation !== id) || ignoresKeyword(state, ctx, "deep")) return state;
+  if (!id || top === undefined || (state.activeLocation !== id && state.secondActiveLocation !== id)) return state;
   const replacement = state.cards[top];
   if (!replacement) return state;
   const discarded = moveEncounter(state, id, "discard", focus.seat, ctx, steps);

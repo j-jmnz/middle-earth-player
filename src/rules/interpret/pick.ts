@@ -236,7 +236,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.minCost != null && (printed.cost == null || printed.cost < spec.minCost)) return false;
   if (spec.oddCost && (printed.cost == null || printed.cost % 2 !== 1)) return false;
   if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
-  if (spec.noVictory && (printed.victory ?? 0) > 0) return false;
+  if (spec.noVictory !== undefined && (printed.victory ?? 0) > 0 === spec.noVictory) return false;
   if (spec.state === "ready" && instance.exhausted) return false;
   if (spec.state === "exhausted" && !instance.exhausted) return false;
   if (spec.canAttack && !legalAttackEnemies(state, instance.controller ?? asking, id, ctx.cards, true).length) return false;
@@ -327,8 +327,8 @@ export function feedsDiscard(instructions: readonly Instruction[]): boolean {
 }
 
 // How many cards match a filter from a seat's side: the count an amount or a condition reads.
-export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext): number {
-  const found = pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, undefined, true);
+export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[]): number {
+  const found = pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, participants, true);
   // "When counting the number of Dwarf characters you control, Bombur counts as two" (families/misc/traits.ts).
   return found.length + countsExtra(state, found, spec);
 }

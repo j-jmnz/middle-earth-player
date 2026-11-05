@@ -73,6 +73,7 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
         eventSeat: event.seat,
         ...(aboutCard(event) ? { subject: aboutCard(event) } : {}),
         ...(event.other ? { other: event.other } : {}),
+        ...(event.participants ? { participants: event.participants } : {}),
         ...(event.trigger === "damageDealt" && event.cardId ? { dealt: event.amount ?? 0, hold: event.cardId } : {}),
         // Any other event's amount is the effect's X (the attachments an explored location had).
         ...(event.trigger !== "damageDealt" && event.amount != null ? { x: event.amount } : {}),

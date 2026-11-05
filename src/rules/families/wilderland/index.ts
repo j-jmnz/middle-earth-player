@@ -8,7 +8,8 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { addFromNamed, refillEvilCreatures, shuffleIntoNamed, shuffleNamed, shuffleNamedIntoEncounter } from "./decks.ts";
 import { attachSelf } from "../../interpret/effect-targeted.ts";
-import { resolveDeep } from "./deep.ts";
+import { replaceFromCaves, resolveDeep } from "./deep.ts";
+import { addToStagingWithResources, arrangeCaves, attachSearched, attachSelfToPicked, cancelStrike, discardUntilTypes, guardPickedAttachment, guardWithDeckTop, putOnPileBottom, returnHeld } from "./kings.ts";
 import { discover } from "./discover.ts";
 import { logCondition } from "./log.ts";
 import { attachRandomTreasure, claimRandomTreasure } from "./treasure.ts";
@@ -23,6 +24,7 @@ import { carryAwayHero, discardGuardedHeroes, releaseGuardedHero } from "./carri
 import { discardFacedownUnder, placeHandUnderLocation, returnFacedownToHands } from "./lost.ts";
 import { clearNemesis, nemesisAttacks, searchNemesis } from "./nemesis.ts";
 import { topFrame } from "../../windows/windows.ts";
+import { pileOf } from "../../core/piles.ts";
 
 // The verbs src/catalog/families/wilderland.ts adds. AttachRandomTreasure runs in the game. The others are not run by the engine: the Resolution
 // ones (DiscoverTreasure, BoonAllyOrLogLine, AddEncounterToPool, RemoveFromPool) are run by rules/setup/resolution.ts, and RemoveFromEncounterDeckIfLogged is dealt by
@@ -81,6 +83,28 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return searchNemesis(state, focus, ctx, steps);
     case "NemesisAttacks":
       return nemesisAttacks(state, focus, ctx, steps);
+    case "AddToStagingWithResources":
+      return addToStagingWithResources(state, instruction, focus, ctx);
+    case "DiscardUntilTypes":
+      return discardUntilTypes(state, instruction, ctx);
+    case "ReplaceFromCaves":
+      return replaceFromCaves(state, focus, ctx, steps);
+    case "ArrangeCaves":
+      return arrangeCaves(state, instruction, focus, steps);
+    case "PutOnPileBottom":
+      return putOnPileBottom(state, instruction);
+    case "AttachSelfToPicked":
+      return attachSelfToPicked(state, focus, ctx);
+    case "AttachSearched":
+      return attachSearched(state, instruction, focus, ctx, steps);
+    case "GuardPickedAttachment":
+      return guardPickedAttachment(state, instruction, focus, ctx, steps);
+    case "GuardWithDeckTop":
+      return guardWithDeckTop(state, focus);
+    case "ReturnGuardedToHand":
+      return state;
+    case "CancelStrike":
+      return cancelStrike(state);
     case "Loot":
     case "Undiscardable":
     case "DiscardToPoolFromSets":
@@ -107,6 +131,7 @@ function eventSubject(state: ScenarioState): string | null {
 
 // The conditions that read the Campaign Log's facts (log.ts). A game dealt without the facts holds neither.
 function condition(state: ScenarioState, found: Condition): boolean | null {
+  if (found.kind === "cavesDeck") return pileOf(state, "cavesDeck").length >= (found.min ?? 1);
   return logCondition(found, state.campaignFacts);
 }
 
@@ -116,7 +141,7 @@ export const manifest: RulesFamily = {
   amount: wilderlandAmount,
   pick: wilderlandPickMatches,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
-  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks"],
+  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => returnHeld(clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx), ctx) },
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "DiscardUntilTypes", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike"],
   run,
 };

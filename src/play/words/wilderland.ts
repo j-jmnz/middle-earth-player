@@ -123,6 +123,8 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
     const card = source ? names.card(source) : "this card";
     return { verb: "Choose", prompt: `Players are tied for the most cards in hand: choose who adds ${card} to their hand. Playing a card then discards that player's whole hand, and player card effects cannot discard ${card}.` };
   }
+  const kings = kingsQuestAsk(instruction, source, names, next);
+  if (kings) return kings;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
   // The guard is attached to the treasure and keeps it from being claimed until it is dealt with (rr.guarded). It is the card the record picked (Twilight Hall, searched for by the campaign card) or the source itself.
@@ -132,8 +134,22 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   return { verb: "Choose", prompt: `${choose} ${host} is attached to it, and the players cannot claim it until ${host} is dealt with.` };
 }
 
-/** The label of an option of that choice: the treasure's title. Null for another instruction. */
+// The King's Quest's choices (18043:A:3, 18047:A:1, 18048:A:1, 18055:A:2, 18058:A:2, 18059:A:2, 18079:B:2, 18080:A:1): the sentence each asks, from the verb it opens or the pick before it.
+function kingsQuestAsk(instruction: Instruction, source: string | null, names: ChoiceNames, next: Instruction | undefined): PickWords | null {
+  const name = source ? names.card(source) : "This card";
+  if (instruction.verb === "ArrangeCaves") return { verb: "Choose", prompt: `Look at the top ${instruction.count} cards of the Caves deck: choose the one that stays on top. The ${instruction.count === 2 ? "other goes" : "others go"} to the bottom.` };
+  if (instruction.verb === "AttachSearched") return { verb: "Attach", prompt: `Choose a ${instruction.trait} ${instruction.type} from the encounter deck or its discard pile to attach to ${instruction.to}.` };
+  if (instruction.verb === "AttachSelf" && instruction.to.kind === "enemy" && instruction.to.trait === "Dragon") return { verb: "Attach", prompt: `Choose a Dragon enemy to attach ${name} to.` };
+  if (instruction.verb !== "Pick") return null;
+  if (next?.verb === "GuardPickedAttachment") return { verb: "Guard", prompt: "Choose an Artifact attachment in your hand: a location from the encounter deck guards it, and the players claim it once that location is dealt with." };
+  if (next?.verb === "AttackFromStaging" && instruction.pick.highestAttack === true) return { verb: "Choose", prompt: "Enemies in the staging area are tied for the highest Attack: choose the one that makes an immediate attack against the first player." };
+  if (next?.verb === "AttachSelfToPicked" && instruction.pick.type === "hero" && instruction.pick.committed === true) return { verb: "Attach", prompt: `Choose a questing hero to attach ${name} to. It is removed from the quest.` };
+  return null;
+}
+
+/** The label of an option of that choice: the treasure's title, or the card a Caves look or a Dragon search offers. Null for another instruction. */
 export function wilderlandOptionLabel(instruction: Instruction, id: string, names: ChoiceNames): string | null {
+  if (instruction.verb === "ArrangeCaves" || instruction.verb === "AttachSearched") return names.card(id);
   return isTreasureDraw(instruction) ? names.code(id) : null;
 }
 
@@ -160,6 +176,8 @@ export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choo
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";
   const option = choose.options.find((entry) => entry.id === optionId);
+  if (option?.instructions[0]?.verb === "ReplaceFromCaves") return "Discard it and replace it with the top card of the Caves deck";
+  if (option?.instructions[0]?.verb === "CancelStrike") return "Cancel the attack: it deals no damage";
   const step = option ? countedBranch(option) : null;
   const number = now?.counted?.[optionId];
   if (!step || number == null) return null;

@@ -243,4 +243,6 @@ export type PendingStrike = {
   engagedSeat?: number;
   ranged?: boolean;
   excessTo?: string;
+  // A card canceled the attack (CancelStrike, 18080:B:2): it deals no damage. Absent on every other attack.
+  canceled?: true;
 };

@@ -146,7 +146,7 @@ export const pickSchema = z.strictObject({
   canAttack: z.boolean().optional(),
   // An ally in a discard pile or the hand whose printed cost is X (Stand and Fight): the amount the effect names.
   cost: z.number().int().min(0).optional(),
-  // A card that prints no victory points ("a location worth no victory points").
+  // A card that prints no victory points ("a location worth no victory points"); `false`: a card that prints some ("3 locations with victory points", 18078:B:2).
   noVictory: z.boolean().optional(),
   // A character that could be declared as a defender of the attack in progress and is not defending it yet (rr.step-6-4-1).
   canDefend: z.boolean().optional(),
@@ -206,6 +206,7 @@ export const pickSchema = z.strictObject({
   hasGuard: z.boolean().optional(),
   isGuard: z.boolean().optional(),
   onPicked: z.boolean().optional(),
+  // A player card (`false`: an encounter card, "all encounter cards are immune", 12172:A:2).
   playerCard: z.boolean().optional(),
   maxDefense: z.number().int().min(0).optional(),
   // A character whose current Attack is at least this ("a character with at least 2 Attack", 12074:A:2).

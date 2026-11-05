@@ -219,3 +219,27 @@ describe("the Wilderland scenario's prompts", () => {
   });
 });
 
+
+// Rules: emce.caves-deck, emce.guarded-x (data/rules/entries.json); ledger lines 18043:A:3, 18045:A:2, 18047:A:1, 18048:A:1, 18055:A:2, 18058:A:2, 18080:A:1, 18080:B:2. The choices of The King's Quest.
+describe("The King's Quest's choices", () => {
+  it("words the Caves look, the Dragon search and the Dragon attachment", () => {
+    expect(wilderlandAsk({ verb: "ArrangeCaves", count: 2 }, null, words)?.prompt).toBe("Look at the top 2 cards of the Caves deck: choose the one that stays on top. The other goes to the bottom.");
+    expect(wilderlandAsk({ verb: "AttachSearched", type: "treachery", trait: "Dragon", to: "Fire-drake" }, null, words)?.prompt).toBe("Choose a Dragon treachery from the encounter deck or its discard pile to attach to Fire-drake.");
+    expect(wilderlandAsk({ verb: "AttachSelf", to: { kind: "enemy", trait: "Dragon" } }, "hall-id", words)?.prompt).toBe("Choose a Dragon enemy to attach Twilight Hall to.");
+    expect(wilderlandAsk({ verb: "AttachSelf", to: { kind: "enemy", trait: "Nazgûl" } }, "hall-id", words)).toBeNull();
+    expect(wilderlandOptionLabel({ verb: "ArrangeCaves", count: 2 }, "hall-id", words)).toBe("Twilight Hall");
+  });
+
+  it("words the picks before the verbs that use them", () => {
+    const pick = (spec: Extract<Instruction, { verb: "Pick" }>["pick"]): Instruction => ({ verb: "Pick", pick: spec });
+    expect(wilderlandAsk(pick({ type: "card", control: "you", from: "hand" }), null, words, { verb: "GuardPickedAttachment", types: ["location"] })?.prompt).toContain("Artifact attachment in your hand");
+    expect(wilderlandAsk(pick({ type: "enemy", control: "any", stagingOnly: true, highestAttack: true }), null, words, { verb: "AttackFromStaging", who: "firstPlayer" })?.prompt).toContain("tied for the highest Attack");
+    expect(wilderlandAsk(pick({ type: "hero", control: "any", committed: true }), "hall-id", words, { verb: "AttachSelfToPicked" })?.prompt).toBe("Choose a questing hero to attach Twilight Hall to. It is removed from the quest.");
+  });
+
+  it("words the branches that replace a location from the Caves deck and cancel an attack", () => {
+    const choose: Extract<Instruction, { verb: "Choose" }> = { verb: "Choose", who: "firstPlayer", options: [{ id: "replace", instructions: [{ verb: "ReplaceFromCaves" }] }, { id: "cancel", instructions: [{ verb: "CancelStrike" }] }] };
+    expect(wilderlandBranchWords(choose, "replace", words)).toBe("Discard it and replace it with the top card of the Caves deck");
+    expect(wilderlandBranchWords(choose, "cancel", words)).toBe("Cancel the attack: it deals no damage");
+  });
+});

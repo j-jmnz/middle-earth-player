@@ -15,6 +15,7 @@ import { revealTop } from "../encounter/named-decks.ts";
 import { attachSelf } from "../../interpret/effect-targeted.ts";
 import { markPicked } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
+import { spawnIntoPile } from "./kings.ts";
 
 /** The Evil Creatures deck ran out: its own discard pile is shuffled back into it (emce.evil-creatures-deck). Settle keeps the game's deck refilled. */
 export function refillEvilCreatures(state: ScenarioState): ScenarioState {
@@ -32,7 +33,7 @@ export function shuffleNamed(state: ScenarioState, instruction: Extract<Instruct
 export function shuffleIntoNamed(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleIntoPile" }>): ScenarioState {
   const zone = NAMED_PILES[instruction.pile].deck;
   const id = [...state.encounterDeck, ...state.setAside].find((other) => state.cards[other]?.code === instruction.code);
-  if (id === undefined) return state;
+  if (id === undefined) return instruction.placed && pileDealt(state, zone) ? shufflePile(spawnIntoPile(state, instruction.code, instruction.pile), zone) : state;
   if (!pileDealt(state, zone)) return moveCard(state, id, { zone: "removed" });
   return shufflePile(updateCard(moveCard(state, id, { zone }), id, { face: "down", controller: null }), zone);
 }

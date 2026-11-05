@@ -31,6 +31,8 @@ export type AmountScope = {
   x?: number;
   dealt?: number;
   excess?: number;
+  // The characters that took part in the player attack the effect answers (enemyAttacked): "X attackers".
+  participants?: readonly string[];
 };
 
 // The running effect frame's picks, subject and X, for an amount or a card reference read inside it.
@@ -46,6 +48,7 @@ export function frameScope(state: ScenarioState, actor: number, sourceId: string
     ...(data.x != null ? { x: data.x } : {}),
     ...(data.dealt != null ? { dealt: data.dealt } : {}),
     ...(data.excess != null ? { excess: data.excess } : {}),
+    ...(data.participants ? { participants: data.participants } : {}),
   };
 }
 
@@ -134,7 +137,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   const familial = familyAmount(state, amount, scope, ctx);
   if (familial !== null) value = familial;
   else if (amount.count && amount.distinct) value = new Set(pickCandidates(state, amount.count, scope.actor, [], scope.sourceId, ctx, undefined, undefined, true).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name)).size;
-  else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx);
+  else if (amount.count) value = countMatching(state, amount.count, scope.actor, scope.sourceId, ctx, scope.participants);
   else if (amount.stat) value = statOf(state, amount.ofNamed ? namedInPlay(state, amount.ofNamed, ctx) : refCard(state, amount.of ?? "self", scope), amount.stat, amount.printed === true, ctx);
   else if (amount.x) value = scope.x ?? 0;
   else if (amount.stage) value = stageNumber(state);

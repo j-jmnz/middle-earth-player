@@ -137,6 +137,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // or at least `min` treasures are recorded as discovered ("If there are 6 or more treasures recorded in the campaign log"). Read from the facts the log hands the game; a game without them holds neither.
   z.strictObject({ kind: z.literal("logged"), line: z.enum(ALLY_LINES), is: z.boolean().optional() }),
   z.strictObject({ kind: z.literal("treasuresLogged"), min: z.number().int().positive() }),
+  // The Caves deck (emce.caves-deck) holds at least `min` cards (1 by default): "look at the top 2 cards of the Caves deck" (18055:A:2). Read by the wilderland family; a game with no Caves deck holds none.
+  z.strictObject({ kind: z.literal("cavesDeck"), min: z.number().int().positive().optional() }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
   // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender

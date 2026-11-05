@@ -318,7 +318,7 @@ export function continueStrike(state: ScenarioState, ctx: ReduceContext, steps: 
   let next = state;
   const { awaiting, awaitDepth: _depth, ...declared } = strike;
   if (awaiting !== "end") {
-    next = strikeEnemy({ ...state, pendingStrike: declared }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
+    next = strike.canceled ? { ...state, pendingStrike: declared } : strikeEnemy({ ...state, pendingStrike: declared }, strike.seat, strike.enemyId, strike.attackerIds, ctx, steps);
     const after = playerAttackWindow(next, ctx, "end");
     if (after) return after;
   }

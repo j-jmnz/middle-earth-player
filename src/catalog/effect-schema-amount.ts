@@ -66,6 +66,10 @@ export const amountExprSchema = z.strictObject({
   islandLeft: z.literal(true).optional(),
   // The most cards that match the pick any one player controls, each player counted from their own side ("X is the number of characters controlled by the player with the most characters", 18023:A:1). Read by the wilderland family.
   mostPerPlayer: pickSchema.optional(),
+  // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.
+  guardedCost: z.literal(true).optional(),
+  // The damage on the card the answered event is about beyond its printed hit points: "for each excess point of damage dealt" (18049:A:2). Read by the wilderland family.
+  excessOf: z.literal("subject").optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),
   // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.

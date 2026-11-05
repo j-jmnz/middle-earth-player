@@ -41,7 +41,8 @@ const VERBS = [
   // Setup: "Create the Caves deck" / "Create the Evil Creatures deck" (emce.caves-deck, emce.evil-creatures-deck): the cards the scenario dealt to the deck are shuffled together with the game's seed. Run by the quest card's Setup, like PrepareUnchartedDeck.
   verbFlags(z.strictObject({ verb: z.literal("ShufflePile"), pile, ...when }), { setupRuns: "top" }),
   // "Shuffle Abandoned Ruin into the Caves deck" (12170:A, 12174:A:1): the copy of the card the game already has (dealt into the encounter deck, or set aside) joins the deck, which is shuffled; with no such deck it is removed from the game. A campaign card's Setup verb the engine resolves after the quest card's Setup shuffled the deck.
-  verbFlags(z.strictObject({ verb: z.literal("ShuffleIntoPile"), pile, code, ...when }), { setupRole: "afterSetup" }),
+  // With `placed` (the campaign card's own line, 12170:A:2: the game has no such card in the pool) a copy the campaign card brings is spawned into a dealt pile; with no such pile it is not in the game.
+  verbFlags(z.strictObject({ verb: z.literal("ShuffleIntoPile"), pile, code, placed: z.literal(true).optional(), ...when }), { setupRole: "afterSetup" }),
   // "Add the top card of the Evil Creatures deck to the staging area" / "Put the top card ... into play engaged with the first player" (18017:A, 18066:B, 18068:A; emce.evil-creatures-deck): `count` cards (1 by default) come off the top of the deck
   // into the staging area or engaged with the actor, the first player or each player (`who`, the actor by default; the staging area ignores it). A deck with a discard pile of its own (Evil Creatures) is refilled from it first when it is empty. The card enters play, and the last one added is the picked card of the running effect (a later AttachGuard or FlipOver reads it). With `attachSource`
   // the source card is attached to each card added ("Add the top card of the Evil Creatures deck to the staging area and attach Frenzied Creature to it", 18018:A:1); with no card to add it stays where it is.
@@ -112,6 +113,29 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchNemesis"), ...when }),
   // The Forest of Great Fear (18076:B:2): "return the nemesis to the staging area and it makes an attack against the first player." An engaged nemesis goes back to the staging area; it then attacks the first player (a shadow card is dealt for the attack, as AttackFirstPlayer does).
   z.strictObject({ verb: z.literal("NemesisAttacks"), ...when }),
+  // The King's Quest (part 3, campaign card 12170; ledger lines 12170:A:2, 12172:A:1, 18078:A:1, 18078:B:1, 18079:A:1, 18079:B:2, 18080:A:1, 18080:B:2, 18055:A:2, 18045:A:2, 18043:A:3, 18048:A:1, 18050:A:2, 12173:A:2).
+  // "Add The Threat to Wilderland to the staging area with X resources on it" (12170:A:2, 12172:A:1): the card enters the staging area with `amount` resource tokens on it. On the campaign card's Setup it is spawned; on the card's own Setup (a copy of the pool the Setup search found) that copy is placed.
+  verbFlags(z.strictObject({ verb: z.literal("AddToStagingWithResources"), code, amount: positiveAmountSchema, ...when }), { setupRole: "dealt" }),
+  // "Discard cards from the top of the encounter deck until he discards an enemy or location" (18078:A:1): like DiscardUntil, with several types; the card is the picked card, and nothing is picked when the deck runs out.
+  z.strictObject({ verb: z.literal("DiscardUntilTypes"), types: z.array(z.enum(["enemy", "location", "treachery"])).min(2), ...when }),
+  // "Discard Contested Depths and replace it with the top card of the Caves deck" (18045:A:2): the source, the active location, is discarded and the top card of the Caves deck takes its place, as the Deep keyword does (emce.deep), but not ignored by a card that ignores the keyword. Nothing happens with the Caves deck empty.
+  z.strictObject({ verb: z.literal("ReplaceFromCaves"), ...when }),
+  // "Look at the top 2 cards of the Caves deck. Put one on top of the Caves deck and put the other on the bottom" (18055:A:2, 18079:B:2): the first player chooses the card that stays on top of the `count` looked at; the rest go to the bottom of the deck, in their order. With fewer than 2 cards in the deck nothing changes.
+  z.strictObject({ verb: z.literal("ArrangeCaves"), count: z.number().int().min(2), ...when }),
+  // "Place Dragon Hoard on the bottom of the Caves deck" (18079:A:1): the set-aside (or encounter deck) card with this code goes to the bottom of the pile, facedown. A game with no such pile dealt, or no such card, changes nothing.
+  z.strictObject({ verb: z.literal("PutOnPileBottom"), pile, code, ...when }),
+  // "Attach to a questing hero" (18048:A:1): the source card is attached to the last picked card (a Pick of a committed hero comes first).
+  z.strictObject({ verb: z.literal("AttachSelfToPicked"), ...when }),
+  // "Search the encounter deck and discard pile for a Dragon treachery and attach it to Fire-drake, if able" (18080:A:1): the first player chooses a card of the type and trait in the encounter deck or its discard pile (one of each title) that the enemy named `to` does not carry yet, and it is attached to that enemy in play. The deck is shuffled by the instruction after it.
+  z.strictObject({ verb: z.literal("AttachSearched"), type: z.enum(["treachery"]), trait: z.string().min(1), to: z.string().min(1), ...when }),
+  // "The first player chooses a player to attach an Artifact attachment from his hand to Dragon Hoard. That attachment gains the guarded (location) keyword" (18043:A:3): the last picked card of a hand is guarded by a location of the encounter deck, found as the Guarded (location) keyword does (emce.guarded-x), and lies in the staging area; once nothing guards it the players claim it, the first player choosing the character it attaches to, as for a treasure. With no location to find it is claimed at once.
+  z.strictObject({ verb: z.literal("GuardPickedAttachment"), types: z.array(z.enum(["enemy", "location"])).min(1), ...when }),
+  // "The first player attaches the top card of his deck to Hobgoblin faceup as a guarded attachment" (18050:A:2): the first player's top deck card lies faceup under the source, which guards it (cardsUnder). Nothing happens with an empty deck.
+  z.strictObject({ verb: z.literal("GuardWithDeckTop"), ...when }),
+  // A marker on Hobgoblin (18050:A:2, its Forced record on leftPlay): "When Hobgoblin leaves play, return the card it was guarding to its owner's hand". An enemy leaving play queues no event, so the settle sweep returns a card held under an enemy that is out of play (families/wilderland/kings.ts returnHeld). It does nothing when run.
+  z.strictObject({ verb: z.literal("ReturnGuardedToHand") }),
+  // "Cancel the attack" (18080:B:2): the player attack in progress deals no damage; its attackers stay exhausted. Run in the response to enemyAttacked, which resolves before the attack's strength is read.
+  z.strictObject({ verb: z.literal("CancelStrike"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -119,6 +143,8 @@ const FLAGS = [
   // On a character: the next damage it would be dealt cancels this many points of it, and the flag is spent ("The next time that character would be dealt damage this round, cancel 1 of that damage", 12166:A:2). Set with a ModifyStat that lasts
   // until the end of the round or the phase; src/rules/families/wilderland/shield.ts takes it as damage is placed.
   "damageShield",
+  // On an enemy: the damage it would be dealt is canceled and the card that granted the flag (Dragon Scales, 18059:A:2) is discarded. Set by a constant ModifyStat of the attachment; src/rules/families/wilderland/shield.ts cancelAllDamage takes it as damage is placed.
+  "cancelsDamage",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

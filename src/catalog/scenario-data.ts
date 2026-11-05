@@ -359,9 +359,14 @@ export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, e
     ...(data.life != null ? { life: data.life } : {}),
     campaignCard: data.campaignCard,
     // The part of the campaign (the campaign card's "part number", dcce.gaining-xp): the scenario's place in the campaign, not its number in its product (Hall of Beorn numbers each Adventure Pack's scenario within the pack).
-    ...(campaign.xp ? { part: partOf(campaign, data.id) } : {}),
+    // Ered Mithrin has no XP, but the burdens The King's Quest (part 3) adds to the pool read it too ("X is the campaign card's part number", 12172:A:1, 12173:A:1: emce.campaign-pool-encounter), so
+    // its games from that part on hold it; the first two parts have no card that reads it, and their state is as it was.
+    ...(campaign.xp || (campaign.id === "ered-mithrin" && partOf(campaign, data.id) >= BURDENS_READ_PART) ? { part: partOf(campaign, data.id) } : {}),
   });
 }
+
+/** The part of Ered Mithrin whose Resolution adds the first burdens that read the campaign card's part number (The King's Quest). */
+const BURDENS_READ_PART = 3;
 
 // The scenario's place in its campaign (1-based); a scenario the campaign does not list is a data error.
 function partOf(campaign: CampaignData, scenarioId: string): number {

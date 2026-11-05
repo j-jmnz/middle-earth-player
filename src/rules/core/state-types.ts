@@ -118,6 +118,8 @@ export type CardInstance = {
   heroSlot?: number;
   // A hero an enemy guards (Carried Away, 18074:A:1): in play, facedown under the guard (the captive zone), controlled by no one. Its owner stays in the game while it is held (families/wilderland/carried.ts); `owner` is the seat that gets it back.
   guardedHero?: true;
+  // A player card an enemy holds under it, faceup (Hobgoblin, 18050:A:2): it returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set only by GuardWithDeckTop.
+  held?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled

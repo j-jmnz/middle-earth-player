@@ -28,7 +28,7 @@ export function openBranch(state: ScenarioState, item: QueueItem, returned: numb
   const data = effectData(state);
   // An option may require something of the cards the effect picked or the event it answers ("If it is an enemy, you may
   // discard it").
-  const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}) };
+  const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}), ...(data?.participants ? { participants: data.participants } : {}) };
   const legal = limitReached(state, instruction, seat, scope.sourceId, ctx) ? [] : untakenOptions(state, instruction, instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx)));
   if (legal.length === 0) return state;
   // A Choose with `upTo` is always asked while an option is left: the actor may stop.

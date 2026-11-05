@@ -19,7 +19,7 @@ import type { Focus } from "../index.ts";
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 // The records of an effect list that carry a verb of a kind, found once for the list (it never changes after the reducer is handed it): "treasure" the verbs that guard a treasure, "objective" the marker that puts an Objective-Location into play.
-const KINDS = { treasure: ["SearchGuardForTreasure", "AttachRandomTreasure"], objective: ["PutObjectiveLocationAfterDiscard"] } as const;
+const KINDS = { treasure: ["SearchGuardForTreasure", "AttachRandomTreasure", "GuardPickedAttachment"], objective: ["PutObjectiveLocationAfterDiscard"] } as const;
 const INDEX = new WeakMap<readonly Effect[], Map<keyof typeof KINDS, readonly Effect[]>>();
 function recordsWithVerbs(effects: readonly Effect[], kind: keyof typeof KINDS): readonly Effect[] {
   let byKind = INDEX.get(effects);
@@ -77,7 +77,7 @@ export function freeTreasures(state: ScenarioState, ctx: ReduceContext, steps: E
   if (setters.length === 0) return state;
   const id = state.staging.find((candidate) => {
     const card = state.cards[candidate];
-    return card != null && card.zone === "staging" && printedOf(ctx.cards, card.code).campaignKind === "treasure" && freeOfEncounters(state, candidate);
+    return card != null && card.zone === "staging" && (printedOf(ctx.cards, card.code).campaignKind === "treasure" || card.setUpBy != null) && freeOfEncounters(state, candidate);
   });
   if (!id) return state;
   const record = setters.find((effect) => effect.id === state.cards[id]?.setUpBy) ?? setters[0]!;

@@ -57,6 +57,8 @@ export type Scope = {
   // What the running effect has picked, and the other card the answered event names.
   picked?: readonly string[];
   other?: string;
+  // The characters that took part in the player attack the effect answers (enemyAttacked).
+  participants?: readonly string[];
   // The running effect's X.
   x?: number;
   // The damage the answered event placed.
@@ -103,6 +105,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // The wilderland family's condition hook answers the campaign log's lines and treasures (families/wilderland/index.ts); the case only completes the switch.
     case "logged":
     case "treasuresLogged":
+    case "cavesDeck":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -153,7 +156,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "damageHere":
       return (scope.sourceId ? (state.cards[scope.sourceId]?.damage ?? 0) : 0) <= condition.max;
     case "less": {
-      const read: AmountScope = { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}) };
+      const read: AmountScope = { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}), ...(scope.participants ? { participants: scope.participants } : {}) };
       return resolveAmount(state, condition.left, read, ctx) < resolveAmount(state, condition.right, read, ctx);
     }
     case "heading":
