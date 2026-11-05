@@ -12,7 +12,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
-import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { hasQuestPoints, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
@@ -42,7 +42,7 @@ export function progressFirstLocations(state: ScenarioState, amount: number, car
   let remaining = amount;
   for (const id of state.staging) {
     const location = next.cards[id];
-    if (remaining <= 0 || !location || !(flagged(next, id, "progressFirstRequired") || (chosen && flagged(next, id, "takesProgressFirst"))) || printedOf(cards, location.code).questPoints == null) continue;
+    if (remaining <= 0 || !location || !(flagged(next, id, "progressFirstRequired") || (chosen && flagged(next, id, "takesProgressFirst"))) || !hasQuestPoints(printedOf(cards, location.code))) continue;
     const points = modifiedStat(next, location, "questPoints", cards);
     const placed = Math.min(remaining, Math.max(0, points - location.progress));
     if (placed <= 0) continue;

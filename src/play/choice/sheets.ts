@@ -20,7 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/wilderland.ts";
-import { branchCaution } from "./wilderland-sheets.ts";
+import { branchCaution, discardCaution } from "./wilderland-sheets.ts";
 import { seaOptionLabel, travelTaxCaution } from "../words/sea.ts";
 import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
@@ -264,10 +264,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const now = { ...branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words), ...wilderlandBranchNow(game, ctx, choose, window.seat, source) };
         // A Choose with `upTo` (Command) stops on the sheet's armed pass, not on a row of the list: "Done", with the options used so far.
         const stop = commandDone(game, ctx, choose, window.seat, source, source ? names.card(source) : "This card");
-        const ask = torch?.note ?? wilderlandChooseNote(choose, game, ctx, words) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        const ask = torch?.note ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
-          note: [`${ask}${who}`, line].filter((part) => part != null).join(" "),
+          note: [`${ask}${/^Player \d+: /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
           alternative: stop ? { label: stop.label, intent: { type: "Choose", optionId: stop.optionId }, caution: stop.caution } : null,
@@ -306,10 +306,11 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
           // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
           const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
+          const kingsCaution = wait?.kind === "target" ? discardCaution(game, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
           const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ?? kingsCaution ? { caution: fire?.caution ?? ship?.caution ?? kingsCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

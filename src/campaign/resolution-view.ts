@@ -41,6 +41,8 @@ export type ResolutionView =
       seatLabel: string | null;
       // What is chosen: boon, burden, card or captive.
       noun: string;
+      // The card the Resolution already added to the pool, when the choice is the other burden of The King's Quest (12170:B:3): the burden chosen joins it.
+      joins?: string;
       // The boon ally the choice is about, when it is one (BoonAllyOrLogLine): what the log line is traded for, and what the line does at later campaign cards' Setups.
       ally: string | null;
       later: string | null;
@@ -166,6 +168,8 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     if (instruction.verb === "BoonAllyOrLogLine" || (instruction.verb === "ChooseCards" && instruction.to === "player")) return [{ optionId: intent.optionId, code, name, hero: heroName, label: state.seatCount > 1 && hero?.controller != null ? `${name} for Player ${hero.controller + 1}` : name }];
     return [{ optionId: intent.optionId, code, name, hero: heroName, label: heroName ? `${name} on ${heroName}` : name }];
   });
+  // The King's Quest (12170:B:3) says "the first player chooses either Threat to Wilderland or Dagnir's Spawn". Fellowship's 142060:B:2 says the same of its burdens; its words stay as they were.
+  const kingsBurden = instruction.verb === "ChooseCards" && instruction.who === "firstPlayer" && instruction.codes.includes("12172") && state.resolutionLog.earned.some((item) => item.code === "12174");
   const eachSeat = instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || (instruction.verb === "ChooseCards" && instruction.who === "eachSeat");
   const first = window.seat === state.firstPlayer ? " (first player)" : "";
   // The seats before this one have confirmed: each recorded card in this group, or the decline when nothing was recorded.
@@ -193,7 +197,8 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     seatCount: state.seatCount,
     eyebrow,
     // A boon ally's offer is the first player's alone, and a table of several players is told whose (the first player token).
-    seatLabel: (eachSeat || instruction.verb === "BoonAllyOrLogLine") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
+    ...(kingsBurden ? { joins: nameOf(world, "12174") } : {}),
+    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
     later: instruction.verb === "BoonAllyOrLogLine" ? ALLY_LINE_FACTS[instruction.line].later : null,
@@ -208,8 +213,13 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
 export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" }>, tile: ResolutionTile): string {
   if (tile.optionId === SKIP) return declineSentence(view);
   switch (view.to) {
-    case "pool":
-      return `${tile.name} is added to the campaign pool.`;
+    case "pool": {
+      if (view.joins == null) return `${tile.name} is added to the campaign pool.`;
+      const other = view.tiles.find((item) => item.optionId !== tile.optionId)?.name;
+      // Dagnir's Spawn is an encounter card of the pool (emce.campaign-pool-encounter); the other burden is not shuffled in.
+      const shuffled = tile.code === "12173" ? " and is shuffled into later encounter decks" : "";
+      return `${tile.name} joins ${view.joins} in the campaign pool${shuffled}${other ? `; ${other} does not` : ""}.`;
+    }
     case "hero":
       return `${tile.name} is attached to ${tile.hero ?? "the hero"} and recorded on the log.`;
     case "hand":

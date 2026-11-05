@@ -82,14 +82,15 @@ function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: Scenari
   const held = cardsUnder(game, card.id).map((id) => game.cards[id]).find((other) => other?.held === true);
   if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game, held.owner) : "a player's"} card, faceup. It returns to its owner's hand when ${name(card.id)} leaves play.`;
   if (card.zone !== "staging") return null;
-  if (ctx.cards.get(card.code)?.type === "attachment") {
+  // The Artifact Dragon Hoard set up (GuardPickedAttachment remembers the record on it), not any attachment that lies in the staging area.
+  if (ctx.cards.get(card.code)?.type === "attachment" && card.setUpBy != null) {
     const guards = guardsOf(game, card);
     return guards.length > 0 ? `Guarded by ${guards.map(name).join(", ")}. Once nothing guards it, the first player claims it for a character.` : null;
   }
   if (card.code !== "12172") return null;
   const left = card.resources;
   return left > 0
-    ? `${left} ${left === 1 ? "resource" : "resources"}: one is removed at the beginning of each quest phase, then the first player chooses between 2 threat for each player and all encounter cards immune to player card effects for the phase`
+    ? `${left} ${left === 1 ? "resource" : "resources"}: one is removed at the beginning of each quest phase, then the first player chooses: each player raises their threat by 2, or every encounter card is immune to player card effects this phase`
     : "No resources left: it does nothing";
 }
 

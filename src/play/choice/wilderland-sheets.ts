@@ -16,3 +16,9 @@ export function branchCaution(game: ScenarioState, ctx: ReduceContext, choose: E
   if (gone.length === 0) return null;
   return `Tap again: ${gone.length === 1 ? `${gone[0]} is` : `${gone.slice(0, -1).join(", ")} and ${gone.at(-1)} are`} destroyed`;
 }
+
+/** Eyes in the Dark (18057:A:2): "Tap again: Aragorn is discarded" on the row of a questing hero the player may discard; undefined for a pick of any other card and for an ally. */
+export function discardCaution(game: ScenarioState, source: string | null, pick: Instruction, next: Instruction | undefined, id: string, name: (id: string) => string): string | undefined {
+  if (source == null || game.cards[source]?.code !== "18057" || pick.verb !== "Pick" || next?.verb !== "Discard") return undefined;
+  return game.cards[id]?.zone === "heroes" ? `Tap again: ${name(id)} is discarded` : undefined;
+}

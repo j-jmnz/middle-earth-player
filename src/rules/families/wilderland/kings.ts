@@ -1,9 +1,10 @@
 // Rules: emce.caves-deck, emce.deep, emce.guarded-x, emce.treasure, emce.campaign-pool-encounter, rr.search, rr.then (data/rules/entries.json); ledger lines 12170:A:2, 12172:A:1, 18045:A:2, 18043:A:3, 18048:A:1, 18050:A:2, 18055:A:2, 18078:A:1, 18079:A:1, 18079:B:2, 18080:A:1, 18080:B:2.
 // The verbs The King's Quest adds to the wilderland family: the card placed with resources on it, the search that stops at two card types, the Caves deck looked at and rearranged, a card sent to its bottom, the questing hero a Condition
 // attaches to, the Dragon treachery searched for, the Artifact the Dragon Hoard guards, the card Hobgoblin holds, and the player attack that is canceled.
-import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { attachSelf } from "../../interpret/effect-targeted.ts";
@@ -18,7 +19,7 @@ import { runSetupVerb } from "../../setup/verbs.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { guardWith } from "../objectives/guard.ts";
 import { discardUntilType } from "../encounter/discard-until.ts";
-import { effectData, pushPicked } from "../encounter/moves.ts";
+import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -33,24 +34,13 @@ export function addToStagingWithResources(state: ScenarioState, instruction: Ver
   return card && amount > 0 ? updateCard(placed, card.id, { resources: card.resources + amount }) : placed;
 }
 
-/** DiscardUntilTypes: cards come off the top of the encounter deck into the discard pile until one of the types is discarded or the deck is empty; that card (or nothing) is the picked card. */
-export function discardUntilTypes(state: ScenarioState, instruction: Verb<"DiscardUntilTypes">, ctx: ReduceContext): ScenarioState {
-  let next = state;
-  for (;;) {
-    const top = next.encounterDeck[0];
-    if (!top) return pushPicked(next, "");
-    next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
-    if ((instruction.types as readonly string[]).includes(printedOf(ctx.cards, next.cards[top]?.code ?? "").type)) return pushPicked(next, top);
-  }
-}
-
-/** ArrangeCaves: the first player looks at the top `count` cards of the Caves deck and chooses the one that stays on top; the others go to the bottom, in their order. Run where no player can be asked, the first stays. */
+/** ArrangeCaves: the player who triggered the Response (neither line names the first player) looks at the top `count` cards of the Caves deck and chooses the one that stays on top; the others go to the bottom, in their order. Run where no player can be asked, the first stays. */
 export function arrangeCaves(state: ScenarioState, instruction: Verb<"ArrangeCaves">, focus: Focus, steps: EngineStep[]): ScenarioState {
   const zone = NAMED_PILES.caves.deck;
   const deck = pileOf(state, zone);
   const looked = deck.slice(0, instruction.count);
   if (looked.length < 2) return state;
-  if (focus.chosen == null && effectData(state)) return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, looked);
+  if (focus.chosen == null && effectData(state)) return askTarget(state, { instruction, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, looked);
   const top = focus.chosen != null && looked.includes(focus.chosen) ? focus.chosen : (looked[0] ?? "");
   return withPile(state, zone, [top, ...deck.slice(instruction.count), ...looked.filter((id) => id !== top)]);
 }
@@ -63,10 +53,13 @@ export function putOnPileBottom(state: ScenarioState, instruction: Verb<"PutOnPi
   return updateCard(moveCard(state, id, { zone }), id, { face: "down", controller: null });
 }
 
-/** AttachSelfToPicked: the source attaches to the last picked card. */
+/** AttachSelfToPicked: the source attaches to the last picked card, unless that card already carries one of its title ("Limit 1 per hero"): it attaches nowhere. */
 export function attachSelfToPicked(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
   const host = lastPicked(state);
-  return focus.sourceId && host && state.cards[host] ? attachSelf(state, focus.sourceId, host, ctx) : state;
+  const code = focus.sourceId ? state.cards[focus.sourceId]?.code : undefined;
+  if (!focus.sourceId || !host || !state.cards[host]) return state;
+  if (state.cards[host].attachments.some((other) => state.cards[other]?.code === code)) return state;
+  return attachSelf(state, focus.sourceId, host, ctx);
 }
 
 /** AttachSearched: the first player chooses among the cards of the type and trait in the encounter deck and discard pile (one of each title) that the enemy named `to` does not carry; it attaches to that enemy in play. */
@@ -116,10 +109,10 @@ export function guardWithDeckTop(state: ScenarioState, focus: Focus): ScenarioSt
 
 /**
  * The settle sweep for ReturnGuardedToHand ("When Hobgoblin leaves play, return the card it was guarding to its owner's hand"): a card held under an enemy that is no longer in play returns to its owner's hand. Only a game whose records hold a card
- * (a cached index of the effect list) looks.
+ * (a card of the game has a record with the verb) looks.
  */
 export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (!holdsCards(ctx.effects)) return state;
+  if (!gameReads(state, ctx, '"GuardWithDeckTop"')) return state;
   let next = state;
   for (const card of Object.values(state.cards)) {
     if (card.held !== true) continue;
@@ -130,16 +123,6 @@ export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioSt
     if (owner >= 0 && (card.zone === "discard" || card.zone === "under")) next = updateCard(moveCard(next, card.id, { zone: "hand", seat: owner }), card.id, { owner: undefined, face: "up", held: undefined });
   }
   return next;
-}
-
-const HOLDERS = new WeakMap<readonly Effect[], boolean>();
-function holdsCards(effects: readonly Effect[]): boolean {
-  let found = HOLDERS.get(effects);
-  if (found === undefined) {
-    found = effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "GuardWithDeckTop"));
-    HOLDERS.set(effects, found);
-  }
-  return found;
 }
 
 /** CancelStrike: the player attack in progress deals no damage. */

@@ -108,9 +108,9 @@ export const pickSchema = z.strictObject({
   // The character attacking or defending in the attack in progress.
   attacking: z.boolean().optional(),
   defending: z.boolean().optional(),
-  // A card with an attachment on it; with `trait`, an attachment with that trait.
+  // A card with an attachment on it; with `trait`, an attachment with that trait. `none`: a card with no such attachment ("Limit 1 per hero": 18048:A:1).
   // `names`: an attachment with one of these titles ("a character with Círdan's Blessing on it", 11201:A:4).
-  hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional(), names: z.array(z.string().min(1)).min(1).optional() }).optional(),
+  hasAttachment: z.strictObject({ trait: z.string().min(1).optional(), playerCard: z.boolean().optional(), names: z.array(z.string().min(1)).min(1).optional(), none: z.literal(true).optional() }).optional(),
   // A card attached to the source (`source`), to the source's host (`host`), to the active location (`activeLocation`), or to
   // the defending character (`defender`).
   attachedTo: z.enum(["source", "host", "activeLocation", "defender"]).optional(),

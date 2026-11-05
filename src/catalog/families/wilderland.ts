@@ -116,8 +116,6 @@ const VERBS = [
   // The King's Quest (part 3, campaign card 12170; ledger lines 12170:A:2, 12172:A:1, 18078:A:1, 18078:B:1, 18079:A:1, 18079:B:2, 18080:A:1, 18080:B:2, 18055:A:2, 18045:A:2, 18043:A:3, 18048:A:1, 18050:A:2, 12173:A:2).
   // "Add The Threat to Wilderland to the staging area with X resources on it" (12170:A:2, 12172:A:1): the card enters the staging area with `amount` resource tokens on it. On the campaign card's Setup it is spawned; on the card's own Setup (a copy of the pool the Setup search found) that copy is placed.
   verbFlags(z.strictObject({ verb: z.literal("AddToStagingWithResources"), code, amount: positiveAmountSchema, ...when }), { setupRole: "dealt" }),
-  // "Discard cards from the top of the encounter deck until he discards an enemy or location" (18078:A:1): like DiscardUntil, with several types; the card is the picked card, and nothing is picked when the deck runs out.
-  z.strictObject({ verb: z.literal("DiscardUntilTypes"), types: z.array(z.enum(["enemy", "location", "treachery"])).min(2), ...when }),
   // "Discard Contested Depths and replace it with the top card of the Caves deck" (18045:A:2): the source, the active location, is discarded and the top card of the Caves deck takes its place, as the Deep keyword does (emce.deep), but not ignored by a card that ignores the keyword. Nothing happens with the Caves deck empty.
   z.strictObject({ verb: z.literal("ReplaceFromCaves"), ...when }),
   // "Look at the top 2 cards of the Caves deck. Put one on top of the Caves deck and put the other on the bottom" (18055:A:2, 18079:B:2): the first player chooses the card that stays on top of the `count` looked at; the rest go to the bottom of the deck, in their order. With fewer than 2 cards in the deck nothing changes.

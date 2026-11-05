@@ -224,7 +224,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
       if (want.playerCard && !isPlayerType(printedOf(ctx.cards, attachment.code))) return false;
       return true;
     });
-    if (!found) return false;
+    if (want.none ? found : !found) return false;
   }
   if (spec.aboveThreat) {
     const threat = seatThreat(state, asking);

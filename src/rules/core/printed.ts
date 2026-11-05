@@ -85,6 +85,8 @@ export type PrintedCard = {
   defense: number | null;
   health: number | null;
   questPoints: number | null;
+  // The card prints X for its quest points: a record sets them (Hills of Wilderland), so the card takes progress and is explored.
+  questPointsX: boolean;
   victory: number | null;
   isUnique: boolean;
   engagementCost: number | null;
@@ -137,6 +139,11 @@ function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
   return { ...(back.willpower != null ? { willpower: back.willpower } : {}), ...(back.threat != null ? { threat: back.threat } : {}), ...(back.engagementCost != null ? { engagementCost: back.engagementCost } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
 }
 
+// Whether the card has quest points: a printed number, or X that a record sets (the card prints it as `questPointsX`).
+export function hasQuestPoints(printed: PrintedCard): boolean {
+  return printed.questPoints != null || printed.questPointsX;
+}
+
 // Whether the card is a location for travel, exploring, progress and the victory display: a location, or an Objective-Location.
 export function isLocationCard(printed: PrintedCard): boolean {
   return printed.type === "location" || printed.objectiveLocation;
@@ -169,6 +176,7 @@ export function definePrinted(
     defense: null,
     health: null,
     questPoints: null,
+    questPointsX: false,
     victory: null,
     isUnique: false,
     engagementCost: null,
@@ -328,6 +336,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     defense: card.defense,
     health: card.health,
     questPoints: card.questPoints,
+    questPointsX: keywords.questPointsX === true,
     victory: card.victory,
     isUnique: card.isUnique,
     engagementCost: card.engagementCost,

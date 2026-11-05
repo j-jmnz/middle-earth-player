@@ -67,8 +67,8 @@ const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },
   { flag: "cannotBeOptionallyEngaged", icon: "engagementCost", word: "Cannot be optionally engaged" },
   { flag: "damageLimit", icon: "hitPoints", word: "Takes at most %n damage at a time" },
-  // Dragon Scales (18059:A:2): all the damage the attached enemy would take is canceled, then the Scales are discarded.
-  { flag: "cancelsDamage", icon: "hitPoints", word: "Cancels all the damage it would take, once" },
+  // Dragon Scales (18059:A:2), the shield badge (the Defense icon, not the hit points icon of the damage-limit badges): all the damage the attached enemy would take is canceled, then the Scales are discarded.
+  { flag: "cancelsDamage", icon: "defense", word: "Cancels all the damage it would take, once" },
 ];
 
 // A flag's words; "%n" is the amount the effect holds (a damage limit).

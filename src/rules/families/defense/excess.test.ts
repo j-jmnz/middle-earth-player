@@ -4,6 +4,9 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
 
 import { definePrinted } from "../../core/printed.ts";
+import { moveCard } from "../../core/zones.ts";
+import { updateCard } from "../../core/state.ts";
+import { announceDestroyed } from "../burden/attack.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { ally, enemy, hero, recordsOf, send, table, treachery, until, type TableSpec } from "./table.ts";
 
@@ -50,5 +53,29 @@ describe("excess combat damage", () => {
     const hit = until(send(defense, { type: "Undefended", heroId: ids.ward! }, ctx), ctx, (current) => current.pendingAttack == null);
     expect(hit.cards[ids.ward!]?.damage).toBe(0);
     expect(hit.seats[0].threat).toBe(threat);
+  });
+});
+
+// Rules: rr.damage, rr.hit-points (data/rules/entries.json); ledger line 18049:A:2.
+describe("the excess damage an event carries for the destroyed character (excessOf)", () => {
+  const hears: Effect = { id: "troll:forced:1", cardCode: "troll", lines: ["troll:A:1"], timing: "forced", trigger: "characterDestroyedByAttack", subject: "self", instructions: [] };
+  const announced = (damageLeft: number) => {
+    const built = table(stopped({ cards: [hero("a", { health: 3 }), enemy("troll", { attack: 9 }), shade], effects: [hears], heroes: [{ code: "a" }], enemies: [{ code: "troll" }], encounter: ["shade"] }));
+    const { ids, ctx } = built;
+    const defense = until(send(built.state, { type: "DeclineEngage" }, ctx), ctx, defenseWindow);
+    const hero0 = ids.a!;
+    // The attack dealt 5 damage on a hero with 3 hit points (2 excess); a Response then canceled some of it, leaving `damageLeft` on the hero in the discard pile.
+    const dead = updateCard(moveCard(defense, hero0, { zone: "discard", seat: 0 }), hero0, { damage: damageLeft });
+    const attack = { ...dead.pendingAttack!, heroId: hero0, defense: { ...dead.pendingAttack!.defense, hitPointsOn: { [hero0]: 3 } } };
+    const next = announceDestroyed({ ...dead, pendingAttack: attack }, attack, ctx);
+    return (next.pendingEvents ?? []).find((event) => event.trigger === "characterDestroyedByAttack")?.amount;
+  };
+
+  it("is the damage dealt beyond the hit points, read when the attack ends", () => {
+    expect(announced(5)).toBe(2);
+  });
+
+  it("does not count damage a Response canceled after it was dealt: 5 damage on 3 remaining, 1 canceled, the character still dies, so the excess is 1", () => {
+    expect(announced(4)).toBe(1);
   });
 });

@@ -3,6 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { checklist } from "../../checklist.ts";
+import { choiceSentence, resolutionView, type ResolutionView } from "../../resolution-view.ts";
+import type { World } from "../../world.ts";
 import { heroBansOf } from "../../loadout.ts";
 import { emptyLog } from "../../log.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
@@ -136,6 +138,34 @@ describe("12170:B Resolution", () => {
     expect(choices.at(-1)).toEqual([CODES.theThreatToWilderland, CODES.dagnirSSpawn]);
     const other = resolutionResult(won(state, (options) => (options.includes("line") ? "line" : (options[0] ?? ""))));
     expect(other?.earned.map((item) => item.code)).toEqual(expect.arrayContaining([CODES.abandonedRuin, CODES.theThreatToWilderland]));
+  });
+
+  it("12170:B:3 the burden choice names the seat (the first player chooses) and says what the burden joins, in the Resolution view", () => {
+    const world = { campaign, scenario: kingsquest, effects: ctx.effects, cards: ctx.cards, sets: new Map<string, string>() } as World;
+    const views: ResolutionView[] = [];
+    let state = openResolution({ ...opened(2), stageCleared: true, window: null, stack: [] }, ctx);
+    for (let guard = 0; guard < 20 && state.window?.kind === "resolution"; guard += 1) {
+      const view = resolutionView(state, world);
+      if (view.kind === "choosing") views.push(view);
+      const options = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
+      state = openResolution(expectOk(reduce(state, { type: "ChooseResolution", optionId: options.includes("line") ? "line" : (options.at(-1) ?? "") } as PlayerIntent, ctx)).state, ctx);
+    }
+    const burden = views.find((view) => view.kind === "choosing" && view.tiles.some((tile) => tile.code === CODES.dagnirSSpawn));
+    expect(burden).toMatchObject({ kind: "choosing", seatLabel: "Player 1 (first player) chooses", joins: "Abandoned Ruin" });
+    if (burden?.kind !== "choosing") return;
+    const dagnir = burden.tiles.find((tile) => tile.code === CODES.dagnirSSpawn)!;
+    const threat = burden.tiles.find((tile) => tile.code === CODES.theThreatToWilderland)!;
+    expect(choiceSentence(burden, dagnir)).toBe("Dagnir's Spawn joins Abandoned Ruin in the campaign pool and is shuffled into later encounter decks; The Threat to Wilderland does not.");
+    expect(choiceSentence(burden, threat)).toBe("The Threat to Wilderland joins Abandoned Ruin in the campaign pool; Dagnir's Spawn does not.");
+    // Solo has no seat to name.
+    const solo = openResolution({ ...opened(1), stageCleared: true, window: null, stack: [] }, ctx);
+    let alone = solo;
+    for (let guard = 0; guard < 20 && alone.window?.kind === "resolution"; guard += 1) {
+      const view = resolutionView(alone, world);
+      if (view.kind === "choosing" && view.tiles.some((tile) => tile.code === CODES.dagnirSSpawn)) expect(view.seatLabel).toBeNull();
+      const options = legalIntents(alone, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
+      alone = openResolution(expectOk(reduce(alone, { type: "ChooseResolution", optionId: options.includes("line") ? "line" : (options.at(-1) ?? "") } as PlayerIntent, ctx)).state, ctx);
+    }
   });
 
   it("a lost game writes nothing", () => {

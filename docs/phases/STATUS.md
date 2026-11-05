@@ -79,7 +79,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 51b | Wilderland on the table | completed | 2026-11-05. Review round done. Phone checks open (below). |
 | 52 | Journey Up the Anduin | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `upanduin-won` missing, so the win flow cannot run. |
 | 53 | Lost in Mirkwood | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `lostmirk-won` missing, so the win flow cannot run. |
-| 54 | The King's Quest | not started | |
+| 54 | The King's Quest | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `kingsquest-won` missing, so the win flow cannot run. |
 | 55 | The Withered Heath | not started | |
 | 56 | Roam Across Rhovanion | not started | |
 | 57 | Fire in the Night | not started | |
@@ -90,6 +90,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ## Open items
 
 ### Fixtures and Maestro
+- `kingsquest-won` is not committed: none of 100 seeds wins The King's Quest with the starter decklists. Until it exists `.maestro/scenarios/the-kings-quest/the-kings-quest.yaml` (and its `CHOICE2_*` path in `scenario-win.yaml`) cannot run.
 - `lostmirk-won` is not committed: none of 100 seeds wins Lost in Mirkwood with the starter decklists. Until it exists `.maestro/scenarios/lost-in-mirkwood/lost-in-mirkwood.yaml` cannot run, and its pool and treasure asserts do not yet prove part 2 wrote them.
 - `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run. `scenario-win.yaml` now taps Confirm twice after a choice and takes `NO_XP`; no flow using it has run.
 
@@ -111,6 +112,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Lost in the Wild: a player-card `canPick` condition knows a hand pick is a discard only when its record says `discarded: true` (Jewels of Wilderland, Glittering Lute); other campaigns' records are not marked.
 - Treasures cannot be played from a hand (no path for type `treasure`); only the claim puts one into play.
 - Wilderland: an Evil Creatures enemy shuffled back into the encounter deck keeps its deck mark (`deckRoute`); no card does this yet.
+- The King's Quest: the goldens' policy keeps Underground Lake in the Caves deck, so no golden explores an X-quest-point location; unit tests cover it. 18079:B:2 has no `anyPlayer`, so only the first player is offered the stage's Caves look. `freeTreasures`' gate is always true in real games (the scan of the staging area is the real gate).
 - Lost in Mirkwood: no golden wins on the nemesis route (stage 4A, The Forest of Great Fear); unit tests cover it. With two players each holding a hero (18074), `heldDial` marks only the first seat's dial.
 - Wilderland readings not user-confirmed: Deep does nothing once its location is no longer active; a non-location Deep replacement other than a Dragon Sign goes to staging; Guarded (X) with no match leaves the objective unguarded.
 
@@ -180,6 +182,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ### Phone and tablet checks
 - Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
 - Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
+- The King's Quest: the Stone-troll discard count, Dagnir's Spawn's branch, the Eyes in the Dark hero caution (Tap again), the Resolution's burden choice with its seat label, the Dragon Scales shield badge, the long notes at 667 × 375.
 - Lost in Mirkwood: the Twilight Hall offer and the Claim step; the Player N lead on Carried Away and Truly Lost at 667 × 375; the held-hero, hand-under and nemesis preview lines; objective-locations' quest points and travel.
 - Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.
 

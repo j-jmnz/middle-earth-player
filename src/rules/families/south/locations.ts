@@ -7,7 +7,7 @@
 import type { EngineStep } from "../../core/intents.ts";
 import { ruleCause } from "../../core/cause.ts";
 import { destroyCard } from "../../core/keywords.ts";
-import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { hasQuestPoints, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { questPointsOf } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, updateCard } from "../../core/state.ts";
@@ -71,7 +71,7 @@ export function progressRoom(state: ScenarioState, id: string, cards: Cards): nu
     const bearer = controlledRingBearer(state, cards);
     if (bearer == null || state.cards[bearer]?.controller !== state.firstPlayer) return 0;
   }
-  if (flagged(state, id, "progressAfterOthers") && activeLocations(state).some((other) => other !== id && printedOf(cards, state.cards[other]?.code ?? "").questPoints != null)) return 0;
+  if (flagged(state, id, "progressAfterOthers") && activeLocations(state).some((other) => other !== id && hasQuestPoints(printedOf(cards, state.cards[other]?.code ?? "")))) return 0;
   return room;
 }
 
@@ -98,7 +98,7 @@ export function placeOnActive(state: ScenarioState, amount: number, cards: Cards
   let next = state;
   let remaining = amount;
   for (let guard = 0; guard < 4 && remaining > 0; guard += 1) {
-    const id = activeLocations(next).find((candidate) => printedOf(cards, next.cards[candidate]?.code ?? "").questPoints != null && progressRoom(next, candidate, cards) > 0);
+    const id = activeLocations(next).find((candidate) => hasQuestPoints(printedOf(cards, next.cards[candidate]?.code ?? "")) && progressRoom(next, candidate, cards) > 0);
     const location = id ? next.cards[id] : undefined;
     if (!id || !location) break;
     const placed = Math.min(remaining, progressRoom(next, id, cards));

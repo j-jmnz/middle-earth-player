@@ -34,10 +34,11 @@ function noteExcess(state: ScenarioState, excess: number): ScenarioState {
   return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, excess: (attack.defense?.excess ?? 0) + excess } } } : state;
 }
 
-// The damage a character took beyond its remaining hit points (its hit points with their modifiers, less the damage on it), kept with the attack for the event that says it was destroyed (excessOf).
-function noteExcessOn(state: ScenarioState, id: string, excess: number): ScenarioState {
+// The hit points (with their modifiers) of a character whose damage went beyond them, kept with the attack for the event that says it was destroyed (excessOf): the excess is read then, from the damage still on the character,
+// so damage a Response canceled in between does not count.
+function noteHitPointsOn(state: ScenarioState, id: string, hitPoints: number): ScenarioState {
   const attack = state.pendingAttack;
-  return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, excessOn: { ...attack.defense?.excessOn, [id]: excess } } } } : state;
+  return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, hitPointsOn: { ...attack.defense?.hitPointsOn, [id]: hitPoints } } } } : state;
 }
 
 // The enemy's combat damage `raw` is placed on `assigned`; the excess goes to threat when the enemy says so. Every place an enemy
@@ -71,7 +72,7 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
-  if (!toThreat && !toQuest && !toShip) return noteExcessOn(placed, targetId, excess);
+  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(placed, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
   if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);
   const flag = toThreat ? "excessToThreat" : "excessToQuestProgress";

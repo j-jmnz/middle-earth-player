@@ -9,10 +9,11 @@ import { cardsUnder, moveCard, spawn } from "../../core/zones.ts";
 import { resolveAmount } from "../../interpret/amounts.ts";
 import { codesOf, ctxOf, deal, record, table, CARDS } from "./fixture.ts";
 import { shuffleIntoNamed } from "./decks.ts";
-import { addToStagingWithResources, arrangeCaves, cancelStrike, discardUntilTypes, guardWithDeckTop, putOnPileBottom, returnHeld } from "./kings.ts";
+import { discardUntil } from "../encounter/moves.ts";
+import { addToStagingWithResources, arrangeCaves, cancelStrike, guardWithDeckTop, putOnPileBottom, returnHeld } from "./kings.ts";
 
 const cards = new Map([...CARDS, ["ally2", definePrinted({ code: "ally2", name: "Ally", type: "ally", sphere: "neutral", cost: 2, willpower: 1, attack: 1, defense: 1, health: 2 })]]);
-const ctx = { effects: [record("x:constant:1", "x", "constant", [{ verb: "GuardWithDeckTop" }])], cards };
+const ctx = { effects: [record("ec1:constant:1", "ec1", "constant", [{ verb: "GuardWithDeckTop" }])], cards };
 const focus = (sourceId: string | null) => ({ seat: 0, sourceId });
 
 describe("AddToStagingWithResources (12170:A:2, 12172:A:1)", () => {
@@ -30,10 +31,10 @@ describe("AddToStagingWithResources (12170:A:2, 12172:A:1)", () => {
   });
 });
 
-describe("DiscardUntilTypes (18078:A:1)", () => {
+describe("DiscardUntil with several types (18078:A:1)", () => {
   it("discards cards until one of the types is discarded", () => {
     const dealt = deal(table(), ["mist", "hazard", "ec1", "plain"], { zone: "encounterDeck" });
-    const done = discardUntilTypes(dealt.state, { verb: "DiscardUntilTypes", types: ["enemy", "location"] }, ctxOf([]));
+    const done = discardUntil(dealt.state, ["enemy", "location"], ctxOf([]));
     expect(codesOf(done, done.encounterDiscard)).toEqual(["mist", "hazard", "ec1"]);
     expect(codesOf(done, done.encounterDeck)).toEqual(["plain"]);
   });
@@ -102,8 +103,13 @@ describe("GuardWithDeckTop and its sweep (18050:A:2)", () => {
   it("an empty deck holds nothing, and a game with no such record does not look", () => {
     const enemy = spawn(table(), "ec1", { zone: "staging" });
     expect(guardWithDeckTop(enemy.state, focus(enemy.id))).toBe(enemy.state);
-    const marked = updateCard(deal(enemy.state, ["ally2"], { zone: "discard", seat: 0 }).state, "i3", { held: true });
+    const dealt = deal(enemy.state, ["ally2"], { zone: "discard", seat: 0 });
+    const marked = updateCard(dealt.state, dealt.ids[0] ?? "", { held: true });
     expect(returnHeld(marked, ctxOf([]))).toBe(marked);
+    // The record list holds a GuardWithDeckTop record, but no card of this game has it: the sweep does not look (the global list always holds Hobgoblin's).
+    const other = { effects: [record("hoard:constant:1", "hoard", "constant", [{ verb: "GuardWithDeckTop" }])], cards };
+    expect(returnHeld(marked, other)).toBe(marked);
+    expect(returnHeld(marked, ctx).cards[dealt.ids[0] ?? ""]?.zone).toBe("hand");
   });
 });
 

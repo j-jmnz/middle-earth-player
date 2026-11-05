@@ -138,7 +138,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "18048",
       lines: ["18048:A:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", committed: true, who: "firstPlayer" } }, { verb: "AttachSelfToPicked" }, { verb: "RemoveFromQuest" }],
+      // Limit 1 per hero: a hero that carries one is not offered.
+      instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", committed: true, who: "firstPlayer", hasAttachment: { names: ["Afraid of the Dark"], none: true } } }, { verb: "AttachSelfToPicked" }, { verb: "RemoveFromQuest" }],
     },
     { id: "18048:constant:1", cardCode: "18048", lines: ["18048:A:1"], timing: "constant", condition: ACTIVE_IS_DARK, instructions: [{ verb: "SetStat", stat: "willpower", value: 0, target: "host" }, { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", target: "host" }] },
     { id: "18048:constant:2", cardCode: "18048", lines: ["18048:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
@@ -315,7 +316,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "18078",
       lines: ["18078:A:1"],
       timing: "setup",
-      instructions: [{ verb: "ShufflePile", pile: "caves" }, { verb: "ShuffleEncounterDeck" }, EACH_PLAYER([{ verb: "DiscardUntilTypes", types: ["enemy", "location"] }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }])],
+      instructions: [{ verb: "ShufflePile", pile: "caves" }, { verb: "ShuffleEncounterDeck" }, EACH_PLAYER([{ verb: "DiscardUntil", types: ["enemy", "location"] }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }])],
     },
     {
       id: "18078:forced:1",

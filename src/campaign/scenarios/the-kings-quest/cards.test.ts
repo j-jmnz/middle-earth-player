@@ -196,6 +196,16 @@ describe("18047 Denizen of the Deep and 18048 Afraid of the Dark", () => {
     expect(run.state.cards[t.hero]?.committed).toBe(false);
   });
 
+  it("18048:A:1 Limit 1 per hero: a second copy does not attach to a questing hero that carries one", () => {
+    const t = kingsquestTable(world, { staging: [] });
+    const first = resolveRecords(updateCard(t.state, t.hero, { committed: true, exhausted: true }), t.ctx, CODES.afraidOfTheDark, "whenRevealed");
+    // Only one hero (the table's second hero stays out of the quest) is questing, and it carries the first copy.
+    const second = spawn(updateCard(first.state, t.hero2, { committed: false }), CODES.afraidOfTheDark, { zone: "staging" });
+    const run = resolveRecords(second.state, t.ctx, CODES.afraidOfTheDark, "whenRevealed", second.id);
+    expect(run.state.cards[t.hero]?.attachments.filter((id) => run.state.cards[id]?.code === CODES.afraidOfTheDark)).toHaveLength(1);
+    expect(run.state.cards[second.id]?.zone).not.toBe("attached");
+  });
+
   it("18048:A:1 while the active location has the Dark trait the hero's Willpower is 0 and its text box is blank", () => {
     const dark = kingsquestTable(world, { active: CODES.undergroundLake });
     const plain = kingsquestTable(world, { active: CODES.lostArmory });
@@ -425,6 +435,19 @@ describe("the Caves deck: 18060 to 18065", () => {
   it("18065:A:1 Underground Lake's Threat is the number of characters controlled by the player with the most characters", () => {
     const t = kingsquestTable(world, { seats: 2, staging: [CODES.undergroundLake], play: ["ally", "ally"] });
     expect(modifiedStat(t.state, t.state.cards[idOf(t.state, CODES.undergroundLake)]!, "threat", world.cards)).toBe(4);
+  });
+
+  it("18065:A:1 Underground Lake prints X quest points: as the active location it is explored once the quest places X progress, X tracking the most characters", () => {
+    expect(world.cards.get(CODES.undergroundLake)).toMatchObject({ questPoints: null, questPointsX: true });
+    const quest = (play: string[]): { zone: string | undefined; points: number } => {
+      const t = kingsquestTable(world, { phase: "Quest", active: CODES.undergroundLake, deck: ["f0", "f0"], play });
+      const lake = idOf(t.state, CODES.undergroundLake);
+      let run: Run = send(start(t.state), { type: "Commit", cardIds: [t.hero, t.hero2] } as PlayerIntent, t.ctx);
+      run = finish(send(run, { type: "Pass" }, t.ctx), t.ctx);
+      return { zone: run.state.cards[lake]?.zone, points: modifiedStat(t.state, t.state.cards[lake]!, "questPoints", world.cards) };
+    };
+    expect(quest([])).toMatchObject({ points: 2, zone: "victory" });
+    expect(quest(["ally", "ally", "ally", "ally", "ally", "ally"])).toMatchObject({ points: 8, zone: "activeLocation" });
   });
 
   it("18065:A:2 an ally that enters play is exhausted", () => {

@@ -110,7 +110,7 @@ export function encounterWords(instruction: Instruction): string | null {
     case "ShuffleEncounterDiscard":
       return "shuffle the encounter discard pile into the encounter deck";
     case "DiscardUntil":
-      return `discard cards from the top of the encounter deck until ${article(verb.type)} is discarded`;
+      return `discard cards from the top of the encounter deck until ${verb.types ? verb.types.map(article).join(" or ") : article(verb.type ?? "card")} is discarded`;
     case "ResolveWhenRevealed":
       return "resolve its \"when revealed\" effects";
     case "RevealFewer":

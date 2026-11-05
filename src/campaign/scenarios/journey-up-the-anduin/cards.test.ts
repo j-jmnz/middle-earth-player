@@ -217,6 +217,22 @@ describe("18023 Hills of Wilderland", () => {
     expect(stat(pair, idOf(pair.state, CODES.hillsOfWilderland), "threat")).toBe(2);
   });
 
+  it("prints X quest points: as the active location it takes the progress of a successful quest and is explored once it holds X, X tracking the most characters", () => {
+    expect(world.cards.get(CODES.hillsOfWilderland)).toMatchObject({ questPoints: null, questPointsX: true });
+    // Two heroes commit; Hills of Wilderland's X is the 2 characters one player controls, so the quest's progress explores it.
+    const t = upanduinTable(world, { phase: "Quest", active: CODES.hillsOfWilderland, deck: ["f0", "f0"] });
+    expect(stat(t, idOf(t.state, CODES.hillsOfWilderland), "questPoints")).toBe(2);
+    let run: Run = send(start(t.state), { type: "Commit", cardIds: [t.hero, t.hero2] } as PlayerIntent, t.ctx);
+    run = finish(send(run, { type: "Pass" }, t.ctx), t.ctx);
+    expect(run.state.cards[idOf(run.state, CODES.hillsOfWilderland)]?.zone).toBe("encounterDiscard");
+    // A third character raises X to 3: the same progress no longer explores it.
+    const more = upanduinTable(world, { phase: "Quest", active: CODES.hillsOfWilderland, deck: ["f0", "f0"], play: ["ally"] });
+    expect(stat(more, idOf(more.state, CODES.hillsOfWilderland), "questPoints")).toBe(3);
+    let again: Run = send(start(more.state), { type: "Commit", cardIds: [more.hero, more.hero2] } as PlayerIntent, more.ctx);
+    again = finish(send(again, { type: "Pass" }, more.ctx), more.ctx);
+    expect(again.state.cards[idOf(again.state, CODES.hillsOfWilderland)]?.zone).toBe("activeLocation");
+  });
+
   it("lets the first player exhaust a character in the quest phase to lower its Threat by 1 until the end of the phase", () => {
     const t = upanduinTable(world, { phase: "Quest", staging: [CODES.hillsOfWilderland] });
     const hills = idOf(t.state, CODES.hillsOfWilderland);

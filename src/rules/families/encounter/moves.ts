@@ -145,14 +145,16 @@ export function shuffleDiscardIn(state: ScenarioState): ScenarioState {
 }
 
 // Cards come off the top of the encounter deck into its discard pile until one of `type` is among them, or the deck is empty.
-// That card is the picked card ("" when none came).
-export function discardUntil(state: ScenarioState, type: CardType, ctx: ReduceContext, trait?: string): ScenarioState {
+// That card is the picked card ("" when none came). A list of types stops at a card of any of them.
+export function discardUntil(state: ScenarioState, wanted: CardType | readonly CardType[], ctx: ReduceContext, trait?: string): ScenarioState {
+  const types: readonly CardType[] = typeof wanted === "string" ? [wanted] : wanted;
   let next = state;
   for (;;) {
     const top = next.encounterDeck[0];
     if (!top) return pushPicked(next, "");
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
-    if (typeOf(next, top, ctx) === type && (trait == null || hasTrait(next, top, trait, ctx))) return pushPicked(next, top);
+    const kind = typeOf(next, top, ctx);
+    if (kind != null && types.includes(kind) && (trait == null || hasTrait(next, top, trait, ctx))) return pushPicked(next, top);
   }
 }
 

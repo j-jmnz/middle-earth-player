@@ -50,4 +50,6 @@
 // 23 (Dream-chaser, phase 48 review): an enemy swept because its damage reached its hit points (destroyOverwhelmed) announces enemyDestroyed and is heard by the cards attached to it, as an
 // enemy destroyed by damage always was: The Thing in the Depths (+3 hit points a player) wins the game when a seat is eliminated under its damage, a Creature swept the same way
 // damages it, and Captain Sahír of The City of Corsairs, whose indestructible lapses with lethal damage on him, ends that scenario: a replayed game of either can take a different path.
-export const ENGINE_VERSION = 23;
+// 24 (Ered Mithrin, phase 54 fix pass): a location that prints X quest points (Hills of Wilderland, Underground Lake) has the quest points its record sets, so it takes progress as the active location
+// and is explored (before, it had none and was never explored): a replayed Journey Up the Anduin game can take a different path.
+export const ENGINE_VERSION = 24;

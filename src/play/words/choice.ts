@@ -106,7 +106,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       if (typeof instruction.amount === "object" && instruction.amount.count?.committed === true && instruction.amount.count.type === "character") return "raise your threat by 1 for each questing character you control";
       const amount = amountWords(instruction.amount);
       if (instruction.who === "firstPlayer") return `the first player raises threat by ${amount}`;
-      if (instruction.who === "eachSeat") return `each player raises threat by ${amount}`;
+      if (instruction.who === "eachSeat") return `each player raises their threat by ${amount}`;
       return `raise your threat by ${amount}`;
     }
     case "LowerThreat": {
@@ -333,7 +333,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? wilderlandBranchWords(choose, optionId, names, now);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);

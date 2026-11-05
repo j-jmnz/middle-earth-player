@@ -92,6 +92,8 @@ function keywordsOf(card: HobCard, dragn: DragnRow, report: BuildReport): { keyw
   const fromDragn = parseKeywordTokens((dragn?.keywords ?? "").split(/(?<=\.)\s+/).filter((sentence) => parseKeywordTokens([sentence]).unknown.length === 0));
   Object.assign(parsed.keywords, fromDragn.keywords);
   for (const token of parsed.unknown) report.unknownKeywords[token] = (report.unknownKeywords[token] ?? 0) + 1;
+  // A location that prints X for its quest points (the number stays null; a record sets the value).
+  if (card.Front.Stats.QuestPoints === "X" && card.CardType === "Location") parsed.keywords.questPointsX = true;
   return { keywords: parsed.keywords, victory };
 }
 

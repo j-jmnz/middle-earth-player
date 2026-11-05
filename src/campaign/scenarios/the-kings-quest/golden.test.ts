@@ -11,8 +11,8 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 // searched down to Dragon Hoard through Deep and Contested Depths, Fire-drake engaged and defeated) and through each way to lose (heroes too small to quest, heroes too brittle to survive). It pins the path from data/ through the Campaign Setup
 // Checklist and buildStart, the stage and Caves records, the Resolution's pool, log line and treasure effects and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.
 //
-// Known gap (reported with phase 54): Underground Lake prints X quest points, which the data holds as none, so the engine cannot explore it (like Hills of Wilderland, 18023); the pinned wins keep it out of the game (it stays in the Caves
-// deck, which the stage 2 look sends it to the bottom of) and a test below says so, so fixing the data moves no golden.
+// Underground Lake prints X quest points (the engine explores it since engine 24, cards.test.ts); the pinned wins' policy still keeps it out of the game (it stays in the Caves deck, which the stage 2 look sends it to the bottom of),
+// and a test below says so, so the goldens stay as they were.
 const treasures: readonly string[] = TREASURES;
 const treacheries = (state: { cards: Record<string, { code: string }> }, cards: ReadonlyMap<string, { type: string }>) => Object.values(state.cards).filter((card) => cards.get(card.code)?.type === "treachery").length;
 
@@ -107,7 +107,7 @@ describe("The King's Quest golden", () => {
         }
       });
 
-      it("keeps Underground Lake in the Caves deck: the engine cannot explore a location that prints X quest points (known gap)", () => {
+      it("keeps Underground Lake in the Caves deck: the policy of the pinned wins sends it to the bottom at the stage 2 look", () => {
         for (const golden of KINGSQUEST_GOLDENS.filter((item) => item.outcome === "won")) {
           const lake = Object.values(game(golden).state.cards).find((card) => card.code === CODES.undergroundLake);
           expect(lake?.zone, golden.name).toBe("cavesDeck");

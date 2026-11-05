@@ -10,6 +10,7 @@ import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { countMatching } from "../../rules/interpret/pick.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
+import { topFrame } from "../../rules/windows/windows.ts";
 
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
@@ -80,7 +81,14 @@ function searchOffer(choose: Extract<Instruction, { verb: "Choose" }>): { code: 
 }
 
 /** The sentence over the Twilight Hall search offer (12168:A:2): the card, where it enters and the treasures it will guard, as many as are left to draw. Null for any other Choose. */
-export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choose" }>, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames): string | null {
+export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choose" }>, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, seat?: number, source?: string | null): string | null {
+  // Dagnir's Spawn (12173:A:2): each player decides for their own characters, so two-handed the note leads with the player.
+  const spread = choose.options.map(distributeBranch).find((assign) => assign != null);
+  if (spread) {
+    const damage = resolveAmount(game, spread.amount, frameScope(game, seat ?? game.firstPlayer, source ?? null), ctx);
+    const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
+    return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+  }
   const offer = searchOffer(choose);
   if (!offer) return null;
   const left = Math.min(offer.count, undiscoveredTreasures(game, ctx).length);
@@ -149,7 +157,8 @@ function kingsQuestAsk(instruction: Instruction, source: string | null, names: C
   const game = facts?.game;
   const says = game ? seatSays(game) : null;
   const ask = (verb: string, text: string): PickWords => (says ? { verb, prompt: says.say(text), ...says.owned } : { verb, prompt: `${text.charAt(0).toUpperCase()}${text.slice(1)}` });
-  if (instruction.verb === "ArrangeCaves") return { verb: "Choose", prompt: `Look at the top ${instruction.count} cards of the Caves deck: choose the one that stays on top. The ${instruction.count === 2 ? "other goes" : "others go"} to the bottom.` };
+  // The look is one player's: the seat that triggered it. The action first, then where the rest go.
+  if (instruction.verb === "ArrangeCaves") return ask("Choose", `keep 1 on top of the Caves deck; the ${instruction.count === 2 ? "other goes" : "others go"} to the bottom.`);
   if (instruction.verb === "AttachSearched") return { verb: "Attach", prompt: `Choose a ${instruction.trait} ${instruction.type} from the encounter deck or its discard pile to attach to ${instruction.to}.` };
   if (instruction.verb === "AttachSelf" && instruction.to.kind === "enemy" && instruction.to.trait === "Dragon") return { verb: "Attach", prompt: `Choose a Dragon enemy to attach ${name} to.` };
   // Stone-troll (18049:A:2): the number of cards is the excess damage the destroyed character took, the frame's X.
@@ -157,18 +166,26 @@ function kingsQuestAsk(instruction: Instruction, source: string | null, names: C
     const count = frameScope(game, game.activeSeat, source).x ?? 0;
     return ask("Discard", `choose ${count} ${count === 1 ? "card" : "cards"} from your hand to discard, one at a time (1 for each point of excess damage).`);
   }
-  if (instruction.verb === "AssignDamage" && (code === "18064" || code === "12173") && says) {
+  if (instruction.verb === "AssignDamage" && (code === "18064" || code === "12173")) {
     const words = assignDamageWords(instruction, null);
-    return { verb: words.verb, prompt: `${name} (Player ${says.seat + 1}): ${words.prompt.charAt(0).toLowerCase()}${words.prompt.slice(1)}`, ...says.owned };
+    return ask(words.verb, `${words.prompt.charAt(0).toLowerCase()}${words.prompt.slice(1)}`);
   }
   if (instruction.verb !== "Pick") return null;
   const pick = instruction.pick;
+  // Stone-troll's excess (18049:A:2) is expanded into one pick and discard for each card; the sheet says how many are left, counting this one.
+  if (code === "18049" && pick.from === "hand" && next?.verb === "DiscardPicked" && game) {
+    const data = topFrame(game)?.data;
+    const left = data?.kind === "effect" ? data.queue.filter((item) => item.instruction.verb === "DiscardPicked").length : 1;
+    return ask("Discard", `discard 1 card from your hand (${left} left: 1 for each point of excess damage).`);
+  }
   if (next?.verb === "GuardPickedAttachment") return ask("Guard", "choose an Artifact attachment in your hand: it lies in the staging area guarded by a location from the encounter deck, and the players claim it once that location is dealt with.");
-  if (code === "18043" && pick.type === "player" && next?.verb === "SwitchActor") return { verb: "Choose", prompt: `Choose the player who sets an Artifact attachment from their hand in the staging area, guarded by a location from the encounter deck (${name}).` };
+  if (code === "18043" && pick.type === "player" && next?.verb === "SwitchActor") return { verb: "Choose", prompt: "Choose the player who puts an Artifact from their hand in the staging area, guarded by a location." };
   if (next?.verb === "AttackFromStaging" && pick.highestAttack === true) {
     const first = game && facts?.options[0] && game.cards[facts.options[0]] ? modifiedStat(game, game.cards[facts.options[0]]!, "attack", facts.ctx.cards) : null;
     const tied = facts?.options.length ?? 0;
-    return ask("Choose", `${tied > 1 ? `${tied} enemies` : "Enemies"} in the staging area are tied for the highest Attack${first != null ? ` (${first})` : ""}: choose the one that makes an immediate attack against the first player.`);
+    // Who the enemy attacks: the chooser when the chooser is the first player, else the first player by number.
+    const attacked = game && game.seatCount > 1 && says && says.seat !== game.firstPlayer ? `Player ${game.firstPlayer + 1}` : "you";
+    return ask("Choose", `choose the enemy that attacks ${attacked}${tied > 1 ? ` (${tied} tied${first != null ? ` at ${first} Attack` : ""})` : ""}.`);
   }
   if (next?.verb === "AttachSelfToPicked" && pick.type === "hero" && pick.committed === true) return ask("Attach", `choose a questing hero of any player to attach ${name} to. It is removed from the quest.`);
   // Each player's own card: "return 1 card from his discard pile" (18044:A:1), "search his deck" (18060:A:1), "a hero's resource pool" (18061:A:1), "a questing character you control" and "an ally you control" (18057), "an attachment you control" (18049:A:3).
@@ -188,9 +205,11 @@ export function wilderlandOptionLabel(instruction: Instruction, id: string, name
 }
 
 // A Choose whose branches count cards at the table (Ruined Supplies, 18025:A:2): the number each states now, read when the sheet is built. Null for any other Choose.
-function countedBranch(option: Extract<Instruction, { verb: "Choose" }>["options"][number]): Extract<Instruction, { verb: "RaiseThreat" | "DamageEach" }> | null {
+function countedBranch(option: Extract<Instruction, { verb: "Choose" }>["options"][number], choose: Extract<Instruction, { verb: "Choose" }>): Extract<Instruction, { verb: "RaiseThreat" | "DamageEach" }> | null {
   const step = option.instructions.length === 1 ? option.instructions[0] : undefined;
-  if (step?.verb === "RaiseThreat" && typeof step.amount === "object" && step.amount.count != null && step.amount.count.control === "you" && step.amount.count.committed !== true && (step.who ?? "actor") === "actor") return step;
+  // Eyes in the Dark (18057:A:2) counts the questing characters, beside a branch that discards one; another card's committed count keeps its own words.
+  const questing = choose.options.some((other) => other.instructions.some((entry) => entry.verb === "Discard"));
+  if (step?.verb === "RaiseThreat" && typeof step.amount === "object" && step.amount.count != null && step.amount.count.control === "you" && (step.amount.count.committed !== true || questing) && (step.who ?? "actor") === "actor") return step;
   return step?.verb === "DamageEach" && typeof step.amount === "number" && step.pick?.control === "you" && step.engagedWith == null ? step : null;
 }
 
@@ -201,26 +220,37 @@ function numberedBranch(option: Extract<Instruction, { verb: "Choose" }>["option
   return step?.verb === "RemoveProgressFromQuest" && typeof step.amount === "object" && step.amount.count != null ? step : null;
 }
 
+// A branch that distributes damage among the player's characters and shuffles its source back into the encounter deck (Dagnir's Spawn, 12173:A:2).
+function distributeBranch(option: Extract<Instruction, { verb: "Choose" }>["options"][number]): Extract<Instruction, { verb: "AssignDamage" }> | null {
+  const [assign, shuffle] = option.instructions;
+  return option.instructions.length === 2 && assign?.verb === "AssignDamage" && shuffle?.verb === "ShuffleSelfIntoEncounterDeck" ? assign : null;
+}
+
 /** The numbers a Choose states for its branches now: how many cards each count finds for the seat choosing, and the amounts read from the table. */
 export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, seat: number, sourceId: string | null): Pick<BranchNow, "counted"> {
   const counted: Record<string, number> = {};
   for (const option of choose.options) {
-    const step = countedBranch(option);
+    const step = countedBranch(option, choose);
     const spec = step?.verb === "RaiseThreat" && typeof step.amount === "object" ? step.amount.count : step?.verb === "DamageEach" ? step.pick : undefined;
     if (spec) counted[option.id] = countMatching(game, spec, seat, sourceId, ctx);
     const numbered = spec ? null : numberedBranch(option);
     if (numbered && typeof numbered.amount === "object") counted[option.id] = resolveAmount(game, numbered.amount, frameScope(game, seat, sourceId), ctx);
+    // Dagnir's Spawn (12173:A:2): the damage a player distributes is the part number.
+    const spread = distributeBranch(option);
+    if (spread) counted[option.id] = resolveAmount(game, spread.amount, frameScope(game, seat, sourceId), ctx);
   }
   return Object.keys(counted).length > 0 ? { counted } : {};
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
-export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow): string | null {
+export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null): string | null {
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";
   const option = choose.options.find((entry) => entry.id === optionId);
   if (option?.instructions[0]?.verb === "ReplaceFromCaves") return "Discard it and replace it with the top card of the Caves deck";
-  if (option?.instructions[0]?.verb === "CancelStrike") return "Cancel the attack: it deals no damage";
+  if (option?.instructions[0]?.verb === "CancelStrike") return "Cancel the attack: no damage, the attackers stay exhausted";
+  const spread = option ? distributeBranch(option) : null;
+  if (spread) return `Assign ${now?.counted?.[optionId] ?? "all the"} damage among your characters: ${source ?? "this card"} is shuffled back into the encounter deck`;
   // 12172:A:2: "all encounter cards are immune to player card effects until the end of the phase".
   if (option?.instructions[0]?.verb === "ModifyStat" && option.instructions[0].stat === "immuneToPlayerCards") return "All encounter cards are immune to player card effects until the end of the phase";
   // 18078:B:1: the location discarded is added to the staging area, or every player raises their threat by its printed Threat.
@@ -235,17 +265,20 @@ export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choo
   // 18061:A:1: the hero a player chooses is their own.
   const [one, two] = option?.instructions ?? [];
   if (one?.verb === "Pick" && one.pick.type === "hero" && one.pick.control === "you" && two?.verb === "AddResources" && two.to === "picked" && typeof two.amount === "number") return `Add ${two.amount} resource${two.amount === 1 ? "" : "s"} to the pool of a hero you control`;
-  const step = option ? countedBranch(option) : null;
+  const step = option ? countedBranch(option, choose) : null;
   const number = now?.counted?.[optionId];
   const numbered = option ? numberedBranch(option) : null;
   if (numbered && number != null) {
     if (numbered.verb === "RemoveProgressFromQuest") return `Remove ${number} progress from the quest (1 for each attacker)`;
     const amount = numbered.amount;
-    const why = typeof amount === "object" && amount.count?.from === "victory" ? "1 for each location in the victory display" : `the printed Threat of ${now?.placing ?? "the discarded location"}`;
+    const why = typeof amount === "object" && amount.count?.from === "victory" ? "1 per victory location" : `the printed Threat of ${now?.placing ?? "the discarded location"}`;
     return `Each player raises their threat by ${number} (${why})`;
   }
   if (!step || number == null) return null;
-  if (step.verb === "RaiseThreat") return `Raise your threat by ${number} (1 for each ${step.amount && typeof step.amount === "object" ? (step.amount.count?.type ?? "card") : "card"} you control)`;
+  if (step.verb === "RaiseThreat") {
+    const count = step.amount && typeof step.amount === "object" ? step.amount.count : undefined;
+    return `Raise your threat by ${number} (1 for each ${count?.committed === true ? "questing " : ""}${count?.type ?? "card"} you control)`;
+  }
   return `Deal ${step.amount} damage to each ${step.pick?.type ?? "card"} you control (${number})`;
 }
 

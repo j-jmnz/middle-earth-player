@@ -12,7 +12,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import type { PrintedCard } from "../core/printed.ts";
-import { isLocationCard, printedOf } from "../core/printed.ts";
+import { hasQuestPoints, isLocationCard, printedOf } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -34,7 +34,7 @@ type Cards = ReadonlyMap<string, PrintedCard>;
 export function questPointsOf(state: ScenarioState, instance: CardInstance, cards: Cards): number | null {
   const printed = printedOf(cards, instance.code);
   // A Lost Island has no quest points and cannot be explored by progress (dcce.uncharted).
-  return printed.questPoints == null || (instance.face === "B" && printed.keywords.uncharted) ? null : modifiedStat(state, instance, "questPoints", cards);
+  return !hasQuestPoints(printed) || (instance.face === "B" && printed.keywords.uncharted) ? null : modifiedStat(state, instance, "questPoints", cards);
 }
 
 // Printed engagement cost with constant effects applied, or null for a card that prints none.

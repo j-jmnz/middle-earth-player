@@ -3,6 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { CODES, codesIn, finish, idOf, kingsquestTable, legalIntents, loadKingsquestWorld, resolveRecords, send, start, type KingsquestWorld, type PlayerIntent, type Run } from "../../../../test/scenarios/the-kings-quest/scene.ts";
 
@@ -86,6 +88,18 @@ describe("18079 The Lower Depths (stage 2)", () => {
     const used = finish(send(run, offered as PlayerIntent, t.ctx), t.ctx, (state) => (state.window?.kind === "choose" ? (state.window.options.at(-1) ?? "") : ""));
     expect(used.state.cards[used.state.questStage ?? ""]?.progress).toBe(progress - 5);
     expect(cavesOf(used)).toEqual([CODES.ancientTreasury, CODES.frightfulDen, CODES.lostArmory]);
+  });
+
+  it("18079:B:2 two-handed, the look is chosen by the seat that resolves the Response, not always the first player", () => {
+    const t = second({ seats: 2, progress: 5, caves: [CODES.lostArmory, CODES.ancientTreasury, CODES.frightfulDen] });
+    // The Response's conditions (the quest phase, a successful quest, 5 progress) are the Response test above; here the effect itself runs for a seat.
+    const effects = t.ctx.effects.filter((effect) => effect.id === "18079:response:1").map(({ condition: _condition, ...effect }) => effect);
+    const looking = (seat: number) => {
+      const pushed = pushCardEffects(t.state, "forced", t.state.questStage ?? "", seat, false, effects, t.ctx, []);
+      return settle({ ...pushed, window: null, mode: "stopped" }, t.ctx, []).window;
+    };
+    expect(looking(1)).toMatchObject({ kind: "choose", seat: 1 });
+    expect(looking(0)).toMatchObject({ kind: "choose", seat: 0 });
   });
 
   it("18079:B:2 with fewer than 5 progress the Response is not offered", () => {
