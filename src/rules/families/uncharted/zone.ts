@@ -2,7 +2,7 @@
 // for the deck's own detaching and attaching. Types and pure helpers only, so zones.ts can use them.
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
-import { shuffleIds } from "../../core/seed.ts";
+import { leavePile, shufflePile } from "../../core/piles.ts";
 import type { Destination } from "../../core/zones.ts";
 
 /** A card of the Grotto deck, whichever side it shows: its Grotto side is a code of the deck, or the side it does not show is (an Underwater side lying on top of its Grotto side, `other`). */
@@ -21,9 +21,7 @@ export function unchartedRoute(state: ScenarioState, current: Pick<CardInstance,
 
 /** The card leaves the Uncharted deck. */
 export function leaveUnchartedDeck(state: ScenarioState, id: string): ScenarioState {
-  const uncharted = state.uncharted;
-  if (!uncharted || !uncharted.deck.includes(id)) return state;
-  return { ...state, uncharted: { ...uncharted, deck: uncharted.deck.filter((other) => other !== id) } };
+  return leavePile(state, "unchartedDeck", id);
 }
 
 /** The card joins the bottom of the Uncharted deck, Lost Island side up and bare of tokens. A double-sided card of two catalog cards (the Grotto deck, dcce.grotto-deck) lies faceup on its Grotto side. */
@@ -40,10 +38,8 @@ export function joinUnchartedDeck(state: ScenarioState, id: string): ScenarioSta
 
 /** The Uncharted deck shuffled by the seed ("shuffled back into the Uncharted deck"). */
 export function shuffleUnchartedDeck(state: ScenarioState): ScenarioState {
-  const uncharted = state.uncharted;
-  if (!uncharted || uncharted.deck.length < 2) return state;
-  const shuffled = shuffleIds(uncharted.deck, state.seed, state.seedCursor);
-  return { ...state, uncharted: { ...uncharted, deck: shuffled.ids }, seedCursor: shuffled.cursor };
+  if ((state.uncharted?.deck.length ?? 0) < 2) return state;
+  return shufflePile(state, "unchartedDeck");
 }
 
 /** A double-sided location that reaches the victory display lies on its real side, face A: it was explored there, and only the Uncharted deck holds a card Lost Island side up. */

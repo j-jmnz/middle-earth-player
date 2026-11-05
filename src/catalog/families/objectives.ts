@@ -14,7 +14,9 @@ const VERBS = [
   // enemy or location counts its Threat there and stays attached until it leaves play; a treachery resolves as it is revealed and
   // the objective gets no attachment. Used as a When Revealed effect on the objective, and by the Setup that attaches 1 encounter card
   // to each objective (01123:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("GuardObjective"), target: cardRefSchema.optional(), ...when }), { setupRuns: "inEach" }),
+  // Guarded (enemy) / Guarded (location) (emce.guarded-x, wor.guarded-x): with `types` the objective is guarded by an encounter card of one of those types. Cards come off the top of the encounter deck into its discard pile until one of them is discarded, and that
+  // card is added to the staging area (it is not revealed) and attached to the objective as its guard; the discard pile is shuffled into an empty deck first. With no card of the types in the deck or the discard pile the objective stays unguarded.
+  verbFlags(z.strictObject({ verb: z.literal("GuardObjective"), target: cardRefSchema.optional(), types: z.array(z.enum(["enemy", "location"])).min(1).optional(), ...when }), { setupRuns: "inEach" }),
   // Claiming (01108:A:2, 01109:A:2, 01110:A:2): the source objective, free of encounters, leaves the staging area and is attached to the
   // last picked hero, a card its controller controls ("Counts as an attachment"). It is announced as `claimed`. A hero with more
   // restricted attachments than it can hold discards the one its controller chooses, and a discarded objective returns to the staging area.

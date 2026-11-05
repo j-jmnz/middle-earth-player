@@ -42,15 +42,15 @@ Read the sections your task touches.
     - 80–85 Codespaces (~110)
     - 86–160 Phone builds from scratch (Mac) (~1.1K)
     - 161–164 Maestro (~170)
-- `docs/architecture.md` — Architecture (~19.0K tok)
+- `docs/architecture.md` — Architecture (~19.4K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~3.5K)
-    - 223–234 Mechanic families (~2.6K) ← 5
+  - 209–234 Engine (~3.8K)
+    - 223–234 Mechanic families (~2.9K) ← 5
   - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)

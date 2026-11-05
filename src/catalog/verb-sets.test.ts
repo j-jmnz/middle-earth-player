@@ -11,7 +11,7 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {
-    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck"]);
+    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "ShufflePile"]);
     expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["RevealEncounter", "SearchMove"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);
   });
@@ -21,7 +21,7 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs the start resolves after the quest card's Setup", () => {
-    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachSetAsideTo", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceSecrets", "PutSetAsideInPlay", "RaiseThreatToAttach", "TradeDamageForThreat", "TradeShipDamage"]);
+    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachSetAsideTo", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceSecrets", "PutSetAsideInPlay", "RaiseThreatToAttach", "ShuffleIntoPile", "TradeDamageForThreat", "TradeShipDamage"]);
   });
 
   it("mark exactly the verbs that reach into the collection", () => {

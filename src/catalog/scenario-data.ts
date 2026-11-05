@@ -248,6 +248,17 @@ export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Norma
   return placementsAt(data, difficulty).flatMap((card) => (card.pile === "corsairDeck" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
 }
 
+// The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck"] as const;
+export function dealtPiles(data: ScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
+  const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
+  for (const card of placementsAt(data, difficulty)) {
+    const pile = DEAL_PILES.find((name) => name === card.pile);
+    if (pile) piles[pile] = [...(piles[pile] ?? []), ...Array.from({ length: copiesAt(card, difficulty) }, () => card.code)];
+  }
+  return piles;
+}
+
 // The Uncharted deck a scenario deals, copy by copy (dcce.uncharted-deck): the `unchartedDeck` pile at the difficulty played. The `islandMap` pile (dcce.island-map) is dealt the same way: its
 // "Prepare the Island Map" Setup takes the double-sided locations from the deck and lays them out.
 export function unchartedCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {

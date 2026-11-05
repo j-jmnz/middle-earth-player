@@ -1,5 +1,5 @@
 import { setupRoleVerbs, type Effect, type ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, corsairCodes, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
@@ -103,6 +103,8 @@ export function buildStart(start: StartInput): StartScenario {
   const corsair = [...corsairCodes(input.scenario, input.difficulty), ...campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoCorsairDeck" ? [instruction.code] : []))];
   const uncharted = unchartedCodes(input.scenario, input.difficulty);
   const doubleSided = doubleSidedCards(input.scenario, input.difficulty);
+  // The decks of Ered Mithrin the scenario deals (emce.caves-deck, emce.evil-creatures-deck); the quest card's Setup shuffles them.
+  const piles = dealtPiles(input.scenario, input.difficulty);
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
@@ -127,6 +129,7 @@ export function buildStart(start: StartInput): StartScenario {
     ...(corsair.length > 0 ? { corsairDeck: corsair } : {}),
     ...(uncharted.length > 0 ? { unchartedDeck: uncharted } : {}),
     ...(doubleSided.length > 0 ? { doubleSided } : {}),
+    ...(Object.keys(piles).length > 0 ? { piles } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
     ...(!standalone && factsOf(input) ? { facts: factsOf(input) } : {}),
   };

@@ -25,7 +25,8 @@ import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
-import { effectData, moveEncounter, shuffleDiscardIn } from "../encounter/moves.ts";
+import { discardUntilType } from "../encounter/discard-until.ts";
+import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
 type PlayInto = Extract<Instruction, { verb: "PlayInto" }>;
@@ -121,11 +122,6 @@ function guardBy(state: ScenarioState, id: string, guardId: string): ScenarioSta
   return attachTo(state, id, guardId);
 }
 
-function typeOf(state: ScenarioState, id: string, ctx: ReduceContext): string | null {
-  const card = state.cards[id];
-  return card ? printedOf(ctx.cards, card.code).type : null;
-}
-
 // Puts an instruction at the front of the running effect's queue.
 function next(state: ScenarioState, instruction: Instruction, seat: number): ScenarioState {
   const data = effectData(state);
@@ -139,21 +135,9 @@ function next(state: ScenarioState, instruction: Instruction, seat: number): Sce
 export function guardWith(state: ScenarioState, instruction: Extract<Instruction, { verb: "GuardWith" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[instruction.card];
   if (!card || card.zone !== "setAside" || card.host) return state;
-  const types: readonly string[] = instruction.types;
-  const wanted = (id: string) => types.includes(typeOf(state, id, ctx) ?? "");
-  if (![...state.encounterDeck, ...state.encounterDiscard].some(wanted)) {
-    return next(state, { verb: "PutIntoPlay", card: "self", unguarded: true }, focus.seat);
-  }
-  let current = state;
-  for (;;) {
-    const top = current.encounterDeck[0];
-    if (!top) {
-      current = shuffleDiscardIn(current);
-      continue;
-    }
-    current = updateCard(moveCard(current, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
-    if (wanted(top)) return guardBy(moveEncounter(current, top, "staging", focus.seat, ctx, steps), card.id, top);
-  }
+  const { state: searched, found } = discardUntilType(state, instruction.types, ctx);
+  if (found == null) return next(state, { verb: "PutIntoPlay", card: "self", unguarded: true }, focus.seat);
+  return guardBy(moveEncounter(searched, found, "staging", focus.seat, ctx, steps), card.id, found);
 }
 
 // Attaches a card in its owner's play area to a card, or places it on a pseudo host, and announces it.

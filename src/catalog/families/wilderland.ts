@@ -1,16 +1,20 @@
-// The vocabulary the Ered Mithrin campaign adds to effect records (phase 50): the treasures the players find (emce.treasure), the boon allies
+// The vocabulary the Ered Mithrin campaign adds to effect records: the treasures the players find (emce.treasure), the boon allies
 // who either join the Campaign Pool or are traded for a log line (emce.boon-allies), the encounter cards the pool holds
-// (emce.campaign-pool-encounter) and the cards a campaign card removes at Setup. Simple verbs; effect-schema-verbs.ts composes them.
+// (emce.campaign-pool-encounter), the cards a campaign card removes at Setup, and what several scenarios share: the Caves deck and Deep
+// (emce.caves-deck, emce.deep), the Evil Creatures deck (emce.evil-creatures-deck), Discover X and Loot (emce.discover, emce.loot). Simple verbs; effect-schema-verbs.ts composes them.
 // src/rules/families/wilderland/ runs them (the Resolution ones in src/rules/setup/resolution.ts, the Setup removal in src/campaign/checklist.ts).
+// Guarded (enemy or location) on an objective (emce.guarded-x) is the objectives family's GuardObjective with `types`.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
 import { ALLY_LINES } from "../ally-lines.ts";
-import { cardRefSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
 const code = z.string().min(1);
+// The decks beside the encounter deck (emce.caves-deck, emce.evil-creatures-deck; src/rules/core/piles.ts): the Caves deck, the Evil Creatures deck, and the two encounter sets Lost in Mirkwood sets aside.
+const pile = z.enum(["caves", "evilCreatures", "spiders", "orcs"]);
 
 const VERBS = [
   // "Look at 3 random undiscovered treasures and attach 1 of them to ~ as a guarded objective" (12168:A:2, 12170:A, 12189:B:2): `count` treasures (3 by default) the log has not recorded and
@@ -33,6 +37,26 @@ const VERBS = [
   // When the log records `line`, the first player chooses up to `count` cards of `cardType` in the encounter deck, `nonUnique` ones only when it says so, none of the titles in `except`, and they are
   // removed from the game. The checklist asks for each choice (campaign/checklist.ts); the cards the deal builds are fewer by them.
   z.strictObject({ verb: z.literal("RemoveFromEncounterDeckIfLogged"), line: z.enum(ALLY_LINES), count: z.number().int().positive(), cardType: z.enum(["enemy", "location", "treachery"]), nonUnique: z.boolean().optional(), except: z.array(z.string().min(1)).optional() }),
+  // Setup: "Create the Caves deck" / "Create the Evil Creatures deck" (emce.caves-deck, emce.evil-creatures-deck): the cards the scenario dealt to the deck are shuffled together with the game's seed. Run by the quest card's Setup, like PrepareUnchartedDeck.
+  verbFlags(z.strictObject({ verb: z.literal("ShufflePile"), pile, ...when }), { setupRuns: "top" }),
+  // "Shuffle Abandoned Ruin into the Caves deck" (12170:A, 12174:A:1): a new copy of the card joins the deck, which is shuffled. A campaign card's Setup verb the engine resolves after the quest card's Setup shuffled the deck.
+  verbFlags(z.strictObject({ verb: z.literal("ShuffleIntoPile"), pile, code, ...when }), { setupRole: "afterSetup" }),
+  // "Add the top card of the Evil Creatures deck to the staging area" / "Put the top card ... into play engaged with the first player" (18017:A, 18066:B, 18068:A; emce.evil-creatures-deck): `count` cards (1 by default) come off the top of the deck
+  // into the staging area or engaged with the actor, the first player or each player (`who`, the actor by default; the staging area ignores it). A deck with a discard pile of its own (Evil Creatures) is refilled from it first when it is empty. The card enters play.
+  z.strictObject({ verb: z.literal("AddFromPile"), pile, to: z.enum(["staging", "engaged"]), count: positiveAmountSchema.optional(), who: z.enum(["actor", "firstPlayer", "eachSeat"]).optional(), ...when }),
+  // "Shuffle the Spiders of Mirkwood encounter set into the encounter deck" (18072:A): the cards of the set-aside deck join the encounter deck, which is shuffled, and the deck is gone (emce.setup-lost-in-mirkwood).
+  z.strictObject({ verb: z.literal("ShufflePileIntoEncounterDeck"), pile, ...when }),
+  // Constant on a location, the Deep keyword (emce.deep; 18046:A, 19016:A): after the players travel to it and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location. Ignored with the Caves
+  // deck empty, while the location is no longer the active location, or while a card in play ignores the keyword (IgnoreKeyword). A location that is not a Deep location is not touched; the engine reads this record when the players travel (families/wilderland/deep.ts).
+  z.strictObject({ verb: z.literal("Deep") }),
+  // Constant on a card in play, usually the campaign card or the quest stage: "Ignore the deep keyword" / "Ignore the deep and discover keywords" (12187:A, 12195:A, 18080:B, 19023:B; emce.deep, emce.discover). While the card is in play the keywords
+  // are not resolved: the scenario-level switch. It does nothing when run.
+  z.strictObject({ verb: z.literal("IgnoreKeyword"), keywords: z.array(z.enum(["deep", "discover"])).min(1) }),
+  // Forced on a location, trigger becameActive with subject self: the Discover X keyword (emce.discover; 19102:A, 19104:A, 19105:A). The first player looks at the top X cards of the encounter deck (the discard pile is shuffled into it when it holds fewer),
+  // attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile. Ignored while a card in play ignores the keyword.
+  z.strictObject({ verb: z.literal("Discover"), amount: positiveAmountSchema, ...when }),
+  // Constant on an objective, the Loot keyword (emce.loot; 19094:A, 19095:A, 19096:A): the card enters play only through the Discover keyword. One revealed from the encounter deck is discarded and another card is revealed (windows/frames.ts startReveal).
+  z.strictObject({ verb: z.literal("Loot") }),
 ] as const;
 
 const TRIGGERS = [] as const;
