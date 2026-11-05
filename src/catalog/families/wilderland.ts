@@ -93,6 +93,25 @@ const VERBS = [
   z.strictObject({ verb: z.literal("GrantSurgeToSubject"), ...when }),
   // A constant marker beside the flag progressDiscards on Searching for a Way Out (18028:A:2): after the cards that progress was turned into are discarded, the topmost Objective-Location in the encounter discard pile enters play (the staging area, its Guarded keyword resolved). It does nothing when run.
   z.strictObject({ verb: z.literal("PutObjectiveLocationAfterDiscard") }),
+  // Carried Away (18074:A:1): "Each player chooses a hero he controls, discards each token and attachment from that hero, and places it in the staging area ... attaches that enemy to the hero he owns in the staging area, guarding it." After a Pick of the hero, a DiscardUntil enemy and a
+  // MoveEncounterCard of that enemy to the staging area, the hero (the card picked before the last) loses its tokens and attachments and lies facedown under the enemy (the captive zone: in play, controlled by no one), flagged as guarded; the enemy guards it (guardsHero). Nothing happens when no enemy was found.
+  z.strictObject({ verb: z.literal("CarryAwayHero"), ...when }),
+  // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
+  z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
+  // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).
+  z.strictObject({ verb: z.literal("DiscardGuardedHeroes"), ...when }),
+  // Truly Lost (18075:A:1): "Each player places his hand of cards facedown under a different location in the staging area." The actor chooses a location in the staging area (an Objective-Location is one) that no player has put a hand under yet, and every card of their hand goes facedown under it, still theirs.
+  // With an empty hand nothing is chosen.
+  z.strictObject({ verb: z.literal("PlaceHandUnderLocation"), ...when }),
+  // Truly Lost (18075:B:2): "return each facedown player card under that location to its owner's hand." The location the event is about (the subject; it has been explored and left play).
+  z.strictObject({ verb: z.literal("ReturnFacedownToHands"), ...when }),
+  // Truly Lost (18075:B:3): "When the players advance from this stage, discard each facedown player card under each location." Each facedown player card under a location goes to its owner's discard pile.
+  z.strictObject({ verb: z.literal("DiscardFacedownUnder"), ...when }),
+  // The Forest of Great Fear (18076:A:1): "Search the remaining set-aside encounter set for the enemy with the most hit points and add it to the staging area. That enemy is the 'nemesis' until it leaves play." Of the enemies in the Spiders of Mirkwood and Dol Guldur Orcs
+  // piles that are still set aside, the one with the most printed hit points (the first player chooses among a tie) enters the staging area, flagged as the nemesis (the pick field nemesis). Nothing happens with both piles used.
+  z.strictObject({ verb: z.literal("SearchNemesis"), ...when }),
+  // The Forest of Great Fear (18076:B:2): "return the nemesis to the staging area and it makes an attack against the first player." An engaged nemesis goes back to the staging area; it then attacks the first player (a shadow card is dealt for the attack, as AttackFirstPlayer does).
+  z.strictObject({ verb: z.literal("NemesisAttacks"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

@@ -275,7 +275,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "questSucceeded":
       return questSucceeded(state, scope.actor, scope.sourceId, condition.committed === true);
     case "questFailed":
-      return state.quested?.round === state.round && !state.quested.succeeded.includes(scope.actor);
+      return state.quested?.round === state.round && (state.quested.failed ?? []).includes(scope.actor);
     case "step":
       return stepHolds(state, condition.is);
     case "engagedThisPhase":

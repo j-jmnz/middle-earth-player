@@ -1,4 +1,4 @@
-// Rules: emce.treasure, emce.boon-allies, emce.campaign-pool-encounter, emce.campaign-log, emce.caves-deck, emce.deep, emce.evil-creatures-deck, emce.discover, emce.loot, rr.guarded (data/rules/entries.json).
+// Rules: rr.player-elimination, rr.explored, emce.treasure, emce.boon-allies, emce.campaign-pool-encounter, emce.campaign-log, emce.caves-deck, emce.deep, emce.evil-creatures-deck, emce.discover, emce.loot, rr.guarded (data/rules/entries.json).
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
@@ -19,6 +19,9 @@ import { setAsideDiscardForPool } from "./discard-pool.ts";
 import { flipOver } from "./flip.ts";
 import { addSourceToHandOfMost } from "./hand.ts";
 import { advanceToLetterStage, grantSurge, freeTreasures, searchGuardForTreasure, takeControlOfSetAside } from "./mirkwood.ts";
+import { carryAwayHero, discardGuardedHeroes, releaseGuardedHero } from "./carried.ts";
+import { discardFacedownUnder, placeHandUnderLocation, returnFacedownToHands } from "./lost.ts";
+import { clearNemesis, nemesisAttacks, searchNemesis } from "./nemesis.ts";
 import { topFrame } from "../../windows/windows.ts";
 
 // The verbs src/catalog/families/wilderland.ts adds. AttachRandomTreasure runs in the game. The others are not run by the engine: the Resolution
@@ -60,10 +63,24 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return takeControlOfSetAside(state, instruction, focus);
     case "SearchGuardForTreasure":
       return searchGuardForTreasure(state, instruction, focus);
-    case "GrantSurgeToSubject": {
-      const data = topFrame(state)?.data;
-      return grantSurge(state, data?.kind === "effect" ? (data.subject ?? null) : null);
-    }
+    case "GrantSurgeToSubject":
+      return grantSurge(state, eventSubject(state));
+    case "CarryAwayHero":
+      return carryAwayHero(state, ctx, steps);
+    case "ReleaseGuardedHero":
+      return releaseGuardedHero(state, eventSubject(state));
+    case "DiscardGuardedHeroes":
+      return discardGuardedHeroes(state, steps);
+    case "PlaceHandUnderLocation":
+      return placeHandUnderLocation(state, focus, ctx, steps);
+    case "ReturnFacedownToHands":
+      return returnFacedownToHands(state, eventSubject(state));
+    case "DiscardFacedownUnder":
+      return discardFacedownUnder(state);
+    case "SearchNemesis":
+      return searchNemesis(state, focus, ctx, steps);
+    case "NemesisAttacks":
+      return nemesisAttacks(state, focus, ctx, steps);
     case "Loot":
     case "Undiscardable":
     case "DiscardToPoolFromSets":
@@ -82,6 +99,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
+// The card the answered event is about, for the effect running now.
+function eventSubject(state: ScenarioState): string | null {
+  const data = topFrame(state)?.data;
+  return data?.kind === "effect" ? (data.subject ?? null) : null;
+}
+
 // The conditions that read the Campaign Log's facts (log.ts). A game dealt without the facts holds neither.
 function condition(state: ScenarioState, found: Condition): boolean | null {
   return logCondition(found, state.campaignFacts);
@@ -93,7 +116,7 @@ export const manifest: RulesFamily = {
   amount: wilderlandAmount,
   pick: wilderlandPickMatches,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
-  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => freeTreasures(controlFreedObjectives(state, ctx), ctx, steps) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard"],
+  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx) },
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks"],
   run,
 };

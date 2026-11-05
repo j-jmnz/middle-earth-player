@@ -169,6 +169,11 @@ export function cardsUnder(state: ScenarioState, locationId: string): string[] {
     .map((card) => card.id);
 }
 
+// The facedown player cards under a location (Truly Lost, 18075:A:1): the cards under it that a player owns, in instance id order.
+export function playerCardsUnder(state: ScenarioState, locationId: string): string[] {
+  return cardsUnder(state, locationId).filter((id) => state.cards[id]?.owner != null);
+}
+
 // Every shadow card dealt to the enemy, the first one first.
 export function shadowCards(instance: CardInstance | undefined): string[] {
   if (!instance) return [];

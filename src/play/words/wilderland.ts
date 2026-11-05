@@ -1,4 +1,4 @@
-// Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:2, 12189:B:2. What the table says when the players look at random undiscovered treasures and choose one to attach as a
+// Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:2, 12189:B:2, 18074:A:1. What the table says when the players look at random undiscovered treasures and choose one to attach as a
 // guarded objective (AttachRandomTreasure). The sentence the choice sheet reads from. Pure.
 import type { Instruction } from "../../catalog/boundary.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
@@ -188,4 +188,10 @@ export const POOL_COPY = "A copy joins the campaign pool if you win";
 /** The log's line for the card set aside: "A Growing Threat sets Hill Troll aside. A copy joins the campaign pool if you win." */
 export function setAsideLine(source: string, card: string): string {
   return `${source} sets ${card} aside. ${POOL_COPY}.`;
+}
+
+/** Carried Away (18074:A:1): the hero a player chooses, before the encounter deck is discarded to the enemy that will guard it. Null for any other pick. */
+export function wilderlandPickWords(pick: Instruction, next: Instruction | undefined): PickWords | null {
+  if (pick.verb !== "Pick" || next?.verb !== "DiscardUntil" || pick.pick.type !== "hero") return null;
+  return { verb: "Carry away", prompt: "Choose a hero you control. It loses its tokens and attachments, and the enemy discarded next guards it." };
 }

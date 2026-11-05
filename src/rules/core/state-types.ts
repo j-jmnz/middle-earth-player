@@ -116,6 +116,10 @@ export type CardInstance = {
   prisoner?: true;
   // The place the prisoner hero had among its seat's heroes, so a rescued (or swapped back) hero returns where it was (families/prisoner.ts).
   heroSlot?: number;
+  // A hero an enemy guards (Carried Away, 18074:A:1): in play, facedown under the guard (the captive zone), controlled by no one. Its owner stays in the game while it is held (families/wilderland/carried.ts); `owner` is the seat that gets it back.
+  guardedHero?: true;
+  // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
+  nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
   // (families/objectives.ts, 01108:A:2).
   claimed?: true;
@@ -374,7 +378,7 @@ export type ScenarioState = {
   spent?: { round: number; ids: readonly string[] };
   // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest
   // successfully this phase", "After Hirgon quests successfully"). Kept only in a game that reads it (families/costs/pay.ts).
-  quested?: { round: number; committed: readonly string[]; succeeded: readonly number[] };
+  quested?: { round: number; committed: readonly string[]; succeeded: readonly number[]; failed?: readonly number[] };
   // Each seat's starting threat level (rr.initial-threat-level), kept at setup only when a card of the game reads it (04053:A:2).
   startingThreat?: readonly number[];
   // The seats a card in play keeps in the game at the threat elimination level (10124:A:2): eliminateEmpties asks that card
@@ -383,5 +387,7 @@ export type ScenarioState = {
   // The seats that control an ally in play which can gain the hero card type (Prince Imrahil, 145005:A:1): a seat with no heroes left
   // is not eliminated until the play sweep has given that ally the type (families/play/sweep.ts, rr.card-types).
   heroSavers?: readonly number[];
+  // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
+  stageLeft?: { to: string; from: string };
   undo: UndoLog;
 };

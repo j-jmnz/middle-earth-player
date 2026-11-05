@@ -120,14 +120,28 @@ describe("18077 Escape from Taur-nu-fuin", () => {
 });
 
 describe("12169 Melanwar", () => {
-  it("places 1 progress on the active location, 3 when the quest failed this round", () => {
-    const base = lostmirkTable(world, { phase: "Travel", play: [CODES.melanwar], active: CODES.twilightHall });
-    const melanwar = idOf(base.state, CODES.melanwar);
-    const active = base.state.activeLocation ?? "";
-    const once = resolveRecords(base.state, base.ctx, "12169", "response", melanwar);
-    expect(once.state.cards[active]?.progress).toBe(1);
-    const failed = { ...base.state, quested: { round: base.state.round, committed: [], succeeded: [] } };
-    const thrice = resolveRecords(failed, base.ctx, "12169", "response", melanwar);
-    expect(thrice.state.cards[active]?.progress).toBe(3);
+  // The quest phase is played out (nobody commits, or the first hero does), and Melanwar's Response after the travel phase begins is used; the progress it placed is the result.
+  const travelWith = (staging: readonly string[], commit: boolean): number => {
+    const t = lostmirkTable(world, { stage: "18071", phase: "Quest", play: [CODES.melanwar], active: CODES.twilightHall, staging, deck: ["f0", "f0"] });
+    let run = start(t.state);
+    if (commit) run = send(run, { type: "Commit", cardIds: [t.hero] }, t.ctx);
+    run = send(run, { type: "Pass" }, t.ctx);
+    expect(run.state.phase).toBe("Travel");
+    const melanwar = idOf(run.state, CODES.melanwar);
+    const before = run.state.cards[run.state.activeLocation ?? ""]?.progress ?? 0;
+    run = send(run, { type: "Trigger", cardId: melanwar, effectId: "12169:response:1" }, t.ctx);
+    return (run.state.cards[run.state.activeLocation ?? ""]?.progress ?? 0) - before;
+  };
+
+  it("places 1 progress on the active location", () => {
+    expect(travelWith([], false)).toBe(1);
+  });
+
+  it("places 3 progress on the active location when the quest failed this round (the questFailed condition)", () => {
+    expect(travelWith(["f3"], false)).toBe(3);
+  });
+
+  it("places 1 progress when the quest succeeded", () => {
+    expect(travelWith([], true)).toBe(1);
   });
 });

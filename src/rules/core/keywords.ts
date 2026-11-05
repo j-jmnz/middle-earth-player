@@ -449,6 +449,9 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     // The elimination level, lowered by a card the seat holds (The One Ring, families/misc.ts).
     const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
+    // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
+    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => card.guardedHero === true && card.owner === index);
+    if (held) continue;
     if (seat.threat >= level || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
       const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;

@@ -224,6 +224,12 @@ export const pickSchema = z.strictObject({
   // Read by the wilderland family (src/rules/families/wilderland/pick.ts); use them with `type: card`.
   objectiveLocation: z.literal(true).optional(),
   guardsObjectiveLocation: z.literal(true).optional(),
+  // Lost in Mirkwood's stages 3 and 4 (ledger lines 18074:B:1, 18075:B:1/B:2, 18076:B:1). `guardsHero`: an enemy that guards a hero (CarryAwayHero), in play or not. `hasFacedownUnder`: a card with a facedown player card under it (PlaceHandUnder), wherever the card is now.
+  // `facedownUnder`, in an `eachAttached`: the cards counted are the facedown player cards under the holder, not its attachments. `nemesis`: the enemy 18076:A:1 named the nemesis, until it leaves play. Read by the wilderland family (src/rules/families/wilderland/pick.ts); use them with `type: card`.
+  guardsHero: z.literal(true).optional(),
+  hasFacedownUnder: z.literal(true).optional(),
+  facedownUnder: z.literal(true).optional(),
+  nemesis: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).

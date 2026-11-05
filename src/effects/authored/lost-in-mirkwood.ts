@@ -1,4 +1,4 @@
-import type { Effect, Instruction } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction } from "../../catalog/boundary.ts";
 
 // Records for Lost in Mirkwood (Ered Mithrin part 2, campaign card 12168): the encounter cards no template reads, the Objective-Locations of Searching for a Way Out, the seven quest stages and the campaign card. Melanwar (12169) is in pool/EMCE.ts. Every line is read from the scan ledger
 // (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) needs no record here. The piles place the cards set aside (the Spiders of Mirkwood and Dol Guldur Orcs sets, Haldan) and the staging area; stage 1A's Setup takes control of Haldan.
@@ -14,7 +14,10 @@ const DISCARD_TOP = { verb: "MoveEncounterCard", card: "deckTop", to: "discard" 
 const DISCARDED_IS = (type: "enemy" | "location") => ({ kind: "matches", card: "picked", pick: { type, control: "any" }, inPlay: false }) as const;
 // "If this attack destroys a character" (12154:A:2): the attack's X is the characters it destroyed.
 const DESTROYED_A_CHARACTER = { kind: "x", min: 1 } as const;
+// "If it is guarding a card" (18036:A:2): the attacker guards an objective (isGuard) or a hero (Carried Away's guard).
+const GUARDING_A_CARD: Condition = { kind: "any", conditions: [{ kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", isGuard: true } }, { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", guardsHero: true } }] };
 const FOREST_LOCATION = { type: "location", control: "any", trait: "Forest" } as const;
+const NEMESIS = { type: "enemy", control: "any", staging: true, nemesis: true } as const;
 const NON_OBJECTIVE_STAGED_LOCATION = { type: "location", control: "any", stagingOnly: true, nonObjective: true } as const;
 
 // Guarded (location) / Guarded (enemy) on an Objective-Location (emce.guarded-x): its When Revealed record, which the cards that put one into play run as well.
@@ -117,8 +120,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["18036:A:2"],
     timing: "shadow",
     instructions: [
-      { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", target: "attacker", when: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", isGuard: true } } },
-      { verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfPhase", target: "attacker", when: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", isGuard: true } } },
+      { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", target: "attacker", when: GUARDING_A_CARD },
+      { verb: "ModifyStat", stat: "defense", amount: 2, until: "endOfPhase", target: "attacker", when: GUARDING_A_CARD },
     ],
   },
 
@@ -192,11 +195,70 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 18072 Spiders of Mirkwood and 18073 Dol Guldur Orcs (stages 2A and 2C): the set swaps into the encounter deck and each player's worth of cards is revealed. The first Spider (Orc) enemy revealed each quest phase gains surge; when a Spider damages a character with an attack that character cannot ready until the end of
   // the round (an Orc: its controller chooses and discards a card from hand).
   { id: "18072:whenRevealed:1", cardCode: "18072", lines: ["18072:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShufflePileIntoEncounterDeck", pile: "spiders" }, { verb: "Repeat", times: { players: true }, instructions: [{ verb: "RevealEncounter" }] }] },
-  { id: "18072:forced:1", cardCode: "18072", lines: ["18072:B:1"], timing: "forced", trigger: "encounterRevealed", subject: { type: "enemy", control: "any", trait: "Spider" }, condition: { kind: "phase", is: "Quest" }, limit: "oncePerPhase", instructions: [{ verb: "GrantSurgeToSubject" }] },
+  { id: "18072:forced:1", cardCode: "18072", lines: ["18072:B:1"], timing: "forced", trigger: "revealed", byEncounterDeck: true, subject: { type: "enemy", control: "any", trait: "Spider" }, condition: { kind: "phase", is: "Quest" }, limit: "oncePerPhase", instructions: [{ verb: "GrantSurgeToSubject" }] },
   { id: "18072:forced:2", cardCode: "18072", lines: ["18072:B:2"], timing: "forced", trigger: "damagedByAttack", subject: { type: "character", control: "any" }, condition: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Spider" } }, instructions: [{ verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "endOfRound", target: "subject" }] },
   { id: "18073:whenRevealed:1", cardCode: "18073", lines: ["18073:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShufflePileIntoEncounterDeck", pile: "orcs" }, { verb: "Repeat", times: { players: true }, instructions: [{ verb: "RevealEncounter" }] }] },
-  { id: "18073:forced:1", cardCode: "18073", lines: ["18073:B:1"], timing: "forced", trigger: "encounterRevealed", subject: { type: "enemy", control: "any", trait: "Orc" }, condition: { kind: "phase", is: "Quest" }, limit: "oncePerPhase", instructions: [{ verb: "GrantSurgeToSubject" }] },
+  { id: "18073:forced:1", cardCode: "18073", lines: ["18073:B:1"], timing: "forced", trigger: "revealed", byEncounterDeck: true, subject: { type: "enemy", control: "any", trait: "Orc" }, condition: { kind: "phase", is: "Quest" }, limit: "oncePerPhase", instructions: [{ verb: "GrantSurgeToSubject" }] },
   { id: "18073:forced:2", cardCode: "18073", lines: ["18073:B:2"], timing: "forced", trigger: "damagedByAttack", subject: { type: "character", control: "any" }, eventSeat: "you", condition: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Orc" } }, instructions: [{ verb: "DiscardFromHand", amount: 1 }] },
+
+  // 18074 Carried Away (stage 3A). Each player chooses a hero, which loses its tokens and attachments; the encounter cards discarded until an enemy is discarded, and that enemy enters the staging area and guards the hero: the hero lies under it, in play and controlled by no one
+  // (CarryAwayHero). Side B: the enemies guarding a hero cannot take non-combat damage (the second sentence, the hero in play under no one's control, is the engine's: the captive zone); when one is defeated its hero returns exhausted; leaving the stage discards the heroes still held.
+  {
+    id: "18074:whenRevealed:1",
+    cardCode: "18074",
+    lines: ["18074:A:1"],
+    timing: "whenRevealed",
+    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }, { verb: "CarryAwayHero" }] }],
+  },
+  { id: "18074:constant:1", cardCode: "18074", lines: ["18074:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotTakeNonCombatDamage", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, guardsHero: true } }] },
+  { id: "18074:forced:1", cardCode: "18074", lines: ["18074:B:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "card", control: "any", guardsHero: true }, instructions: [{ verb: "ReleaseGuardedHero" }] },
+  { id: "18074:forced:2", cardCode: "18074", lines: ["18074:B:3"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "DiscardGuardedHeroes" }] },
+
+  // 18075 Truly Lost (stage 3C). Each player discards until a non-objective location is discarded and adds it to the staging area (an Objective-Location has the Objective type, so DiscardUntil location skips it); then each places their hand facedown under a different location there.
+  // Side B: a location gets +1 quest point for each facedown player card under it (an Objective-Location is a location); the explored location returns them to their owners' hands (heard in the staging area and as the active location); leaving the stage discards the cards still under locations.
+  {
+    id: "18075:whenRevealed:1",
+    cardCode: "18075",
+    lines: ["18075:A:1"],
+    timing: "whenRevealed",
+    instructions: [
+      { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardUntil", type: "location" }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }] },
+      { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "PlaceHandUnderLocation" }] },
+    ],
+  },
+  {
+    id: "18075:constant:1",
+    cardCode: "18075",
+    lines: ["18075:B:1"],
+    timing: "constant",
+    instructions: [
+      { verb: "ModifyStat", stat: "questPoints", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any" }, eachAttached: { type: "card", control: "any", facedownUnder: true } },
+      { verb: "ModifyStat", stat: "questPoints", amount: 1, until: "whileSourceInPlay", holders: { type: "card", control: "any", objectiveLocation: true }, eachAttached: { type: "card", control: "any", facedownUnder: true } },
+    ],
+  },
+  { id: "18075:forced:1", cardCode: "18075", lines: ["18075:B:2"], timing: "forced", trigger: "locationExplored", subject: { type: "card", control: "any", hasFacedownUnder: true }, instructions: [{ verb: "ReturnFacedownToHands" }] },
+  { id: "18075:forced:2", cardCode: "18075", lines: ["18075:B:2"], timing: "forced", trigger: "activeExplored", subject: { type: "card", control: "any", hasFacedownUnder: true }, instructions: [{ verb: "ReturnFacedownToHands" }] },
+  { id: "18075:forced:3", cardCode: "18075", lines: ["18075:B:3"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "DiscardFacedownUnder" }] },
+
+  // 18076 The Forest of Great Fear (stage 4A). Searching for a Way Out leaves the game; the set-aside set's enemy with the most hit points enters the staging area as the nemesis (SearchNemesis). Side B: the nemesis gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects; at the end of the round
+  // it returns to the staging area and attacks the first player; the stage cannot be defeated while it is in play; it cannot take damage with less than 8 progress on the stage; defeating it wins the game.
+  { id: "18076:whenRevealed:1", cardCode: "18076", lines: ["18076:A:1"], timing: "whenRevealed", instructions: [{ verb: "RemoveCodeFromGame", code: "18028" }, { verb: "SearchNemesis" }] },
+  {
+    id: "18076:constant:1",
+    cardCode: "18076",
+    lines: ["18076:B:1"],
+    timing: "constant",
+    instructions: [
+      { verb: "ModifyStat", stat: "threat", amount: 2, until: "whileSourceInPlay", holders: NEMESIS },
+      { verb: "ModifyStat", stat: "attack", amount: 2, until: "whileSourceInPlay", holders: NEMESIS },
+      { verb: "ModifyStat", stat: "defense", amount: 2, until: "whileSourceInPlay", holders: NEMESIS },
+      { verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: NEMESIS },
+    ],
+  },
+  { id: "18076:forced:1", cardCode: "18076", lines: ["18076:B:2"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "NemesisAttacks" }] },
+  { id: "18076:constant:2", cardCode: "18076", lines: ["18076:B:3"], timing: "constant", condition: { kind: "canPick", pick: NEMESIS }, instructions: [{ verb: "Restrict", what: "advance" }] },
+  { id: "18076:constant:3", cardCode: "18076", lines: ["18076:B:3"], timing: "constant", condition: { kind: "less", left: { stat: "progress", of: "self" }, right: 8 }, instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: NEMESIS }] },
+  { id: "18076:triggered:1", cardCode: "18076", lines: ["18076:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: NEMESIS, instructions: [{ verb: "WinGame" }] },
 
   // 18077 Escape from Taur-nu-fuin (stage 4C). Searching for a Way Out leaves the game and, starting with the first player, each player discards cards until an enemy is discarded and puts it into play engaged with them. At the end of the round each player raises their threat by 1 for each enemy engaged with them;
   // the stage cannot be defeated while a player is engaged with an enemy, and defeating it wins the game.

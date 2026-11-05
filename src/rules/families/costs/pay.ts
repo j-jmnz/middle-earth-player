@@ -143,11 +143,16 @@ export function spentThisRound(state: ScenarioState, id: string): boolean {
 }
 
 // This round's quest is remembered, in a game that reads it: who committed (the quest's resolution clears the flag before its
-// Responses are offered) and whose quest succeeded ("If you quest successfully this phase", "After Hirgon quests successfully").
+// Responses are offered), whose quest succeeded ("If you quest successfully this phase", "After Hirgon quests successfully") and, in a game that reads
+// `questFailed`, whose quest failed ("If you quested unsuccessfully this round", 12169:A:2).
 export function noteEvent(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ScenarioState {
-  if ((event.trigger !== "questSucceeded" && event.trigger !== "committed") || event.seat == null) return state;
-  if (!gameReads(state, ctx, '"kind":"questSucceeded"')) return state;
+  if ((event.trigger !== "questSucceeded" && event.trigger !== "committed" && event.trigger !== "questFailed") || event.seat == null) return state;
   const now = state.quested?.round === state.round ? state.quested : { round: state.round, committed: [], succeeded: [] };
+  if (event.trigger === "questFailed") {
+    if (!gameReads(state, ctx, '"kind":"questFailed"')) return state;
+    return (now.failed ?? []).includes(event.seat) ? state : { ...state, quested: { ...now, failed: [...(now.failed ?? []), event.seat] } };
+  }
+  if (!gameReads(state, ctx, '"kind":"questSucceeded"')) return state;
   if (event.trigger === "committed") return event.cardId ? { ...state, quested: { ...now, committed: [...now.committed, event.cardId] } } : state;
   return now.succeeded.includes(event.seat) ? state : { ...state, quested: { ...now, succeeded: [...now.succeeded, event.seat] } };
 }

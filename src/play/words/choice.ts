@@ -27,7 +27,7 @@ import { islandPickWords, islandWords } from "./island.ts";
 import { aflameBranchWords, aflamePickWords, aflameWords, type BranchNow } from "./aflame.ts";
 import { stormcallerBranchWords, stormcallerWords } from "./stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
-import { wilderlandBranchWords } from "./wilderland.ts";
+import { wilderlandBranchWords, wilderlandPickWords } from "./wilderland.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -396,7 +396,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (play) return play;
   const deck = pick.verb === "Pick" && next ? deckPickThenWords(pick, next, after) : null;
   if (deck) return deck;
-  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game, after) ?? attackPickWords(pick, next);
+  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game, after) ?? attackPickWords(pick, next) ?? wilderlandPickWords(pick, next);
   if (burden) return burden;
   if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null, game) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick, names.card) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const family = aflamePickWords(pick, next, names, sourceId, amountNow, game) ?? islandPickWords(pick, next, names, sourceId, game);

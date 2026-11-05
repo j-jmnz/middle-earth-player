@@ -153,7 +153,11 @@ export function engageOrGrapple(state: ScenarioState, instruction: Verb<"EngageO
 
 /** AttackFirstPlayer: the source enemy attacks the first player now, from the staging area or while engaged with any player, as an attack outside the combat phase. */
 export function attackFirstPlayer(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = focus.sourceId;
+  return enemyAttacksFirstPlayer(state, focus.sourceId, ctx, steps);
+}
+
+/** The enemy attacks the first player now, from the staging area or while engaged with any player (the nemesis of 18076:B:2 shares it). */
+export function enemyAttacksFirstPlayer(state: ScenarioState, id: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = id ? state.cards[id] : undefined;
   const seat = state.firstPlayer;
   if (!id || !enemy || (enemy.zone !== "staging" && enemy.zone !== "engaged") || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;

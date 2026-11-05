@@ -45,6 +45,9 @@ function holdersOf(state: ScenarioState, source: CardInstance, target: string | 
       return cardsInPlay(state).filter((instance) => printedOf(ctx.cards, instance.code).type === "enemy").map((instance) => instance.id);
     case "host":
       return source.host ? [source.host] : [];
+    // The quest card the players are on, for a constant on another card that changes it ("progress on the main quest is discarded instead", 18028:A:2).
+    case "currentQuest":
+      return state.questStage ? [state.questStage] : [];
     case "table":
       return ["table"];
     // The Stormcaller, wherever it stands: in its area, in the staging area or engaged (families/stormcaller/zone.ts).

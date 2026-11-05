@@ -17,6 +17,7 @@ import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { manifest as catalog } from "../../../catalog/families/breaking.ts";
 import { areaOf, mergeView, viewOf } from "./areas.ts";
+import { noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { runCards } from "./cards.ts";
 import { ringBearerId } from "../burden/deck.ts";
@@ -73,6 +74,8 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
   // The seat controls its own stage once stages are separate: the Forced effects and Responses of a stage are about its own seat (mec109.multiple-staging-areas).
   next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
   steps.push({ kind: "advance", cardId: nextId });
+  // Only a game with a card that hears "after a quest card is defeated" keeps the stage it left (Lost in Mirkwood's letters), so every other game's state stays as it was.
+  if (currentId && questCardDefeatedHeard(next, ctx)) next = noteSkippedStage(next, nextId, currentId);
   return afterProgress(next, before, ctx, steps);
 }
 

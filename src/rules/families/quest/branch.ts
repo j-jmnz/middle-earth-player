@@ -49,14 +49,27 @@ export function reached(state: ScenarioState, code: string): ScenarioState {
 }
 
 // The quest card the quest has just advanced from, when it advanced to `newId`: the stage a branch came from, or the one before it
-// in the scenario's order. Its card instance, now out of play.
+// in the scenario's order. Its card instance, now out of play. A quest that jumped past stages (AdvanceToStage, Lost in Mirkwood's
+// letters) names the stage it left (`stageLeft`).
 export function defeatedBefore(state: ScenarioState, newId: string): string | undefined {
+  if (state.stageLeft?.to === newId) return state.stageLeft.from;
+  return orderBefore(state, newId);
+}
+
+function orderBefore(state: ScenarioState, newId: string): string | undefined {
   const code = state.cards[newId]?.code;
   if (code == null) return undefined;
   const source = state.stages.find((stage) => stage.branch?.includes(code));
   const at = state.stages.findIndex((stage) => stage.code === code);
   const before = source?.code ?? state.stages[at - 1]?.code;
   return before == null ? undefined : Object.values(state.cards).find((card) => card.code === before)?.id;
+}
+
+// The quest advanced from `leftId` to `newId` past stages: the stage before the new one in the scenario's order was never played (it is still in the quest deck), so the stage that was left is
+// remembered for "After a quest card is defeated" (18074:B:3). An advance to the next stage in order leaves the state as it was.
+export function noteSkippedStage(state: ScenarioState, newId: string, leftId: string): ScenarioState {
+  const prior = orderBefore(state, newId);
+  return prior != null && prior !== leftId && state.cards[prior]?.zone === "questDeck" ? { ...state, stageLeft: { to: newId, from: leftId } } : state;
 }
 
 // Whether a card in the game hears "After a quest card is defeated" (Mendor, 01135:A:3; "When you defeat this stage", 01120:B:1). The event
