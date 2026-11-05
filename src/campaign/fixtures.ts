@@ -22,6 +22,7 @@ import templeFixtures from "./fixtures/temple-of-the-deceived.json";
 import fixtures from "./fixtures/scenario-1.json";
 import ruinsFixtures from "./fixtures/the-drowned-ruins.json";
 import havenFixtures from "./fixtures/a-storm-on-cobas-haven.json";
+import corsairsFixtures from "./fixtures/the-city-of-corsairs.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -60,6 +61,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "temple-of-the-deceived": templeFixtures,
   "the-drowned-ruins": ruinsFixtures,
   "a-storm-on-cobas-haven": havenFixtures,
+  "the-city-of-corsairs": corsairsFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

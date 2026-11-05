@@ -1,4 +1,4 @@
-// Rules: dcce.ships, dcce.prepare-your-fleet, dcce.heading, dcce.sailing-tests, dcce.corsair-deck, dcce.boarding, dcce.last-player, dcce.archery
+// Rules: dcce.ships, dcce.prepare-your-fleet, dcce.heading, dcce.sailing-tests, dcce.corsair-deck, dcce.boarding, dcce.last-player, dcce.archery, dcce.from-sea-to-land
 // (data/rules/entries.json). The verbs src/catalog/families/sea.ts adds. The ship rules (sea/ships.ts), the Sailing test (sea/sailing.ts), Boarding
 // (sea/boarding.ts) and the routes of the Corsair deck and the Stormcaller Elite (sea/routes.ts) work inside the engine's own steps and are not verbs.
 import type { CombatHooks, RulesFamily } from "../../interpret/family-manifest.ts";
@@ -28,6 +28,7 @@ import { discardAlliesForWillpower, restoreShipEnemies, takeControlAsShip } from
 import { attackWithPicked } from "./ramming.ts";
 import { shipAttackReason, shipDefenseReason, shipEnemyAttacking, shipObjectivesAmong, shipsOnlyReason } from "./ships.ts";
 import { announceShipsExhausted, noteAttachedToShip } from "./water.ts";
+import { damageOnMatching, discardAllInPlay, setAsideEncounterDeck } from "./swap.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -87,6 +88,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return takeControlAsShip(state, focus);
     case "AttackWithPicked":
       return attackWithPicked(state, instruction, ctx, steps);
+    case "SetAsideEncounterDeck":
+      return setAsideEncounterDeck(state, instruction);
+    case "DiscardAllInPlay":
+      return discardAllInPlay(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
@@ -99,4 +104,4 @@ const SHIP_COMBAT: CombatHooks = {
   undefended: (state, candidates, cards) => (shipEnemyAttacking(state, cards) ? shipObjectivesAmong(candidates(), state, cards) : []),
 };
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "DiscardAllInPlay"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null) };

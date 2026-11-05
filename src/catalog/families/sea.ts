@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { pickSchema } from "../effect-schema-pick.ts";
 import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
@@ -83,6 +84,15 @@ const VERBS = [
   // enemy makes an immediate attack (counted for noneReturned like any attack made by an effect); with `raiseStagingThreat`, when the attack ends the total Threat in the staging area is raised, until the phase or the
   // round ends, by the damage the attack dealt.
   z.strictObject({ verb: z.literal("AttackWithPicked"), raiseStagingThreat: z.enum(["endOfPhase", "endOfRound"]).optional(), ...when }),
+  // "Set the current encounter deck and discard pile aside, inactive" (12148:B:1, dcce.from-sea-to-land): every card of the encounter deck and its discard pile goes to the set-aside zone, and the Corsair
+  // piles are left alone. `carry`: the cards with these codes are the ones the stage's search "shuffles into the second encounter deck" ("each copy of Battle-hardened and each copy of Watch Tower"): they
+  // stay in the encounter deck, those in the discard pile moving to it, and are not set aside. Copies in play stay in play. The second deck is the encounter set the stage's Setup set aside: ShuffleSetAsideSet
+  // and EndCorsairDeck after this verb make it the active encounter deck, the Corsair deck and its discard pile shuffled into it.
+  z.strictObject({ verb: z.literal("SetAsideEncounterDeck"), carry: z.array(z.string().min(1)).optional(), ...when }),
+  // "Discard all Ship enemies, Ship objectives, and Ocean locations in play" (12148:A:1): every card in play that matches `pick` is discarded (not destroyed, so a Victory enemy does not go to the victory
+  // display, rr.victory): an encounter card to the encounter discard pile, a player's card to its owner's discard pile, its attachments with it and its tokens gone. A non-ship enemy goes to the Corsair discard pile
+  // while a Corsair deck exists (dcce.corsair-deck).
+  z.strictObject({ verb: z.literal("DiscardAllInPlay"), pick: pickSchema, ...when }),
 ] as const;
 
 // About a Ship objective: it became exhausted by any means, defending, attacking, questing, Sailing or an effect ("When attached objective exhausts", 12132:A:1). Announced by a settle sweep (families/sea/water.ts) only in a game
