@@ -2,18 +2,34 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `kingsquest-won` (scripts/e2e/the-kings-quest.ts): a real two-handed
-# game of The King's Quest, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Phase 54. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `kingsquest-won` (scripts/e2e/the-kings-quest.ts): a real two-handed game of
+# The King's Quest (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's and Lost in Mirkwood's wins write (Turayn and Melanwar in a pool, the Orcs card part 2 pooled,
+# two treasures discovered), parked on its win (The Fire Worm, Fire-drake defeated). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md).
+# The Resolution asks two choices, both the first player's (12170:B:1, 12170:B:3): whether Isolde joins the pool or the line "Isolde is on the hunt" is written (the flow writes the line), then which burden goes to the pool
+# with Abandoned Ruin (the flow takes Dagnir's Spawn). It then writes the treasure the players control, if any, and unlocks The Withered Heath, which the app cannot deal yet: the path stops there and its node reads Coming soon
+# (src/campaign/scenarios/the-kings-quest/golden.test.ts pins the path).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: kingsquest-won
       SCENARIO_ID: the-kings-quest
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
+      CHOICE_ID: "line"
+      CHOICE_PROMPT: "Isolde or the log"
+      CHOICE_CONSEQUENCE: ".*Isolde is on the hunt.*"
+      CHOICE2_ID: "12173"
+      CHOICE2_PROMPT: "Choose a burden"
+      CHOICE2_CONSEQUENCE: ".*Spawn is added to the campaign pool.*"
+      NO_XP: "true"
+# The win wrote Isolde's line to the Campaign Log (the path reads it under the Unique Allies line) and Abandoned Ruin and Dagnir's Spawn to the pool.
+- assertVisible:
+    id: path-ally-lines
+    text: ".*Isolde is on the hunt.*"
+- assertVisible:
+    id: pool
+    text: ".*Abandoned Ruin.*"
+- assertVisible:
+    id: pool
+    text: ".*Dagnir.s Spawn.*"
 # The win unlocks The Withered Heath, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-the-withered-heath-status
@@ -21,4 +37,5 @@ tags:
 - assertVisible:
     id: path-soon
     text: "The Withered Heath is coming soon."
-# TODO (phone half): this scenario's own assertions on the path screen after the win (a carried card).
+- assertNotVisible:
+    id: begin

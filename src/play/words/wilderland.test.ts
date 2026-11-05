@@ -234,12 +234,60 @@ describe("The King's Quest's choices", () => {
     const pick = (spec: Extract<Instruction, { verb: "Pick" }>["pick"]): Instruction => ({ verb: "Pick", pick: spec });
     expect(wilderlandAsk(pick({ type: "card", control: "you", from: "hand" }), null, words, { verb: "GuardPickedAttachment", types: ["location"] })?.prompt).toContain("Artifact attachment in your hand");
     expect(wilderlandAsk(pick({ type: "enemy", control: "any", stagingOnly: true, highestAttack: true }), null, words, { verb: "AttackFromStaging", who: "firstPlayer" })?.prompt).toContain("tied for the highest Attack");
-    expect(wilderlandAsk(pick({ type: "hero", control: "any", committed: true }), "hall-id", words, { verb: "AttachSelfToPicked" })?.prompt).toBe("Choose a questing hero to attach Twilight Hall to. It is removed from the quest.");
+    expect(wilderlandAsk(pick({ type: "hero", control: "any", committed: true }), "hall-id", words, { verb: "AttachSelfToPicked" })?.prompt).toBe("Choose a questing hero of any player to attach Twilight Hall to. It is removed from the quest.");
   });
 
   it("words the branches that replace a location from the Caves deck and cancel an attack", () => {
     const choose: Extract<Instruction, { verb: "Choose" }> = { verb: "Choose", who: "firstPlayer", options: [{ id: "replace", instructions: [{ verb: "ReplaceFromCaves" }] }, { id: "cancel", instructions: [{ verb: "CancelStrike" }] }] };
     expect(wilderlandBranchWords(choose, "replace", words)).toBe("Discard it and replace it with the top card of the Caves deck");
     expect(wilderlandBranchWords(choose, "cancel", words)).toBe("Cancel the attack: it deals no damage");
+  });
+});
+
+// Rules: emce.caves-deck, emce.guarded-x (data/rules/entries.json); ledger lines 18043:A:3, 18044:A:1, 18045:A:2, 18047:A:1, 18049:A:2, 18049:A:3, 18057:A:2, 18060:A:1, 18061:A:1, 18064:A:1, 18078:B:1, 18080:B:2, 12172:A:2, 12173:A:2.
+// The choices of The King's Quest that a player decides for their own cards or numbers: two-handed they lead with "Player N:" and say `owned`, solo they have no lead; a branch states the number the table holds now.
+describe("The King's Quest's seat-by-seat choices and numbers", () => {
+  const table = (seats: 1 | 2, code: string): { facts: { game: ScenarioState; ctx: typeof ctx; options: readonly string[] }; source: string } => {
+    const base = spawn({ ...idleScenario(seats), seed: 5 }, "hall", { zone: "staging" });
+    const state: ScenarioState = { ...base.state, cards: { ...base.state.cards, [base.id]: { ...base.state.cards[base.id]!, code } } };
+    return { facts: { game: state, ctx, options: [] }, source: base.id };
+  };
+  const pick = (spec: Extract<Instruction, { verb: "Pick" }>["pick"]): Instruction => ({ verb: "Pick", pick: spec });
+
+  it("leads with the player and marks the sentence owned two-handed, and has no lead solo", () => {
+    const two = table(2, "18044");
+    const solo = table(1, "18044");
+    const discard = pick({ type: "card", control: "you", from: "discard" });
+    expect(wilderlandAsk(discard, two.source, words, { verb: "MovePicked", to: "hand" }, null, two.facts)).toEqual({ verb: "Take", prompt: "Player 1: choose a card from your discard pile to return to your hand.", owned: true });
+    expect(wilderlandAsk(discard, solo.source, words, { verb: "MovePicked", to: "hand" }, null, solo.facts)).toEqual({ verb: "Take", prompt: "Choose a card from your discard pile to return to your hand." });
+  });
+
+  it("words each player's own cards: the Lost Armory search, the resource, the questing character, the ally, the attachment", () => {
+    const asks = (code: string, spec: Extract<Instruction, { verb: "Pick" }>["pick"]) => {
+      const t = table(2, code);
+      return wilderlandAsk(pick(spec), t.source, words, undefined, null, t.facts)?.prompt;
+    };
+    expect(asks("18060", { type: "card", control: "you", from: "deck", cardType: "attachment", traits: ["Weapon", "Armor"] })).toBe("Player 1: search your deck: choose a Weapon or Armor attachment to put into your hand. Your deck is then shuffled.");
+    expect(asks("18061", { type: "hero", control: "you" })).toBe("Player 1: choose a hero you control to add 1 resource to.");
+    expect(asks("18057", { type: "character", control: "you", committed: true })).toBe("Player 1: choose a questing character you control to discard.");
+    expect(asks("18057", { type: "ally", control: "you" })).toBe("Player 1: choose an ally you control to discard.");
+    expect(asks("18049", { type: "attachment", control: "you" })).toBe("Player 1: choose an attachment you control to discard.");
+  });
+
+  it("states the number of cards Stone-troll's excess damage discards, and the damage a player still assigns", () => {
+    const t = table(2, "18049");
+    const withX: ScenarioState = { ...t.facts.game, stack: [{ id: "f1", frame: "forced", sourceId: t.source, actor: 0, peril: false, effectId: "18049:forced:1", instructions: [], cancel: null, blockCancel: null, step: 0, data: { kind: "effect", x: 2, queue: [], picked: [], wait: null } } as never] };
+    expect(wilderlandAsk({ verb: "DiscardFromHand", amount: { excessOf: "subject" } }, t.source, words, undefined, null, { ...t.facts, game: withX })?.prompt).toBe("Player 1: choose 2 cards from your hand to discard, one at a time (1 for each point of excess damage).");
+    const cavern = table(2, "18064");
+    expect(wilderlandAsk({ verb: "AssignDamage", amount: 3, pick: { type: "character", control: "you" }, left: 2, of: 3 }, cavern.source, { ...words, card: () => "Crumbling Cavern" }, undefined, null, cavern.facts)).toMatchObject({ prompt: "Crumbling Cavern (Player 1): assign 1 damage to a character you control (2 of 3 left).", owned: true });
+  });
+
+  it("states the numbers of the branches now: the victory display's locations, the printed Threat, the attackers", () => {
+    const threat: Extract<Instruction, { verb: "Choose" }> = { verb: "Choose", who: "firstPlayer", options: [{ id: "threat", instructions: [{ verb: "RaiseThreat", amount: { count: { type: "location", control: "any", from: "victory" } }, who: "eachSeat" }] }, { id: "printed", instructions: [{ verb: "RaiseThreat", amount: { stat: "threat", of: "picked", printed: true }, who: "eachSeat" }] }, { id: "remove", instructions: [{ verb: "RemoveProgressFromQuest", amount: { count: { type: "character", control: "any", participating: true } } }] }, { id: "add", instructions: [{ verb: "MoveEncounterCard", card: "picked", to: "staging" }] }, { id: "immune", instructions: [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "endOfPhase", holders: { type: "card", control: "any", playerCard: false } }] }] };
+    expect(wilderlandBranchWords(threat, "threat", words, { counted: { threat: 3 } })).toBe("Each player raises their threat by 3 (1 for each location in the victory display)");
+    expect(wilderlandBranchWords(threat, "printed", words, { counted: { printed: 2 }, placing: "Dark Tunnel" })).toBe("Each player raises their threat by 2 (the printed Threat of Dark Tunnel)");
+    expect(wilderlandBranchWords(threat, "remove", words, { counted: { remove: 2 } })).toBe("Remove 2 progress from the quest (1 for each attacker)");
+    expect(wilderlandBranchWords(threat, "add", words, { placing: "Dark Tunnel" })).toBe("Add Dark Tunnel to the staging area");
+    expect(wilderlandBranchWords(threat, "immune", words)).toBe("All encounter cards are immune to player card effects until the end of the phase");
   });
 });

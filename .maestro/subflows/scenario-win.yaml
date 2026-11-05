@@ -8,6 +8,7 @@ appId: com.middleearth.lcg
 # Optional env: NO_XP (any non-empty value: the campaign has no XP, so the path shows no XP line and no Spend XP button; a flow that does not pass it asserts both). Optional env: TABLE_WIDGET (the testID of one widget of the scenario's own table, read while the victory is on it: the Dream-chaser scenarios' heading-value). Optional env: CHOICE_ID, CHOICE_PROMPT, CHOICE_CONSEQUENCE (all three or none). CHOICE_ID is the code of the card the Resolution's one choice offers,
 # CHOICE_PROMPT the choice's eyebrow text, CHOICE_CONSEQUENCE the sentence the confirm line shows once the card is chosen (a regular expression). The screen has two Confirm steps: the first sends the choice, and the second, under the settled sentence
 # ("Confirming records ..."), writes the log.
+# Optional env: CHOICE2_ID, CHOICE2_PROMPT, CHOICE2_CONSEQUENCE (all three or none, and only with CHOICE_ID): a Resolution that asks a second choice once the first is confirmed (The King's Quest: Isolde, then the burden for Abandoned Ruin). They read as CHOICE_ID, CHOICE_PROMPT and CHOICE_CONSEQUENCE do, and the second Confirm sends the second choice and settles the screen.
 # Optional env: LAST_PART (any value: the scenario is the last of its campaign). The campaign is then complete, so the XP total stays on the path and Spend XP is gone; the flow asserts only the total.
 - launchApp:
     clearState: true
@@ -55,6 +56,32 @@ appId: com.middleearth.lcg
       - assertVisible:
           id: resolution-consequence
           text: "${CHOICE_CONSEQUENCE}"
+      - tapOn:
+          id: resolution-confirm
+# One choice: the screen settles on what the log will hold. A second choice (CHOICE2_*) is asked first, chosen and confirmed the same way.
+- runFlow:
+    when:
+      true: "${typeof CHOICE_ID !== 'undefined' && CHOICE_ID !== '' && (typeof CHOICE2_ID === 'undefined' || CHOICE2_ID === '')}"
+    commands:
+      - extendedWaitUntil:
+          visible:
+            id: resolution-consequence
+            text: "Confirming records.*"
+          timeout: 15000
+- runFlow:
+    when:
+      true: "${typeof CHOICE2_ID !== 'undefined' && CHOICE2_ID !== ''}"
+    commands:
+      - extendedWaitUntil:
+          visible: "${CHOICE2_PROMPT}"
+          timeout: 15000
+      - assertVisible:
+          id: resolution-choice-${CHOICE2_ID}
+      - tapOn:
+          id: resolution-choice-${CHOICE2_ID}
+      - assertVisible:
+          id: resolution-consequence
+          text: "${CHOICE2_CONSEQUENCE}"
       - tapOn:
           id: resolution-confirm
       - extendedWaitUntil:

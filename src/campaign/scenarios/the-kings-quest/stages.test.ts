@@ -150,6 +150,14 @@ describe("18080 The Fire Worm (stage 3)", () => {
     expect(poor.run.state.cards[poor.run.state.questStage ?? ""]?.progress).toBe(1);
   });
 
+  it("18080:B:2 once per declared attack: X is that attack's attackers (2 attackers remove 2, not 1 each twice), exactly X progress still lets the player remove it, and a canceled attack leaves its attackers exhausted (user ruling, 2026-11-05)", () => {
+    const exact = attack(2, 2, "remove");
+    expect(exact.run.state.cards[exact.run.state.questStage ?? ""]?.progress).toBe(0);
+    expect(exact.run.state.cards[exact.drake]?.damage).toBeGreaterThan(0);
+    const canceled = attack(5, 2, "cancel");
+    for (const id of [canceled.t.hero, canceled.t.hero2]) expect(canceled.run.state.cards[id]?.exhausted).toBe(true);
+  });
+
   it("18080:B:3 the stage cannot be defeated while Fire-drake is in play, and defeating it wins the game", () => {
     const t = third({ engaged: [{ code: CODES.fireDrake, seat: 0 }] });
     expect(restricted(t.state, t.ctx, "advance").length).toBeGreaterThan(0);

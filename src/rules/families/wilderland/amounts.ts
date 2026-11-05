@@ -12,7 +12,7 @@ const printedCost = (state: ScenarioState, id: string | undefined, ctx: ReduceCo
   return id ? (printedOf(ctx.cards, state.cards[id]?.code ?? "").cost ?? 0) : 0;
 };
 
-/** `mostPerPlayer`: the most cards matching the pick that any one player controls, counted from each player's own side ("the player with the most characters"). `guardedCost`: the printed cost of the card the source guards (under it, or the player card it guards). `excessOf`: the damage on the subject beyond its printed hit points. Null for any other amount. */
+/** `mostPerPlayer`: the most cards matching the pick that any one player controls, counted from each player's own side ("the player with the most characters"). `guardedCost`: the printed cost of the card the source guards (under it, or the player card it guards). `excessOf`: the damage the destroyed character took beyond its remaining hit points when it was dealt (the event's amount). Null for any other amount. */
 export function wilderlandAmount(state: ScenarioState, amount: Exclude<Amount, number>, scope: AmountScope, ctx: ReduceContext): number | null {
   if (amount.guardedCost) {
     const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
@@ -20,11 +20,8 @@ export function wilderlandAmount(state: ScenarioState, amount: Exclude<Amount, n
     const guarded = [...cardsUnder(state, source.id), ...(source.guard && source.host ? [source.host] : [])];
     return guarded.reduce((sum, id) => sum + printedCost(state, id, ctx), 0);
   }
-  if (amount.excessOf) {
-    const subject = scope.subject ? state.cards[scope.subject] : undefined;
-    const health = subject ? printedOf(ctx.cards, subject.code).health : null;
-    return subject && health != null ? Math.max(0, subject.damage - health) : 0;
-  }
+  // The event's amount, the X of the frame: the combat damage beyond the character's remaining hit points (defense/excess.ts).
+  if (amount.excessOf) return Math.max(0, scope.x ?? 0);
   const pick = amount.mostPerPlayer;
   if (pick == null) return null;
   return Math.max(0, ...livingSeats(state).map((seat) => countMatching(state, pick, seat, scope.sourceId, ctx)));

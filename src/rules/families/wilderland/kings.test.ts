@@ -125,10 +125,19 @@ describe("the amounts guardedCost and excessOf (18050:A:1, 18049:A:2)", () => {
     expect(resolveAmount(enemy.state, { guardedCost: true }, { actor: 0, sourceId: enemy.id }, { effects: [], cards })).toBe(0);
   });
 
-  it("excessOf is the damage on the subject beyond its printed hit points", () => {
+  it("guardedCost reads whatever the enemy guards: an objective (a guard linked to its host) as well as a taken player card (18050:A:1, user ruling, 2026-11-05)", () => {
+    const objective = spawn(table(), "ally2", { zone: "staging" });
+    const enemy = spawn(objective.state, "ec1", { zone: "staging" });
+    const guarding = updateCard(enemy.state, enemy.id, { guard: true, host: objective.id });
+    expect(resolveAmount(guarding, { guardedCost: true }, { actor: 0, sourceId: enemy.id }, { effects: [], cards })).toBe(2);
+    // A guard that is not linked to a host (or is free) reads 0.
+    expect(resolveAmount(enemy.state, { guardedCost: true }, { actor: 0, sourceId: enemy.id }, { effects: [], cards })).toBe(0);
+  });
+
+  it("excessOf is the event's amount: the damage dealt beyond the subject's remaining hit points (the frame's X), 0 with none", () => {
     const ally = spawn(table(), "ally2", { zone: "discard", seat: 0 });
-    const hurt = updateCard(ally.state, ally.id, { damage: 5 });
-    expect(resolveAmount(hurt, { excessOf: "subject" }, { actor: 0, sourceId: null, subject: ally.id }, { effects: [], cards })).toBe(3);
+    expect(resolveAmount(ally.state, { excessOf: "subject" }, { actor: 0, sourceId: null, subject: ally.id, x: 3 }, { effects: [], cards })).toBe(3);
     expect(resolveAmount(ally.state, { excessOf: "subject" }, { actor: 0, sourceId: null, subject: ally.id }, { effects: [], cards })).toBe(0);
   });
+
 });

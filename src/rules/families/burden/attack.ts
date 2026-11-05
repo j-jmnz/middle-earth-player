@@ -62,5 +62,5 @@ export function charactersDestroyed(state: ScenarioState, attack: PendingAttack,
 // queues the event). Called as the attack ends, where the damage has been answered and a held lethal wound has become a destruction.
 export function announceDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): ScenarioState {
   if (!gameReads(state, ctx, '"trigger":"characterDestroyedByAttack"')) return state;
-  return destroyedByAttack(state, attack, ctx).reduce((next, id) => queueEvent(next, { trigger: "characterDestroyedByAttack", seat: state.cards[id]?.controller ?? attack.seat, subject: id, other: attack.enemyId }), state);
+  return destroyedByAttack(state, attack, ctx).reduce((next, id) => queueEvent(next, { trigger: "characterDestroyedByAttack", seat: state.cards[id]?.controller ?? attack.seat, subject: id, other: attack.enemyId, ...(attack.defense?.excessOn?.[id] != null ? { amount: attack.defense.excessOn[id] } : {}) }), state);
 }

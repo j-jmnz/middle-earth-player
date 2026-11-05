@@ -220,6 +220,19 @@ describe("18049 Stone-troll, 18050 Hobgoblin, 18051 Werewolf, 18052 Giant Spider
     expect(fought.run.state.seats[0]?.hand).toHaveLength(2);
   });
 
+  it("18049:A:2 the excess is beyond the character's remaining hit points with their modifiers: +1 hit point makes it 1, -1 makes it 3 (user ruling, 2026-11-05)", () => {
+    const discarded = (amount: number): number => {
+      const layout = { hand: ["filler", "filler", "filler", "filler"] };
+      const fought = kingsquestFight(world, "f0", CODES.stoneTroll, layout, {
+        tweak: (state, made) => ({ ...updateCard(state, made.hero, { damage: 4 }), modifiers: [...state.modifiers, { instanceId: made.hero, sourceId: made.hero, stat: "hitPoints", amount, until: "endOfRound" }] }),
+      });
+      expect(fought.run.state.cards[fought.made.hero]?.zone).toBe("discard");
+      return 4 - (fought.run.state.seats[0]?.hand.length ?? 0);
+    };
+    expect(discarded(1)).toBe(1);
+    expect(discarded(-1)).toBe(3);
+  });
+
   it("18049:A:2 an attack that does not destroy a character discards nothing", () => {
     const fought = kingsquestFight(world, "f0", CODES.stoneTroll, { hand: ["filler", "filler"] });
     expect(fought.run.state.seats[0]?.hand).toHaveLength(2);

@@ -6,11 +6,14 @@ import { printedOf } from "../../rules/core/printed.ts";
 import { undiscoveredTreasures } from "../../rules/families/wilderland/treasure.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
+import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { countMatching } from "../../rules/interpret/pick.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
+import { assignDamageWords } from "./south.ts";
 
 /** The table the words read: what is dealt now, the records, and the options the window offers. */
 type Facts = { game: ScenarioState; ctx: ReduceContext; options: readonly string[] };
@@ -49,13 +52,16 @@ function askedSeat(game: ScenarioState): number {
 }
 
 // Truly Lost's hand (18075:A:1) and The Forest of Great Fear's nemesis (18076:A:1): the choice names its number, the side of the table it happens on and whose it is. Two-handed the sentence leads with the player and says so (`owned`: the sheet adds no "Player N chooses." after it); solo it has no lead.
+function seatSays(game: ScenarioState): { seat: number; owned: { owned?: true }; say: (text: string) => string } {
+  const seat = askedSeat(game);
+  const lead = game.seatCount > 1 ? `Player ${seat + 1}: ` : "";
+  return { seat, owned: game.seatCount > 1 ? { owned: true as const } : {}, say: (text) => (lead ? `${lead}${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`) };
+}
+
 function stageAsk(instruction: Instruction, facts: Facts | undefined): PickWords | null {
   const game = facts?.game;
   if (!game || (instruction.verb !== "PlaceHandUnderLocation" && instruction.verb !== "SearchNemesis")) return null;
-  const seat = askedSeat(game);
-  const lead = game.seatCount > 1 ? `Player ${seat + 1}: ` : "";
-  const owned = game.seatCount > 1 ? { owned: true as const } : {};
-  const say = (text: string) => (lead ? `${lead}${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`);
+  const { seat, owned, say } = seatSays(game);
   if (instruction.verb === "SearchNemesis") {
     const hitPoints = facts.options[0] ? printedOf(facts.ctx.cards, game.cards[facts.options[0]]?.code ?? "").health : undefined;
     return { verb: "Choose", prompt: say(`${facts.options.length} enemies are tied for the most hit points${hitPoints != null ? ` (${hitPoints})` : ""}. Choose the nemesis: it enters the staging area with +2 Threat, Attack and Defense and attacks the first player at the end of each round.`), ...owned };
@@ -123,7 +129,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
     const card = source ? names.card(source) : "this card";
     return { verb: "Choose", prompt: `Players are tied for the most cards in hand: choose who adds ${card} to their hand. Playing a card then discards that player's whole hand, and player card effects cannot discard ${card}.` };
   }
-  const kings = kingsQuestAsk(instruction, source, names, next);
+  const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
@@ -134,16 +140,44 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   return { verb: "Choose", prompt: `${choose} ${host} is attached to it, and the players cannot claim it until ${host} is dealt with.` };
 }
 
-// The King's Quest's choices (18043:A:3, 18047:A:1, 18048:A:1, 18055:A:2, 18058:A:2, 18059:A:2, 18079:B:2, 18080:A:1): the sentence each asks, from the verb it opens or the pick before it.
-function kingsQuestAsk(instruction: Instruction, source: string | null, names: ChoiceNames, next: Instruction | undefined): PickWords | null {
+// The King's Quest's choices (18043:A:3, 18044:A:1, 18047:A:1, 18048:A:1, 18049:A:2, 18049:A:3, 18055:A:2, 18057:A:2, 18058:A:2, 18059:A:2, 18060:A:1, 18061:A:1, 18064:A:1, 12173:A:2, 18079:B:2, 18080:A:1): the sentence each asks, from the verb it opens or the pick before it.
+// A choice made by one player at a time names the number, the side of the table and the player (Choice tray): two-handed it leads with "Player N:" (`owned`), solo it has no lead.
+function kingsQuestAsk(instruction: Instruction, source: string | null, names: ChoiceNames, next: Instruction | undefined, facts: Facts | undefined): PickWords | null {
   const name = source ? names.card(source) : "This card";
+  // The source is the card's instance on the table; the words test hands the card's code.
+  const code = source ? (facts?.game.cards[source]?.code ?? source) : undefined;
+  const game = facts?.game;
+  const says = game ? seatSays(game) : null;
+  const ask = (verb: string, text: string): PickWords => (says ? { verb, prompt: says.say(text), ...says.owned } : { verb, prompt: `${text.charAt(0).toUpperCase()}${text.slice(1)}` });
   if (instruction.verb === "ArrangeCaves") return { verb: "Choose", prompt: `Look at the top ${instruction.count} cards of the Caves deck: choose the one that stays on top. The ${instruction.count === 2 ? "other goes" : "others go"} to the bottom.` };
   if (instruction.verb === "AttachSearched") return { verb: "Attach", prompt: `Choose a ${instruction.trait} ${instruction.type} from the encounter deck or its discard pile to attach to ${instruction.to}.` };
   if (instruction.verb === "AttachSelf" && instruction.to.kind === "enemy" && instruction.to.trait === "Dragon") return { verb: "Attach", prompt: `Choose a Dragon enemy to attach ${name} to.` };
+  // Stone-troll (18049:A:2): the number of cards is the excess damage the destroyed character took, the frame's X.
+  if (instruction.verb === "DiscardFromHand" && typeof instruction.amount === "object" && instruction.amount.excessOf != null && game) {
+    const count = frameScope(game, game.activeSeat, source).x ?? 0;
+    return ask("Discard", `choose ${count} ${count === 1 ? "card" : "cards"} from your hand to discard, one at a time (1 for each point of excess damage).`);
+  }
+  if (instruction.verb === "AssignDamage" && (code === "18064" || code === "12173") && says) {
+    const words = assignDamageWords(instruction, null);
+    return { verb: words.verb, prompt: `${name} (Player ${says.seat + 1}): ${words.prompt.charAt(0).toLowerCase()}${words.prompt.slice(1)}`, ...says.owned };
+  }
   if (instruction.verb !== "Pick") return null;
-  if (next?.verb === "GuardPickedAttachment") return { verb: "Guard", prompt: "Choose an Artifact attachment in your hand: a location from the encounter deck guards it, and the players claim it once that location is dealt with." };
-  if (next?.verb === "AttackFromStaging" && instruction.pick.highestAttack === true) return { verb: "Choose", prompt: "Enemies in the staging area are tied for the highest Attack: choose the one that makes an immediate attack against the first player." };
-  if (next?.verb === "AttachSelfToPicked" && instruction.pick.type === "hero" && instruction.pick.committed === true) return { verb: "Attach", prompt: `Choose a questing hero to attach ${name} to. It is removed from the quest.` };
+  const pick = instruction.pick;
+  if (next?.verb === "GuardPickedAttachment") return ask("Guard", "choose an Artifact attachment in your hand: it lies in the staging area guarded by a location from the encounter deck, and the players claim it once that location is dealt with.");
+  if (code === "18043" && pick.type === "player" && next?.verb === "SwitchActor") return { verb: "Choose", prompt: `Choose the player who sets an Artifact attachment from their hand in the staging area, guarded by a location from the encounter deck (${name}).` };
+  if (next?.verb === "AttackFromStaging" && pick.highestAttack === true) {
+    const first = game && facts?.options[0] && game.cards[facts.options[0]] ? modifiedStat(game, game.cards[facts.options[0]]!, "attack", facts.ctx.cards) : null;
+    const tied = facts?.options.length ?? 0;
+    return ask("Choose", `${tied > 1 ? `${tied} enemies` : "Enemies"} in the staging area are tied for the highest Attack${first != null ? ` (${first})` : ""}: choose the one that makes an immediate attack against the first player.`);
+  }
+  if (next?.verb === "AttachSelfToPicked" && pick.type === "hero" && pick.committed === true) return ask("Attach", `choose a questing hero of any player to attach ${name} to. It is removed from the quest.`);
+  // Each player's own card: "return 1 card from his discard pile" (18044:A:1), "search his deck" (18060:A:1), "a hero's resource pool" (18061:A:1), "a questing character you control" and "an ally you control" (18057), "an attachment you control" (18049:A:3).
+  if (code === "18044" && pick.from === "discard") return ask("Take", "choose a card from your discard pile to return to your hand.");
+  if (code === "18060" && pick.from === "deck") return ask("Take", "search your deck: choose a Weapon or Armor attachment to put into your hand. Your deck is then shuffled.");
+  if (code === "18061" && pick.type === "hero") return ask("Add", "choose a hero you control to add 1 resource to.");
+  if (code === "18057" && pick.committed === true) return ask("Discard", "choose a questing character you control to discard.");
+  if (code === "18057" && pick.type === "ally") return ask("Discard", "choose an ally you control to discard.");
+  if (code === "18049" && pick.type === "attachment") return ask("Discard", "choose an attachment you control to discard.");
   return null;
 }
 
@@ -160,13 +194,22 @@ function countedBranch(option: Extract<Instruction, { verb: "Choose" }>["options
   return step?.verb === "DamageEach" && typeof step.amount === "number" && step.pick?.control === "you" && step.engagedWith == null ? step : null;
 }
 
-/** The numbers a Choose states for its branches now: how many cards each count finds for the seat choosing. */
+// A branch whose number the table holds now (the victory display's locations, a discarded location's printed Threat, the attackers of a declared attack): "Each player raises threat by X" (18045:A:2, 18078:B:1), "Remove X progress from the quest" (18080:B:2).
+function numberedBranch(option: Extract<Instruction, { verb: "Choose" }>["options"][number]): Extract<Instruction, { verb: "RaiseThreat" | "RemoveProgressFromQuest" }> | null {
+  const step = option.instructions.length === 1 ? option.instructions[0] : undefined;
+  if (step?.verb === "RaiseThreat" && step.who === "eachSeat" && typeof step.amount === "object") return step;
+  return step?.verb === "RemoveProgressFromQuest" && typeof step.amount === "object" && step.amount.count != null ? step : null;
+}
+
+/** The numbers a Choose states for its branches now: how many cards each count finds for the seat choosing, and the amounts read from the table. */
 export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, seat: number, sourceId: string | null): Pick<BranchNow, "counted"> {
   const counted: Record<string, number> = {};
   for (const option of choose.options) {
     const step = countedBranch(option);
     const spec = step?.verb === "RaiseThreat" && typeof step.amount === "object" ? step.amount.count : step?.verb === "DamageEach" ? step.pick : undefined;
     if (spec) counted[option.id] = countMatching(game, spec, seat, sourceId, ctx);
+    const numbered = spec ? null : numberedBranch(option);
+    if (numbered && typeof numbered.amount === "object") counted[option.id] = resolveAmount(game, numbered.amount, frameScope(game, seat, sourceId), ctx);
   }
   return Object.keys(counted).length > 0 ? { counted } : {};
 }
@@ -178,8 +221,29 @@ export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choo
   const option = choose.options.find((entry) => entry.id === optionId);
   if (option?.instructions[0]?.verb === "ReplaceFromCaves") return "Discard it and replace it with the top card of the Caves deck";
   if (option?.instructions[0]?.verb === "CancelStrike") return "Cancel the attack: it deals no damage";
+  // 12172:A:2: "all encounter cards are immune to player card effects until the end of the phase".
+  if (option?.instructions[0]?.verb === "ModifyStat" && option.instructions[0].stat === "immuneToPlayerCards") return "All encounter cards are immune to player card effects until the end of the phase";
+  // 18078:B:1: the location discarded is added to the staging area, or every player raises their threat by its printed Threat.
+  const moved = option?.instructions[0];
+  if (moved?.verb === "MoveEncounterCard" && moved.card === "picked" && moved.to === "staging") return now?.placing ? `Add ${now.placing} to the staging area` : "Add the discarded location to the staging area";
+  // 18044:A:1, 18060:A:1: a card of the player's own discard pile or deck goes to their hand.
+  const first = option?.instructions[0];
+  if (first?.verb === "Pick" && option?.instructions[1]?.verb === "MovePicked" && option.instructions[1].to === "hand" && first.pick.control === "you") {
+    if (first.pick.from === "discard" && first.pick.cardType == null && first.pick.type === "card") return "Return a card from your discard pile to your hand";
+    if (first.pick.from === "deck" && first.pick.traits?.includes("Weapon") === true) return "Search your deck for a Weapon or Armor attachment and put it into your hand";
+  }
+  // 18061:A:1: the hero a player chooses is their own.
+  const [one, two] = option?.instructions ?? [];
+  if (one?.verb === "Pick" && one.pick.type === "hero" && one.pick.control === "you" && two?.verb === "AddResources" && two.to === "picked" && typeof two.amount === "number") return `Add ${two.amount} resource${two.amount === 1 ? "" : "s"} to the pool of a hero you control`;
   const step = option ? countedBranch(option) : null;
   const number = now?.counted?.[optionId];
+  const numbered = option ? numberedBranch(option) : null;
+  if (numbered && number != null) {
+    if (numbered.verb === "RemoveProgressFromQuest") return `Remove ${number} progress from the quest (1 for each attacker)`;
+    const amount = numbered.amount;
+    const why = typeof amount === "object" && amount.count?.from === "victory" ? "1 for each location in the victory display" : `the printed Threat of ${now?.placing ?? "the discarded location"}`;
+    return `Each player raises their threat by ${number} (${why})`;
+  }
   if (!step || number == null) return null;
   if (step.verb === "RaiseThreat") return `Raise your threat by ${number} (1 for each ${step.amount && typeof step.amount === "object" ? (step.amount.count?.type ?? "card") : "card"} you control)`;
   return `Deal ${step.amount} damage to each ${step.pick?.type ?? "card"} you control (${number})`;

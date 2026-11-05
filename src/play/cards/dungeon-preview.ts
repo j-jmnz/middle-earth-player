@@ -35,7 +35,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (!card) return null;
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
-  const lost = lostInMirkwoodDetail(game, ctx, card, name);
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name);
   if (lost) return lost;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
@@ -75,6 +75,22 @@ function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: Sce
   if (card.nemesis !== true) return null;
   const stage = game.questStage ? ctx.cards.get(game.cards[game.questStage]?.code ?? "")?.questPoints : null;
   return `The nemesis: immune to player card effects, takes no damage while the stage has fewer than ${stage ?? 8} progress, blocks the stage while in play, returns to the staging area and attacks the first player at the end of each round. Defeating it wins the game.`;
+}
+
+// The King's Quest's cards (ledger lines 18050:A:2, 18043:A:3, 12172:A:2): the card Hobgoblin holds faceup under it, an Artifact guarded in the staging area, and The Threat to Wilderland's resources. The engine decided each; this only says it.
+function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
+  const held = cardsUnder(game, card.id).map((id) => game.cards[id]).find((other) => other?.held === true);
+  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game, held.owner) : "a player's"} card, faceup. It returns to its owner's hand when ${name(card.id)} leaves play.`;
+  if (card.zone !== "staging") return null;
+  if (ctx.cards.get(card.code)?.type === "attachment") {
+    const guards = guardsOf(game, card);
+    return guards.length > 0 ? `Guarded by ${guards.map(name).join(", ")}. Once nothing guards it, the first player claims it for a character.` : null;
+  }
+  if (card.code !== "12172") return null;
+  const left = card.resources;
+  return left > 0
+    ? `${left} ${left === 1 ? "resource" : "resources"}: one is removed at the beginning of each quest phase, then the first player chooses between 2 threat for each player and all encounter cards immune to player card effects for the phase`
+    : "No resources left: it does nothing";
 }
 
 // The encounter cards attached to a card as its guards, in the order they were attached (rr.guarded).

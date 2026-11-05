@@ -12,7 +12,7 @@ import { addStandIns, entry, fightEnemy, HERO, HERO2, HERO3, opening, sceneEffec
 
 // Shared scene for the The King's Quest effect tests (ered-mithrin part 3, campaign card 12170). Test-only. The heroes are plain numbers (no player card text), so what a test shows comes from
 // the scenario's records and the engine. The helpers every scene shares (id lookups, answers, the fight) are test/harness/scene-kit.ts; this file keeps the scenario's codes, its layout and its table.
-// TODO: describe the cards that need their own layout fields (a second active location, a grotto deck, an island map) and add them to the layout and the table below.
+// The layout adds the Caves deck (`caves`, top first) and the cards set aside (Fire-drake, Dragon Hoard and the Dragon Might set) to the staging area, the encounter deck and the victory display.
 export const kingsquest: ScenarioData = loadScenario("the-kings-quest");
 export const campaign: CampaignData = loadCampaign("ered-mithrin");
 export const dealt: ScenarioData = campaignScenario(kingsquest);

@@ -33,7 +33,7 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // round), so the pill shows it will go (rr.lasting-effects).
 export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit";
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage";
 
 // A "cannot" an effect put on the card, with the icon of the thing it cannot do.
 export type FlagBadge = { flag: FlagStat; icon: IconName; word: string };
@@ -67,6 +67,8 @@ const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },
   { flag: "cannotBeOptionallyEngaged", icon: "engagementCost", word: "Cannot be optionally engaged" },
   { flag: "damageLimit", icon: "hitPoints", word: "Takes at most %n damage at a time" },
+  // Dragon Scales (18059:A:2): all the damage the attached enemy would take is canceled, then the Scales are discarded.
+  { flag: "cancelsDamage", icon: "hitPoints", word: "Cancels all the damage it would take, once" },
 ];
 
 // A flag's words; "%n" is the amount the effect holds (a damage limit).

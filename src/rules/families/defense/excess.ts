@@ -15,6 +15,7 @@ import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay } from "../../core/state.ts";
 import { readsAmount, readsCondition } from "../../interpret/amounts.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 import { damageGoesTo } from "./damage.ts";
 
@@ -31,6 +32,12 @@ function noteLanded(state: ScenarioState, landed: number): ScenarioState {
 function noteExcess(state: ScenarioState, excess: number): ScenarioState {
   const attack = state.pendingAttack;
   return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, excess: (attack.defense?.excess ?? 0) + excess } } } : state;
+}
+
+// The damage a character took beyond its remaining hit points (its hit points with their modifiers, less the damage on it), kept with the attack for the event that says it was destroyed (excessOf).
+function noteExcessOn(state: ScenarioState, id: string, excess: number): ScenarioState {
+  const attack = state.pendingAttack;
+  return attack ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, excessOn: { ...attack.defense?.excessOn, [id]: excess } } } } : state;
 }
 
 // The enemy's combat damage `raw` is placed on `assigned`; the excess goes to threat when the enemy says so. Every place an enemy
@@ -54,7 +61,9 @@ export function combatDamage(
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");
-  if (!toThreat && !toQuest && !toShip) return placed;
+  // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
+  const reads = gameReads(state, ctx, '"excessOf"');
+  if (!toThreat && !toQuest && !toShip && !reads) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -62,6 +71,7 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
+  if (!toThreat && !toQuest && !toShip) return noteExcessOn(placed, targetId, excess);
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
   if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);
   const flag = toThreat ? "excessToThreat" : "excessToQuestProgress";

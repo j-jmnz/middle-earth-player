@@ -32,6 +32,8 @@ export type AttackDefense = {
   landed?: number;
   // The damage beyond the remaining hit points of the character the attack damaged, noted for an enemy that sends it on (excessToShip).
   excess?: number;
+  // The damage each character took beyond its remaining hit points, noted when a card reads it (excessOf, 18049:A:2).
+  excessOn?: Readonly<Record<string, number>>;
   // The attacking enemy's Attack when its shadow cards began to resolve, to tell whether one increased it.
   attackBefore?: number;
 };

@@ -217,6 +217,10 @@ describe("the Maestro flows", () => {
         expect(given.filter((name) => !read.includes(name)), `${flow.rel} passes env ${sub.rel} never reads`).toEqual([]);
         // A choice goes with its prompt and its consequence.
         if (given.includes("CHOICE_ID")) expect(["CHOICE_PROMPT", "CHOICE_CONSEQUENCE"].filter((name) => !given.includes(name)), flow.rel).toEqual([]);
+        // A second choice goes with its prompt and its consequence, and only after a first.
+        if (given.includes("CHOICE2_ID")) {
+          expect(["CHOICE_ID", "CHOICE2_PROMPT", "CHOICE2_CONSEQUENCE"].filter((name) => !given.includes(name)), flow.rel).toEqual([]);
+        }
       }
     }
     expect(calls).toBeGreaterThan(0);
