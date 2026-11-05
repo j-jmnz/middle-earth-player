@@ -36,6 +36,7 @@ export function deckRefusal(deck: DeckContent, faces: ReadonlyMap<string, DeckSa
   return deckSaveRefusal(deck.heroes, deck.cards, faces, [], deckRulesOf(EFFECTS, deck.cards.map((card) => card.code)));
 }
 
+// A ready deck has no words (nothing on the deck screens says it is ready): `text` is what a deck that is not ready still needs.
 export type DeckReadiness = { ready: true; text: string } | { ready: false; text: string };
 
 /**
@@ -49,7 +50,7 @@ export function deckReadiness(deck: DeckContent, faces: ReadonlyMap<string, Deck
     if (fellowship) return { ready: false, text: `${fellowship.name}: Fellowship heroes only in a saga` };
   }
   const refusal = deckRefusal(deck, faces);
-  if (!refusal) return { ready: true, text: "Ready to play" };
+  if (!refusal) return { ready: true, text: "" };
   // "At least 50 cards." (100 with A Perilous Voyage): a contract is no deck card, so it is not counted.
   const short = /^At least (\d+) cards\.$/.exec(refusal.rule);
   if (short) {
@@ -75,6 +76,11 @@ export function deckCountLine(deck: Pick<DeckContent, "heroes" | "cards">): stri
 export function deckShortLine(deck: Pick<DeckContent, "cards">): string | null {
   const total = deckCardCount(deck.cards);
   return total < DECK_MINIMUM ? `${total} of ${DECK_MINIMUM} cards` : null;
+}
+
+/** The count line a cover or row shows: "47 of 50 cards" says what "Needs 3 more cards" says, so a deck that shows the latter shows one of the two. */
+export function shortToShow(short: string | null | undefined, status: { ready: boolean; text: string }): string | null {
+  return short && !(!status.ready && /^Needs \d+ more cards?$/.test(status.text)) ? short : null;
 }
 
 /** "2 heroes and 4 cards": what a deck holds, for a sentence. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DeckSaveCard } from "../../catalog/deck-save";
-import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckReadiness, deckShortLine, deckSections, newDeckName, savedDeckName, sphereSplit, startingThreat } from "./status.ts";
+import { copyDeckName, costCurve, deckContentsPhrase, deckCountLine, deckReadiness, deckShortLine, deckSections, newDeckName, savedDeckName, shortToShow, sphereSplit, startingThreat } from "./status.ts";
 
 function fact(name: string, typeCode: string, deckLimit: number | null = 3): DeckSaveCard {
   return { name, typeCode, sphereCode: "lore", deckLimit, deckLegal: true, traits: null };
@@ -24,7 +24,7 @@ describe("deckReadiness", () => {
   });
 
   it("is ready with a hero and fifty cards", () => {
-    expect(deckReadiness({ name: "x", heroes: ["h1"], cards: allies }, facts)).toEqual({ ready: true, text: "Ready to play" });
+    expect(deckReadiness({ name: "x", heroes: ["h1"], cards: allies }, facts)).toEqual({ ready: true, text: "" });
   });
 
   it("says how many cards a short deck still needs, and when it needs a hero", () => {
@@ -48,6 +48,14 @@ describe("deck lines", () => {
   it("shows the card count on a cover or row only while the deck is short", () => {
     expect(deckShortLine({ cards: [{ code: "a0", count: 48 }] })).toBe("48 of 50 cards");
     expect(deckShortLine({ cards: allies })).toBeNull();
+  });
+
+  it("shows the count on a cover or row unless the words already say how many cards the deck needs", () => {
+    expect(shortToShow("48 of 50 cards", { ready: false, text: "Needs 2 more cards" })).toBeNull();
+    expect(shortToShow("49 of 50 cards", { ready: false, text: "Needs 1 more card" })).toBeNull();
+    expect(shortToShow("48 of 50 cards", { ready: false, text: "Needs a hero" })).toBe("48 of 50 cards");
+    expect(shortToShow("48 of 50 cards", { ready: true, text: "" })).toBe("48 of 50 cards");
+    expect(shortToShow(null, { ready: false, text: "Needs 2 more cards" })).toBeNull();
   });
 
   it("adds the heroes' threat, and has none while a hero's threat is unknown", () => {

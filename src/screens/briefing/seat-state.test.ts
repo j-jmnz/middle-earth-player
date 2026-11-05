@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { seatFolded, seatState, type SeatStateInput } from "./seat-state";
 
 const deck = { id: "d1", heroes: ["h1", "h2", "h3"] };
-const base: SeatStateInput = { seeded: "ready", deck, fallen: [], readiness: new Map([["d1", { ready: true, text: "Ready to play" }]]), short: null, missingRingBearer: false };
+const base: SeatStateInput = { seeded: "ready", deck, fallen: [], nameOf: (code) => `Hero ${code}`, readiness: new Map([["d1", { ready: true, text: "" }]]), short: null, missingRingBearer: false };
 
 describe("a briefing seat's folded state", () => {
   it("says Ready, or the short line, for a deck that can be dealt", () => {
@@ -15,7 +15,8 @@ describe("a briefing seat's folded state", () => {
     expect(seatState({ ...base, deck: null })).toEqual({ text: "No deck yet", attention: true });
     expect(seatState({ ...base, readiness: new Map([["d1", { ready: false, text: "Needs a hero" }]]) })).toEqual({ text: "Needs a hero", attention: true });
     expect(seatState({ ...base, readiness: new Map() })).toEqual({ text: "Not ready", attention: true });
-    expect(seatState({ ...base, fallen: ["h2"] }).attention).toBe(true);
+    expect(seatState({ ...base, fallen: ["h2"] })).toEqual({ text: "Hero h2 fell and cannot be played", attention: true });
+    expect(seatState({ ...base, fallen: ["h1", "h3"] }).text).toBe("Hero h1, Hero h3 fell and cannot be played");
     expect(seatState({ ...base, missingRingBearer: true })).toEqual({ text: "Needs a Ring-bearer", attention: true });
   });
 

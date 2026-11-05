@@ -1,7 +1,6 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { campaignOf } from "../data/campaign-data";
-import { bumpDeckRevision } from "./revision";
 import { decks } from "../data/user-schema";
 
 export const STEALTH_ID = "stealth-and-steadfastness";
@@ -182,5 +181,4 @@ export function insertStarterDecks<TRun>(user: BaseSQLiteDatabase<"sync", TRun>)
       cards: deck.cards.map((card) => ({ code: card.code, count: card.count })),
     }).run();
   }
-  if (missing.length > 0) bumpDeckRevision();
 }

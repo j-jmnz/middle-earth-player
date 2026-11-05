@@ -3,6 +3,7 @@ import type { BeatStore } from "../store/beat-store.ts";
 import type { SlotNumbers } from "../cards/card-effects.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import type { LayoutOptions } from "../layout/layout.ts";
+import type { Reach, RowFeet } from "../layout/column-reach.ts";
 import type { SpotlightHandoff } from "../spotlight/handoff.ts";
 import type { ZoneFacts } from "../store/selectors.ts";
 import type { StageArea } from "../spotlight/stage.ts";
@@ -35,6 +36,13 @@ export type TableCanvasProps = {
   store: TableStore;
   width: number;
   height: number;
+  // The command column lies over the canvas's right edge, `column` points past `width`: the canvas draws that far, and a crowded top row
+  // the column's empty top covers (`reach` rows, column-reach.ts) runs on into it (row-reach.ts). The hand and the play area stay in `width`.
+  column?: number;
+  // null: the screen has not measured the column and its dock yet, so the canvas only reports the rows' feet and lays nothing out (table-canvas.native.tsx).
+  reach?: Reach | null;
+  // Told the feet of the staging and engagement rows each time they move, so the screen can count the reach.
+  onRowFeet?: (feet: RowFeet) => void;
   // The cached file (or bundled scan) for a code, or null while it is not on the phone.
   picture: (code: string) => PictureSource | null;
   // Moves when the image cache gains a file, so a card drawn as its name is tried again.
@@ -68,6 +76,8 @@ export type TableCanvasProps = {
   look?: { contrast: boolean };
   // A tap on a card, or on a pile ("pile:discard"). The screen decides what it does; a tap never sends an intent.
   onTap: (cardId: string) => void;
+  // A tap that hits no card or pile: the screen folds an open tray for it, as for the top of the command column.
+  onEmptyTap?: () => void;
   // A long press on a face-up card: the screen shows it large over the table.
   onPreview: (cardId: string) => void;
   // A drag ended on one of the selected card's drop targets (a key from targetKey). The screen picks; it does not send.

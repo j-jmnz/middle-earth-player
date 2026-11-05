@@ -10,6 +10,7 @@ import {
   prebuiltDetail,
   prebuiltRows,
   readDecklistBody,
+  ringsDbUrl,
   type PoolFact,
 } from "./import.ts";
 
@@ -22,22 +23,41 @@ const pool = new Map<string, PoolFact>([
 ]);
 
 describe("parseDecklistRef", () => {
+  const decklist = (id: string) => ({ kind: "decklist", id });
+  const deck = (id: string) => ({ kind: "deck", id });
+
   it("accepts a decimal id and the two ringsdb.com decklist URLs", () => {
-    expect(parseDecklistRef(" 4821 ")).toBe("4821");
-    expect(parseDecklistRef("https://ringsdb.com/decklist/view/4821")).toBe("4821");
-    expect(parseDecklistRef("https://ringsdb.com/decklist/view/4821/")).toBe("4821");
-    expect(parseDecklistRef("https://ringsdb.com/decklist/view/68989/thegoodthebadandtheugly-1.0")).toBe("68989");
-    expect(parseDecklistRef("https://ringsdb.com/decklist/view/68989/thegoodthebadandtheugly-1.0/")).toBe("68989");
-    expect(parseDecklistRef("https://www.ringsdb.com/api/public/decklist/4821.json")).toBe("4821");
-    expect(parseDecklistRef("http://ringsdb.com/api/public/decklist/4821.json?x=1")).toBe("4821");
+    expect(parseDecklistRef(" 4821 ")).toEqual(decklist("4821"));
+    expect(parseDecklistRef("https://ringsdb.com/decklist/view/4821")).toEqual(decklist("4821"));
+    expect(parseDecklistRef("https://ringsdb.com/decklist/view/4821/")).toEqual(decklist("4821"));
+    expect(parseDecklistRef("https://ringsdb.com/decklist/view/68989/thegoodthebadandtheugly-1.0")).toEqual(decklist("68989"));
+    expect(parseDecklistRef("https://ringsdb.com/decklist/view/68989/thegoodthebadandtheugly-1.0/")).toEqual(decklist("68989"));
+    expect(parseDecklistRef("https://www.ringsdb.com/api/public/decklist/4821.json")).toEqual(decklist("4821"));
+    expect(parseDecklistRef("http://ringsdb.com/api/public/decklist/4821.json?x=1")).toEqual(decklist("4821"));
+  });
+
+  it("accepts the two ringsdb.com deck URLs", () => {
+    expect(parseDecklistRef("https://ringsdb.com/deck/view/4821")).toEqual(deck("4821"));
+    expect(parseDecklistRef("https://ringsdb.com/deck/view/4821/")).toEqual(deck("4821"));
+    expect(parseDecklistRef("https://www.ringsdb.com/deck/view/4821/road-to-rivendell")).toEqual(deck("4821"));
+    expect(parseDecklistRef("https://ringsdb.com/api/public/deck/4821.json")).toEqual(deck("4821"));
   });
 
   it("refuses anything else", () => {
     expect(parseDecklistRef("")).toBeNull();
     expect(parseDecklistRef("12a")).toBeNull();
     expect(parseDecklistRef("https://example.com/decklist/view/4821")).toBeNull();
-    expect(parseDecklistRef("https://ringsdb.com/deck/view/4821")).toBeNull();
+    expect(parseDecklistRef("https://example.com/deck/view/4821")).toBeNull();
+    expect(parseDecklistRef("https://ringsdb.com/deck/edit/4821")).toBeNull();
     expect(parseDecklistRef("https://ringsdb.com/api/public/decklist/4821")).toBeNull();
+    expect(parseDecklistRef("https://ringsdb.com/api/public/deck/4821")).toBeNull();
+  });
+});
+
+describe("ringsDbUrl", () => {
+  it("names the public JSON of each kind", () => {
+    expect(ringsDbUrl({ kind: "decklist", id: "4821" })).toBe("https://ringsdb.com/api/public/decklist/4821.json");
+    expect(ringsDbUrl({ kind: "deck", id: "4821" })).toBe("https://ringsdb.com/api/public/deck/4821.json");
   });
 });
 

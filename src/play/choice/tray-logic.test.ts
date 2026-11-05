@@ -6,7 +6,7 @@ import type { Choice } from "./table-choice.ts";
 import { tableLayout } from "../layout/layout.ts";
 import { TOP_BAR } from "../chrome/top-bar-layout.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "../store/selectors.ts";
-import { COLUMN_PAD, listsResponses, outsideLayers, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
+import { COLUMN_PAD, listsResponses, outsideLayers, tapAction, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
 // The choice tray (docs/design-system-table.md; phase 21): its tiles, its count, what a tap outside it does, and where it sits
 // against the command column and the dock. No rule is implemented here.
@@ -109,6 +109,14 @@ describe("the outside tap", () => {
   it("folds an open tray and goes no further: no pick, no pile, no intent", () => {
     expect(tapRoute({ panelOpen: true, reader: false, cardId: "c1" })).toBe("fold");
     expect(tapRoute({ panelOpen: true, reader: false, cardId: "pile:discard" })).toBe("fold");
+  });
+
+  it("picks a tappable card of the open sheet with the tray open, through the tray's own pick, and folds for any other card", () => {
+    const picked: string[] = [];
+    const pick = (id: string) => (picked.push(id), true);
+    expect(tapAction({ panelOpen: true, reader: false, cardId: "c1", peeking: false, faceDown: false, answers: true }, pick)).toBe("picked");
+    expect(tapAction({ panelOpen: true, reader: false, cardId: "c2", peeking: false, faceDown: false, answers: false }, pick)).toBe("fold");
+    expect(picked).toEqual(["c1"]);
   });
 
   it("routes normally with a screen reader on or no tray open", () => {

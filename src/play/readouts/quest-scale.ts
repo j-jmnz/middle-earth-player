@@ -9,8 +9,9 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import type { Readout } from "./readout.ts";
 import { questSeat } from "../store/selectors.ts";
 
-// `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves.
-// Outside it the meter is not drawn at all: a Planning "−3 Short" before anyone could commit would be a false alarm.
+// `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves,
+// and only until it resolves. Outside it the meter is not drawn at all: a Planning "−3 Short" before anyone could commit would be a
+// false alarm, and so would one after resolution (window 3.4), once the committed willpower is cleared.
 // `seat`: the seat whose staging area and willpower these are once stages are separate between players (the acting seat's, whichever seat a peek draws), else null.
 export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean; seat: number | null };
 
@@ -26,7 +27,7 @@ export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: R
   }
   const threat = stagingThreat(game, ctx.cards, seat);
   const willpower = committedWillpower(game, ctx.cards, seat);
-  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest", seat: owner };
+  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" && !game.questResolved, seat: owner };
 }
 
 /** What a screen reader hears of the scale: the threat in staging, the willpower committed and how far ahead or short it is. */

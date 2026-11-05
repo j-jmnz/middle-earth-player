@@ -1,7 +1,7 @@
 // The tabs (docs/design-system.md, Navigation): a dock at the foot of a phone and a tablet in portrait, a rail down the left edge of an
 // expanded window. Five hubs: Campaigns, Scenarios, Decks, Cards, Rules. Settings is a pushed screen, opened by the gear at the top
 // right of each hub (`GearButton`) or, beside the rail, by the rail's own Settings at its foot. Re-exported by chrome.tsx.
-import { useEffect, useState, useSyncExternalStore, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import { type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, type Tabs } from "expo-router";
@@ -9,10 +9,6 @@ import { useRouter, type Tabs } from "expo-router";
 import { GearMark } from "../kit/chrome-marks";
 import { IconButton } from "../kit/chrome-buttons";
 import { useTitleShadow } from "../kit/chrome-text";
-import { useDatabases } from "../data/databases";
-import { deckRevision, subscribeDeckRevision } from "../deck/revision";
-import { deckReadiness } from "../deck/status";
-import { deckFaces, listDecks } from "../deck/store";
 import { usePalette } from "../kit/palette-hook";
 import { GameIcon } from "../../ui/game-icon";
 import { iconAspect, type IconName } from "../../ui/icon-map";
@@ -79,42 +75,12 @@ function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][numbe
 }
 
 /**
- * Whether a saved deck is not ready to play: the dot on the Decks tab. Read after the frame whenever the saved decks change (the deck
- * store's revision moves on each write), so a deck saved or fixed in the editor shows at once, a change of tab reads nothing, and the
- * tab bar never holds up the first paint of a hub.
- */
-function useUnreadyDeck(): boolean {
-  const { catalog, user } = useDatabases();
-  const revision = useSyncExternalStore(subscribeDeckRevision, deckRevision, deckRevision);
-  const [unready, setUnready] = useState(false);
-  useEffect(() => {
-    let cancelled = false;
-    const frame = requestAnimationFrame(() => {
-      const decks = listDecks(user);
-      const faces = deckFaces(catalog, decks.flatMap((deck) => [...deck.heroes, ...deck.cards.map((card) => card.code)]));
-      if (!cancelled) setUnready(decks.some((deck) => !deckReadiness(deck, faces).ready));
-    });
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frame);
-    };
-  }, [catalog, user, revision]);
-  return unready;
-}
-
-/**
  * The tabs: a dock at the foot of the screen, or in an expanded window (a tablet in landscape) a rail down the left edge
  * (docs/design-system.md, Navigation). The tabs/_layout.tsx puts the bar where this draws it. Same tabs, testIDs and `tablist` role.
  */
 export function AppTabBar(props: TabBarProps) {
   const { rail } = useSizeClass();
   return rail ? <RailTabBar {...props} /> : <DockTabBar {...props} />;
-}
-
-/** The red dot of a tab that needs a look (a deck not ready), at the top right of its icon. */
-function Badge({ right }: { right: string }) {
-  const palette = usePalette();
-  return <View pointerEvents="none" style={{ position: "absolute", top: 10, right: right as `${number}%`, width: 7, height: 7, borderRadius: 3.5, backgroundColor: palette.threat, boxShadow: `0 0 6px ${palette.threat}` }} />;
 }
 
 /**
@@ -126,7 +92,6 @@ function DockTabBar(props: TabBarProps) {
   const palette = usePalette();
   const insets = useSafeAreaInsets();
   const s = useUiScale();
-  const unready = useUnreadyDeck();
   // The words stay at Medium's size at Large, so five fit across a narrow phone.
   const labelScale = Math.min(s, 1);
   const t = useTableTokens();
@@ -170,7 +135,6 @@ function DockTabBar(props: TabBarProps) {
                 >
                   {word}
                 </Text>
-                {route.name === "decks" && unready && !focused ? <Badge right="24%" /> : null}
               </>
             )}
           </Pressable>
@@ -191,12 +155,11 @@ function RailTabBar(props: TabBarProps) {
   const router = useRouter();
   const s = useUiScale();
   const insets = useSafeAreaInsets();
-  const unready = useUnreadyDeck();
   const labelScale = Math.min(s, 1);
   const label = (focused: boolean) => ({ fontSize: 12 * labelScale, lineHeight: 15 * labelScale, letterSpacing: 0.4 * labelScale, color: focused ? palette.bone : palette.faint });
   const t = useTableTokens();
   const light = t.depth === "light";
-  const item = (key: string, focused: boolean, icon: ReactElement | undefined, word: string, button: object, badge = false) => (
+  const item = (key: string, focused: boolean, icon: ReactElement | undefined, word: string, button: object) => (
     <Pressable key={key} {...button} className="items-center justify-center" style={{ minHeight: 72 * s, gap: 6 * s }}>
       {({ pressed }) => (
         <>
@@ -213,7 +176,6 @@ function RailTabBar(props: TabBarProps) {
           <Text className="font-display" style={label(focused)} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
             {word}
           </Text>
-          {badge ? <Badge right="26%" /> : null}
         </>
       )}
     </Pressable>
@@ -233,7 +195,7 @@ function RailTabBar(props: TabBarProps) {
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingTop: Math.max(insets.top, 36 * s), paddingBottom: Math.max(insets.bottom, 24 * s) }} showsVerticalScrollIndicator={false}>
         {state.routes.map((route, index) => {
           const { focused, options, word, button } = tabItem(props, route, index);
-          return item(route.key, focused, options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: RAIL_ICON * s }) as ReactElement | undefined, word, button, route.name === "decks" && unready && !focused);
+          return item(route.key, focused, options.tabBarIcon?.({ focused, color: focused ? palette.bone : palette.faint, size: RAIL_ICON * s }) as ReactElement | undefined, word, button);
         })}
         <View className="mt-auto">
           {item("settings", false, <GearMark color={palette.faint} size={RAIL_ICON * s} />, "Settings", {

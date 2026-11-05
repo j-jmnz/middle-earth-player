@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native";
 import { CroppedArt } from "./art";
 import { COVER, PAINTING, type Region } from "./crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "../kit/chrome";
+import { shortToShow } from "../deck/status";
 import { HeroTrio } from "./hero-trio";
 import { CardThumb, useCardPreview } from "../images/picture";
 import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../../ui/surfaces";
@@ -207,9 +208,8 @@ type DeckSummary = {
   detail: string;
   // "47 of 50 cards" while the deck is short (deck/status.ts, deckShortLine); the cover and row show the count only then.
   short?: string | null;
+  // A ready deck shows no status and is heard without one; a deck that is not ready shows what it needs, in danger (Readiness).
   status: { ready: boolean; text: string };
-  // The deck list: a ready deck shows no status line and no dot; only a deck that is not ready shows its rule. The briefing's picker leaves it off.
-  quietReady?: boolean;
   // "6 cards with text not applied" (deck/status.ts, notAppliedLine), under the status; not a readiness rule.
   note?: string | null;
   onPress: () => void;
@@ -227,10 +227,10 @@ type DeckSummary = {
 };
 
 // The press props of a deck in the list (a button) or in the briefing's picker (a radio).
-function pressProps({ name, heroes, detail, status, quietReady, note, onPress, onLongPress, onMove, canMove, testID, selected, disabled }: DeckSummary) {
+function pressProps({ name, heroes, detail, status, note, onPress, onLongPress, onMove, canMove, testID, selected, disabled }: DeckSummary) {
   const picker = selected !== undefined;
   const moves = onMove && canMove ? [...(canMove.up ? [{ name: "moveUp", label: "Move up" }] : []), ...(canMove.down ? [{ name: "moveDown", label: "Move down" }] : [])] : [];
-  const said = quietReady && status.ready ? "" : `, ${status.text}`;
+  const said = status.ready ? "" : `, ${status.text}`;
   return {
     testID,
     collapsable: false,
@@ -267,14 +267,14 @@ function heroNames(heroes: readonly HeroFace[]): string {
   return heroes.length > 0 ? heroes.map((hero) => hero.name).join(", ") : "No heroes yet";
 }
 
-function StatusLine({ testID, short, status, quietReady, note }: { testID: string; short?: string | null; status: DeckSummary["status"]; quietReady?: boolean; note?: string | null }) {
-  const quiet = quietReady && status.ready;
+function StatusLine({ testID, short, status, note }: { testID: string; short?: string | null; status: DeckSummary["status"]; note?: string | null }) {
+  const count = shortToShow(short, status);
   return (
     <View>
-      {short || !quiet ? (
+      {count || !status.ready ? (
         <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
-          {short ? <Text className="text-label text-muted">{short}</Text> : null}
-          <Readiness testID={`${testID}-status`} status={status} quietReady={quietReady} />
+          {count ? <Text className="text-label text-muted">{count}</Text> : null}
+          <Readiness testID={`${testID}-status`} status={status} />
         </View>
       ) : null}
       {note ? (
@@ -288,14 +288,15 @@ function StatusLine({ testID, short, status, quietReady, note }: { testID: strin
 
 /**
  * A saved deck in the deck list's Cards view: its three heroes' paintings side by side, split by 1 pt of the ground and fading into
- * the cover's foot, then the deck's name, and a line with the heroes on the left and whether it is ready on the right (and "47 of 50 cards" under it while the deck is short). The selected
+ * the cover's foot, then the deck's name, the heroes' names, and, for a deck that is not ready, what it needs on a line of its own under them (two lines at most; "47 of 50 cards" follows while the deck is short and the words do not say so). The selected
  * deck (the briefing's picker) carries the silver ring. A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance).
  */
 export function DeckCover(props: DeckSummary & { height: number }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
-  const { name, heroes, short, status, quietReady, note, height, testID, children, selected, disabled } = props;
+  const { name, heroes, short, status, note, height, testID, children, selected, disabled } = props;
+  const count = shortToShow(short, status);
   const foot = t.depth === "light" ? palette.raised : palette.dusk;
   return (
     <View className="overflow-hidden rounded-item" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
@@ -321,13 +322,11 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                   <SelectedMark selected={selected} />
                 </View>
               </View>
-              <View className="mt-0.5 flex-row items-center justify-between gap-2">
-                <Text className="min-w-0 shrink text-label text-muted" numberOfLines={1}>
-                  {heroNames(heroes)}
-                </Text>
-                <Readiness testID={`${testID}-status`} status={status} quietReady={quietReady} />
-              </View>
-              {short ? <Text className="text-label text-faint">{short}</Text> : null}
+              <Text className="mt-0.5 min-w-0 text-label text-muted" numberOfLines={1}>
+                {heroNames(heroes)}
+              </Text>
+              <Readiness testID={`${testID}-status`} status={status} lines={2} />
+              {count ? <Text className="text-label text-faint">{count}</Text> : null}
               {note ? (
                 <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
                   {note}
@@ -343,35 +342,24 @@ export function DeckCover(props: DeckSummary & { height: number }) {
 }
 
 /**
- * Ready to play, with a green dot, or what the deck still needs, with a red one. `testID` names the words. With `quietReady`
- * (the deck list and editor) a ready deck shows nothing and a deck that is not ready shows its rule in danger, with no dot.
+ * What a deck that is not ready still needs, in danger, with no dot; nothing for a ready deck (user instruction, 2026-11-05: the deck
+ * rows, covers, editor and picker carry no readiness mark). `testID` names the words.
  */
-export function Readiness({ testID, status, lines = 1, quietReady }: { testID: string; status: DeckSummary["status"]; lines?: number; quietReady?: boolean }) {
+export function Readiness({ testID, status, lines = 1 }: { testID: string; status: DeckSummary["status"]; lines?: number }) {
   const palette = usePalette();
-  const s = useUiScale();
-  const color = status.ready ? palette.ok : palette.danger;
-  if (quietReady) {
-    return status.ready ? null : (
-      <Text testID={testID} className="shrink text-label" style={{ color }} numberOfLines={lines}>
-        {status.text}
-      </Text>
-    );
-  }
+  if (status.ready) return null;
   return (
-    <View className="shrink flex-row items-center gap-1.5">
-      <View style={{ width: 7 * s, height: 7 * s, borderRadius: 3.5 * s, backgroundColor: color, boxShadow: `0 0 6px ${withAlphaHex(color, 0.7)}` }} />
-      <Text testID={testID} className="shrink text-label" style={{ color }} numberOfLines={lines}>
-        {status.text}
-      </Text>
-    </View>
+    <Text testID={testID} className="shrink text-label" style={{ color: palette.danger }} numberOfLines={lines}>
+      {status.text}
+    </Text>
   );
 }
 
-/** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and the readiness. */
+/** A saved deck in the deck list's List view: the heroes as small pictures, the name, the counts and what a deck that is not ready needs. */
 export function DeckRow(props: DeckSummary) {
   const palette = usePalette();
   const t = useTableTokens();
-  const { name, heroes, short, status, quietReady, note, testID, children, selected, disabled } = props;
+  const { name, heroes, short, status, note, testID, children, selected, disabled } = props;
   return (
     <View className="mb-1.5 overflow-hidden rounded-item" style={selected ? { boxShadow: selectedRingOf(t) } : undefined}>
       {/* The surface is on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
@@ -383,7 +371,7 @@ export function DeckRow(props: DeckSummary) {
               <Text className={`font-display text-heading ${disabled ? "text-faint" : selected ? "text-accentHigh" : "text-bone"}`} numberOfLines={1}>
                 {name}
               </Text>
-              <StatusLine testID={testID} short={short} status={status} quietReady={quietReady} note={note} />
+              <StatusLine testID={testID} short={short} status={status} note={note} />
             </View>
             {selected === undefined ? <Chevron direction="right" color={palette.faint} size={8} /> : <SelectedMark selected={selected} />}
           </View>

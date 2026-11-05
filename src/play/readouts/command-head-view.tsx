@@ -3,13 +3,10 @@
 // never pushes the dock; command-head.ts says what it draws in that room. A tap on the meter lists the cards that make up its threat (`onMeter`).
 import { View } from "react-native";
 
-import { headPlan } from "./command-head.ts";
+import { headPlan, METER_MOST } from "./command-head.ts";
 import { QuestMeterView } from "./quest-meter-view.tsx";
 import type { QuestScale } from "./quest-scale.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
-
-/** The tallest the meter grows (Medium's points). */
-const METER_MOST = 230;
 
 export function CommandHead({ scale, room, bottom, onMeter }: { scale: QuestScale; room: number; bottom: number; onMeter?: () => void }) {
   const s = useUiScale();

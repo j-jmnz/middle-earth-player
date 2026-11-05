@@ -171,6 +171,7 @@ export function TableLayers({
   barBottom,
   commandWidth,
   anchorTop,
+  columnClear = 0,
   picture,
   onPreview,
   onAllSettings,
@@ -194,6 +195,9 @@ export function TableLayers({
   commandWidth: number;
   // The screen y of the top of the dock's content (its words, the choice's rows and its buttons), or null until it is measured.
   anchorTop: number | null;
+  // How far down from the bar the table's top rows run on under the command column (column-reach.ts): taps there reach the canvas, which
+  // folds the tray or picks itself, so the outside layer over the column starts under them. 0 when no row reaches under it.
+  columnClear?: number;
   onPreview: (cardId: string) => void;
   // The settings panel's All settings: leave the table for the Settings tab (the game is saved), as the menu's Rules does.
   onAllSettings: () => void;
@@ -244,7 +248,7 @@ export function TableLayers({
       {outsideLayers({ trayShown, reading: reading != null, reader }) ? (
         <>
           <Pressable testID="tray-outside-bar" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: 0, left: insets.left + dialsEdge, right: insets.right + menuZone, height: barBottom }} />
-          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom, right: insets.right, width: commandWidth, height: Math.max(0, anchor - barBottom) }} />
+          <Pressable testID="tray-outside-column" accessible={false} importantForAccessibility="no" onPress={choice.foldOutside} style={{ position: "absolute", top: barBottom + columnClear, right: insets.right, width: commandWidth, height: Math.max(0, anchor - barBottom - columnClear) }} />
         </>
       ) : null}
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}

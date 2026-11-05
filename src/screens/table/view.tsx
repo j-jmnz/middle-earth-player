@@ -3,7 +3,7 @@
 // intent in user.db, and this view hands the canvas the pictures in the image cache and lays the pieces out. The reducer is
 // the only writer of the game; how a tap becomes an intent is src/play/choice/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
@@ -22,10 +22,8 @@ import { railFor } from "../../play/phases/rail";
 import { dialTicksSelector, threatSelector } from "../../play/store/selectors";
 import { effectById, type ReduceContext, type TableStore } from "../../play/store/store";
 import { createHandoff } from "../../play/spotlight/handoff";
-import { SpotlightLayer } from "../../play/spotlight/layer";
-import type { SpotlightLayerProps } from "../../play/spotlight/handoff";
 import type { StageArea } from "../../play/spotlight/stage";
-import { TableCanvas } from "../../play/canvas/table-canvas";
+import { PicturedCanvas, PicturedSpotlight } from "./pictured";
 import type { TableCanvasProps } from "../../play/canvas/table-canvas-types";
 import { MomentBanner } from "../../play/readouts/moment-banner";
 import { TableDock } from "../../play/choice/dock/table-dock";
@@ -53,6 +51,7 @@ import { dockReadout } from "../../play/readouts/readout";
 import { questScaleOf } from "../../play/readouts/quest-scale";
 import { CommandHead } from "../../play/readouts/command-head-view";
 import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../../play/readouts/command-head";
+import { columnReach, coveredTop, type RowFeet } from "../../play/layout/column-reach";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
@@ -63,25 +62,13 @@ import { BAR_TOP } from "../../play/chrome/top-bar-layout";
 import { goBack } from "../nav/go-back";
 import { useTablePictures } from "./use-table-pictures";
 import { pictureAt, useCardLookups } from "./card-lookups";
-import { useImageRevision, useImageSnapshot } from "../images/store";
+import { useImageRevision } from "../images/store";
 import type { World } from "../../campaign/world";
 import type { CardFacts } from "../session/open-game";
 import { commandWidth as commandWidthOf } from "./command";
 import type { PlayClock } from "../session/play-clock";
 import { usePlayClock } from "../session/use-play-clock";
 import { useUiScale } from "../../ui/ui-scale";
-
-// The canvas and the spotlight's layer read the image cache's revision themselves, so a picture that lands draws them and not the view above
-// (the table view, its hooks and its panels).
-const PicturedCanvas = memo(function PicturedCanvas(props: Omit<TableCanvasProps, "pictureRevision">) {
-  const { revision } = useImageSnapshot();
-  return <TableCanvas {...props} pictureRevision={revision} />;
-});
-
-const PicturedSpotlight = memo(function PicturedSpotlight(props: Omit<SpotlightLayerProps, "pictureRevision">) {
-  const { revision } = useImageSnapshot();
-  return <SpotlightLayer {...props} pictureRevision={revision} />;
-});
 
 /** Where the table's chrome leads: back to the screen the game belongs to, the outcome screen, and the booklet. */
 export type TableNav = {
@@ -107,7 +94,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const screen = useWindowDimensions();
   const s = useUiScale();
   const t = useTableTokens();
-  // The canvas wrapper's size, and its left edge in the row.
+  // The canvas wrapper's size (the command column lies over its right edge), and its left edge in the row.
   const [size, setSize] = useState<{ width: number; height: number; x: number } | null>(null);
   // The plan and clock the table canvas hands the combat spotlight's full-screen layer, created once (spotlight/handoff.ts).
   const [handoff] = useState(createHandoff);
@@ -137,6 +124,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const [numbersRow, setNumbersRow] = useState(NUMBERS_ROW * s);
   // Whether the dock, as last measured, drew that row.
   const [dockHasNumbers, setDockHasNumbers] = useState(true);
+  // The feet of the canvas's staging and engagement rows, as the canvas last laid them out (column-reach.ts).
+  const [feet, setFeet] = useState<RowFeet | null>(null);
   // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
   const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
   const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
@@ -274,15 +263,19 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
-  // The head stands in the column's room above the dock (command-head.ts). The quest meter is drawn in the Quest phase only; while it
-  // shows, the dock keeps only the readout's result line, and with no room for it (or outside the Quest phase) the dock keeps the numbers.
+  // The head stands in the column's room above the dock (command-head.ts), the quest meter in the Quest phase only; while it shows, the dock keeps only the readout's result line.
   const footPad = Math.max(insets.bottom, 8 * s);
-  // Whether the head shows is planned against the dock with its numbers row, the same height whether the meter is up or not, so the dock
-  // shrinking when the meter takes the numbers cannot turn the head off again (no flip, and no dependence on which was measured first).
-  // The head itself stands in the room the dock really leaves.
-  const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s);
+  // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
+  const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
+  // The reach (the top rows wholly above the dock, which a crowded row may run on under, column-reach.ts) is planned without the head, against the dock with its
+  // numbers row, the same height whether or not the meter has taken it; the head then gets only the room under the rows the reach covers (no flip between the two).
   const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
-  const planRoom = headRoom(columnHeight, footPad, dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers), HEAD_GAP * s);
+  const planDock = dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers);
+  const column = { height: columnHeight, foot: footPad, dock: planDock, margin: 8 * s, top: peekRoom };
+  const reach = columnReach(column, feet);
+  const covered = coveredTop(column, feet, reach);
+  const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s, covered);
+  const planRoom = headRoom(columnHeight, footPad, planDock, HEAD_GAP * s, covered);
   const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, s, scale.live) !== "hidden";
   const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
@@ -296,8 +289,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
     [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
   );
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
-  // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
-  const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
+  // A tap on a covered row reaches the canvas, which folds the tray or picks, so the tray's outside layer over the column starts under it.
+  const columnClear = reach === 0 || !feet ? 0 : peekRoom + (reach === 2 ? feet.engaged : feet.staging);
   // How a card code is shown large, by picture key (src/play/canvas/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
     name: nameOf(key),
@@ -366,14 +359,19 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           onMenu={() => setMenuOpen((open) => !open)}
         />
         <View className="min-h-0 flex-1 flex-row">
+          {/* The command column's fade (below), under the canvas. */}
+          <View pointerEvents="none" style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: commandWidth, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }} />
           <View className="min-h-0 flex-1" style={{ paddingTop: peekRoom }} onLayout={onLayout}>
             {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (words/area.ts). */}
             <AreaSummary store={store} nameOf={nameOf} />
             {size ? (
               <PicturedCanvas
                 store={store}
-                width={size.width}
+                width={size.width - commandWidth}
                 height={size.height - peekRoom}
+                column={commandWidth}
+                reach={columnHeight > 0 && dockHeight > 0 && feet != null ? reach : null}
+                onRowFeet={setFeet}
                 picture={pictureOf}
                 nameOf={nameOf}
                 sphereOf={sphereOf}
@@ -390,13 +388,14 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
                 handoff={handoff}
                 look={look}
                 onTap={choice.onTap}
+                onEmptyTap={choice.foldOutside}
                 onPreview={onPreview}
                 onDrop={choice.onDrop}
               />
             ) : null}
           </View>
-          {/* The command column stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner); the dock has no panel of its own. */}
-          <View testID="command" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ width: commandWidth, paddingBottom: footPad, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }}>
+          {/* The command column lies over the canvas's right edge, its empty top passing taps to the canvas. It stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner), drawn under the canvas (above) so a row that runs on under the column stays clear; the dock has no panel of its own. */}
+          <View testID="command" pointerEvents="box-none" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: commandWidth, paddingBottom: footPad }}>
             {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
             <CommandHead scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onMeter={() => setReading({ kind: "stagingThreat" })} />
             <TableDock
@@ -444,6 +443,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
         barBottom={barBottom}
         commandWidth={commandWidth}
         anchorTop={anchor}
+        columnClear={columnClear}
         onPreview={onPreview}
         onAllSettings={() => {
           // The panel closes first, so it is not still open when the player comes back.

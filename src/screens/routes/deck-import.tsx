@@ -8,7 +8,7 @@ import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchFi
 import { editSavedDeck, startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, decklistUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, droppedSentence, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -18,6 +18,7 @@ import { useListGutter } from "../nav/list-gutter";
 import { showToast } from "../kit/toast";
 
 const FETCH_FAILURE = "RingsDB did not respond.";
+const PRIVATE_DECK = "RingsDB did not return that deck. Make it public in its RingsDB sharing settings.";
 
 async function readJson(url: string): Promise<unknown> {
   const response = await fetch(url);
@@ -39,7 +40,7 @@ async function droppedName(code: string): Promise<string> {
 }
 
 // The try/catch and try/finally below live here because the React Compiler cannot compile them inside a component.
-// The decklist as fetched, or null when the request failed.
+// The deck or decklist as fetched, or null when the request failed.
 async function fetchJson(url: string): Promise<{ payload: unknown } | null> {
   try {
     return { payload: await readJson(url) };
@@ -84,15 +85,16 @@ export default function DeckImportScreen() {
   async function onImport(): Promise<void> {
     if (busy || opening.current) return;
     setMessage(null);
-    const id = parseDecklistRef(value);
-    if (!id) {
-      setMessage("That is not a RingsDB decklist.");
+    const ref = parseDecklistRef(value);
+    if (!ref) {
+      setMessage("That is not a RingsDB deck or decklist.");
       return;
     }
     await whileBusy(setBusy, async () => {
-      const fetched = await fetchJson(decklistUrl(id));
+      const fetched = await fetchJson(ringsDbUrl(ref));
       if (!fetched) {
-        setMessage(FETCH_FAILURE);
+        // RingsDB answers 404 for a deck its owner does not share, so the likely fix is the sharing setting.
+        setMessage(ref.kind === "deck" ? PRIVATE_DECK : FETCH_FAILURE);
         return;
       }
       const body = readDecklistBody(fetched.payload);
@@ -152,7 +154,7 @@ export default function DeckImportScreen() {
       </View>
       <Section title="RingsDB" className="mt-4" />
       <View className="flex-row">
-        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB decklist" accessibilityLabel="RingsDB decklist link or number" search={false} />
+        <SearchField testID="deck-import-input" value={value} onChangeText={setValue} placeholder="RingsDB deck or decklist" accessibilityLabel="RingsDB deck or decklist link, or decklist number" search={false} />
       </View>
       {message ? (
         <BodyText tone="danger" className="mt-4">

@@ -7,6 +7,8 @@ export type SeatStateInput = {
   // The picked deck, or null; `heroes` are its hero codes.
   deck: { id: string; heroes: readonly string[] } | null;
   fallen: readonly string[];
+  // A hero's name by code, for the words about a fallen hero.
+  nameOf: (code: string) => string;
   readiness: ReadonlyMap<string, { ready: boolean; text: string }>;
   // The deck's short line ("47 of 50 cards"), or null when it is whole.
   short: string | null;
@@ -25,9 +27,12 @@ export function pickedReady(input: Pick<SeatStateInput, "deck" | "fallen" | "rea
 }
 
 export function seatState(input: SeatStateInput): SeatState {
-  const { seeded, deck, readiness, short, missingRingBearer } = input;
+  const { seeded, deck, fallen, readiness, short, missingRingBearer, nameOf } = input;
   if (seeded === "pending") return { text: "Loading", attention: false };
   if (!deck) return { text: "No deck yet", attention: true };
+  // A picked deck whose hero fell in the campaign cannot be dealt, whatever its readiness says; the picker words it the same way.
+  const fell = deck.heroes.filter((code) => fallen.includes(code));
+  if (fell.length > 0) return { text: `${fell.map(nameOf).join(", ")} fell and cannot be played`, attention: true };
   if (!pickedReady(input)) return { text: readiness.get(deck.id)?.text ?? "Not ready", attention: true };
   if (missingRingBearer) return { text: "Needs a Ring-bearer", attention: true };
   return { text: short ?? "Ready", attention: false };

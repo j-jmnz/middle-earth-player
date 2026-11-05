@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
-import { meterFractions, scaleLabel, scaleMarker, stagingWord, type QuestScale } from "./quest-scale.ts";
+import { expectOk } from "../../rules/core/test-fixture.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
+import { starterStart, starterWorld } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
+
+import { meterFractions, questScaleOf, scaleLabel, scaleMarker, stagingWord, type QuestScale } from "./quest-scale.ts";
 import { dockReadout, type Readout } from "./readout.ts";
 
 describe("scaleMarker", () => {
@@ -60,5 +64,28 @@ describe("meterFractions", () => {
 
   it("draws two zeros empty", () => {
     expect(meterFractions(meter(0, 0))).toEqual({ threat: 0, willpower: 0, line: 0 });
+  });
+});
+
+describe("questScaleOf", () => {
+  let ctx: ReduceContext;
+  let kept: ScenarioState;
+
+  beforeAll(async () => {
+    ctx = (await starterWorld("stealth-and-steadfastness")).ctx;
+    kept = expectOk(reduce(startScenario(starterStart("stealth-and-steadfastness", 1), ctx), { type: "Keep" }, ctx)).state;
+  });
+
+  it("is live while the players commit and while staging reveals (rr.step-3-4)", () => {
+    expect(questScaleOf({ ...kept, phase: "Quest", mode: "questCommit", questResolved: false }, ctx, null).live).toBe(true);
+    expect(questScaleOf({ ...kept, phase: "Quest", mode: "staging", questResolved: false }, ctx, null).live).toBe(true);
+  });
+
+  it("is not live once the quest has resolved, though the phase is still Quest", () => {
+    expect(questScaleOf({ ...kept, phase: "Quest", mode: "resolution", questResolved: true }, ctx, null).live).toBe(false);
+  });
+
+  it("is not live outside the Quest phase", () => {
+    expect(questScaleOf({ ...kept, phase: "Planning", mode: "planning", questResolved: false }, ctx, null).live).toBe(false);
   });
 });

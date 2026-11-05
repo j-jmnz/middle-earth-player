@@ -45,11 +45,13 @@ type Args = {
   scrubOn: boolean;
   select: (cardId: string | null) => void;
   onTap: (cardId: string) => void;
+  // A tap that hits no slot (the table's empty ground, the covered band under the command column): the screen folds an open tray for it.
+  onEmptyTap?: () => void;
   onPreview: (cardId: string) => void;
   onDrop: (cardId: string, target: string) => void;
 };
 
-export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onPreview, onDrop }: Args) {
+export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onEmptyTap, onPreview, onDrop }: Args) {
   const { progress: hurryProgress, clear: hurryClear } = hurry;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
@@ -238,7 +240,9 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
 
     const tap = Gesture.Tap().onEnd((event) => {
       const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
-      if (slot && !swallow.get()) scheduleOnRN(onTap, slot.id);
+      if (swallow.get()) return;
+      if (slot) scheduleOnRN(onTap, slot.id);
+      else if (onEmptyTap) scheduleOnRN(onEmptyTap);
     });
 
     // Held still past the press delay, a face-up card on the table opens large; a discard pile opens its list. On the hand the
@@ -336,7 +340,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       });
 
     return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, spreadNow, push, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, release, select, onTap, onPreview, onScrub]);
+  }, [slots, lifts, spreadNow, push, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, release, select, onTap, onEmptyTap, onPreview, onScrub]);
 
   const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, left, drop, spread }), [rise, apart, scrubLift, index, left, drop, spread]);
   return { gesture, liftTransform, scrub };

@@ -255,7 +255,6 @@ export default function Decks() {
       detail: deckCountLine(deck),
       short: deckShortLine(deck),
       status: readiness.get(deck.id) ?? { ready: false, text: "" },
-      quietReady: true,
       note: notAppliedLine(deck, inactive),
       onPress: () => openDeck(deck),
       // A long press drags the deck while the list can be reordered, and starts Manage when it cannot.

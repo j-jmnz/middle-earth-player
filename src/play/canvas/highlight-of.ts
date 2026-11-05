@@ -31,6 +31,15 @@ export function highlightKeys({ game, seat, sheet, choice, panel }: { game: Scen
   };
 }
 
+/**
+ * Whether the board leaves the open sheet's cards unlit (`panel` for highlightKeys): only while the choice is on paper and none of its
+ * cards is drawn on the table. A tray that opened for a folded or off-table option, or after List, Actions or Commit, still glows, dims
+ * and marks the cards that are on the table, and a tap on one picks it (tray-logic.ts, tapRoute).
+ */
+export function boardUnlit(panel: boolean, sheet: Sheet, onTable: (cardId: string) => boolean): boolean {
+  return panel && ![...tappable(sheet)].some(onTable);
+}
+
 const ids = (key: string): string[] => (key === "" ? [] : key.split(","));
 
 export function highlightOf(keys: HighlightKeys): TableHighlight {

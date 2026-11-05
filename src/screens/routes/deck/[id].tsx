@@ -264,7 +264,7 @@ export default function DeckEditor() {
     />
   );
   // What the deck still lacks, in danger, beside Save: said once, at the foot of the deck on every size; a ready deck says nothing.
-  const status = <Readiness testID="deck-error" status={readiness} lines={2} quietReady />;
+  const status = <Readiness testID="deck-error" status={readiness} lines={2} />;
   // The bar: Add cards (opens the pool) on a phone and in portrait, whether the deck is ready, and Save deck, the one primary.
   const actionBar = (align: "auto" | "fill") => (
     <ActionBar align={align}>

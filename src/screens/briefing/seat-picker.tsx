@@ -86,7 +86,7 @@ export function SeatPicker({
   // stored per seat index in `sections`, like every FoldSection (fold-section.tsx); a seat that needs the player opens anyway (seat-state.ts).
   const folds = useFolds();
   const foldId = `briefing-seat-${index}`;
-  const state = seatState({ seeded, deck: pickedDeck, fallen, readiness, short, missingRingBearer: slot && !ringBearer });
+  const state = seatState({ seeded, deck: pickedDeck, fallen, nameOf, readiness, short, missingRingBearer: slot && !ringBearer });
   const folded = seatFolded(folds.folded(foldId), state);
   // A Ring-bearer the deck brings itself is one of the candidates (a Fellowship hero with the Ring-bearer trait).
   const carries = (code: string) => candidates.some((candidate) => candidate.code === code);
