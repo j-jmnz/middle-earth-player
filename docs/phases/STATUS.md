@@ -10,6 +10,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Phases 12 to 16 each have an engine half and a phone half (phase 12 describes them). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active` or `not started`. The phase is completed when both halves are.
 - Phases 27 to 33 (Mirkwood Paths and The Dark of Mirkwood, plan `docs/plans/mirkwood-paths.md`) have **one review round per phase** (user instruction, 2026-10-27). The main session runs `/reviewer` once on the phase's diff, and `/ux` once when `src/screens` or `src/play` changed, hands their blocks to one implementer fix pass, and closes the phase without re-running the reviewers. A block that pass leaves open goes in the phase's note and does not keep the phase open. This replaces "`/reviewer` reports no blocks" for those phases. Phases 29 to 33 have an engine half and a phone half, as phase 12 describes.
 - Phases 37 to 48 and 39b (Dream-chaser, plan `docs/plans/dream-chaser.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-10-30). Phases 40 to 48 have an engine half and a phone half, as phase 12 describes.
+- Phases 49 to 60 and 51b (Ered Mithrin, plan `docs/plans/ered-mithrin.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-11-05). Phases 52 to 60 have an engine half and a phone half, as phase 12 describes.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - A cloud session has no phone, simulator or Maestro. Phone checks stay open and are listed here, not marked done.
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
@@ -72,6 +73,19 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 46 | The Drowned Ruins | completed | 2026-11-04. Engine done, review round done. Phone checks open: the Grotto pile (top-card preview and speech, the glide back to it), Command's armed Done and up-to notes, the flip naming its side, Into the Abyss counts; both Maestro flows unrun; `ruins-won` missing, so the win flow cannot run. |
 | 47 | A Storm on Cobas Haven | completed | 2026-11-04. Engine done, review round done. Phone checks open: a controlled tower in staging (fold rank, reader label, its Action from either seat), guarded and re-guarded towers, the Islet's "1 held" pill and where the held enemy returns, the Skirmisher as a ship, Taking on Water's three exhaust picks and host caution, the added-phase rail and carousel, the Tactics hero list, Gandalf's entry, Gavin's Planning Action; both Maestro flows unrun; `haven-won` missing, so the win flow cannot run. |
 | 48 | The City of Corsairs | not started | Coming soon (user decision, 2026-11-01). Open: which Stormcaller card the campaign Setup flips (12151 has no Campaign Mode only side; only 110042 has one). |
+| 49 | Ered Mithrin data | not started | |
+| 50 | Ered Mithrin campaign shell, treasures and the pool | not started | |
+| 51 | Wilderland mechanics family | not started | |
+| 51b | Wilderland on the table | not started | |
+| 52 | Journey Up the Anduin | not started | |
+| 53 | Lost in Mirkwood | not started | |
+| 54 | The King's Quest | not started | |
+| 55 | The Withered Heath | not started | |
+| 56 | Roam Across Rhovanion | not started | |
+| 57 | Fire in the Night | not started | |
+| 58 | The Ghost of Framsburg | not started | |
+| 59 | Mount Gundabad | not started | |
+| 60 | The Fate of Wilderland | not started | |
 
 ## Open items
 

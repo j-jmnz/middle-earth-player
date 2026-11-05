@@ -103,13 +103,13 @@ Read the sections your task touches.
   - 823–841 Card images (~1.1K) ← 6
   - 842–867 Persistence and shipping (~1.7K)
   - 868–908 Screens (~4.4K) ← 2
-    - 894–908 Table screen (~1.6K) ← 4
+    - 894–908 Table screen (~1.6K) ← 5
 - `docs/design-system-table.md` — Design system — Table (landscape) (~28.7K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
   - 28–35 Quest scale (~500) ← 2
-  - 36–39 Canvas (~560) ← 1
+  - 36–39 Canvas (~560) ← 2
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
   - 58–80 Cards (~3.9K) ← 9
@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.2K tok)
-  - 5–16 Rules (~550)
-  - 17–75 Phases (~2.3K)
-  - 76–172 Open items (~4.8K)
-    - 78–92 Fixtures and Maestro (~640)
-    - 93–126 Rules and engine (~1.4K)
-    - 127–148 Screens and code (~1.2K)
-    - 149–172 Phone and tablet checks (~1.6K)
-  - 173–189 Standing decisions (~430)
+- `docs/phases/STATUS.md` — Phase status (~8.4K tok)
+  - 5–17 Rules (~620)
+  - 18–89 Phases (~2.5K)
+  - 90–186 Open items (~4.8K)
+    - 92–106 Fixtures and Maestro (~640)
+    - 107–140 Rules and engine (~1.4K)
+    - 141–162 Screens and code (~1.2K)
+    - 163–186 Phone and tablet checks (~1.6K)
+  - 187–203 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -204,6 +204,19 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
 - `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
+- `docs/phases/phase-49-ered-mithrin-data.md` — Phase 49 — Ered Mithrin data (~2.5K tok)
+- `docs/phases/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.2K tok)
+- `docs/phases/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
+- `docs/phases/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~1.3K tok)
+- `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~1.2K tok)
+- `docs/phases/phase-53-lost-in-mirkwood.md` — Phase 53 — Lost in Mirkwood (~1.2K tok)
+- `docs/phases/phase-54-the-kings-quest.md` — Phase 54 — The King's Quest (~1.1K tok)
+- `docs/phases/phase-55-the-withered-heath.md` — Phase 55 — The Withered Heath (~1.1K tok)
+- `docs/phases/phase-56-roam-across-rhovanion.md` — Phase 56 — Roam Across Rhovanion (~1.1K tok)
+- `docs/phases/phase-57-fire-in-the-night.md` — Phase 57 — Fire in the Night (~1.1K tok)
+- `docs/phases/phase-58-the-ghost-of-framsburg.md` — Phase 58 — The Ghost of Framsburg (~1.1K tok)
+- `docs/phases/phase-59-mount-gundabad.md` — Phase 59 — Mount Gundabad (~1.2K tok)
+- `docs/phases/phase-60-the-fate-of-wilderland.md` — Phase 60 — The Fate of Wilderland (~1.0K tok)
 
 ## Done phases
 
@@ -247,7 +260,7 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
     - 50–62 The second pile slot (~430)
     - 63–70 Boarding (~160)
     - 71–87 The Sailing test (~680)
-    - 88–113 Crowding: squeeze, then fold (~740)
+    - 88–113 Crowding: squeeze, then fold (~740) ← 1
     - 114–117 The rule that no control types a number (~180)
     - 118–128 Scenario areas (~330)
   - 129–139 Cards it must hold (~230)
@@ -292,7 +305,7 @@ Read when a task names the plan.
   - 148–154 Conditions (~110)
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
-  - 237–273 Mechanic families: engine and records together (~1.4K) ← 2
+  - 237–273 Mechanic families: engine and records together (~1.4K) ← 3
   - 274–286 Readings the review catches (~410) ← 3
   - 287–306 Not expressible yet: leave open, report (~390)
 - `docs/plans/ered-mithrin.md` — Plan: Ered Mithrin (The Wilds of Rhovanion and the six Ered Mithrin Adventure Packs) (~7.3K tok)
