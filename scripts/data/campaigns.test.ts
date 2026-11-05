@@ -12,14 +12,14 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
     // The campaigns built from the Revised Core Set and The Dark of Mirkwood are listed and stay locked until one of their
     // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29, The Dark of Mirkwood since phase 32: both hold The Oath; Dream-chaser since phase 40: Voyage Across Belegaer); the two later sagas
     // have no scenario files at all.
-    // Ered Mithrin is built and locked until phase 50 registers it and a scenario is playable.
+    // Ered Mithrin has been playable since phase 52 (Journey Up the Anduin).
     const locked = index.filter((entry) => !entry.playable);
-    expect(locked.map((entry) => entry.name)).toEqual(["Ered Mithrin", "The Two Towers", "The Return of the King"]);
+    expect(locked.map((entry) => entry.name)).toEqual(["The Two Towers", "The Return of the King"]);
     expect(locked.filter((entry) => ["The Two Towers", "The Return of the King"].includes(entry.name)).every((entry) => entry.scenarioCount === 6)).toBe(true);
   });
 
@@ -97,8 +97,8 @@ describe("data/campaigns/index.json", () => {
     expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [entry] }, campaign)).toThrow("lists no scenario for");
   });
 
-  it("lists Ered Mithrin with its nine scenarios, locked until one of them is in PLAYABLE_SCENARIOS (phase 50 on)", () => {
-    expect(index.find((entry) => entry.id === "ered-mithrin")).toMatchObject({ name: "Ered Mithrin", scenarioCount: 9, playable: false });
+  it("lists Ered Mithrin with its nine scenarios, playable once one of them is in PLAYABLE_SCENARIOS (Journey Up the Anduin, phase 52)", () => {
+    expect(index.find((entry) => entry.id === "ered-mithrin")).toMatchObject({ name: "Ered Mithrin", scenarioCount: 9, playable: true });
     const campaign = loadCampaign("ered-mithrin");
     expect(campaign.scenarios).toEqual([
       "journey-up-the-anduin",

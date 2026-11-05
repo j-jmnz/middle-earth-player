@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~64.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~64.7K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,19 +92,19 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–680 Dream-chaser (~13.1K)
-  - 681–693 Ered Mithrin (~1.4K)
-  - 694–702 Nightmare (~420)
-  - 703–741 Deckbuilding (~1.8K) ← 1
-  - 742–820 Effects (~3.2K)
-    - 744–802 Three layers (~2.4K)
-    - 803–812 Player side quests, contracts and saga cards (~430)
-    - 813–816 Window stack (~100)
-    - 817–820 Coverage test (~270)
-  - 821–841 Data sources (~560)
-  - 842–860 Card images (~1.1K) ← 6
-  - 861–886 Persistence and shipping (~1.7K)
-  - 887–928 Screens (~4.7K) ← 2
-    - 913–928 Table screen (~1.8K) ← 5
+  - 681–695 Ered Mithrin (~1.7K)
+  - 696–704 Nightmare (~420)
+  - 705–743 Deckbuilding (~1.8K) ← 1
+  - 744–822 Effects (~3.2K)
+    - 746–804 Three layers (~2.4K)
+    - 805–814 Player side quests, contracts and saga cards (~430)
+    - 815–818 Window stack (~100)
+    - 819–822 Coverage test (~270)
+  - 823–843 Data sources (~560)
+  - 844–862 Card images (~1.1K) ← 6
+  - 863–888 Persistence and shipping (~1.7K)
+  - 889–930 Screens (~4.7K) ← 2
+    - 915–930 Table screen (~1.8K) ← 5
 - `docs/design-system-table.md` — Design system — Table (landscape) (~29.9K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
@@ -129,7 +129,7 @@ Read the sections your task touches.
   - 258–261 One answer, one tap (~240)
   - 262–265 Stops and Always use (~250)
   - 266–269 Guide (~120)
-  - 270–280 Choice tray (~1.0K) ← 8
+  - 270–280 Choice tray (~1.1K) ← 8
   - 281–294 Reading panels (~1.5K) ← 6
   - 295–304 Phase carousel (~680)
   - 305–310 Quest advance (~530) ← 1
@@ -209,7 +209,7 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.3K tok)
 - `docs/phases/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
 - `docs/phases/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~2.5K tok)
-- `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~1.2K tok)
+- `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~670 tok)
 - `docs/phases/phase-53-lost-in-mirkwood.md` — Phase 53 — Lost in Mirkwood (~1.2K tok)
 - `docs/phases/phase-54-the-kings-quest.md` — Phase 54 — The King's Quest (~1.1K tok)
 - `docs/phases/phase-55-the-withered-heath.md` — Phase 55 — The Withered Heath (~1.1K tok)

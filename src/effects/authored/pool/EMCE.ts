@@ -1,0 +1,49 @@
+import type { Effect } from "../../../catalog/boundary.ts";
+
+// Records for the Ered Mithrin campaign expansion's boons, burdens and treasures whose lines no template reads (data/cards/EMCE.json): the cards Journey Up the Anduin deals or places, Turayn (12166) and A Growing Threat (12167), and the nine treasures (12196
+// to 12204) its campaign card attaches to a character. A treasure is no deck-legal card, so the coverage test and the draft do not ask for its lines; they are written here because a claimed treasure plays in the game.
+// Rules: emce.boon-allies, emce.campaign-pool-encounter, emce.treasure, rr.cancel, rr.damage (data/rules/entries.json). An id here that a template also produces replaces the generated record; list it in REPLACES.
+export const RECORDS: readonly Effect[] = [
+  // 12166 Turayn (boon ally; Sentinel is a keyword). After he exhausts, another character's next damage this round is reduced by 1 (families/wilderland/shield.ts).
+  {"id":"12166:response:1","cardCode":"12166","lines":["12166:A:2"],"timing":"response","trigger":"exhausted","subject":"self","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","other":true}},{"verb":"ModifyStat","stat":"damageShield","amount":1,"until":"endOfRound","target":"picked"}]},
+  // 12167 A Growing Threat (burden; Surge is a keyword). The topmost eligible card of the encounter discard pile is set aside and the Resolution adds a copy of it to the pool; A Growing Threat leaves the game.
+  {"id":"12167:whenRevealed:1","cardCode":"12167","lines":["12167:A:2"],"timing":"whenRevealed","instructions":[{"verb":"SetAsideDiscardForPool","exclude":["unique","objective","burden"]},{"verb":"RemoveSourceFromGame"}]},
+
+  // 12196 Anvil of Gundabad (treasure). Claimed or played, it finds any number of Item attachments among the top 5 cards of its controller's deck; its Action plays an Item attachment from the hand for 1 less.
+  {"id":"12196:constant:1","cardCode":"12196","lines":["12196:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12196:response:1","cardCode":"12196","lines":["12196:A:2"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Each","pick":{"type":"card","control":"you","from":"deck","top":5,"cardType":"attachment","trait":"Item"},"upTo":"any","instructions":[{"verb":"MovePicked","to":"hand"}]},{"verb":"ShuffleDeck"}]},
+  {"id":"12196:action:1","cardCode":"12196","lines":["12196:A:3"],"timing":"action","cost":[{"kind":"exhaustSelf"},{"kind":"exhaustHost"}],"instructions":[{"verb":"PlayFromHand","pick":{"type":"card","control":"you","cardType":"attachment","trait":"Item"},"reduce":1,"min":0}]},
+  // 12197 Axe of the Edain (treasure). Restricted. +2 Attack; after it is played, 2 damage to a non-unique enemy engaged with its player.
+  {"id":"12197:constant:1","cardCode":"12197","lines":["12197:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12197:constant:2","cardCode":"12197","lines":["12197:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12197:response:1","cardCode":"12197","lines":["12197:A:3"],"timing":"response","trigger":"played","subject":"self","eventSeat":"you","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","engaged":"you","nonUnique":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","engaged":"you","nonUnique":true}},{"verb":"DamageCard","amount":2}]},
+  // 12198 Durin's Dagger (treasure). +1 Attack; it may be played from the discard pile.
+  {"id":"12198:constant:1","cardCode":"12198","lines":["12198:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12198:constant:2","cardCode":"12198","lines":["12198:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12198:constant:3","cardCode":"12198","lines":["12198:A:3"],"timing":"constant","instructions":[{"verb":"PlayFromDiscard"}]},
+  // 12199 Dwarf-Lord's Crown (treasure, attaches to a hero). Action: exhaust it to give each ally that shares a Trait with the attached hero +1 Willpower, Attack and Defense for the phase.
+  {"id":"12199:constant:1","cardCode":"12199","lines":["12199:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
+  {"id":"12199:action:1","cardCode":"12199","lines":["12199:A:2"],"timing":"action","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","holders":{"type":"ally","control":"any","sharesTrait":"host"}},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfPhase","holders":{"type":"ally","control":"any","sharesTrait":"host"}},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfPhase","holders":{"type":"ally","control":"any","sharesTrait":"host"}}]},
+  // 12200 Glittering Lute (treasure). Restricted. +2 Willpower; after it is played each player may discard a card from hand to reduce their threat by 2.
+  {"id":"12200:constant:1","cardCode":"12200","lines":["12200:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12200:constant:2","cardCode":"12200","lines":["12200:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12200:response:1","cardCode":"12200","lines":["12200:A:3"],"timing":"response","trigger":"played","subject":"self","eventSeat":"you","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"Choose","who":"actor","options":[{"id":"discard","requires":{"kind":"canPick","pick":{"type":"card","control":"you","from":"hand"}},"instructions":[{"verb":"DiscardFromHand","amount":1},{"verb":"LowerThreat","amount":2,"who":"actor"}]},{"id":"decline","instructions":[]}]}]}]},
+  // 12201 Gondolin Shield (treasure). Restricted. +1 Defense and sentinel; exhausted with 1 resource spent, it cancels a Shadow effect triggered in an attack its character defends, and the attacker is dealt another shadow card.
+  {"id":"12201:constant:1","cardCode":"12201","lines":["12201:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12201:constant:2","cardCode":"12201","lines":["12201:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"sentinel","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12201:response:1","cardCode":"12201","lines":["12201:A:3"],"timing":"response","trigger":"shadowPending","cost":[{"kind":"exhaustSelf"},{"kind":"resources","amount":1,"from":"host"}],"condition":{"kind":"matches","card":"host","pick":{"type":"character","control":"any","defending":true}},"instructions":[{"verb":"CancelEffect"},{"verb":"DealShadowTo","target":"attacker"}]},
+  // 12202 Helm of Heroes (treasure). Restricted. +2 Defense; after its character takes damage from an enemy's attack, 1 resource goes to a hero's pool of the player's choice.
+  {"id":"12202:constant:1","cardCode":"12202","lines":["12202:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12202:constant:2","cardCode":"12202","lines":["12202:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":2,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12202:response:1","cardCode":"12202","lines":["12202:A:3"],"timing":"response","trigger":"damagedByAttack","subject":"host","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":1,"to":"picked"}]},
+  // 12203 Jewels of Wilderland (treasure). +1 Willpower; Action: exhaust it and discard a card from hand to draw a card.
+  {"id":"12203:constant:1","cardCode":"12203","lines":["12203:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12203:constant:2","cardCode":"12203","lines":["12203:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12203:action:1","cardCode":"12203","lines":["12203:A:3"],"timing":"action","cost":{"kind":"exhaustSelf"},"condition":{"kind":"canPick","pick":{"type":"card","control":"you","from":"hand"}},"instructions":[{"verb":"DiscardFromHand","amount":1},{"verb":"Draw","amount":1}]},
+  // 12204 Masterwork Bow (treasure). Restricted. +1 Attack and ranged; after its character attacks and defeats an enemy, 1 progress goes on a location in the staging area.
+  {"id":"12204:constant:1","cardCode":"12204","lines":["12204:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
+  {"id":"12204:constant:2","cardCode":"12204","lines":["12204:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"12204:response:1","cardCode":"12204","lines":["12204:A:3"],"timing":"response","trigger":"attackDestroyed","subject":"host","condition":{"kind":"canPick","pick":{"type":"location","control":"any","stagingOnly":true}},"instructions":[{"verb":"Pick","pick":{"type":"location","control":"any","stagingOnly":true}},{"verb":"PlaceProgressOn","amount":1,"target":"picked"}]},
+];
+
+export const REPLACES: readonly string[] = [];

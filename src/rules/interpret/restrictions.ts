@@ -11,7 +11,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -35,6 +35,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
     found.push({
       sourceId: source.id,
       what,
+      ...(instruction.location ? { location: instruction.location } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
@@ -45,7 +46,8 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
 }
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
-  return restricted(state, ctx, "travel").some((rule) => rule.sourceId === locationId);
+  // A restriction on the location itself, or one a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
+  return restricted(state, ctx, "travel").some((rule) => (rule.location == null ? rule.sourceId === locationId : state.cards[locationId]?.code === rule.location));
 }
 
 // "When faced with the option to travel, the players must travel to The East Bight if there is no active location" (01088:A:1): the

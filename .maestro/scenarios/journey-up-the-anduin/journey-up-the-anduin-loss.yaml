@@ -1,0 +1,12 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Phase 52. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `upanduin-lost` (scripts/e2e/journey-up-the-anduin.ts): a real two-handed game of
+# Journey Up the Anduin (the Defenders of Gondor and Swords of the Noldor lists, Easy) from a new Ered Mithrin save, parked on its loss (the threat). A loss has no reward screen and writes nothing: the scenario stays
+# current, no pool card, treasure or log line reaches the log. The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
+- runFlow:
+    file: ../../subflows/scenario-loss.yaml
+    env:
+      FIXTURE: upanduin-lost
+      SCENARIO_ID: journey-up-the-anduin

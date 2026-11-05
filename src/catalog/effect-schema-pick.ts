@@ -218,6 +218,8 @@ export const pickSchema = z.strictObject({
   maxAttachments: z.number().int().min(0).optional(),
   // Not a card with one of these titles ("a character in play (other than Bilbo Baggins)").
   exceptNames: z.array(z.string().min(1)).min(1).optional(),
+  // A card dealt into a named deck with a discard pile of its own ("an enemy from the Evil Creatures deck", 18066:B:3; emce.evil-creatures-deck): in play or not, whichever zone it lies in. Read by the wilderland family (src/rules/families/wilderland/pick.ts).
+  fromDeck: z.literal("evilCreatures").optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
   sameTitleAs: z.literal("activeLocation").optional(),

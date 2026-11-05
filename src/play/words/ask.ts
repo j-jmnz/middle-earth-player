@@ -33,7 +33,7 @@ export function askWords(a: {
   }
   return (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
-    wilderlandAsk(instruction, source, names) ??
+    wilderlandAsk(instruction, source, names, queue[0], picked) ??
     seaAsk(instruction, queue[0], options, game, ctx, names, source) ??
     pickWords(instruction, queue[0], names, source, source ? restrictedLimit(game, source) : 2, game, amountNow, queue.slice(1))
   );

@@ -4,25 +4,11 @@ Engine half depends on: phase 51
 Phone half depends on: phase 51b
 Blocks: phase 53
 
-Plan: [docs/plans/ered-mithrin.md](../plans/ered-mithrin.md), "Phases 52-60: one scenario each" and "Notes for the orchestrator". Procedure: [phase 12](phase-12-knife-in-the-dark.md), "Scenario procedure".
+Plan: [docs/plans/ered-mithrin.md](../plans/ered-mithrin.md), "Phases 52-60: one scenario each". Procedure: [phase 12](phase-12-knife-in-the-dark.md), "Scenario procedure".
 
 ## Goal
 
 `journey-up-the-anduin`, Ered Mithrin part 1, is playable in campaign and standalone.
-
-## Procedure
-
-The phase 12 "Scenario procedure", steps 1 to 6, for `journey-up-the-anduin`, and the plan's list for phases 52 to 60:
-
-- `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 49).
-- `pnpm scenario:new journey-up-the-anduin` (`--dry-run` first) writes the skeletons and the registry lines. `pnpm effects:draft journey-up-the-anduin`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution and the boons, burdens and treasures it names, on both sides where a card has two.
-- A new verb goes in a mechanic family (`src/catalog/families/<f>.ts`, `src/rules/families/<f>/`), cites a ledger line or an `emce.*` span, and has its own test. Do not bend an existing verb to mean something else.
-- Scenario records go in `src/effects/authored/journey-up-the-anduin.ts`; the EMCE boon, burden and treasure records in `src/effects/authored/pool/EMCE.ts`.
-- Golden: `src/campaign/scenarios/journey-up-the-anduin/golden.json` with its golden test, scene and game scripts: true solo and two-handed, a win and a loss, with the Resolution's pool, log-line and treasure effects. Random treasure picks are a seeded draw.
-- A campaign test chains the previous part's real Resolution and checks that its pool, treasures and log lines reach this part (for part 1, the campaign start).
-- Add `journey-up-the-anduin` to `src/campaign/playable.ts`, then `pnpm effects:open` and `node --experimental-strip-types scripts/card-smoke/run.ts <new codes>`, including the EMCE cards this scenario deals.
-- Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
-- Rule wording comes from the pinned MEC115 PDF (`pnpm data:query`), never from memory. A scan the agent cannot read is a question for the user. If a golden of an existing campaign would move, stop and report why.
 
 ## Cards
 

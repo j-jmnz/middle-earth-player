@@ -305,7 +305,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && wait.item.instruction.verb === "AttachRandomTreasure" ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (wait.item.instruction.verb === "AttachRandomTreasure" || wait.item.instruction.verb === "ClaimRandomTreasure") ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

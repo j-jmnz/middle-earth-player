@@ -55,7 +55,15 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       const free = (id: string): boolean => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) && (code == null || !attachBlocked(state, ctx, id, code));
       if (instruction.to.kind === "hero") {
         const seat = attachSeat(state, instruction, item.seat, sourceId);
-        return seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);
+        const hosts = seat == null ? [] : attachHeroHosts(state, instruction.to, seat, ctx.cards).filter(free);
+        // "The hero with the most attachments" (18027:A:1): among the heroes the card is not on, those holding the most.
+        const most = Math.max(0, ...hosts.map((id) => state.cards[id]?.attachments.length ?? 0));
+        return instruction.to.control === "mostAttachments" ? hosts.filter((id) => (state.cards[id]?.attachments.length ?? 0) === most) : hosts;
+      }
+      // The enemy making the attack in progress (18018:A:2).
+      if (instruction.to.kind === "attackingEnemy") {
+        const attacker = state.pendingAttack?.enemyId;
+        return attacker != null && state.cards[attacker] != null && free(attacker) ? [attacker] : [];
       }
       // A Ship objective: the Limit-1 check of a hero or enemy host does not apply (a ship may carry more than one Taking on Water).
       if (instruction.to.kind === "ship") return instruction.to.defender ? defendingShip(state, ctx) : controlledShips(state, ctx);

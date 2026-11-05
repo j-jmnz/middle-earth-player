@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
+import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { isStatCondition, type Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
@@ -101,7 +102,7 @@ export function runExtraVerb(
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
     case "DiscardRandomFromHand":
-      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx));
+      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
     case "PlaceUnderSelf": {
       const id = lastPicked(state);
       if (!focus.sourceId || !state.cards[id] || !state.cards[focus.sourceId]) return state;
@@ -276,10 +277,11 @@ function damageAllies(
 }
 
 // The seat discards cards from its hand chosen by the seed, one roll each.
-function discardRandom(state: ScenarioState, seat: number, amount: number): ScenarioState {
+function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {
-    const hand = next.seats[seat]?.hand ?? [];
+    // A card a player card cannot discard (Lost in the Wild, 18026:A:1) is not among the cards drawn at random.
+    const hand = (next.seats[seat]?.hand ?? []).filter((held) => !barredFromPlayerDiscard(next, ctx, held, sourceId));
     if (hand.length === 0) break;
     const id = hand[nextUint(next.seed, next.seedCursor) % hand.length];
     next = { ...next, seedCursor: next.seedCursor + 1 };

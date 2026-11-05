@@ -13,6 +13,7 @@ import { spawn } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
 import { guardWith } from "../objectives/guard.ts";
+import { markPicked } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
 
 type Verb = Extract<Instruction, { verb: "AttachRandomTreasure" }>;
@@ -46,6 +47,27 @@ export function attachRandomTreasure(state: ScenarioState, instruction: Verb, fo
 function attach(state: ScenarioState, code: string, guardId: string): ScenarioState {
   const spawned = spawn(state, code, { zone: "staging" });
   return guardWith(spawned.state, guardId, spawned.id);
+}
+
+/**
+ * ClaimRandomTreasure (120165:A:3, emce.treasure): `count` (3) undiscovered treasures are drawn with the game's seed, which moves the seed once, and the first player chooses one. It is set aside, faceup, and is the picked card of the
+ * running effect: the Pick of a character it may attach to (`hostForPicked`) and AttachPicked that follow put it on that character, which the players then control. Run outside an effect frame, which cannot ask, it takes the first drawn.
+ */
+export function claimRandomTreasure(state: ScenarioState, instruction: Extract<Instruction, { verb: "ClaimRandomTreasure" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const pool = undiscoveredTreasures(state, ctx);
+  if (focus.chosen != null) return pool.includes(focus.chosen) ? take(state, focus.chosen) : state;
+  const drawn = shuffleIds(pool, state.seed, state.seedCursor);
+  const candidates = drawn.ids.slice(0, instruction.count ?? 3);
+  const moved = { ...state, seedCursor: drawn.cursor };
+  const first = candidates[0];
+  if (first == null) return state;
+  if (candidates.length === 1 || !effectData(state)) return take(moved, first);
+  return askTarget(moved, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, candidates);
+}
+
+function take(state: ScenarioState, code: string): ScenarioState {
+  const spawned = spawn(state, code, { zone: "setAside" }, "up");
+  return markPicked(spawned.state, spawned.id);
 }
 
 /** The treasures a player controls: claimed and attached to a character, not still in the staging area under a guard. */

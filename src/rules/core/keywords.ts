@@ -14,6 +14,7 @@ import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts"
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { resourceShield } from "../families/aflame/attack.ts";
+import { damageShield } from "../families/wilderland/shield.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "../families/play/hooks.ts";
 import { alliesToHandDestination } from "../families/deck/rules.ts";
 import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
@@ -206,7 +207,9 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
-  const shield = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
+  const resources = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
+  // "The next time that character would be dealt damage this round, cancel 1 of that damage" (12166:A:2): the flag's points come off first, and it is spent.
+  const shield = damageShield(resources.state, id, resources.amount);
   const dealt = cap > 0 ? Math.max(0, Math.min(shield.amount, cap - taken)) : shield.amount;
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });

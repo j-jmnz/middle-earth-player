@@ -25,6 +25,7 @@ import { dealOut } from "../families/breaking/deal.ts";
 import { moveCard } from "../core/zones.ts";
 import { chooseAmount } from "../families/defense/index.ts";
 import { dealAttackShadow } from "../families/defense/listen.ts";
+import { discardShadowOf } from "../combat/shadow.ts";
 
 export type EffectSpec = {
   frame: FrameName;
@@ -220,7 +221,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return immediateAttack(state, frame.cardId, item.seat, ctx, steps);
+      return immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false);
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -306,7 +307,7 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], shadow = true): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
   // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
@@ -317,8 +318,8 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, seat: nu
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
   }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
-  // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts).
-  const dealt = dealAttackShadow(state, sourceId, ctx, steps);
+  // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts), unless the card says it is not (`shadow: false`, 18022:A:1).
+  const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : discardShadowOf(state, sourceId);
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };

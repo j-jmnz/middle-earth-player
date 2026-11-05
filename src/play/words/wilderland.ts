@@ -4,10 +4,18 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
 
-/** The sentence and the verb of the choice AttachRandomTreasure or Discover asks, or null for another instruction. */
-export function wilderlandAsk(instruction: Instruction, source: string | null, names: ChoiceNames): PickWords | null {
+/** The sentence and the verb of the choice AttachRandomTreasure, ClaimRandomTreasure or Discover asks, or the character a claimed treasure goes on, or null for another instruction. */
+export function wilderlandAsk(instruction: Instruction, source: string | null, names: ChoiceNames, next?: Instruction, picked?: string | null): PickWords | null {
+  // The character a claimed treasure is attached to (120165:A:3): the Pick of a card it may attach to (`hostForPicked`) before AttachPicked; the treasure is named once the table knows it.
+  if (instruction.verb === "Pick" && instruction.pick.hostForPicked === true && next?.verb === "AttachPicked") return { verb: "Attach", prompt: picked ? `Choose a character to carry ${names.card(picked)}.` : "Choose a character to attach it to." };
   // Discover X looked at several Loot objectives: the first player picks the one to attach to the active location (emce.discover).
   if (instruction.verb === "Discover") return { verb: "Attach", prompt: `Discover: choose 1 Loot objective to attach to ${source ? names.card(source) : "the active location"} as a guarded objective.` };
+  // ClaimRandomTreasure (120165:A:3): the treasure is claimed for a character; the choice of the character follows (choice.ts, AttachPicked).
+  if (instruction.verb === "ClaimRandomTreasure") return { verb: "Attach", prompt: `Choose 1 of ${instruction.count ?? 3} random undiscovered treasures to attach to a character.` };
+  // The Shadow card of Frenzied Creature goes on the attacking enemy, whom nobody chooses (18018:A:2).
+  if (instruction.verb === "AttachSelf" && instruction.to.kind === "attackingEnemy") return { verb: "Attach", prompt: `Attach ${source ? names.card(source) : "this card"} to the attacking enemy.` };
+  // Players tied for the most cards in hand: the first player names who takes the card (18026:A:1).
+  if (instruction.verb === "AddSourceToHandOfMost") return { verb: "Choose", prompt: `Players are tied for the most cards in hand: choose who adds ${source ? names.card(source) : "this card"} to their hand.` };
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${instruction.count ?? 3} random undiscovered treasures to attach as a guarded objective.`;
   // The guard is attached to the treasure and keeps it from being claimed until it is dealt with (rr.guarded).
@@ -18,7 +26,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
 
 /** The label of an option of that choice: the treasure's title. Null for another instruction. */
 export function wilderlandOptionLabel(instruction: Instruction, id: string, names: ChoiceNames): string | null {
-  return instruction.verb === "AttachRandomTreasure" ? names.code(id) : null;
+  return instruction.verb === "AttachRandomTreasure" || instruction.verb === "ClaimRandomTreasure" ? names.code(id) : null;
 }
 
 // Discover X (emce.discover): the banner's beats, and the cards of the look strip. The engine's `discover` step names the cards looked at, the Loot objective that was attached and the Hazard card that was revealed;
@@ -81,3 +89,4 @@ export function discoverLogLine(facts: Pick<DiscoverFacts, "looked"> & { locatio
 export function lookStripWords(count: number): string {
   return `Discover look, ${cards(count)} placed in the encounter discard pile`;
 }
+

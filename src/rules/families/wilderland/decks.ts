@@ -12,6 +12,8 @@ import type { ScenarioState } from "../../core/state.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { moveCard } from "../../core/zones.ts";
 import { revealTop } from "../encounter/named-decks.ts";
+import { attachSelf } from "../../interpret/effect-targeted.ts";
+import { markPicked } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
 
 /** The Evil Creatures deck ran out: its own discard pile is shuffled back into it (emce.evil-creatures-deck). Settle keeps the game's deck refilled. */
@@ -35,7 +37,10 @@ export function shuffleIntoNamed(state: ScenarioState, instruction: Extract<Inst
   return shufflePile(updateCard(moveCard(state, id, { zone }), id, { face: "down", controller: null }), zone);
 }
 
-/** "Add the top card of the Evil Creatures deck to the staging area" (emce.evil-creatures-deck): `count` cards for each seat the verb names, each entering play. */
+/**
+ * "Add the top card of the Evil Creatures deck to the staging area" (emce.evil-creatures-deck): `count` cards for each seat the verb names, each entering play. The last one added is the picked card of the running effect; with `attachSource`
+ * the source card is attached to each (18018:A:1: the Condition goes on the enemy it adds).
+ */
 export function addFromNamed(state: ScenarioState, instruction: Extract<Instruction, { verb: "AddFromPile" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const zones = NAMED_PILES[instruction.pile];
   const count = instruction.count == null ? 1 : resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
@@ -46,6 +51,8 @@ export function addFromNamed(state: ScenarioState, instruction: Extract<Instruct
       const one = revealTop(next, zones, instruction.to, seat, ctx, steps);
       next = one.state;
       if (one.id == null) break;
+      next = markPicked(next, one.id);
+      if (instruction.attachSource && focus.sourceId != null) next = attachSelf(next, focus.sourceId, one.id, ctx);
     }
   }
   return next;
