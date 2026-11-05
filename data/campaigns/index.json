@@ -24,6 +24,12 @@
     "playable": true
   },
   {
+    "id": "ered-mithrin",
+    "name": "Ered Mithrin",
+    "scenarioCount": 9,
+    "playable": false
+  },
+  {
     "id": "the-two-towers",
     "name": "The Two Towers",
     "scenarioCount": 6,

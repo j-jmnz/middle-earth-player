@@ -12,7 +12,11 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // quest swaps to: The Thing in the Depths 5, The City of Corsairs 9, dcce.from-sea-to-land), `unchartedDeck` (dcce.uncharted-deck),
 // `islandMap` (Temple of the Deceived's fifteen double-sided locations, dcce.island-map), `grottoDeck` (dcce.grotto-deck) and
 // `stormcallerQuests` (stages 2C to 4C beside the Stormcaller, dcce.stormcallers-area). None is part of the encounter deck.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests"] as const;
+// Ered Mithrin's decks beside the encounter deck (docs/plans/ered-mithrin.md, phase 49), each a zone the scenario's Setup builds from encounter sets:
+// `evilCreaturesDeck` (the Wilderlands enemies, emce.evil-creatures-deck), `cavesDeck` (the Lost Caves set and the cards a Setup shuffles in,
+// emce.caves-deck), `sideQuestDeck` (Fire in the Night's eight encounter side quests, emce.side-quests), and Lost in Mirkwood's two decks
+// `spidersDeck` and `orcsDeck` (the Spiders of Mirkwood and Dol Guldur Orcs sets, which the quest swaps into the encounter deck).
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z

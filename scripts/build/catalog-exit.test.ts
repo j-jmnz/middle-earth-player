@@ -121,6 +121,10 @@ describe("built catalog", () => {
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("dream-chaser")).toMatchObject({ name: "Dream-chaser", scenario_count: 9, playable: 1 });
       expect(database.prepare("select campaign_id from cards where code = ?").get("11171")?.campaign_id).toBe("dream-chaser");
       expect(database.prepare("select campaign_id from cards where code = ?").get("12019")?.campaign_id).toBe("dream-chaser");
+      // Ered Mithrin: built and listed locked (phase 50 registers it), its cards tagged with it, a treasure carrying its campaign kind and no deck legality.
+      expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("ered-mithrin")).toMatchObject({ name: "Ered Mithrin", scenario_count: 9, playable: 0 });
+      for (const code of ["12168", "120165", "18020", "19099", "12204"]) expect(database.prepare("select campaign_id from cards where code = ?").get(code)?.campaign_id, code).toBe("ered-mithrin");
+      expect(database.prepare("select name, type_code, campaign_kind, deck_legal from cards where code = ?").get("12204")).toMatchObject({ name: "Masterwork Bow", type_code: "treasure", campaign_kind: "treasure", deck_legal: 0 });
       expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(
         "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bag-End.jpg",
       );

@@ -17,8 +17,9 @@ describe("data/campaigns/index.json", () => {
     // The campaigns built from the Revised Core Set and The Dark of Mirkwood are listed and stay locked until one of their
     // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29, The Dark of Mirkwood since phase 32: both hold The Oath; Dream-chaser since phase 40: Voyage Across Belegaer); the two later sagas
     // have no scenario files at all.
+    // Ered Mithrin is built and locked until phase 50 registers it and a scenario is playable.
     const locked = index.filter((entry) => !entry.playable);
-    expect(locked.map((entry) => entry.name)).toEqual(["The Two Towers", "The Return of the King"]);
+    expect(locked.map((entry) => entry.name)).toEqual(["Ered Mithrin", "The Two Towers", "The Return of the King"]);
     expect(locked.filter((entry) => ["The Two Towers", "The Return of the King"].includes(entry.name)).every((entry) => entry.scenarioCount === 6)).toBe(true);
   });
 
@@ -94,5 +95,38 @@ describe("data/campaigns/index.json", () => {
     const entry = { id: "x", name: "X", products: ["No Such Pack"], reason: "r", source: "s" };
     const scenarioIndex = campaign.scenarios.map((id, at) => ({ Title: id, Slug: id, Product: "The Black Riders", Number: at + 1 }));
     expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [entry] }, campaign)).toThrow("lists no scenario for");
+  });
+
+  it("lists Ered Mithrin with its nine scenarios, locked until one of them is in PLAYABLE_SCENARIOS (phase 50 on)", () => {
+    expect(index.find((entry) => entry.id === "ered-mithrin")).toMatchObject({ name: "Ered Mithrin", scenarioCount: 9, playable: false });
+    const campaign = loadCampaign("ered-mithrin");
+    expect(campaign.scenarios).toEqual([
+      "journey-up-the-anduin",
+      "lost-in-mirkwood",
+      "the-kings-quest",
+      "the-withered-heath",
+      "roam-across-rhovanion",
+      "fire-in-the-night",
+      "the-ghost-of-framsburg",
+      "mount-gundabad",
+      "the-fate-of-wilderland",
+    ]);
+    expect(campaign.saga).toBe(false);
+    expect(campaign.bookletId).toBe("ered-mithrin");
+    expect(campaign.prelude).toEqual([]);
+    expect(campaign.starterDecks).toEqual([]);
+    // The booklet (MEC115) opens on the page each scenario's setup is printed on (emce.setup-<id>).
+    expect(campaign.bookletPages).toEqual({ "journey-up-the-anduin": 5, "lost-in-mirkwood": 6, "the-kings-quest": 8, "the-withered-heath": 10, "roam-across-rhovanion": 13, "fire-in-the-night": 14, "the-ghost-of-framsburg": 16, "mount-gundabad": 20, "the-fate-of-wilderland": 22 });
+    expect(campaign.campaignCards).toEqual({
+      "journey-up-the-anduin": "120165",
+      "lost-in-mirkwood": "12168",
+      "the-kings-quest": "12170",
+      "the-withered-heath": "12175",
+      "roam-across-rhovanion": "12184",
+      "fire-in-the-night": "12187",
+      "the-ghost-of-framsburg": "12189",
+      "mount-gundabad": "12193",
+      "the-fate-of-wilderland": "12195",
+    });
   });
 });

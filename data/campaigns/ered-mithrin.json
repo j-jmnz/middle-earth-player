@@ -1,0 +1,41 @@
+{
+  "id": "ered-mithrin",
+  "name": "Ered Mithrin",
+  "scenarios": [
+    "journey-up-the-anduin",
+    "lost-in-mirkwood",
+    "the-kings-quest",
+    "the-withered-heath",
+    "roam-across-rhovanion",
+    "fire-in-the-night",
+    "the-ghost-of-framsburg",
+    "mount-gundabad",
+    "the-fate-of-wilderland"
+  ],
+  "campaignCards": {
+    "journey-up-the-anduin": "120165",
+    "lost-in-mirkwood": "12168",
+    "the-kings-quest": "12170",
+    "the-withered-heath": "12175",
+    "roam-across-rhovanion": "12184",
+    "fire-in-the-night": "12187",
+    "the-ghost-of-framsburg": "12189",
+    "mount-gundabad": "12193",
+    "the-fate-of-wilderland": "12195"
+  },
+  "prelude": [],
+  "starterDecks": [],
+  "bookletPages": {
+    "journey-up-the-anduin": 5,
+    "lost-in-mirkwood": 6,
+    "the-kings-quest": 8,
+    "the-withered-heath": 10,
+    "roam-across-rhovanion": 13,
+    "fire-in-the-night": 14,
+    "the-ghost-of-framsburg": 16,
+    "mount-gundabad": 20,
+    "the-fate-of-wilderland": 22
+  },
+  "bookletId": "ered-mithrin",
+  "saga": false
+}

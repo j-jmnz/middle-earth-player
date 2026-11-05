@@ -44,9 +44,19 @@ export type ProductDef = {
   // The RingsDB twin pack Hall of Beorn's cards are paired with, which is also the pack name DragnCards gives them (the
   // Fellowship boxes). null: the box's cards come from Hall of Beorn alone, stamped with packs[0].
   twinPack: string | null;
+  // The product is a campaign expansion: it prints a campaign's campaign cards, boons and burdens, and no scenario of its own (the
+  // Dream-chaser and Ered Mithrin Campaign Expansions). The scan scope takes every card it prints, and a Hall of Beorn Treasure row of it is a campaign treasure.
+  campaignExpansion?: boolean;
+  // Hall of Beorn lists some keywords of the box's cards as text only, so the keyword sentences that open a line of the scan-read ledger
+  // are keywords the card has (scripts/data/normalize/printed.ts).
+  ledgerKeywords?: boolean;
+  // The cards a scenario's campaign card Resolution names that the campaign deals are its boons, burdens and treasures: any other name in it is a count or a
+  // condition ("If there are 3 or more resources on Urdug", "Hrogar's Hill"). Dream-chaser's Resolution names are cut at its XP list instead.
+  campaignCardRewards?: boolean;
 };
 
 const DCCE = "Dream-chaser Campaign Expansion";
+const EMCE = "Ered Mithrin Campaign Expansion";
 
 export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Black Riders", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TBR" },
@@ -54,14 +64,23 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "Revised Core Set", packs: ["RevCore"], home: "mirkwood-paths", load: "setup", easySheet: true, twinPack: null },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
-  { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: "Flight of the Stormcaller", packs: ["FotS"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: "The Thing in the Depths", packs: ["TitD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: "Temple of the Deceived", packs: ["TotD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: "The Drowned Ruins", packs: ["DR"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: "A Storm on Cobas Haven", packs: ["SoCH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: "The City of Corsairs", packs: ["CoC"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
-  { name: DCCE, packs: ["DCCE"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Flight of the Stormcaller", packs: ["FotS"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Thing in the Depths", packs: ["TitD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Temple of the Deceived", packs: ["TotD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Drowned Ruins", packs: ["DR"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "A Storm on Cobas Haven", packs: ["SoCH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The City of Corsairs", packs: ["CoC"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: DCCE, packs: ["DCCE"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, ledgerKeywords: true },
+  // Ered Mithrin: The Wilds of Rhovanion and the six Adventure Packs are the base cards, the Campaign Expansion (MEC115, 2024) the campaign.
+  { name: "The Wilds of Rhovanion", packs: ["TWoR"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Withered Heath", packs: ["TWH"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Roam Across Rhovanion", packs: ["RAR"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Fire in the Night", packs: ["FitN"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Ghost of Framsburg", packs: ["TGoF"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Mount Gundabad", packs: ["MG"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Fate of Wilderland", packs: ["TFoW"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: EMCE, packs: ["EMCE"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, campaignCardRewards: true, ledgerKeywords: true },
 ];
 
 // The catalog's `cards.campaign_id`: the campaign a pack's cards belong to. A product with a twin pack (the Fellowship boxes, whose
@@ -104,6 +123,11 @@ const CAVES: ScenarioDef = { id: "the-caves-of-nibin-dum", product: "The Dark of
 // A Dream-chaser scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q06.n / E06.n).
 function dreamChaser(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
   return { id, product, campaignProduct: DCCE, setupSpan: `dcce.setup-${id}`, deck: { normal: `Q06.${n}`, easy: `E06.${n}` }, groups };
+}
+
+// An Ered Mithrin scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q08.n / E08.n).
+function eredMithrin(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
+  return { id, product, campaignProduct: EMCE, setupSpan: `emce.setup-${id}`, deck: { normal: `Q08.${n}`, easy: `E08.${n}` }, groups };
 }
 
 export const CAMPAIGNS: readonly CampaignDef[] = [
@@ -174,6 +198,26 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     xp: true,
     ledger: "dream-chaser",
   },
+  {
+    id: "ered-mithrin",
+    name: "Ered Mithrin",
+    products: ["The Wilds of Rhovanion", "The Withered Heath", "Roam Across Rhovanion", "Fire in the Night", "The Ghost of Framsburg", "Mount Gundabad", "The Fate of Wilderland", EMCE],
+    scenarios: [
+      eredMithrin(1, "journey-up-the-anduin", "The Wilds of Rhovanion", { sharedEncounterDeck2: "evilCreaturesDeck" }),
+      eredMithrin(2, "lost-in-mirkwood", "The Wilds of Rhovanion", { sharedEncounterDeck2: "spidersDeck", sharedEncounterDeck3: "orcsDeck" }),
+      eredMithrin(3, "the-kings-quest", "The Wilds of Rhovanion", { sharedEncounterDeck2: "cavesDeck" }),
+      eredMithrin(4, "the-withered-heath", "The Withered Heath", { sharedEncounterDeck2: "cavesDeck" }),
+      eredMithrin(5, "roam-across-rhovanion", "Roam Across Rhovanion"),
+      eredMithrin(6, "fire-in-the-night", "Fire in the Night", { sharedEncounterDeck2: "sideQuestDeck" }),
+      eredMithrin(7, "the-ghost-of-framsburg", "The Ghost of Framsburg"),
+      eredMithrin(8, "mount-gundabad", "Mount Gundabad", { sharedEncounterDeck2: "cavesDeck" }),
+      eredMithrin(9, "the-fate-of-wilderland", "The Fate of Wilderland"),
+    ],
+    bookletId: "ered-mithrin",
+    bookletDoc: "emce",
+    saga: false,
+    ledger: "ered-mithrin",
+  },
 ];
 
 // The packs of the products built from Hall of Beorn alone (no twin pack): their boons and burdens have a pool file of their own.
@@ -198,6 +242,7 @@ export function scenarioSlug(title: string): string {
     .normalize("NFD")
     .replace(/\p{M}/gu, "")
     .toLowerCase()
+    .replace(/['’]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }

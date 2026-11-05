@@ -1,0 +1,297 @@
+{
+  "id": "lost-in-mirkwood",
+  "name": "Lost in Mirkwood",
+  "number": 2,
+  "stages": [
+    "18071",
+    "18072",
+    "18073",
+    "18074",
+    "18075",
+    "18076",
+    "18077"
+  ],
+  "encounterSets": [
+    {
+      "name": "Lost in Mirkwood",
+      "count": 16
+    },
+    {
+      "name": "Dark Woods",
+      "count": 5
+    },
+    {
+      "name": "Gathering Gloom",
+      "count": 5
+    },
+    {
+      "name": "Passage Through Mirkwood",
+      "count": 6
+    },
+    {
+      "name": "Spiders of Mirkwood",
+      "count": 12
+    },
+    {
+      "name": "Dol Guldur Orcs",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "18029",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18030",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18031",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18032",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18033",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18034",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18035",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18036",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18037",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18038",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18039",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18040",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18041",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01097",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01098",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "01099",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "01100",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18072",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18073",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18074",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18075",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18077",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18028",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "01096",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "01074",
+      "normal": 2,
+      "easy": 2,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01075",
+      "normal": 1,
+      "easy": 0,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01077",
+      "normal": 2,
+      "easy": 2,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01078",
+      "normal": 3,
+      "easy": 3,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01079",
+      "normal": 1,
+      "easy": 0,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01080",
+      "normal": 2,
+      "easy": 0,
+      "pile": "spidersDeck"
+    },
+    {
+      "code": "01089",
+      "normal": 3,
+      "easy": 3,
+      "pile": "orcsDeck"
+    },
+    {
+      "code": "01090",
+      "normal": 1,
+      "easy": 0,
+      "pile": "orcsDeck"
+    },
+    {
+      "code": "01091",
+      "normal": 2,
+      "easy": 1,
+      "pile": "orcsDeck"
+    },
+    {
+      "code": "01092",
+      "normal": 1,
+      "easy": 1,
+      "pile": "orcsDeck"
+    },
+    {
+      "code": "01093",
+      "normal": 3,
+      "easy": 1,
+      "pile": "orcsDeck"
+    },
+    {
+      "code": "01094",
+      "normal": 2,
+      "easy": 1,
+      "pile": "orcsDeck"
+    },
+    {
+      "code": "01095",
+      "normal": 2,
+      "easy": 2,
+      "pile": "orcsDeck"
+    }
+  ],
+  "campaignCard": "12168",
+  "campaignPlaced": [
+    "12169"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q08.2",
+    "dragnEasy": "E08.2",
+    "hobSlug": "Lost-in-Mirkwood"
+  }
+}

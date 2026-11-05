@@ -27,7 +27,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `roam-across-rhovanion`, an
 ## Cards
 
 - Campaign card, collector number 184 (code after the EMCE rule in `data/overrides.json`, `productCodes`).
-- Trust in Urdug (`emce.trust-in-urdug`).
+- Trust in Urdug (printed on the campaign card 12184, not in the MEC115 rules text).
 - Trust in Urdug: a resource on Urdug at setup and after each claimed objective, or shuffle Urdug's Cunning in; Urdug gets +1 to each stat per resource.
 - Tiny; Grey Mountain Giant (Indestructible, `emce.indestructible`). Ignore Deep.
 - Resolution: Misplaced Trust goes into the Campaign Pool and into each deck at 3 or more resources, otherwise Urdug's Cunning; a copy of a staging-area location goes to the pool.

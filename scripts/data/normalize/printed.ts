@@ -32,7 +32,7 @@ export type Difference = { key: string; ledger: string[]; source: string[] };
 // The printings (a pack code, or the product's name where the reader wrote that) of the Dream-chaser box cards. Hall of Beorn lists some of their keywords as text only (Immune to player card
 // effects on the ships and the Thing in the Depths), so for these cards the keyword sentences that open a line of the scan-read ledger are
 // keywords the card has, and the Sailing success symbols the ledger counts are kept with them (dcce.sailing-tests).
-export const LEDGER_KEYWORD_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => [product.name, ...product.packs]));
+export const LEDGER_KEYWORD_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.ledgerKeywords).flatMap((product) => [product.name, ...product.packs]));
 
 function ledgerKeywords(entry: LedgerEntry): PrintedKeywords {
   const sentences: string[] = [];

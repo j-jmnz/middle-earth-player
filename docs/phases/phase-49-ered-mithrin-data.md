@@ -63,7 +63,7 @@ The plan's Phase 49 items 1 to 8, in order. Network order: `pnpm data:sync hallo
    - `emce.caves-deck`, `emce.deep`, `emce.guarded-x`, `emce.immune`
    - `emce.treasure`, `emce.campaign-pool-encounter`
    - `emce.evil-creatures-deck`, `emce.dragon-signs`
-   - `emce.indestructible`, `emce.trust-in-urdug`
+   - `emce.indestructible`
    - `emce.side-quests`, `emce.loot`, `emce.discover`
    - `emce.gundabad-quest-deck`, `emce.bypassing`
    - `emce.boon-allies`, `emce.haldan`, `emce.campaign-log`

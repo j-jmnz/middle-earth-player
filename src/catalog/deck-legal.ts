@@ -27,6 +27,8 @@ export function deckLegal(typeCode: string, typeName: string): boolean {
   // 2026-10-23: every live treasure row has type_name Campaign, so the check above
   // already rejects them. A treasure is deck-legal only when type_name is not
   // Campaign. Do not mark every treasure legal.
+  // An Ered Mithrin treasure (campaignKind "treasure", emce.treasure) is never legal through this function: the build sets its deckLegal false, and a
+  // discovered one is admitted by the campaign log, outside the 50 card minimum.
   if (typeCode === "treasure") return true;
 
   if (PLAYER_TYPE_CODES.has(typeCode)) return true;

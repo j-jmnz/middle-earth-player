@@ -89,7 +89,7 @@ export type PrintedCard = {
   keywords: Keywords;
   leavesPlayLoses: boolean;
   // A boon or burden (Campaign Mode), its burden set, and the deck it joins when it is in the campaign pool.
-  campaignKind: "boon" | "burden" | null;
+  campaignKind: "boon" | "burden" | "treasure" | null;
   burdenSet: string | null;
   backType: "player" | "encounter" | null;
   // Null for a card that is not a ship.

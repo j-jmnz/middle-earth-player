@@ -12,7 +12,7 @@ import { titleKey } from "./names.ts";
 const PRODUCT_PACK: ReadonlyMap<string, string> = new Map(PRODUCTS.flatMap((product) => (product.twinPack === null ? [[product.name, product.packs[0] ?? ""] as const] : [])));
 
 // Types of the cards taken from those boxes: what a scenario deals. Player cards of the box are RingsDB's.
-const PRODUCT_TYPES = new Set(["Enemy", "Location", "Treachery", "Quest", "Objective", "Objective_Ally", "Campaign", "Ship_Enemy", "Ship_Objective"]);
+const PRODUCT_TYPES = new Set(["Enemy", "Location", "Treachery", "Quest", "Objective", "Objective_Ally", "Objective_Location", "Campaign", "Ship_Enemy", "Ship_Objective", "Treasure", "Encounter_Side_Quest"]);
 
 // A product whose Hall of Beorn codes collide takes the code from its collector number (overrides.productCodes).
 export function productCodeOf(overrides: Pick<Overrides, "productCodes">): (card: HobCard) => string | null {
@@ -116,6 +116,21 @@ export function fillShipSets(raw: RawData, byCode: Map<string, Card>): void {
   for (const card of ships) {
     const set = named.get(`${card.name}\u0000${card.type}`);
     if (card.encounterSet == null && set) byCode.set(card.code, { ...card, encounterSet: set });
+  }
+}
+
+// Hall of Beorn gives the eight encounter side quests of Fire in the Night no encounter info, but its scenario file lists each under its set ("Fire in the
+// Night"). A side quest of a built box takes the set its slug is listed under.
+export function fillSideQuestSets(raw: Pick<RawData, "scenarios">, byCode: Map<string, Card>): void {
+  const bySlug = new Map<string, string>();
+  for (const scenario of raw.scenarios) {
+    for (const item of scenario.ScenarioCards) if (item.EncounterSet && !/Nightmare$/.test(item.EncounterSet)) bySlug.set(item.Slug, setName(item.EncounterSet) ?? item.EncounterSet);
+  }
+  const products = new Set(PRODUCTS.flatMap((product) => product.packs));
+  for (const card of byCode.values()) {
+    if (card.type !== "encounter-side-quest" || card.encounterSet != null || !card.printings.some((printing) => products.has(printing.pack))) continue;
+    const set = card.printings.map((printing) => (printing.hobSlug ? bySlug.get(printing.hobSlug) : undefined)).find((name) => name !== undefined);
+    if (set) byCode.set(card.code, { ...card, encounterSet: set });
   }
 }
 

@@ -781,6 +781,13 @@
   ],
   "scenarioPiles": [
     {
+      "scenario": "mount-gundabad",
+      "code": "19143",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Wormsbane in the staging area (Q08.8, E08.8). The quest card The Side Door (19134) prints \"Setup: ... Attach Wormsbane to a hero, Broken side face-up.\", so it is attached to a hero at Setup, not staged. Its Reforged side is the same physical card (overrides.dragnCardCodes).",
+      "source": "scan 19134.A; dragncards preBuiltDecks.json (Q08.8, E08.8); Ered Mithrin Campaign Expansion rulebook MEC115 p20 (emce.setup-mount-gundabad)"
+    },
+    {
       "scenario": "a-shadow-of-the-past",
       "code": "141017",
       "pile": "campaign",
@@ -894,7 +901,23 @@
       "source": "scan 12147.A; scan 12149.A; dcce.from-sea-to-land"
     }
   ],
+  "scenarioRemovals": [
+    {
+      "scenario": "journey-up-the-anduin",
+      "set": "Wilderlands",
+      "types": ["location", "treachery"],
+      "reason": "The Evil Creatures deck is the Wilderlands enemies: \"Remove each location and treachery card from the Wilderlands encounter set from the game\" (emce.evil-creatures-deck, MEC115 p5). Hall of Beorn's scenario list counts the whole set (The Brown Lands 2, The East Bight 2), so those counts are not dealt copies. The Wilderlands enemies (8 copies) are dealt in the Evil Creatures deck.",
+      "source": "Ered Mithrin Campaign Expansion rulebook MEC115 p5 (emce.evil-creatures-deck); hallofbeorn.com/Export/Scenarios/Journey-Up-the-Anduin"
+    }
+  ],
   "scenarioEasy": [
+    {
+      "scenario": "the-ghost-of-framsburg",
+      "code": "19099",
+      "easy": 1,
+      "reason": "The DragnCards Easy deck (E08.7) keeps both copies of Crypt Stalker. Hall of Beorn gives 1 in both its scenario list and its card record (EasyModeQuantity 1), and its Easy counts for the scenario's three sets sum to 30 where DragnCards' E08.7 deals 31. The gold Easy mark is printed on individual copies, so the one pinned scan (scans/19099.A.jpg) cannot show it; the two agreeing Hall of Beorn fields win, as for Black Steed of Flight to the Ford. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Ghost-of-Framsburg; hallofbeorn.com/Export/EncounterCards (Crypt Stalker EasyModeQuantity 1); dragncards E08.7"
+    },
     {
       "scenario": "a-knife-in-the-dark",
       "code": "141069",
@@ -1004,6 +1027,56 @@
       "from": 0,
       "reason": "A Dream-chaser Campaign Expansion card with a collector number below 171 is a 2023 reprint of a card the Adventure Packs print (Calphon 13, the Stormcaller 42, The Thing in the Depths 63, Temple Guardian 77, Gate Key 78, Dol Amroth Warship 102, the Shattered Monument 129, the six ships 136 to 141) with a Campaign Mode only or Upgraded side. Its Hall of Beorn code ('12' and the number) is the original's, so it is '110' and its three-digit number (110042 is the Stormcaller reprint; 12019 is the pack's). The six-digit prefix 110 is unused; the other six-digit prefixes are 131-132, 140-148 and 900-907. The two sides of one reprint share the code.",
       "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Dream-chaser Campaign Expansion, Number); ringsdb.com pack DCCE (11172 to 11216); Dream-chaser Campaign Expansion rulebook MEC111"
+    },
+    {
+      "set": "Ered Mithrin Campaign Expansion",
+      "prefix": "12",
+      "width": 3,
+      "from": 166,
+      "reason": "Hall of Beorn codes the Ered Mithrin Campaign Expansion '19' and the collector number (165 to 204), which collides with six Fate of Wilderland codes (19165 to 19170). RingsDB codes the box's 31 boons, burdens and treasures '12' and the collector number (12166 to 12204), which no other card bears, so a card with collector number 166 or more takes that code, and the eight campaign cards RingsDB does not list take the same pattern (Lost in Mirkwood 12168, The King's Quest 12170, The Withered Heath 12175, Roam Across Rhovanion 12184, Fire in the Night 12187, The Ghost of Framsburg 12189, Mount Gundabad 12193, The Fate of Wilderland 12195).",
+      "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Ered Mithrin Campaign Expansion, Number); ringsdb.com pack EMCE (12166 to 12204); Ered Mithrin Campaign Expansion rulebook MEC115"
+    },
+    {
+      "set": "Ered Mithrin Campaign Expansion",
+      "prefix": "120",
+      "width": 3,
+      "from": 0,
+      "reason": "The Journey Up the Anduin campaign card is collector number 165, and '12165' is Fury and Malice of The City of Corsairs (RingsDB, pack CoC). The six-digit prefix 120 is unused (the prefixes in use are 110, 131-132, 140-148 and 900-907), so the card is 120165.",
+      "source": "hallofbeorn.com/Export/QuestCards (CardSet Ered Mithrin Campaign Expansion, Number 165); ringsdb.com pack CoC (12165 Fury and Malice); Ered Mithrin Campaign Expansion rulebook MEC115"
+    }
+  ],
+  "dragnPackAliases": [
+    {
+      "dragncards": "Core Set",
+      "pack": "RevCore",
+      "reason": "DragnCards' load lists for Journey Up the Anduin and Lost in Mirkwood (Q08.1, Q08.2) deal the 2011 Core Set's cards of the Wilderlands, Journey Along the Anduin, Passage Through Mirkwood, Spiders of Mirkwood and Dol Guldur Orcs sets. The Ered Mithrin Campaign Expansion's setup text names the same sets, and the app already builds and ledgers them as the Revised Core Set's reprints (same codes 01074 to 01131, same collector numbers), so a Core Set row is the Revised Core Set card with its collector number and name (user decision, 2026-11-05).",
+      "source": "DragnCards preBuiltDecks.json (Q08.1, Q08.2) and cardDb.tsv (packName Core Set, numberInPack); Ered Mithrin Campaign Expansion rulebook MEC115 p5 and p6 (emce.setup-journey-up-the-anduin, emce.setup-lost-in-mirkwood)"
+    }
+  ],
+  "dragnCardCodes": [
+    {
+      "dragncards": "Mount Gundabad",
+      "number": 143,
+      "side": "a",
+      "code": "19143",
+      "reason": "Wormsbane is one card with two sides, Broken (side A) and Reforged (side B), and DragnCards files it as one Attachment card with a .B picture, collector number 143. Hall of Beorn files the two sides as two Objective cards, #143 Wormsbane (Broken) and #144 Wormsbane (Reforged), so no title and type match finds either (the Setup line is \"Attach Wormsbane to a hero, Broken side face-up\"). Side A is the Broken card.",
+      "source": "dragncards cardDb.tsv (Mount Gundabad 143, Wormsbane, both rows) and preBuiltDecks.json (Q08.8, E08.8); hallofbeorn.com/Export/EncounterCards (Wormsbane-Broken, Wormsbane-Reforged, Mount Gundabad 143 and 144); scan 19143.A"
+    },
+    {
+      "dragncards": "Mount Gundabad",
+      "number": 143,
+      "side": "b",
+      "code": "19144",
+      "reason": "Side B of the DragnCards Wormsbane (collector number 143, the .B picture) is the Reforged card, which Hall of Beorn numbers 144. See the side A entry.",
+      "source": "dragncards cardDb.tsv (Mount Gundabad 143, Wormsbane, .B row); hallofbeorn.com/Export/EncounterCards (Wormsbane-Reforged, Mount Gundabad 144); scan 19144.A"
+    },
+    {
+      "dragncards": "The Wilds of Rhovanion",
+      "number": 30,
+      "side": "a",
+      "code": "18030",
+      "reason": "Abandoned Village is an objective-location of Lost in Mirkwood. DragnCards types it Location, and Hall of Beorn has no OCTGN guid for it (its three siblings Overgrown Path, Bare Hilltop and Forest Clearing have one), so no guid or type match finds it. The card is Hall of Beorn's Abandoned Village, The Wilds of Rhovanion #30.",
+      "source": "dragncards cardDb.tsv (The Wilds of Rhovanion 30, Abandoned Village) and preBuiltDecks.json (Q08.2, E08.2); hallofbeorn.com/Export/EncounterCards (Abandoned-Village-TWoR, no OctgnGuid); scan 18030.A"
     }
   ],
   "encounterSetAliases": [
