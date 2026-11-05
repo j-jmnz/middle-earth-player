@@ -2,11 +2,13 @@
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
 import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
+import { stagePlace } from "../../rules/families/quest/branch.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
 
 
 import { dungeonDetail } from "./dungeon-preview.ts";
+import { earlierStages } from "./earlier-stages.ts";
 import { grappleDetail, shipLoss } from "../words/grapple.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
@@ -54,9 +56,18 @@ export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "res
   ];
 }
 
+// An earlier stage as the quest stage's preview lists it: "Stage 1B" over its name, on its B side, the side it was played on. Its number
+// is its place in the quest (branch.ts stagePlace), as the quest advance screen counts it.
+function earlierStage(game: ScenarioState, code: string, describe: Describe): PreviewCard {
+  const place = stagePlace(game, code);
+  const described = describe(code, pictureKey({ code, face: "B" }));
+  return { code, ...described, ...(place ? { title: `Stage ${place.at}B`, detail: described.name } : {}), effects: [], role: "Earlier stage" };
+}
+
 /**
  * The cards the preview lists, and which of them it opens on. `extra` adds cards that are not on the table (Look). `line` reads a
- * printed line of the ledger by id, for the quest stage's objective.
+ * printed line of the ledger by id, for the quest stage's objective. The quest stage lists the stages defeated before it after its own
+ * cards (earlier-stages.ts), so a swipe or the strip steps back through the quest.
  */
 export function previewCards(
   game: ScenarioState,
@@ -69,10 +80,12 @@ export function previewCards(
   // Why the card the player pressed cannot be chosen in the pick that is open (why.ts, whyNotChosen), or null.
   chosen: (cardId: string) => string | null = () => null,
 ): { cards: PreviewCard[]; start: number } {
-  const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId)];
+  const earlier = earlierStages(game, ctx, cardId);
+  const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId), ...earlier];
   const cards = ids.flatMap((id, index): PreviewCard[] => {
     const card = game.cards[id];
     if (!card) return [];
+    if (earlier.includes(id)) return [earlierStage(game, card.code, describe)];
     const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : card.host ? "Attachment" : null;
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
