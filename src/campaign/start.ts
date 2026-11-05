@@ -33,6 +33,8 @@ export type StartInput = {
   facts?: Omit<CampaignFacts, "modeCard">;
   // The encounter cards the campaign card's Setup searched for and removed from the game (RemoveFromEncounterDeckIfLogged, chosen in the checklist): one code for each copy, taken out of the deck built here.
   removedFromEncounter?: readonly string[];
+  // The Caves deck cards the campaign card's Setup searched for and removed from the game (RemoveFromCavesIfLogged, chosen in the checklist): one code for each copy, taken out of the Caves deck dealt here.
+  removedFromCaves?: readonly string[];
   // Campaign when absent.
   mode?: PlayMode;
   // The Hard/Expert Mode card the players put next to the quest deck (dcce.hard-expert), Campaign Mode only: its Resolution adds its XP.
@@ -104,7 +106,9 @@ export function buildStart(start: StartInput): StartScenario {
   const uncharted = unchartedCodes(input.scenario, input.difficulty);
   const doubleSided = doubleSidedCards(input.scenario, input.difficulty);
   // The decks of Ered Mithrin the scenario deals (emce.caves-deck, emce.evil-creatures-deck); the quest card's Setup shuffles them.
-  const piles = dealtPiles(input.scenario, input.difficulty);
+  const dealtDecks = dealtPiles(input.scenario, input.difficulty);
+  const removedCaves = standalone ? [] : (input.removedFromCaves ?? []);
+  const piles = removedCaves.length > 0 && dealtDecks.cavesDeck ? { ...dealtDecks, cavesDeck: withoutCards(dealtDecks.cavesDeck, removedCaves) } : dealtDecks;
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {

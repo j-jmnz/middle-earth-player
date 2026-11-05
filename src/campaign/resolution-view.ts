@@ -51,7 +51,7 @@ export type ResolutionView =
       decline: ResolutionDecline | null;
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
       // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4).
-      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal";
+      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure";
     }
   | {
       kind: "settled";
@@ -134,6 +134,9 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   } else if (instruction.verb === "RemoveFromPool") {
     noun = "card";
     eyebrow = "Remove a card from the pool";
+  } else if (instruction.verb === "ChooseRandomTreasure") {
+    noun = "treasure";
+    eyebrow = "Choose a treasure";
   } else if (instruction.verb === "ChooseCards") {
     const kinds = new Set(instruction.codes.map((code) => world.cards.get(code)?.campaignKind ?? null));
     noun = kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
@@ -205,7 +208,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     answered,
     tiles,
     decline,
-    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.to,
+    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.to,
   };
 }
 
@@ -232,6 +235,8 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
       return tile.code
         ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded, so no card is removed from the encounter deck for it later.`
         : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool. ${view.later ? `Later Setups remove from the encounter deck ${view.later}.` : ""}`.trim();
+    case "treasure":
+      return `${tile.name} is attached to a character the players control, and the players discover it.`;
     case "removal":
       if (tile.copies == null) return `${tile.label} is removed from the campaign pool.`;
       return tile.copies > 1 ? `One copy of ${tile.name} leaves the campaign pool (${tile.copies - 1} ${tile.copies === 2 ? "stays" : "stay"}).` : `${tile.name} leaves the campaign pool: it was the last copy.`;

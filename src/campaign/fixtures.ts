@@ -26,6 +26,7 @@ import corsairsFixtures from "./fixtures/the-city-of-corsairs.json";
 import upanduinFixtures from "./fixtures/journey-up-the-anduin.json";
 import lostmirkFixtures from "./fixtures/lost-in-mirkwood.json";
 import kingsquestFixtures from "./fixtures/the-kings-quest.json";
+import heathFixtures from "./fixtures/the-withered-heath.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -68,6 +69,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "journey-up-the-anduin": upanduinFixtures,
   "lost-in-mirkwood": lostmirkFixtures,
   "the-kings-quest": kingsquestFixtures,
+  "the-withered-heath": heathFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

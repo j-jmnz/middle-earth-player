@@ -2,7 +2,7 @@
 // "Unique Allies Protecting Wilderland" lines, the boxes marked beside Beldis for each player and the encounter cards of the Campaign Pool with their copies. Pure.
 import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-lines.ts";
 import type { Condition, Instruction } from "../catalog/boundary.ts";
-import { campaignScenario, encounterCodes, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { campaignScenario, dealtPiles, encounterCodes, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { logCondition, type LogFacts } from "../rules/families/wilderland/log.ts";
@@ -97,6 +97,11 @@ export function searchableDeck(scenario: ScenarioData, difficulty: Difficulty | 
   return [...encounterCodes(campaignScenario(scenario), difficulty, seatCount), ...pooled];
 }
 
+/** The Caves deck as the campaign card's Setup finds it: the cards the scenario deals into it (the Lost Caves set, emce.caves-deck). */
+export function searchableCaves(scenario: ScenarioData, difficulty: Difficulty | undefined): string[] {
+  return [...(dealtPiles(campaignScenario(scenario), difficulty).cavesDeck ?? [])];
+}
+
 /** What a Setup search works on: the log's lines, the cards, the deck as it stands (the checklist's working copy, which the search takes the removed cards out of) and how the first player answers. */
 export type DeckSearch = {
   allyLines: readonly AllyLine[];
@@ -109,21 +114,23 @@ export type DeckSearch = {
 /**
  * RemoveFromEncounterDeckIfLogged (emce.boon-allies; 12170:A and the Setups after it): when the log records the line, the first player searches the encounter deck for cards of a type and removes
  * them from the game, up to the count (a deck with fewer of them gives what it has: rr.search). The first player names each by its code; a title with several copies can be named again.
- * Returns the codes removed, in order, the ones before a missing answer included.
+ * RemoveFromCavesIfLogged (12175:A) is the same search of the Caves deck, which `search.deck` then holds. Returns the codes removed, in order, the ones before a missing answer included.
  */
-export function removeFromDeck(instruction: Extract<Instruction, { verb: "RemoveFromEncounterDeckIfLogged" }>, search: DeckSearch): { removed: string[] } {
+export function removeFromDeck(instruction: Extract<Instruction, { verb: "RemoveFromEncounterDeckIfLogged" | "RemoveFromCavesIfLogged" }>, search: DeckSearch): { removed: string[] } {
   const { allyLines, cards, deck } = search;
   const removed: string[] = [];
   if (!allyLines.includes(instruction.line)) return { removed };
+  const except = instruction.verb === "RemoveFromEncounterDeckIfLogged" ? (instruction.except ?? []) : [];
+  const where = instruction.verb === "RemoveFromCavesIfLogged" ? "the Caves deck" : "the encounter deck";
   const matches = (code: string): boolean => {
     const printed = cards.get(code);
-    return printed != null && printed.type === instruction.cardType && !(instruction.nonUnique && printed.isUnique) && !(instruction.except ?? []).includes(printed.name);
+    return printed != null && printed.type === instruction.cardType && !(instruction.nonUnique && printed.isUnique) && !except.includes(printed.name);
   };
   for (let taken = 0; taken < instruction.count; taken += 1) {
     const options = [...new Set(deck.filter(matches))];
     if (options.length === 0) break;
     const noun = NOUNS[instruction.cardType];
-    const answer = search.take(options, `\u201c${ALLY_LINE_FACTS[instruction.line].words}\u201d: search the encounter deck for ${instruction.count} ${instruction.nonUnique ? "non-unique " : ""}${noun} and remove them from the game. Card ${taken + 1} of ${Math.min(instruction.count, deck.filter(matches).length + taken)}.`);
+    const answer = search.take(options, `\u201c${ALLY_LINE_FACTS[instruction.line].words}\u201d: search ${where} for ${instruction.count} ${instruction.nonUnique ? "non-unique " : ""}${noun} and remove them from the game. Card ${taken + 1} of ${Math.min(instruction.count, deck.filter(matches).length + taken)}.`);
     if (answer == null) break;
     deck.splice(deck.indexOf(answer), 1);
     removed.push(answer);

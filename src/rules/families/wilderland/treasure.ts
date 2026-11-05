@@ -25,6 +25,14 @@ export function undiscoveredTreasures(state: ScenarioState, ctx: ReduceContext):
   return [...ctx.cards.values()].filter((printed) => printed.campaignKind === "treasure" && !discovered.has(printed.code) && !dealt.has(printed.code)).map((printed) => printed.code).sort();
 }
 
+/** The `count` treasures a Resolution offers (ChooseRandomTreasure): drawn from the undiscovered ones, none the log or this Resolution has written, with the game's seed; the cursor is the seed's place afterwards. */
+export function drawTreasures(state: ScenarioState, count: number, ctx: ReduceContext): { candidates: string[]; cursor: number } {
+  const written = new Set(state.resolutionLog.treasures ?? []);
+  const pool = undiscoveredTreasures(state, ctx).filter((code) => !written.has(code));
+  const drawn = shuffleIds(pool, state.seed, state.seedCursor);
+  return { candidates: drawn.ids.slice(0, count), cursor: drawn.cursor };
+}
+
 /**
  * AttachRandomTreasure: `count` (3) undiscovered treasures are drawn with the game's seed, which moves the seed once; the first player chooses one, and it enters the staging area guarded by
  * `to`. The choice is the verb run again with `focus.chosen`, which draws nothing: the candidates are the options of the window. Run outside an effect frame, which cannot ask, it takes the first drawn.

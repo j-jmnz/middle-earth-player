@@ -22,6 +22,7 @@ import * as corsairs from "../scenarios/the-city-of-corsairs/game.ts";
 import * as upanduin from "../scenarios/journey-up-the-anduin/game.ts";
 import * as lostmirk from "../scenarios/lost-in-mirkwood/game.ts";
 import * as kingsquest from "../scenarios/the-kings-quest/game.ts";
+// import * as heath from "../scenarios/the-withered-heath/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -69,4 +70,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("journey-up-the-anduin", "Journey Up the Anduin", upanduin.UPANDUIN_GOLDENS, upanduin.upanduinWorld, upanduin.playGolden),
   entry("lost-in-mirkwood", "Lost in Mirkwood", lostmirk.LOSTMIRK_GOLDENS, lostmirk.lostmirkWorld, lostmirk.playGolden),
   entry("the-kings-quest", "The King's Quest", kingsquest.KINGSQUEST_GOLDENS, kingsquest.kingsquestWorld, kingsquest.playGolden),
+  // entry("the-withered-heath", "The Withered Heath", heath.HEATH_GOLDENS, heath.heathWorld, heath.playGolden),
 ];

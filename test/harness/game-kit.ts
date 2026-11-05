@@ -230,6 +230,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
       poolEncounterCards: checked.poolEncounterCards,
       poolIntoPlay: checked.poolIntoPlay,
       removedFromEncounter: checked.removedFromEncounter,
+      removedFromCaves: checked.removedFromCaves,
       ...(dealtFacts ? { facts: dealtFacts } : {}),
       ...(modeCard ? { modeCard } : {}),
     });

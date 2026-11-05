@@ -314,7 +314,9 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   if (!now || inPlay(from) || !inPlay(now.zone)) return state;
   const clock = state.clock + 1;
   // Tokens placed on a card while it was set aside stay on it as it enters play ("add 1 resource to each of them", 12039:B:2).
-  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false });
+  // The damage a card was set aside with stays too when the card says so (keepsDamage, 19024:A:1).
+  const keeps = from === "setAside" && now.keepsDamage === true;
+  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: keeps ? now.damage : 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false, ...(keeps ? { keepsDamage: undefined } : {}) });
 }
 
 // `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.

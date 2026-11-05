@@ -89,6 +89,15 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
+  // Deadly Cold (19021:A:1): the character just picked is exhausted or takes the damage; each player decides for the characters they control.
+  const [exhaust, damage] = choose.options;
+  if (choose.options.length === 2 && exhaust?.id === "exhaust" && exhaust.instructions[0]?.verb === "Exhaust" && damage?.id === "damage" && damage.instructions[0]?.verb === "DamageCard") {
+    const data = topFrame(game)?.data;
+    const picked = data?.kind === "effect" ? data.picked?.at(-1) : undefined;
+    const amount = damage.instructions[0].amount;
+    const text = `exhaust ${picked ? names.card(picked) : "this character"}, or deal it ${typeof amount === "number" ? amount : 1} damage?`;
+    return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+  }
   const offer = searchOffer(choose);
   if (!offer) return null;
   const left = Math.min(offer.count, undiscoveredTreasures(game, ctx).length);
@@ -139,6 +148,8 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
+  const heath = heathAsk(instruction, source, next, facts);
+  if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
   // The guard is attached to the treasure and keeps it from being claimed until it is dealt with (rr.guarded). It is the card the record picked (Twilight Hall, searched for by the campaign card) or the source itself.
@@ -146,6 +157,34 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   if (!guardId) return { verb: "Choose", prompt: choose };
   const host = names.card(guardId);
   return { verb: "Choose", prompt: `${choose} ${host} is attached to it, and the players cannot claim it until ${host} is dealt with.` };
+}
+
+// The Withered Heath's choices (19022:B:1, 19024:B:1, 19025:A:1, 12176:A:4, 12183:A:1): the sentence each asks. One player's choice leads with "Player N:" two-handed (`owned`), as the King's Quest's do.
+function heathAsk(instruction: Instruction, source: string | null, next: Instruction | undefined, facts: Facts | undefined): PickWords | null {
+  const game = facts?.game;
+  const says = game ? seatSays(game) : null;
+  const ask = (verb: string, text: string): PickWords => (says ? { verb, prompt: says.say(text), ...says.owned } : { verb, prompt: `${text.charAt(0).toUpperCase()}${text.slice(1)}` });
+  // The look at the encounter deck on a stage's side B: one of the cards is revealed, the rest are discarded before it resolves.
+  if (instruction.verb === "PickEncounter" && instruction.from === "looked" && next?.verb === "DiscardOtherLooked") {
+    const looked = facts?.options.length || 3;
+    return ask("Reveal", `choose 1 of the ${looked} cards you looked at to reveal. ${looked === 2 ? "The other is" : "The others are"} discarded first.`);
+  }
+  if (instruction.verb === "ArrangeLookedDeck") {
+    const left = facts?.options.length ?? 0;
+    return ask("Choose", instruction.kept == null ? "choose the card that stays on top of your deck. The rest go to the bottom, in the order you choose." : `choose the next card for the bottom of your deck (${left} left).`);
+  }
+  if (instruction.verb !== "Pick") return null;
+  const pick = instruction.pick;
+  const code = source ? (game?.cards[source]?.code ?? source) : undefined;
+  // Master of the Hunt (12176:A:4): the player whose deck is looked at; that player puts one card on top and the rest on the bottom.
+  if (code === "12176" && pick.type === "player" && next?.verb === "LookAtTop") return ask("Look", `choose a player to look at the top ${typeof next.count === "number" ? next.count : 3} cards of their deck. They put 1 of them on top of their deck and the rest on the bottom, in any order.`);
+  // Cold-Drake (19025:B:2): the dragon that returns to the staging area and attacks each player.
+  if (pick.type === "enemy" && pick.names?.length === 1 && next?.verb === "ReturnToStaging") return { verb: "Choose", prompt: `${pick.names[0]} returns to the staging area, then makes an immediate attack against each player in turn order.` };
+  // Cold-Drake (19025:A:1): the one enemy that attacks each player in turn order; the sheet has nothing to ask while it is the only candidate.
+  if (pick.type === "enemy" && pick.names?.length === 1 && next?.verb === "ForEachPlayer") return { verb: "Choose", prompt: `${pick.names[0]} makes an immediate attack against each player in turn order.` };
+  // Rhyme of the Slayer (12183:A:1): the hero with Dragon-slayer on it.
+  if (pick.type === "hero" && pick.hasAttachment?.names?.length === 1 && next?.verb === "ModifyStatVersus") return { verb: "Choose", prompt: `The hero with ${pick.hasAttachment.names[0]} gets +${next.amount} Attack while attacking the chosen enemy this phase.` };
+  return null;
 }
 
 // The King's Quest's choices (18043:A:3, 18044:A:1, 18047:A:1, 18048:A:1, 18049:A:2, 18049:A:3, 18055:A:2, 18057:A:2, 18058:A:2, 18059:A:2, 18060:A:1, 18061:A:1, 18064:A:1, 12173:A:2, 18079:B:2, 18080:A:1): the sentence each asks, from the verb it opens or the pick before it.
@@ -249,6 +288,10 @@ export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choo
   const option = choose.options.find((entry) => entry.id === optionId);
   if (option?.instructions[0]?.verb === "ReplaceFromCaves") return "Discard it and replace it with the top card of the Caves deck";
   if (option?.instructions[0]?.verb === "CancelStrike") return "Cancel the attack: no damage, the attackers stay exhausted";
+  // Deadly Cold (19021:A:1): the character the question is about is the one the sentence over the choice names.
+  const lead = option?.instructions[0];
+  if (lead?.verb === "Exhaust" && lead.target?.kind === "picked" && choose.options.length === 2) return "Exhaust it";
+  if (lead?.verb === "DamageCard" && lead.target === "picked" && choose.options.length === 2 && typeof lead.amount === "number") return `Deal it ${lead.amount} damage`;
   const spread = option ? distributeBranch(option) : null;
   if (spread) return `Assign ${now?.counted?.[optionId] ?? "all the"} damage among your characters: ${source ?? "this card"} is shuffled back into the encounter deck`;
   // 12172:A:2: "all encounter cards are immune to player card effects until the end of the phase".

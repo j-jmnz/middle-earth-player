@@ -221,7 +221,10 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   const resources = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
   // "The next time that character would be dealt damage this round, cancel 1 of that damage" (12166:A:2): the flag's points come off first, and it is spent.
   const shield = damageShield(resources.state, id, resources.amount);
-  const dealt = cap > 0 ? Math.max(0, Math.min(shield.amount, cap - taken)) : shield.amount;
+  const capped = cap > 0 ? Math.max(0, Math.min(shield.amount, cap - taken)) : shield.amount;
+  // "It cannot have more than 18 damage" (19023:B:3): a card with a ceiling takes what room is left under it.
+  const ceiling = heldAmount(state, id, "damageCeiling");
+  const dealt = ceiling > 0 ? Math.max(0, Math.min(capped, ceiling - instance.damage)) : capped;
   const damage = instance.damage + dealt;
   steps.push({ kind: "damage", targetId: id, amount: dealt, cause });
   let next = updateCard(cap > 0 ? { ...shield.state, roundDamage: { ...state.roundDamage, [id]: taken + dealt } } : shield.state, id, { damage });

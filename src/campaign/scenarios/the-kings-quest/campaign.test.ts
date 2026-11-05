@@ -46,9 +46,8 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
     expect(campaign.scenarios[3]).toBe("the-withered-heath");
   });
 
-  it("is playable, and the path offers it after Journey Up the Anduin and Lost in Mirkwood and The Withered Heath is not yet", () => {
+  it("is playable, and the path offers it after Journey Up the Anduin and Lost in Mirkwood and The Withered Heath after it", () => {
     expect(PLAYABLE_SCENARIOS).toContain(kingsquest.id);
-    expect(PLAYABLE_SCENARIOS).not.toContain("the-withered-heath");
     const fresh = campaignPath(campaign, {}, newSave("kings", campaign.id, 1).log);
     expect(fresh[2]).toMatchObject({ id: kingsquest.id, status: expect.not.stringMatching(/completed/) });
     const path = campaignPath(campaign, {}, afterEarlier(2));
@@ -125,7 +124,7 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
     expect(state.piles?.cavesDeck?.length).toBeGreaterThan(0);
   });
 
-  it("hands its pool, treasure and log lines to the next part when won, unlocks The Withered Heath (coming soon), and writes nothing when lost", async () => {
+  it("hands its pool, treasure and log lines to the next part when won, unlocks The Withered Heath, and writes nothing when lost", async () => {
     // Two-handed, after the earlier parts: Isolde, Abandoned Ruin and The Threat to Wilderland join the pool next to Turayn and Melanwar, and the treasure is added to the ones discovered.
     const win = golden("two-handed, won, after the earlier parts, a treasure discovered");
     const state = playGolden(win, ctx).state;
@@ -140,13 +139,13 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
     // What The Withered Heath is handed: the log's columns as the game reads them.
     const facts = wilderlandFacts(log, campaign.id);
     expect(facts.treasures).toEqual(log.treasures);
-    // The path now offers the fourth part next: it is not yet playable, so it is coming soon.
+    // The path now offers the fourth part next.
     const path = campaignPath(campaign, {}, log);
     expect(path.slice(0, 4).map((node) => [node.id, node.status === "completed"])).toEqual([["journey-up-the-anduin", true], ["lost-in-mirkwood", true], [kingsquest.id, true], [nextPartId(campaign, kingsquest.id), false]]);
     expect(path[3]?.status).toBe(nextPartStatus(campaign, kingsquest.id));
-    expect(path[3]?.status).toBe("soon");
+    expect(path[3]?.status).toBe("current");
     const step = nextStep(path, null);
-    expect(step).toMatchObject({ kind: "soon", node: { id: "the-withered-heath" } });
+    expect(step).toMatchObject({ kind: "begin", node: { id: "the-withered-heath" } });
     // The lines instead of the allies: Isolde's line is written, and Dagnir's Spawn joins the pool.
     const lined = golden("two-handed, Easy, won, Turayn's oath");
     const lineState = playGolden(lined, ctx).state;

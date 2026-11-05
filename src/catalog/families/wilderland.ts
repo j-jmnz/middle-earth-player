@@ -134,6 +134,42 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReturnGuardedToHand") }),
   // "Cancel the attack" (18080:B:2): the player attack in progress deals no damage; its attackers stay exhausted. Run in the response to enemyAttacked, which resolves before the attack's strength is read.
   z.strictObject({ verb: z.literal("CancelStrike"), ...when }),
+  // The Withered Heath (part 4, campaign card 12175; ledger lines 12175:A:2, 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1, 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4).
+  // "Shuffle 2 set aside Dragon Sign objectives into the Caves deck" (19022:A:1, 19024:A:1): up to `count` set-aside copies of the card join the pile, which is shuffled with the game's seed. A game that dealt no such pile, or has no copy set aside, changes nothing.
+  z.strictObject({ verb: z.literal("ShuffleSetAsideIntoPile"), pile, code, count: z.number().int().positive(), ...when }),
+  // "Set Cold-Drake aside, out of play. (Do not remove damage tokens from it.)" (19024:A:1): the card in play with this code is set aside, facedown, as SetAsideInPlay sets one aside, but it keeps the damage tokens on it. Its attachments are discarded. Nothing happens when no such card is in play.
+  z.strictObject({ verb: z.literal("SetAsideKeepingDamage"), code, ...when }),
+  // "Remove 3 damage tokens from the set-aside Cold-Drake" (19024:B:2): up to `amount` damage tokens come off the set-aside card with this code (no card in play has the damage: moria's RemoveDamageFrom reaches only a card in play).
+  z.strictObject({ verb: z.literal("RemoveSetAsideDamage"), code, amount: z.number().int().positive(), ...when }),
+  // "Search the Caves deck for a Dragon Sign and attach it to Creature Den as a guarded objective. Shuffle the Caves deck." (19018:A:1): the first card of the pile with this code enters the staging area (added to it from out of play) and the source card, in play as the active location,
+  // becomes its guard (rr.guarded, as AttachRandomTreasure guards a treasure). The Dragon Sign is free of encounters once the source leaves play. With no such card in the pile nothing changes. The shuffle is the record's (ShufflePile).
+  z.strictObject({ verb: z.literal("AttachGuardedFromPile"), pile, code, ...when }),
+  // A constant marker on an objective: "When Dragon Sign is free of encounters, add it to the victory display" (19012:A:3). The settle sweep moves a card with it in the staging area to the victory display once nothing guards it (families/wilderland/heath.ts). It does nothing when run.
+  z.strictObject({ verb: z.literal("VictoryWhenFree") }),
+  // A constant marker, in play under the record's own condition: "While Mountain Pass is in the staging area, the 'when revealed' effects of Weather treachery cards cannot be canceled" (19015:A:1). A Response that cancels the When Revealed effects of an encounter card
+  // with the trait is not offered while the marker's source is in play and its record holds (rr.cancel, families/wilderland/heath.ts). It does nothing when run.
+  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1) }),
+  // "Look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest" (19022:B:1, 19024:B:1): after LookAtTop and a PickEncounter of one looked card, the other looked cards that are still on top go to the encounter discard pile faceup; the picked card is then the top card, and the
+  // RevealEncounter after it reveals it. The discard comes first, a deliberate order as Discover's (emce.discover): a Surge on the revealed card reveals the next card of the deck, not one of the looked ones.
+  z.strictObject({ verb: z.literal("DiscardOtherLooked"), ...when }),
+  // "They put 1 of those cards on the top of their deck and put the rest on the bottom of their deck in any order" (12176:A:4): the actor (the player whose deck was looked at, after SwitchActor) chooses which of the `top` cards LookAtTop showed stays on top, then the card for each next place
+  // among the others from the top of what goes to the bottom; the bottom cards keep the order they are chosen in. One card or none looked at changes nothing. `kept` and `bottom` are engine use: the choices so far.
+  z.strictObject({ verb: z.literal("ArrangeLookedDeck"), kept: z.string().optional(), bottom: z.array(z.string()).optional(), ...when }),
+  // "...it makes an immediate attack against you" (12179:A:4): the card the answered event is about (`target`, the subject by default), an enemy engaged with the actor, makes an immediate attack against them, dealt a shadow card of its own as any attack an effect makes is.
+  // Nothing happens when it is not engaged or may not attack.
+  z.strictObject({ verb: z.literal("ImmediateAttackBy"), target: cardRefSchema.optional(), ...when }),
+  // "For each ready character a player controls, he must choose: either exhaust that character, or deal 1 damage to it" (19021:A:1): the actor, run for each player in turn, is asked once for each ready character they control, in the order they entered play,
+  // whether it is exhausted or takes `amount` damage. The characters are those ready when the verb starts.
+  z.strictObject({ verb: z.literal("ExhaustOrDamageEachReady"), amount: z.number().int().positive(), ...when }),
+  // Campaign Setup: "A player may search their deck for a unique boon ally and add it to their hand" (12175:A:2). Each player in turn, the first player first, may take a unique boon ally of their deck (a pool ally the checklist is about to shuffle into it is in the deck already) into their starting hand, or decline;
+  // the offer ends with the first who takes one. Dealt by the checklist (campaign/checklist.ts), so it changes nothing here.
+  z.strictObject({ verb: z.literal("SearchBoonAllyToHand") }),
+  // Campaign Setup: "If 'Melanwar has given you guidance on traversing Wilderland,' search ... the Caves deck for 1 location and remove them from the game" (12175:A:2). As RemoveFromEncounterDeckIfLogged, but from the Caves deck the scenario deals (emce.caves-deck): the first player
+  // chooses up to `count` cards of `cardType` and they are removed from the game. Dealt by the checklist, so it changes nothing here.
+  z.strictObject({ verb: z.literal("RemoveFromCavesIfLogged"), line: z.enum(ALLY_LINES), count: z.number().int().positive(), cardType: z.enum(["enemy", "location", "treachery"]), nonUnique: z.boolean().optional() }),
+  // Resolution: "the players also look at 3 random undiscovered treasures and choose 1 to attach to an eligible character" (12175:B:7; emce.treasure): `count` (3) undiscovered treasures are drawn with the game's seed and the first player chooses one. The scenario is over, so the
+  // attachment has no game left to matter in: the treasure joins the discovered ones the Resolution writes (the line after it, DiscoverTreasure, would write a treasure the players control). Run by the Resolution (rules/setup/resolution.ts).
+  verbFlags(z.strictObject({ verb: z.literal("ChooseRandomTreasure"), count: z.number().int().min(1).optional(), ...when }), { collection: "treasure" }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -143,6 +179,8 @@ const FLAGS = [
   "damageShield",
   // On an enemy: the damage it would be dealt is canceled and the card that granted the flag (Dragon Scales, 18059:A:2) is discarded. Set by a constant ModifyStat of the attachment; src/rules/families/wilderland/shield.ts cancelAllDamage takes it as damage is placed.
   "cancelsDamage",
+  // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/keywords.ts placeDamage).
+  "damageCeiling",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

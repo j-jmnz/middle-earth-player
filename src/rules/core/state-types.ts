@@ -120,6 +120,8 @@ export type CardInstance = {
   guardedHero?: true;
   // A player card an enemy holds under it, faceup (Hobgoblin, 18050:A:2): it returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set only by GuardWithDeckTop.
   held?: true;
+  // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideKeepingDamage.
+  keepsDamage?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
@@ -328,6 +330,8 @@ export type ScenarioState = {
   resolutionAt: number;
   resolutionSeat: number;
   resolutionLog: ResolutionLog;
+  // The treasures a Resolution drew for the players to choose from (ChooseRandomTreasure), while the choice is open: drawn once, with the game's seed.
+  resolutionOffer?: readonly string[];
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
   // "round:step" for each framework action window opened this round (rr.framework-steps), so each opens once, and

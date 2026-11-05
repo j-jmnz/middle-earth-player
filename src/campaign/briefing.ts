@@ -192,6 +192,7 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     poolEncounterCards: plan.poolEncounterCards,
     poolIntoPlay: plan.poolIntoPlay,
     removedFromEncounter: plan.removedFromEncounter,
+    removedFromCaves: plan.removedFromCaves,
     ...(input.modeCard ? { modeCard: input.modeCard } : {}),
     // The log's structured facts (the pool as the checklist leaves it, with the cards the campaign card's Setup added); a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
     facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id) },

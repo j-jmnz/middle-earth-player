@@ -6,7 +6,7 @@ tags:
 # The King's Quest (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's and Lost in Mirkwood's wins write (Turayn and Melanwar in a pool, the Orcs card part 2 pooled,
 # two treasures discovered), parked on its win (The Fire Worm, Fire-drake defeated). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md).
 # The Resolution asks two choices, both the first player's (12170:B:1, 12170:B:3): whether Isolde joins the pool or the line "Isolde is on the hunt" is written (the flow writes the line), then which burden goes to the pool
-# with Abandoned Ruin (the flow takes Dagnir's Spawn). It then writes the treasure the players control, if any, and unlocks The Withered Heath, which the app cannot deal yet: the path stops there and its node reads Coming soon
+# with Abandoned Ruin (the flow takes Dagnir's Spawn). It then writes the treasure the players control, if any, and unlocks The Withered Heath, whose node reads Next
 # (src/campaign/scenarios/the-kings-quest/golden.test.ts pins the path).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
@@ -30,12 +30,11 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Dagnir.s Spawn.*"
-# The win unlocks The Withered Heath, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Withered Heath, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-the-withered-heath-status
-    text: "Coming soon"
-- assertVisible:
+    text: "Next"
+- assertNotVisible:
     id: path-soon
-    text: "The Withered Heath is coming soon."
 - assertNotVisible:
     id: begin

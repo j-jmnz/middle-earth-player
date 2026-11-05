@@ -11,6 +11,7 @@ import { attachSelf } from "../../interpret/effect-targeted.ts";
 import { replaceFromCaves, resolveDeep } from "./deep.ts";
 import { addToStagingWithResources, arrangeCaves, attachSearched, attachSelfToPicked, cancelStrike, guardPickedAttachment, guardWithDeckTop, putOnPileBottom, returnHeld } from "./kings.ts";
 import { discover } from "./discover.ts";
+import { arrangeLookedDeck, attachGuardedFromPile, discardOtherLooked, exhaustOrDamageEachReady, immediateAttackBy, removeSetAsideDamage, setAsideKeepingDamage, shuffleSetAsideIntoPile, victoryWhenFree } from "./heath.ts";
 import { logCondition } from "./log.ts";
 import { attachRandomTreasure, claimRandomTreasure } from "./treasure.ts";
 import { wilderlandAmount } from "./amounts.ts";
@@ -103,18 +104,39 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return state;
     case "CancelStrike":
       return cancelStrike(state);
+    case "ShuffleSetAsideIntoPile":
+      return shuffleSetAsideIntoPile(state, instruction);
+    case "SetAsideKeepingDamage":
+      return setAsideKeepingDamage(state, instruction, ctx, steps);
+    case "RemoveSetAsideDamage":
+      return removeSetAsideDamage(state, instruction);
+    case "AttachGuardedFromPile":
+      return attachGuardedFromPile(state, instruction, focus, ctx, steps);
+    case "DiscardOtherLooked":
+      return discardOtherLooked(state);
+    case "ArrangeLookedDeck":
+      return arrangeLookedDeck(state, instruction, focus, steps);
+    case "ExhaustOrDamageEachReady":
+      return exhaustOrDamageEachReady(state, instruction, focus, ctx, steps);
+    case "ImmediateAttackBy":
+      return immediateAttackBy(state, instruction, focus, ctx, steps);
     case "Loot":
     case "Undiscardable":
     case "DiscardToPoolFromSets":
     case "PutObjectiveLocationAfterDiscard":
     case "GainControlWhenFree":
     case "IgnoreKeyword":
+    case "VictoryWhenFree":
+    case "UncancelableWhenRevealed":
       return state;
     case "DiscoverTreasure":
     case "BoonAllyOrLogLine":
     case "AddEncounterToPool":
     case "RemoveFromPool":
     case "RemoveFromEncounterDeckIfLogged":
+    case "SearchBoonAllyToHand":
+    case "RemoveFromCavesIfLogged":
+    case "ChooseRandomTreasure":
       return state;
     default:
       return null;
@@ -139,7 +161,7 @@ export const manifest: RulesFamily = {
   amount: wilderlandAmount,
   pick: wilderlandPickMatches,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
-  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => returnHeld(clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx), ctx) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike"],
+  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => victoryWhenFree(returnHeld(clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx), ctx), ctx, steps) },
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "SetAsideKeepingDamage", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure"],
   run,
 };

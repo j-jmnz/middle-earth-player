@@ -6,7 +6,7 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { AFTER_HAND, type StartSeat } from "../rules/setup/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
-import { logConditionHolds, poolEncounterCopies, removeFromDeck, searchableDeck } from "./wilderland.ts";
+import { logConditionHolds, poolEncounterCopies, removeFromDeck, searchableCaves, searchableDeck } from "./wilderland.ts";
 import { xpRowOf } from "./xp.ts";
 
 // The Campaign Setup Checklist as numbered steps. Each step names the rule it follows and says what it did, so the
@@ -32,7 +32,7 @@ export type ChecklistInput = {
 };
 
 export type ChecklistPlan =
-  | { ok: true; steps: ChecklistStep[]; threatModifier: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; log: CampaignLog }
+  | { ok: true; steps: ChecklistStep[]; threatModifier: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
   | { ok: false; errors: string[]; needs: Need | null };
 
 const TEXT: Readonly<Record<number, string>> = {
@@ -50,8 +50,8 @@ const TEXT: Readonly<Record<number, string>> = {
 // What the campaign card's Setup does at step 6: the answers it takes, and what it did, asked and refused.
 type Dealing = { did: string[]; errors: string[]; needs: Need | null };
 // What a verb works on: the seats, the pool, the answers still unused and the names.
-// `deck` is the encounter deck a Setup search looks through as it stands (the campaign card's own shuffles so far, and the pool's encounter cards), `removed` the codes searched out of it.
-type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[] };
+// `deck` is the encounter deck a Setup search looks through as it stands (the campaign card's own shuffles so far, and the pool's encounter cards), `removed` the codes searched out of it; `caves` and `removedCaves` are the Caves deck's.
+type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[]; caves: string[]; removedCaves: string[] };
 
 // The next answer for `seat`, if it is one of `legal`. With none left the step needs one; a wrong one is an error.
 function takeAnswer(table: Table, legal: readonly string[], seat: number, note?: string): string | null {
@@ -72,6 +72,43 @@ function searchEncounterDeck(table: Table, instruction: Extract<Instruction, { v
   const found = removeFromDeck(instruction, { allyLines: table.input.log.allyLines, cards: table.input.cards, deck: table.deck, take: (legal, note) => takeAnswer(table, legal, 0, note) });
   table.removed.push(...found.removed);
   table.out.did.push(...found.removed.map((code) => `The first player searches the encounter deck and removes ${table.name(code)} from the game.`));
+}
+
+// RemoveFromCavesIfLogged: the same search of the Caves deck the scenario deals (12175:A).
+function searchCaves(table: Table, instruction: Extract<Instruction, { verb: "RemoveFromCavesIfLogged" }>): void {
+  const found = removeFromDeck(instruction, { allyLines: table.input.log.allyLines, cards: table.input.cards, deck: table.caves, take: (legal, note) => takeAnswer(table, legal, 0, note) });
+  table.removedCaves.push(...found.removed);
+  table.out.did.push(...found.removed.map((code) => `The first player searches the Caves deck and removes ${table.name(code)} from the game.`));
+}
+
+// SearchBoonAllyToHand (12175:A): each player in turn, first player first, may take a unique boon ally of their deck (a pool ally that step 7 would shuffle into it, or one the deck holds) into their hand, or skip; the offer ends with the first who takes one.
+// Setup follows the opening hand and any mulligan (rr.setup step 7), so the ally joins the hand after the mulligan, as AddToHandAfterMulligan's cards do; a pool ally stays in the pool but is not shuffled into the deck.
+function searchBoonAlly(table: Table): void {
+  const { seats, pool, fresh, input, name } = table;
+  const isBoonAlly = (code: string): boolean => {
+    const printed = input.cards.get(code);
+    return printed != null && printed.type === "ally" && printed.isUnique && printed.campaignKind === "boon";
+  };
+  for (const [index, seat] of seats.entries()) {
+    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && Math.min(card.seat ?? 0, seats.length - 1) === index && isBoonAlly(card.code));
+    const options = [...new Set([...seat.deck.filter(isBoonAlly), ...pooled.map((card) => card.code)])];
+    if (options.length === 0) continue;
+    const answer = takeAnswer(table, [...options, "skip"], index, "Search your deck for a unique boon ally and add it to your hand, or skip. If you take one, no other player does.");
+    if (answer == null) return;
+    if (answer === "skip") {
+      table.out.did.push(`Seat ${index + 1} does not search for a boon ally.`);
+      continue;
+    }
+    const inDeck = seat.deck.indexOf(answer);
+    if (inDeck >= 0) seat.deck.splice(inDeck, 1);
+    else {
+      const taken = pooled.find((card) => card.code === answer);
+      if (taken) fresh.add(taken);
+    }
+    seat.afterMulligan.push(answer);
+    table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand.`);
+    return;
+  }
 }
 
 // AttachChosen: the first player chooses any hero at the table, their own or another player's.
@@ -151,8 +188,8 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
 }
 
 // Step 6: the campaign card's Setup instructions that deal a card to a player, in the order the card lists them.
-function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[] } {
-  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [] };
+function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[] } {
+  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [] };
   for (const instruction of campaignSetup) {
     // A line that shuffles a card into the encounter deck puts it where the searches after it look (the Setup lines run in print order).
     if (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, input.log)) table.deck.push(instruction.code);
@@ -161,8 +198,10 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "AddToPool") addToPool(table, instruction);
     else if (instruction.verb === "ChooseCards") chooseCards(table, instruction);
     else if (instruction.verb === "RemoveFromEncounterDeckIfLogged") searchEncounterDeck(table, instruction);
+    else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
+    else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
   }
-  return { ...table.out, removed: table.removed };
+  return { ...table.out, removed: table.removed, removedCaves: table.removedCaves };
 }
 
 // The pool card's own campaignSetup record puts it into play ("Put Mendor into play at the start of each scenario").
@@ -304,6 +343,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     poolEncounterCards,
     poolIntoPlay,
     removedFromEncounter: six.removed,
+    removedFromCaves: six.removedCaves,
     log: { ...log, heroesBySeat, threatPenalty, campaignPool: pool, carryIn: [] },
   };
 }

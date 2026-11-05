@@ -66,6 +66,7 @@ import { corsairsFixtures } from "./the-city-of-corsairs.ts";
 import { upanduinFixtures } from "./journey-up-the-anduin.ts";
 import { lostmirkFixtures } from "./lost-in-mirkwood.ts";
 import { kingsquestFixtures } from "./the-kings-quest.ts";
+import { heathFixtures } from "./the-withered-heath.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -375,6 +376,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "journey-up-the-anduin": () => upanduinFixtures(),
   "lost-in-mirkwood": () => lostmirkFixtures(),
   "the-kings-quest": () => kingsquestFixtures(),
+  "the-withered-heath": () => heathFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
