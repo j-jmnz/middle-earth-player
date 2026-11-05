@@ -25,10 +25,16 @@ export type BuiltDecklist = {
   heroLimit: { cardCode: string; cardName: string } | null;
 };
 
-/** A decimal id, a ringsdb.com decklist view URL (with or without its slug), or the public decklist JSON URL. */
-export function parseDecklistRef(input: string): string | null {
+/** What an import names on RingsDB: a published decklist, or a player's own deck (shown only while its owner shares it). */
+export type RingsDbRef = { kind: "decklist" | "deck"; id: string };
+
+/**
+ * A decimal id (a decklist), a ringsdb.com decklist or deck view URL (with or without its slug), or the public decklist or
+ * deck JSON URL.
+ */
+export function parseDecklistRef(input: string): RingsDbRef | null {
   const trimmed = input.trim();
-  if (/^\d+$/.test(trimmed)) return trimmed;
+  if (/^\d+$/.test(trimmed)) return { kind: "decklist", id: trimmed };
   let url: URL;
   try {
     url = new URL(trimmed);
@@ -37,16 +43,17 @@ export function parseDecklistRef(input: string): string | null {
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return null;
   if (url.hostname !== "ringsdb.com" && url.hostname !== "www.ringsdb.com") return null;
-  // The link RingsDB shows carries the deck's slug: /decklist/view/68989/thegoodthebadandtheugly-1.0.
-  const view = /^\/decklist\/view\/(\d+)(?:\/[^/]+)?\/?$/.exec(url.pathname);
-  if (view?.[1]) return view[1];
-  const api = /^\/api\/public\/decklist\/(\d+)\.json$/.exec(url.pathname);
-  if (api?.[1]) return api[1];
+  // The link RingsDB shows carries the slug: /decklist/view/68989/thegoodthebadandtheugly-1.0, /deck/view/4821/road.
+  const view = /^\/(decklist|deck)\/view\/(\d+)(?:\/[^/]+)?\/?$/.exec(url.pathname);
+  if (view?.[1] && view[2]) return { kind: view[1] === "deck" ? "deck" : "decklist", id: view[2] };
+  const api = /^\/api\/public\/(decklist|deck)\/(\d+)\.json$/.exec(url.pathname);
+  if (api?.[1] && api[2]) return { kind: api[1] === "deck" ? "deck" : "decklist", id: api[2] };
   return null;
 }
 
-export function decklistUrl(id: string): string {
-  return `https://ringsdb.com/api/public/decklist/${id}.json`;
+/** The public JSON for a ref. A deck's payload has the decklist's `name`, `heroes` and `slots`. */
+export function ringsDbUrl(ref: RingsDbRef): string {
+  return `https://ringsdb.com/api/public/${ref.kind}/${ref.id}.json`;
 }
 
 export function cardUrl(code: string): string {
