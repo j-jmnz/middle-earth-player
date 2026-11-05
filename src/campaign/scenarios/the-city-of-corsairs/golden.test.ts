@@ -6,7 +6,7 @@ import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
 import type { PlayerIntent } from "../../../rules/core/intents.ts";
 import type { StartScenario } from "../../../rules/setup/setup.ts";
-import { CORSAIRS_GOLDENS, UPGRADED_CODES, afterHaven, blessingChoices, playGolden, corsairsWorld, type CorsairsDecks, type CorsairsGolden } from "../../../../test/scenarios/the-city-of-corsairs/game.ts";
+import { CORSAIRS_GOLDENS, afterHaven, blessingChoices, playGolden, corsairsWorld, type CorsairsDecks, type CorsairsGolden } from "../../../../test/scenarios/the-city-of-corsairs/game.ts";
 import { CODES, campaign, corsairs } from "../../../../test/scenarios/the-city-of-corsairs/scene.ts";
 import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
@@ -45,8 +45,16 @@ function replay(game: { start: StartScenario; intents: readonly PlayerIntent[] }
     }
     if (stage === CODES.stage4) seen.add("stage 4");
     if (stage === CODES.stage3) seen.add("stage 3");
+    // CarryToSecondDeck (11215:B:1): the burden without the Ship trait is in the second deck as stage 3 begins, not set aside with the first.
+    if (stage === CODES.stage3 && of(now, OMINOUS_FATE).some((card) => card.zone === "encounterDeck")) seen.add("Ominous Fate carried into the second encounter deck");
+    // AttackOtherPlayers (11216:A:4): Captain Sahír, engaged with one player, attacks another.
+    const attack = now.pendingAttack;
+    if (attack && code(now, attack.enemyId) === CODES.captainSahir && now.cards[attack.enemyId]?.controller !== attack.seat) seen.add("Captain Sahír attacks the other player");
   };
   for (const intent of game.intents) {
+    // Streets of Umbar (12160:A:1): the players decline to travel, or travel to a location of another title, with it in the staging area.
+    const streets = of(state, CODES.streetsOfUmbar).some((card) => card.zone === "staging");
+    if (streets && state.window?.kind === "travel" && !state.activeLocation && (intent.type === "DeclineTravel" || (intent.type === "Travel" && code(state, intent.locationId) !== CODES.streetsOfUmbar))) seen.add("the Streets of Umbar tax");
     state = expectOk(reduce(state, intent, ctx)).state;
     scan(state);
     if (intent.type === "Trigger") seen.add(`Trigger ${intent.effectId}`);
@@ -111,7 +119,7 @@ goldenSuite<CorsairsGolden, CorsairsDecks>({
       }
     });
 
-    it("reaches the moments the records act in: the Black Key leaving with the Stormcaller, the swap to the second deck, The Black Sword's Refresh Action and its removal, Captain Sahír indestructible with lethal damage and then destroyed, the Stormcaller sunk, Gavin returned", () => {
+    it("reaches the moments the records act in: the Black Key leaving with the Stormcaller, the swap to the second deck, The Black Sword's Refresh Action and its removal, Captain Sahír indestructible with lethal damage and then destroyed, the Stormcaller sunk, Gavin returned, Ominous Fate carried to the second deck, Captain Sahír's attack on the other player, the Streets of Umbar tax", () => {
       const reached = new Set<string>();
       for (const golden of CORSAIRS_GOLDENS) for (const item of replay(game(golden), world(golden).ctx)) reached.add(item);
       for (const wanted of [
@@ -125,6 +133,9 @@ goldenSuite<CorsairsGolden, CorsairsDecks>({
         "Captain Sahír with lethal damage, indestructible",
         "the Stormcaller in the victory display",
         "Gavin returned, in play",
+        "Ominous Fate carried into the second encounter deck",
+        "Captain Sahír attacks the other player",
+        "the Streets of Umbar tax",
       ]) expect(reached.has(wanted), wanted).toBe(true);
     }, 120_000);
   },
@@ -132,7 +143,12 @@ goldenSuite<CorsairsGolden, CorsairsDecks>({
   won(state, golden) {
     expect(state.cards[state.questStage ?? ""]?.code).toBe(CODES.stage4);
     expect(state.resolutionLog.earned.map((item) => item.code).sort()).toEqual([]);
-    expect(golden.upgraded ? UPGRADED_CODES : []).toEqual(golden.upgraded ? [CODES.gavin, CODES.calaerion, CODES.theBlackSword, MONUMENT] : []);
+    // The cards a golden upgraded were dealt on their Upgraded side, face B, and show it at the end (Gavin's side is read at the opening); in any other game none shows side B.
+    for (const wanted of [CODES.calaerion, CODES.theBlackSword]) {
+      const faces = of(state, wanted).map((card) => card.face);
+      expect(faces.length, `${golden.name}: ${wanted}`).toBeGreaterThan(0);
+      expect(faces.every((face) => (face === "B") === (golden.upgraded === true)), `${golden.name}: ${wanted} ${faces.join()}`).toBe(true);
+    }
   },
   // What the campaign card's list awards, counted from the final state (11215:B:6 to B:9): 1 XP for each surviving player; 1 for each Corsair Warship, Shattered Monument, Crowley and Stormcaller in the victory display;
   // 2 if Thunderstruck is; -1 if Ominous Fate is; the Hard card gains 1 and the Expert card 2.

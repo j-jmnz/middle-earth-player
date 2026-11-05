@@ -6,7 +6,7 @@ import type { AmountScope } from "../../interpret/amounts.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { printedOf } from "../../core/printed.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -26,8 +26,16 @@ export function setAsideEncounterDeck(state: ScenarioState, instruction: Verb<"S
     if (!card) continue;
     if (!carry.has(card.code) && card.carried !== true) next = updateCard(moveCard(next, id, { zone: "setAside" }), id, { face: "down", controller: null });
     else if (card.zone === "encounterDiscard") next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" });
+    if (card.carried === true) next = unmarked(next, id);
   }
   return next;
+}
+
+// The mark has been used: the card is in the second deck like any other.
+function unmarked(state: ScenarioState, id: string): ScenarioState {
+  const current = state.cards[id];
+  if (!current) return state;
+  return { ...state, cards: { ...state.cards, [id]: Object.fromEntries(Object.entries(current).filter(([key]) => key !== "carried")) as CardInstance } };
 }
 
 /** CarryToSecondDeck: each boon and each burden without the trait that is in the encounter deck or its discard pile is marked as carried (setAsideEncounterDeck keeps it in the deck); one from the discard pile moves to the deck. */

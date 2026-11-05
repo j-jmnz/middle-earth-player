@@ -7,6 +7,7 @@ import { titleDeck } from "../../rules/families/sea/cards.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../rules/core/printed.ts";
+import { familyTravelCost } from "../../rules/interpret/family-hooks.ts";
 import { lastPicked } from "../../rules/interpret/player-verbs.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { livingSeats } from "../../rules/core/state.ts";
@@ -81,6 +82,17 @@ function seaPickThenWords(pick: Extract<Instruction, { verb: "Pick" }>, next: In
 
 const resources = (count: number): string => `${count} ${count === 1 ? "resource" : "resources"}`;
 
+/** The armed line of a travel option, or of "Do not travel" (`locationId` null), when a rule charges for it (Streets of Umbar, 12160:A:1): "Tap again: 2 resources go on a Raider enemy (Streets of Umbar)".
+ * Undefined when nothing is charged. */
+export function travelTaxCaution(game: ScenarioState, ctx: ReduceContext, locationId: string | null, names: Pick<ChoiceNames, "card">): string | undefined {
+  const charge = familyTravelCost(game, ctx, locationId);
+  const place = charge?.instructions.find((step) => step.verb === "PlaceResourceTokens");
+  if (!charge || place?.verb !== "PlaceResourceTokens" || typeof place.amount !== "number") return undefined;
+  const pick = charge.instructions.find((step) => step.verb === "Pick");
+  const where = pick?.verb === "Pick" && pick.pick.type === "enemy" ? article(`${pick.pick.trait ? `${pick.pick.trait} ` : ""}enemy`) : "a card";
+  return `Tap again: ${resources(place.amount)} ${place.amount === 1 ? "goes" : "go"} on ${where} (${names.card(charge.source)})`;
+}
+
 /** What a sea verb that asks a player for a card or an option says to ask (dcce.prepare-your-fleet, 11171:A:2, 11016:B:3, 11021:A:1, 110139:A:4, 110139:B:5). Null for any other verb.
  * Each prompt leads with the decision, so it reads first on a short screen. The ship a question is about is named by `seaAsk`, which reads the game. */
 export function seaPickWords(instruction: Instruction, next?: Instruction, names?: ChoiceNames, sourceId?: string | null, game?: ScenarioState, after?: readonly Instruction[]): PickWords | null {
@@ -112,7 +124,7 @@ export function seaPickWords(instruction: Instruction, next?: Instruction, names
 /** The questions that need the game to be worded: the ship a Campaign Setup choice is for (the fitting's ship is the first without a Modification boon, the trade's is
  * `instruction.ship`), the hero a trade pays, the second ship of a lone player, and the excess damage a Ship objective takes. Null for any other pick. `options` are the ids
  * the sheet offers. */
-export function seaAsk(pick: Instruction, next: Instruction | undefined, options: readonly string[], game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, sourceId: string | null): PickWords | null {
+export function seaAsk(pick: Instruction, next: Instruction | undefined, options: readonly string[], game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, sourceId: string | null, after: readonly Instruction[] = []): PickWords | null {
   if (pick.verb === "FitShips") {
     const ship = controlledShips(game, ctx).find((id) => !(game.cards[id]?.attachments ?? []).some((attached) => pick.codes.includes(game.cards[attached]?.code ?? "")));
     return { verb: "Fit", prompt: ship ? `${names.card(ship)}: choose a Modification boon to attach.` : "Choose a Modification boon to attach." };
@@ -149,8 +161,21 @@ export function seaAsk(pick: Instruction, next: Instruction | undefined, options
   // A Raider enemy that gets resources (Watch Tower's Shadow, 12156:A:2; Foes of Ecthelion, 12163:A:1): the player chooses which.
   if (pick.verb === "Pick" && pick.pick.type === "enemy" && pick.pick.trait === "Raider" && next?.verb === "PlaceResourceTokens" && next.on === "picked") {
     const host = sourceId ? names.card(sourceId) : "This card";
-    const gets = typeof next.amount === "number" ? resources(next.amount) : "resources equal to the printed cost of the ally destroyed";
+    const gets = typeof next.amount === "number" ? resources(next.amount) : next.amount.stat === "cost" && next.amount.of === "other" ? "resources equal to the printed cost of the ally destroyed" : "resources";
     return { verb: "Give", prompt: `${host}: choose a Raider enemy ${pick.pick.stagingOnly === true ? "in the staging area " : ""}to get ${gets}.` };
+  }
+  // Umbar Harbor's Shadow (12162:A:2): the hero who gives the 1 resource, before the attacking Raider that gets it is picked.
+  if (pick.verb === "Pick" && pick.pick.type === "hero" && pick.pick.hasResources === true && next?.verb === "Pick" && next.pick.attackingEnemy === true) {
+    return { verb: "Give", prompt: `${sourceId ? names.card(sourceId) : "This card"}: choose a hero you control to give 1 resource to the attacking Raider.` };
+  }
+  // Southern Belfalas's Travel (12154:A:1): any one player reveals the top Corsair card and engages it.
+  if (pick.verb === "RevealCorsair" && pick.who === "anyPlayer") {
+    return { verb: "Engage", prompt: `${sourceId ? names.card(sourceId) : "This card"}: choose the player who reveals the top card of the Corsair deck and engages it.` };
+  }
+  // The Black Sword's Refresh Action (11215:B:3): the Sword is the only card that holds the resource, so it is taken without asking and the hero's choice says what it is for.
+  const moved = after[0];
+  if (pick.verb === "Pick" && pick.pick.type === "hero" && pick.pick.control === "you" && pick.pick.state === "ready" && next?.verb === "Exhaust" && moved?.verb === "MoveResources" && typeof moved.amount === "number") {
+    return { verb: "Exhaust", prompt: `Choose a hero you control to exhaust and take ${resources(moved.amount)} from The Black Sword.` };
   }
   // The Black Sword's Refresh Action (11215:B:3): the resource comes off the Sword.
   if (pick.verb === "Pick" && pick.pick.names?.includes("The Black Sword") && next?.verb === "Pick") return { verb: "Take", prompt: "The Black Sword gives 1 resource to the hero who exhausts." };

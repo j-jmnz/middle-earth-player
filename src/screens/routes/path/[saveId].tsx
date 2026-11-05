@@ -179,7 +179,8 @@ export default function CampaignPath() {
           Spend after this scenario.
         </Label>
       ) : null}
-      {save.active == null && xpUnspentOf(save.log) > 0 ? (
+      {/* Once the last scenario is won there is no scenario to spend before: the total stays, the control goes. */}
+      {save.active == null && !complete && xpUnspentOf(save.log) > 0 ? (
         <View className="-ml-3 mt-1 items-start">
           <TextButton label="Spend XP" testID="xp-open" tone="accent" onPress={() => router.push({ pathname: "/xp/[saveId]", params: { saveId: save.id } })} />
         </View>

@@ -15,7 +15,13 @@ tags:
       SCENARIO_ID: the-city-of-corsairs
       # The Heading is on the table while the victory shows: one widget of this scenario's own table.
       TABLE_WIDGET: heading-value
-# Every scenario is won: the path says so and has nothing to begin.
+      # The last part of the campaign: Spend XP is gone with the campaign complete, the XP total stays.
+      LAST_PART: "1"
+# Every scenario is won: the path says so, has nothing to begin and nothing to spend the XP before.
+- assertVisible:
+    id: xp-line
+- assertNotVisible:
+    id: xp-open
 - assertVisible: ".*9 of 9 completed.*"
 - assertNotVisible:
     id: begin

@@ -18,7 +18,7 @@ import { askWords } from "../words/ask.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
-import { seaOptionLabel } from "../words/sea.ts";
+import { seaOptionLabel, travelTaxCaution } from "../words/sea.ts";
 import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
 import { DONE } from "../../rules/families/deck/choose.ts";
@@ -354,6 +354,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const activePoints = active ? questPointsOf(game, active, ctx.cards) : null;
       const waiting = area.staging.some((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "location");
       const blocked = targets.length === 0 && active != null && waiting;
+      const declineTax = travelTaxCaution(game, ctx, null, names);
       return {
         kind: "pick",
         key: `travel:${game.round}`,
@@ -382,13 +383,14 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const granted = grantedTravelWords(game, id);
           const grapple = grappleTravel(game, ctx, id);
           const label = [mapped?.lead, base.label, line, granted, caller?.words, grapple?.words, mapped?.words].filter((part) => part != null && part !== "").join(" · ");
-          const caution = caller?.caution ?? grapple?.caution ?? mapped?.caution;
+          // A rule that charges for leaving where the players are (Streets of Umbar, 12160:A:1) is said before the confirm sends.
+          const caution = caller?.caution ?? grapple?.caution ?? mapped?.caution ?? travelTaxCaution(game, ctx, id, names);
           return { ...base, label, stats, ...(caution ? { caution } : {}), ...(mapped ? { place: mapped.place } : {}), intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),
         primary: null,
         // The players must travel if able on some stages (mec109.stage-4): the engine then offers no way to decline.
-        alternative: has(legal, "DeclineTravel") ? { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" } } : null,
+        alternative: has(legal, "DeclineTravel") ? { label: targets.length > 0 ? "Do not travel" : "Continue", intent: { type: "DeclineTravel" }, ...(declineTax ? { caution: declineTax } : {}) } : null,
       };
     }
     case "optionalEngage": {

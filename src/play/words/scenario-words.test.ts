@@ -25,6 +25,9 @@ import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 // The instructions that ask for something besides a Pick of a card: the sheet words them with pickWords (src/play/choice/sheets.ts).
 const ASKING = new Set([...ASKING_VERBS, "PickEncounter", "ChooseX", "Reattach", "PlayFromHand", "PayToPlay", "SpendResources", "ChooseAmount", "DiscardRestricted", "AssignDamage"]);
 
+// RevealCorsair asks only when the first player names who reveals it (12154:A:1); the other readings of the verb name nobody.
+const asks = (instruction: Instruction): boolean => ASKING.has(instruction.verb) || (instruction.verb === "RevealCorsair" && instruction.who === "anyPlayer");
+
 // A sentence that is allowed to equal the fallback or to be a bare prompt, by `<record id> @<the instruction's path in the record> <verb | option id>`
 // (test/harness/record-walk.ts). Each entry says why it is fine, and the test fails on an entry no sentence needs any more.
 const OPEN_ACTIVE = "Open: picks the active location, a single card unless a second location is active; the prompt should say what the location is picked for.";
@@ -79,7 +82,7 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
     problems.length = 0;
     for (const effect of records) {
       walk(effect.instructions, (instruction, next, after, path) => {
-        if (!ASKING.has(instruction.verb)) return;
+        if (!asks(instruction)) return;
         // Only a ReturnToStaging that lets the player choose an engaged enemy asks; the others send a known card back without a question.
         if (instruction.verb === "ReturnToStaging" && !(instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose")) return;
         const words = askWords({ game, ctx, names, instruction, queue: next ? [next, ...after] : [], options: [], source: effect.cardCode, picked: null });
@@ -124,15 +127,15 @@ describe("pinned sentences", () => {
   const campaign = campaigns.find((one) => one.scenarios.includes("a-storm-on-cobas-haven")) ?? campaigns[0]!;
   const game = blankScenario({ seatCount: 2, seed: 1, definition: scenarioDefinition(scenario, campaign, EFFECTS) });
   const ctx: ReduceContext = { effects: EFFECTS, cards: new Map() };
-  const asked = (id: string, verb?: string): { pick: Instruction; next: Instruction | undefined; after: readonly Instruction[] } => {
+  const asked = (id: string, verb?: string, nth = 0): { pick: Instruction; next: Instruction | undefined; after: readonly Instruction[] } => {
     const found: { pick: Instruction; next: Instruction | undefined; after: readonly Instruction[] }[] = [];
     walk(EFFECTS.find((effect) => effect.id === id)!.instructions, (instruction, next, after) => {
-      if (verb ? instruction.verb === verb : ASKING.has(instruction.verb)) found.push({ pick: instruction, next, after });
+      if (verb ? instruction.verb === verb : asks(instruction)) found.push({ pick: instruction, next, after });
     });
-    return found[0]!;
+    return found[nth]!;
   };
-  const words = (id: string, code: string, verb?: string) => {
-    const { pick, next, after } = asked(id, verb);
+  const words = (id: string, code: string, verb?: string, nth = 0) => {
+    const { pick, next, after } = asked(id, verb, nth);
     return askWords({ game, ctx, names, instruction: pick, queue: next ? [next, ...after] : [], options: [], source: code, picked: null }).prompt;
   };
 
@@ -151,6 +154,14 @@ describe("pinned sentences", () => {
   it("names Corsair Skirmisher and Taking on Water in the sentences that said this card (12125, 12132)", () => {
     expect(words("12125:response:1", "12125")).toBe("Corsair Skirmisher: choose an ally to discard. At least 3 Willpower is needed to take control of it as a Ship objective.");
     expect(words("12132:whenRevealed:1", "12132")).toBe("Choose the Ship objective to attach Taking on Water to.");
+  });
+
+  it("says who gives and who gets in The City of Corsairs' resource moves (12162, 12154, 12156, 11215)", () => {
+    expect(words("12162:shadow:1", "12162")).toBe("Umbar Harbor: choose a hero you control to give 1 resource to the attacking Raider.");
+    expect(words("12162:shadow:1", "12162", undefined, 1)).toBe("Umbar Harbor: the attacking enemy gets 1 resource.");
+    expect(words("12154:travel:1", "12154")).toBe("Southern Belfalas: choose the player who reveals the top card of the Corsair deck and engages it.");
+    expect(words("12156:shadow:1", "12156")).toBe("Watch Tower: choose a Raider enemy to get resources equal to the printed cost of the ally destroyed.");
+    expect(words("11215:action:1", "11215", undefined, 1)).toBe("Choose a hero you control to exhaust and take 1 resource from The Black Sword.");
   });
 });
 

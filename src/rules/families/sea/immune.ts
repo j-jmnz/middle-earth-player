@@ -2,13 +2,16 @@
 // immuneToPlayerEvents is not offered to an event's Pick, the way a card that is immune to player card effects is not (a player card that is not an event still reaches it).
 import type { PickContext } from "../../interpret/pick.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 
+const READS_FLAG = '"stat":"immuneToPlayerEvents"';
+
 /** The family's pick hook: false when the candidate is immune to player events and the effect choosing it is a player event. */
 export function immuneToEvents(state: ScenarioState, id: string, at: PickContext, ctx: ReduceContext): boolean {
-  if (at.counting || at.sourceId == null || !flagged(state, id, "immuneToPlayerEvents")) return true;
+  if (at.counting || at.sourceId == null || !flagged(state, id, "immuneToPlayerEvents") || !gameReads(state, ctx, READS_FLAG)) return true;
   const source = state.cards[at.sourceId];
   if (!source) return true;
   const printed = printedOf(ctx.cards, source.code);

@@ -227,8 +227,7 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
-  // A ship-objective attacks only ship-enemies (dcce.ship-objectives).
-  // "Only Ship objectives can be declared as attackers against Raider Flagship" (12124:A:3).
+  // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
   if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code))) return false;
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;

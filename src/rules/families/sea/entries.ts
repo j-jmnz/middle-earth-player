@@ -28,7 +28,7 @@ export function noteEntries(state: ScenarioState, ctx: ReduceContext): ScenarioS
 /** Whether a limit in force says the card cannot be played or put into play now: it is an ally and this round's allies that entered play have reached `max`. */
 export function entriesBarred(state: ScenarioState, cardId: string, ctx: ReduceContext): boolean {
   const card = state.cards[cardId];
-  if (!card || inPlay(card.zone)) return false;
+  if (!card || inPlay(card.zone) || !gameReads(state, ctx, READS_LIMIT)) return false;
   const printed = printedOf(ctx.cards, card.code);
   if (!isAllyLike(printed) || printed.type === "hero") return false;
   const known = state.entries;

@@ -58,6 +58,8 @@ describe("CarryToSecondDeck (11215:B:1)", () => {
     const next = setAsideEncounterDeck(carryToSecondDeck(made.state, carry, made.ctx), { verb: "SetAsideEncounterDeck", carry: [CODES.watchTower] });
     expect(codesAt(next, next.encounterDeck)).toEqual([OMINOUS_FATE, CODES.crowley, CODES.watchTower].sort());
     expect(codesAt(next, next.setAside)).toEqual([CODES.lightCruiser, CODES.thunderstruck, CODES.waterspout].sort());
+    // The mark is used up: the cards kept are in the second deck like any other.
+    expect(Object.values(next.cards).some((card) => card.carried !== undefined)).toBe(false);
   });
 
   it("leaves a burden in play where it is, and does nothing in a game with no boon or burden in the deck", () => {
@@ -97,6 +99,15 @@ describe("immune to player events (12159:A:1)", () => {
     expect(pickFor(made, made.state, idOf(made.state, MONUMENT))).toContain(withResource);
   });
 
+  it("does nothing in a game with no card that reads the flag, whatever holds it", () => {
+    const made = make({ staging: [{ code: CODES.umbarRaider, resources: 1 }], hand: ["event"] });
+    const raider = idOf(made.state, CODES.umbarRaider);
+    const flagged = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: raider, sourceId: raider, stat: "immuneToPlayerEvents" as const, amount: 1, until: "whileSourceInPlay" as const }] };
+    expect(pickFor(made, flagged, idOf(flagged, "event"))).toContain(raider);
+    const withMonument = make({ staging: [MONUMENT, { code: CODES.umbarRaider, resources: 1 }], hand: ["event"] });
+    expect(pickFor(withMonument, withMonument.state, idOf(withMonument.state, "event"))).not.toContain(idOf(withMonument.state, CODES.umbarRaider));
+  });
+
   it("ends when the Monument leaves the staging area", () => {
     const made = make({ staging: [MONUMENT, { code: CODES.umbarRaider, resources: 1 }], hand: ["event"] });
     const left = syncConstants(moveCard(made.state, idOf(made.state, MONUMENT), { zone: "encounterDiscard" }), made.ctx);
@@ -122,6 +133,13 @@ describe("LimitEntries (12155:A:1)", () => {
     // The ally that entered is discarded: it entered play this round all the same.
     const gone = noteEntries(moveCard(entered, first ?? "", { zone: "discard", seat: 0 }), made.ctx);
     expect(entriesBarred(gone, second ?? "", made.ctx)).toBe(true);
+  });
+
+  it("bars nothing in a game with no card that reads the limit", () => {
+    const made = make({ hand: ["ally", "ally"] });
+    const [first, second] = idsOf(made.state, "ally");
+    const entered = moveCard({ ...made.state, entries: { round: made.state.round, mark: made.state.clock, count: 5 } }, first ?? "", { zone: "play", seat: 0 });
+    expect(entriesBarred(entered, second ?? "", made.ctx)).toBe(false);
   });
 
   it("counts again in the next round, and does not bar a card that is not an ally or a game whose location is not active", () => {

@@ -12,7 +12,7 @@ import { addStandIns, entry, fightEnemy, HERO, HERO2, HERO3, opening, sceneEffec
 
 // Shared scene for the The City of Corsairs effect tests (dream-chaser part 9, campaign card 11215). Test-only. The heroes are plain numbers (no player card text), so what a test shows comes from
 // the scenario's records and the engine. The helpers every scene shares (id lookups, answers, the fight) are test/harness/scene-kit.ts; this file keeps the scenario's codes, its layout and its table.
-// TODO: describe the cards that need their own layout fields (a second active location, a grotto deck, an island map) and add them to the layout and the table below.
+// The layout needs no field of its own: the Corsair deck, the second encounter deck and the set aside Black Sword and Captain Sahír are dealt with `deck`, `setAside` and `staging`, and the tests that read them put the cards there.
 export const corsairs: ScenarioData = loadScenario("the-city-of-corsairs");
 export const campaign: CampaignData = loadCampaign("dream-chaser");
 export const dealt: ScenarioData = campaignScenario(corsairs);

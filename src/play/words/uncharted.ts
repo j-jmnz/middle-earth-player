@@ -166,8 +166,9 @@ export function unchartedPickWords(pick: Instruction, next: Instruction | undefi
     case "LookAtTop":
     case "LookAtBottom":
       return { verb: "Look", prompt: `${host}: choose the player whose deck you look at the top and bottom cards of.` };
+    // The card from the deck among the ones looked at (The Fate of Númenor's switch); any other Pick that precedes a Pick is worded by its own family.
     case "Pick":
-      return { verb: "Switch", prompt: `${host}: choose the card from your deck, among the ones you looked at, to switch with a card in your hand.` };
+      return pick.verb === "Pick" && pick.pick.looked === true && pick.pick.from === "deck" ? { verb: "Switch", prompt: `${host}: choose the card from your deck, among the ones you looked at, to switch with a card in your hand.` } : null;
     case "SwapPicked":
       return { verb: "Switch", prompt: `${host}: choose the card in your hand to switch with the one from your deck.` };
     case "MoveCard":

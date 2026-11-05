@@ -24,12 +24,24 @@ export type SettleHook = (state: ScenarioState, ctx: ReduceContext, steps: Engin
  * families is SETTLE_ORDER in src/rules/families/index.ts. */
 export type SettleHooks = { readonly before?: SettleHook; readonly after?: SettleHook; readonly sweep?: SettleHook };
 
+/** What traveling costs beyond the location's own Travel line: the instructions to resolve, in a frame of their own for `source` (the card whose rule charges it). */
+export type TravelCharge = { readonly source: string; readonly instructions: readonly Instruction[] };
+
 /** Traveling the families change: `may` lets the players travel although the active location stays; `reach` lists locations beyond staging
- * they may travel to (appended after the staged ones, when `may` holds or not: a family returns [] when it does not apply). */
+ * they may travel to (appended after the staged ones, when `may` holds or not: a family returns [] when it does not apply). `cost` is the charge
+ * for traveling to `locationId`, or for declining to travel when it is null (the first family's charge wins); `forced` lists the staged locations the
+ * players must travel to because they cannot pay a charge (appended after the core's own). `unpayable` is true for an instruction of a Travel line that the
+ * players cannot pay now (rr.travel: they then cannot travel to that location). */
 export type TravelHooks = {
   readonly may?: (state: ScenarioState, ctx: ReduceContext) => boolean;
   readonly reach?: (state: ScenarioState, ctx: ReduceContext) => readonly string[];
+  readonly cost?: (state: ScenarioState, ctx: ReduceContext, locationId: string | null) => TravelCharge | null;
+  readonly forced?: (state: ScenarioState, ctx: ReduceContext) => readonly string[];
+  readonly unpayable?: (state: ScenarioState, instruction: Instruction) => boolean;
 };
+
+/** Whether a family bars playing a card, or putting it into play (`putting`), from the hand or by an effect: true bars it. Asked after the core's own bars. */
+export type PlayHook = (state: ScenarioState, cardId: string, ctx: ReduceContext) => boolean;
 
 /** A filter predicate of a family: false takes the card out of the pick, true leaves the other predicates to decide. Runs after the core's. */
 export type PickHook = (state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext) => boolean;
@@ -66,4 +78,5 @@ export type RulesFamily = {
   readonly amount?: AmountHook;
   readonly attached?: AttachedHook;
   readonly combat?: CombatHooks;
+  readonly play?: PlayHook;
 };

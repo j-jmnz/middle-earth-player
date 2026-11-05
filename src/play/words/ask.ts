@@ -32,7 +32,7 @@ export function askWords(a: {
   }
   return (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
-    seaAsk(instruction, queue[0], options, game, ctx, names, source) ??
+    seaAsk(instruction, queue[0], options, game, ctx, names, source, queue.slice(1)) ??
     pickWords(instruction, queue[0], names, source, source ? restrictedLimit(game, source) : 2, game, amountNow, queue.slice(1))
   );
 }

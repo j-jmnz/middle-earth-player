@@ -10,7 +10,7 @@ import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, engageOneEach, fillerLoadout, HERO_STATS, STRONG_HEROES as HEROES, type PlayedGame } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The City of Corsairs in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to the first location they are offered (declining only when none is), engage one enemy at a time, and answer a choice with the first option or, as the policy says, the last; the Sailing test, the hunt for Captain Sahír and The Black Sword's Refresh Action are the policy fields below.
 export const CORSAIRS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type CorsairsDecks = "strong" | "weak" | "brittle" | "armed";
