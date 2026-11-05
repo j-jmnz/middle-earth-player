@@ -53,6 +53,16 @@ User decisions (2026-11-05):
 - `PaperSheet` titles are not headers.
 - Some things are announced twice: the toast, and the resolution's ", selected".
 
+### Independence from ordinary play
+
+The screen reader path is entirely separate from ordinary play (user instruction, 2026-11-05). With no screen reader on, the app looks, moves, sounds and plays exactly as it does now. This covers the canvas, gestures, drag, the hand scrub, the spotlight, motion, haptics, timings, words on screen, layout, and the web build.
+
+- **One gate.** All new reader behaviour is gated on `useReaderMode()`, a new hook in `src/ui/screen-reader.ts` that returns `Platform.OS !== "web" && useScreenReader()`. The plain `useScreenReader()` answers yes on web, so it is not a gate for anything new.
+- **The reader's own files.** New reader code lives in its own files: `card-speech.ts`, `reader-table.tsx`, `announce.ts`, `use-reader-focus.ts` and `long-press-action.ts`. The ordinary path does not import a reader file, except through one switch at the point where the reader takes over, such as `table-canvas.native.tsx` choosing `ReaderTable`.
+- **Ordinary files gain only accessibility props.** A shared file can gain `accessibility*`, `importantForAccessibility` and `onAccessibilityAction` props, which a sighted touch user never meets. It does not change what is drawn, how a touch acts, or any text on screen. When a reader needs different words (a note, a hint), they are a field read only under `useReaderMode()`; the visible string stays the same.
+- **Tests stay as they are.** No golden, fixture, Maestro flow or existing test assertion changes, except the import of moved `announceForAccessibility` calls. The engine (`src/rules`) and `data/` are not touched.
+- **The reviewer checks it.** `reviewer` checks each section's diff against these rules and blocks any change that reaches a user with no screen reader on.
+
 ### How the work runs
 
 The plan runs through `orchestrator` with Sonnet implementers, one commit per section. Then one review round: `reviewer` on every section, and `ux` on the sections that touch `src/play` or `src/screens`.
@@ -83,7 +93,7 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 - The hint says what a tap does in the open moment: "Can be played, costs 2 Spirit"; "Can commit, 3 willpower"; "Pick to defend, takes 3 damage, destroyed". It reads `TableHighlight` (`tappable`, `picked`, `marks`, `muted`) and the window sheet's `plays`.
 - `zoneSpeech(zone, count, seat, game)` says the zone headings: "Staging area, 3 cards, threat 5"; "Engaged with you, 2 enemies"; "Your hand, 6 cards".
 - Pile words stay in `pile-speech.ts`.
-- `ZoneRow` (`table-canvas.tsx`) and `spoken()` (`table-canvas.native.tsx`) both call `cardSpeech`, so the web list and the phone say the same words.
+- The reader table calls `cardSpeech`, and so does `spoken()` (`table-canvas.native.tsx`), which is reached only with a reader on. Its existing sentences stay word for word, and the existing tests prove it. The web list (`table-canvas.tsx`) is not touched.
 
 **`src/ui/announce.ts`**
 - `announce(text)` queues what it is given, so one line does not cut off the next (iOS drops an announcement made while another is speaking). It moves on at the `announcementFinished` event, and on a timer on Android.
@@ -101,7 +111,7 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 ## 2. The reader table on the phone
 
 **`src/play/canvas/reader-table.tsx`**
-- The web list's `ZoneRow`, `PileRow`, `SeaLines` and `DiscoverLook` move to a shared `src/play/canvas/table-list.tsx`, so the web and the reader table use one copy. `table-canvas.tsx` keeps only its frame.
+- The reader table is its own component. It reads the same selectors as the web list (`zoneSelector`, `pileSelector`, `secondPilesOf`, the sea and look words), and the web list's file is not edited.
 - The zones are headers (`accessibilityRole="header"` with `zoneSpeech`), in this order:
   1. the quest and the active location;
   2. staging, then engaged;
@@ -113,12 +123,11 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 - A custom action **"Show card"** (`accessibilityActions`) opens the preview, as the long press does. A pile's action opens its list.
 
 **`table-canvas.native.tsx`**
-- While `useScreenReader()` is on, it renders `ReaderTable` in place of the `Canvas` and `ReaderPiles`.
+- While `useReaderMode()` is on, it renders `ReaderTable` in place of the `Canvas` and `ReaderPiles`. When it is off, the canvas branch is the code that runs today, unchanged.
 - `onRowFeet` and `reach` still answer, so the command column lays out as before. The gestures are not mounted.
-- `ReaderPiles` is deleted once nothing else uses it.
 
-**The window sheet's note.** With a reader on, "Tap a glowing card to play it, or drag it" becomes "Cards that say 'can be played' can be played now."
-- `SheetNames` gains a `reader` flag, read in `windowSheet` (`bar-sheets.ts`) and wherever else a note says "glowing", "drag" or "tap on the table". Find them with a grep on `src/play/choice/*sheets*.ts`.
+**The window sheet's note.** A sheet gains an optional `readerNote` beside its `note`. The window sheet's is "Cards that say 'can be played' can be played now.", in place of "Tap a glowing card to play it, or drag it". So is any other note that says "glowing", "drag" or "tap on the table" (find them with a grep on `src/play/choice/*sheets*.ts`).
+- The dock speaks `readerNote` only under `useReaderMode()`. The visible `note` and every existing sheet test stay as they are.
 
 **Tests**
 - `table-list-rows.test.ts`: the order and grouping as a pure function.
@@ -140,7 +149,7 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 
 **Distribute rows** (pay a cost, assign damage)
 - Each row is `adjustable`, with increment and decrement actions that add or take away one share, and the value "2 of 3 paid".
-- Tap still adds one. The pure step goes in `tray-logic.ts`.
+- These are accessibility actions only. A touch on the row behaves as it does now. The pure step goes in `tray-logic.ts`, as a new function; the existing ones do not change.
 
 **Roles in the tray.** A pick row is a `radio`, a multi row a `checkbox`, and a trigger row a `button`. Each row's spoken name is its label and detail, from `trayTiles`.
 
@@ -179,14 +188,14 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 - The sphere chips in `pool/filter-sheet.tsx` become radios, with a group label. `OptionRow` gets a hint that it opens a choice. The captions become headers.
 - The Ring-bearer candidates (`briefing/seat-picker.tsx`) become radios with selected state.
 - The resolution tiles (`routes/resolution/[saveId].tsx`) drop ", selected" from their label.
-- Each node of the path road (`campaign/path-road.tsx`) gets text and a state (won, next, locked, coming soon), even when it cannot be pressed.
+- Each node of the path road (`campaign/path-road.tsx`) gets an `accessibilityLabel` and a state (won, next, locked, coming soon), even when it cannot be pressed. Nothing visible changes.
 - The log's notes field (`routes/log/[saveId].tsx`) gets a label. The `Eyebrow` labels that title a group (`kit/chrome-text.tsx`) become headers.
 - The card page's picture (`images/picture.tsx`, `InspectCardImage`) gets the card's name. The pinch zoom stays a visual extra. The page already shows the card's text: check it is in the reading order.
 
 **The booklet reader** (`modules/booklet-pdf`, `routes/booklet/[id].tsx`)
 - Android (`BookletPdfView.kt`): each page's `ImageView` gets `contentDescription` "Page 12 of 32", and changing page announces it.
 - iOS (`BookletPdfModule.swift`): check that PDFKit reads the page's text and says the page. Where it does not, label it the same way.
-- On both: a **"Rules on this page"** button lists the rule entries from that page (`data/rules/entries.json`, by document and page, through the catalog), which open in the rules reader. This is the readable path to the booklet's words.
+- On both: under `useReaderMode()` only, so it is never drawn for a sighted user, a **"Rules on this page"** button lists the rule entries from that page (`data/rules/entries.json`, by document and page, through the catalog), which open in the rules reader. This is the readable path to the booklet's words.
 - The native compile is a phone check (`docs/phases/STATUS.md`, phase 10 already lists it).
 
 **The static check:** `scripts/checks/a11y.test.ts`. It parses `src/**/*.tsx` with the `typescript` package, as the other checks do, and fails on:
@@ -234,6 +243,11 @@ A screen's own section adds only what departs from this.
 ## Verification
 
 **After each section.** `pnpm lint`, `pnpm typecheck`, `pnpm vitest run <touched tests>`, then `pnpm test:changed`.
+
+**Independence check.**
+- Every existing test, golden, fixture and Maestro flow passes unchanged. `git diff origin/main -- '*.test.ts' .maestro src/campaign/fixtures` shows only new files and moved announce imports.
+- Web screenshots (the `run` skill) of the hub, the deck editor and the table are taken before and after the plan, and match.
+- `useReaderMode()` returns false on web and with no reader on, which a test in `screen-reader.test.ts` checks.
 
 **Once at the end.** `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm data:check` and `pnpm docs:index`. Report each command and its result. `reader-play.test.ts` and `a11y.test.ts` are the parity gates.
 
