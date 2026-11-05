@@ -105,11 +105,11 @@ Read the sections your task touches.
   - 868–893 Persistence and shipping (~1.7K)
   - 894–935 Screens (~4.7K) ← 2
     - 920–935 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~30.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~30.2K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
-  - 28–35 Quest scale (~500) ← 3
+  - 28–35 Quest scale (~530) ← 3
   - 36–39 Canvas (~560) ← 2
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
