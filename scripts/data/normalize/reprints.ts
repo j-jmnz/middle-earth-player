@@ -2,7 +2,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import { titleKey } from "./names.ts";
 
 // The Dream-chaser Campaign Expansion reprints some cards of the Adventure Packs with a "Campaign Mode only" or "Upgraded" side (the
-// rulebook's p29; docs/plans/dream-chaser.md, Facts). A reprint has the code `110` and its collector number (data/overrides.json,
+// rulebook's p29; docs/plans/done/dream-chaser.md, Facts). A reprint has the code `110` and its collector number (data/overrides.json,
 // productCodes) and is the same card as its original: same name, type and encounter set. A campaign game deals the reprint where one
 // exists; standalone play deals the original, which is what a scenario's piles name (ScenarioData.reprints maps one to the other).
 export const isReprint = (card: Pick<Card, "code" | "printings">): boolean => /^110\d{3}$/.test(card.code) && card.printings.some((printing) => printing.pack === "DCCE");

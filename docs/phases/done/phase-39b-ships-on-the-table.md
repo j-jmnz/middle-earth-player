@@ -3,7 +3,7 @@
 Depends on: phase 39
 Blocks: phase 40 (its phone half; its engine half needs only phase 39)
 
-Plan: [docs/plans/dream-chaser.md](../../plans/dream-chaser.md), "Phase 39b - Ships on the table" and "Notes for the orchestrator and the implementer agent". User request, 2026-10-30: "how to handle ships and their cards on the board in the limited board space." The user chose the Heading dial, folding into a "+n" stack, the Corsair piles on the board and the Island Map chip with a panel (2026-10-30).
+Plan: [docs/plans/done/dream-chaser.md](../../plans/done/dream-chaser.md), "Phase 39b - Ships on the table" and "Notes for the orchestrator and the implementer agent". User request, 2026-10-30: "how to handle ships and their cards on the board in the limited board space." The user chose the Heading dial, folding into a "+n" stack, the Corsair piles on the board and the Island Map chip with a panel (2026-10-30).
 
 ## Goal
 

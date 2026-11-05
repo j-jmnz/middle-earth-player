@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~8.3K tok)
   - 5–16 Rules (~550)
-  - 17–75 Phases (~2.3K)
-  - 76–172 Open items (~4.8K)
+  - 17–75 Phases (~2.4K)
+  - 76–174 Open items (~4.9K)
     - 78–92 Fixtures and Maestro (~640)
-    - 93–126 Rules and engine (~1.4K)
-    - 127–148 Screens and code (~1.2K)
-    - 149–172 Phone and tablet checks (~1.6K)
-  - 173–189 Standing decisions (~430)
+    - 93–128 Rules and engine (~1.4K)
+    - 129–150 Screens and code (~1.2K)
+    - 151–174 Phone and tablet checks (~1.6K)
+  - 175–191 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -203,7 +203,6 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
 
 ## Done phases
 
@@ -256,31 +255,19 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
   - 176–190 E2E (~270)
   - 191–213 Exit (~320)
 - `docs/phases/done/phase-40-voyage-across-belegaer.md` — Phase 40 — Voyage Across Belegaer (~970 tok)
-- `docs/phases/done/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~910 tok)
-- `docs/phases/done/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~920 tok)
+- `docs/phases/done/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~920 tok)
+- `docs/phases/done/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~930 tok)
 - `docs/phases/done/phase-43-flight-of-the-stormcaller.md` — Phase 43 — Flight of the Stormcaller (~930 tok)
-- `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~930 tok)
-- `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~940 tok)
+- `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~940 tok)
+- `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~950 tok)
 - `docs/phases/done/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
 - `docs/phases/done/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
+- `docs/phases/done/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
 
 ## Live plans
 
 Read when a task names the plan.
 
-- `docs/plans/dream-chaser.md` — Plan: Dream-chaser (The Grey Havens and the six Dream-chaser Adventure Packs) (~10.4K tok)
-  - 3–26 Context (~760)
-  - 27–88 Facts found during exploration (~3.3K) ← 1
-  - 89–177 Approach: thirteen new phases (37-48 and 39b) (~5.2K)
-    - 93–111 Phase 37 - Dream-chaser data (nothing playable yet) (~1.3K)
-    - 112–124 Phase 38 - Dream-chaser campaign shell and XP (~640)
-    - 125–138 Phase 39 - Sea mechanics family (~740)
-    - 139–152 Phase 39b - Ships on the table (~240)
-    - 153–177 Phases 40-48 - one scenario each (phase 12 procedure) (~2.1K)
-  - 178–188 Critical files (~310)
-  - 189–202 Verification (~210)
-  - 203–213 Notes for the orchestrator and the implementer agent (~380)
-  - 214–221 Risks (~210)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.3K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
@@ -346,6 +333,7 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/board-ux.md` — Board UX: motion, focus and a quieter table (~3.5K tok)
 - `docs/plans/done/combat-spotlight-redesign.md` — Combat spotlight redesign (~3.9K tok)
 - `docs/plans/done/data-store-refactor.md` — Plan: a local game-data store, fetched once, generated wherever possible (~5.1K tok)
+- `docs/plans/done/dream-chaser.md` — Plan: Dream-chaser (The Grey Havens and the six Dream-chaser Adventure Packs) (~10.4K tok)
 - `docs/plans/done/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
 - `docs/plans/done/inactive-text.md` — Inactive text: a rethink (~2.4K tok)
 - `docs/plans/done/performance-pass.md` — Performance pass: snappy taps, animations and screens (user request, 2026-10-29) (~4.3K tok)
@@ -361,7 +349,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
-- `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
+- `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/done/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/tools`: phases/phase-12-knife-in-the-dark.md, Scenario procedure (2); architecture.md, Modules (1)
 - `src/campaign`: architecture.md, Tests (2)

@@ -3,7 +3,7 @@
 Depends on: phase 38
 Blocks: phase 40
 
-Plan: [docs/plans/dream-chaser.md](../../plans/dream-chaser.md), "Phase 39 - Sea mechanics family" and "Notes for the orchestrator and the implementer agent".
+Plan: [docs/plans/done/dream-chaser.md](../../plans/done/dream-chaser.md), "Phase 39 - Sea mechanics family" and "Notes for the orchestrator and the implementer agent".
 
 ## Goal
 

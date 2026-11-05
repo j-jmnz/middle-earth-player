@@ -39,7 +39,7 @@ export type SetupClause =
   | { kind: "addToHandAfterMulligan"; codes: string[]; count: number }
   | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[] };
 
-// Dream-chaser (docs/plans/dream-chaser.md, phase 37): the Setup steps of its stage 1A and campaign cards. Every one is quoted from a
+// Dream-chaser (docs/plans/done/dream-chaser.md, phase 37): the Setup steps of its stage 1A and campaign cards. Every one is quoted from a
 // ledger line (data/printed/dream-chaser.json) and names the cards (and, for the deck steps, the encounter sets) it moves; the build checks
 // that each card the load list puts in a pile is placed by one of them, the engine families of phases 39 to 48 run them.
 export type SetupStep =
