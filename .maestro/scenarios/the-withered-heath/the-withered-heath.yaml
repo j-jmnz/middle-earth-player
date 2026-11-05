@@ -2,19 +2,32 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `heath-won` (scripts/e2e/the-withered-heath.ts): a real two-handed
-# game of The Withered Heath, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Phase 55. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `heath-won` (scripts/e2e/the-withered-heath.ts): a real two-handed game of
+# The Withered Heath (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's and The King's Quest's wins write (Turayn, Melanwar and Isolde in a pool,
+# Abandoned Ruin and The Threat to Wilderland pooled, the treasures discovered), parked on its win (A Cornered Dragon, Cold-Drake defeated, 3 Dragon Signs in the victory display). The fixture is OPEN when
+# scripts/e2e/fixtures.ts found no such win of the two starter decklists in its seeds (docs/phases/STATUS.md).
+# The Resolution adds each Accolade boon in play to the pool on its hero (no question) and asks each player for a Song boon (12175:B:6): the first player takes The Canny Huntsman, then the second player A Tale of Victories.
+# With 4 Dragon Signs it would also ask the first player to choose 1 of 3 random undiscovered treasures; the fixture's win has 3, so it does not. It then writes the treasure the players control, if any, and unlocks Roam
+# Across Rhovanion, which the app cannot deal yet (src/campaign/scenarios/the-withered-heath/golden.test.ts pins the path).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: heath-won
       SCENARIO_ID: the-withered-heath
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      CHOICE_ID: "12180"
+      CHOICE_PROMPT: "Choose a Song boon"
+      CHOICE_CONSEQUENCE: ".*Canny Huntsman is added to the campaign pool.*"
+      CHOICE2_ID: "12181"
+      CHOICE2_PROMPT: "Choose a Song boon"
+      CHOICE2_CONSEQUENCE: ".*Tale of Victories is added to the campaign pool.*"
+      NO_XP: "true"
+# The win wrote both Songs to the pool beside the allies and burdens the earlier parts put there.
+- assertVisible:
+    id: pool
+    text: ".*Canny Huntsman.*"
+- assertVisible:
+    id: pool
+    text: ".*Tale of Victories.*"
 # The win unlocks Roam Across Rhovanion, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-roam-across-rhovanion-status

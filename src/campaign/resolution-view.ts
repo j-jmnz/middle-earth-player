@@ -52,6 +52,8 @@ export type ResolutionView =
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
       // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4).
       to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure";
+      // The choice is of Song boons (The Withered Heath, 12175:B:6): each player takes one, a Song only once.
+      songs?: true;
     }
   | {
       kind: "settled";
@@ -139,7 +141,8 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     eyebrow = "Choose a treasure";
   } else if (instruction.verb === "ChooseCards") {
     const kinds = new Set(instruction.codes.map((code) => world.cards.get(code)?.campaignKind ?? null));
-    noun = kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
+    const sung = instruction.codes.length > 0 && instruction.codes.every((code) => world.cards.get(code)?.traits.includes("Song") === true);
+    noun = sung ? "Song boon" : kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
     eyebrow = instruction.to === "player" ? "Choose a player" : `Choose a ${noun}`;
   }
   const intents = legalIntents(state, contextOf(world));
@@ -203,6 +206,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     ...(kingsBurden ? { joins: nameOf(world, "12174") } : {}),
     seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
+    ...(noun === "Song boon" ? { songs: true as const } : {}),
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
     later: instruction.verb === "BoonAllyOrLogLine" ? ALLY_LINE_FACTS[instruction.line].later : null,
     answered,
@@ -217,6 +221,7 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
   if (tile.optionId === SKIP) return declineSentence(view);
   switch (view.to) {
     case "pool": {
+      if (view.songs) return `${tile.name} is added to the campaign pool.${view.seatCount > 1 ? " No other player can take it." : ""}`;
       if (view.joins == null) return `${tile.name} is added to the campaign pool.`;
       const other = view.tiles.find((item) => item.optionId !== tile.optionId)?.name;
       // Dagnir's Spawn is an encounter card of the pool (emce.campaign-pool-encounter); the other burden is not shuffled in.
@@ -236,7 +241,7 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
         ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded, so no card is removed from the encounter deck for it later.`
         : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool. ${view.later ? `Later Setups remove from the encounter deck ${view.later}.` : ""}`.trim();
     case "treasure":
-      return `${tile.name} is attached to a character the players control, and the players discover it.`;
+      return `${tile.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`;
     case "removal":
       if (tile.copies == null) return `${tile.label} is removed from the campaign pool.`;
       return tile.copies > 1 ? `One copy of ${tile.name} leaves the campaign pool (${tile.copies - 1} ${tile.copies === 2 ? "stays" : "stay"}).` : `${tile.name} leaves the campaign pool: it was the last copy.`;
@@ -258,6 +263,8 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
     const ally = view.ally ?? "the ally";
     return view.seatCount > 1 ? `Choose which player takes ${ally}, or the line for the log.` : `Take ${ally}, or the line for the log.`;
   }
+  // The treasure of three random undiscovered ones (12175:B:7): the number now.
+  if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.`;
   const what =
     view.to === "hero"
       ? `a ${view.noun} and a hero`

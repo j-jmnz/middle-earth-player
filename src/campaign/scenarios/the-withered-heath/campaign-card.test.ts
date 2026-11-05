@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { campaignScenario } from "../../../catalog/scenario-data.ts";
 import { checklist } from "../../checklist.ts";
-import { choiceSentence, resolutionView } from "../../resolution-view.ts";
+import { choiceSentence, consequenceSentence, resolutionView } from "../../resolution-view.ts";
 import type { World } from "../../world.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../log.ts";
 import { EFFECTS } from "../../../effects/index.ts";
@@ -407,5 +407,41 @@ describe("12175:B Resolution", () => {
       expect(view.tiles).toHaveLength(3);
       expect(choiceSentence(view, view.tiles[0]!)).toContain("discover");
     }
+  });
+
+  // The Resolution's questions in the view: the Song a player takes, and the treasure of three (12175:B:6, 12175:B:7).
+  const questions = (seats: 1 | 2, signs: number): ReturnType<typeof resolutionView>[] => {
+    const world = { campaign, scenario: heath, effects: ctx.effects, cards: ctx.cards, sets: new Map<string, string>() } as World;
+    let next = openResolution({ ...withSigns(opened(seats), signs), stageCleared: true, window: null, stack: [] }, ctx);
+    const seen: ReturnType<typeof resolutionView>[] = [];
+    for (let guard = 0; guard < 12 && next.window?.kind === "resolution"; guard += 1) {
+      seen.push(resolutionView(next, world));
+      const options = legalIntents(next, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
+      next = openResolution(expectOk(reduce(next, { type: "ChooseResolution", optionId: options[0] ?? "skip" } as PlayerIntent, ctx)).state, ctx);
+    }
+    return seen;
+  };
+
+  it("12175:B:6 the Song question says Song boon, the player two-handed, and that no other player can take the same Song", () => {
+    for (const seats of [1, 2] as const) {
+      const view = questions(seats, 0).find((entry) => entry.kind === "choosing" && entry.noun === "Song boon");
+      expect(view, `${seats} seats`).toMatchObject({ kind: "choosing", eyebrow: "Choose a Song boon", songs: true });
+      if (view?.kind !== "choosing") continue;
+      expect(view.tiles.map((tile) => tile.name)).toEqual(["The Canny Huntsman", "A Tale of Victories", "Lay of Courage", "Rhyme of the Slayer"]);
+      expect(view.decline?.label).toBe("No Song boon");
+      expect(view.seatLabel, `${seats} seats`).toBe(seats === 2 ? "Player 1 (first player) chooses" : null);
+      const sentence = choiceSentence(view, view.tiles[0]!);
+      expect(sentence).toBe(`The Canny Huntsman is added to the campaign pool.${seats === 2 ? " No other player can take it." : ""}`);
+      expect(consequenceSentence(view, null, true)).toContain("Song boon");
+    }
+  });
+
+  it("12175:B:7 the treasure question states how many are offered, what choosing records, and that it is not attached to a character", () => {
+    const view = questions(1, 4).find((entry) => entry.kind === "choosing" && entry.to === "treasure");
+    expect(view).toMatchObject({ kind: "choosing", eyebrow: "Choose a treasure" });
+    if (view?.kind !== "choosing") return;
+    expect(consequenceSentence(view, null, false)).toBe(`Choose 1 of the ${view.tiles.length} random undiscovered treasures. It is recorded as discovered when you confirm.`);
+    const name = view.tiles[0]!.name;
+    expect(choiceSentence(view, view.tiles[0]!)).toBe(`${name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`);
   });
 });

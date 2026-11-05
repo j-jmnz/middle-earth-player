@@ -14,6 +14,8 @@ import { topFrame } from "../../rules/windows/windows.ts";
 
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
+import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
+import { askedSeat, seatSays } from "./seat.ts";
 import { assignDamageWords } from "./south.ts";
 
 /** The table the words read: what is dealt now, the records, and the options the window offers. */
@@ -45,18 +47,6 @@ function weighedDownAsk(instruction: Instruction, source: string | null, names: 
   const hero = names.card(host);
   const itself = source != null && facts?.options.includes(source) === true;
   return { verb: "Discard", prompt: `${name}: choose an attachment to discard from ${hero}.${itself ? ` ${name} can discard itself: ${hero} has no other attachment that is not an objective.` : ""}` };
-}
-
-// The seat whose decision the open choice is: the one the window asks, else the first player.
-function askedSeat(game: ScenarioState): number {
-  return game.window?.kind === "choose" ? game.window.seat : game.firstPlayer;
-}
-
-// Truly Lost's hand (18075:A:1) and The Forest of Great Fear's nemesis (18076:A:1): the choice names its number, the side of the table it happens on and whose it is. Two-handed the sentence leads with the player and says so (`owned`: the sheet adds no "Player N chooses." after it); solo it has no lead.
-function seatSays(game: ScenarioState): { seat: number; owned: { owned?: true }; say: (text: string) => string } {
-  const seat = askedSeat(game);
-  const lead = game.seatCount > 1 ? `Player ${seat + 1}: ` : "";
-  return { seat, owned: game.seatCount > 1 ? { owned: true as const } : {}, say: (text) => (lead ? `${lead}${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`) };
 }
 
 function stageAsk(instruction: Instruction, facts: Facts | undefined): PickWords | null {
@@ -98,6 +88,8 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `exhaust ${picked ? names.card(picked) : "this character"}, or deal it ${typeof amount === "number" ? amount : 1} damage?`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
+  const accolade = heathChooseNote(choose, game, names);
+  if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (!offer) return null;
   const left = Math.min(offer.count, undiscoveredTreasures(game, ctx).length);
@@ -148,7 +140,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
-  const heath = heathAsk(instruction, source, next, facts);
+  const heath = heathAsk(instruction, source, names, next, facts);
   if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
@@ -157,34 +149,6 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   if (!guardId) return { verb: "Choose", prompt: choose };
   const host = names.card(guardId);
   return { verb: "Choose", prompt: `${choose} ${host} is attached to it, and the players cannot claim it until ${host} is dealt with.` };
-}
-
-// The Withered Heath's choices (19022:B:1, 19024:B:1, 19025:A:1, 12176:A:4, 12183:A:1): the sentence each asks. One player's choice leads with "Player N:" two-handed (`owned`), as the King's Quest's do.
-function heathAsk(instruction: Instruction, source: string | null, next: Instruction | undefined, facts: Facts | undefined): PickWords | null {
-  const game = facts?.game;
-  const says = game ? seatSays(game) : null;
-  const ask = (verb: string, text: string): PickWords => (says ? { verb, prompt: says.say(text), ...says.owned } : { verb, prompt: `${text.charAt(0).toUpperCase()}${text.slice(1)}` });
-  // The look at the encounter deck on a stage's side B: one of the cards is revealed, the rest are discarded before it resolves.
-  if (instruction.verb === "PickEncounter" && instruction.from === "looked" && next?.verb === "DiscardOtherLooked") {
-    const looked = facts?.options.length || 3;
-    return ask("Reveal", `choose 1 of the ${looked} cards you looked at to reveal. ${looked === 2 ? "The other is" : "The others are"} discarded first.`);
-  }
-  if (instruction.verb === "ArrangeLookedDeck") {
-    const left = facts?.options.length ?? 0;
-    return ask("Choose", instruction.kept == null ? "choose the card that stays on top of your deck. The rest go to the bottom, in the order you choose." : `choose the next card for the bottom of your deck (${left} left).`);
-  }
-  if (instruction.verb !== "Pick") return null;
-  const pick = instruction.pick;
-  const code = source ? (game?.cards[source]?.code ?? source) : undefined;
-  // Master of the Hunt (12176:A:4): the player whose deck is looked at; that player puts one card on top and the rest on the bottom.
-  if (code === "12176" && pick.type === "player" && next?.verb === "LookAtTop") return ask("Look", `choose a player to look at the top ${typeof next.count === "number" ? next.count : 3} cards of their deck. They put 1 of them on top of their deck and the rest on the bottom, in any order.`);
-  // Cold-Drake (19025:B:2): the dragon that returns to the staging area and attacks each player.
-  if (pick.type === "enemy" && pick.names?.length === 1 && next?.verb === "ReturnToStaging") return { verb: "Choose", prompt: `${pick.names[0]} returns to the staging area, then makes an immediate attack against each player in turn order.` };
-  // Cold-Drake (19025:A:1): the one enemy that attacks each player in turn order; the sheet has nothing to ask while it is the only candidate.
-  if (pick.type === "enemy" && pick.names?.length === 1 && next?.verb === "ForEachPlayer") return { verb: "Choose", prompt: `${pick.names[0]} makes an immediate attack against each player in turn order.` };
-  // Rhyme of the Slayer (12183:A:1): the hero with Dragon-slayer on it.
-  if (pick.type === "hero" && pick.hasAttachment?.names?.length === 1 && next?.verb === "ModifyStatVersus") return { verb: "Choose", prompt: `The hero with ${pick.hasAttachment.names[0]} gets +${next.amount} Attack while attacking the chosen enemy this phase.` };
-  return null;
 }
 
 // The King's Quest's choices (18043:A:3, 18044:A:1, 18047:A:1, 18048:A:1, 18049:A:2, 18049:A:3, 18055:A:2, 18057:A:2, 18058:A:2, 18059:A:2, 18060:A:1, 18061:A:1, 18064:A:1, 12173:A:2, 18079:B:2, 18080:A:1): the sentence each asks, from the verb it opens or the pick before it.
@@ -240,6 +204,8 @@ function kingsQuestAsk(instruction: Instruction, source: string | null, names: C
 /** The label of an option of that choice: the treasure's title, or the card a Caves look or a Dragon search offers. Null for another instruction. */
 export function wilderlandOptionLabel(instruction: Instruction, id: string, names: ChoiceNames): string | null {
   if (instruction.verb === "ArrangeCaves" || instruction.verb === "AttachSearched") return names.card(id);
+  const done = heathOptionLabel(instruction, id);
+  if (done) return done;
   return isTreasureDraw(instruction) ? names.code(id) : null;
 }
 
@@ -283,6 +249,8 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
 export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null): string | null {
+  const accolade = heathBranchWords(choose, optionId, names);
+  if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";
   const option = choose.options.find((entry) => entry.id === optionId);

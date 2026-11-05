@@ -93,7 +93,7 @@ function searchBoonAlly(table: Table): void {
     const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && Math.min(card.seat ?? 0, seats.length - 1) === index && isBoonAlly(card.code));
     const options = [...new Set([...seat.deck.filter(isBoonAlly), ...pooled.map((card) => card.code)])];
     if (options.length === 0) continue;
-    const answer = takeAnswer(table, [...options, "skip"], index, "Search your deck for a unique boon ally and add it to your hand, or skip. If you take one, no other player does.");
+    const answer = takeAnswer(table, [...options, "skip"], index, "Search your deck for a unique boon ally to add to your hand, or skip. It joins your hand after the mulligan, and if you take one no other player does.");
     if (answer == null) return;
     if (answer === "skip") {
       table.out.did.push(`Seat ${index + 1} does not search for a boon ally.`);

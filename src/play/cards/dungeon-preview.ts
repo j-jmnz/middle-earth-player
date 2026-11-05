@@ -4,6 +4,7 @@
 import { freeOfEncounters } from "../../rules/families/objectives/index.ts";
 import { heroGuardedBy } from "../../rules/families/wilderland/carried.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
+import { flagged, heldAmount } from "../../rules/core/state.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
@@ -35,7 +36,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (!card) return null;
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
-  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name);
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name);
   if (lost) return lost;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
@@ -92,6 +93,31 @@ function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: Scenari
   return left > 0
     ? `${left} ${left === 1 ? "resource" : "resources"}: one is removed at the beginning of each quest phase, then the first player chooses: each player raises their threat by 2, or every encounter card is immune to player card effects this phase`
     : "No resources left: it does nothing";
+}
+
+// The Withered Heath's cards (ledger lines 19012:A:1 to 19012:A:3, 19023:B:2, 19023:B:3, 19025:B:1, 19024:A:1, 19024:B:2): a Dragon Sign and its guard, Cold-Drake while a stage makes it engaged with each player and caps its damage, and the damage it keeps set aside.
+// The engine decided each; this only says it.
+function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
+  if (card.code === "19012" && card.zone === "staging") {
+    const guards = guardsOf(game, card);
+    return guards.length > 0
+      ? `Guarded by ${guards.map(name).join(", ")}, which is immune to player card effects. When nothing guards it, it goes to the victory display.`
+      : "Free of encounters: it goes to the victory display";
+  }
+  if (card.code !== "19011") return null;
+  if (card.zone === "setAside") {
+    // 19024:B:2: "At the end of the round, remove 3 damage tokens from the set-aside Cold-Drake."
+    const heal = ctx.effects.find((effect) => effect.id === "19024:forced:2")?.instructions.find((step) => step.verb === "RemoveSetAsideDamage");
+    return card.keepsDamage === true && card.damage > 0 ? `Set aside with ${card.damage} damage, which it keeps when it returns.${heal?.verb === "RemoveSetAsideDamage" ? ` ${heal.amount} damage come off it at the end of each round.` : ""}` : null;
+  }
+  if (card.zone !== "staging" && card.zone !== "engaged") return null;
+  const lines: string[] = [];
+  if (flagged(game, card.id, "engagedWithAll")) lines.push("Engaged with each player from the staging area: it attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat");
+  const cap = heldAmount(game, card.id, "damageCap");
+  if (cap > 0) lines.push(`Takes at most ${cap} damage each round (${Math.max(0, cap - (game.roundDamage?.[card.id] ?? 0))} more this round)`);
+  const ceiling = heldAmount(game, card.id, "damageCeiling");
+  if (ceiling > 0) lines.push(`Never has more than ${ceiling} damage${flagged(game, card.id, "indestructible") ? ", and stays in play even then" : ""}`);
+  return lines.length > 0 ? `${lines.join(". ")}.` : null;
 }
 
 // The encounter cards attached to a card as its guards, in the order they were attached (rr.guarded).

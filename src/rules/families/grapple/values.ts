@@ -12,13 +12,19 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { isElite } from "../sea/routes.ts";
 
 const CHANGE_OF_PLANS = "12040";
+// Hunting the Beast (19024:A:1) sets Cold-Drake (19011) aside, damage and all, while stage 2 (19023:B:2, which kept it from being destroyed) is already gone.
+const HUNTING_THE_BEAST = "19024";
+const COLD_DRAKE = "19011";
 
 /** An enemy whose damage the stage that just left held back (rr.destroy; ledger lines 12039:B:1, 12040:B:1): Captain Sahír and Na'asiyah were indestructible under Take the Ship!, so the damage
  * on them waits, lethal, for the When Revealed of Change of Plans that turns them into allies; no other enemy in any stage's When Revealed is held. */
 export function heldByLapsedStage(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
-  if (printed.type !== "enemy" || !isElite(printed)) return false;
-  return state.stack.some((frame) => frame.frame === "whenRevealed" && frame.cardId != null && state.cards[frame.cardId]?.zone === "questStage" && state.cards[frame.cardId]?.code === CHANGE_OF_PLANS);
+  if (printed.type !== "enemy") return false;
+  // Cold-Drake at 18 damage under The Cold-Drake Attacks! (19023:B:2, 19023:B:3) waits for the When Revealed of Hunting the Beast that sets it aside with that damage (19024:A:1), and is not destroyed in between.
+  const waits = isElite(printed) ? CHANGE_OF_PLANS : printed.code === COLD_DRAKE ? HUNTING_THE_BEAST : null;
+  if (waits == null) return false;
+  return state.stack.some((frame) => frame.frame === "whenRevealed" && frame.cardId != null && state.cards[frame.cardId]?.zone === "questStage" && state.cards[frame.cardId]?.code === waits);
 }
 
 /** The Threat a grappled enemy adds to the location it is grappled with (dcce.grapple: "it adds 2 Threat to the Threat of the location"). */

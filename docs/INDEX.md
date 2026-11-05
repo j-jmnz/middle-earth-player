@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~71.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~71.9K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,20 +92,20 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–705 Ered Mithrin (~5.7K)
-  - 706–714 Nightmare (~420)
-  - 715–753 Deckbuilding (~1.8K) ← 1
-  - 754–832 Effects (~3.2K)
-    - 756–814 Three layers (~2.4K)
-    - 815–824 Player side quests, contracts and saga cards (~430)
-    - 825–828 Window stack (~100)
-    - 829–832 Coverage test (~270)
-  - 833–853 Data sources (~560)
-  - 854–872 Card images (~1.1K) ← 6
-  - 873–898 Persistence and shipping (~1.7K)
-  - 899–940 Screens (~4.7K) ← 2
-    - 925–940 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~31.5K tok)
+  - 686–707 Ered Mithrin (~6.3K) ← 1
+  - 708–716 Nightmare (~420)
+  - 717–755 Deckbuilding (~1.8K) ← 1
+  - 756–834 Effects (~3.2K)
+    - 758–816 Three layers (~2.4K)
+    - 817–826 Player side quests, contracts and saga cards (~430)
+    - 827–830 Window stack (~100)
+    - 831–834 Coverage test (~270)
+  - 835–855 Data sources (~560)
+  - 856–874 Card images (~1.1K) ← 6
+  - 875–900 Persistence and shipping (~1.7K)
+  - 901–942 Screens (~4.7K) ← 2
+    - 927–942 Table screen (~1.8K) ← 5
+- `docs/design-system-table.md` — Design system — Table (landscape) (~32.6K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -113,30 +113,30 @@ Read the sections your task touches.
   - 36–39 Canvas (~560) ← 2
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
-  - 58–83 Cards (~4.7K) ← 9
-  - 84–89 The Sailing test (~690) ← 5
-  - 90–103 The Island Map (~1.7K) ← 8
-  - 104–107 Tokens and effects (~320)
-  - 108–121 Piles (~1.8K) ← 8
-  - 122–127 Marks of the open moment (~400) ← 1
-  - 128–196 Motion (~3.2K) ← 8
-  - 197–223 Spotlight (~2.4K) ← 18
-  - 224–229 Gestures (~420) ← 5
-  - 230–233 Hold, slide and release (~940)
-  - 234–239 Peeking at the other seat (~600) ← 1
-  - 240–255 Command column (~1.9K) ← 9
-  - 256–259 Two taps (~350) ← 2
-  - 260–263 One answer, one tap (~240)
-  - 264–267 Stops and Always use (~250)
-  - 268–271 Guide (~120)
-  - 272–282 Choice tray (~2.1K) ← 10
-  - 283–296 Reading panels (~1.5K) ← 6
-  - 297–306 Phase carousel (~680)
-  - 307–312 Quest advance (~530) ← 1
-  - 313–316 Undo (~140)
-  - 317–320 Haptics (~280)
-  - 321–331 Banner (~580) ← 1
-  - 332–335 Android Back (~90)
+  - 58–84 Cards (~5.0K) ← 9
+  - 85–90 The Sailing test (~690) ← 5
+  - 91–104 The Island Map (~1.7K) ← 8
+  - 105–108 Tokens and effects (~320)
+  - 109–122 Piles (~1.8K) ← 8
+  - 123–128 Marks of the open moment (~400) ← 1
+  - 129–197 Motion (~3.2K) ← 8
+  - 198–224 Spotlight (~2.4K) ← 18
+  - 225–230 Gestures (~420) ← 5
+  - 231–234 Hold, slide and release (~940)
+  - 235–240 Peeking at the other seat (~600) ← 1
+  - 241–256 Command column (~1.9K) ← 9
+  - 257–260 Two taps (~350) ← 2
+  - 261–264 One answer, one tap (~240)
+  - 265–268 Stops and Always use (~250)
+  - 269–272 Guide (~120)
+  - 273–284 Choice tray (~2.8K) ← 12
+  - 285–298 Reading panels (~1.5K) ← 6
+  - 299–308 Phase carousel (~680)
+  - 309–314 Quest advance (~530) ← 1
+  - 315–318 Undo (~140)
+  - 319–322 Haptics (~280)
+  - 323–333 Banner (~580) ← 1
+  - 334–337 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~24.6K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -379,10 +379,10 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/done/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/tools`: phases/phase-12-knife-in-the-dark.md, Scenario procedure (2); architecture.md, Modules (1)
-- `src/campaign`: architecture.md, Tests (2)
+- `src/campaign`: architecture.md, Tests (2); brief.md, Ered Mithrin (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
-- `src/play`: design-system-table.md, Spotlight (14); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Choice tray (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
+- `src/play`: design-system-table.md, Spotlight (14); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Choice tray (7); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
 - `src/rules`: architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Briefing (5); design-system.md, Components (5); design-system.md, History (4); design-system.md, Campaign path (3); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `src/ui`: design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)
