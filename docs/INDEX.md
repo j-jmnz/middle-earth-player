@@ -94,7 +94,7 @@ Read the sections your task touches.
   - 628–685 Dream-chaser (~15.7K)
   - 686–700 Ered Mithrin (~1.9K)
   - 701–709 Nightmare (~420)
-  - 710–748 Deckbuilding (~1.8K) ← 1
+  - 710–748 Deckbuilding (~1.8K) ← 2
   - 749–827 Effects (~3.2K)
     - 751–809 Three layers (~2.4K)
     - 810–819 Player side quests, contracts and saga cards (~430)
@@ -109,11 +109,11 @@ Read the sections your task touches.
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
-  - 28–35 Quest scale (~500) ← 2
+  - 28–35 Quest scale (~500) ← 3
   - 36–39 Canvas (~560) ← 2
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
-  - 58–81 Cards (~4.1K) ← 9
+  - 58–81 Cards (~4.1K) ← 10
   - 82–87 The Sailing test (~690) ← 5
   - 88–101 The Island Map (~1.7K) ← 8
   - 102–105 Tokens and effects (~320)
@@ -124,12 +124,12 @@ Read the sections your task touches.
   - 222–227 Gestures (~420) ← 5
   - 228–231 Hold, slide and release (~940)
   - 232–237 Peeking at the other seat (~600) ← 1
-  - 238–253 Command column (~1.9K) ← 9
+  - 238–253 Command column (~1.9K) ← 10
   - 254–257 Two taps (~350) ← 2
   - 258–261 One answer, one tap (~240)
   - 262–265 Stops and Always use (~250)
   - 266–269 Guide (~120)
-  - 270–280 Choice tray (~1.3K) ← 9
+  - 270–280 Choice tray (~1.3K) ← 10
   - 281–294 Reading panels (~1.5K) ← 6
   - 295–304 Phase carousel (~680)
   - 305–310 Quest advance (~530) ← 1
@@ -335,6 +335,7 @@ Read when a task names the plan.
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
+- `docs/plans/table-and-deck-fixes.md` — Plan: table and deck fixes (~3.0K tok)
 
 ## Handovers
 
