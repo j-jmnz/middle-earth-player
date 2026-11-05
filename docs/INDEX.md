@@ -179,15 +179,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~8.2K tok)
   - 5–16 Rules (~550)
   - 17–75 Phases (~2.3K)
-  - 76–170 Open items (~4.7K)
+  - 76–172 Open items (~4.8K)
     - 78–92 Fixtures and Maestro (~640)
     - 93–126 Rules and engine (~1.4K)
-    - 127–147 Screens and code (~1.2K)
-    - 148–170 Phone and tablet checks (~1.5K)
-  - 171–187 Standing decisions (~430)
+    - 127–148 Screens and code (~1.2K)
+    - 149–172 Phone and tablet checks (~1.6K)
+  - 173–189 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -309,7 +309,7 @@ Read when a task names the plan.
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
   - 3–14 Context (~450)
-  - 15–24 What does not move (~190) ← 1
+  - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
   - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
   - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~630)
@@ -317,7 +317,7 @@ Read when a task names the plan.
   - 84–92 E. Data: seed what can be seeded (~300)
   - 93–105 F. Faster feedback while authoring (~540)
   - 106–130 Where a scenario's cost is now (~760)
-  - 131–144 Next steps (~440) ← 1
+  - 131–144 Next steps (~440)
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
@@ -337,7 +337,6 @@ Open work; read when a task names it.
   - 119–125 Commit (~110)
   - 126–133 Report (your final message) (~90)
 - `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
-- `docs/handover/pipeline-proposal-review.md` — Handover: review the scenario pipeline proposal from phase 47 (~2.9K tok)
 
 ## Done plans
 
