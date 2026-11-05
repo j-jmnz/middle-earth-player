@@ -52,6 +52,8 @@ export const amountExprSchema = z.strictObject({
   // Counsel, rounded up", 11184:A:1). Read by the aflame family (src/rules/families/aflame/values.ts).
   level: z.literal(true).optional(),
   halved: z.literal(true).optional(),
+  // The value read is divided by this and rounded down before `times` and `plus` apply ("For every 5 resources on Captain Sahír, he makes an additional attack", 12158:A:3).
+  every: z.number().int().positive().optional(),
   // amount = value × times + plus, at most `limit`, at least 0.
   times: z.number().int().optional(),
   plus: z.number().int().optional(),

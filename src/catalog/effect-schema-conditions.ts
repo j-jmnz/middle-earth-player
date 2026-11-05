@@ -223,6 +223,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The scenario is played in Campaign Mode, which is when its campaign card is in the game (rr.campaign-cards): "Use this
   // action only if you are playing campaign mode" (141062:A:1).
   z.strictObject({ kind: z.literal("campaign") }),
+  // The Campaign Log marks this card upgraded (every box beside it is marked, dcce.scalable-upgradable): "If \"Gavin returned,\" put him into play" (11215:A:3). False in a game with no campaign facts.
+  z.strictObject({ kind: z.literal("upgraded"), code: z.string().min(1) }),
   // The card DiscardBottom discarded in this effect has a printed cost of `max` or less ("If that card's printed cost is 2 or less", 11032:A:2); a card with no printed cost does not, and nothing
   // discarded does not. Read by the uncharted family (src/rules/families/uncharted/cards.ts).
   z.strictObject({ kind: z.literal("discardedCost"), max: z.number().int().min(0) }),

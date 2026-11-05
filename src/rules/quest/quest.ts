@@ -313,10 +313,11 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
 }
 
 // The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
-// cannot be optionally engaged (141051:A:1, 141052:A:1).
+// cannot be optionally engaged (141051:A:1, 141052:A:1), and none at all while the table holds the flag ("Until the end of the round, enemies cannot be optionally engaged", 12164:A:1).
 // Once stages are separate a seat optionally engages only an enemy in its own staging area (mec109.multiple-staging-areas): the acting seat, or `seat`.
 export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const acting = seat ?? state.activeSeat;
+  if (flagged(state, "table", "cannotBeOptionallyEngaged")) return [];
   return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage"));
 }
 

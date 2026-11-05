@@ -5,6 +5,8 @@ import { constantInstructions, memoOf, type StateMemo } from "./constant-records
 import type { ReduceContext } from "./interpret.ts";
 import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
+import { corsairHolds } from "../families/sea/corsair.ts";
+import { mustTravelTitled } from "../families/sea/streets.ts";
 import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
@@ -53,9 +55,12 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
 // travel to one of these and may not decline or go elsewhere.
 export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[] {
   if (state.activeLocation || state.secondActiveLocation) return [];
-  return restricted(state, ctx, "travelOnly")
+  const only = restricted(state, ctx, "travelOnly")
     .map((rule) => rule.sourceId)
     .filter((id) => state.cards[id]?.zone === "staging" && !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  // "must either travel to a location named Streets of Umbar or add 2 resources to a Raider enemy in play" (12160:A:1) with no Raider to add them to.
+  const titled = mustTravelTitled(state, ctx).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  return [...only, ...titled];
 }
 
 // "If the players cannot pay the Travel cost, then they cannot travel to that location." (rr.travel). A Travel cost that
@@ -78,6 +83,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       }
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
+      // "One player must reveal the top card of the Corsair deck and engage it to travel here" (12154:A:1): the Corsair deck and its discard pile hold a card to reveal.
+      if (instruction.verb === "RevealCorsair") return !corsairHolds(state);
       // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.
       if (instruction.verb === "DiscardRandomFromHand" && instruction.who === "firstPlayer" && typeof instruction.amount === "number") {
         return (state.seats[state.firstPlayer]?.hand.length ?? 0) < instruction.amount;

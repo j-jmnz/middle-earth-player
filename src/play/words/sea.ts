@@ -22,7 +22,8 @@ export function seaWords(instruction: Instruction): string | null {
       return instruction.direction === "offCourse" ? "shift your heading off-course" : "shift your heading on-course";
     case "RevealCorsair": {
       const count = instruction.count == null ? "1" : typeof instruction.count === "number" ? String(instruction.count) : "X";
-      return `reveal the top ${count === "1" ? "card" : `${count} cards`} of the Corsair deck and put ${count === "1" ? "it" : "them"} into play engaged with ${instruction.who === "eachSeat" ? "each player" : "you"}`;
+      const engaged = instruction.who === "eachSeat" ? "each player" : instruction.who === "anyPlayer" ? "the player the first player names" : "you";
+      return `reveal the top ${count === "1" ? "card" : `${count} cards`} of the Corsair deck and put ${count === "1" ? "it" : "them"} into play engaged with ${engaged}`;
     }
     case "EngageLastPlayer":
       return "it engages the last player";
@@ -145,6 +146,14 @@ export function seaAsk(pick: Instruction, next: Instruction | undefined, options
     const amount = resolveAmount(game, next.amount, frameScope(game, game.activeSeat, sourceId), ctx);
     return { verb: "Assign", prompt: amount > 0 ? `Choose the Ship objective you control that takes ${amount} excess damage.` : "Choose the Ship objective you control that takes the excess damage." };
   }
+  // A Raider enemy that gets resources (Watch Tower's Shadow, 12156:A:2; Foes of Ecthelion, 12163:A:1): the player chooses which.
+  if (pick.verb === "Pick" && pick.pick.type === "enemy" && pick.pick.trait === "Raider" && next?.verb === "PlaceResourceTokens" && next.on === "picked") {
+    const host = sourceId ? names.card(sourceId) : "This card";
+    const gets = typeof next.amount === "number" ? resources(next.amount) : "resources equal to the printed cost of the ally destroyed";
+    return { verb: "Give", prompt: `${host}: choose a Raider enemy ${pick.pick.stagingOnly === true ? "in the staging area " : ""}to get ${gets}.` };
+  }
+  // The Black Sword's Refresh Action (11215:B:3): the resource comes off the Sword.
+  if (pick.verb === "Pick" && pick.pick.names?.includes("The Black Sword") && next?.verb === "Pick") return { verb: "Take", prompt: "The Black Sword gives 1 resource to the hero who exhausts." };
   return null;
 }
 

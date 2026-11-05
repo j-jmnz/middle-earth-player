@@ -11,7 +11,7 @@ import { engageEnemy } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { endCorsairDeck, prepareCorsairDeck, refillCorsairDeck, revealCorsair } from "./corsair.ts";
+import { endCorsairDeck, prepareCorsairDeck, refillCorsairDeck, revealCorsair, revealForAnyPlayer } from "./corsair.ts";
 import { prepareFleet } from "./fleet.ts";
 import { shiftHeading } from "./heading.ts";
 import { lastPlayer } from "./players.ts";
@@ -28,7 +28,10 @@ import { discardAlliesForWillpower, restoreShipEnemies, takeControlAsShip } from
 import { attackWithPicked } from "./ramming.ts";
 import { shipAttackReason, shipDefenseReason, shipEnemyAttacking, shipObjectivesAmong, shipsOnlyReason } from "./ships.ts";
 import { announceShipsExhausted, noteAttachedToShip } from "./water.ts";
-import { damageOnMatching, discardAllInPlay, setAsideEncounterDeck } from "./swap.ts";
+import { carryToSecondDeck, damageOnMatching, discardAllInPlay, setAsideEncounterDeck } from "./swap.ts";
+import { noteEntries } from "./entries.ts";
+import { immuneToEvents } from "./immune.ts";
+import { attackOtherPlayers } from "./attacks.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -42,6 +45,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return shiftHeading(state, instruction.direction);
     case "RevealCorsair": {
       const count = instruction.count == null ? 1 : resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
+      if (instruction.who === "anyPlayer") return revealForAnyPlayer(state, instruction, focus, count, ctx, steps);
       const seats = instruction.who === "eachSeat" ? livingSeats(state) : [focus.seat];
       let next = state;
       for (const seat of seats) next = revealCorsair(next, seat, count, ctx, steps);
@@ -90,8 +94,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attackWithPicked(state, instruction, ctx, steps);
     case "SetAsideEncounterDeck":
       return setAsideEncounterDeck(state, instruction);
+    case "AttackOtherPlayers":
+      return attackOtherPlayers(state, instruction, focus, ctx, steps);
+    case "CarryToSecondDeck":
+      return carryToSecondDeck(state, instruction, ctx);
     case "DiscardAllInPlay":
       return discardAllInPlay(state, instruction, focus, ctx, steps);
+    // A constant the engine reads when an ally is played or put into play (families/sea/entries.ts).
+    case "LimitEntries":
+    case "TravelOrAddResources":
+      return state;
     default:
       return null;
   }
@@ -104,4 +116,4 @@ const SHIP_COMBAT: CombatHooks = {
   undefended: (state, candidates, cards) => (shipEnemyAttacking(state, cards) ? shipObjectivesAmong(candidates(), state, cards) : []),
 };
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "DiscardAllInPlay"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null) };
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => noteEntries(announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked", "SetAsideEncounterDeck", "CarryToSecondDeck", "AttackOtherPlayers", "DiscardAllInPlay", "LimitEntries", "TravelOrAddResources"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT, pick: (state, id, _spec, at, ctx) => immuneToEvents(state, id, at, ctx), amount: (state, amount, scope, ctx) => (amount.damageOn ? damageOnMatching(state, amount.damageOn, scope, ctx) : null) };

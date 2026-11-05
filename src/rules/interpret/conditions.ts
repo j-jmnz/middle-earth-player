@@ -289,6 +289,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return (state.burdenDeck?.length ?? 0) >= (condition.min ?? 1);
     case "campaign":
       return Object.values(state.cards).some((card) => card.zone === "campaign");
+    case "upgraded":
+      return state.campaignFacts?.upgraded?.includes(condition.code) === true;
     case "x":
       return (scope.x ?? 0) >= condition.min;
     case "discardedCost":

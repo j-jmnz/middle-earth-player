@@ -1,4 +1,4 @@
-// Rules: dcce.from-sea-to-land, rr.victory, rr.destroy, rr.discard-pile-and-victory-display (data/rules/entries.json); ledger lines 12148:A:1 and 12148:B:1. The Coast of Umbar's second encounter deck takes the place of the
+// Rules: dcce.from-sea-to-land, rr.victory, rr.destroy, rr.discard-pile-and-victory-display (data/rules/entries.json); ledger lines 12148:A:1, 12148:B:1 and 11215:B:1. The Coast of Umbar's second encounter deck takes the place of the
 // first at stage 2B: the first deck and its discard pile are set aside, inactive, with the cards the stage's search carries across, and the ships and the sea leave play.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -8,6 +8,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
+import { printedOf } from "../../core/printed.ts";
 import { moveCard } from "../../core/zones.ts";
 import { moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -16,15 +17,29 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 
 /** SetAsideEncounterDeck: the encounter deck and its discard pile are set aside, facedown, inactive (the Corsair piles are not part of them). The copies of the `carry` codes found there stay in the encounter deck,
  * those from the discard pile moving to it: "search the encounter deck and discard pile for each copy of Battle-hardened and each copy of Watch Tower, and shuffle them into the second encounter deck" (12148:B:1).
- * Copies in play are not looked at. The second deck joins the encounter deck after this (ShuffleSetAsideSet, then EndCorsairDeck for the Corsair piles). */
+ * Copies in play are not looked at. The cards CarryToSecondDeck marked (the campaign card's Forced effect on this stage, 11215:B:1) stay in the deck the same way. The second deck joins the encounter deck after this (ShuffleSetAsideSet, then EndCorsairDeck for the Corsair piles). */
 export function setAsideEncounterDeck(state: ScenarioState, instruction: Verb<"SetAsideEncounterDeck">): ScenarioState {
   const carry = new Set(instruction.carry ?? []);
   let next = state;
   for (const id of [...state.encounterDeck, ...state.encounterDiscard]) {
     const card = state.cards[id];
     if (!card) continue;
-    if (!carry.has(card.code)) next = updateCard(moveCard(next, id, { zone: "setAside" }), id, { face: "down", controller: null });
+    if (!carry.has(card.code) && card.carried !== true) next = updateCard(moveCard(next, id, { zone: "setAside" }), id, { face: "down", controller: null });
     else if (card.zone === "encounterDiscard") next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" });
+  }
+  return next;
+}
+
+/** CarryToSecondDeck: each boon and each burden without the trait that is in the encounter deck or its discard pile is marked as carried (setAsideEncounterDeck keeps it in the deck); one from the discard pile moves to the deck. */
+export function carryToSecondDeck(state: ScenarioState, instruction: Verb<"CarryToSecondDeck">, ctx: ReduceContext): ScenarioState {
+  let next = state;
+  for (const id of [...state.encounterDeck, ...state.encounterDiscard]) {
+    const card = state.cards[id];
+    if (!card) continue;
+    const printed = printedOf(ctx.cards, card.code);
+    const carries = printed.campaignKind === "boon" || (printed.campaignKind === "burden" && !printed.traits.includes(instruction.exceptBurdenTrait));
+    if (!carries) continue;
+    next = updateCard(card.zone === "encounterDiscard" ? moveCard(next, id, { zone: "encounterDeck" }) : next, id, { carried: true, ...(card.zone === "encounterDiscard" ? { face: "down" as const } : {}) });
   }
   return next;
 }

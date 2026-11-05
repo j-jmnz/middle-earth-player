@@ -11,6 +11,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { heldAmount, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { entriesBarred } from "../sea/entries.ts";
 import { lootUnder } from "./loot.ts";
 
 // The `faceUp` condition: the card shows this side. A card dealt face up shows its side A.
@@ -77,6 +78,8 @@ export function hostDiscount(state: ScenarioState, cardId: string, seat: number,
 // playing only: a card put into play is not played (rr.play-and-put-into-play), and "cannot" is absolute (rr.cannot). `putting`: the question is about putting the card into play.
 export function playBlocked(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, putting = false): boolean {
   if (!state.cards[cardId]) return false;
+  // A limit on the allies that enter play each round bars playing and putting into play alike (LimitEntries, families/sea/entries.ts).
+  if (entriesBarred(state, cardId, ctx)) return true;
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "CannotPlay") continue;
     if (instruction.anyPlayer ? putting : (source.controller ?? state.firstPlayer) !== seat) continue;

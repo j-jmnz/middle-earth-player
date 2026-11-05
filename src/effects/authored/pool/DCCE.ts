@@ -396,6 +396,23 @@ export const RECORDS: readonly Effect[] = [
   { id: "11196:forced:3", cardCode: "11196", lines: ["11196:A:4"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }, { verb: "FlipCard" }] },
   { id: "11196:forced:4", cardCode: "11196", lines: ["11196:B:4"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "AttackFirstPlayer" }] },
   { id: "11210:whenRevealed:1", cardCode: "11210", lines: ["11210:A:5"], timing: "whenRevealed", instructions: [FIRST_PLAYER_CHOOSES, { verb: "TakeRevealedCard", who: "picked", committed: true }, { verb: "Pick", pick: LANWYN }, { verb: "AddResources", amount: 1, to: "picked", when: { kind: "canPick", pick: LANWYN } }] },
+
+  // 11216 The Black Sword (burden objective the campaign card of The City of Corsairs attaches to Captain Sahír; Immune to player card effects is a keyword). It enters play (is attached) with 3 resources on it (side B: 2), Captain
+  // Sahír gets +2 Attack (side A only) and gains indestructible, and after he attacks for the first time each round he attacks each other player in turn order.
+  { id: "11216:triggered:1", cardCode: "11216", lines: ["11216:A:2"], timing: "triggered", trigger: "attached", subject: "self", instructions: [{ verb: "PlaceResourceTokens", amount: 3, on: "self" }] },
+  { id: "11216:triggered:2", cardCode: "11216", lines: ["11216:B:2"], timing: "triggered", trigger: "attached", subject: "self", instructions: [{ verb: "PlaceResourceTokens", amount: 2, on: "self" }] },
+  {
+    id: "11216:constant:1",
+    cardCode: "11216",
+    lines: ["11216:A:3"],
+    timing: "constant",
+    instructions: [
+      { verb: "ModifyStat", stat: "attack", amount: 2, until: "whileSourceInPlay", holders: BLACK_KEY_SAHIR },
+      { verb: "ModifyStat", stat: "indestructible", amount: 1, until: "whileSourceInPlay", holders: BLACK_KEY_SAHIR },
+    ],
+  },
+  { id: "11216:constant:2", cardCode: "11216", lines: ["11216:B:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "indestructible", amount: 1, until: "whileSourceInPlay", holders: BLACK_KEY_SAHIR }] },
+  { id: "11216:forced:1", cardCode: "11216", lines: ["11216:A:4", "11216:B:4"], timing: "forced", trigger: "attackResolved", subject: BLACK_KEY_SAHIR, limit: "oncePerRound", instructions: [{ verb: "AttackOtherPlayers", target: "subject" }] },
 ];
 
 export const REPLACES: readonly string[] = [];

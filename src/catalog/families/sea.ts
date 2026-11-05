@@ -4,7 +4,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
-import { positiveAmountSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 import { verbFlags } from "../verb-flags.ts";
@@ -24,8 +24,9 @@ const VERBS = [
   // game with no Heading card.
   z.strictObject({ verb: z.literal("ShiftHeading"), direction: z.enum(["onCourse", "offCourse"]), ...when }),
   // "Reveal the top card of the Corsair deck and put it into play, engaged with you" (dcce.boarding, dcce.corsair-deck): `count` cards (1 by
-  // default) for the actor, or for each player (`eachSeat`). The deck refills from its discard pile when it runs out.
-  z.strictObject({ verb: z.literal("RevealCorsair"), count: positiveAmountSchema.optional(), who: z.enum(["actor", "eachSeat"]).optional(), ...when }),
+  // default) for the actor, or for each player (`eachSeat`), or for one player the first player names (`anyPlayer`: "One player must reveal the top card of the Corsair deck and engage it", 12154:A:1; the only
+  // player takes it without being asked). The deck refills from its discard pile when it runs out.
+  z.strictObject({ verb: z.literal("RevealCorsair"), count: positiveAmountSchema.optional(), who: z.enum(["actor", "eachSeat", "anyPlayer"]).optional(), ...when }),
   // "Engages the last player" (dcce.last-player): the source enemy, in the staging area, engages the player to the right of the first player.
   z.strictObject({ verb: z.literal("EngageLastPlayer"), ...when }),
   // Engine use: "Boarding X" resolves for the ship-enemy that engaged the actor from the staging area (dcce.boarding), in a frame under the Responses to the engagement.
@@ -89,10 +90,25 @@ const VERBS = [
   // stay in the encounter deck, those in the discard pile moving to it, and are not set aside. Copies in play stay in play. The second deck is the encounter set the stage's Setup set aside: ShuffleSetAsideSet
   // and EndCorsairDeck after this verb make it the active encounter deck, the Corsair deck and its discard pile shuffled into it.
   z.strictObject({ verb: z.literal("SetAsideEncounterDeck"), carry: z.array(z.string().min(1)).optional(), ...when }),
+  // "Captain Sahír makes an attack against each other player (in turn order)" (11216:A:4): the source enemy attacks, one after the other from the first player on, each player it is not engaged with, as an attack
+  // outside the combat phase dealt a shadow card of its own. `target`: the enemy that attacks (the source by default; "subject" for a card that hears the enemy's attack end). `seat` is engine use: the player whose
+  // attack is next.
+  z.strictObject({ verb: z.literal("AttackOtherPlayers"), target: cardRefSchema.optional(), seat: z.number().int().min(0).optional(), ...when }),
+  // "Search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck" (11215:B:1, dcce.from-sea-to-land): every boon, and every burden without the
+  // trait `exceptBurdenTrait`, found in the encounter deck or its discard pile is marked as carried across: a discard-pile card moves to the deck, and the stage's SetAsideEncounterDeck keeps the marked cards in it
+  // while it sets the rest aside. Run while the first deck is still the encounter deck (the Forced effect resolves above the stage's When Revealed, rr.forced).
+  z.strictObject({ verb: z.literal("CarryToSecondDeck"), exceptBurdenTrait: z.string().min(1), ...when }),
   // "Discard all Ship enemies, Ship objectives, and Ocean locations in play" (12148:A:1): every card in play that matches `pick` is discarded (not destroyed, so a Victory enemy does not go to the victory
   // display, rr.victory): an encounter card to the encounter discard pile, a player's card to its owner's discard pile, its attachments with it and its tokens gone. A non-ship enemy goes to the Corsair discard pile
   // while a Corsair deck exists (dcce.corsair-deck).
   z.strictObject({ verb: z.literal("DiscardAllInPlay"), pick: pickSchema, ...when }),
+  // Constant on a location in the staging area: "When faced with the option to travel, if Streets of Umbar is in the staging area, the players must either travel to a location named Streets of Umbar or add 2
+  // resources to a Raider enemy in play" (12160:A:1). Declining to travel, or traveling to a location with another title, costs the first player's choice of a card that matches `pick` getting `amount` resources
+  // (families/sea/streets.ts); with no such card the players can only travel to a location with the source's title.
+  z.strictObject({ verb: z.literal("TravelOrAddResources"), amount: z.number().int().positive(), pick: pickSchema, ...when }),
+  // Constant on a card in play: no more than `max` cards of this type can enter play each round, played or put into play ("While Corsair Waters is the active location, no more than 1 ally can enter play each
+  // round", 12155:A:1). An ally that entered play and left again counts (families/sea/entries.ts).
+  z.strictObject({ verb: z.literal("LimitEntries"), cardType: z.literal("ally"), max: z.number().int().min(0), ...when }),
 ] as const;
 
 // About a Ship objective: it became exhausted by any means, defending, attacking, questing, Sailing or an effect ("When attached objective exhausts", 12132:A:1). Announced by a settle sweep (families/sea/water.ts) only in a game
@@ -131,6 +147,8 @@ const FLAGS = [
   "gainsVictory",
   // On an enemy: only a Ship objective can be declared as an attacker against it ("Only Ship objectives can be declared as attackers against Raider Flagship", 12124:A:3; families/sea/ships.ts).
   "shipAttackersOnly",
+  // On an enemy: it is immune to player events, not to the other player cards ("Each Raider enemy with at least 1 resource on it is immune to player events", 12159:A:1; families/sea/immune.ts).
+  "immuneToPlayerEvents",
 ] as const;
 
 export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

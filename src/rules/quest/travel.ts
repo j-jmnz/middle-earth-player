@@ -6,6 +6,7 @@ import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { textBlank } from "../families/attachments/hold.ts";
 import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
+import { travelTax } from "../families/sea/streets.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { travelTo } from "./quest.ts";
@@ -22,6 +23,19 @@ export function travelTaken(state: ScenarioState): ScenarioState {
   if (state.separate && livingSeats(state).some((seat) => !(state.travelDone ?? []).includes(seat))) return state;
   const { travelDone: _done, ...rest } = state;
   return markReached(rest, "traveled");
+}
+
+/** The DeclineTravel intent: the opportunity is taken, and a rule that charges for not traveling (12160:A:1, families/sea/streets.ts) resolves its cost in a frame of its own. */
+export function declineTravel(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const taken: ScenarioState = { ...travelTaken(state), window: null };
+  const tax = travelTax(state, ctx, null);
+  if (!tax) return taken;
+  const code = state.cards[tax.source]?.code ?? "";
+  return pushEffectFrame(
+    taken,
+    { frame: "travel", sourceId: tax.source, actor: state.firstPlayer, peril: false, effectId: `${code}:travel`, instructions: tax.instructions, causes: tax.instructions.map(() => ruleCause("rr.travel")), cancel: null, blockCancel: null },
+    steps,
+  );
 }
 
 const TRAVEL_HERE: Instruction = { verb: "Travel", to: "self" };
@@ -53,7 +67,8 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
   const effects = textBlank(state, locationId) ? [] : recordsOfFace(location, ctx.effects.filter((effect) => effect.cardCode === location.code)).filter((effect) => effect.timing === "travel");
   const first = effects[0];
   // A Travel cost another card gave the location comes after its own (families/grapple/travel.ts).
-  const granted = grantedTravel(state, locationId);
+  // The cost of traveling away from Streets of Umbar (12160:A:1, families/sea/streets.ts) comes after the others.
+  const granted = [...grantedTravel(state, locationId), ...(travelTax(state, ctx, locationId)?.instructions ?? [])];
   if (!first && granted.length === 0) {
     // Once stages are separate the seat travels to its own active location (families/breaking/areas.ts).
     let refused = false;
