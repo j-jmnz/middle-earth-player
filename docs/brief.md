@@ -713,7 +713,7 @@ The builder is a root route beside the campaign list.
 
 `deck_legal` is set at catalog build for `hero`, `ally`, `attachment`, `event`, `contract`, `player-side-quest` and `treasure` rows (`src/catalog/deck-legal.ts`; a treasure typed `Campaign` is not). `Campaign`, encounter, quest, and nightmare rows are not deck-legal. TBR's pack file mixes heroes with `type_name: "Campaign"`. Filter those out in the build script, not in the UI.
 
-A deck saves at any stage, so a deck can be built over several sittings (user decision, 2026-10-25). The deck list and the editor say whether it is ready to play, and name the first rule it breaks ("Needs 3 more cards"); the briefing does not offer a deck that is not ready. Adding a copy past the copy limit, a hero twice, or a fourth hero is refused at the tap, with a sentence naming the card and the rule, and does not change the deck.
+A deck saves at any stage, so a deck can be built over several sittings (user decision, 2026-10-25). The deck list and the editor name the first rule a deck that is not ready breaks ("Needs 3 more cards"); a ready deck carries no mark, and the list keeps its Ready and Not ready filters (user instruction, 2026-11-05). The briefing does not offer a deck that is not ready. Adding a copy past the copy limit, a hero twice, or a fourth hero is refused at the tap, with a sentence naming the card and the rule, and does not change the deck.
 
 Universal rules, which decide whether a deck is ready to play, are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25):
 

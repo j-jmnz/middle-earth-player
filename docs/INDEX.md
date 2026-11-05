@@ -146,7 +146,7 @@ Read the sections your task touches.
   - 102–119 Type (~670) ← 5
   - 120–137 Spacing, radius, border (~600) ← 2
   - 138–159 Backdrops (~950) ← 5
-  - 160–167 Navigation (~420) ← 3
+  - 160–167 Navigation (~410) ← 3
   - 168–205 Components (~1.7K) ← 9
   - 206–220 Icons (~480) ← 6
   - 221–239 Card art (~740) ← 2
@@ -174,7 +174,7 @@ Read the sections your task touches.
     - 423–426 Rule (~220) ← 1
     - 427–430 Booklet (~100)
     - 431–434 Database (~20)
-  - 435–454 States (~610)
+  - 435–454 States (~620)
 
 ## Phases
 

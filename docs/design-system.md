@@ -64,7 +64,7 @@ Values live in `src/screens/kit/palette.js`. `tailwind.config.js` maps them to u
 | accentLine | `#5A6E5C` | `#637A69` | The current stop's outer ring; a past phase tick |
 | onAccent | `#0C1014` | `#F7F1E3` | Text on the primary; the switch's knob when on |
 | moon | `#8FA894` | `#725219` | Section headings, overlines |
-| ok | `#8FBF7A` | `#3B6B2C` | Ready to play, Won · score, Ahead |
+| ok | `#8FBF7A` | `#3B6B2C` | Won · score, Ahead |
 | paper / paperPressed / paperEdge | `#E6DCC6` / `#D2C4A6` / `#A8977A` | same | Parchment, lit in the middle and burnt at the rim (`parchmentSurface`) |
 | ink / inkMuted / inkLabel / inkLine | `#221E17` / `#5C4F3D` / `#6B4E1C` / `#4A3A24` | same | Ink on parchment; inkLine is drawn at 25 to 40% for the log's rules |
 | felt / feltLight | `#030405` / `#0C0F12` | `#E4DCCB` / `#F2EBDC` | The table's ground, kept for the panels that name it; the canvas itself is transparent over the fog |
@@ -159,7 +159,7 @@ Do not add a scene for one screen; reuse one of these.
 
 ## Navigation
 
-- **Phone and tablet portrait**: a bottom dock (`AppTabBar`, `tab-bar.tsx`) with five hubs: Campaigns, Scenarios, Decks, Cards, Rules. 68 pt over the home indicator (12 when the platform reports none), on a dark band rising out of the page with a faint lit top. Each tab is a 24 pt printed icon over its word in Marcellus SC 12: the One Ring, the crossed axes, the hero, the unique star, the Lore book. The active tab has a 2 pt accentHigh bar across the top of its slot, inset 22% each side and glowing, a radial wash under it, and its icon (with a soft glow) and word in bone; the others are faint. A 7 pt red dot sits on Decks while a saved deck is not ready (`useUnreadyDeck`, read after the frame).
+- **Phone and tablet portrait**: a bottom dock (`AppTabBar`, `tab-bar.tsx`) with five hubs: Campaigns, Scenarios, Decks, Cards, Rules. 68 pt over the home indicator (12 when the platform reports none), on a dark band rising out of the page with a faint lit top. Each tab is a 24 pt printed icon over its word in Marcellus SC 12: the One Ring, the crossed axes, the hero, the unique star, the Lore book. The active tab has a 2 pt accentHigh bar across the top of its slot, inset 22% each side and glowing, a radial wash under it, and its icon (with a soft glow) and word in bone; the others are faint. No tab carries a badge.
 - **Tablet landscape (expanded)**: the same five become a left rail, 88 pt plus the left safe inset, items 72 pt tall with a 26 pt icon; the active item has a 2 pt bar at its leading edge and a wash fading right. **Settings** sits at the rail's foot and pushes the Settings screen (`settings-open`).
 - **Settings is not a tab.** On a phone and in portrait it opens from the round gear at the top right of each hub (`GearButton`, `settings-open`); the table's All settings opens it too (`from=table`). It is a pushed route (`settings.tsx`) with Back beside its title.
 - **The dock and the rail are hidden** on pushed screens: the path, the deck editor, the card, the briefing, the resolution, the log, settings and the table.
@@ -445,7 +445,7 @@ Scene `calm`. Title Database, the failure in body. No retry.
 | Completed | A lit stop or a filled diamond, Won · score in green, the reward names as chips. |
 | Selected | The selected ring (`selectedRingOf`) or the selected wash with its bar, plus the word Selected on a radio. |
 | Refused | Danger sentence naming the card and the rule. The refused change does not happen. |
-| Not ready | A deck that breaks a deckbuilding rule: the rule in danger ("Needs 3 more cards"), with no dot, in the deck list and editor. It saves; the briefing does not offer it. A ready deck shows no status there; the briefing's picker still says Ready to play with an ok dot. |
+| Not ready | A deck that breaks a deckbuilding rule: the rule in danger ("Needs 3 more cards"), with no dot, in the deck list, the editor and the briefing's picker. It saves; the briefing does not offer it. A ready deck shows no status and no dot anywhere, and the Decks tab carries no badge (user instruction, 2026-11-05). |
 | Failed test | The word Failed plus the engine's numbers. |
 | Not applied | A card with a printed line the app does not apply: the struck ring on the table, "Not applied" with the loss in a list row (Ability not applied, Cannot be played, Text not applied), the lines under the Not applied overline on the card and in the preview, and the count on a deck ("2 cards with text not applied"). Never the word inactive. |
 | Armed | A button that sends with nothing picked, after its first tap: the line above the buttons says what the second tap does in the accent, with a 2 pt bar running down (`docs/design-system-table.md`, Two taps), and a haptic tick. The button keeps its size, place and label. A moment with one answer arms nothing. |
