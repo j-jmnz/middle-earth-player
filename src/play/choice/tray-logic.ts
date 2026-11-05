@@ -64,7 +64,7 @@ export function tileAction(tile: Pick<TrayTile, "look">): "read" | "pick" {
 }
 
 // The sheet's verb without its trailing preposition ("Defend with" is "Defend").
-const wordOf = (verb: string): string => verb.replace(/\s+(with|to|on|for)$/i, "");
+export const wordOf = (verb: string): string => verb.replace(/\s+(with|to|on|for)$/i, "");
 
 /** The count the dock's title speaks while the rows are open, led by the moment's verb: "Defend · pick 1 of 6", "Commit · 2 of 4 picked". */
 export function trayCount(sheet: Sheet, choice: Choice): string {

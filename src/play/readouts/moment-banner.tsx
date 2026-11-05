@@ -1,7 +1,7 @@
 // The outcome banner over the table (docs/design-system-table.md, Banner): what the last intent did, in beats, for a few
 // seconds. A tap or a swipe sends it away (user request, 2026-10-29); the log keeps every step.
 import { useEffect, useMemo, useState } from "react";
-import { AccessibilityInfo, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -17,6 +17,7 @@ import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
+import { announce } from "../../ui/announce.ts";
 
 // What a screen reader hears of a line: the line that lays cards in the Discover look strip names the strip (emce.discover), every other line its text.
 function spoken(line: MomentLine): string {
@@ -73,7 +74,7 @@ export function MomentBanner({
   const label = `${moment.title}. ${moment.lines.map(spoken).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   useEffect(() => {
-    AccessibilityInfo.announceForAccessibility(label);
+    announce(label);
   }, [label]);
   // The fades: the banner and each line come in and the banner goes out over MOTION.bannerIn and bannerOut.
   const scale = useMotionScale();

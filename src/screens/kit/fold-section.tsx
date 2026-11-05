@@ -3,7 +3,7 @@
 // expanded and an announcement on each toggle. The body stays mounted and is hidden, so what it holds keeps its state; there is
 // no animation (docs/design-system.md, Performance: a fold is a state change, not a motion).
 import { useCallback, useMemo, useState, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { sectionTitleStyle } from "../../ui/section-heading";
 import { textSurface } from "../../ui/surfaces";
@@ -16,6 +16,7 @@ import { plural } from "../history/words";
 import { usePalette } from "./palette-hook";
 import { readSections, writeSection } from "../data/section-store";
 import { Text } from "../../ui/text";
+import { announce } from "../../ui/announce";
 
 /** The screen's fold state: `folded` reads a section (its default when the viewer never changed it), `setFolded` changes and stores it. */
 export function useFolds(): { folded: (id: string, defaultFolded?: boolean) => boolean; setFolded: (id: string, folded: boolean, defaultFolded?: boolean) => void } {
@@ -84,7 +85,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
         accessibilityLabel={foldWords(title, folded, counted)}
         onPress={() => {
           onFold(!folded);
-          AccessibilityInfo.announceForAccessibility(`${title} ${folded ? "unfolded" : "folded"}`);
+          announce(`${title} ${folded ? "unfolded" : "folded"}`);
         }}
         className="flex-1"
       >

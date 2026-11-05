@@ -5,7 +5,7 @@
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { View } from "react-native";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
@@ -18,6 +18,7 @@ import { primaryReady, type Dock, type DockButton } from "../table-choice.ts";
 import { useUiScale } from "../../../ui/ui-scale.ts";
 import { useTableTokens } from "../../../ui/use-table-tokens.ts";
 import { Text } from "../../../ui/text.tsx";
+import { announce } from "../../../ui/announce.ts";
 
 // How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
 // only shows it running out, on the linear curve of src/ui/motion-tokens.ts, and does not run under reduced motion (the line says it).
@@ -83,7 +84,7 @@ export function DockButtons({
       timer.current = setTimeout(() => setArmed(null), wait);
       tickArmed();
       // A screen reader hears what the second tap does, the loss a caution names included.
-      AccessibilityInfo.announceForAccessibility(button.armed ?? `Tap again: ${button.label}`);
+      announce(button.armed ?? `Tap again: ${button.label}`);
       return;
     }
     setArmed(null);

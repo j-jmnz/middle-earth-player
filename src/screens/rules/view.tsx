@@ -1,7 +1,7 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useDeferredValue, useEffect, useEffectEvent, useMemo, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 import { BodyText, ListRow, Screen, SearchField, Section, TwoPane } from "../kit/chrome";
 import { BOOKLETS } from "../booklets/books";
@@ -17,6 +17,7 @@ import { capWidth } from "../../ui/size-class";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
+import { announce } from "../../ui/announce";
 
 // The books keep the testIDs they had on the campaign list; the others are `booklet-open-<id>`.
 const BOOK_TEST_IDS: Readonly<Record<string, string>> = { "fellowship-of-the-ring": "booklet-open", "learn-to-play": "booklet-open-learn-to-play" };
@@ -94,7 +95,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
     const at = visible.findIndex((item) => item.id === id);
     if (at >= 0) void listRef.current?.scrollToIndex({ index: at, animated: true });
     const title = glossaryEntry(id)?.title;
-    if (title) AccessibilityInfo.announceForAccessibility(title);
+    if (title) announce(title);
   });
   useEffect(() => {
     if (!expanded || !picked) return;
