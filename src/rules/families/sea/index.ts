@@ -1,7 +1,7 @@
 // Rules: dcce.ships, dcce.prepare-your-fleet, dcce.heading, dcce.sailing-tests, dcce.corsair-deck, dcce.boarding, dcce.last-player, dcce.archery
 // (data/rules/entries.json). The verbs src/catalog/families/sea.ts adds. The ship rules (sea/ships.ts), the Sailing test (sea/sailing.ts), Boarding
 // (sea/boarding.ts) and the routes of the Corsair deck and the Stormcaller Elite (sea/routes.ts) work inside the engine's own steps and are not verbs.
-import type { RulesFamily } from "../../interpret/family-manifest.ts";
+import type { CombatHooks, RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -26,6 +26,7 @@ import { considerOutOfPlay, releaseHeld } from "./islet.ts";
 import { discardFromAnyDeck, nameCard, plunderHand } from "./cards.ts";
 import { discardAlliesForWillpower, restoreShipEnemies, takeControlAsShip } from "./skirmisher.ts";
 import { attackWithPicked } from "./ramming.ts";
+import { shipAttackReason, shipDefenseReason, shipEnemyAttacking, shipObjectivesAmong, shipsOnlyReason } from "./ships.ts";
 import { announceShipsExhausted, noteAttachedToShip } from "./water.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -91,4 +92,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked"], run, attached: noteAttachedToShip };
+// A ship-objective attacks only ship-enemies, a ship-enemy's attack is defended only by a ship-objective, and its undefended damage goes to a ship-objective (dcce.ship-enemies, dcce.ship-objectives).
+const SHIP_COMBAT: CombatHooks = {
+  defense: shipDefenseReason,
+  attack: (state, enemyId, attacker, target) => shipAttackReason(attacker, target) ?? shipsOnlyReason(state, enemyId, attacker),
+  undefended: (state, candidates, cards) => (shipEnemyAttacking(state, cards) ? shipObjectivesAmong(candidates(), state, cards) : []),
+};
+
+export const manifest: RulesFamily = { name: "sea", settle: { after: (state) => refillCorsairDeck(state), sweep: (state, ctx) => announceShipsExhausted(restoreShipEnemies(releaseHeld(state)), ctx) }, verbs: ["PrepareCorsairDeck", "EndCorsairDeck", "PrepareFleet", "ShiftHeading", "RevealCorsair", "EngageLastPlayer", "Board", "SearchShips", "FitShips", "TradeShipDamage", "PlunderHand", "NameCard", "DiscardFromAnyDeck", "DamageShip", "ShuffleIntoCorsairDeck", "ShuffleRandomSetAside", "MakeEngagementChecks", "SetAsideSelf", "ConsiderOutOfPlay", "DiscardAlliesForWillpower", "TakeControlAsShip", "AttackWithPicked"], run, attached: noteAttachedToShip, combat: SHIP_COMBAT };

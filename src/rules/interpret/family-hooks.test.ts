@@ -4,9 +4,10 @@ import type { Amount, Condition, PickSpec } from "../../catalog/boundary.ts";
 import { blankScenario } from "../core/state.ts";
 import { cardMap, fixtureDefinition, hero } from "../core/test-fixture.ts";
 import { spawn } from "../core/zones.ts";
+import { canAttack, canDefend, undefendedTargets } from "../combat/combat.ts";
 import { legalTargets } from "../engine/legal.ts";
 import type { RulesFamily } from "./family-manifest.ts";
-import { familyAmount, familyAttached, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
+import { familyAmount, familyAttached, familyAttackReason, familyDefenseReason, familyUndefendedTargets, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
 import { resolveAmount } from "./amounts.ts";
 import { holds } from "./conditions.ts";
 import { matchesPick } from "./pick.ts";
@@ -106,6 +107,22 @@ describe("attached hooks", () => {
   });
 });
 
+describe("combat hooks", () => {
+  const printed = hero("h1", "leadership");
+  const cards = cardMap([printed]);
+  it("answer with the first family's reason, and with the first non-empty list of undefended targets", () => {
+    const a = family("a", { combat: { defense: () => null, attack: () => null, undefended: () => [] } });
+    const b = family("b", { combat: { defense: () => "no defense", attack: () => "no attack", undefended: () => ["x"] } });
+    const c = family("c", { combat: { defense: () => "other", attack: () => "other", undefended: () => ["y"] } });
+    expect(familyDefenseReason(state, printed, cards, [a, family("none")])).toBeNull();
+    expect(familyDefenseReason(state, printed, cards, [a, b, c])).toBe("no defense");
+    expect(familyAttackReason(state, "e", printed, printed, [a])).toBeNull();
+    expect(familyAttackReason(state, "e", printed, printed, [a, b, c])).toBe("no attack");
+    expect(familyUndefendedTargets(state, () => ["h"], cards, [a])).toEqual([]);
+    expect(familyUndefendedTargets(state, () => ["h"], cards, [a, b, c])).toEqual(["x"]);
+  });
+});
+
 // The core's own call sites, with a synthetic family in the list the core walks (withFamilies).
 describe("the core's hook calls", () => {
   const at = { seat: 0, sourceId: null };
@@ -139,6 +156,18 @@ describe("the core's hook calls", () => {
     expect(withFamilies([family("a", { travel: { may: () => true, reach: () => ["there"] } })], () => legalTargets(held, { type: "Travel" }, ctx))).toEqual(["there"]);
     expect(withFamilies([family("a", { travel: { reach: () => ["there"] } })], () => legalTargets(held, { type: "Travel" }, ctx))).toEqual([]);
     expect(withFamilies([family("a", { travel: { reach: () => ["there"] } })], () => legalTargets(traveling, { type: "Travel" }, ctx))).toEqual(["there"]);
+  });
+
+  it("canDefend, canAttack and undefendedTargets ask a family's combat hooks", () => {
+    const cards = cardMap([hero("h1", "leadership"), hero("e1", "neutral")]);
+    const { state: first, id } = spawn(state, "h1", { zone: "heroes", seat: 0 });
+    const { state: dealt, id: enemyId } = spawn(first, "e1", { zone: "engaged", seat: 0 });
+    const barring = family("a", { combat: { defense: () => "no", attack: () => "no", undefended: (_state, candidates) => candidates().slice(0, 1) } });
+    expect(canDefend(dealt, 0, id, cards)).toBe(true);
+    expect(canAttack(dealt, 0, id, enemyId, cards)).toBe(true);
+    expect(withFamilies([barring], () => canDefend(dealt, 0, id, cards))).toBe(false);
+    expect(withFamilies([barring], () => canAttack(dealt, 0, id, enemyId, cards))).toBe(false);
+    expect(withFamilies([barring], () => undefendedTargets(dealt, 0, cards))).toEqual([id]);
   });
 
   it("withFamilies restores the list, also when the callback throws", () => {

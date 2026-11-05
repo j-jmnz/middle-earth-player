@@ -2,6 +2,7 @@
 // default (registered by families/index.ts; withFamilies swaps it for a test). A hook returns a new state or the same object, never a changed one.
 import type { Amount, Condition, PickSpec } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../core/intents.ts";
+import type { PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { AmountScope } from "./amounts.ts";
 import type { Scope } from "./conditions.ts";
@@ -50,6 +51,7 @@ type Hooked = {
   readonly condition: readonly RulesFamily[];
   readonly amount: readonly RulesFamily[];
   readonly attached: readonly RulesFamily[];
+  readonly combat: readonly RulesFamily[];
 };
 const hookedBy = new WeakMap<readonly RulesFamily[], Hooked>();
 
@@ -63,6 +65,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       condition: families.filter((family) => family.condition != null),
       amount: families.filter((family) => family.amount != null),
       attached: families.filter((family) => family.attached != null),
+      combat: families.filter((family) => family.combat != null),
     };
     hookedBy.set(families, found);
   }
@@ -148,4 +151,31 @@ export function familyAttached(state: ScenarioState, id: string, host: string, c
   let current = state;
   for (const family of hooked(families).attached) current = family.attached?.(current, id, host, ctx) ?? current;
   return current;
+}
+
+/** Why a family bars the character from defending the attack in progress, or null (the first family's reason). */
+export function familyDefenseReason(state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, families: readonly RulesFamily[] = active()): string | null {
+  for (const family of hooked(families).combat) {
+    const reason = family.combat?.defense?.(state, defender, cards);
+    if (reason) return reason;
+  }
+  return null;
+}
+
+/** Why a family bars the attacker from being declared against the enemy, or null (the first family's reason). */
+export function familyAttackReason(state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, families: readonly RulesFamily[] = active()): string | null {
+  for (const family of hooked(families).combat) {
+    const reason = family.combat?.attack?.(state, enemyId, attacker, target);
+    if (reason) return reason;
+  }
+  return null;
+}
+
+/** The characters a family sends an undefended attack's damage to instead of the heroes (the first non-empty answer), or an empty list. */
+export function familyUndefendedTargets(state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>, families: readonly RulesFamily[] = active()): readonly string[] {
+  for (const family of hooked(families).combat) {
+    const found = family.combat?.undefended?.(state, candidates, cards);
+    if (found && found.length > 0) return found;
+  }
+  return NONE;
 }

@@ -2,6 +2,7 @@
 // src/rules/families/<family>/index.ts exports one `manifest`; src/rules/families/index.ts lists them in play order.
 import type { Amount, Condition, Instruction, PickSpec } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../core/intents.ts";
+import type { PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { AmountScope } from "./amounts.ts";
 import type { Scope } from "./conditions.ts";
@@ -42,6 +43,15 @@ export type AmountHook = (state: ScenarioState, amount: Exclude<Amount, number>,
 /** A card attached to a host by AttachSelf: the family notes what it needs about the pair (the host's state at the moment it was attached). Returns a new state or the same object. */
 export type AttachedHook = (state: ScenarioState, id: string, host: string, ctx: ReduceContext) => ScenarioState;
 
+/** Who may attack and defend, and where an undefended attack's damage goes, for the families that change it (src/rules/combat/combat.ts, src/rules/engine/legal.ts).
+ * `defense` and `attack` return why the character may not, or null; the first family with a reason wins. `undefended` returns the characters an undefended attack's
+ * damage may go to instead of the heroes, or an empty list; `candidates` is the player's characters, read only when asked. The first non-empty answer wins. */
+export type CombatHooks = {
+  readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>) => string | null;
+  readonly attack?: (state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard) => string | null;
+  readonly undefended?: (state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>) => readonly string[];
+};
+
 export type RulesFamily = {
   /** The folder name, which is also the catalog file name in src/catalog/families. */
   readonly name: string;
@@ -55,4 +65,5 @@ export type RulesFamily = {
   readonly condition?: ConditionHook;
   readonly amount?: AmountHook;
   readonly attached?: AttachedHook;
+  readonly combat?: CombatHooks;
 };
