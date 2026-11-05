@@ -250,6 +250,8 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
     if (printed.type === "hero") next = noteHostDefeated(next, instance.id, cards);
     next = destroyCard(next, instance.id, cards, steps, false, true);
     if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
+    // An enemy whose indestructible lapsed with its lethal damage still on it (Captain Sahír once no enemy has a resource, 12150:B:1) is destroyed all the same and announces it: his win (12150:B:3) hears it.
+    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: instance.id });
   }
   return next;
 }

@@ -80,6 +80,7 @@ export const CODES = {
   sendForHelp11214: "11214", // Send for Help
   theBlackSword: "11216", // The Black Sword
 } as const;
+export const SHIP_CODES: readonly string[] = ["110136", "110137", "110138", "110139", "110140", "110141"];
 export { HERO, HERO2, HERO3 };
 export type { Entry };
 

@@ -2,16 +2,23 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `corsairs-won` (scripts/e2e/the-city-of-corsairs.ts): a real two-handed
-# game of The City of Corsairs, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Phase 48. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `corsairs-won` (scripts/e2e/the-city-of-corsairs.ts): a real two-handed
+# game of The City of Corsairs (the Defenders of Gondor and Swords of the Noldor lists) from the log the first eight parts' wins write (parts 1 to 8 recorded as won, so the path resumes it), parked on its win
+# (stage 4, Captain Sahír destroyed). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md). The Resolution asks no choice ("The players
+# win the campaign!"); confirming writes the XP from the campaign card (1 for each surviving player, Corsair Warships, the Shattered Monument, Crowley, the Stormcaller, Thunderstruck, Ominous Fate) and, this being the
+# last part of the campaign, completes it: the path has nothing to begin and its foot reads "Campaign complete." (src/campaign/scenarios/the-city-of-corsairs/golden.test.ts pins the path).
+# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: corsairs-won
       SCENARIO_ID: the-city-of-corsairs
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      # The Heading is on the table while the victory shows: one widget of this scenario's own table.
+      TABLE_WIDGET: heading-value
+# Every scenario is won: the path says so and has nothing to begin.
+- assertVisible: ".*9 of 9 completed.*"
+- assertNotVisible:
+    id: begin
+- assertVisible:
+    id: path-complete
+    text: "Campaign complete\\."
