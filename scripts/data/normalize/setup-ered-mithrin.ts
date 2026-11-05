@@ -1,20 +1,15 @@
-import type { NameIndex, SetupClause, SetupStep } from "./setup-text.ts";
+import { namedBy, setsOf, stepWith } from "./setup-names.ts";
+import type { NameIndex, SetupClause } from "./setup-text.ts";
 
 // Ered Mithrin's Setup sentences (docs/plans/ered-mithrin.md, phase 49): the nine stage 1A cards' and the nine campaign cards'. Every pattern is quoted from a
 // ledger line (data/printed/ered-mithrin.json), names the cards (and, for the deck steps, the encounter sets) it moves, and returns null for a sentence it
 // does not read, so the other patterns try it. A step that names cards returns null when a name finds no card: the sentence ends up unread and the
 // scenario is not built, a name is never dropped silently. A sentence that only restates the one before it (`This is the side quest deck`,
 // `Add each discarded location to the staging area`) is read as nothing after that one, and left to the other patterns otherwise.
-const setsOf = (list: string): string[] => list.split(/,\s*(?:and\s+)?|\s+and\s+/).map((name) => name.trim()).filter((name) => name !== "");
-
 export function readEredMithrin(sentence: string, names: NameIndex, before: readonly SetupClause[]): SetupClause[] | null {
   const last = before.at(-1);
-  const step = (kind: SetupStep, extra: Partial<Extract<SetupClause, { kind: "step" }>> = {}): SetupClause => ({ kind: "step", step: kind, codes: [], ...extra });
-  // A card name in a phrase ("the Stormcaller" is "Stormcaller"); a phrase that is not a list of card names finds none.
-  const named = (phrase: string | undefined): string[] => {
-    const text = (phrase ?? "").replace(/^the /i, "");
-    return names.without(text).replace(/\b(?:and|an?|the|\d+|copy|copies|of)\b/g, " ").replace(/[\s,.]/g, "") === "" ? names.codesOf(text) : [];
-  };
+  const step = stepWith([]);
+  const named = namedBy(names);
   let match: RegExpExecArray | null;
 
   if (/^Create the Evil Creatures deck \(see insert\) and place it next to the quest deck$/i.test(sentence)) return [step("buildEvilCreaturesDeck")];

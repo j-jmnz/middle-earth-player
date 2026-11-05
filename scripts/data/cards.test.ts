@@ -220,7 +220,7 @@ describe("Mirkwood Paths cards", () => {
     // RingsDB's own codes for the 31 boons, burdens and treasures, and the same pattern for the eight campaign cards it does not list.
     expect(cards.get("12168")).toMatchObject({ name: "Lost in Mirkwood", type: "campaign" });
     expect(cards.get("12195")).toMatchObject({ name: "The Fate of Wilderland", type: "campaign" });
-    // 12165 is Fury and Malice of The City of Corsairs: the Journey Up the Anduin campaign card (collector number 165) takes the unused 120 prefix.
+    // 12165 is Fury and Malice of The City of Corsairs: the Journey Up the Anduin campaign card (number 165 in Hall of Beorn and RingsDB, 164 on the scan) takes the unused 120 prefix.
     expect(cards.get("12165")).toMatchObject({ name: "Fury and Malice" });
     expect(cards.get("12165")?.printings[0]?.pack).toBe("CoC");
     expect(cards.get("120165")).toMatchObject({ name: "Journey Up the Anduin", type: "campaign" });

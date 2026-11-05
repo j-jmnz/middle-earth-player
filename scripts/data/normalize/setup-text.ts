@@ -1,5 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
+import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
 // What a Setup line says, as data. A sentence the patterns do not read is returned in `unread`, so a new Setup
 // verb fails a build loudly instead of being skipped. Names are found by matching the known card names of the
@@ -186,25 +187,16 @@ function sentencesOf(text: string): string[] {
 const WORD: Readonly<Record<string, number>> = { a: 1, an: 1, one: 1, two: 2, three: 3 };
 const amount = (word: string | undefined): number => (word === undefined ? 1 : (WORD[word.toLowerCase()] ?? Number(word)));
 
-// Only separators and the quantity words are left once the names are blanked: "1 copy of  and  copy of ", ",  , and ".
-const isNameList = (rest: string): boolean => rest.replace(/\b(?:and|an?|the|\d+|copy|copies|of)\b/g, " ").replace(/[\s,.]/g, "") === "";
-
 // "(2 instead if there are 3 or more players in the game)", "(3 copies instead if there are 3 or 4 players in the game)",
 // "(the top 3 instead if there are 3 or more players in the game)": the larger count from that many players on.
 const MANY = /\s*\((?:the top )?(\d+)(?: copies)? instead if there are (\d+) or (?:more|\d+) players in the game\)/i;
-
-const setsOf = (list: string): string[] => list.split(/,\s*(?:and\s+)?|\s+and\s+/).map((name) => name.trim()).filter((name) => name !== "");
 
 // The Dream-chaser Setup steps (SetupStep). A sentence none of them reads returns null, and the other patterns try it. A step that
 // names cards (take control, attach, a threat trade, the choices, the secrets) returns null when a name finds no card, so the sentence
 // ends up unread and the scenario is not built; a name is never dropped silently.
 function readDreamChaser(sentence: string, names: NameIndex): SetupClause[] | null {
-  const step = (kind: SetupStep, extra: Partial<Extract<SetupClause, { kind: "step" }>> = {}): SetupClause => ({ kind: "step", step: kind, codes: names.codesOf(sentence), ...extra });
-  // A card name in the sentence, "the Stormcaller" as "Stormcaller"; a phrase that is not one card's name finds none.
-  const named = (phrase: string | undefined): string[] => {
-    const text = (phrase ?? "").replace(/^the /i, "");
-    return isNameList(names.without(text)) ? names.codesOf(text) : [];
-  };
+  const step = stepWith(names.codesOf(sentence));
+  const named = namedBy(names);
   let match: RegExpExecArray | null;
   if ((match = /^Prepare the (Corsair|Uncharted|Grotto) deck$/i.exec(sentence))) {
     const kind = { corsair: "prepareCorsairDeck", uncharted: "prepareUnchartedDeck", grotto: "prepareGrottoDeck" } as const;
@@ -302,9 +294,9 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const dreamChaser = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses);
-    if (dreamChaser) {
-      clauses.push(...dreamChaser);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses);
+    if (campaignStep) {
+      clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {
       clauses.push({ kind: "aside", codes: names.codesOf(match[2] ?? ""), allCopies: match[1] !== undefined });
     } else if ((match = /^Search the encounter deck for (?:\d+ )?(?:cop(?:y|ies) of )?(.+?),? and add them to the staging area$/i.exec(sentence)) && /\bcopy of\b/i.test(sentence)) {

@@ -10,8 +10,9 @@ import {
   type ScenarioData,
 } from "../../../src/catalog/scenario-data.ts";
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, PRODUCTS, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
-import type { Overrides } from "./cards.ts";
+import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
+import { setsOf } from "./setup-names.ts";
 import { pileAccepts, questFacts } from "./scenario-piles.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
@@ -79,7 +80,7 @@ function bookletSetsOf(entry: RuleEntry | undefined): string[] {
   const match = /built with all the cards from (?:the following encounter sets: )?(.+?)(?: encounter set)?\.(?: These sets| This set| \s*$|$)/.exec(flat);
   if (!match?.[1]) return [];
   // "(these last two sets can be found in ... the core set)" says where sets are found, not what they are called.
-  return match[1].replace(/\s*\([^)]*\)/g, "").split(/,\s*(?:and\s+)?|\s+and\s+/).map((name) => name.trim()).filter((name) => name !== "");
+  return setsOf(match[1].replace(/\s*\([^)]*\)/g, ""));
 }
 
 export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: Overrides, rules: readonly RuleEntry[], campaignDefs: readonly CampaignDef[] = CAMPAIGNS): ScenarioResult {
@@ -89,6 +90,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
   const byGuid = new Map<string, Card>();
   const byPackNumber = new Map<string, Card>();
   const bySlug = new Map<string, Card>();
+  const revCoreSlugs = new Map<string, Card>();
   for (const card of cards) {
     for (const printing of card.printings) {
       if (printing.octgnGuid) byGuid.set(printing.octgnGuid, card);
@@ -96,9 +98,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       if (printing.hobSlug) bySlug.set(printing.hobSlug, card);
       // Hall of Beorn's scenario lists name a Revised Core Set card by its original Core Set slug ("Forest-Spider-Core"): Ered Mithrin's first two
       // scenarios deal the Revised Core Set's reprints of those cards (overrides.dragnPackAliases).
-      if (printing.hobSlug?.endsWith("-RevCore")) bySlug.set(printing.hobSlug.replace(/-RevCore$/, "-Core"), card);
+      if (printing.hobSlug?.endsWith("-RevCore")) revCoreSlugs.set(printing.hobSlug.replace(/-RevCore$/, "-Core"), card);
     }
   }
+  for (const [slug, card] of revCoreSlugs) if (!bySlug.has(slug)) bySlug.set(slug, card);
   const ruleById = new Map(rules.map((entry) => [entry.id, entry]));
   // The booklet's name for a set, as the cards print it (overrides.encounterSetAliases).
   const aliases = new Map(overrides.encounterSetAliases.map((alias) => [plain(alias.booklet), plain(alias.set)]));
@@ -110,6 +113,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
   const { resolve, sideRow } = dragnResolver(raw, cards, overrides, { byCode, byGuid, byPackNumber });
   const reprintOf = reprintsOf(cards);
 
+  // The name of a card as a word of a text, either apostrophe: built once per name.
+  const mentioned = new Map<string, RegExp>();
   const scenarios: ScenarioData[] = [];
   const campaignCards: Record<string, string> = {};
   // The cards a campaign's scenarios start with in player 1's play area (the Fellowship's Ring-bearer attachments), by scenario.
@@ -164,7 +169,15 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // A card of the scenario's own box that its campaign card names without its scenario listing it (Ered Mithrin's The King's Quest: "Haldan may be included").
     const campaignText = `${byCode.get(campaignCard)?.text ?? ""}\n${bySlug.get(hob.QuestCards[0]?.Slug ?? "")?.text ?? ""}`;
     const ownBox = productOf(def.product).packs;
-    const inCampaignText = (card: Card) => card.campaignKind == null && !["hero", "ally", "attachment", "event"].includes(card.type) && card.printings.some((p) => ownBox.includes(p.pack)) && new RegExp(`\\b${card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(campaignText);
+    const inCampaignText = (card: Card) => {
+      if (card.campaignKind != null || PLAYER_TYPES.has(card.type) || !card.printings.some((p) => ownBox.includes(p.pack))) return false;
+      let pattern = mentioned.get(card.name);
+      if (!pattern) {
+        pattern = new RegExp(`\\b${card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/['\u2019]/g, "['\u2019]")}\\b`);
+        mentioned.set(card.name, pattern);
+      }
+      return pattern.test(campaignText);
+    };
     const extras = def.deck === undefined ? [] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
     const names = nameIndex([...scope, ...extras], new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
 
@@ -217,6 +230,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         // One physical card with two catalog cards for its sides: `card` is the side faceup, `other` its back. A folded card (Card.back) has none.
         if (other && other.code === card.code) other = null;
         if (other && eliteFaceup && card.type !== eliteFaceup && other.type === eliteFaceup) [card, other] = [other, card];
+        // A two-sided card the Setup has the first player take control of is dealt on the side it names (Haldan, not Woodmen Village).
+        const controlled = def.takeControlFaceup === true && clausesOf(quest, "step").some((clause) => clause.step === "takeControl" && other != null && clause.codes.includes(other.code) && !clause.codes.includes(card?.code ?? ""));
+        if (other && controlled) [card, other] = [other, card];
         const was = pile;
         const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card?.code && (rule.from === undefined || rule.from === was));
         if (moved) pile = moved.pile;
@@ -330,6 +346,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       if (clause.kind === "stage") for (const code of clause.codes) if (!inPile(code, ["staging"])) local.push(`${id}: Setup adds ${nameOf(code)} to staging, which the load list does not`);
       if (clause.kind === "active") for (const code of clause.codes) if (!inPile(code, ["activeLocation"])) local.push(`${id}: Setup makes ${nameOf(code)} the active location, which the load list does not`);
       if (clause.kind === "attachChosen") for (const code of clause.codes) if (!inPile(code, ["attachedChosen"])) local.push(`${id}: Setup attaches ${nameOf(code)} to a hero, which the load list does not`);
+      if (clause.kind === "step" && clause.step === "takeControl") for (const code of clause.codes) if (!inPile(code, ["setAside"])) local.push(`${id}: Setup has the first player take control of ${nameOf(code)}, which the load list does not set aside`);
       if (clause.kind === "attachRingBearer") for (const code of clause.codes) if (!inPile(code, ["attached"])) local.push(`${id}: Setup attaches ${nameOf(code)} to the Ring-bearer, which the load list does not`);
     }
     // "Set all copies of X aside": every copy the box holds, Hall of Beorn's Normal count.
@@ -370,7 +387,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         if (hobSets[at] === "") local.push(`${id}: the booklet names the encounter set ${name}, and no card of the load list belongs to it`);
       });
       const listedSets = new Set(booklet.map(canon));
-      for (const [key, name] of printedSets) if (!listedSets.has(key)) local.push(`${id}: the load list deals ${name} cards, which the booklet's encounter sets do not name`);
+      // A card the first player takes control of (Haldan) is no part of the encounter deck, so its set need not be one the booklet names.
+      const controlled = clausesOf(quest, "step").filter((clause) => clause.step === "takeControl").flatMap((clause) => clause.codes);
+      const onlyControlled = (name: string) => placed.every((item) => canon(byCode.get(item.code)?.encounterSet ?? "") !== canon(name) || item.pile === "quest" || controlled.some((code) => same(code, item.code)));
+      for (const [key, name] of printedSets) if (!listedSets.has(key) && !onlyControlled(name)) local.push(`${id}: the load list deals ${name} cards, which the booklet's encounter sets do not name`);
     } else if (JSON.stringify(booklet.map(canon).sort()) !== JSON.stringify(hobSets.map(canon).sort())) local.push(`${id}: encounter sets: booklet ${booklet.join(", ")} / Hall of Beorn ${hobSets.join(", ")}`);
     const setNames = hobSets;
     const encounterSets = setNames.map((name) => ({

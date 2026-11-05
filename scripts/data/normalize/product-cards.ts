@@ -99,14 +99,21 @@ export function setName(name: string | null | undefined, cardSet?: string): stri
   return plain.replace(/ Campaign$/, "");
 }
 
-// Hall of Beorn gives the Dream-chaser ships no encounter info, but its scenario files list each ship under its set ("Umbar Fleet", "The
-// Dream-chaser's Fleet"). A ship takes the set its slug is listed under; a 2023 reprint (Dream-chaser Campaign Expansion) takes its original's.
-const DREAM_CHASER_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => product.packs));
-export function fillShipSets(raw: RawData, byCode: Map<string, Card>): void {
+// The encounter set each scenario file lists a card (by its slug) under, Nightmare sets left out.
+function setBySlug(raw: Pick<RawData, "scenarios">): Map<string, string> {
   const bySlug = new Map<string, string>();
   for (const scenario of raw.scenarios) {
     for (const item of scenario.ScenarioCards) if (item.EncounterSet && !/Nightmare$/.test(item.EncounterSet)) bySlug.set(item.Slug, setName(item.EncounterSet) ?? item.EncounterSet);
   }
+  return bySlug;
+}
+
+// Hall of Beorn gives the Dream-chaser ships no encounter info, but its scenario files list each ship under its set ("Umbar Fleet", "The
+// Dream-chaser's Fleet"). A ship takes the set its slug is listed under; a 2023 reprint (Dream-chaser Campaign Expansion) takes its original's.
+// Ships are Dream-chaser cards only, so the Dream-chaser boxes' packs are the whole scope.
+const DREAM_CHASER_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.home === "dream-chaser").flatMap((product) => product.packs));
+export function fillShipSets(raw: RawData, byCode: Map<string, Card>): void {
+  const bySlug = setBySlug(raw);
   const ships = [...byCode.values()].filter((card) => (card.type === "ship-enemy" || card.type === "ship-objective") && card.campaignKind == null && card.printings.some((printing) => DREAM_CHASER_PACKS.has(printing.pack)));
   const named = new Map<string, string>();
   for (const card of ships) {
@@ -122,10 +129,7 @@ export function fillShipSets(raw: RawData, byCode: Map<string, Card>): void {
 // Hall of Beorn gives the eight encounter side quests of Fire in the Night no encounter info, but its scenario file lists each under its set ("Fire in the
 // Night"). A side quest of a built box takes the set its slug is listed under.
 export function fillSideQuestSets(raw: Pick<RawData, "scenarios">, byCode: Map<string, Card>): void {
-  const bySlug = new Map<string, string>();
-  for (const scenario of raw.scenarios) {
-    for (const item of scenario.ScenarioCards) if (item.EncounterSet && !/Nightmare$/.test(item.EncounterSet)) bySlug.set(item.Slug, setName(item.EncounterSet) ?? item.EncounterSet);
-  }
+  const bySlug = setBySlug(raw);
   const products = new Set(PRODUCTS.flatMap((product) => product.packs));
   for (const card of byCode.values()) {
     if (card.type !== "encounter-side-quest" || card.encounterSet != null || !card.printings.some((printing) => products.has(printing.pack))) continue;
@@ -201,7 +205,7 @@ export function addDragnBacks(raw: Pick<RawData, "dragnSides">, byCode: Map<stri
   const typeKey = (value: string) => value.toLowerCase().replace(/[\s-]/g, "");
   for (const sides of raw.dragnSides.values()) {
     const { a, b } = sides;
-    const product = PRODUCTS.find((item) => item.name === a?.packName && item.home === "dream-chaser");
+    const product = PRODUCTS.find((item) => item.name === a?.packName && item.sidedDragnRows === true);
     // Both rows are one card only when they carry one name and one type: the Grotto locations differ in name, the Stormcaller Elite in type.
     if (!a || !b || !product || Number(a.numberInPack) >= 900 || titleKey(a.name ?? "") !== titleKey(b.name ?? "") || a.type !== b.type) continue;
     const mine = [...byCode.values()].filter(
@@ -218,6 +222,6 @@ export function addDragnBacks(raw: Pick<RawData, "dragnSides">, byCode: Map<stri
 // double-sided card; a Dream-chaser card takes the side that bears its title (else the front), so its keywords and Victory are its own.
 export function dragnRowOf(raw: Pick<RawData, "dragn" | "dragnSides">, guid: string, card: Pick<HobCard, "CardSet" | "Title">): Record<string, string> | undefined {
   const sides = raw.dragnSides.get(guid);
-  if (!sides || !PRODUCTS.some((product) => product.name === card.CardSet && product.home === "dream-chaser")) return raw.dragn.get(guid);
+  if (!sides || !PRODUCTS.some((product) => product.name === card.CardSet && product.sidedDragnRows === true)) return raw.dragn.get(guid);
   return [sides.a, sides.b].find((row) => row !== undefined && titleKey(row.name ?? "") === titleKey(card.Title)) ?? sides.a ?? sides.b;
 }

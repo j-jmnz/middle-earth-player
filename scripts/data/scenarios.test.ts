@@ -280,7 +280,7 @@ describe("Ered Mithrin campaign", () => {
   const campaign = loadCampaign("ered-mithrin");
   const DECK = {
     "journey-up-the-anduin": { normal: 35, easy: 22, staging: [], setAside: ["18016", "18069"], evil: 8 },
-    "lost-in-mirkwood": { normal: 32, easy: 24, staging: ["01096", "18028"], setAside: [], spiders: 12, orcs: 14 },
+    "lost-in-mirkwood": { normal: 32, easy: 24, staging: ["01096", "18028"], setAside: ["18070"], spiders: 12, orcs: 14 },
     "the-kings-quest": { normal: 35, easy: 25, staging: [], setAside: ["18042", "18043", "18058", "18059"], caves: 6 },
     "the-withered-heath": { normal: 37, easy: 26, staging: [], setAside: ["19011", "19012"], caves: 6 },
     "roam-across-rhovanion": { normal: 40, easy: 26, staging: [], setAside: ["19036", "19037", "19052", "19054"] },
@@ -339,6 +339,8 @@ describe("Ered Mithrin campaign", () => {
     expect(mirkwood.cards.filter((card) => card.pile === "orcsDeck").every((card) => byCode.get(card.code)?.encounterSet === "Dol Guldur Orcs")).toBe(true);
     // Woodmen Village and Haldan are the two sides of one card: set aside together, Haldan is not a player card.
     expect(journey.cards.find((card) => card.code === "18069")).toMatchObject({ pile: "setAside", back: "18070" });
+    // Lost in Mirkwood's Setup has the first player take control of Haldan: the same card, set aside Haldan faceup.
+    expect(mirkwood.cards.find((card) => card.code === "18070")).toMatchObject({ pile: "setAside", back: "18069" });
   });
 
   it("deals Wormsbane to a hero at Setup, both sides, and keeps the Easy Mode counts Hall of Beorn gives where DragnCards' deck keeps more", () => {

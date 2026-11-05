@@ -73,7 +73,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 46 | The Drowned Ruins | completed | 2026-11-04. Engine done, review round done. Phone checks open: the Grotto pile (top-card preview and speech, the glide back to it), Command's armed Done and up-to notes, the flip naming its side, Into the Abyss counts; both Maestro flows unrun; `ruins-won` missing, so the win flow cannot run. |
 | 47 | A Storm on Cobas Haven | completed | 2026-11-04. Engine done, review round done. Phone checks open: a controlled tower in staging (fold rank, reader label, its Action from either seat), guarded and re-guarded towers, the Islet's "1 held" pill and where the held enemy returns, the Skirmisher as a ship, Taking on Water's three exhaust picks and host caution, the added-phase rail and carousel, the Tactics hero list, Gandalf's entry, Gavin's Planning Action; both Maestro flows unrun; `haven-won` missing, so the win flow cannot run. |
 | 48 | The City of Corsairs | not started | Coming soon (user decision, 2026-11-01). Open: which Stormcaller card the campaign Setup flips (12151 has no Campaign Mode only side; only 110042 has one). |
-| 49 | Ered Mithrin data | not started | |
+| 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Mount Gundabad stage 2 pictures (19137-19142); Crypt Stalker Easy count unconfirmed. |
 | 50 | Ered Mithrin campaign shell, treasures and the pool | not started | |
 | 51 | Wilderland mechanics family | not started | |
 | 51b | Wilderland on the table | not started | |
@@ -137,6 +137,10 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - One active location per separate stage (phase 16) is read from `rr.active-location` and `mec109.multiple-staging-areas`, not stated by a card. Not user-confirmed.
 - Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
 - Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
+
+- Ered Mithrin data: Mount Gundabad stage 2s 19137-19142 are pictures-test exceptions; cardgame.tools files them as `MEC70-137`..`-142` (front `MEC70-135a`..`g`). Needs a number mapping in `scripts/data/sources/pictures.ts` and `pnpm data:sync pictures` before phase 59.
+- Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
+- Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Screens and code
 

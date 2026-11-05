@@ -1033,7 +1033,7 @@
       "prefix": "12",
       "width": 3,
       "from": 166,
-      "reason": "Hall of Beorn codes the Ered Mithrin Campaign Expansion '19' and the collector number (165 to 204), which collides with six Fate of Wilderland codes (19165 to 19170). RingsDB codes the box's 31 boons, burdens and treasures '12' and the collector number (12166 to 12204), which no other card bears, so a card with collector number 166 or more takes that code, and the eight campaign cards RingsDB does not list take the same pattern (Lost in Mirkwood 12168, The King's Quest 12170, The Withered Heath 12175, Roam Across Rhovanion 12184, Fire in the Night 12187, The Ghost of Framsburg 12189, Mount Gundabad 12193, The Fate of Wilderland 12195).",
+      "reason": "Hall of Beorn codes the Ered Mithrin Campaign Expansion '19' and the collector number (165 to 204), which collides with six Fate of Wilderland codes (19165 to 19170). RingsDB codes the box's 31 boons, burdens and treasures '12' and its collector number (12166 to 12204), which no other card bears, so a card with number 166 or more takes that code, and the eight campaign cards RingsDB does not list take the same pattern (Lost in Mirkwood 12168, The King's Quest 12170, The Withered Heath 12175, Roam Across Rhovanion 12184, Fire in the Night 12187, The Ghost of Framsburg 12189, Mount Gundabad 12193, The Fate of Wilderland 12195).",
       "source": "hallofbeorn.com/Export/EncounterCards, QuestCards, PlayerCards (CardSet Ered Mithrin Campaign Expansion, Number); ringsdb.com pack EMCE (12166 to 12204); Ered Mithrin Campaign Expansion rulebook MEC115"
     },
     {
@@ -1041,8 +1041,8 @@
       "prefix": "120",
       "width": 3,
       "from": 0,
-      "reason": "The Journey Up the Anduin campaign card is collector number 165, and '12165' is Fury and Malice of The City of Corsairs (RingsDB, pack CoC). The six-digit prefix 120 is unused (the prefixes in use are 110, 131-132, 140-148 and 900-907), so the card is 120165.",
-      "source": "hallofbeorn.com/Export/QuestCards (CardSet Ered Mithrin Campaign Expansion, Number 165); ringsdb.com pack CoC (12165 Fury and Malice); Ered Mithrin Campaign Expansion rulebook MEC115"
+      "reason": "Hall of Beorn and RingsDB number the box's cards one above the collector number the cards print (the scans print 164 on Journey Up the Anduin, 166 on A Growing Threat, 167 on Lost in Mirkwood), and the code follows their number. The Journey Up the Anduin campaign card is their number 165, and '12165' is Fury and Malice of The City of Corsairs (RingsDB, pack CoC; 12164 is Umbar Patrol). The six-digit prefix 120 is unused (the prefixes in use are 110, 131-132, 140-148 and 900-907), so the card is 120165.",
+      "source": "hallofbeorn.com/Export/QuestCards (CardSet Ered Mithrin Campaign Expansion, Number 165); ringsdb.com pack CoC (12165 Fury and Malice); scans 120165.A (prints 164), 12167.A (prints 166), 12168.A (prints 167); Ered Mithrin Campaign Expansion rulebook MEC115"
     }
   ],
   "dragnPackAliases": [

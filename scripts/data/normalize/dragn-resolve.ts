@@ -1,5 +1,5 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import { PRODUCTS } from "../campaign-defs.ts";
+import { PRODUCTS, scenarioSlug } from "../campaign-defs.ts";
 import type { Overrides } from "./cards.ts";
 import type { RawData } from "./load-raw.ts";
 import { sameName } from "./names.ts";
@@ -35,8 +35,7 @@ export function dragnResolver(
     // Cards of one name whose collector number the sources disagree on (Mount Gundabad's seven Exploring Gundabad stages: Hall of Beorn
     // numbers The Upper Levels 135, DragnCards 136): the name of the card's other side, which Hall of Beorn keeps in its slug, finds it.
     const sideName = raw.dragnSides.get(row.databaseId)?.b?.name ?? "";
-    const slugOf = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "").replace(/[^A-Za-z0-9]+/g, "-").toLowerCase();
-    const viaSlug = sideName === "" ? [] : named.filter((card) => card.printings.some((printing) => (printing.hobSlug ?? "").toLowerCase().includes(slugOf(sideName))));
+    const viaSlug = sideName === "" ? [] : named.filter((card) => card.printings.some((printing) => scenarioSlug(printing.hobSlug ?? "").includes(scenarioSlug(sideName))));
     return viaSlug.length === 1 ? (viaSlug[0] ?? null) : null;
   };
   // A DragnCards pack that stands for another pack's cards (overrides.dragnPackAliases): found by collector number and name.

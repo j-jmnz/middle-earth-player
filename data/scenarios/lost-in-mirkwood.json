@@ -196,6 +196,13 @@
       "perPlayer": 1
     },
     {
+      "code": "18070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "18069"
+    },
+    {
       "code": "01074",
       "normal": 2,
       "easy": 2,

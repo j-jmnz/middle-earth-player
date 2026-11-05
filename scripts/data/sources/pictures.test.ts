@@ -4,7 +4,6 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { scenarioCards } from "../../../src/catalog/scenario-data.ts";
-import { loadCards } from "../load-cards.ts";
 import { loadScenario } from "../load-scenarios.ts";
 import { DATA_DIR } from "../paths.ts";
 import { MEC109_CHANGED } from "../printed/scope.ts";
@@ -77,7 +76,9 @@ describe("pictures", () => {
     // Ered Mithrin: no source pictures the Campaign Expansion's own cards (cardgame.tools' MEC115 stops at the encounter cards, JvZijp's Drive holds
     // none of a campaign expansion's cards), and Mount Gundabad's stage 2 cards 19137 to 19142, whose shared front and own backs the sources file under
     // other numbers (cardgame.tools lists all seven under 135, JvZijp numbers the backs one up): those keep their scan.
-    const emce = loadCards().filter((card) => card.printings.some((printing) => printing.pack === "EMCE")).map((card) => card.code);
+    // The Campaign Expansion's 40 cards, by code (120165 is the Journey Up the Anduin campaign card; the rest are 12166 to 12204).
+    const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
+    // Pinning 19137 to 19142 needs their cardgame.tools pages (MEC70-137 to 142 backs, the shared 135 front) fetched: `pnpm data:sync pictures`.
     const unpictured = new Set([...MEC109_CHANGED, "11084", ...emce, "19137", "19138", "19139", "19140", "19141", "19142"]);
     const missing: string[] = [];
     for (const id of readdirSync(path.join(DATA_DIR, "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {

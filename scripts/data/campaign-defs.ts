@@ -25,6 +25,9 @@ export type ScenarioDef = {
   // The piles of the DragnCards load groups this scenario's deck uses beyond the common ones (sharedQuestDeck, sharedEncounterDeck,
   // sharedStagingArea, sharedActiveLocation, sharedSetAside): `sharedEncounterDeck2` is a different deck in each Dream-chaser scenario.
   groups?: Readonly<Record<string, Pile>>;
+  // A two-sided card the Setup has the first player take control of is dealt on the side the Setup names (Ered Mithrin's Haldan, loaded as
+  // Woodmen Village and flipped by DragnCards' postLoadActionList), where the load list's side is not the one in play.
+  takeControlFaceup?: boolean;
 };
 
 // A Hall of Beorn product (a box) the pipeline builds cards or scenarios from: the one table every other site derives from.
@@ -53,6 +56,12 @@ export type ProductDef = {
   // The cards a scenario's campaign card Resolution names that the campaign deals are its boons, burdens and treasures: any other name in it is a count or a
   // condition ("If there are 3 or more resources on Urdug", "Hrogar's Hill"). Dream-chaser's Resolution names are cut at its XP list instead.
   campaignCardRewards?: boolean;
+  // DragnCards files each side of a double-sided card of the box as a row of its own (the Dream-chaser boxes): addDragnBacks and dragnRowOf
+  // read the two rows as one card.
+  sidedDragnRows?: boolean;
+  // The product reprints cards of the Adventure Packs with a Campaign Mode only or Upgraded side (the Dream-chaser Campaign Expansion): a campaign
+  // game deals the reprint (scripts/data/normalize/reprints.ts).
+  campaignReprints?: boolean;
 };
 
 const DCCE = "Dream-chaser Campaign Expansion";
@@ -64,14 +73,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "Revised Core Set", packs: ["RevCore"], home: "mirkwood-paths", load: "setup", easySheet: true, twinPack: null },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
-  { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: "Flight of the Stormcaller", packs: ["FotS"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: "The Thing in the Depths", packs: ["TitD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: "Temple of the Deceived", packs: ["TotD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: "The Drowned Ruins", packs: ["DR"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: "A Storm on Cobas Haven", packs: ["SoCH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: "The City of Corsairs", packs: ["CoC"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
-  { name: DCCE, packs: ["DCCE"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, ledgerKeywords: true },
+  { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: "Flight of the Stormcaller", packs: ["FotS"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: "The Thing in the Depths", packs: ["TitD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: "Temple of the Deceived", packs: ["TotD"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: "The Drowned Ruins", packs: ["DR"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: "A Storm on Cobas Haven", packs: ["SoCH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: "The City of Corsairs", packs: ["CoC"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
+  { name: DCCE, packs: ["DCCE"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, ledgerKeywords: true, sidedDragnRows: true, campaignReprints: true },
   // Ered Mithrin: The Wilds of Rhovanion and the six Adventure Packs are the base cards, the Campaign Expansion (MEC115, 2024) the campaign.
   { name: "The Wilds of Rhovanion", packs: ["TWoR"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
   { name: "The Withered Heath", packs: ["TWH"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
@@ -127,7 +136,7 @@ function dreamChaser(n: number, id: string, product: string, groups: Readonly<Re
 
 // An Ered Mithrin scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q08.n / E08.n).
 function eredMithrin(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
-  return { id, product, campaignProduct: EMCE, setupSpan: `emce.setup-${id}`, deck: { normal: `Q08.${n}`, easy: `E08.${n}` }, groups };
+  return { id, product, campaignProduct: EMCE, setupSpan: `emce.setup-${id}`, deck: { normal: `Q08.${n}`, easy: `E08.${n}` }, groups, takeControlFaceup: true };
 }
 
 export const CAMPAIGNS: readonly CampaignDef[] = [
@@ -204,7 +213,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     products: ["The Wilds of Rhovanion", "The Withered Heath", "Roam Across Rhovanion", "Fire in the Night", "The Ghost of Framsburg", "Mount Gundabad", "The Fate of Wilderland", EMCE],
     scenarios: [
       eredMithrin(1, "journey-up-the-anduin", "The Wilds of Rhovanion", { sharedEncounterDeck2: "evilCreaturesDeck" }),
-      eredMithrin(2, "lost-in-mirkwood", "The Wilds of Rhovanion", { sharedEncounterDeck2: "spidersDeck", sharedEncounterDeck3: "orcsDeck" }),
+      eredMithrin(2, "lost-in-mirkwood", "The Wilds of Rhovanion", { sharedEncounterDeck2: "spidersDeck", sharedEncounterDeck3: "orcsDeck", player1Play1: "setAside" }),
       eredMithrin(3, "the-kings-quest", "The Wilds of Rhovanion", { sharedEncounterDeck2: "cavesDeck" }),
       eredMithrin(4, "the-withered-heath", "The Withered Heath", { sharedEncounterDeck2: "cavesDeck" }),
       eredMithrin(5, "roam-across-rhovanion", "Roam Across Rhovanion"),

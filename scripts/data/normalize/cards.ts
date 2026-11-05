@@ -104,7 +104,7 @@ function keywordOnly(card: HobCard): (line: string) => boolean {
   };
 }
 
-const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
+export const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
 const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective", "encounter-side-quest", "ship-enemy", "ship-objective"]);
 
 // A Hall of Beorn Treasure of a campaign expansion (Ered Mithrin's, emce.treasure). The Hobbit saga's Treasure rows (Sting) are RingsDB's
@@ -393,7 +393,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
           backType: null,
           errata: null,
           imagesrc: null,
-          deckLegal: realType(source) ? false : deckLegal(type?.type ?? "", type?.typeName ?? ""),
+          deckLegal: realType(source) ? false : deckLegal(type?.type ?? "", type?.typeName ?? "", facts.campaignKind),
           printings: [...printings, ...known],
         };
     return card;
