@@ -119,6 +119,8 @@ export type LayoutOptions = {
   deckTop?: CardInstance | null;
   // The cards a Sailing test looked at, top of the deck first, with the success symbols each prints: laid in a strip over staging (look-strip.ts).
   look?: readonly { card: CardInstance; success: number }[];
+  // The strip leaves the staging band to the cards that stand there (Discover's Loot objective and Hazard, which the banner rings above the veil): it lies in the engagement and play bands only (emce.discover).
+  lookLeavesStaging?: boolean;
   // The sea family's staging stacks: a staging card with more than one card under it shows one peek and a count (placeStaging). Off, every attachment peeks as it always did.
   stacks?: boolean;
   // The cards a fold must keep on the table (row-fold.ts): those the open moment asks about, the picked ones and the one the banner's beat names.
@@ -410,7 +412,10 @@ export function tableLayout(
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);
   // Each second-slot deck stands in the slot's left place, its discard pile in the right one (only the Corsair and Evil Creatures pairs have one).
-  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...Object.fromEntries(SECOND_DECKS.filter((id) => piles[id]).map((id) => [id, secondDeck])), ...Object.fromEntries(SECOND_DISCARDS.filter((id) => piles[id]).map((id) => [id, secondDiscard])), ...(piles.victory ? { victory } : {}) };
+  const pileRects: { -readonly [K in keyof TablePiles<Rect>]: TablePiles<Rect>[K] } = { deck, discard, encounterDeck, encounterDiscard };
+  for (const id of SECOND_DECKS) if (piles[id]) pileRects[id] = secondDeck;
+  for (const id of SECOND_DISCARDS) if (piles[id]) pileRects[id] = secondDiscard;
+  if (piles.victory) pileRects.victory = victory;
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table/view.tsx).
   const held = piles.deck.attached ?? [];
@@ -424,7 +429,8 @@ export function tableLayout(
 
   // A Sailing test's look: the cards come off the encounter deck face up and stand in a strip over staging, then the engagement band and the play band (look-strip.ts).
   if (options.look && options.look.length > 0) {
-    const strip = lookStrip(options.look.length, lookBands({ zones: { staging, engaged, play } }), card, gap, touch(scale, MIN_TARGET));
+    const bands = lookBands({ zones: { staging, engaged, play } });
+    const strip = lookStrip(options.look.length, options.lookLeavesStaging === true ? bands.slice(1) : bands, card, gap, touch(scale, MIN_TARGET));
     options.look.forEach((row, index) => {
       const place = strip.places[index];
       if (place) slots.push({ ...slotOf(row.card, "encounterDeck", "card", place), faceDown: false, success: row.success });

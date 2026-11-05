@@ -99,8 +99,8 @@ const NO_FAN: readonly (SkImage | null)[] = [];
 
 const isTappable = (slot: CardSlot, ctx: PieceContext) => ctx.highlight.tappable.has(slot.id) || ctx.targetIds.has(slot.id);
 const pickedCount = (slot: CardSlot, ctx: PieceContext) => ctx.highlight.picked.get(slot.id) ?? 0;
-// A Sailing test's look veils staging, the engagement area and the play area under the strip (docs/design-system-table.md, The Sailing test).
-const veiledByLook = (slot: CardSlot, ctx: PieceContext) => ctx.looking && slot.success == null && slot.kind !== "pile" && (slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "play");
+// A look (a Sailing test's, or Discover's) veils staging, the engagement area and the play area under the strip (docs/design-system-table.md, The Sailing test); the cards the banner's beat rings stand above the veil.
+const veiledByLook = (slot: CardSlot, ctx: PieceContext) => ctx.looking && slot.success == null && slot.kind !== "pile" && !ctx.beating.has(slot.id) && (slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "play");
 const isDimmed = (slot: CardSlot, ctx: PieceContext) =>
   (ctx.highlight.dimOthers && !isTappable(slot, ctx) && pickedCount(slot, ctx) === 0) || ctx.highlight.muted.has(slot.id) || veiledByLook(slot, ctx);
 

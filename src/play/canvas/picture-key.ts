@@ -15,3 +15,9 @@ export function pictureKey(card: { code: string; face: CardFace }): string {
 export function pictureCode(key: string): string {
   return fallenBase(key.endsWith(".B") ? key.slice(0, -2) : key);
 }
+
+/** A card's name by its picture key, as the canvas names a card everywhere; the id itself for a card the game does not hold. */
+export function nameOfCard(cards: Readonly<Record<string, { code: string; face: CardFace } | undefined>>, id: string, nameOf: (key: string) => string): string {
+  const card = cards[id];
+  return nameOf(card ? pictureKey(card) : id);
+}

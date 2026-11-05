@@ -105,7 +105,7 @@ Read the sections your task touches.
   - 861–886 Persistence and shipping (~1.7K)
   - 887–928 Screens (~4.7K) ← 2
     - 913–928 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~29.7K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~29.9K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -119,7 +119,7 @@ Read the sections your task touches.
   - 102–105 Tokens and effects (~320)
   - 106–119 Piles (~1.8K) ← 8
   - 120–125 Marks of the open moment (~400) ← 1
-  - 126–194 Motion (~3.0K) ← 8
+  - 126–194 Motion (~3.2K) ← 8
   - 195–221 Spotlight (~2.4K) ← 18
   - 222–227 Gestures (~420) ← 5
   - 228–231 Hold, slide and release (~940)
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.9K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.1K tok)
   - 5–17 Rules (~620)
   - 18–89 Phases (~2.6K)
-  - 90–196 Open items (~5.2K)
+  - 90–198 Open items (~5.4K)
     - 92–106 Fixtures and Maestro (~640)
-    - 107–146 Rules and engine (~1.6K)
-    - 147–171 Screens and code (~1.3K)
-    - 172–196 Phone and tablet checks (~1.7K)
-  - 197–213 Standing decisions (~430)
+    - 107–147 Rules and engine (~1.6K)
+    - 148–172 Screens and code (~1.3K)
+    - 173–198 Phone and tablet checks (~1.8K)
+  - 199–215 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -208,7 +208,7 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-49-ered-mithrin-data.md` — Phase 49 — Ered Mithrin data (~2.5K tok)
 - `docs/phases/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.3K tok)
 - `docs/phases/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
-- `docs/phases/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~2.4K tok)
+- `docs/phases/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~2.5K tok)
 - `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~1.2K tok)
 - `docs/phases/phase-53-lost-in-mirkwood.md` — Phase 53 — Lost in Mirkwood (~1.2K tok)
 - `docs/phases/phase-54-the-kings-quest.md` — Phase 54 — The King's Quest (~1.1K tok)

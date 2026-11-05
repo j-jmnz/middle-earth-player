@@ -44,6 +44,11 @@ describe("the treasure choice", () => {
     expect(wilderlandAsk({ verb: "Draw" }, "hall-id", words)).toBeNull();
   });
 
+  it("asks which looked-at Loot objective Discover attaches, naming the location", () => {
+    expect(wilderlandAsk({ verb: "Discover", amount: 3 }, "hall-id", words)).toEqual({ verb: "Attach", prompt: "Discover: choose 1 Loot objective to attach to Twilight Hall as a guarded objective." });
+    expect(wilderlandAsk({ verb: "Discover", amount: 3 }, null, words)?.prompt).toBe("Discover: choose 1 Loot objective to attach to the active location as a guarded objective.");
+  });
+
   it("labels each option with the treasure's title, and no other instruction's", () => {
     expect(wilderlandOptionLabel(ATTACH, "ta", words)).toBe("Treasure A");
     expect(wilderlandOptionLabel({ verb: "Draw" }, "ta", words)).toBeNull();

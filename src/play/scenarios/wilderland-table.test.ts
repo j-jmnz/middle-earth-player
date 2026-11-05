@@ -2,8 +2,11 @@
 // moves to and from them, a treasure guarded in the staging area, and Discover's beats and look strip. The engine decided each; nothing here changes one.
 import { describe, expect, it } from "vitest";
 
-import { updateCard } from "../../rules/core/state.ts";
-import { moveCard } from "../../rules/core/zones.ts";
+import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
+import { moveCard, spawn } from "../../rules/core/zones.ts";
+import { expectOk } from "../../rules/core/test-fixture.ts";
+import { reduce } from "../../rules/engine/reduce.ts";
+import { CARDS, codesOf, ctxOf, deal, marker, record, table } from "../../rules/families/wilderland/fixture.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 
 import { dungeonDetail, treasureSpeech } from "../cards/dungeon-preview.ts";
@@ -108,6 +111,22 @@ describe("how a card moves to and from the Wilderland piles", () => {
     expect(cavesMotion && cavesSlot ? cavesSlot.x + cavesSlot.w / 2 + cavesMotion.dx : null).toBeCloseTo((cavesNext.piles.cavesDeck?.x ?? 0) + (cavesNext.piles.cavesDeck?.w ?? 0) / 2, 5);
   });
 
+  it("brings a Cave placed at the active location off the Caves deck, as a Cave revealed into staging comes, and leaves other arrivals alone", () => {
+    const caves = wilderlandFixture({ caves: 3 });
+    const prev = layoutFor(caves);
+    const cave = caves.ids.caves0 ?? "";
+    const placed = layoutFor({ ...caves, state: moveCard(caves.state, cave, { zone: "activeLocation" }) });
+    const motion = motionsBetween(prev, placed, () => null, { zoneWas: (id) => caves.state.cards[id]?.zone ?? null }).motions.get(cave);
+    const slot = placed.slots.find((candidate) => candidate.id === cave);
+    expect(slot?.zone).toBe("activeLocation");
+    expect([motion?.flip, motion?.land]).toEqual([true, "pop"]);
+    const deck = placed.piles.cavesDeck;
+    expect(motion && slot && deck ? slot.x + slot.w / 2 + motion.dx : null).toBeCloseTo((deck?.x ?? 0) + (deck?.w ?? 0) / 2, 5);
+    // A card that arrives at the active location from nowhere in particular still grows in where it lands.
+    const elsewhere = motionsBetween(prev, placed, () => null, { zoneWas: () => null }).motions.get(cave);
+    expect([elsewhere?.flip, elsewhere?.land]).not.toEqual([true, "pop"]);
+  });
+
   it("sends an Evil Creature that leaves play to its own discard pile, shaking on the way", () => {
     const fixture = wilderlandFixture({ evilDeck: 2, engaged: 0, staging: 1 });
     const staged = fixture.state.staging[0] ?? "";
@@ -139,27 +158,27 @@ describe("how a card moves to and from the Wilderland piles", () => {
 describe("a treasure guarded in the staging area", () => {
   const name = (fixture: ReturnType<typeof wilderlandFixture>) => (id: string) => fixture.cards.get(fixture.state.cards[id]?.code ?? id)?.name ?? id;
 
-  it("says who guards it in its preview, and that it is free to claim once nothing does", () => {
+  it("says who guards it in its preview, and that it is free of encounters once nothing does", () => {
     const guarded = wilderlandFixture({ treasure: "guarded" });
     expect(dungeonDetail(guarded.state, guarded.ctx, guarded.ids.treasure ?? "", name(guarded))).toBe("Guarded by troll");
     const free = wilderlandFixture({ treasure: "free" });
-    expect(dungeonDetail(free.state, free.ctx, free.ids.treasure ?? "", name(free))).toBe("Free of encounters: you can claim it");
+    expect(dungeonDetail(free.state, free.ctx, free.ids.treasure ?? "", name(free))).toBe("Free of encounters");
     // The guard is a card of its own: it says nothing of the treasure.
     expect(dungeonDetail(guarded.state, guarded.ctx, guarded.ids.guard ?? "", name(guarded))).toBeNull();
   });
 
-  it("is free to claim again once the guard has left play", () => {
+  it("is free of encounters again once the guard has left play", () => {
     const fixture = wilderlandFixture({ treasure: "guarded" });
     const treasure = fixture.ids.treasure ?? "";
     const gone = updateCard(moveCard(fixture.state, fixture.ids.guard ?? "", { zone: "encounterDiscard" }), treasure, { attachments: [] });
-    expect(dungeonDetail(gone, fixture.ctx, treasure, name(fixture))).toBe("Free of encounters: you can claim it");
+    expect(dungeonDetail(gone, fixture.ctx, treasure, name(fixture))).toBe("Free of encounters");
   });
 
   it("is heard as guarded, or free of encounters, and only in the staging area", () => {
     const guarded = wilderlandFixture({ treasure: "guarded" });
     expect(treasureSpeech(guarded.state, guarded.ids.treasure ?? "", name(guarded))).toBe("guarded by troll");
     const free = wilderlandFixture({ treasure: "free" });
-    expect(treasureSpeech(free.state, free.ids.treasure ?? "", name(free))).toBe("free of encounters, the players can claim it");
+    expect(treasureSpeech(free.state, free.ids.treasure ?? "", name(free))).toBe("free of encounters");
     const held = moveCard(free.state, free.ids.treasure ?? "", { zone: "discard", seat: 0 });
     expect(treasureSpeech(held, free.ids.treasure ?? "", name(free))).toBeNull();
     expect(treasureSpeech(free.state, "nobody", name(free))).toBeNull();
@@ -167,7 +186,7 @@ describe("a treasure guarded in the staging area", () => {
 });
 
 describe("Discover on the table (emce.discover)", () => {
-  const facts = { location: { id: "hill", name: "Plain Hill" }, looked: 3, loot: { id: "key", name: "Crypt Key" }, hazard: { id: "bad", name: "Rockfall" }, rest: ["orc"] };
+  const facts = { location: { id: "hill", name: "Plain Hill" }, looked: 3, loot: { id: "key", name: "Crypt Key" }, hazard: { id: "bad", name: "Rockfall", staged: true }, rest: ["orc"] };
 
   it("tells the keyword as a beat for the look, one for each result and one for the rest, ringing the cards each names", () => {
     expect(discoverTitle(3)).toBe("Discover 3");
@@ -175,7 +194,15 @@ describe("Discover on the table (emce.discover)", () => {
       { text: "Plain Hill: looked at the top 3 cards of the encounter deck", cards: ["hill"] },
       { text: "Crypt Key is attached to Plain Hill as a guarded objective", cards: ["key"] },
       { text: "Rockfall is revealed and added to the staging area", cards: ["bad"] },
-      { text: "1 card is placed in the encounter discard pile", cards: ["look:orc"] },
+      // The last line lays the strip and rings the Loot objective and the staged Hazard, which stand above the veil.
+      { text: "1 card is placed in the encounter discard pile", cards: ["look:orc", "key", "bad"] },
+    ]);
+    // A treachery is resolved and discarded: "revealed", with no ring and not among the cards above the veil.
+    expect(discoverLines({ ...facts, hazard: { id: "bad", name: "Rockfall", staged: false } })).toEqual([
+      { text: "Plain Hill: looked at the top 3 cards of the encounter deck", cards: ["hill"] },
+      { text: "Crypt Key is attached to Plain Hill as a guarded objective", cards: ["key"] },
+      { text: "Rockfall is revealed", cards: [] },
+      { text: "1 card is placed in the encounter discard pile", cards: ["look:orc", "key"] },
     ]);
     expect(discoverLines({ ...facts, rest: ["a", "b"] }).at(-1)?.text).toBe("2 cards are placed in the encounter discard pile");
     expect(discoverLines({ ...facts, loot: null, hazard: null, rest: [] })).toEqual([
@@ -200,14 +227,80 @@ describe("Discover on the table (emce.discover)", () => {
     const fixture = wilderlandFixture();
     const moment = momentOf(fixture.state, fixture.state, [step], names);
     expect(moment?.title).toBe("Discover 4");
+    // The state holds none of the cards, so the Hazard is not in the staging area: it reads as a revealed treachery.
     expect(moment?.lines.map((line) => line.text)).toEqual([
       "Plain Hill: looked at the top 4 cards of the encounter deck",
       "Crypt Key is attached to Plain Hill as a guarded objective",
-      "Rockfall is revealed and added to the staging area",
+      "Rockfall is revealed",
       "2 cards are placed in the encounter discard pile",
     ]);
-    expect(moment?.lines.at(-1)?.cards).toEqual(["look:mist", "look:orc"]);
+    expect(moment?.lines.at(-1)?.cards).toEqual(["look:mist", "look:orc", "key"]);
     const lines = logLines([step], { card: names.card, code: (code) => code, effectCard: () => null, rule: (rule) => rule, line: () => null });
     expect(lines[0]?.text).toBe("Discover at Plain Hill: looked at 4 cards, attached Crypt Key, revealed Rockfall");
+  });
+});
+
+// The real path: Travel to a location with Discover, which the banner tells in one moment (rules/families/wilderland/discover.test.ts builds the same table).
+describe("the banner of a Travel to a Discover location", () => {
+  const LOOT = [marker("loot1", { verb: "Loot" }), marker("loot2", { verb: "Loot" })];
+  const discover = (amount: number) => record("plain:forced:1", "plain", "forced", [{ verb: "Discover", amount }], { trigger: "becameActive", subject: "self" });
+
+  function travelled(deck: readonly string[], amount = 3): { before: ScenarioState; after: ScenarioState; steps: readonly EngineStep[] } {
+    const hill = spawn(table(), "plain", { zone: "staging" });
+    const dealt = deal(hill.state, deck, { zone: "encounterDeck" });
+    const before = { ...withMode(dealt.state, "travel"), boundaryPhase: "Travel" as const, window: { kind: "travel" as const } };
+    const result = expectOk(reduce(before, { type: "Travel", locationId: hill.id }, ctxOf([...LOOT, discover(amount)])));
+    return { before, after: result.state, steps: result.steps.flat() };
+  }
+  const names = (state: ScenarioState) => ({ card: (id: string) => CARDS.get(state.cards[id]?.code ?? "")?.name ?? id });
+
+  it("tells the Discover lines together, uncut and last, once, and ends on the line that lays the look strip", () => {
+    const { before, after, steps } = travelled(["mist", "loot1", "stalker", "orc"]);
+    const moment = momentOf(before, after, steps, names(after));
+    expect(moment?.title).toBe("Traveled to Plain Hill");
+    const texts = moment?.lines.map((line) => line.text) ?? [];
+    expect(texts).toEqual([
+      "It is the active location now",
+      "Discover 3",
+      "Plain Hill: looked at the top 3 cards of the encounter deck",
+      "Crypt Key is attached to Plain Hill as a guarded objective",
+      "Crypt Stalker is revealed and added to the staging area",
+      "1 card is placed in the encounter discard pile",
+    ]);
+    // The Hazard's own reveal is told in Discover's lines, once.
+    expect(texts.some((text) => text.startsWith("Revealed"))).toBe(false);
+    const last = moment?.lines.at(-1);
+    const discarded = codesOf(after, after.encounterDiscard);
+    expect(discarded).toEqual(["mist"]);
+    expect(lookIdsOf(new Set(last?.cards))).toEqual(after.encounterDiscard);
+    // The Loot objective and the Hazard are ringed on that line too, above the strip's veil.
+    const staged = codesOf(after, after.staging);
+    expect(staged.sort()).toEqual(["loot1", "stalker"]);
+    expect(last?.cards).toEqual(expect.arrayContaining([...after.staging]));
+    // Nothing was cut.
+    expect(texts.some((text) => text.startsWith("And "))).toBe(false);
+  });
+
+  it("shows the strip under reduced motion, which rings only the last line's cards, and holds it on the last beat", () => {
+    const { before, after, steps } = travelled(["mist", "loot1", "stalker", "orc"]);
+    const moment = momentOf(before, after, steps, names(after));
+    // Reduced motion shows every line at once and rings the last one's cards (readouts/moment-banner.tsx).
+    const rung = moment?.lines[(moment?.lines.length ?? 1) - 1]?.cards ?? [];
+    expect(lookIdsOf(new Set(rung))).toEqual(after.encounterDiscard);
+    // Every earlier line leaves the strip out, so it shows on the last beat alone.
+    expect(moment?.lines.slice(0, -1).every((line) => lookIdsOf(new Set(line.cards)).length === 0)).toBe(true);
+  });
+
+  it("says a Hazard treachery is revealed, without a ring or the staging area, and still ends on the strip", () => {
+    const { before, after, steps } = travelled(["hazard", "orc", "mist"], 2);
+    const moment = momentOf(before, after, steps, names(after));
+    const texts = moment?.lines.map((line) => line.text) ?? [];
+    expect(texts).toContain("Rockfall is revealed");
+    expect(texts.some((text) => text.includes("added to the staging area"))).toBe(false);
+    const hazard = moment?.lines.find((line) => line.text === "Rockfall is revealed");
+    expect(hazard?.cards).toBeUndefined();
+    const last = moment?.lines.at(-1);
+    expect(lookIdsOf(new Set(last?.cards))).toEqual(after.encounterDiscard.filter((id) => after.cards[id]?.code === "orc"));
+    expect(last?.cards?.some((id) => after.cards[id]?.code === "hazard")).toBe(false);
   });
 });

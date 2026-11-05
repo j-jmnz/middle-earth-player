@@ -25,7 +25,7 @@ import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
 import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
-import { pictureKey } from "./picture-key.ts";
+import { nameOfCard, pictureKey } from "./picture-key.ts";
 import { areaFacts, areaSpeech } from "../store/stormcaller-table.ts";
 import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
 import { grappleDetail } from "../words/grapple.ts";
@@ -78,12 +78,13 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   const { views, piles } = useViews(store, seat, facts);
   // The cards a Sailing test looked at stand in a strip over the table (look-strip.ts); the rest of the table carries the night veil meanwhile.
   const lookedCards = useStore(store, (state) => lookedOf(state.game));
-  // Discover X's cards that went to the encounter discard pile lie in the same strip while the banner is on the beat that names them (emce.discover); the table is not veiled for them, so the Loot and the Hazard stay readable.
+  // Discover X's cards that went to the encounter discard pile lie in the same strip while the banner is on the beat that names them (emce.discover), in the engagement and play bands only: the table carries the veil, and the Loot
+  // objective and the Hazard the beat rings stand above it in staging. A card that has since left the discard pile (reshuffled, or drawn into staging) is not shown.
   const game = useStore(store, (state) => state.game);
   const discoverKey = useMemo(() => lookIdsOf(beating).join(","), [beating]);
-  const discovered = useMemo(() => (discoverKey === "" ? NO_CARDS : discoverKey.split(",").flatMap((id) => (game.cards[id] ? [game.cards[id]] : []))), [discoverKey, game]);
+  const discovered = useMemo(() => (discoverKey === "" ? NO_CARDS : discoverKey.split(",").flatMap((id) => (game.cards[id]?.zone === "encounterDiscard" ? [game.cards[id]] : []))), [discoverKey, game]);
   const strip = useMemo(() => [...lookedCards.map((card) => ({ card, success: success(card.code) })), ...discovered.map((card) => ({ card, success: 0 }))], [lookedCards, discovered, success]);
-  const looking = lookedCards.length > 0;
+  const looking = lookedCards.length > 0 || discovered.length > 0;
   // A sea game stacks the cards under a staging card into one counted peek (layout.ts); every other game peeks each as it always did.
   const seaGame = useStore(store, (state) => state.game.sea != null);
   const selected = useStore(store, (state) => state.selected);
@@ -102,8 +103,8 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, stacks: seaGame }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, seaGame],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame],
   );
   // The cards the rows folded away are told to the table's pick (a folded card is not on the table) and to the row list (row-fold.ts).
   const foldedKey = (layout.folds ?? []).map((fold) => `${fold.zone}:${fold.cards.join(",")}`).join("|");
@@ -152,7 +153,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
     // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
     if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
     // The Havens Burn's count, the enemies grappled under a location, and a Ship location's Threat against the total that loses (each is a sentence of its own; none drops another).
-    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech, controlSpeech(game, slot.id), facts.typeOf(slot.code) === "treasure" ? treasureSpeech(game, slot.id, (id) => nameOf(game.cards[id]?.code ?? id)) : null].filter((part): part is string => part != null);
+    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech, controlSpeech(game, slot.id), facts.typeOf(slot.code) === "treasure" ? treasureSpeech(game, slot.id, (id) => nameOfCard(game.cards, id, nameOf)) : null].filter((part): part is string => part != null);
     return said.length > 0 ? `${nameOf(slot.picture ?? slot.code)}, ${said.join(". ")}` : null;
   };
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.

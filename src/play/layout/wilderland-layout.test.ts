@@ -124,6 +124,23 @@ describe("the second slot for the Wilderland decks", () => {
     expect(evil.zones.hand).toEqual(plain.zones.hand);
   });
 
+  it("keeps the narrowed engagement row's steps at a 44 pt target where the cards overlap, and folds the rest, on the smallest screen", () => {
+    const small = SCREENS[0] as Screen;
+    const target = touch(S, 44);
+    for (const spec of [{ ...EVIL, engaged: 9 }, { ...CAVES, engaged: 9 }]) {
+      const layout = layoutOf(spec, small, S);
+      const row = layout.slots.filter((slot) => slot.zone === "engaged" && slot.kind === "card").sort((a, b) => a.x - b.x);
+      expect(row.length).toBeGreaterThan(1);
+      for (let index = 0; index + 1 < row.length; index += 1) {
+        const here = slotBounds(row[index] as CardSlot);
+        const step = slotBounds(row[index + 1] as CardSlot).x - here.x;
+        if (step < here.w - 0.5) expect(step, row[index]?.id).toBeGreaterThanOrEqual(target - 0.5);
+      }
+      // Every card stays inside the narrowed zone, clear of the slot's piles.
+      for (const slot of row) expect(slot.x + slot.w).toBeLessThanOrEqual(layout.zones.engaged.x + layout.zones.engaged.w + 0.5);
+    }
+  });
+
   it("draws each pile as a pile slot with its count, the discard pile faced up", () => {
     const layout = layoutOf(EVIL, screen, M);
     const deck = layout.slots.find((slot) => slot.id === "pile:evilCreaturesDeck");
@@ -173,6 +190,20 @@ describe("a treasure guarded in the staging area", () => {
 });
 
 describe("Discover's cards in the look strip", () => {
+  it("leaves the staging band to the cards that stand there when asked, and uses the engagement band first", () => {
+    const fixture = wilderlandFixture({ staging: 3, engaged: 2, evilDeck: 2 });
+    const { views, piles } = wilderlandViews(fixture);
+    const cards = [fixture.ids.evilDeck0, fixture.ids.evilDeck1].map((id) => fixture.state.cards[id ?? ""]).filter((card) => card != null);
+    const layout = tableLayout(591, 338, views, piles, { look: cards.map((card) => ({ card, success: 0 })), lookLeavesStaging: true });
+    const strip = layout.slots.filter((slot) => slot.success === 0);
+    expect(strip).toHaveLength(2);
+    expect(strip.map((slot) => slot.y)).toEqual(strip.map(() => layout.zones.engaged.y));
+    // No staging card is covered by a strip card.
+    for (const staged of layout.slots.filter((slot) => slot.zone === "staging" && slot.kind === "card")) {
+      for (const slot of strip) expect(overlap(slotBounds(staged), slotBounds(slot)), staged.id).toBe(false);
+    }
+  });
+
   it("lays the cards at the table's card size over staging, with no success medallion", () => {
     const fixture = wilderlandFixture({ staging: 3, engaged: 2, evilDeck: 3 });
     const { views, piles } = wilderlandViews(fixture);

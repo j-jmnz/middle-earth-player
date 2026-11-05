@@ -8,8 +8,8 @@ import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { attachTo, spawn } from "../../rules/core/zones.ts";
 
-import type { LayoutViews, PileViews } from "../layout/layout.ts";
-import { PILES, pileSelector, secondPilesOf, TABLE_ZONES, zoneSelector, type ZoneFacts } from "../store/selectors.ts";
+import { fixtureViews } from "../store/fixture-views.ts";
+import type { ZoneFacts } from "../store/selectors.ts";
 import { zoneFactsOf } from "../store/zone-facts.ts";
 
 /** A card with a Sailing success symbol on its text box (dcce.sailing-tests). */
@@ -102,12 +102,8 @@ export function seaFixture(spec: SeaSpec = {}): SeaFixture {
   return { state, ctx: built.ctx, ids, facts: zoneFactsOf(built.ctx.cards), cards: built.ctx.cards };
 }
 
-/** The views the canvas draws for one seat of a fixture: every zone, the four piles and the Corsair pair when the game has one. */
-export function seaViews(fixture: Pick<SeaFixture, "state" | "facts">, seat = 0): { views: LayoutViews; piles: PileViews } {
-  const views = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, seat, fixture.facts)(fixture.state)])) as unknown as LayoutViews;
-  const piles = Object.fromEntries([...PILES, ...secondPilesOf(fixture.state)].map((pile) => [pile, pileSelector(pile, seat)(fixture.state)])) as unknown as PileViews;
-  return { views, piles };
-}
+/** The views the canvas draws for one seat of a fixture (store/fixture-views.ts). */
+export const seaViews = fixtureViews;
 
 const constant = (id: string, stat: "sailsAnyTest" | "sailingExtra", amount: number): Effect => ({ id: `dc:constant:${id}`, cardCode: "dc", lines: [`dc:A:${id}`], timing: "constant", instructions: [{ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay" }] });
 

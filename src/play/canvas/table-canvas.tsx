@@ -8,11 +8,13 @@ import { useStore } from "zustand";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 
 import { stagingWord } from "../words/area.ts";
+import { beatIds } from "../store/beat-store.ts";
+import { lookIdsOf, lookStripWords } from "../words/wilderland.ts";
 import { treasureSpeech } from "../cards/dungeon-preview.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 
 import { NO_HIGHLIGHT } from "../store/peek.ts";
-import { pictureKey } from "./picture-key.ts";
+import { nameOfCard, pictureKey } from "./picture-key.ts";
 import { grappleTell } from "../words/grapple.ts";
 import { islandTell } from "../words/uncharted.ts";
 import { stageFactsOf } from "../store/stormcaller-table.ts";
@@ -76,7 +78,7 @@ function marksText(slot: SlotInfo | null): string {
 
 // A treasure in the staging area, in words: who guards it, or that it is free to claim (emce.treasure).
 function treasureTell(game: ScenarioState, card: CardInstance, facts: TableCanvasProps["facts"], nameOf: TableCanvasProps["nameOf"]): string {
-  const said = facts.typeOf(card.code) === "treasure" ? treasureSpeech(game, card.id, (id) => nameOf(game.cards[id]?.code ?? id)) : null;
+  const said = facts.typeOf(card.code) === "treasure" ? treasureSpeech(game, card.id, (id) => nameOfCard(game.cards, id, nameOf)) : null;
   return said ? ` · ${said}` : "";
 }
 
@@ -135,7 +137,15 @@ function SeaLines({ store, seat, nameOf, facts, t }: Pick<TableCanvasProps, "sto
   );
 }
 
-export function TableCanvas({ store, width, height, nameOf, inactive, facts, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
+// The Discover look strip, in words, while the banner is on the beat that lays cards in it (emce.discover).
+function DiscoverLook({ store, beats }: Pick<TableCanvasProps, "store" | "beats">) {
+  const key = useStore(beats, (state) => state.key);
+  const peeking = useStore(store, (state) => state.viewedSeat != null);
+  const count = peeking ? 0 : lookIdsOf(beatIds(key)).length;
+  return count > 0 ? <Text className="mb-2 text-label text-bone">{lookStripWords(count)}</Text> : null;
+}
+
+export function TableCanvas({ store, width, height, nameOf, inactive, facts, info, beats, onTap, onPreview, highlight: marked }: TableCanvasProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
@@ -148,6 +158,7 @@ export function TableCanvas({ store, width, height, nameOf, inactive, facts, inf
   return (
     <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
       <SeaLines store={store} seat={seat} nameOf={nameOf} facts={facts} t={t} />
+      <DiscoverLook store={store} beats={beats} />
       {TABLE_ZONES.map((zone) => (
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}

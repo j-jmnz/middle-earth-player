@@ -76,7 +76,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Mount Gundabad stage 2 pictures (19137-19142); Crypt Stalker Easy count unconfirmed. |
 | 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app; phone checks; `ered-mithrin-start`, `booklet-ered-mithrin` flows not run. |
 | 51 | Wilderland mechanics family | completed | 2026-11-05. Engine only; review round done. Not built: Caves-deck bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover. |
-| 51b | Wilderland on the table | not started | |
+| 51b | Wilderland on the table | completed | 2026-11-05. Review round done. Phone checks open (below). |
 | 52 | Journey Up the Anduin | not started | |
 | 53 | Lost in Mirkwood | not started | |
 | 54 | The King's Quest | not started | |
@@ -105,6 +105,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
 ### Rules and engine
+- Ered Mithrin: nothing claims a free treasure yet (`emce.treasure`); the claim comes with the first scenario that attaches one.
 - Wilderland: an Evil Creatures enemy shuffled back into the encounter deck keeps its deck mark (`deckRoute`); no card does this yet.
 - Wilderland readings not user-confirmed: Deep does nothing once its location is no longer active; a non-location Deep replacement other than a Dragon Sign goes to staging; Guarded (X) with no match leaves the objective unguarded.
 
@@ -170,6 +171,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
 
 ### Phone and tablet checks
+- Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
 - Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.
 
 None ran. Each needs a device.

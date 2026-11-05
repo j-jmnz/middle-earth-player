@@ -4,8 +4,10 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
 
-/** The sentence and the verb of the choice AttachRandomTreasure asks, or null for another instruction. */
+/** The sentence and the verb of the choice AttachRandomTreasure or Discover asks, or null for another instruction. */
 export function wilderlandAsk(instruction: Instruction, source: string | null, names: ChoiceNames): PickWords | null {
+  // Discover X looked at several Loot objectives: the first player picks the one to attach to the active location (emce.discover).
+  if (instruction.verb === "Discover") return { verb: "Attach", prompt: `Discover: choose 1 Loot objective to attach to ${source ? names.card(source) : "the active location"} as a guarded objective.` };
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${instruction.count ?? 3} random undiscovered treasures to attach as a guarded objective.`;
   // The guard is attached to the treasure and keeps it from being claimed until it is dealt with (rr.guarded).
@@ -35,8 +37,17 @@ export function lookBeat(ids: readonly string[]): readonly string[] {
   return ids.map((id) => `${LOOK_PREFIX}${id}`);
 }
 
-/** What a Discover resolved: the location and how many cards were looked at, the Loot objective and the Hazard card (name and id) if any, and the ids of the rest, which went to the encounter discard pile. */
-export type DiscoverFacts = { location: { id: string; name: string }; looked: number; loot: { id: string; name: string } | null; hazard: { id: string; name: string } | null; rest: readonly string[] };
+/**
+ * What a Discover resolved: the location and how many cards were looked at, the Loot objective and the Hazard card (name and id) if any, and the ids of the rest, which went to the encounter discard pile.
+ * `staged` says the Hazard stands in the staging area (an enemy or a location); a treachery is resolved and lies in the discard pile.
+ */
+export type DiscoverFacts = {
+  location: { id: string; name: string };
+  looked: number;
+  loot: { id: string; name: string } | null;
+  hazard: { id: string; name: string; staged: boolean } | null;
+  rest: readonly string[];
+};
 
 const cards = (count: number): string => `${count} ${count === 1 ? "card" : "cards"}`;
 
@@ -45,14 +56,19 @@ export function discoverTitle(depth: number): string {
   return `Discover ${depth}`;
 }
 
-/** The lines of the Discover beat in the order the rule resolves them: the look, the Loot objective, the Hazard, and the rest in the discard pile. Each says which cards the table rings; the rest are laid in the look strip. */
+/**
+ * The lines of the Discover beat in the order the rule resolves them: the look, the Loot objective, the Hazard, and the rest in the discard pile. Each says which cards the table rings. The last line lays the rest in the
+ * look strip and rings the Loot objective and the staged Hazard, which stand above the strip's veil; it is the beat the banner holds until it is dismissed (and the only one drawn under reduced motion).
+ */
 export function discoverLines(facts: DiscoverFacts): readonly { text: string; cards: readonly string[] }[] {
   const { location, loot, hazard, rest } = facts;
   const lines: { text: string; cards: readonly string[] }[] = [{ text: `${location.name}: looked at the top ${cards(facts.looked)} of the encounter deck`, cards: [location.id] }];
   if (loot) lines.push({ text: `${loot.name} is attached to ${location.name} as a guarded objective`, cards: [loot.id] });
-  if (hazard) lines.push({ text: `${hazard.name} is revealed and added to the staging area`, cards: [hazard.id] });
-  if (rest.length > 0) lines.push({ text: `${cards(rest.length)} ${rest.length === 1 ? "is" : "are"} placed in the encounter discard pile`, cards: lookBeat(rest) });
-  else if (!loot && !hazard) lines.push({ text: "No Loot objective or Hazard card was among them", cards: [] });
+  if (hazard) lines.push(hazard.staged ? { text: `${hazard.name} is revealed and added to the staging area`, cards: [hazard.id] } : { text: `${hazard.name} is revealed`, cards: [] });
+  if (rest.length > 0) {
+    const stands = [...(loot ? [loot.id] : []), ...(hazard?.staged ? [hazard.id] : [])];
+    lines.push({ text: `${cards(rest.length)} ${rest.length === 1 ? "is" : "are"} placed in the encounter discard pile`, cards: [...lookBeat(rest), ...stands] });
+  } else if (!loot && !hazard) lines.push({ text: "No Loot objective or Hazard card was among them", cards: [] });
   return lines;
 }
 

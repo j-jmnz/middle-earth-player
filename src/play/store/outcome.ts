@@ -40,7 +40,8 @@ function seatWord(state: ScenarioState, seat: number): string {
   return state.seatCount > 1 ? `Player ${seat + 1} threat` : "Threat";
 }
 
-type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[] };
+// `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip).
+type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean };
 
 /**
  * The banner for one accepted intent, or null when it changed nothing worth one (a draw, a resource, a pass that only moved
@@ -54,6 +55,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     groups.push(group);
     current = group;
     return group;
+  };
+  // The group a step closes: the next line opens a group of its own.
+  const close = () => {
+    current = null;
   };
   const line = (text: string, mark: LogMark = null, cards: readonly string[] = []) => {
     (current ?? open(9, "", "plain")).lines.push({ text, mark, ...(cards.length > 0 ? { cards } : {}) });
@@ -160,12 +165,14 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       }
       case "reveal":
-        if (!current || current.rank !== 3) open(3, "Staging", "plain");
+        // The Hazard a Discover revealed is told in Discover's own lines.
+        if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId)) return;
+        if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
         line(`Revealed ${names.card(step.cardId)}`);
         return;
       // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
       case "grapple":
-        if (!current || current.rank !== 3) open(3, "Staging", "plain");
+        if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
         line(grappleLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.locationId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
@@ -189,12 +196,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       case "eliminate":
         open(0, `Player ${step.seat + 1} is eliminated`, "bad");
         return;
-      // Discover X (emce.discover): one beat for the look and one for each result; the cards that went to the discard pile lie in the look strip while the banner is on the beat that names them.
+      // Discover X (emce.discover): one beat for the look and one for each result, kept together and last; the cards that went to the discard pile lie in the look strip on the last beat (the Hazard's own reveal is not told again).
       case "discover": {
-        open(3, discoverTitle(step.looked.length), "plain");
-        const named = (id: string | undefined) => (id ? { id, name: names.card(id) } : null);
+        open(3, discoverTitle(step.looked.length), "plain").whole = true;
         const rest = step.looked.filter((id) => id !== step.loot && id !== step.hazard);
-        for (const beat of discoverLines({ location: { id: step.locationId, name: names.card(step.locationId) }, looked: step.looked.length, loot: named(step.loot), hazard: named(step.hazard), rest })) line(beat.text, null, beat.cards);
+        const loot = step.loot ? { id: step.loot, name: names.card(step.loot) } : null;
+        // A Hazard that is not in the staging area after the step was a treachery: resolved and discarded, not added to staging.
+        const hazard = step.hazard ? { id: step.hazard, name: names.card(step.hazard), staged: after.cards[step.hazard]?.zone === "staging" } : null;
+        for (const beat of discoverLines({ location: { id: step.locationId, name: names.card(step.locationId) }, looked: step.looked.length, loot, hazard, rest })) line(beat.text, null, beat.cards);
+        close();
         return;
       }
       case "resetEncounterDeck":
@@ -228,12 +238,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
 
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");
   if (shown.length === 0) return null;
-  const lead = [...shown].sort((a, b) => a.rank - b.rank)[0] ?? shown[0];
+  // A whole group (Discover's) comes last and is never cut: its last line is the one that holds the look strip until the banner is dismissed, and the only one drawn under reduced motion.
+  const flow = shown.filter((group) => !group.whole);
+  const lead = [...(flow.length > 0 ? flow : shown)].sort((a, b) => a.rank - b.rank)[0] ?? shown[0];
   if (!lead) return null;
-  const lines = [...lead.lines, ...shown.filter((group) => group !== lead).flatMap((group) => (group.title ? [{ text: group.title, mark: null }, ...group.lines] : group.lines))];
+  const told = (group: Group): MomentLine[] => (group === lead || !group.title ? group.lines : [{ text: group.title, mark: null }, ...group.lines]);
+  const lines = (flow.includes(lead) ? [lead, ...flow.filter((group) => group !== lead)] : []).flatMap(told);
   const kept = lines.slice(0, MOST);
   if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
-  return { title: lead.title || "This turn", tone: lead.tone, lines: kept };
+  return { title: lead.title || "This turn", tone: lead.tone, lines: [...kept, ...shown.filter((group) => group.whole).flatMap(told)] };
 }
 
 function listed(ids: readonly string[], card: (cardId: string) => string): string {
