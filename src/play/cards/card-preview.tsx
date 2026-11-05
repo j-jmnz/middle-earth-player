@@ -23,7 +23,8 @@ import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
-import { swipeStep } from "./preview-swipe.ts";
+import { clampStep, swipeStep } from "./preview-swipe.ts";
+import { chipLabel, EARLIER_STAGE, listHeading, previewValue, rowName } from "./preview-words.ts";
 import { SecondaryButton } from "../../ui/buttons.tsx";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { cardCorner } from "../../ui/card-corner.ts";
@@ -181,15 +182,16 @@ export function CardPreview({
     .activeOffsetX([-12 * s, 12 * s])
     .failOffsetY([-12 * s, 12 * s])
     .onEnd((event) => setAt((now) => swipeStep(now, count, event.translationX, event.velocityX, s)));
-  const step = (by: number) => setAt((now) => Math.min(count - 1, Math.max(0, now + by)));
+  const step = (by: number) => setAt((now) => clampStep(now, count, by));
   const frame = (
     <GestureDetector gesture={swipe}>
       <Animated.View
         testID="card-preview-card"
         accessible={count > 1}
         accessibilityRole={count > 1 ? "adjustable" : undefined}
-        accessibilityLabel={count > 1 ? `${shown.title ?? shown.name}, ${at + 1} of ${count}` : undefined}
-        accessibilityHint={count > 1 ? "Swipe up or down for the other cards shown with it" : undefined}
+        accessibilityLabel={count > 1 ? "Card shown large" : undefined}
+        accessibilityValue={count > 1 ? { text: previewValue(shown, at, count) } : undefined}
+        accessibilityHint={count > 1 ? "Adjust to show the other cards with it" : undefined}
         accessibilityActions={count > 1 ? [{ name: "increment" }, { name: "decrement" }] : undefined}
         onAccessibilityAction={(event) => step(event.nativeEvent.actionName === "increment" ? 1 : -1)}
         style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : cardCorner(size.width, size.height), overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}
@@ -269,7 +271,7 @@ export function CardPreview({
                 ) : null}
                 {all.length > 1 ? (
                   <View testID="card-preview-attached">
-                    <Text className="font-display text-eyebrow uppercase text-accent">{at === 0 ? "With it" : "The card and what is with it"}</Text>
+                    <Text className="font-display text-eyebrow uppercase text-accent">{listHeading(all, at)}</Text>
                     {all.map((item, index) => (
                       <Pressable
                         key={`${item.code}:${index}`}
@@ -289,9 +291,9 @@ export function CardPreview({
                             </View>
                             <View className="shrink">
                               <Text numberOfLines={1} className="text-body text-bone">
-                                {item.name}
+                                {rowName(item)}
                               </Text>
-                              {item.role ? <Text className="text-label text-muted">{item.role}</Text> : null}
+                              {item.role && item.role !== EARLIER_STAGE ? <Text className="text-label text-muted">{item.role}</Text> : null}
                             </View>
                           </View>
                         )}
@@ -320,7 +322,7 @@ export function CardPreview({
                       key={`${item.code}:${index}`}
                       testID={`card-preview-related-${index}`}
                       accessibilityRole="button"
-                      accessibilityLabel={item.role ? `${item.name}, ${item.role}` : item.name}
+                      accessibilityLabel={chipLabel(item)}
                       accessibilityState={{ selected: index === at }}
                       onPress={() => setAt(index)}
                     >

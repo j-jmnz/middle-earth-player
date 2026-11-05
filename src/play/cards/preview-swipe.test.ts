@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { swipeStep } from "./preview-swipe.ts";
+import { clampStep, swipeStep } from "./preview-swipe.ts";
 
 describe("swipeStep", () => {
   it("steps to the next card on a swipe to the left and back on a swipe to the right", () => {
@@ -22,5 +22,13 @@ describe("swipeStep", () => {
     expect(swipeStep(2, 3, -80, 0, 1)).toBe(2);
     expect(swipeStep(0, 3, 80, 0, 1)).toBe(0);
     expect(swipeStep(0, 1, -80, 0, 1)).toBe(0);
+  });
+});
+
+describe("clampStep", () => {
+  it("moves by one and stops at either end", () => {
+    expect(clampStep(1, 3, 1)).toBe(2);
+    expect(clampStep(2, 3, 1)).toBe(2);
+    expect(clampStep(0, 3, -1)).toBe(0);
   });
 });

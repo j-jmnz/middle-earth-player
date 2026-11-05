@@ -50,8 +50,8 @@ import { useTableTokens } from "../../ui/use-table-tokens";
 import { dockReadout } from "../../play/readouts/readout";
 import { questScaleOf } from "../../play/readouts/quest-scale";
 import { CommandHead } from "../../play/readouts/command-head-view";
-import { dockWithNumbers, HEAD_GAP, headHeight, headPlan, headRoom, NUMBERS_ROW } from "../../play/readouts/command-head";
-import { columnReach, type RowFeet } from "../../play/layout/column-reach";
+import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../../play/readouts/command-head";
+import { columnReach, coveredTop, type RowFeet } from "../../play/layout/column-reach";
 import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
@@ -263,15 +263,19 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
-  // The head stands in the column's room above the dock (command-head.ts). The quest meter is drawn in the Quest phase only; while it
-  // shows, the dock keeps only the readout's result line, and with no room for it (or outside the Quest phase) the dock keeps the numbers.
+  // The head stands in the column's room above the dock (command-head.ts), the quest meter in the Quest phase only; while it shows, the dock keeps only the readout's result line.
   const footPad = Math.max(insets.bottom, 8 * s);
-  // Whether the head shows is planned against the dock with its numbers row, the same height whether the meter is up or not, so the dock
-  // shrinking when the meter takes the numbers cannot turn the head off again (no flip, and no dependence on which was measured first).
-  // The head itself stands in the room the dock really leaves.
-  const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s);
+  // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
+  const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
+  // The reach (the top rows wholly above the dock, which a crowded row may run on under, column-reach.ts) is planned without the head, against the dock with its
+  // numbers row, the same height whether or not the meter has taken it; the head then gets only the room under the rows the reach covers (no flip between the two).
   const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
-  const planRoom = headRoom(columnHeight, footPad, dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers), HEAD_GAP * s);
+  const planDock = dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers);
+  const column = { height: columnHeight, foot: footPad, dock: planDock, margin: 8 * s, top: peekRoom };
+  const reach = columnReach(column, feet);
+  const covered = coveredTop(column, feet, reach);
+  const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s, covered);
+  const planRoom = headRoom(columnHeight, footPad, planDock, HEAD_GAP * s, covered);
   const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, s, scale.live) !== "hidden";
   const meterShown = headShown && scale.live;
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
@@ -285,11 +289,6 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
     [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
   );
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
-  // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
-  const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
-  // How many top rows lie wholly above the dock and the head, which a crowded row may run on under (column-reach.ts); only a row's foot crossed changes it.
-  const head = headShown ? HEAD_GAP * s + headHeight(headPlan(room, s, scale.live), room, s) : 0;
-  const reach = columnReach({ height: columnHeight, foot: footPad, dock: dockHeight, head, margin: 8 * s, top: peekRoom }, feet);
   // A tap on a covered row reaches the canvas, which folds the tray or picks, so the tray's outside layer over the column starts under it.
   const columnClear = reach === 0 || !feet ? 0 : peekRoom + (reach === 2 ? feet.engaged : feet.staging);
   // How a card code is shown large, by picture key (src/play/canvas/picture-key.ts): the preview's cards and the advanced stage.
@@ -371,7 +370,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
                 width={size.width - commandWidth}
                 height={size.height - peekRoom}
                 column={commandWidth}
-                reach={reach}
+                reach={columnHeight > 0 && dockHeight > 0 && feet != null ? reach : null}
                 onRowFeet={setFeet}
                 picture={pictureOf}
                 nameOf={nameOf}
@@ -389,6 +388,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
                 handoff={handoff}
                 look={look}
                 onTap={choice.onTap}
+                onEmptyTap={choice.foldOutside}
                 onPreview={onPreview}
                 onDrop={choice.onDrop}
               />

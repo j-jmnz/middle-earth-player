@@ -7,6 +7,7 @@ import type { CardInstance } from "../../rules/core/state.ts";
 import { tableLayout, type LayoutViews, type PileViews, type Rect, type TableLayout } from "./layout.ts";
 import { slotBounds } from "./hits.ts";
 import { foldRow, type FoldGroup } from "./row-fold.ts";
+import { rowFeet } from "./column-reach.ts";
 import { reachRow } from "./row-reach.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneEntry, type ZoneId, type ZoneView } from "../store/selectors.ts";
 
@@ -68,6 +69,17 @@ describe("a row under the command column", () => {
     }
   });
 
+  it("sets the cards carried past the piles at least two gaps clear of them", () => {
+    for (const canvas of CANVASES) {
+      const { views, piles } = table(16, 2);
+      const reached = tableLayout(canvas.width, canvas.height, views, piles, { column: canvas.column, reach: 1 });
+      const piled = reached.piles.encounterDiscard.x + reached.piles.encounterDiscard.w;
+      const past = zoneSlots(reached, "staging").filter((slot) => slot.kind === "card" && slot.x >= piled);
+      expect(past.length, `${canvas.width}`).toBeGreaterThan(0);
+      expect(Math.min(...past.map((slot) => slot.x)) - piled, `${canvas.width}`).toBeGreaterThanOrEqual(12);
+    }
+  });
+
   it("reaches the engagement area only with reach 2", () => {
     for (const canvas of CANVASES) {
       const { views, piles } = table(2, 14);
@@ -76,6 +88,19 @@ describe("a row under the command column", () => {
       expect(tableLayout(canvas.width, canvas.height, views, piles, { column: canvas.column, reach: 1 })).toEqual(plain);
       const reached = tableLayout(canvas.width, canvas.height, views, piles, { column: canvas.column, reach: 2 });
       expect(folded(reached, "engaged")).toBeLessThan(folded(plain, "engaged"));
+    }
+  });
+
+  it("keeps both rows' feet the same at every reach when a card that folds has an attachment", () => {
+    for (const canvas of CANVASES) {
+      const { views, piles } = table(16, 2);
+      const staging = views.staging.entries.map((e, at) => (at === 4 ? { ...e, attached: [card("sa", "staging")] } : e));
+      const withAttachment = { ...views, staging: { ...views.staging, entries: staging } } as LayoutViews;
+      const feet = ([0, 1, 2] as const).map((reach) => rowFeet(tableLayout(canvas.width, canvas.height, withAttachment, piles, { column: canvas.column, reach })));
+      expect(feet[1], `${canvas.width}`).toEqual(feet[0]);
+      expect(feet[2], `${canvas.width}`).toEqual(feet[0]);
+      const plain = rowFeet(tableLayout(canvas.width, canvas.height, views, piles, { column: canvas.column }));
+      expect(feet[0]?.staging).toBeGreaterThan(plain.staging);
     }
   });
 

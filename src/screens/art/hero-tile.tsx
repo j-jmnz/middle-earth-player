@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native";
 import { CroppedArt } from "./art";
 import { COVER, PAINTING, type Region } from "./crop";
 import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNight } from "../kit/chrome";
+import { shortToShow } from "../deck/status";
 import { HeroTrio } from "./hero-trio";
 import { CardThumb, useCardPreview } from "../images/picture";
 import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../../ui/surfaces";
@@ -267,11 +268,12 @@ function heroNames(heroes: readonly HeroFace[]): string {
 }
 
 function StatusLine({ testID, short, status, note }: { testID: string; short?: string | null; status: DeckSummary["status"]; note?: string | null }) {
+  const count = shortToShow(short, status);
   return (
     <View>
-      {short || !status.ready ? (
+      {count || !status.ready ? (
         <View className="mt-1 flex-row flex-wrap items-center gap-x-2">
-          {short ? <Text className="text-label text-muted">{short}</Text> : null}
+          {count ? <Text className="text-label text-muted">{count}</Text> : null}
           <Readiness testID={`${testID}-status`} status={status} />
         </View>
       ) : null}
@@ -286,7 +288,7 @@ function StatusLine({ testID, short, status, note }: { testID: string; short?: s
 
 /**
  * A saved deck in the deck list's Cards view: its three heroes' paintings side by side, split by 1 pt of the ground and fading into
- * the cover's foot, then the deck's name, and a line with the heroes on the left and, for a deck that is not ready, what it needs on the right (and "47 of 50 cards" under it while the deck is short). The selected
+ * the cover's foot, then the deck's name, the heroes' names, and, for a deck that is not ready, what it needs on a line of its own under them (two lines at most; "47 of 50 cards" follows while the deck is short and the words do not say so). The selected
  * deck (the briefing's picker) carries the silver ring. A FlashList row: a solid fill and no shadow (docs/design-system.md, Performance).
  */
 export function DeckCover(props: DeckSummary & { height: number }) {
@@ -294,6 +296,7 @@ export function DeckCover(props: DeckSummary & { height: number }) {
   const t = useTableTokens();
   const s = useUiScale();
   const { name, heroes, short, status, note, height, testID, children, selected, disabled } = props;
+  const count = shortToShow(short, status);
   const foot = t.depth === "light" ? palette.raised : palette.dusk;
   return (
     <View className="overflow-hidden rounded-item" style={{ backgroundColor: foot, ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}>
@@ -319,13 +322,11 @@ export function DeckCover(props: DeckSummary & { height: number }) {
                   <SelectedMark selected={selected} />
                 </View>
               </View>
-              <View className="mt-0.5 flex-row items-center justify-between gap-2">
-                <Text className="min-w-0 shrink text-label text-muted" numberOfLines={1}>
-                  {heroNames(heroes)}
-                </Text>
-                <Readiness testID={`${testID}-status`} status={status} />
-              </View>
-              {short ? <Text className="text-label text-faint">{short}</Text> : null}
+              <Text className="mt-0.5 min-w-0 text-label text-muted" numberOfLines={1}>
+                {heroNames(heroes)}
+              </Text>
+              <Readiness testID={`${testID}-status`} status={status} lines={2} />
+              {count ? <Text className="text-label text-faint">{count}</Text> : null}
               {note ? (
                 <Text testID={`${testID}-not-applied`} className="mt-0.5 text-label text-muted">
                   {note}

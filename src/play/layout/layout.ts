@@ -96,6 +96,8 @@ export type TableLayout = {
   piles: TablePiles<Rect>;
   // The cards that left staging or the engagement area for a fold stack are on no slot: the row list shows them.
   folds?: readonly FoldPlace[];
+  // The staging row's foot with every staging card's peeks drawn, folded or not (column-reach.ts reads it, so the row's foot never depends on the fold).
+  stagingFoot?: number;
   slots: readonly CardSlot[];
   marks: readonly CombatMark[];
   // The enemy whose attack is in progress, edged on the table from the moment it attacks.
@@ -139,6 +141,8 @@ export type LayoutOptions = {
 const GUTTER = 8;
 const GAP = 6;
 export const PEEK = 10;
+// The gaps between a covered row's piles and the cards carried past them.
+const PILE_BREAK = 3;
 // How much of a hand card shows above the bottom edge: a share of the card, and never less than a 44 pt target plus the
 // fan's drop at the ends (at a UI scale the target is `touch`, and the drop is scaled).
 export const HAND_SHOW = 0.56;
@@ -413,10 +417,11 @@ export function tableLayout(
   // Staging and the engagement area squeeze to 44 pt steps and then fold the groups the moment does not ask about into a stack at the row's left end (row-fold.ts).
   const folds: FoldPlace[] = [];
   const folding: RowFolding = { keep: options.keep, pile, folds, target: touch(scale, MIN_TARGET), stacks: options.stacks === true };
-  // A covered row runs on past its piles, if it has any, to a gutter short of the column's right edge (row-reach.ts).
+  // A covered row runs on past its piles, if it has any, to a gutter short of the column's right edge (row-reach.ts). The cards carried past the piles
+  // stand three gaps clear of them, so the piles read as their own block and not as the row's last cards.
   const reach = (options.column ?? 0) > 0 ? (options.reach ?? 0) : 0;
   const reachOf = (row: Rect, piled: boolean): RowReach => {
-    const start = piled ? width - rightGutter + gap : row.x + row.w;
+    const start = piled ? width - rightGutter + PILE_BREAK * gap : row.x + row.w;
     return { hole: start - (row.x + row.w), extra: width + (options.column ?? 0) - rightGutter - start };
   };
   placeRow(views.staging.entries, "staging", staging, card, slots, m, folding, reach >= 1 ? reachOf(staging, true) : null);
@@ -468,6 +473,7 @@ export function tableLayout(
     zones: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
     piles: pileRects,
     folds,
+    stagingFoot: stagingY + card.h + peek * (options.stacks ? Math.min(1, deepestUnder(views.staging.entries)) : deepestUnder(views.staging.entries)),
     slots,
     marks,
     attacker: options.attacker ?? null,

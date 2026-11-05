@@ -60,7 +60,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, column, reach, onRowFeet, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, column, reach, onRowFeet, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onEmptyTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -104,7 +104,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame, column, reach }),
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame, column, reach: reach ?? 0 }),
     [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame, column, reach],
   );
   // The rows' feet go up to the screen, which counts how many the command column's empty top covers (column-reach.ts). They do not move with the reach.
@@ -147,7 +147,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
   const reader = useScreenReader();
   // The drag, the tap, the press and the hand scrub (hand-gestures.native.ts).
-  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop });
+  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onEmptyTap, onPreview, onDrop });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
 
   // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.
@@ -227,5 +227,23 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   );
 }
 
+// Until the screen has measured the command column and its dock (`reach` null) the table is not laid out: this only tells the screen the rows' feet, which
+// do not depend on the reach, so the first table that is drawn, folded and answered is the one the reach decides, and a resumed game opens as the same moment reached in play.
+function RowFeetProbe({ store, width, height, column, onRowFeet, facts, bottomInset }: TableCanvasProps) {
+  const s = useUiScale();
+  const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
+  const { views, piles } = useViews(store, seat, facts);
+  const seaGame = useStore(store, (state) => state.game.sea != null);
+  const feet = rowFeet(tableLayout(width, height, views, piles, { bottomInset, scale: s, stacks: seaGame, column }));
+  useLayoutEffect(() => {
+    onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });
+  }, [onRowFeet, feet.staging, feet.engaged]);
+  return null;
+}
+
+function TableOrProbe(props: TableCanvasProps) {
+  return props.reach === null ? <RowFeetProbe {...props} /> : <Table {...props} />;
+}
+
 // Drawn again only when its props change: the screen keeps them stable while their contents are the same.
-export const TableCanvas = memo(Table);
+export const TableCanvas = memo(TableOrProbe);
