@@ -7,6 +7,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // The set-aside card with this code becomes the active location (not traveling: no Travel effect, nothing hears "traveled").
@@ -14,7 +15,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("MakeSetAsideActive"), code: z.string().min(1), ...when }),
   // Each player (`eachSeat`) assigns `amount` damage among the cards that match `pick` from their side, one damage at a time on the card
   // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
-  z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
   // The actor discards each card that matches `pick` (from their side) to its owner's discard pile ("discard each ally he controls",
   // 142037:A:1).
   z.strictObject({ verb: z.literal("DiscardEach"), pick: pickSchema, ...when }),

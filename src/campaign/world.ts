@@ -3,7 +3,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import type { Effect } from "../catalog/boundary.ts";
+import { collectionVerbs, type Effect } from "../catalog/boundary.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
 import { campaignGameCodes, recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
@@ -80,9 +80,15 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
   return { campaign, scenario, effects, cards: printed, sets, deckFacts };
 }
 
-// Whether a card among these codes has a record that chooses a hero card from the collection.
+// Whether a card among these codes has a record, at any depth, with a verb that chooses a hero card from the collection (`collection: "hero"`, src/catalog/verb-flags.ts).
 function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
-  return effects.some((effect) => codes.has(effect.cardCode) && /"(SwapHero|AttachCollectionHero|TakeHeroFromCollection)"/.test(JSON.stringify(effect.instructions)));
+  const heroVerbs = collectionVerbs("hero");
+  return effects.some((effect) => {
+    if (!codes.has(effect.cardCode)) return false;
+    const verbs: string[] = [];
+    walkInstructions(effect.instructions, (instruction) => verbs.push(String(instruction.verb)));
+    return verbs.some((verb) => heroVerbs.has(verb));
+  });
 }
 
 // Every instruction in a value, nested ones too (a Choose's options, an Each's instructions), whatever the key order.
@@ -97,13 +103,14 @@ function walkInstructions(value: unknown, visit: (instruction: Record<string, un
   for (const inner of Object.values(entry)) walkInstructions(inner, visit);
 }
 
-// The codes the records of these cards take from the collection by code (TakeCardFromCollection): they are loaded whether or not the scenario deals them.
+// The codes the records of these cards take from the collection by code (`collection: "card"`): they are loaded whether or not the scenario deals them.
 function collectionTaken(effects: readonly Effect[], codes: ReadonlySet<string>): string[] {
+  const cardVerbs = collectionVerbs("card");
   const taken: string[] = [];
   for (const effect of effects) {
     if (!codes.has(effect.cardCode)) continue;
     walkInstructions(effect.instructions, (instruction) => {
-      if (instruction.verb === "TakeCardFromCollection" && typeof instruction.code === "string") taken.push(instruction.code);
+      if (typeof instruction.verb === "string" && cardVerbs.has(instruction.verb) && typeof instruction.code === "string") taken.push(instruction.code);
     });
   }
   return taken;

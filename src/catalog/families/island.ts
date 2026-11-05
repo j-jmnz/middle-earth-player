@@ -6,12 +6,13 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Setup: "Prepare the Island Map" (dcce.island-map). The double-sided locations the scenario dealt as its Uncharted deck are separated: the cards with the codes in `temple` (the three Temple of the
   // Deceived locations) are shuffled and laid in the right-hand column, the others are shuffled and fill the first four columns, a grid of three rows by five. Every card lies Lost Island (or
   // Temple of the Deceived) side up, which nobody looks at.
-  z.strictObject({ verb: z.literal("PrepareIslandMap"), temple: z.array(z.string().min(1)).min(1), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareIslandMap"), temple: z.array(z.string().min(1)).min(1), ...when }), { setupRuns: "top" }),
   // Setup: "Flip over the top-left and bottom-left locations of the Island Map (without resolving their Forced effects, if any)" (12067:A:1): both turn to their other side with no flip announced.
   z.strictObject({ verb: z.literal("RevealIslandCorners"), ...when }),
   // Setup: "choose one as the players' starting active location, using a resource token to represent which location is active" (12067:A:1): the picked location becomes the active location where it

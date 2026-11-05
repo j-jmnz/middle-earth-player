@@ -6,11 +6,12 @@ import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Damage tokens go on the card in play with this printed code, none of it dealt: nothing answers or cancels them ("place 10 damage tokens
   // on it", 142040:A:1).
-  z.strictObject({ verb: z.literal("PlaceDamageOn"), code: z.string().min(1), amount: z.number().int().positive(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PlaceDamageOn"), code: z.string().min(1), amount: z.number().int().positive(), ...when }), { setupRuns: "top" }),
   // Up to `amount` damage tokens come off the card in play with this printed code; it stops at 0 ("remove 1 damage token from Doom, Doom,
   // Doom", 142040:B:1, 142042:A:1, 142043:A:1, 142048:A:1, 142059:A:2).
   z.strictObject({ verb: z.literal("RemoveDamageFrom"), code: z.string().min(1), amount: z.number().int().positive(), ...when }),

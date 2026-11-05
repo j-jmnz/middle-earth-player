@@ -6,6 +6,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Every living player draws `amount` cards (1 by default), the first player first ("each player draws 1 card"). Unlike
@@ -33,20 +34,20 @@ const VERBS = [
   // title is not in play and whose threat cost is at most the picked hero's, and swaps them. The picked hero leaves the game;
   // the new one takes its place, ready and with no tokens, and each attachment it may have moves to it, the others are
   // discarded (22090:A:2).
-  z.strictObject({ verb: z.literal("SwapHero"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("SwapHero"), ...when }), { collection: "hero" }),
   // "Search the players' collections for a hero" (11212:A:2): the actor chooses a hero card from the collection (every hero card the game knows, as SwapHero) that is not a Fellowship or Baggins card and
   // whose title is not in play. The card is set aside and is the picked card for the instructions after it (a PutIntoPlay puts it into play). Nothing happens with none to choose.
-  z.strictObject({ verb: z.literal("TakeHeroFromCollection"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("TakeHeroFromCollection"), ...when }), { collection: "hero" }),
   // "Search the players' collections for Gandalf ally" (11214:A:2): the card with this code is taken from the collection, set aside, and is the picked card for the instructions after it. Nothing happens
   // when the game does not know the card.
-  z.strictObject({ verb: z.literal("TakeCardFromCollection"), code: z.string().min(1), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("TakeCardFromCollection"), code: z.string().min(1), ...when }), { collection: "card" }),
   // "After the current phase, there is an additional instance of the chosen phase" (11213:A:2): once the phase in progress ends the round runs this phase in full (its framework steps, its action windows),
   // then goes on to the phase it would have gone to. Several asked for run one after the other, in the order asked. Not the quest, travel or encounter phase: no card asks for those.
   z.strictObject({ verb: z.literal("AddPhaseInstance"), phase: z.enum(["Resource", "Planning", "Combat", "Refresh"]), ...when }),
   // The source attachment's host: the actor chooses another version (a hero card with the same title, not a Fellowship or Baggins
   // card) from the collection, which is attached to the source: while the source is in play the host has its game text and
   // resource icon, and the card is out of the game once the source leaves play (22146:A:2).
-  z.strictObject({ verb: z.literal("AttachCollectionHero"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("AttachCollectionHero"), ...when }), { collection: "hero" }),
   // The source ally becomes an attachment on the last picked ally: it counts as a Restricted Mount attachment while it is (Wild
   // Stallion, 19033:A:2). One copy goes on each ally; a character with too many Restricted attachments discards one.
   z.strictObject({ verb: z.literal("AttachAsMount"), ...when }),

@@ -7,6 +7,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Setup: "Prepare the Corsair deck" (dcce.corsair-deck). Every non-ship enemy still in the encounter deck goes to the Corsair deck, which is
@@ -18,7 +19,7 @@ const VERBS = [
   // Setup: "Players prepare their fleet" (dcce.prepare-your-fleet). Each player in turn takes one of the six ship-objectives set aside (the
   // Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the
   // game, and the Heading card is attached to the Dream-chaser, set to on-course. A seat with a choice asks it as a choice of cards.
-  z.strictObject({ verb: z.literal("PrepareFleet"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareFleet"), ...when }), { setupRuns: "top" }),
   // "Shift your heading off-course" / "on-course" (dcce.heading): one step toward Storm / toward Sun, never past either end. Nothing happens in a
   // game with no Heading card.
   z.strictObject({ verb: z.literal("ShiftHeading"), direction: z.enum(["onCourse", "offCourse"]), ...when }),

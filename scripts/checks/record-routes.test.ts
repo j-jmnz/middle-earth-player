@@ -63,7 +63,7 @@ describe("record routes", () => {
   it("runs every quest card's Setup record the scenario's data does not place (families/quest/setup.ts revealsPerPlayer)", () => {
     const skipped = records("setup").filter((effect) => questCards.has(effect.cardCode) && !revealsPerPlayer(effect));
     const unplaced = skipped.flatMap((effect) => effect.instructions.filter((instruction) => !PLACED_BY_DATA.has(instruction.verb)).map((instruction) => `${effect.id}: ${instruction.verb}`));
-    expect(unplaced, "a quest card's Setup record that is neither run nor placed: list its verb in revealsPerPlayer").toEqual([]);
+    expect(unplaced, "a quest card's Setup record that is neither run nor placed: flag its verb `setupRuns` in its family file (src/catalog/verb-flags.ts)").toEqual([]);
   });
 
   it("runs in a frame every Shadow record with a verb only a frame runs (combat/shadow.ts runsInFrame)", () => {
@@ -72,7 +72,7 @@ describe("record routes", () => {
     for (const verb of ["Pick", "Choose", "Each", "Repeat"]) expect(frameOnly, verb).toContain(verb);
     const unframed = records("shadow").filter((effect) => !runsInFrame([effect]));
     const failing = unframed.flatMap((effect) => effect.instructions.filter((instruction) => frameOnly.has(instruction.verb)).map((instruction) => `${effect.id}: ${instruction.verb}`));
-    expect(failing, "a Shadow record that would fail with \"Unimplemented instruction\": list its verb in runsInFrame").toEqual([]);
+    expect(failing, "a Shadow record that would fail with \"Unimplemented instruction\": flag its verb `runsInFrame` in its family file (src/catalog/verb-flags.ts)").toEqual([]);
   });
 
   it("reads every verb of a campaign card's Setup (src/campaign/start.ts, src/campaign/checklist.ts)", () => {

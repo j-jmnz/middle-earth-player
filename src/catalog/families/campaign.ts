@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const code = z.string().min(1);
 
@@ -33,7 +34,7 @@ const VERBS = [
   setupRole(z.strictObject({ verb: z.literal("SetAsideEachPlayer"), code, ...when }), "dealt"),
   // The last picked hero gets a set-aside copy of the card attached to it ("each player attaches 1 set-aside copy of Valor to a hero they
   // control, if able", 01130:A:3). With no set-aside copy left, or no hero picked, nothing happens. The `attached` event is announced.
-  z.strictObject({ verb: z.literal("AttachSetAside"), code, ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("AttachSetAside"), code, ...when }), { setupRuns: "top" }),
   // Resolution: each copy of these cards attached to a hero in play joins the Campaign Pool attached to that hero ("Add each copy of
   // Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached ... and attach them
   // to those heroes when setting up each subsequent scenario", 01130:B:1). A hero that fell takes its copies out of the pool (campaign/log.ts).

@@ -7,12 +7,13 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { phaseNameSchema, when } from "../effect-schema-conditions.ts";
 import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const who = z.enum(["actor", "firstPlayer", "picked"]);
 
 const VERBS = [
   // Setup: "Prepare the Uncharted deck" (dcce.uncharted-deck). The double-sided locations dealt as the Uncharted deck are shuffled, each Lost Island side up.
-  z.strictObject({ verb: z.literal("PrepareUnchartedDeck"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareUnchartedDeck"), ...when }), { setupRuns: "top" }),
   // "Add N copies of Lost Island from the top of the Uncharted deck to the staging area" (11025:A:1, 11025:B:3, 11026:A:1, 11035:A:2): the top `count` cards of the deck join the
   // staging area without being revealed, Lost Island side up. The Uncharted deck is not shuffled by this verb.
   z.strictObject({ verb: z.literal("AddLostIslands"), count: positiveAmountSchema, ...when }),
@@ -33,7 +34,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AddStageProgress"), amount: positiveAmountSchema, ...when }),
   // Setup: "Prepare the Grotto deck" (12092:A:1, dcce.grotto-deck): the double-sided locations the scenario dealt as its Grotto deck are shuffled; each lies Grotto side faceup and its
   // Underwater side is never looked at before a flip. The Shrine to Morgoth is set aside by the scenario's piles.
-  z.strictObject({ verb: z.literal("PrepareGrottoDeck"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareGrottoDeck"), ...when }), { setupRuns: "top" }),
   // "Add the top 2 locations from the Grotto deck to the staging area, Grotto side faceup" (12092:A:1, 12092:B:2), and with `flip`, "and flip that location to its Underwater side" (12108:A:1): the
   // top `count` cards of the Grotto deck join the staging area without being revealed; each is then flipped, losing the progress it has (none yet), and announced as flipped over.
   z.strictObject({ verb: z.literal("AddFromGrottoDeck"), count: positiveAmountSchema, flip: z.boolean().optional(), ...when }),
@@ -64,7 +65,7 @@ const VERBS = [
   // window. The cards shown are the ones the effect looked at, the bottom one the picked card, so a Pick with `looked` and SwapPicked can switch one with a card in hand.
   z.strictObject({ verb: z.literal("LookAtBottom"), count: positiveAmountSchema.optional(), deck: z.enum(["own", "picked", "encounter"]).optional(), ...when }),
   // "Discard the bottom card of your deck" (11033:A:2, 11034:A:1, 11071:A:2, 11070:A:2): the bottom card of the deck of `who` (the actor; the first player) goes to its owner's discard pile, announced as discarded from the deck, and the effect remembers it, so the condition `discardedCost` can read its printed cost.
-  z.strictObject({ verb: z.literal("DiscardBottom"), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("DiscardBottom"), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }), { runsInFrame: true }),
   // "Then, he discards each card in his hand with a printed cost higher than that of the discarded card" (11034:A:1): from the hand of `who`, each card whose printed cost is higher
   // than that of the card DiscardBottom discarded goes to its owner's discard pile.
   z.strictObject({ verb: z.literal("DiscardCostlier"), who: who.exclude(["picked"]).optional(), ...when }),

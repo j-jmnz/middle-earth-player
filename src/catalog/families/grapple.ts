@@ -8,12 +8,13 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // "Immediately attach that enemy facedown to the location in the staging area specified in parentheses" (dcce.grapple): the source enemy (or the last picked card) with the Grapple keyword
   // attaches to the staging-area location the keyword names, the first player choosing among those tied; with no location in the staging area it is added to the staging area. Resolved by a
   // revealed enemy as it is revealed, and by "resolve the Grapple keyword" (12053:A:3, 12054:A:3). `card` is engine use: the enemy to resolve for (a card the effect discarded).
-  z.strictObject({ verb: z.literal("ResolveGrapple"), target: z.enum(["self", "picked"]).optional(), card: z.string().min(1).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("ResolveGrapple"), target: z.enum(["self", "picked"]).optional(), card: z.string().min(1).optional(), ...when }), { runsInFrame: true }),
   // "Discard the top 3 cards of the encounter deck. Resolve the Grapple keyword on each enemy discarded by this effect." (12055:A:1): `count` cards; each enemy among them resolves its keyword,
   // in the order discarded.
   z.strictObject({ verb: z.literal("DiscardTopGrapple"), count: positiveAmountSchema, ...when }),
@@ -43,7 +44,7 @@ const VERBS = [
   // Shadow effect of an enemy card ("After this attack, either put Giant Arm into play engaged with you and deal it a shadow card, or resolve its Grapple keyword", 12054:A:3): the actor chooses as the
   // shadow effect resolves, and what they chose is done once the attack is over. The source (a shadow card) comes into play engaged with the actor and is dealt a shadow card of its own, or it resolves its
   // Grapple keyword. Both options are always possible. `card` and `choice` are engine use: the shadow card and the choice, queued for the end of the attack.
-  z.strictObject({ verb: z.literal("EngageOrGrapple"), card: z.string().min(1).optional(), choice: z.enum(["engage", "grapple"]).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("EngageOrGrapple"), card: z.string().min(1).optional(), choice: z.enum(["engage", "grapple"]).optional(), ...when }), { runsInFrame: true }),
   // "Sea Serpent makes an attack against the first player" (11196:B:4): the source enemy, in the staging area or engaged with any player, attacks the first player now, dealt a shadow card for the attack.
   z.strictObject({ verb: z.literal("AttackFirstPlayer"), ...when }),
   // "Each of those characters gain a Trait of your choice" (11195:A:5): the actor chooses a Trait printed in the game, which the last picked card has until the end of the round.
