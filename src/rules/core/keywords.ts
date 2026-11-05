@@ -5,7 +5,7 @@ import type { Cause } from "./cause.ts";
 import { threatSaved } from "../families/quest/threat.ts";
 import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
 import type { EngineStep } from "./intents.ts";
-import { cardTypeOf, fromEncounterDeck, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
+import { cardTypeOf, fromEncounterDeck, isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
@@ -182,6 +182,14 @@ export function lowerThreat(state: ScenarioState, seat: number, amount: number, 
 export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string): boolean {
   if (state && id && flagged(state, id, "immuneToPlayerCards")) return false;
   return !printed.keywords.immuneToPlayerCardEffects;
+}
+
+/** Whether an effect from `sourceId` is a player card effect: a player card without an encounter back, or no card at all (a choice a player makes). An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards). */
+export function isPlayerCardEffect(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, sourceId: string | null): boolean {
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  if (!source) return true;
+  const printed = printedOf(cards, source.code);
+  return isPlayerType(printed) && printed.backType !== "encounter";
 }
 
 // An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).

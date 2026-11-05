@@ -1,5 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
-import type { PickSpec } from "../../catalog/boundary.ts";
+import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
@@ -17,7 +17,7 @@ import { playBlocked } from "../families/sidequests/contract.ts";
 import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { hasKeyword, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "../core/keywords.ts";
+import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "../core/keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
 import { activeFor, sharedStaging } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
@@ -45,6 +45,8 @@ export type PickContext = {
   // The answered event's cards, when a condition is read for it (families/attack/pick.ts).
   subject?: string | null;
   other?: string | null;
+  // The cards chosen are discarded by the effect (a DiscardPicked after the pick): the filter of a card that cannot be discarded by player card effects reads it (families/wilderland/pick.ts).
+  discards?: boolean;
 };
 
 function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
@@ -276,7 +278,7 @@ export function pickCandidates(
   participants?: readonly string[],
   counting = false,
   // The answered event's subject and other card, for a condition read about it (families/attack/pick.ts).
-  event?: { subject?: string | null; other?: string | null },
+  event?: { subject?: string | null; other?: string | null; discards?: boolean },
 ): string[] {
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
@@ -285,9 +287,8 @@ export function pickCandidates(
     return code ? attachmentHostIds(state, asking, code, ctx) : [];
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
-  const source = sourceId ? state.cards[sourceId] : undefined;
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
-  const playerEffect = !counting && (source == null || (isPlayerType(printedOf(ctx.cards, source.code)) && printedOf(ctx.cards, source.code).backType !== "encounter"));
+  const playerEffect = !counting && isPlayerCardEffect(state, ctx.cards, sourceId);
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   const found = raw.filter((id) => {
@@ -318,6 +319,11 @@ function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLo
   const holder =
     where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
   return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
+}
+
+/** Whether the instructions after a pick discard what it chose. */
+export function feedsDiscard(instructions: readonly Instruction[]): boolean {
+  return instructions.some((instruction) => instruction.verb === "DiscardPicked");
 }
 
 // How many cards match a filter from a seat's side: the count an amount or a condition reads.

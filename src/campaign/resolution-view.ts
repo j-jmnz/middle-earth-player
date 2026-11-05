@@ -41,8 +41,9 @@ export type ResolutionView =
       seatLabel: string | null;
       // What is chosen: boon, burden, card or captive.
       noun: string;
-      // The boon ally the choice is about, when it is one (BoonAllyOrLogLine): what the log line is traded for.
+      // The boon ally the choice is about, when it is one (BoonAllyOrLogLine): what the log line is traded for, and what the line does at later campaign cards' Setups.
       ally: string | null;
+      later: string | null;
       answered: readonly ResolutionAnswer[];
       tiles: readonly ResolutionTile[];
       decline: ResolutionDecline | null;
@@ -191,9 +192,11 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     seat: window.seat,
     seatCount: state.seatCount,
     eyebrow,
-    seatLabel: eachSeat && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
+    // A boon ally's offer is the first player's alone, and a table of several players is told whose (the first player token).
+    seatLabel: (eachSeat || instruction.verb === "BoonAllyOrLogLine") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
+    later: instruction.verb === "BoonAllyOrLogLine" ? ALLY_LINE_FACTS[instruction.line].later : null,
     answered,
     tiles,
     decline,
@@ -217,8 +220,8 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
       return `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} shuffles it into their deck after drawing their starting hand, for the rest of the campaign.`;
     case "ally":
       return tile.code
-        ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded.`
-        : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool.`;
+        ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded, so no card is removed from the encounter deck for it later.`
+        : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool. ${view.later ? `Later Setups remove from the encounter deck ${view.later}.` : ""}`.trim();
     case "removal":
       if (tile.copies == null) return `${tile.label} is removed from the campaign pool.`;
       return tile.copies > 1 ? `One copy of ${tile.name} leaves the campaign pool (${tile.copies - 1} ${tile.copies === 2 ? "stays" : "stay"}).` : `${tile.name} leaves the campaign pool: it was the last copy.`;
@@ -233,8 +236,13 @@ export function declineSentence(view: Extract<ResolutionView, { kind: "choosing"
   return `${who} ${who === "You" ? "take" : "takes"} no ${what}. Nothing is recorded for this choice.`;
 }
 
-/** The sentence above Confirm before anything is chosen, built from the noun: "Choose a boon and a hero, or tap No boon." */
+/** The sentence above Confirm before anything is chosen, built from the noun: "Choose a boon and a hero, or tap No boon." A boon ally's offer says who takes the ally. */
 export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" }>): string {
+  // A boon ally's offer: the first player answers for the group, and the ally goes to the player whose hero is tapped (emce.boon-allies).
+  if (view.to === "ally") {
+    const ally = view.ally ?? "the ally";
+    return view.seatCount > 1 ? `Choose which player takes ${ally}, or the line for the log.` : `Take ${ally}, or the line for the log.`;
+  }
   const what =
     view.to === "hero"
       ? `a ${view.noun} and a hero`
@@ -242,9 +250,7 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
         ? "a hero to name as a captive"
         : view.to === "player"
           ? "a player, by one of their heroes"
-          : view.to === "ally"
-            ? "the ally for a player, by one of their heroes, or the line for the log"
-            : view.to === "removal"
+          : view.to === "removal"
               ? "a card to remove from the campaign pool"
               : `a ${view.noun}`;
   const decline = view.decline ? `, or tap ${view.decline.label}` : "";

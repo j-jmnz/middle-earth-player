@@ -9,7 +9,7 @@ import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
 import { reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { upanduinStart, upanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/game.ts";
-import { CODES, TREASURES, codesIn, finish, idOf, idsOf, legalIntents, loadUpanduinWorld, resolveRecords, send, start, upanduinTable, type Run, type UpanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
+import { CODES, TREASURES, codesIn, idOf, legalIntents, loadUpanduinWorld, resolveRecords, send, start, upanduinTable, type Run, type UpanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
 
 let ctx: ReduceContext;
 let scene: UpanduinWorld;
@@ -138,7 +138,7 @@ function won(state: ScenarioState, pick: (options: readonly string[]) => string 
 }
 
 const asked = (state: ScenarioState) => legalIntents(openResolution({ ...state, stageCleared: true, window: null, stack: [] }, ctx), ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
-// Enemies from the Evil Creatures deck come into play (the staging area) and a treasure is claimed by the first hero, as the Response would leave them.
+// The first `enemies` cards of the Evil Creatures deck come into play in the staging area, as the Forced effects that add them would leave them.
 function played(state: ScenarioState, enemies: number): ScenarioState {
   let next = state;
   for (const id of (state.piles?.evilCreaturesDeck ?? []).slice(0, enemies)) next = moveCard(next, id, { zone: "staging" });
@@ -185,5 +185,3 @@ describe("120165:B Resolution", () => {
     expect(resolutionResult(openResolution({ ...lost, stageCleared: true, window: null }, ctx))).toBeNull();
   });
 });
-
-void [finish, idsOf, codesIn];

@@ -67,8 +67,8 @@ export function aflameWords(instruction: Instruction): string | null {
 }
 
 /** The numbers and names a branch's words state, read when the sheet is built: the cards a Look takes (Galdor's Counsel, Lore: half its level plus the copies chosen) and the card being placed. */
-// `x`: Command's X (the Command options that name it, command.ts). `hand`: the cards in the choosing seat's hand and how many of each printed type (Into the Abyss' card types, uncharted.ts).
-export type BranchNow = { count?: number; placing?: string; x?: number; hand?: { total: number; byType: Readonly<Record<string, number>> } };
+// `x`: Command's X (the Command options that name it, command.ts). `counted`: the number a branch's count states for each option now (Ruined Supplies, wilderland.ts). `hand`: the cards in the choosing seat's hand and how many of each printed type (Into the Abyss' card types, uncharted.ts).
+export type BranchNow = { count?: number; placing?: string; x?: number; hand?: { total: number; byType: Readonly<Record<string, number>> }; counted?: Readonly<Record<string, number>> };
 
 /** The `BranchNow` of a Choose: the look count its branches carry resolved now, and the name of the card the last Pick chose (the card a Lore Counsel places). */
 export function branchNow(game: ScenarioState, ctx: ReduceContext, choose: Choose, seat: number, sourceId: string | null, picked: string | null, names: Pick<ChoiceNames, "card">): BranchNow {

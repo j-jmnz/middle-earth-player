@@ -10,3 +10,14 @@ tags:
     env:
       FIXTURE: upanduin-lost
       SCENARIO_ID: journey-up-the-anduin
+# Back on the path, none of the Ered Mithrin columns of the log appeared: no treasure, no ally line, no Beldis box, no encounter card in the pool.
+- tapOn:
+    id: log-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertNotVisible:
+    id: wilderland-line
+- assertNotVisible:
+    id: path-pool-encounter

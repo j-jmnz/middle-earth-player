@@ -36,7 +36,7 @@ function asked(): ScenarioState {
 describe("the treasure choice", () => {
   it("names the guard in its sentence and asks for one of the treasures", () => {
     expect(wilderlandAsk(ATTACH, "hall-id", words)).toEqual({
-      verb: "Attach",
+      verb: "Choose",
       prompt: "Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Twilight Hall is attached to it, and the players cannot claim it until Twilight Hall is dealt with.",
     });
     // With no card to name, the sentence stands alone.
@@ -64,3 +64,73 @@ describe("the treasure choice", () => {
     expect(sheet.note).toContain("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective.");
   });
 });
+
+// Ruined Supplies (18025:A:2): each branch states the number it counts now, and the damage branch warns about an ally it destroys.
+describe("a choice that counts allies", () => {
+  const supplies = new Map(cards);
+  for (const [code, health] of [["pony", 1], ["bear", 3]] as const) supplies.set(code, definePrinted({ code, name: code === "pony" ? "Pony" : "Bear", type: "ally", sphere: "neutral", cost: 1, willpower: 1, attack: 1, defense: 1, health }));
+  const ally = { type: "ally", control: "you" } as const;
+  const CHOOSE: Instruction = {
+    verb: "Choose",
+    who: "actor",
+    options: [
+      { id: "threat", instructions: [{ verb: "RaiseThreat", amount: { count: ally }, who: "actor" }] },
+      { id: "damage", instructions: [{ verb: "DamageEach", amount: 1, pick: ally }] },
+    ],
+  };
+  const reduce = { effects: [], cards: supplies };
+
+  function offered(): ScenarioState {
+    let state: ScenarioState = { ...idleScenario(1), seed: 5 };
+    state = spawn(state, "frodo", { zone: "heroes", seat: 0 }).state;
+    for (const code of ["pony", "bear", "bear"]) state = spawn(state, code, { zone: "play", seat: 0 }).state;
+    const source = spawn(state, "hall", { zone: "staging" });
+    return settle(pushEffectFrame(source.state, { frame: "whenRevealed", sourceId: source.id, actor: 0, peril: false, effectId: "hall:whenRevealed:1", instructions: [CHOOSE], cancel: null, blockCancel: null }, []), reduce, []);
+  }
+
+  it("states the threat raised and the damage dealt now, and warns before an ally is destroyed", () => {
+    const state = offered();
+    const sheet = sheetFor(state, reduce, legalIntents(state, reduce), { ...names(), card: (id) => supplies.get(state.cards[id]?.code ?? "")?.name ?? id });
+    if (sheet?.kind !== "pick") throw new Error("expected a pick sheet");
+    expect(sheet.options.map((option) => option.label)).toEqual(["Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)"]);
+    expect(sheet.options.map((option) => option.caution)).toEqual([undefined, "Tap again: Pony is destroyed"]);
+  });
+});
+
+// Turayn's Response, Weighed Down and Lost in the Wild: what the sheet asks.
+describe("the Wilderland scenario's prompts", () => {
+  it("says what Turayn's shield does", () => {
+    const pick: Instruction = { verb: "Pick", pick: { type: "character", control: "any", other: true } };
+    const shield: Instruction = { verb: "ModifyStat", stat: "damageShield", amount: 1, until: "endOfRound", target: "picked" };
+    expect(wilderlandAsk(pick, "turayn-id", words, shield)?.prompt).toBe("Choose another character: the next time it would be dealt damage this round, cancel 1 of that damage.");
+  });
+
+  it("asks who gets Weighed Down in a tie only, and says when it discards itself", () => {
+    const attach: Instruction = { verb: "AttachSelf", to: { kind: "hero", control: "mostAttachments" } };
+    const facts = (options: readonly string[]) => ({ game: idleScenario(1), ctx, options });
+    expect(wilderlandAsk(attach, "down", words, undefined, null, facts(["a", "b"]))?.prompt).toBe("Heroes are tied for the most attachments: choose who gets down. That hero is exhausted.");
+    expect(wilderlandAsk(attach, "down", words, undefined, null, facts(["a"]))?.prompt).toBe("down attaches to a. That hero is exhausted.");
+    let game: ScenarioState = idleScenario(1);
+    game = spawn(game, "frodo", { zone: "heroes", seat: 0 }).state;
+    const down = spawn(game, "hall", { zone: "attached" });
+    const hosted = { ...down.state, cards: { ...down.state.cards, [down.id]: { ...down.state.cards[down.id]!, host: "hero-id" } } };
+    const discard: Instruction = { verb: "Pick", pick: { type: "card", control: "any", attachedTo: "host", other: true } };
+    const forced = { game: hosted, ctx, options: ["x"] };
+    expect(wilderlandAsk(discard, down.id, { ...words, card: (id) => (id === down.id ? "Weighed Down" : "Frodo") }, { verb: "Discard", target: { kind: "picked" } }, null, forced)?.prompt).toBe("Weighed Down: choose an attachment to discard from Frodo.");
+    const itself = { ...forced, options: ["x", down.id] };
+    expect(wilderlandAsk(discard, down.id, { ...words, card: (id) => (id === down.id ? "Weighed Down" : "Frodo") }, { verb: "Discard", target: { kind: "picked" } }, null, itself)?.prompt).toContain("Weighed Down can discard itself");
+  });
+
+  it("warns that playing a card discards the hand of the player Lost in the Wild goes to", () => {
+    expect(wilderlandAsk({ verb: "AddSourceToHandOfMost" }, "hall-id", words)?.prompt).toContain("Playing a card then discards that player's whole hand");
+  });
+
+  it("counts the treasures drawn, and names the host noun of the character step", () => {
+    const facts = (options: readonly string[]) => ({ game: idleScenario(1), ctx, options });
+    expect(wilderlandAsk(ATTACH, null, words, undefined, null, facts(["ta", "tb"]))?.prompt).toBe("Choose 1 of 2 random undiscovered treasures to attach as a guarded objective.");
+    expect(wilderlandAsk({ verb: "ClaimRandomTreasure" }, null, words, undefined, null, facts(["ta"]))).toEqual({ verb: "Choose", prompt: "Choose 1 of 1 random undiscovered treasures to attach to a character." });
+    const pick: Instruction = { verb: "Pick", pick: { type: "card", control: "any", hostForPicked: true, who: "firstPlayer" } };
+    expect(wilderlandAsk(pick, null, words, { verb: "AttachPicked" })).toEqual({ verb: "Attach", prompt: "Choose a character to attach it to." });
+  });
+});
+

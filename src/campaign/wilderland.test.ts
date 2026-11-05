@@ -11,7 +11,7 @@ import { attachTo, spawn } from "../rules/core/zones.ts";
 
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";
 import { parseLog, newSave } from "./save.ts";
-import { choiceSentence, resolutionView, settledSentence } from "./resolution-view.ts";
+import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { cappedTally, logConditionHolds, NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts, WILDERLAND_CAMPAIGN } from "./wilderland.ts";
 import { copiesMark, encounterSpeech, keepsWilderlandLog, wilderlandView } from "./wilderland-view.ts";
 import { campaignPath } from "./path.ts";
@@ -227,8 +227,15 @@ describe("the Resolution screen's words", () => {
     const [ally, line] = [two.tiles[0], two.tiles[2]];
     if (!ally || !line) throw new Error("missing tiles");
     // Each choice says what is given up.
-    expect(choiceSentence(two, line)).toBe(`“${ALLY_LINE_FACTS.turayn.words}” is marked in the campaign log. Turayn does not join the campaign pool.`);
-    expect(choiceSentence(two, ally)).toMatch(/adds it to their deck for the rest of the campaign\. The log line is not recorded\.$/);
+    // The line says what it buys at the later campaign cards that read it (12170, 12187 and 12195 print the Setups).
+    expect(choiceSentence(two, line)).toBe(`“${ALLY_LINE_FACTS.turayn.words}” is marked in the campaign log. Turayn does not join the campaign pool. Later Setups remove from the encounter deck ${ALLY_LINE_FACTS.turayn.later}.`);
+    expect(ALLY_LINE_FACTS.turayn.later).toBe("3 treacheries in The King's Quest, 3 non-unique locations in Fire in the Night and 3 non-unique enemies in The Fate of Wilderland");
+    expect(choiceSentence(two, ally)).toMatch(/adds it to their deck for the rest of the campaign\. The log line is not recorded, so no card is removed from the encounter deck for it later\.$/);
+    // The offer names who takes the ally, and in a table of several players whose choice it is.
+    expect(promptSentence(solo)).toBe("Take Turayn, or the line for the log.");
+    expect(promptSentence(two)).toBe("Choose which player takes Turayn, or the line for the log.");
+    expect(solo.seatLabel).toBeNull();
+    expect(two.seatLabel).toBe("Player 1 (first player) chooses");
   });
 
   it("calls the decline of a removal \"Remove nothing\", tells encounter cards from the pool's own with their copies, and a boon two seats hold by seat", () => {

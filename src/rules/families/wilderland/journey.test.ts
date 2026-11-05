@@ -15,7 +15,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { damageShield } from "./shield.ts";
-import { CARDS, ctxOf, record, table } from "./fixture.ts";
+import { CARDS, ctxOf, marker, table } from "./fixture.ts";
 
 const cards = cardMap([
   ...CARDS.values(),
@@ -23,6 +23,7 @@ const cards = cardMap([
   definePrinted({ code: "unique", name: "Unique", type: "enemy", isUnique: true, threat: 1, engagementCost: 10, attack: 1, defense: 1, health: 1 }),
   definePrinted({ code: "curse", name: "Curse", type: "treachery", campaignKind: "burden", burdenSet: "x", backType: "encounter" }),
   definePrinted({ code: "haldan", name: "Haldan", type: "objective", willpower: 2, attack: 3, defense: 1, health: 4 }),
+  definePrinted({ code: "axe", name: "Axe", type: "treasure", campaignKind: "treasure" }),
   definePrinted({ code: "village", name: "Village", type: "location", threat: 4, questPoints: 4 }),
 ]);
 
@@ -124,17 +125,56 @@ describe("the pick filters fromDeck and Undiscardable (18066:B:3, 18026:A:1)", (
     expect(found).toEqual([marked.id]);
   });
 
-  it("a hand pick made for a player card leaves out a card with the Undiscardable marker; an encounter card's pick does not", () => {
-    const lostRecord: Effect = record("lost:whenRevealed:1", "lost", "whenRevealed", [{ verb: "Undiscardable" }]);
-    const ctx: ReduceContext = { effects: [lostRecord], cards };
+  it("a hand pick that is discarded leaves out a card with the Undiscardable marker when a player card makes it; an encounter card's pick does not, and a pick that gives or swaps still offers it", () => {
+    const ctx: ReduceContext = { effects: [marker("lost", { verb: "Undiscardable" })], cards };
     let state = table();
     state = spawn(state, "lost", { zone: "hand", seat: 0 }).state;
     state = spawn(state, "blessing", { zone: "hand", seat: 0 }).state;
     const staging = spawn(state, "mist", { zone: "staging" });
     const spec = { type: "card", control: "you", from: "hand" } as const;
-    const byHero = pickCandidates(staging.state, spec, 0, [], staging.state.seats[0]?.heroes[0] ?? null, ctx).map((id) => staging.state.cards[id]?.code);
-    const byEncounter = pickCandidates(staging.state, spec, 0, [], staging.id, ctx).map((id) => staging.state.cards[id]?.code);
-    expect(byHero).toEqual(["blessing"]);
-    expect(byEncounter.sort()).toEqual(["blessing", "lost"]);
+    const codes = (source: string | null, discards: boolean | undefined) =>
+      pickCandidates(staging.state, spec, 0, [], source, ctx, undefined, undefined, false, { discards }).map((id) => staging.state.cards[id]?.code).sort();
+    const hero = staging.state.seats[0]?.heroes[0] ?? null;
+    expect(codes(hero, true)).toEqual(["blessing"]);
+    expect(codes(staging.id, true)).toEqual(["blessing", "lost"]);
+    expect(codes(hero, false)).toEqual(["blessing", "lost"]);
+    expect(pickCandidates(staging.state, { ...spec, discarded: true }, 0, [], hero, ctx).map((id) => staging.state.cards[id]?.code)).toEqual(["blessing"]);
+  });
+
+  it("a Pick followed by DiscardPicked in a player card's effect never discards it, and a Pick for GivePicked offers it", () => {
+    const ctx: ReduceContext = { effects: [marker("lost", { verb: "Undiscardable" })], cards };
+    let state = table();
+    state = spawn(state, "lost", { zone: "hand", seat: 0 }).state;
+    const hero = state.seats[0]?.heroes[0] ?? "";
+    const pick = { verb: "Pick", pick: { type: "card", control: "you", from: "hand" } } as const;
+    const discarded = frame(state, hero, [pick, { verb: "DiscardPicked" }], ctx.effects);
+    expect(discarded.state.seats[0]?.hand).toHaveLength(1);
+    const each = frame(state, hero, [{ verb: "Each", pick: pick.pick, instructions: [{ verb: "DiscardPicked" }] }], ctx.effects);
+    expect(each.state.seats[0]?.hand).toHaveLength(1);
+    const cost = frame(state, hero, [{ verb: "DiscardFromHand", amount: 1 }], ctx.effects);
+    expect(cost.state.seats[0]?.hand).toHaveLength(1);
+    // The same hand pick, chosen for GivePicked, is offered both cards (08032).
+    const withBlessing = spawn(state, "blessing", { zone: "hand", seat: 0 }).state;
+    const give = frame(withBlessing, hero, [{ verb: "Each", pick: pick.pick, upTo: 1, instructions: [{ verb: "GivePicked" }] }], ctx.effects);
+    const offered = give.state.window?.kind === "choose" ? give.state.window.options.flatMap((id) => give.state.cards[id]?.code ?? []).sort() : [];
+    expect(offered).toEqual(["blessing", "lost"]);
+    const dropped = frame(withBlessing, hero, [{ verb: "Each", pick: pick.pick, upTo: 1, instructions: [{ verb: "DiscardPicked" }] }], ctx.effects);
+    const kept = dropped.state.window?.kind === "choose" ? dropped.state.window.options.flatMap((id) => dropped.state.cards[id]?.code ?? []) : [];
+    expect(kept).toEqual(["blessing"]);
+  });
+
+  it("a treasure is a player card: its pick leaves out a card immune to player card effects and a card that cannot be discarded by them", () => {
+    const ctx: ReduceContext = { effects: [marker("lost", { verb: "Undiscardable" })], cards };
+    let state = table();
+    state = spawn(state, "lost", { zone: "hand", seat: 0 }).state;
+    state = spawn(state, "blessing", { zone: "hand", seat: 0 }).state;
+    const immune = spawn(state, "urdug", { zone: "staging" });
+    const axe = spawn(immune.state, "axe", { zone: "play", seat: 0 });
+    const enemies = pickCandidates(axe.state, { type: "enemy", control: "any", staging: true }, 0, [], axe.id, ctx);
+    expect(enemies).toEqual([]);
+    const byMist = pickCandidates(axe.state, { type: "enemy", control: "any", staging: true }, 0, [], immune.id, ctx);
+    expect(byMist).toEqual([immune.id]);
+    const hand = pickCandidates(axe.state, { type: "card", control: "you", from: "hand" }, 0, [], axe.id, ctx, undefined, undefined, false, { discards: true });
+    expect(hand.map((id) => axe.state.cards[id]?.code)).toEqual(["blessing"]);
   });
 });

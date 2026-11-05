@@ -6,6 +6,7 @@ import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { heldAmount, updateCard } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
 import { pickCandidates } from "../../../rules/interpret/pick.ts";
 
 import { CODES, finish, idOf, idsOf, legalIntents, legalTargets, loadUpanduinWorld, resolveRecords, send, start, upanduinFight, upanduinReveal, upanduinTable, type PlayerIntent, type Run, type UpanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
@@ -183,6 +184,22 @@ describe("18022 Pack of Wargs", () => {
     expect(fight.run.state.cards[idOf(fight.run.state, CODES.packOfWargs)]?.shadowId ?? null).toBeNull();
   });
 
+  it("makes its additional attack outside combat too, at The Old Ford, and that attack is dealt no shadow card", () => {
+    const t = upanduinTable(world, { staging: [CODES.theOldFord, CODES.packOfWargs], deck: ["f0", "f0", "f0"] });
+    let run: Run = resolveRecords(t.state, t.ctx, CODES.theOldFord, "forced", idOf(t.state, CODES.theOldFord));
+    const attackers: string[] = [];
+    const shadows: boolean[] = [];
+    for (let guard = 0; guard < 6 && run.state.window?.kind === "defense"; guard += 1) {
+      const enemy = run.state.cards[run.state.pendingAttack?.enemyId ?? ""];
+      attackers.push(enemy?.code ?? "");
+      shadows.push(enemy?.shadowId != null);
+      run = send(run, { type: "Undefended", heroId: t.hero }, t.ctx);
+    }
+    expect(attackers).toEqual([CODES.packOfWargs, CODES.packOfWargs]);
+    expect(shadows).toEqual([true, false]);
+    expect(run.state.cards[t.hero]?.damage).toBe((world.cards.get(CODES.packOfWargs)?.attack ?? 0) * 2);
+  });
+
   it("attacks once when its shadow card has an effect", () => {
     const fight = upanduinFight(world, CODES.woodedRiverbank, CODES.packOfWargs, {}, { undefended: true });
     const attack = world.cards.get(CODES.packOfWargs)?.attack ?? 0;
@@ -302,11 +319,36 @@ describe("18026 Lost in the Wild", () => {
   it("cannot be discarded from the hand by a player card effect, though an encounter card's effect discards it", () => {
     const base = upanduinTable(world, { hand: ["filler"] });
     const lost = spawn(base.state, CODES.lostInTheWild, { zone: "hand", seat: 0 });
-    const picks = (source: string) => pickCandidates(lost.state, { type: "card", control: "you", from: "hand" }, 0, [], source, base.ctx).map((id) => lost.state.cards[id]?.code);
-    // A hero's effect leaves it out; an effect of the location in the staging area (an encounter card) does not.
-    expect(picks(base.hero)).toEqual(["filler"]);
+    const picks = (source: string, discards: boolean) => pickCandidates(lost.state, { type: "card", control: "you", from: "hand" }, 0, [], source, base.ctx, undefined, undefined, false, { discards }).map((id) => lost.state.cards[id]?.code);
+    // A hero's effect that discards leaves it out, one that gives or swaps does not; an effect of the location in the staging area (an encounter card) does not.
+    expect(picks(base.hero, true)).toEqual(["filler"]);
+    expect(picks(base.hero, false)).toEqual(expect.arrayContaining([CODES.lostInTheWild, "filler"]));
     const place = spawn(lost.state, CODES.theOldFord, { zone: "staging" });
-    expect(pickCandidates(place.state, { type: "card", control: "you", from: "hand" }, 0, [], place.id, base.ctx).map((id) => place.state.cards[id]?.code)).toEqual(expect.arrayContaining([CODES.lostInTheWild, "filler"]));
+    expect(pickCandidates(place.state, { type: "card", control: "you", from: "hand" }, 0, [], place.id, base.ctx, undefined, undefined, false, { discards: true }).map((id) => place.state.cards[id]?.code)).toEqual(expect.arrayContaining([CODES.lostInTheWild, "filler"]));
+  });
+});
+
+describe("18026 Lost in the Wild against the treasures (a treasure is a player card)", () => {
+  it("is not discardable by Jewels of Wilderland or Glittering Lute, and Axe of the Edain cannot damage an enemy immune to player card effects", () => {
+    const base = upanduinTable(world, { seats: 2 });
+    const lost = spawn(base.state, CODES.lostInTheWild, { zone: "hand", seat: 0 });
+    const scope = (state: typeof lost.state, sourceId: string) => ({ actor: 0, sourceId, returned: 0 });
+    for (const code of ["12203", "12200"]) {
+      const treasure = spawn(lost.state, code, { zone: "play", seat: 0 });
+      const effect = base.ctx.effects.find((record) => record.cardCode === code && (record.timing === "action" || record.timing === "response"));
+      const condition = code === "12203" ? effect?.condition : effect?.instructions.flatMap((step) => (step.verb === "ForEachPlayer" ? step.instructions : [])).flatMap((step) => (step.verb === "Choose" ? step.options : [])).find((option) => option.id === "discard")?.requires;
+      expect(condition, code).toBeDefined();
+      // Only Lost in the Wild is in the hand: the discard cannot be paid.
+      expect(holds(treasure.state, condition!, scope(treasure.state, treasure.id), base.ctx), code).toBe(false);
+      // With another card in hand the discard can.
+      const other = spawn(treasure.state, "filler", { zone: "hand", seat: 0 });
+      expect(holds(other.state, condition!, scope(other.state, treasure.id), base.ctx), code).toBe(true);
+    }
+    const immune = upanduinTable(world, { staging: [CODES.theOldFord], engaged: [CODES.hillTroll] });
+    const axe = spawn(immune.state, "12197", { zone: "play", seat: 0 });
+    const spec = { type: "location", control: "any", stagingOnly: true } as const;
+    expect(pickCandidates(axe.state, spec, 0, [], axe.id, immune.ctx)).toEqual([]);
+    expect(pickCandidates(axe.state, spec, 0, [], idOf(axe.state, CODES.hillTroll), immune.ctx)).toHaveLength(1);
   });
 });
 
@@ -348,7 +390,13 @@ describe("18027 Weighed Down", () => {
 
   it("is chosen by the first player among heroes tied for the most attachments", () => {
     const t = withAttachments([1, 1, 1]);
-    const run = resolveRecords(t.state, t.ctx, CODES.weighedDown, "whenRevealed", undefined, (state) => (state.window?.kind === "choose" ? (state.window.options.at(-1) ?? "") : ""));
+    const choosers: number[] = [];
+    const run = resolveRecords(t.state, t.ctx, CODES.weighedDown, "whenRevealed", undefined, (state) => {
+      if (state.window?.kind !== "choose") return "";
+      choosers.push(state.window.seat);
+      return state.window.options.at(-1) ?? "";
+    });
+    expect(choosers).toEqual([t.state.firstPlayer]);
     expect(run.state.cards[run.id]?.host).not.toBeNull();
     expect(run.state.cards[run.id]?.zone).toBe("attached");
   });
@@ -365,5 +413,40 @@ describe("18027 Weighed Down", () => {
     const down = resolveRecords(bare.state, bare.ctx, CODES.weighedDown, "whenRevealed");
     const gone = resolveRecords(down.state, bare.ctx, CODES.weighedDown, "forced", down.id);
     expect(gone.state.cards[down.id]?.zone).toBe("encounterDiscard");
+  });
+
+  // Haldan is an objective; attached to the hero it counts as an objective attachment.
+  const attachedObjective = (t: ReturnType<typeof withAttachments>) => {
+    const spawned = spawn(t.state, CODES.haldan, { zone: "play", seat: 0 });
+    return { ...t, state: attachTo(spawned.state, spawned.id, t.hero), objective: spawned.id };
+  };
+
+  it("lets the controller choose an objective attachment too, and never itself while another non-objective attachment is on the hero", () => {
+    const t = attachedObjective(withAttachments([1, 0, 0]));
+    const attached = resolveRecords(t.state, t.ctx, CODES.weighedDown, "whenRevealed");
+    const offered: string[][] = [];
+    const readied = resolveRecords(attached.state, t.ctx, CODES.weighedDown, "forced", attached.id, (state) => {
+      if (state.window?.kind !== "choose") return "";
+      offered.push([...state.window.options]);
+      return state.window.options[0] ?? "";
+    });
+    expect(offered).toHaveLength(1);
+    expect(offered[0]).toHaveLength(2);
+    expect(offered[0]).toContain(t.objective);
+    expect(offered[0]).not.toContain(attached.id);
+    expect(readied.state.cards[attached.id]?.zone).toBe("attached");
+  });
+
+  it("offers itself with the objective attachments when no other non-objective attachment is on the hero", () => {
+    const t = attachedObjective(withAttachments([0, 0, 0]));
+    const attached = resolveRecords(t.state, t.ctx, CODES.weighedDown, "whenRevealed");
+    const offered: string[][] = [];
+    resolveRecords(attached.state, t.ctx, CODES.weighedDown, "forced", attached.id, (state) => {
+      if (state.window?.kind !== "choose") return "";
+      offered.push([...state.window.options]);
+      return state.window.options[0] ?? "";
+    });
+    expect(offered).toHaveLength(1);
+    expect([...(offered[0] ?? [])].sort()).toEqual([attached.id, t.objective].sort());
   });
 });

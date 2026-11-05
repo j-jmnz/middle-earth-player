@@ -7,11 +7,12 @@ import { campaign, upanduin } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
 
-// Test helper. A whole game of Journey Up the Anduin in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// Test helper. A whole game of Journey Up the Anduin in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest) and the decks free
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players engage the enemies and attack the Evil Creatures first (they keep the stages shut), one hero quests, nobody defends, a choice takes
+// the first option (or the last, as the policy says), and the Resolution's offer is answered by the policy.
 export const UPANDUIN_POLICY: PolicyOptions = { scout: "q3", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type UpanduinDecks = "strong" | "weak" | "brittle";
+// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat.
+export type UpanduinDecks = "strong" | "weak";
 
 export const upanduinLoadout = fillerLoadout;
 
@@ -31,8 +32,8 @@ export type UpanduinPolicy = {
 export const DEFAULT_POLICY: UpanduinPolicy = { choose: "first", resolve: "first", act: false };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
-export function upanduinIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: UpanduinPolicy = DEFAULT_POLICY): PlayerIntent {
+// `options`: the auto-player's own policy for the answers this one does not give; the Maestro fixtures (scripts/e2e/journey-up-the-anduin.ts) play real decklists, so they turn card play on.
+export function upanduinIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: UpanduinPolicy = DEFAULT_POLICY, options: PolicyOptions = UPANDUIN_POLICY): PlayerIntent {
   // The Resolution's offer (Turayn joins the pool for a player, or the oath line): the first option is the ally, the last the line.
   if (state.window?.kind === "resolution") {
     const options = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
@@ -61,7 +62,7 @@ export function upanduinIntent(state: ScenarioState, ctx: ReduceContext, memory:
   }
   const engage = engageOneEach(state, ctx, 6);
   if (engage) return engage;
-  return nextIntent(state, ctx, { ...UPANDUIN_POLICY, act: policy.act }, memory, legalIntents(state, ctx));
+  return nextIntent(state, ctx, { ...options, act: policy.act }, memory, legalIntents(state, ctx));
 }
 
 export type UpanduinGame = PlayedGame;
@@ -70,7 +71,7 @@ export type UpanduinGame = PlayedGame;
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type UpanduinGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: UpanduinDecks; outcome: "won" | "lost"; policy?: Partial<UpanduinPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 
-// TODO: the games to pin, a few wins (true solo and two-handed, Normal and Easy, a Mode card, after the earlier parts) and a few losses (each way the scenario can be lost), each on a fixed seed.
+// The pinned games: wins (true solo and two-handed, Normal and Easy, both Resolution offers, treasures) and losses on threat, each on a fixed seed.
 export const UPANDUIN_GOLDENS: readonly UpanduinGolden[] = [
   { name: "true solo, won, Turayn joins the pool", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, Easy, won, the oath line", seatCount: 1, seed: 8, difficulty: "Easy", decks: "strong", outcome: "won", policy: { resolve: "last" } },
@@ -86,7 +87,7 @@ const game = campaignGame<UpanduinDecks, UpanduinPolicy>({
   campaign,
   scenario: upanduin,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
+  // The scenario's cards, the cards its campaign card places, Haldan and the treasures the campaign card can attach.
   codes: [...upanduin.cards.map((card) => card.code), ...upanduin.campaignPlaced, "18070", "12196", "12197", "12198", "12199", "12200", "12201", "12202", "12203", "12204"],
   intent: upanduinIntent,
   policy: DEFAULT_POLICY,

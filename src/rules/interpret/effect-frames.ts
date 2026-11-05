@@ -15,7 +15,8 @@ import { runInstruction, type ReduceContext } from "./interpret.ts";
 import { runEncounterItem } from "../families/encounter/items.ts";
 import { chooseEach } from "../families/deck/each.ts";
 import { lookedDeckSeat } from "../families/deck/rules.ts";
-import { pickCandidates } from "./pick.ts";
+import { feedsDiscard, pickCandidates } from "./pick.ts";
+import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, withSeat } from "../core/state.ts";
 import { offerResponses } from "../windows/responses.ts";
@@ -271,7 +272,7 @@ function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Re
   if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
   // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck/each.ts).
   if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
-  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null });
+  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null, discards: feedsDiscard(instruction.instructions) });
   const cause = item.cause ? { cause: item.cause } : {};
   const expanded = ids.flatMap((id) => [
     { instruction: { verb: "Pick" as const, pick: instruction.pick }, seat: item.seat, chosen: id, ...cause },
@@ -296,7 +297,9 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
   const instruction = item.instruction;
   const data = topFrame(state)?.data;
   if (instruction.verb !== "DiscardFromHand" || data?.kind !== "effect") return state;
-  const count = Math.min(resolveAmount(state, instruction.amount, frameScope(state, item.seat, frame.cardId), ctx), state.seats[item.seat]?.hand.length ?? 0);
+  // A card a player card cannot discard (Lost in the Wild, 18026:A:1) is not one of the cards that can be discarded.
+  const discardable = (state.seats[item.seat]?.hand ?? []).filter((held) => !barredFromPlayerDiscard(state, ctx, held, frame.cardId)).length;
+  const count = Math.min(resolveAmount(state, instruction.amount, frameScope(state, item.seat, frame.cardId), ctx), discardable);
   const cause = item.cause ? { cause: item.cause } : {};
   const pick = { verb: "Pick" as const, pick: { type: "card" as const, control: "you" as const, from: "hand" as const } };
   const expanded = Array.from({ length: count }, (): QueueItem[] => [
@@ -314,7 +317,7 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, seat: nu
   // after this one", data/printed/fellowship-of-the-ring.json 142047:A:2, 141072:A:2).
   if (sourceId && enemy?.zone === "staging") {
     if (attackBarred(state, sourceId, seat) || state.seats[seat]?.eliminated) return state;
-    const stagedBegun = beginEnemyAttack(dealForAttack(state, sourceId, steps), seat, sourceId, ctx, steps, true);
+    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps) : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, true);
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
   }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
@@ -332,7 +335,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
   // The actor chooses, unless the card says the first player does.
   const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
-  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants);
+  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked" });
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctByCode(state, found);
   let chosen = item.chosen;
   if (!chosen) {

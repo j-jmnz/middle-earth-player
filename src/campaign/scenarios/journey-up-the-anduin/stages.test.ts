@@ -5,7 +5,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { restricted, travelBlocked } from "../../../rules/interpret/restrictions.ts";
 import { heldAmount, updateCard } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
+import { reduce } from "../../../rules/engine/reduce.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { doRefresh } from "../../../rules/engine/refresh.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { CODES, finish, idOf, legalIntents, loadUpanduinWorld, resolveRecords, send, start, upanduinTable, type PlayerIntent, type Run, type UpanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
 
@@ -127,6 +129,14 @@ describe("18068 The Passage of the Ford", () => {
     expect(travelBlocked(ready.state, ready.ctx, idOf(ready.state, CODES.theOldFord))).toBe(false);
   });
 
+  it("names the stage, what it needs and what it has when it refuses travel to The Old Ford, and says nothing of progress for another location", () => {
+    const t = upanduinTable(world, { stage: "18068", progress: 2, phase: "Travel", staging: [CODES.theOldFord, CODES.banksOfTheAnduin] });
+    const refused = reduce(t.state, { type: "Travel", locationId: idOf(t.state, CODES.theOldFord) }, t.ctx);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) expect(refused.reason).toBe("The Passage of the Ford: the players cannot travel here until the stage has 5 progress (2 now)");
+    expect(reduce(t.state, { type: "Travel", locationId: idOf(t.state, CODES.banksOfTheAnduin) }, t.ctx).ok).toBe(true);
+  });
+
   it("adds the top Evil Creatures card to the staging area at the beginning of each quest phase", () => {
     const t = upanduinTable(world, { stage: "18068", evilCreatures: [CODES.hillTroll] });
     const run = resolveRecords(t.state, t.ctx, "18068", "forced", idOf(t.state, "18068"));
@@ -182,6 +192,19 @@ describe("18069 Woodmen Village and 18070 Haldan", () => {
     const freed = settle(moveCard(settled, troll, { zone: "encounterDiscard" }), t.ctx, []);
     expect(freed.cards[village]).toMatchObject({ controller: freed.firstPlayer });
     expect(freed.cards[village]?.zone).toBe("play");
+  });
+
+  it("passes to the new first player when the refresh phase moves the token, so 18067 still sees the first player control him", () => {
+    const t = upanduinTable(world, { stage: "18067", play: [CODES.haldan], seats: 2 });
+    const haldan = idOf(t.state, CODES.haldan);
+    const settled = settle(t.state, t.ctx, []);
+    expect(settled.cards[haldan]?.controller).toBe(0);
+    expect(restricted(settled, t.ctx, "advance")).toHaveLength(0);
+    const nextRound = settle(doRefresh(settled, t.ctx, []), t.ctx, []);
+    expect(nextRound.firstPlayer).toBe(1);
+    expect(nextRound.cards[haldan]).toMatchObject({ zone: "play", controller: 1 });
+    expect(nextRound.cards[haldan]?.owner ?? null).toBeNull();
+    expect(restricted(nextRound, t.ctx, "advance")).toHaveLength(0);
   });
 
   it("does not exhaust to quest while there is an active location", () => {

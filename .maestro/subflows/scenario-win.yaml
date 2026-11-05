@@ -5,8 +5,9 @@ appId: com.middleearth.lcg
 # assertions before or after the call (`.maestro/scenarios/<scenario-id>/`). This folder is outside the `flows` globs of `.maestro/config.yaml`, so
 # `maestro test .maestro` does not run it on its own.
 # Env: FIXTURE (the fixture name, src/campaign/fixtures/registry.ts), SCENARIO_ID (the scenario's id, data/scenarios).
-# Optional env: TABLE_WIDGET (the testID of one widget of the scenario's own table, read while the victory is on it: the Dream-chaser scenarios' heading-value). Optional env: CHOICE_ID, CHOICE_PROMPT, CHOICE_CONSEQUENCE (all three or none). CHOICE_ID is the code of the card the Resolution's one choice offers,
-# CHOICE_PROMPT the choice's eyebrow text, CHOICE_CONSEQUENCE the sentence the confirm line shows once the card is chosen (a regular expression).
+# Optional env: NO_XP (any non-empty value: the campaign has no XP, so the path shows no XP line and no Spend XP button; a flow that does not pass it asserts both). Optional env: TABLE_WIDGET (the testID of one widget of the scenario's own table, read while the victory is on it: the Dream-chaser scenarios' heading-value). Optional env: CHOICE_ID, CHOICE_PROMPT, CHOICE_CONSEQUENCE (all three or none). CHOICE_ID is the code of the card the Resolution's one choice offers,
+# CHOICE_PROMPT the choice's eyebrow text, CHOICE_CONSEQUENCE the sentence the confirm line shows once the card is chosen (a regular expression). The screen has two Confirm steps: the first sends the choice, and the second, under the settled sentence
+# ("Confirming records ..."), writes the log.
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/${FIXTURE}"
@@ -40,7 +41,7 @@ appId: com.middleearth.lcg
     visible:
       id: resolution
     timeout: 30000
-# A campaign card whose Resolution asks one choice: the card is chosen and the confirm line names it. One that asks none goes straight to confirm.
+# A campaign card whose Resolution asks one choice: the card is chosen, the confirm line names it, the first Confirm sends the choice and the screen settles on what the log will hold. One that asks none goes straight to the final confirm.
 - runFlow:
     when:
       true: "${typeof CHOICE_ID !== 'undefined' && CHOICE_ID !== ''}"
@@ -53,6 +54,13 @@ appId: com.middleearth.lcg
       - assertVisible:
           id: resolution-consequence
           text: "${CHOICE_CONSEQUENCE}"
+      - tapOn:
+          id: resolution-confirm
+      - extendedWaitUntil:
+          visible:
+            id: resolution-consequence
+            text: "Confirming records.*"
+          timeout: 15000
 - tapOn:
     id: resolution-confirm
 - extendedWaitUntil:
@@ -62,8 +70,12 @@ appId: com.middleearth.lcg
 - assertVisible:
     id: node-${SCENARIO_ID}-status
     text: "Won.*"
-# The XP the Resolution gave is written: the line reads it and there is XP to spend.
-- assertVisible:
-    id: xp-line
-- assertVisible:
-    id: xp-open
+# The XP the Resolution gave is written: the line reads it and there is XP to spend. A campaign without XP (Ered Mithrin) passes NO_XP.
+- runFlow:
+    when:
+      true: "${typeof NO_XP === 'undefined' || NO_XP === ''}"
+    commands:
+      - assertVisible:
+          id: xp-line
+      - assertVisible:
+          id: xp-open

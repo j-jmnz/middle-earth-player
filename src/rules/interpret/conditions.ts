@@ -63,6 +63,8 @@ export type Scope = {
   dealt?: number;
   // The damage the attack sent on past its defender (excessToShip).
   excess?: number;
+  // The attack an `attackResolved` event answers dealt its enemy a shadow card with no effect, which was discarded when it resolved (18022:A:1).
+  shadowBlank?: boolean;
 };
 
 // The card a `matches` condition reads.
@@ -355,11 +357,16 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return host != null && (host === state.activeLocation || host === state.secondActiveLocation);
     }
     case "shadowBlank":
-      return shadowCards(scope.sourceId ? state.cards[scope.sourceId] : undefined).some((id) => {
-        const code = state.cards[id]?.code;
-        return code != null && !ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "shadow");
-      });
+      return scope.shadowBlank === true || shadowBlankOf(state, scope.sourceId, ctx);
   }
+}
+
+/** Whether the enemy holds a shadow card with no shadow effect. */
+export function shadowBlankOf(state: ScenarioState, enemyId: string | null, ctx: Pick<ReduceContext, "effects">): boolean {
+  return shadowCards(enemyId ? state.cards[enemyId] : undefined).some((id) => {
+    const code = state.cards[id]?.code;
+    return code != null && !ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "shadow");
+  });
 }
 
 // An enemy engaged with the seat (`you`) or with another player (`other`).

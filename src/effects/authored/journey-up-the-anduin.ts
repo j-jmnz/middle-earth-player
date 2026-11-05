@@ -19,6 +19,10 @@ const X_RESOURCES: Condition = {
   ],
 };
 const ACTIVE_LOCATION = { kind: "canPick", pick: { type: "location", control: "any", active: true } } as const;
+// Weighed Down (18027:A:1): an attachment on the hero other than itself, an objective one too; "no other non-objective attachments" lets it choose itself.
+const OTHER_ATTACHMENT = { type: "card", control: "any", attachedTo: "host", other: true } as const;
+const ANY_ATTACHMENT = { type: "card", control: "any", attachedTo: "host" } as const;
+const HAS_OTHER_NON_OBJECTIVE = { kind: "canPick", pick: { type: "card", control: "any", attachedTo: "host", nonObjective: true, other: true } } as const;
 const CONDITION_ATTACHMENT = { verb: "CountsAs", cardType: "attachment", trait: "Condition" } as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
@@ -42,7 +46,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "120165:resolution:1", cardCode: "120165", lines: ["120165:B:1"], timing: "resolution", instructions: [{ verb: "BoonAllyOrLogLine", ally: "12166", line: "turayn" }] },
   { id: "120165:resolution:2", cardCode: "120165", lines: ["120165:B:2"], timing: "resolution", instructions: [{ verb: "DiscoverTreasure" }] },
-  { id: "120165:resolution:3", cardCode: "120165", lines: ["120165:B:3"], timing: "resolution", instructions: [{ verb: "AddEncounterToPool", codes: ["12167"] }, { verb: "AddEncounterToPool", codes: ["01081", "01082", "01083", "01084", "01085"], inPlay: true }] },
+  { id: "120165:resolution:3", cardCode: "120165", lines: ["120165:B:3"], timing: "resolution", instructions: [{ verb: "AddEncounterToPool", codes: ["12167"] }, { verb: "AddEncounterToPool", fromDeck: "evilCreatures" }] },
 
   // 18016 The Old Ford: 5 more quest points for each enemy in play; becoming the active location, each enemy in the staging area attacks the first player, one after the other.
   { id: "18016:constant:1", cardCode: "18016", lines: ["18016:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { count: { type: "enemy", control: "any", staging: true }, times: 5 }, until: "whileSourceInPlay", target: "self" }] },
@@ -175,7 +179,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "18025:shadow:1", cardCode: "18025", lines: ["18025:A:3"], timing: "shadow", instructions: [{ verb: "RaiseThreat", amount: { count: { type: "enemy", control: "any", engaged: "you" } }, who: "actor" }] },
 
   // 18026 Lost in the Wild: the player with the most cards in hand among those holding no copy adds it to their hand, where player card effects cannot discard it and playing a card discards the hand.
-  { id: "18026:whenRevealed:1", cardCode: "18026", lines: ["18026:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSourceToHandOfMost" }, { verb: "Undiscardable" }] },
+  { id: "18026:whenRevealed:1", cardCode: "18026", lines: ["18026:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSourceToHandOfMost" }] },
+  // "While in a player's hand, Lost in the Wild gains: Cannot be discarded by player card effects" (the marker constantVerbCodes reads; families/wilderland/pick.ts).
+  { id: "18026:constant:1", cardCode: "18026", lines: ["18026:A:1"], timing: "constant", instructions: [{ verb: "Undiscardable" }] },
   {
     id: "18026:forced:1",
     cardCode: "18026",
@@ -190,7 +196,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "DiscardEach", pick: { type: "card", control: "you", from: "hand" } }, { verb: "Discard", target: { kind: "self" } }],
   },
 
-  // 18027 Weighed Down: it attaches to the hero with the most attachments that it is not on, which exhausts; as a Condition attachment, when that hero readies its controller chooses and discards one of its attachments (Weighed Down only when it has no other non-objective one).
+  // 18027 Weighed Down: it attaches to the hero with the most attachments that it is not on, which exhausts; as a Condition attachment, when that hero readies its controller chooses and discards one of its attachments (Weighed Down itself only when it has no other non-objective one).
   { id: "18027:whenRevealed:1", cardCode: "18027", lines: ["18027:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "hero", control: "mostAttachments" } }, { verb: "Exhaust", target: { kind: "ref", ref: "host" } }] },
   { id: "18027:constant:1", cardCode: "18027", lines: ["18027:A:1"], timing: "constant", instructions: [CONDITION_ATTACHMENT] },
   {
@@ -201,9 +207,16 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "readied",
     subject: "host",
     instructions: [
-      { verb: "Pick", pick: { type: "card", control: "any", attachedTo: "host", nonObjective: true, other: true }, when: { kind: "canPick", pick: { type: "card", control: "any", attachedTo: "host", nonObjective: true, other: true } } },
-      { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "card", control: "any", attachedTo: "host", nonObjective: true, other: true } } },
-      { verb: "Discard", target: { kind: "self" }, when: { kind: "not", condition: { kind: "canPick", pick: { type: "card", control: "any", attachedTo: "host", nonObjective: true, other: true } } } },
+      // One option is legal: read before anything is discarded, so choosing an attachment never opens the other.
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          { id: "other", requires: HAS_OTHER_NON_OBJECTIVE, instructions: [{ verb: "Pick", pick: OTHER_ATTACHMENT }, { verb: "Discard", target: { kind: "picked" } }] },
+          // Weighed Down itself is chosen only when no other non-objective attachment is on the hero: it and any objective attachment are the choices.
+          { id: "self", requires: { kind: "not", condition: HAS_OTHER_NON_OBJECTIVE }, instructions: [{ verb: "Pick", pick: ANY_ATTACHMENT }, { verb: "Discard", target: { kind: "picked" } }] },
+        ],
+      },
     ],
   },
 

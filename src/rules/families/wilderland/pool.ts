@@ -38,8 +38,8 @@ export function discoverTreasures(state: ScenarioState, ctx: ReduceContext): Res
  * The copies of a code in play that the pool does not already hold: the game dealt the pool's tallied copies into the encounter deck (they are in the pool already), so of the copies in play at most
  * the ones the scenario itself dealt are new. A copy has no identity, so the pool's copies are taken to be in play only as far as the scenario's own cannot fill the play areas.
  */
-function newCopiesInPlay(state: ScenarioState, code: string): number {
-  const dealt = Object.values(state.cards).filter((card) => card.code === code);
+function newCopiesInPlay(state: ScenarioState, code: string, deck?: string): number {
+  const dealt = Object.values(state.cards).filter((card) => card.code === code && (deck == null || card.deck === deck));
   const own = Math.max(0, dealt.length - (state.campaignFacts?.encounterPool?.[code] ?? 0));
   return Math.min(own, dealt.filter((card) => inPlay(card.zone)).length);
 }
@@ -47,8 +47,10 @@ function newCopiesInPlay(state: ScenarioState, code: string): number {
 /** AddEncounterToPool: a copy of each code, or a copy for each card of the code in play that the pool does not hold already (emce.campaign-pool-encounter). The log caps the copies at what one collection holds. */
 export function addEncounterCards(state: ScenarioState, instruction: Verb<"AddEncounterToPool">): ResolutionLog {
   let tally = poolTally(state);
-  for (const code of instruction.codes) {
-    const copies = instruction.inPlay ? newCopiesInPlay(state, code) : 1;
+  // `fromDeck`: the codes of the deck's cards in play, found in the order the cards entered play.
+  const codes = instruction.codes ?? [...new Set(Object.values(state.cards).filter((card) => card.deck === instruction.fromDeck && inPlay(card.zone)).map((card) => card.code))];
+  for (const code of codes) {
+    const copies = instruction.inPlay || instruction.fromDeck ? newCopiesInPlay(state, code, instruction.fromDeck) : 1;
     if (copies > 0) tally = withCopies(tally, code, copies);
   }
   return { ...state.resolutionLog, encounterPool: tally };

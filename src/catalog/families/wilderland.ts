@@ -28,8 +28,9 @@ const VERBS = [
   // The players choose between the two, the first player answering for the group; there is no default. `ally` joins the pool (any player may add it to their deck), or `line` is recorded.
   z.strictObject({ verb: z.literal("BoonAllyOrLogLine"), ally: code, line: z.enum(ALLY_LINES), ...when }),
   // Resolution: encounter cards join the Campaign Pool ("Add A Growing Threat and each Evil Creatures enemy in play to the campaign pool", 120165:B; emce.campaign-pool-encounter): one copy of each of `codes`,
-  // or with `inPlay` one copy of a code for each card with that code in play that the pool did not deal into this game. The log tallies the copies, never past what one collection holds.
-  z.strictObject({ verb: z.literal("AddEncounterToPool"), codes: z.array(code).min(1), inPlay: z.boolean().optional(), ...when }),
+  // or with `inPlay` one copy of a code for each card with that code in play that the pool did not deal into this game, or with `fromDeck` (not `codes`) one copy of each card dealt from that deck in play ("each Evil Creatures enemy in play",
+  // a card of the deck whatever its code). The log tallies the copies, never past what one collection holds.
+  z.strictObject({ verb: z.literal("AddEncounterToPool"), codes: z.array(code).min(1).optional(), fromDeck: z.literal("evilCreatures").optional(), inPlay: z.boolean().optional(), ...when }),
   // Resolution: cards leave the Campaign Pool. A record names exactly one of `codes` and `choice` (checked on the effect: src/catalog/effect-schema.ts). `codes` reaches only the encounter cards the pool tallies, not the pool's own cards: every copy of these encounter cards ("Remove A Growing Threat from the campaign pool", 12193:B). `choice: "eachPlayerNonBurden"`: each player in turn may
   // remove one card that is not a burden, a card of the pool or an encounter card the pool tallies ("Each player may remove a non-burden card from the campaign pool", 12187:B); a player may decline.
   z.strictObject({ verb: z.literal("RemoveFromPool"), codes: z.array(code).min(1).optional(), choice: z.literal("eachPlayerNonBurden").optional(), ...when }),

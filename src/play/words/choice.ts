@@ -27,6 +27,7 @@ import { islandPickWords, islandWords } from "./island.ts";
 import { aflameBranchWords, aflamePickWords, aflameWords, type BranchNow } from "./aflame.ts";
 import { stormcallerBranchWords, stormcallerWords } from "./stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
+import { wilderlandBranchWords } from "./wilderland.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -38,7 +39,6 @@ export type ChoiceNames = {
 };
 
 type ChooseInstruction = Extract<Instruction, { verb: "Choose" }>;
-type PickInstruction = Extract<Instruction, { verb: "Pick" }>;
 
 const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 const PLURALS: Readonly<Record<string, string>> = { hero: "heroes", ally: "allies", enemy: "enemies" };
@@ -333,14 +333,14 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? wilderlandBranchWords(choose, optionId, now);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
   if (whole) return whole;
   // A run of "pick a hero, remove it from the quest" is one decision: how many heroes leave the quest.
   const removals = option.instructions.filter((instruction) => instruction.verb === "RemoveFromQuest").length;
-  const picks = option.instructions.filter((instruction): instruction is PickInstruction => instruction.verb === "Pick");
+  const picks = option.instructions.filter((instruction): instruction is Extract<Instruction, { verb: "Pick" }> => instruction.verb === "Pick");
   if (removals > 0 && removals === picks.length && removals * 2 === option.instructions.length) {
     const noun = PICK_NOUNS[picks[0]?.pick.type ?? "hero"] ?? "character";
     const control = picks[0]?.pick.control === "you" ? " you control" : "";

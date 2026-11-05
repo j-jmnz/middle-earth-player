@@ -60,13 +60,10 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
         const most = Math.max(0, ...hosts.map((id) => state.cards[id]?.attachments.length ?? 0));
         return instruction.to.control === "mostAttachments" ? hosts.filter((id) => (state.cards[id]?.attachments.length ?? 0) === most) : hosts;
       }
-      // The enemy making the attack in progress (18018:A:2).
-      if (instruction.to.kind === "attackingEnemy") {
-        const attacker = state.pendingAttack?.enemyId;
-        return attacker != null && state.cards[attacker] != null && free(attacker) ? [attacker] : [];
-      }
       // A Ship objective: the Limit-1 check of a hero or enemy host does not apply (a ship may carry more than one Taking on Water).
       if (instruction.to.kind === "ship") return instruction.to.defender ? defendingShip(state, ctx) : controlledShips(state, ctx);
+      // An attackingEnemy host is attached inline by the wilderland family (18018:A:2), never offered here.
+      if (instruction.to.kind !== "enemy") return [];
       const trait = instruction.to.trait;
       return [...state.staging, ...livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? [])].filter((id) => hasEnemyType(state, id, ctx) && hasTrait(state, id, trait, ctx) && free(id));
     }

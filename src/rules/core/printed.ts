@@ -276,8 +276,9 @@ export function fromEncounterDeck(printed: PrintedCard): boolean {
   return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
 }
 
+// A treasure is a player card ("Treasure is a new type of player card", emce.treasure).
 export function isPlayerType(printed: PrintedCard): boolean {
-  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract";
+  return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract" || printed.type === "treasure";
 }
 
 const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign", "nightmare", "player-side-quest", "contract"];

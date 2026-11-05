@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~64.7K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~64.9K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,7 +92,7 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–680 Dream-chaser (~13.1K)
-  - 681–695 Ered Mithrin (~1.7K)
+  - 681–695 Ered Mithrin (~1.9K)
   - 696–704 Nightmare (~420)
   - 705–743 Deckbuilding (~1.8K) ← 1
   - 744–822 Effects (~3.2K)
@@ -105,7 +105,7 @@ Read the sections your task touches.
   - 863–888 Persistence and shipping (~1.7K)
   - 889–930 Screens (~4.7K) ← 2
     - 915–930 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~29.9K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~30.1K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -129,7 +129,7 @@ Read the sections your task touches.
   - 258–261 One answer, one tap (~240)
   - 262–265 Stops and Always use (~250)
   - 266–269 Guide (~120)
-  - 270–280 Choice tray (~1.1K) ← 8
+  - 270–280 Choice tray (~1.3K) ← 8
   - 281–294 Reading panels (~1.5K) ← 6
   - 295–304 Phase carousel (~680)
   - 305–310 Quest advance (~530) ← 1
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~9.1K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.5K tok)
   - 5–17 Rules (~620)
   - 18–89 Phases (~2.6K)
-  - 90–198 Open items (~5.4K)
-    - 92–106 Fixtures and Maestro (~640)
-    - 107–147 Rules and engine (~1.6K)
-    - 148–172 Screens and code (~1.3K)
-    - 173–198 Phone and tablet checks (~1.8K)
-  - 199–215 Standing decisions (~430)
+  - 90–203 Open items (~5.7K)
+    - 92–107 Fixtures and Maestro (~720)
+    - 108–151 Rules and engine (~1.8K)
+    - 152–176 Screens and code (~1.3K)
+    - 177–203 Phone and tablet checks (~1.9K)
+  - 204–220 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -209,7 +209,7 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.3K tok)
 - `docs/phases/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
 - `docs/phases/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~2.5K tok)
-- `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~670 tok)
+- `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~1.2K tok)
 - `docs/phases/phase-53-lost-in-mirkwood.md` — Phase 53 — Lost in Mirkwood (~1.2K tok)
 - `docs/phases/phase-54-the-kings-quest.md` — Phase 54 — The King's Quest (~1.1K tok)
 - `docs/phases/phase-55-the-withered-heath.md` — Phase 55 — The Withered Heath (~1.1K tok)

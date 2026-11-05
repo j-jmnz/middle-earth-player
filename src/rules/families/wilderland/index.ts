@@ -29,7 +29,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ClaimRandomTreasure":
       return claimRandomTreasure(state, instruction, focus, ctx, steps);
     case "SetAsideDiscardForPool":
-      return setAsideDiscardForPool(state, instruction, ctx);
+      return setAsideDiscardForPool(state, instruction, focus, ctx, steps);
     case "FlipOver":
       return flipOver(state, instruction, focus);
     case "AddSourceToHandOfMost":

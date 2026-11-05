@@ -1,5 +1,4 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
-import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { isStatCondition, type Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
@@ -20,6 +19,7 @@ import { afterProgress } from "../quest/stage-reveal.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
+import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
 import { attachTo, cardsUnder, moveCard } from "../core/zones.ts";

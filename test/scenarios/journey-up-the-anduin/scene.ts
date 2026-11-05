@@ -12,7 +12,6 @@ import { addStandIns, entry, fightEnemy, finish, send, start, HERO, HERO2, HERO3
 
 // Shared scene for the Journey Up the Anduin effect tests (ered-mithrin part 1, campaign card 120165). Test-only. The heroes are plain numbers (no player card text), so what a test shows comes from
 // the scenario's records and the engine. The helpers every scene shares (id lookups, answers, the fight) are test/harness/scene-kit.ts; this file keeps the scenario's codes, its layout and its table.
-// TODO: describe the cards that need their own layout fields (a second active location, a grotto deck, an island map) and add them to the layout and the table below.
 export const upanduin: ScenarioData = loadScenario("journey-up-the-anduin");
 export const campaign: CampaignData = loadCampaign("ered-mithrin");
 export const dealt: ScenarioData = campaignScenario(upanduin);

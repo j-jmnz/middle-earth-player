@@ -12,7 +12,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { LogMark } from "./log.ts";
 import { detachLine, grappleLine } from "../words/grapple.ts";
 import { boardingWords } from "../words/sea.ts";
-import { discoverLines, discoverTitle } from "../words/wilderland.ts";
+import { discoverLines, discoverTitle, POOL_COPY } from "../words/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -207,6 +207,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         close();
         return;
       }
+      // A Growing Threat sets a card of the discard pile aside (12167:A:2): the card, and what winning does with it.
+      case "setAsideForPool":
+        if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
+        line(`${names.card(step.sourceId)} sets ${names.card(step.cardId)} aside`, null, [step.cardId]);
+        line(POOL_COPY);
+        return;
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck");
         return;
