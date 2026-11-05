@@ -18,6 +18,7 @@ import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { partBehindCurrentStatus } from "../../../../test/harness/next-part.ts";
 import { levelOf, xpFacts } from "../../xp.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let ctx: ReduceContext;
 
@@ -146,7 +147,7 @@ describe("A Storm on Cobas Haven in the Dream-chaser campaign", () => {
     const lost = playGolden({ name: "lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost" }, world.ctx).state;
     expect(lost.lost).toBe(true);
     const log = { ...emptyLog(1), completed: campaign.scenarios.slice(0, 7) };
-    expect(applyResolution(log, lost.scenarioId, lost, world.cards)).toBe(log);
+    expect(applyResolution(log, lost.scenarioId, lost, world.cards, NO_COPY_LIMITS)).toBe(log);
     expect(campaignPath(campaign, {}, log).find((node) => node.id === "a-storm-on-cobas-haven")?.status).toBe("current");
   });
 });

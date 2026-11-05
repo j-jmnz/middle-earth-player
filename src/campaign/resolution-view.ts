@@ -8,14 +8,17 @@
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
-import { answeredSeats, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
-import { removalCode, LOG_LINE } from "../rules/families/wilderland/pool.ts";
+import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
+import { isEncounterOption, LOG_LINE, poolTally, removalCode, removalSeat } from "../rules/families/wilderland/pool.ts";
 import { ALLY_LINE_FACTS, type AllyLine } from "../catalog/ally-lines.ts";
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
+import { cappedTally } from "./wilderland.ts";
 
-export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null };
+// `label`: the words on the tile ("Tireless Ranger on Sam Gamgee", "Turayn for Player 1"). `wide`: a tile with no card, laid in a row of its own under the card tiles (the log line). `tag` is a muted
+// word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
+export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number };
 
 // The decline of an optional choice: the reducer's `skip` option, with its words ("No boon").
 export type ResolutionDecline = { optionId: string; label: string };
@@ -38,6 +41,8 @@ export type ResolutionView =
       seatLabel: string | null;
       // What is chosen: boon, burden, card or captive.
       noun: string;
+      // The boon ally the choice is about, when it is one (BoonAllyOrLogLine): what the log line is traded for.
+      ally: string | null;
       answered: readonly ResolutionAnswer[];
       tiles: readonly ResolutionTile[];
       decline: ResolutionDecline | null;
@@ -79,11 +84,25 @@ function poolChanges(state: ScenarioState, tally: Readonly<Record<string, number
   return { added, removed };
 }
 
+// A card of the Campaign Pool a player may remove: an encounter card the pool tallies (with its copies and a tag that tells it from the pool's own cards), or a card of the pool, told by its player's seat
+// when two players hold the same one (`shared`).
+function removalTile(world: World, optionId: string, tally: Readonly<Record<string, number>>, shared: boolean): ResolutionTile {
+  const code = removalCode(optionId);
+  const name = nameOf(world, code);
+  if (isEncounterOption(optionId)) {
+    const copies = tally[code] ?? 1;
+    return { optionId, code, name, hero: null, label: name, tag: copies > 1 ? `encounter card \u00b7 ${copies} copies` : "encounter card", copies };
+  }
+  const seat = removalSeat(optionId);
+  return { optionId, code, name, hero: null, label: shared && seat != null ? `${name} (Player ${seat + 1})` : name };
+}
+
 export function resolutionView(state: ScenarioState, world: World): ResolutionView {
   if (state.lost) return { kind: "lost", reason: state.lossReason };
   const settled = resolutionResult(state);
   if (settled) {
-    const changes = poolChanges(state, settled.encounterPool);
+    // The tally the log will hold: the copies are capped at what one collection holds (applyResolution).
+    const changes = poolChanges(state, settled.encounterPool ? cappedTally(settled.encounterPool, world.copies) : undefined);
     const gone = [...changes.removed, ...(settled.poolRemoved ?? []).map((item) => item.code)];
     return {
       kind: "settled",
@@ -102,8 +121,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   const window = state.window;
   if (!state.stageCleared || window?.kind !== "resolution") return { kind: "playing" };
   const instruction = state.resolution[window.step];
-  const asks = instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
-  if (!asks) return { kind: "playing" };
+  if (!asksPlayers(instruction)) return { kind: "playing" };
   let decline: ResolutionDecline | null = null;
   let eyebrow = "Name a captive";
   let noun = "captive";
@@ -118,25 +136,34 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     noun = kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
     eyebrow = instruction.to === "player" ? "Choose a player" : `Choose a ${noun}`;
   }
-  const tiles: ResolutionTile[] = legalIntents(state, contextOf(world)).flatMap((intent): ResolutionTile[] => {
+  const intents = legalIntents(state, contextOf(world));
+  const removable = instruction.verb === "RemoveFromPool" ? intents.flatMap((intent) => (intent.type === "ChooseResolution" && intent.optionId !== SKIP ? [removalCode(intent.optionId)] : [])) : [];
+  const tally = poolTally(state);
+  const tiles: ResolutionTile[] = intents.flatMap((intent): ResolutionTile[] => {
     if (intent.type !== "ChooseResolution") return [];
     if (intent.optionId === SKIP) {
-      decline = { optionId: SKIP, label: `No ${noun}` };
+      decline = { optionId: SKIP, label: instruction.verb === "RemoveFromPool" ? "Remove nothing" : `No ${noun}` };
       return [];
     }
     if (instruction.verb === "NameCaptives") {
       const code = state.cards[intent.optionId]?.code ?? intent.optionId;
-      return [{ optionId: intent.optionId, code, name: nameOf(world, code), hero: null }];
+      const name = nameOf(world, code);
+      return [{ optionId: intent.optionId, code, name, hero: null, label: name }];
     }
-    // The log line is a tile with no card: the line as the Campaign Log prints it.
-    if (instruction.verb === "BoonAllyOrLogLine" && intent.optionId === LOG_LINE) return [{ optionId: LOG_LINE, code: null, name: ALLY_LINE_FACTS[instruction.line].words, hero: null }];
-    if (instruction.verb === "RemoveFromPool") {
-      const code = removalCode(intent.optionId);
-      return [{ optionId: intent.optionId, code, name: nameOf(world, code), hero: null }];
+    // The log line is a tile with no card: the line as the Campaign Log prints it, in a row of its own.
+    if (instruction.verb === "BoonAllyOrLogLine" && intent.optionId === LOG_LINE) {
+      const words = ALLY_LINE_FACTS[instruction.line].words;
+      return [{ optionId: LOG_LINE, code: null, name: words, hero: null, label: words, wide: true }];
     }
+    if (instruction.verb === "RemoveFromPool") return [removalTile(world, intent.optionId, tally, state.seatCount > 1 && removable.filter((code) => code === removalCode(intent.optionId)).length > 1)];
     const [code = "", heroId] = intent.optionId.split(">");
-    const heroCode = heroId ? state.cards[heroId]?.code : undefined;
-    return [{ optionId: intent.optionId, code, name: nameOf(world, code), hero: heroCode ? nameOf(world, heroCode) : null }];
+    const hero = heroId ? state.cards[heroId] : undefined;
+    const heroCode = hero?.code;
+    const name = nameOf(world, code);
+    const heroName = heroCode ? nameOf(world, heroCode) : null;
+    // A card for a player (a boon ally, or Recurring Nightmare) joins that player's pool or deck, not the hero that names them: "Turayn for Player 1", the card alone in a solo game.
+    if (instruction.verb === "BoonAllyOrLogLine" || (instruction.verb === "ChooseCards" && instruction.to === "player")) return [{ optionId: intent.optionId, code, name, hero: heroName, label: state.seatCount > 1 && hero?.controller != null ? `${name} for Player ${hero.controller + 1}` : name }];
+    return [{ optionId: intent.optionId, code, name, hero: heroName, label: heroName ? `${name} on ${heroName}` : name }];
   });
   const eachSeat = instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || (instruction.verb === "ChooseCards" && instruction.who === "eachSeat");
   const first = window.seat === state.firstPlayer ? " (first player)" : "";
@@ -146,12 +173,15 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       const captive = state.resolutionLog.captives.find((item) => item.seat === seat);
       return { seat, words: captive ? nameOf(world, captive.hero) : `No ${noun}` };
     }
-    // The group's answer to a boon ally is the first player's; the removals of the pool are not kept by seat.
+    // The group's answer to a boon ally is the first player's; the removals of the pool are kept by seat.
     if (instruction.verb === "BoonAllyOrLogLine") {
       const ally = state.resolutionLog.earned.find((item) => item.step === window.step);
       return { seat, words: ally ? nameOf(world, ally.code) : ALLY_LINE_FACTS[instruction.line].words };
     }
-    if (instruction.verb === "RemoveFromPool") return { seat, words: "Answered" };
+    if (instruction.verb === "RemoveFromPool") {
+      const taken = state.resolutionLog.poolAnswers?.find((item) => item.seat === seat)?.option;
+      return { seat, words: taken == null || taken === SKIP ? "Nothing removed" : nameOf(world, removalCode(taken)) };
+    }
     const card = state.resolutionLog.earned.find((item) => item.step === window.step && item.seat === seat);
     return { seat, words: card ? cardWords(world, { code: card.code, hero: card.hero, seat }) : `No ${noun}` };
   });
@@ -163,6 +193,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     eyebrow,
     seatLabel: eachSeat && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
+    ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
     answered,
     tiles,
     decline,
@@ -186,10 +217,11 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
       return `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} shuffles it into their deck after drawing their starting hand, for the rest of the campaign.`;
     case "ally":
       return tile.code
-        ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign.`
-        : `\u201c${tile.name}\u201d is marked in the campaign log.`;
+        ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded.`
+        : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool.`;
     case "removal":
-      return `${tile.name} is removed from the campaign pool.`;
+      if (tile.copies == null) return `${tile.label} is removed from the campaign pool.`;
+      return tile.copies > 1 ? `One copy of ${tile.name} leaves the campaign pool (${tile.copies - 1} ${tile.copies === 2 ? "stays" : "stay"}).` : `${tile.name} leaves the campaign pool: it was the last copy.`;
   }
 }
 

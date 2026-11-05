@@ -13,7 +13,8 @@ import { settle } from "../../engine/machine.ts";
 import { legalIntents, reduce } from "../../engine/reduce.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, spawn } from "../../core/zones.ts";
-import { openResolution, resolutionResult } from "../../setup/resolution.ts";
+import { effectSchema } from "../../../catalog/boundary.ts";
+import { asksPlayers, openResolution, resolutionResult } from "../../setup/resolution.ts";
 import { freeOfEncounters } from "../objectives/index.ts";
 import { run } from "./index.ts";
 
@@ -210,6 +211,16 @@ describe("AddEncounterToPool and RemoveFromPool (emce.campaign-pool-encounter)",
     expect(result?.encounterPool).toEqual({ wolf: 2 });
   });
 
+  it("counts with `inPlay` only the copies the pool did not deal into the game", () => {
+    // The pool holds 1 wolf, dealt with the scenario's own: 2 wolves are in play, so the pool gains the 1 that was the scenario's, not both.
+    const { state } = table(1, 3, facts({ encounterPool: { wolf: 1 } }));
+    const dealt = spawn(spawn(state, "wolf", { zone: "staging" }).state, "wolf", { zone: "engaged", seat: 0 }).state;
+    expect(resolutionResult(won([{ verb: "AddEncounterToPool", codes: ["wolf"], inPlay: true }], dealt))?.encounterPool).toEqual({ wolf: 2 });
+    // Two wolves dealt (one the pool's) and one in play: a copy has no identity, so the pool gains one, never more than the scenario's own.
+    const one = spawn(spawn(state, "wolf", { zone: "staging" }).state, "wolf", { zone: "encounterDeck" }).state;
+    expect(resolutionResult(won([{ verb: "AddEncounterToPool", codes: ["wolf"], inPlay: true }], one))?.encounterPool).toEqual({ wolf: 2 });
+  });
+
   it("removes every copy of the cards named", () => {
     const { state } = table(1, 3, facts({ encounterPool: { growing: 2, wolf: 1 } }));
     expect(resolutionResult(won([{ verb: "RemoveFromPool", codes: ["growing"] }], state))?.encounterPool).toEqual({ wolf: 1 });
@@ -234,5 +245,24 @@ describe("AddEncounterToPool and RemoveFromPool (emce.campaign-pool-encounter)",
     const declined = resolutionResult(choose(won([{ verb: "RemoveFromPool", choice: "eachPlayerNonBurden" }], some), "skip"));
     expect(declined?.encounterPool).toBeUndefined();
     expect(declined?.poolRemoved).toBeUndefined();
+  });
+});
+
+describe("the records and the instructions that ask", () => {
+  const record = (instruction: Instruction) => ({ id: "x:resolution:1", cardCode: "x", lines: ["x:B:1"], timing: "resolution", instructions: [instruction] });
+
+  it("a RemoveFromPool record names exactly one of the cards and the choice", () => {
+    expect(effectSchema.safeParse(record({ verb: "RemoveFromPool", codes: ["growing"] })).success).toBe(true);
+    expect(effectSchema.safeParse(record({ verb: "RemoveFromPool", choice: "eachPlayerNonBurden" })).success).toBe(true);
+    expect(effectSchema.safeParse(record({ verb: "RemoveFromPool" })).success).toBe(false);
+    expect(effectSchema.safeParse(record({ verb: "RemoveFromPool", codes: ["growing"], choice: "eachPlayerNonBurden" })).success).toBe(false);
+  });
+
+  it("asksPlayers is true for an instruction that opens a window, and for a removal only when it has a choice", () => {
+    expect(asksPlayers({ verb: "BoonAllyOrLogLine", ally: "turayn", line: "turayn" })).toBe(true);
+    expect(asksPlayers({ verb: "RemoveFromPool", choice: "eachPlayerNonBurden" })).toBe(true);
+    expect(asksPlayers({ verb: "RemoveFromPool", codes: ["growing"] })).toBe(false);
+    expect(asksPlayers({ verb: "AddEncounterToPool", codes: ["wolf"] })).toBe(false);
+    expect(asksPlayers(undefined)).toBe(false);
   });
 });

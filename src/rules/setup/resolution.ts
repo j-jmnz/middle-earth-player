@@ -11,7 +11,7 @@ import { xpOf } from "../families/dreamchaser/index.ts";
 import { dealtCopies } from "../families/aflame/cards.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../core/state.ts";
-import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, discoverTreasures, removalOptions, removeEncounterCards } from "../families/wilderland/pool.ts";
+import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards } from "../families/wilderland/pool.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
 // one seat at a time, first player first; the rest settle on their own from the final state (Lust for the Ring
@@ -20,7 +20,12 @@ import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, di
 export const SKIP = "skip";
 
 // The instructions that open a window for the players: a card to take, a captive to name, a boon ally or its log line (BoonAllyOrLogLine), a card of the pool to remove (RemoveFromPool with a choice).
-type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" }>;
+export type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" }>;
+
+/** Whether the Resolution instruction asks the players: a card to take, a captive to name, a boon ally or its log line, a card of the pool to remove (a RemoveFromPool with no choice settles at once). */
+export function asksPlayers(instruction: Instruction | undefined): instruction is Choosing {
+  return instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
+}
 
 function seatOrder(state: ScenarioState): number[] {
   const living = livingSeats(state);
@@ -199,11 +204,6 @@ function remainingCodes(state: ScenarioState, instruction: Extract<Instruction, 
   return instruction.codes.filter((code) => !taken.has(code));
 }
 
-// A card for a player: one option for each player in the game, named by the first hero they control.
-function playerOptions(state: ScenarioState, codes: readonly string[]): string[] {
-  return codes.flatMap((code) => livingSeats(state).flatMap((index) => (state.seats[index]?.heroes[0] ? [`${code}>${state.seats[index]?.heroes[0]}`] : [])));
-}
-
 function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: number, ctx: ReduceContext): string[] {
   if (instruction.verb === "NameCaptives") {
     const named = new Set(state.resolutionLog.captives.map((item) => item.seat));
@@ -229,8 +229,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
 function asking(state: ScenarioState): { instruction: Choosing; seat: number } | null {
   if (state.window?.kind !== "resolution") return null;
   const instruction = state.resolution[state.window.step];
-  if (instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null)) return { instruction, seat: state.window.seat };
-  return null;
+  return asksPlayers(instruction) ? { instruction, seat: state.window.seat } : null;
 }
 
 // The seats that have already answered the open choice, in the order they answered (first player first).
@@ -271,7 +270,7 @@ export function applyResolution(state: ScenarioState, optionId: string): Scenari
   } else if (instruction.verb === "BoonAllyOrLogLine") {
     log = applyAllyOrLine(state, instruction, optionId, seat, step);
   } else if (instruction.verb === "RemoveFromPool") {
-    if (optionId !== SKIP) log = applyRemoval(state, optionId);
+    log = noteRemovalAnswer(optionId !== SKIP ? applyRemoval(state, optionId) : log, seat, optionId);
   } else if (optionId !== SKIP) {
     const [code = "", heroId] = optionId.split(">");
     const hero = heroId ? state.cards[heroId] : undefined;

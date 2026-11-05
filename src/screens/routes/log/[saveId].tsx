@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
-import { keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
+import { copiesMark, encounterSpeech, keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { MODE_CARD_NAME, type ModeCard } from "../../../campaign/xp";
 import { markedRows, markedSpeech, xpWords } from "../../../campaign/xp-view";
 import { cards } from "../../../catalog/schema";
@@ -40,7 +40,7 @@ function Row({ label, value, lines, onCard, testID, icon, speech }: { label: str
     <View className="py-2.5" style={{ borderBottomWidth: 1, borderBottomColor: withAlphaHex(palette.inkLine, RULE) }}>
       <View className="flex-row items-center gap-1">
         {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
-        <Text className="font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
+        <Text className="shrink font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
       {lines && onCard ? (
         <CardLines lines={lines} empty="None" onCard={onCard} testID={testID} className="mt-0.5 text-body text-ink" {...(speech ? { speech } : {})} />
@@ -166,8 +166,8 @@ export default function Log() {
           <Row label="Burdens" lines={pool("burden")} onCard={card} testID="log-burdens" />
           {wilderland ? <Row label="Treasures" lines={namesOnLines(wilderland.treasures, nameOf)} onCard={card} testID="log-treasures" /> : null}
           {wilderland ? <Row label="Unique Allies Protecting Wilderland" lines={wilderland.lines.map((words): Line => [{ text: words }])} onCard={card} testID="log-ally-lines" /> : null}
-          {wilderland ? <Row label="Beldis" lines={wilderland.beldis.map((words): Line => [{ text: words }])} onCard={card} testID="log-beldis" /> : null}
-          {wilderland ? <Row label="Encounter cards in the Campaign Pool" lines={wilderland.encounter.map((entry): Line => [cardSegment(entry.code, nameOf), { text: entry.copies > 1 ? ` \u00d7${entry.copies}` : "" }])} onCard={card} testID="log-pool-encounter" /> : null}
+          {wilderland ? <Row label="Beldis" lines={wilderland.beldis.map((row): Line => [{ text: `${row.prefix}${row.boxes}` }])} onCard={card} speech={wilderland.beldis.map((row) => row.speech).join(". ")} testID="log-beldis" /> : null}
+          {wilderland ? <Row label="Encounter cards in the Campaign Pool" lines={wilderland.encounter.map((entry): Line => [cardSegment(entry.code, nameOf), { text: copiesMark(entry.copies) }])} onCard={card} speech={encounterSpeech(wilderland.encounter, nameOf)} testID="log-pool-encounter" /> : null}
           <Row
             label="Captives"
             lines={log.captives.map((captive) => [cardSegment(captive.hero, nameOf), { text: save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : "" }])}

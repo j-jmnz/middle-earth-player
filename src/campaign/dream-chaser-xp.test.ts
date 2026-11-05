@@ -30,6 +30,7 @@ import { worldCodes, worldFrom, type World } from "./world.ts";
 import { mirkwoodLoadout, mirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/game.ts";
 import { campaign as mirkwoodCampaign, passage } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 import { gavinReturned, MODE_CARD_CODE, modeXp, spendXp, xpUnspentOf } from "./xp.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 
 // Rules: dcce.gaining-xp, dcce.scalable-upgradable, dcce.hard-expert, dcce.naasiyah (data/rules/entries.json). The Dream-chaser campaign shell: a
 // Resolution's GainXp lines, the XP the log keeps and the players spend, the Hard/Expert Mode card the deal places, the reprints a campaign game
@@ -112,29 +113,29 @@ describe("the log keeps the XP and the players spend it", () => {
 
   it("a won scenario writes its XP once, and a scenario already on the log is not granted again", () => {
     const state = won(lines, { seats: 2, victory: [THUNDERSTRUCK] });
-    const log = applyResolution(emptyLog(2), VOYAGE, state, cards);
+    const log = applyResolution(emptyLog(2), VOYAGE, state, cards, NO_COPY_LIMITS);
     expect(log.xpGained).toEqual({ [VOYAGE]: 4 });
     expect(xpUnspentOf(log)).toBe(4);
-    expect(applyResolution(log, VOYAGE, state, cards).xpGained).toEqual({ [VOYAGE]: 4 });
+    expect(applyResolution(log, VOYAGE, state, cards, NO_COPY_LIMITS).xpGained).toEqual({ [VOYAGE]: 4 });
   });
 
   it("never writes less than 0 XP, and a campaign with no XP line writes no XP", () => {
     const losing = won([{ verb: "GainXp", amount: -1 }]);
-    expect(applyResolution(emptyLog(1), VOYAGE, losing, cards).xpGained).toEqual({ [VOYAGE]: 0 });
-    expect(applyResolution(emptyLog(1), VOYAGE, won([]), cards).xpGained).toEqual({});
+    expect(applyResolution(emptyLog(1), VOYAGE, losing, cards, NO_COPY_LIMITS).xpGained).toEqual({ [VOYAGE]: 0 });
+    expect(applyResolution(emptyLog(1), VOYAGE, won([]), cards, NO_COPY_LIMITS).xpGained).toEqual({});
   });
 
   it("a lost scenario writes nothing", () => {
     const lost = { ...won(lines), lost: true };
-    expect(applyResolution(emptyLog(1), VOYAGE, lost, cards)).toEqual(emptyLog(1));
+    expect(applyResolution(emptyLog(1), VOYAGE, lost, cards, NO_COPY_LIMITS)).toEqual(emptyLog(1));
   });
 
   it("the XP a Resolution gave is spent box by box, and the marks stay when the next scenario is written", () => {
-    const first = applyResolution(emptyLog(1), VOYAGE, won(lines, { victory: [THUNDERSTRUCK] }), cards);
+    const first = applyResolution(emptyLog(1), VOYAGE, won(lines, { victory: [THUNDERSTRUCK] }), cards, NO_COPY_LIMITS);
     const spent = spendXp(first, { "11201": 2 });
     if (!spent.ok) throw new Error(spent.reason);
     expect(xpUnspentOf(spent.log)).toBe(1);
-    const second = applyResolution(spent.log, "the-fate-of-numenor", { ...won(lines), scenarioId: "the-fate-of-numenor" }, cards);
+    const second = applyResolution(spent.log, "the-fate-of-numenor", { ...won(lines), scenarioId: "the-fate-of-numenor" }, cards, NO_COPY_LIMITS);
     expect(second.marks).toEqual({ "11201": 2 });
     expect(xpUnspentOf(second)).toBe(2);
     expect(second.completed).toEqual([VOYAGE, "the-fate-of-numenor"]);
@@ -142,7 +143,7 @@ describe("the log keeps the XP and the players spend it", () => {
 
   it("the path shows the XP a completed scenario gave", () => {
     const campaign = loadCampaign("dream-chaser");
-    const log = applyResolution(emptyLog(1), VOYAGE, won(lines), cards);
+    const log = applyResolution(emptyLog(1), VOYAGE, won(lines), cards, NO_COPY_LIMITS);
     const nodes = campaignPath(campaign, {}, log);
     expect(nodes[0]).toMatchObject({ id: VOYAGE, status: "completed", xp: 1 });
     expect("xp" in (nodes[1] ?? {})).toBe(false);
@@ -151,8 +152,8 @@ describe("the log keeps the XP and the players spend it", () => {
   it("records the Hard/Expert Mode card the game was played with", () => {
     const facts = { prisoner: null, usedOnce: [], counters: {}, modeCard: "expert" as const };
     const state = won(lines, {}, (current) => ({ ...current, campaignFacts: facts }));
-    expect(applyResolution(emptyLog(1), VOYAGE, state, cards).modes).toEqual({ [VOYAGE]: "expert" });
-    expect(applyResolution(emptyLog(1), VOYAGE, won(lines), cards).modes).toEqual({});
+    expect(applyResolution(emptyLog(1), VOYAGE, state, cards, NO_COPY_LIMITS).modes).toEqual({ [VOYAGE]: "expert" });
+    expect(applyResolution(emptyLog(1), VOYAGE, won(lines), cards, NO_COPY_LIMITS).modes).toEqual({});
   });
 
   it("\"Gavin returned\" is four XP spent on him after A Storm on Cobas Haven", () => {

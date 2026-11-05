@@ -29,16 +29,16 @@ appId: com.middleearth.lcg
     id: xp-line
 - assertNotVisible:
     id: xp-open
-- assertVisible:
+# The path shows a group of the Ered Mithrin log only once it holds something; the log keeps every row.
+- assertNotVisible:
     id: wilderland-line
-- assertVisible:
+- assertNotVisible:
     id: path-treasures
-- assertVisible:
+- assertNotVisible:
     id: path-ally-lines
-- assertVisible:
+- assertNotVisible:
     id: path-beldis
-- assertVisible: "0 of 4 used"
-- assertVisible:
+- assertNotVisible:
     id: path-pool-encounter
 - tapOn:
     id: log-open

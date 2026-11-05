@@ -40,6 +40,8 @@ export type ResolutionLog = {
   allyLines?: readonly AllyLine[];
   encounterPool?: Readonly<Record<string, number>>;
   poolRemoved?: readonly { code: string; seat: number | null }[];
+  // What each seat answered to the choice of a card to remove from the pool, in the order they answered: the option taken, or the decline (the screen reads it back for the seats that have answered).
+  poolAnswers?: readonly { seat: number; option: string }[];
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes

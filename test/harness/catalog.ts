@@ -21,3 +21,8 @@ export async function loadPrinted(codes: readonly string[]): Promise<ReadonlyMap
 export async function loadDefinition(id: string): Promise<ScenarioDefinition> {
   return scenarioDefinition(loadScenario(id), loadCampaign(), EFFECTS);
 }
+
+/** Every treasure of the Ered Mithrin campaign: the pool a record that draws a random treasure (AttachRandomTreasure) draws from, as the app's world loads it (src/campaign/world.ts). */
+export function loadTreasures(): ReadonlyMap<string, PrintedCard> {
+  return new Map(loadCards().filter((card) => card.campaignKind === "treasure").map((card) => [card.code, printedFromCard(card)]));
+}

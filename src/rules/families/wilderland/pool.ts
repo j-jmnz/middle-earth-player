@@ -1,4 +1,4 @@
-// Rules: emce.treasure, emce.boon-allies, emce.campaign-pool-encounter (data/rules/entries.json); ledger lines 120165:B:1, 12187:B:1, 12193:B:1. What the Ered Mithrin Resolution writes for the
+// Rules: emce.treasure, emce.boon-allies, emce.campaign-pool-encounter (data/rules/entries.json); ledger lines 120165:B:1 to 120165:B:3, 12187:B:1, 12187:B:4, 12193:B:4. What the Ered Mithrin Resolution writes for the
 // Campaign Log: the treasures discovered, the log line a boon ally was traded for, and the encounter cards the Campaign Pool tallies. Pure functions of the state; src/rules/setup/resolution.ts runs them.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -34,11 +34,21 @@ export function discoverTreasures(state: ScenarioState, ctx: ReduceContext): Res
   return found.length === 0 ? state.resolutionLog : { ...state.resolutionLog, treasures: [...have, ...found] };
 }
 
-/** AddEncounterToPool: a copy of each code, or a copy for each card of the code in play (emce.campaign-pool-encounter). The log caps the copies at what one collection holds. */
+/**
+ * The copies of a code in play that the pool does not already hold: the game dealt the pool's tallied copies into the encounter deck (they are in the pool already), so of the copies in play at most
+ * the ones the scenario itself dealt are new. A copy has no identity, so the pool's copies are taken to be in play only as far as the scenario's own cannot fill the play areas.
+ */
+function newCopiesInPlay(state: ScenarioState, code: string): number {
+  const dealt = Object.values(state.cards).filter((card) => card.code === code);
+  const own = Math.max(0, dealt.length - (state.campaignFacts?.encounterPool?.[code] ?? 0));
+  return Math.min(own, dealt.filter((card) => inPlay(card.zone)).length);
+}
+
+/** AddEncounterToPool: a copy of each code, or a copy for each card of the code in play that the pool does not hold already (emce.campaign-pool-encounter). The log caps the copies at what one collection holds. */
 export function addEncounterCards(state: ScenarioState, instruction: Verb<"AddEncounterToPool">): ResolutionLog {
   let tally = poolTally(state);
   for (const code of instruction.codes) {
-    const copies = instruction.inPlay ? Object.values(state.cards).filter((card) => card.code === code && inPlay(card.zone)).length : 1;
+    const copies = instruction.inPlay ? newCopiesInPlay(state, code) : 1;
     if (copies > 0) tally = withCopies(tally, code, copies);
   }
   return { ...state.resolutionLog, encounterPool: tally };
@@ -66,6 +76,22 @@ export function removalOptions(state: ScenarioState, ctx: ReduceContext): string
   return [...encounter, ...pooled];
 }
 
+/** Whether an option of a RemoveFromPool choice is an encounter card the pool tallies (else it is a card of the pool itself). */
+export function isEncounterOption(optionId: string): boolean {
+  return optionId.startsWith(ENCOUNTER);
+}
+
+/** The seat of the pool card a RemoveFromPool option names, or null for an encounter card or a card no seat holds. */
+export function removalSeat(optionId: string): number | null {
+  const seat = optionId.startsWith(POOLED) ? (optionId.split("@")[1] ?? "") : "";
+  return seat === "" ? null : Number(seat);
+}
+
+/** One seat's answer to the choice of a card to remove, kept so the screen can say what each seat chose (`option` is the option taken, or the decline). */
+export function noteRemovalAnswer(log: ResolutionLog, seat: number, option: string): ResolutionLog {
+  return { ...log, poolAnswers: [...(log.poolAnswers ?? []), { seat, option }] };
+}
+
 /** The card code an option of a RemoveFromPool choice names. */
 export function removalCode(optionId: string): string {
   return optionId.slice(optionId.startsWith(POOLED) ? POOLED.length : ENCOUNTER.length).split("@")[0] ?? "";
@@ -79,10 +105,14 @@ export function applyRemoval(state: ScenarioState, optionId: string): Resolution
   return { ...state.resolutionLog, poolRemoved: [...(state.resolutionLog.poolRemoved ?? []), { code, seat: seat === "" ? null : Number(seat) }] };
 }
 
+/** A card for a player: one option for each player in the game, named by the first hero they control (`<code>><hero>`). */
+export function playerOptions(state: ScenarioState, codes: readonly string[]): string[] {
+  return codes.flatMap((code) => livingSeats(state).flatMap((index) => (state.seats[index]?.heroes[0] ? [`${code}>${state.seats[index]?.heroes[0]}`] : [])));
+}
+
 /** The options of BoonAllyOrLogLine: the ally for each player in the game, named by their first hero, or the log line. */
 export function allyOrLineOptions(state: ScenarioState, instruction: Verb<"BoonAllyOrLogLine">): string[] {
-  const heroes = livingSeats(state).flatMap((seat) => (state.seats[seat]?.heroes[0] ? [`${instruction.ally}>${state.seats[seat]?.heroes[0]}`] : []));
-  return [...heroes, LOG_LINE];
+  return [...playerOptions(state, [instruction.ally]), LOG_LINE];
 }
 
 /** The answer to BoonAllyOrLogLine: the ally joins the pool for the chosen player (and goes in that player's deck), or the line is recorded. */

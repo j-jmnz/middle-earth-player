@@ -102,8 +102,8 @@ function heroesByOwner(state: ScenarioState): string[][] {
 
 // A transaction on the log. A loss writes nothing, a scenario that is still being resolved writes nothing, and a
 // scenario that is already on the log is not granted again.
-// `copies` is how many copies of a card one collection holds, which caps the encounter cards the pool tallies (emce.campaign-pool-encounter); a card it does not list is not capped.
-export function applyResolution(log: CampaignLog, scenarioId: string, state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, copies?: ReadonlyMap<string, number>): CampaignLog {
+// `copies` is how many copies of a card one collection holds, which caps the encounter cards the pool tallies (emce.campaign-pool-encounter); a card it does not list is not capped (`NO_COPY_LIMITS` for a table with no collection).
+export function applyResolution(log: CampaignLog, scenarioId: string, state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, copies: ReadonlyMap<string, number>): CampaignLog {
   const result = resolutionResult(state);
   if (!result || state.scenarioId !== scenarioId || log.completed.includes(scenarioId)) return log;
   const bearer = ringBearerOf(state, cards);

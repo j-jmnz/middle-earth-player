@@ -312,6 +312,10 @@ export const effectSchema = z.strictObject({
   // The Resolution is the only place XP is awarded (dcce.gaining-xp): a GainXp line anywhere else would silently do nothing.
   message: "GainXp is a Resolution verb",
   path: ["timing"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "RemoveFromPool" || (instruction.codes != null) !== (instruction.choice != null)), {
+  // RemoveFromPool takes the encounter cards it names or lets each player choose, never both and never neither (emce.campaign-pool-encounter).
+  message: "RemoveFromPool names exactly one of codes and choice",
+  path: ["instructions"],
 });
 
 export type Instruction = z.infer<typeof instructionSchema>;

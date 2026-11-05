@@ -74,7 +74,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 47 | A Storm on Cobas Haven | completed | 2026-11-04. Engine done, review round done. Phone checks open: a controlled tower in staging (fold rank, reader label, its Action from either seat), guarded and re-guarded towers, the Islet's "1 held" pill and where the held enemy returns, the Skirmisher as a ship, Taking on Water's three exhaust picks and host caution, the added-phase rail and carousel, the Tactics hero list, Gandalf's entry, Gavin's Planning Action; both Maestro flows unrun; `haven-won` missing, so the win flow cannot run. |
 | 48 | The City of Corsairs | not started | Coming soon (user decision, 2026-11-01). Open: which Stormcaller card the campaign Setup flips (12151 has no Campaign Mode only side; only 110042 has one). |
 | 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Mount Gundabad stage 2 pictures (19137-19142); Crypt Stalker Easy count unconfirmed. |
-| 50 | Ered Mithrin campaign shell, treasures and the pool | not started | |
+| 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app; phone checks; `ered-mithrin-start`, `booklet-ered-mithrin` flows not run. |
 | 51 | Wilderland mechanics family | not started | |
 | 51b | Wilderland on the table | not started | |
 | 52 | Journey Up the Anduin | not started | |
@@ -143,6 +143,9 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Screens and code
+- Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
+- Ered Mithrin: nothing marks Beldis's boxes yet (phase 57).
+- Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
@@ -165,6 +168,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
 
 ### Phone and tablet checks
+- Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.
 
 None ran. Each needs a device.
 

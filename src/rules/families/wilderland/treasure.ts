@@ -1,4 +1,4 @@
-// Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:1, 12189:B:2. The treasures of the Ered Mithrin campaign in a game: the draw of 3 random
+// Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:2, 12189:B:2. The treasures of the Ered Mithrin campaign in a game: the draw of 3 random
 // undiscovered treasures, the choice of one, and its attachment to an encounter card as a guarded objective.
 import type { Instruction } from "../../../catalog/boundary.ts";
 

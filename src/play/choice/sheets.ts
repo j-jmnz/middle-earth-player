@@ -13,6 +13,7 @@ import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 import type { Frame, GameEvent, ResponseOffer } from "../../rules/core/state.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
+import { asksPlayers } from "../../rules/setup/resolution.ts";
 
 import { askWords } from "../words/ask.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
@@ -158,7 +159,7 @@ export function isStepWindow(game: ScenarioState): boolean {
 export function wonSheet(game: ScenarioState): Sheet {
   const rewards = game.resolution.length > 0;
   // A Resolution that asks nothing (The Oath's: the tokens and the burden they earn) has no rewards to choose: the screen after it only shows what is recorded.
-  const asks = game.resolution.some((instruction) => instruction.verb === "ChooseCards" || instruction.verb === "NameCaptives" || instruction.verb === "BoonAllyOrLogLine" || (instruction.verb === "RemoveFromPool" && instruction.choice != null));
+  const asks = game.resolution.some(asksPlayers);
   return {
     kind: "outcome",
     key: "won",

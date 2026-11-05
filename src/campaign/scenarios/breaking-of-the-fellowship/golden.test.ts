@@ -10,6 +10,7 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of Breaking of the Fellowship played by the auto-player (test/scenarios/breaking-of-the-fellowship/game.ts), true solo and two-handed, through wins (with two
 // different stage 3 titles, with a hero fallen into evil, in Normal and Easy) and losses (before the Fellowship breaks, and at the separate stages), on fixed seeds. It pins
@@ -71,7 +72,7 @@ goldenSuite<BreakingGolden, BreakingDecks, BreakingGame>({
   lost: (state, golden, { cards }, game) => {
     expect(state.separate === true).toBe(golden.separate);
     const before = { ...emptyLog(golden.seatCount), completed: game.log.completed };
-    expect(applyResolution(before, state.scenarioId, state, cards)).toBe(before);
+    expect(applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS)).toBe(before);
     // The fifth node is the last won; the sixth is the one in play.
     expect(campaignPath(campaign, {}, before).map((node) => node.status).slice(4, 6)).toEqual(["completed", "current"]);
   },

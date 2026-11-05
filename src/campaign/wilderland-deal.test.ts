@@ -100,6 +100,15 @@ describe("the pool's encounter cards (emce.campaign-pool-encounter)", () => {
   });
 });
 
+describe("the pool the game reads (emce.campaign-pool-encounter)", () => {
+  it("includes a card the campaign card's Setup adds, so a Resolution may offer it for removal", () => {
+    const [trick = ""] = treacheries;
+    const made = ok(plan(emptyLog(1), [record({ verb: "AddToPool", code: trick })]));
+    expect(emptyLog(1).campaignPool).toEqual([]);
+    expect(wilderlandFacts(made.log, WILDERLAND_CAMPAIGN).pool).toEqual([{ code: trick, seat: null }]);
+  });
+});
+
 describe("RemoveFromEncounterDeckIfLogged (emce.boon-allies)", () => {
   const search = (count: number, extra: Partial<Extract<Instruction, { verb: "RemoveFromEncounterDeckIfLogged" }>> = {}) =>
     record({ verb: "RemoveFromEncounterDeckIfLogged", line: "turayn", count, cardType: "treachery", ...extra });
@@ -154,6 +163,27 @@ describe("RemoveFromEncounterDeckIfLogged (emce.boon-allies)", () => {
     if (nonUnique.ok) throw new Error("expected a choice");
     expect(nonUnique.needs?.options.every((code) => cards.get(code)?.isUnique === false)).toBe(true);
     expect(nonUnique.needs?.options).toContain(wolf);
+  });
+});
+
+describe("the deck a Setup search looks through is the deck the deal builds", () => {
+  const search = record({ verb: "RemoveFromEncounterDeckIfLogged", line: "turayn", count: 99, cardType: "treachery" });
+  const logged = logWith({ allyLines: ["turayn"] });
+
+  // The cards the search finds in the deck, as the note "Card 1 of N" counts them.
+  function found(log: CampaignLog): number {
+    const asked = plan(log, [search]);
+    if (asked.ok) throw new Error("expected a choice");
+    return Number(/Card 1 of (\d+)/.exec(asked.needs?.note ?? "")?.[1]);
+  }
+
+  it("holds the pool's encounter-backed cards the deal shuffles in, and not one that goes to a player's deck", () => {
+    const [trick = ""] = treacheries;
+    const base = found(logged);
+    const card = { code: trick, back: "encounter", burdenSet: null, attachedTo: null, seat: 0 } as const;
+    expect(found({ ...logged, campaignPool: [card] })).toBe(base + 1);
+    expect(found({ ...logged, campaignPool: [{ ...card, afterHand: true }] })).toBe(base);
+    expect(found({ ...logged, encounterPool: { [trick]: 2 } })).toBe(base + 2);
   });
 });
 

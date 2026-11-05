@@ -17,6 +17,7 @@ import { checklist } from "../../checklist.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const FRODO = "141001";
 const SAM = "141002";
@@ -99,7 +100,7 @@ describe("the Resolution (142060:B:1 to 142060:B:3), read from the final state",
     // The fallen hero is not offered as a captive: it is no longer among its player's heroes.
     expect(state.resolutionLog.captives.map((item) => item.hero)).not.toContain(fallen);
     expect(state.resolutionLog.earned.map((item) => item.code)).toEqual(["142089"]);
-    const log = applyResolution(game.log, state.scenarioId, state, (await breakingGameWorld()).cards);
+    const log = applyResolution(game.log, state.scenarioId, state, (await breakingGameWorld()).cards, NO_COPY_LIMITS);
     expect(log.fallenHeroesBySeat.flat()).toEqual([fallen]);
   });
 

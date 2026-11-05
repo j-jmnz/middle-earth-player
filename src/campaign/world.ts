@@ -96,7 +96,7 @@ function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>)
 }
 
 // Whether a card among these codes has a record, at any depth, with a verb that draws from the treasures of the catalog (`collection: "treasure"`, src/catalog/verb-flags.ts).
-function namesTreasures(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
+export function namesTreasures(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
   const treasureVerbs = collectionVerbs("treasure");
   return effects.some((effect) => {
     if (!codes.has(effect.cardCode)) return false;

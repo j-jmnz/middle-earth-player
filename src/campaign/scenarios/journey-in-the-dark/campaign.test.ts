@@ -19,6 +19,7 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
 import type { World } from "../../world.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const FRODO = "141001";
 const SAM = "141002";
@@ -138,7 +139,7 @@ describe("a whole game's Resolution on the campaign log", () => {
     const balrogInPlay = Object.values(game.state.cards).some((card) => card.code === BALROG && ["staging", "engaged", "activeLocation"].includes(card.zone));
     expect(earned.length).toBe(balrogInPlay ? 4 : 2);
     const before = { ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south"] };
-    const after = applyResolution(before, game.state.scenarioId, game.state, strong.cards);
+    const after = applyResolution(before, game.state.scenarioId, game.state, strong.cards, NO_COPY_LIMITS);
     expect(after.completed).toContain("journey-in-the-dark");
     expect(after.campaignPool.map((card) => card.code).sort()).toEqual([...earned].sort());
     expect(campaignPath(campaign, {}, after).map((node) => node.status)).toEqual(["completed", "completed", "completed", "completed", "completed", "current"]);

@@ -11,9 +11,9 @@ import { attachTo, spawn } from "../rules/core/zones.ts";
 
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";
 import { parseLog, newSave } from "./save.ts";
-import { resolutionView, settledSentence } from "./resolution-view.ts";
-import { cappedTally, logConditionHolds, poolEncounterCopies, wilderlandFacts, WILDERLAND_CAMPAIGN } from "./wilderland.ts";
-import { keepsWilderlandLog, wilderlandView } from "./wilderland-view.ts";
+import { choiceSentence, resolutionView, settledSentence } from "./resolution-view.ts";
+import { cappedTally, logConditionHolds, NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts, WILDERLAND_CAMPAIGN } from "./wilderland.ts";
+import { copiesMark, encounterSpeech, keepsWilderlandLog, wilderlandView } from "./wilderland-view.ts";
 import { campaignPath } from "./path.ts";
 import type { World } from "./world.ts";
 
@@ -21,6 +21,7 @@ import type { World } from "./world.ts";
 // scenario's Resolution writes into them, what the game reads back, and an older save that has none of them.
 const cards = cardMap([
   hero("frodo", "lore"),
+  hero("sam", "spirit"),
   definePrinted({ code: "stage", name: "Stage", type: "quest" }),
   definePrinted({ code: "growing", name: "A Growing Threat", type: "treachery" }),
   definePrinted({ code: "wolf", name: "Gundabad Hunter", type: "enemy" }),
@@ -85,7 +86,7 @@ describe("what a won scenario writes", () => {
     const held = updateCard(attachTo(treasure.state, treasure.id, Object.values(table.cards)[0]?.id ?? ""), treasure.id, { controller: 0, claimed: true });
     const state = resolved(held, "line", [...resolution, { verb: "DiscoverTreasure" }]);
     const before: CampaignLog = { ...emptyLog(1), treasures: ["t0"], allyLines: ["isolde"], encounterPool: { wolf: 1 } };
-    const log = applyResolution(before, SCENARIO, state, cards);
+    const log = applyResolution(before, SCENARIO, state, cards, NO_COPY_LIMITS);
     expect(log.allyLines).toEqual(["isolde", "turayn"]);
     expect(log.encounterPool).toEqual({ wolf: 2, growing: 1 });
     expect(log.treasures).toEqual(["t0", "t1"]);
@@ -96,7 +97,7 @@ describe("what a won scenario writes", () => {
   it("puts the ally in the pool for the player chosen, and no line in the log", () => {
     const waiting = won(game(), resolution);
     const ally = legalIntents(waiting, ctx).flatMap((intent) => (intent.type === "ChooseResolution" && intent.optionId !== "line" ? [intent.optionId] : []))[0] ?? "";
-    const log = applyResolution(emptyLog(1), SCENARIO, resolved(game(), ally), cards);
+    const log = applyResolution(emptyLog(1), SCENARIO, resolved(game(), ally), cards, NO_COPY_LIMITS);
     expect(log.campaignPool.map((card) => [card.code, card.seat, card.back])).toEqual([["turayn", 0, "player"]]);
     expect(log.allyLines).toEqual([]);
   });
@@ -111,15 +112,15 @@ describe("what a won scenario writes", () => {
 
   it("writes nothing for a loss, and does not grant a scenario twice", () => {
     const lost = { ...resolved(game(), "line"), lost: true };
-    expect(applyResolution(emptyLog(1), SCENARIO, lost, cards)).toEqual(emptyLog(1));
-    const once = applyResolution(emptyLog(1), SCENARIO, resolved(game(), "line"), cards);
-    expect(applyResolution(once, SCENARIO, resolved(game(), "line"), cards)).toBe(once);
+    expect(applyResolution(emptyLog(1), SCENARIO, lost, cards, NO_COPY_LIMITS)).toEqual(emptyLog(1));
+    const once = applyResolution(emptyLog(1), SCENARIO, resolved(game(), "line"), cards, NO_COPY_LIMITS);
+    expect(applyResolution(once, SCENARIO, resolved(game(), "line"), cards, NO_COPY_LIMITS)).toBe(once);
   });
 
   it("returns the boxes beside Beldis the game ended with", () => {
     const state = resolved(game({ ...baseFacts, beldisUses: [3] }), "line");
-    expect(applyResolution({ ...emptyLog(1), beldisUses: [3] }, SCENARIO, state, cards).beldisUses).toEqual([3]);
-    expect(applyResolution(emptyLog(1), SCENARIO, resolved(game(), "line"), cards).beldisUses).toEqual([]);
+    expect(applyResolution({ ...emptyLog(1), beldisUses: [3] }, SCENARIO, state, cards, NO_COPY_LIMITS).beldisUses).toEqual([3]);
+    expect(applyResolution(emptyLog(1), SCENARIO, resolved(game(), "line"), cards, NO_COPY_LIMITS).beldisUses).toEqual([]);
   });
 });
 
@@ -167,10 +168,18 @@ describe("the path and the log screen's view", () => {
     expect(wilderlandView(log, 2)).toEqual({
       treasures: ["t1"],
       lines: [ALLY_LINE_FACTS.turayn.words, ALLY_LINE_FACTS.beldis.words],
-      beldis: ["Player 1: 1 of 4 used", "Player 2: 0 of 4 used"],
+      beldis: [
+        { prefix: "Player 1: ", boxes: "\u25a0\u25a1\u25a1\u25a1", used: 1, speech: "Player 1: Beldis, 1 of 4 boxes marked" },
+        { prefix: "Player 2: ", boxes: "\u25a1\u25a1\u25a1\u25a1", used: 0, speech: "Player 2: Beldis, 0 of 4 boxes marked" },
+      ],
       encounter: [{ code: "growing", copies: 1 }, { code: "wolf", copies: 2 }],
     });
-    expect(wilderlandView(emptyLog(1), 1).beldis).toEqual(["0 of 4 used"]);
+    expect(wilderlandView(emptyLog(1), 1).beldis).toEqual([{ prefix: "", boxes: "\u25a1\u25a1\u25a1\u25a1", used: 0, speech: "Beldis, 0 of 4 boxes marked" }]);
+    expect(wilderlandView({ ...emptyLog(1), beldisUses: [2] }, 1).beldis[0]?.boxes).toBe("\u25a0\u25a0\u25a1\u25a1");
+    // A screen reader hears the copies of an encounter card, not the multiplication sign.
+    expect(encounterSpeech([{ code: "growing", copies: 1 }, { code: "wolf", copies: 2 }], (code) => (code === "wolf" ? "Gundabad Hunter" : "A Growing Threat"))).toBe("A Growing Threat. Gundabad Hunter, 2 copies");
+    expect(copiesMark(1)).toBe("");
+    expect(copiesMark(3)).toBe(" \u00d73");
   });
 
   it("names the four allies' lines as the Campaign Log sheet prints them (emce.boon-allies)", () => {
@@ -199,6 +208,66 @@ describe("the Resolution screen's words", () => {
     expect(view.to).toBe("ally");
     expect(view.decline).toBeNull();
     expect(view.tiles.map((tile) => [tile.code, tile.name])).toEqual([["turayn", "Turayn"], [null, ALLY_LINE_FACTS.turayn.words]]);
+  });
+
+  function twoHanded(facts?: CampaignFacts): ScenarioState {
+    let state: ScenarioState = { ...idleScenario(2), scenarioId: SCENARIO, ...(facts ? { campaignFacts: facts } : {}) };
+    state = spawn(state, "frodo", { zone: "heroes", seat: 0 }).state;
+    return spawn(state, "sam", { zone: "heroes", seat: 1 }).state;
+  }
+
+  it("names the ally for a player, not for the hero that names them, and lays the log line in a row of its own", () => {
+    const resolution: ScenarioState["resolution"] = [{ verb: "BoonAllyOrLogLine", ally: "turayn", line: "turayn" }];
+    const solo = resolutionView(won(game(), resolution), world);
+    const two = resolutionView(won(twoHanded(), resolution), world);
+    if (solo.kind !== "choosing" || two.kind !== "choosing") throw new Error("expected a choice");
+    expect(solo.tiles.map((tile) => tile.label)).toEqual(["Turayn", ALLY_LINE_FACTS.turayn.words]);
+    expect(two.tiles.map((tile) => tile.label)).toEqual(["Turayn for Player 1", "Turayn for Player 2", ALLY_LINE_FACTS.turayn.words]);
+    expect(two.tiles.map((tile) => tile.wide === true)).toEqual([false, false, true]);
+    const [ally, line] = [two.tiles[0], two.tiles[2]];
+    if (!ally || !line) throw new Error("missing tiles");
+    // Each choice says what is given up.
+    expect(choiceSentence(two, line)).toBe(`“${ALLY_LINE_FACTS.turayn.words}” is marked in the campaign log. Turayn does not join the campaign pool.`);
+    expect(choiceSentence(two, ally)).toMatch(/adds it to their deck for the rest of the campaign\. The log line is not recorded\.$/);
+  });
+
+  it("calls the decline of a removal \"Remove nothing\", tells encounter cards from the pool's own with their copies, and a boon two seats hold by seat", () => {
+    const facts: CampaignFacts = { ...baseFacts, encounterPool: { wolf: 2, growing: 1 }, pool: [{ code: "turayn", seat: 0 }, { code: "turayn", seat: 1 }] };
+    const waiting = won(twoHanded(facts), [{ verb: "RemoveFromPool", choice: "eachPlayerNonBurden" }]);
+    const view = resolutionView(waiting, world);
+    if (view.kind !== "choosing") throw new Error("expected a choice");
+    expect(view.decline?.label).toBe("Remove nothing");
+    const byId = new Map(view.tiles.map((tile) => [tile.optionId, tile]));
+    expect(byId.get("e:wolf")).toMatchObject({ label: "Gundabad Hunter", tag: "encounter card \u00b7 2 copies", copies: 2 });
+    expect(byId.get("e:growing")).toMatchObject({ tag: "encounter card", copies: 1 });
+    expect(byId.get("p:turayn@0")).toMatchObject({ label: "Turayn (Player 1)" });
+    expect(byId.get("p:turayn@1")).toMatchObject({ label: "Turayn (Player 2)" });
+    expect(choiceSentence(view, byId.get("e:wolf")!)).toBe("One copy of Gundabad Hunter leaves the campaign pool (1 stays).");
+    expect(choiceSentence(view, byId.get("e:growing")!)).toBe("A Growing Threat leaves the campaign pool: it was the last copy.");
+  });
+
+  it("says what each seat that answered chose", () => {
+    const facts: CampaignFacts = { ...baseFacts, encounterPool: { wolf: 2 } };
+    const waiting = won(twoHanded(facts), [{ verb: "RemoveFromPool", choice: "eachPlayerNonBurden" }]);
+    const first = reduce(waiting, { type: "ChooseResolution", optionId: "e:wolf" }, ctx);
+    if (!first.ok) throw new Error(first.reason);
+    const second = resolutionView(first.state, world);
+    if (second.kind !== "choosing") throw new Error("expected a choice");
+    expect(second.answered).toEqual([{ seat: 0, words: "Gundabad Hunter" }]);
+    const declined = reduce(waiting, { type: "ChooseResolution", optionId: "skip" }, ctx);
+    if (!declined.ok) throw new Error(declined.reason);
+    const view = resolutionView(declined.state, world);
+    expect(view.kind === "choosing" && view.answered).toEqual([{ seat: 0, words: "Nothing removed" }]);
+  });
+
+  it("states the pool's copies as the log will hold them, capped at what one collection holds", () => {
+    const resolution: ScenarioState["resolution"] = [{ verb: "AddEncounterToPool", codes: ["wolf", "wolf"] }];
+    const state = won(game({ ...baseFacts, encounterPool: { wolf: 1 } }), resolution);
+    const capped = resolutionView(state, { ...world, copies: new Map([["wolf", 2]]) });
+    const open = resolutionView(state, world);
+    if (capped.kind !== "settled" || open.kind !== "settled") throw new Error("expected the settled view");
+    expect(capped.poolAdded).toEqual(["wolf"]);
+    expect(open.poolAdded).toEqual(["wolf", "wolf"]);
   });
 
   it("states what confirming records: treasures, lines and the pool's encounter cards", () => {

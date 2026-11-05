@@ -35,8 +35,12 @@ function asked(): ScenarioState {
 
 describe("the treasure choice", () => {
   it("names the guard in its sentence and asks for one of the treasures", () => {
-    expect(wilderlandAsk(ATTACH, "hall-id", words)).toEqual({ verb: "Attach", prompt: expect.stringContaining("Twilight Hall: look at 3 random undiscovered treasures and choose 1") });
-    expect(wilderlandAsk({ verb: "AttachRandomTreasure", count: 2 }, null, words)?.prompt).toContain("The card: look at 2 random");
+    expect(wilderlandAsk(ATTACH, "hall-id", words)).toEqual({
+      verb: "Attach",
+      prompt: "Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Twilight Hall is attached to it, and the players cannot claim it until Twilight Hall is dealt with.",
+    });
+    // With no card to name, the sentence stands alone.
+    expect(wilderlandAsk({ verb: "AttachRandomTreasure", count: 2 }, null, words)?.prompt).toBe("Choose 1 of 2 random undiscovered treasures to attach as a guarded objective.");
     expect(wilderlandAsk({ verb: "Draw" }, "hall-id", words)).toBeNull();
   });
 
@@ -52,6 +56,6 @@ describe("the treasure choice", () => {
     expect(sheet.options).toHaveLength(3);
     expect(sheet.options.map((option) => option.label).every((label) => /^Treasure [A-D]$/.test(label))).toBe(true);
     expect(sheet.options.map((option) => option.code)).toEqual(sheet.options.map((option) => option.id));
-    expect(sheet.note).toContain("choose 1 to attach");
+    expect(sheet.note).toContain("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective.");
   });
 });

@@ -20,6 +20,7 @@ import { buildStart } from "../../start.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { newSave } from "../../save.ts";
 import { campaignPath } from "../../path.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const mini = loadCampaign("the-dark-of-mirkwood");
 const EARLIER = ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"];
@@ -41,12 +42,12 @@ beforeAll(async () => {
   const twoGolden = OATH_GOLDENS.find((item) => item.name === "two-handed, steady heroes, 6 tokens placed, won with Guilty Conscience")!;
   const steady = await oathWorld("steady");
   const two = playOath(twoGolden, steady.ctx);
-  oathTwo = applyResolution({ ...oathPlan(2, emptyLog(2), twoGolden.adaptations).log, completed: EARLIER }, two.state.scenarioId, two.state, steady.cards);
-  oathBlank = applyResolution(oathPlan(2, emptyLog(2), twoGolden.adaptations).log, two.state.scenarioId, two.state, steady.cards);
+  oathTwo = applyResolution({ ...oathPlan(2, emptyLog(2), twoGolden.adaptations).log, completed: EARLIER }, two.state.scenarioId, two.state, steady.cards, NO_COPY_LIMITS);
+  oathBlank = applyResolution(oathPlan(2, emptyLog(2), twoGolden.adaptations).log, two.state.scenarioId, two.state, steady.cards, NO_COPY_LIMITS);
   const soloGolden = OATH_GOLDENS.find((item) => item.name === "true solo, the Fervor of Lore already used, won")!;
   const strongOath = await oathWorld("strong");
   const solo = playOath(soloGolden, strongOath.ctx);
-  oathSolo = applyResolution({ ...oathPlan(1, emptyLog(1), soloGolden.adaptations).log, completed: EARLIER }, solo.state.scenarioId, solo.state, strongOath.cards);
+  oathSolo = applyResolution({ ...oathPlan(1, emptyLog(1), soloGolden.adaptations).log, completed: EARLIER }, solo.state.scenarioId, solo.state, strongOath.cards, NO_COPY_LIMITS);
   cards = new Map([...steady.cards, ...strong.cards]);
   ctx = strong.ctx;
 }, 240_000);
@@ -107,21 +108,21 @@ describe("what a win writes (41051:B:1)", () => {
   it("completes Mirkwood Paths and The Dark of Mirkwood: the path shows every part done", () => {
     const golden = won.find((item) => item.name === "two-handed, won")!;
     const game = playGolden(golden, ctx);
-    const log = applyResolution({ ...oathTwo, campaignPool: [] }, game.state.scenarioId, game.state, cards);
+    const log = applyResolution({ ...oathTwo, campaignPool: [] }, game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...EARLIER, "the-oath", "the-caves-of-nibin-dum"]);
     expect(campaignPath(campaign, {}, log).map((node) => node.status)).toEqual(["completed", "completed", "completed", "completed", "completed"]);
-    const second = applyResolution({ ...oathBlank, campaignPool: [] }, game.state.scenarioId, game.state, cards);
+    const second = applyResolution({ ...oathBlank, campaignPool: [] }, game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(campaignPath(mini, {}, second).map((node) => node.status)).toEqual(["completed", "completed"]);
   });
 
   it("keeps a Ranger Sense for each player for the next campaign when the highest final threat is under 40, and nothing at 40 or more", () => {
     const under = playGolden(won.find((item) => item.name === "two-handed, won")!, ctx);
-    const log = applyResolution(emptyLog(2), under.state.scenarioId, under.state, cards);
+    const log = applyResolution(emptyLog(2), under.state.scenarioId, under.state, cards, NO_COPY_LIMITS);
     expect(log.carryOver.map((card) => `${card.code}:${card.perPlayer === true}`)).toEqual(["41049:true"]);
     // The Ranger Sense joins this campaign's pool now, one for each player, as well.
     expect(log.campaignPool.filter((card) => card.code === "41049").map((card) => card.seat).sort()).toEqual([0, 1]);
     const over = playGolden(won.find((item) => item.name === "two-handed, threat 40 or higher at the end, won")!, ctxFor("tense"));
-    const bare = applyResolution(emptyLog(2), over.state.scenarioId, over.state, cards);
+    const bare = applyResolution(emptyLog(2), over.state.scenarioId, over.state, cards, NO_COPY_LIMITS);
     expect(bare.carryOver).toEqual([]);
     expect(bare.campaignPool.map((card) => card.code)).not.toContain("41049");
   });
@@ -142,7 +143,7 @@ describe("what a win writes (41051:B:1)", () => {
   it("is taken in by a new save of any campaign once the campaign is finished: a Ranger Sense is shuffled into each player's deck", () => {
     const game = playGolden(won.find((item) => item.name === "two-handed, won")!, ctx);
     for (const [campaignId, scenarios] of [["mirkwood-paths", campaign.scenarios], ["the-dark-of-mirkwood", mini.scenarios]] as const) {
-      const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards);
+      const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
       const finished = { ...log, completed: [...scenarios] };
       const old = { id: "old", campaignId, seatCount: 2 as const, score: 0, log: finished };
       const offers = carryOffers([old as never], (id) => (id === campaignId ? scenarios : null));
@@ -168,8 +169,8 @@ describe("what a loss leaves", () => {
     for (const golden of CAVES_GOLDENS.filter((item) => item.outcome === "lost")) {
       const lost = playGolden(golden, ctxFor(golden.decks));
       const blank = emptyLog(golden.seatCount);
-      expect(applyResolution(blank, lost.state.scenarioId, lost.state, cards), golden.name).toBe(blank);
-      expect(applyResolution(oathTwo, lost.state.scenarioId, lost.state, cards), golden.name).toBe(oathTwo);
+      expect(applyResolution(blank, lost.state.scenarioId, lost.state, cards, NO_COPY_LIMITS), golden.name).toBe(blank);
+      expect(applyResolution(oathTwo, lost.state.scenarioId, lost.state, cards, NO_COPY_LIMITS), golden.name).toBe(oathTwo);
     }
   });
 
@@ -177,7 +178,7 @@ describe("what a loss leaves", () => {
     const lost = CAVES_GOLDENS.find((item) => item.name === "true solo, weak, lost on threat")!;
     const game = playGolden({ ...lost, boon: "play" }, ctxFor("weak"));
     const log = emptyLog(1);
-    expect(applyResolution(log, game.state.scenarioId, game.state, cards)).toBe(log);
+    expect(applyResolution(log, game.state.scenarioId, game.state, cards, NO_COPY_LIMITS)).toBe(log);
   });
 });
 

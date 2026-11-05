@@ -17,6 +17,7 @@ import { applyResolution } from "../../log.ts";
 import { newSave } from "../../save.ts";
 import { campaignPath } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
@@ -118,7 +119,7 @@ describe("The Fate of Númenor in the Dream-chaser campaign", () => {
     const golden = FATE_GOLDENS.find((item) => item.name === "two-handed, won")!;
     const world = await fateWorld(golden.decks);
     const game = playGolden(golden, world.ctx);
-    const log = applyResolution(afterVoyage(2), game.state.scenarioId, game.state, world.cards);
+    const log = applyResolution(afterVoyage(2), game.state.scenarioId, game.state, world.cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["voyage-across-belegaer", "the-fate-of-numenor"]);
     expect(log.xpGained["the-fate-of-numenor"]).toBe(game.state.resolutionLog.xp);
     expect(log.xpGained["voyage-across-belegaer"]).toBe(4);
@@ -128,7 +129,7 @@ describe("The Fate of Númenor in the Dream-chaser campaign", () => {
     const lost = FATE_GOLDENS.find((item) => item.name === "true solo, weak, lost on threat")!;
     const lostGame = playGolden(lost, (await fateWorld(lost.decks)).ctx);
     const untouched = afterVoyage(1);
-    expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards)).toBe(untouched);
+    expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards, NO_COPY_LIMITS)).toBe(untouched);
   });
 });
 

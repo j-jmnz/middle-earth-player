@@ -23,7 +23,7 @@ The plan's Phase 50 items 1 to 8:
    - `src/screens/rules/glossary.ts`: `DOC_NAMES`, `BOOKS`, and the `emce.setup-` filter.
    - The `src/screens/rules/view.tsx` tile and `BOOK_SCENE`.
 3. **Loadout** (`src/campaign/loadout.ts`).
-   - Haldan (a TWoR hero) is refused in every part except 3, citing `emce.haldan`. `HERO_BANS` allows one banned part per ban today; Ered Mithrin needs "every part except 3", so the ban takes a list of parts.
+   - Haldan (hero 19026, from RAR; TWoR 18070 is the objective ally, not the hero) is refused in every part except 3, citing `emce.haldan`. `HERO_BANS` allows one banned part per ban today; Ered Mithrin needs "every part except 3", so the ban takes a list of parts.
    - A discovered treasure may be added to a deck: 1 copy by title, outside the 50-card minimum (`emce.treasure`). An undiscovered treasure is refused, with the reason.
 4. **Campaign log** (`src/campaign/log.ts`; Zod with defaults, so old saves load; columns follow the MEC115 Campaign Log sheet, `emce.campaign-log`):
    - treasures discovered;
@@ -42,7 +42,7 @@ The plan's Phase 50 items 1 to 8:
 6. **Screens.**
    - The path and log show treasures, ally lines, Beldis's boxes and the pool's encounter cards.
    - The Resolution's choices are made on the existing resolution screen (as Parrying Cutlass or Throwing Axe was). No control types a number.
-7. **Versions.** Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the catalog version if a column changes.
+7. **Versions.** The catalog version bumps if a column changes. The `ENGINE_VERSION` bump (`src/rules/engine/version.ts`) belongs to the first phase whose records use these verbs: a verb no record uses cannot move a replayed game.
 8. **Tests and flows.**
    - Tests: registry, loadout (Haldan, treasures), log round trip, old-save load, pool encounter cards dealt.
    - Flows: `.maestro/features/ered-mithrin-start.yaml` and `.maestro/features/booklet-ered-mithrin.yaml`; update `.maestro/features/scenarios-boxes.yaml`.

@@ -32,6 +32,7 @@ import { loadWorld } from "../../world.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let world: AnduinWorld;
 let cards: Map<string, PrintedCard>;
@@ -92,7 +93,7 @@ describe("Journey Along the Anduin in a campaign", () => {
   it("receives Passage Through Mirkwood's earned pool through the Campaign Setup Checklist (01129:B:1)", async () => {
     const golden = MIRKWOOD_GOLDENS.find((item) => item.outcome === "won" && item.seatCount === 2)!;
     const passage = playPassage(golden, (await mirkwoodWorld("strong")).ctx);
-    const log = applyResolution(emptyLog(2), passage.state.scenarioId, passage.state, cards);
+    const log = applyResolution(emptyLog(2), passage.state.scenarioId, passage.state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["passage-through-mirkwood"]);
     expect(campaignPath(campaign, {}, log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);
     const plan = checklist({ log, scenario: anduin, seats: anduinLoadout(2), effects: EFFECTS, cards });
@@ -235,7 +236,7 @@ describe("what a win writes", () => {
     // Both of seat 0's heroes carry a Valor: one pool card for each hero, not one for the seat.
     expect(made.result?.earned.map((item) => `${item.code}@${item.hero}`).sort()).toEqual(["01133@ah1", "01133@ah2", "01138@ah3"]);
     expect(made.result?.prisoner).toBe("ah2");
-    const log = applyResolution(emptyLog(2), made.state.scenarioId, made.state, cards);
+    const log = applyResolution(emptyLog(2), made.state.scenarioId, made.state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["journey-along-the-anduin"]);
     expect(log.prisoner).toBe("ah2");
     expect(log.campaignPool.map((card) => `${card.code}@${card.attachedTo}`).sort()).toEqual(["01133@ah1", "01133@ah2", "01138@ah3"]);
@@ -247,14 +248,14 @@ describe("what a win writes", () => {
       const valor = spawn(state, "01133", { zone: "play", seat: 0 });
       return attachTo(valor.state, valor.id, ids.hero);
     });
-    const log = applyResolution({ ...emptyLog(2), fallenHeroesBySeat: [["ah1"], []] }, made.state.scenarioId, made.state, cards);
+    const log = applyResolution({ ...emptyLog(2), fallenHeroesBySeat: [["ah1"], []] }, made.state.scenarioId, made.state, cards, NO_COPY_LIMITS);
     expect(log.campaignPool).toEqual([]);
   });
 
   it("hands the pool on its heroes to the next scenario's checklist: each Valor and Scarred is attached to its hero again (01130:B:1)", () => {
     const game = games.get("two-handed, brittle heroes, won with a Valor and a Scarred")!;
     expect(game.state.stageCleared).toBe(true);
-    const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards);
+    const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(log.campaignPool.length).toBeGreaterThan(0);
     // Escape from Dol Guldur's campaign card asks the first player where Appointed by Fate goes (01131:A:2).
     const plan = checklist({ log, scenario: loadScenario("escape-from-dol-guldur"), seats: log.heroesBySeat.map((heroes) => ({ heroes, deck: Array.from({ length: 30 }, () => "filler") })), effects: EFFECTS, cards, choices: [`01134>${log.heroesBySeat[0]?.[0]}`] });

@@ -13,6 +13,7 @@ import { breaking, campaign } from "../../../../test/scenarios/breaking-of-the-f
 import { applyResolution } from "../../log.ts";
 import { resolutionView, settledSentence, type ResolutionView } from "../../resolution-view.ts";
 import type { World } from "../../world.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const FOLLOWED_BY_NIGHT = "142089";
 const ILL_FATE = "142090";
@@ -64,7 +65,7 @@ describe("the resolution screens of Breaking of the Fellowship", () => {
     expect(settled.captives).toHaveLength(1);
     expect(end.stageCleared).toBe(true);
     // The log holds the boon chosen at the Setup (it joined the pool then) and the burden chosen now.
-    const written = applyResolution(breakingCampaignStart(1, 1, "Normal", strong.cards).log, breaking.id, end, strong.cards);
+    const written = applyResolution(breakingCampaignStart(1, 1, "Normal", strong.cards).log, breaking.id, end, strong.cards, NO_COPY_LIMITS);
     expect(written.campaignPool.map((card) => card.code).sort()).toEqual(["142015", FOLLOWED_BY_NIGHT]);
   });
 
@@ -88,7 +89,7 @@ describe("the resolution screens of Breaking of the Fellowship", () => {
     expect(sentence).toContain("recorded as fallen");
     // Confirming writes those rows to the campaign log.
     const { log } = breakingCampaignStart(2, 6, "Normal", strong.cards);
-    const written = applyResolution(log, breaking.id, end, strong.cards);
+    const written = applyResolution(log, breaking.id, end, strong.cards, NO_COPY_LIMITS);
     expect(written.captives).toHaveLength(2);
     expect(written.fallenHeroesBySeat.flat().length).toBeGreaterThan(0);
     expect(written.completed).toContain(breaking.id);

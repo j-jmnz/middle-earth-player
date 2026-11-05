@@ -18,7 +18,7 @@ type HeroBanEntry = { ban: HeroBan; parts: readonly number[] };
 const upTo = (last: number): number[] => Array.from({ length: last }, (_, index) => index + 1);
 
 // "When playing the Dream-chaser campaign, the Na'asiyah hero cannot be used in scenarios 1 through 7" (dcce.naasiyah). "Haldan cannot be used as a hero in this campaign" (emce.haldan, MEC115 p.2):
-// the campaign card of The King's Quest, the third part, says "Haldan may be included among a player's heroes" (12170:A:1), so the ban holds in every part but that one.
+// the campaign card of The King's Quest, the third part, says "Haldan may be included among a player's heroes" (12170:A:2), so the ban holds in every part but that one.
 const HERO_BANS: Readonly<Record<string, HeroBanEntry>> = {
   "dream-chaser": { ban: { code: "12109", name: "Na'asiyah", rule: "dcce.naasiyah" }, parts: upTo(7) },
   "ered-mithrin": { ban: { code: "19026", name: "Haldan", rule: "emce.haldan" }, parts: [1, 2, 4, 5, 6, 7, 8, 9] },
