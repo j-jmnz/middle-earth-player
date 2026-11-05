@@ -214,3 +214,33 @@ describe("the reading layer", () => {
     expect(openReading({ kind: "carousel" }, { kind: "carousel" })).toBeNull();
   });
 });
+
+describe("a reader's double tap (screen reader on)", () => {
+  // The reader table calls the canvas's onTap, so a double tap goes where the canvas tap goes: a card is picked or previewed, a pile opens its list.
+  it("picks a card of the open moment, with the tray open or not", () => {
+    for (const panelOpen of [true, false]) {
+      expect(tapRoute({ panelOpen, reader: true, cardId: "c1", peeking: false })).toBe("pick");
+      expect(tapAction({ panelOpen, reader: true, cardId: "c1", peeking: false, faceDown: false }, () => true)).toBe("picked");
+    }
+  });
+
+  it("opens the preview of a card the moment does not ask about, and nothing for a facedown one", () => {
+    expect(tapAction({ panelOpen: true, reader: true, cardId: "c2", peeking: false, faceDown: false }, () => false)).toBe("preview");
+    expect(tapAction({ panelOpen: false, reader: true, cardId: "c2", peeking: false, faceDown: true }, () => false)).toBe("none");
+  });
+
+  it("only previews while peeking at the other seat, and never asks the pick", () => {
+    let asked = false;
+    const pick = () => {
+      asked = true;
+      return true;
+    };
+    expect(tapAction({ panelOpen: true, reader: true, cardId: "c1", peeking: true, faceDown: false }, pick)).toBe("preview");
+    expect(asked).toBe(false);
+  });
+
+  it("opens a pile's list and a fold stack's row list, never folding the tray", () => {
+    expect(tapAction({ panelOpen: true, reader: true, cardId: "pile:discard", peeking: false, faceDown: false }, () => true)).toBe("pile");
+    expect(tapRoute({ panelOpen: true, reader: true, cardId: "fold:staging" })).toBe("pile");
+  });
+});

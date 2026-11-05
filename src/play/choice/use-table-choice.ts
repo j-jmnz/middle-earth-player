@@ -14,7 +14,7 @@ import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts"
 import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
 import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
-import { useScreenReader } from "../../ui/screen-reader.ts";
+import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, actingSeat, isLooked, onTableFor } from "../store/selectors.ts";
 import { dropOutcome, targetFromKey } from "../store/selection.ts";
 import { cannotPay } from "./why.ts";
@@ -28,7 +28,7 @@ import { sheetFor } from "./sheets.ts";
 import { effectById } from "../../rules/windows/listen.ts";
 import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState, TableStore } from "../store/store.ts";
 import type { LayoutOptions } from "../layout/layout.ts";
-import type { TableHighlight } from "../canvas/table-canvas-types.ts";
+import type { ReaderSeed, TableHighlight } from "../canvas/table-canvas-types.ts";
 import type { DockExtra } from "./dock/buttons.tsx";
 import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
@@ -45,6 +45,8 @@ export type TableChoice = {
   unavailable: readonly Unavailable[];
   readout: Readout | null;
   highlight: TableHighlight;
+  // What the reader table needs besides the highlight; null with no phone screen reader on, so the canvas gets nothing new.
+  readerSeed: ReaderSeed | null;
   raised: string | null;
   fight: LayoutOptions["preview"];
   // The choice is on a paper panel, and the panel is open (not folded).
@@ -105,6 +107,8 @@ export function useTableChoice({
   const moment = useStore(store, (state) => state.moment);
   const canUndo = useStore(store, (state) => state.history.length > 0);
   const reader = useScreenReader();
+  // The phone's screen reader (not the web list): it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
+  const readerMode = useReaderMode();
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [held, setHeld] = useState<Choice | null>(null);
   const [folded, setFolded] = useState<string | null>(null);
@@ -160,7 +164,9 @@ export function useTableChoice({
   const fight = useMemo(() => fightOf(fightKey), [fightKey]);
   // The hand card being played rises whole above the bottom edge.
   const raised = live ? playedCard(live.sheet) : null;
-  const baseHeader = headerOf(sheet, game);
+  // A reader hears the sheet's own sentence for it where the visible note names a glow or a drag (sheet-types.ts, readerNote).
+  const headed = headerOf(sheet, game);
+  const baseHeader = readerMode && sheet.kind !== "outcome" && sheet.readerNote ? { ...headed, note: sheet.readerNote } : headed;
   // While stops are on, the eyebrow says so first (a long eyebrow is cut at its end): the table passes some windows.
   const header = settings.stopsOn ? { ...baseHeader, step: `Stops on · ${baseHeader.step}` } : baseHeader;
   const guide = useGuide(settings, game, sheet, legal, live != null, header.note);
@@ -321,6 +327,7 @@ export function useTableChoice({
     choice,
     dock,
     header,
+    readerSeed: readerMode ? { sheet, cards: ctx.cards } : null,
     // No line shows it (the cards' marks and the primary's verb say it); the primary's hint speaks it.
     picked: pickedWords(sheet, choice, names),
     unavailable: sheet.kind === "pick" ? (sheet.unavailable ?? []) : [],

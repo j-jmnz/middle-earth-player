@@ -1,7 +1,8 @@
+import type { PrintedCard } from "../../rules/core/printed.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import type { BeatStore } from "../store/beat-store.ts";
 import type { SlotNumbers } from "../cards/card-effects.ts";
-import type { OptionMark } from "../choice/sheet-types.ts";
+import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import type { LayoutOptions } from "../layout/layout.ts";
 import type { Reach, RowFeet } from "../layout/column-reach.ts";
 import type { SpotlightHandoff } from "../spotlight/handoff.ts";
@@ -32,6 +33,10 @@ export type TableHighlight = {
 // and whether a delayed effect will act on it.
 export type SlotInfo = SlotNumbers;
 
+// What only the reader table reads (reader-table.tsx): the sheet of the open moment and the printed cards, for the words on each card.
+// The screen passes it while a screen reader is on and null otherwise, so the canvas's props are what they were without one.
+export type ReaderSeed = { sheet: Sheet; cards: ReadonlyMap<string, PrintedCard> };
+
 export type TableCanvasProps = {
   store: TableStore;
   width: number;
@@ -59,6 +64,7 @@ export type TableCanvasProps = {
   // The engine's numbers on a card, read from the state the canvas is handed (so a render never reads the store) and the seat drawn.
   info: (game: ScenarioState, seat: number, cardId: string) => SlotInfo;
   highlight: TableHighlight;
+  readerSeed?: ReaderSeed | null;
   // The cards the banner's current line names (the shadow card, the card damaged), ringed while the banner is at that line. The canvas
   // reads them itself, so a beat draws it and not the screen above it (beat-store.ts).
   beats: BeatStore;

@@ -379,7 +379,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
                 facts={facts}
                 success={success}
                 info={info}
-                highlight={choice.highlight}
+                highlight={choice.highlight} readerSeed={choice.readerSeed}
                 beats={beats}
                 raised={choice.raised}
                 fight={choice.fight}

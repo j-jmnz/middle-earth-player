@@ -35,7 +35,8 @@ import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { ReaderPiles } from "./reader-piles.tsx";
-import { useScreenReader } from "../../ui/screen-reader.ts";
+import { ReaderTable } from "./reader-table.tsx";
+import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useBackImages, useTokenImages } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
@@ -241,7 +242,17 @@ function RowFeetProbe({ store, width, height, column, onRowFeet, facts, bottomIn
   return null;
 }
 
+// With a screen reader on the phone the reader table takes the canvas's place (reader-table.tsx); the probe keeps answering the rows' feet so the command column lays out as it does over the canvas.
 function TableOrProbe(props: TableCanvasProps) {
+  const reader = useReaderMode();
+  if (reader && props.readerSeed) {
+    return (
+      <>
+        <RowFeetProbe {...props} />
+        <ReaderTable {...props} readerSeed={props.readerSeed} />
+      </>
+    );
+  }
   return props.reach === null ? <RowFeetProbe {...props} /> : <Table {...props} />;
 }
 
