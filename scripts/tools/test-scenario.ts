@@ -24,6 +24,8 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 //   coverage   the effect coverage, migration and record-route checks, the copied-lines test, the golden registry's own test, the file-size test and the rule-id
 //              test (COVERAGE_TESTS), and every
 //              choice-words test (src/play/words): a record on a card another scenario's words test reads (a campaign card, a recurring ally) can break it
+//   reader     src/play/reader-play.test.ts for the scenario (READER_PLAY_SCENARIO=<id>): a seeded game played through what a screen reader can reach, which fails
+//              on an intent the engine offers that no labelled element sends. The first scenario, and any scenario with a line in the golden registry, has games
 //   smoke      scripts/card-smoke/run.ts on the player cards the scenario deals (skipped when it deals none)
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
 //              none), committed, staged, unstaged or untracked (changedFamilyTests)
@@ -37,6 +39,7 @@ export type Selection = {
 };
 
 export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts"];
+export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
 export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
@@ -118,6 +121,11 @@ export function selectTests(id: string, changed: readonly string[], tree: readon
   return { tests, goldens: { files: goldens, title }, coverage, families: changedFamilyTests(changed, tree).filter((file) => !taken.has(file)) };
 }
 
+/** True when the scenario has games for the reader parity test: scenario 1 (a starter deck) or a scenario with a line in the golden registry (a commented-out line is none). */
+export function hasReaderGames(id: string, registrySource: string): boolean {
+  return id === "a-shadow-of-the-past" || new RegExp(`^\\s*entry\\("${escapeRegExp(id)}",`, "m").test(registrySource);
+}
+
 /** The player cards the scenario deals that have effect records: the campaign's starter decks when it opens the campaign, and player cards among its own. */
 export function playerCodes(id: string, recorded: readonly string[]): string[] {
   const scenario = loadScenario(id);
@@ -172,15 +180,18 @@ async function main(log: Log): Promise<void> {
 
   const tree = [...git(["ls-files", "--cached", "--others", "--exclude-standard"])].filter((file) => /^(src|scripts|test)\/.*\.test\.ts$/.test(file) && existsSync(path.join(ROOT, file)));
   const changed = changedFiles();
-  const title = registryTitle(id, readFileSync(path.join(ROOT, "test/harness/golden-registry.ts"), "utf8"));
+  const registrySource = readFileSync(path.join(ROOT, "test/harness/golden-registry.ts"), "utf8");
+  const title = registryTitle(id, registrySource);
   const selection = selectTests(id, changed, tree, title, (file) => readFileSync(path.join(ROOT, file), "utf8"));
   const smoke = playerCodes(id, smokeCodes());
 
-  const parts: { name: string; files: string[]; filter?: string; note?: string }[] = [
+  const readerGames = hasReaderGames(id, registrySource) && existsSync(path.join(ROOT, READER_TEST));
+  const parts: { name: string; files: string[]; filter?: string; note?: string; env?: Record<string, string> }[] = [
     { name: "tests", files: selection.tests },
     { name: "goldens", files: selection.goldens.files, filter: selection.goldens.title ?? undefined, note: title === null ? (id in DIRECT_GOLDENS ? "no registry entry: replay.test.ts and causes.test.ts read its goldens directly and run whole in tests" : "no entry in test/harness/golden-registry.ts") : undefined },
     { name: "coverage", files: selection.coverage },
     { name: "families", files: selection.families, note: selection.families.length === 0 ? "no pool, family or manifest file changed" : undefined },
+    { name: "reader", files: readerGames ? [READER_TEST] : [], note: readerGames ? undefined : "no games: the scenario has no line in test/harness/golden-registry.ts", env: { READER_PLAY_SCENARIO: id } },
   ];
 
   if (listOnly) {
@@ -198,7 +209,7 @@ async function main(log: Log): Promise<void> {
       results.push({ name: part.name, ok: true, ms: 0, detail: `skipped${part.note ? ` (${part.note})` : ""}` });
       continue;
     }
-    const outcome = run("pnpm", vitest(part.files, part.filter));
+    const outcome = run("pnpm", vitest(part.files, part.filter), part.env);
     results.push({ name: part.name, ok: outcome.ok, ms: outcome.ms, detail: `${part.files.length} files${part.filter ? `, -t ${part.filter}` : ""}` });
   }
   if (smoke.length === 0) results.push({ name: "smoke", ok: true, ms: 0, detail: "skipped (no player cards dealt)" });

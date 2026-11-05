@@ -25,6 +25,7 @@ import { dockExtras } from "./dock/extras.ts";
 import { usePeeking } from "../store/use-peek.ts";
 import { useStable } from "../../ui/use-stable.ts";
 import { boardUnlit, fightOf, highlightKeys, highlightOf, playedCard } from "../canvas/highlight-of.ts";
+import { listedOnPaper, pickResult } from "./pick-route.ts";
 import { listsResponses, stepChoice, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import { effectById } from "../../rules/windows/listen.ts";
@@ -32,7 +33,7 @@ import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState, TableStor
 import type { LayoutOptions } from "../layout/layout.ts";
 import type { ReaderSeed, TableHighlight } from "../canvas/table-canvas-types.ts";
 import type { DockExtra } from "./dock/buttons.tsx";
-import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
+import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
 // A sheet the player opened from the table, for the game it was opened in. `panel` keeps it on paper even when its choices
 // are cards on the table (the Actions list reads the printed lines).
@@ -112,9 +113,10 @@ export function useTableChoice({
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
   const canUndo = useStore(store, (state) => state.history.length > 0);
-  const reader = useScreenReader();
   // The phone's screen reader (not the web list): it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
   const readerMode = useReaderMode();
+  // The tray lists the choices for any reader, and a development build that forces the reader table (screen-reader.ts) lists them too.
+  const reader = useScreenReader() || readerMode;
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   // The card or row a screen reader's user last activated (set only under the reader): focus stays on it when the next moment still asks about it.
   const [touched, setTouched] = useState<string | null>(null);
@@ -148,7 +150,8 @@ export function useTableChoice({
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   // A Response the player may use opens listed, beside the dock's Pass (user request, 2026-10-29).
   const responses = listsResponses(sheet, game.window?.kind);
-  const asked = (live?.panel ?? false) || listed === sheet.key || responses || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0) || (reader && sheet.kind === "pick" && sheet.look != null);
+  // `!!`: the compiler reads a call's result as an object that may change later, which a boolean read by a callback below is not.
+  const asked = !!listedOnPaper((live?.panel ?? false) || listed === sheet.key, responses, reader, sheet.kind, tappable(sheet).size, sheet.kind === "pick" && sheet.look != null);
   const panel = asked || !onTheTable(sheet, onTable);
   const panelOpen = trayOpen(panel, folded, sheet.key);
   const passLegal = legal.some((intent) => intent.type === "Pass");
@@ -269,11 +272,11 @@ export function useTableChoice({
   const pick = useCallback(
     (id: string): boolean => {
       // The only answer of the moment: the tap on its card sends it.
-      if (dock.single && dock.primary && primaryReady(dock) && tappable(sheet).has(id)) {
+      const result = pickResult(sheet, held, id, table, dock);
+      if (result.kind === "primary" && dock.primary) {
         onButton(dock.primary);
         return true;
       }
-      const result = tap(sheet, held, id, table);
       if (result.kind === "choice") setHeld(result.choice);
       else if (result.kind === "open") open(result.sheet);
       return result.kind !== "none";

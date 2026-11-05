@@ -1,5 +1,5 @@
 // The reader gate: a screen reader on a phone, never on the web (whose react-native-web always says yes) and never with no reader.
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useReaderMode, useScreenReader } from "./screen-reader.ts";
 
@@ -46,6 +46,48 @@ describe("useReaderMode", () => {
     phone.os = "web";
     phone.screenReader = true;
     expect(useScreenReader()).toBe(true);
+    expect(useReaderMode()).toBe(false);
+  });
+});
+
+// The development override Maestro's reader flow uses (.maestro/features/screen-reader.yaml): it needs a development build and the variable.
+describe("useReaderMode with EXPO_PUBLIC_FORCE_READER", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("is true on a phone in a development build with the variable set to 1, with no screen reader on", () => {
+    vi.stubGlobal("__DEV__", true);
+    vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "1");
+    expect(useReaderMode()).toBe(true);
+    phone.os = "android";
+    expect(useReaderMode()).toBe(true);
+    // The plain hook still answers what the phone's reader says.
+    expect(useScreenReader()).toBe(false);
+  });
+
+  it("is false in a release build, whatever the variable says", () => {
+    vi.stubGlobal("__DEV__", false);
+    vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "1");
+    expect(useReaderMode()).toBe(false);
+  });
+
+  it("is false when the variable is not 1, and when the build has no __DEV__ at all", () => {
+    vi.stubGlobal("__DEV__", true);
+    vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "0");
+    expect(useReaderMode()).toBe(false);
+    vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "");
+    expect(useReaderMode()).toBe(false);
+    vi.unstubAllGlobals();
+    vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "1");
+    expect(useReaderMode()).toBe(false);
+  });
+
+  it("is false on the web even in a development build with the variable set", () => {
+    vi.stubGlobal("__DEV__", true);
+    vi.stubEnv("EXPO_PUBLIC_FORCE_READER", "1");
+    phone.os = "web";
     expect(useReaderMode()).toBe(false);
   });
 });

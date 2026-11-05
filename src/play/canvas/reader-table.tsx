@@ -27,6 +27,8 @@ const OPEN_LIST = [{ name: "open", label: "Open the list" }];
 
 type ButtonProps = {
   id: string;
+  // The stable id a Maestro flow taps (.maestro/features/screen-reader.yaml): the card's place in its zone, or the pile's name; a card's own id changes from game to game.
+  testID: string;
   label: string;
   hint: string | null;
   picked: number;
@@ -42,11 +44,11 @@ type ButtonProps = {
 // One button: the card's or pile's words, 44 pt high at least. `dimmed`: a pick is open and does not ask about it (told to the reader as disabled; a
 // double tap still goes to the canvas tap, which opens the card large). The pressed fill is on a view inside: NativeWind drops a style function on a
 // Pressable that also has a className.
-function ReaderButton({ id, label, hint, picked, glows, dimmed, muted, faint, actions, onAction, onTap }: ButtonProps) {
+function ReaderButton({ id, testID, label, hint, picked, glows, dimmed, muted, faint, actions, onAction, onTap }: ButtonProps) {
   const t = useTableTokens();
   return (
     <Pressable
-      testID={`reader-${id}`}
+      testID={testID}
       accessible
       accessibilityRole="button"
       accessibilityLabel={label}
@@ -69,13 +71,14 @@ function ReaderButton({ id, label, hint, picked, glows, dimmed, muted, faint, ac
   );
 }
 
-function Item({ item, game, seat, deps, onTap, onPreview }: { item: ReaderItem; game: ScenarioState; seat: number; deps: CardSpeechDeps } & Pick<ReaderProps, "onTap" | "onPreview">) {
+function Item({ item, place, game, seat, deps, onTap, onPreview }: { item: ReaderItem; place: number; game: ScenarioState; seat: number; deps: CardSpeechDeps } & Pick<ReaderProps, "onTap" | "onPreview">) {
   const highlight = deps.highlight;
   if (item.kind === "text") return <Text className="text-label text-bone">{item.text}</Text>;
   if (item.kind === "pile") {
     return (
       <ReaderButton
         id={item.id}
+        testID={`reader-pile-${item.pile}`}
         label={item.label}
         hint={item.hint}
         picked={highlight.picked.get(item.id) ?? 0}
@@ -95,6 +98,7 @@ function Item({ item, game, seat, deps, onTap, onPreview }: { item: ReaderItem; 
   return (
     <ReaderButton
       id={item.id}
+      testID={`reader-card-${item.zone}-${place}`}
       label={said.label}
       hint={said.hint}
       picked={highlight.picked.get(item.id) ?? 0}
@@ -132,12 +136,12 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
       {rows.map((section) => (
         <View key={section.key} className="mb-3 gap-1">
           {section.heading ? (
-            <Text accessibilityRole="header" className="text-label text-muted">
+            <Text testID={`reader-zone-${section.key}`} accessibilityRole="header" className="text-label text-muted">
               {section.heading}
             </Text>
           ) : null}
           {section.items.map((item, index) => (
-            <Item key={item.kind === "text" ? `text:${index}` : item.id} item={item} game={game} seat={seat} deps={deps} onTap={onTap} onPreview={onPreview} />
+            <Item key={item.kind === "text" ? `text:${index}` : item.id} item={item} place={section.items.slice(0, index).filter((before) => before.kind === "card").length} game={game} seat={seat} deps={deps} onTap={onTap} onPreview={onPreview} />
           ))}
         </View>
       ))}
