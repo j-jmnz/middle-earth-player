@@ -13,12 +13,15 @@ export function campaignTextCodes(a: {
   // The booklet's Setup span of a Dream-chaser scenario, whose campaign paragraph is dcce.campaign-setup-<id>; null for any other campaign.
   setupSpan: string | null;
   cardPacks: readonly string[];
+  // Only the Resolution's boons, burdens and treasures are dealt (ProductDef.campaignCardRewards).
+  campaignCardsOnly?: boolean;
 }): string[] {
   const found: string[] = [];
   const ofThisBox = (code: string): boolean => a.byCode.get(code)?.printings.some((p) => a.cardPacks.includes(p.pack)) === true;
   // The Resolution on the back names its rewards: they are dealt by the campaign, never by the load list.
   // Dream-chaser's XP list ("Gain the following: 1 XP for each Corsair Warship in the victory display") names cards it only counts.
-  found.push(...a.names.codesOf((a.byCode.get(a.campaignCard)?.back?.text ?? "").split("Gain the following")[0] ?? ""));
+  const rewards = a.names.codesOf((a.byCode.get(a.campaignCard)?.back?.text ?? "").split("Gain the following")[0] ?? "");
+  found.push(...(a.campaignCardsOnly ? rewards.filter((code) => a.byCode.get(code)?.campaignKind != null) : rewards));
   if (a.setupSpan != null) {
     // The booklet's campaign paragraph (dcce.campaign-setup-<id>) lists the cards a campaign game needs ("all copies of Send for Help ... Set aside each Send for Help facedown"). The campaign
     // card names most of them in its Setup; a card only the paragraph names (the Send for Help cards, which Gavin's Planning Action shuffles in) is dealt by the campaign too.

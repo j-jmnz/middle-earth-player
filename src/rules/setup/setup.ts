@@ -12,6 +12,7 @@ import { placeContracts } from "../families/sidequests/contract.ts";
 import { setAsideEncounterCards } from "../families/sidequests/encounter.ts";
 import { pushPlayerSetup } from "../families/sidequests/setup.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "../interpret/interpret.ts";
+import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { handSetup, searchSetup } from "./search.ts";
@@ -44,6 +45,9 @@ export type StartSeat = {
   loot?: readonly string[];
 };
 
+// The zones a scenario deals: every pile but the Evil Creatures discard pile, which starts empty.
+type DealtZone = Exclude<PileZone, "evilCreaturesDiscard">;
+
 export type StartScenario = {
   seatCount: 1 | 2;
   seed: number;
@@ -56,6 +60,8 @@ export type StartScenario = {
   burdenDeck?: readonly string[];
   // The non-ship enemies the scenario deals as its Corsair deck (dcce.corsair-deck), when it has one; "Prepare the Corsair deck" shuffles it.
   corsairDeck?: readonly string[];
+  // The decks of Ered Mithrin the scenario deals (emce.caves-deck, emce.evil-creatures-deck), by zone; the quest card's Setup shuffles them.
+  piles?: Readonly<Partial<Record<DealtZone, readonly string[]>>>;
   // The double-sided locations the scenario deals as its Uncharted deck (dcce.uncharted-deck), Lost Island side up; "Prepare the Uncharted deck" shuffles it.
   unchartedDeck?: readonly string[];
   // The cards with two sides that are two catalog cards: the Grotto deck the scenario deals (dcce.grotto-deck), each Grotto side up, and the Underwater side of a Grotto card the Setup sets aside; "Prepare the Grotto deck" shuffles it.
@@ -92,6 +98,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   if (input.corsairDeck && input.corsairDeck.length > 0) {
     state = { ...state, corsairDeck: [], corsairDiscard: [] };
     for (const code of input.corsairDeck) state = spawn(state, code, { zone: "corsairDeck" }).state;
+  }
+  for (const [zone, codes] of Object.entries(input.piles ?? {}) as [DealtZone, readonly string[]][]) {
+    for (const code of codes) state = spawn(state, code, { zone }).state;
+    // The Evil Creatures deck has a discard pile of its own, which exists from the start (emce.evil-creatures-deck).
+    if (zone === "evilCreaturesDeck") state = { ...state, piles: { ...state.piles, evilCreaturesDiscard: state.piles?.evilCreaturesDiscard ?? [] } };
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);

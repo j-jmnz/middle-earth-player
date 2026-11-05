@@ -19,6 +19,7 @@ import { applyResolution, emptyLog, poolCard, type CampaignLog } from "../../log
 import { newSave } from "../../save.ts";
 import { campaignPath } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
@@ -103,7 +104,7 @@ describe("Voyage Across Belegaer in the Dream-chaser campaign", () => {
     const golden = VOYAGE_GOLDENS.find((item) => item.name === "two-handed, won")!;
     const world = await voyageWorld(golden.decks);
     const game = playGolden(golden, world.ctx);
-    const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, world.cards);
+    const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, world.cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["voyage-across-belegaer"]);
     expect(log.xpGained["voyage-across-belegaer"]).toBe(game.state.resolutionLog.xp);
     expect(log.campaignPool.map((card) => card.code)).toEqual(["11176"]);
@@ -115,7 +116,7 @@ describe("Voyage Across Belegaer in the Dream-chaser campaign", () => {
     const lost = VOYAGE_GOLDENS.find((item) => item.name === "true solo, weak, lost on threat")!;
     const lostGame = playGolden(lost, (await voyageWorld(lost.decks)).ctx);
     const untouched = emptyLog(1);
-    expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards)).toBe(untouched);
+    expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards, NO_COPY_LIMITS)).toBe(untouched);
   });
 
   it("carries the previous part's pool into the encounter deck and the player decks through the checklist (Ominous Fate and a pool card)", () => {

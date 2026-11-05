@@ -14,6 +14,7 @@ import { CODES, campaign, corsairs } from "../../../../test/scenarios/the-city-o
 
 import { buildStart } from "../../start.ts";
 import { emptyLog, applyResolution } from "../../log.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
@@ -144,7 +145,7 @@ describe("The City of Corsairs in the Dream-chaser campaign", () => {
     const won = playGolden(golden!, ctx).state;
     expect(won.stageCleared).toBe(true);
     const before = afterHaven(1);
-    const log = applyResolution(before, won.scenarioId, won, ctx.cards);
+    const log = applyResolution(before, won.scenarioId, won, ctx.cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...campaign.scenarios]);
     expect(log.xpGained[corsairs.id]).toBe(won.resolutionLog.xp);
     expect(nextStep(campaignPath(campaign, {}, log), null)).toEqual({ kind: "finished" });
@@ -156,7 +157,7 @@ describe("The City of Corsairs in the Dream-chaser campaign", () => {
     const lost = playGolden({ name: "lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost" }, world.ctx).state;
     expect(lost.lost).toBe(true);
     const log = { ...emptyLog(1), completed: campaign.scenarios.slice(0, 8) };
-    expect(applyResolution(log, lost.scenarioId, lost, world.cards)).toBe(log);
+    expect(applyResolution(log, lost.scenarioId, lost, world.cards, NO_COPY_LIMITS)).toBe(log);
     expect(campaignPath(campaign, {}, log).find((node) => node.id === "the-city-of-corsairs")?.status).toBe("current");
   });
 });

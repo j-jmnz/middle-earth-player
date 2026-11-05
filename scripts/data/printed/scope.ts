@@ -14,8 +14,8 @@ import type { HobCard } from "../sources/hallofbeorn.ts";
 import { foldTwoSided } from "../normalize/product-cards.ts";
 import { titleKey } from "../normalize/names.ts";
 
-// The pack the Dream-chaser Campaign Expansion's cards are printed in (scripts/data/campaign-defs.ts).
-const DREAM_CHASER_EXPANSION = "DCCE";
+// The packs the Campaign Expansions' cards are printed in (ProductDef.campaignExpansion, scripts/data/campaign-defs.ts).
+const CAMPAIGN_EXPANSION_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.campaignExpansion).flatMap((product) => product.packs));
 
 // The cards whose printed text the ledger holds: everything every built scenario deals (the six of the Fellowship box, the
 // three Revised Core scenarios, The Oath and The Caves of Nibin-Dûm), on every difficulty (the Nightmare decks of the nine that
@@ -92,9 +92,9 @@ function boxCodes(): string[] {
     }
   }
   for (const card of cards) if (card.campaignKind && card.printings.some((printing) => PRODUCT_PACKS.has(printing.pack))) codes.add(card.code);
-  // Everything the Dream-chaser Campaign Expansion prints that is not a player card: the nine campaign cards, the Hard and Expert Mode card
-  // (in no scenario's list), the 2023 reprints with their Campaign Mode only and Upgraded sides, the ships and every boon and burden.
-  for (const card of cards) if (card.printings.some((printing) => printing.pack === DREAM_CHASER_EXPANSION)) codes.add(card.code);
+  // Everything a Campaign Expansion prints: the nine campaign cards, the Dream-chaser's Hard and Expert Mode card (in no scenario's list), its
+  // 2023 reprints with their Campaign Mode only and Upgraded sides, its ships, every boon and burden, and Ered Mithrin's treasures.
+  for (const card of cards) if (card.printings.some((printing) => CAMPAIGN_EXPANSION_PACKS.has(printing.pack))) codes.add(card.code);
   // The box's Ring-bearer: every scenario starts with a Fellowship-sphere Ring-bearer hero in play (mec109.setting-up-the-game),
   // so his text is part of every game.
   for (const card of cards) {

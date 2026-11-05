@@ -45,7 +45,7 @@ export function assignDamage(state: ScenarioState, instruction: Assign, focus: F
 export function discardEach(state: ScenarioState, instruction: Extract<Instruction, { verb: "DiscardEach" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   let next = state;
   let count = 0;
-  for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx)) {
+  for (const id of pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx, undefined, undefined, false, { discards: true })) {
     const card = next.cards[id];
     const seat = card?.owner ?? card?.controller;
     if (!card || seat == null) continue;

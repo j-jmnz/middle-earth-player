@@ -11,6 +11,7 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of Journey in the Dark played by the auto-player (test/scenarios/journey-in-the-dark/game.ts), true solo and two-handed, through wins (with the
 // Balrog still to come and with the Balrog in play) and losses, on fixed seeds. It pins the path from data/ through buildStart, the scenario's records, the
@@ -63,7 +64,7 @@ goldenSuite<MoriaGolden, MoriaDecks>({
     expect(log.campaignPool.map((card) => card.code).sort()).toEqual(state.resolutionLog.earned.map((item) => item.code).sort());
     // Written after scenarios 1 to 4, the win unlocks Breaking of the Fellowship.
     const before = { ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south"] };
-    const after = applyResolution(before, state.scenarioId, state, world.cards);
+    const after = applyResolution(before, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     expect(campaignPath(campaign, {}, after).map((node) => node.status).slice(3, 6)).toEqual(["completed", "completed", "current"]);
     expect(campaign.scenarios[5]).toBe("breaking-of-the-fellowship");
   },

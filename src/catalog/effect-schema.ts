@@ -297,8 +297,8 @@ export const effectSchema = z.strictObject({
   anyPlayer: z.boolean().optional(),
   // This Response is the player's the event happened to, whoever controls the source ("the engaged player may ...", 12125:A:3): the seat of the event answers it, and it is not offered when the event names no seat.
   answeredBy: z.literal("eventSeat").optional(),
-  // This Action or Response of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
-  // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area).
+  // This Action, Response or Forced effect of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
+  // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area; Lost in the Wild's Forced effect, 18026:A:1).
   fromHand: z.literal(true).optional(),
   // A "revealed" event is heard only when the encounter deck itself revealed the card (staging, a surge, the top card;
   // rr.staging), not when a player searched for it and revealed it ("as it is revealed by the encounter deck", 01006:A:1).
@@ -312,6 +312,14 @@ export const effectSchema = z.strictObject({
   // The Resolution is the only place XP is awarded (dcce.gaining-xp): a GainXp line anywhere else would silently do nothing.
   message: "GainXp is a Resolution verb",
   path: ["timing"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "RemoveFromPool" || (instruction.codes != null) !== (instruction.choice != null)), {
+  // RemoveFromPool takes the encounter cards it names or lets each player choose, never both and never neither (emce.campaign-pool-encounter).
+  message: "RemoveFromPool names exactly one of codes and choice",
+  path: ["instructions"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "AddEncounterToPool" || (instruction.codes != null) !== (instruction.fromDeck != null)), {
+  // AddEncounterToPool names the codes it adds or the deck whose enemies in play it adds, never both and never neither (emce.campaign-pool-encounter).
+  message: "AddEncounterToPool names exactly one of codes and fromDeck",
+  path: ["instructions"],
 });
 
 export type Instruction = z.infer<typeof instructionSchema>;

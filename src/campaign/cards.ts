@@ -7,8 +7,8 @@ import { printedFromCard, type PrintedCard } from "../rules/core/printed.ts";
 // so the phone never reads data/cards at runtime. The catalog keeps the same fields as data/cards that the engine reads.
 export type CatalogRow = typeof cards.$inferSelect;
 
-function kindOf(value: string | null): "boon" | "burden" | null {
-  return value === "boon" || value === "burden" ? value : null;
+function kindOf(value: string | null): "boon" | "burden" | "treasure" | null {
+  return value === "boon" || value === "burden" || value === "treasure" ? value : null;
 }
 
 function backOf(value: string | null): "player" | "encounter" | null {

@@ -208,3 +208,121 @@ describe("parseSetup: Dream-chaser Setup sentences", () => {
     expect(read("Setup: Sail to Umbar.").unread).toEqual(["Sail to Umbar"]);
   });
 });
+
+// Ered Mithrin (phase 49): each sentence is quoted from data/printed/ered-mithrin.json (the scan-read ledger).
+describe("parseSetup: Ered Mithrin Setup sentences", () => {
+  const list = [
+    card("g1", "Turayn", "ally"),
+    card("g2", "A Growing Threat", "treachery"),
+    card("g3", "Haldan", "objective"),
+    card("g4", "Searching for a Way Out", "objective"),
+    card("g5", "Forest Spider"),
+    card("g6", "Twilight Hall", "location"),
+    card("g7", "Dagnir's Spawn"),
+    card("g8", "Abandoned Ruin", "location"),
+    card("g9", "The Threat to Wilderland", "objective"),
+    card("h1", "Urdug", "objective"),
+    card("h2", "Urdug", "enemy"),
+    card("h3", "Urdug's Cunning", "treachery"),
+    card("h4", "Wormsbane", "objective"),
+    card("h5", "Wormsbane", "objective"),
+    card("h6", "Dragon Sign", "objective"),
+    card("h7", "Fire-drake"),
+    card("h8", "Dragon Hoard", "location"),
+    card("h9", "Dagnir"),
+    card("i1", "Dragon-sickness", "treachery"),
+  ];
+  const em = nameIndex(list, new Set(["g3"]));
+  const read = (text: string) => parseSetup(text, em);
+  const steps = (text: string) => read(text).clauses.map((clause) => (clause.kind === "step" ? clause.step : clause.kind));
+
+  it("reads the deck steps of the stage 1A cards (18066.A, 18078.A, 19134.A, 19083.A)", () => {
+    expect(steps("Setup: Set Haldan aside, out of play. Create the Evil Creatures deck (see insert) and place it next to the quest deck.")).toEqual(["aside", "buildEvilCreaturesDeck"]);
+    expect(steps("Setup: Build the Caves deck (see insert) and set it next to the quest deck.")).toEqual(["buildCavesDeck"]);
+    expect(steps("Setup: Create the Caves deck and the quest deck (see insert).")).toEqual(["buildCavesDeck", "prepareQuestDeck"]);
+    const side = read("Setup: Search the encounter deck for all 8 encounter side quests, shuffle them together, and place them facedown next to the quest deck. This is the side quest deck. The first player adds Dagnir to the staging area and shuffles the encounter deck. Each other player reveals an encounter card.");
+    expect(side.unread).toEqual([]);
+    expect(side.clauses).toEqual([
+      { kind: "step", step: "buildSideQuestDeck", codes: [], count: 8 },
+      { kind: "stage", codes: ["h9"], perPlayer: null, count: 1 },
+      { kind: "shuffleEncounterDeck" },
+      { kind: "step", step: "eachOtherPlayerReveals", codes: [], count: 1 },
+    ]);
+  });
+
+  it("reads the cards discarded for the staging area, and the sets set aside by name (18071.A, 18078.A, 19134.A, 19168.A)", () => {
+    expect(read("Setup: Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.")).toEqual({
+      clauses: [{ kind: "discardToStaging", types: ["location"], amount: "players", eachPlayer: false, shuffleFirst: true }],
+      unread: [],
+    });
+    expect(read("Setup: Shuffle the encounter deck and discard cards from the top until X locations have been discarded, where X is 1 less than the number of players in the game. Add those locations to the staging area.").clauses).toEqual([
+      { kind: "discardToStaging", types: ["location"], amount: "playersLessOne", eachPlayer: false, shuffleFirst: true },
+    ]);
+    expect(read("Setup: Each player discards cards from the top of the encounter deck until he discards an enemy or location and adds that card to the staging area.").clauses).toEqual([
+      { kind: "discardToStaging", types: ["enemy", "location"], amount: "players", eachPlayer: true, shuffleFirst: false },
+    ]);
+    expect(read("Setup: Set the Spiders of Mirkwood and Dol Guldur Orcs encounter sets aside, out of play.").clauses).toEqual([{ kind: "step", step: "setSetsAside", codes: [], asideSets: ["Spiders of Mirkwood", "Dol Guldur Orcs"] }]);
+    expect(read("Setup: Set Fire-drake, Dragon Hoard, and the Dragon Might encounter sets aside, out of play.").clauses).toEqual([
+      { kind: "aside", codes: ["h7", "h8"], allCopies: false },
+      { kind: "step", step: "setSetsAside", codes: [], asideSets: ["Dragon Might"] },
+    ]);
+  });
+
+  it("reads who takes control of a card, and a card with an objective and an enemy side (12168.A, 12170.A, 19047.A, 18071.A)", () => {
+    expect(read("Setup: Any player gains control of Turayn.").clauses).toEqual([{ kind: "step", step: "takeControl", codes: ["g1"] }]);
+    expect(read("Setup: The first player takes control of Urdug, objective side face-up.").clauses).toEqual([{ kind: "step", step: "takeControl", codes: ["h1", "h2"] }]);
+    expect(read("Setup: The first player takes control of Haldan and adds Searching for a Way Out to the staging area. Each player adds 1 Forest Spider to the staging area.").clauses).toEqual([
+      { kind: "step", step: "takeControl", codes: ["g3"] },
+      { kind: "stage", codes: ["g4"], perPlayer: null, count: 1 },
+      { kind: "stage", codes: ["g5"], perPlayer: 1, count: 0 },
+    ]);
+  });
+
+  it("reads the treasure steps of Lost in Mirkwood and the campaign cards (12168.A, 12170.A, 12184.A)", () => {
+    const hall = read("Setup: The first player may search the encounter deck for a copy of Twilight Hall and add it to the staging area. If they do, the players look at 3 random undiscovered treasures and attach 1 of them to Twilight Hall as a guarded objective. When free of encounters, the players claim the treasure and attach it to any character.");
+    expect(hall.unread).toEqual([]);
+    expect(hall.clauses).toEqual([
+      { kind: "step", step: "searchAndStage", codes: [], to: ["g6"] },
+      { kind: "step", step: "attachTreasure", codes: [], to: ["g6"], count: 3 },
+      { kind: "step", step: "claimTreasure", codes: [] },
+    ]);
+    const king = read("Setup: Each player may change hero cards without incurring the +1 threat penalty, and Haldan may be included among a player's heroes. Add The Threat to Wilderland to the staging area, shuffle Dagnir's Spawn into the encounter deck, and shuffle Abandoned Ruin into the Caves deck. If \"Turayn has taken an oath of vigilance,\" search the encounter deck for 3 treacheries and remove them from the game.");
+    expect(king.unread).toEqual([]);
+    expect(king.clauses).toEqual([
+      { kind: "waivePenalty" },
+      { kind: "step", step: "haldanMayBeHero", codes: [], to: ["g3"] },
+      { kind: "stage", codes: ["g9"], perPlayer: null, count: 1 },
+      { kind: "shuffleInto", codes: ["g7"], into: "encounter deck", set: null },
+      { kind: "shuffleInto", codes: ["g8"], into: "Caves deck", set: null },
+      { kind: "removeCards", ifLogged: "Turayn has taken an oath of vigilance", count: 3, what: "treachery", nonUnique: false, except: null, alsoCaves: null },
+    ]);
+    const roam = read("Setup: The first player may put their trust in Urdug by placing a resource on him (from the token pool). If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck. Flip this card over.");
+    expect(roam.unread).toEqual([]);
+    expect(roam.clauses.map((clause) => (clause.kind === "step" ? clause.step : clause.kind))).toEqual(["trustInUrdug", "cunningUnlessTrusted", "flipCampaignCard"]);
+    expect(read("Setup: If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck.").unread).toHaveLength(1);
+  });
+
+  it("reads the log conditions, the boon search and the ignored keywords (12175.A, 12184.A, 12187.A, 12193.A, 12195.A)", () => {
+    expect(read("Setup: A player may search their deck for a unique boon ally and add it to their hand. If \"Melanwar has given you guidance on traversing Wilderland,\" search the encounter deck for 2 non-unique locations and the Caves deck for 1 location and remove them from the game.").clauses).toEqual([
+      { kind: "searchDeckForBoon", who: "aPlayer", unique: true, cards: "boon ally" },
+      { kind: "removeCards", ifLogged: "Melanwar has given you guidance on traversing Wilderland", count: 2, what: "location", nonUnique: true, except: null, alsoCaves: 1 },
+    ]);
+    expect(read("Setup: If \"Melanwar has given you guidance on traversing Wilderland,\" search the encounter deck for 3 non-unique enemies not named Grey Mountain Giant and remove them from the game.").clauses).toEqual([
+      { kind: "removeCards", ifLogged: "Melanwar has given you guidance on traversing Wilderland", count: 3, what: "enemy", nonUnique: true, except: "Grey Mountain Giant", alsoCaves: null },
+    ]);
+    expect(read("Setup: Each player may search their deck for a boon or treasure card and add it to their hand.").clauses).toEqual([{ kind: "searchDeckForBoon", who: "eachPlayer", unique: false, cards: "boon or treasure" }]);
+    expect(read("Setup: If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck. Flip this card.").clauses).toEqual([
+      { kind: "shuffleInto", codes: ["i1"], into: "encounter deck", set: null, ifTreasures: 6 },
+      { kind: "step", step: "flipCampaignCard", codes: [] },
+    ]);
+    expect(read("Setup: Ignore the deep and discover keywords.").clauses).toEqual([{ kind: "step", step: "ignoreKeywords", codes: [], sets: ["deep", "discover"] }]);
+    expect(read("Setup: Ignore the deep keyword. (Note: If you make 5 or more progress on the main quest, you will earn a treasure during quest resolution.)").unread).toEqual([]);
+    expect(read("Setup: Attach Wormsbane to a hero, Broken side face-up.").clauses).toEqual([{ kind: "attachChosen", codes: ["h4", "h5"], who: "anyPlayer" }]);
+  });
+
+  it("leaves a sentence unread when a name it must hold finds no card", () => {
+    expect(read("Setup: The first player takes control of Thranduil and adds Searching for a Way Out to the staging area.").unread).toHaveLength(1);
+    expect(read("Setup: Shuffle 2 set aside Dragon Sign objectives into the Caves deck.").clauses).toEqual([{ kind: "step", step: "shuffleAsideIntoCaves", codes: ["h6"], count: 2 }]);
+    expect(read("Setup: Shuffle 2 set aside Spiders objectives into the Caves deck.").unread).toHaveLength(1);
+  });
+});

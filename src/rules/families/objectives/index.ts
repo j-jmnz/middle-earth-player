@@ -1,4 +1,4 @@
-// Rules: rr.guarded, ltp.guarded, rr.objective-cards, ltp.objective-cards, rr.attachment-cards, rr.restricted (data/rules/entries.json);
+// Rules: rr.guarded, ltp.guarded, emce.guarded-x, wor.guarded-x, rr.objective-cards, ltp.objective-cards, rr.attachment-cards, rr.restricted (data/rules/entries.json);
 // ledger lines 01108:A:1-2, 01109:A:1-2, 01110:A:1-2, 01123:A:1, 12121:A:1, 12126:A:3, 12127:A:3, 12133:A:1 (AttachGuard, guard.ts), 12134:A:2 to 12137:A:2 (ControlWhenFree, control.ts).
 //
 // The guarded objectives of Escape from Dol Guldur. An objective with the Guarded keyword is guarded when it is revealed (even in
@@ -21,10 +21,12 @@ import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
+import { discardUntilType } from "../encounter/discard-until.ts";
+import { moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { controlSweep } from "./control.ts";
 import { freeOfEncounters } from "./free.ts";
-import { attachGuard } from "./guard.ts";
+import { attachGuard, guardWith } from "./guard.ts";
 import { objectivesPickMatches } from "./pick.ts";
 
 export { freeOfEncounters };
@@ -51,12 +53,22 @@ function guardObjective(state: ScenarioState, instruction: Extract<Instruction, 
   const id = refCard(state, instruction.target ?? "self", frameScope(state, focus.seat, focus.sourceId));
   const objective = id ? state.cards[id] : undefined;
   if (!id || !objective || objective.zone !== "staging" || printedOf(ctx.cards, objective.code).type !== "objective") return state;
+  // Guarded (enemy) / Guarded (location): the card found is added to the staging area and guards the objective, not revealed (emce.guarded-x).
+  if (instruction.types) return guardedByType(state, id, instruction.types, focus, ctx, steps);
   const ready = resetEncounterDeck(state, steps);
   const at = ready.encounterDeck.findIndex((cardId) => printedOf(ctx.cards, ready.cards[cardId]?.code ?? "").type !== "objective");
   if (at < 0) return ready;
   // The guard comes to the top of the deck, the objectives above it keep their order below it.
   const deck = [ready.encounterDeck[at] ?? "", ...ready.encounterDeck.slice(0, at), ...ready.encounterDeck.slice(at + 1)];
   return startReveal({ ...ready, encounterDeck: deck }, focus.seat, ctx, steps, undefined, id);
+}
+
+// Guarded (X) on an objective (emce.guarded-x, wor.guarded-x): cards are discarded from the encounter deck until one of the types is discarded (the discard pile is shuffled into an empty deck), and that card is added to the staging area
+// and attached to the objective as a guarded objective. With no card of the types in the deck or the discard pile the objective stays unguarded.
+export function guardedByType(state: ScenarioState, objectiveId: string, types: readonly string[], focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const { state: searched, found } = discardUntilType(state, types, ctx);
+  if (found == null) return state;
+  return guardWith(moveEncounter(searched, found, "staging", focus.seat, ctx, steps), found, objectiveId);
 }
 
 // ClaimObjective: the source objective leaves the staging area for the last picked hero, controlled by that hero's controller.

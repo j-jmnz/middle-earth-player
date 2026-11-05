@@ -9,6 +9,7 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { validateLoadout } from "../../loadout.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of Flight to the Ford played by the auto-player (test/scenarios/flight-to-the-ford/game.ts), true solo and
 // two-handed, through a win and through a loss, on fixed seeds. The wins use the big-number loadout beside the saga Frodo; the
@@ -54,7 +55,7 @@ goldenSuite<FordGolden, FordDecks>({
     expect(log.campaignPool.map((card) => card.code).sort()).toEqual([...new Set(earnableBurdens(state, world.cards))].sort());
     for (const card of log.campaignPool) expect(card).toMatchObject({ back: "encounter", burdenSet: "Flight to the Ford", attachedTo: null });
     // Written after scenarios 1 and 2, the win unlocks The Ring Goes South.
-    const after = applyResolution({ ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past", "a-knife-in-the-dark"] }, state.scenarioId, state, world.cards);
+    const after = applyResolution({ ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past", "a-knife-in-the-dark"] }, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     expect(campaignPath(campaign, {}, after).map((node) => node.status).slice(0, 4)).toEqual(["completed", "completed", "completed", "current"]);
     expect(campaign.scenarios[3]).toBe("the-ring-goes-south");
   },

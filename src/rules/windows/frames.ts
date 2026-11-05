@@ -20,6 +20,7 @@ import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watch
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
 import { grapplesOnReveal, pushGrapple } from "../families/grapple/attach.ts";
+import { skipLoot } from "../families/wilderland/loot.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -54,8 +55,10 @@ export function startReveal(
   // The objective the card guards (families/objectives.ts).
   guards?: string,
 ): ScenarioState {
-  const ready = cardId ? state : resetEncounterDeck(state, steps);
-  const id = cardId ?? ready.encounterDeck[0];
+  // A Loot card on top of the deck is discarded, not revealed (emce.loot).
+  const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
+  const ready = skipped.state;
+  const id = skipped.top;
   const instance = id ? ready.cards[id] : undefined;
   if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;

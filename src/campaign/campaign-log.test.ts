@@ -13,6 +13,7 @@ import { carryOffers } from "./carry-over.ts";
 import { checklist } from "./checklist.ts";
 import { applyResolution, emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
 import { newSave, parseLog } from "./save.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 
 // Rules: ltp.campaign-pool, rr.campaign-pool, ltp.campaign-log, rr.campaign-log (data/rules/entries.json). The campaign log on
 // the Mirkwood campaigns: several copies of one code in the pool, structured facts in place of notes, and the cards a finished
@@ -47,38 +48,38 @@ describe("the pool holds several copies of one code", () => {
   it("each player earns a copy: two seats, two entries, each with its seat", () => {
     const state = won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }], 2);
     expect(resolutionResult(state)?.earned.map((item) => [item.code, item.seat])).toEqual([[SUPPORT, 0], [SUPPORT, 1]]);
-    const log = applyResolution(emptyLog(2), SCENARIO, state, cards);
+    const log = applyResolution(emptyLog(2), SCENARIO, state, cards, NO_COPY_LIMITS);
     expect(copies(log, SUPPORT).map((card) => card.seat)).toEqual([0, 1]);
   });
 
   it("an Earn without eachPlayer is still one copy, however often it is listed (the Fellowship's behavior)", () => {
     const state = won([{ verb: "Earn", codes: [SUPPORT, SUPPORT] }, { verb: "Earn", codes: [SUPPORT] }], 2);
-    expect(copies(applyResolution(emptyLog(2), SCENARIO, state, cards), SUPPORT)).toHaveLength(1);
+    expect(copies(applyResolution(emptyLog(2), SCENARIO, state, cards, NO_COPY_LIMITS), SUPPORT)).toHaveLength(1);
   });
 
   it("a copy earned again by the same player is the same entry, and another player's copy is not", () => {
-    const first = applyResolution(emptyLog(2), SCENARIO, won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }], 2), cards);
-    const again = applyResolution({ ...first, completed: [] }, SCENARIO, won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }], 2), cards);
+    const first = applyResolution(emptyLog(2), SCENARIO, won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }], 2), cards, NO_COPY_LIMITS);
+    const again = applyResolution({ ...first, completed: [] }, SCENARIO, won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }], 2), cards, NO_COPY_LIMITS);
     expect(copies(again, SUPPORT)).toHaveLength(2);
   });
 
   it("The Ring Draws Them chosen in scenario 1 and earned again by Flight to the Ford's EarnAllBurdens is one pool entry", () => {
     // Scenario 1's ChooseCards writes the card with the choosing seat; the Ford's Resolution earns every burden still in the encounter deck or discard, for nobody.
     const first = won([], 1, (s) => ({ ...s, resolutionLog: { ...s.resolutionLog, earned: [{ code: RING_DRAWS_THEM, to: "pool", seat: 0, hero: null, step: 0 }] } }));
-    const afterOne = applyResolution(emptyLog(1), SCENARIO, first, cards);
+    const afterOne = applyResolution(emptyLog(1), SCENARIO, first, cards, NO_COPY_LIMITS);
     expect(copies(afterOne, RING_DRAWS_THEM)).toHaveLength(1);
     const ford = won([{ verb: "EarnAllBurdens" }], 1, (s) => spawn(s, RING_DRAWS_THEM, { zone: "encounterDiscard" }).state);
     expect(resolutionResult(ford)?.earned.map((item) => [item.code, item.seat])).toEqual([[RING_DRAWS_THEM, null]]);
-    const afterFord = applyResolution(afterOne, "flight-to-the-ford", { ...ford, scenarioId: "flight-to-the-ford" }, cards);
+    const afterFord = applyResolution(afterOne, "flight-to-the-ford", { ...ford, scenarioId: "flight-to-the-ford" }, cards, NO_COPY_LIMITS);
     expect(copies(afterFord, RING_DRAWS_THEM)).toHaveLength(1);
   });
 
   it("removing a card from the pool removes one entry for each time it was removed, the named player's copy first", () => {
     const pool: PoolCard[] = [0, 1].map((seat) => ({ code: SUPPORT, back: "player", burdenSet: null, attachedTo: null, seat, perPlayer: true }));
     const mine = won([], 2, (s) => ({ ...s, removedFromPool: [{ code: SUPPORT, seat: 1 }] }));
-    expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, mine, cards), SUPPORT).map((card) => card.seat)).toEqual([0]);
+    expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, mine, cards, NO_COPY_LIMITS), SUPPORT).map((card) => card.seat)).toEqual([0]);
     const both = won([], 2, (s) => ({ ...s, removedFromPool: [{ code: SUPPORT, seat: 0 }, { code: SUPPORT, seat: 1 }] }));
-    expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, both, cards), SUPPORT)).toHaveLength(0);
+    expect(copies(applyResolution({ ...emptyLog(2), campaignPool: pool }, SCENARIO, both, cards, NO_COPY_LIMITS), SUPPORT)).toHaveLength(0);
   });
 
   it("an eliminated player still gets a copy: eachPlayer counts every seat", () => {
@@ -89,13 +90,13 @@ describe("the pool holds several copies of one code", () => {
 
 describe("structured campaign facts", () => {
   it("start with nothing, and a win writes what the game recorded: the prisoner, a once-per-campaign use, a counter", () => {
-    const blank = applyResolution(emptyLog(1), SCENARIO, won([], 1), cards);
+    const blank = applyResolution(emptyLog(1), SCENARIO, won([], 1), cards, NO_COPY_LIMITS);
     expect(blank).toMatchObject({ prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [] });
     const facts = { prisoner: HERO, usedOnce: ["41044"], counters: { "41050": 6 } };
-    const log = applyResolution(emptyLog(1), SCENARIO, won([], 1, (s) => ({ ...s, campaignFacts: facts })), cards);
+    const log = applyResolution(emptyLog(1), SCENARIO, won([], 1, (s) => ({ ...s, campaignFacts: facts })), cards, NO_COPY_LIMITS);
     expect(log).toMatchObject(facts);
     // A Resolution that names a prisoner or a counter writes that over the facts it was started with.
-    const named = applyResolution(emptyLog(1), SCENARIO, won([], 1, (s) => ({ ...s, campaignFacts: facts, resolutionLog: { ...s.resolutionLog, prisoner: "141002", counters: { "41050": 7 } } })), cards);
+    const named = applyResolution(emptyLog(1), SCENARIO, won([], 1, (s) => ({ ...s, campaignFacts: facts, resolutionLog: { ...s.resolutionLog, prisoner: "141002", counters: { "41050": 7 } } })), cards, NO_COPY_LIMITS);
     expect(named).toMatchObject({ prisoner: "141002", counters: { "41050": 7 }, usedOnce: ["41044"] });
   });
 
@@ -105,7 +106,7 @@ describe("structured campaign facts", () => {
   });
 
   it("round trips through the stored JSON", () => {
-    const log = applyResolution(emptyLog(2), SCENARIO, won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }, { verb: "CarryOver", codes: [MENDOR] }], 2, (s) => ({ ...s, campaignFacts: { prisoner: HERO, usedOnce: [], counters: {} } })), cards);
+    const log = applyResolution(emptyLog(2), SCENARIO, won([{ verb: "Earn", codes: [SUPPORT], eachPlayer: true }, { verb: "CarryOver", codes: [MENDOR] }], 2, (s) => ({ ...s, campaignFacts: { prisoner: HERO, usedOnce: [], counters: {} } })), cards, NO_COPY_LIMITS);
     expect(parseLog(JSON.parse(JSON.stringify(log)))).toEqual(log);
   });
 });
@@ -118,16 +119,16 @@ describe("carry-over to the next campaign", () => {
   const scenariosOf = (id: string) => (id === "campaign" ? [SCENARIO] : null);
 
   it("a Resolution writes carryOver cards, one copy or one for each player, and a loss writes nothing", () => {
-    const log = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
+    const log = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards, NO_COPY_LIMITS);
     // One entry for a copy for each player: the next save's seats decide how many.
     expect(log.carryOver.map((card) => [card.code, card.seat, card.perPlayer ?? false])).toEqual([[MENDOR, null, false], [SUPPORT, null, true]]);
     expect(log.campaignPool).toEqual([]);
-    const lost = applyResolution(emptyLog(2), SCENARIO, { ...won(resolution, 2), lost: true }, cards);
+    const lost = applyResolution(emptyLog(2), SCENARIO, { ...won(resolution, 2), lost: true }, cards, NO_COPY_LIMITS);
     expect(lost.carryOver).toEqual([]);
   });
 
   it("offers the carry-over of a finished save of any campaign, and only a finished one", () => {
-    const done = { ...newSave("done", "campaign", 2), log: applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards) };
+    const done = { ...newSave("done", "campaign", 2), log: applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards, NO_COPY_LIMITS) };
     const open = { ...done, id: "open", log: { ...done.log, completed: [] } };
     const empty = { ...newSave("empty", "campaign", 1), log: { ...emptyLog(1), completed: [SCENARIO] } };
     const other = { ...done, id: "other", campaignId: "another" };
@@ -137,7 +138,7 @@ describe("carry-over to the next campaign", () => {
   });
 
   it("an offer a save has taken is not made again, and returns when that save is gone", () => {
-    const done = { ...newSave("done", "campaign", 2), log: applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards) };
+    const done = { ...newSave("done", "campaign", 2), log: applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards, NO_COPY_LIMITS) };
     const taker = newSave("taker", "mirkwood-paths", 1, { carried: done.log.carryOver, carriedFrom: done.id });
     expect(taker.log.carriedFrom).toBe("done");
     expect(carryOffers([done, taker], scenariosOf)).toEqual([]);
@@ -147,7 +148,7 @@ describe("carry-over to the next campaign", () => {
   });
 
   it("a new save takes the cards in, and its first checklist moves them into the pool and clears carryIn", () => {
-    const finished = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
+    const finished = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards, NO_COPY_LIMITS);
     const fresh = newSave("next", "mirkwood-paths", 2, { carried: finished.carryOver });
     expect(fresh.log.carryIn).toHaveLength(3);
     expect(fresh.log.carryIn.map((card) => card.seat)).toEqual([null, 0, 1]);
@@ -165,10 +166,10 @@ describe("carry-over to the next campaign", () => {
   });
 
   it("a copy for each player follows the new save's seats: two seats to one gives one copy, one to two gives each a copy", () => {
-    const twoSeats = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards);
+    const twoSeats = applyResolution(emptyLog(2), SCENARIO, won(resolution, 2), cards, NO_COPY_LIMITS);
     const solo = newSave("solo", "mirkwood-paths", 1, { carried: twoSeats.carryOver });
     expect(solo.log.carryIn.filter((card) => card.code === SUPPORT).map((card) => card.seat)).toEqual([0]);
-    const oneSeat = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards);
+    const oneSeat = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards, NO_COPY_LIMITS);
     const pair = newSave("pair", "mirkwood-paths", 2, { carried: oneSeat.carryOver });
     expect(pair.log.carryIn.filter((card) => card.code === SUPPORT).map((card) => card.seat)).toEqual([0, 1]);
   });
@@ -181,7 +182,7 @@ describe("carry-over to the next campaign", () => {
   });
 
   it("an unfinished campaign's carryOver stays on its own log: part 4 of Mirkwood Paths continues the same log", () => {
-    const part3 = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards);
+    const part3 = applyResolution(emptyLog(1), SCENARIO, won(resolution, 1), cards, NO_COPY_LIMITS);
     // Nothing moves it into the pool while the campaign goes on: only a new save's carryIn does.
     const plan = checklist({ log: part3, scenario: loadScenario("the-oath"), seats: [{ heroes: [HERO, "141002"], deck: [] }], effects: EFFECTS, cards, choices: [`41044>${HERO}`] });
     if (!plan.ok) throw new Error(plan.errors.join(" "));

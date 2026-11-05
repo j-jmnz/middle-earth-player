@@ -18,6 +18,7 @@ import type { World } from "../../world.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const FRODO = "141001";
 const SAM = "141002";
@@ -119,7 +120,7 @@ describe("the campaign across scenarios 2 and 3", () => {
     const game = playGolden(golden, (await fordWorld(golden.decks)).ctx);
     const log = afterTwo();
     const cards = new Map([...(await fordWorld(golden.decks)).cards, ...ctx.cards]);
-    const after = applyResolution(log, game.state.scenarioId, game.state, cards);
+    const after = applyResolution(log, game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(after.completed).toEqual(["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford"]);
     // The earlier cards stay; the burdens in play, in the encounter deck and in its discard pile join them.
     expect(after.campaignPool.slice(0, 3)).toEqual(log.campaignPool);

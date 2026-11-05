@@ -19,6 +19,7 @@ import * as temple from "../scenarios/temple-of-the-deceived/game.ts";
 import * as ruins from "../scenarios/the-drowned-ruins/game.ts";
 import * as haven from "../scenarios/a-storm-on-cobas-haven/game.ts";
 import * as corsairs from "../scenarios/the-city-of-corsairs/game.ts";
+import * as upanduin from "../scenarios/journey-up-the-anduin/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -63,4 +64,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-drowned-ruins", "The Drowned Ruins", ruins.RUINS_GOLDENS, ruins.ruinsWorld, ruins.playGolden),
   entry("a-storm-on-cobas-haven", "A Storm on Cobas Haven", haven.HAVEN_GOLDENS, haven.havenWorld, haven.playGolden),
   entry("the-city-of-corsairs", "The City of Corsairs", corsairs.CORSAIRS_GOLDENS, corsairs.corsairsWorld, corsairs.playGolden),
+  entry("journey-up-the-anduin", "Journey Up the Anduin", upanduin.UPANDUIN_GOLDENS, upanduin.upanduinWorld, upanduin.playGolden),
 ];

@@ -11,6 +11,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { causeProblems } from "./cause-check.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
 import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
+import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
 // Test helper. The suite every campaign scenario's golden test (src/campaign/scenarios/<scenario-id>/golden.test.ts) registers: the
 // snapshot of the games, the opening, the cause of every number, the won loop (the Resolution, the XP, the next part on the campaign
@@ -124,12 +125,12 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         if (xp != null) expect(state.resolutionLog.xp).toBe(xp);
         const earlier = spec.campaign.scenarios.slice(0, index);
         const before = spec.before ? spec.before(golden, game(golden)) : golden.after ? { ...emptyLog(golden.seatCount), completed: earlier } : emptyLog(golden.seatCount);
-        const log = applyResolution(before, state.scenarioId, state, world.cards);
+        const log = applyResolution(before, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
         expect(log.completed).toEqual([...before.completed, spec.scenario.id]);
         if (xp != null) expect(log.xpGained[spec.scenario.id]).toBe(xpAwarded(xp));
         expect(log.modes).toEqual(golden.mode ? { [spec.scenario.id]: golden.mode } : {});
         // The part after this one is the one the path offers now: the log this Resolution writes onto a campaign that won the parts before it.
-        const path = campaignPath(spec.campaign, {}, applyResolution(logBefore(spec.campaign, spec.scenario, golden.seatCount), state.scenarioId, state, world.cards));
+        const path = campaignPath(spec.campaign, {}, applyResolution(logBefore(spec.campaign, spec.scenario, golden.seatCount), state.scenarioId, state, world.cards, NO_COPY_LIMITS));
         // The last part of a campaign has none after it.
         const last = index + 1 >= spec.campaign.scenarios.length;
         expect(path.map((node) => node.status).slice(0, index + 2)).toEqual([...Array.from({ length: index + 1 }, () => "completed"), ...(last ? [] : [nextPartStatus(spec.campaign, spec.scenario.id)])]);
@@ -154,7 +155,7 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         expect(state.resolutionLog.earned).toEqual([]);
         expect(state.resolutionLog.xp).toBeUndefined();
         const log = emptyLog(golden.seatCount);
-        expect(applyResolution(log, state.scenarioId, state, cards)).toBe(log);
+        expect(applyResolution(log, state.scenarioId, state, cards, NO_COPY_LIMITS)).toBe(log);
         spec.lost?.(state, golden, worldOf(golden), game(golden));
       });
     }

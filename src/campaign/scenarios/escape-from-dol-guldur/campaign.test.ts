@@ -26,6 +26,7 @@ import { newSave } from "../../save.ts";
 import { campaignPath } from "../../path.ts";
 import { resolutionView, settledSentence } from "../../resolution-view.ts";
 import { loadWorld } from "../../world.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
@@ -42,7 +43,7 @@ beforeAll(async () => {
   const golden = ANDUIN_GOLDENS.find((item) => item.name === "two-handed, brittle heroes, won with a Valor and a Scarred")!;
   const game = playAnduin(golden, brittle.ctx);
   // Journey Along the Anduin's win on top of Passage Through Mirkwood's: the pool on its heroes, the prisoner named.
-  anduinLog = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, game.state.scenarioId, game.state, new Map([...brittle.cards, ...cards]));
+  anduinLog = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, game.state.scenarioId, game.state, new Map([...brittle.cards, ...cards]), NO_COPY_LIMITS);
   await dolGuldurWorld("strong");
   oathCards = new Map(await loadPrinted(["41041", "41044", "41045"]));
 }, 120_000);
@@ -98,7 +99,7 @@ describe("what a win writes (01131:B:2)", () => {
   it("keeps Mendor, and a Mendor's Support for each player, for the next campaign when Mendor is still in play, and unlocks The Oath", () => {
     const golden = won.find((item) => item.name === "two-handed, won")!;
     const game = playGolden(golden, ctx);
-    const log = applyResolution({ ...anduinLog, campaignPool: [] }, game.state.scenarioId, game.state, cards);
+    const log = applyResolution({ ...anduinLog, campaignPool: [] }, game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"].filter((id) => log.completed.includes(id)));
     expect(log.completed.at(-1)).toBe("escape-from-dol-guldur");
     expect(log.carryOver.map((card) => `${card.code}:${card.perPlayer === true}`).sort()).toEqual(["01132:true", "01135:false"]);
@@ -113,7 +114,7 @@ describe("what a win writes (01131:B:2)", () => {
       const world = worlds.get(golden.decks)!;
       const game = playGolden(golden, world.ctx);
       expect(Object.values(game.state.cards).find((card) => card.code === "01135")?.zone, name).toBe("removed");
-      const log = applyResolution(emptyLog(golden.seatCount), game.state.scenarioId, game.state, world.cards);
+      const log = applyResolution(emptyLog(golden.seatCount), game.state.scenarioId, game.state, world.cards, NO_COPY_LIMITS);
       expect(log.carryOver, name).toEqual([]);
       expect(log.completed, name).toEqual(["escape-from-dol-guldur"]);
     }
@@ -122,7 +123,7 @@ describe("what a win writes (01131:B:2)", () => {
   it("is taken in by a new save once the campaign is finished: Mendor goes into play at the start of each scenario and each player's Mendor's Support is shuffled into their deck", () => {
     const golden = won.find((item) => item.name === "two-handed, won")!;
     const game = playGolden(golden, ctx);
-    const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards);
+    const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     const finished = { ...log, completed: [...campaign.scenarios] };
     const save = (id: string, log: CampaignLog) => ({ id, campaignId: "mirkwood-paths", seatCount: 2 as const, score: 0, log });
     const offers = carryOffers([save("old", finished) as never], (campaignId) => (campaignId === "mirkwood-paths" ? campaign.scenarios : null));

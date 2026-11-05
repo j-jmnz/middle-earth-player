@@ -1,0 +1,215 @@
+{
+  "id": "the-ghost-of-framsburg",
+  "name": "The Ghost of Framsburg",
+  "number": 7,
+  "stages": [
+    "19109",
+    "19110",
+    "19111"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Ghost of Framsburg",
+      "count": 23
+    },
+    {
+      "name": "Wild Creatures",
+      "count": 8
+    },
+    {
+      "name": "Afraid of the Dark",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "19094",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19095",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19096",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19098",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19099",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19100",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19101",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19102",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "19103",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19104",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19105",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19106",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19107",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "19108",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18053",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18048",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18057",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19109",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19110",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19111",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19101",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "19102",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "19103",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "19104",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "19105",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "19097",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignCard": "12189",
+  "campaignPlaced": [
+    "12190",
+    "12191",
+    "12192"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q08.7",
+    "dragnEasy": "E08.7",
+    "hobSlug": "The-Ghost-of-Framsburg"
+  }
+}

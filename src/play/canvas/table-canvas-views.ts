@@ -19,6 +19,8 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const corsair = useMemo(() => ({ deck: pileSelector("corsairDeck", seat), discard: pileSelector("corsairDiscard", seat) }), [seat]);
   const uncharted = useMemo(() => pileSelector("unchartedDeck", seat), [seat]);
   const grotto = useMemo(() => pileSelector("grottoDeck", seat), [seat]);
+  // The Evil Creatures pair and the Caves deck (Ered Mithrin), only while the game has dealt them; shared, so a peek leaves them too.
+  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat) }), [seat]);
   // The victory display, shared by the seats, drawn only while a card is in it.
   const victoryOf = useMemo(() => victoryPileSelector(facts.pointsOf ?? noPoints), [facts]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
@@ -36,13 +38,16 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const corsairDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("corsairDiscard") ? corsair.discard(state.game) : null));
   const unchartedDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("unchartedDeck") ? uncharted(state.game) : null));
   const grottoDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("grottoDeck") ? grotto(state.game) : null));
+  const evilCreaturesDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("evilCreaturesDeck") ? wilderland.evilDeck(state.game) : null));
+  const evilCreaturesDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("evilCreaturesDiscard") ? wilderland.evilDiscard(state.game) : null));
+  const cavesDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("cavesDeck") ? wilderland.caves(state.game) : null));
   const victory = useStore(store, (state) => victoryOf(state.game));
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
-      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(victory ? { victory } : {}) },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(victory ? { victory } : {}) },
     }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, victory],
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, cavesDeck, victory],
   );
 }
 

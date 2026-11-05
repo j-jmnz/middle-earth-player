@@ -7,6 +7,7 @@ import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { CampaignFacts, ResolutionLog } from "./campaign-state.ts";
 import type { SeaState } from "../families/sea/types.ts";
 import type { UnchartedState } from "../families/uncharted/types.ts";
+import type { PileZone } from "./piles.ts";
 import type { Discount } from "./discount-types.ts";
 
 export type { Discount };
@@ -52,6 +53,8 @@ export type ZoneName =
   | "corsairDiscard"
   // The Uncharted deck (dcce.uncharted-deck), out of play, every card Lost Island side up; the Stormcaller's area (dcce.stormcallers-area) and the Island Map (dcce.island-map), in play, outside the staging area.
   | "unchartedDeck" | "stormcallerArea" | "islandMap"
+  // The decks beside the encounter deck in Ered Mithrin (emce.caves-deck, emce.evil-creatures-deck), out of play (core/piles.ts): the Caves deck, the Evil Creatures deck and its own discard pile, and the two encounter sets Lost in Mirkwood sets aside.
+  | PileZone
   | "victory"
   | "setAside"
   | "removed"
@@ -121,6 +124,9 @@ export type CardInstance = {
   guard?: true;
   // A card of the encounter deck or its discard pile that a search "shuffles into the second encounter deck": SetAsideEncounterDeck keeps it in the deck when it sets the rest aside (families/sea/swap.ts, 11215:B:1).
   carried?: true;
+  // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
+  // leaves play (emce.evil-creatures-deck). Absent on every other card.
+  deck?: "evilCreatures";
 };
 
 export type Seat = {
@@ -227,6 +233,8 @@ export type ScenarioState = {
   // The Corsair deck and its discard pile, present once a scenario deals a Corsair deck (dcce.corsair-deck; families/sea/corsair.ts).
   corsairDeck?: readonly string[];
   corsairDiscard?: readonly string[];
+  // The decks of Ered Mithrin by zone name, present once a scenario deals one (core/piles.ts, families/wilderland/decks.ts).
+  piles?: Readonly<Partial<Record<PileZone, readonly string[]>>>;
   // The Uncharted deck and the codes of the double-sided locations that go back into it, present once a scenario deals one (families/uncharted.ts).
   uncharted?: UnchartedState;
   // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a

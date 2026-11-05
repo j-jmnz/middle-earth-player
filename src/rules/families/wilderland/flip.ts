@@ -1,0 +1,19 @@
+// Rules: rr.guarded (data/rules/entries.json); ledger line 18069:A:2. "Flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective": the card shows its other side and enters the staging area.
+import type { Instruction } from "../../../catalog/boundary.ts";
+
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
+import { guardWith } from "../objectives/guard.ts";
+import type { Focus } from "../index.ts";
+
+/** FlipOver: the source card, wherever it lies, becomes the card `into` and enters the staging area faceup with none of its old tokens; with `guardedBy` the picked card guards it. A source that is gone changes nothing. */
+export function flipOver(state: ScenarioState, instruction: Extract<Instruction, { verb: "FlipOver" }>, focus: Focus): ScenarioState {
+  const id = focus.sourceId;
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card) return state;
+  const flipped = updateCard(moveCard(state, id, { zone: "staging" }), id, { code: instruction.into, other: card.code, face: "up", controller: null, progress: 0, damage: 0, resources: 0 });
+  const guard = instruction.guardedBy ? lastPicked(flipped) : "";
+  return guard !== "" && flipped.cards[guard] ? guardWith(flipped, guard, id) : flipped;
+}

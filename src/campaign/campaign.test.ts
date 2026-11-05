@@ -15,6 +15,7 @@ import { checklist, type ChecklistInput } from "./checklist.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "./log.ts";
 import { campaignPath } from "./path.ts";
 import { buildStart } from "./start.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 
 // The campaign across two scenarios: win scenario 1 with a choice, then set scenario 2 up from the log.
 const campaign = loadCampaign();
@@ -38,7 +39,7 @@ function wonWith(first: string, second_: string): { state: ScenarioState; table:
   run = send(run, { type: "Pass" }, table.ctx);
   run = send(run, { type: "ChooseResolution", optionId: first }, table.ctx);
   run = send(run, { type: "ChooseResolution", optionId: second_ }, table.ctx);
-  return { state: run.state, table, log: applyResolution(emptyLog(1), run.state.scenarioId, run.state, cards) };
+  return { state: run.state, table, log: applyResolution(emptyLog(1), run.state.scenarioId, run.state, cards, NO_COPY_LIMITS) };
 }
 
 const DECK = Array.from({ length: 10 }, (_, index) => `deck${index}`);
@@ -248,7 +249,7 @@ describe("A Knife in the Dark from the log of A Shadow of the Past", () => {
     const sam = ended.seats[0]?.heroes.find((id) => ended.cards[id]?.code === SAM) ?? "";
     expect(legalIntents(ended, ctx)).toContainEqual({ type: "ChooseResolution", optionId: `141018>${sam}` });
     const done = expectOk(reduce(ended, { type: "ChooseResolution", optionId: `141018>${sam}` }, ctx)).state;
-    const after = applyResolution(log, done.scenarioId, done, cards);
+    const after = applyResolution(log, done.scenarioId, done, cards, NO_COPY_LIMITS);
     expect(after.completed).toEqual(["a-shadow-of-the-past", "a-knife-in-the-dark"]);
     expect(after.campaignPool).toContainEqual({ code: "141018", back: "player", burdenSet: null, attachedTo: SAM, seat: 0 });
     expect(after.earned["a-knife-in-the-dark"]).toEqual(["141018"]);
@@ -266,7 +267,7 @@ describe("A Knife in the Dark from the log of A Shadow of the Past", () => {
     const { started, ctx } = knifeStart(log, [{ heroes: [FRODO, SAM], deck: STARTER }]);
     const kept = expectOk(reduce(started, { type: "Keep" }, ctx)).state;
     const lost: ScenarioState = { ...kept, lost: true, lossReason: "The One Ring left play", window: null };
-    expect(applyResolution(log, lost.scenarioId, lost, cards)).toBe(log);
+    expect(applyResolution(log, lost.scenarioId, lost, cards, NO_COPY_LIMITS)).toBe(log);
     expect(campaignPath(campaign, {}, log).map((node) => node.status)).toEqual(["completed", "current", "locked", "locked", "locked", "locked"]);
   });
 });

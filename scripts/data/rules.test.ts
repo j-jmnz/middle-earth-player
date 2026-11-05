@@ -205,3 +205,37 @@ describe("Dream-chaser spans", () => {
     expect(text("dcce.from-sea-to-land")).toContain("shuffle the Corsair Deck and Corsair discard pile into the second encounter deck");
   });
 });
+
+// Ered Mithrin (phase 49): the Ered Mithrin Campaign Expansion rulebook (MEC115) is the document `emce`.
+describe("Ered Mithrin spans", () => {
+  const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");
+  const SCENARIOS = ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"];
+
+  it("pin the rulebook as a document of 28 pages with a span for each rule the plan names", () => {
+    expect(docs.get("emce")?.pages.length).toBe(28);
+    for (const id of [
+      ...SCENARIOS.map((scenario) => `emce.setup-${scenario}`),
+      ...["caves-deck", "deep", "guarded-x", "immune", "treasure", "campaign-pool-encounter", "evil-creatures-deck", "dragon-signs", "indestructible", "side-quests", "loot", "discover", "gundabad-quest-deck", "bypassing", "boon-allies", "haldan", "campaign-log"].map((rule) => `emce.${rule}`),
+    ]) {
+      expect(byId.has(id), id).toBe(true);
+    }
+  });
+
+  it("print each scenario's encounter-deck paragraph, the set lists the build checks the cards against", () => {
+    expect(text("emce.setup-journey-up-the-anduin")).toContain("Journey Up the Anduin, Grey Mountain Goblins, Hills of Wilderland, Lost in Wilderland, Journey Along the Anduin, and Wilderlands");
+    expect(text("emce.setup-lost-in-mirkwood")).toContain("Lost in Mirkwood, Dark Woods, Gathering Gloom, Passage Through Mirkwood, Spiders of Mirkwood and Dol Guldur Orcs");
+    expect(text("emce.setup-mount-gundabad")).toContain("Mount Gundabad, Fell Beasts, Deep Underground, Afraid of the Dark, Lost Caves, and Dragon Might");
+  });
+
+  it("hold the keyword and deck rules as the rulebook words them", () => {
+    expect(text("emce.caves-deck")).toContain("take each card from the Lost Caves encounter set");
+    expect(text("emce.deep")).toContain("If there are no cards remaining in the Caves deck, the Deep keyword is ignored.");
+    expect(text("emce.guarded-x")).toContain("X is a card type: enemy or location");
+    expect(text("emce.treasure")).toContain("Treasure cards added to a deck do not count towards that deck’s 50 card minimum.");
+    expect(text("emce.campaign-pool-encounter")).toContain("add the noted number of copies of each card listed in the campaign log to the encounter deck, regardless of encounter set");
+    expect(text("emce.evil-creatures-deck")).toContain("Remove each location and treachery card from the Wilderlands encounter set from the game.");
+    expect(text("emce.gundabad-quest-deck")).toContain("shuffle all stage 2 quest cards together randomly");
+    expect(text("emce.haldan")).toContain("Haldan cannot be used as a hero in this campaign.");
+    expect(text("emce.boon-allies")).toContain("Isolde is on the hunt");
+  });
+});

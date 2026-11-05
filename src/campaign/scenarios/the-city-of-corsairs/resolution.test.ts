@@ -10,6 +10,7 @@ import { CODES, corsairsTable, loadCorsairsWorld, type CorsairsLayout, type Cors
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 
 let world: CorsairsWorld;
@@ -59,7 +60,7 @@ describe("11215:B:4 Resolution: The players win the campaign!", () => {
     const { state, made } = won({});
     const before = { ...emptyLog(1), completed: campaign.scenarios.slice(0, -1) };
     expect(nextStep(campaignPath(campaign, {}, before), null)).toMatchObject({ kind: expect.stringMatching(/begin|soon/) });
-    const after = applyResolution(before, "the-city-of-corsairs", state, made.ctx.cards);
+    const after = applyResolution(before, "the-city-of-corsairs", state, made.ctx.cards, NO_COPY_LIMITS);
     expect(after.completed).toEqual([...campaign.scenarios]);
     expect(nextStep(campaignPath(campaign, {}, after), null)).toEqual({ kind: "finished" });
   });

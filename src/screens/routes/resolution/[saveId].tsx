@@ -31,27 +31,34 @@ import { Text } from "../../../ui/text";
 function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; selected: boolean; imagesrc: string | null; onPress: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const label = tile.hero ? `${tile.name} on ${tile.hero}` : tile.name;
+  const label = tile.label;
+  // A tile with no card (the campaign log line) is a row of its own across the group, in body type: a sentence does not fit a card's cell.
+  const wide = tile.wide === true;
   return (
     <Pressable
       testID={`resolution-choice-${tile.optionId}`}
       collapsable={false}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      accessibilityLabel={selected ? `${label}, selected` : label}
+      accessibilityLabel={`${selected ? `${label}, selected` : label}${tile.tag ? `, ${tile.tag}` : ""}`}
       onPress={onPress}
       // Two tiles a row: a boon offered on each hero makes a longer list than one row holds. An odd last tile keeps the
       // two-column width.
-      style={{ flexBasis: "46%", flexGrow: 1, maxWidth: "50%" }}
+      style={wide ? { width: "100%" } : { flexBasis: "46%", flexGrow: 1, maxWidth: "50%" }}
     >
       {({ pressed }) => (
         <View
-          className="min-h-14 items-center rounded-item p-3"
+          className={wide ? "min-h-14 justify-center rounded-item px-4 py-3" : "min-h-14 items-center rounded-item p-3"}
           style={{ ...tileSurface(pressed, t), ...(selected ? { boxShadow: selectedRingOf(t) } : {}) }}
         >
           {tile.code ? <CardThumb code={tile.code} imagesrc={imagesrc} width={72 * s} height={100 * s} /> : null}
-          <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
-          {selected ? <Text className="mt-0.5 text-label font-semibold text-accentHigh">Selected</Text> : null}
+          {wide ? (
+            <Text className={`text-body ${selected ? "font-semibold text-accentHigh" : "text-bone"}`}>{label}</Text>
+          ) : (
+            <Text className={`mt-2.5 text-center font-display text-heading ${selected ? "text-accentHigh" : "text-bone"}`}>{label}</Text>
+          )}
+          {tile.tag ? <Text className="mt-0.5 text-center text-label text-muted">{tile.tag}</Text> : null}
+          {selected ? <Text className={wide ? "mt-0.5 text-label font-semibold text-accentHigh" : "mt-0.5 text-center text-label font-semibold text-accentHigh"}>Selected</Text> : null}
         </View>
       )}
     </Pressable>

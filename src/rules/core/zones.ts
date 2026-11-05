@@ -7,7 +7,8 @@ import { dealtFace } from "../families/dreamchaser/facts.ts";
 import { routeDestination } from "../families/sea/routes.ts";
 import { grappledWith } from "../families/grapple/values.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
-import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
+import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
+import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { flagged, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
@@ -16,7 +17,7 @@ export type Destination =
   | { zone: "seatQuest"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking/areas.ts); the card is in
   // `staging` and in that seat's list.
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap"; area?: number }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap" | PileZone; area?: number }
   // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
   // Without it the card takes the state's own slot, which on a seat's view (families/breaking/areas.ts) is that seat's.
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }
@@ -74,6 +75,8 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     if (!seat) return state;
     return patchSeatList(state, current.controller, listKey, without(seat[listKey], id));
   }
+  // The decks beside the encounter deck (Corsair, Uncharted, Ered Mithrin's) leave through one accessor (piles.ts).
+  if (isDeckZone(current.zone)) return leavePile(state, current.zone, id);
   switch (current.zone) {
     case "seatQuest": {
       if (current.controller == null) return state;
@@ -98,12 +101,6 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return { ...state, encounterDiscard: without(state.encounterDiscard, id) };
     case "burdenDeck":
       return { ...state, burdenDeck: without(state.burdenDeck ?? [], id) };
-    case "corsairDeck":
-      return { ...state, corsairDeck: without(state.corsairDeck ?? [], id) };
-    case "corsairDiscard":
-      return { ...state, corsairDiscard: without(state.corsairDiscard ?? [], id) };
-    case "unchartedDeck":
-      return leaveUnchartedDeck(state, id);
     case "victory":
       return { ...state, victory: without(state.victory, id) };
     case "setAside":
@@ -237,6 +234,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   const zone = dest.zone;
   // A claimed objective (families/objectives.ts) that returns to the staging area is controlled by nobody again.
   const stamped = updateCard(state, id, { zone, controller: zone === "staging" && !current.claimed ? current.controller : null, ...(current.claimed ? { claimed: undefined } : {}) });
+  if (zone === "unchartedDeck") return joinUnchartedDeck(stamped, id);
+  if (isDeckZone(zone)) return joinPile(stamped, zone, id);
   switch (zone) {
     case "staging": {
       const listed = { ...stamped, staging: append(stamped.staging, id) };
@@ -252,12 +251,6 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, encounterDiscard: append(stamped.encounterDiscard, id) };
     case "burdenDeck":
       return { ...stamped, burdenDeck: append(stamped.burdenDeck ?? [], id) };
-    case "corsairDeck":
-      return { ...stamped, corsairDeck: append(stamped.corsairDeck ?? [], id) };
-    case "corsairDiscard":
-      return { ...stamped, corsairDiscard: append(stamped.corsairDiscard ?? [], id) };
-    case "unchartedDeck":
-      return joinUnchartedDeck(stamped, id);
     case "stormcallerArea":
       return joinStormcallerArea(stamped, id);
     case "victory":
@@ -326,8 +319,10 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // A temporary card leaves the game when it leaves play, whether it is defeated, returned to a hand or a deck or discarded ("If those heroes leave play, they are removed from the game", 11212:A:2).
   const wanted: Destination = current.temporary && inPlay(current.zone) && !inPlay(requested.zone) ? { zone: "removed" } : requested;
   // A card with a route of its own never reaches the encounter deck or discard pile (families/sea/routes.ts); one that has no place there stays put.
-  const dest = routeDestination(state, current, unchartedRoute(state, current, wanted));
-  if (!dest) return state;
+  const routed = routeDestination(state, current, unchartedRoute(state, current, wanted));
+  if (!routed) return state;
+  // A card dealt into a deck with a discard pile of its own goes back to that pile, even with Victory (core/piles.ts, emce.evil-creatures-deck).
+  const dest = current.deck === undefined ? routed : deckRoute(current, routed, inPlay(current.zone));
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";

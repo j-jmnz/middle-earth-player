@@ -64,6 +64,8 @@ export const amountExprSchema = z.strictObject({
   grappled: z.literal(true).optional(),
   // The total Threat of the locations to the left of the active location, in its row on the Island Map ("X is the total Threat of all locations to the left of the active location", 12078:A:1; src/rules/families/island/pick.ts).
   islandLeft: z.literal(true).optional(),
+  // The most cards that match the pick any one player controls, each player counted from their own side ("X is the number of characters controlled by the player with the most characters", 18023:A:1). Read by the wilderland family.
+  mostPerPlayer: pickSchema.optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),
   // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.

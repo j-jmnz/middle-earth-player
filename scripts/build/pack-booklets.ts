@@ -14,6 +14,7 @@ export const BOOKLET_SOURCES: Record<BookletId, string> = {
   "rules-reference": "mec101_rules_reference.pdf",
   "the-dark-of-mirkwood": "dark_of_mirkwood_rulebook_v2.pdf",
   "dream-chaser": "mec111_dream-chaser_campaign_expansion.pdf",
+  "ered-mithrin": "mec115_rules-web.pdf",
 };
 
 export type PackedBooklet = {

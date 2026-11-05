@@ -11,6 +11,7 @@ import { codesIn } from "../../../../test/harness/scene-kit.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of The Oath in Campaign Mode played by the auto-player (test/scenarios/the-oath/game.ts), true solo and two-handed, through a win
 // (with 6 tokens on the campaign card and without, with each Adaptation, with and without the Fervor of Lore recorded as used) and through a loss, on
@@ -64,7 +65,7 @@ goldenSuite<OathGolden, OathDecks>({
     expect(campaignPath(campaign, {}, log).map((node) => node.status)).toEqual(["completed", "completed", "completed", "completed", "current"]);
     expect(campaign.scenarios[4]).toBe("the-caves-of-nibin-dum");
     const setup = oathPlan(golden.seatCount, emptyLog(golden.seatCount), golden.adaptations).log;
-    const blank = applyResolution(setup, state.scenarioId, state, world.cards);
+    const blank = applyResolution(setup, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     expect(blank.completed).toEqual(["the-oath"]);
     expect(campaignPath(mini, {}, blank).map((node) => node.status)).toEqual(["completed", "current"]);
     expect(mini.scenarios[1]).toBe("the-caves-of-nibin-dum");
@@ -80,6 +81,6 @@ goldenSuite<OathGolden, OathDecks>({
   lost: (state, golden, world) => {
     expect(state.resolutionLog.counters).toBeUndefined();
     const log = emptyLog(golden.seatCount);
-    expect(applyResolution(log, state.scenarioId, state, world.cards).usedOnce).toEqual([]);
+    expect(applyResolution(log, state.scenarioId, state, world.cards, NO_COPY_LIMITS).usedOnce).toEqual([]);
   },
 });

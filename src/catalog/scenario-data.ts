@@ -12,7 +12,11 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // quest swaps to: The Thing in the Depths 5, The City of Corsairs 9, dcce.from-sea-to-land), `unchartedDeck` (dcce.uncharted-deck),
 // `islandMap` (Temple of the Deceived's fifteen double-sided locations, dcce.island-map), `grottoDeck` (dcce.grotto-deck) and
 // `stormcallerQuests` (stages 2C to 4C beside the Stormcaller, dcce.stormcallers-area). None is part of the encounter deck.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests"] as const;
+// Ered Mithrin's decks beside the encounter deck (docs/plans/ered-mithrin.md, phase 49), each a zone the scenario's Setup builds from encounter sets:
+// `evilCreaturesDeck` (the Wilderlands enemies, emce.evil-creatures-deck), `cavesDeck` (the Lost Caves set and the cards a Setup shuffles in,
+// emce.caves-deck), `sideQuestDeck` (Fire in the Night's eight encounter side quests, emce.side-quests), and Lost in Mirkwood's two decks
+// `spidersDeck` and `orcsDeck` (the Spiders of Mirkwood and Dol Guldur Orcs sets, which the quest swaps into the encounter deck).
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -242,6 +246,17 @@ export function setupInstructions(data: ScenarioData, difficulty: Difficulty = "
 // The Corsair deck a scenario deals, copy by copy (dcce.corsair-deck): the `corsairDeck` pile at the difficulty played.
 export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Normal"): string[] {
   return placementsAt(data, difficulty).flatMap((card) => (card.pile === "corsairDeck" ? Array.from({ length: copiesAt(card, difficulty) }, () => card.code) : []));
+}
+
+// The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck"] as const;
+export function dealtPiles(data: ScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
+  const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
+  for (const card of placementsAt(data, difficulty)) {
+    const pile = DEAL_PILES.find((name) => name === card.pile);
+    if (pile) piles[pile] = [...(piles[pile] ?? []), ...Array.from({ length: copiesAt(card, difficulty) }, () => card.code)];
+  }
+  return piles;
 }
 
 // The Uncharted deck a scenario deals, copy by copy (dcce.uncharted-deck): the `unchartedDeck` pile at the difficulty played. The `islandMap` pile (dcce.island-map) is dealt the same way: its

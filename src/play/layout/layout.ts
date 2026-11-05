@@ -78,7 +78,10 @@ export type CardSlot = Rect & {
 // `preview` marks a fight the player has picked but not confirmed yet.
 export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
-// The four piles every table has, the second slot's when the scenario declares it (the Corsair pair: dcce.corsair-deck), and the victory display while a card is in it.
+// The second slot's decks, which stand in its left place, and its discard piles, in its right one.
+const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "cavesDeck"] as const;
+const SECOND_DISCARDS = ["corsairDiscard", "evilCreaturesDiscard"] as const;
+// The four piles every table has, the second slot's when the game has one (the Corsair pair: dcce.corsair-deck; the Evil Creatures pair or the Caves deck: emce.evil-creatures-deck, emce.caves-deck), and the victory display while a card is in it.
 export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId | VictoryPileId, T>>>;
 
 /** A row's fold stack: where it stands, the cards that left the row, and the card whose face it shows (row-fold.ts). */
@@ -116,6 +119,8 @@ export type LayoutOptions = {
   deckTop?: CardInstance | null;
   // The cards a Sailing test looked at, top of the deck first, with the success symbols each prints: laid in a strip over staging (look-strip.ts).
   look?: readonly { card: CardInstance; success: number }[];
+  // The strip leaves the staging band to the cards that stand there (Discover's Loot objective and Hazard, which the banner rings above the veil): it lies in the engagement and play bands only (emce.discover).
+  lookLeavesStaging?: boolean;
   // The sea family's staging stacks: a staging card with more than one card under it shows one peek and a count (placeStaging). Off, every attachment peeks as it always did.
   stacks?: boolean;
   // The cards a fold must keep on the table (row-fold.ts): those the open moment asks about, the picked ones and the one the banner's beat names.
@@ -368,13 +373,11 @@ export function tableLayout(
   // The second slot of piles (a scenario with a second deck: the Corsair pair) stands at the right end of the engagement area, as wide as the encounter pair and
   // right-aligned with the canvas (under the encounter pair, or under the encounter discard pile and the victory display while that is out); the engagement area
   // narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
-  const second = piles.corsairDeck != null || piles.corsairDiscard != null || piles.unchartedDeck != null || piles.grottoDeck != null;
+  const second = SECOND_DECKS.some((id) => piles[id] != null) || SECOND_DISCARDS.some((id) => piles[id] != null);
   const secondY = engagedY + Math.round((card.h - pile.h) / 2);
   const secondX = width - rightGutter - encounterW;
-  const corsairDeck: Rect = { x: secondX, y: secondY, w: pile.w, h: pile.h };
-  const corsairDiscard: Rect = { x: secondX + pile.w + gap, y: secondY, w: pile.w, h: pile.h };
-  const unchartedDeck = corsairDeck;
-  const grottoDeck = corsairDeck;
+  const secondDeck: Rect = { x: secondX, y: secondY, w: pile.w, h: pile.h };
+  const secondDiscard: Rect = { x: secondX + pile.w + gap, y: secondY, w: pile.w, h: pile.h };
 
   // The left column: the quest card (sideways) level with staging, the active location level with the engagement area, the
   // player's deck and discard pile level with the play area.
@@ -408,13 +411,17 @@ export function tableLayout(
   placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
   placePlay(plan, play, slots, m);
-  const pileRects: TablePiles<Rect> = { deck, discard, encounterDeck, encounterDiscard, ...(piles.corsairDeck ? { corsairDeck } : {}), ...(piles.corsairDiscard ? { corsairDiscard } : {}), ...(piles.unchartedDeck ? { unchartedDeck } : {}), ...(piles.grottoDeck ? { grottoDeck } : {}), ...(piles.victory ? { victory } : {}) };
+  // Each second-slot deck stands in the slot's left place, its discard pile in the right one (only the Corsair and Evil Creatures pairs have one).
+  const pileRects: { -readonly [K in keyof TablePiles<Rect>]: TablePiles<Rect>[K] } = { deck, discard, encounterDeck, encounterDiscard };
+  for (const id of SECOND_DECKS) if (piles[id]) pileRects[id] = secondDeck;
+  for (const id of SECOND_DISCARDS) if (piles[id]) pileRects[id] = secondDiscard;
+  if (piles.victory) pileRects.victory = victory;
   // An encounter card attached to the deck (Iron Shackles) peeks out above it, drawn before the deck, so the "Deck" label under the deck never
   // covers it; a tap on the deck opens it (table/view.tsx).
   const held = piles.deck.attached ?? [];
   held.forEach((attached, at) => slots.push(slotOf(attached, "play", "attachment", { x: deck.x, y: deck.y - (held.length - at) * peek, w: deck.w, h: deck.h })));
   for (const id of ["deck", "discard", "encounterDeck", "encounterDiscard"] as const) slots.push(pileSlot(piles[id], pileRects[id], options.deckTop));
-  for (const id of ["corsairDeck", "corsairDiscard", "unchartedDeck", "grottoDeck", "victory"] as const) {
+  for (const id of [...SECOND_DECKS, ...SECOND_DISCARDS, "victory"] as const) {
     const view = piles[id];
     const rect = pileRects[id];
     if (view && rect) slots.push(pileSlot(view, rect, undefined));
@@ -422,7 +429,8 @@ export function tableLayout(
 
   // A Sailing test's look: the cards come off the encounter deck face up and stand in a strip over staging, then the engagement band and the play band (look-strip.ts).
   if (options.look && options.look.length > 0) {
-    const strip = lookStrip(options.look.length, lookBands({ zones: { staging, engaged, play } }), card, gap, touch(scale, MIN_TARGET));
+    const bands = lookBands({ zones: { staging, engaged, play } });
+    const strip = lookStrip(options.look.length, options.lookLeavesStaging === true ? bands.slice(1) : bands, card, gap, touch(scale, MIN_TARGET));
     options.look.forEach((row, index) => {
       const place = strip.places[index];
       if (place) slots.push({ ...slotOf(row.card, "encounterDeck", "card", place), faceDown: false, success: row.success });

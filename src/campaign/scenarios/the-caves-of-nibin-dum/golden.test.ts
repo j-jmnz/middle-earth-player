@@ -11,6 +11,7 @@ import { codesIn } from "../../../../test/harness/scene-kit.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of The Caves of Nibin-Dûm in Campaign Mode played by the auto-player (test/scenarios/the-caves-of-nibin-dum/game.ts), true solo and two-handed, through a
 // win (with "No Time to Waste!" kept and played, with a final threat under 40 and at 40 or more, in Normal and Easy) and through a loss, on fixed seeds. It pins the path
@@ -76,7 +77,7 @@ goldenSuite<CavesGolden, CavesDecks>({
     const highest = Math.max(...finalThreats(state, golden.seatCount));
     expect(campaign.scenarios[4]).toBe("the-caves-of-nibin-dum");
     const setup = cavesPlan(golden.seatCount, emptyLog(golden.seatCount)).log;
-    const blank = applyResolution({ ...setup, completed: ["the-oath"] }, state.scenarioId, state, world.cards);
+    const blank = applyResolution({ ...setup, completed: ["the-oath"] }, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     expect(blank.completed).toEqual(["the-oath", "the-caves-of-nibin-dum"]);
     expect(campaignPath(mini, {}, blank).map((node) => node.status)).toEqual(["completed", "completed"]);
     expect(mini.scenarios[1]).toBe("the-caves-of-nibin-dum");

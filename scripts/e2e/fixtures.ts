@@ -63,6 +63,7 @@ import { templeFixtures } from "./temple-of-the-deceived.ts";
 import { ruinsFixtures } from "./the-drowned-ruins.ts";
 import { havenFixtures } from "./a-storm-on-cobas-haven.ts";
 import { corsairsFixtures } from "./the-city-of-corsairs.ts";
+import { upanduinFixtures } from "./journey-up-the-anduin.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -369,6 +370,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "the-drowned-ruins": () => ruinsFixtures(),
   "a-storm-on-cobas-haven": () => havenFixtures(),
   "the-city-of-corsairs": () => corsairsFixtures(),
+  "journey-up-the-anduin": () => upanduinFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so

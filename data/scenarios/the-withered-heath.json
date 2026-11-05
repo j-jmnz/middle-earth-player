@@ -1,0 +1,214 @@
+{
+  "id": "the-withered-heath",
+  "name": "The Withered Heath",
+  "number": 4,
+  "stages": [
+    "19022",
+    "19023",
+    "19024",
+    "19025"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Withered Heath",
+      "count": 23
+    },
+    {
+      "name": "Lost Caves",
+      "count": 6
+    },
+    {
+      "name": "Wild Creatures",
+      "count": 8
+    },
+    {
+      "name": "Lost in Wilderland",
+      "count": 6
+    }
+  ],
+  "cards": [
+    {
+      "code": "19013",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19014",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19015",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "19016",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "19017",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19018",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19019",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19020",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19021",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18053",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18025",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18026",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18027",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19022",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19023",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19024",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19011",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "19012",
+      "normal": 4,
+      "easy": 4,
+      "pile": "setAside"
+    },
+    {
+      "code": "18060",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18061",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18062",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    }
+  ],
+  "campaignCard": "12175",
+  "campaignPlaced": [
+    "12176",
+    "12177",
+    "12178",
+    "12179",
+    "12180",
+    "12181",
+    "12182",
+    "12183"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q08.4",
+    "dragnEasy": "E08.4",
+    "hobSlug": "The-Withered-Heath"
+  }
+}

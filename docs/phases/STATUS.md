@@ -10,6 +10,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Phases 12 to 16 each have an engine half and a phone half (phase 12 describes them). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active` or `not started`. The phase is completed when both halves are.
 - Phases 27 to 33 (Mirkwood Paths and The Dark of Mirkwood, plan `docs/plans/mirkwood-paths.md`) have **one review round per phase** (user instruction, 2026-10-27). The main session runs `/reviewer` once on the phase's diff, and `/ux` once when `src/screens` or `src/play` changed, hands their blocks to one implementer fix pass, and closes the phase without re-running the reviewers. A block that pass leaves open goes in the phase's note and does not keep the phase open. This replaces "`/reviewer` reports no blocks" for those phases. Phases 29 to 33 have an engine half and a phone half, as phase 12 describes.
 - Phases 37 to 48 and 39b (Dream-chaser, plan `docs/plans/done/dream-chaser.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-10-30). Phases 40 to 48 have an engine half and a phone half, as phase 12 describes.
+- Phases 49 to 60 and 51b (Ered Mithrin, plan `docs/plans/ered-mithrin.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-11-05). Phases 52 to 60 have an engine half and a phone half, as phase 12 describes.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - A cloud session has no phone, simulator or Maestro. Phone checks stay open and are listed here, not marked done.
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
@@ -72,10 +73,24 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 46 | The Drowned Ruins | completed | 2026-11-04. Engine done, review round done. Phone checks open: the Grotto pile (top-card preview and speech, the glide back to it), Command's armed Done and up-to notes, the flip naming its side, Into the Abyss counts; both Maestro flows unrun; `ruins-won` missing, so the win flow cannot run. |
 | 47 | A Storm on Cobas Haven | completed | 2026-11-04. Engine done, review round done. Phone checks open: a controlled tower in staging (fold rank, reader label, its Action from either seat), guarded and re-guarded towers, the Islet's "1 held" pill and where the held enemy returns, the Skirmisher as a ship, Taking on Water's three exhaust picks and host caution, the added-phase rail and carousel, the Tactics hero list, Gandalf's entry, Gavin's Planning Action; both Maestro flows unrun; `haven-won` missing, so the win flow cannot run. |
 | 48 | The City of Corsairs | completed | 2026-11-05. Engine done, review round done. Phone checks open: the Streets of Umbar tax caution on the travel sheet and "Do not travel", the Umbar Harbor and Southern Belfalas questions, The Black Sword's Refresh Action, the second encounter deck after stage 2B, "Campaign complete" with no Spend XP; both Maestro flows unrun; `corsairs-won` missing, so the win flow cannot run. |
+| 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Mount Gundabad stage 2 pictures (19137-19142); Crypt Stalker Easy count unconfirmed. |
+| 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app; phone checks; `ered-mithrin-start`, `booklet-ered-mithrin` flows not run. |
+| 51 | Wilderland mechanics family | completed | 2026-11-05. Engine only; review round done. Not built: Caves-deck bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover. |
+| 51b | Wilderland on the table | completed | 2026-11-05. Review round done. Phone checks open (below). |
+| 52 | Journey Up the Anduin | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `upanduin-won` missing, so the win flow cannot run. |
+| 53 | Lost in Mirkwood | not started | |
+| 54 | The King's Quest | not started | |
+| 55 | The Withered Heath | not started | |
+| 56 | Roam Across Rhovanion | not started | |
+| 57 | Fire in the Night | not started | |
+| 58 | The Ghost of Framsburg | not started | |
+| 59 | Mount Gundabad | not started | |
+| 60 | The Fate of Wilderland | not started | |
 
 ## Open items
 
 ### Fixtures and Maestro
+- `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run. `scenario-win.yaml` now taps Confirm twice after a choice and takes `NO_XP`; no flow using it has run.
 
 - Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark-loss.yaml` cannot run either.
 - A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
@@ -91,6 +106,12 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
 ### Rules and engine
+- Journey Up the Anduin readings not user-confirmed: the treasure comes at exactly X resources (120165:A:3); the first player chooses the treasure and its character; progress placed after a successful quest counts for 18066:B:1; locations from 18066:A:1 are added as each is discarded; 18067:B:1 caps staging locations only; Lost in the Wild goes to the encounter discard when it discards the hand.
+- Lost in the Wild: a player-card `canPick` condition knows a hand pick is a discard only when its record says `discarded: true` (Jewels of Wilderland, Glittering Lute); other campaigns' records are not marked.
+- Treasures cannot be played from a hand (no path for type `treasure`); only the claim puts one into play.
+- Ered Mithrin: nothing claims a free treasure yet (`emce.treasure`); the claim comes with the first scenario that attaches one.
+- Wilderland: an Evil Creatures enemy shuffled back into the encounter deck keeps its deck mark (`deckRoute`); no card does this yet.
+- Wilderland readings not user-confirmed: Deep does nothing once its location is no longer active; a non-location Deep replacement other than a Dragon Sign goes to staging; Guarded (X) with no match leaves the objective unguarded.
 
 - Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
 - Dream-chaser: the two Grapple variants on Nightmare cards (fewest or most enemies grappled) stay unparsed.
@@ -126,7 +147,14 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
 - Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
 
+- Ered Mithrin data: Mount Gundabad stage 2s 19137-19142 are pictures-test exceptions; cardgame.tools files them as `MEC70-137`..`-142` (front `MEC70-135a`..`g`). Needs a number mapping in `scripts/data/sources/pictures.ts` and `pnpm data:sync pictures` before phase 59.
+- Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
+- Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
+
 ### Screens and code
+- Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
+- Ered Mithrin: nothing marks Beldis's boxes yet (phase 57).
+- Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
@@ -149,6 +177,9 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
 
 ### Phone and tablet checks
+- Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
+- Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
+- Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.
 
 None ran. Each needs a device.
 

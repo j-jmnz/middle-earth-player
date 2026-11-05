@@ -5,6 +5,8 @@ import { reduce, startScenario } from "../../rules/engine/reduce.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { starterStart, starterWorld } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
 
+import { wilderlandFixture } from "../store/wilderland-fixture.ts";
+
 import { prefetchCodes, resolutionCodes } from "./prefetch.ts";
 
 // The table prefetches the hand, the face-up cards on the table (shadow cards and discard tops included) and the next screen,
@@ -64,5 +66,14 @@ describe("prefetch", () => {
     const game = startScenario(starterStart("stealth-and-steadfastness", 1), ctx);
     expect(resolutionCodes(game)).toEqual([]);
     expect(resolutionCodes({ ...game, stageCleared: true })).toEqual(expect.arrayContaining(["141078", "141079"]));
+  });
+
+  it("asks for the top card of the Evil Creatures discard pile, and of no deck of the second slot", () => {
+    const fixture = wilderlandFixture({ evilDeck: 2, evilDiscard: 2, caves: undefined });
+    const codes = prefetchCodes(fixture.state, 0);
+    expect(codes).toContain("warg");
+    // The same cards in the deck alone are not asked for.
+    const deckOnly = wilderlandFixture({ evilDeck: 2, evilDiscard: 0 });
+    expect(prefetchCodes(deckOnly.state, 0)).not.toContain("warg");
   });
 });

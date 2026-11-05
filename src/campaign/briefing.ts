@@ -15,6 +15,7 @@ import { isNightmarePlayable, isPlayable } from "./playable.ts";
 import { printedScenarioName } from "./printed-name.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
+import { wilderlandFacts } from "./wilderland.ts";
 import { xpFacts, type ModeCard } from "./xp.ts";
 
 export type BriefingSeat = { deckId: string | null; heroes: readonly string[]; deck: readonly string[] };
@@ -85,6 +86,8 @@ const RULE_OF: Readonly<Record<string, string>> = {
   ringInDeck: "The One Ring is not a deck card",
   sameHero: "No two players use the same hero",
   bannedHero: "A hero the campaign refuses in this scenario",
+  undiscoveredTreasure: "A treasure must be discovered first",
+  treasureCopies: "One copy of a treasure",
 };
 
 // A seat's saved deck as the deckbuilding check reads it: its heroes, and its cards counted by code.
@@ -96,8 +99,8 @@ function deckCounts(deck: readonly string[]): { code: string; count: number }[] 
 
 // What a loadout must satisfy before any deal, campaign or standalone: a saved deck per seat with one to three heroes
 // (rr.deckbuilding), no fallen hero (the campaign's list; none in a standalone game), and the saga rules on the
-// loadout (validateLoadout).
-export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], bans: readonly HeroBan[] = []): { problems: Problem[]; loadout: LoadoutSeat[] } {
+// loadout (validateLoadout). A treasure in a deck is admitted when the log records it (`discovered`, emce.treasure).
+export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], bans: readonly HeroBan[] = [], discovered: readonly string[] = []): { problems: Problem[]; loadout: LoadoutSeat[] } {
   const problems: Problem[] = [];
   const { world } = input;
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
@@ -109,7 +112,8 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
       problems.push({ rule: limit === 3 ? "One to three heroes" : `One to ${limit} heroes`, message: `${label} has ${seat.heroes.length} heroes. A saved deck has one to ${limit === 3 ? "three" : limit}.` });
     } else if (world.deckFacts) {
       // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is. A contract's deckbuilding rules apply.
-      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck), world.deckFacts, [], deckRulesOf(world.effects, seat.deck));
+      // A treasure the log records is no deck card for this check: it is outside the 50 card minimum (emce.treasure); validateLoadout admits or refuses it.
+      const refusal = deckSaveRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, [], deckRulesOf(world.effects, seat.deck));
       if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
     }
     for (const code of seat.heroes) {
@@ -118,7 +122,7 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
   });
   const loadout = loadoutOf(input);
   if (problems.length === 0) {
-    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
+    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans, discovered)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
   }
   return { problems, loadout };
 }
@@ -129,7 +133,7 @@ export function comingSoonProblems(world: World): Problem[] {
 }
 
 function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
-  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat(), heroBansOf(input.world.campaign, input.world.scenario.id));
+  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat(), heroBansOf(input.world.campaign, input.world.scenario.id), input.log.treasures);
   return { problems: [...comingSoonProblems(input.world), ...difficultyProblems(input.world, input.difficulty), ...problems], loadout };
 }
 
@@ -148,7 +152,7 @@ export function briefing(input: BriefingInput): Briefing {
   const empty: Briefing = { problems, needs: null, needsRingBearer, penaltyAdded: 0, penaltyWaived: waived, steps: [], dealable: false };
   if (problems.length > 0) return empty;
 
-  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, ...(input.choices ? { choices: input.choices } : {}) });
+  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
   if (!plan.ok) {
     return { ...empty, needs: plan.needs, problems: plan.errors.map((message) => ({ rule: "Campaign Setup Checklist", message })) };
   }
@@ -168,7 +172,7 @@ export function checklistPlan(input: BriefingInput): Extract<ChecklistPlan, { ok
   const { problems, loadout } = check(input);
   if (problems.length > 0) throw new Error(problems.map((problem) => problem.message).join(" "));
   const { world, log } = input;
-  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, ...(input.choices ? { choices: input.choices } : {}) });
+  const plan = checklist({ log, scenario: world.scenario, seats: loadout, effects: world.effects, cards: world.cards, difficulty: input.difficulty, ...(input.choices ? { choices: input.choices } : {}) });
   if (!plan.ok) throw new Error(plan.errors.join(" ") || "The campaign card asks for a choice");
   return plan;
 }
@@ -187,9 +191,10 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     effects: world.effects,
     poolEncounterCards: plan.poolEncounterCards,
     poolIntoPlay: plan.poolIntoPlay,
+    removedFromEncounter: plan.removedFromEncounter,
     ...(input.modeCard ? { modeCard: input.modeCard } : {}),
-    // The log's structured facts; a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
-    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log) },
+    // The log's structured facts (the pool as the checklist leaves it, with the cards the campaign card's Setup added); a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id) },
   });
 }
 

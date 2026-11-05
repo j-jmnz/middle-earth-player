@@ -136,3 +136,49 @@ describe("Dream-chaser printed-text ledger", () => {
     }
   });
 });
+
+// Ered Mithrin (phase 49): data/printed/ered-mithrin.json, read from the pinned scans (the Wilds of Rhovanion and the six Adventure Packs' cards, the Campaign
+// Expansion's campaign cards, boons, burdens and treasures). The Revised Core Set sets its first two scenarios deal are ledgered with Mirkwood Paths.
+describe("Ered Mithrin printed-text ledger", () => {
+  const file = JSON.parse(readFileSync(new URL("../../data/printed/ered-mithrin.json", import.meta.url), "utf8")) as { entries: { code: string; side: string }[] };
+  const mine = file.entries.map((entry) => ledger.byKey.get(keyOf(entry.code, entry.side))).filter((entry): entry is NonNullable<typeof entry> => entry !== undefined);
+  const text = (code: string, side: string) => ledger.byKey.get(keyOf(code, side))?.lines.join(" ") ?? "";
+
+  it("holds both sides of each of the nine campaign cards and each boon, burden and treasure of the Campaign Expansion", () => {
+    for (const code of ["120165", "12168", "12170", "12175", "12184", "12187", "12189", "12193", "12195"]) {
+      expect(ledger.byKey.has(keyOf(code, "A")), `${code}.A`).toBe(true);
+      expect(ledger.byKey.has(keyOf(code, "B")), `${code}.B`).toBe(true);
+    }
+    for (let code = 12166; code <= 12204; code += 1) {
+      if (["12168", "12170", "12175", "12184", "12187", "12189", "12193", "12195"].includes(String(code))) continue;
+      expect(ledger.byKey.has(keyOf(String(code), "A")), `${code}.A`).toBe(true);
+    }
+    expect(mine).toHaveLength(file.entries.length);
+    expect(file.entries.length).toBeGreaterThanOrEqual(260);
+  });
+
+  it("holds every card the nine scenarios deal beyond the Revised Core Set's: stages on both sides, the double-sided cards, the side quests", () => {
+    for (const code of ["18066", "18073", "18080", "19022", "19047", "19083", "19109", "19134", "19142", "19168"]) {
+      expect(ledger.byKey.has(keyOf(code, "A")), `${code}.A`).toBe(true);
+      expect(ledger.byKey.has(keyOf(code, "B")), `${code}.B`).toBe(true);
+    }
+    for (const code of ["18069", "18070", "19143", "19144", "19052", "19053", "19054", "19055", "19066", "19073"]) expect(ledger.byKey.has(keyOf(code, "A")), `${code}.A`).toBe(true);
+  });
+
+  it("reads the printed wording, keeping the card's own typos under misprints", () => {
+    expect(text("120165", "A")).toContain("Setup: Any player gains control of Turayn. Shuffle A Growing Threat into the encounter deck.");
+    expect(text("12195", "B")).toBe("Resolution: The players win the campaign!");
+    expect(text("18066", "A")).toContain("Create the Evil Creatures deck (see insert)");
+    expect(text("18069", "A")).toContain("Forced: When Woodmen Village is explored");
+    expect(text("12187", "B")).toContain("look at 3 random undiscovered treasures and choose 1");
+    expect(ledger.byKey.get(keyOf("12187", "B"))?.misprints[0]?.printed).toContain("and and choose 1");
+    expect(ledger.byKey.get(keyOf("19168", "B"))?.misprints[0]?.printed).toContain("The Goblin's Assault");
+  });
+
+  it("names the scan each side was read from, and who read it", () => {
+    for (const entry of mine) {
+      expect(entry.readBy, `${entry.code}.${entry.side}`).toMatch(/read from the scan image/);
+      expect(entry.scan.sha256, `${entry.code}.${entry.side}`).toMatch(/^[0-9a-f]{64}$/);
+    }
+  });
+});

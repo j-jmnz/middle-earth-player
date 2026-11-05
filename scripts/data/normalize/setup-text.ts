@@ -1,4 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
+import { readEredMithrin } from "./setup-ered-mithrin.ts";
+import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
 // What a Setup line says, as data. A sentence the patterns do not read is returned in `unread`, so a new Setup
 // verb fails a build loudly instead of being skipped. Names are found by matching the known card names of the
@@ -9,7 +11,8 @@ export type SetupClause =
   | { kind: "stage"; codes: string[]; perPlayer: number | null; count: number; many?: { count: number; from: number } }
   | { kind: "active"; codes: string[] }
   | { kind: "attachRingBearer"; codes: string[] }
-  | { kind: "shuffleInto"; codes: string[]; into: "encounter deck" | "burden deck" | "Corsair deck"; set: string | null }
+  // `ifTreasures`: Ered Mithrin's "If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck".
+  | { kind: "shuffleInto"; codes: string[]; into: "encounter deck" | "burden deck" | "Corsair deck" | "Caves deck"; set: string | null; ifTreasures?: number }
   | { kind: "lifeSet"; amount: number }
   | { kind: "damageOn"; codes: string[]; amount: number }
   | { kind: "eachPlayerAddsLocation"; count: number }
@@ -30,14 +33,25 @@ export type SetupClause =
   // "Put Mendor into play."
   | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" }
   // "Attach X to a hero of the first player's choice." / "The first player attaches X to one of his heroes."
-  | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" }
+  // `anyPlayer`: "Attach Wormsbane to a hero, Broken side face-up" names no player.
+  | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" | "anyPlayer" }
   // "Each player chooses 1 Adaptation boon attachment and attaches it to one of their heroes."
   | { kind: "eachPlayerChoosesBoon"; trait: string }
   // "Add each copy of X in a player's hand to the Campaign Pool." / "... and add it to the Campaign Pool."
   | { kind: "addToCampaignPool"; codes: string[] }
   // "Each player adds 1 copy of X to their hand after drawing their starting hand (including taking a mulligan)."
   | { kind: "addToHandAfterMulligan"; codes: string[]; count: number }
-  | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[] };
+  | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[] }
+  // Ered Mithrin (docs/plans/ered-mithrin.md, phase 49), each quoted from data/printed/ered-mithrin.json.
+  // "Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each
+  // discarded location to the staging area." (`amount` "playersLessOne": "X is 1 less than the number of players in the game";
+  // `eachPlayer`: "Each player discards cards from the top of the encounter deck until he discards an enemy or location and adds that card to the staging area".)
+  | { kind: "discardToStaging"; types: ("enemy" | "location")[]; amount: "players" | "playersLessOne"; eachPlayer: boolean; shuffleFirst: boolean }
+  // "If \"Turayn has taken an oath of vigilance,\" search the encounter deck for 3 treacheries and remove them from the game" (`ifLogged` null: no condition):
+  // `from` is the deck, `nonUnique` the "non-unique" qualifier, `except` "not named Grey Mountain Giant", `alsoCaves` "and the Caves deck for 1 location".
+  | { kind: "removeCards"; ifLogged: string | null; count: number; what: "treachery" | "location" | "enemy"; nonUnique: boolean; except: string | null; alsoCaves: number | null }
+  // "A player may search their deck for a unique boon ally and add it to their hand" / "Each player may search their deck for a boon or treasure card ...".
+  | { kind: "searchDeckForBoon"; who: "aPlayer" | "eachPlayer"; unique: boolean; cards: "boon ally" | "boon or treasure" };
 
 // Dream-chaser (docs/plans/done/dream-chaser.md, phase 37): the Setup steps of its stage 1A and campaign cards. Every one is quoted from a
 // ledger line (data/printed/dream-chaser.json) and names the cards (and, for the deck steps, the encounter sets) it moves; the build checks
@@ -67,7 +81,23 @@ export type SetupStep =
   | "searchChoice" // "Search the encounter deck for a Dol Amroth objective of your choice"
   | "putIntoPlayIfLogged" // 'If "Gavin returned," put him into play under any player's control': codes are the card the log fact is about
   | "flipCampaignCard" // "Flip this card over": the campaign card turns to its standing back
-  | "resolveGuarded";
+  | "resolveGuarded"
+  // Ered Mithrin (emce.*): each quoted from a stage 1A or campaign card Setup.
+  | "buildEvilCreaturesDeck" // "Create the Evil Creatures deck (see insert) and place it next to the quest deck": emce.evil-creatures-deck
+  | "buildCavesDeck" // "Build the Caves deck (see insert) and set it next to the quest deck": emce.caves-deck
+  | "prepareQuestDeck" // "Create the Caves deck and the quest deck (see insert)": emce.gundabad-quest-deck
+  | "buildSideQuestDeck" // "Search the encounter deck for all 8 encounter side quests, shuffle them together, and place them facedown next to the quest deck": emce.side-quests
+  | "setSetsAside" // "Set the Spiders of Mirkwood and Dol Guldur Orcs encounter sets aside, out of play": asideSets
+  | "asideEachOtherObjective" // "Set each other objective and objective-ally aside, out of play"
+  | "shuffleAsideIntoCaves" // "Shuffle 2 set aside Dragon Sign objectives into the Caves deck"
+  | "searchAndStage" // "The first player may search the encounter deck for a copy of Twilight Hall and add it to the staging area"
+  | "attachTreasure" // "the players look at 3 random undiscovered treasures and attach 1 of them to Twilight Hall as a guarded objective": emce.treasure
+  | "claimTreasure" // "When free of encounters, the players claim the treasure and attach it to any character"
+  | "haldanMayBeHero" // "and Haldan may be included among a player's heroes": emce.haldan
+  | "trustInUrdug" // "The first player may put their trust in Urdug by placing a resource on him (from the token pool)": campaign card 12184
+  | "cunningUnlessTrusted" // "If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck"
+  | "eachOtherPlayerReveals" // "Each other player reveals an encounter card"
+  | "ignoreKeywords"; // "Ignore the deep keyword" / "Ignore the deep and discover keywords": sets are the keywords
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
@@ -157,25 +187,16 @@ function sentencesOf(text: string): string[] {
 const WORD: Readonly<Record<string, number>> = { a: 1, an: 1, one: 1, two: 2, three: 3 };
 const amount = (word: string | undefined): number => (word === undefined ? 1 : (WORD[word.toLowerCase()] ?? Number(word)));
 
-// Only separators and the quantity words are left once the names are blanked: "1 copy of  and  copy of ", ",  , and ".
-const isNameList = (rest: string): boolean => rest.replace(/\b(?:and|an?|the|\d+|copy|copies|of)\b/g, " ").replace(/[\s,.]/g, "") === "";
-
 // "(2 instead if there are 3 or more players in the game)", "(3 copies instead if there are 3 or 4 players in the game)",
 // "(the top 3 instead if there are 3 or more players in the game)": the larger count from that many players on.
 const MANY = /\s*\((?:the top )?(\d+)(?: copies)? instead if there are (\d+) or (?:more|\d+) players in the game\)/i;
-
-const setsOf = (list: string): string[] => list.split(/,\s*(?:and\s+)?|\s+and\s+/).map((name) => name.trim()).filter((name) => name !== "");
 
 // The Dream-chaser Setup steps (SetupStep). A sentence none of them reads returns null, and the other patterns try it. A step that
 // names cards (take control, attach, a threat trade, the choices, the secrets) returns null when a name finds no card, so the sentence
 // ends up unread and the scenario is not built; a name is never dropped silently.
 function readDreamChaser(sentence: string, names: NameIndex): SetupClause[] | null {
-  const step = (kind: SetupStep, extra: Partial<Extract<SetupClause, { kind: "step" }>> = {}): SetupClause => ({ kind: "step", step: kind, codes: names.codesOf(sentence), ...extra });
-  // A card name in the sentence, "the Stormcaller" as "Stormcaller"; a phrase that is not one card's name finds none.
-  const named = (phrase: string | undefined): string[] => {
-    const text = (phrase ?? "").replace(/^the /i, "");
-    return isNameList(names.without(text)) ? names.codesOf(text) : [];
-  };
+  const step = stepWith(names.codesOf(sentence));
+  const named = namedBy(names);
   let match: RegExpExecArray | null;
   if ((match = /^Prepare the (Corsair|Uncharted|Grotto) deck$/i.exec(sentence))) {
     const kind = { corsair: "prepareCorsairDeck", uncharted: "prepareUnchartedDeck", grotto: "prepareGrottoDeck" } as const;
@@ -260,7 +281,7 @@ function readDreamChaser(sentence: string, names: NameIndex): SetupClause[] | nu
     const codes = named(match[1]);
     return codes.length === 0 ? null : [step("putIntoPlayIfLogged", { codes })];
   }
-  if (/^Flip this card over$/i.test(sentence)) return [step("flipCampaignCard", { codes: [] })];
+  if (/^Flip this card(?: over)?$/i.test(sentence)) return [step("flipCampaignCard", { codes: [] })];
   if (/^Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area$/i.test(sentence)) return [step("searchChoice", { codes: [] })];
   if (/^Then, shuffle the encounter deck and resolve the Guarded keyword on that objective$/i.test(sentence)) return [step("resolveGuarded", { codes: [] }), { kind: "shuffleEncounterDeck" }];
   return null;
@@ -273,9 +294,9 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const dreamChaser = readDreamChaser(sentence, names);
-    if (dreamChaser) {
-      clauses.push(...dreamChaser);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses);
+    if (campaignStep) {
+      clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {
       clauses.push({ kind: "aside", codes: names.codesOf(match[2] ?? ""), allCopies: match[1] !== undefined });
     } else if ((match = /^Search the encounter deck for (?:\d+ )?(?:cop(?:y|ies) of )?(.+?),? and add them to the staging area$/i.exec(sentence)) && /\bcopy of\b/i.test(sentence)) {

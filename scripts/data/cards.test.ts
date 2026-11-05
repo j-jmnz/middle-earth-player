@@ -214,4 +214,51 @@ describe("Mirkwood Paths cards", () => {
     expect(dream.filter((card) => / Campaign$/.test(`${card.encounterSet ?? ""}${card.burdenSet ?? ""}`)).map((card) => card.code)).toEqual([]);
     expect(cards.get("11188")).toMatchObject({ burdenSet: "Raid on the Grey Havens", encounterSet: "Raid on the Grey Havens" });
   });
+
+  // Ered Mithrin (phase 49).
+  it("codes the Ered Mithrin Campaign Expansion 12 and the collector number from 166 on, 120 and the collector number below it", () => {
+    // RingsDB's own codes for the 31 boons, burdens and treasures, and the same pattern for the eight campaign cards it does not list.
+    expect(cards.get("12168")).toMatchObject({ name: "Lost in Mirkwood", type: "campaign" });
+    expect(cards.get("12195")).toMatchObject({ name: "The Fate of Wilderland", type: "campaign" });
+    // 12165 is Fury and Malice of The City of Corsairs: the Journey Up the Anduin campaign card (number 165 in Hall of Beorn and RingsDB, 164 on the scan) takes the unused 120 prefix.
+    expect(cards.get("12165")).toMatchObject({ name: "Fury and Malice" });
+    expect(cards.get("12165")?.printings[0]?.pack).toBe("CoC");
+    expect(cards.get("120165")).toMatchObject({ name: "Journey Up the Anduin", type: "campaign" });
+    expect(cards.get("120165")?.printings[0]).toMatchObject({ pack: "EMCE", number: 165 });
+    // Hall of Beorn's 19165 to 19170 are The Fate of Wilderland's own cards.
+    expect(cards.get("19165")).toMatchObject({ name: "Fierce Attack" });
+    expect(cards.get("19165")?.printings[0]?.pack).toBe("TFoW");
+    expect(all.filter((card) => card.printings.some((printing) => printing.pack === "EMCE"))).toHaveLength(40);
+  });
+
+  it("types the Expansion's boons, burdens and treasures by their type bar and keeps treasures out of the card pool", () => {
+    expect(cards.get("12166")).toMatchObject({ name: "Turayn", campaignKind: "boon", type: "ally", deckLegal: false, backType: "player" });
+    expect(cards.get("12176")).toMatchObject({ name: "Master of the Hunt", campaignKind: "boon", type: "attachment" });
+    expect(cards.get("12190")).toMatchObject({ name: "Ashen Brazier", campaignKind: "boon", type: "objective" });
+    expect(cards.get("12167")).toMatchObject({ name: "A Growing Threat", campaignKind: "burden", type: "treachery", burdenSet: "Journey up the Anduin", backType: "encounter" });
+    expect(cards.get("12173")).toMatchObject({ name: "Dagnir's Spawn", campaignKind: "burden", type: "enemy", burdenSet: "The King's Quest" });
+    for (const code of ["12196", "12197", "12198", "12199", "12200", "12201", "12202", "12203", "12204"]) {
+      expect(cards.get(code), code).toMatchObject({ campaignKind: "treasure", type: "treasure", typeName: "Treasure", deckLegal: false, backType: "player" });
+    }
+    expect(all.filter((card) => card.printings.some((printing) => printing.pack === "EMCE") && card.campaignKind != null)).toHaveLength(31);
+    // The Hobbit saga's Treasure rows (Sting) are RingsDB's "treasure / Campaign" cards and stay as they were.
+    expect(cards.get("131020")).toMatchObject({ name: "Sting", type: "treasure", typeName: "Campaign", campaignKind: null });
+  });
+
+  it("reads the keyword sentences that open a ledger line as keywords of the Ered Mithrin boxes' cards (Hall of Beorn lists Immune to player card effects as text only)", () => {
+    expect(cards.get("18016")?.keywords).toMatchObject({ immune: true });
+    expect(cards.get("19053")?.keywords).toMatchObject({ indestructible: true, immune: true });
+    expect(cards.get("19074")?.keywords).toMatchObject({ immune: true });
+    expect(cards.get("18020")?.keywords).not.toMatchObject({ immune: true });
+  });
+
+  it("types an objective-location, names the Expansion's encounter sets without the Campaign suffix, and gives the side quests Fire in the Night's set", () => {
+    expect(cards.get("18029")).toMatchObject({ name: "Overgrown Path", type: "objective", typeName: "Objective Location" });
+    expect(cards.get("18016")).toMatchObject({ name: "The Old Ford", type: "location" });
+    expect(cards.get("12185")).toMatchObject({ burdenSet: "Roam Across Rhovanion", encounterSet: "Roam Across Rhovanion" });
+    expect(all.filter((card) => card.printings.some((printing) => printing.pack === "EMCE") && / Campaign$/.test(`${card.encounterSet ?? ""}${card.burdenSet ?? ""}`))).toEqual([]);
+    for (const code of ["19066", "19067", "19068", "19069", "19070", "19071", "19072", "19073"]) {
+      expect(cards.get(code), code).toMatchObject({ type: "encounter-side-quest", encounterSet: "Fire in the Night" });
+    }
+  });
 });

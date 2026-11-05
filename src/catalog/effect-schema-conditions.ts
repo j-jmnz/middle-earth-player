@@ -1,6 +1,7 @@
 // Conditions in effect records, the targets an instruction names, and the phase names a condition reads.
 import { z } from "zod";
 
+import { ALLY_LINES } from "./ally-lines.ts";
 import { amountSchema } from "./effect-schema-amount.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
 
@@ -132,6 +133,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("controlledByPlayers") }),
   // A hero is the "prisoner" now, facedown, until it is rescued (`is`), or none is (01124:B:3; src/rules/families/prisoner/index.ts).
   z.strictObject({ kind: z.literal("prisoner"), is: z.boolean() }),
+  // The Ered Mithrin Campaign Log (emce.boon-allies, emce.treasure; src/rules/families/wilderland/index.ts): the "Unique Allies Protecting Wilderland" line is recorded (`is` false: it is not),
+  // or at least `min` treasures are recorded as discovered ("If there are 6 or more treasures recorded in the campaign log"). Read from the facts the log hands the game; a game without them holds neither.
+  z.strictObject({ kind: z.literal("logged"), line: z.enum(ALLY_LINES), is: z.boolean().optional() }),
+  z.strictObject({ kind: z.literal("treasuresLogged"), min: z.number().int().positive() }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
   // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender

@@ -20,8 +20,8 @@ import { writeSave } from "../../../data/campaign-store";
 import { useDatabases } from "../../../data/databases";
 import { recordUnclosedRun } from "../../../session/table-session";
 import { dealSeed } from "../../../nav/e2e";
-import { sphereTell } from "../../../../play/words/aflame";
-import { actionLine, needWords } from "../../../briefing/words";
+import { needWords } from "../../../briefing/words";
+import { NeedChoices } from "../../../briefing/need-choices";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ModePicker, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
 import { routeCode } from "../../../nav/route-code";
@@ -137,6 +137,8 @@ export default function Briefing() {
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
   const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? [], nameOf) : null;
+  // What the choice is, when the options alone do not say (a search of the encounter deck for cards the log's line removes).
+  const intro = asked?.intro ?? result.needs?.note ?? null;
   const completed = save.log.completed.includes(scenario.id);
   const fallen = save.log.fallenHeroesBySeat.flat();
 
@@ -246,28 +248,13 @@ export default function Briefing() {
       {result.needs ? (
         <View testID="briefing-choice" className="mt-5">
           <Section title={`Seat ${result.needs.seat + 1} chooses`} />
-          {asked?.intro ? (
+          {intro ? (
             <Label tone="muted" testID="briefing-choice-intro">
-              {asked.intro}
+              {intro}
             </Label>
           ) : null}
           {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
-          {result.needs.options.map((option) => {
-            const [code = "", host] = option.split(">");
-            const label = option === "skip" ? "Skip" : host ? `${nameOf(code)} on ${nameOf(host)}` : `${nameOf(code)}${sphereTell(nameOf(code), printedText[code])}`;
-            // The card's Action line, so the choice is made knowing what the boon does.
-            const action = option === "skip" ? null : actionLine(printedText[code]);
-            return (
-              <View key={option}>
-                <TextButton label={label} testID={`choice-${option}`} onPress={() => setChoices((current) => [...current, option])} />
-                {action ? (
-                  <Label tone="muted" className="mb-1 text-center" testID={`choice-${option}-action`}>
-                    {action}
-                  </Label>
-                ) : null}
-              </View>
-            );
-          })}
+          <NeedChoices options={result.needs.options} nameOf={nameOf} printedText={printedText} onChoose={(option) => setChoices((current) => [...current, option])} />
         </View>
       ) : null}
 

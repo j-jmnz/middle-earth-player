@@ -21,6 +21,7 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
 import type { World } from "../../world.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const FRODO = "141001";
 const SAM = "141002";
@@ -113,7 +114,7 @@ describe("the campaign across scenarios 3 and 4", () => {
       const won = settle(syncConstants(runInstruction({ ...state, window: null }, { verb: "ProgressQuest", amount: 9 }, { seat: 0, sourceId: table.frodo }, table.ctx, []), table.ctx), table.ctx, []);
       expect(won.stageCleared, String(attached)).toBe(true);
       expect(won.resolutionLog.earned.map((item) => item.code), String(attached)).toEqual(attached ? [LUST] : []);
-      const log = applyResolution(emptyLog(1), won.scenarioId, won, ctx.cards);
+      const log = applyResolution(emptyLog(1), won.scenarioId, won, ctx.cards, NO_COPY_LIMITS);
       expect(log.completed, String(attached)).toEqual(["the-ring-goes-south"]);
       expect(log.campaignPool.map((card) => card.code), String(attached)).toEqual(attached ? [LUST] : []);
     }

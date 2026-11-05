@@ -10,7 +10,8 @@ export type SetupRuns = "top" | "inForEachPlayer" | "inEach";
 // What a record that names the verb needs from the player's collection (src/campaign/world.ts loadWorld):
 // - "hero": it chooses a hero card of the collection, so every deck-legal hero is loaded.
 // - "card": it takes the card with its `code` from the collection, so that code is loaded whether or not the scenario deals it.
-export type CollectionUse = "hero" | "card";
+// - "treasure": it draws from the treasures of the catalog, so every treasure card is loaded (Ered Mithrin, emce.treasure).
+export type CollectionUse = "hero" | "card" | "treasure";
 
 // Which of a campaign card's Setup verbs the scenario's start handles itself (src/campaign/start.ts):
 // - "dealt": the engine runs it in Setup, in the campaign card's printed order, before the quest card's Setup (the Fellowship's two verbs, an objective ally put into play, a card set aside).
@@ -37,6 +38,6 @@ export function verbFlagsOf(schema: z.ZodType): VerbFlags {
   if (meta?.runsInFrame === true) flags.runsInFrame = true;
   if (meta?.setupRuns === "top" || meta?.setupRuns === "inForEachPlayer" || meta?.setupRuns === "inEach") flags.setupRuns = meta.setupRuns;
   if (meta?.setupRole === "dealt" || meta?.setupRole === "afterSetup") flags.setupRole = meta.setupRole;
-  if (meta?.collection === "hero" || meta?.collection === "card") flags.collection = meta.collection;
+  if (meta?.collection === "hero" || meta?.collection === "card" || meta?.collection === "treasure") flags.collection = meta.collection;
   return flags;
 }
