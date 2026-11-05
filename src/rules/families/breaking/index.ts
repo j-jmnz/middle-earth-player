@@ -60,7 +60,7 @@ export function isBreakingVerb(verb: string): boolean {
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are
 // released, rr.attachment-cards) and set aside, the new stage is side B up with no progress, and its When Revealed effects are pushed as frames for the seat.
-function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const nextId = state.questDeck.find((id) => state.cards[id]?.code === code);
   if (!nextId) return state;
   const before = steps.length;

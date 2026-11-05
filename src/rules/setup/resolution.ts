@@ -7,10 +7,12 @@ import type { LegalIntent, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { fallenBase, printedOf } from "../core/printed.ts";
 import type { Earned, ResolutionLog } from "../core/campaign-state.ts";
+import { frameScope, resolveAmount } from "../interpret/amounts.ts";
 import { xpOf } from "../families/dreamchaser/index.ts";
 import { dealtCopies } from "../families/aflame/cards.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../core/state.ts";
+import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards } from "../families/wilderland/pool.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
@@ -170,6 +172,13 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       case "AddEncounterToPool":
         next = stepOver(next, addEncounterCards(next, instruction));
         break;
+      // Cards discarded from the encounter deck until X of a set's cards are, each added to the pool (12168:B:3).
+      case "DiscardToPoolFromSets": {
+        const count = resolveAmount(next, instruction.count, frameScope(next, next.firstPlayer, null), ctx);
+        const discarded = discardToPoolFromSets(next, instruction.sets, count, ctx);
+        next = stepOver(discarded.state, addEncounterCards(discarded.state, { verb: "AddEncounterToPool", codes: discarded.codes }));
+        break;
+      }
       case "ChooseCards":
       case "BoonAllyOrLogLine":
       case "RemoveFromPool":

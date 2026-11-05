@@ -24,6 +24,7 @@ import ruinsFixtures from "./fixtures/the-drowned-ruins.json";
 import havenFixtures from "./fixtures/a-storm-on-cobas-haven.json";
 import corsairsFixtures from "./fixtures/the-city-of-corsairs.json";
 import upanduinFixtures from "./fixtures/journey-up-the-anduin.json";
+import lostmirkFixtures from "./fixtures/lost-in-mirkwood.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -64,6 +65,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "a-storm-on-cobas-haven": havenFixtures,
   "the-city-of-corsairs": corsairsFixtures,
   "journey-up-the-anduin": upanduinFixtures,
+  "lost-in-mirkwood": lostmirkFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

@@ -187,6 +187,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The actor's quest succeeded this round (rr.step-3-4): "If you quest successfully this phase", read in the quest phase.
   // `committed`: and the source card was committed to it ("After Hirgon quests successfully").
   z.strictObject({ kind: z.literal("questSucceeded"), committed: z.boolean().optional() }),
+  // The actor quested this round and the quest did not succeed ("If you quested unsuccessfully this round", 12169:A:2): the quest was resolved and the actor is not among the seats it succeeded for. False before the quest is resolved.
+  z.strictObject({ kind: z.literal("questFailed") }),
   // Where the round is in its framework steps (rr.framework-steps): in the quest phase before the staging step, after it, or
   // before the quest is resolved; in the travel phase with no active location, so the players could travel (rr.step-4-2); in
   // the encounter phase after the engagement checks ("Play only after the staging step").

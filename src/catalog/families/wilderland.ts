@@ -77,6 +77,22 @@ const VERBS = [
   // "The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand" (18026:A:1): of the players with no card of the source's title in hand, the one with the most cards in hand takes the source into
   // their hand (the first player chooses among players tied). Nothing happens when every player holds a copy.
   z.strictObject({ verb: z.literal("AddSourceToHandOfMost"), ...when }),
+  // Lost in Mirkwood's Objective-Locations (18029 to 18032:A:3, "advance to the next stage A, if able"): the quest advances to the stage of the next number with this letter (A is the first of its level, C the second). `levels` lists the quest's stages by number, each level its
+  // A stage and its C stage (18071 | 18072, 18073 | 18074, 18075 | 18076, 18077). With no such stage (the last level) nothing happens. The stage left is defeated and the new one is revealed, as AdvanceToStage does.
+  z.strictObject({ verb: z.literal("AdvanceToLetterStage"), letter: z.enum(["A", "C"]), levels: z.array(z.array(z.string().min(1)).min(1).max(2)).min(2), ...when }),
+  // Quest Setup: "The first player takes control of Haldan" (18071:A:1; emce.haldan): the set-aside card with this code enters the first player's play area, faceup and ready. The card was dealt set aside by the scenario's piles; this is the stage's own Setup, run once the piles are placed.
+  verbFlags(z.strictObject({ verb: z.literal("TakeControlOfSetAside"), code }), { setupRuns: "top" }),
+  // Campaign Setup: "The first player may search the encounter deck for a copy of Twilight Hall and add it to the staging area. If they do, the players look at 3 random undiscovered treasures and attach 1 of them to Twilight Hall as a guarded objective"
+  // (12168:A:2): once the quest card's Setup has run, the first player chooses whether to search the encounter deck and its discard pile for a copy of `code`; if they search and one is found it is added to the staging area and AttachRandomTreasure
+  // guards a treasure with it. No copy to find, or a refusal, changes nothing.
+  verbFlags(z.strictObject({ verb: z.literal("SearchGuardForTreasure"), code, count: z.number().int().min(1).optional(), ...when }), { setupRole: "afterSetup", collection: "treasure" }),
+  // Resolution: "Discard cards from the encounter deck until X cards from either the Spiders of Mirkwood or Dol Guldur Orcs encounter set have been discarded and add those cards to the campaign pool" (12168:B:3; emce.campaign-pool-encounter): cards come off the top of the encounter deck
+  // into the encounter discard pile until `count` of them belong to one of `sets`, or the deck is empty; each of those goes to the pool (the log keeps no more copies than one collection holds). Run by the Resolution (src/rules/setup/resolution.ts).
+  z.strictObject({ verb: z.literal("DiscardToPoolFromSets"), sets: z.array(z.string().min(1)).min(1), count: positiveAmountSchema, ...when }),
+  // "The first Spider enemy revealed each quest phase gains surge" (18072:B:1, 18073:B:1): the card the answered `encounterRevealed` event is about gains surge, as if it printed the keyword (rr.surge). A Forced effect of a quest stage with a limit of once per phase.
+  z.strictObject({ verb: z.literal("GrantSurgeToSubject"), ...when }),
+  // A constant marker beside the flag progressDiscards on Searching for a Way Out (18028:A:2): after the cards that progress was turned into are discarded, the topmost Objective-Location in the encounter discard pile enters play (the staging area, its Guarded keyword resolved). It does nothing when run.
+  z.strictObject({ verb: z.literal("PutObjectiveLocationAfterDiscard") }),
 ] as const;
 
 const TRIGGERS = [] as const;

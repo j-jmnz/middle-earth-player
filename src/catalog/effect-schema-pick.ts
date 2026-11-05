@@ -220,6 +220,10 @@ export const pickSchema = z.strictObject({
   exceptNames: z.array(z.string().min(1)).min(1).optional(),
   // A card dealt into a named deck with a discard pile of its own ("an enemy from the Evil Creatures deck", 18066:B:3; emce.evil-creatures-deck): in play or not, whichever zone it lies in. Read by the wilderland family (src/rules/families/wilderland/pick.ts).
   fromDeck: z.literal("evilCreatures").optional(),
+  // An Objective-Location (`objectiveLocation`, 18028:A:1; ledger line 18029:A:2): a card whose printed type line is Objective-Location, in the staging area or the active location. `guardsObjectiveLocation`: an encounter card attached to one as its guard ("each card guarding one").
+  // Read by the wilderland family (src/rules/families/wilderland/pick.ts); use them with `type: card`.
+  objectiveLocation: z.literal(true).optional(),
+  guardsObjectiveLocation: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).

@@ -7,6 +7,8 @@ export type PrintedSource = Pick<
   | "code" | "name" | "type" | "traits" | "sphere" | "cost" | "threat" | "willpower" | "attack" | "defense" | "health"
   | "questPoints" | "victory" | "isUnique" | "engagementCost" | "keywords" | "campaignKind" | "burdenSet" | "backType" | "encounterSet"
 > & {
+  // The printed type line ("Objective Location"): the Lost in Mirkwood objective-locations are objectives that travel, explore and count as locations (rr.victory, ledger lines 18029:A:2, 18029:A:3).
+  typeName?: string;
   // The stats of the Upgraded side, side B (a catalog row carries them as `upgraded`, a data/cards record as `back`).
   upgraded?: UpgradedStats | null;
   back?: Card["back"];
@@ -92,6 +94,8 @@ export type PrintedCard = {
   campaignKind: "boon" | "burden" | "treasure" | null;
   burdenSet: string | null;
   backType: "player" | "encounter" | null;
+  // An Objective-Location (Lost in Mirkwood, 18029 to 18032): an objective card that the players travel to, that takes progress as the active location and goes to the victory display explored. `type` stays "objective" (it is guarded, claimed and revealed as an objective).
+  objectiveLocation: boolean;
   // Null for a card that is not a ship.
   ship: ShipKind | null;
   // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).
@@ -135,6 +139,11 @@ function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
 
 // The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play/sweep.ts) lost
 // the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
+// Whether the card is a location for travel, exploring, progress and the victory display: a location, or an Objective-Location.
+export function isLocationCard(printed: PrintedCard): boolean {
+  return printed.type === "location" || printed.objectiveLocation;
+}
+
 export function cardTypeOf(instance: { zone: string }, printed: PrintedCard): CardType {
   return instance.zone === "heroes" ? "hero" : printed.type;
 }
@@ -162,6 +171,7 @@ export function definePrinted(
     burdenSet: null,
     backType: null,
     ship: null,
+    objectiveLocation: false,
     encounterSet: null,
     upgraded: null,
     ...card,
@@ -320,6 +330,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     burdenSet: card.burdenSet,
     backType: card.backType,
     ship,
+    objectiveLocation: card.typeName === "Objective Location",
     encounterSet: card.encounterSet,
     upgraded: card.upgraded ?? upgradedOfBack(card.back),
     keywords: {

@@ -9,6 +9,9 @@ export const RECORDS: readonly Effect[] = [
   // 12167 A Growing Threat (burden; Surge is a keyword). The topmost eligible card of the encounter discard pile is set aside and the Resolution adds a copy of it to the pool; A Growing Threat leaves the game.
   {"id":"12167:whenRevealed:1","cardCode":"12167","lines":["12167:A:2"],"timing":"whenRevealed","instructions":[{"verb":"SetAsideDiscardForPool","exclude":["unique","objective","burden"]},{"verb":"RemoveSourceFromGame"}]},
 
+  // 12169 Melanwar (boon ally; Ranged is a keyword). After the travel phase begins he exhausts to place 1 progress on the active location, 3 instead if the player quested unsuccessfully this round.
+  {"id":"12169:response:1","cardCode":"12169","lines":["12169:A:2"],"timing":"response","trigger":"beginningOfPhase","cost":{"kind":"exhaustSelf"},"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Travel"},{"kind":"canPick","pick":{"type":"location","control":"any","active":true}}]},"instructions":[{"verb":"PlaceProgressOn","amount":1,"target":"activeLocation","when":{"kind":"not","condition":{"kind":"questFailed"}}},{"verb":"PlaceProgressOn","amount":3,"target":"activeLocation","when":{"kind":"questFailed"}}]},
+
   // 12196 Anvil of Gundabad (treasure). Claimed or played, it finds any number of Item attachments among the top 5 cards of its controller's deck; its Action plays an Item attachment from the hand for 1 less.
   {"id":"12196:constant:1","cardCode":"12196","lines":["12196:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
   {"id":"12196:response:1","cardCode":"12196","lines":["12196:A:2"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Each","pick":{"type":"card","control":"you","from":"deck","top":5,"cardType":"attachment","trait":"Item"},"upTo":"any","instructions":[{"verb":"MovePicked","to":"hand"}]},{"verb":"ShuffleDeck"}]},

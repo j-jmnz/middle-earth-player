@@ -12,7 +12,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import type { PrintedCard } from "../core/printed.ts";
-import { printedOf } from "../core/printed.ts";
+import { isLocationCard, printedOf } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -299,7 +299,7 @@ export function travelTo(state: ScenarioState, locationId: string, cards: Cards,
   if (!slot && !travelsOverActive(state)) return null;
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
-  if (printedOf(cards, instance.code).type !== "location") return null;
+  if (!isLocationCard(printedOf(cards, instance.code))) return null;
   return slot ? moveCard(state, locationId, { zone: slot }) : makeActiveIn(state, locationId);
 }
 
@@ -308,7 +308,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
   const view = viewOf(state, seat);
   return view.staging.filter((id) => {
     const instance = view.cards[id];
-    return instance != null && printedOf(cards, instance.code).type === "location";
+    return instance != null && isLocationCard(printedOf(cards, instance.code));
   });
 }
 

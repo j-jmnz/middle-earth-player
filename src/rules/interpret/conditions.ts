@@ -274,6 +274,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return spendablePools(state, scope.actor, condition, ctx).total >= condition.min;
     case "questSucceeded":
       return questSucceeded(state, scope.actor, scope.sourceId, condition.committed === true);
+    case "questFailed":
+      return state.quested?.round === state.round && !state.quested.succeeded.includes(scope.actor);
     case "step":
       return stepHolds(state, condition.is);
     case "engagedThisPhase":

@@ -18,6 +18,8 @@ import { wilderlandPickMatches } from "./pick.ts";
 import { setAsideDiscardForPool } from "./discard-pool.ts";
 import { flipOver } from "./flip.ts";
 import { addSourceToHandOfMost } from "./hand.ts";
+import { advanceToLetterStage, grantSurge, freeTreasures, searchGuardForTreasure, takeControlOfSetAside } from "./mirkwood.ts";
+import { topFrame } from "../../windows/windows.ts";
 
 // The verbs src/catalog/families/wilderland.ts adds. AttachRandomTreasure runs in the game. The others are not run by the engine: the Resolution
 // ones (DiscoverTreasure, BoonAllyOrLogLine, AddEncounterToPool, RemoveFromPool) are run by rules/setup/resolution.ts, and RemoveFromEncounterDeckIfLogged is dealt by
@@ -52,8 +54,20 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return resolveDeep(state, focus, ctx, steps);
     case "Discover":
       return discover(state, instruction, focus, ctx, steps);
+    case "AdvanceToLetterStage":
+      return advanceToLetterStage(state, instruction, ctx, steps);
+    case "TakeControlOfSetAside":
+      return takeControlOfSetAside(state, instruction, focus);
+    case "SearchGuardForTreasure":
+      return searchGuardForTreasure(state, instruction, focus);
+    case "GrantSurgeToSubject": {
+      const data = topFrame(state)?.data;
+      return grantSurge(state, data?.kind === "effect" ? (data.subject ?? null) : null);
+    }
     case "Loot":
     case "Undiscardable":
+    case "DiscardToPoolFromSets":
+    case "PutObjectiveLocationAfterDiscard":
     case "GainControlWhenFree":
     case "IgnoreKeyword":
       return state;
@@ -79,7 +93,7 @@ export const manifest: RulesFamily = {
   amount: wilderlandAmount,
   pick: wilderlandPickMatches,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
-  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx) => controlFreedObjectives(state, ctx) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword"],
+  settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => freeTreasures(controlFreedObjectives(state, ctx), ctx, steps) },
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard"],
   run,
 };

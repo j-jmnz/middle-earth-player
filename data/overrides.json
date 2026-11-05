@@ -777,6 +777,46 @@
       },
       "reason": "The source has the Nightmare ship-enemy Venom's Bite with no stats. The picture (Nightmare Dream-chaser / Flight of the Stormcaller, 004) prints engagement cost 34, Threat 5, Attack 8, Defense 5, 14 hit points and Victory 5, type line SHIP-ENEMY.",
       "source": "nightmare picture 004 - Venom's Bite (data/raw/nightmare/drive.json)"
+    },
+    {
+      "match": {
+        "code": "18029"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the objective-location Overgrown Path no quest points. The scan prints a quest points box of 4, no Threat and Victory 4 (a location for travel and exploring, rr.victory), so progress can be placed on it once it is the active location.",
+      "source": "scan 18029.A, sha256 91a99adff6ae91d6baae01167fe674866b2ce1e54a24f98d542c24240069fb6a (data/printed/ered-mithrin.json)"
+    },
+    {
+      "match": {
+        "code": "18030"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the objective-location Abandoned Village no quest points. The scan prints a quest points box of 4, no Threat and Victory 4 (a location for travel and exploring, rr.victory), so progress can be placed on it once it is the active location.",
+      "source": "scan 18030.A, sha256 d5d84b7e20cedeb9349bf35aab2008ba129530742d450e34177c38161b16fdfe (data/printed/ered-mithrin.json)"
+    },
+    {
+      "match": {
+        "code": "18031"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the objective-location Bare Hilltop no quest points. The scan prints a quest points box of 4, no Threat and Victory 4 (a location for travel and exploring, rr.victory), so progress can be placed on it once it is the active location.",
+      "source": "scan 18031.A, sha256 ff81edd39f067874eef0c4261c979c6b255592d9e753e832b52afe0ed0f49a92 (data/printed/ered-mithrin.json)"
+    },
+    {
+      "match": {
+        "code": "18032"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the objective-location Forest Clearing no quest points. The scan prints a quest points box of 4, no Threat and Victory 4 (a location for travel and exploring, rr.victory), so progress can be placed on it once it is the active location.",
+      "source": "scan 18032.A, sha256 d60fe5f09910ff5ef7519f755d999a0f930fea1d8ba52792442635c8c0d7bd34 (data/printed/ered-mithrin.json)"
     }
   ],
   "scenarioPiles": [
@@ -905,7 +945,10 @@
     {
       "scenario": "journey-up-the-anduin",
       "set": "Wilderlands",
-      "types": ["location", "treachery"],
+      "types": [
+        "location",
+        "treachery"
+      ],
       "reason": "The Evil Creatures deck is the Wilderlands enemies: \"Remove each location and treachery card from the Wilderlands encounter set from the game\" (emce.evil-creatures-deck, MEC115 p5). Hall of Beorn's scenario list counts the whole set (The Brown Lands 2, The East Bight 2), so those counts are not dealt copies. The Wilderlands enemies (8 copies) are dealt in the Evil Creatures deck.",
       "source": "Ered Mithrin Campaign Expansion rulebook MEC115 p5 (emce.evil-creatures-deck); hallofbeorn.com/Export/Scenarios/Journey-Up-the-Anduin"
     }

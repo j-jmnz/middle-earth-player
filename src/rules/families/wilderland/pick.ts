@@ -1,7 +1,8 @@
-// Rules: emce.evil-creatures-deck (data/rules/entries.json); ledger lines 18066:B:3, 18026:A:1. The wilderland family's pick filters: a card dealt into the Evil Creatures deck (`fromDeck`), and a card in a hand that player card effects cannot discard
+// Rules: emce.evil-creatures-deck, rr.victory (data/rules/entries.json); ledger lines 18066:B:3, 18026:A:1. The wilderland family's pick filters: a card dealt into the Evil Creatures deck (`fromDeck`), and a card in a hand that player card effects cannot discard
 // (the constant verb Undiscardable) when the pick feeds a discard.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
+import { printedOf } from "../../core/printed.ts";
 import { isPlayerCardEffect } from "../../core/keywords.ts";
 import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import type { PickContext } from "../../interpret/pick.ts";
@@ -19,6 +20,11 @@ export function wilderlandPickMatches(state: ScenarioState, id: string, spec: Pi
   const card = state.cards[id];
   if (!card) return true;
   if (spec.fromDeck != null && card.deck !== spec.fromDeck) return false;
+  if (spec.objectiveLocation && !printedOf(ctx.cards, card.code).objectiveLocation) return false;
+  if (spec.guardsObjectiveLocation) {
+    const host = card.host ? state.cards[card.host] : undefined;
+    if (!card.guard || !host || !printedOf(ctx.cards, host.code).objectiveLocation) return false;
+  }
   // "Cannot be discarded by player card effects": a pick from the hand that the effect discards leaves the card out. A pick that gives, swaps or moves a card still offers it.
   if (spec.from === "hand" && (at.discards || spec.discarded) && !at.counting && barredFromPlayerDiscard(state, ctx, id, at.sourceId)) return false;
   return true;

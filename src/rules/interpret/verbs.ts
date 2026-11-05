@@ -328,7 +328,7 @@ function discardTarget(
 }
 
 // The reveal frame of the source card keeps the surge it was given for the rest of that reveal.
-function markSurge(state: ScenarioState, sourceId: string | null): ScenarioState {
+export function markSurge(state: ScenarioState, sourceId: string | null): ScenarioState {
   for (let index = state.stack.length - 1; index >= 0; index -= 1) {
     const frame = state.stack[index];
     if (frame?.frame !== "reveal" || frame.cardId !== sourceId || frame.data.kind !== "reveal") continue;

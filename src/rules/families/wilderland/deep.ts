@@ -43,7 +43,7 @@ export function resolveDeep(state: ScenarioState, focus: Focus, ctx: ReduceConte
 }
 
 // The guarded keyword of a Dragon Sign added to the staging area: each typed GuardObjective of its When Revealed records, run for the sign itself.
-function resolveGuarded(state: ScenarioState, signId: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function resolveGuarded(state: ScenarioState, signId: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const sign = state.cards[signId];
   if (!sign || textBlank(state, signId)) return state;
   let next = state;

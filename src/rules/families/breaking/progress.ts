@@ -5,6 +5,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
+import { putObjectiveLocation } from "../wilderland/mirkwood.ts";
 import { startReveal } from "../../windows/frames.ts";
 import { moveCard } from "../../core/zones.ts";
 
@@ -33,5 +34,6 @@ export function payOwed(state: ScenarioState, ctx: ReduceContext, steps: EngineS
     }
   }
   for (const entry of revealed) next = startReveal(next, entry.seat, ctx, steps, entry.id);
-  return next;
+  // Searching for a Way Out (18028:A:2): the topmost Objective-Location in the discard pile enters play after the discards.
+  return putObjectiveLocation(next, ctx, steps);
 }

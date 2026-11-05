@@ -5,7 +5,7 @@ import type { Cause } from "./cause.ts";
 import { threatSaved } from "../families/quest/threat.ts";
 import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
 import type { EngineStep } from "./intents.ts";
-import { cardTypeOf, fromEncounterDeck, isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, livingSeats, modifierActive, updateCard, withSeat, withThreat } from "./state.ts";
@@ -299,7 +299,7 @@ export function defeatedDestination(
   instance: CardInstance,
   printed: PrintedCard,
 ): Destination {
-  if ((printed.type === "enemy" || printed.type === "location") && victoryOf(instance, printed) != null) {
+  if ((printed.type === "enemy" || isLocationCard(printed)) && victoryOf(instance, printed) != null) {
     return { zone: "victory" };
   }
   // A card put into play for a time leaves the game when it leaves play (PutIntoPlay `then: removeFromGame`, 11212:A:2).
@@ -363,15 +363,15 @@ export function destroyCard(
   // The cards attached to a location that leaves play hear about it (Elf-stone). Whether the location was explored is
   // decided here, while the attachments still count (rr.explored): an Elf-stone's extra quest point is gone once it is discarded.
   let next = state;
-  if (printed.type === "location") {
+  if (isLocationCard(printed)) {
     for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
-  if (explored && printed.type === "location" && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   // A location explored in the staging area (not the active location, which announced itself above) is heard by "after a location is explored" (Northern Tracker, The Evening Star).
-  if (explored && printed.type === "location" && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: instance.attachments.length });
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
-  if (explored && printed.type === "location" && instance.zone === "staging") next = releaseGrappled(next, id);
+  if (explored && isLocationCard(printed) && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).

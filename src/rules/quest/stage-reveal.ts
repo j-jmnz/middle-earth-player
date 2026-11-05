@@ -7,7 +7,7 @@ import { questFailureRaise } from "../families/quest/threat.ts";
 import { askQuestProgress } from "../families/attachments/quest.ts";
 import { resolveSideQuests, sideQuestTotals } from "../families/sidequests/quest.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
-import { printedOf } from "../core/printed.ts";
+import { isLocationCard, printedOf } from "../core/printed.ts";
 import { advanceStage, clearCommitted, questPointsOf, resolveQuest } from "./quest.ts";
 import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -133,7 +133,7 @@ function progressesQuest(state: ScenarioState, id: string, ctx: ReduceContext): 
 
 function isLocation(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
-  return instance != null && printedOf(ctx.cards, instance.code).type === "location";
+  return instance != null && isLocationCard(printedOf(ctx.cards, instance.code));
 }
 
 function finish(state: ScenarioState): ScenarioState {

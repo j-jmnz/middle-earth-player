@@ -10,7 +10,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, modifiedStat } from "../../core/keywords.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
-import { printedOf } from "../../core/printed.ts";
+import { isLocationCard, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
@@ -22,7 +22,7 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 
 function isLocation(state: ScenarioState, id: string | null, ctx: ReduceContext): id is string {
   const card = id ? state.cards[id] : undefined;
-  return card != null && printedOf(ctx.cards, card.code).type === "location";
+  return card != null && isLocationCard(printedOf(ctx.cards, card.code));
 }
 
 // The location becomes the active location; another active location goes back to the staging area with its progress. This is
