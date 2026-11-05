@@ -27,6 +27,7 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { buildStart } from "../../start.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const oath = loadScenario("the-oath");
 const mini = loadCampaign("the-dark-of-mirkwood");
@@ -43,9 +44,9 @@ beforeAll(async () => {
   const brittle = await anduinWorld("brittle");
   const anduin = playAnduin(ANDUIN_GOLDENS.find((item) => item.name === "two-handed, brittle heroes, won with a Valor and a Scarred")!, brittle.ctx);
   const dol = await dolGuldurWorld("strong");
-  const afterAnduin = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, anduin.state.scenarioId, anduin.state, new Map([...brittle.cards, ...dol.cards]));
+  const afterAnduin = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, anduin.state.scenarioId, anduin.state, new Map([...brittle.cards, ...dol.cards]), NO_COPY_LIMITS);
   const escape = playDolGuldur(DOL_GULDUR_GOLDENS.find((item) => item.name === "two-handed, won")!, dol.ctx);
-  escapeLog = applyResolution(afterAnduin, escape.state.scenarioId, escape.state, dol.cards);
+  escapeLog = applyResolution(afterAnduin, escape.state.scenarioId, escape.state, dol.cards, NO_COPY_LIMITS);
   // The Caves of Nibin-Dûm, dealt below as the later scenario, hands each seat a "No Time to Waste!" and shuffles Shiny Distraction in.
   const caves = new Map(await loadPrinted(["41042", "41048", "41049"]));
   cards = new Map([...brittle.cards, ...dol.cards, ...world.cards, ...caves]);
@@ -250,7 +251,7 @@ describe("The Oath, the campaign card (41050:A:3, 41050:B:1)", () => {
 
   it("writes Guilty Conscience to the Campaign Log, and a burden goes to the pool backed by the encounter deck", () => {
     const { state } = resolved(7);
-    const log = applyResolution(emptyLog(1), "the-oath", state, scene.cards);
+    const log = applyResolution(emptyLog(1), "the-oath", state, scene.cards, NO_COPY_LIMITS);
     expect(log.counters).toEqual({});
     expect(log.campaignPool.map((card) => card.code)).toEqual(["41043"]);
     expect(log.campaignPool[0]?.back).toBe("encounter");

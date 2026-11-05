@@ -10,12 +10,19 @@ import { bannerSpan } from "./banner-span.ts";
 import { layoutAnim, timing, useMotionScale, useReduceMotion } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { CONTAINER_RADIUS } from "../../ui/radius.ts";
-import { BEAT_MS, type Moment } from "../store/outcome.ts";
+import { BEAT_MS, type Moment, type MomentLine } from "../store/outcome.ts";
+import { lookIdsOf, lookStripWords } from "../words/wilderland.ts";
 import { LineMark } from "../chrome/table-chrome.tsx";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
+
+// What a screen reader hears of a line: the line that lays cards in the Discover look strip names the strip (emce.discover), every other line its text.
+function spoken(line: MomentLine): string {
+  const laid = lookIdsOf(new Set(line.cards ?? [])).length;
+  return laid > 0 ? lookStripWords(laid) : line.text;
+}
 
 const BANNER_WIDTH = 440;
 const BANNER_MIN = 260;
@@ -63,7 +70,7 @@ export function MomentBanner({
   const screen = useWindowDimensions();
   const { left, right } = bannerSpan(screen.width, BANNER_WIDTH * s + 2 * SIDE, leftClear, rightClear);
   const room = Math.max(0, screen.width - left - right - 2 * SIDE);
-  const label = `${moment.title}. ${moment.lines.map((line) => line.text).join(". ")}`;
+  const label = `${moment.title}. ${moment.lines.map(spoken).join(". ")}`;
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
   useEffect(() => {
     AccessibilityInfo.announceForAccessibility(label);

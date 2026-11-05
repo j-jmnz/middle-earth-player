@@ -22,6 +22,7 @@ import { newSave } from "../../save.ts";
 import { campaignPath } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { levelOf } from "../../xp.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
@@ -154,7 +155,7 @@ describe("Raid on the Grey Havens in the Dream-chaser campaign", () => {
     const golden = RAID_GOLDENS.find((item) => item.name === "two-handed, a Galdor's Counsel each (Leadership and Tactics), won")!;
     const world = await raidWorld(golden.decks);
     const game = playGolden(golden, world.ctx);
-    const log = applyResolution(afterFate(2), game.state.scenarioId, game.state, world.cards);
+    const log = applyResolution(afterFate(2), game.state.scenarioId, game.state, world.cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens"]);
     expect(log.xpGained["raid-on-the-grey-havens"]).toBe(game.state.resolutionLog.xp);
     expect(log.xpGained["voyage-across-belegaer"]).toBe(4);
@@ -164,7 +165,7 @@ describe("Raid on the Grey Havens in the Dream-chaser campaign", () => {
     const lost = RAID_GOLDENS.find((item) => item.name === "true solo, weak, lost when the Dream-chaser burns")!;
     const lostGame = playGolden(lost, (await raidWorld(lost.decks)).ctx);
     const untouched = afterFate(1);
-    expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards)).toBe(untouched);
+    expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards, NO_COPY_LIMITS)).toBe(untouched);
   });
 });
 

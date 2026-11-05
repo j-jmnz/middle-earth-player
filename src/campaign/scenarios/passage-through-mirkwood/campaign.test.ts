@@ -16,6 +16,7 @@ import { checklist } from "../../checklist.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
@@ -76,7 +77,7 @@ describe("what a win writes and the next part receives", () => {
     it(`${name}: the Resolution earns a Mendor's Support for each player and the burden, and unlocks Journey Along the Anduin`, () => {
       const game = won.get(name)!;
       const seats = game.state.seatCount;
-      const log = applyResolution(emptyLog(seats), game.state.scenarioId, game.state, cards);
+      const log = applyResolution(emptyLog(seats), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
       expect(log.completed).toEqual(["passage-through-mirkwood"]);
       const burden = game.state.stagesReached?.includes("01122") ? "01136" : "01137";
       expect(log.campaignPool.map((card) => card.code)).toEqual([...Array.from({ length: seats }, () => "01132"), burden]);

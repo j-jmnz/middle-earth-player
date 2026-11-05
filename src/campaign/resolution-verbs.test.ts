@@ -12,6 +12,7 @@ import { loadPrinted } from "../../test/harness/catalog.ts";
 import { loadWorld, table, type World } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { first, send, start } from "../../test/harness/scene-kit.ts";
 import { applyResolution as writeLog, emptyLog } from "./log.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 
 
 // The resolution verbs the cards use, run against the real records of the campaign cards (142019, 142039, 142060,
@@ -173,7 +174,7 @@ describe("141044 Resolution, per seat from the first player", () => {
     const { state, ctx } = won("141044", 2);
     const done = send(send(start(state), { type: "ChooseResolution", optionId: "skip" }, ctx), { type: "ChooseResolution", optionId: "skip" }, ctx);
     expect(resolutionResult(done.state)?.earned).toEqual([]);
-    expect(writeLog(emptyLog(2), done.state.scenarioId, done.state, cards).campaignPool).toEqual([]);
+    expect(writeLog(emptyLog(2), done.state.scenarioId, done.state, cards, NO_COPY_LIMITS).campaignPool).toEqual([]);
   });
 
   it("writes each chosen boon to the log as attached to the hero the option named, with its seat, not as a loose pool card", () => {
@@ -181,7 +182,7 @@ describe("141044 Resolution, per seat from the first player", () => {
     const sam = first(state, SAM);
     const merry = first(state, MERRY);
     const done = send(send(start(state), { type: "ChooseResolution", optionId: `141019>${sam}` }, ctx), { type: "ChooseResolution", optionId: `141020>${merry}` }, ctx);
-    const log = writeLog(emptyLog(2), done.state.scenarioId, done.state, cards);
+    const log = writeLog(emptyLog(2), done.state.scenarioId, done.state, cards, NO_COPY_LIMITS);
     expect(log.campaignPool).toEqual([
       { code: "141019", back: "player", burdenSet: null, attachedTo: SAM, seat: 0 },
       { code: "141020", back: "player", burdenSet: null, attachedTo: MERRY, seat: 1 },

@@ -1,8 +1,9 @@
 import { setupRoleVerbs, type Effect, type ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, corsairCodes, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
+import { logConditionHolds } from "./wilderland.ts";
 import { MODE_CARD_CODE, MODE_CARD_SIDE, type ModeCard } from "./xp.ts";
 
 // Campaign Mode, or the scenario played as a standalone adventure (mec109.campaign-mode: "players can still play the
@@ -30,6 +31,8 @@ export type StartInput = {
   // The campaign log's structured facts, handed to the engine (Campaign Mode only). Left out when the log holds none. The Hard/Expert Mode card
   // the game is played with is `modeCard`, below: the facts take it from there.
   facts?: Omit<CampaignFacts, "modeCard">;
+  // The encounter cards the campaign card's Setup searched for and removed from the game (RemoveFromEncounterDeckIfLogged, chosen in the checklist): one code for each copy, taken out of the deck built here.
+  removedFromEncounter?: readonly string[];
   // Campaign when absent.
   mode?: PlayMode;
   // The Hard/Expert Mode card the players put next to the quest deck (dcce.hard-expert), Campaign Mode only: its Resolution adds its XP.
@@ -49,7 +52,7 @@ const DEALT_VERBS = setupRoleVerbs("dealt");
 const AFTER_SETUP_VERBS = setupRoleVerbs("afterSetup");
 
 function hasFacts(facts: CampaignFacts): boolean {
-  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;
+  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null || facts.treasures != null || facts.allyLines != null || facts.beldisUses != null || facts.encounterPool != null || facts.pool != null;
 }
 
 // The facts the engine gets: the log's, and the Hard/Expert Mode card chosen for this game (the log records it when the scenario is won).
@@ -57,6 +60,17 @@ function factsOf(input: StartInput): CampaignFacts | undefined {
   const logged = input.facts ?? { prisoner: null, usedOnce: [], counters: {} };
   const facts: CampaignFacts = input.modeCard ? { ...logged, modeCard: input.modeCard } : logged;
   return hasFacts(facts) ? facts : undefined;
+}
+
+// The deck without the cards Setup removed from the game: the first copy of each code, once for each time it is listed.
+function withoutCards(deck: readonly string[], removed: readonly string[]): string[] {
+  if (removed.length === 0) return [...deck];
+  const left = [...deck];
+  for (const code of removed) {
+    const at = left.indexOf(code);
+    if (at >= 0) left.splice(at, 1);
+  }
+  return left;
 }
 
 export function buildStart(start: StartInput): StartScenario {
@@ -81,13 +95,16 @@ export function buildStart(start: StartInput): StartScenario {
   const dealt = campaignSetup.filter((instruction) => DEALT_VERBS.has(instruction.verb));
   const named = new Set(dealt.flatMap((instruction) => (instruction.verb === "PutObjectiveAllyIntoPlay" ? [instruction.code] : [])));
   const poolInPlay = standalone ? [] : (input.poolIntoPlay ?? []).filter((code) => !named.has(code));
-  const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" ? [instruction.code] : []));
+  // A line that reads the Campaign Log ("If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck") holds by the log's facts.
+  const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, start.facts) ? [instruction.code] : []));
   const afterSetup = campaignSetup.filter((instruction) => AFTER_SETUP_VERBS.has(instruction.verb));
   const burden = burdenCodes(input.scenario);
   // The Corsair deck the scenario deals, and the cards the campaign card shuffles into it ("Shuffle Crowley into the Corsair deck"); the quest card's Setup shuffles it.
   const corsair = [...corsairCodes(input.scenario, input.difficulty), ...campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoCorsairDeck" ? [instruction.code] : []))];
   const uncharted = unchartedCodes(input.scenario, input.difficulty);
   const doubleSided = doubleSidedCards(input.scenario, input.difficulty);
+  // The decks of Ered Mithrin the scenario deals (emce.caves-deck, emce.evil-creatures-deck); the quest card's Setup shuffles them.
+  const piles = dealtPiles(input.scenario, input.difficulty);
   // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/nightmare-mode.md).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
@@ -106,12 +123,13 @@ export function buildStart(start: StartInput): StartScenario {
       ],
     },
     seats: input.seats,
-    encounterDeck: [...encounterCodes(input.scenario, input.difficulty, input.seatCount), ...shuffledIn, ...(input.poolEncounterCards ?? [])],
+    encounterDeck: withoutCards([...encounterCodes(input.scenario, input.difficulty, input.seatCount), ...shuffledIn, ...(input.poolEncounterCards ?? [])], standalone ? [] : (input.removedFromEncounter ?? [])),
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(corsair.length > 0 ? { corsairDeck: corsair } : {}),
     ...(uncharted.length > 0 ? { unchartedDeck: uncharted } : {}),
     ...(doubleSided.length > 0 ? { doubleSided } : {}),
+    ...(Object.keys(piles).length > 0 ? { piles } : {}),
     ...(input.difficulty ? { difficulty: input.difficulty } : {}),
     ...(!standalone && factsOf(input) ? { facts: factsOf(input) } : {}),
   };

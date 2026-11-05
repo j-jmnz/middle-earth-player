@@ -41,9 +41,10 @@ export const cardSchema = z.strictObject({
   timings: z.array(z.string()),
   text: z.string().nullable(),
   shadowText: z.string().nullable(),
-  // A boon or burden card (Campaign Mode), from the card's type bar. A burden belongs to a burden set, which is
-  // printed where an encounter set icon would be; later campaign cards remove burdens by burden set.
-  campaignKind: z.enum(["boon", "burden"]).nullable(),
+  // A boon, burden or treasure card (Campaign Mode), from the card's type bar. A burden belongs to a burden set, which is
+  // printed where an encounter set icon would be; later campaign cards remove burdens by burden set. A treasure (Ered Mithrin,
+  // emce.treasure) is a player card that is deck-legal only through the campaign log, never from the card pool.
+  campaignKind: z.enum(["boon", "burden", "treasure"]).nullable(),
   burdenSet: z.string().nullable(),
   // Which deck the card goes back to when it joins the campaign pool: a player card to a player deck, an
   // encounter card to the encounter deck. Null for quest, campaign and nightmare cards.

@@ -10,6 +10,7 @@ import { campaign, scenario, loadWorld, type World } from "../../test/scenarios/
 import { validateLoadout, type LoadoutSeat } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
 import { buildStart } from "./start.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 
 // A whole A Shadow of the Past on fixed seeds. The Ring-bearer is the saga hero; the three other heroes
 // and the deck are in-memory cards with big numbers, so the outcome depends on the engine and the seed
@@ -74,12 +75,12 @@ describe("a whole game of A Shadow of the Past", () => {
 
   it("records the chosen cards once, and a second win does not grant them again", () => {
     const { state } = play(WIN_SEED);
-    const log = applyResolution(emptyLog(1), state.scenarioId, state, cards);
+    const log = applyResolution(emptyLog(1), state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.campaignPool.map((card) => card.code)).toEqual(["141078", "141077"]);
     expect(log.completed).toEqual([state.scenarioId]);
     const second = play(OTHER_WIN_SEED).state;
     expect(second.stageCleared).toBe(true);
-    expect(applyResolution(log, second.scenarioId, second, cards)).toBe(log);
+    expect(applyResolution(log, second.scenarioId, second, cards, NO_COPY_LIMITS)).toBe(log);
   });
 
   it("writes nothing for a loss", () => {
@@ -89,6 +90,6 @@ describe("a whole game of A Shadow of the Past", () => {
     expect(state.window).toBeNull();
     expect(state.resolutionLog.earned).toEqual([]);
     const empty = emptyLog(1);
-    expect(applyResolution(empty, state.scenarioId, state, cards)).toBe(empty);
+    expect(applyResolution(empty, state.scenarioId, state, cards, NO_COPY_LIMITS)).toBe(empty);
   });
 });

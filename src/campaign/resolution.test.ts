@@ -6,6 +6,7 @@ import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import { begin, buildTable, FRODO, idsOf, SAM, sceneCards, send, type Run, type Table } from "../../test/harness/scene.ts";
 
 import { applyResolution, emptyLog } from "./log.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 
 let base: Awaited<ReturnType<typeof sceneCards>>;
 
@@ -97,7 +98,7 @@ describe("campaign log", () => {
 
   it("records each chosen card once, a Permanent card on the Ring-bearer, and not the cards left on the table", () => {
     const { state, table } = won();
-    const log = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards);
+    const log = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([state.scenarioId]);
     expect(log.campaignPool).toEqual([
       { code: "141078", back: "encounter", burdenSet: "A Shadow of the Past", attachedTo: null, seat: 0 },
@@ -109,7 +110,7 @@ describe("campaign log", () => {
 
   it("scores the win by the Learn to Play formula", () => {
     const { state, table } = won();
-    const log = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards);
+    const log = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards, NO_COPY_LIMITS);
     const record = log.scenarios[state.scenarioId];
     expect(record?.rounds).toBe(state.round);
     const damage = state.seats[0]?.heroes.reduce((sum, id) => sum + (state.cards[id]?.damage ?? 0), 0) ?? 0;
@@ -119,18 +120,18 @@ describe("campaign log", () => {
 
   it("does not grant the reward a second time", () => {
     const { state, table } = won();
-    const once = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards);
-    const again = applyResolution(once, state.scenarioId, state, table.ctx.cards);
+    const once = applyResolution(emptyLog(1), state.scenarioId, state, table.ctx.cards, NO_COPY_LIMITS);
+    const again = applyResolution(once, state.scenarioId, state, table.ctx.cards, NO_COPY_LIMITS);
     expect(again).toBe(once);
   });
 
   it("writes nothing for a loss, or while a choice is still open", () => {
     const { run, table } = winningQuest();
     const empty = emptyLog(1);
-    expect(applyResolution(empty, run.state.scenarioId, run.state, table.ctx.cards)).toBe(empty);
+    expect(applyResolution(empty, run.state.scenarioId, run.state, table.ctx.cards, NO_COPY_LIMITS)).toBe(empty);
     const { state } = won();
     const lost = { ...state, lost: true, lossReason: "test" };
-    expect(applyResolution(empty, state.scenarioId, lost, table.ctx.cards)).toBe(empty);
-    expect(applyResolution(empty, "other-scenario", state, table.ctx.cards)).toBe(empty);
+    expect(applyResolution(empty, state.scenarioId, lost, table.ctx.cards, NO_COPY_LIMITS)).toBe(empty);
+    expect(applyResolution(empty, "other-scenario", state, table.ctx.cards, NO_COPY_LIMITS)).toBe(empty);
   });
 });

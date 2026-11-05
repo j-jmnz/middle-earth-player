@@ -34,6 +34,7 @@ const READ_FROM_CAMPAIGN_SETUP: Readonly<Record<string, string>> = {
   AddToPool: "src/campaign/checklist.ts",
   ChooseCards: "src/campaign/checklist.ts",
   WaiveThreatPenalty: "src/campaign/checklist.ts",
+  RemoveFromEncounterDeckIfLogged: "src/campaign/checklist.ts",
   ShuffleIntoEncounterDeck: "src/campaign/start.ts",
   ShuffleIntoCorsairDeck: "src/campaign/start.ts",
   KeepCampaignCard: "src/rules/families/burden/campaign.ts",

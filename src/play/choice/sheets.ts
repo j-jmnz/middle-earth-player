@@ -13,11 +13,14 @@ import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 import type { Frame, GameEvent, ResponseOffer } from "../../rules/core/state.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
+import { asksPlayers } from "../../rules/setup/resolution.ts";
 
 import { askWords } from "../words/ask.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
+import { isTreasureDraw, wilderlandBranchNow, wilderlandOptionLabel, wilderlandTravel } from "../words/wilderland.ts";
+import { branchCaution } from "./wilderland-sheets.ts";
 import { seaOptionLabel } from "../words/sea.ts";
 import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
@@ -157,7 +160,7 @@ export function isStepWindow(game: ScenarioState): boolean {
 export function wonSheet(game: ScenarioState): Sheet {
   const rewards = game.resolution.length > 0;
   // A Resolution that asks nothing (The Oath's: the tokens and the burden they earn) has no rewards to choose: the screen after it only shows what is recorded.
-  const asks = game.resolution.some((instruction) => instruction.verb === "ChooseCards" || instruction.verb === "NameCaptives");
+  const asks = game.resolution.some(asksPlayers);
   return {
     kind: "outcome",
     key: "won",
@@ -257,7 +260,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The Cave Torch's X: the options place 1 to 3 progress (41029:A:2).
         const torch = cavesXChoice(choose, (data?.queue ?? []).map((item) => item.instruction));
         // The numbers a branch states are the ones the table holds now (the cards a Counsel looks at), and the card a Counsel places is named.
-        const now = branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words);
+        const now = { ...branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words), ...wilderlandBranchNow(game, ctx, choose, window.seat, source) };
         // A Choose with `upTo` (Command) stops on the sheet's armed pass, not on a row of the list: "Done", with the options used so far.
         const stop = commandDone(game, ctx, choose, window.seat, source, source ? names.card(source) : "This card");
         const ask = torch?.note ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
@@ -271,7 +274,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             // A branch that raises or lowers threat carries the threat icon with the record's amount.
             const threat = branchThreat(choose, id);
             const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
-            return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source, now), code: null, ...(stats.length > 0 ? { stats } : {}), intent: { type: "Choose", optionId: id } };
+            // A branch that deals damage to each of the player's allies warns when it destroys one.
+            const caution = branchCaution(game, ctx, choose, id, window.seat, source, names.card);
+            return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source, now), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }
@@ -294,7 +299,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
@@ -303,7 +308,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }
@@ -381,8 +386,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // A Travel cost another card gave it (Weather Deck, 12044:A:1), and the enemies grappled with it that come out and join the staging area (dcce.grapple): the confirm is armed with what they do.
           const granted = grantedTravelWords(game, id);
           const grapple = grappleTravel(game, ctx, id);
-          const label = [mapped?.lead, base.label, line, granted, caller?.words, grapple?.words, mapped?.words].filter((part) => part != null && part !== "").join(" · ");
-          const caution = caller?.caution ?? grapple?.caution ?? mapped?.caution;
+          // The Old Ford makes each enemy in the staging area attack when it becomes active (18016:A:3).
+          const attacks = wilderlandTravel(game, ctx, id);
+          const label = [mapped?.lead, base.label, line, granted, caller?.words, grapple?.words, attacks?.words, mapped?.words].filter((part) => part != null && part !== "").join(" · ");
+          const caution = caller?.caution ?? grapple?.caution ?? attacks?.caution ?? mapped?.caution;
           return { ...base, label, stats, ...(caution ? { caution } : {}), ...(mapped ? { place: mapped.place } : {}), intent: { type: "Travel", locationId: id } };
         }),
         ...(unavailable.length > 0 ? { unavailable } : {}),

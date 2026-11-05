@@ -23,6 +23,11 @@ describe("deckLegal", () => {
     expect(deckLegal("treasure", "Treasure")).toBe(true);
   });
 
+  it("rejects a campaign treasure (Ered Mithrin's, type name Treasure) by its campaign kind", () => {
+    expect(deckLegal("treasure", "Treasure", "treasure")).toBe(false);
+    expect(deckLegal("treasure", "Treasure", null)).toBe(true);
+  });
+
   it("rejects a treasure whose type name is Campaign", () => {
     expect(deckLegal("treasure", "Campaign")).toBe(false);
   });

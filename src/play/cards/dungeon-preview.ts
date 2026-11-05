@@ -34,10 +34,14 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
-  if (card.zone === "staging" && ctx.cards.get(card.code)?.type === "objective") {
-    const guards = card.attachments.filter((id) => game.cards[id]?.guard === true && game.cards[id]?.host === cardId);
+  // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
+  const kind = ctx.cards.get(card.code)?.type;
+  if (card.zone === "staging" && (kind === "objective" || kind === "treasure")) {
+    const guards = guardsOf(game, card);
     // A tower the players control that a Ship enemy guards again (Siege Ship, The Raiders' Assault) stays theirs: control is taken once.
     if (guards.length > 0) return `Guarded by ${guards.map(name).join(", ")}${playersControl(card) ? ". The players still control it." : ""}`;
+    // Nothing claims a treasure yet, so the line says only that it is free (emce.treasure).
+    if (kind === "treasure" && freeOfEncounters(game, cardId)) return "Free of encounters";
     if (claimable(ctx, card.code) && freeOfEncounters(game, cardId)) return "Free of encounters: you can claim it";
     // A tower freed of encounters stays in the staging area, controlled by the players as a group (ControlWhenFree, 12134:A:2): it has no hero to hang on.
     if (playersControl(card)) return "Free of encounters: the players control it";
@@ -46,6 +50,22 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
   if (held.length > 0) return `${held.map((other) => name(other.id)).join(", ")} is held underneath, out of play, while this is the active location`;
   return null;
+}
+
+// The encounter cards attached to a card as its guards, in the order they were attached (rr.guarded).
+function guardsOf(game: ScenarioState, card: ScenarioState["cards"][string]): string[] {
+  return card.attachments.filter((id) => game.cards[id]?.guard === true && game.cards[id]?.host === card.id);
+}
+
+/**
+ * What a screen reader hears of a treasure in the staging area, which the table draws as a guarded pair or alone: "guarded by Twilight Hall", or "free of encounters" (emce.treasure,
+ * rr.guarded). Null for a card that is not in the staging area, or a card that is not a treasure (the caller knows its printing).
+ */
+export function treasureSpeech(game: ScenarioState, cardId: string, name: (id: string) => string): string | null {
+  const card = game.cards[cardId];
+  if (!card || card.zone !== "staging") return null;
+  const guards = guardsOf(game, card);
+  return guards.length > 0 ? `guarded by ${guards.map(name).join(", ")}` : "free of encounters";
 }
 
 // An objective with a claiming Action (the condition of which reads "free of encounters", rr.guarded).

@@ -201,8 +201,11 @@ export const simpleVerbs = [
       // of the players tied for the highest), or (`highestThreatCost`, "Attach to the hero with the highest threat cost", 41043:A:2) the hero
       // with the highest printed threat cost among every hero in play (the first player chooses among those tied), or (`picked`, "attach this
       // card to one of that player's heroes", 900106:A:1) a hero of the player the effect picked, who chooses it.
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
+      // or (`mostAttachments`, "Attach to the hero with the most attachments without Weighed Down attached", 18027:A:1) the hero with the most attachments among those the card is not on yet; the first player chooses among heroes tied.
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
+      // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
+      z.strictObject({ kind: z.literal("attackingEnemy") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
@@ -213,7 +216,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("TakeControl"), who: whoSchema, ...when }),
   verb("GainSurge"),
   z.strictObject({ verb: z.literal("HideTest"), x: z.number().int().positive(), ...when }),
-  verb("ImmediateAttack"),
+  // The source enemy attacks now, dealt a shadow card of its own; with `shadow: false` it is dealt none ("makes an additional attack after this one. (Do not deal it a shadow card.)", 18022:A:1).
+  z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), ...when }),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
   // The actor readies one hero they control.
@@ -229,6 +233,8 @@ export const simpleVerbs = [
   z.strictObject({
     verb: z.literal("Restrict"),
     what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly"]),
+    // With "travel" on a card that is not the location: the players cannot travel to the location with this code ("The players cannot travel to The Old Ford unless there is at least 5 progress here", 18068:B:1).
+    location: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
     // With "defend": every ally (not only those with little Willpower) cannot defend the source's attacks ("Allies cannot defend against

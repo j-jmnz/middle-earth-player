@@ -2,6 +2,8 @@ import { checklist } from "../../src/campaign/checklist.ts";
 import type { LoadoutSeat } from "../../src/campaign/loadout.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../src/campaign/log.ts";
 import { buildStart } from "../../src/campaign/start.ts";
+import { wilderlandFacts } from "../../src/campaign/wilderland.ts";
+import { namesTreasures } from "../../src/campaign/world.ts";
 import { campaignScenario, type CampaignData, type Difficulty, type ScenarioData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import type { CampaignFacts, ModeCard } from "../../src/rules/core/campaign-state.ts";
@@ -13,7 +15,7 @@ import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent, t
 import type { StartScenario } from "../../src/rules/setup/setup.ts";
 
 import { gameCodes } from "../../scripts/data/load-scenarios.ts";
-import { loadPrinted } from "./catalog.ts";
+import { loadPrinted, loadTreasures } from "./catalog.ts";
 import { faceProblems } from "./face-check.ts";
 import { FRODO } from "./scene.ts";
 
@@ -180,7 +182,10 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
 
   async function world(decks: D): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
     const dealt = campaignScenario(spec.scenario);
-    const cards = await standInWorld([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(spec.campaign, spec.scenario), ...spec.codes], spec.stats[decks]);
+    const codes = [...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(spec.campaign, spec.scenario), ...spec.codes];
+    const cards = await standInWorld(codes, spec.stats[decks]);
+    // A record that draws a random treasure needs every treasure of the catalog, as the app's world loads them.
+    if (namesTreasures(EFFECTS, new Set(codes))) for (const [code, treasure] of loadTreasures()) if (!cards.has(code)) cards.set(code, treasure);
     const ships = spec.shipStats?.[decks];
     if (ships) for (const code of spec.shipCodes ?? []) cards.set(code, { ...cards.get(code)!, ...ships });
     loaded = cards;
@@ -202,14 +207,17 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
     };
   }
 
-  function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[]) {
-    const checked = checklist({ log, scenario: campaignScenario(spec.scenario), seats: fillerLoadout(seatCount), effects: EFFECTS, cards: cardsOrThrow(), ...(choices ? { choices } : {}) });
+  function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) {
+    const checked = checklist({ log, scenario: campaignScenario(spec.scenario), seats: fillerLoadout(seatCount), effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}), ...(choices ? { choices } : {}) });
     if (!checked.ok) throw new Error(checked.errors.join("; ") || "The campaign card asks for a choice");
     return checked;
   }
 
   function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]): StartScenario {
-    const checked = plan(seatCount, log, choices);
+    const checked = plan(seatCount, log, choices, difficulty);
+    // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
+    const logged = wilderlandFacts(checked.log, spec.campaign.id);
+    const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...facts, ...logged } : facts;
     return buildStart({
       campaign: spec.campaign,
       scenario: spec.scenario,
@@ -221,7 +229,8 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
       difficulty,
       poolEncounterCards: checked.poolEncounterCards,
       poolIntoPlay: checked.poolIntoPlay,
-      ...(facts ? { facts } : {}),
+      removedFromEncounter: checked.removedFromEncounter,
+      ...(dealtFacts ? { facts: dealtFacts } : {}),
       ...(modeCard ? { modeCard } : {}),
     });
   }

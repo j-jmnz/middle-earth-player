@@ -272,3 +272,88 @@ describe("Dream-chaser campaign", () => {
     expect(loadScenario("raid-on-the-grey-havens").campaignPlaced).toEqual(expect.arrayContaining(["11183", "11184", "11185", "11186", "11187", "11188", "11189", "11190"]));
   });
 });
+
+// Ered Mithrin (docs/plans/ered-mithrin.md, phase 49): built from The Wilds of Rhovanion, the six Adventure Packs and the Ered Mithrin Campaign Expansion.
+// The DragnCards Q08 load lists lead the piles, the first two scenarios deal the Revised Core Set's reprints of the Core Set sets they load
+// (overrides.dragnPackAliases), and the booklet's paragraph (emce.setup-<id>) and the printed Setup are the checks.
+describe("Ered Mithrin campaign", () => {
+  const campaign = loadCampaign("ered-mithrin");
+  const DECK = {
+    "journey-up-the-anduin": { normal: 35, easy: 22, staging: [], setAside: ["18016", "18069"], evil: 8 },
+    "lost-in-mirkwood": { normal: 32, easy: 24, staging: ["01096", "18028"], setAside: ["18070"], spiders: 12, orcs: 14 },
+    "the-kings-quest": { normal: 35, easy: 25, staging: [], setAside: ["18042", "18043", "18058", "18059"], caves: 6 },
+    "the-withered-heath": { normal: 37, easy: 26, staging: [], setAside: ["19011", "19012"], caves: 6 },
+    "roam-across-rhovanion": { normal: 40, easy: 26, staging: [], setAside: ["19036", "19037", "19052", "19054"] },
+    "fire-in-the-night": { normal: 37, easy: 23, staging: ["19074"], setAside: [], side: 8 },
+    "the-ghost-of-framsburg": { normal: 41, easy: 29, staging: ["19101", "19102", "19103", "19104", "19105"], setAside: ["19097"] },
+    "mount-gundabad": { normal: 41, easy: 28, staging: ["19125"], setAside: ["19122"], caves: 8 },
+    "the-fate-of-wilderland": { normal: 43, easy: 30, staging: ["19155", "19156", "19157"], setAside: [] },
+  } as const;
+  const copies = (id: string, pile: string): number => loadScenario(id).cards.filter((card) => card.pile === pile).reduce((sum, card) => sum + card.normal, 0);
+
+  it("builds all nine scenarios in play order, each with its campaign card, and deals only cards data/cards has", () => {
+    expect(campaign.scenarios).toEqual(Object.keys(DECK));
+    expect(() => loadScenarioDefinitions(new URL("../../data/", import.meta.url).pathname, byCode, [], "ered-mithrin")).not.toThrow();
+    for (const id of campaign.scenarios) {
+      const scenario = loadScenario(id);
+      expect(campaign.campaignCards[id], id).toBe(scenario.campaignCard);
+      expect(byCode.get(scenario.campaignCard)?.type, id).toBe("campaign");
+      expect(scenario.source.dragnNormal, id).toMatch(/^Q08\.\d$/);
+      expect(scenario.source.dragnEasy, id).toMatch(/^E08\.\d$/);
+      expect(scenario.cards.some((card) => byCode.get(card.code)?.printings.some((printing) => printing.pack === "Nightmare")), `${id} deals no Nightmare card`).toBe(false);
+    }
+    expect(campaign.campaignCards).toMatchObject({ "journey-up-the-anduin": "120165", "lost-in-mirkwood": "12168", "the-fate-of-wilderland": "12195" });
+    expect(campaign.saga).toBe(false);
+    expect(campaign.xp).toBeUndefined();
+    expect(campaign.bookletId).toBe("ered-mithrin");
+  });
+
+  it.each(Object.entries(DECK))("%s deals the encounter deck, the extra decks and the Setup piles the load list and the printed Setup leave", (id, pin) => {
+    const scenario = loadScenario(id);
+    expect(encounterCodes(scenario)).toHaveLength(pin.normal);
+    expect(encounterCodes(scenario, "Easy")).toHaveLength(pin.easy);
+    expect(scenario.cards.filter((card) => card.pile === "staging").map((card) => card.code).sort()).toEqual([...pin.staging]);
+    expect(scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code).sort()).toEqual([...pin.setAside]);
+    expect(copies(id, "evilCreaturesDeck")).toBe("evil" in pin ? pin.evil : 0);
+    expect(copies(id, "cavesDeck")).toBe("caves" in pin ? pin.caves : 0);
+    expect(copies(id, "sideQuestDeck")).toBe("side" in pin ? pin.side : 0);
+    expect(copies(id, "spidersDeck")).toBe("spiders" in pin ? pin.spiders : 0);
+    expect(copies(id, "orcsDeck")).toBe("orcs" in pin ? pin.orcs : 0);
+  });
+
+  it("names the encounter sets the booklet's paragraph names, in its order, with the core sets' names as the cards print them", () => {
+    expect(loadScenario("journey-up-the-anduin").encounterSets.map((set) => set.name)).toEqual(["Journey up the Anduin", "Grey Mountain Goblins", "Hills of Wilderland", "Lost in Wilderland", "Journey Along the Anduin", "Wilderlands"]);
+    expect(loadScenario("lost-in-mirkwood").encounterSets.map((set) => set.name)).toEqual(["Lost in Mirkwood", "Dark Woods", "Gathering Gloom", "Passage Through Mirkwood", "Spiders of Mirkwood", "Dol Guldur Orcs"]);
+    expect(loadScenario("mount-gundabad").encounterSets.map((set) => set.name)).toEqual(["Mount Gundabad", "Fell Beasts", "Deep Underground", "Afraid of the Dark", "Lost Caves", "Dragon Might"]);
+  });
+
+  it("deals the Revised Core Set's reprints of the Core Set sets Journey Up the Anduin and Lost in Mirkwood load, with the Wilderlands enemies as the Evil Creatures deck", () => {
+    const journey = loadScenario("journey-up-the-anduin");
+    expect(journey.cards.filter((card) => card.pile === "evilCreaturesDeck").map((card) => byCode.get(card.code)?.name).sort()).toEqual(["Goblin Sniper", "Hill Troll", "Marsh Adder", "Wargs", "Wolf Rider"]);
+    for (const card of journey.cards.filter((item) => item.pile === "encounter" || item.pile === "evilCreaturesDeck")) {
+      const printed = byCode.get(card.code);
+      if (/^01\d{3}$/.test(card.code)) expect(printed?.printings[0]?.pack, card.code).toBe("RevCore");
+    }
+    const mirkwood = loadScenario("lost-in-mirkwood");
+    expect(mirkwood.cards.filter((card) => card.pile === "spidersDeck").every((card) => byCode.get(card.code)?.encounterSet === "Spiders of Mirkwood")).toBe(true);
+    expect(mirkwood.cards.filter((card) => card.pile === "orcsDeck").every((card) => byCode.get(card.code)?.encounterSet === "Dol Guldur Orcs")).toBe(true);
+    // Woodmen Village and Haldan are the two sides of one card: set aside together, Haldan is not a player card.
+    expect(journey.cards.find((card) => card.code === "18069")).toMatchObject({ pile: "setAside", back: "18070" });
+    // Lost in Mirkwood's Setup has the first player take control of Haldan: the same card, set aside Haldan faceup.
+    expect(mirkwood.cards.find((card) => card.code === "18070")).toMatchObject({ pile: "setAside", back: "18069" });
+  });
+
+  it("deals Wormsbane to a hero at Setup, both sides, and keeps the Easy Mode counts Hall of Beorn gives where DragnCards' deck keeps more", () => {
+    expect(loadScenario("mount-gundabad").cards.find((card) => card.code === "19143")).toMatchObject({ pile: "attachedChosen", back: "19144" });
+    expect(loadScenario("the-ghost-of-framsburg").cards.find((card) => card.code === "19099")).toMatchObject({ normal: 2, easy: 1 });
+  });
+
+  it("deals the boons, burdens and allies each campaign card names, and no quest or objective it only mentions", () => {
+    const placed = (id: string) => loadScenario(id).campaignPlaced.map((code) => byCode.get(code)?.name);
+    expect(placed("journey-up-the-anduin")).toEqual(["Turayn", "A Growing Threat"]);
+    expect(placed("the-kings-quest")).toEqual(["Isolde", "The Threat to Wilderland", "Dagnir's Spawn", "Abandoned Ruin"]);
+    expect(placed("roam-across-rhovanion")).toEqual(["Urdug's Cunning", "Misplaced Trust"]);
+    expect(placed("the-fate-of-wilderland")).toEqual([]);
+    for (const id of campaign.scenarios) for (const code of loadScenario(id).campaignPlaced) expect(byCode.get(code)?.campaignKind, `${id} ${code}`).not.toBeNull();
+  });
+});

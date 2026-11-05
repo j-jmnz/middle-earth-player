@@ -3,6 +3,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { effectsOfCard } from "../families/misc/text.ts";
 import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
 import { modifiedStat } from "../core/keywords.ts";
@@ -11,7 +12,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -35,6 +36,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
     found.push({
       sourceId: source.id,
       what,
+      ...(instruction.location ? { location: instruction.location } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
@@ -45,7 +47,24 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
 }
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
-  return restricted(state, ctx, "travel").some((rule) => rule.sourceId === locationId);
+  // A restriction on the location itself, or one a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
+  return restricted(state, ctx, "travel").some((rule) => (rule.location == null ? rule.sourceId === locationId : state.cards[locationId]?.code === rule.location));
+}
+
+/**
+ * Why the players cannot travel to the location, when a quest stage holds them back until it has enough progress ("The players cannot travel to The Old Ford unless there is at least 5 progress here", 18068:B:1):
+ * the stage's name, what it needs and what it has. Null for any other restriction, which keeps the engine's general reason.
+ */
+export function travelProgressReason(state: ScenarioState, ctx: ReduceContext, locationId: string): string | null {
+  const rule = restricted(state, ctx, "travel").find((entry) => entry.location != null && state.cards[locationId]?.code === entry.location);
+  const source = rule ? state.cards[rule.sourceId] : undefined;
+  if (!source) return null;
+  for (const effect of effectsOfCard(state, ctx, source)) {
+    const gate = effect.condition?.kind === "not" ? effect.condition.condition : undefined;
+    if (effect.timing !== "constant" || gate?.kind !== "stageProgress" || !effect.instructions.some((instruction) => instruction.verb === "Restrict" && instruction.what === "travel")) continue;
+    return `${printedOf(ctx.cards, source.code).name}: the players cannot travel here until the stage has ${gate.min} progress (${source.progress} now)`;
+  }
+  return null;
 }
 
 // "When faced with the option to travel, the players must travel to The East Bight if there is no active location" (01088:A:1): the

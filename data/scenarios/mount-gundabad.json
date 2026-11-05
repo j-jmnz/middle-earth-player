@@ -1,0 +1,275 @@
+{
+  "id": "mount-gundabad",
+  "name": "Mount Gundabad",
+  "number": 8,
+  "stages": [
+    "19134",
+    "19135",
+    "19137",
+    "19138",
+    "19139",
+    "19140",
+    "19141",
+    "19142"
+  ],
+  "encounterSets": [
+    {
+      "name": "Mount Gundabad",
+      "count": 21
+    },
+    {
+      "name": "Fell Beasts",
+      "count": 4
+    },
+    {
+      "name": "Deep Underground",
+      "count": 9
+    },
+    {
+      "name": "Afraid of the Dark",
+      "count": 5
+    },
+    {
+      "name": "Lost Caves",
+      "count": 6
+    },
+    {
+      "name": "Dragon Might",
+      "count": 4
+    }
+  ],
+  "cards": [
+    {
+      "code": "19126",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "19127",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19128",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19129",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19130",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19131",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19132",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "19133",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18049",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18054",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18055",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18056",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18048",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18057",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18059",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19134",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19135",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19137",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19140",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19141",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19142",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19125",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "19122",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "19143",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen",
+      "back": "19144"
+    },
+    {
+      "code": "19123",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "19124",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18060",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18061",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18062",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    }
+  ],
+  "campaignCard": "12193",
+  "campaignPlaced": [
+    "12167",
+    "12194"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q08.8",
+    "dragnEasy": "E08.8",
+    "hobSlug": "Mount-Gundabad"
+  }
+}

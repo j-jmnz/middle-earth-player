@@ -27,6 +27,11 @@ const overridesSchema = z.object({
       }),
     )
     .default([]),
+  // Cards of an encounter set the scenario's own Setup removes from the game, which Hall of Beorn's list of the set still counts (Journey Up the
+  // Anduin removes the Wilderlands locations and treacheries, emce.evil-creatures-deck): the dealt count is checked against the rest of the list only.
+  scenarioRemovals: z
+    .array(z.object({ scenario: z.string().min(1), set: z.string().min(1), types: z.array(z.string().min(1)).min(1), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
   // A printed Easy count the sources disagree on. `easy` is the count of copies that stay in an Easy deck.
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
@@ -64,6 +69,17 @@ const overridesSchema = z.object({
   // A name a booklet prints for an encounter set that the cards print otherwise (the Learn to Play's "Journey Down the Anduin").
   encounterSetAliases: z
     .array(z.object({ booklet: z.string().min(1), set: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
+  // A DragnCards `packName` that stands for another pack's cards: the row's collector number (`numberInPack`) and name find the card in `pack`.
+  // Ered Mithrin's first two scenarios load the 2011 Core Set's encounter sets, which the app deals as the Revised Core Set's reprints of them.
+  dragnPackAliases: z
+    .array(z.object({ dragncards: z.string().min(1), pack: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) }))
+    .default([]),
+  // The card of a DragnCards row the sources cannot match: the row's box (`packName`), collector number and side ("a" the row of the id, "b" its
+  // `.B` picture row). Hall of Beorn numbers or types the card otherwise (Mount Gundabad's Wormsbane is two Hall of Beorn cards, #143 and #144, and one
+  // DragnCards card with two sides) or has no OCTGN guid for it.
+  dragnCardCodes: z
+    .array(z.object({ dragncards: z.string().min(1), number: z.number().int().positive(), side: z.enum(["a", "b"]), code: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
   // Cards the app leaves out of the player card pool (not deck-legal): every card of a pack, or one card by code.
   outOfScope: z

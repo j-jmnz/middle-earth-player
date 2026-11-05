@@ -20,7 +20,7 @@ import { hasKeyword } from "../core/keywords.ts";
 import { attachmentTargets, discardPlayable, playReason, playWindowReason } from "../player/planning.ts";
 import { resolutionIntents, resolutionReason } from "../setup/resolution.ts";
 import { optionalEnemies, stagingLocations } from "../quest/quest.ts";
-import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable } from "../interpret/restrictions.ts";
+import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason } from "../interpret/restrictions.ts";
 import { flagged, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
 import { sideQuestReason } from "../families/sidequests/quest.ts";
@@ -262,7 +262,7 @@ function travelReason(
   if (!travelCandidates(state, ctx).includes(intent.locationId)) return "That location is not in staging";
   const forced = forcedTravel(state, ctx);
   if (forced.length > 0 && !forced.includes(intent.locationId)) return "The players must travel to the location that says so";
-  if (travelBlocked(state, ctx, intent.locationId)) return "Players cannot travel to that location now";
+  if (travelBlocked(state, ctx, intent.locationId)) return travelProgressReason(state, ctx, intent.locationId) ?? "Players cannot travel to that location now";
   if (travelCostUnpayable(state, ctx, intent.locationId)) return "The players cannot pay that location's Travel cost";
   return null;
 }

@@ -16,12 +16,13 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   mec109: bookletName("fellowship-of-the-ring"),
   tdom: bookletName("the-dark-of-mirkwood"),
   dcce: bookletName("dream-chaser"),
+  emce: bookletName("ered-mithrin"),
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
-  return !/^(mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-)/.test(entry.id);
+  return !/^(mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-)/.test(entry.id);
 }
 
 // A title's words without what opens it: an FAQ entry number ("(1.11) Limitations on Attacks"), a framework step number
@@ -69,6 +70,7 @@ const BOOKS: Readonly<Partial<Record<string, BookletId>>> = {
   "learn-to-play": "learn-to-play",
   tdom: "the-dark-of-mirkwood",
   dcce: "dream-chaser",
+  emce: "ered-mithrin",
   rr: "rules-reference",
 };
 

@@ -11,6 +11,7 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 import { validateLoadout } from "../../loadout.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of The Ring Goes South played by the auto-player (test/scenarios/the-ring-goes-south/game.ts), true solo and two-handed,
 // through a win and through a loss, on fixed seeds. The wins use the big-number loadout beside the saga Frodo: the Council of Elrond's
@@ -62,7 +63,7 @@ goldenSuite<SouthGolden, SouthDecks>({
     expect(log.campaignPool.map((card) => card.code)).toEqual(lustAttached(state) ? ["142084"] : []);
     // Written after scenarios 1 to 3, the win unlocks Journey in the Dark.
     const before = { ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford"] };
-    const after = applyResolution(before, state.scenarioId, state, world.cards);
+    const after = applyResolution(before, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     expect(campaignPath(campaign, {}, after).map((node) => node.status).slice(0, 5)).toEqual(["completed", "completed", "completed", "completed", "current"]);
     expect(campaign.scenarios[4]).toBe("journey-in-the-dark");
   },

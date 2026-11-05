@@ -2,6 +2,7 @@
 // scenario as the seed and the intents sent, never the table.
 import { z } from "zod";
 
+import { ALLY_LINES, BELDIS_BOXES } from "../catalog/ally-lines.ts";
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data.ts";
 import type { PlayerIntent } from "../rules/core/intents.ts";
 
@@ -45,6 +46,11 @@ export const campaignLogSchema = z.strictObject({
   marks: z.record(z.string(), z.number().int().nonnegative()).default({}),
   modes: z.record(z.string(), z.enum(MODE_CARDS)).default({}),
   modeDefault: z.enum(MODE_CARDS).nullable().default(null),
+  // The Ered Mithrin Campaign Log (phase 50, emce.campaign-log). A log saved before it reads with these defaults.
+  treasures: z.array(z.string()).default([]),
+  allyLines: z.array(z.enum(ALLY_LINES)).default([]),
+  beldisUses: z.array(z.number().int().min(0).max(BELDIS_BOXES)).default([]),
+  encounterPool: z.record(z.string(), z.number().int().positive()).default({}),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open

@@ -35,7 +35,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
   switch (pile) {
     case "setAside":
-      return said(["aside"]) || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective"));
+      return said(["aside"]) || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -62,6 +62,16 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
       return stepExists("prepareStormcallerArea");
     case "encounterDeck2":
       return stepExists("secondDeck", "buildDeck") && setAsideBySet;
+    // Ered Mithrin's decks: built by their Setup step, or (the two Lost in Mirkwood sets) set aside by set name.
+    case "evilCreaturesDeck":
+      return stepExists("buildEvilCreaturesDeck");
+    case "cavesDeck":
+      return stepExists("buildCavesDeck");
+    case "sideQuestDeck":
+      return stepExists("buildSideQuestDeck");
+    case "spidersDeck":
+    case "orcsDeck":
+      return setAsideBySet;
     default:
       return true;
   }

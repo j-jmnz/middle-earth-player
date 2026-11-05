@@ -8,6 +8,7 @@ import { validateLoadout } from "../../loadout.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 // A permanent golden: whole games of A Knife in the Dark played by the auto-player (test/scenarios/a-knife-in-the-dark/game.ts), true solo and
 // two-handed, through a win and through a loss, on fixed seeds. The wins use the scenario 1 golden's big-number loadout
@@ -59,11 +60,11 @@ describe("golden: a whole game of A Knife in the Dark", () => {
         expect(state.seats[item.seat ?? -1]?.heroes.map((id) => state.cards[id]?.code)).toContain(item.hero);
       }
       expect(new Set(earned.map((item) => item.code)).size).toBe(earned.length);
-      const log = applyResolution(emptyLog(golden.seatCount), state.scenarioId, state, cards);
+      const log = applyResolution(emptyLog(golden.seatCount), state.scenarioId, state, cards, NO_COPY_LIMITS);
       expect(log.completed).toEqual(["a-knife-in-the-dark"]);
       for (const item of earned) expect(log.campaignPool).toContainEqual({ code: item.code, back: "player", burdenSet: null, attachedTo: item.hero, seat: item.seat });
       // Written after scenario 1, the win unlocks Flight to the Ford.
-      const after = applyResolution({ ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past"] }, state.scenarioId, state, cards);
+      const after = applyResolution({ ...emptyLog(golden.seatCount), completed: ["a-shadow-of-the-past"] }, state.scenarioId, state, cards, NO_COPY_LIMITS);
       expect(campaignPath(campaign, {}, after).map((node) => node.status).slice(0, 3)).toEqual(["completed", "completed", "current"]);
     });
   }
@@ -77,7 +78,7 @@ describe("golden: a whole game of A Knife in the Dark", () => {
       expect(state.failure).toBeNull();
       expect(state.resolutionLog.earned).toEqual([]);
       const log = emptyLog(golden.seatCount);
-      expect(applyResolution(log, state.scenarioId, state, cards)).toBe(log);
+      expect(applyResolution(log, state.scenarioId, state, cards, NO_COPY_LIMITS)).toBe(log);
     });
   }
 });

@@ -14,6 +14,7 @@ import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import type { Log } from "../log.ts";
+import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
 // The parts every scenario's seed finder (scripts/e2e/<scenario-id>.ts) shares: a printed decklist as a seat's heroes and
 // deck, and a game dealt from a save the way the app deals it (deal, then resume) and played to its end by the scenario's
@@ -134,7 +135,7 @@ export async function wonLog<G extends { name: string; decks: string }>(part: Wo
   const world = await part.world(golden.decks);
   const game = part.play(golden, world.ctx);
   if (!game.state.stageCleared || game.state.lost) throw new Error(`The ${part.title} golden no longer wins`);
-  const written = applyResolution(before, game.state.scenarioId, game.state, world.cards);
+  const written = applyResolution(before, game.state.scenarioId, game.state, world.cards, NO_COPY_LIMITS);
   const blank = emptyLog(2);
   return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
 }

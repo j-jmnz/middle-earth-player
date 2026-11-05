@@ -11,6 +11,7 @@ import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, t
 import { applyResolution } from "./log.ts";
 import { beginActive, dropLastIntent, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
+import { NO_COPY_LIMITS } from "./wilderland.ts";
 import type { World } from "./world.ts";
 
 export function contextOf(world: World): ReduceContext {
@@ -103,5 +104,5 @@ export function finish(save: Save, world: World, state: ScenarioState): Save {
   if (!loadout || state.lost || !isWon(state)) return drop(save);
   if (save.log.completed.includes(state.scenarioId)) return drop(save);
   const plan = checklistPlan(inputOf(save, world, loadout));
-  return { ...drop(save), log: applyResolution(plan.log, state.scenarioId, state, world.cards) };
+  return { ...drop(save), log: applyResolution(plan.log, state.scenarioId, state, world.cards, world.copies ?? NO_COPY_LIMITS) };
 }

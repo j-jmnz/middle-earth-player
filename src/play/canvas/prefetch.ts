@@ -8,6 +8,8 @@
 // `<code>.B`, the picture of the side it shows.
 import { inPlay, type ScenarioState } from "../../rules/core/state.ts";
 
+import { isDiscardPile, secondPilesOf } from "../store/pile-ids.ts";
+import { pileIds } from "../store/selectors.ts";
 import { pictureKey } from "./picture-key.ts";
 
 function faceUp(game: ScenarioState, ids: readonly string[]): string[] {
@@ -22,7 +24,8 @@ export function prefetchCodes(game: ScenarioState, seat: number, next: readonly 
   // A shadow card is not in play, but the table draws it beside its enemy once it is turned face up.
   const table = Object.values(game.cards).flatMap((card) => ((inPlay(card.zone) || card.zone === "shadow") && card.face !== "down" ? [pictureKey(card)] : []));
   // The top of each discard pile is drawn face up: a treachery goes there straight from its reveal.
-  const tops = [game.seats[seat]?.discard ?? [], game.encounterDiscard, game.corsairDiscard ?? []].flatMap((pile) => faceUp(game, pile.slice(-1)));
+  // The second slot's discard piles too (the Corsair and Evil Creatures piles), whichever the game has dealt.
+  const tops = [game.seats[seat]?.discard ?? [], game.encounterDiscard, ...secondPilesOf(game).filter(isDiscardPile).map((pile) => pileIds(game, pile, seat))].flatMap((pile) => faceUp(game, pile.slice(-1)));
   return [...new Set([...faceUp(game, game.seats[seat]?.hand ?? []), ...table, ...tops, ...next])];
 }
 

@@ -10,8 +10,10 @@ import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButto
 import { Road, roadLayout } from "../../campaign/path-road";
 import { CardLines } from "../../campaign/card-lines";
 import { poolCardLine, type Line } from "../../campaign/log-facts";
+import { PoolEncounterLine, WilderlandLine } from "../../campaign/wilderland-log";
 import { useListPreview } from "../../pool/list-preview";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
+import { keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { xpWords } from "../../../campaign/xp-view";
 import { xpUnspentOf } from "../../../campaign/xp";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../data/campaign-data";
@@ -88,7 +90,7 @@ export default function CampaignPath() {
   const stageNames = useMemo(() => cardNames(catalog, campaign ? campaign.scenarios.flatMap((id) => scenarioOf(id)?.stages ?? []) : []), [catalog, campaign]);
   const names = useMemo(() => {
     if (!save) return new Map<string, string>();
-    return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat(), ...save.log.carryOver.map((card) => card.code)]);
+    return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat(), ...save.log.carryOver.map((card) => card.code), ...save.log.treasures, ...Object.keys(save.log.encounterPool)]);
   }, [catalog, save]);
 
   if (!loaded) return <Screen scene="path" testID="campaign-path"><NavBar onBack={() => goBack(router, "/")} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
@@ -186,6 +188,10 @@ export default function CampaignPath() {
       ) : null}
     </View>
   ) : null;
+  // Ered Mithrin: the pool's encounter cards under the pool, then the treasures found, the lines the boon allies were traded for and Beldis's boxes (emce.campaign-log).
+  const wilderland = keepsWilderlandLog(campaign) ? wilderlandView(save.log, save.seatCount) : null;
+  const wilderlandPool = wilderland ? <PoolEncounterLine view={wilderland} name={name} onCard={preview.openCode} /> : null;
+  const wilderlandLine = wilderland ? <WilderlandLine view={wilderland} name={name} onCard={preview.openCode} /> : null;
   // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
   const logButton = (
     <View className="-ml-3 mt-1 items-start">
@@ -241,7 +247,9 @@ export default function CampaignPath() {
             {noticeRow}
             {roadView}
             {poolLine}
+            {wilderlandPool}
             {xpLine}
+            {wilderlandLine}
             {logButton}
           </ScreenScroll>
           <View style={{ width: PATH_SIDE * s }}>
@@ -286,7 +294,9 @@ export default function CampaignPath() {
         {roadView}
         {footer ? <View className="mt-3">{footer}</View> : null}
         {poolLine}
+        {wilderlandPool}
         {xpLine}
+        {wilderlandLine}
         {logButton}
       </ScreenScroll>
       {preview.overlay}

@@ -41,9 +41,10 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
     const leftItself = event.trigger === "leftPlay" && event.cardId === instance.id;
     for (const effect of effectsOfCard(state, ctx, instance)) {
       if (effect.timing !== timing || !hears(state, effect, instance, event, ctx)) continue;
-      if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event) && !hearsFromSetAside(instance, event)) continue;
+      // A Forced effect an encounter card gains in a player's hand works from there (`fromHand`, 18026:A:1).
+      if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event) && !hearsFromSetAside(instance, event) && !(effect.fromHand === true && instance.zone === "hand")) continue;
       const owner = forcedActor(state, instance, event, ctx);
-      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}), ...(event.byPlayerCard ? { byPlayerCard: true } : {}), ...(event.fromStaging ? { fromStaging: true } : {}) };
+      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}), ...(event.byPlayerCard ? { byPlayerCard: true } : {}), ...(event.fromStaging ? { fromStaging: true } : {}), ...(event.shadowBlank ? { shadowBlank: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // A Forced effect with a limit ("Limit once per game", 01130:A:4) does not fire once its uses are spent.
       if (effect.limit && limitSpent(state, effect, instance.id, owner)) continue;

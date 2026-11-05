@@ -1,5 +1,6 @@
 // What a campaign scenario hands to and takes from the campaign log: the Resolution's record and the facts the log gives the game.
 // Types only; state.ts holds the rest of the scenario state.
+import type { AllyLine } from "../../catalog/ally-lines.ts";
 
 // What a won scenario writes for the campaign: cards earned (and where each went), heroes that fell, captives.
 export type Earned = {
@@ -32,6 +33,15 @@ export type ResolutionLog = {
   counters?: Readonly<Record<string, number>>;
   // The XP the Resolution's GainXp lines added up to (dcce.gaining-xp); the campaign log records it. Absent where no line ran.
   xp?: number;
+  // Ered Mithrin (emce.treasure, emce.boon-allies, emce.campaign-pool-encounter): what the Resolution's wilderland verbs record, left out while a game records none. The treasures
+  // the players control and discovered (DiscoverTreasure), the log lines a boon ally was traded for (BoonAllyOrLogLine), the encounter cards of the pool with their copies as the
+  // Resolution left them (AddEncounterToPool, RemoveFromPool; absent while it changed none), and the pool's cards a player removed.
+  treasures?: readonly string[];
+  allyLines?: readonly AllyLine[];
+  encounterPool?: Readonly<Record<string, number>>;
+  poolRemoved?: readonly { code: string; seat: number | null }[];
+  // What each seat answered to the choice of a card to remove from the pool, in the order they answered: the option taken, or the decline (the screen reads it back for the seats that have answered).
+  poolAnswers?: readonly { seat: number; option: string }[];
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
@@ -50,4 +60,12 @@ export type CampaignFacts = {
   upgraded?: readonly string[];
   // The Hard/Expert Mode card the players put next to the quest deck this game (dcce.hard-expert): the campaign log records it per scenario.
   modeCard?: ModeCard;
+  // The Ered Mithrin log as the game reads it (emce.treasure, emce.boon-allies, emce.campaign-log), each left out while it holds nothing: the treasures discovered, the "Unique Allies
+  // Protecting Wilderland" lines recorded, the boxes marked beside Beldis for each seat, the encounter cards of the Campaign Pool with their copies, and the cards of the pool a
+  // Resolution may remove (each pool entry's code and seat).
+  treasures?: readonly string[];
+  allyLines?: readonly AllyLine[];
+  beldisUses?: readonly number[];
+  encounterPool?: Readonly<Record<string, number>>;
+  pool?: readonly { code: string; seat: number | null }[];
 };

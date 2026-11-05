@@ -1,0 +1,186 @@
+{
+  "id": "fire-in-the-night",
+  "name": "Fire in the Night",
+  "number": 6,
+  "stages": [
+    "19083"
+  ],
+  "encounterSets": [
+    {
+      "name": "Fire in the Night",
+      "count": 30
+    },
+    {
+      "name": "Grey Mountain Goblins",
+      "count": 5
+    },
+    {
+      "name": "Dark Woods",
+      "count": 5
+    },
+    {
+      "name": "Gathering Gloom",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "19075",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19076",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "19077",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19078",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "19079",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19080",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19081",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "19082",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18020",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18021",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18038",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18039",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18040",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18041",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "19083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "19074",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "19066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19072",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    },
+    {
+      "code": "19073",
+      "normal": 1,
+      "easy": 1,
+      "pile": "sideQuestDeck"
+    }
+  ],
+  "campaignCard": "12187",
+  "campaignPlaced": [
+    "12188"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q08.6",
+    "dragnEasy": "E08.6",
+    "hobSlug": "Fire-in-the-Night"
+  }
+}

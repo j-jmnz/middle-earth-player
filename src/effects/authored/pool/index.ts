@@ -18,6 +18,7 @@ import * as packDCCEHaven from "./DCCEHaven.ts";
 import * as packDR from "./DR.ts";
 import * as packDoCG from "./DoCG.ts";
 import * as packEaAD from "./EaAD.ts";
+import * as packEMCE from "./EMCE.ts";
 import * as packEfMG from "./EfMG.ts";
 import * as packFitN from "./FitN.ts";
 import * as packFoS from "./FoS.ts";
@@ -99,6 +100,7 @@ const PACKS: readonly { RECORDS: readonly Effect[]; REPLACES: readonly string[] 
   packDR,
   packDoCG,
   packEaAD,
+  packEMCE,
   packEfMG,
   packFitN,
   packFoS,

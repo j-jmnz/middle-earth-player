@@ -194,9 +194,12 @@ export function TextButton({
   disabled = false,
   small = false,
   tight = false,
+  onLongPress,
 }: {
   label: string;
   onPress: () => void;
+  // A long press on a button that names a card shows the card large (the briefing's choices, like the Ring-bearer rows).
+  onLongPress?: () => void;
   testID: string;
   tone?: "bone" | "accent" | "ink" | "danger" | "muted";
   // A printed icon before the word, in the word's colour (Full path, Campaign log, New playthrough on Campaigns).
@@ -234,6 +237,8 @@ export function TextButton({
       accessibilityHint={accessibilityHint}
       disabled={disabled}
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={350}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}
       style={{ minHeight: row, justifyContent: "center" }}
     >

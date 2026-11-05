@@ -1,0 +1,221 @@
+{
+  "id": "the-kings-quest",
+  "name": "The King's Quest",
+  "number": 3,
+  "stages": [
+    "18078",
+    "18079",
+    "18080"
+  ],
+  "encounterSets": [
+    {
+      "name": "The King's Quest",
+      "count": 9
+    },
+    {
+      "name": "Fell Beasts",
+      "count": 4
+    },
+    {
+      "name": "Wild Creatures",
+      "count": 8
+    },
+    {
+      "name": "Deep Underground",
+      "count": 9
+    },
+    {
+      "name": "Afraid of the Dark",
+      "count": 5
+    },
+    {
+      "name": "Dragon Might",
+      "count": 0
+    },
+    {
+      "name": "Lost Caves",
+      "count": 6
+    }
+  ],
+  "cards": [
+    {
+      "code": "18044",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18045",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18046",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18047",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18049",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18053",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18054",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18055",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18056",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "18048",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "18057",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "18078",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18079",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "18042",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "18043",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "18058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "18059",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "18060",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18061",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18062",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    },
+    {
+      "code": "18065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "cavesDeck"
+    }
+  ],
+  "campaignCard": "12170",
+  "campaignPlaced": [
+    "12171",
+    "12172",
+    "12173",
+    "12174"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q08.3",
+    "dragnEasy": "E08.3",
+    "hobSlug": "The-King's-Quest"
+  }
+}

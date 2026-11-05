@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
+import { copiesMark, encounterSpeech, keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { MODE_CARD_NAME, type ModeCard } from "../../../campaign/xp";
 import { markedRows, markedSpeech, xpWords } from "../../../campaign/xp-view";
 import { cards } from "../../../catalog/schema";
@@ -39,7 +40,7 @@ function Row({ label, value, lines, onCard, testID, icon, speech }: { label: str
     <View className="py-2.5" style={{ borderBottomWidth: 1, borderBottomColor: withAlphaHex(palette.inkLine, RULE) }}>
       <View className="flex-row items-center gap-1">
         {icon ? <GameIcon name={icon} size={12 * s} tint="inkLabel" /> : null}
-        <Text className="font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
+        <Text className="shrink font-bold text-eyebrow uppercase text-inkLabel">{label}</Text>
       </View>
       {lines && onCard ? (
         <CardLines lines={lines} empty="None" onCard={onCard} testID={testID} className="mt-0.5 text-body text-ink" {...(speech ? { speech } : {})} />
@@ -50,6 +51,11 @@ function Row({ label, value, lines, onCard, testID, icon, speech }: { label: str
       )}
     </View>
   );
+}
+
+// One card on each line (the treasures, each a name that opens its card).
+function namesOnLines(codes: readonly string[], nameOf: (code: string) => string): Line[] {
+  return codes.map((code): Line => [cardSegment(code, nameOf)]);
 }
 
 // "5 XP · Hard": under a won scenario's name, the XP its Resolution gave and the Hard/Expert Mode card it was played with; empty where there is neither.
@@ -83,6 +89,8 @@ export default function Log() {
     if (save.log.prisoner) codes.add(save.log.prisoner);
     for (const card of save.log.carryOver) codes.add(card.code);
     for (const code of save.log.usedOnce) codes.add(code);
+    for (const code of save.log.treasures) codes.add(code);
+    for (const code of Object.keys(save.log.encounterPool)) codes.add(code);
     if (codes.size === 0) return [];
     return catalog.select().from(cards).where(inArray(cards.code, [...codes])).all();
   }, [catalog, save]);
@@ -123,6 +131,8 @@ export default function Log() {
   // The Dream-chaser's marked cards, each with its boxes.
   const marked = (kind: "scalable" | "upgradable"): Line[] => markedRows(log, kind).map((row) => [{ text: row.name, code: row.code }, { text: ` ${row.boxes}` }]);
   const card = preview.openCode;
+  // The Ered Mithrin columns (emce.campaign-log): treasures, the allies' lines, Beldis's boxes, the pool's encounter cards.
+  const wilderland = keepsWilderlandLog(campaign) ? wilderlandView(log, save.seatCount) : null;
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
 
@@ -154,6 +164,10 @@ export default function Log() {
           {campaign.xp ? <Row label="Upgradable Cards" lines={marked("upgradable")} onCard={card} speech={markedSpeech(log, "upgradable")} testID="log-upgradable" /> : null}
           <Row label="Boons" lines={pool("boon")} onCard={card} testID="log-boons" />
           <Row label="Burdens" lines={pool("burden")} onCard={card} testID="log-burdens" />
+          {wilderland ? <Row label="Treasures" lines={namesOnLines(wilderland.treasures, nameOf)} onCard={card} testID="log-treasures" /> : null}
+          {wilderland ? <Row label="Unique Allies Protecting Wilderland" lines={wilderland.lines.map((words): Line => [{ text: words }])} onCard={card} testID="log-ally-lines" /> : null}
+          {wilderland ? <Row label="Beldis" lines={wilderland.beldis.map((row): Line => [{ text: `${row.prefix}${row.boxes}` }])} onCard={card} speech={wilderland.beldis.map((row) => row.speech).join(". ")} testID="log-beldis" /> : null}
+          {wilderland ? <Row label="Encounter cards in the Campaign Pool" lines={wilderland.encounter.map((entry): Line => [cardSegment(entry.code, nameOf), { text: copiesMark(entry.copies) }])} onCard={card} speech={encounterSpeech(wilderland.encounter, nameOf)} testID="log-pool-encounter" /> : null}
           <Row
             label="Captives"
             lines={log.captives.map((captive) => [cardSegment(captive.hero, nameOf), { text: save.seatCount > 1 ? ` (Player ${captive.seat + 1})` : "" }])}

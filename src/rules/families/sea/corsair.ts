@@ -4,13 +4,14 @@
 // discard pile is shuffled back into it at once. Its enemies are revealed only by card abilities, such as the Boarding keyword.
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { refillDeck } from "../../core/decks.ts";
+import { DECKS, shufflePile } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
-import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { moveCard } from "../../core/zones.ts";
-import { moveEncounter } from "../encounter/moves.ts";
+import { revealTop } from "../encounter/named-decks.ts";
 
 /** The Corsair deck has been prepared in this game: its zones exist. */
 export function hasCorsairDeck(state: Pick<ScenarioState, "corsairDeck">): boolean {
@@ -24,8 +25,7 @@ export function corsairHolds(state: Pick<ScenarioState, "corsairDeck" | "corsair
 
 // The Corsair deck shuffled with the game's seed.
 function shuffledDeck(state: ScenarioState): ScenarioState {
-  const shuffled = shuffleIds(state.corsairDeck ?? [], state.seed, state.seedCursor);
-  return { ...state, corsairDeck: shuffled.ids, seedCursor: shuffled.cursor };
+  return shufflePile(state, "corsairDeck");
 }
 
 /** "Prepare the Corsair deck" (dcce.corsair-deck): the non-ship enemies of the encounter deck join those already dealt to the Corsair deck, the deck
@@ -43,19 +43,13 @@ export function prepareCorsairDeck(state: ScenarioState, ctx: ReduceContext): Sc
 
 /** The Corsair deck ran out: its discard pile is shuffled back into it (dcce.corsair-deck). Settle keeps every game's deck refilled. */
 export function refillCorsairDeck(state: ScenarioState): ScenarioState {
-  if (state.corsairDeck === undefined || state.corsairDeck.length > 0 || (state.corsairDiscard ?? []).length === 0) return state;
-  let next = state;
-  for (const id of [...(state.corsairDiscard ?? [])]) next = updateCard(moveCard(next, id, { zone: "corsairDeck" }), id, { face: "down" });
-  return shuffledDeck(next);
+  return refillDeck(state, DECKS.corsair);
 }
 
 /** Reveals the top card of the Corsair deck and puts it into play engaged with the seat (dcce.boarding): an enemy entering play, so the engine
  * announces it as every encounter card that enters play is. Null when the deck and its discard pile are both empty. */
 export function revealOne(state: ScenarioState, seat: number, ctx: ReduceContext, steps: EngineStep[]): { state: ScenarioState; id: string | null } {
-  const filled = refillCorsairDeck(state);
-  const top = filled.corsairDeck?.[0];
-  if (!top) return { state: filled, id: null };
-  return { state: moveEncounter(filled, top, "engaged", seat, ctx, steps), id: top };
+  return revealTop(state, DECKS.corsair, "engaged", seat, ctx, steps);
 }
 
 /** Reveals `count` cards, one after the other (the deck refills between them), each into play engaged with the seat. */

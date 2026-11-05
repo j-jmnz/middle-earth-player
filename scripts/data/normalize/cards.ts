@@ -6,7 +6,7 @@ import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
 import { titleKey } from "./names.ts";
-import { addDragnBacks, addNightmareCards, addProductCards, dragnOnlyCards, dragnRowOf, fillShipSets, foldTwoSided, productCodeOf, setName } from "./product-cards.ts";
+import { addDragnBacks, addNightmareCards, addProductCards, dragnOnlyCards, dragnRowOf, fillShipSets, fillSideQuestSets, foldTwoSided, productCodeOf, setName } from "./product-cards.ts";
 import type { Overrides } from "./overrides.ts";
 import { timingLabels } from "./timings.ts";
 
@@ -29,6 +29,9 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   Objective_Ally: { type: "objective", typeName: "Objective Ally" },
   Campaign: { type: "campaign", typeName: "Campaign" },
   Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
+  // Ered Mithrin: an objective that is also a location (The Old Ford), and the treasure a discovered campaign card becomes (emce.treasure).
+  Objective_Location: { type: "objective", typeName: "Objective Location" },
+  Treasure: { type: "treasure", typeName: "Treasure" },
   // Types only Nightmare decks of later cycles print (the encounter side quests of The Lost Realm on, Dream-chaser's ships).
   Encounter_Side_Quest: { type: "encounter-side-quest", typeName: "Encounter Side Quest" },
   Ship_Enemy: { type: "ship-enemy", typeName: "Ship-enemy" },
@@ -101,20 +104,24 @@ function keywordOnly(card: HobCard): (line: string) => boolean {
   };
 }
 
-const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
+export const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event"]);
 const ENCOUNTER_TYPES = new Set(["enemy", "location", "treachery", "objective", "encounter-side-quest", "ship-enemy", "ship-objective"]);
 
-// The type bar says Boon or Burden. A burden's burden set is printed where an encounter set icon would be, and
+// A Hall of Beorn Treasure of a campaign expansion (Ered Mithrin's, emce.treasure). The Hobbit saga's Treasure rows (Sting) are RingsDB's
+// "treasure / Campaign" cards and stay as they are.
+const isCampaignTreasure = (card: HobCard): boolean => card.CardType === "Treasure" && PRODUCTS.some((product) => product.campaignExpansion && product.name === card.CardSet);
+
+// The type bar says Boon or Burden (or Treasure). A burden's burden set is printed where an encounter set icon would be, and
 // Hall of Beorn lists it as the card's encounter set.
-function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | null; burdenSet: string | null } {
-  const kind = card.CardSubType === "Boon" ? "boon" : card.CardSubType === "Burden" ? "burden" : null;
+function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | "treasure" | null; burdenSet: string | null } {
+  const kind = card.CardSubType === "Boon" ? "boon" : card.CardSubType === "Burden" ? "burden" : isCampaignTreasure(card) ? "treasure" : null;
   return { campaignKind: kind, burdenSet: kind === "burden" ? setName(card.EncounterInfo?.EncounterSet, card.CardSet) : null };
 }
 
 // RingsDB types every boon and burden "treasure" and gives it the type name Campaign. The type bar prints the real
-// type (Attachment, Treachery, Objective Ally), which is what the card does in play.
+// type (Attachment, Treachery, Objective Ally), which is what the card does in play. A treasure prints Treasure.
 function realType(card: HobCard): { type: string; typeName: string } | null {
-  return card.CardSubType === "Boon" || card.CardSubType === "Burden" ? (TYPE_BY_HOB[card.CardType] ?? null) : null;
+  return card.CardSubType === "Boon" || card.CardSubType === "Burden" || isCampaignTreasure(card) ? (TYPE_BY_HOB[card.CardType] ?? null) : null;
 }
 
 function backTypeOf(type: string): "player" | "encounter" | null {
@@ -386,7 +393,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
           backType: null,
           errata: null,
           imagesrc: null,
-          deckLegal: realType(source) ? false : deckLegal(type?.type ?? "", type?.typeName ?? ""),
+          deckLegal: realType(source) ? false : deckLegal(type?.type ?? "", type?.typeName ?? "", facts.campaignKind),
           printings: [...printings, ...known],
         };
     return card;
@@ -420,6 +427,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   addProductCards(hobCards, byCode, hobCode, merge);
   addNightmareCards(hobCards, byCode, merge);
   fillShipSets(raw, byCode);
+  fillSideQuestSets(raw, byCode);
   addDragnBacks(raw, byCode);
 
   const cards: Card[] = [];
@@ -440,7 +448,9 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const backed = set?.back && typed.back ? { ...typed, back: { ...typed.back, ...set.back } } : typed;
     const next = outOfScope(overrides, backed) ? { ...backed, deckLegal: false } : backed;
     // A card whose printed back is not the one its type implies (the Stormcaller Elite has no encounter back) carries it as an override.
-    cards.push(cardSchema.parse({ ...next, backType: set?.backType !== undefined ? set.backType : backTypeOf(next.type) }));
+    // A treasure of a campaign (campaignKind) is a player card whatever its type; the treasures RingsDB files under older cycles keep no back.
+    const backType = set?.backType !== undefined ? set.backType : next.campaignKind === "treasure" ? "player" : backTypeOf(next.type);
+    cards.push(cardSchema.parse({ ...next, backType }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));
   return { cards, report };

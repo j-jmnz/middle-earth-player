@@ -18,6 +18,7 @@ import { campaignPath } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { levelOf } from "../../xp.ts";
 import { EFFECTS } from "../../../effects/index.ts";
+import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 let cards: Map<string, PrintedCard>;
 let ctx: ReduceContext;
@@ -138,7 +139,7 @@ describe("Flight of the Stormcaller in the Dream-chaser campaign", () => {
     const golden = FLIGHT_GOLDENS.find((item) => item.outcome === "won")!;
     const game = playGolden(golden, ctx);
     expect(game.state.stageCleared).toBe(true);
-    const log = applyResolution(emptyLog(golden.seatCount), game.state.scenarioId, game.state, cards);
+    const log = applyResolution(emptyLog(golden.seatCount), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(log.completed.at(-1)).toBe("flight-of-the-stormcaller");
     expect(log.xpGained["flight-of-the-stormcaller"]).toBeGreaterThanOrEqual(1);
     const path = campaignPath(campaign, {}, { ...log, completed: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller"] });

@@ -21,8 +21,12 @@ const NON_PLAYER_TYPE_CODES = new Set([
   "ship-objective",
 ]);
 
-export function deckLegal(typeCode: string, typeName: string): boolean {
+// `campaignKind` is the card's campaign kind where the caller knows it (Card.campaignKind): a campaign treasure is told from the plain "treasure"
+// rows by it, since Ered Mithrin's treasures print the type name Treasure, not Campaign.
+export function deckLegal(typeCode: string, typeName: string, campaignKind?: string | null): boolean {
   if (typeName === "Campaign") return false;
+  // An Ered Mithrin treasure (emce.treasure) is never deck-legal: a discovered one is admitted by the campaign log, outside the 50 card minimum.
+  if (campaignKind === "treasure") return false;
 
   // 2026-10-23: every live treasure row has type_name Campaign, so the check above
   // already rejects them. A treasure is deck-legal only when type_name is not

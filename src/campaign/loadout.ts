@@ -12,16 +12,23 @@ export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[] }
 // A hero a campaign refuses in a scenario, with the rule that says so. Campaign Mode only: a standalone game is not bound by it.
 export type HeroBan = { code: string; name: string; rule: string };
 
-// "When playing the Dream-chaser campaign, the Na'asiyah hero cannot be used in scenarios 1 through 7" (dcce.naasiyah).
-const HERO_BANS: Readonly<Record<string, { ban: HeroBan; scenarios: number }>> = {
-  "dream-chaser": { ban: { code: "12109", name: "Na'asiyah", rule: "dcce.naasiyah" }, scenarios: 7 },
+// A ban holds in the listed parts of the campaign, counted from 1 in the campaign's order of play (not in the other parts).
+type HeroBanEntry = { ban: HeroBan; parts: readonly number[] };
+
+const upTo = (last: number): number[] => Array.from({ length: last }, (_, index) => index + 1);
+
+// "When playing the Dream-chaser campaign, the Na'asiyah hero cannot be used in scenarios 1 through 7" (dcce.naasiyah). "Haldan cannot be used as a hero in this campaign" (emce.haldan, MEC115 p.2):
+// the campaign card of The King's Quest, the third part, says "Haldan may be included among a player's heroes" (12170:A:2), so the ban holds in every part but that one.
+const HERO_BANS: Readonly<Record<string, HeroBanEntry>> = {
+  "dream-chaser": { ban: { code: "12109", name: "Na'asiyah", rule: "dcce.naasiyah" }, parts: upTo(7) },
+  "ered-mithrin": { ban: { code: "19026", name: "Haldan", rule: "emce.haldan" }, parts: [1, 2, 4, 5, 6, 7, 8, 9] },
 };
 
 /** The heroes the campaign refuses in this scenario (the scenario's place in the campaign's order decides). */
 export function heroBansOf(campaign: Pick<CampaignData, "id" | "scenarios">, scenarioId: string): HeroBan[] {
   const entry = HERO_BANS[campaign.id];
   const place = campaign.scenarios.indexOf(scenarioId);
-  return entry && place >= 0 && place < entry.scenarios ? [entry.ban] : [];
+  return entry && place >= 0 && entry.parts.includes(place + 1) ? [entry.ban] : [];
 }
 
 export type LoadoutRule =
@@ -33,7 +40,9 @@ export type LoadoutRule =
   | "tooManyHeroes"
   | "ringInDeck"
   | "sameHero"
-  | "bannedHero";
+  | "bannedHero"
+  | "undiscoveredTreasure"
+  | "treasureCopies";
 
 export type LoadoutError = { rule: LoadoutRule; code: string; card: string; message: string };
 
@@ -47,7 +56,8 @@ function isRingBearer(card: PrintedCard): boolean {
   return isFellowship(card) && card.traits.includes("Ring-bearer");
 }
 
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = []): LoadoutError[] {
+// `discovered` is the treasures the Campaign Log records (emce.treasure): a deck may hold a treasure only when its code is listed, one copy by title, and a game without a log lists none.
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = []): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -75,6 +85,17 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   for (const card of heroCards.flat()) {
     const ban = card == null ? undefined : bans.find((item) => item.code === card.code);
     if (card != null && ban != null) fail("bannedHero", card, `${ban.name} cannot be used in this scenario of the campaign (${ban.rule})`);
+  }
+
+  // A treasure is a deck card only once the log records it (emce.treasure): "if that treasure card is marked in the campaign log". No more than 1 copy of a title.
+  for (const deck of deckCards) {
+    const seen = new Set<string>();
+    for (const card of deck) {
+      if (card == null || card.campaignKind !== "treasure") continue;
+      if (!discovered.includes(card.code)) fail("undiscoveredTreasure", card, "a treasure can be added to a deck only once the players have discovered it and it is marked in the campaign log (emce.treasure)");
+      else if (seen.has(card.name)) fail("treasureCopies", card, "no more than 1 copy of a treasure, by title, can be added to a player's deck (emce.treasure)");
+      seen.add(card.name);
+    }
   }
 
   if (!saga) {

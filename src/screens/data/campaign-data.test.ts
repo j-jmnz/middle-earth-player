@@ -53,8 +53,8 @@ describe("the registry", () => {
     }
   });
 
-  it("splits the scenarios into four boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser"]);
+  it("splits the scenarios into five boxes, each scenario in one, each box inside its own campaign", () => {
+    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser", "Ered Mithrin"]);
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
     const every = new Set(campaignIds().flatMap((id) => campaignOf(id)?.scenarios ?? []));
@@ -97,6 +97,22 @@ describe("the registry", () => {
     expect(bookletParams("dream-chaser", "voyage-across-belegaer")).toEqual({ id: "dream-chaser", page: "6" });
     expect(bookletParams("dream-chaser", "the-city-of-corsairs")).toEqual({ id: "dream-chaser", page: "24" });
     expect(bookletParams("dream-chaser")).toEqual({ id: "dream-chaser" });
+  });
+
+  it("registers Ered Mithrin: nine scenarios in order in one box, no XP, no saga, its own booklet on each scenario's page", () => {
+    const campaign = campaignOf("ered-mithrin");
+    expect(campaignIds()).toContain("ered-mithrin");
+    expect(campaign).toMatchObject({ name: "Ered Mithrin", saga: false, bookletId: "ered-mithrin", prelude: [] });
+    expect(campaign?.xp).toBeUndefined();
+    expect(campaign?.scenarios).toHaveLength(9);
+    for (const id of campaign?.scenarios ?? []) expect(scenarioOf(id)?.id).toBe(id);
+    expect(BOXES.find((box) => box.id === "ered-mithrin")?.scenarios).toEqual(campaign?.scenarios);
+    expect(boxOf("the-fate-of-wilderland")?.id).toBe("ered-mithrin");
+    expect(campaignOfScenario("lost-in-mirkwood")?.id).toBe("ered-mithrin");
+    expect(scenarioNames(campaign!)["journey-up-the-anduin"]).toBe("Journey Up the Anduin");
+    expect(bookletParams("ered-mithrin", "journey-up-the-anduin")).toEqual({ id: "ered-mithrin", page: "5" });
+    expect(bookletParams("ered-mithrin", "the-fate-of-wilderland")).toEqual({ id: "ered-mithrin", page: "22" });
+    expect(bookletParams("ered-mithrin")).toEqual({ id: "ered-mithrin" });
   });
 
   it("names a scenario as printed, without Hall of Beorn's \" (Campaign)\" suffix", () => {

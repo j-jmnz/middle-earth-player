@@ -40,7 +40,11 @@ export type EngineStep =
   // The cards of an encounter set left the game (RemoveEncounterSet), or the set-aside cards of one were shuffled into the encounter deck (ShuffleSetAsideSet): how many (dcce.stormcaller-and-the-thing).
   | { kind: "removeSet"; set: string; count: number }
   | { kind: "shuffleSet"; set: string; count: number }
-  | { kind: "resetEncounterDeck"; count: number; cause: Cause };
+  | { kind: "resetEncounterDeck"; count: number; cause: Cause }
+  // Discover X resolved for the active location: the cards looked at (top of the encounter deck first), the Loot objective attached to it as a guarded objective and the Hazard card revealed, if any (emce.discover). The rest went to the encounter discard pile.
+  | { kind: "discover"; locationId: string; looked: readonly string[]; loot?: string; hazard?: string; cause: Cause }
+  // A card from the encounter discard pile was set aside for the Resolution to add a copy of to the campaign pool (A Growing Threat, 12167:A:2; emce.campaign-pool-encounter): the card that did it and the card set aside.
+  | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };
 

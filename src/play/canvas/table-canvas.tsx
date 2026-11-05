@@ -5,11 +5,16 @@ import { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
+import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
+
 import { stagingWord } from "../words/area.ts";
+import { beatIds } from "../store/beat-store.ts";
+import { lookIdsOf, lookStripWords } from "../words/wilderland.ts";
+import { treasureSpeech } from "../cards/dungeon-preview.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 
 import { NO_HIGHLIGHT } from "../store/peek.ts";
-import { pictureKey } from "./picture-key.ts";
+import { nameOfCard, pictureKey } from "./picture-key.ts";
 import { grappleTell } from "../words/grapple.ts";
 import { islandTell } from "../words/uncharted.ts";
 import { stageFactsOf } from "../store/stormcaller-table.ts";
@@ -33,7 +38,7 @@ const ZONE_WORD: Record<ZoneId, string> = {
   hand: "Hand",
 };
 
-type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "info" | "onTap" | "onPreview" | "highlight"> & { seat: number; t: TableTokens };
+type RowProps = Pick<TableCanvasProps, "store" | "nameOf" | "inactive" | "info" | "facts" | "onTap" | "onPreview" | "highlight"> & { seat: number; t: TableTokens };
 
 function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { id: string; label: string; faceDown: boolean; t: TableTokens } & Pick<TableCanvasProps, "onTap" | "onPreview" | "highlight">) {
   const picked = highlight.picked.get(id) ?? 0;
@@ -71,7 +76,13 @@ function marksText(slot: SlotInfo | null): string {
   return `${engagement}${loss}${slot.delayed ? " · an effect comes later" : ""}`;
 }
 
-function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, highlight, t }: RowProps & { zone: ZoneId }) {
+// A treasure in the staging area, in words: who guards it, or that it is free to claim (emce.treasure).
+function treasureTell(game: ScenarioState, card: CardInstance, facts: TableCanvasProps["facts"], nameOf: TableCanvasProps["nameOf"]): string {
+  const said = facts.typeOf(card.code) === "treasure" ? treasureSpeech(game, card.id, (id) => nameOfCard(game.cards, id, nameOf)) : null;
+  return said ? ` · ${said}` : "";
+}
+
+function ZoneRow({ store, zone, seat, nameOf, inactive, info, facts, onTap, onPreview, highlight, t }: RowProps & { zone: ZoneId }) {
   const select = useMemo(() => zoneSelector(zone, seat), [zone, seat]);
   const view = useStore(store, (state) => select(state.game));
   // The numbers in a card's words come from this state, not the store read in render (the compiler would keep them stale).
@@ -86,7 +97,7 @@ function ZoneRow({ store, zone, seat, nameOf, inactive, info, onTap, onPreview, 
             key={card.id}
             id={card.id}
             faceDown={hidesFace(card)}
-            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(pictureKey(card))}${card.exhausted ? " (exhausted)" : ""}${islandTell(game, card) ? ` · ${islandTell(game, card)}` : ""}${inactive(pictureKey(card)) ? " · Not applied" : ""}${grappleTell(game, card.id)}${area ? ` · ${areaTell(area, area === "stage" ? stageFactsOf(game, info(game, seat, card.id).questPoints) : null)}` : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
+            label={isPrisoner(card) ? `Prisoner: ${nameOf(card.code)}, face down` : card.prisoner === true ? "Face down, held with the prisoner" : card.face === "down" ? "Face down" : `${nameOf(pictureKey(card))}${card.exhausted ? " (exhausted)" : ""}${islandTell(game, card) ? ` · ${islandTell(game, card)}` : ""}${inactive(pictureKey(card)) ? " · Not applied" : ""}${grappleTell(game, card.id)}${treasureTell(game, card, facts, nameOf)}${area ? ` · ${areaTell(area, area === "stage" ? stageFactsOf(game, info(game, seat, card.id).questPoints) : null)}` : ""}${marksText(zone === "hand" ? null : info(game, seat, card.id))}`}
             onTap={onTap}
             onPreview={onPreview}
             highlight={highlight}
@@ -126,19 +137,28 @@ function SeaLines({ store, seat, nameOf, facts, t }: Pick<TableCanvasProps, "sto
   );
 }
 
-export function TableCanvas({ store, width, height, nameOf, inactive, facts, info, onTap, onPreview, highlight: marked }: TableCanvasProps) {
+// The Discover look strip, in words, while the banner is on the beat that lays cards in it (emce.discover).
+function DiscoverLook({ store, beats }: Pick<TableCanvasProps, "store" | "beats">) {
+  const key = useStore(beats, (state) => state.key);
+  const peeking = useStore(store, (state) => state.viewedSeat != null);
+  const count = peeking ? 0 : lookIdsOf(beatIds(key)).length;
+  return count > 0 ? <Text className="mb-2 text-label text-bone">{lookStripWords(count)}</Text> : null;
+}
+
+export function TableCanvas({ store, width, height, nameOf, inactive, facts, info, beats, onTap, onPreview, highlight: marked }: TableCanvasProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   // Peeking at the other seat: nothing is outlined or filled, and a tap only previews (use-table-choice.ts).
   const highlight = useStore(store, (state) => state.viewedSeat != null) ? NO_HIGHLIGHT : marked;
-  const rowProps = { store, seat, nameOf, inactive, info, onTap, onPreview, highlight, t };
+  const rowProps = { store, seat, nameOf, inactive, info, facts, onTap, onPreview, highlight, t };
   const second = useStore(store, (state) => secondPilesOf(state.game));
   // The victory display is listed while a card is in it, as the canvas draws it.
   const victory = useStore(store, (state) => state.game.victory.length > 0);
   return (
     <ScrollView style={{ width, height }} contentContainerStyle={{ padding: 12 * s }}>
       <SeaLines store={store} seat={seat} nameOf={nameOf} facts={facts} t={t} />
+      <DiscoverLook store={store} beats={beats} />
       {TABLE_ZONES.map((zone) => (
         <ZoneRow key={zone} zone={zone} {...rowProps} />
       ))}

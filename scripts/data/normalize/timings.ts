@@ -46,6 +46,8 @@ export function lineTimings(line: string): Set<string> {
   }
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text.
   if (/Counts as an? (?:\w+ )?attachment/.test(line)) allowed.add("constant");
+  // "While in a player's hand, Lost in the Wild gains: "Cannot be discarded by player card effects. ..."" gives the card a constant ability of its own from the hand (18026:A:1).
+  if (/While in a player's hand, .+ gains: "/.test(line)) allowed.add("constant");
   // An attachment's quoted text with no label of its own may trigger on a condition, as any unlabelled line may ("Counts as a Condition
   // attachment with the text, "Each time attached hero readies, deal it 1 damage."", 900106:A:1).
   const quoted = /Counts as an? (?:\w+ )?attachment with the text[,:]? "([^"]*)"/.exec(line)?.[1];

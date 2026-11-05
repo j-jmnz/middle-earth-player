@@ -4,6 +4,7 @@ import { verbsRunningInFrame, type Effect } from "../../catalog/boundary.ts";
 
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { holdsNow } from "../interpret/verbs.ts";
+import { shadowBlankOf } from "../interpret/conditions.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { runInstruction, type ReduceContext } from "../interpret/interpret.ts";
@@ -265,10 +266,12 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
     attack.immediate || done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
   // The shadow cards an attack outside the combat phase was dealt are discarded once it resolves
   // (faq.enemy-attacks-outside-combat).
+  // The events it announces answer after the shadow card is gone, so they carry whether it had no effect (18022:A:1).
+  const blank = shadowBlankOf(done, attack.enemyId, ctx);
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
   // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
   const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
-  const announced = queueEvent(announceDestroyed(cleared, attack, ctx), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender });
+  const announced = queueEvent(announceDestroyed(cleared, attack, ctx), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender, ...(blank ? { shadowBlank: true as const } : {}) });
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
   // A shadow card that attacks the defending player (Wolf Rider) attacks once this attack's own "after" instructions have run, and the
   // shadow cards that follow it once its attack has ended (startShadowAttack carries the rest of the list onto its attack).
