@@ -11,7 +11,6 @@ import { CODES, campaign, haven } from "../../../../test/scenarios/a-storm-on-co
 import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
 import { emptyLog } from "../../log.ts";
-import { nextStep } from "../../path.ts";
 
 // A permanent golden: whole games of A Storm on Cobas Haven in Campaign Mode played by the auto-player (test/scenarios/a-storm-on-cobas-haven/game.ts), true solo and two-handed, through a win (in Normal and Easy, after the
 // first seven parts, with the Hard and the Expert Mode card, with Black Key and Calaerion on their Upgraded sides, with Belfalas Islet holding the Raider Flagship, with the Actions of Gavin, the towers and Taking on Water used,
@@ -125,8 +124,7 @@ goldenSuite<HavenGolden, HavenDecks>({
       ]) expect(reached.has(wanted), wanted).toBe(true);
     }, 120_000);
   },
-  wins: "wins on stage 3, Break Through the Fleet! (defeated, or with the Raider Flagship in the victory display), runs 11209's Resolution (the XP is awarded, the Círdan's Blessing chosen joins the pool) and unlocks The City of Corsairs, which the app cannot deal yet",
-  next: "soon",
+  wins: "wins on stage 3, Break Through the Fleet! (defeated, or with the Raider Flagship in the victory display), runs 11209's Resolution (the XP is awarded, the Círdan's Blessing chosen joins the pool) and unlocks The City of Corsairs",
   before: (golden) => (golden.after ? afterRuins(golden.seatCount) : emptyLog(golden.seatCount)),
   won(state, golden) {
     expect(state.cards[state.questStage ?? ""]?.code).toBe(CODES.stage3);
@@ -154,12 +152,9 @@ goldenSuite<HavenGolden, HavenDecks>({
       (golden.mode === "hard" ? 1 : golden.mode === "expert" ? 2 : 0)
     );
   },
-  afterWin({ golden, log, path }) {
+  afterWin({ golden, log }) {
     // The Círdan's Blessing chosen at Setup joins the pool, with Ominous Fate from the earlier parts.
     expect(log.campaignPool.map((card) => card.code).sort()).toEqual([...(golden.after ? ["11176"] : []), ...chosenCards(golden)].sort());
-    // The path stops at The City of Corsairs, which the app cannot deal yet: nothing begins it.
-    expect(path[8]?.id).toBe("the-city-of-corsairs");
-    expect(nextStep(path, null)).toMatchObject({ kind: "soon", node: { id: "the-city-of-corsairs" } });
     expect(UPGRADED_CODES).toEqual([CODES.blackKey, CODES.calaerion]);
   },
 });

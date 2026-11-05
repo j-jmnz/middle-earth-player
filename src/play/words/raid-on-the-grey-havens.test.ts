@@ -3,13 +3,14 @@
 // option id.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect, Instruction } from "../../catalog/boundary.ts";
+import type { Effect } from "../../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../../effects/authored/raid-on-the-grey-havens.ts";
 import { RECORDS as DCCE_RECORDS } from "../../effects/authored/pool/DCCE.ts";
 import { CODES, idOf, loadRaidWorld, raidTable, type RaidWorld } from "../../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 import { aflameWords, branchNow, dealtNow } from "./aflame.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
+import { walk } from "../../../test/harness/record-walk.ts";
 
 let world: RaidWorld;
 
@@ -19,14 +20,6 @@ beforeAll(async () => {
 
 const names: ChoiceNames = { card: (id) => id, code: (code) => world.cards.get(code)?.name ?? code };
 const records: readonly Effect[] = [...AUTHORED_EFFECTS, ...DCCE_RECORDS.filter((effect) => ["11183", "11184", "11185", "11186", "11187", "11189", "11190"].includes(effect.cardCode))];
-
-function walk(instructions: readonly Instruction[], visit: (instruction: Instruction, next: Instruction | undefined) => void): void {
-  instructions.forEach((instruction, index) => {
-    visit(instruction, instructions[index + 1]);
-    if ("instructions" in instruction && Array.isArray(instruction.instructions)) walk(instruction.instructions, visit);
-    if (instruction.verb === "Choose") for (const option of instruction.options) walk(option.instructions, visit);
-  });
-}
 
 describe("the words of the Raid on the Grey Havens choices", () => {
   it("every Choose names each branch in a sentence", () => {

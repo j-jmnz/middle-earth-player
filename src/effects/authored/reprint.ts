@@ -1,13 +1,14 @@
 import type { Ledger } from "../../catalog/active-text.ts";
 import type { Effect } from "../../catalog/boundary.ts";
-import { stripKeywords } from "../../catalog/keyword-line.ts";
+import { selfNamed } from "../../catalog/self-named.ts";
 
 // The records of a ledger line, taken again by another line with the same printed text: a card printed again in a later product (Forest Gate 01100 and 41012,
 // Calphon 11028 and 110013) or a sentence a card prints twice (the two sides of a Campaign Expansion ship). A copy keeps the source record and changes its
 // card code, its ledger line ids and its id, whose number is the one the line has on the target: the source's number moved by how far the target's line stands
 // from the source's among the records of that timing (their order is the printed order, front, side B, then the shadow). A copy is refused, when the module loads, if
-// the copy would take an id that is in use. Each copied record keeps the line pairs it was copied by (`copiedLines`), and src/effects/copies.test.ts refuses a pair
-// whose two ledger lines differ once normalized (keywords stripped), so a ledger edit cannot keep a stale copy. The check is a test, not
+// the copy would take an id that is in use. Each copied record keeps the line pairs it was copied by (`copiedLines`) and its source (`copySource`), and
+// src/effects/copies.test.ts refuses a pair whose two ledger lines differ once normalized (keywords stripped, each card's own name read as {self}), so a
+// ledger edit cannot keep a stale copy, and a source record that names its own card by code in any field, or by name when the target card is named otherwise, since a copy changes only the code, the line ids and the id (a same-named reprint keeps a name that is still right). The check is a test, not
 // a load-time throw, so this module does not import the ledger JSON and the Node scripts that load the effects (effects:open, card-smoke, the fixture writer) run.
 export type Copy = { readonly copy: readonly (readonly [from: string, to: string])[] };
 
@@ -53,18 +54,40 @@ export function printedLine(ledger: Ledger, lineId: string): string | undefined 
 export type CopiedLine = { readonly from: string; readonly to: string };
 
 const COPIED = new WeakMap<Effect, readonly CopiedLine[]>();
+const SOURCES = new WeakMap<Effect, Effect>();
 
 /** The line pairs a record was made by, when `withCopies` made it. */
 export function copiedLines(record: Effect): readonly CopiedLine[] | undefined {
   return COPIED.get(record);
 }
 
-/** Why a pair may not be copied under this ledger, or null when its two lines read the same. */
-export function copyMismatch(ledger: Ledger, pair: CopiedLine): string | null {
+/** The record a copy was made from, when `withCopies` made it. */
+export function copySource(record: Effect): Effect | undefined {
+  return SOURCES.get(record);
+}
+
+/** A card's printed name by its code, as the copy check reads each card's own name as {self}. */
+export type NameOf = (code: string) => string | undefined;
+
+/**
+ * Why a pair may not be copied under this ledger, or null when its two lines read the same with each card's own name as {self}. A source record that
+ * names its own card in any field is refused too when the target card has another name, and when it holds the source's card code in any field: a copy changes
+ * only the code, the line ids and the id, so the name or code would stay the source card's. A reprint under the same name keeps a name that is still right.
+ */
+export function copyMismatch(ledger: Ledger, pair: CopiedLine, nameOf: NameOf, source: Effect): string | null {
   const from = printedLine(ledger, pair.from);
   const to = printedLine(ledger, pair.to);
   if (from === undefined || to === undefined) return `The printed-text ledger has no line ${from === undefined ? pair.from : pair.to}`;
-  return stripKeywords(from) === stripKeywords(to) ? null : `Cannot copy ${pair.from} to ${pair.to}: "${from}" is not "${to}"`;
+  const fromName = nameOf(parse(pair.from, LINE).code);
+  const toName = nameOf(parse(pair.to, LINE).code);
+  if (fromName === undefined || toName === undefined) return `No card name for ${fromName === undefined ? pair.from : pair.to}`;
+  if (selfNamed(fromName, from) !== selfNamed(toName, to)) return `Cannot copy ${pair.from} to ${pair.to}: "${from}" is not "${to}"`;
+  const { id, cardCode, lines, ...fields } = source;
+  if (fromName.toLowerCase() !== toName.toLowerCase() && JSON.stringify(fields).toLowerCase().includes(fromName.toLowerCase())) return `Cannot copy ${source.id} to ${pair.to}: the record names its own card "${fromName}"`;
+  const fromCode = parse(pair.from, LINE).code;
+  const toCode = parse(pair.to, LINE).code;
+  if (fromCode !== toCode && JSON.stringify(fields).includes(`"${fromCode}"`)) return `Cannot copy ${source.id} to ${pair.to}: the record names its own card by code "${fromCode}"`;
+  return null;
 }
 
 // The record's printed place, with its position in the list as the tiebreak, as the rank of the record among its card's records of its timing.
@@ -119,6 +142,7 @@ export function withCopies(items: readonly (Effect | Copy)[], options: Options =
   for (const list of made.values()) {
     for (const { source, record } of list) {
       COPIED.set(record, source.lines.map((from, at) => ({ from, to: record.lines[at] ?? "" })));
+      SOURCES.set(record, source);
     }
   }
   return items.flatMap((item) => (isCopy(item) ? (made.get(item) ?? []).map(({ record }) => record) : [item]));

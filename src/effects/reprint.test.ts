@@ -52,7 +52,7 @@ describe("withCopies", () => {
     const [, copied] = withCopies([calphon, copyLine("11028:A:3", "110013:A:3")]);
     const pairs = copiedLines(copied!) ?? [];
     expect(pairs).toEqual([{ from: "11028:A:3", to: "110013:A:3" }]);
-    expect(copyMismatch(shippedLedger(), pairs[0]!)).toMatch(/11028:A:3.*110013:A:3/);
+    expect(copyMismatch(shippedLedger(), pairs[0]!, () => "Calphon", calphon)).toMatch(/11028:A:3.*110013:A:3/);
     expect(copiedLines(calphon)).toBeUndefined();
   });
 

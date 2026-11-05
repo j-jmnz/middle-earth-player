@@ -8,6 +8,7 @@ import { amountExprSchema, amountSchema, cardRefSchema } from "./effect-schema-a
 import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
 import { pickSchema, sphereSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifierStatSchema, modifierUntilSchema } from "./effect-schema-stats.ts";
+import { verbFlags } from "./verb-flags.ts";
 import { simpleInstructionSchema, simpleVerbs } from "./effect-schema-verbs.ts";
 import { FAMILY_TRIGGERS } from "./families/index.ts";
 
@@ -140,7 +141,7 @@ const optionEachSchema = z.strictObject({
   ...when,
 });
 
-const choiceSchema = z.strictObject({
+const choiceSchema = verbFlags(z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
   // Each option may be taken once in this effect: a later Choose of the same effect offers only the options not taken yet
@@ -159,7 +160,7 @@ const choiceSchema = z.strictObject({
       }),
     )
     .min(1),
-});
+}), { runsInFrame: true });
 
 // `endOfAttack`: when the player attack in progress ends (rr.step-6-8-4; "After this attack resolves, discard ~"), with the
 // attacked enemy as the frame's other card (src/rules/families/attack/flow.ts).
@@ -193,7 +194,7 @@ const afterAttackSchema = z.strictObject({
 
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready
 // each Dwarf character", "Deal 1 damage to each enemy in the staging area"). Nobody chooses.
-const eachSchema = z.strictObject({
+const eachSchema = verbFlags(z.strictObject({
   verb: z.literal("Each"),
   pick: pickSchema,
   // A Delay here is made once for each card ("If any of those allies are still in play at the end of the round, discard them").
@@ -206,14 +207,14 @@ const eachSchema = z.strictObject({
   totalCost: amountSchema.optional(),
   taken: z.array(z.string()).optional(),
   ...when,
-});
+}), { runsInFrame: true });
 
 // Runs the instructions this many times ("Resolve that effect again for each copy of ~ in your discard pile").
-const repeatSchema = z.strictObject({
+const repeatSchema = verbFlags(z.strictObject({
   verb: z.literal("Repeat"),
   times: amountSchema,
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema])),
-});
+}), { runsInFrame: true });
 
 export const instructionSchema = z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, delaySchema, afterAttackSchema, forEachPlayerSchema, eachSchema, repeatSchema]);
 

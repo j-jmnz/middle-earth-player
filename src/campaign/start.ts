@@ -1,5 +1,4 @@
-import type { Effect, ScenarioDefinition } from "../catalog/boundary.ts";
-import { verbsWithRole } from "../catalog/setup-verbs.ts";
+import { setupRoleVerbs, type Effect, type ScenarioDefinition } from "../catalog/boundary.ts";
 import { burdenCodes, campaignScenario, corsairCodes, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
@@ -45,9 +44,9 @@ export type StartInput = {
 // campaign checklist (src/campaign/checklist.ts) before the scenario starts. The quest card's last Setup step is the
 // encounter deck shuffle, which the piles cannot express.
 // The verbs of the campaign card's Setup the start deals itself, and those that resolve in a frame after the quest card's Setup
-// (ScenarioDefinition.afterSetup): each verb's schema entry says which (src/catalog/setup-role.ts).
-const DEALT_VERBS = verbsWithRole("dealt");
-const AFTER_SETUP_VERBS = verbsWithRole("afterSetup");
+// (ScenarioDefinition.afterSetup): each verb's schema entry says which (src/catalog/verb-flags.ts).
+const DEALT_VERBS = setupRoleVerbs("dealt");
+const AFTER_SETUP_VERBS = setupRoleVerbs("afterSetup");
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null;

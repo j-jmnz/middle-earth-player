@@ -6,12 +6,13 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Setup: "Shuffle the encounter deck and discard cards from the top of the encounter deck until X locations with the Aflame keyword are discarded, where X is the number of players in
   // the game. Add each discarded Aflame location to the staging area." (11036:A:1). `perPlayer` Aflame locations for each player: the cards above them go to the encounter discard pile,
   // each Aflame location found goes to the staging area, and the deck stops when it is empty. The line's "shuffle the encounter discard pile back" is a ShuffleEncounterDiscard after it.
-  z.strictObject({ verb: z.literal("DiscardUntilAflame"), perPlayer: z.number().int().positive(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilAflame"), perPlayer: z.number().int().positive(), ...when }), { setupRuns: "top" }),
   // "Search the encounter deck and discard pile for the Aflame location with the highest Aflame value, and add it to the staging area" (11040:A:1). Of locations tied on the value
   // that are not copies of one card the first player chooses. The encounter deck is not shuffled by this verb.
   z.strictObject({ verb: z.literal("SearchAflame"), ...when }),

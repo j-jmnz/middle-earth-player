@@ -7,10 +7,13 @@ import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
 import { DATA_DIR, ROOT } from "../data/paths.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
+import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 
 // The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/phases/phase-12-knife-in-the-dark.md, Scenario procedure):
 //
 //   pnpm test:scenario <scenario-id> [--list]
+//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, with WORDS_DUMP=<id>: it prints every sentence
+//                                                 the scenario's choices say (the check for a bare "Choose a player." or a fallback sentence)
 //
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
@@ -18,7 +21,8 @@ import { smokeCodes } from "../card-smoke/world.ts";
 //   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: causes, replay and the Maestro
 //              fixtures. A scenario with no entry skips them, except a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
 //              whole (in the tests part, as they import its scene)
-//   coverage   the effect coverage, migration and record-route checks, the copied-lines test and the golden registry's own test (COVERAGE_TESTS), and every
+//   coverage   the effect coverage, migration and record-route checks, the copied-lines test, the golden registry's own test, the file-size test and the rule-id
+//              test (COVERAGE_TESTS), and every
 //              choice-words test (src/play/words): a record on a card another scenario's words test reads (a campaign card, a recurring ally) can break it
 //   smoke      scripts/card-smoke/run.ts on the player cards the scenario deals (skipped when it deals none)
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
@@ -32,8 +36,9 @@ export type Selection = {
   families: string[];
 };
 
-export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts"];
+export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts"];
 const WORDS_ROOT = "src/play/words/";
+const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
 export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -50,18 +55,18 @@ export function scenarioTests(id: string, tree: readonly string[], read: (file: 
 }
 
 const FAMILY_ROOTS = ["src/effects/authored/pool/", "src/effects/authored/families/", "src/catalog/families/", "src/rules/families/"];
-// Files outside those folders that make or check the families: the hook dispatch and manifest types, the setup-role marks and the schema verb lists.
+// Files outside those folders that make or check the families: the hook dispatch and manifest types, the verb flags and the schema verb lists.
 const FAMILY_FILES = [
   "src/rules/interpret/family-hooks.ts",
   "src/rules/interpret/family-manifest.ts",
   "src/catalog/family-manifest.ts",
-  "src/catalog/setup-role.ts",
-  "src/catalog/setup-verbs.ts",
+  "src/catalog/verb-flags.ts",
+  "src/catalog/verb-sets.ts",
   "src/catalog/effect-schema-verbs.ts",
 ];
 // The two dispatch files affect every family; the rest name no family.
 const EVERY_FAMILY_FILES = ["src/rules/interpret/family-hooks.ts", "src/rules/interpret/family-manifest.ts", "src/catalog/family-manifest.ts"];
-const MANIFEST_TESTS = ["src/catalog/families/families.test.ts", "src/rules/interpret/family-manifest.test.ts", "src/rules/interpret/family-hooks.test.ts", "src/catalog/setup-verbs.test.ts"];
+const MANIFEST_TESTS = ["src/catalog/families/families.test.ts", "src/rules/interpret/family-manifest.test.ts", "src/rules/interpret/family-hooks.test.ts", "src/catalog/verb-sets.test.ts"];
 
 /**
  * The pool and family tests, when they could have moved. A changed file under src/effects/authored/pool/, src/effects/authored/families/,
@@ -139,9 +144,9 @@ function changedFiles(): string[] {
 
 type PartResult = { name: string; ok: boolean; ms: number; detail: string };
 
-function run(command: string, args: string[]): { ok: boolean; ms: number } {
+function run(command: string, args: string[], env?: Record<string, string>): { ok: boolean; ms: number } {
   const begin = performance.now();
-  const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit" });
+  const result = spawnSync(command, args, { cwd: ROOT, stdio: "inherit", env: { ...process.env, ...env } });
   return { ok: result.status === 0, ms: performance.now() - begin };
 }
 
@@ -150,9 +155,20 @@ const vitest = (files: string[], filter?: string): string[] => ["exec", "vitest"
 async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   const listOnly = process.argv.includes("--list");
+  const wordsOnly = process.argv.includes("--words");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --words]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
+
+  if (wordsOnly) {
+    if (!existsSync(path.join(ROOT, WORDS_TEST))) throw new Error(`${WORDS_TEST} does not exist`);
+    // The test reads the playable and the scaffolded scenarios only; for any other id vitest would run nothing and report success.
+    if (!WORDS_SCENARIOS.includes(id)) throw new Error(`${id} is neither playable (src/campaign/playable.ts) nor scaffolded (src/campaign/scenarios/${id}/golden.test.ts), so the words test does not read it`);
+    // The describe.each title of the test is "the words of <id>"; WORDS_DUMP makes it print the sentences.
+    const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, "-t", `the words of ${id}`, "--silent=false"], { WORDS_DUMP: id });
+    if (!outcome.ok) throw new Error("the words test failed");
+    return;
+  }
 
   const tree = [...git(["ls-files", "--cached", "--others", "--exclude-standard"])].filter((file) => /^(src|scripts|test)\/.*\.test\.ts$/.test(file) && existsSync(path.join(ROOT, file)));
   const changed = changedFiles();

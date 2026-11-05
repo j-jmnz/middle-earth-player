@@ -5,7 +5,7 @@
 // from the top of the encounter deck, and adds it to the staging area" (01126:A:1) is a record with a ForEachPlayer that holds a
 // RevealEncounter, run here in a frame of its own after the deck is shuffled. The stage then turns to its side B, and its When Revealed
 // effects resolve (01126:B:1, "Search the encounter deck for 1 Hill Troll (if one is not already in play)"), after the Setup's reveals.
-import type { Effect } from "../../../catalog/boundary.ts";
+import { setupRunVerbs, type Effect } from "../../../catalog/boundary.ts";
 
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -16,26 +16,17 @@ import type { ScenarioState } from "../../core/state.ts";
 // first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet), or prepares the Uncharted deck (PrepareUnchartedDeck) or the Grotto deck (PrepareGrottoDeck): the Setup the piles cannot place.
 // A Setup that searches the encounter deck for each player (142040:A:1, "each player adds 1 different location") or puts damage tokens on a
 // card (PlaceDamageOn) is run here too.
+// Which verbs do it is on their schema entries (`setupRuns`, src/catalog/verb-flags.ts): a verb run at the top level, or one inside a top-level ForEachPlayer or Each.
 export function revealsPerPlayer(effect: Effect): boolean {
-  return (
-    effect.timing === "setup" &&
-    effect.instructions.some(
-      (instruction) =>
-        (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inner.verb === "RevealEncounter" || inner.verb === "SearchMove")) ||
-        instruction.verb === "PlaceDamageOn" ||
-        (instruction.verb === "Each" && instruction.instructions.some((inner) => inner.verb === "GuardObjective")) ||
-        instruction.verb === "AttachSetAside" ||
-        // Each player chooses a ship (families/sea/fleet.ts).
-        instruction.verb === "PrepareFleet" ||
-        // The Uncharted deck is prepared and Calphon comes into play under the first player (families/uncharted/deck.ts).
-        instruction.verb === "PrepareUnchartedDeck" ||
-        // The Island Map is laid out of the dealt locations, the starting location is chosen and the Gate Key is attached (families/island.ts).
-        instruction.verb === "PrepareIslandMap" ||
-        // The Grotto deck is prepared, its top locations join the staging area and the objective allies come into play (families/uncharted/grotto.ts).
-        instruction.verb === "PrepareGrottoDeck" ||
-        // Cards are discarded from the encounter deck until an Aflame location for each player is, and each joins the staging area (families/aflame/cards.ts).
-        instruction.verb === "DiscardUntilAflame",
-    )
+  if (effect.timing !== "setup") return false;
+  const top = setupRunVerbs("top");
+  const inForEachPlayer = setupRunVerbs("inForEachPlayer");
+  const inEach = setupRunVerbs("inEach");
+  return effect.instructions.some(
+    (instruction) =>
+      top.has(instruction.verb) ||
+      (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inForEachPlayer.has(inner.verb))) ||
+      (instruction.verb === "Each" && instruction.instructions.some((inner) => inEach.has(inner.verb))),
   );
 }
 

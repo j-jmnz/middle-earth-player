@@ -6,7 +6,7 @@ import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.
 import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifyStatSchema } from "./effect-schema-stats.ts";
 import { FAMILY_VERBS } from "./families/index.ts";
-import { setupRole } from "./setup-role.ts";
+import { verbFlags } from "./verb-flags.ts";
 
 function verb<const Verb extends string>(name: Verb) {
   return z.strictObject({ verb: z.literal(name), ...when });
@@ -61,7 +61,7 @@ export const simpleVerbs = [
   // `other`: the second card the answered event names (the defender of an attack that resolved).
   z.strictObject({ verb: z.literal("Ready"), target: z.enum(["self", "host", "picked", "allCharacters", "subject", "defender", "other"]).optional(), ...when }),
   // Chooses a card or a player for the instructions that follow (target "picked"). A choice of one is made without asking.
-  z.strictObject({ verb: z.literal("Pick"), pick: pickSchema, ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("Pick"), pick: pickSchema, ...when }), { runsInFrame: true }),
   // Lowers a threat dial. It stops at 0.
   // `eventSeat` is the player the answered event happened to.
   z.strictObject({ verb: z.literal("LowerThreat"), amount: positiveAmountSchema, who: z.enum(["actor", "picked", "eachSeat", "eventSeat"]), ...when }),
@@ -140,10 +140,10 @@ export const simpleVerbs = [
   verb("AdvanceStep"),
   verb("ResolveEffect"),
   modifyStatSchema,
-  setupRole(codeVerb("AddToStaging"), "dealt"),
+  verbFlags(codeVerb("AddToStaging"), { setupRole: "dealt" }),
   codeVerb("MakeActiveLocation"),
-  setupRole(codeVerb("SetAside"), "dealt"),
-  setupRole(codeVerb("AttachToRingBearer"), "dealt"),
+  verbFlags(codeVerb("SetAside"), { setupRole: "dealt" }),
+  verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
   codeVerb("AddSetAsideToStaging"),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
@@ -167,7 +167,7 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, ...when }),
   // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
   // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
-  z.strictObject({
+  verbFlags(z.strictObject({
     verb: z.literal("SearchMove"),
     ...searchSelector,
     // `engaged`: into play engaged with the player who searches ("put it into play engaged with you", 41013:A:1, 41024:A:1).
@@ -183,7 +183,7 @@ export const simpleVerbs = [
     // 41005:A:1). The titles are the cards' printed names; cards that share one are the same choice.
     different: z.boolean().optional(),
     ...when,
-  }),
+  }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   z.strictObject({ verb: z.literal("ReturnToStaging"), target: targetSchema, ...when }),
   z.strictObject({
     verb: z.literal("EngageAll"),

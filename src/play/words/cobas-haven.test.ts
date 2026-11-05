@@ -2,7 +2,6 @@
 // id and no "Choose a character." that does not say what the card is for.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Instruction } from "../../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../../effects/authored/a-storm-on-cobas-haven.ts";
 import { RECORDS as SEND_FOR_HELP } from "../../effects/authored/pool/DCCEHaven.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
@@ -15,7 +14,9 @@ import { delayedLines } from "../cards/card-effects.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 
+import { askWords } from "./ask.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
+import { ASKING_VERBS, walk } from "../../../test/harness/record-walk.ts";
 
 let world: HavenWorld;
 
@@ -27,28 +28,18 @@ beforeAll(async () => {
   for (const [code, card] of await loadPrinted([CODES.dreamChaser, CODES.dawnStar, "01001", "01002", "01073", "04053", "09001"])) world.cards.set(code, card);
 }, 120_000);
 
-// Every instruction a record holds, nested ones too, each with the instruction that follows it in its list.
-function walk(instructions: readonly Instruction[], visit: (instruction: Instruction, next: Instruction | undefined, after: readonly Instruction[]) => void): void {
-  instructions.forEach((instruction, index) => {
-    visit(instruction, instructions[index + 1], instructions.slice(index + 2));
-    if ("instructions" in instruction && Array.isArray(instruction.instructions)) walk(instruction.instructions, visit);
-    if (instruction.verb === "Choose") for (const option of instruction.options) walk(option.instructions, visit);
-  });
-}
-
 describe("the words of A Storm on Cobas Haven choices", () => {
   const names = (): ChoiceNames => ({ card: (id) => world.cards.get(id)?.name ?? id, code: (code) => world.cards.get(code)?.name ?? code });
-  // The instructions that ask a player for a card: the sheet words them with pickWords (src/play/choice/sheets.ts).
-  const ASKING = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand", "DiscardAlliesForWillpower"]);
 
   it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
     const prompts: string[] = [];
+    const table = havenTable(world);
     for (const effect of AUTHORED_EFFECTS) {
       walk(effect.instructions, (instruction, next, after) => {
-        if (!ASKING.has(instruction.verb)) return;
+        if (!ASKING_VERBS.has(instruction.verb)) return;
         // A ReturnToStaging of the picked enemy sends it back without a question: the Pick before it asks.
         if (instruction.verb === "ReturnToStaging" && !(instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose")) return;
-        const words = pickWords(instruction, next, names(), effect.cardCode, 2, undefined, undefined, after);
+        const words = askWords({ game: table.state, ctx: table.ctx, names: names(), instruction, queue: next ? [next, ...after] : [], options: [], source: effect.cardCode, picked: null });
         expect(words.prompt, effect.id).toMatch(/^[A-Z].*\.$/);
         expect(words.prompt, effect.id).not.toMatch(/^Choose an? \w+\.$/);
         expect(words.prompt, effect.id).not.toBe("Choose one.");
@@ -71,9 +62,9 @@ describe("the words of A Storm on Cobas Haven choices", () => {
     expect(prompts).toContain("Choose a Ship enemy that is not guarding an objective. While Belfalas Islet is the active location, it is considered to be out of play.");
     expect(prompts).toContain("Choose a Dol Amroth objective from the encounter deck or discard pile to add to the staging area.");
     // Corsair Skirmisher's Response (12125:A:3), Ramming Speed! (12131:A:1) and Taking on Water (12132:A:1, and its Action's three characters).
-    expect(prompts).toContain("Choose an ally to discard. Discard allies you control with a total of at least 3 Willpower to take control of this card as a Ship objective.");
+    expect(prompts).toContain("Corsair Skirmisher: choose an ally to discard. At least 3 Willpower is needed to take control of it as a Ship objective.");
     expect(prompts).toContain("Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack.");
-    expect(prompts).toContain("Choose the Ship objective this card attaches to.");
+    expect(prompts).toContain("Choose the Ship objective to attach Taking on Water to.");
     // Taking on Water's Action is read on the table below: the Repeat is expanded in the queue there.
     expect(prompts).toContain("Choose a character to exhaust.");
   });
@@ -89,7 +80,7 @@ describe("the words of A Storm on Cobas Haven choices", () => {
     const prompts: string[] = [];
     for (const effect of SEND_FOR_HELP) {
       walk(effect.instructions, (instruction, next, after) => {
-        if (!ASKING.has(instruction.verb) && !["PutIntoPlay", "TakeHeroFromCollection", "PlayFrom"].includes(instruction.verb)) return;
+        if (!ASKING_VERBS.has(instruction.verb) && !["PutIntoPlay", "TakeHeroFromCollection", "PlayFrom"].includes(instruction.verb)) return;
         const words = pickWords(instruction, next, names(), effect.cardCode, 2, undefined, undefined, after);
         if (instruction.verb === "PutIntoPlay" || instruction.verb === "TakeCardFromCollection") return;
         expect(words.prompt, effect.id).toMatch(/^[A-Z].*\.$/);

@@ -149,6 +149,9 @@ export type CampaignGameSpec<D extends string, P extends object> = {
   scenario: ScenarioData;
   /** The numbers of the stand-in heroes q1 to q6, by deck. */
   stats: Readonly<Record<D, HeroStats>>;
+  /** The numbers a deck gives the scenario's ships (`shipCodes`) over their printed ones, as `stats` gives the stand-in heroes theirs. */
+  shipStats?: Partial<Record<D, Partial<HeroStats>>>;
+  shipCodes?: readonly string[];
   /** The codes loaded after the scenario's own, its campaign card's and the campaign's game codes. */
   codes: readonly string[];
   /** The scenario's answer (its policy applied) and the policy a golden's own is laid over. */
@@ -178,6 +181,8 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   async function world(decks: D): Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }> {
     const dealt = campaignScenario(spec.scenario);
     const cards = await standInWorld([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...gameCodes(spec.campaign, spec.scenario), ...spec.codes], spec.stats[decks]);
+    const ships = spec.shipStats?.[decks];
+    if (ships) for (const code of spec.shipCodes ?? []) cards.set(code, { ...cards.get(code)!, ...ships });
     loaded = cards;
     return { cards, ctx: { effects: EFFECTS, cards } };
   }

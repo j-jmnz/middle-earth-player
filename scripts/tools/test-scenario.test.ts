@@ -24,7 +24,7 @@ const TREE = [
   "test/harness/golden-registry.test.ts",
   "src/rules/interpret/family-manifest.test.ts",
   "src/rules/interpret/family-hooks.test.ts",
-  "src/catalog/setup-verbs.test.ts",
+  "src/catalog/verb-sets.test.ts",
   "src/play/store/island-place.test.ts",
   "src/play/choice/stormcaller-sheets.test.ts",
   "src/play/store/unrelated.test.ts",
@@ -62,17 +62,17 @@ describe("changedFamilyTests", () => {
       "src/catalog/families/families.test.ts",
       "src/rules/interpret/family-manifest.test.ts",
       "src/rules/interpret/family-hooks.test.ts",
-      "src/catalog/setup-verbs.test.ts",
+      "src/catalog/verb-sets.test.ts",
       "src/rules/families/grapple/index.test.ts",
       "src/rules/families/sea/index.test.ts",
     ]);
   });
 
   it("treats the hook, manifest and setup files as family files", () => {
-    for (const file of ["src/rules/interpret/family-hooks.ts", "src/rules/interpret/family-manifest.ts", "src/catalog/family-manifest.ts", "src/catalog/setup-role.ts", "src/catalog/setup-verbs.ts", "src/catalog/effect-schema-verbs.ts"]) {
-      expect(changedFamilyTests([file], TREE), file).toEqual(expect.arrayContaining(["src/rules/interpret/family-manifest.test.ts", "src/rules/interpret/family-hooks.test.ts", "src/catalog/setup-verbs.test.ts"]));
+    for (const file of ["src/rules/interpret/family-hooks.ts", "src/rules/interpret/family-manifest.ts", "src/catalog/family-manifest.ts", "src/catalog/verb-flags.ts", "src/catalog/verb-sets.ts", "src/catalog/effect-schema-verbs.ts"]) {
+      expect(changedFamilyTests([file], TREE), file).toEqual(expect.arrayContaining(["src/rules/interpret/family-manifest.test.ts", "src/rules/interpret/family-hooks.test.ts", "src/catalog/verb-sets.test.ts"]));
     }
-    expect(changedFamilyTests(["src/catalog/setup-verbs.ts"], TREE).some((file) => file.startsWith("src/rules/families/"))).toBe(false);
+    expect(changedFamilyTests(["src/catalog/verb-sets.ts"], TREE).some((file) => file.startsWith("src/rules/families/"))).toBe(false);
     expect(changedFamilyTests(["src/rules/interpret/family-hooks.ts"], TREE)).toContain("src/rules/families/sea/index.test.ts");
   });
 

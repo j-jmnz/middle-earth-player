@@ -1,22 +1,17 @@
-import { execFileSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { ROOT, tracked } from "./tracked.ts";
+
 // The repository's layout (docs/architecture.md, Repository map): no folder grows into a pile, each mechanic family is
 // one folder, and every folder named for a scenario is named by its id in data/scenarios. Move files with pnpm move.
-
-const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
 // More source files than this in one folder (tests aside) and it wants subfolders.
 const MOST_FILES = 40;
 // Folders that are a list by design: one record file per product pack, named by its pack code.
 const LISTS = new Set(["src/effects/authored/pool"]);
-
-function tracked(): string[] {
-  return execFileSync("git", ["ls-files", "-z", "src", "scripts", "test"], { cwd: ROOT, encoding: "utf8" }).split("\0").filter(Boolean);
-}
 
 function folders(dir: string): string[] {
   return readdirSync(path.join(ROOT, dir)).filter((name) => statSync(path.join(ROOT, dir, name)).isDirectory()).sort();

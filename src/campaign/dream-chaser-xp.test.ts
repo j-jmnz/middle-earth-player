@@ -23,6 +23,7 @@ import prebuilt from "../../data/decks/prebuilt.json";
 import { briefing, loadoutProblems, startFor, type BriefingInput } from "./briefing.ts";
 import { heroBansOf, validateLoadout } from "./loadout.ts";
 import { applyResolution, emptyLog } from "./log.ts";
+import { isPlayable } from "./playable.ts";
 import { campaignPath } from "./path.ts";
 import { buildStart } from "./start.ts";
 import { worldCodes, worldFrom, type World } from "./world.ts";
@@ -298,14 +299,22 @@ describe("Na'asiyah (dcce.naasiyah)", () => {
 
   it("the briefing names the card and the rule, and a scenario from the eighth on deals her", () => {
     const seats = [{ deckId: "deck", heroes: [NAASIYAH, HERO_B, HERO_C], deck }];
-    // The seventh is playable and has only the hero ban; the eighth is playable and deals her; the ninth is coming soon, so it has only the coming-soon problem.
+    // The seventh is playable and has only the hero ban; the eighth is playable and deals her.
     const early = briefing(inputOf(dealWorld("the-drowned-ruins"), { seats }));
     expect(early.dealable).toBe(false);
     expect(early.problems.map((problem) => problem.rule)).toEqual(["A hero the campaign refuses in this scenario"]);
     expect(early.problems[0]?.message).toContain("Na'asiyah (12109)");
     expect(early.problems[0]?.message).toContain("dcce.naasiyah");
     expect(briefing(inputOf(dealWorld("a-storm-on-cobas-haven"), { seats })).problems).toEqual([]);
-    expect(briefing(inputOf(dealWorld("the-city-of-corsairs"), { seats })).problems.map((problem) => problem.rule)).toEqual(["Coming soon"]);
+  });
+
+  it("a part the app can deal has no Coming soon problem, and a part it cannot has only that one", () => {
+    const seats = [{ deckId: "deck", heroes: [NAASIYAH, HERO_B, HERO_C], deck }];
+    for (const id of campaign.scenarios) {
+      const rules = briefing(inputOf(dealWorld(id), { seats })).problems.map((problem) => problem.rule);
+      if (isPlayable(id)) expect(rules, id).not.toContain("Coming soon");
+      else expect(rules, id).toEqual(["Coming soon"]);
+    }
   });
 
   it("a standalone game of the scenario is not bound by it", () => {

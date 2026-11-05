@@ -6,13 +6,13 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { phaseNameSchema, when } from "../effect-schema-conditions.ts";
-import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const who = z.enum(["actor", "firstPlayer", "picked"]);
 
 const VERBS = [
   // Setup: "Prepare the Uncharted deck" (dcce.uncharted-deck). The double-sided locations dealt as the Uncharted deck are shuffled, each Lost Island side up.
-  z.strictObject({ verb: z.literal("PrepareUnchartedDeck"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareUnchartedDeck"), ...when }), { setupRuns: "top" }),
   // "Add N copies of Lost Island from the top of the Uncharted deck to the staging area" (11025:A:1, 11025:B:3, 11026:A:1, 11035:A:2): the top `count` cards of the deck join the
   // staging area without being revealed, Lost Island side up. The Uncharted deck is not shuffled by this verb.
   z.strictObject({ verb: z.literal("AddLostIslands"), count: positiveAmountSchema, ...when }),
@@ -33,7 +33,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AddStageProgress"), amount: positiveAmountSchema, ...when }),
   // Setup: "Prepare the Grotto deck" (12092:A:1, dcce.grotto-deck): the double-sided locations the scenario dealt as its Grotto deck are shuffled; each lies Grotto side faceup and its
   // Underwater side is never looked at before a flip. The Shrine to Morgoth is set aside by the scenario's piles.
-  z.strictObject({ verb: z.literal("PrepareGrottoDeck"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareGrottoDeck"), ...when }), { setupRuns: "top" }),
   // "Add the top 2 locations from the Grotto deck to the staging area, Grotto side faceup" (12092:A:1, 12092:B:2), and with `flip`, "and flip that location to its Underwater side" (12108:A:1): the
   // top `count` cards of the Grotto deck join the staging area without being revealed; each is then flipped, losing the progress it has (none yet), and announced as flipped over.
   z.strictObject({ verb: z.literal("AddFromGrottoDeck"), count: positiveAmountSchema, flip: z.boolean().optional(), ...when }),
@@ -48,13 +48,13 @@ const VERBS = [
   // `to: "lastPlayer"`: the last player takes control of it instead of the first ("the last player takes control of Na'asiyah", 12092:A:1).
   // `to: "anyPlayer"`: "Put Gavin into play under any player's control" (11209:A:3): the first player chooses which player takes it (the only player takes it without being asked).
   // `to: "actor"`: the player who uses the effect takes it ("Take control of 1 set aside copy of Dol Amroth Warship", 12136:A:3).
-  setupRole(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup" }),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
-  setupRole(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), { setupRole: "afterSetup" }),
   // Campaign Setup: "For each character in play, its controller may deal 1 damage to it to reduce their threat by 1" (11179:A:2). In player order, each character in play is
   // offered to its controller (trade or keep); a trade deals `damage` to it and lowers that player's threat by `threat`. `character` is engine use: the character being decided.
-  setupRole(z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }), { setupRole: "afterSetup" }),
   // The campaign card stays beside the quest deck while the scenario is played, because a card of the scenario places resources on it (Revenant, 11181:A:4) and its Resolution
   // counts them (11179:B:4). Changes nothing when it runs; rules/families/burden/campaign.ts reads it.
   z.strictObject({ verb: z.literal("KeepCampaignCard"), ...when }),
@@ -64,7 +64,7 @@ const VERBS = [
   // window. The cards shown are the ones the effect looked at, the bottom one the picked card, so a Pick with `looked` and SwapPicked can switch one with a card in hand.
   z.strictObject({ verb: z.literal("LookAtBottom"), count: positiveAmountSchema.optional(), deck: z.enum(["own", "picked", "encounter"]).optional(), ...when }),
   // "Discard the bottom card of your deck" (11033:A:2, 11034:A:1, 11071:A:2, 11070:A:2): the bottom card of the deck of `who` (the actor; the first player) goes to its owner's discard pile, announced as discarded from the deck, and the effect remembers it, so the condition `discardedCost` can read its printed cost.
-  z.strictObject({ verb: z.literal("DiscardBottom"), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("DiscardBottom"), who: z.enum(["actor", "firstPlayer"]).optional(), ...when }), { runsInFrame: true }),
   // "Then, he discards each card in his hand with a printed cost higher than that of the discarded card" (11034:A:1): from the hand of `who`, each card whose printed cost is higher
   // than that of the card DiscardBottom discarded goes to its owner's discard pile.
   z.strictObject({ verb: z.literal("DiscardCostlier"), who: who.exclude(["picked"]).optional(), ...when }),

@@ -5,13 +5,13 @@ import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
 import { when } from "../effect-schema-conditions.ts";
-import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Setup: "Prepare the Island Map" (dcce.island-map). The double-sided locations the scenario dealt as its Uncharted deck are separated: the cards with the codes in `temple` (the three Temple of the
   // Deceived locations) are shuffled and laid in the right-hand column, the others are shuffled and fill the first four columns, a grid of three rows by five. Every card lies Lost Island (or
   // Temple of the Deceived) side up, which nobody looks at.
-  z.strictObject({ verb: z.literal("PrepareIslandMap"), temple: z.array(z.string().min(1)).min(1), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareIslandMap"), temple: z.array(z.string().min(1)).min(1), ...when }), { setupRuns: "top" }),
   // Setup: "Flip over the top-left and bottom-left locations of the Island Map (without resolving their Forced effects, if any)" (12067:A:1): both turn to their other side with no flip announced.
   z.strictObject({ verb: z.literal("RevealIslandCorners"), ...when }),
   // Setup: "choose one as the players' starting active location, using a resource token to represent which location is active" (12067:A:1): the picked location becomes the active location where it
@@ -22,7 +22,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachGuarded"), name: z.string().min(1), to: z.string().min(1), ...when }),
   // Campaign Setup: "Shuffle Starla and both Recurring Nightmares together and place one facedown under each Temple of the Deceived location, as secrets" (11197:A:2): the set-aside copies of the cards
   // with these codes are shuffled and lie facedown under the Temple locations, one each, in the order the seed gives.
-  setupRole(z.strictObject({ verb: z.literal("PlaceSecrets"), codes: z.array(z.string().min(1)).min(1), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("PlaceSecrets"), codes: z.array(z.string().min(1)).min(1), ...when }), { setupRole: "afterSetup" }),
   // "Flip over a secret at your location. If it is a Recurring Nightmare, it engages you. If it is Starla, you gain control of her (ready)." (11197:A:3): the secret under the active location turns
   // faceup, and the actor takes the card as that line says. Nothing happens when the active location has no secret.
   z.strictObject({ verb: z.literal("FlipSecret"), ...when }),
@@ -41,7 +41,7 @@ const VERBS = [
   // Campaign Setup: "One player may raise their threat by 4 to attach Spyglass to a hero" (11197:A:2). In player order each player is offered it, if their threat can rise by `amount` without reaching
   // 50, and the first to accept raises their threat and chooses a hero (any player's) for the set-aside copy of the card with this code; nobody is offered it after that. `seat` and `accepted` are
   // engine use: the player being asked, and the player who said yes and now chooses the hero.
-  setupRole(z.strictObject({ verb: z.literal("RaiseThreatToAttach"), code: z.string().min(1), amount: z.number().int().positive(), seat: z.number().int().min(0).optional(), accepted: z.boolean().optional(), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("RaiseThreatToAttach"), code: z.string().min(1), amount: z.number().int().positive(), seat: z.number().int().min(0).optional(), accepted: z.boolean().optional(), ...when }), { setupRole: "afterSetup" }),
 ] as const;
 
 const TRIGGERS = [

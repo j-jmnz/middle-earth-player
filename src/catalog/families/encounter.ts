@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 // The printed types of the cards in an encounter deck (rr.encounter-deck).
 const encounterType = z.enum(["enemy", "location", "treachery", "objective"]);
@@ -54,7 +55,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CountEncounterTop"), top: z.number().int().positive(), type: encounterType, not: z.boolean().optional(), ...when }),
   // Reveals the top card of the encounter deck for the actor, or for the player the answered event happened to
   // (`eventSeat`), in a staging of its own (rr.reveal, rr.staging): the effect goes on once that card is resolved.
-  z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat"]).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat"]).optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   // Searches the encounter deck, then its discard pile, then the player's collection (in that order, "search the encounter deck, discard pile, and
   // your collection for a Goblin Sniper", 41041:A:1) for a card with the printed title of `code`, and adds it to the staging area. The app tracks
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
@@ -67,7 +68,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("DiscardUntil"), type: encounterType, trait: z.string().min(1).optional(), ...when }),
   // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
   // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
-  z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }), { runsInFrame: true }),
   // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1).
   z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), ...when }),
   // The staging step of this phase reveals `amount` more cards (rr.step-3-3): "reveal an additional encounter card this phase"

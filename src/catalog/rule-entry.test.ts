@@ -9,6 +9,6 @@ describe("parseRuleEntries", () => {
   });
 
   it("refuses a span without its page", () => {
-    expect(() => parseRuleEntries([{ id: "rr.x", doc: "rr", column: 1, title: "X", text: "", terms: [] }])).toThrow();
+    expect(() => parseRuleEntries([{ id: "rr.surge", doc: "rr", column: 1, title: "X", text: "", terms: [] }])).toThrow();
   });
 });

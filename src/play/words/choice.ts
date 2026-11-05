@@ -6,10 +6,10 @@ import type { Amount, Instruction } from "../../catalog/boundary.ts";
 import { lastPicked } from "../../rules/interpret/player-verbs.ts";
 import { questProgressMoved } from "../../rules/interpret/verbs.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
-import { attachmentPickWords, attachmentWords } from "./attachment.ts";
+import { attachmentPickWords, attachmentWords, reattachWords } from "./attachment.ts";
 import { deckBranchWords, deckPickThenWords, deckPickWords, deckWords } from "./deck.ts";
 import { encounterPickWords, encounterWords } from "./encounter.ts";
-import { attackWords } from "./attack.ts";
+import { attackPickWords, attackWords } from "./attack.ts";
 import { assignDamageWords, southWords } from "./south.ts";
 import { moriaBranchWords, moriaPickWords, moriaWords } from "./moria.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden.ts";
@@ -385,19 +385,20 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   // The costs family's verbs that ask for a card: which card to play, which pool pays the next resource, the new host.
   if (pick.verb === "PlayFromHand") return { verb: "Play", prompt: "Choose a card to play from your hand." };
   if (pick.verb === "PayToPlay" || pick.verb === "SpendResources") return { verb: "Pay", prompt: "Choose whose pool pays 1 resource." };
-  if (pick.verb === "Reattach") return { verb: "Attach", prompt: "Choose the card to attach it to." };
+  if (pick.verb === "Reattach") return reattachWords(pick, pick.card === "picked" ? (game && game.cards[lastPicked(game)] ? names.card(lastPicked(game)) : null) : sourceId ? names.card(sourceId) : null);
   if (pick.verb === "ChooseAmount") return { verb: "Choose", prompt: "Choose X." };
   if (pick.verb === "AssignDamage") return assignDamageWords(pick, sourceId ? names.card(sourceId) : null);
   const sea = seaPickWords(pick, next, names, sourceId, game, after);
   if (sea) return sea;
   const picked = game ? lastPicked(game) : "";
-  const play = playPickWords(pick, picked && game?.cards[picked] ? names.card(picked) : null);
+  // A PutIntoPlay is about the source itself (no `card`, or "self": a Guarded attachment that enters play when its guard leaves) or the card the effect picked.
+  const play = playPickWords(pick, pick.verb === "PutIntoPlay" && (pick.card === undefined || pick.card === "self") ? (sourceId ? names.card(sourceId) : null) : picked && game?.cards[picked] ? names.card(picked) : null);
   if (play) return play;
   const deck = pick.verb === "Pick" && next ? deckPickThenWords(pick, next, after) : null;
   if (deck) return deck;
-  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game);
+  const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game, after) ?? attackPickWords(pick, next);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null, game) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? aflamePickWords(pick, next, names, sourceId) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null, game) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick, names.card) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
   const family = aflamePickWords(pick, next, names, sourceId, amountNow, game) ?? islandPickWords(pick, next, names, sourceId, game);
   if (family) return family;
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;

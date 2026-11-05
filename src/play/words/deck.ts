@@ -96,13 +96,13 @@ export function deckWords(instruction: Instruction): string | null {
 }
 
 /** What one of the family's choosing verbs asks for (the verb for the button and a prompt), or null when it is not one. */
-export function deckPickWords(asked: Instruction): { verb: string; prompt: string } | null {
+export function deckPickWords(asked: Instruction, cardName?: (cardId: string) => string): { verb: string; prompt: string } | null {
   switch (asked.verb) {
     case "Each":
       if (asked.upTo == null) return null;
       return { verb: "Choose", prompt: asked.upTo === "any" ? "Choose any number of cards, one at a time. Done stops." : `Choose up to ${asked.upTo} card${asked.upTo === 1 ? "" : "s"}, one at a time. Done stops.` };
     case "PlayFrom":
-      if (asked.card) return { verb: "Attach", prompt: "Choose the card to attach it to." };
+      if (asked.card) return { verb: "Attach", prompt: `Choose the card to attach ${cardName ? cardName(asked.card) : "it"} to.` };
       if (asked.pick.from === "deck") return { verb: "Play", prompt: `Choose a card from the top ${asked.pick.top ?? "few"} cards of your deck to play${asked.free ? " for no cost" : ""}.` };
       return { verb: "Play", prompt: "Choose a card to play from the discard pile." };
     default:

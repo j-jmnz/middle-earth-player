@@ -17,6 +17,7 @@ export {
   timingSchema,
   triggerSchema,
 } from "./effect-schema.ts";
+export { collectionVerbs, setupRoleVerbs, setupRunVerbs, verbsRunningInFrame } from "./verb-sets.ts";
 export type {
   Amount,
   AmountExpr,

@@ -6,7 +6,7 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
-import { setupRole } from "../setup-role.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Setup: "Prepare the Corsair deck" (dcce.corsair-deck). Every non-ship enemy still in the encounter deck goes to the Corsair deck, which is
@@ -18,7 +18,7 @@ const VERBS = [
   // Setup: "Players prepare their fleet" (dcce.prepare-your-fleet). Each player in turn takes one of the six ship-objectives set aside (the
   // Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the
   // game, and the Heading card is attached to the Dream-chaser, set to on-course. A seat with a choice asks it as a choice of cards.
-  z.strictObject({ verb: z.literal("PrepareFleet"), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("PrepareFleet"), ...when }), { setupRuns: "top" }),
   // "Shift your heading off-course" / "on-course" (dcce.heading): one step toward Storm / toward Sun, never past either end. Nothing happens in a
   // game with no Heading card.
   z.strictObject({ verb: z.literal("ShiftHeading"), direction: z.enum(["onCourse", "offCourse"]), ...when }),
@@ -37,11 +37,11 @@ const VERBS = [
   // Of the cards with these codes set aside, each player in player order takes one for each ship-objective they control, in the order the ships
   // were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded). Resolved after the quest card's
   // Setup has prepared the fleet (ScenarioDefinition.afterSetup).
-  setupRole(z.strictObject({ verb: z.literal("FitShips"), codes: z.array(z.string().min(1)).min(1), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("FitShips"), codes: z.array(z.string().min(1)).min(1), ...when }), { setupRole: "afterSetup" }),
   // Campaign Setup: "For each ship-objective, its controller may deal 2 damage to it to add 1 resource to a hero's resource pool" (11171:A:2). In
   // player order, the controller of each ship chooses to trade or keep; a trade deals `damage` to the ship and adds `resources` to the pool of a hero
   // they choose (`ship` and `hero` are engine use: the ship being traded for and the hero chosen so far).
-  setupRole(z.strictObject({ verb: z.literal("TradeShipDamage"), damage: z.number().int().positive(), resources: z.number().int().positive(), ship: z.string().optional(), hero: z.string().optional(), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("TradeShipDamage"), damage: z.number().int().positive(), resources: z.number().int().positive(), ship: z.string().optional(), hero: z.string().optional(), ...when }), { setupRole: "afterSetup" }),
   // Deals `amount` damage to the last picked card, a Ship objective, as the encounter or campaign card whose effect it is: a ship is immune to player card
   // effects, not to this ("Excess damage from this attack is dealt to a Ship objective you control", 11055:A:2).
   z.strictObject({ verb: z.literal("DamageShip"), amount: positiveAmountSchema, ...when }),

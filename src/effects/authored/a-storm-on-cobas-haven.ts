@@ -30,11 +30,10 @@ const SHIP_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, tra
 const FLAGSHIP: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Raider Flagship"] };
 const CAN_GUARD: Condition = { kind: "canPick", pick: UNGUARDED_OBJECTIVE };
 
-// "Guarded." of the four towers (12134 to 12137) is written once and copied. Their second line names the card ("If Sea-ward Tower is free of encounters ..."), which the copy check (src/effects/copies.test.ts)
-// does not read as the same sentence on another card, so each tower has its own record of it.
-const TOWERS = ["12134", "12135", "12136", "12137"] as const;
+// "Guarded." and "If {self} is free of encounters, the first player takes control of it." of the four towers (12134 to 12137) are written once, on Sea-ward Tower, and copied: the second
+// line names its card, and the copy check (src/effects/copies.test.ts) reads each tower's own name as {self}.
 const guardedTower: Effect = { id: "12134:whenRevealed:1", cardCode: "12134", lines: ["12134:A:1"], timing: "whenRevealed", instructions: [{ verb: "GuardObjective" }] };
-const freeTower = (code: string): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", instructions: [{ verb: "ControlWhenFree" }] });
+const freeTower: Effect = { id: "12134:constant:1", cardCode: "12134", lines: ["12134:A:2"], timing: "constant", instructions: [{ verb: "ControlWhenFree" }] };
 
 // "If your current heading is at the worst setting (Storm), Raider Flagship gets -50 engagement cost." (12120:B:3, copied to 12121:B:2), and "Raider Flagship gets -50 engagement cost." (12122:B:2).
 const FLAGSHIP_CHEAPER: Instruction = { verb: "ModifyStat", stat: "engagementCost", amount: -50, until: "whileSourceInPlay", holders: FLAGSHIP };
@@ -47,7 +46,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     copyLines("12134", "12135", "A:1"),
     copyLines("12134", "12136", "A:1"),
     copyLines("12134", "12137", "A:1"),
-    ...TOWERS.map(freeTower),
+    freeTower,
+    copyLines("12134", "12135", "A:2"),
+    copyLines("12134", "12136", "A:2"),
+    copyLines("12134", "12137", "A:2"),
 
     // 12134 Sea-ward Tower: while the players control it, each Sailing test looks at 2 more cards of the encounter deck.
     { id: "12134:constant:2", cardCode: "12134", lines: ["12134:A:3"], timing: "constant", condition: { kind: "controlledByPlayers" }, instructions: [{ verb: "ModifyStat", stat: "sailingLook", amount: 2, until: "whileSourceInPlay", target: "table" }] },

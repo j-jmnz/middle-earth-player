@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -84,10 +84,17 @@ describe("effect coverage", () => {
     });
   }
 
-  it("keeps the scenarios that are not playable honest: each has a printed line nobody owns yet", () => {
+  // A scenario with every line owned waits for PLAYABLE only until its golden is pinned: while golden.test.ts exists and golden.json does not
+  // (the records are done and the game is being played), it may be absent; once golden.json exists it must be listed.
+  const goldenPending = (id: string): boolean => {
+    const dir = path.join(ROOT, "src", "campaign", "scenarios", id);
+    return existsSync(path.join(dir, "golden.test.ts")) && !existsSync(path.join(dir, "golden.json"));
+  };
+
+  it("keeps the scenarios that are not playable honest: each has a printed line nobody owns yet, or a golden still to pin", () => {
     for (const scenario of unplayable) {
       const open = openOf([...dealtCodes(campaign, [scenario], { nightmare: false })].filter((code) => !campaignCards.has(code)));
-      expect(open.length, `${scenario.id} would be playable: add it to PLAYABLE`).toBeGreaterThan(0);
+      if (open.length === 0) expect(goldenPending(scenario.id), `${scenario.id} would be playable: add it to PLAYABLE (its golden.json exists)`).toBe(true);
     }
   });
 
