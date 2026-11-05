@@ -6,8 +6,8 @@ tags:
 # game of A Storm on Cobas Haven (the Defenders of Gondor and Swords of the Noldor lists) from the log the first seven parts' wins write, parked on its win (stage 3, Break Through the Fleet!). The fixture is OPEN when
 # scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md). The Resolution asks no choice (the Círdan's Blessing chosen at the Campaign Setup joins the pool, and spending 4 XP
 # on Gavin is the XP screen's); confirming writes the XP from the campaign card (1 for each surviving player, on-course, 2 Dol Amroth Warships in play, 2 Corsair Skirmishers, 4 Dol Amroth objectives, Corsair Warships,
-# Crowley, Raider Flagship and Thunderstruck in the victory display, Ominous Fate) and, with parts 1 to 7 won in the log, reaches The City of Corsairs, which the app cannot deal yet: the path stops there and its node reads
-# Coming soon, with no Begin (src/campaign/scenarios/a-storm-on-cobas-haven/golden.test.ts pins the path).
+# Crowley, Raider Flagship and Thunderstruck in the victory display, Ominous Fate) and, with parts 1 to 7 won in the log, reaches The City of Corsairs, the current part (src/campaign/scenarios/a-storm-on-cobas-haven/golden.test.ts
+# pins the path).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
@@ -15,12 +15,11 @@ tags:
       SCENARIO_ID: a-storm-on-cobas-haven
       # The Heading is on the table while the victory shows: one widget of this scenario's own table.
       TABLE_WIDGET: heading-value
-# The path stops at The City of Corsairs: its node and the line under the road read Coming soon, and nothing begins it.
+# The City of Corsairs is playable now (phase 48): its node is the current one and the path offers Begin.
 - assertVisible:
     id: node-the-city-of-corsairs-status
-    text: "Coming soon"
-- assertVisible:
-    id: path-soon
-    text: "The City of Corsairs is coming soon."
+    text: "Next"
 - assertNotVisible:
+    id: path-soon
+- assertVisible:
     id: begin

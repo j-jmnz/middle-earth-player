@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { cardMap, fixtureDefinition, hero } from "./test-fixture.ts";
 import { ruleCause } from "./cause.ts";
-import { defeatedDestination, placeDamage, raiseThreat } from "./keywords.ts";
+import { defeatedDestination, destroyOverwhelmed, placeDamage, raiseThreat } from "./keywords.ts";
 import { definePrinted } from "./printed.ts";
 import { blankScenario, updateCard } from "./state.ts";
 import { spawn } from "./zones.ts";
@@ -99,5 +99,24 @@ describe("keywords", () => {
     const fallen = placeDamage(state, spawned.id, 3, cards, [], "framework", ruleCause("rr.effects"));
     expect(fallen.cards[spawned.id]?.zone).toBe("discard");
     expect(fallen.seats[0]?.discard).toContain(spawned.id);
+  });
+
+  it("announces an enemy the sweep destroys because its damage reached its hit points, and the attachments it holds hear it (rr.hit-points, rr.destroy)", () => {
+    const enemy = definePrinted({ code: "orc", name: "Orc", type: "enemy", health: 3 });
+    const curse = definePrinted({ code: "curse", name: "Curse", type: "attachment" });
+    const cards = cardMap([enemy, curse]);
+    let state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const spawned = spawn(state, "orc", { zone: "engaged", seat: 0 });
+    const attached = spawn(spawned.state, "curse", { zone: "play", seat: 0 });
+    state = updateCard(attached.state, attached.id, { host: spawned.id });
+    state = updateCard(state, spawned.id, { attachments: [attached.id], damage: 2 });
+    // Damage short of its hit points: the sweep leaves it and says nothing.
+    expect(destroyOverwhelmed(state, cards, [])).toBe(state);
+    const swept = destroyOverwhelmed(updateCard(state, spawned.id, { damage: 3 }), cards, []);
+    expect(swept.cards[spawned.id]?.zone).toBe("encounterDiscard");
+    expect(swept.pendingEvents?.filter((event) => event.trigger !== "leftPlay").map((event) => [event.trigger, event.subject ?? event.other])).toEqual([
+      ["hostDefeated", spawned.id],
+      ["enemyDestroyed", spawned.id],
+    ]);
   });
 });

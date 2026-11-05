@@ -4,9 +4,12 @@ import type { Amount, Condition, PickSpec } from "../../catalog/boundary.ts";
 import { blankScenario } from "../core/state.ts";
 import { cardMap, fixtureDefinition, hero } from "../core/test-fixture.ts";
 import { spawn } from "../core/zones.ts";
+import { canAttack, canDefend, undefendedTargets } from "../combat/combat.ts";
 import { legalTargets } from "../engine/legal.ts";
+import { playBlocked } from "../families/sidequests/contract.ts";
+import { forcedTravel, travelCostUnpayable } from "./restrictions.ts";
 import type { RulesFamily } from "./family-manifest.ts";
-import { familyAmount, familyAttached, familyCondition, familyMayTravel, familyPickMatches, familyTravelReach, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
+import { familyAmount, familyAttached, familyAttackReason, familyDefenseReason, familyForcedTravel, familyPlayBarred, familyUndefendedTargets, familyCondition, familyMayTravel, familyPickMatches, familyTravelCost, familyTravelReach, familyTravelUnpayable, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
 import { resolveAmount } from "./amounts.ts";
 import { holds } from "./conditions.ts";
 import { matchesPick } from "./pick.ts";
@@ -60,9 +63,46 @@ describe("travel hooks", () => {
     expect(familyTravelReach(state, ctx, some)).toEqual(["x", "y", "z"]);
   });
 
+  it("charge for traveling (the first family's charge wins), list the locations the players must travel to, and say what they cannot pay", () => {
+    const charge = { source: "s1", instructions: [] };
+    const some = [family("a", { travel: { cost: () => null, forced: () => [], unpayable: () => false } }), family("b", { travel: { cost: (_s, _c, at) => (at === "x" ? null : charge), forced: () => ["x"], unpayable: (_s, step) => step.verb === "Heal" } }), family("c", { travel: { forced: () => ["y"] } })];
+    expect(familyTravelCost(state, ctx, "x", [family("a")])).toBeNull();
+    expect(familyTravelCost(state, ctx, "z", some)).toBe(charge);
+    expect(familyTravelCost(state, ctx, "x", some)).toBeNull();
+    expect(familyTravelCost(state, ctx, null, some)).toBe(charge);
+    expect(familyForcedTravel(state, ctx, [family("a")])).toEqual([]);
+    expect(familyForcedTravel(state, ctx, some)).toEqual(["x", "y"]);
+    expect(familyTravelUnpayable(state, { verb: "Heal", target: "self", amount: 1 }, some)).toBe(true);
+    expect(familyTravelUnpayable(state, { verb: "Heal", target: "self", amount: 1 }, [family("a")])).toBe(false);
+  });
+
   it("change nothing for the real families", () => {
     expect(familyMayTravel(state, ctx)).toBe(false);
     expect(familyTravelReach(state, ctx)).toEqual([]);
+    expect(familyTravelCost(state, ctx, null)).toBeNull();
+    expect(familyForcedTravel(state, ctx)).toEqual([]);
+  });
+
+  it("forcedTravel and travelCostUnpayable ask them", () => {
+    const { state: staged, id } = spawn(state, "e1", { zone: "staging" });
+    const forcing = family("a", { travel: { forced: () => [id], unpayable: () => true } });
+    expect(forcedTravel(staged, ctx)).toEqual([]);
+    expect(withFamilies([family("a", { travel: { forced: () => [id] } })], () => forcedTravel(staged, ctx))).toEqual([id]);
+    // A forced location the players cannot pay for is not one they must travel to.
+    const costly = { ...ctx, effects: [{ id: "e1:travel:1", cardCode: "e1", lines: [], timing: "travel" as const, instructions: [{ verb: "Heal" as const, target: "self" as const, amount: 1 }] }] };
+    expect(withFamilies([forcing], () => travelCostUnpayable(staged, costly, id))).toBe(true);
+    expect(withFamilies([forcing], () => forcedTravel(staged, costly))).toEqual([]);
+  });
+});
+
+describe("play hooks", () => {
+  it("bar playing and putting into play when some family says so", () => {
+    const { state: held, id } = spawn(state, "h1", { zone: "hand", seat: 0 });
+    expect(familyPlayBarred(held, id, ctx, [family("a")])).toBe(false);
+    expect(familyPlayBarred(held, id, ctx, [family("a", { play: () => false }), family("b", { play: (_state, card) => card === id })])).toBe(true);
+    expect(playBlocked(held, id, 0, ctx)).toBe(false);
+    expect(withFamilies([family("a", { play: () => true })], () => playBlocked(held, id, 0, ctx))).toBe(true);
+    expect(withFamilies([family("a", { play: () => true })], () => playBlocked(held, id, 0, ctx, true))).toBe(true);
   });
 });
 
@@ -106,6 +146,22 @@ describe("attached hooks", () => {
   });
 });
 
+describe("combat hooks", () => {
+  const printed = hero("h1", "leadership");
+  const cards = cardMap([printed]);
+  it("answer with the first family's reason, and with the first non-empty list of undefended targets", () => {
+    const a = family("a", { combat: { defense: () => null, attack: () => null, undefended: () => [] } });
+    const b = family("b", { combat: { defense: () => "no defense", attack: () => "no attack", undefended: () => ["x"] } });
+    const c = family("c", { combat: { defense: () => "other", attack: () => "other", undefended: () => ["y"] } });
+    expect(familyDefenseReason(state, printed, cards, [a, family("none")])).toBeNull();
+    expect(familyDefenseReason(state, printed, cards, [a, b, c])).toBe("no defense");
+    expect(familyAttackReason(state, "e", printed, printed, [a])).toBeNull();
+    expect(familyAttackReason(state, "e", printed, printed, [a, b, c])).toBe("no attack");
+    expect(familyUndefendedTargets(state, () => ["h"], cards, [a])).toEqual([]);
+    expect(familyUndefendedTargets(state, () => ["h"], cards, [a, b, c])).toEqual(["x"]);
+  });
+});
+
 // The core's own call sites, with a synthetic family in the list the core walks (withFamilies).
 describe("the core's hook calls", () => {
   const at = { seat: 0, sourceId: null };
@@ -139,6 +195,18 @@ describe("the core's hook calls", () => {
     expect(withFamilies([family("a", { travel: { may: () => true, reach: () => ["there"] } })], () => legalTargets(held, { type: "Travel" }, ctx))).toEqual(["there"]);
     expect(withFamilies([family("a", { travel: { reach: () => ["there"] } })], () => legalTargets(held, { type: "Travel" }, ctx))).toEqual([]);
     expect(withFamilies([family("a", { travel: { reach: () => ["there"] } })], () => legalTargets(traveling, { type: "Travel" }, ctx))).toEqual(["there"]);
+  });
+
+  it("canDefend, canAttack and undefendedTargets ask a family's combat hooks", () => {
+    const cards = cardMap([hero("h1", "leadership"), hero("e1", "neutral")]);
+    const { state: first, id } = spawn(state, "h1", { zone: "heroes", seat: 0 });
+    const { state: dealt, id: enemyId } = spawn(first, "e1", { zone: "engaged", seat: 0 });
+    const barring = family("a", { combat: { defense: () => "no", attack: () => "no", undefended: (_state, candidates) => candidates().slice(0, 1) } });
+    expect(canDefend(dealt, 0, id, cards)).toBe(true);
+    expect(canAttack(dealt, 0, id, enemyId, cards)).toBe(true);
+    expect(withFamilies([barring], () => canDefend(dealt, 0, id, cards))).toBe(false);
+    expect(withFamilies([barring], () => canAttack(dealt, 0, id, enemyId, cards))).toBe(false);
+    expect(withFamilies([barring], () => undefendedTargets(dealt, 0, cards))).toEqual([id]);
   });
 
   it("withFamilies restores the list, also when the callback throws", () => {

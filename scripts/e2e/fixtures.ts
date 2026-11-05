@@ -62,6 +62,7 @@ import { depthsFixtures } from "./the-thing-in-the-depths.ts";
 import { templeFixtures } from "./temple-of-the-deceived.ts";
 import { ruinsFixtures } from "./the-drowned-ruins.ts";
 import { havenFixtures } from "./a-storm-on-cobas-haven.ts";
+import { corsairsFixtures } from "./the-city-of-corsairs.ts";
 import { upanduinFixtures } from "./journey-up-the-anduin.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
@@ -368,6 +369,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "temple-of-the-deceived": () => templeFixtures(),
   "the-drowned-ruins": () => ruinsFixtures(),
   "a-storm-on-cobas-haven": () => havenFixtures(),
+  "the-city-of-corsairs": () => corsairsFixtures(),
   "journey-up-the-anduin": () => upanduinFixtures(),
 };
 

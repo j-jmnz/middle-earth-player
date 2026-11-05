@@ -152,6 +152,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.grappled) value = grappledCount(state);
   else if (amount.islandLeft) value = leftThreat(state, ctx);
   else if (amount.resourcesOn) value = resourcesOnMatching(state, amount.resourcesOn, scope, ctx, amount.max === true);
+  if (amount.every != null) value = Math.floor(value / amount.every);
   value = value * (amount.times ?? 1) + (amount.plus ?? 0) + (amount.plusChosen ? chosenCopies(state, scope.sourceId, ctx) : 0);
   if (amount.limit != null) value = Math.min(value, amount.limit);
   return amount.negative ? -Math.max(0, value) : Math.max(0, value);

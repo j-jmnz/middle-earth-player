@@ -8,6 +8,7 @@ appId: com.middleearth.lcg
 # Optional env: NO_XP (any non-empty value: the campaign has no XP, so the path shows no XP line and no Spend XP button; a flow that does not pass it asserts both). Optional env: TABLE_WIDGET (the testID of one widget of the scenario's own table, read while the victory is on it: the Dream-chaser scenarios' heading-value). Optional env: CHOICE_ID, CHOICE_PROMPT, CHOICE_CONSEQUENCE (all three or none). CHOICE_ID is the code of the card the Resolution's one choice offers,
 # CHOICE_PROMPT the choice's eyebrow text, CHOICE_CONSEQUENCE the sentence the confirm line shows once the card is chosen (a regular expression). The screen has two Confirm steps: the first sends the choice, and the second, under the settled sentence
 # ("Confirming records ..."), writes the log.
+# Optional env: LAST_PART (any value: the scenario is the last of its campaign). The campaign is then complete, so the XP total stays on the path and Spend XP is gone; the flow asserts only the total.
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/${FIXTURE}"
@@ -77,5 +78,9 @@ appId: com.middleearth.lcg
     commands:
       - assertVisible:
           id: xp-line
-      - assertVisible:
-          id: xp-open
+      - runFlow:
+          when:
+            true: "${typeof LAST_PART === 'undefined' || LAST_PART === ''}"
+          commands:
+            - assertVisible:
+                id: xp-open

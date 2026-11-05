@@ -42,15 +42,15 @@ Read the sections your task touches.
     - 80–85 Codespaces (~110)
     - 86–160 Phone builds from scratch (Mac) (~1.1K)
     - 161–164 Maestro (~170)
-- `docs/architecture.md` — Architecture (~19.4K tok)
+- `docs/architecture.md` — Architecture (~19.6K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~3.9K)
-    - 223–234 Mechanic families (~3.0K) ← 5
+  - 209–234 Engine (~4.0K)
+    - 223–234 Mechanic families (~3.1K) ← 5
   - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~64.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~67.5K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -91,20 +91,20 @@ Read the sections your task touches.
     - 574–594 Escape from Dol Guldur (~2.7K)
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
-  - 628–680 Dream-chaser (~13.1K)
-  - 681–695 Ered Mithrin (~1.9K)
-  - 696–704 Nightmare (~420)
-  - 705–743 Deckbuilding (~1.8K) ← 1
-  - 744–822 Effects (~3.2K)
-    - 746–804 Three layers (~2.4K)
-    - 805–814 Player side quests, contracts and saga cards (~430)
-    - 815–818 Window stack (~100)
-    - 819–822 Coverage test (~270)
-  - 823–843 Data sources (~560)
-  - 844–862 Card images (~1.1K) ← 6
-  - 863–888 Persistence and shipping (~1.7K)
-  - 889–930 Screens (~4.7K) ← 2
-    - 915–930 Table screen (~1.8K) ← 5
+  - 628–685 Dream-chaser (~15.7K)
+  - 686–700 Ered Mithrin (~1.9K)
+  - 701–709 Nightmare (~420)
+  - 710–748 Deckbuilding (~1.8K) ← 1
+  - 749–827 Effects (~3.2K)
+    - 751–809 Three layers (~2.4K)
+    - 810–819 Player side quests, contracts and saga cards (~430)
+    - 820–823 Window stack (~100)
+    - 824–827 Coverage test (~270)
+  - 828–848 Data sources (~560)
+  - 849–867 Card images (~1.1K) ← 6
+  - 868–893 Persistence and shipping (~1.7K)
+  - 894–935 Screens (~4.7K) ← 2
+    - 920–935 Table screen (~1.8K) ← 5
 - `docs/design-system-table.md` — Design system — Table (landscape) (~30.1K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
@@ -125,11 +125,11 @@ Read the sections your task touches.
   - 228–231 Hold, slide and release (~940)
   - 232–237 Peeking at the other seat (~600) ← 1
   - 238–253 Command column (~1.9K) ← 9
-  - 254–257 Two taps (~320) ← 2
+  - 254–257 Two taps (~350) ← 2
   - 258–261 One answer, one tap (~240)
   - 262–265 Stops and Always use (~250)
   - 266–269 Guide (~120)
-  - 270–280 Choice tray (~1.3K) ← 8
+  - 270–280 Choice tray (~1.3K) ← 9
   - 281–294 Reading panels (~1.5K) ← 6
   - 295–304 Phase carousel (~680)
   - 305–310 Quest advance (~530) ← 1
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~9.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.6K tok)
   - 5–17 Rules (~620)
-  - 18–89 Phases (~2.6K)
-  - 90–203 Open items (~5.7K)
+  - 18–89 Phases (~2.7K)
+  - 90–205 Open items (~5.8K)
     - 92–107 Fixtures and Maestro (~720)
-    - 108–151 Rules and engine (~1.8K)
-    - 152–176 Screens and code (~1.3K)
-    - 177–203 Phone and tablet checks (~1.9K)
-  - 204–220 Standing decisions (~430)
+    - 108–153 Rules and engine (~1.9K)
+    - 154–178 Screens and code (~1.3K)
+    - 179–205 Phone and tablet checks (~1.9K)
+  - 206–222 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -204,7 +204,6 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
 - `docs/phases/phase-49-ered-mithrin-data.md` — Phase 49 — Ered Mithrin data (~2.5K tok)
 - `docs/phases/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.3K tok)
 - `docs/phases/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
@@ -270,31 +269,19 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
   - 176–190 E2E (~270)
   - 191–213 Exit (~320)
 - `docs/phases/done/phase-40-voyage-across-belegaer.md` — Phase 40 — Voyage Across Belegaer (~970 tok)
-- `docs/phases/done/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~910 tok)
-- `docs/phases/done/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~920 tok)
+- `docs/phases/done/phase-41-the-fate-of-numenor.md` — Phase 41 — The Fate of Númenor (~920 tok)
+- `docs/phases/done/phase-42-raid-on-the-grey-havens.md` — Phase 42 — Raid on the Grey Havens (~930 tok)
 - `docs/phases/done/phase-43-flight-of-the-stormcaller.md` — Phase 43 — Flight of the Stormcaller (~930 tok)
-- `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~930 tok)
-- `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~940 tok)
+- `docs/phases/done/phase-44-the-thing-in-the-depths.md` — Phase 44 — The Thing in the Depths (~940 tok)
+- `docs/phases/done/phase-45-temple-of-the-deceived.md` — Phase 45 — Temple of the Deceived (~950 tok)
 - `docs/phases/done/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
 - `docs/phases/done/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
+- `docs/phases/done/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
 
 ## Live plans
 
 Read when a task names the plan.
 
-- `docs/plans/dream-chaser.md` — Plan: Dream-chaser (The Grey Havens and the six Dream-chaser Adventure Packs) (~10.4K tok)
-  - 3–26 Context (~760)
-  - 27–88 Facts found during exploration (~3.3K) ← 1
-  - 89–177 Approach: thirteen new phases (37-48 and 39b) (~5.2K)
-    - 93–111 Phase 37 - Dream-chaser data (nothing playable yet) (~1.3K)
-    - 112–124 Phase 38 - Dream-chaser campaign shell and XP (~640)
-    - 125–138 Phase 39 - Sea mechanics family (~740)
-    - 139–152 Phase 39b - Ships on the table (~240)
-    - 153–177 Phases 40-48 - one scenario each (phase 12 procedure) (~2.1K)
-  - 178–188 Critical files (~310)
-  - 189–202 Verification (~210)
-  - 203–213 Notes for the orchestrator and the implementer agent (~380)
-  - 214–221 Risks (~210)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.3K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
@@ -373,6 +360,7 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/board-ux.md` — Board UX: motion, focus and a quieter table (~3.5K tok)
 - `docs/plans/done/combat-spotlight-redesign.md` — Combat spotlight redesign (~3.9K tok)
 - `docs/plans/done/data-store-refactor.md` — Plan: a local game-data store, fetched once, generated wherever possible (~5.1K tok)
+- `docs/plans/done/dream-chaser.md` — Plan: Dream-chaser (The Grey Havens and the six Dream-chaser Adventure Packs) (~10.4K tok)
 - `docs/plans/done/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
 - `docs/plans/done/inactive-text.md` — Inactive text: a rethink (~2.4K tok)
 - `docs/plans/done/performance-pass.md` — Performance pass: snappy taps, animations and screens (user request, 2026-10-29) (~4.3K tok)
@@ -388,13 +376,13 @@ The sections each area's comments cite, most cited first. Read these before chan
 
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/checks`: architecture.md, Modules (1); architecture.md, Repository map (1)
-- `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/dream-chaser.md, Facts found during exploration (1)
+- `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/done/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/tools`: phases/phase-12-knife-in-the-dark.md, Scenario procedure (2); architecture.md, Modules (1)
 - `src/campaign`: architecture.md, Tests (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
-- `src/play`: design-system-table.md, Spotlight (14); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Choice tray (4); design-system-table.md, Gestures (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
+- `src/play`: design-system-table.md, Spotlight (14); design-system-table.md, Cards (9); design-system-table.md, Command column (8); design-system-table.md, The Island Map (8); design-system-table.md, Spacing and the play area's rows (7); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Choice tray (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Banner (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
 - `src/rules`: architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Briefing (5); design-system.md, Components (5); design-system.md, History (4); design-system.md, Campaign path (3); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `src/ui`: design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)

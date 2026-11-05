@@ -52,6 +52,8 @@ export const amountExprSchema = z.strictObject({
   // Counsel, rounded up", 11184:A:1). Read by the aflame family (src/rules/families/aflame/values.ts).
   level: z.literal(true).optional(),
   halved: z.literal(true).optional(),
+  // The value read is divided by this and rounded down before `times` and `plus` apply ("For every 5 resources on Captain Sahír, he makes an additional attack", 12158:A:3).
+  every: z.number().int().positive().optional(),
   // amount = value × times + plus, at most `limit`, at least 0.
   times: z.number().int().optional(),
   plus: z.number().int().optional(),
@@ -68,6 +70,8 @@ export const amountExprSchema = z.strictObject({
   resourcesOn: pickSchema.optional(),
   // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
   max: z.literal(true).optional(),
+  // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
+  damageOn: pickSchema.optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

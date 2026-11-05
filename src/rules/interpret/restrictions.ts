@@ -6,6 +6,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { effectsOfCard } from "../families/misc/text.ts";
 import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
+import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
 import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
@@ -72,9 +73,12 @@ export function travelProgressReason(state: ScenarioState, ctx: ReduceContext, l
 // travel to one of these and may not decline or go elsewhere.
 export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[] {
   if (state.activeLocation || state.secondActiveLocation) return [];
-  return restricted(state, ctx, "travelOnly")
+  const only = restricted(state, ctx, "travelOnly")
     .map((rule) => rule.sourceId)
     .filter((id) => state.cards[id]?.zone === "staging" && !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  // A family's rule that the players must travel to a location because they cannot pay for not traveling (Streets of Umbar, 12160:A:1, families/sea/streets.ts).
+  const titled = familyForcedTravel(state, ctx).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  return [...only, ...titled];
 }
 
 // "If the players cannot pay the Travel cost, then they cannot travel to that location." (rr.travel). A Travel cost that
@@ -97,6 +101,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       }
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
+      // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).
+      if (familyTravelUnpayable(state, instruction)) return true;
       // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.
       if (instruction.verb === "DiscardRandomFromHand" && instruction.who === "firstPlayer" && typeof instruction.amount === "number") {
         return (state.seats[state.firstPlayer]?.hand.length ?? 0) < instruction.amount;

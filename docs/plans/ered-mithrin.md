@@ -13,7 +13,7 @@ Campaign mode comes from the **Ered Mithrin Campaign Expansion** (RingsDB `EMCE`
 - **encounter cards in the Campaign Pool**;
 - the Learn to Play campaign log.
 
-The work has the same shape as `docs/plans/dream-chaser.md`:
+The work has the same shape as `docs/plans/done/dream-chaser.md`:
 1. a data phase;
 2. a campaign-shell phase;
 3. one shared mechanics family plus its table pieces;

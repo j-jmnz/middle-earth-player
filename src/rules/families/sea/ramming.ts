@@ -10,7 +10,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { attackWith } from "../burden/attack.ts";
+import { attackWith } from "../attack/immediate.ts";
 
 /** Of the cards that matched, only those with the highest Attack as the table shows it; all of them when tied. */
 export function highestAttack(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string[] {

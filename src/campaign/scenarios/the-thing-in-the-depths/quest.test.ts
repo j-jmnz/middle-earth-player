@@ -3,6 +3,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds } from "../../../rules/interpret/conditions.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { legalIntents } from "../../../rules/engine/legal.ts";
@@ -226,6 +227,25 @@ describe("Defend the Ship! (12041)", () => {
     expect(cardOf(run.state, CODES.thingOriginal)?.zone).toBe("victory");
     expect(run.state.stageCleared).toBe(true);
     expect(run.state.lost).toBe(false);
+  });
+
+  it("wins the game when a seat is eliminated and the Thing's hit points (+3 for each player) fall to its damage: the sweep destroys it and announces it (B:3, rr.hit-points)", () => {
+    const made = make({ seats: 2, stage: "12041", staging: [{ code: CODES.thingOriginal, damage: 12 }] });
+    const thing = cardOf(made.state, CODES.thingOriginal)!;
+    expect(modifiedStat(made.state, thing, "hitPoints", made.ctx.cards)).toBe(14);
+    const out = { ...made.state, seats: [made.state.seats[0]!, { ...made.state.seats[1]!, eliminated: true }] } as ScenarioState;
+    // The constant is read again with one player left: 8 + 3 hit points under 12 damage.
+    const lowered = syncConstants(out, made.ctx);
+    expect(modifiedStat(lowered, cardOf(lowered, CODES.thingOriginal)!, "hitPoints", made.ctx.cards)).toBe(11);
+    const run = finish(start(lowered), made.ctx);
+    const settled = { state: settle(run.state, made.ctx, []), steps: run.steps };
+    expect(cardOf(settled.state, CODES.thingOriginal)?.zone).toBe("victory");
+    expect(settled.state.stageCleared).toBe(true);
+    expect(settled.state.lost).toBe(false);
+    // With both seats living the same damage destroys nothing.
+    const kept = finish(start(made.state), made.ctx);
+    expect(cardOf(kept.state, CODES.thingOriginal)).toMatchObject({ zone: "staging", damage: 12 });
+    expect(kept.state.stageCleared).not.toBe(true);
   });
 
   it("does not win the game while The Thing in the Depths stands: a Creature that is destroyed deals only its own Threat", () => {

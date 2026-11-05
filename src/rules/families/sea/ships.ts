@@ -1,7 +1,7 @@
 // Rules: dcce.ships, dcce.ship-enemies, dcce.ship-objectives (data/rules/entries.json). Ships are an enemy (the ship-enemy) and an objective ally (the
 // ship-objective) for every purpose, with these exceptions. A ship-enemy's attack can be defended only by a ship-objective, and left undefended its
 // damage goes to a ship-objective its player controls instead of a hero. A ship-objective can attack only ship-enemies and defend only against the
-// attacks of ship-enemies. A ship-enemy can be attacked by ship-objectives and by non-ship characters alike. combat.ts (the defender and attacker
+// attacks of ship-enemies. A ship-enemy can be attacked by ship-objectives and by non-ship characters alike. The sea manifest's `combat` hook (combat.ts, the defender and attacker
 // pickers) and legal.ts (the legal-intent check and its refusal) ask these.
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";

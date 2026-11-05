@@ -24,13 +24,12 @@ import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, trave
 import { flagged, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
 import { sideQuestReason } from "../families/sidequests/quest.ts";
-import { familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
+import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
 import { freeSlot, mustTravel } from "../families/south/locations.ts";
 import { viewOf } from "../families/breaking/areas.ts";
-import { shipAttackReason, shipDefenseReason, shipsOnlyReason } from "../families/sea/ships.ts";
 import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "../families/sea/sailing-legal.ts";
 import { printedOf } from "../core/printed.ts";
 
@@ -296,7 +295,7 @@ function defenderReason(
     if (!hasKeyword(state, defender.id, "sentinel", ctx.cards)) return "Sentinel is required to defend for another seat";
   }
   // A ship-enemy's attack is defended only by a ship-objective (dcce.ship-enemies, dcce.ship-objectives).
-  const ship = shipDefenseReason(state, printedOf(ctx.cards, defender.code), ctx.cards);
+  const ship = familyDefenseReason(state, printedOf(ctx.cards, defender.code), ctx.cards);
   if (ship) return ship;
   if (!canDefend(state, state.pendingAttack.seat, intent.defenderId, ctx.cards)) return "That character cannot defend";
   if (defenseBlocked(state, ctx, intent.defenderId)) return "That character cannot defend this enemy's attack";
@@ -334,10 +333,8 @@ function attackReason(
     if (seen.has(attackerId)) return "That character cannot attack twice";
     seen.add(attackerId);
     if (!canAttack(state, state.activeSeat, attackerId, intent.enemyId, ctx.cards)) {
-      const ship = shipAttackReason(printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""), printedOf(ctx.cards, enemy.code));
-      if (ship) return ship;
-      const only = shipsOnlyReason(state, intent.enemyId, printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""));
-      if (only) return only;
+      const barred = familyAttackReason(state, intent.enemyId, printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""), printedOf(ctx.cards, enemy.code));
+      if (barred) return barred;
       if (enemy.controller !== state.activeSeat) return "Ranged is required to attack an enemy engaged with another seat";
       return "That attack is illegal";
     }

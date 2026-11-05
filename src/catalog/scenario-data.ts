@@ -7,7 +7,7 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // `burden` is the burden deck (Flight to the Ford): a zone beside the quest deck, not part of the encounter deck.
 // `attachedChosen` is a card the quest's Setup attaches to a hero the first player chooses (The Caves of Nibin-Dûm's Cave
 // Torch): out of the encounter deck, dealt by the Setup record, not by `setupInstructions`.
-// Dream-chaser's extra decks (docs/plans/dream-chaser.md, phase 37), each a zone the scenario's Setup prepares (the engine reads them from
+// Dream-chaser's extra decks (docs/plans/done/dream-chaser.md, phase 37), each a zone the scenario's Setup prepares (the engine reads them from
 // phase 39 on): `corsairDeck` (the non-ship enemies, "Prepare the Corsair deck", dcce.corsair-deck), `encounterDeck2` (the deck the
 // quest swaps to: The Thing in the Depths 5, The City of Corsairs 9, dcce.from-sea-to-land), `unchartedDeck` (dcce.uncharted-deck),
 // `islandMap` (Temple of the Deceived's fifteen double-sided locations, dcce.island-map), `grottoDeck` (dcce.grotto-deck) and

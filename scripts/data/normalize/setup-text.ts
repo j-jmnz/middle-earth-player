@@ -53,7 +53,7 @@ export type SetupClause =
   // "A player may search their deck for a unique boon ally and add it to their hand" / "Each player may search their deck for a boon or treasure card ...".
   | { kind: "searchDeckForBoon"; who: "aPlayer" | "eachPlayer"; unique: boolean; cards: "boon ally" | "boon or treasure" };
 
-// Dream-chaser (docs/plans/dream-chaser.md, phase 37): the Setup steps of its stage 1A and campaign cards. Every one is quoted from a
+// Dream-chaser (docs/plans/done/dream-chaser.md, phase 37): the Setup steps of its stage 1A and campaign cards. Every one is quoted from a
 // ledger line (data/printed/dream-chaser.json) and names the cards (and, for the deck steps, the encounter sets) it moves; the build checks
 // that each card the load list puts in a pile is placed by one of them, the engine families of phases 39 to 48 run them.
 export type SetupStep =

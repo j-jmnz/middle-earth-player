@@ -2,15 +2,20 @@
 // pile. "Prepare the Corsair deck" takes every non-ship enemy out of the encounter deck, shuffles them into a deck of their own, and from then on a
 // non-ship enemy that would be discarded goes to the Corsair discard pile (the route sea/routes.ts gives it). The Corsair deck runs out, and its
 // discard pile is shuffled back into it at once. Its enemies are revealed only by card abilities, such as the Boarding keyword.
+import type { Instruction } from "../../../catalog/boundary.ts";
+
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { refillDeck } from "../../core/decks.ts";
 import { DECKS, shufflePile } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
+import { askTarget } from "../../windows/choices.ts";
+import type { Focus } from "../index.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { moveCard } from "../../core/zones.ts";
+import { effectData } from "../encounter/moves.ts";
 import { revealTop } from "../encounter/named-decks.ts";
 
 /** The Corsair deck has been prepared in this game: its zones exist. */
@@ -61,6 +66,15 @@ export function revealCorsair(state: ScenarioState, seat: number, count: number,
     if (one.id == null) break;
   }
   return next;
+}
+
+/** RevealCorsair `who: "anyPlayer"` ("One player must reveal the top card of the Corsair deck and engage it", 12154:A:1): the first player names the player who reveals, and the only player does it without being asked. */
+export function revealForAnyPlayer(state: ScenarioState, instruction: Extract<Instruction, { verb: "RevealCorsair" }>, focus: Focus, count: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const seats = livingSeats(state);
+  const named = focus.chosen?.startsWith("seat:") ? Number(focus.chosen.slice("seat:".length)) : undefined;
+  const seat = named != null && seats.includes(named) ? named : seats.length === 1 ? seats[0] : undefined;
+  if (seat == null) return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null }, seats.map((index) => `seat:${index}`)) : state;
+  return revealCorsair(state, seat, count, ctx, steps);
 }
 
 /** "End the Corsair deck" (dcce.from-sea-to-land, stage 2B of The City of Corsairs): the Corsair deck and its discard pile are shuffled into the

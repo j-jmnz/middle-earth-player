@@ -4,7 +4,7 @@ Depends on: phase 37
 Blocks: phase 39
 May be split into 38 and 38b (as 28 and 28b) if the XP screen is large.
 
-Plan: [docs/plans/dream-chaser.md](../../plans/dream-chaser.md), "Phase 38 - Dream-chaser campaign shell and XP" and "Notes for the orchestrator and the implementer agent". Analogue: [phase 28](phase-28-campaign-registry.md).
+Plan: [docs/plans/done/dream-chaser.md](../../plans/done/dream-chaser.md), "Phase 38 - Dream-chaser campaign shell and XP" and "Notes for the orchestrator and the implementer agent". Analogue: [phase 28](phase-28-campaign-registry.md).
 
 ## Goal
 

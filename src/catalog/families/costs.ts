@@ -82,7 +82,8 @@ const VERBS = [
 
 // An attachment was attached to a card: played onto it, or moved to it (the event's subject is the attachment, its other card
 // the new host). "After a Signal attachment is attached to a hero".
-const TRIGGERS = ["attached"] as const;
+// About a seat: its heroes' (or allies') pools paid resources for a card played, an ability or a cancel; the event's amount is how many ("After the engaged player spends any number of resources", 12153:A:2).
+const TRIGGERS = ["attached", "resourcesSpent"] as const;
 
 // Resource icons a card has while it holds the flag (amount 1): "Amarthiúl gains the Tactics resource icon", "give attached
 // hero a Leadership icon until the end of the phase". `collectsResources`: a card that is not a hero collects this many

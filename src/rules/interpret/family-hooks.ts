@@ -1,11 +1,12 @@
 // How the core calls the hooks of the mechanic families (docs/architecture.md, Mechanic families): each function walks a family list, RULES_FAMILIES by
 // default (registered by families/index.ts; withFamilies swaps it for a test). A hook returns a new state or the same object, never a changed one.
-import type { Amount, Condition, PickSpec } from "../../catalog/boundary.ts";
+import type { Amount, Condition, Instruction, PickSpec } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../core/intents.ts";
+import type { PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { AmountScope } from "./amounts.ts";
 import type { Scope } from "./conditions.ts";
-import type { RulesFamily, SettleHook, SettleHooks } from "./family-manifest.ts";
+import type { RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { PickContext } from "./pick.ts";
 
@@ -46,10 +47,15 @@ type Order = Readonly<Record<SettlePhase, readonly string[]>>;
 type Hooked = {
   readonly may: readonly RulesFamily[];
   readonly reach: readonly RulesFamily[];
+  readonly cost: readonly RulesFamily[];
+  readonly forced: readonly RulesFamily[];
+  readonly unpayable: readonly RulesFamily[];
+  readonly play: readonly RulesFamily[];
   readonly pick: readonly RulesFamily[];
   readonly condition: readonly RulesFamily[];
   readonly amount: readonly RulesFamily[];
   readonly attached: readonly RulesFamily[];
+  readonly combat: readonly RulesFamily[];
 };
 const hookedBy = new WeakMap<readonly RulesFamily[], Hooked>();
 
@@ -59,10 +65,15 @@ function hooked(families: readonly RulesFamily[]): Hooked {
     found = {
       may: families.filter((family) => family.travel?.may != null),
       reach: families.filter((family) => family.travel?.reach != null),
+      cost: families.filter((family) => family.travel?.cost != null),
+      forced: families.filter((family) => family.travel?.forced != null),
+      unpayable: families.filter((family) => family.travel?.unpayable != null),
+      play: families.filter((family) => family.play != null),
       pick: families.filter((family) => family.pick != null),
       condition: families.filter((family) => family.condition != null),
       amount: families.filter((family) => family.amount != null),
       attached: families.filter((family) => family.attached != null),
+      combat: families.filter((family) => family.combat != null),
     };
     hookedBy.set(families, found);
   }
@@ -119,6 +130,37 @@ export function familyTravelReach(state: ScenarioState, ctx: ReduceContext, fami
   return found;
 }
 
+/** The charge a family puts on traveling to the location (`locationId` null: on declining to travel), or null when none does (the first family's charge). */
+export function familyTravelCost(state: ScenarioState, ctx: ReduceContext, locationId: string | null, families: readonly RulesFamily[] = active()): TravelCharge | null {
+  for (const family of hooked(families).cost) {
+    const charge = family.travel?.cost?.(state, ctx, locationId);
+    if (charge) return charge;
+  }
+  return null;
+}
+
+/** The staged locations the families say the players must travel to; the same empty list when none does. */
+export function familyForcedTravel(state: ScenarioState, ctx: ReduceContext, families: readonly RulesFamily[] = active()): readonly string[] {
+  let found: readonly string[] = NONE;
+  for (const family of hooked(families).forced) {
+    const more = family.travel?.forced?.(state, ctx);
+    if (more && more.length > 0) found = found.length === 0 ? more : [...found, ...more];
+  }
+  return found;
+}
+
+/** Whether some family says the players cannot pay this instruction of a Travel line now. */
+export function familyTravelUnpayable(state: ScenarioState, instruction: Instruction, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).unpayable) if (family.travel?.unpayable?.(state, instruction) === true) return true;
+  return false;
+}
+
+/** Whether some family bars the card from being played or put into play. */
+export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx) === true) return true;
+  return false;
+}
+
 /** False when a family's pick predicate rejects the card. */
 export function familyPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).pick) if (family.pick?.(state, id, spec, at, ctx) === false) return false;
@@ -148,4 +190,31 @@ export function familyAttached(state: ScenarioState, id: string, host: string, c
   let current = state;
   for (const family of hooked(families).attached) current = family.attached?.(current, id, host, ctx) ?? current;
   return current;
+}
+
+/** Why a family bars the character from defending the attack in progress, or null (the first family's reason). */
+export function familyDefenseReason(state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, families: readonly RulesFamily[] = active()): string | null {
+  for (const family of hooked(families).combat) {
+    const reason = family.combat?.defense?.(state, defender, cards);
+    if (reason) return reason;
+  }
+  return null;
+}
+
+/** Why a family bars the attacker from being declared against the enemy, or null (the first family's reason). */
+export function familyAttackReason(state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, families: readonly RulesFamily[] = active()): string | null {
+  for (const family of hooked(families).combat) {
+    const reason = family.combat?.attack?.(state, enemyId, attacker, target);
+    if (reason) return reason;
+  }
+  return null;
+}
+
+/** The characters a family sends an undefended attack's damage to instead of the heroes (the first non-empty answer), or an empty list. */
+export function familyUndefendedTargets(state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>, families: readonly RulesFamily[] = active()): readonly string[] {
+  for (const family of hooked(families).combat) {
+    const found = family.combat?.undefended?.(state, candidates, cards);
+    if (found && found.length > 0) return found;
+  }
+  return NONE;
 }

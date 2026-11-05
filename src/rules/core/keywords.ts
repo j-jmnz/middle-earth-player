@@ -233,16 +233,22 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
     if (lethal && state.holdLethal) return next;
   }
   if (lethal) {
-    // The cards attached to an enemy hear that it was destroyed ("When attached enemy is destroyed", families/attachments/hold.ts).
-    if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, id, printed.type === "hero" ? cards : undefined);
-    next = destroyCard(next, id, cards, steps, false, true);
-    // A hero or ally destroyed by damage is announced to Responses and Forced effects (rr.destroy), and so is an enemy.
-    if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: id });
-    if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: id });
+    next = destroyAndAnnounce(next, instance, printed, cards, steps);
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
   }
+  return next;
+}
+
+// A hero, ally or enemy whose damage reached its hit points: the cards attached to it hear it ("When attached enemy is destroyed", families/attachments/hold.ts), it is
+// destroyed, and Responses and Forced effects hear that a hero or ally (rr.destroy) or an enemy was destroyed. Damage and the sweep below both end this way.
+function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, instance.id, printed.type === "hero" ? cards : undefined);
+  next = destroyCard(next, instance.id, cards, steps, false, true);
+  if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
+  if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: instance.id });
   return next;
 }
 
@@ -258,9 +264,9 @@ export function destroyOverwhelmed(state: ScenarioState, cards: ReadonlyMap<stri
     const current = next.cards[instance.id];
     if (!current || !inPlay(current.zone) || current.damage < modifiedStat(next, current, "hitPoints", cards)) continue;
     if (held(next, instance.id)) continue;
-    if (printed.type === "hero") next = noteHostDefeated(next, instance.id, cards);
-    next = destroyCard(next, instance.id, cards, steps, false, true);
-    if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
+    // An enemy whose indestructible lapsed with its lethal damage still on it (Captain Sahír once no enemy has a resource, 12150:B:1), or whose hit points fell under its damage
+    // (The Thing in the Depths with a seat eliminated, 12049), is destroyed all the same and announces it: Sahír's win (12150:B:3) and the Thing's (12041:B:3) hear it.
+    next = destroyAndAnnounce(next, instance, printed, cards, steps);
   }
   return next;
 }

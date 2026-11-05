@@ -47,4 +47,7 @@
 // a replayed Temple of the Deceived game can take a different path.
 // 22: the Drowned Ruins campaign card counts the resources on its own card (11200:B:4); the copy of the Fate of Númenor line counted 11179's and gave 0 XP:
 // a replayed Drowned Ruins game can end with more XP.
-export const ENGINE_VERSION = 22;
+// 23 (Dream-chaser, phase 48 review): an enemy swept because its damage reached its hit points (destroyOverwhelmed) announces enemyDestroyed and is heard by the cards attached to it, as an
+// enemy destroyed by damage always was: The Thing in the Depths (+3 hit points a player) wins the game when a seat is eliminated under its damage, a Creature swept the same way
+// damages it, and Captain Sahír of The City of Corsairs, whose indestructible lapses with lethal damage on him, ends that scenario: a replayed game of either can take a different path.
+export const ENGINE_VERSION = 23;

@@ -5,8 +5,6 @@
 // enemy's own card makes it (effect-frames.ts), against the player the enemy is engaged with.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { beginEnemyAttack } from "../../combat/combat.ts";
-import { attackBarred } from "../../interpret/constants.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -19,7 +17,7 @@ import type { Focus } from "../index.ts";
 import { declaredDefenders } from "../defense/defenders.ts";
 import { damageGoesTo } from "../defense/damage.ts";
 import { gameReads } from "../../core/game-reads.ts";
-import { dealAttackShadow } from "../defense/listen.ts";
+import { attackWith } from "../attack/immediate.ts";
 import { effectData } from "../encounter/moves.ts";
 
 type Each = Extract<Instruction, { verb: "ImmediateAttackEach" }>;
@@ -27,19 +25,6 @@ type Each = Extract<Instruction, { verb: "ImmediateAttackEach" }>;
 // The enemies engaged with a player now, in player order and the order they engaged in.
 function engagedEnemies(state: ScenarioState): string[] {
   return livingSeats(state).flatMap((seat) => state.seats[seat]?.engaged ?? []);
-}
-
-// One immediate attack by an enemy that is still engaged and may attack. The attack is counted before it starts (the Forced effects
-// of its start push frames over the running effect's), and it is dealt a shadow card of its own; one dealt for an earlier attack is
-// discarded first (rr.attacks-outside-the-combat-phase, faq.additional-attacks).
-export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const enemy = state.cards[enemyId];
-  if (enemy?.zone !== "engaged" || enemy.controller == null || attackBarred(state, enemyId, enemy.controller)) return state;
-  const data = effectData(state);
-  const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const dealt = dealAttackShadow(counted, enemyId, ctx, steps);
-  const begun = beginEnemyAttack(dealt, enemy.controller, enemyId, ctx, steps);
-  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
 
 // ImmediateAttackEach. The first time it runs it queues an attack for each engaged enemy ahead of the rest of the effect; each

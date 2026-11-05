@@ -122,6 +122,8 @@ export type CardInstance = {
   // An encounter card attached to a guarded objective as its guard (rr.guarded): it is unlinked from the objective when it leaves play,
   // or when it attaches itself to another card (families/objectives.ts).
   guard?: true;
+  // A card of the encounter deck or its discard pile that a search "shuffles into the second encounter deck": SetAsideEncounterDeck keeps it in the deck when it sets the rest aside (families/sea/swap.ts, 11215:B:1).
+  carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
   deck?: "evilCreatures";
@@ -366,6 +368,8 @@ export type ScenarioState = {
   // `paid`: the pools that paid for it and how much each (Linhir Sea-captain's "paid all of its cost from a single hero").
   // `phase`: the phase it was played in when that was not the Planning phase ("the first non-unique card you play each planning phase").
   played?: readonly { id: string; code: string; seat: number; round: number; phase?: string; paid?: readonly { heroId: string; amount: number }[] }[];
+  // The allies that entered play this round and the clock reading the count was taken at, in a game whose cards limit it (LimitEntries, families/sea/entries.ts).
+  entries?: { round: number; mark: number; count: number };
   // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
   spent?: { round: number; ids: readonly string[] };
   // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest

@@ -3,7 +3,7 @@
 Depends on: phase 36
 Blocks: phase 38
 
-Plan: [docs/plans/dream-chaser.md](../../plans/dream-chaser.md), "Phase 37 - Dream-chaser data" and "Notes for the orchestrator and the implementer agent". Analogue: [phase 27](phase-27-multi-campaign-data.md).
+Plan: [docs/plans/done/dream-chaser.md](../../plans/done/dream-chaser.md), "Phase 37 - Dream-chaser data" and "Notes for the orchestrator and the implementer agent". Analogue: [phase 27](phase-27-multi-campaign-data.md).
 
 ## Goal
 

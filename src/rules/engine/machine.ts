@@ -34,7 +34,7 @@ import { afterPaying } from "../families/deck/play.ts";
 import { doRefresh } from "./refresh.ts";
 import { askReadyPayments } from "../families/attachments/ready.ts";
 import { engagementStep, engageEnemy, optionalEnemies } from "../quest/quest.ts";
-import { travelIntent, travelTaken } from "../quest/travel.ts";
+import { declineTravel, travelIntent, travelTaken } from "../quest/travel.ts";
 import { advanceFreed, resolutionStep } from "../quest/stage-reveal.ts";
 import { pushDue } from "../windows/delayed.ts";
 import { crossBoundary } from "../windows/triggers.ts";
@@ -156,7 +156,7 @@ export function applyIntent(
     case "Travel":
       return travelIntent(state, intent.locationId, ctx, steps);
     case "DeclineTravel":
-      return { ...travelTaken(state), window: null };
+      return declineTravel(state, ctx, steps);
     case "Engage": {
       // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
       const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);

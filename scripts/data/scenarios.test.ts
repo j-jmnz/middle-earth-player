@@ -136,7 +136,7 @@ describe("Mirkwood campaigns", () => {
   });
 });
 
-// Dream-chaser (docs/plans/dream-chaser.md, phase 37): built from the seven original sets and the Dream-chaser Campaign Expansion. The
+// Dream-chaser (docs/plans/done/dream-chaser.md, phase 37): built from the seven original sets and the Dream-chaser Campaign Expansion. The
 // DragnCards Q06 load lists lead the piles; the booklet's paragraph and the printed Setup are the checks.
 describe("Dream-chaser campaign", () => {
   const campaign = loadCampaign("dream-chaser");

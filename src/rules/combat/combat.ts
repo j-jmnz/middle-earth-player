@@ -1,6 +1,7 @@
 // Rules: rr.combat-phase, rr.defending-player, rr.attacks-outside-the-combat-phase, rr.step-6-2, rr.step-6-4b, rr.ranged,
 // rr.step-6-8b, rr.step-6-8-1, mec109.archery, faq.limitations-on-attacks, ltp.deal-shadow-cards, ltp.resolve-enemy-attacks,
 // ltp.undefended-attack, ltp.resolve-player-attacks (data/rules/entries.json).
+import { familyAttackReason, familyDefenseReason, familyUndefendedTargets } from "../interpret/family-hooks.ts";
 import { announceEnemyAttacked, attackerLimitReached } from "../families/aflame/attack.ts";
 import { attackBarred } from "../interpret/constants.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -24,7 +25,6 @@ import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/at
 import { countsDefense, struck } from "../families/attack/strike.ts";
 import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
-import { shipEnemyAttacking, shipMayAttack, shipMayDefend, shipObjectivesAmong, shipsOnlyBarred } from "../families/sea/ships.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -163,7 +163,7 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
   // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
-  if (!shipMayDefend(state, printed, cards)) return false;
+  if (familyDefenseReason(state, printed, cards)) return false;
   if (instance.controller === attackedSeat) return true;
   return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
 }
@@ -227,10 +227,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
-  // A ship-objective attacks only ship-enemies (dcce.ship-objectives).
-  if (!shipMayAttack(printed, printedOf(cards, enemy.code))) return false;
-  // "Only Ship objectives can be declared as attackers against Raider Flagship" (12124:A:3).
-  if (shipsOnlyBarred(state, enemyId, printed)) return false;
+  // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
+  if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code))) return false;
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
@@ -389,8 +387,8 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   const locations = undefendedLocations(state);
   if (locations.length > 0) return locations;
   // A ship-enemy's undefended attack damages a ship-objective its player controls, not a hero (dcce.ship-enemies).
-  const ships = shipEnemyAttacking(state, cards) ? shipObjectivesAmong(characters(state, seat, cards), state, cards) : [];
-  if (ships.length > 0) return ships;
+  const ships = familyUndefendedTargets(state, () => characters(state, seat, cards), cards);
+  if (ships.length > 0) return [...ships];
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.
