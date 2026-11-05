@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dockWithNumbers, HEAD_COMPACT, headPlan, headRoom, METER_FULL_LEAST, NUMBERS_ROW } from "./command-head.ts";
+import { dockWithNumbers, HEAD_COMPACT, headHeight, headPlan, headRoom, METER_FULL_LEAST, METER_MOST, NUMBERS_ROW } from "./command-head.ts";
 
 describe("headPlan", () => {
   it("gives way by height: the full meter, then the compact one, then nothing", () => {
@@ -38,5 +38,14 @@ describe("dockWithNumbers", () => {
       expect(planned(tall, false)).toBe(planned(tall - NUMBERS_ROW, true));
     }
     expect(verdict(tall, false)).toBe(verdict(tall - NUMBERS_ROW, true));
+  });
+});
+
+describe("headHeight", () => {
+  it("is the full meter up to its tallest with its padding, the compact meter's whole room, and nothing hidden", () => {
+    expect(headHeight("full", 400)).toBe(METER_MOST + 2);
+    expect(headHeight("full", 150)).toBe(152);
+    expect(headHeight("compact", 70)).toBe(70);
+    expect(headHeight("hidden", 400)).toBe(0);
   });
 });

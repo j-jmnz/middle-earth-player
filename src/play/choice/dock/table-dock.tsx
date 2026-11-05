@@ -154,9 +154,9 @@ export function TableDock({
   ) : null;
   const readoutLine = dense && trayOpen;
   return (
-    <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
+    <View pointerEvents="box-none" style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
       {/* No panel: the dock stands on the command column's fade (table/view.tsx). The words, the choice's rows (when it is open) and the
-          numbers and buttons are stacked from the foot of the column up. */}
+          numbers and buttons are stacked from the foot of the column up. The column's empty top above them passes taps to the canvas. */}
       <View
         ref={root}
         collapsable={false}

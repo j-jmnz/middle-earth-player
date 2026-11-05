@@ -3,6 +3,7 @@ import type { BeatStore } from "../store/beat-store.ts";
 import type { SlotNumbers } from "../cards/card-effects.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import type { LayoutOptions } from "../layout/layout.ts";
+import type { Reach, RowFeet } from "../layout/column-reach.ts";
 import type { SpotlightHandoff } from "../spotlight/handoff.ts";
 import type { ZoneFacts } from "../store/selectors.ts";
 import type { StageArea } from "../spotlight/stage.ts";
@@ -35,6 +36,12 @@ export type TableCanvasProps = {
   store: TableStore;
   width: number;
   height: number;
+  // The command column lies over the canvas's right edge, `column` points past `width`: the canvas draws that far, and a crowded top row
+  // the column's empty top covers (`reach` rows, column-reach.ts) runs on into it (row-reach.ts). The hand and the play area stay in `width`.
+  column?: number;
+  reach?: Reach;
+  // Told the feet of the staging and engagement rows each time they move, so the screen can count the reach.
+  onRowFeet?: (feet: RowFeet) => void;
   // The cached file (or bundled scan) for a code, or null while it is not on the phone.
   picture: (code: string) => PictureSource | null;
   // Moves when the image cache gains a file, so a card drawn as its name is tried again.

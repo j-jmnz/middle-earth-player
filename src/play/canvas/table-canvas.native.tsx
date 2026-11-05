@@ -25,6 +25,7 @@ import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
 import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
+import { rowFeet } from "../layout/column-reach.ts";
 import { nameOfCard, pictureKey } from "./picture-key.ts";
 import { areaFacts, areaSpeech } from "../store/stormcaller-table.ts";
 import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
@@ -59,7 +60,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, column, reach, onRowFeet, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -103,9 +104,16 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame, column, reach }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame, column, reach],
   );
+  // The rows' feet go up to the screen, which counts how many the command column's empty top covers (column-reach.ts). They do not move with the reach.
+  const feet = rowFeet(layout);
+  useLayoutEffect(() => {
+    onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });
+  }, [onRowFeet, feet.staging, feet.engaged]);
+  // The canvas draws under the command column too.
+  const drawnWidth = width + (column ?? 0);
   // The cards the rows folded away are told to the table's pick (a folded card is not on the table) and to the row list (row-fold.ts).
   const foldedKey = (layout.folds ?? []).map((fold) => `${fold.zone}:${fold.cards.join(",")}`).join("|");
   useLayoutEffect(() => {
@@ -174,7 +182,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   return (
     <>
       <GestureDetector gesture={gesture}>
-        <Canvas style={{ width, height }}>
+        <Canvas style={{ width: drawnWidth, height }}>
           {/* No felt and no zone boxes: the screen's fog (ember over the encounter, moonlight over the fellowship) shows through, and
               the engagement area is told apart by a red haze toward its left, where the enemies stand. */}
           <SkRect x={layout.zones.engaged.x - 12 * s} y={layout.zones.engaged.y - 10 * s} width={layout.zones.engaged.w + 24 * s} height={layout.zones.engaged.h + 20 * s}>
@@ -199,7 +207,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             </Leaving>
           ))}
           {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
-          <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
+          <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={drawnWidth} height={height} t={t} piece={piece} />
           <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints, slot.zone === "questStage" ? owner : null)} contrast={contrast} />
           {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
           {layout.marks.map((mark) => (

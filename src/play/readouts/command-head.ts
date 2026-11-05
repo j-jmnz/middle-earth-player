@@ -10,6 +10,8 @@ export const METER_FULL_LEAST = 100;
 export const NUMBERS_ROW = 28;
 /** The gap between the head and the dock's top. */
 export const HEAD_GAP = 4;
+/** The tallest the full meter grows (Medium's points). */
+export const METER_MOST = 230;
 
 export type HeadMode = "full" | "compact" | "hidden";
 
@@ -17,6 +19,12 @@ export type HeadMode = "full" | "compact" | "hidden";
 export function headPlan(room: number, scale = 1, meter = true): HeadMode {
   if (!meter || room < HEAD_COMPACT * scale) return "hidden";
   return room < METER_FULL_LEAST * scale ? "compact" : "full";
+}
+
+/** The height the head takes of its `room`: the full meter up to its tallest and its top padding, the compact one all of it, nothing hidden. */
+export function headHeight(mode: HeadMode, room: number, scale = 1): number {
+  if (mode === "hidden") return 0;
+  return mode === "full" ? Math.min(METER_MOST * scale, room) + 2 * scale : room;
 }
 
 /** The free height above the dock: the column less its foot padding, the dock and a gap above the dock. */
