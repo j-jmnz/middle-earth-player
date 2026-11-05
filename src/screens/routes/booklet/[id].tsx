@@ -5,6 +5,8 @@ import { View } from "react-native";
 
 import { BodyText, PrimaryButton, RingMark, Screen, TextButton } from "../../kit/chrome";
 import { bookletName, isBookletId, startPage } from "../../booklets/books";
+import { reportBookletPage } from "../../booklets/page-store";
+import { PageRulesButton } from "../../booklets/page-rules-button";
 import { BookletPdf } from "../../booklets/reader-view";
 import { bookletUri, hasBundledBooklet, importBooklet, installBundledBooklet } from "../../booklets/store";
 import { readBooklet, writeLastPage, type BookletRow } from "../../data/campaign-store";
@@ -89,6 +91,7 @@ export default function Booklet() {
             style={{ flex: 1 }}
             onPageChange={(event) => {
               const { page } = event.nativeEvent;
+              reportBookletPage(id, page);
               if (firstEvent.current) {
                 firstEvent.current = false;
                 if (page !== first) return;
@@ -97,6 +100,7 @@ export default function Booklet() {
             }}
           />
         </View>
+        <PageRulesButton id={id} first={first} />
         <CloseBar onClose={close} />
       </Screen>
     );

@@ -442,6 +442,8 @@ Medium: the same list in a reading column. Expanded: a list-detail (`TwoPane`): 
 
 `booklet/[id].tsx`, scene `calm`. The PDF page fills the screen on the ground. Close is a centred text button at the bottom in thumb reach. Missing file: a tonal tile with the ring mark, the book name, "This booklet is not on this phone. Scenarios still play without it.", and Add booklet. On a tablet the PDF stays full bleed; the missing and installing states sit in a centred 480 column.
 
+What a reader hears (`modules/booklet-pdf`): each page is "Page 12 of 32", and a page that comes into view is announced, on Android only while TalkBack's touch exploration is on and on iOS only while VoiceOver runs. The PDF's own words are a picture to TalkBack, so with a screen reader on, and never otherwise, a secondary button "Rules on this page" sits above Close (`page-rules-button.tsx`, heard as "Rules on this page, page 12: 3 rules", disabled when the page holds none). It lists the page's rule entries (`page-rules.ts`: the glossary entries whose book and PDF page match the page the view reports), and a row opens the entry in the rules reader.
+
 ### Database
 
 Scene `calm`. Title Database, the failure in body. No retry.

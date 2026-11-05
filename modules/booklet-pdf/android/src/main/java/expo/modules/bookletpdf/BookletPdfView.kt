@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityManager
 import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -129,6 +130,13 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
     reported = position + 1
     wantedPage = reported
     onPageChange(mapOf("page" to reported, "pageCount" to count))
+    announcePage(reported, count)
+  }
+
+  // Says the page that came into view, only while TalkBack's touch exploration is on; a sighted reader hears nothing.
+  private fun announcePage(page: Int, count: Int) {
+    val accessibility = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager ?: return
+    if (accessibility.isEnabled && accessibility.isTouchExplorationEnabled) announceForAccessibility("Page $page of $count")
   }
 
   // The renderer is closed on the render thread, after the renders that are already queued, under the lock they take.
@@ -175,6 +183,8 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
         }
       }
       holder.bound = position
+      // The page's spoken name for TalkBack; it draws nothing.
+      holder.image.contentDescription = "Page ${position + 1} of ${renderer?.pageCount ?: 0}"
       val token = Any()
       holder.token = token
       val scale = quality
