@@ -20,7 +20,7 @@ import * as ruins from "../scenarios/the-drowned-ruins/game.ts";
 import * as haven from "../scenarios/a-storm-on-cobas-haven/game.ts";
 import * as corsairs from "../scenarios/the-city-of-corsairs/game.ts";
 import * as upanduin from "../scenarios/journey-up-the-anduin/game.ts";
-// import * as lostmirk from "../scenarios/lost-in-mirkwood/game.ts";
+import * as lostmirk from "../scenarios/lost-in-mirkwood/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -66,5 +66,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("a-storm-on-cobas-haven", "A Storm on Cobas Haven", haven.HAVEN_GOLDENS, haven.havenWorld, haven.playGolden),
   entry("the-city-of-corsairs", "The City of Corsairs", corsairs.CORSAIRS_GOLDENS, corsairs.corsairsWorld, corsairs.playGolden),
   entry("journey-up-the-anduin", "Journey Up the Anduin", upanduin.UPANDUIN_GOLDENS, upanduin.upanduinWorld, upanduin.playGolden),
-  // entry("lost-in-mirkwood", "Lost in Mirkwood", lostmirk.LOSTMIRK_GOLDENS, lostmirk.lostmirkWorld, lostmirk.playGolden),
+  entry("lost-in-mirkwood", "Lost in Mirkwood", lostmirk.LOSTMIRK_GOLDENS, lostmirk.lostmirkWorld, lostmirk.playGolden),
 ];

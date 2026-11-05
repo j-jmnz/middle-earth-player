@@ -77,7 +77,7 @@ export async function loadLostmirkWorld(): Promise<LostmirkWorld> {
   const definition = scenarioDefinition(dealt, campaign, EFFECTS);
   const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...TREASURES, ...gameCodes(campaign, lostmirk)])];
   const cards = new Map(await loadPrinted(codes));
-  addStandIns(cards, ["f0", "f3", "place", "treachery", "heroes"]);
+  addStandIns(cards, ["f0", "f3", "mild", "place", "treachery", "heroes"]);
   addStandIns(cards, ["filler", "event", "ally"], [0, 1, 2, 3]);
   return { definition, cards };
 }

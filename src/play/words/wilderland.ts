@@ -1,4 +1,4 @@
-// Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:2, 12189:B:2, 18074:A:1. What the table says when the players look at random undiscovered treasures and choose one to attach as a
+// Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:2, 12189:B:2, 18074:A:1, 18075:A:1, 18076:A:1. What the table says when the players look at random undiscovered treasures and choose one to attach as a
 // guarded objective (AttachRandomTreasure). The sentence the choice sheet reads from. Pure.
 import type { Instruction } from "../../catalog/boundary.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
@@ -42,6 +42,21 @@ function weighedDownAsk(instruction: Instruction, source: string | null, names: 
   return { verb: "Discard", prompt: `${name}: choose an attachment to discard from ${hero}.${itself ? ` ${name} can discard itself: ${hero} has no other attachment that is not an objective.` : ""}` };
 }
 
+// Truly Lost's hand (18075:A:1) and The Forest of Great Fear's nemesis (18076:A:1): the choice names its number, the side of the table it happens on and whose it is.
+function stageAsk(instruction: Instruction, names: ChoiceNames, facts: Facts | undefined): PickWords | null {
+  const game = facts?.game;
+  if (!game || (instruction.verb !== "PlaceHandUnderLocation" && instruction.verb !== "SearchNemesis")) return null;
+  const seat = game.window?.kind === "choose" ? game.window.seat : game.firstPlayer;
+  if (instruction.verb === "SearchNemesis") {
+    const hitPoints = facts.options[0] ? printedOf(facts.ctx.cards, game.cards[facts.options[0]]?.code ?? "").health : undefined;
+    const who = game.seatCount > 1 ? `Player ${seat + 1}` : "You";
+    return { verb: "Choose", prompt: `${who}: ${facts.options.length} enemies are tied for the most hit points${hitPoints != null ? ` (${hitPoints})` : ""}. Choose the nemesis: it enters the staging area with +2 Threat, Attack and Defense and attacks the first player at the end of each round.` };
+  }
+  const count = game.seats[seat]?.hand.length ?? 0;
+  const whose = game.seatCount > 1 ? `Player ${seat + 1}'s` : "your";
+  return { verb: "Choose", prompt: `Choose a location in the staging area to put ${whose} hand under, ${count} ${count === 1 ? "card" : "cards"} facedown. It gets +${count} quest ${count === 1 ? "point" : "points"}, the cards return to ${whose} hand when it is explored, and they are discarded if the players advance.` };
+}
+
 /** The sentence and the verb of the choice AttachRandomTreasure, ClaimRandomTreasure or Discover asks, or the character a claimed treasure goes on, or null for another instruction. */
 export function wilderlandAsk(instruction: Instruction, source: string | null, names: ChoiceNames, next?: Instruction, picked?: string | null, facts?: Facts): PickWords | null {
   // The character a claimed treasure is attached to (120165:A:3): the Pick of a card it may attach to (`hostForPicked`) before AttachPicked; the treasure is named once the table knows it.
@@ -54,6 +69,8 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
     const amount = typeof next.amount === "number" ? next.amount : 1;
     return { verb: "Protect", prompt: `Choose another character: the next time it would be dealt damage this round, cancel ${amount} of that damage.` };
   }
+  const stage = stageAsk(instruction, names, facts);
+  if (stage) return stage;
   const weighed = weighedDownAsk(instruction, source, names, next, facts);
   if (weighed) return weighed;
   // Discover X looked at several Loot objectives: the first player picks the one to attach to the active location (emce.discover).
@@ -193,5 +210,5 @@ export function setAsideLine(source: string, card: string): string {
 /** Carried Away (18074:A:1): the hero a player chooses, before the encounter deck is discarded to the enemy that will guard it. Null for any other pick. */
 export function wilderlandPickWords(pick: Instruction, next: Instruction | undefined): PickWords | null {
   if (pick.verb !== "Pick" || next?.verb !== "DiscardUntil" || pick.pick.type !== "hero") return null;
-  return { verb: "Carry away", prompt: "Choose a hero you control. It loses its tokens and attachments, and the enemy discarded next guards it." };
+  return { verb: "Carry away", prompt: "Choose 1 hero you control to be carried away. It loses its tokens and attachments, and the next enemy discarded from the encounter deck enters the staging area and holds it." };
 }

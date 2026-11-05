@@ -96,7 +96,7 @@ const VERBS = [
   // Carried Away (18074:A:1): "Each player chooses a hero he controls, discards each token and attachment from that hero, and places it in the staging area ... attaches that enemy to the hero he owns in the staging area, guarding it." After a Pick of the hero, a DiscardUntil enemy and a
   // MoveEncounterCard of that enemy to the staging area, the hero (the card picked before the last) loses its tokens and attachments and lies facedown under the enemy (the captive zone: in play, controlled by no one), flagged as guarded; the enemy guards it (guardsHero). Nothing happens when no enemy was found.
   z.strictObject({ verb: z.literal("CarryAwayHero"), ...when }),
-  // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
+  // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." (user ruling, 2026-11-05: when it leaves play in any way) The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
   // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).
   z.strictObject({ verb: z.literal("DiscardGuardedHeroes"), ...when }),

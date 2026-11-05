@@ -305,7 +305,8 @@ function defenderReason(
 function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>, ctx: ReduceContext): string | null {
   if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
   const heroes = undefendedTargets(state, state.pendingAttack.seat, ctx.cards);
-  if (heroes.length === 0) return "No hero can take the attack";
+  // A seat whose only heroes are held by an enemy (Carried Away, 18074) has no hero to take the attack: it is undefended and deals no damage (shadow.ts, resolveAttack).
+  if (heroes.length === 0) return null;
   if (heroes.length === 1) {
     const only = heroes[0];
     if (intent.heroId != null && intent.heroId !== only) return "Choose a hero";

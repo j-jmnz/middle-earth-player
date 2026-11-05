@@ -120,6 +120,8 @@ export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar
 /** A part whose golden is played for the log of the playthrough that won it. */
 export type WonPart<G extends { name: string; decks: string }> = {
   title: string;
+  /** The name of the golden to play, "two-handed, won" unless the part names its wins by what they reach. */
+  golden?: string;
   goldens: readonly G[];
   world: (decks: G["decks"]) => Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }>;
   play: (golden: G, ctx: ReduceContext) => { state: ScenarioState };
@@ -130,8 +132,9 @@ export type WonPart<G extends { name: string; decks: string }> = {
  * one for the first), its heroes and what hangs on them left out, as the fixture's seats play real decklists.
  */
 export async function wonLog<G extends { name: string; decks: string }>(part: WonPart<G>, before: CampaignLog = emptyLog(2)): Promise<CampaignLog> {
-  const golden = part.goldens.find((item) => item.name === "two-handed, won");
-  if (!golden) throw new Error(`The ${part.title} golden "two-handed, won" is gone`);
+  const wanted = part.golden ?? "two-handed, won";
+  const golden = part.goldens.find((item) => item.name === wanted);
+  if (!golden) throw new Error(`The ${part.title} golden "${wanted}" is gone`);
   const world = await part.world(golden.decks);
   const game = part.play(golden, world.ctx);
   if (!game.state.stageCleared || game.state.lost) throw new Error(`The ${part.title} golden no longer wins`);

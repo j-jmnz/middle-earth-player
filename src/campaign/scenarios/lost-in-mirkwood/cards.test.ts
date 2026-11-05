@@ -144,4 +144,11 @@ describe("12169 Melanwar", () => {
   it("places 1 progress when the quest succeeded", () => {
     expect(travelWith([], true)).toBe(1);
   });
+
+  it("places 1 progress when the willpower equals the threat: a tie is not unsuccessful (user ruling, 2026-11-05)", () => {
+    // The first hero's Willpower is 2, the two Threat-1 enemies in the staging area add up to 2.
+    expect(travelWith(["mild", "mild"], true)).toBe(1);
+    // One Threat more and the quest fails.
+    expect(travelWith(["mild", "mild", "mild"], true)).toBe(3);
+  });
 });

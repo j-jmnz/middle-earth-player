@@ -212,6 +212,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
+  // No hero is left to take the attack (every hero of the seat is held, 18074): it deals no damage.
+  if (!next.cards[attack.heroId]) return afterDamage(next, ctx, steps);
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
   const hit = noteAttackDamage(next, combatDamage(next, attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx);

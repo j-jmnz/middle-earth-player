@@ -18,6 +18,7 @@ import { wilderlandAsk, wilderlandOptionLabel } from "./wilderland.ts";
 const cards = cardMap([
   hero("frodo", "lore"),
   definePrinted({ code: "stage", name: "Stage", type: "quest" }),
+  definePrinted({ code: "spawn", name: "Spawn", type: "enemy", threat: 2, engagementCost: 40, attack: 3, defense: 3, health: 9 }),
   definePrinted({ code: "hall", name: "Twilight Hall", type: "location", threat: 2, questPoints: 3 }),
   ...["a", "b", "c", "d"].map((code) => definePrinted({ code: `t${code}`, name: `Treasure ${code.toUpperCase()}`, type: "treasure", campaignKind: "treasure" })),
 ]);
@@ -119,6 +120,27 @@ describe("the Wilderland scenario's prompts", () => {
     expect(wilderlandAsk(discard, down.id, { ...words, card: (id) => (id === down.id ? "Weighed Down" : "Frodo") }, { verb: "Discard", target: { kind: "picked" } }, null, forced)?.prompt).toBe("Weighed Down: choose an attachment to discard from Frodo.");
     const itself = { ...forced, options: ["x", down.id] };
     expect(wilderlandAsk(discard, down.id, { ...words, card: (id) => (id === down.id ? "Weighed Down" : "Frodo") }, { verb: "Discard", target: { kind: "picked" } }, null, itself)?.prompt).toContain("Weighed Down can discard itself");
+  });
+
+  it("names the number, the staging area and the owner when a hand goes under a location (18075:A:1), solo and two-handed", () => {
+    const place: Instruction = { verb: "PlaceHandUnderLocation" };
+    const withHand = (seats: 1 | 2) => {
+      let game: ScenarioState = idleScenario(seats);
+      game = spawn(game, "frodo", { zone: "hand", seat: 0 }).state;
+      return spawn(game, "frodo", { zone: "hand", seat: 0 }).state;
+    };
+    expect(wilderlandAsk(place, null, words, undefined, null, { game: withHand(1), ctx, options: ["a", "b"] })?.prompt).toBe(
+      "Choose a location in the staging area to put your hand under, 2 cards facedown. It gets +2 quest points, the cards return to your hand when it is explored, and they are discarded if the players advance.",
+    );
+    expect(wilderlandAsk(place, null, words, undefined, null, { game: withHand(2), ctx, options: ["a", "b"] })?.prompt).toContain("put Player 1's hand under");
+  });
+
+  it("names the hit points and the first player when the nemesis is a tie (18076:A:1)", () => {
+    const nemesis: Instruction = { verb: "SearchNemesis" };
+    let game: ScenarioState = idleScenario(2);
+    const one = spawn(game, "spawn", { zone: "spidersDeck" }, "down");
+    const two = spawn(one.state, "spawn", { zone: "spidersDeck" }, "down");
+    expect(wilderlandAsk(nemesis, null, words, undefined, null, { game: two.state, ctx, options: [one.id, two.id] })?.prompt).toMatch(/^Player 1: 2 enemies are tied for the most hit points \(9\)/);
   });
 
   it("warns that playing a card discards the hand of the player Lost in the Wild goes to", () => {

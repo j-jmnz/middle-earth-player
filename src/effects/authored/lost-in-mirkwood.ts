@@ -202,7 +202,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "18073:forced:2", cardCode: "18073", lines: ["18073:B:2"], timing: "forced", trigger: "damagedByAttack", subject: { type: "character", control: "any" }, eventSeat: "you", condition: { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Orc" } }, instructions: [{ verb: "DiscardFromHand", amount: 1 }] },
 
   // 18074 Carried Away (stage 3A). Each player chooses a hero, which loses its tokens and attachments; the encounter cards discarded until an enemy is discarded, and that enemy enters the staging area and guards the hero: the hero lies under it, in play and controlled by no one
-  // (CarryAwayHero). Side B: the enemies guarding a hero cannot take non-combat damage (the second sentence, the hero in play under no one's control, is the engine's: the captive zone); when one is defeated its hero returns exhausted; leaving the stage discards the heroes still held.
+  // (CarryAwayHero). Side B: the enemies guarding a hero cannot take non-combat damage (the second sentence, the hero in play under no one's control, is the engine's: the captive zone); when one leaves play in any way its hero returns exhausted; leaving the stage discards the heroes still held.
   {
     id: "18074:whenRevealed:1",
     cardCode: "18074",
@@ -211,7 +211,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", card: "picked", to: "staging" }, { verb: "CarryAwayHero" }] }],
   },
   { id: "18074:constant:1", cardCode: "18074", lines: ["18074:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotTakeNonCombatDamage", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, guardsHero: true } }] },
-  { id: "18074:forced:1", cardCode: "18074", lines: ["18074:B:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "card", control: "any", guardsHero: true }, instructions: [{ verb: "ReleaseGuardedHero" }] },
+  { id: "18074:forced:1", cardCode: "18074", lines: ["18074:B:2"], timing: "forced", trigger: "leftPlay", subject: { type: "card", control: "any", guardsHero: true }, instructions: [{ verb: "ReleaseGuardedHero" }] },
   { id: "18074:forced:2", cardCode: "18074", lines: ["18074:B:3"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "DiscardGuardedHeroes" }] },
 
   // 18075 Truly Lost (stage 3C). Each player discards until a non-objective location is discarded and adds it to the staging area (an Objective-Location has the Objective type, so DiscardUntil location skips it); then each places their hand facedown under a different location there.

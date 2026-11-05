@@ -218,12 +218,36 @@ describe("18074 Carried Away", () => {
     expect(back.seats[0]?.heroes[0]).toBe(hero.id);
   });
 
-  it("a guard that leaves play without being defeated does not free the hero", () => {
+  it("a guard that leaves play in any way, discarded by an effect, returns the hero exhausted too (user ruling, 2026-11-05)", () => {
     const { t, run } = reveal({ deck: ["f3"] });
     const hero = Object.values(run.state.cards).find((card) => card.guardedHero === true)!;
     const guard = cardsOf(run.state, "f3")[0]!;
-    const gone = settle(destroyCard(run.state, guard.id, t.ctx.cards, []), t.ctx, []);
-    expect(gone.cards[hero.id]).toMatchObject({ zone: "captive", guardedHero: true });
+    const gone = finish({ state: settle(moveCard(run.state, guard.id, { zone: "encounterDiscard" }), t.ctx, []), steps: [] }, t.ctx).state;
+    expect(gone.cards[guard.id]?.zone).toBe("encounterDiscard");
+    expect(gone.cards[hero.id]).toMatchObject({ zone: "heroes", controller: 0, exhausted: true, face: "up" });
+    expect(gone.cards[hero.id]?.guardedHero).toBeUndefined();
+  });
+
+  it("a guard moving between the staging area and an engagement keeps the hero held", () => {
+    const { run } = reveal({ deck: ["f3"] });
+    const hero = Object.values(run.state.cards).find((card) => card.guardedHero === true)!;
+    const guard = cardsOf(run.state, "f3")[0]!;
+    const engaged = moveCard(run.state, guard.id, { zone: "engaged", seat: 0 });
+    expect(engaged.cards[hero.id]).toMatchObject({ zone: "captive", guardedHero: true });
+  });
+
+  it("a seat whose every hero is held is attacked undefended and takes no damage: the attack ends and the game goes on", () => {
+    const hold = (state: ScenarioState, made: LostmirkTable): ScenarioState => {
+      const guard = spawn(state, "f3", { zone: "staging" });
+      let next = guard.state;
+      for (const hero of [made.hero, made.hero2]) next = updateCard(moveCard(next, hero, { zone: "captive", hostId: guard.id }), hero, { guardedHero: true, owner: 0, face: "down" });
+      return { ...next, seats: next.seats.map((seat, index) => (index === 0 ? { ...seat, heroes: [] } : seat)) as unknown as ScenarioState["seats"] };
+    };
+    const fight = lostmirkFight(world, "f0", "f3", {}, { undefended: true, tweak: hold });
+    expect(fight.run.state.lost).toBe(false);
+    expect(fight.run.state.pendingAttack).toBeNull();
+    expect(fight.run.state.seats[0]?.eliminated).toBeFalsy();
+    for (const hero of [fight.made.hero, fight.made.hero2]) expect(fight.run.state.cards[hero]).toMatchObject({ zone: "captive", damage: 0 });
   });
 
   it("advancing from the stage discards each guarded hero to its owner's discard pile (18074:B:3)", () => {

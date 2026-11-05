@@ -427,6 +427,8 @@ function commit(state: ScenarioState, cardIds: readonly string[], steps: EngineS
 
 function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string {
   const heroes = undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
+  // No hero is left to take the attack (every hero of the seat is held, 18074): nobody does.
+  if (heroes.length === 0) return "";
   if (heroes.length === 1) return heroes[0] ?? "";
   return heroId ?? "";
 }
