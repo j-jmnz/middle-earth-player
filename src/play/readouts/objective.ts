@@ -43,8 +43,9 @@ export function stageText(ctx: ReduceContext, code: string, line: (id: string) =
   return text === "" ? null : text;
 }
 
+// A win is an instruction that wins the game, one a Choose option holds, or one a Delay holds ("When Cold-Drake is defeated, the players win the game", 19025:B:3).
 function wins(instructions: readonly Instruction[]): boolean {
-  return instructions.some((instruction) => instruction.verb === "WinGame" || ("options" in instruction && Array.isArray(instruction.options) && instruction.options.some((option: { instructions?: readonly Instruction[] }) => wins(option.instructions ?? []))));
+  return instructions.some((instruction) => instruction.verb === "WinGame" || (instruction.verb === "Delay" && wins(instruction.instructions)) || ("options" in instruction && Array.isArray(instruction.options) && instruction.options.some((option: { instructions?: readonly Instruction[] }) => wins(option.instructions ?? []))));
 }
 
 /** The printed line that says how the stage is won, or null when the stage fills with progress (or nothing says). */

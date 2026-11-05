@@ -156,6 +156,12 @@ describe("The Withered Heath golden", () => {
         // The offer and the win come after the defeat: Cold-Drake's destruction is announced before the game is won.
         const destroyed = steps.findIndex((step) => step.kind === "destroy" && state.cards[step.targetId]?.code === CODES.coldDrake);
         expect(destroyed, golden.name).toBeGreaterThanOrEqual(0);
+        // The offer is the campaign card's Forced effect: it opens after Cold-Drake's destruction and closes before the game ends, where the win is announced.
+        const campaignCard = Object.values(state.cards).find((card) => card.code === CODES.campaignCard)?.id;
+        const isOffer = (kind: "push" | "pop") => (step: (typeof steps)[number]): boolean => step.kind === kind && step.frame === "forced" && step.cardId === campaignCard;
+        const offered = steps.findIndex((step, index) => index > destroyed && isOffer("push")(step));
+        expect(offered, golden.name).toBeGreaterThan(destroyed);
+        expect(steps.findLastIndex(isOffer("pop")), golden.name).toBeGreaterThan(offered);
         expect(state.stageCleared, golden.name).toBe(true);
       });
 

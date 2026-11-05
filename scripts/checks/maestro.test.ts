@@ -221,6 +221,8 @@ describe("the Maestro flows", () => {
         if (given.includes("CHOICE2_ID")) {
           expect(["CHOICE_ID", "CHOICE2_PROMPT", "CHOICE2_CONSEQUENCE"].filter((name) => !given.includes(name)), flow.rel).toEqual([]);
         }
+        // A seat label for the second choice goes only with a second choice.
+        if (given.includes("CHOICE2_SEAT")) expect(given, flow.rel).toContain("CHOICE2_ID");
       }
     }
     expect(calls).toBeGreaterThan(0);

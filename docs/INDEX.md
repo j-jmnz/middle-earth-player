@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~71.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~72.1K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,7 +92,7 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–707 Ered Mithrin (~6.3K) ← 1
+  - 686–707 Ered Mithrin (~6.5K) ← 1
   - 708–716 Nightmare (~420)
   - 717–755 Deckbuilding (~1.8K) ← 1
   - 756–834 Effects (~3.2K)
@@ -105,7 +105,7 @@ Read the sections your task touches.
   - 875–900 Persistence and shipping (~1.7K)
   - 901–942 Screens (~4.7K) ← 2
     - 927–942 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~32.6K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~32.9K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -113,7 +113,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560) ← 2
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
-  - 58–84 Cards (~5.0K) ← 9
+  - 58–84 Cards (~5.1K) ← 9
   - 85–90 The Sailing test (~690) ← 5
   - 91–104 The Island Map (~1.7K) ← 8
   - 105–108 Tokens and effects (~320)
@@ -129,7 +129,7 @@ Read the sections your task touches.
   - 261–264 One answer, one tap (~240)
   - 265–268 Stops and Always use (~250)
   - 269–272 Guide (~120)
-  - 273–284 Choice tray (~2.8K) ← 12
+  - 273–284 Choice tray (~3.1K) ← 12
   - 285–298 Reading panels (~1.5K) ← 6
   - 299–308 Phase carousel (~680)
   - 309–314 Quest advance (~530) ← 1
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~10.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~10.2K tok)
   - 5–17 Rules (~620)
-  - 18–89 Phases (~2.7K)
-  - 90–210 Open items (~6.2K)
-    - 92–109 Fixtures and Maestro (~850)
-    - 110–156 Rules and engine (~2.0K)
-    - 157–181 Screens and code (~1.3K)
-    - 182–210 Phone and tablet checks (~2.0K)
-  - 211–227 Standing decisions (~430)
+  - 18–89 Phases (~2.8K)
+  - 90–212 Open items (~6.3K)
+    - 92–110 Fixtures and Maestro (~900)
+    - 111–157 Rules and engine (~2.0K)
+    - 158–182 Screens and code (~1.3K)
+    - 183–212 Phone and tablet checks (~2.1K)
+  - 213–229 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)

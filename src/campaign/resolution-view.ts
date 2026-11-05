@@ -204,7 +204,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     eyebrow,
     // A boon ally's offer is the first player's alone, and a table of several players is told whose (the first player token).
     ...(kingsBurden ? { joins: nameOf(world, "12174") } : {}),
-    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
+    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
     ...(noun === "Song boon" ? { songs: true as const } : {}),
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,

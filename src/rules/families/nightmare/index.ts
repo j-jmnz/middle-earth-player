@@ -18,11 +18,12 @@ import { matchesPick } from "../../interpret/pick.ts";
 import { printedOf } from "../../core/printed.ts";
 import { engageEnemy, engageWith } from "../../quest/quest.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import type { GameEvent, ResponseOffer, ScenarioState } from "../../core/state.ts";
+import type { ResponseOffer, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { dealAttackShadow } from "../defense/listen.ts";
+import { cancelsReveal } from "../encounter/cancel.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./dungeon.ts";
@@ -153,10 +154,7 @@ function attachIfDamaged(state: ScenarioState, cardId: string, defenderId: strin
 // A Response that would cancel the effects of an encounter card being revealed, on a card with the trait its When Revealed record names in
 // NotCanceledBy ("cannot be canceled by the Ring-bearer's effect", 906208:A:1), is not offered (rr.cancel).
 export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, effect: Effect, ctx: ReduceContext): boolean {
-  const event: GameEvent | undefined = offer.event;
-  if (!event || (event.trigger !== "encounterRevealed" && event.trigger !== "whenRevealedPending")) return false;
-  if (!effect.instructions.some((instruction) => instruction.verb === "CancelEffect")) return false;
-  const subject = event.subject ?? event.cardId;
+  const subject = offer.event ? cancelsReveal(state, offer.event, effect) : undefined;
   const code = subject ? state.cards[subject]?.code : undefined;
   if (!code) return false;
   const traits = effectsOf(ctx, code)

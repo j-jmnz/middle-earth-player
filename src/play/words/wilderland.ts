@@ -79,17 +79,8 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  // Deadly Cold (19021:A:1): the character just picked is exhausted or takes the damage; each player decides for the characters they control.
-  const [exhaust, damage] = choose.options;
-  if (choose.options.length === 2 && exhaust?.id === "exhaust" && exhaust.instructions[0]?.verb === "Exhaust" && damage?.id === "damage" && damage.instructions[0]?.verb === "DamageCard") {
-    const data = topFrame(game)?.data;
-    const picked = data?.kind === "effect" ? data.picked?.at(-1) : undefined;
-    const amount = damage.instructions[0].amount;
-    const text = `exhaust ${picked ? names.card(picked) : "this character"}, or deal it ${typeof amount === "number" ? amount : 1} damage?`;
-    return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
-  }
-  const accolade = heathChooseNote(choose, game, names);
-  if (accolade) return accolade;
+  const heath = heathChooseNote(choose, game, names);
+  if (heath) return heath;
   const offer = searchOffer(choose);
   if (!offer) return null;
   const left = Math.min(offer.count, undiscoveredTreasures(game, ctx).length);
@@ -204,7 +195,7 @@ function kingsQuestAsk(instruction: Instruction, source: string | null, names: C
 /** The label of an option of that choice: the treasure's title, or the card a Caves look or a Dragon search offers. Null for another instruction. */
 export function wilderlandOptionLabel(instruction: Instruction, id: string, names: ChoiceNames): string | null {
   if (instruction.verb === "ArrangeCaves" || instruction.verb === "AttachSearched") return names.card(id);
-  const done = heathOptionLabel(instruction, id);
+  const done = heathOptionLabel(instruction, id, names);
   if (done) return done;
   return isTreasureDraw(instruction) ? names.code(id) : null;
 }
@@ -248,18 +239,14 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
-export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null): string | null {
-  const accolade = heathBranchWords(choose, optionId, names);
+export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState): string | null {
+  const accolade = heathBranchWords(choose, optionId, names, game);
   if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";
   const option = choose.options.find((entry) => entry.id === optionId);
   if (option?.instructions[0]?.verb === "ReplaceFromCaves") return "Discard it and replace it with the top card of the Caves deck";
   if (option?.instructions[0]?.verb === "CancelStrike") return "Cancel the attack: no damage, the attackers stay exhausted";
-  // Deadly Cold (19021:A:1): the character the question is about is the one the sentence over the choice names.
-  const lead = option?.instructions[0];
-  if (lead?.verb === "Exhaust" && lead.target?.kind === "picked" && choose.options.length === 2) return "Exhaust it";
-  if (lead?.verb === "DamageCard" && lead.target === "picked" && choose.options.length === 2 && typeof lead.amount === "number") return `Deal it ${lead.amount} damage`;
   const spread = option ? distributeBranch(option) : null;
   if (spread) return `Assign ${now?.counted?.[optionId] ?? "all the"} damage among your characters: ${source ?? "this card"} is shuffled back into the encounter deck`;
   // 12172:A:2: "all encounter cards are immune to player card effects until the end of the phase".

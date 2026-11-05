@@ -80,7 +80,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 52 | Journey Up the Anduin | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `upanduin-won` missing, so the win flow cannot run. |
 | 53 | Lost in Mirkwood | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `lostmirk-won` missing, so the win flow cannot run. |
 | 54 | The King's Quest | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `kingsquest-won` missing, so the win flow cannot run. |
-| 55 | The Withered Heath | not started | |
+| 55 | The Withered Heath | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `heath-won` missing, so the win flow cannot run. |
 | 56 | Roam Across Rhovanion | not started | |
 | 57 | Fire in the Night | not started | |
 | 58 | The Ghost of Framsburg | not started | |
@@ -90,6 +90,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ## Open items
 
 ### Fixtures and Maestro
+- `heath-won` is not committed: none of 100 seeds wins The Withered Heath with the starter decklists. Until it exists `.maestro/scenarios/the-withered-heath/the-withered-heath.yaml` (with `CHOICE2_SEAT`) cannot run.
 - `kingsquest-won` is not committed: none of 100 seeds wins The King's Quest with the starter decklists. Until it exists `.maestro/scenarios/the-kings-quest/the-kings-quest.yaml` (and its `CHOICE2_*` path in `scenario-win.yaml`) cannot run.
 - `lostmirk-won` is not committed: none of 100 seeds wins Lost in Mirkwood with the starter decklists. Until it exists `.maestro/scenarios/lost-in-mirkwood/lost-in-mirkwood.yaml` cannot run, and its pool and treasure asserts do not yet prove part 2 wrote them.
 - `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run. `scenario-win.yaml` now taps Confirm twice after a choice and takes `NO_XP`; no flow using it has run.
@@ -182,6 +183,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ### Phone and tablet checks
 - Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
 - Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
+- The Withered Heath: Deadly Cold's named rows and Tap again caution, the Accolade offer and decline rows two-handed, Master of the Hunt and The Canny Huntsman top/bottom steps at 667 × 375, the Dragon Sign count and stage 3/4 details, the Resolution's Song and treasure questions with their seat labels, the Campaign Setup boon-ally search.
 - The King's Quest: the Stone-troll discard count, Dagnir's Spawn's branch, the Eyes in the Dark hero caution (Tap again), the Resolution's burden choice with its seat label, the Dragon Scales shield badge, the long notes at 667 × 375.
 - Lost in Mirkwood: the Twilight Hall offer and the Claim step; the Player N lead on Carried Away and Truly Lost at 667 × 375; the held-hero, hand-under and nemesis preview lines; objective-locations' quest points and travel.
 - Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.

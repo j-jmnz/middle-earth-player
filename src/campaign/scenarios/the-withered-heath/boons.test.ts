@@ -6,6 +6,7 @@ import { reduce, startScenario, type ReduceContext } from "../../../rules/engine
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
 import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { readyBarred } from "../../../rules/core/holder-classes.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
@@ -301,7 +302,7 @@ describe("12182 Lay of Courage", () => {
     expect(offered).toBeDefined();
     const used = finish(send(run, { ...(offered as Extract<PlayerIntent, { type: "Trigger" }>), payments: [{ heroId: t.hero, amount: 1 }] } as PlayerIntent, tired.ctx), tired.ctx);
     // Heavy Snow's When Revealed did not resolve: no character was exhausted by it and the readying bar did not start.
-    expect(flagged(used.state, tired.hero, "cannotReadyByEffect")).toBe(false);
+    expect(readyBarred(used.state, tired.hero, world.cards)).toBe(false);
     expect(used.state.cards[tired.hero]?.exhausted).toBe(false);
     expect(used.state.cards[idOf(used.state, CODES.layOfCourage)]?.zone).toBe("victory");
   });
@@ -311,7 +312,7 @@ describe("12182 Lay of Courage", () => {
     let run = start(t.state);
     for (let guard = 0; guard < 8 && run.state.window?.kind === "pass"; guard += 1) run = send(run, { type: "Pass" }, t.ctx);
     run = finish(run, t.ctx);
-    expect(flagged(run.state, t.hero, "cannotReadyByEffect")).toBe(true);
+    expect(readyBarred(run.state, t.hero, world.cards)).toBe(true);
   });
 
   it("12182:A:1 it is a Quest Response: not offered in the combat phase", () => {
@@ -339,6 +340,16 @@ describe("12183 Rhyme of the Slayer", () => {
     const run = play(t, CODES.rhymeOfTheSlayer, takes(CODES.coldDrake));
     expect(modifiedStat(run.state, run.state.cards[drake]!, "attack", world.cards)).toBe((world.cards.get(CODES.coldDrake)?.attack ?? 0) - 4);
     expect(run.state.modifiers.filter((modifier) => modifier.against != null)).toEqual([]);
+  });
+
+  it("12183:A:1 the card says \"Choose an enemy\": an enemy engaged with a player and one in the staging area are both offered", () => {
+    const t = funded(carrying({ phase: "Combat", hand: [CODES.rhymeOfTheSlayer], engaged: ["f3"], staging: ["mild"] }, []));
+    const offered: string[][] = [];
+    play(t, CODES.rhymeOfTheSlayer, (state) => {
+      if (state.window?.kind === "choose") offered.push(state.window.options.map((id) => state.cards[id]?.code ?? id));
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(offered[0]?.slice().sort()).toEqual(["f3", "mild"]);
   });
 
   it("12183:A:1 it can choose an enemy in the staging area, and is a Combat Action: not playable in the quest phase", () => {

@@ -1,6 +1,6 @@
 // Rules: emce.caves-deck, emce.dragon-signs, rr.guarded, rr.victory, rr.cancel, rr.in-play-and-out-of-play, rr.damage (data/rules/entries.json); ledger lines 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1, 19022:B:1, 19024:A:1, 19024:B:2, 19021:A:1, 19023:B:3.
 // The verbs The Withered Heath adds to the wilderland family, one by one, on the family's fixture table.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { definePrinted } from "../../core/printed.ts";
@@ -13,14 +13,17 @@ import { settle } from "../../engine/machine.ts";
 import { effectData } from "../encounter/moves.ts";
 import { drawTreasures } from "./treasure.ts";
 import { codesOf, ctxOf, deal, marker, record, table, CARDS } from "./fixture.ts";
-import { arrangeLookedDeck, attachGuardedFromPile, discardOtherLooked, immediateAttackBy, removeSetAsideDamage, setAsideKeepingDamage, shuffleSetAsideIntoPile, victoryWhenFree, whenRevealedUncancelable } from "./heath.ts";
+import { arrangeLookedDeck, attachGuardedFromPile, discardOtherLooked, immediateAttackBy, removeSetAsideDamage, shuffleSetAsideIntoPile, victoryWhenFree, whenRevealedUncancelable } from "./heath.ts";
 import { guardWith } from "../objectives/guard.ts";
+import { setAsideInPlay } from "../caves/index.ts";
+import * as constantRecords from "../../interpret/constant-records.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 
 const focus = (sourceId: string | null) => ({ seat: 0, sourceId });
 const drake = definePrinted({ code: "drake", name: "Cold-Drake", type: "enemy", isUnique: true, threat: 1, engagementCost: 10, attack: 6, defense: 1, health: 18, victory: 6 });
 const cards = new Map([...CARDS, ["drake", drake], ["weather", definePrinted({ code: "weather", name: "Heavy Snow", type: "treachery", traits: ["Weather"] })]]);
 const ctx = { effects: [marker("sign", { verb: "VictoryWhenFree" })], cards };
+const KEEP = { verb: "SetAsideInPlay", code: "drake", keepDamage: true } as const;
 
 describe("ShuffleSetAsideIntoPile (19022:A:1, 19024:A:1)", () => {
   const withCaves = (setAside: number) => {
@@ -48,7 +51,7 @@ describe("ShuffleSetAsideIntoPile (19022:A:1, 19024:A:1)", () => {
   });
 });
 
-describe("SetAsideKeepingDamage and RemoveSetAsideDamage (19024:A:1, 19024:B:2)", () => {
+describe("SetAsideInPlay with keepDamage and RemoveSetAsideDamage (19024:A:1, 19024:B:2)", () => {
   const inPlay = () => {
     const made = spawn(table(), "drake", { zone: "staging" });
     return { state: updateCard(made.state, made.id, { damage: 11, resources: 2 }), id: made.id };
@@ -56,18 +59,18 @@ describe("SetAsideKeepingDamage and RemoveSetAsideDamage (19024:A:1, 19024:B:2)"
 
   it("sets the card aside facedown with its damage, and loses its other tokens", () => {
     const { state, id } = inPlay();
-    const done = setAsideKeepingDamage(state, { verb: "SetAsideKeepingDamage", code: "drake" }, ctxOf([]), []);
+    const done = setAsideInPlay(state, KEEP, ctxOf([]), []);
     expect(done.cards[id]).toMatchObject({ zone: "setAside", face: "down", damage: 11, resources: 0, controller: null });
   });
 
   it("nothing happens when no such card is in play", () => {
     const state = table();
-    expect(setAsideKeepingDamage(state, { verb: "SetAsideKeepingDamage", code: "drake" }, ctxOf([]), [])).toBe(state);
+    expect(setAsideInPlay(state, KEEP, ctxOf([]), [])).toBe(state);
   });
 
   it("the damage stays on the card as it enters play again, and only then (a card set aside any other way enters clean)", () => {
     const { state, id } = inPlay();
-    const away = setAsideKeepingDamage(state, { verb: "SetAsideKeepingDamage", code: "drake" }, ctxOf([]), []);
+    const away = setAsideInPlay(state, KEEP, ctxOf([]), []);
     const back = moveCard(away, id, { zone: "staging" });
     expect(back.cards[id]).toMatchObject({ zone: "staging", damage: 11 });
     expect(back.cards[id]?.keepsDamage).toBeUndefined();
@@ -77,7 +80,7 @@ describe("SetAsideKeepingDamage and RemoveSetAsideDamage (19024:A:1, 19024:B:2)"
 
   it("removes up to `amount` damage tokens from the set-aside card, to 0", () => {
     const { state, id } = inPlay();
-    let away = setAsideKeepingDamage(state, { verb: "SetAsideKeepingDamage", code: "drake" }, ctxOf([]), []);
+    let away = setAsideInPlay(state, KEEP, ctxOf([]), []);
     const damage: number[] = [];
     for (let round = 0; round < 5; round += 1) {
       away = removeSetAsideDamage(away, { verb: "RemoveSetAsideDamage", code: "drake", amount: 3 });
@@ -141,6 +144,17 @@ describe("VictoryWhenFree (19012:A:3)", () => {
     expect(victoryWhenFree(made.state, ctxOf([]), []).cards[made.id]?.zone).toBe("staging");
   });
 
+  it("a game without a card whose record has the verb does no work, though the effect list holds one", () => {
+    const lookups = vi.spyOn(constantRecords, "constantVerbCodes");
+    const quiet = spawn(table(), "orc", { zone: "staging" });
+    expect(sweep(quiet.state)).toBe(quiet.state);
+    expect(lookups).not.toHaveBeenCalled();
+    const made = spawn(table(), "sign", { zone: "staging" });
+    expect(sweep(made.state).cards[made.id]?.zone).toBe("victory");
+    expect(lookups).toHaveBeenCalled();
+    lookups.mockRestore();
+  });
+
   it("is a settle sweep: settle moves the freed sign", () => {
     const sign = spawn(table(), "sign", { zone: "staging" });
     const orc = spawn(sign.state, "orc", { zone: "staging" });
@@ -171,6 +185,16 @@ describe("UncancelableWhenRevealed (19015:A:1)", () => {
     const reacts = record("hero:response:8", "frodo", "response", [{ verb: "RaiseThreat", amount: 1 }], { trigger: "whenRevealedPending" });
     expect(whenRevealedUncancelable(card.state, { trigger: "whenRevealedPending", seat: 0, subject: card.id }, reacts, { effects: [bar], cards })).toBe(false);
     expect(whenRevealedUncancelable(card.state, { trigger: "questSucceeded", seat: 0, subject: card.id }, cancels, { effects: [bar], cards })).toBe(false);
+  });
+
+  it("a game without a card whose record has the marker does no work, though the effect list holds one", () => {
+    const scans = vi.spyOn(constantRecords, "constantInstructions");
+    const plain = spawn(table(), "weather", { zone: "staging" });
+    expect(whenRevealedUncancelable(plain.state, { trigger: "whenRevealedPending", seat: 0, subject: plain.id }, cancels, { effects: [bar, cancels], cards })).toBe(false);
+    expect(scans).not.toHaveBeenCalled();
+    expect(check("weather", [bar])).toBe(true);
+    expect(scans).toHaveBeenCalled();
+    scans.mockRestore();
   });
 
   it("the source's own condition decides: a marker whose record needs the staging area bars nothing from the discard pile", () => {

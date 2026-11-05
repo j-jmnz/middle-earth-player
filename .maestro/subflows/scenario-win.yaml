@@ -9,6 +9,7 @@ appId: com.middleearth.lcg
 # CHOICE_PROMPT the choice's eyebrow text, CHOICE_CONSEQUENCE the sentence the confirm line shows once the card is chosen (a regular expression). The screen has two Confirm steps: the first sends the choice, and the second, under the settled sentence
 # ("Confirming records ..."), writes the log.
 # Optional env: CHOICE2_ID, CHOICE2_PROMPT, CHOICE2_CONSEQUENCE (all three or none, and only with CHOICE_ID): a Resolution that asks a second choice once the first is confirmed (The King's Quest: Isolde, then the burden for Abandoned Ruin). They read as CHOICE_ID, CHOICE_PROMPT and CHOICE_CONSEQUENCE do, and the second Confirm sends the second choice and settles the screen.
+# Optional env: CHOICE2_SEAT (only with CHOICE2_ID): the seat label the second choice shows ("Player 2 chooses"), read before the choice is tapped, for a Resolution whose two questions share a prompt (The Withered Heath's Songs).
 # Optional env: LAST_PART (any value: the scenario is the last of its campaign). The campaign is then complete, so the XP total stays on the path and Spend XP is gone; the flow asserts only the total.
 - launchApp:
     clearState: true
@@ -75,6 +76,13 @@ appId: com.middleearth.lcg
       - extendedWaitUntil:
           visible: "${CHOICE2_PROMPT}"
           timeout: 15000
+      - runFlow:
+          when:
+            true: "${typeof CHOICE2_SEAT !== 'undefined' && CHOICE2_SEAT !== ''}"
+          commands:
+            - assertVisible:
+                id: resolution-seat
+                text: "${CHOICE2_SEAT}"
       - assertVisible:
           id: resolution-choice-${CHOICE2_ID}
       - tapOn:

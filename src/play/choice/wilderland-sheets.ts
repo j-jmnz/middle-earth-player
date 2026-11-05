@@ -5,9 +5,15 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 
 import { damageOutcome } from "../store/foresight.ts";
 
-/** "Tap again: Beorn is destroyed" for a branch that deals damage to each card its filter finds, when that destroys one; null otherwise. The game is lost when the card's leaving loses it (damageOutcome). */
-export function branchCaution(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, seat: number, sourceId: string | null, name: (id: string) => string): string | null {
-  const step = choose.options.find((option) => option.id === optionId)?.instructions.find((instruction) => instruction.verb === "DamageEach");
+/** "Tap again: Beorn is destroyed" for a branch that deals damage to each card its filter finds, when that destroys one; null otherwise. The game is lost when the card's leaving loses it (damageOutcome). Deadly Cold (19021:A:1) deals its damage to the one character `picked`. */
+export function branchCaution(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, seat: number, sourceId: string | null, name: (id: string) => string, picked: string | null = null): string | null {
+  const instructions = choose.options.find((option) => option.id === optionId)?.instructions ?? [];
+  const hurt = instructions.find((instruction) => instruction.verb === "DamageCard");
+  if (hurt?.verb === "DamageCard" && hurt.target === "picked" && typeof hurt.amount === "number" && picked != null) {
+    const outcome = damageOutcome(game, ctx, picked, hurt.amount);
+    return outcome.loss ? `Tap again: ${name(picked)} falls and the game is lost` : outcome.destroyed ? `Tap again: ${name(picked)} is destroyed` : null;
+  }
+  const step = instructions.find((instruction) => instruction.verb === "DamageEach");
   if (step?.verb !== "DamageEach" || typeof step.amount !== "number" || !step.pick || step.pick.control !== "you") return null;
   const outcomes = pickCandidates(game, step.pick, seat, [], sourceId, ctx).map((id) => ({ id, outcome: damageOutcome(game, ctx, id, step.amount as number) }));
   const lost = outcomes.find((entry) => entry.outcome.loss);

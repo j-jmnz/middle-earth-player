@@ -69,6 +69,8 @@ describe("12175:A Setup", () => {
     const taken = heathPlan(2, log, ["skip", CODES.melanwar]);
     expect(taken.seats[1]?.afterMulligan).toEqual([CODES.melanwar]);
     expect(taken.seats[1]?.deck).not.toContain(CODES.melanwar);
+    // The checklist's line says when the ally joins the hand.
+    expect(taken.steps.flatMap((step) => step.did)).toContain("Seat 2 searches their deck for Melanwar and adds it to their hand after the mulligan.");
     expect(taken.seats[0]?.deck).toContain(CODES.turayn);
     // The ally taken stays in the pool, shuffled into no deck.
     expect(taken.log.campaignPool.map((card) => card.code)).toEqual(expect.arrayContaining([CODES.turayn, CODES.melanwar]));
@@ -433,6 +435,13 @@ describe("12175:B Resolution", () => {
       const sentence = choiceSentence(view, view.tiles[0]!);
       expect(sentence).toBe(`The Canny Huntsman is added to the campaign pool.${seats === 2 ? " No other player can take it." : ""}`);
       expect(consequenceSentence(view, null, true)).toContain("Song boon");
+    }
+  });
+
+  it("12175:B:7 two-handed, the treasure question names the first player who chooses it; solo it has no label", () => {
+    for (const seats of [1, 2] as const) {
+      const view = questions(seats, 4).find((entry) => entry.kind === "choosing" && entry.to === "treasure");
+      expect(view, `${seats} seats`).toMatchObject({ kind: "choosing", seatLabel: seats === 2 ? "Player 1 (first player) chooses" : null });
     }
   });
 

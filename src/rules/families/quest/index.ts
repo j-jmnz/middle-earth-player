@@ -49,7 +49,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "ReadyAll": {
       let next = state;
-      for (const id of characters(state, focus.seat, ctx.cards)) if (!instruction.trait || hasTrait(state, id, instruction.trait, ctx)) next = readyCard(next, id, playerSource(state, focus.sourceId, ctx));
+      for (const id of characters(state, focus.seat, ctx.cards)) if (!instruction.trait || hasTrait(state, id, instruction.trait, ctx)) next = readyCard(next, id, playerSource(state, focus.sourceId, ctx), ctx.cards);
       return next;
     }
     case "BarEngagement": {

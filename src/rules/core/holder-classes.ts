@@ -1,0 +1,45 @@
+// Rules: rr.lasting-effects, rr.attachment-cards (data/rules/entries.json).
+import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
+
+import { cardTypeOf, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
+import type { CardInstance, ScenarioState } from "./state.ts";
+import { flagged, inPlay, modifierActive } from "./state.ts";
+
+// The holder of a modifier on every ally in play, now and entering play later: an encounter card's lasting effect
+// (rr.lasting-effects, 141071:A:1). It stands in the modifier's instance id.
+export const ALLIES_CLASS = "allies";
+// The same for every character, hero or ally ("Until the end of the round, characters cannot be readied by player card effects", 19020:A:2).
+export const CHARACTERS_CLASS = "characters";
+export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS;
+
+// Whether a modifier is held by this card: by its id, or by a class it belongs to.
+export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
+  if (modifier.instanceId === instance.id) return true;
+  if (!inPlay(instance.zone)) return false;
+  if (modifier.instanceId === ALLIES_CLASS) return cardTypeOf(instance, printed) === "ally";
+  return modifier.instanceId === CHARACTERS_CLASS && (instance.zone === "heroes" || isCharacterType(printed));
+}
+
+// A modifier held by a class of cards rather than one card: no card has to exist for it yet.
+export function addClassModifier(
+  state: ScenarioState,
+  holder: ClassHolder,
+  sourceId: string,
+  stat: ModifierStat,
+  amount: number,
+  until: ModifierUntil,
+): ScenarioState {
+  return { ...state, modifiers: [...state.modifiers, { instanceId: holder, sourceId, stat, amount, until }] };
+}
+
+// A card effect cannot ready the card: it cannot ready at all (cannotReady), or only not by card effects (cannotReadyByEffect,
+// "characters cannot ready from card effects", 12102:A:1; the refresh phase readies it), or not by player card effects
+// (cannotReadyByPlayerCard, on the card or on the class of characters, 19020:A:2). `byPlayer` is the printed cards of the game when
+// the effect comes from a player card; without it the player-card bar does not apply.
+export function readyBarred(state: ScenarioState, id: string, byPlayer?: ReadonlyMap<string, PrintedCard>): boolean {
+  if (flagged(state, id, "cannotReady") || flagged(state, id, "cannotReadyByEffect")) return true;
+  const card = state.cards[id];
+  if (byPlayer == null || card == null) return false;
+  const printed = printedOf(byPlayer, card.code);
+  return state.modifiers.some((modifier) => modifier.stat === "cannotReadyByPlayerCard" && modifier.amount > 0 && modifierActive(state, modifier) && heldBy(modifier, card, printed));
+}

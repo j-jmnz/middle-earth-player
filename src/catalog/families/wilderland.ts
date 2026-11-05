@@ -137,8 +137,6 @@ const VERBS = [
   // The Withered Heath (part 4, campaign card 12175; ledger lines 12175:A:2, 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1, 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4).
   // "Shuffle 2 set aside Dragon Sign objectives into the Caves deck" (19022:A:1, 19024:A:1): up to `count` set-aside copies of the card join the pile, which is shuffled with the game's seed. A game that dealt no such pile, or has no copy set aside, changes nothing.
   z.strictObject({ verb: z.literal("ShuffleSetAsideIntoPile"), pile, code, count: z.number().int().positive(), ...when }),
-  // "Set Cold-Drake aside, out of play. (Do not remove damage tokens from it.)" (19024:A:1): the card in play with this code is set aside, facedown, as SetAsideInPlay sets one aside, but it keeps the damage tokens on it. Its attachments are discarded. Nothing happens when no such card is in play.
-  z.strictObject({ verb: z.literal("SetAsideKeepingDamage"), code, ...when }),
   // "Remove 3 damage tokens from the set-aside Cold-Drake" (19024:B:2): up to `amount` damage tokens come off the set-aside card with this code (no card in play has the damage: moria's RemoveDamageFrom reaches only a card in play).
   z.strictObject({ verb: z.literal("RemoveSetAsideDamage"), code, amount: z.number().int().positive(), ...when }),
   // "Search the Caves deck for a Dragon Sign and attach it to Creature Den as a guarded objective. Shuffle the Caves deck." (19018:A:1): the first card of the pile with this code enters the staging area (added to it from out of play) and the source card, in play as the active location,
@@ -181,6 +179,8 @@ const FLAGS = [
   "cancelsDamage",
   // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/keywords.ts placeDamage).
   "damageCeiling",
+  // On a character, or on every character ModifyStat target "characters" holds now and later: player card effects cannot ready it ("characters cannot be readied by player card effects", 19020:A:2). Read by readyBarred (rules/core/holder-classes.ts).
+  "cannotReadyByPlayerCard",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

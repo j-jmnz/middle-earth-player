@@ -106,7 +106,7 @@ const FLAGS = [
   "noFlipActive",
   // On a card: it cannot enter the staging area ("Shrine to Morgoth cannot enter the staging area", 12094:A:1); moveCard refuses a move there.
   "cannotEnterStaging",
-  // On a card: card effects cannot ready it ("characters cannot ready from card effects", 12102:A:1); the refresh phase still does. Read by readyBarred (rules/core/state.ts).
+  // On a card: card effects cannot ready it ("characters cannot ready from card effects", 12102:A:1); the refresh phase still does. Read by readyBarred (rules/core/holder-classes.ts).
   "cannotReadyByEffect",
 ] as const;
 

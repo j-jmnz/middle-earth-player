@@ -120,7 +120,7 @@ export type CardInstance = {
   guardedHero?: true;
   // A player card an enemy holds under it, faceup (Hobgoblin, 18050:A:2): it returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set only by GuardWithDeckTop.
   held?: true;
-  // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideKeepingDamage.
+  // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;

@@ -5,8 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { legalIntents } from "../../rules/engine/legal.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
+import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
+import { attachTo, spawn } from "../../rules/core/zones.ts";
 import { pushCardEffects } from "../../rules/interpret/effect-frames.ts";
 import { CODES, heathTable, idOf, loadHeathWorld, send, type HeathWorld } from "../../../test/scenarios/the-withered-heath/scene.ts";
 
@@ -50,7 +50,27 @@ describe("the Accolade boon a stage defeated offers (12175:B:1)", () => {
     const sheet = sheetOf(t, state);
     expect(sheet.note).toMatch(/^Player 1: attach Master of the Hunt to one of your heroes\? It is the reward for defeating stage 1, you control no Accolade boon, and it joins your Campaign Pool on that hero if you win\./);
     expect(sheet.note).not.toContain("Player 1 chooses");
-    expect(labels(sheet)).toEqual(["Attach Master of the Hunt to one of your heroes", "Decline Master of the Hunt: it is not offered again"]);
+    expect(labels(sheet)).toEqual(["Attach Master of the Hunt to one of your heroes", "Decline Master of the Hunt: Player 2 is offered it next"]);
+  });
+
+  it("the decline row says the next seat that controls no Accolade boon is offered it, and 'not offered again' for the last such seat", () => {
+    const { t, state } = offer(2, "19023", 1);
+    expect(labels(sheetOf(t, state)).at(-1)).toBe("Decline Master of the Hunt: Player 2 is offered it next");
+    // Player 2 already carries another Accolade boon: Player 1's decline is the last offer.
+    const unbroken = spawn(t.state, CODES.unbroken, { zone: "play", seat: 1 });
+    const held = attachTo(unbroken.state, unbroken.id, t.seat1Hero ?? "");
+    const lone = opened(t, held, CODES.campaignCard, "forced", idOf(held, CODES.campaignCard), "forced", "12175:forced:1");
+    expect(labels(sheetOf(t, lone)).at(-1)).toBe("Decline Master of the Hunt: it is not offered again");
+    // The first player token on Player 2: the first offer is Player 2's, and Player 1 is offered it next.
+    const flipped = { ...t.state, firstPlayer: 1 };
+    const turned = opened(t, flipped, CODES.campaignCard, "forced", idOf(flipped, CODES.campaignCard), "forced", "12175:forced:1");
+    const sheet = sheetOf(t, turned);
+    expect(sheet.note).toMatch(/^Player 2: attach Master of the Hunt/);
+    expect(labels(sheet).at(-1)).toBe("Decline Master of the Hunt: Player 1 is offered it next");
+    // Declining as the first seat, the second seat is asked, and nobody follows it.
+    const second = sheetOf(t, take(t, state, "decline"));
+    expect(second.note).toMatch(/^Player 2: attach Master of the Hunt/);
+    expect(labels(second).at(-1)).toBe("Decline Master of the Hunt: it is not offered again");
   });
 
   it("solo, has no lead; the last stage is the defeat of Cold-Drake", () => {
@@ -86,12 +106,22 @@ describe("Master of the Hunt (12176:A:4)", () => {
     const pick = sheetOf(t, state);
     expect(pick.note).toMatch(/^Player 1: choose a player to look at the top 3 cards of their deck\. They put 1 of them on top of their deck and the rest on the bottom, in any order\./);
     expect(labels(pick)).toEqual(["Player 1", "Player 2"]);
-    const looking = pass(t, take(t, state, pick.options[0]!.id));
+    const picked = take(t, state, pick.options[0]!.id);
+    // The look names the player whose deck it is, and says the cards are moved next.
+    expect(picked.window?.kind).toBe("look");
+    const look = sheetOf(t, picked);
+    expect(look.note).toBe("Player 1: the top 3 cards of your deck. You keep 1 on top and put the rest on the bottom next.");
+    expect(look.note).not.toContain("Nothing moves");
+    const looking = pass(t, picked);
     const keep = sheetOf(t, looking);
+    expect(labels(keep).every((label) => label.startsWith("Keep on top: "))).toBe(true);
     expect(keep.note).toMatch(/^Player 1: choose the card that stays on top of your deck\. The other 2 go to the bottom, in the order you choose next\./);
     expect(keep.note).not.toContain("Player 1 chooses");
     const next = sheetOf(t, take(t, looking, keep.options[0]!.id));
-    expect(next.note).toMatch(/^Player 1: choose the next card for the bottom of your deck, highest first \(2 left\)\./);
+    expect(next.note).toMatch(/^Player 1: choose the next card to place under the rest of your deck, below the ones already placed \(2 left\)\./);
+    expect(next.note).not.toContain("highest first");
+    expect(labels(next).every((label) => label.startsWith("To bottom: "))).toBe(true);
+
   });
 
   it("solo, has no lead and no player to choose", () => {
@@ -112,9 +142,17 @@ describe("The Canny Huntsman (12180:A:1)", () => {
   it("two-handed, leads with the player and says the cards chosen go to the bottom, in order, and Done puts the rest on top", () => {
     const { t, state } = song(2);
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toMatch(/^Player 1: choose the cards that go to the bottom of the encounter deck, from the top 5 you looked at, one at a time, in the order they go\. Done puts the rest back on top, in any order\./);
+    expect(sheet.note).toMatch(/^Player 1: choose the cards that go to the bottom of the encounter deck, from the top 5 you looked at, one at a time: each is placed under the rest\. Done puts the rest back on top, in the order you choose next\./);
     expect(sheet.note).not.toContain("Player 1 chooses");
+    expect(sheet.note).not.toContain("in any order");
+    expect(sheet.note).not.toContain("so far");
     expect(labels(sheet).at(-1)).toBe("Done: the rest stay on top");
+    expect(labels(sheet).slice(0, -1).every((label) => label.startsWith("To bottom: "))).toBe(true);
+    // Each card chosen is counted in the note.
+    const one = take(t, state, sheet.options[0]!.id);
+    expect(one.window?.kind).toBe("choose");
+    expect(sheetOf(t, one).note).toContain("1 to the bottom so far.");
+    expect(sheetOf(t, take(t, one, sheetOf(t, one).options[0]!.id)).note).toContain("2 to the bottom so far.");
   });
 
   it("solo, has no lead; the cards left on top are ordered next", () => {
@@ -145,7 +183,7 @@ describe("High Falls (19019:A:3) and Heavy Snow (19020:A:2)", () => {
     const t = heathTable(world, { seats: 2, staging: [CODES.heavySnow] });
     const snow = idOf(t.state, CODES.heavySnow);
     const sheet = sheetOf(t, opened(t, t.state, CODES.heavySnow, "whenRevealed", snow, "whenRevealed"));
-    expect(sheet.note).toMatch(/^Player 1: choose a ready character in play to exhaust, any player's\. No card effect can ready a character until the end of the round\./);
+    expect(sheet.note).toMatch(/^Player 1: choose a ready character in play to exhaust, any player's\. No player card effect can ready a character until the end of the round\./);
     expect(sheet.note).not.toContain("Player 1 chooses");
     expect(sheet.options).toHaveLength(3);
     const solo = heathTable(world, { staging: [CODES.heavySnow] });
@@ -174,14 +212,57 @@ describe("Unbroken (12177:A:4) and Rhyme of the Slayer (12183:A:1)", () => {
       const boon = idOf(t.state, CODES.unbroken);
       const worn = { ...t, state: attachTo(t.state, boon, t.hero) };
       const sheet = sheetOf(worn, opened(worn, worn.state, CODES.unbroken, "action", boon, "forced", "12177:action:1"));
-      expect(sheet.note).toContain(`${lead} 1 card from your hand to discard. The hero with Unbroken heals 1 damage.`);
+      expect(sheet.note).toContain(`${lead} 1 card from your hand to discard. ${nameOf(worn.state.cards[worn.hero]?.code ?? "")}, the hero with Unbroken, heals 1 damage.`);
       expect(sheet.note).not.toContain("chooses");
     }
   });
 
-  it("Rhyme of the Slayer: the enemy in the staging area gets -4 Attack and the hero with Dragon-slayer +4 against it", () => {
+  it("Rhyme of the Slayer: any enemy gets -4 Attack, and the +4 against it is told only when a hero carries Dragon-slayer", () => {
     const t = heathTable(world, { seats: 2, phase: "Combat", staging: ["f3", "f0"], hand: [CODES.rhymeOfTheSlayer] });
-    const sheet = sheetOf(t, opened(t, t.state, CODES.rhymeOfTheSlayer, "action", idOf(t.state, CODES.rhymeOfTheSlayer)));
-    expect(sheet.note).toContain("Player 1: choose an enemy in the staging area: it gets -4 Attack until the end of the phase, and the hero with Dragon-slayer gets +4 Attack against it.");
+    const bare = sheetOf(t, opened(t, t.state, CODES.rhymeOfTheSlayer, "action", idOf(t.state, CODES.rhymeOfTheSlayer)));
+    expect(bare.note).toContain("Player 1: choose an enemy: it gets -4 Attack until the end of the phase.");
+    expect(bare.note).not.toContain("staging area");
+    expect(bare.note).not.toContain("+4");
+    const slayer = spawn(t.state, CODES.dragonSlayer, { zone: "play", seat: 0 });
+    const armed = { ...t, state: attachTo(slayer.state, slayer.id, t.hero) };
+    const sheet = sheetOf(armed, opened(armed, armed.state, CODES.rhymeOfTheSlayer, "action", idOf(armed.state, CODES.rhymeOfTheSlayer)));
+    expect(sheet.note).toContain("Player 1: choose an enemy: it gets -4 Attack until the end of the phase, and the hero with Dragon-slayer gets +4 Attack against it.");
+  });
+});
+
+describe("Deadly Cold (19021:A:1)", () => {
+  const cold = (seats: 1 | 2, layout: Parameters<typeof heathTable>[1] = {}) => {
+    const t = heathTable(world, { seats, staging: [CODES.deadlyCold], ...layout });
+    const state = opened(t, t.state, CODES.deadlyCold, "whenRevealed", idOf(t.state, CODES.deadlyCold), "whenRevealed");
+    return { t, state };
+  };
+
+  it("names the character on both rows, counts the player's ready characters, and leads with the player two-handed", () => {
+    const { t, state } = cold(2);
+    const first = sheetOf(t, state);
+    const hero = (id: string) => nameOf(state.cards[id]?.code ?? "");
+    expect(first.note).toMatch(new RegExp(`^Player 1: exhaust ${hero(t.hero)}, or deal it 1 damage\\? \\(1 of 2\\)`));
+    expect(labels(first)).toEqual([`Exhaust ${hero(t.hero)}`, `Deal ${hero(t.hero)} 1 damage`]);
+    const second = sheetOf(t, take(t, state, "exhaust"));
+    expect(second.note).toMatch(new RegExp(`^Player 1: exhaust ${hero(t.hero2)}, or deal it 1 damage\\? \\(2 of 2\\)`));
+    // The next player's count starts again, with their own characters.
+    const other = sheetOf(t, take(t, take(t, state, "exhaust"), "exhaust"));
+    expect(other.note).toMatch(new RegExp(`^Player 2: exhaust ${hero(t.seat1Hero ?? "")}, or deal it 1 damage\\? \\(1 of 1\\)`));
+    expect(other.note).not.toContain("chooses");
+  });
+
+  it("solo has no lead", () => {
+    const { t, state } = cold(1);
+    expect(sheetOf(t, state).note).toMatch(/^Exhaust \S+, or deal it 1 damage\? \(1 of 2\)/);
+  });
+
+  it("the damage row warns when the damage destroys the character, and the exhaust row never does", () => {
+    const { t, state } = cold(1);
+    const hurt = updateCard(state, t.hero, { damage: (world.cards.get(state.cards[t.hero]?.code ?? "")?.health ?? 0) - 1 });
+    const sheet = sheetOf(t, hurt);
+    const rows = Object.fromEntries(sheet.options.map((option) => [option.label.startsWith("Exhaust") ? "exhaust" : "damage", option]));
+    expect(rows.exhaust?.caution).toBeUndefined();
+    expect(rows.damage?.caution).toMatch(/^Tap again: .+ (falls and the game is lost|is destroyed)$/);
+    expect(sheetOf(t, state).options.every((option) => option.caution === undefined)).toBe(true);
   });
 });

@@ -22,6 +22,7 @@ import { placedLimit } from "../families/uncharted/limit.ts";
 import { discardArea } from "../families/breaking/areas.ts";
 import { grappleThreat } from "../families/grapple/values.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
+import { heldBy } from "./holder-classes.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 export type DamageSource = "framework" | "player" | "combat";
@@ -30,15 +31,6 @@ export { printedStat };
 
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
-
-// The holder of a modifier on every ally in play, now and entering play later: an encounter card's lasting effect
-// (rr.lasting-effects, 141071:A:1). It stands in the modifier's instance id.
-export const ALLIES_CLASS = "allies";
-
-// Whether a modifier is held by this card: by its id, or by the class ALLIES_CLASS.
-export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
-  return modifier.instanceId === instance.id || (modifier.instanceId === ALLIES_CLASS && cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone));
-}
 
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
 // A set modifier overrides every other one, the most recent set winning (rr.modifiers).
@@ -133,18 +125,6 @@ export function addModifier(
 ): ScenarioState {
   if (!state.cards[instanceId]) return state;
   return { ...state, modifiers: [...state.modifiers, { instanceId, sourceId, stat, amount, until }] };
-}
-
-// A modifier held by a class of cards rather than one card (ALLIES_CLASS): no card has to exist for it yet.
-export function addClassModifier(
-  state: ScenarioState,
-  holder: typeof ALLIES_CLASS,
-  sourceId: string,
-  stat: ModifierStat,
-  amount: number,
-  until: ModifierUntil,
-): ScenarioState {
-  return { ...state, modifiers: [...state.modifiers, { instanceId: holder, sourceId, stat, amount, until }] };
 }
 
 export function placedAmount(printed: PrintedCard, amount: number): number {

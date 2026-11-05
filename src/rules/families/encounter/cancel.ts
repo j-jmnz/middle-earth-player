@@ -11,6 +11,14 @@ export function encounterUncancelable(state: ScenarioState): boolean {
   return flagged(state, "table", "encounterUncancelable");
 }
 
+// The card whose When Revealed effects an offer would cancel: the event is a reveal and the effect holds a CancelEffect (rr.cancel). Undefined for any other offer.
+export function cancelsReveal(state: ScenarioState, event: GameEvent, effect: Effect): string | undefined {
+  if (event.trigger !== "encounterRevealed" && event.trigger !== "whenRevealedPending") return undefined;
+  if (!effect.instructions.some((instruction) => instruction.verb === "CancelEffect")) return undefined;
+  const subject = event.subject ?? event.cardId;
+  return subject && state.cards[subject] ? subject : undefined;
+}
+
 // Whether an offer in this window is barred: a Response that cancels the effect of an encounter card about to resolve (CancelEffect) is not
 // offered in the When Revealed or Shadow window. The window itself stays: a Response that only reacts (Round Shield's Defense) is still offered.
 export function cancelBarred(state: ScenarioState, event: GameEvent, effect: Effect): boolean {

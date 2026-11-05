@@ -4,7 +4,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
-import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard } from "../../../rules/core/state.ts";
+import { readyBarred } from "../../../rules/core/holder-classes.ts";
+import { readyCard } from "../../../rules/interpret/player-verbs.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { guardWith } from "../../../rules/families/objectives/guard.ts";
 import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
@@ -308,15 +310,38 @@ describe("19019 High Falls", () => {
 });
 
 describe("19020 Heavy Snow and 19021 Deadly Cold", () => {
-  it("19020:A:2 the first player exhausts a character and, until the end of the round, characters cannot be readied by card effects", () => {
+  it("19020:A:2 the first player exhausts a character and, until the end of the round, characters cannot be readied by player card effects", () => {
     const t = heathTable(world, { seats: 2, staging: [CODES.heavySnow] });
     const snow = idOf(t.state, CODES.heavySnow);
     const run = resolveRecords(t.state, t.ctx, CODES.heavySnow, "whenRevealed", snow);
     const exhausted = [t.hero, t.hero2, t.seat1Hero ?? ""].filter((id) => run.state.cards[id]?.exhausted);
     expect(exhausted).toHaveLength(1);
-    for (const id of [t.hero, t.hero2, t.seat1Hero ?? ""]) expect(flagged(run.state, id, "cannotReadyByEffect"), id).toBe(true);
+    for (const id of [t.hero, t.hero2, t.seat1Hero ?? ""]) expect(readyBarred(run.state, id, world.cards), id).toBe(true);
     const calm = heathTable(world, { staging: [CODES.heavySnow] });
-    expect(flagged(calm.state, calm.hero, "cannotReadyByEffect")).toBe(false);
+    expect(readyBarred(calm.state, calm.hero, world.cards)).toBe(false);
+  });
+
+  it("19020:A:2 rr.lasting-effects: a character entering play later that round is barred too, a card effect of the encounter deck is not, and the round's end lifts it", () => {
+    const t = heathTable(world, { staging: [CODES.heavySnow] });
+    const snow = idOf(t.state, CODES.heavySnow);
+    const run = resolveRecords(t.state, t.ctx, CODES.heavySnow, "whenRevealed", snow);
+    const entered = spawn(run.state, CODES.turayn, { zone: "play", seat: 0 });
+    // Only a player card effect is barred from readying: the refresh phase and an encounter card's effect still ready.
+    expect(readyBarred(entered.state, entered.id, world.cards)).toBe(true);
+    expect(readyBarred(entered.state, entered.id)).toBe(false);
+    const enemy = spawn(entered.state, CODES.snowTroll, { zone: "staging" });
+    expect(readyBarred(enemy.state, enemy.id, world.cards)).toBe(false);
+    expect(expireModifiers(entered.state, ["endOfRound"]).modifiers.some((modifier) => modifier.stat === "cannotReadyByPlayerCard")).toBe(false);
+  });
+
+  it("19020:A:2 a player card's Ready is refused for a character that entered play after Heavy Snow", () => {
+    const t = heathTable(world, { staging: [CODES.heavySnow] });
+    const snow = idOf(t.state, CODES.heavySnow);
+    const run = resolveRecords(t.state, t.ctx, CODES.heavySnow, "whenRevealed", snow);
+    const entered = spawn(run.state, CODES.turayn, { zone: "play", seat: 0 });
+    const tired = updateCard(entered.state, entered.id, { exhausted: true });
+    expect(readyCard(tired, entered.id, true, world.cards).cards[entered.id]?.exhausted).toBe(true);
+    expect(readyCard(tired, entered.id).cards[entered.id]?.exhausted).toBe(false);
   });
 
   it("19020:A:3 the Shadow exhausts a character the defender controls", () => {

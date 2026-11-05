@@ -16,8 +16,9 @@ import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
 import { placeDamage } from "../core/keywords.ts";
 import { stagingLocations } from "../quest/quest.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { readyBarred, inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
-import { printedOf } from "../core/printed.ts";
+import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
+import { printedOf, type PrintedCard } from "../core/printed.ts";
+import { readyBarred } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { attachTo, moveCard } from "../core/zones.ts";
@@ -82,15 +83,15 @@ export function runPlayerVerb(
     case "Ready": {
       if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender" || instruction.target === "other") {
         const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
-        return state.cards[id] ? readyCard(state, id, playerSource(state, focus.sourceId, ctx)) : state;
+        return state.cards[id] ? readyCard(state, id, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
       }
       if (instruction.target === "host") {
         const hostId = focus.sourceId ? state.cards[focus.sourceId]?.host : null;
-        return hostId && state.cards[hostId] && !readyBarred(state, hostId) ? updateCard(state, hostId, { exhausted: false }) : state;
+        return hostId && state.cards[hostId] && !readyBarred(state, hostId, byPlayerCards(state, focus.sourceId, ctx)) ? updateCard(state, hostId, { exhausted: false }) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;
-      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id)) next = updateCard(next, id, { exhausted: false });
+      for (const seat of livingSeats(state)) for (const id of characters(state, seat, ctx.cards)) if (!readyBarred(state, id, byPlayerCards(state, focus.sourceId, ctx))) next = updateCard(next, id, { exhausted: false });
       return next;
     }
     case "Exhaust": {
@@ -306,11 +307,16 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
   return state;
 }
 
+// The printed cards when a player card is the source of the effect (the bar on player card effects reads them), else nothing.
+export function byPlayerCards(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): ReadonlyMap<string, PrintedCard> | undefined {
+  return playerSource(state, sourceId, ctx) ? ctx.cards : undefined;
+}
+
 // A card readies or exhausts, and the Responses that hear it are told ("After ~ readies", "After ~ exhausts").
-export function readyCard(state: ScenarioState, id: string, byPlayerCard = false): ScenarioState {
+export function readyCard(state: ScenarioState, id: string, byPlayerCard = false, cards?: ReadonlyMap<string, PrintedCard>): ScenarioState {
   const card = state.cards[id];
   // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
-  if (!card?.exhausted || readyBarred(state, id)) return state;
+  if (!card?.exhausted || readyBarred(state, id, byPlayerCard ? cards : undefined)) return state;
   return queueEvent(updateCard(state, id, { exhausted: false }), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
 }
 

@@ -21,6 +21,7 @@ import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote,
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/wilderland.ts";
 import { branchCaution, discardCaution } from "./wilderland-sheets.ts";
+import { heathLookNote } from "../words/heath.ts";
 import { seaOptionLabel, travelTaxCaution } from "../words/sea.ts";
 import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
@@ -276,7 +277,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             const threat = branchThreat(choose, id);
             const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
             // A branch that deals damage to each of the player's allies warns when it destroys one.
-            const caution = branchCaution(game, ctx, choose, id, window.seat, source, names.card);
+            const caution = branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
             return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source, now), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
@@ -345,7 +346,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: window.cardIds.map((id) => (window.side === "A" ? (names.facedown?.(id) ?? names.card(id)) : names.card(id))).join(", ") || "Look",
         // Dark Knowledge (01071:A:2) looks at a shadow card dealt to an enemy; a look at the top of a player's own deck
         // (LookAtTop with `deck: "own"`) says so.
-        note: lookNote(game, window.cardIds, window.seat, window.side),
+        note: heathLookNote(game, window.cardIds) ?? lookNote(game, window.cardIds, window.seat, window.side),
         verb: "",
         options: [],
         primary: { label: "Done", intent: { type: "Pass" } },

@@ -17,6 +17,7 @@ tags:
       CHOICE_ID: "12180"
       CHOICE_PROMPT: "Choose a Song boon"
       CHOICE_CONSEQUENCE: ".*Canny Huntsman is added to the campaign pool.*"
+      CHOICE2_SEAT: "Player 2 chooses"
       CHOICE2_ID: "12181"
       CHOICE2_PROMPT: "Choose a Song boon"
       CHOICE2_CONSEQUENCE: ".*Tale of Victories is added to the campaign pool.*"

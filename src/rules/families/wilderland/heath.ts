@@ -7,10 +7,10 @@ import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { constantInstructions, constantVerbCodes } from "../../interpret/constant-records.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
-import { lastPicked } from "../../interpret/player-verbs.ts";
 import { NAMED_PILES, pileDealt, pileOf, shufflePile } from "../../core/piles.ts";
 import type { GameEvent, ScenarioState } from "../../core/state.ts";
 import { updateCard, withSeat } from "../../core/state.ts";
@@ -19,7 +19,8 @@ import { askTarget } from "../../windows/choices.ts";
 import { attackWith } from "../attack/immediate.ts";
 import { lookedDeckSeat } from "../deck/rules.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
-import { lookedOnTop } from "../encounter/items.ts";
+import { cancelsReveal } from "../encounter/cancel.ts";
+import { moveOtherLooked } from "../encounter/items.ts";
 import { freeOfEncounters } from "../objectives/free.ts";
 import { guardWith } from "../objectives/guard.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
@@ -39,13 +40,17 @@ export function shuffleSetAsideIntoPile(state: ScenarioState, instruction: Verb<
   return shufflePile(next, zone);
 }
 
-/** SetAsideKeepingDamage: the card in play with the code is set aside, facedown, with the damage on it; its attachments are discarded and its other tokens go. */
-export function setAsideKeepingDamage(state: ScenarioState, instruction: Verb<"SetAsideKeepingDamage">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const card = Object.values(state.cards).find((entry) => entry.code === instruction.code && (entry.zone === "staging" || entry.zone === "engaged"));
-  if (!card) return state;
-  const left = moveEncounter(state, card.id, "removed", state.firstPlayer, ctx, steps);
-  // `removed` drops the tokens with the card: the damage is put back, and the card waits set aside, as SetAsideInPlay leaves a card.
-  return updateCard(moveCard(left, card.id, { zone: "setAside" }), card.id, { face: "down", controller: null, damage: card.damage, keepsDamage: true });
+/**
+ * An enemy that waits, damage and all, for the When Revealed of the stage that sets it aside with its damage (SetAsideInPlay with keepDamage, 19024:A:1): Cold-Drake at 18 damage lost the protection of stage 2 (19023:B:2) when stage 3 was
+ * revealed, and is not destroyed before that stage's record runs. Read by the settle sweep, like the lapsed stage hold (grapple/values.ts).
+ */
+export function heldBySettingAside(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const code = state.cards[id]?.code;
+  if (!code) return false;
+  return state.stack.some((frame) => {
+    const stage = frame.frame === "whenRevealed" && frame.cardId != null && state.cards[frame.cardId]?.zone === "questStage" ? state.cards[frame.cardId] : undefined;
+    return stage != null && ctx.effects.some((effect) => effect.cardCode === stage.code && effect.timing === "whenRevealed" && effect.instructions.some((instruction) => instruction.verb === "SetAsideInPlay" && instruction.keepDamage === true && instruction.code === code));
+  });
 }
 
 /** RemoveSetAsideDamage: up to `amount` damage tokens come off the set-aside card with the code. */
@@ -68,12 +73,11 @@ export function attachGuardedFromPile(state: ScenarioState, instruction: Verb<"A
 
 /**
  * The settle sweep for VictoryWhenFree ("When Dragon Sign is free of encounters, add it to the victory display"): a card with the marker in the staging area that nothing guards goes to the victory display. Nothing resolves while a frame is open, so a sign
- * just added to the staging area is guarded (its Guarded keyword resolved) before it is looked at. Only a game that has a card with the marker looks.
+ * just added to the staging area is guarded (its Guarded keyword resolved) before it is looked at. Only a game that has a card with a record of the verb looks (`gameReads`); every other game does no work here.
  */
 export function victoryWhenFree(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (state.stack.length > 0 || state.lost || state.failure || state.staging.length === 0) return state;
+  if (state.stack.length > 0 || state.lost || state.failure || state.staging.length === 0 || !gameReads(state, ctx, '"VictoryWhenFree"')) return state;
   const codes = constantVerbCodes(ctx, "VictoryWhenFree");
-  if (codes.size === 0) return state;
   let next = state;
   for (const id of state.staging) {
     const card = next.cards[id];
@@ -82,23 +86,16 @@ export function victoryWhenFree(state: ScenarioState, ctx: ReduceContext, steps:
   return next;
 }
 
-/** Whether a Response that cancels the When Revealed effects of the card the event is about is barred: a card in play whose record holds says the effects of cards with a trait cannot be canceled (UncancelableWhenRevealed, 19015:A:1). */
+/** Whether a Response that cancels the When Revealed effects of the card the event is about is barred: a card in play whose record holds says the effects of cards with a trait cannot be canceled (UncancelableWhenRevealed, 19015:A:1). Only a game that has such a card looks. */
 export function whenRevealedUncancelable(state: ScenarioState, event: GameEvent, effect: Effect, ctx: ReduceContext): boolean {
-  if ((event.trigger !== "whenRevealedPending" && event.trigger !== "encounterRevealed") || !effect.instructions.some((instruction) => instruction.verb === "CancelEffect")) return false;
-  if (constantVerbCodes(ctx, "UncancelableWhenRevealed").size === 0) return false;
-  const revealed = event.subject ?? event.cardId;
-  if (!revealed || !state.cards[revealed]) return false;
+  const revealed = cancelsReveal(state, event, effect);
+  if (!revealed || !gameReads(state, ctx, '"UncancelableWhenRevealed"')) return false;
   return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && hasTrait(state, revealed, instruction.trait, ctx));
 }
 
 /** DiscardOtherLooked: the cards LookAtTop showed that are still on top, but the picked one, go to the encounter discard pile faceup. The picked card is then the top card of the deck. */
 export function discardOtherLooked(state: ScenarioState): ScenarioState {
-  const picked = lastPicked(state);
-  const others = lookedOnTop(state).filter((id) => id !== picked);
-  if (others.length === 0) return state;
-  let next = state;
-  for (const id of others) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
-  return picked && next.cards[picked]?.zone === "encounterDeck" ? { ...next, encounterDeck: [picked, ...next.encounterDeck.filter((id) => id !== picked)] } : next;
+  return moveOtherLooked(state, "discard");
 }
 
 /**

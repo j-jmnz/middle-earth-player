@@ -145,7 +145,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
-      return focus.sourceId ? readyCard(state, focus.sourceId, playerSource(state, focus.sourceId, ctx)) : state;
+      return focus.sourceId ? readyCard(state, focus.sourceId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
     case "Commit":
       // A card the effect names commits as it is, and is announced (families/attack.ts).
       if (instruction.target) return commitCard(state, instruction.target, focus);

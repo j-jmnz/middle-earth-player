@@ -143,7 +143,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     copyLine("18046:A:1", "19019:A:1"),
     copyLine("41011:A:1", "19019:A:2"),
     { id: "19019:travel:1", cardCode: "19019", lines: ["19019:A:3"], timing: "travel", instructions: [{ verb: "AssignDamage", amount: { count: STAGING_LOCATIONS }, pick: ANY_CHARACTER }] },
-    // 19020 Heavy Snow (Doomed is a keyword): the first player exhausts a character, and until the end of the round no card effect readies one; the Shadow exhausts a character the defender controls.
+    // 19020 Heavy Snow (Doomed is a keyword): the first player exhausts a character, and until the end of the round no player card effect readies a character; the Shadow exhausts a character the defender controls.
     {
       id: "19020:whenRevealed:1",
       cardCode: "19020",
@@ -152,7 +152,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "Pick", pick: { type: "character", control: "any", state: "ready", who: "firstPlayer" } },
         { verb: "Exhaust", target: { kind: "picked" } },
-        { verb: "ModifyStat", stat: "cannotReadyByEffect", amount: 1, until: "endOfRound", holders: ANY_CHARACTER },
+        { verb: "ModifyStat", stat: "cannotReadyByPlayerCard", amount: 1, until: "endOfRound", target: "characters" },
       ],
     },
     copyLine("12044:A:2", "19020:A:3"),
@@ -219,7 +219,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "19024",
       lines: ["19024:A:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "ShuffleSetAsideIntoPile", pile: "caves", code: "19012", count: 2 }, { verb: "SetAsideKeepingDamage", code: "19011" }, { verb: "ShuffleEncounterDiscard" }, LOCATIONS_TO_STAGING],
+      instructions: [{ verb: "ShuffleSetAsideIntoPile", pile: "caves", code: "19012", count: 2 }, { verb: "SetAsideInPlay", code: "19011", keepDamage: true }, { verb: "ShuffleEncounterDiscard" }, LOCATIONS_TO_STAGING],
     },
     { id: "19024:forced:1", cardCode: "19024", lines: ["19024:B:1"], timing: "forced", trigger: "activeExplored", instructions: LOOK_AT_THREE },
     { id: "19024:forced:2", cardCode: "19024", lines: ["19024:B:2"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "RemoveSetAsideDamage", code: "19011", amount: 3 }] },

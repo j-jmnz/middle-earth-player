@@ -51,6 +51,17 @@ export function lookedOnTop(state: ScenarioState): string[] {
   return found;
 }
 
+// The looked-at cards still on top, but the picked one, go to the bottom of the encounter deck in their order, or to the encounter discard pile faceup. The picked card is then on top.
+export function moveOtherLooked(state: ScenarioState, to: "bottom" | "discard"): ScenarioState {
+  const picked = lastPicked(state);
+  const others = lookedOnTop(state).filter((id) => id !== picked);
+  if (others.length === 0) return state;
+  if (to === "bottom") return { ...state, encounterDeck: [...state.encounterDeck.filter((id) => !others.includes(id)), ...others] };
+  let next = state;
+  for (const id of others) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  return picked && next.cards[picked]?.zone === "encounterDeck" ? { ...next, encounterDeck: [picked, ...next.encounterDeck.filter((id) => id !== picked)] } : next;
+}
+
 function encounterPool(state: ScenarioState, instruction: PickEncounter): string[] {
   const top = instruction.top ?? Number.MAX_SAFE_INTEGER;
   switch (instruction.from) {

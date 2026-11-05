@@ -53,6 +53,11 @@ type Dealing = { did: string[]; errors: string[]; needs: Need | null };
 // `deck` is the encounter deck a Setup search looks through as it stands (the campaign card's own shuffles so far, and the pool's encounter cards), `removed` the codes searched out of it; `caves` and `removedCaves` are the Caves deck's.
 type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[]; caves: string[]; removedCaves: string[] };
 
+// The seat a pool card is dealt to: the seat it was recorded for, or the last seat when the game has fewer.
+function poolSeat(card: PoolCard, seatCount: number): number {
+  return Math.min(card.seat ?? 0, seatCount - 1);
+}
+
 // The next answer for `seat`, if it is one of `legal`. With none left the step needs one; a wrong one is an error.
 function takeAnswer(table: Table, legal: readonly string[], seat: number, note?: string): string | null {
   const answer = table.answers.shift();
@@ -90,7 +95,7 @@ function searchBoonAlly(table: Table): void {
     return printed != null && printed.type === "ally" && printed.isUnique && printed.campaignKind === "boon";
   };
   for (const [index, seat] of seats.entries()) {
-    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && Math.min(card.seat ?? 0, seats.length - 1) === index && isBoonAlly(card.code));
+    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && poolSeat(card, seats.length) === index && isBoonAlly(card.code));
     const options = [...new Set([...seat.deck.filter(isBoonAlly), ...pooled.map((card) => card.code)])];
     if (options.length === 0) continue;
     const answer = takeAnswer(table, [...options, "skip"], index, "Search your deck for a unique boon ally to add to your hand, or skip. It joins your hand after the mulligan, and if you take one no other player does.");
@@ -106,7 +111,7 @@ function searchBoonAlly(table: Table): void {
       if (taken) fresh.add(taken);
     }
     seat.afterMulligan.push(answer);
-    table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand.`);
+    table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand after the mulligan.`);
     return;
   }
 }
@@ -316,7 +321,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
       continue;
     }
     // Shuffled into the chosen player's deck once the starting hand is drawn (11197:B:1): dealt after the mulligan (setup.ts, AFTER_HAND).
-    const seat = Math.min(card.seat ?? 0, seatCount - 1);
+    const seat = poolSeat(card, seatCount);
     if (card.afterHand) {
       seats[seat]?.afterMulligan.push(`${AFTER_HAND}${card.code}`);
       did7.push(`${name(card.code)} is shuffled into seat ${seat + 1}'s deck after the starting hand is drawn.`);

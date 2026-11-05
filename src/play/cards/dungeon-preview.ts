@@ -100,9 +100,17 @@ function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: Scenari
 function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
   if (card.code === "19012" && card.zone === "staging") {
     const guards = guardsOf(game, card);
-    return guards.length > 0
+    const fate = guards.length > 0
       ? `Guarded by ${guards.map(name).join(", ")}, which is immune to player card effects. When nothing guards it, it goes to the victory display.`
-      : "Free of encounters: it goes to the victory display";
+      : "Free of encounters: it goes to the victory display.";
+    return `${fate} ${signCount(game, ctx)}`;
+  }
+  // A stage whose records read the Dragon Signs in the victory display (19022:B:2, 19024:B:3, 19025:B:1): how many lie there, how many the treasure takes, and Cold-Drake's kept damage while it is set aside.
+  if (card.zone === "questStage" && ctx.effects.some((effect) => effect.cardCode === card.code && JSON.stringify(effect).includes('"Dragon Sign"'))) {
+    const drake = Object.values(game.cards).find((other) => other.code === "19011" && other.zone === "setAside" && other.keepsDamage === true);
+    const heal = ctx.effects.find((effect) => effect.id === "19024:forced:2")?.instructions.find((step) => step.verb === "RemoveSetAsideDamage");
+    const kept = drake && drake.damage > 0 ? ` ${name(drake.id)} is set aside with ${drake.damage} damage${heal?.verb === "RemoveSetAsideDamage" ? `; ${heal.amount} come off each round` : ""}.` : "";
+    return `${signCount(game, ctx)}${kept}`;
   }
   if (card.code !== "19011") return null;
   if (card.zone === "setAside") {
@@ -114,10 +122,22 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   const lines: string[] = [];
   if (flagged(game, card.id, "engagedWithAll")) lines.push("Engaged with each player from the staging area: it attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat");
   const cap = heldAmount(game, card.id, "damageCap");
-  if (cap > 0) lines.push(`Takes at most ${cap} damage each round (${Math.max(0, cap - (game.roundDamage?.[card.id] ?? 0))} more this round)`);
+  // A cap that counts the Dragon Signs in the victory display (19025:B:1) says so; a fixed one (19023:B:2) does not.
+  const stage = game.questStage ? game.cards[game.questStage]?.code : undefined;
+  const counted = ctx.effects.some((effect) => effect.cardCode === stage && effect.instructions.some((step) => step.verb === "ModifyStat" && step.stat === "damageCap" && typeof step.amount === "object"));
+  if (cap > 0) lines.push(`Takes at most ${cap} damage each round (${counted ? "1 for each Dragon Sign in the victory display; " : ""}${Math.max(0, cap - (game.roundDamage?.[card.id] ?? 0))} more this round)`);
   const ceiling = heldAmount(game, card.id, "damageCeiling");
   if (ceiling > 0) lines.push(`Never has more than ${ceiling} damage${flagged(game, card.id, "indestructible") ? ", and stays in play even then" : ""}`);
   return lines.length > 0 ? `${lines.join(". ")}.` : null;
+}
+
+// "N of 4 Dragon Signs in the victory display; 4 discover a treasure." (12175:B:7): the signs of the game, and how many the Resolution's treasure takes, read from the record.
+function signCount(game: ScenarioState, ctx: ReduceContext): string {
+  const signs = Object.values(game.cards).filter((card) => card.code === "19012");
+  const step = ctx.effects.find((effect) => effect.id === "12175:resolution:2")?.instructions[0];
+  const rule = step && "when" in step ? step.when : undefined;
+  const need = rule?.kind === "less" && typeof rule.left === "number" ? rule.left + 1 : signs.length;
+  return `${signs.filter((card) => card.zone === "victory").length} of ${signs.length} Dragon Signs in the victory display; ${need} discover a treasure.`;
 }
 
 // The encounter cards attached to a card as its guards, in the order they were attached (rr.guarded).
