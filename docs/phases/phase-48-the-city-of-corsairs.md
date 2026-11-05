@@ -21,6 +21,8 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `the-city-of-corsairs`, and
 - Golden: `src/campaign/scenarios/the-city-of-corsairs/golden.json` with its `golden.test.ts` beside it, and `test/scenarios/the-city-of-corsairs/scene.ts` and `game.ts` on the shared kit (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`; the seed finder `scripts/e2e/seed-kit.ts`), listed in `test/harness/golden-registry.ts`: true solo and two-handed, a win and a loss, with the XP the campaign card awards.
 - A campaign test checks that the previous part's pool, XP and marks reach this part, and that the standalone game uses the base sides.
 - Add `the-city-of-corsairs` to `src/campaign/playable.ts`, then `pnpm effects:open`.
+- Before the records, move the sea family's direct calls from the core (the attack legality in `src/rules/engine/legal.ts` and `src/rules/combat/combat.ts`) behind a family hook, with the goldens byte-identical (`docs/plans/scenario-pipeline.md`, section D).
+- The rulings needed first are the Stormcaller card the campaign Setup flips (the 48 row of the Phases table in `docs/phases/STATUS.md`) and the readings that carry over: Gavin's and Send for Help's seats and the added Refresh (`docs/phases/STATUS.md`, Open items, Rules and engine).
 - Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
 
 ## Cards

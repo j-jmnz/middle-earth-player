@@ -70,6 +70,8 @@ printed the same as a line another card's record already owns is a copy, not a r
   card code, line ids and the number its line has on the target, from printed order. The source must be an authored record
   in the same list or in `pool`, and a card whose records of one timing live in several files is not copied this way.
   `src/effects/copies.test.ts` fails when a copied pair's two ledger lines no longer read the same.
+- A copy compares both lines with each card's own name as `{self}`. It refuses a source record that names its own card in a field other than `id`, `cardCode` and `lines` when the two cards' names differ; a same-named reprint passes.
+- `pnpm effects:draft` groups a batch's twins: the first line is written, the others take it with `copyLine` (record ids named). A twin owned in another file prints the `copyLine` and the `{ pool: ALIAS }` import, which makes the pool file's records a source (`withCopies` reads `pool`).
 
 ## The record
 
@@ -267,7 +269,7 @@ family owns files that are composed by the `index.ts` next to them, so families 
 Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
-A new verb that a quest card's Setup uses goes in `revealsPerPlayer` (`src/rules/families/quest/setup.ts`), and one a Shadow line uses goes in `runsInFrame` (`src/rules/combat/shadow.ts`) when it asks a player or pushes effects. `scripts/checks/record-routes.test.ts` (in `pnpm test:scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
+A new verb extends an existing one where it can. Before adding one, read the draft's nearest records and run `git grep <rule-id> src/rules` for code that cites the same rule id. A new verb that a quest card's Setup uses is flagged `setupRuns` in its schema entry, and one a Shadow line uses is flagged `runsInFrame` when it asks a player or pushes effects, one that takes a card from the collection `collection` (`src/catalog/verb-flags.ts`); `verb-sets.test.ts` pins the sets. `scripts/checks/record-routes.test.ts` (in `pnpm test:scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
 
 ## Readings the review catches
 
@@ -279,6 +281,7 @@ Read each new record against these before the review. Each one is a card bug a r
 - **"For any reason" and "cannot enter …".** The route must cover every way a card can arrive: discards made by player cards, searches, reshuffles, and both sides of a two-sided card.
 - **The trigger's scope.** "After a location is explored" hears a location explored in the staging area too (`locationExplored`), not only the active one (`activeExplored`). Check which zones the trigger's event is queued from.
 - **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
+- **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 
 ## Not expressible yet: leave open, report

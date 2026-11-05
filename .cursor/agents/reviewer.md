@@ -64,7 +64,7 @@ Do not demand a shared abstraction for two lines that happen to look similar and
 ## File size
 
 - One module, one reason to change.
-- Past roughly 300 lines, the file needs a single reason to stay together. Past roughly 500, splitting is a block unless the file is a fixture or generated catalog output.
+- The 300 and 500 line rule is in `.cursor/rules/code-standards.mdc`, Making a change; `scripts/checks/file-size.test.ts` enforces the 500. A file that grew past 300 without a single reason to stay together is a finding.
 - Split along behavior: quest resolution, combat, Hide, a screen, a sheet. Do not split a function across files so a reader must open five files to follow one path.
 - A screen that also holds SQL, image downloads, and rule checks is three modules.
 

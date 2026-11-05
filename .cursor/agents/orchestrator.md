@@ -22,12 +22,15 @@ Run the tasks one after another, in the plan's order. Never run two implementers
 Each brief stands on its own, because the agent knows only what you give it:
 - The plan section it owns, quoted in full, and the files it must read first.
 - The file:line references the section names, with the date they were read, and an instruction to re-read each file before editing (earlier tasks move lines). These belong in the brief only; nothing committed cites a line number.
-- What earlier tasks changed: commit hashes, new functions and signatures, moved files, and any rule a later task must keep (the compiler test at zero bailouts, a cache that relies on immutable state).
+- What earlier tasks changed: commit hashes, new functions and signatures, moved files, and any rule a later task must keep (the compiler test at zero bailouts, a cache that relies on immutable state). For a scenario, list the verbs, flags, conditions and pick fields added since the base, from `git diff <base> -- src/catalog`.
 - The behaviours to keep exactly, and the plan's out-of-scope list.
 - Where it must STOP and report instead of deciding: a change that alters a behaviour the plan keeps, a missing API, a test that breaks for a reason the plan did not expect. It must never work around one silently.
 - Any measurement the plan asks for (before and after, a scratch script in the session scratchpad, never committed).
 - The exit: `pnpm test`, `pnpm lint`, `pnpm typecheck`, plus `pnpm data:check` when the engine or `data/` could move, and the task's own checks, run as `.cursor/rules/code-standards.mdc` (Checking a change) says: targeted tests while working, the full suite once at the end, and each result reported with whether the tree changed after it.
 - Do not commit or push; do not edit `docs/phases/STATUS.md`. Report changes by file, each deviation from the plan and why, and the command results.
+- A task that writes records ends its report with a Readings list: for each line read in more than one way, the line, the reading taken, the alternative, a citation (a ledger line or a rule span) and a status: `literal`, `span-settled` or `needs-ruling`.
+- After the last records task and before the goldens task, ask the user once about the `needs-ruling` readings. Rulings go to `docs/brief.md`; the other readings go to Open items in `docs/phases/STATUS.md`.
+- The task that writes the table words runs `pnpm test:scenario <id> --words` and checks each sentence against `docs/design-system-table.md`, Choice tray, before it hands back.
 
 ## After each task
 

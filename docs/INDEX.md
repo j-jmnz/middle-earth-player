@@ -10,7 +10,7 @@ Read whole.
 
 - `CLAUDE.md` — Claude Code (~2.1K tok)
 - `.cursor/rules/authority.mdc` — Authority (~450 tok)
-- `.cursor/rules/code-standards.mdc` — Code standards (~1.8K tok)
+- `.cursor/rules/code-standards.mdc` — Code standards (~1.9K tok)
 - `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
 
 ## Agents
@@ -18,7 +18,7 @@ Read whole.
 Each agent reads its own file.
 
 - `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
-- `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.5K tok)
+- `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.7K tok)
 - `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.3K tok)
 - `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
@@ -128,7 +128,7 @@ Read the sections your task touches.
   - 254–257 One answer, one tap (~240)
   - 258–261 Stops and Always use (~250)
   - 262–265 Guide (~120)
-  - 266–275 Choice tray (~940) ← 6
+  - 266–275 Choice tray (~940) ← 8
   - 276–289 Reading panels (~1.5K) ← 6
   - 290–299 Phase carousel (~680)
   - 300–305 Quest advance (~530) ← 1
@@ -190,7 +190,7 @@ STATUS.md, then the active phase file.
   - 171–187 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
-- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
+- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
 - `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~1.0K tok)
 - `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~1.1K tok)
 - `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~790 tok)
@@ -203,7 +203,7 @@ STATUS.md, then the active phase file.
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
 - `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.0K tok)
+- `docs/phases/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
 
 ## Done phases
 
@@ -281,20 +281,20 @@ Read when a task names the plan.
   - 189–202 Verification (~210)
   - 203–213 Notes for the orchestrator and the implementer agent (~380)
   - 214–221 Risks (~210)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~7.1K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.3K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
-  - 51–73 Templates and copied lines (~520) ← 3
-  - 74–98 The record (~500)
-  - 99–115 Which card an instruction acts on (~380)
-  - 116–136 Pick filters (~410)
-  - 137–145 Amounts (~180)
-  - 146–152 Conditions (~110)
-  - 153–172 Triggers and stat flags (~440)
-  - 173–234 Patterns (~1.4K)
-  - 235–271 Mechanic families: engine and records together (~1.3K) ← 2
-  - 272–283 Readings the review catches (~380) ← 3
-  - 284–303 Not expressible yet: leave open, report (~390)
+  - 51–75 Templates and copied lines (~650) ← 3
+  - 76–100 The record (~500)
+  - 101–117 Which card an instruction acts on (~380)
+  - 118–138 Pick filters (~410)
+  - 139–147 Amounts (~180)
+  - 148–154 Conditions (~110)
+  - 155–174 Triggers and stat flags (~440)
+  - 175–236 Patterns (~1.4K)
+  - 237–273 Mechanic families: engine and records together (~1.4K) ← 2
+  - 274–286 Readings the review catches (~410) ← 3
+  - 287–306 Not expressible yet: leave open, report (~390)
 - `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
   - 3–19 Context (~370)
   - 20–83 Facts found during exploration (~1.2K)
@@ -307,20 +307,20 @@ Read when a task names the plan.
   - 250–277 Notes for the orchestrator and the implementer agent (~770)
   - 278–283 Risks (~110)
 - `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~4.4K tok)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190) ← 1
-  - 25–45 A. Effects: draft better, template the repeats, copy identical lines (~760)
-  - 46–54 B. One registry for scenarios, fixtures and goldens (~280)
-  - 55–67 C. A shared scenario kit and `pnpm scenario:new` (~510)
-  - 68–79 D. One manifest per family (~330)
-  - 80–87 E. Data: seed what can be seeded (~210)
-  - 88–95 F. Faster feedback while authoring (~220)
-  - 96–119 Where a scenario's cost is now (~680)
-  - 120–137 Next steps (~440) ← 1
-  - 138–147 After each scenario phase (~160)
-  - 148–151 Order (~70)
-  - 152–159 Verification (~100)
+  - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~960)
+  - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
+  - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~630)
+  - 72–83 D. One manifest per family (~460)
+  - 84–92 E. Data: seed what can be seeded (~300)
+  - 93–105 F. Faster feedback while authoring (~500)
+  - 106–130 Where a scenario's cost is now (~780)
+  - 131–144 Next steps (~440) ← 1
+  - 145–156 After each scenario phase (~210)
+  - 157–160 Order (~70)
+  - 161–168 Verification (~100)
 
 ## Handovers
 
