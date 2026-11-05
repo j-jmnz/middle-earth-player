@@ -266,19 +266,27 @@ describe("the Maestro flows", () => {
   });
 
   // The line under the road that says the next part is coming soon is true only while that part is not playable, so a part becoming playable
-  // fails here (and in the coverage check) until the flow of the part before it stops asserting it.
+  // fails here (and in the coverage check) until the flow of the part before it stops asserting it. A flow under scenarios/<id>/ is about that scenario;
+  // a top-level flow (features/) names none and is skipped. A scenario in two campaigns has a follower in each, and each is checked.
   it("assert path-soon only on a part followed by one the app cannot deal, and every such part's flows assert it", () => {
     const assertsSoon = (flow: Flow): boolean => uses(flow, "assertVisible").some((call) => asMap(call).id === "path-soon");
-    const followers = new Map<string, string | undefined>(CAMPAIGNS.flatMap((item) => item.scenarios.map((id, index) => [id, item.scenarios[index + 1]] as const)));
+    const scenarioOf = (flow: Flow): string | null => /^scenarios\/([^/]+)\/[^/]+$/.exec(flow.rel)?.[1] ?? null;
+    const followersOf = (id: string): { campaign: string; next: string | undefined }[] =>
+      CAMPAIGNS.filter((item) => item.scenarios.includes(id)).map((item) => ({ campaign: item.id, next: item.scenarios[item.scenarios.indexOf(id) + 1] }));
     for (const flow of RUNNABLE.filter(assertsSoon)) {
-      const id = flow.rel.split("/")[1] as string;
-      const next = followers.get(id);
-      expect(next != null && !isPlayable(next), `${flow.rel} asserts path-soon, so the part after ${id} must not be playable`).toBe(true);
+      const id = scenarioOf(flow);
+      expect(id, `${flow.rel} asserts path-soon but is not under scenarios/<scenario-id>/`).not.toBeNull();
+      const followers = followersOf(id as string);
+      expect(followers.length, `${flow.rel}: ${id} is in no campaign`).toBeGreaterThan(0);
+      for (const { campaign, next } of followers) expect(next != null && !isPlayable(next), `${flow.rel} asserts path-soon, so the part after ${id} in ${campaign} must not be playable`).toBe(true);
     }
-    for (const [id, next] of followers) {
-      if (next == null || isPlayable(next) || !isPlayable(id)) continue;
-      const flows = RUNNABLE.filter((flow) => flow.rel.startsWith(`scenarios/${id}/`));
-      expect(flows.some(assertsSoon), `${id} is followed by ${next}, which is not playable: a flow of ${id} must assert path-soon`).toBe(true);
+    for (const item of CAMPAIGNS) {
+      item.scenarios.forEach((id, index) => {
+        const next = item.scenarios[index + 1];
+        if (next == null || isPlayable(next) || !isPlayable(id)) return;
+        const flows = RUNNABLE.filter((flow) => scenarioOf(flow) === id);
+        expect(flows.some(assertsSoon), `${id} is followed by ${next} in ${item.id}, which is not playable: a flow of ${id} must assert path-soon`).toBe(true);
+      });
     }
   });
 });

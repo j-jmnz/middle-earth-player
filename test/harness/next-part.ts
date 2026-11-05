@@ -5,9 +5,10 @@ import type { NodeStatus } from "../../src/campaign/path.ts";
 // Test helper. What the campaign path shows for the part after a scenario once that scenario is won, worked out from the playable list
 // and the campaign's order, so a scenario test never names it (a part becoming playable changes no test).
 
-/** The id of the part after the scenario in the campaign's order, or null for the last part. */
+/** The id of the part after the scenario in the campaign's order, or null for the last part and for a scenario that is not in the campaign. */
 export function nextPartId(campaign: CampaignData, scenarioId: string): string | null {
-  return campaign.scenarios[campaign.scenarios.indexOf(scenarioId) + 1] ?? null;
+  const at = campaign.scenarios.indexOf(scenarioId);
+  return at < 0 ? null : (campaign.scenarios[at + 1] ?? null);
 }
 
 /** The status the path gives the part after a won scenario: "current" when the app can deal it, "soon" when it cannot, null for the last part. */

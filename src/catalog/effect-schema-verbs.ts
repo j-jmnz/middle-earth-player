@@ -6,7 +6,6 @@ import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.
 import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifyStatSchema } from "./effect-schema-stats.ts";
 import { FAMILY_VERBS } from "./families/index.ts";
-import { setupRole } from "./setup-role.ts";
 import { verbFlags } from "./verb-flags.ts";
 
 function verb<const Verb extends string>(name: Verb) {
@@ -141,10 +140,10 @@ export const simpleVerbs = [
   verb("AdvanceStep"),
   verb("ResolveEffect"),
   modifyStatSchema,
-  setupRole(codeVerb("AddToStaging"), "dealt"),
+  verbFlags(codeVerb("AddToStaging"), { setupRole: "dealt" }),
   codeVerb("MakeActiveLocation"),
-  setupRole(codeVerb("SetAside"), "dealt"),
-  setupRole(codeVerb("AttachToRingBearer"), "dealt"),
+  verbFlags(codeVerb("SetAside"), { setupRole: "dealt" }),
+  verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
   codeVerb("AddSetAsideToStaging"),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is

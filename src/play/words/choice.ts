@@ -391,7 +391,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   const sea = seaPickWords(pick, next, names, sourceId, game, after);
   if (sea) return sea;
   const picked = game ? lastPicked(game) : "";
-  const play = playPickWords(pick, picked && game?.cards[picked] ? names.card(picked) : null);
+  // A PutIntoPlay is about the source itself (no `card`, or "self": a Guarded attachment that enters play when its guard leaves) or the card the effect picked.
+  const play = playPickWords(pick, pick.verb === "PutIntoPlay" && (pick.card === undefined || pick.card === "self") ? (sourceId ? names.card(sourceId) : null) : picked && game?.cards[picked] ? names.card(picked) : null);
   if (play) return play;
   const deck = pick.verb === "Pick" && next ? deckPickThenWords(pick, next, after) : null;
   if (deck) return deck;

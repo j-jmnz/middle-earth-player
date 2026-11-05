@@ -8,7 +8,7 @@ import { selfNamed } from "../../catalog/self-named.ts";
 // from the source's among the records of that timing (their order is the printed order, front, side B, then the shadow). A copy is refused, when the module loads, if
 // the copy would take an id that is in use. Each copied record keeps the line pairs it was copied by (`copiedLines`) and its source (`copySource`), and
 // src/effects/copies.test.ts refuses a pair whose two ledger lines differ once normalized (keywords stripped, each card's own name read as {self}), so a
-// ledger edit cannot keep a stale copy, and a source record that names its own card in any field when the target card is named otherwise, since a copy changes only the code, the line ids and the id (a same-named reprint keeps a name that is still right). The check is a test, not
+// ledger edit cannot keep a stale copy, and a source record that names its own card by code in any field, or by name when the target card is named otherwise, since a copy changes only the code, the line ids and the id (a same-named reprint keeps a name that is still right). The check is a test, not
 // a load-time throw, so this module does not import the ledger JSON and the Node scripts that load the effects (effects:open, card-smoke, the fixture writer) run.
 export type Copy = { readonly copy: readonly (readonly [from: string, to: string])[] };
 
@@ -71,8 +71,8 @@ export type NameOf = (code: string) => string | undefined;
 
 /**
  * Why a pair may not be copied under this ledger, or null when its two lines read the same with each card's own name as {self}. A source record that
- * names its own card in any field is refused too when the target card has another name: a copy changes only the code, the line ids and the id, so the name
- * would stay the source card's. A reprint under the same name keeps a name that is still right.
+ * names its own card in any field is refused too when the target card has another name, and when it holds the source's card code in any field: a copy changes
+ * only the code, the line ids and the id, so the name or code would stay the source card's. A reprint under the same name keeps a name that is still right.
  */
 export function copyMismatch(ledger: Ledger, pair: CopiedLine, nameOf: NameOf, source: Effect): string | null {
   const from = printedLine(ledger, pair.from);
@@ -84,6 +84,9 @@ export function copyMismatch(ledger: Ledger, pair: CopiedLine, nameOf: NameOf, s
   if (selfNamed(fromName, from) !== selfNamed(toName, to)) return `Cannot copy ${pair.from} to ${pair.to}: "${from}" is not "${to}"`;
   const { id, cardCode, lines, ...fields } = source;
   if (fromName.toLowerCase() !== toName.toLowerCase() && JSON.stringify(fields).toLowerCase().includes(fromName.toLowerCase())) return `Cannot copy ${source.id} to ${pair.to}: the record names its own card "${fromName}"`;
+  const fromCode = parse(pair.from, LINE).code;
+  const toCode = parse(pair.to, LINE).code;
+  if (fromCode !== toCode && JSON.stringify(fields).includes(`"${fromCode}"`)) return `Cannot copy ${source.id} to ${pair.to}: the record names its own card by code "${fromCode}"`;
   return null;
 }
 

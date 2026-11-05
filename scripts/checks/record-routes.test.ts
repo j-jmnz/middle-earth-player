@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Instruction } from "../../src/catalog/boundary.ts";
 import { instructionSchema } from "../../src/catalog/effect-schema.ts";
-import { verbsWithRole } from "../../src/catalog/setup-verbs.ts";
+import { setupRoleVerbs } from "../../src/catalog/verb-sets.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { runsInFrame } from "../../src/rules/combat/shadow.ts";
 import { blankScenario } from "../../src/rules/core/state.ts";
@@ -27,7 +27,7 @@ const records = (timing: string) => EFFECTS.filter((effect) => effect.timing ===
 // A Setup record made only of these needs no run; any other needs revealsPerPlayer.
 const PLACED_BY_DATA: ReadonlySet<string> = new Set(["SetAside", "AddToStaging", "MakeActiveLocation", "AttachToRingBearer", "ShuffleEncounterDeck", "ShuffleBurdenDeck", "SetLife"]);
 
-// The verbs of a campaign card's Setup that the start or the checklist reads itself, not by a setup role (src/catalog/setup-role.ts).
+// The verbs of a campaign card's Setup that the start or the checklist reads itself, not by a setup role (src/catalog/verb-flags.ts).
 const READ_FROM_CAMPAIGN_SETUP: Readonly<Record<string, string>> = {
   AttachChosen: "src/campaign/checklist.ts",
   AddToHandAfterMulligan: "src/campaign/checklist.ts",
@@ -76,9 +76,9 @@ describe("record routes", () => {
   });
 
   it("reads every verb of a campaign card's Setup (src/campaign/start.ts, src/campaign/checklist.ts)", () => {
-    const roles = new Set([...verbsWithRole("dealt"), ...verbsWithRole("afterSetup")]);
+    const roles = new Set([...setupRoleVerbs("dealt"), ...setupRoleVerbs("afterSetup")]);
     const dropped = records("campaignSetup").flatMap((effect) => effect.instructions.filter((instruction) => !roles.has(instruction.verb) && !(instruction.verb in READ_FROM_CAMPAIGN_SETUP)).map((instruction) => `${effect.id}: ${instruction.verb}`));
-    expect(dropped, "a campaign Setup verb nothing reads: give its schema entry a setupRole, or read it in the start or the checklist").toEqual([]);
+    expect(dropped, "a campaign Setup verb nothing reads: give its schema entry a setupRole flag, or read it in the start or the checklist").toEqual([]);
     for (const [verb, file] of Object.entries(READ_FROM_CAMPAIGN_SETUP)) expect(source(file), `${verb} in ${file}`).toContain(`"${verb}"`);
   });
 });

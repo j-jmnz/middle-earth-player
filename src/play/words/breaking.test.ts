@@ -74,6 +74,6 @@ describe("the words of Breaking of the Fellowship's choices", () => {
 
   it("the Seat of Amon Hen names the draw and the threat of the player it asks for", () => {
     const instructions = EFFECTS.find((effect) => effect.id === "142065:response:1")?.instructions ?? [];
-    expect(pickWords(instructions[0]!, instructions[1], names(), "142065", 2, undefined, undefined, instructions.slice(2))).toEqual({ verb: "Draw", prompt: "Choose the player who draws 2 cards and lowers their threat by 2." });
+    expect(pickWords(instructions[0]!, instructions[1], names(), "142065", 2, undefined, undefined, instructions.slice(2))).toEqual({ verb: "Choose", prompt: "Choose the player who draws 2 cards and lowers their threat by 2." });
   });
 });

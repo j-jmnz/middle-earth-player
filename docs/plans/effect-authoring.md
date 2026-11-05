@@ -70,7 +70,7 @@ printed the same as a line another card's record already owns is a copy, not a r
   card code, line ids and the number its line has on the target, from printed order. The source must be an authored record
   in the same list or in `pool`, and a card whose records of one timing live in several files is not copied this way.
   `src/effects/copies.test.ts` fails when a copied pair's two ledger lines no longer read the same.
-- A copy compares both lines with each card's own name as `{self}`. It refuses a source record that names its own card in a field other than `id`, `cardCode` and `lines` when the two cards' names differ; a same-named reprint passes.
+- A copy compares both lines with each card's own name as `{self}`. It refuses a source record that holds its own card code in a field other than `id`, `cardCode` and `lines`, and one that names its own card when the two cards' names differ (a same-named reprint passes): a copy changes only the code, the line ids and the id, so such a record is written again for the target card.
 - `pnpm effects:draft` groups a batch's twins: the first line is written, the others take it with `copyLine` (record ids named). A twin owned in another file prints the `copyLine` and the `{ pool: ALIAS }` import, which makes the pool file's records a source (`withCopies` reads `pool`).
 
 ## The record
@@ -264,12 +264,12 @@ family owns files that are composed by the `index.ts` next to them, so families 
   `pick`, `condition` and `amount` (`src/rules/interpret/family-manifest.ts`, dispatched by `src/rules/interpret/family-hooks.ts`; `condition` and `amount` return
   `null` for what is not the family's). A hook returns a new state or the same one. `interpret/family-hooks.test.ts` shows each with a synthetic family.
 - A campaign card's Setup verb that `src/campaign/start.ts` deals in Setup (`dealt`) or resolves after the quest card's Setup (`afterSetup`) is wrapped in
-  `setupRole(schema, role)` (`src/catalog/setup-role.ts`) in its schema entry; `setup-verbs.test.ts` pins the two sets.
+  flagged `setupRole: "dealt"` or `"afterSetup"` (`verbFlags`, `src/catalog/verb-flags.ts`) in its schema entry; `verb-sets.test.ts` pins the two sets.
 
 Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
-A new verb extends an existing one where it can. Before adding one, read the draft's nearest records and run `git grep <rule-id> src/rules` for code that cites the same rule id. A new verb that a quest card's Setup uses is flagged `setupRuns` in its schema entry, and one a Shadow line uses is flagged `runsInFrame` when it asks a player or pushes effects, one that takes a card from the collection `collection` (`src/catalog/verb-flags.ts`); `verb-sets.test.ts` pins the sets. `scripts/checks/record-routes.test.ts` (in `pnpm test:scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
+A new verb extends an existing one where it can. Before adding one, read the draft's nearest records and run `git grep <rule-id> src/rules` for code that cites the same rule id. A new verb is flagged in its schema entry (`src/catalog/verb-flags.ts`): `setupRuns` when a quest card's Setup uses it, `runsInFrame` when a Shadow line uses it and it asks a player or pushes effects, and `collection` when it takes a hero or a card from the player's collection; `verb-sets.test.ts` pins the sets. `scripts/checks/record-routes.test.ts` (in `pnpm test:scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
 
 ## Readings the review catches
 

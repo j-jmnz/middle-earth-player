@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { ROOT, tracked } from "./tracked.ts";
 
-// A source file stays at or under MOST_LINES (counted as `wc -l` does: newline characters). The files over it today are listed at their
+// A source file, tracked or new and not ignored, stays at or under MOST_LINES (counted as `wc -l` does: newline characters). The files over it today are listed at their
 // current counts: one may not grow, and an entry whose file is back under the limit is stale and goes. Move files with pnpm move.
 const MOST_LINES = 500;
 
@@ -36,6 +36,11 @@ describe("file size", () => {
       .filter(([file, lines]) => lines > (OVER_LIMIT[file] ?? MOST_LINES))
       .map(([file, lines]) => `${file}: ${lines} lines, at most ${OVER_LIMIT[file] ?? MOST_LINES}`);
     expect(over).toEqual([]);
+  });
+
+  it("lists each file in OVER_LIMIT at its count, not above it", () => {
+    const loose = Object.entries(OVER_LIMIT).filter(([file, limit]) => (counts.get(file) ?? 0) > MOST_LINES && (counts.get(file) ?? 0) < limit).map(([file, limit]) => `${file}: ${counts.get(file)} lines, listed at ${limit}`);
+    expect(loose, "lower the entry to the count").toEqual([]);
   });
 
   it("lists in OVER_LIMIT only files that are still over the limit", () => {

@@ -6,7 +6,6 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { phaseNameSchema, when } from "../effect-schema-conditions.ts";
-import { setupRole } from "../setup-role.ts";
 import { verbFlags } from "../verb-flags.ts";
 
 const who = z.enum(["actor", "firstPlayer", "picked"]);
@@ -49,13 +48,13 @@ const VERBS = [
   // `to: "lastPlayer"`: the last player takes control of it instead of the first ("the last player takes control of Na'asiyah", 12092:A:1).
   // `to: "anyPlayer"`: "Put Gavin into play under any player's control" (11209:A:3): the first player chooses which player takes it (the only player takes it without being asked).
   // `to: "actor"`: the player who uses the effect takes it ("Take control of 1 set aside copy of Dol Amroth Warship", 12136:A:3).
-  setupRole(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup" }),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
-  setupRole(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), { setupRole: "afterSetup" }),
   // Campaign Setup: "For each character in play, its controller may deal 1 damage to it to reduce their threat by 1" (11179:A:2). In player order, each character in play is
   // offered to its controller (trade or keep); a trade deals `damage` to it and lowers that player's threat by `threat`. `character` is engine use: the character being decided.
-  setupRole(z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }), "afterSetup"),
+  verbFlags(z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }), { setupRole: "afterSetup" }),
   // The campaign card stays beside the quest deck while the scenario is played, because a card of the scenario places resources on it (Revenant, 11181:A:4) and its Resolution
   // counts them (11179:B:4). Changes nothing when it runs; rules/families/burden/campaign.ts reads it.
   z.strictObject({ verb: z.literal("KeepCampaignCard"), ...when }),

@@ -45,4 +45,6 @@
 // 21 (Dream-chaser, phase 45 fix pass): an Exhaust that names a card by code or by title exhausts a ready one (readyNamedCard, as its Travel cost is checked), a card that hears its own leaving by any route
 // (`exitedPlay`, Recurring Nightmare) is announced once it is out of play, a card drawn into a hand that hears `enteredHand` is announced by the draw, and the Island Map keeps the locations the players traveled from:
 // a replayed Temple of the Deceived game can take a different path.
-export const ENGINE_VERSION = 21;
+// 22: the Drowned Ruins campaign card counts the resources on its own card (11200:B:4); the copy of the Fate of Númenor line counted 11179's and gave 0 XP:
+// a replayed Drowned Ruins game can end with more XP.
+export const ENGINE_VERSION = 22;

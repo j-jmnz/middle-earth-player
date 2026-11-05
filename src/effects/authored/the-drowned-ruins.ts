@@ -64,7 +64,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
     { id: "11200:resolution:1", cardCode: "11200", lines: ["11200:B:1"], timing: "resolution", instructions: [{ verb: "EarnDealt", codes: COMMAND_AND_BLESSING }] },
-    copyLine("11179:B:4", "11200:B:4"),
+    // Written here, not copied from 11179:B:4: the Fate of Númenor line counts the resources on its own campaign card (11179).
+    { id: "11200:resolution:3", cardCode: "11200", lines: ["11200:B:4"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, each: { kind: "tokens", code: "11200" }, max: 3 }] },
     copyLine("11194:B:5", "11200:B:5"),
     copyLine("11182:B:8", "11200:B:6"),
     { id: "11200:resolution:7", cardCode: "11200", lines: ["11200:B:7"], timing: "resolution", instructions: [{ verb: "GainXp", amount: 1, when: { kind: "count", pick: UNDERWATER_IN_VICTORY, min: 5 } }] },

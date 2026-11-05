@@ -95,13 +95,8 @@ export function seaPickWords(instruction: Instruction, next?: Instruction, names
       return { verb: "Advance", prompt: "Choose the stage to advance to. The other goes to the bottom." };
     case "SearchShips":
       return { verb: "Add", prompt: "Choose which Ship enemy with the highest Threat is added to the staging area." };
-    case "DiscardAlliesForWillpower": {
-      const chosen = instruction.taken?.length ?? 0;
-      const source = names && sourceId ? names.card(sourceId) : "it";
-      return { verb: "Discard", prompt: `Choose ${chosen === 0 ? "an ally" : "another ally"} to discard. Discard allies you control with a total of at least ${instruction.willpower} Willpower to take control of ${source} as a Ship objective.` };
-    }
     case "AttachSelf":
-      return instruction.to.kind === "ship" ? { verb: "Attach", prompt: `Choose the Ship objective ${names && sourceId ? names.card(sourceId) : "it"} attaches to.` } : null;
+      return instruction.to.kind === "ship" ? { verb: "Attach", prompt: `Choose the Ship objective to attach ${names && sourceId ? names.card(sourceId) : "it"} to.` } : null;
     case "MakeEngagementChecks":
       return { verb: "Engage", prompt: "Choose which of the enemies tied for the highest engagement cost the engagement check engages." };
     case "NameCard":

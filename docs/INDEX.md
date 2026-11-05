@@ -42,15 +42,15 @@ Read the sections your task touches.
     - 80–85 Codespaces (~110)
     - 86–160 Phone builds from scratch (Mac) (~1.1K)
     - 161–164 Maestro (~170)
-- `docs/architecture.md` — Architecture (~18.8K tok)
+- `docs/architecture.md` — Architecture (~18.9K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~3.3K)
-    - 223–234 Mechanic families (~2.4K) ← 5
+  - 209–234 Engine (~3.4K)
+    - 223–234 Mechanic families (~2.5K) ← 5
   - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
@@ -284,7 +284,7 @@ Read when a task names the plan.
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.3K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
-  - 51–75 Templates and copied lines (~650) ← 3
+  - 51–75 Templates and copied lines (~690) ← 4
   - 76–100 The record (~500)
   - 101–117 Which card an instruction acts on (~380)
   - 118–138 Pick filters (~410)
@@ -310,13 +310,13 @@ Read when a task names the plan.
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190) ← 1
-  - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~960)
+  - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
   - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
   - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~630)
   - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
-  - 93–105 F. Faster feedback while authoring (~500)
-  - 106–130 Where a scenario's cost is now (~780)
+  - 93–105 F. Faster feedback while authoring (~540)
+  - 106–130 Where a scenario's cost is now (~760)
   - 131–144 Next steps (~440) ← 1
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)

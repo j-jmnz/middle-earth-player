@@ -14,6 +14,7 @@ import { delayedLines } from "../cards/card-effects.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 
+import { askWords } from "./ask.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import { ASKING_VERBS, walk } from "../../../test/harness/record-walk.ts";
 
@@ -32,12 +33,13 @@ describe("the words of A Storm on Cobas Haven choices", () => {
 
   it("every instruction that asks a player says what the card is for, in a sentence of its own", () => {
     const prompts: string[] = [];
+    const table = havenTable(world);
     for (const effect of AUTHORED_EFFECTS) {
       walk(effect.instructions, (instruction, next, after) => {
         if (!ASKING_VERBS.has(instruction.verb)) return;
         // A ReturnToStaging of the picked enemy sends it back without a question: the Pick before it asks.
         if (instruction.verb === "ReturnToStaging" && !(instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose")) return;
-        const words = pickWords(instruction, next, names(), effect.cardCode, 2, undefined, undefined, after);
+        const words = askWords({ game: table.state, ctx: table.ctx, names: names(), instruction, queue: next ? [next, ...after] : [], options: [], source: effect.cardCode, picked: null });
         expect(words.prompt, effect.id).toMatch(/^[A-Z].*\.$/);
         expect(words.prompt, effect.id).not.toMatch(/^Choose an? \w+\.$/);
         expect(words.prompt, effect.id).not.toBe("Choose one.");
@@ -60,9 +62,9 @@ describe("the words of A Storm on Cobas Haven choices", () => {
     expect(prompts).toContain("Choose a Ship enemy that is not guarding an objective. While Belfalas Islet is the active location, it is considered to be out of play.");
     expect(prompts).toContain("Choose a Dol Amroth objective from the encounter deck or discard pile to add to the staging area.");
     // Corsair Skirmisher's Response (12125:A:3), Ramming Speed! (12131:A:1) and Taking on Water (12132:A:1, and its Action's three characters).
-    expect(prompts).toContain("Choose an ally to discard. Discard allies you control with a total of at least 3 Willpower to take control of Corsair Skirmisher as a Ship objective.");
+    expect(prompts).toContain("Corsair Skirmisher: choose an ally to discard. At least 3 Willpower is needed to take control of it as a Ship objective.");
     expect(prompts).toContain("Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack.");
-    expect(prompts).toContain("Choose the Ship objective Taking on Water attaches to.");
+    expect(prompts).toContain("Choose the Ship objective to attach Taking on Water to.");
     // Taking on Water's Action is read on the table below: the Repeat is expanded in the queue there.
     expect(prompts).toContain("Choose a character to exhaust.");
   });

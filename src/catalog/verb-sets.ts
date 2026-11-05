@@ -1,6 +1,6 @@
 // The verbs that carry each flag of verb-flags.ts, read off every top-level instruction schema (the simple verbs of each family and the structural ones in effect-schema.ts). Built on first use.
 import { instructionSchema } from "./effect-schema.ts";
-import { verbFlagsOf, type CollectionUse, type SetupRuns } from "./verb-flags.ts";
+import { verbFlagsOf, type CollectionUse, type SetupRole, type SetupRuns } from "./verb-flags.ts";
 
 function verbsWhere(test: (flags: ReturnType<typeof verbFlagsOf>) => boolean): ReadonlySet<string> {
   return new Set(instructionSchema.options.filter((schema) => test(verbFlagsOf(schema))).map((schema) => schema.shape.verb.value));
@@ -28,4 +28,9 @@ export function setupRunVerbs(runs: SetupRuns): ReadonlySet<string> {
 /** The verbs a record uses to reach into the player's collection. */
 export function collectionVerbs(use: CollectionUse): ReadonlySet<string> {
   return memoized(`collection:${use}`, () => verbsWhere((flags) => flags.collection === use));
+}
+
+/** The verbs of a campaign card's Setup that the start deals itself, or resolves after the quest card's Setup (see SetupRole). */
+export function setupRoleVerbs(role: SetupRole): ReadonlySet<string> {
+  return memoized(`role:${role}`, () => verbsWhere((flags) => flags.setupRole === role));
 }

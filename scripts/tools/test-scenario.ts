@@ -7,6 +7,7 @@ import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
 import { DATA_DIR, ROOT } from "../data/paths.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
+import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 
 // The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/phases/phase-12-knife-in-the-dark.md, Scenario procedure):
 //
@@ -54,18 +55,18 @@ export function scenarioTests(id: string, tree: readonly string[], read: (file: 
 }
 
 const FAMILY_ROOTS = ["src/effects/authored/pool/", "src/effects/authored/families/", "src/catalog/families/", "src/rules/families/"];
-// Files outside those folders that make or check the families: the hook dispatch and manifest types, the setup-role marks and the schema verb lists.
+// Files outside those folders that make or check the families: the hook dispatch and manifest types, the verb flags and the schema verb lists.
 const FAMILY_FILES = [
   "src/rules/interpret/family-hooks.ts",
   "src/rules/interpret/family-manifest.ts",
   "src/catalog/family-manifest.ts",
-  "src/catalog/setup-role.ts",
-  "src/catalog/setup-verbs.ts",
+  "src/catalog/verb-flags.ts",
+  "src/catalog/verb-sets.ts",
   "src/catalog/effect-schema-verbs.ts",
 ];
 // The two dispatch files affect every family; the rest name no family.
 const EVERY_FAMILY_FILES = ["src/rules/interpret/family-hooks.ts", "src/rules/interpret/family-manifest.ts", "src/catalog/family-manifest.ts"];
-const MANIFEST_TESTS = ["src/catalog/families/families.test.ts", "src/rules/interpret/family-manifest.test.ts", "src/rules/interpret/family-hooks.test.ts", "src/catalog/setup-verbs.test.ts"];
+const MANIFEST_TESTS = ["src/catalog/families/families.test.ts", "src/rules/interpret/family-manifest.test.ts", "src/rules/interpret/family-hooks.test.ts", "src/catalog/verb-sets.test.ts"];
 
 /**
  * The pool and family tests, when they could have moved. A changed file under src/effects/authored/pool/, src/effects/authored/families/,
@@ -161,6 +162,8 @@ async function main(log: Log): Promise<void> {
 
   if (wordsOnly) {
     if (!existsSync(path.join(ROOT, WORDS_TEST))) throw new Error(`${WORDS_TEST} does not exist`);
+    // The test reads the playable and the scaffolded scenarios only; for any other id vitest would run nothing and report success.
+    if (!WORDS_SCENARIOS.includes(id)) throw new Error(`${id} is neither playable (src/campaign/playable.ts) nor scaffolded (src/campaign/scenarios/${id}/golden.test.ts), so the words test does not read it`);
     // The describe.each title of the test is "the words of <id>"; WORDS_DUMP makes it print the sentences.
     const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, "-t", `the words of ${id}`, "--silent=false"], { WORDS_DUMP: id });
     if (!outcome.ok) throw new Error("the words test failed");

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { collectionVerbs, setupRunVerbs, verbsRunningInFrame } from "./verb-sets.ts";
+import { collectionVerbs, setupRoleVerbs, setupRunVerbs, verbsRunningInFrame } from "./verb-sets.ts";
 
 // The verbs of each flag, as src/rules/combat/shadow.ts, src/rules/families/quest/setup.ts and src/campaign/world.ts listed them by name before each schema entry carried its flag.
 const sorted = (verbs: ReadonlySet<string>) => [...verbs].sort();
@@ -14,6 +14,14 @@ describe("verb flags", () => {
     expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck"]);
     expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["RevealEncounter", "SearchMove"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);
+  });
+
+  it("mark exactly the verbs the start deals in Setup", () => {
+    expect(sorted(setupRoleVerbs("dealt"))).toEqual(["AddToStaging", "AttachToRingBearer", "PutObjectiveAllyIntoPlay", "SetAside", "SetAsideEachPlayer"]);
+  });
+
+  it("mark exactly the verbs the start resolves after the quest card's Setup", () => {
+    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachSetAsideTo", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceSecrets", "PutSetAsideInPlay", "RaiseThreatToAttach", "TradeDamageForThreat", "TradeShipDamage"]);
   });
 
   it("mark exactly the verbs that reach into the collection", () => {

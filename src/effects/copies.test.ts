@@ -46,4 +46,10 @@ describe("copied records", () => {
     expect(check("2", naming)).toMatch(/names its own card "Ann"/);
     expect(check("4", naming)).toBeNull();
   });
+
+  it("refuses a source that holds its own card code in any field", () => {
+    const coded = record({ each: { kind: "tokens", code: "1" } });
+    expect(check("2", coded)).toMatch(/by code "1"/);
+    expect(check("2", record({ each: { kind: "tokens", code: "9" } }))).toBeNull();
+  });
 });

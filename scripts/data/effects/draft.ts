@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { parse as parseJsonc } from "jsonc-parser";
 
@@ -26,7 +27,7 @@ import { vocabulary, vocabularyMarkdown } from "./vocabulary.ts";
 // "Core", "TRD"), or the list of codes (separated by commas or spaces), that has a printed line no record covers yet. With --all it also drafts the lines
 // that authored records already cover, to review or redo them.
 
-function words(text: string): Set<string> {
+function wordSet(text: string): Set<string> {
   return new Set(text.toLowerCase().match(/[a-z]{4,}/g) ?? []);
 }
 
@@ -35,15 +36,38 @@ function overlap(a: Set<string>, b: Set<string>): number {
   return shared / Math.max(1, a.size + b.size - shared);
 }
 
-function main(log: Log): void {
+// The authored files that export records (a scenario's `AUTHORED_EFFECTS`, a pool or family file's `RECORDS`), with the records each holds: where a record to copy is written.
+type Holder = { file: string; exported: "AUTHORED_EFFECTS" | "RECORDS"; records: ReadonlySet<Effect> };
+
+function authoredFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? authoredFiles(full) : entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts") ? [full] : [];
+  });
+}
+
+async function loadHolders(): Promise<Holder[]> {
+  const holders: Holder[] = [];
+  for (const full of authoredFiles(path.join(ROOT, "src", "effects", "authored"))) {
+    const loaded = (await import(pathToFileURL(full).href)) as Record<string, unknown>;
+    for (const exported of ["AUTHORED_EFFECTS", "RECORDS"] as const) {
+      const list = loaded[exported];
+      if (Array.isArray(list)) holders.push({ file: path.relative(ROOT, full).replaceAll(path.sep, "/"), exported, records: new Set(list as Effect[]) });
+    }
+  }
+  return holders;
+}
+
+async function main(log: Log): Promise<void> {
   const targets = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   const pieces = splitCodes(targets);
-  // Codes: several pieces that are all codes, or one piece of 5 or 6 digits. Anything else is one name (a scenario, deck or pack id).
-  const asCodes = pieces.length > 1 ? pieces.every((piece) => /^[0-9A-Za-z]+$/.test(piece)) : /^\d{5,6}$/.test(pieces[0] ?? "");
-  const scenarioId = asCodes ? pieces.join(",") : targets[0];
-  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>");
   const campaigns = loadCampaigns();
   const cards = loadCards();
+  // Codes: every piece is a known card code. Anything else is one name (a scenario, deck or pack id).
+  const known = new Set(cards.map((card) => card.code));
+  const asCodes = pieces.length > 0 && pieces.every((piece) => known.has(piece));
+  const scenarioId = asCodes ? pieces.join(",") : targets[0];
+  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>");
   const prebuilt = prebuiltDecksSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as unknown).find((entry) => entry.id === scenarioId);
   const deck = campaigns.flatMap((campaign) => campaign.starterDecks).find((entry) => entry.id === scenarioId) ?? (prebuilt ? { id: prebuilt.id, rows: [...prebuilt.heroes.map((code) => ({ code })), ...prebuilt.cards] } : undefined);
   const packCodes = cards.filter((card) => isPoolCard(card) && card.printings[0]?.pack === scenarioId).map((card) => card.code);
@@ -114,12 +138,12 @@ function main(log: Log): void {
   const textWords = (effect: Effect): Set<string> => {
     const known = effectTexts.get(effect);
     if (known) return known;
-    const made = words(effect.lines.map((id) => segmentById.get(id)?.line ?? "").join(" "));
+    const made = wordSet(effect.lines.map((id) => segmentById.get(id)?.line ?? "").join(" "));
     effectTexts.set(effect, made);
     return made;
   };
   const nearest = (line: Unmatched): { lineId: string; text: string; effect: Effect }[] => {
-    const own = words(line.line);
+    const own = wordSet(line.line);
     return EFFECTS.filter((effect) => effect.cardCode !== line.card.code && effect.lines.length > 0)
       .map((effect) => ({ effect, score: overlap(own, textWords(effect)) }))
       .sort((a, b) => b.score - a.score)
@@ -156,24 +180,38 @@ function main(log: Log): void {
     return group.length > 1 ? group : [];
   };
 
-  // The `{ pool: ... }` import withCopies needs when the record to copy lives in another file than the copy (targetOf finds both).
-  const poolImport = (sourceCard: Card, copyCard: Card): string[] => {
-    const from = targetOf(sourceCard);
-    const to = targetOf(copyCard);
-    if (from === to) return [];
-    const stem = path.basename(from, ".ts");
-    const alias = (from.includes("/pool/") ? stem : (stem.split("-").find((word) => word !== "the" && word !== "a") ?? stem)).toUpperCase();
-    const relative = path.relative(path.dirname(to), from).replaceAll(path.sep, "/");
-    const exported = from.includes("/pool/") ? "RECORDS" : "AUTHORED_EFFECTS";
-    return [`In ${to}: \`import { ${exported} as ${alias} } from "${relative.startsWith(".") ? relative : `./${relative}`}";\` and pass \`{ pool: ${alias} }\` as the second argument of \`withCopies\`.`];
+  // The `{ pool: ... }` import withCopies needs when the records to copy are written in another file than the copy's: the file that holds them (a scenario's AUTHORED_EFFECTS, a pool or
+  // family file's RECORDS), found by the records themselves. A generated record is in no authored file and needs no import.
+  const holders = await loadHolders();
+  const holderOf = (records: readonly Effect[]): Holder | undefined => holders.find((holder) => records.some((record) => holder.records.has(record)));
+  const stemOf = (file: string): string => path.basename(file, ".ts");
+  const words = (file: string): string[] => stemOf(file).split("-").filter((word) => word !== "the" && word !== "a");
+  // The first word of the stem (RAID, VOYAGE), the whole stem when another authored file starts with the same word (FLIGHT_OF_THE_STORMCALLER, FLIGHT_TO_THE_FORD).
+  const aliasOf = (file: string): string => {
+    const first = (words(file)[0] ?? stemOf(file)).toUpperCase();
+    const shared = holders.some((other) => other.file !== file && (words(other.file)[0] ?? "").toUpperCase() === first);
+    return file.includes("/pool/") ? stemOf(file).toUpperCase() : shared ? stemOf(file).toUpperCase().replaceAll("-", "_") : first;
   };
-  // The id the copy takes, as withCopies numbers it among the card's records already written.
+  const poolImport = (twinRecords: readonly Effect[], copyCard: Card): string[] => importFrom(holderOf(twinRecords), copyCard);
+  // A record of the batch is not written yet: the file it will go in is where targetOf puts its card.
+  const plannedImport = (sourceCard: Card, copyCard: Card): string[] => {
+    const file = targetOf(sourceCard);
+    return importFrom({ file, exported: file.includes("/pool/") ? "RECORDS" : "AUTHORED_EFFECTS", records: new Set() }, copyCard);
+  };
+  const importFrom = (holder: Holder | undefined, copyCard: Card): string[] => {
+    const to = targetOf(copyCard);
+    if (holder === undefined || holder.file === to) return [];
+    const alias = aliasOf(holder.file);
+    const relative = path.relative(path.dirname(to), holder.file).replaceAll(path.sep, "/");
+    return [`In ${to}: \`import { ${holder.exported} as ${alias} } from "${relative.startsWith(".") ? relative : `./${relative}`}";\` and pass \`{ pool: ${alias} }\` as the second argument of \`withCopies\`.`];
+  };
+  // The id the copy takes, as withCopies numbers it among the card's records already written; the error withCopies throws, when it refuses.
   const copiedIds = (twin: { lineId: string; card: Card }, line: Unmatched): string => {
     try {
       const made = withCopies([...EFFECTS.filter((effect) => effect.cardCode === line.card.code), copyLine(twin.lineId, line.lineId)], { pool: EFFECTS.filter((effect) => effect.cardCode === twin.card.code) });
       return made.filter((effect) => effect.lines.includes(line.lineId)).map((effect) => effect.id).join(", ") || suggestedId(line);
-    } catch {
-      return suggestedId(line);
+    } catch (error) {
+      return `withCopies refuses: ${error instanceof Error ? error.message : String(error)}`;
     }
   };
 
@@ -220,15 +258,15 @@ function main(log: Log): void {
         sections.push(`Exact match: the same text, with the card name as {self}, is owned elsewhere. Copy the records below, with this card's code, line id and number.`, ``);
         for (const twin of twins) {
           sections.push(`${twin.lineId} (card ${twin.card.name}): \`${`copyLine("${twin.lineId}", "${line.lineId}")`}\`, record id \`${copiedIds(twin, line)}\``, ``, "```json", ...twin.records.map((effect) => JSON.stringify(effect)), "```", ``);
-          sections.push(...poolImport(twin.card, line.card).map((text) => `${text}`), ``);
+          sections.push(...poolImport(twin.records, line.card).map((text) => `${text}`), ``);
         }
       } else if (batch.length > 0 && writer.lineId !== line.lineId) {
         sections.push(`Twin in this batch: the same text, with the card name as {self}, as ${writer.lineId} (card ${writer.card.name}). Write no record here: take ${writer.lineId}'s with \`${`copyLine("${writer.lineId}", "${line.lineId}")`}\` (record id \`${suggestedId(line)}\` if the source is of that timing; withCopies numbers it).`, ``);
-        sections.push(...poolImport(writer.card, line.card), ``);
+        sections.push(...plannedImport(writer.card, line.card), ``);
       } else if (batch.length > 0) {
         const copies = batch.slice(1);
         sections.push(`Twins in this batch: the same text, with the card name as {self}, as ${copies.map((other) => other.lineId).join(", ")}. Write this line's record once; the others take it:`, ``);
-        for (const other of copies) sections.push(`- \`${`copyLine("${line.lineId}", "${other.lineId}")`}\` (card ${other.card.name}, record id \`${suggestedId(other)}\`)${poolImport(line.card, other.card).map((text) => `. ${text}`).join("")}`);
+        for (const other of copies) sections.push(`- \`${`copyLine("${line.lineId}", "${other.lineId}")`}\` (card ${other.card.name}, record id \`${suggestedId(other)}\`)${plannedImport(line.card, other.card).map((text) => `. ${text}`).join("")}`);
         sections.push(``);
       } else {
         sections.push(`Nearest records for this line:`, ``);

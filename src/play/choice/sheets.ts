@@ -5,7 +5,6 @@
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../../catalog/boundary.ts";
-import { restrictedLimit } from "../../rules/player/attach.ts";
 import { rejectionReason } from "../../rules/engine/legal.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 import { printedOf } from "../../rules/core/printed.ts";
@@ -15,11 +14,12 @@ import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState 
 import type { Frame, GameEvent, ResponseOffer } from "../../rules/core/state.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
-import { branchThreat, branchWords, outOfPlayLabel, pickWords, type ChoiceNames } from "../words/choice.ts";
+import { askWords } from "../words/ask.ts";
+import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
-import { grantedTravelWords, grappleAsk, grappleFactsOf, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
-import { seaAsk, seaOptionLabel } from "../words/sea.ts";
-import { switchNote, tradeWords, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
+import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
+import { seaOptionLabel } from "../words/sea.ts";
+import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
 import { DONE } from "../../rules/families/deck/choose.ts";
 import { branchNow, dealtNow } from "../words/aflame.ts";
@@ -277,12 +277,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       }
       // A Pick names what the card is for: a hero removed from the quest, an attachment discarded, an ally put into play,
       // an enemy placed under Weather Hills.
-      const trade = wait?.kind === "target" && wait.item.instruction.verb === "TradeDamageForThreat" ? wait.item.instruction : null;
-      const traded = trade?.character ? game.cards[trade.character] : undefined;
-      const tradeAsk = trade && traded ? { verb: "Trade", prompt: tradeWords(game, ctx.cards, trade, names.card(traded.id), effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"))) } : null;
       // What the instruction after the pick deals or places, read now (the damage, progress or resources a prompt and a row state).
       const amountNow = wait?.kind === "target" ? dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source) : undefined;
-      const asked = wait?.kind === "target" ? (tradeAsk ?? (wait.item.instruction ? grappleAsk(wait.item.instruction, source, words, grappleFactsOf(game, ctx, wait.item.instruction, data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null)) : null) ?? seaAsk(wait.item.instruction, data?.queue[0]?.instruction, window.options, game, ctx, words, source) ?? pickWords(wait.item.instruction, data?.queue[0]?.instruction, words, source, source ? restrictedLimit(game, source) : 2, game, amountNow, data?.queue.slice(1).map((item) => item.instruction))) : { verb: "Choose", prompt: "Choose one." };
+      const queue = (data?.queue ?? []).map((item) => item.instruction);
+      const asked = wait?.kind === "target" ? askWords({ game, ctx, names: words, instruction: wait.item.instruction, queue, options: window.options, source, picked: data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null, amountNow }) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);
       return {

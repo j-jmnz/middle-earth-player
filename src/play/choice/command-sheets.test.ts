@@ -5,6 +5,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { legalIntents } from "../../rules/engine/legal.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { updateCard } from "../../rules/core/state.ts";
+import { attachTo, spawn } from "../../rules/core/zones.ts";
+import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { CODES, idOf, loadRuinsWorld, ruinsTable, send, start, type Run, type RuinsLayout, type RuinsWorld } from "../../../test/scenarios/the-drowned-ruins/scene.ts";
 
 import { sheetFor } from "./sheets.ts";
@@ -70,6 +72,25 @@ describe("a Command's choice sheet", () => {
     expect(question?.note).toContain("You may engage Sea-scorpion.");
     expect(question?.alternative).toBeNull();
     expect(question?.note).not.toContain("Choose one.");
+  });
+});
+
+describe("Command's attachment option (11204:A:5)", () => {
+  it("names the attachment that moves, and asks for another eligible character", async () => {
+    const base = ruinsTable(world, { seats: 2, phase: "Combat", hand: [CODES.command11204], staging: [CODES.seaScorpion] });
+    const attachment = await loadPrinted(["01057"]);
+    for (const [code, card] of attachment) world.cards.set(code, card);
+    const made = { ...base, ctx: { ...base.ctx, cards: new Map([...base.ctx.cards, ...attachment]) } };
+    const key = spawn(made.state, "01057", { zone: "play", seat: 0 });
+    const level = { prisoner: null, usedOnce: [], counters: {}, levels: { [CODES.command11204]: 2 } };
+    const state = updateCard({ ...attachTo(key.state, key.id, made.hero), campaignFacts: level }, made.hero, { resources: 3 });
+    let run = send(start(state), { type: "PlayCard", cardId: idOf(state, CODES.command11204), payments: [{ heroId: made.hero, amount: 1 }] }, made.ctx);
+    run = send(run, { type: "Choose", optionId: "attachment" }, made.ctx);
+    // The only attachment is picked without a question.
+    expect(sheetOf(run, made.ctx)?.options.map((option) => option.id)).toEqual(["moveIt", "stayPut"]);
+    run = send(run, { type: "Choose", optionId: "moveIt" }, made.ctx);
+    const sheet = sheetOf(run, made.ctx);
+    expect(sheet?.note).toContain(`Choose another eligible character to move ${nameOf("01057")} to.`);
   });
 });
 
