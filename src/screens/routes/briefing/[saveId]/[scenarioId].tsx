@@ -137,6 +137,8 @@ export default function Briefing() {
 
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
   const asked = result.needs ? needWords(result.needs.seat, result.needs.options, (code) => world.cards.get(code)?.traits ?? [], nameOf) : null;
+  // What the choice is, when the options alone do not say (a search of the encounter deck for cards the log's line removes).
+  const intro = asked?.intro ?? result.needs?.note ?? null;
   const completed = save.log.completed.includes(scenario.id);
   const fallen = save.log.fallenHeroesBySeat.flat();
 
@@ -246,9 +248,9 @@ export default function Briefing() {
       {result.needs ? (
         <View testID="briefing-choice" className="mt-5">
           <Section title={`Seat ${result.needs.seat + 1} chooses`} />
-          {asked?.intro ? (
+          {intro ? (
             <Label tone="muted" testID="briefing-choice-intro">
-              {asked.intro}
+              {intro}
             </Label>
           ) : null}
           {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}

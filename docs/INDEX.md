@@ -42,15 +42,15 @@ Read the sections your task touches.
     - 80–85 Codespaces (~110)
     - 86–160 Phone builds from scratch (Mac) (~1.1K)
     - 161–164 Maestro (~170)
-- `docs/architecture.md` — Architecture (~18.9K tok)
+- `docs/architecture.md` — Architecture (~19.0K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~3.4K)
-    - 223–234 Mechanic families (~2.5K) ← 5
+  - 209–234 Engine (~3.5K)
+    - 223–234 Mechanic families (~2.6K) ← 5
   - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
@@ -59,51 +59,52 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~62.5K tok)
-  - 17–37 Sections (~380)
-  - 38–49 Product (~520)
-  - 50–63 Non-goals (~560)
-  - 64–84 Decisions (~830)
-  - 85–113 Stack (~810)
-  - 114–131 Performance and feel (~750)
-  - 132–149 Repository layout (~440)
-  - 150–363 Domain (~9.2K)
-    - 152–224 Campaign (~1.8K) ← 1
-    - 225–239 Mirkwood campaign cards and carry-over (~870)
-    - 240–251 Standalone play (~800)
-    - 252–263 Scenario state (~570)
-    - 264–296 The engine plays the game (~2.1K) ← 4
-    - 297–304 Engine steps (~180)
-    - 305–333 Core round (~1.3K) ← 1
-    - 334–363 Keywords implemented once (~1.6K)
-  - 364–521 Fellowship of the Ring (~10.4K)
-    - 388–402 Scenario 1 resolution (~370)
-    - 403–416 A Knife in the Dark (~1.6K) ← 1
-    - 417–420 Hide tests (~130)
-    - 421–444 Flight to the Ford burden deck and life (~1.6K) ← 1
-    - 445–459 The Ring Goes South, stage 4 and the damage on locations (~1.3K) ← 1
-    - 460–475 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
-    - 476–499 Breaking of the Fellowship, stage 2B (~2.2K) ← 1
-    - 500–521 Seeded decks (~660)
-  - 522–621 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
-    - 540–553 Passage Through Mirkwood (~1.6K)
-    - 554–567 Journey Along the Anduin (~2.1K)
-    - 568–588 Escape from Dol Guldur (~2.7K)
-    - 589–603 The Oath (~2.3K)
-    - 604–621 The Caves of Nibin-Dûm (~2.3K)
-  - 622–674 Dream-chaser (~13.1K)
-  - 675–683 Nightmare (~420)
-  - 684–722 Deckbuilding (~1.8K) ← 1
-  - 723–801 Effects (~3.2K)
-    - 725–783 Three layers (~2.4K)
-    - 784–793 Player side quests, contracts and saga cards (~430)
-    - 794–797 Window stack (~100)
-    - 798–801 Coverage test (~270)
-  - 802–822 Data sources (~560)
-  - 823–841 Card images (~1.1K) ← 6
-  - 842–867 Persistence and shipping (~1.7K)
-  - 868–908 Screens (~4.4K) ← 2
-    - 894–908 Table screen (~1.6K) ← 5
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~64.0K tok)
+  - 17–38 Sections (~410)
+  - 39–50 Product (~530)
+  - 51–64 Non-goals (~560)
+  - 65–85 Decisions (~830)
+  - 86–114 Stack (~810)
+  - 115–132 Performance and feel (~750)
+  - 133–150 Repository layout (~440)
+  - 151–369 Domain (~9.3K)
+    - 153–230 Campaign (~1.9K) ← 1
+    - 231–245 Mirkwood campaign cards and carry-over (~870)
+    - 246–257 Standalone play (~800)
+    - 258–269 Scenario state (~570)
+    - 270–302 The engine plays the game (~2.1K) ← 4
+    - 303–310 Engine steps (~180)
+    - 311–339 Core round (~1.3K) ← 1
+    - 340–369 Keywords implemented once (~1.6K)
+  - 370–527 Fellowship of the Ring (~10.4K)
+    - 394–408 Scenario 1 resolution (~370)
+    - 409–422 A Knife in the Dark (~1.6K) ← 1
+    - 423–426 Hide tests (~130)
+    - 427–450 Flight to the Ford burden deck and life (~1.6K) ← 1
+    - 451–465 The Ring Goes South, stage 4 and the damage on locations (~1.3K) ← 1
+    - 466–481 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
+    - 482–505 Breaking of the Fellowship, stage 2B (~2.2K) ← 1
+    - 506–527 Seeded decks (~660)
+  - 528–627 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
+    - 546–559 Passage Through Mirkwood (~1.6K)
+    - 560–573 Journey Along the Anduin (~2.1K)
+    - 574–594 Escape from Dol Guldur (~2.7K)
+    - 595–609 The Oath (~2.3K)
+    - 610–627 The Caves of Nibin-Dûm (~2.3K)
+  - 628–680 Dream-chaser (~13.1K)
+  - 681–693 Ered Mithrin (~1.2K)
+  - 694–702 Nightmare (~420)
+  - 703–741 Deckbuilding (~1.8K) ← 1
+  - 742–820 Effects (~3.2K)
+    - 744–802 Three layers (~2.4K)
+    - 803–812 Player side quests, contracts and saga cards (~430)
+    - 813–816 Window stack (~100)
+    - 817–820 Coverage test (~270)
+  - 821–841 Data sources (~560)
+  - 842–860 Card images (~1.1K) ← 6
+  - 861–886 Persistence and shipping (~1.7K)
+  - 887–927 Screens (~4.5K) ← 2
+    - 913–927 Table screen (~1.6K) ← 5
 - `docs/design-system-table.md` — Design system — Table (landscape) (~28.7K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4

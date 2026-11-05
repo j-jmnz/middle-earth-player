@@ -18,6 +18,7 @@ import { askWords } from "../words/ask.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
+import { wilderlandOptionLabel } from "../words/wilderland.ts";
 import { seaOptionLabel } from "../words/sea.ts";
 import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
@@ -157,7 +158,7 @@ export function isStepWindow(game: ScenarioState): boolean {
 export function wonSheet(game: ScenarioState): Sheet {
   const rewards = game.resolution.length > 0;
   // A Resolution that asks nothing (The Oath's: the tokens and the burden they earn) has no rewards to choose: the screen after it only shows what is recorded.
-  const asks = game.resolution.some((instruction) => instruction.verb === "ChooseCards" || instruction.verb === "NameCaptives");
+  const asks = game.resolution.some((instruction) => instruction.verb === "ChooseCards" || instruction.verb === "NameCaptives" || instruction.verb === "BoonAllyOrLogLine" || (instruction.verb === "RemoveFromPool" && instruction.choice != null));
   return {
     kind: "outcome",
     key: "won",
@@ -294,7 +295,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
@@ -303,7 +304,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && wait.item.instruction.verb === "AttachRandomTreasure" ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ? { caution: fire?.caution ?? ship?.caution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

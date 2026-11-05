@@ -9,9 +9,10 @@ import { SceneArt } from "../../art/art";
 import { BodyText, Chip, Eyebrow, IconButton, Label, NavBar, Panel, PrimaryButton, Screen, ScreenScroll, TextButton } from "../../kit/chrome";
 import { Road, roadLayout } from "../../campaign/path-road";
 import { CardLines } from "../../campaign/card-lines";
-import { poolCardLine, type Line } from "../../campaign/log-facts";
+import { cardSegment, poolCardLine, type Line } from "../../campaign/log-facts";
 import { useListPreview } from "../../pool/list-preview";
 import { carryVerb, carryWords } from "../../../campaign/carry-words";
+import { keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { xpWords } from "../../../campaign/xp-view";
 import { xpUnspentOf } from "../../../campaign/xp";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../data/campaign-data";
@@ -88,7 +89,7 @@ export default function CampaignPath() {
   const stageNames = useMemo(() => cardNames(catalog, campaign ? campaign.scenarios.flatMap((id) => scenarioOf(id)?.stages ?? []) : []), [catalog, campaign]);
   const names = useMemo(() => {
     if (!save) return new Map<string, string>();
-    return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat(), ...save.log.carryOver.map((card) => card.code)]);
+    return cardNames(catalog, [...save.log.campaignPool.map((card) => card.code), ...save.log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...Object.values(save.log.earned).flat(), ...save.log.carryOver.map((card) => card.code), ...save.log.treasures, ...Object.keys(save.log.encounterPool)]);
   }, [catalog, save]);
 
   if (!loaded) return <Screen scene="path" testID="campaign-path"><NavBar onBack={() => goBack(router, "/")} backTestID="path-back" /><BodyText tone="muted">Loading</BodyText></Screen>;
@@ -186,6 +187,24 @@ export default function CampaignPath() {
       ) : null}
     </View>
   ) : null;
+  // Ered Mithrin: the treasures found, the lines the boon allies were traded for, Beldis's boxes and the pool's encounter cards (emce.campaign-log).
+  const wilderland = keepsWilderlandLog(campaign) ? wilderlandView(save.log, save.seatCount) : null;
+  const wilderlandLine = wilderland ? (
+    <View className="mt-3" testID="wilderland-line">
+      <Eyebrow>Treasures</Eyebrow>
+      <CardLines lines={wilderland.treasures.map((code): Line => [cardSegment(code, name)])} empty="None discovered." onCard={preview.openCode} testID="path-treasures" className="mt-0.5 text-label text-bone" />
+      <Eyebrow>Unique Allies Protecting Wilderland</Eyebrow>
+      <Text testID="path-ally-lines" className="mt-0.5 text-label text-bone">
+        {wilderland.lines.length > 0 ? wilderland.lines.join(". ") : "None recorded."}
+      </Text>
+      <Eyebrow>Beldis</Eyebrow>
+      <Text testID="path-beldis" className="mt-0.5 text-label text-bone">
+        {wilderland.beldis.join(" · ")}
+      </Text>
+      <Eyebrow>Encounter cards in the Campaign Pool</Eyebrow>
+      <CardLines lines={wilderland.encounter.map((entry): Line => [cardSegment(entry.code, name), { text: entry.copies > 1 ? ` \u00d7${entry.copies}` : "" }])} empty="None." onCard={preview.openCode} testID="path-pool-encounter" className="mt-0.5 text-label text-bone" />
+    </View>
+  ) : null;
   // The campaign log, in the page under the pool, not at the screen's foot (user request, 2026-10-29).
   const logButton = (
     <View className="-ml-3 mt-1 items-start">
@@ -242,6 +261,7 @@ export default function CampaignPath() {
             {roadView}
             {poolLine}
             {xpLine}
+            {wilderlandLine}
             {logButton}
           </ScreenScroll>
           <View style={{ width: PATH_SIDE * s }}>
@@ -287,6 +307,7 @@ export default function CampaignPath() {
         {footer ? <View className="mt-3">{footer}</View> : null}
         {poolLine}
         {xpLine}
+        {wilderlandLine}
         {logButton}
       </ScreenScroll>
       {preview.overlay}

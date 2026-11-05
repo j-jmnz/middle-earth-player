@@ -29,6 +29,7 @@ const BOOK_SCENE: Readonly<Record<string, string>> = {
   "rules-reference": "journey-along-the-anduin",
   "the-dark-of-mirkwood": "the-oath",
   "dream-chaser": "voyage-across-belegaer",
+  "ered-mithrin": "journey-up-the-anduin",
 };
 
 // The books as tiles 150 pt tall: the scene of the book dimmed under its name, the Lore book glowing in the corner. Two to a row at

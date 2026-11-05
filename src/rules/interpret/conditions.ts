@@ -98,6 +98,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // The south family's condition hook answers noneDiscarded (families/south/damage.ts) before this switch; the case only completes it.
     case "noneDiscarded":
       return false;
+    // The wilderland family's condition hook answers the campaign log's lines and treasures (families/wilderland/index.ts); the case only completes the switch.
+    case "logged":
+    case "treasuresLogged":
+      return false;
     case "hideFailed":
       return state.hideFailures.some(
         (failure) =>

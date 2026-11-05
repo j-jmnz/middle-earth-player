@@ -4,7 +4,10 @@ import { heldCopy, holdsCopy, resolutionResult } from "../rules/setup/resolution
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 
+import type { AllyLine } from "../catalog/ally-lines.ts";
+
 import { scoreOf, type ScenarioScore } from "./score.ts";
+import { cappedTally } from "./wilderland.ts";
 import { xpAwarded, type ModeCard } from "./xp.ts";
 
 // A boon or burden the players have earned. `back` says which deck it joins; `attachedTo` is the hero (a code) a
@@ -56,11 +59,20 @@ export type CampaignLog = {
   // each briefing first (the briefing may change it); null for none.
   modes: Readonly<Record<string, ModeCard>>;
   modeDefault: ModeCard | null;
+  // The Ered Mithrin Campaign Log (emce.campaign-log, MEC115 p.26-27). An older log reads with these defaults.
+  // The treasures the players discovered (emce.treasure): the codes written beside the boons, which a deck may then hold.
+  treasures: readonly string[];
+  // The "Unique Allies Protecting Wilderland" lines recorded instead of a boon ally joining the pool (emce.boon-allies).
+  allyLines: readonly AllyLine[];
+  // The boxes marked beside Beldis for each seat, up to four (emce.campaign-log). A seat with none read is 0.
+  beldisUses: readonly number[];
+  // The encounter cards in the Campaign Pool and how many copies of each: every later encounter deck holds them, whatever its set (emce.campaign-pool-encounter).
+  encounterPool: Readonly<Record<string, number>>;
 };
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {} };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -90,7 +102,8 @@ function heroesByOwner(state: ScenarioState): string[][] {
 
 // A transaction on the log. A loss writes nothing, a scenario that is still being resolved writes nothing, and a
 // scenario that is already on the log is not granted again.
-export function applyResolution(log: CampaignLog, scenarioId: string, state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): CampaignLog {
+// `copies` is how many copies of a card one collection holds, which caps the encounter cards the pool tallies (emce.campaign-pool-encounter); a card it does not list is not capped.
+export function applyResolution(log: CampaignLog, scenarioId: string, state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, copies?: ReadonlyMap<string, number>): CampaignLog {
   const result = resolutionResult(state);
   if (!result || state.scenarioId !== scenarioId || log.completed.includes(scenarioId)) return log;
   const bearer = ringBearerOf(state, cards);
@@ -110,7 +123,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone:
   // one pool entry for each removal, the player's own copy when the game says whose it was.
   const pool: PoolCard[] = log.campaignPool.filter((card) => card.attachedTo == null || !fallen.has(card.attachedTo));
-  for (const removal of state.removedFromPool ?? []) {
+  for (const removal of [...(state.removedFromPool ?? []), ...(result.poolRemoved ?? [])]) {
     const at = pool.findIndex((card) => card.code === removal.code && card.seat === removal.seat);
     const any = at >= 0 ? at : pool.findIndex((card) => card.code === removal.code);
     if (any >= 0) pool.splice(any, 1);
@@ -147,5 +160,10 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     marks: log.marks,
     modes: state.campaignFacts?.modeCard ? { ...log.modes, [scenarioId]: state.campaignFacts.modeCard } : log.modes,
     modeDefault: log.modeDefault,
+    treasures: [...new Set([...log.treasures, ...(result.treasures ?? [])])],
+    allyLines: [...new Set([...log.allyLines, ...(result.allyLines ?? [])])],
+    // The game started from the log's boxes and returns the whole record, as it does the uses.
+    beldisUses: state.campaignFacts?.beldisUses ?? log.beldisUses,
+    encounterPool: result.encounterPool ? cappedTally(result.encounterPool, copies) : log.encounterPool,
   };
 }

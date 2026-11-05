@@ -9,6 +9,8 @@
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
+import { removalCode, LOG_LINE } from "../rules/families/wilderland/pool.ts";
+import { ALLY_LINE_FACTS, type AllyLine } from "../catalog/ally-lines.ts";
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
@@ -40,7 +42,8 @@ export type ResolutionView =
       tiles: readonly ResolutionTile[];
       decline: ResolutionDecline | null;
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
-      to: "pool" | "hand" | "hero" | "captive" | "player";
+      // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4).
+      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal";
     }
   | {
       kind: "settled";
@@ -52,18 +55,42 @@ export type ResolutionView =
       used?: readonly string[];
       // Cards the log keeps for the next campaign (01131:B:2), a copy for each player when `eachPlayer`.
       carried?: readonly { code: string; eachPlayer: boolean }[];
+      // The Ered Mithrin log (emce.treasure, emce.boon-allies, emce.campaign-pool-encounter): the treasures discovered, the lines recorded, and the encounter cards that join or leave the pool, a code once for each copy.
+      treasures?: readonly string[];
+      lines?: readonly AllyLine[];
+      poolAdded?: readonly string[];
+      poolRemoved?: readonly string[];
     };
 
 function nameOf(world: World, code: string): string {
   return world.cards.get(code)?.name ?? code;
 }
 
+// The copies the Resolution added to and took from the pool's encounter cards: its tally against the one the game started from, a code once for each copy.
+function poolChanges(state: ScenarioState, tally: Readonly<Record<string, number>> | undefined): { added: string[]; removed: string[] } {
+  const was = state.campaignFacts?.encounterPool ?? {};
+  const added: string[] = [];
+  const removed: string[] = [];
+  for (const code of new Set([...Object.keys(was), ...Object.keys(tally ?? was)])) {
+    const change = (tally ?? was)[code] ?? 0;
+    const before = was[code] ?? 0;
+    (change > before ? added : removed).push(...Array.from({ length: Math.abs(change - before) }, () => code));
+  }
+  return { added, removed };
+}
+
 export function resolutionView(state: ScenarioState, world: World): ResolutionView {
   if (state.lost) return { kind: "lost", reason: state.lossReason };
   const settled = resolutionResult(state);
   if (settled) {
+    const changes = poolChanges(state, settled.encounterPool);
+    const gone = [...changes.removed, ...(settled.poolRemoved ?? []).map((item) => item.code)];
     return {
       kind: "settled",
+      ...((settled.treasures ?? []).length > 0 ? { treasures: [...(settled.treasures ?? [])] } : {}),
+      ...((settled.allyLines ?? []).length > 0 ? { lines: [...(settled.allyLines ?? [])] } : {}),
+      ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),
+      ...(gone.length > 0 ? { poolRemoved: gone } : {}),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
@@ -75,11 +102,18 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   const window = state.window;
   if (!state.stageCleared || window?.kind !== "resolution") return { kind: "playing" };
   const instruction = state.resolution[window.step];
-  if (instruction?.verb !== "ChooseCards" && instruction?.verb !== "NameCaptives") return { kind: "playing" };
+  const asks = instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
+  if (!asks) return { kind: "playing" };
   let decline: ResolutionDecline | null = null;
   let eyebrow = "Name a captive";
   let noun = "captive";
-  if (instruction.verb === "ChooseCards") {
+  if (instruction.verb === "BoonAllyOrLogLine") {
+    noun = "ally";
+    eyebrow = `${nameOf(world, instruction.ally)} or the log`;
+  } else if (instruction.verb === "RemoveFromPool") {
+    noun = "card";
+    eyebrow = "Remove a card from the pool";
+  } else if (instruction.verb === "ChooseCards") {
     const kinds = new Set(instruction.codes.map((code) => world.cards.get(code)?.campaignKind ?? null));
     noun = kinds.size === 1 && kinds.has("burden") ? "burden" : kinds.size === 1 && kinds.has("boon") ? "boon" : "card";
     eyebrow = instruction.to === "player" ? "Choose a player" : `Choose a ${noun}`;
@@ -94,11 +128,17 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       const code = state.cards[intent.optionId]?.code ?? intent.optionId;
       return [{ optionId: intent.optionId, code, name: nameOf(world, code), hero: null }];
     }
+    // The log line is a tile with no card: the line as the Campaign Log prints it.
+    if (instruction.verb === "BoonAllyOrLogLine" && intent.optionId === LOG_LINE) return [{ optionId: LOG_LINE, code: null, name: ALLY_LINE_FACTS[instruction.line].words, hero: null }];
+    if (instruction.verb === "RemoveFromPool") {
+      const code = removalCode(intent.optionId);
+      return [{ optionId: intent.optionId, code, name: nameOf(world, code), hero: null }];
+    }
     const [code = "", heroId] = intent.optionId.split(">");
     const heroCode = heroId ? state.cards[heroId]?.code : undefined;
     return [{ optionId: intent.optionId, code, name: nameOf(world, code), hero: heroCode ? nameOf(world, heroCode) : null }];
   });
-  const eachSeat = instruction.verb === "NameCaptives" || instruction.who === "eachSeat";
+  const eachSeat = instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || (instruction.verb === "ChooseCards" && instruction.who === "eachSeat");
   const first = window.seat === state.firstPlayer ? " (first player)" : "";
   // The seats before this one have confirmed: each recorded card in this group, or the decline when nothing was recorded.
   const answered = answeredSeats(state).map((seat): ResolutionAnswer => {
@@ -106,6 +146,12 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       const captive = state.resolutionLog.captives.find((item) => item.seat === seat);
       return { seat, words: captive ? nameOf(world, captive.hero) : `No ${noun}` };
     }
+    // The group's answer to a boon ally is the first player's; the removals of the pool are not kept by seat.
+    if (instruction.verb === "BoonAllyOrLogLine") {
+      const ally = state.resolutionLog.earned.find((item) => item.step === window.step);
+      return { seat, words: ally ? nameOf(world, ally.code) : ALLY_LINE_FACTS[instruction.line].words };
+    }
+    if (instruction.verb === "RemoveFromPool") return { seat, words: "Answered" };
     const card = state.resolutionLog.earned.find((item) => item.step === window.step && item.seat === seat);
     return { seat, words: card ? cardWords(world, { code: card.code, hero: card.hero, seat }) : `No ${noun}` };
   });
@@ -120,7 +166,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     answered,
     tiles,
     decline,
-    to: instruction.verb === "NameCaptives" ? "captive" : instruction.to,
+    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.to,
   };
 }
 
@@ -138,19 +184,37 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
       return `${tile.name} is recorded as a captive.`;
     case "player":
       return `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} shuffles it into their deck after drawing their starting hand, for the rest of the campaign.`;
+    case "ally":
+      return tile.code
+        ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign.`
+        : `\u201c${tile.name}\u201d is marked in the campaign log.`;
+    case "removal":
+      return `${tile.name} is removed from the campaign pool.`;
   }
 }
 
 /** The sentence above Confirm when the seat declines: nothing is written for this choice. */
 export function declineSentence(view: Extract<ResolutionView, { kind: "choosing" }>): string {
   const who = view.seatCount > 1 && view.seatLabel ? `Player ${view.seat + 1}` : "You";
+  if (view.to === "removal") return `${who} ${who === "You" ? "remove" : "removes"} nothing from the campaign pool.`;
   const what = view.decline?.label.replace(/^No /, "") ?? "card";
   return `${who} ${who === "You" ? "take" : "takes"} no ${what}. Nothing is recorded for this choice.`;
 }
 
 /** The sentence above Confirm before anything is chosen, built from the noun: "Choose a boon and a hero, or tap No boon." */
 export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" }>): string {
-  const what = view.to === "hero" ? `a ${view.noun} and a hero` : view.to === "captive" ? "a hero to name as a captive" : view.to === "player" ? "a player, by one of their heroes" : `a ${view.noun}`;
+  const what =
+    view.to === "hero"
+      ? `a ${view.noun} and a hero`
+      : view.to === "captive"
+        ? "a hero to name as a captive"
+        : view.to === "player"
+          ? "a player, by one of their heroes"
+          : view.to === "ally"
+            ? "the ally for a player, by one of their heroes, or the line for the log"
+            : view.to === "removal"
+              ? "a card to remove from the campaign pool"
+              : `a ${view.noun}`;
   const decline = view.decline ? `, or tap ${view.decline.label}` : "";
   return `Choose ${what}${decline}. Your choice is written to the campaign log when you confirm.`;
 }
@@ -188,9 +252,18 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   const captives = view.captives.length > 0 ? `${fallen} ${andList(view.captives.map((code) => nameOf(world, code)))} ${view.captives.length === 1 ? "is" : "are"} recorded as captive.` : fallen;
   // The hero a Resolution takes prisoner is written to the log too (01130:B:1): a sentence of its own, with the reason.
   const prisoner = view.prisoner ? `${captives} ${nameOf(world, view.prisoner)}, the hero with the most damage, is taken prisoner.` : captives;
+  // The Ered Mithrin log (emce.treasure, emce.boon-allies, emce.campaign-pool-encounter): treasures discovered, lines marked, encounter cards joining or leaving the pool.
+  const treasures = view.treasures && view.treasures.length > 0 ? `${prisoner} The players discover ${andList(view.treasures.map((code) => nameOf(world, code)))}.` : prisoner;
+  const lines = view.lines && view.lines.length > 0 ? `${treasures} ${andList(view.lines.map((line) => `\u201c${ALLY_LINE_FACTS[line].words}\u201d`))} ${view.lines.length === 1 ? "is" : "are"} marked in the campaign log.` : treasures;
+  const copies = (codes: readonly string[]) => andList([...new Set(codes)].map((code) => {
+    const count = codes.filter((other) => other === code).length;
+    return count > 1 ? `${count} copies of ${nameOf(world, code)}` : nameOf(world, code);
+  }));
+  const joined = view.poolAdded && view.poolAdded.length > 0 ? `${lines} ${copies(view.poolAdded)} join${view.poolAdded.length === 1 ? "s" : ""} the campaign pool as encounter cards.` : lines;
+  const left = view.poolRemoved && view.poolRemoved.length > 0 ? `${joined} ${copies(view.poolRemoved)} leave${view.poolRemoved.length === 1 ? "s" : ""} the campaign pool.` : joined;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
-  if (!view.carried || view.carried.length === 0) return prisoner;
+  if (!view.carried || view.carried.length === 0) return left;
   const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));
   const carried = carryWords(kept, (code) => nameOf(world, code));
-  return `${prisoner} ${carried.charAt(0).toUpperCase()}${carried.slice(1)} ${carryVerb(kept)} kept for your next campaign.`;
+  return `${left} ${carried.charAt(0).toUpperCase()}${carried.slice(1)} ${carryVerb(kept)} kept for your next campaign.`;
 }

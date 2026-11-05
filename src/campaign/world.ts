@@ -23,6 +23,8 @@ export type World = {
   // The deckbuilding facts of the same rows (rr.deckbuilding), so the briefing refuses a saved deck that is not ready to
   // play. A world built by hand in a test may leave it out, and then that check is skipped.
   deckFacts?: ReadonlyMap<string, DeckSaveCard>;
+  // How many copies of each card one collection holds (the catalog's quantity), which caps the encounter cards the Campaign Pool tallies (emce.campaign-pool-encounter).
+  copies?: ReadonlyMap<string, number>;
 };
 
 function instructionCodes(effects: readonly Effect[], card: string): string[] {
@@ -61,13 +63,15 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
 
 // The codes a log names: its heroes, its fallen heroes, the cards of its pool and the cards it takes in from another campaign.
 export function logCodes(log: CampaignLog): string[] {
-  return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.carryIn.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : []))];
+  return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.carryIn.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...log.treasures, ...Object.keys(log.encounterPool)];
 }
 
 export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {
   const sets = new Map<string, string>();
   const deckFacts = new Map<string, DeckSaveCard>();
+  const copies = new Map<string, number>();
   for (const row of rows) {
+    copies.set(row.code, row.quantity);
     if (row.encounterSet) sets.set(row.code, row.encounterSet);
     deckFacts.set(row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits });
   }
@@ -77,7 +81,7 @@ export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effect
   for (const row of rows) if (row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
   // The Orc Guard a deck card becomes (01107:A:1) is no card of the catalog: the engine makes it, and the table names it.
   printed.set(ORC_GUARD_CODE, printedOf(printed, ORC_GUARD_CODE));
-  return { campaign, scenario, effects, cards: printed, sets, deckFacts };
+  return { campaign, scenario, effects, cards: printed, sets, deckFacts, copies };
 }
 
 // Whether a card among these codes has a record, at any depth, with a verb that chooses a hero card from the collection (`collection: "hero"`, src/catalog/verb-flags.ts).
@@ -88,6 +92,19 @@ function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>)
     const verbs: string[] = [];
     walkInstructions(effect.instructions, (instruction) => verbs.push(String(instruction.verb)));
     return verbs.some((verb) => heroVerbs.has(verb));
+  });
+}
+
+// Whether a card among these codes has a record, at any depth, with a verb that draws from the treasures of the catalog (`collection: "treasure"`, src/catalog/verb-flags.ts).
+function namesTreasures(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
+  const treasureVerbs = collectionVerbs("treasure");
+  return effects.some((effect) => {
+    if (!codes.has(effect.cardCode)) return false;
+    let found = false;
+    walkInstructions(effect.instructions, (instruction) => {
+      if (typeof instruction.verb === "string" && treasureVerbs.has(instruction.verb)) found = true;
+    });
+    return found;
   });
 }
 
@@ -128,10 +145,14 @@ export function loadWorld<TRun>(
   const dealt = worldCodes(campaign, scenario, effects, extra);
   const codes = [...new Set([...dealt, ...collectionTaken(effects, new Set(dealt))])];
   const rows = catalog.select().from(cards).where(inArray(cards.code, codes)).all();
+  // A record that draws a random treasure (AttachRandomTreasure, emce.treasure) needs every treasure of the catalog: the draw is from the ones the log has not recorded.
+  const treasures = namesTreasures(effects, new Set(codes)) ? catalog.select().from(cards).where(eq(cards.campaignKind, "treasure")).all() : [];
+  const loaded = new Set(rows.map((row) => row.code));
+  const withTreasures = treasures.length > 0 ? [...rows, ...treasures.filter((row) => !loaded.has(row.code))] : rows;
   // A card that names the player's collection (Helm of Secrecy, Thorongil) needs every hero card the player may own: the app
   // tracks no collection, so that is every deck-legal hero (families/misc/collection.ts).
-  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, rows);
-  const known = new Set(rows.map((row) => row.code));
+  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, withTreasures);
+  const known = new Set(withTreasures.map((row) => row.code));
   const heroes = catalog.select().from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.deckLegal, true))).all();
-  return worldFrom(campaign, scenario, effects, [...rows, ...heroes.filter((row) => !known.has(row.code))]);
+  return worldFrom(campaign, scenario, effects, [...withTreasures, ...heroes.filter((row) => !known.has(row.code))]);
 }

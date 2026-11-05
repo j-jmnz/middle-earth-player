@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 
 import index from "../../../data/campaigns/index.json";
 import entries from "../../../data/rules/entries.json";
@@ -27,9 +27,7 @@ describe("campaign data on the phone", () => {
 
 describe("the registry", () => {
   it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
-    // Ered Mithrin is built and listed locked: it has no screens until phase 50 (docs/phases/phase-50-ered-mithrin-campaign-shell.md), so the registry does not hold it.
-    const locked = new Set(index.filter((entry) => !entry.playable && entry.id === "ered-mithrin").map((entry) => entry.id));
-    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).filter((id) => !locked.has(id)).sort();
+    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
     expect([...campaignIds()].sort()).toEqual(built);
     for (const entry of index) {
       const campaign = campaignOf(entry.id);
@@ -41,8 +39,7 @@ describe("the registry", () => {
   });
 
   it("holds every scenario file, and each campaign's scenarios are all in it", () => {
-    const locked = index.filter((entry) => !entry.playable && entry.id === "ered-mithrin").flatMap((entry) => (campaignOf(entry.id) === null && existsSync(`data/campaigns/${entry.id}.json`) ? (JSON.parse(readFileSync(`data/campaigns/${entry.id}.json`, "utf8")) as { scenarios: string[] }).scenarios : []));
-    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).filter((id) => !locked.includes(id)).sort();
+    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
     for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
     for (const id of campaignIds()) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
   });
@@ -56,8 +53,8 @@ describe("the registry", () => {
     }
   });
 
-  it("splits the scenarios into four boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser"]);
+  it("splits the scenarios into five boxes, each scenario in one, each box inside its own campaign", () => {
+    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser", "Ered Mithrin"]);
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
     const every = new Set(campaignIds().flatMap((id) => campaignOf(id)?.scenarios ?? []));
@@ -100,6 +97,22 @@ describe("the registry", () => {
     expect(bookletParams("dream-chaser", "voyage-across-belegaer")).toEqual({ id: "dream-chaser", page: "6" });
     expect(bookletParams("dream-chaser", "the-city-of-corsairs")).toEqual({ id: "dream-chaser", page: "24" });
     expect(bookletParams("dream-chaser")).toEqual({ id: "dream-chaser" });
+  });
+
+  it("registers Ered Mithrin: nine scenarios in order in one box, no XP, no saga, its own booklet on each scenario's page", () => {
+    const campaign = campaignOf("ered-mithrin");
+    expect(campaignIds()).toContain("ered-mithrin");
+    expect(campaign).toMatchObject({ name: "Ered Mithrin", saga: false, bookletId: "ered-mithrin", prelude: [] });
+    expect(campaign?.xp).toBeUndefined();
+    expect(campaign?.scenarios).toHaveLength(9);
+    for (const id of campaign?.scenarios ?? []) expect(scenarioOf(id)?.id).toBe(id);
+    expect(BOXES.find((box) => box.id === "ered-mithrin")?.scenarios).toEqual(campaign?.scenarios);
+    expect(boxOf("the-fate-of-wilderland")?.id).toBe("ered-mithrin");
+    expect(campaignOfScenario("lost-in-mirkwood")?.id).toBe("ered-mithrin");
+    expect(scenarioNames(campaign!)["journey-up-the-anduin"]).toBe("Journey Up the Anduin");
+    expect(bookletParams("ered-mithrin", "journey-up-the-anduin")).toEqual({ id: "ered-mithrin", page: "5" });
+    expect(bookletParams("ered-mithrin", "the-fate-of-wilderland")).toEqual({ id: "ered-mithrin", page: "22" });
+    expect(bookletParams("ered-mithrin")).toEqual({ id: "ered-mithrin" });
   });
 
   it("names a scenario as printed, without Hall of Beorn's \" (Campaign)\" suffix", () => {

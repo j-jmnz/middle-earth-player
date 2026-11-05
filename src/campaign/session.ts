@@ -103,5 +103,5 @@ export function finish(save: Save, world: World, state: ScenarioState): Save {
   if (!loadout || state.lost || !isWon(state)) return drop(save);
   if (save.log.completed.includes(state.scenarioId)) return drop(save);
   const plan = checklistPlan(inputOf(save, world, loadout));
-  return { ...drop(save), log: applyResolution(plan.log, state.scenarioId, state, world.cards) };
+  return { ...drop(save), log: applyResolution(plan.log, state.scenarioId, state, world.cards, world.copies) };
 }

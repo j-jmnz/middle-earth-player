@@ -31,6 +31,7 @@ import { manifest as aflame } from "./aflame/index.ts";
 import { manifest as stormcaller } from "./stormcaller/index.ts";
 import { manifest as grapple } from "./grapple/index.ts";
 import { manifest as island } from "./island/index.ts";
+import { manifest as wilderland } from "./wilderland/index.ts";
 import { registerFamilies } from "../interpret/family-hooks.ts";
 
 export type { Focus };
@@ -38,7 +39,7 @@ export type { Focus };
 // The mechanic families' rules, in play order: where two runners could answer one verb, the first in this list does (docs/architecture.md, Mechanic families).
 // The order is the catalog list's (src/catalog/families/index.ts).
 export const RULES_FAMILIES: readonly RulesFamily[] = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island,
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland,
 ];
 
 // The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
