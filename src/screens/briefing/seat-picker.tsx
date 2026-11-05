@@ -5,6 +5,7 @@ import { useContext, useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../../play/cards/not-applied";
+import { longPressA11y } from "../../ui/long-press-action";
 import { rowSurface } from "../../ui/surfaces";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { CroppedArt } from "../art/art";
@@ -231,15 +232,16 @@ export function SeatPicker({
         {pickedDeck && !choosing && slot && !ringBearer ? (
           <View testID="ringbearer-slot" className="mt-3">
             <Section title="Ring-bearer" />
-            <View className="gap-2">
+            <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel="Ring-bearer">
               {candidates.map((candidate) => (
                 <Pressable
                   key={candidate.code}
                   testID={`ringbearer-${candidate.code}`}
                   collapsable={false}
-                  accessibilityRole="button"
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: false, checked: false }}
                   accessibilityLabel={`Choose ${candidate.name}${candidate.packName ? `, ${candidate.packName}` : ""}`}
-                  accessibilityHint="Long press to see the card"
+                  {...longPressA11y("Show card large", () => openCard(candidate.code))}
                   onPress={() => onRingBearer(candidate.code)}
                   onLongPress={() => openCard(candidate.code)}
                   delayLongPress={350}

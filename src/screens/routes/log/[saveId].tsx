@@ -203,6 +203,7 @@ export default function Log() {
             <Text className="font-bold text-eyebrow uppercase text-inkLabel">Notes</Text>
             <TextInput
               testID="log-notes"
+              accessibilityLabel="Notes"
               multiline
               value={notes}
               onChangeText={setEdited}

@@ -8,6 +8,7 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
+import { longPressA11y } from "../../ui/long-press-action.ts";
 import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures } from "../choice/dock/budget.ts";
 import { chipOnSurface, dropShadowOf } from "../../ui/surfaces.ts";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
@@ -62,6 +63,7 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
       accessibilityRole="button"
       accessibilityState={{ selected: playable }}
       accessibilityLabel={[card.label, said].filter(Boolean).join(". ")}
+      {...(onLongPress ? longPressA11y("Show card large", onLongPress) : null)}
       accessibilityHint={playable ? "Tap to play it. Hold to read the card" : "Shows the card"}
       onPress={onPress}
       onLongPress={onLongPress}

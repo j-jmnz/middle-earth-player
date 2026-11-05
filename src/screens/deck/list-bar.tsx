@@ -40,7 +40,7 @@ export function DeckListBar({
     <View className="mt-2">
       <View className="flex-row items-center gap-2">
         <SearchField testID={`${testIDPrefix}-search`} value={filter.query} onChangeText={(query) => onFilter({ ...filter, query })} placeholder="Search" accessibilityLabel="Search decks or heroes" />
-        <Segmented options={VIEWS} value={view} onChange={setDeckListView} testIDPrefix={`${testIDPrefix}-view`} />
+        <Segmented options={VIEWS} value={view} onChange={setDeckListView} testIDPrefix={`${testIDPrefix}-view`} accessibilityLabel="Deck view" />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-1.5 px-6">
         {STATUSES.map((status) => (

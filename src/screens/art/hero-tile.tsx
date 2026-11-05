@@ -7,6 +7,7 @@ import { Chevron, markedSphere, RingMark, sphereWord, SphereMark, usePressedNigh
 import { shortToShow } from "../deck/status";
 import { HeroTrio } from "./hero-trio";
 import { CardThumb, useCardPreview } from "../images/picture";
+import { longPressA11y, mergeA11yActions, type A11yActions } from "../../ui/long-press-action";
 import { dropShadowOf, nightFade, rowSurface, selectedRingOf, slateSurface } from "../../ui/surfaces";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import type { PictureSource } from "../../play/canvas/table-canvas-types";
@@ -150,6 +151,7 @@ export function HeroTile({
           accessibilityRole="button"
           accessibilityLabel={`${hero.name}, ${sphere}${loss ? `, ${loss}` : ""}`}
           accessibilityHint="Opens the card"
+          {...(onLongPress ? longPressA11y("Show card large", () => onLongPress(preview)) : null)}
           onPress={onPress}
           onLongPress={onLongPress ? () => onLongPress(preview) : undefined}
           delayLongPress={350}
@@ -231,6 +233,18 @@ function pressProps({ name, heroes, detail, status, note, onPress, onLongPress, 
   const picker = selected !== undefined;
   const moves = onMove && canMove ? [...(canMove.up ? [{ name: "moveUp", label: "Move up" }] : []), ...(canMove.down ? [{ name: "moveDown", label: "Move down" }] : [])] : [];
   const said = status.ready ? "" : `, ${status.text}`;
+  const moveActions: Partial<A11yActions> | null =
+    moves.length > 0
+      ? {
+          accessibilityActions: moves,
+          onAccessibilityAction: (event) => {
+            if (event.nativeEvent.actionName === "moveUp") onMove?.("up");
+            if (event.nativeEvent.actionName === "moveDown") onMove?.("down");
+          },
+        }
+      : null;
+  // The long press (Manage) is also an action, beside Move up and Move down.
+  const actions = onLongPress ? mergeA11yActions(moveActions, longPressA11y("Manage decks", onLongPress)) : moveActions;
   return {
     testID,
     collapsable: false,
@@ -238,14 +252,8 @@ function pressProps({ name, heroes, detail, status, note, onPress, onLongPress, 
     accessibilityState: picker ? { selected, disabled: disabled ?? false } : undefined,
     accessibilityLabel: `${name}, ${heroNames(heroes)}, ${detail}${said}${note ? `, ${note}` : ""}`,
     accessibilityHint: picker ? undefined : "Opens the deck",
-    accessibilityActions: moves.length > 0 ? moves : undefined,
-    onAccessibilityAction:
-      moves.length > 0
-        ? (event: { nativeEvent: { actionName: string } }) => {
-            if (event.nativeEvent.actionName === "moveUp") onMove?.("up");
-            if (event.nativeEvent.actionName === "moveDown") onMove?.("down");
-          }
-        : undefined,
+    accessibilityActions: actions && actions.accessibilityActions && actions.accessibilityActions.length > 0 ? actions.accessibilityActions : undefined,
+    onAccessibilityAction: actions?.onAccessibilityAction,
     disabled: disabled ?? false,
     onPress,
     onLongPress,

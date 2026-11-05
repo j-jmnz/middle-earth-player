@@ -99,7 +99,7 @@ export default function CardScreen() {
       <CardFacts row={row} />
       {upgraded ? (
         <View testID="card-upgraded-side" className="mt-5">
-          <Eyebrow tone="accent">Upgraded side</Eyebrow>
+          <Eyebrow tone="accent" header>Upgraded side</Eyebrow>
           <View className="mt-2">
             <CardTextView text={upgraded} />
           </View>

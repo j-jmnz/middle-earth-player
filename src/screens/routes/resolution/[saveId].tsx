@@ -40,7 +40,7 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       collapsable={false}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      accessibilityLabel={`${selected ? `${label}, selected` : label}${tile.tag ? `, ${tile.tag}` : ""}`}
+      accessibilityLabel={`${label}${tile.tag ? `, ${tile.tag}` : ""}`}
       onPress={onPress}
       // Two tiles a row: a boon offered on each hero makes a longer list than one row holds. An odd last tile keeps the
       // two-column width.
@@ -249,7 +249,6 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                     label={view.decline.label}
                     testID="resolution-decline"
                     selected={declined}
-                    accessibilityLabel={declined ? `${view.decline.label}, selected` : view.decline.label}
                     onPress={() => setChosen(view.decline?.optionId ?? null)}
                   />
                   {declined ? <Text className="text-label font-semibold text-accentHigh">Selected</Text> : null}

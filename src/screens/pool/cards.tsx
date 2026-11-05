@@ -9,6 +9,7 @@ import { CountStepper } from "../kit/count-stepper";
 import { addDraftCard, announceDraftChange, takeDraftCard, type TitleLookup } from "../deck/draft";
 import { CardThumbFrame, RowCardImage, useCardPreview } from "../images/picture";
 import { cardCorner } from "../../ui/card-corner";
+import { longPressA11y } from "../../ui/long-press-action";
 import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { dropShadowOf, selectedRingOf } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
@@ -127,6 +128,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         collapsable={false}
         accessibilityRole="button"
         accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${adding && count > 0 ? `, ${count} in the deck` : ""}`}
+        {...longPressA11y("Show card large", () => onPreview(item.code, item.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => onOpen(item.code)}
         onLongPress={() => onPreview(item.code, item.name, picture)}

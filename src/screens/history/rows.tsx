@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import type { RunRecord } from "../../campaign/runs";
+import { longPressA11y } from "../../ui/long-press-action";
 import { rowSurface } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
 import { Text } from "../../ui/text";
@@ -72,6 +73,7 @@ export function HistoryCard({
         accessibilityLabel={accessibilityLabel}
         disabled={onPress == null && onLongPress == null}
         onPress={onPress ?? undefined}
+        {...(onLongPress ? longPressA11y("Start managing", onLongPress) : null)}
         onLongPress={onLongPress ?? undefined}
         delayLongPress={350}
       >

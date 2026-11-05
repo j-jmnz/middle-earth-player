@@ -16,12 +16,13 @@ const eyebrowTone = { accent: "text-accent", moon: "text-moon", muted: "text-mut
  * An overline: one short tag above a title in bold Barlow capitals, tracked wide (Fellowship of the Ring · 2 of 6, In progress ·
  * Round 4). Moon by default; accent above the thing to act on. `rule` draws the short line before it that the hero text opens with.
  * `onArt` is an overline over a picture: it takes the title's colour (bone) and its shadow, since moon or accent is too faint on a bright painting.
+ * `header` is for an eyebrow that titles a group of rows or a block of text: a screen reader hears it as a heading (its role only; nothing is drawn differently).
  */
-export function Eyebrow({ children, tone = "moon", testID, rule = false, onArt = false }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string; rule?: boolean; onArt?: boolean }) {
+export function Eyebrow({ children, tone = "moon", testID, rule = false, onArt = false, header = false }: { children: string; tone?: keyof typeof eyebrowTone; testID?: string; rule?: boolean; onArt?: boolean; header?: boolean }) {
   const palette = usePalette();
   const shadow = useTitleShadow();
   const text = (
-    <Text testID={testID} className={`font-bold text-eyebrow uppercase ${eyebrowTone[onArt ? "bone" : tone]}`} style={onArt ? shadow : undefined}>
+    <Text testID={testID} accessibilityRole={header ? "header" : undefined} className={`font-bold text-eyebrow uppercase ${eyebrowTone[onArt ? "bone" : tone]}`} style={onArt ? shadow : undefined}>
       {children}
     </Text>
   );

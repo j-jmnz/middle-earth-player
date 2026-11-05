@@ -288,7 +288,7 @@ export function CardPoolBody({
       />
       <View className="mt-1 flex-row items-center justify-between">
         <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
-        <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact />
+        <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact accessibilityLabel="Card view" />
       </View>
       <View
         className="mt-2 min-h-0 flex-1"

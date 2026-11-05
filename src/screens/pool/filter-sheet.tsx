@@ -137,8 +137,8 @@ function Chip({
   const mark = sphere ? markedSphere(sphere) : null;
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityRole="radio"
+      accessibilityState={{ selected, checked: selected }}
       onPress={onPress}
       className="mb-2 mr-2 min-h-touch flex-row items-center gap-2 rounded-control px-4"
       style={{ backgroundColor: selected ? palette.ink : withAlphaHex(palette.ink, 0.08) }}
@@ -149,11 +149,13 @@ function Chip({
   );
 }
 
-function OptionRow({ label, detail, onPress, icon }: { label: string; detail: string; onPress: () => void; icon?: IconName }) {
+// `opens` is a row that opens a list of choices (its hint says so); the rows in that list pick one.
+function OptionRow({ label, detail, onPress, icon, opens = false }: { label: string; detail: string; onPress: () => void; icon?: IconName; opens?: boolean }) {
   const s = useUiScale();
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityHint={opens ? "Opens a choice" : undefined}
       onPress={onPress}
       className="min-h-14 flex-row items-center justify-between"
     >
@@ -190,8 +192,10 @@ function FilterBody({
 }) {
   return (
     <View>
-      <Text className="mb-2 text-label text-inkLabel">Sphere</Text>
-      <View className="flex-row flex-wrap">
+      <Text accessibilityRole="header" className="mb-2 text-label text-inkLabel">
+        Sphere
+      </Text>
+      <View className="flex-row flex-wrap" accessibilityRole="radiogroup" accessibilityLabel="Sphere">
         {spheres.map((sphere) => (
           <Chip
             key={sphere.code}
@@ -203,9 +207,9 @@ function FilterBody({
         ))}
       </View>
       <View className="mt-1" />
-      <OptionRow label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
-      <OptionRow label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
-      <OptionRow label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
+      <OptionRow opens label="Pack or cycle" detail={packDetail(filter, groups)} onPress={() => onChoose("pack")} />
+      <OptionRow opens label="Trait" detail={filter.trait ?? "Any"} onPress={() => onChoose("trait")} />
+      <OptionRow opens label="Cost" icon="cost" detail={filter.cost ?? "Any"} onPress={() => onChoose("cost")} />
       <SettingSwitch surface="paper" roomy label="Unique" value={filter.unique} onChange={(unique) => onChange({ ...filter, unique })} testID="pool-unique" />
       <SettingSwitch surface="paper" roomy label="Active text" value={filter.activeText} onChange={(activeText) => onChange({ ...filter, activeText })} testID="pool-active-text" />
     </View>

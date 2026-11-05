@@ -13,7 +13,7 @@ import { useReaderMode } from "./screen-reader.ts";
 export const SETTLE_MS = 350;
 
 // A module-level function: the React Compiler cannot compile a try/catch inside a hook.
-function focusNode(target: ComponentRef<typeof View> | null): void {
+export function focusNode(target: ComponentRef<typeof View> | null): void {
   try {
     const node = target ? findNodeHandle(target) : null;
     if (node != null) AccessibilityInfo.setAccessibilityFocus(node);

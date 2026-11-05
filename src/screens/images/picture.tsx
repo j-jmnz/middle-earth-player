@@ -44,18 +44,21 @@ export function RowCardImage({
   return <CardImage recyclingKey={code} cachePolicy="memory-disk" source={source} width={width} height={height} />;
 }
 
+// The card page's picture says the card's name to a screen reader (docs/design-system.md, Screen reader); the pinch zoom stays a visual extra.
 export function InspectCardImage({
   code,
+  name,
   source,
   width,
   height,
 }: {
   code: string;
+  name: string;
   source: { uri: string } | number;
   width: number;
   height: number;
 }) {
-  return <Image recyclingKey={code} contentFit="contain" cachePolicy={cachePolicyFor(source)} source={source} style={{ width, height }} />;
+  return <Image recyclingKey={code} contentFit="contain" accessible accessibilityRole="image" accessibilityLabel={name} cachePolicy={cachePolicyFor(source)} source={source} style={{ width, height }} />;
 }
 
 export function CoverCardImage({
