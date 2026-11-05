@@ -412,11 +412,11 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
               extras={pills.pills}
               more={pills.more}
               onMore={more.show} onLines={more.showLines}
-              resetKey={choice.resetKey}
+              resetKey={choice.resetKey} momentKey={choice.sheet.key} stay={choice.stayFocus}
               guide={choice.guide}
               trayOpen={choice.panelOpen}
               count={trayCount(choice.sheet, choice.choice)}
-              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} />}
+              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} onStep={choice.onStep} />}
               onTop={setAnchor}
               onHeight={(height, hasNumbers) => {
                 setDockHeight(height);

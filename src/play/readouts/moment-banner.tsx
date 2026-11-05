@@ -1,6 +1,6 @@
 // The outcome banner over the table (docs/design-system-table.md, Banner): what the last intent did, in beats, for a few
 // seconds. A tap or a swipe sends it away (user request, 2026-10-29); the log keeps every step.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
@@ -10,20 +10,15 @@ import { bannerSpan } from "./banner-span.ts";
 import { layoutAnim, timing, useMotionScale, useReduceMotion } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { CONTAINER_RADIUS } from "../../ui/radius.ts";
-import { BEAT_MS, type Moment, type MomentLine } from "../store/outcome.ts";
-import { lookIdsOf, lookStripWords } from "../words/wilderland.ts";
+import { BEAT_MS, type Moment } from "../store/outcome.ts";
+import { bannerLabel, bannerSpeech } from "./banner-speech.ts";
 import { LineMark } from "../chrome/table-chrome.tsx";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 import { announce } from "../../ui/announce.ts";
-
-// What a screen reader hears of a line: the line that lays cards in the Discover look strip names the strip (emce.discover), every other line its text.
-function spoken(line: MomentLine): string {
-  const laid = lookIdsOf(new Set(line.cards ?? [])).length;
-  return laid > 0 ? lookStripWords(laid) : line.text;
-}
+import { useReaderMode } from "../../ui/screen-reader.ts";
 
 const BANNER_WIDTH = 440;
 const BANNER_MIN = 260;
@@ -71,11 +66,16 @@ export function MomentBanner({
   const screen = useWindowDimensions();
   const { left, right } = bannerSpan(screen.width, BANNER_WIDTH * s + 2 * SIDE, leftClear, rightClear);
   const room = Math.max(0, screen.width - left - right - 2 * SIDE);
-  const label = `${moment.title}. ${moment.lines.map(spoken).join(". ")}`;
+  const label = bannerLabel(moment);
+  // The phone's reader never sees the spotlight, so it hears the banner's title and then each line as its own announcement, in order, through
+  // the queue (banner-speech.ts); every other listener (the web list included) hears the label at once, as it always has.
+  const reader = useReaderMode();
   // A live region is Android's only and is not read reliably on a view that has just mounted: announce on both platforms.
-  useEffect(() => {
-    announce(label);
-  }, [label]);
+  const say = useEffectEvent(() => {
+    if (reader) for (const line of bannerSpeech(moment)) announce(line);
+    else announce(label);
+  });
+  useEffect(() => say(), [label, reader]);
   // The fades: the banner and each line come in and the banner goes out over MOTION.bannerIn and bannerOut.
   const scale = useMotionScale();
   const fade = useMemo(() => ({ enter: layoutAnim(FadeInDown, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);

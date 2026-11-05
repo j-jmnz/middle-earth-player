@@ -13,7 +13,7 @@ import { chipOnSurface, dropShadowOf } from "../../ui/surfaces.ts";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 
-import type { LogLine } from "../store/log.ts";
+import { logLineSpeech, type LogLine } from "../store/log.ts";
 import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
@@ -206,7 +206,7 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
         {lines.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing has happened this round yet.</Text> : null}
         {lines.map((line) => (
-          <View key={line.key} testID={`log-line-${line.key}`} className="border-b py-2" style={{ borderColor: t.inkLine }}>
+          <View key={line.key} testID={`log-line-${line.key}`} accessible accessibilityLabel={logLineSpeech(line)} className="border-b py-2" style={{ borderColor: t.inkLine }}>
             <View className="flex-row items-center gap-2">
               <LineMark mark={line.mark} />
               <Text className="shrink text-body text-ink">{line.text}</Text>

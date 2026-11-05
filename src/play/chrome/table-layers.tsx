@@ -252,7 +252,7 @@ export function TableLayers({
         </>
       ) : null}
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
-      <TrayFrame open={panel != null} surface={night ? "night" : "paper"} testID="reading" place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
+      <TrayFrame open={panel != null} surface={night ? "night" : "paper"} testID="reading" onClose={close} place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
         {held?.kind === "pile" ? (
           <PileReading
             store={store}

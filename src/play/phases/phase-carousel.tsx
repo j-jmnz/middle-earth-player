@@ -155,6 +155,7 @@ export function PhaseCarousel({
       <Animated.View
         testID="phase-carousel"
         accessibilityViewIsModal
+        onAccessibilityEscape={onClose}
         style={[
           {
             position: "absolute",

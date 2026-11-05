@@ -5,6 +5,8 @@
 // not empty, and the one timer is cancelled with it. The web build speaks at once, as it always has (react-native-web's live region).
 import { AccessibilityInfo, Platform } from "react-native";
 
+import { accessibility } from "./accessibility.ts";
+
 // The wait after a line when no event ends it: a base plus the time a default speaking rate takes for each character, capped.
 const BASE_MS = 1000;
 const PER_CHAR_MS = 70;
@@ -54,13 +56,14 @@ function speak(text: string): void {
   timer = setTimeout(advance, waitFor(text));
 }
 
-/** Announces `text` to a screen reader after the lines already queued. */
+/** Announces `text` to a screen reader after the lines already queued. On the phone with no screen reader on it does nothing at all: no listener, no timer. */
 export function announce(text: string): void {
   if (text === "") return;
   if (Platform.OS === "web") {
     AccessibilityInfo.announceForAccessibility(text);
     return;
   }
+  if (!accessibility().screenReader) return;
   if (speaking == null) {
     speak(text);
     return;

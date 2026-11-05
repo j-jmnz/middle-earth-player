@@ -2,7 +2,8 @@
 // the command column's box (the width the rows and the reading panels share), and what a tap outside it does. The component is
 // choice/tray.tsx, drawn inside the dock; the hook that holds the fold is use-table-choice.ts.
 import { successWords } from "../words/sea.ts";
-import type { Choice } from "./table-choice.ts";
+import { shareOf, shareSum, type Share } from "./pay.ts";
+import { choiceFor, type Choice } from "./table-choice.ts";
 import type { PlaceMark } from "../store/island-place.ts";
 import type { OptionMark, Sheet, SheetStat } from "./sheet-types.ts";
 
@@ -61,6 +62,68 @@ export function trayTiles(sheet: Sheet): TrayTile[] {
 /** What a tap on a tile does: a card a Sailing test looked at is no choice, so it opens the card large ("read"); any other tile picks. */
 export function tileAction(tile: Pick<TrayTile, "look">): "read" | "pick" {
   return tile.look != null ? "read" : "pick";
+}
+
+/**
+ * The role a screen reader gives a row of the open tray (docs/design-system-table.md, Screen reader): a pick is one of several to choose
+ * from (radio), a multi a set to tick (checkbox), a trigger a thing to use (button), a share an amount to raise or lower (adjustable). A
+ * card a Sailing test looked at is listed to read, a button. Said only under useReaderMode.
+ */
+export type TileRole = "radio" | "checkbox" | "button" | "adjustable";
+
+export function tileRole(sheet: Sheet): TileRole {
+  switch (sheet.kind) {
+    case "pick":
+      return sheet.look != null ? "button" : "radio";
+    case "multi":
+      return "checkbox";
+    case "distribute":
+      return "adjustable";
+    case "trigger":
+    case "window":
+    case "outcome":
+      return "button";
+  }
+}
+
+/** The state a row of that role speaks: a radio or a checkbox is checked, any other is selected. */
+export function tileState(role: TileRole, selected: boolean): { checked: boolean } | { selected: boolean } {
+  return role === "radio" || role === "checkbox" ? { checked: selected } : { selected };
+}
+
+/** The most one recipient of a distribute sheet can take: its own pool, and for a fixed total no more than the total. */
+export function shareCap(sheet: Extract<Sheet, { kind: "distribute" }>, id: string): number {
+  const item = sheet.options.find((candidate) => candidate.id === id);
+  if (!item) return 0;
+  return sheet.exact ? Math.min(item.max, sheet.total) : item.max;
+}
+
+/** What a share row speaks as its value: "2 of 3 paid" (a cost) or "2 of 3 assigned" (archery damage). */
+export function shareValue(sheet: Extract<Sheet, { kind: "distribute" }>, shares: readonly Share[], id: string): { now: number; max: number; text: string } {
+  const now = shareOf(shares, id);
+  const max = shareCap(sheet, id);
+  return { now, max, text: `${now} of ${max} ${sheet.purpose.kind === "archery" ? "assigned" : "paid"}` };
+}
+
+/**
+ * One share more (`delta` 1) or less (-1) for a recipient, from an increment or decrement action of a screen reader. Unlike a tap, which
+ * goes round to none at its cap, an action stops at the ends: it adds while the recipient is under its cap and, for a fixed total, while
+ * the total is not met, and takes one away only while it holds one. Returns the same list when nothing moves.
+ */
+export function stepShares(shares: readonly Share[], id: string, cap: number, total: number | null, delta: 1 | -1): readonly Share[] {
+  const current = shareOf(shares, id);
+  const next = delta === 1 ? (current >= cap || (total != null && shareSum(shares) >= total) ? current : current + 1) : Math.max(0, current - 1);
+  if (next === current) return shares;
+  const rest = shares.filter((share) => share.id !== id);
+  return next > 0 ? [...rest, { id, amount: next }] : rest;
+}
+
+/** The choice after an increment or decrement action on a distribute row, or null when the row does not exist or nothing moves. */
+export function stepChoice(sheet: Sheet, held: Choice | null, id: string, delta: 1 | -1): Choice | null {
+  if (sheet.kind !== "distribute") return null;
+  const choice = choiceFor(sheet, held);
+  const shares = stepShares(choice.shares, id, shareCap(sheet, id), sheet.exact ? sheet.total : null, delta);
+  return shares === choice.shares ? null : { ...choice, shares };
 }
 
 // The sheet's verb without its trailing preposition ("Defend with" is "Defend").

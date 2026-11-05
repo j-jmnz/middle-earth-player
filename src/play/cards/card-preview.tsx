@@ -217,6 +217,7 @@ export function CardPreview({
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
       <Pressable
         testID="card-preview-scrim"
+        accessibilityRole="button"
         accessibilityLabel="Close the preview"
         onPress={close}
         style={[StyleSheet.absoluteFill, wide ? styles.row : styles.column, { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left + 16 * s, paddingRight: insets.right + 16 * s }]}

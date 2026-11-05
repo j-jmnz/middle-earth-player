@@ -29,12 +29,15 @@ export function TrayFrame({
   place,
   surface = "night",
   testID,
+  onClose,
   children,
 }: {
   open: boolean;
   place: TrayPlace;
   surface?: "night" | "paper";
   testID: string;
+  // What a screen reader's escape gesture does while the panel is open (it is then modal: the table behind it is not read).
+  onClose?: () => void;
   children: ReactNode;
 }) {
   const t = useTableTokens();
@@ -48,6 +51,8 @@ export function TrayFrame({
       testID={testID}
       collapsable={false}
       pointerEvents={open ? "auto" : "none"}
+      accessibilityViewIsModal={open}
+      onAccessibilityEscape={open ? onClose : undefined}
       style={[
         {
           position: "absolute",

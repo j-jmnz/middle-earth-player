@@ -6,6 +6,7 @@ import { announce, clearAnnouncements, waitFor } from "./announce.ts";
 
 const phone = vi.hoisted(() => ({
   os: "ios",
+  reader: true,
   said: [] as string[],
   handlers: new Set<(event: { announcement?: string; success?: boolean }) => void>(),
   added: 0,
@@ -32,6 +33,9 @@ vi.mock("react-native", () => ({
   },
 }));
 
+// The phone's accessibility store: announce speaks only while a screen reader is on.
+vi.mock("./accessibility.ts", () => ({ accessibility: () => ({ reduceMotion: null, screenReader: phone.reader }) }));
+
 const finish = (announcement?: string) => {
   for (const handler of [...phone.handlers]) handler({ ...(announcement != null ? { announcement } : {}), success: true });
 };
@@ -39,6 +43,7 @@ const finish = (announcement?: string) => {
 beforeEach(() => {
   vi.useFakeTimers();
   phone.os = "ios";
+  phone.reader = true;
   phone.said = [];
   phone.added = 0;
   phone.removed = 0;
@@ -149,6 +154,15 @@ describe("announce", () => {
     announce("one");
     announce("two");
     expect(phone.said).toEqual(["one", "two"]);
+    expect(phone.added).toBe(0);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("does nothing at all on the phone with no screen reader on", () => {
+    phone.reader = false;
+    announce("one");
+    announce("two");
+    expect(phone.said).toEqual([]);
     expect(phone.added).toBe(0);
     expect(vi.getTimerCount()).toBe(0);
   });
