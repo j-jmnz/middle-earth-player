@@ -101,8 +101,16 @@ export function runExtraVerb(
     case "ShuffleSelfIntoEncounterDeck": {
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
-    case "DiscardRandomFromHand":
+    case "DiscardRandomFromHand": {
+      // `eachSeat` ("each player discards 1 card at random from his hand", 19040:A:1): every living player, the first player first.
+      if (instruction.who === "eachSeat") {
+        const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
+        const living = livingSeats(state);
+        const at = Math.max(0, living.indexOf(state.firstPlayer));
+        return [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
+      }
       return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
+    }
     case "PlaceUnderSelf": {
       const id = lastPicked(state);
       if (!focus.sourceId || !state.cards[id] || !state.cards[focus.sourceId]) return state;

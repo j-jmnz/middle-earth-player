@@ -34,7 +34,7 @@ export function stagePlace(state: ScenarioState, code: string): { at: number; of
   const seen = new Set<string>();
   for (const stage of state.stages) {
     if (seen.has(stage.code)) continue;
-    const sharing = state.stages.find((other) => other.branch?.includes(stage.code))?.branch ?? [stage.code];
+    const sharing = state.stages.find((other) => other.branch?.includes(stage.code))?.branch ?? state.stages.find((other) => other.randomNext?.codes.includes(stage.code))?.randomNext?.codes ?? [stage.code];
     for (const sibling of sharing) seen.add(sibling);
     places.push([...sharing]);
   }

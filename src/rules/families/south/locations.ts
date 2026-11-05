@@ -67,6 +67,9 @@ export function progressRoom(state: ScenarioState, id: string, cards: Cards): nu
   let room = points == null ? Number.MAX_SAFE_INTEGER : Math.max(0, points - location.progress);
   const cap = heldAmount(state, id, "progressCap");
   if (cap > 0) room = Math.min(room, Math.max(0, cap - heldAmount(state, id, "progressPlaced")));
+  // A cap on all the locations in the staging area together (Deep Ravine, 19042:A:1): the progress placed on any of them this round counts against it.
+  const shared = heldAmount(state, id, "progressCapShared");
+  if (shared > 0) room = Math.min(room, Math.max(0, shared - heldAmount(state, "table", "progressPlacedShared")));
   if (flagged(state, id, "progressNeedsRingBearer")) {
     const bearer = controlledRingBearer(state, cards);
     if (bearer == null || state.cards[bearer]?.controller !== state.firstPlayer) return 0;
@@ -88,8 +91,11 @@ export function damageLoss(state: ScenarioState, cards: Cards): ScenarioState {
 
 // Notes progress placed on a location this round, for a cap.
 export function notePlaced(state: ScenarioState, id: string, amount: number): ScenarioState {
-  if (heldAmount(state, id, "progressCap") <= 0 || amount <= 0) return state;
-  return { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId: id, stat: "progressPlaced", amount, until: "endOfRound" }] };
+  if (amount <= 0) return state;
+  let next = state;
+  if (heldAmount(next, id, "progressCapShared") > 0) next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId: id, stat: "progressPlacedShared", amount, until: "endOfRound" }] };
+  if (heldAmount(next, id, "progressCap") <= 0) return next;
+  return { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId: id, stat: "progressPlaced", amount, until: "endOfRound" }] };
 }
 
 // Progress from questing goes on the active locations first (rr.active-location): each takes what it can, a location that is held

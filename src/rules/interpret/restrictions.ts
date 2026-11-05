@@ -9,11 +9,12 @@ import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
 import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
+import { isGuard } from "../families/objectives/pick.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -38,6 +39,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       sourceId: source.id,
       what,
       ...(instruction.location ? { location: instruction.location } : {}),
+      ...(instruction.guarding ? { guarding: instruction.guarding } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
@@ -47,9 +49,15 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
   return found;
 }
 
+// Whether the card is attached as the guard of the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
+function guardsTitled(state: ScenarioState, ctx: ReduceContext, id: string, title: string): boolean {
+  const host = state.cards[id]?.host;
+  return isGuard(state, id) && host != null && printedOf(ctx.cards, state.cards[host]?.code ?? "").name === title;
+}
+
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   // A restriction on the location itself, or one a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
-  return restricted(state, ctx, "travel").some((rule) => (rule.location == null ? rule.sourceId === locationId : state.cards[locationId]?.code === rule.location));
+  return restricted(state, ctx, "travel").some((rule) => (rule.location == null ? rule.sourceId === locationId : state.cards[locationId]?.code === rule.location && (rule.guarding == null || guardsTitled(state, ctx, locationId, rule.guarding))));
 }
 
 /**
@@ -57,7 +65,7 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
  * the stage's name, what it needs and what it has. Null for any other restriction, which keeps the engine's general reason.
  */
 export function travelProgressReason(state: ScenarioState, ctx: ReduceContext, locationId: string): string | null {
-  const rule = restricted(state, ctx, "travel").find((entry) => entry.location != null && state.cards[locationId]?.code === entry.location);
+  const rule = restricted(state, ctx, "travel").find((entry) => entry.location != null && state.cards[locationId]?.code === entry.location && (entry.guarding == null || guardsTitled(state, ctx, locationId, entry.guarding)));
   const source = rule ? state.cards[rule.sourceId] : undefined;
   if (!source) return null;
   for (const effect of effectsOfCard(state, ctx, source)) {

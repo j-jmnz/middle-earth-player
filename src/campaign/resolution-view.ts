@@ -50,8 +50,8 @@ export type ResolutionView =
       tiles: readonly ResolutionTile[];
       decline: ResolutionDecline | null;
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
-      // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4).
-      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure";
+      // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4). `location`: a location in the staging area a copy of which joins the pool (12184:B:4).
+      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure" | "location";
       // The choice is of Song boons (The Withered Heath, 12175:B:6): each player takes one, a Song only once.
       songs?: true;
     }
@@ -136,6 +136,9 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   } else if (instruction.verb === "RemoveFromPool") {
     noun = "card";
     eyebrow = "Remove a card from the pool";
+  } else if (instruction.verb === "ChooseStagedLocationForPool") {
+    noun = "location";
+    eyebrow = "Choose a location for the pool";
   } else if (instruction.verb === "ChooseRandomTreasure") {
     noun = "treasure";
     eyebrow = "Choose a treasure";
@@ -164,6 +167,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       const words = ALLY_LINE_FACTS[instruction.line].words;
       return [{ optionId: LOG_LINE, code: null, name: words, hero: null, label: words, wide: true }];
     }
+    if (instruction.verb === "ChooseStagedLocationForPool") return [{ optionId: intent.optionId, code: intent.optionId, name: nameOf(world, intent.optionId), hero: null, label: nameOf(world, intent.optionId) }];
     if (instruction.verb === "RemoveFromPool") return [removalTile(world, intent.optionId, tally, state.seatCount > 1 && removable.filter((code) => code === removalCode(intent.optionId)).length > 1)];
     const [code = "", heroId] = intent.optionId.split(">");
     const hero = heroId ? state.cards[heroId] : undefined;
@@ -176,7 +180,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
   });
   // The King's Quest (12170:B:3) says "the first player chooses either Threat to Wilderland or Dagnir's Spawn". Fellowship's 142060:B:2 says the same of its burdens; its words stay as they were.
   const kingsBurden = instruction.verb === "ChooseCards" && instruction.who === "firstPlayer" && instruction.codes.includes("12172") && state.resolutionLog.earned.some((item) => item.code === "12174");
-  const eachSeat = instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || (instruction.verb === "ChooseCards" && instruction.who === "eachSeat");
+  const eachSeat = instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || instruction.verb === "ChooseStagedLocationForPool" || (instruction.verb === "ChooseCards" && instruction.who === "eachSeat");
   const first = window.seat === state.firstPlayer ? " (first player)" : "";
   // The seats before this one have confirmed: each recorded card in this group, or the decline when nothing was recorded.
   const answered = answeredSeats(state).map((seat): ResolutionAnswer => {
@@ -188,6 +192,10 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     if (instruction.verb === "BoonAllyOrLogLine") {
       const ally = state.resolutionLog.earned.find((item) => item.step === window.step);
       return { seat, words: ally ? nameOf(world, ally.code) : ALLY_LINE_FACTS[instruction.line].words };
+    }
+    if (instruction.verb === "ChooseStagedLocationForPool") {
+      const chosen = state.resolutionLog.poolAnswers?.find((item) => item.seat === seat)?.option;
+      return { seat, words: chosen == null ? "No location" : nameOf(world, chosen) };
     }
     if (instruction.verb === "RemoveFromPool") {
       const taken = state.resolutionLog.poolAnswers?.find((item) => item.seat === seat)?.option;
@@ -212,7 +220,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     answered,
     tiles,
     decline,
-    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.to,
+    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseStagedLocationForPool" ? "location" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.to,
   };
 }
 
@@ -240,6 +248,8 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
       return tile.code
         ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded, so no card is removed from the encounter deck for it later.`
         : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool. ${view.later ? `Later Setups remove from the encounter deck ${view.later}.` : ""}`.trim();
+    case "location":
+      return `A copy of ${tile.name} is added to the campaign pool as an encounter card.`;
     case "treasure":
       return `${tile.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`;
     case "removal":

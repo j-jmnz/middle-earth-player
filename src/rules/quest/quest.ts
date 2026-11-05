@@ -22,6 +22,7 @@ import { travelsOverActive } from "../families/grapple/travel.ts";
 import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { branchFrom, reached as reachedStage } from "../families/quest/branch.ts";
+import { randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { viewOf, withView } from "../families/breaking/areas.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
 import { orderedNext, stageToVictory } from "../families/quest/order.ts";
@@ -155,7 +156,9 @@ export function resolveQuest(
   }
   // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
   if (willpower !== threat) {
-    for (const seat of hearing) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat });
+    // In a quest whose stages come in a random order (AdvanceToRandomStage) the failed quest's event carries the amount the threat would rise by, for the stage that answers it ("place X progress here", 19051:B:2); no other game's events change.
+    const stamped = willpower < threat && state.stages.some((stage) => stage.randomNext != null);
+    for (const seat of hearing) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat, ...(stamped ? { amount: threat - willpower } : {}) });
   }
   const ready = withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance));
   return only == null ? clearCommitted(ready) : ready;
@@ -253,7 +256,10 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A quest that branches (BranchStage, 01120:B:1) chooses the next stage at random and ends at a stage it led to.
     const branched = ordered ? null : branchFrom(next, current.code);
     if (branched) next = branched.state;
-    const nextId = ordered ? ordered.id : (() => {
+    // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once.
+    const rolled = ordered || branched ? null : randomStageFrom(next, current.code);
+    if (rolled) next = rolled.state;
+    const nextId = ordered ? ordered.id : rolled ? rolled.id : (() => {
       const nextCode = branched ? branched.code : index < 0 ? undefined : next.stages[index + 1]?.code;
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
@@ -261,7 +267,8 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const nextCode = next.cards[nextId]?.code;
     // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
     next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
-    next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : "setAside" });
+    next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : rolled?.remove ? "removed" : "setAside" });
+    if (rolled) next = { ...next, stageLeft: { to: nextId, from: currentId } };
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: "B" });
     if (next.stageChoice) next = withoutStageChoice(next);

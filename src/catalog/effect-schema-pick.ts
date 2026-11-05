@@ -231,6 +231,10 @@ export const pickSchema = z.strictObject({
   hasFacedownUnder: z.literal(true).optional(),
   facedownUnder: z.literal(true).optional(),
   nemesis: z.literal(true).optional(),
+  // Roam Across Rhovanion's guards (ledger lines 19049:B:1, 19049:B:3, 19050:B:1, 19048:B:3, 19050:B:3). `guardsCard`: an encounter card that guards a card, as the guard of an objective or as the keeper of a player card held under it (Hobgoblin). `guardsNamed`: an encounter card attached
+  // to the objective with this title as its guard. Read by the wilderland family (src/rules/families/wilderland/pick.ts).
+  guardsCard: z.literal(true).optional(),
+  guardsNamed: z.string().min(1).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).

@@ -8,6 +8,7 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { constantInstructions, constantVerbCodes } from "../../interpret/constant-records.ts";
 import { gameReads } from "../../core/game-reads.ts";
+import { printedOf } from "../../core/printed.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
@@ -90,7 +91,7 @@ export function victoryWhenFree(state: ScenarioState, ctx: ReduceContext, steps:
 export function whenRevealedUncancelable(state: ScenarioState, event: GameEvent, effect: Effect, ctx: ReduceContext): boolean {
   const revealed = cancelsReveal(state, event, effect);
   if (!revealed || !gameReads(state, ctx, '"UncancelableWhenRevealed"')) return false;
-  return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && hasTrait(state, revealed, instruction.trait, ctx));
+  return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && (instruction.trait == null || hasTrait(state, revealed, instruction.trait, ctx)) && (instruction.cardType == null || printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === instruction.cardType));
 }
 
 /** DiscardOtherLooked: the cards LookAtTop showed that are still on top, but the picked one, go to the encounter discard pile faceup. The picked card is then the top card of the deck. */
@@ -159,7 +160,7 @@ export function exhaustOrDamageEachReady(state: ScenarioState, instruction: Verb
     who: "actor",
     options: [
       { id: "exhaust", instructions: [{ verb: "Exhaust", target: { kind: "picked" } }] },
-      { id: "damage", instructions: [{ verb: "DamageCard", amount: instruction.amount, target: "picked" }] },
+      instruction.or === "threat" ? { id: "threat", instructions: [{ verb: "RaiseThreat", amount: instruction.amount, who: "actor" }] } : { id: "damage", instructions: [{ verb: "DamageCard", amount: instruction.amount, target: "picked" }] },
     ],
   };
   const items = pickCandidates(state, pick, focus.seat, [], focus.sourceId, ctx).flatMap((id) => [

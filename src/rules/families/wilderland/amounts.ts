@@ -3,7 +3,8 @@ import type { Amount } from "../../../catalog/boundary.ts";
 
 import type { AmountScope } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { countMatching } from "../../interpret/pick.ts";
+import { countMatching, matchesPick } from "../../interpret/pick.ts";
+import { effectData } from "../encounter/moves.ts";
 import { printedOf } from "../../core/printed.ts";
 import { livingSeats, type ScenarioState } from "../../core/state.ts";
 import { cardsUnder } from "../../core/zones.ts";
@@ -19,6 +20,11 @@ export function wilderlandAmount(state: ScenarioState, amount: Exclude<Amount, n
     if (!source) return 0;
     const guarded = [...cardsUnder(state, source.id), ...(source.guard && source.host ? [source.host] : [])];
     return guarded.reduce((sum, id) => sum + printedCost(state, id, ctx), 0);
+  }
+  // "For each enemy discarded this way": the cards DiscardEncounterTop discarded, still in the encounter discard pile, that match the pick.
+  if (amount.discardedMatching) {
+    const pick = amount.discardedMatching;
+    return (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard" && matchesPick(state, id, pick, { seat: scope.actor, sourceId: scope.sourceId, counting: true }, ctx)).length;
   }
   // The event's amount, the X of the frame: the combat damage beyond the character's remaining hit points (defense/excess.ts).
   if (amount.excessOf) return Math.max(0, scope.x ?? 0);

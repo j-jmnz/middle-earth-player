@@ -61,8 +61,8 @@ const VERBS = [
   // Constant on an objective, the Loot keyword (emce.loot; 19094:A, 19095:A, 19096:A): the card enters play only through the Discover keyword. One revealed from the encounter deck is discarded and another card is revealed (windows/frames.ts startReveal).
   z.strictObject({ verb: z.literal("Loot") }),
   // Constant on an objective: "The first player gains control of Haldan while he is free of encounters" (18070:A:1; rr.guarded). The objective stays in the staging area under its guard; once none is attached to it, it enters the first player's play area,
-  // controlled by them (families/wilderland/control.ts). It does nothing when run.
-  z.strictObject({ verb: z.literal("GainControlWhenFree"), who: z.literal("firstPlayer") }),
+  // controlled by them (families/wilderland/control.ts). With `claim` gaining control is a claim (rr.objective-cards: "If a player claims an objective, then that player gains control of that objective", 19054:A:2) and `claimed` is announced. It does nothing when run.
+  z.strictObject({ verb: z.literal("GainControlWhenFree"), who: z.literal("firstPlayer"), claim: z.literal(true).optional() }),
   // A marker in a record of a card that lies in a hand: "Cannot be discarded by player card effects" (18026:A:1). A pick from a hand that a player card makes leaves the card out; an encounter card's effect still discards it. It does nothing when run.
   z.strictObject({ verb: z.literal("Undiscardable") }),
   // "The players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character" (120165:A:3; emce.treasure): `count` treasures (3 by default) the log has not recorded and the game has not dealt are drawn with the game's
@@ -145,8 +145,8 @@ const VERBS = [
   // A constant marker on an objective: "When Dragon Sign is free of encounters, add it to the victory display" (19012:A:3). The settle sweep moves a card with it in the staging area to the victory display once nothing guards it (families/wilderland/heath.ts). It does nothing when run.
   z.strictObject({ verb: z.literal("VictoryWhenFree") }),
   // A constant marker, in play under the record's own condition: "While Mountain Pass is in the staging area, the 'when revealed' effects of Weather treachery cards cannot be canceled" (19015:A:1). A Response that cancels the When Revealed effects of an encounter card
-  // with the trait is not offered while the marker's source is in play and its record holds (rr.cancel, families/wilderland/heath.ts). It does nothing when run.
-  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1) }),
+  // with the trait is not offered while the marker's source is in play and its record holds (rr.cancel, families/wilderland/heath.ts). With `cardType` the effects of treachery cards ("The 'when revealed' effects of treachery cards cannot be canceled", 19048:B:1). It does nothing when run.
+  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional() }),
   // "Look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest" (19022:B:1, 19024:B:1): after LookAtTop and a PickEncounter of one looked card, the other looked cards that are still on top go to the encounter discard pile faceup; the picked card is then the top card, and the
   // RevealEncounter after it reveals it. The discard comes first, a deliberate order as Discover's (emce.discover): a Surge on the revealed card reveals the next card of the deck, not one of the looked ones.
   z.strictObject({ verb: z.literal("DiscardOtherLooked"), ...when }),
@@ -158,7 +158,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ImmediateAttackBy"), target: cardRefSchema.optional(), ...when }),
   // "For each ready character a player controls, he must choose: either exhaust that character, or deal 1 damage to it" (19021:A:1): the actor, run for each player in turn, is asked once for each ready character they control, in the order they entered play,
   // whether it is exhausted or takes `amount` damage. The characters are those ready when the verb starts.
-  z.strictObject({ verb: z.literal("ExhaustOrDamageEachReady"), amount: z.number().int().positive(), ...when }),
+  // With `or: "threat"` the other choice is to raise their threat by `amount` ("either exhaust that character or raise his threat by 1", 19045:A:1).
+  z.strictObject({ verb: z.literal("ExhaustOrDamageEachReady"), amount: z.number().int().positive(), or: z.enum(["damage", "threat"]).optional(), ...when }),
   // Campaign Setup: "A player may search their deck for a unique boon ally and add it to their hand" (12175:A:2). Each player in turn, the first player first, may take a unique boon ally of their deck (a pool ally the checklist is about to shuffle into it is in the deck already) into their starting hand, or decline;
   // the offer ends with the first who takes one. Dealt by the checklist (campaign/checklist.ts), so it changes nothing here.
   z.strictObject({ verb: z.literal("SearchBoonAllyToHand") }),
@@ -168,6 +169,25 @@ const VERBS = [
   // Resolution: "the players also look at 3 random undiscovered treasures and choose 1 to attach to an eligible character" (12175:B:7; emce.treasure): `count` (3) undiscovered treasures are drawn with the game's seed and the first player chooses one. The scenario is over, so the
   // attachment has no game left to matter in: the treasure joins the discovered ones the Resolution writes (the line after it, DiscoverTreasure, would write a treasure the players control). Run by the Resolution (rules/setup/resolution.ts).
   verbFlags(z.strictObject({ verb: z.literal("ChooseRandomTreasure"), count: z.number().int().min(1).optional(), ...when }), { collection: "treasure" }),
+  // Roam Across Rhovanion (part 5, campaign card 12184; ledger lines 12184:A:2, 12184:B:1, 12184:B:3, 12184:B:4, 19036:A:1, 19037:A:1, 19044:A:1, 19047:B:2, 19048:B:2, 19051:A:1).
+  // "Advance to a random stage 2A, if able. Otherwise, advance to stage 3A" (19047:B:2, 19048:B:2, 19049:B:2, 19050:B:2): the quest card names the stages it proceeds to, each played once in a random order (the game's seed): one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated
+  // is removed from the game. The scenario definition copies it onto the stage (`stages[i].randomNext`) and the quest takes it when the stage is defeated, so run on a stage that was defeated it does nothing; run on the stage the quest is at (19047:B:2's Forced effect) it advances the quest at once.
+  z.strictObject({ verb: z.literal("AdvanceToRandomStage"), codes: z.array(code).min(2), otherwise: code.optional(), remove: z.literal(true).optional() }),
+  // "The first player loses control of both Urdug and Tiny, flips them to their enemy sides, and adds them to the staging area. (Remove any damage that was on them.)" (19051:A:1): the card in play with this code becomes the card `into`, faceup and ready in the staging area, controlled by no one,
+  // with no damage; it keeps its resource tokens and its attachments. Nothing happens when no such card is in play.
+  z.strictObject({ verb: z.literal("FlipToEnemySide"), code, into: code, ...when }),
+  // "The first player may put their trust in Urdug by placing a resource on him (from the token pool). If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck" (12184:A:2, 12184:B:1): the first player chooses to place a resource on the card in play with the code `code`, or a copy of `burden`
+  // is shuffled into the encounter deck. Run in Campaign Setup after the quest card's Setup (Urdug comes into play there), and as a Forced effect of the campaign card.
+  verbFlags(z.strictObject({ verb: z.literal("PutTrust"), code, burden: code, ...when }), { setupRole: "afterSetup" }),
+  // A constant marker on an objective: "While Durin's Key is free of encounters, the first player attaches it to a hero he controls" (19036:A:1), "While Urdug's Horn is free of encounters, attach it to Urdug" (19037:A:1). The settle sweep claims a card with it in the staging area once nothing guards it
+  // (families/wilderland/rhovanion.ts): the first player chooses one of their heroes, or with `host` the card in play with that title is the host. The claim is announced as `claimed`. It does nothing when run.
+  z.strictObject({ verb: z.literal("ClaimWhenFree"), host: z.string().min(1).optional() }),
+  // "The first player loses control of Urdug, then attach Urdug to a location in the staging area as a guarded objective" (19044:A:1): the card in play with this code goes back to the staging area, controlled by no one, guarded by the last picked card (a location in the staging area). Nothing happens when no such card is
+  // in play or nothing is picked.
+  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, ...when }),
+  // Resolution: "Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able" (12184:B:4): each player in turn, the first player first, chooses a location (by title) in the staging area that no earlier player chose, unless
+  // every title is taken; a copy of each joins the Campaign Pool's encounter cards (never more than one collection holds). A burden location (Abandoned Ruin) is not offered: it joins the pool as a burden. Run by the Resolution (rules/setup/resolution.ts).
+  z.strictObject({ verb: z.literal("ChooseStagedLocationForPool"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -181,6 +201,10 @@ const FLAGS = [
   "damageCeiling",
   // On a character, or on every character ModifyStat target "characters" holds now and later: player card effects cannot ready it ("characters cannot be readied by player card effects", 19020:A:2). Read by readyBarred (rules/core/holder-classes.ts).
   "cannotReadyByPlayerCard",
+  // On a location in the staging area: no more than this much progress can be placed on the locations in the staging area as a whole each round ("no more than 1 progress can be placed on locations in the staging area each round", 19042:A:1). Read by progressRoom (families/south/locations.ts).
+  "progressCapShared",
+  // Engine use: the progress placed this round on locations that hold progressCapShared, noted on the table (families/south/locations.ts notePlaced).
+  "progressPlacedShared",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -235,6 +235,8 @@ export const simpleVerbs = [
     what: z.enum(["advance", "travel", "attach", "heroLimit", "defend", "travelOnly"]),
     // With "travel" on a card that is not the location: the players cannot travel to the location with this code ("The players cannot travel to The Old Ford unless there is at least 5 progress here", 18068:B:1).
     location: z.string().min(1).optional(),
+    // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
+    guarding: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
     // With "defend": every ally (not only those with little Willpower) cannot defend the source's attacks ("Allies cannot defend against
@@ -374,7 +376,7 @@ export const simpleVerbs = [
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
   // picks them (141047:A:2, 141084:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer"]).optional(), ...when }),
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.
@@ -402,7 +404,8 @@ export const simpleVerbs = [
   }),
   // Resolution: these cards are earned, with no choice. `eachPlayer`: one copy for each living player ("Each player earns 1 copy of
   // the Mendor's Support boon", 01129:B:1), the pool holding several copies of the one code.
-  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), eachPlayer: z.boolean().optional(), ...when }),
+  // `afterHand`: the copy goes into its player's deck, shuffled in once the starting hand is drawn ("adds a copy of Misplaced Trust to the campaign pool (and their deck)", 12184:B:3; the card's own Setup, 12186:A:1), as a card a player chooses for the pool does (Recurring Nightmare, 11197:B:1).
+  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), eachPlayer: z.boolean().optional(), afterHand: z.literal(true).optional(), ...when }),
   // Resolution: every burden in play, in the encounter deck and in the encounter discard pile is earned.
   verb("EarnAllBurdens"),
   // Resolution: the hero this card is attached to joins the fallen heroes.

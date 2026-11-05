@@ -13,7 +13,7 @@ import { dealtCopies } from "../families/aflame/cards.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../core/state.ts";
 import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
-import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards } from "../families/wilderland/pool.ts";
+import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
@@ -23,11 +23,11 @@ import { drawTreasures } from "../families/wilderland/treasure.ts";
 export const SKIP = "skip";
 
 // The instructions that open a window for the players: a card to take, a captive to name, a boon ally or its log line (BoonAllyOrLogLine), a card of the pool to remove (RemoveFromPool with a choice).
-export type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" | "ChooseRandomTreasure" }>;
+export type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" | "ChooseRandomTreasure" | "ChooseStagedLocationForPool" }>;
 
 /** Whether the Resolution instruction asks the players: a card to take, a captive to name, a boon ally or its log line, a card of the pool to remove (a RemoveFromPool with no choice settles at once). */
 export function asksPlayers(instruction: Instruction | undefined): instruction is Choosing {
-  return instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || instruction?.verb === "ChooseRandomTreasure" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
+  return instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || instruction?.verb === "ChooseRandomTreasure" || instruction?.verb === "ChooseStagedLocationForPool" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
 }
 
 function seatOrder(state: ScenarioState): number[] {
@@ -39,7 +39,7 @@ function seatOrder(state: ScenarioState): number[] {
 function seatsFor(state: ScenarioState, instruction: Choosing): number[] {
   const order = seatOrder(state);
   // The group answers a boon ally's offer through its first player; a removal from the pool is each player's, first player first.
-  if (instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool") return order;
+  if (instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || instruction.verb === "ChooseStagedLocationForPool") return order;
   if (instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure") return order.slice(0, 1);
   return instruction.who === "firstPlayer" ? order.slice(0, 1) : order;
 }
@@ -78,9 +78,9 @@ function earn(state: ScenarioState, entries: readonly Earned[]): ResolutionLog {
 
 // The entries one instruction hands out: one copy of each code, or one for each player at the table. An eliminated player is
 // still in the campaign, so every seat counts.
-function copiesOf(state: ScenarioState, codes: readonly string[], eachPlayer: boolean | undefined): Earned[] {
+function copiesOf(state: ScenarioState, codes: readonly string[], eachPlayer: boolean | undefined, afterHand?: true): Earned[] {
   const seats = eachPlayer ? Array.from({ length: state.seatCount }, (_, seat) => seat) : [null];
-  return seats.flatMap((seat) => codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: state.resolutionAt, ...(eachPlayer ? { perPlayer: true } : {}) })));
+  return seats.flatMap((seat) => codes.map((code) => ({ code, to: "pool" as const, seat, hero: null, step: state.resolutionAt, ...(eachPlayer ? { perPlayer: true } : {}), ...(afterHand ? { afterHand } : {}) })));
 }
 
 // Each copy of these cards attached to a hero in play, with that hero: one entry for each copy (EarnAttached), `to: "hero"` as a card the
@@ -129,7 +129,7 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
     }
     switch (instruction.verb) {
       case "Earn":
-        next = stepOver(next, earn(next, copiesOf(next, instruction.codes, instruction.eachPlayer)));
+        next = stepOver(next, earn(next, copiesOf(next, instruction.codes, instruction.eachPlayer, instruction.afterHand)));
         break;
       // The copies of these cards the game holds, whoever played them (families/aflame/cards.ts).
       case "EarnDealt":
@@ -192,6 +192,7 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         return { ...offered, stack: [], perilSeat: null, window: { kind: "resolution" as const, step: offered.resolutionAt, seat }, activeSeat: seat, passed: [] };
       }
       case "ChooseCards":
+      case "ChooseStagedLocationForPool":
       case "BoonAllyOrLogLine":
       case "RemoveFromPool":
       case "NameCaptives": {
@@ -236,6 +237,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
     });
   }
   if (instruction.verb === "BoonAllyOrLogLine") return allyOrLineOptions(state, instruction);
+  if (instruction.verb === "ChooseStagedLocationForPool") return stagedLocationOptions(state, ctx);
   if (instruction.verb === "ChooseRandomTreasure") return [...(state.resolutionOffer ?? [])];
   if (instruction.verb === "RemoveFromPool") {
     const removable = removalOptions(state, ctx);
@@ -293,6 +295,9 @@ export function applyResolution(state: ScenarioState, optionId: string): Scenari
     log = applyAllyOrLine(state, instruction, optionId, seat, step);
   } else if (instruction.verb === "RemoveFromPool") {
     log = noteRemovalAnswer(optionId !== SKIP ? applyRemoval(state, optionId) : log, seat, optionId);
+  } else if (instruction.verb === "ChooseStagedLocationForPool") {
+    // A copy of the location joins the pool's encounter cards (12184:B:4); the next player's options leave it out.
+    log = applyStagedLocation(state, optionId, seat);
   } else if (instruction.verb === "ChooseRandomTreasure") {
     // The treasure is attached to a character and the players control it: the next line discovers it (the scenario is over, so which character is not asked).
     log = { ...log, treasures: [...new Set([...(log.treasures ?? []), optionId])] };

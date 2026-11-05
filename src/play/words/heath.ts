@@ -45,7 +45,7 @@ function coldOffer(choose: Choose): number | null {
 }
 
 // The character the question is about, and how far through the asked player's ready characters it is: "2 of 3". The frame's picks are every player's, so only this player's count; the pick queue holds the characters still to come.
-function coldPlace(game: ScenarioState): { id: string | null; at: number; of: number } {
+export function coldPlace(game: ScenarioState): { id: string | null; at: number; of: number } {
   const data = effectData(game);
   const seat = askedSeat(game);
   const mine = (data?.picked ?? []).filter((id) => game.cards[id]?.controller === seat);

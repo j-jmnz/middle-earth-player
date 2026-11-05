@@ -29,12 +29,11 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Tale of Victories.*"
-# The win unlocks Roam Across Rhovanion, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks Roam Across Rhovanion, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-roam-across-rhovanion-status
-    text: "Coming soon"
-- assertVisible:
+    text: "Next"
+- assertNotVisible:
     id: path-soon
-    text: "Roam Across Rhovanion is coming soon."
 - assertNotVisible:
     id: begin

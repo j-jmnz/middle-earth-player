@@ -3,7 +3,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { printedOf } from "../../core/printed.ts";
+import { isLocationCard, printedOf } from "../../core/printed.ts";
 import type { ResolutionLog } from "../../core/campaign-state.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../../core/state.ts";
 import { controlledTreasures } from "./treasure.ts";
@@ -89,7 +89,7 @@ export function removalSeat(optionId: string): number | null {
   return seat === "" ? null : Number(seat);
 }
 
-/** One seat's answer to the choice of a card to remove, kept so the screen can say what each seat chose (`option` is the option taken, or the decline). */
+/** One seat's answer to the choice of a card to remove (or of a location to add, ChooseStagedLocationForPool), kept so the screen can say what each seat chose and the next player's options leave it out (`option` is the option taken, or the decline). */
 export function noteRemovalAnswer(log: ResolutionLog, seat: number, option: string): ResolutionLog {
   return { ...log, poolAnswers: [...(log.poolAnswers ?? []), { seat, option }] };
 }
@@ -124,4 +124,24 @@ export function applyAllyOrLine(state: ScenarioState, instruction: Verb<"BoonAll
   const hero = state.cards[optionId.split(">")[1] ?? ""];
   if (log.earned.some((item) => item.code === instruction.ally)) return log;
   return { ...log, earned: [...log.earned, { code: instruction.ally, to: "pool", seat: hero?.controller ?? seat, hero: null, step }] };
+}
+
+/**
+ * The options of ChooseStagedLocationForPool (12184:B:4): the codes of the locations in the staging area, none of them a burden (it joins the pool as one), leaving out the titles an earlier player chose ("Players must choose different locations, if able"):
+ * when every title is taken, any of them is offered again. No location in the staging area offers nothing.
+ */
+export function stagedLocationOptions(state: ScenarioState, ctx: ReduceContext): string[] {
+  const staged = [...new Set(state.staging.flatMap((id) => {
+    const card = state.cards[id];
+    const printed = card ? printedOf(ctx.cards, card.code) : null;
+    return card && card.zone === "staging" && printed && isLocationCard(printed) && printed.campaignKind !== "burden" ? [card.code] : [];
+  }))];
+  const taken = new Set((state.resolutionLog.poolAnswers ?? []).map((item) => item.option));
+  const different = staged.filter((code) => !taken.has(code));
+  return different.length > 0 ? different : staged;
+}
+
+/** One seat's choice of a location: a copy joins the pool's encounter cards, and the answer is kept for the next player. */
+export function applyStagedLocation(state: ScenarioState, code: string, seat: number): ResolutionLog {
+  return noteRemovalAnswer({ ...state.resolutionLog, encounterPool: withCopies(poolTally(state), code, 1) }, seat, code);
 }

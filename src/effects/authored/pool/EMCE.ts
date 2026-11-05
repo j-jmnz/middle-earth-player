@@ -25,6 +25,14 @@ export const RECORDS: readonly Effect[] = [
   {"id":"12174:setup:1","cardCode":"12174","lines":["12174:A:1"],"timing":"setup","instructions":[{"verb":"ShuffleIntoPile","pile":"caves","code":"12174"}]},
   {"id":"12174:response:1","cardCode":"12174","lines":["12174:A:2"],"timing":"response","trigger":"becameActive","subject":"self","limit":"oncePerGame","instructions":[{"verb":"AttachRandomTreasure"}]},
 
+  // 12185 Urdug's Cunning (burden; Doomed 1 and Surge are keywords). Revealed, the top 5 cards of the encounter deck are discarded and, for each enemy among them, each player deals 1 damage to a character they control; the Shadow gives the attacker +2 Defense for the phase.
+  {"id":"12185:whenRevealed:1","cardCode":"12185","lines":["12185:A:2"],"timing":"whenRevealed","instructions":[{"verb":"DiscardEncounterTop","count":5},{"verb":"AssignDamage","amount":{"discardedMatching":{"type":"enemy","control":"any"}},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]},
+  {"id":"12185:shadow:1","cardCode":"12185","lines":["12185:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"defense","amount":2,"until":"endOfPhase","target":"attacker"}]},
+  // 12186 Misplaced Trust (burden, a player's card). Setup: it is shuffled into its player's deck after the starting hand (the Resolution earns it `afterHand`, and the checklist deals it so); drawn, it attaches to a hero its player controls as a Condition attachment: the attached character cannot have player card attachments and is immune to player card effects.
+  {"id":"12186:setup:1","cardCode":"12186","lines":["12186:A:1"],"timing":"setup","instructions":[{"verb":"ShuffleSelfIntoDeck"}]},
+  {"id":"12186:forced:1","cardCode":"12186","lines":["12186:A:2"],"timing":"forced","trigger":"enteredHand","subject":"self","instructions":[{"verb":"AttachSelf","to":{"kind":"hero","control":"you"}}]},
+  {"id":"12186:constant:1","cardCode":"12186","lines":["12186:A:2"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"},{"verb":"ModifyStat","stat":"noPlayerAttachments","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"immuneToPlayerCards","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+
   // 12176 to 12179, the Accolade boons (Permanent is a keyword; their Setup attaches them to a hero). Each is a title for a stage defeated in The Withered Heath (12175:B:1); they join the pool on their hero at its Resolution.
   // 12176 Master of the Hunt: +1 hit point; after the hero commits to the quest the chosen player looks at the top 3 cards of their deck, puts 1 on top and the rest on the bottom in any order.
   {"id":"12176:constant:1","cardCode":"12176","lines":["12176:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"hitPoints","amount":1,"until":"whileSourceInPlay","target":"host"}]},

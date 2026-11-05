@@ -101,14 +101,14 @@ export function placeQuestingProgress(state: ScenarioState, amount: number, card
 }
 
 // Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes
-// damage from an enemy attack"): the characters whose damage went up between the two states.
+// damage from an enemy attack"): the characters whose damage went up between the two states; the enemy making the attack is the event's other card.
 export function noteAttackDamage(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (!listened(after, ctx, ["damagedByAttack"])) return after;
   let next = after;
   for (const now of Object.values(after.cards)) {
     const was = before.cards[now.id];
     if (!was || !inPlay(now.zone) || now.damage <= was.damage || !isCharacterType(printedOf(ctx.cards, now.code))) continue;
-    next = queueEvent(next, { trigger: "damagedByAttack", seat: now.controller, cardId: now.id, subject: now.id, amount: now.damage - was.damage });
+    next = queueEvent(next, { trigger: "damagedByAttack", seat: now.controller, cardId: now.id, subject: now.id, amount: now.damage - was.damage, ...(after.pendingAttack ? { other: after.pendingAttack.enemyId } : {}) });
   }
   return next;
 }

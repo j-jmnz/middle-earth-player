@@ -1,4 +1,4 @@
-// Rules: emce.evil-creatures-deck, rr.victory (data/rules/entries.json); ledger lines 18066:B:3, 18026:A:1, 18074:B:1, 18075:B:2, 18076:B:1. The wilderland family's pick filters: a card dealt into the Evil Creatures deck (`fromDeck`), and a card in a hand that player card effects cannot discard
+// Rules: emce.evil-creatures-deck, rr.victory (data/rules/entries.json); ledger lines 18066:B:3, 18026:A:1, 18074:B:1, 18075:B:2, 18076:B:1, 19049:B:1, 19049:B:3, 19050:B:1. The wilderland family's pick filters: a card dealt into the Evil Creatures deck (`fromDeck`), and a card in a hand that player card effects cannot discard
 // (the constant verb Undiscardable) when the pick feeds a discard.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
@@ -8,7 +8,8 @@ import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import type { PickContext } from "../../interpret/pick.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { playerCardsUnder } from "../../core/zones.ts";
+import { cardsUnder, playerCardsUnder } from "../../core/zones.ts";
+import { isGuard } from "../objectives/pick.ts";
 import { heroGuardedBy } from "./carried.ts";
 
 /** Whether a card in a hand is barred from the discards a player card makes (the constant verb Undiscardable) and `sourceId` is a player card effect: its effect, a cost it takes or a random discard. A game rule or an encounter card's effect is not barred. */
@@ -31,6 +32,12 @@ export function wilderlandPickMatches(state: ScenarioState, id: string, spec: Pi
   if (spec.guardsHero && heroGuardedBy(state, id) == null) return false;
   if (spec.hasFacedownUnder && playerCardsUnder(state, id).length === 0) return false;
   if (spec.nemesis && card.nemesis !== true) return false;
+  // Roam Across Rhovanion: a card that guards a card (an objective's guard, or the keeper of a card held under it), a card that guards the objective with a title.
+  if (spec.guardsCard && !isGuard(state, id) && cardsUnder(state, id).length === 0) return false;
+  if (spec.guardsNamed != null) {
+    const host = card.host ? state.cards[card.host] : undefined;
+    if (!isGuard(state, id) || !host || printedOf(ctx.cards, host.code).name !== spec.guardsNamed) return false;
+  }
   // "Cannot be discarded by player card effects": a pick from the hand that the effect discards leaves the card out. A pick that gives, swaps or moves a card still offers it.
   if (spec.from === "hand" && (at.discards || spec.discarded) && !at.counting && barredFromPlayerDiscard(state, ctx, id, at.sourceId)) return false;
   return true;
