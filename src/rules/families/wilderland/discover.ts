@@ -53,6 +53,7 @@ export function discover(state: ScenarioState, instruction: Verb, focus: Focus, 
   const drawn = shuffleIds(hazards, next.seed, next.seedCursor);
   const hazard = drawn.ids[0];
   next = { ...next, seedCursor: drawn.cursor };
+  steps.push({ kind: "discover", locationId, looked, ...(chosen !== undefined ? { loot: chosen } : {}), ...(hazard !== undefined ? { hazard } : {}), cause: currentCause(steps, ruleCause("emce.discover")) });
   // The rest are discarded before the Hazard is revealed, a deliberate order: emce.discover lists the reveal as step 3 and the discard as step 4, but the reveal is a frame that resolves after this verb returns, so the
   // discard has to be done by then; the Hazard is moved to the top of the deck and revealed by it, added to the staging area (or resolved, a treachery).
   for (const id of looked) if (id !== chosen && id !== hazard) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });

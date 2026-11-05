@@ -12,6 +12,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { LogMark } from "./log.ts";
 import { detachLine, grappleLine } from "../words/grapple.ts";
 import { boardingWords } from "../words/sea.ts";
+import { discoverLines, discoverTitle } from "../words/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -188,6 +189,14 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       case "eliminate":
         open(0, `Player ${step.seat + 1} is eliminated`, "bad");
         return;
+      // Discover X (emce.discover): one beat for the look and one for each result; the cards that went to the discard pile lie in the look strip while the banner is on the beat that names them.
+      case "discover": {
+        open(3, discoverTitle(step.looked.length), "plain");
+        const named = (id: string | undefined) => (id ? { id, name: names.card(id) } : null);
+        const rest = step.looked.filter((id) => id !== step.loot && id !== step.hazard);
+        for (const beat of discoverLines({ location: { id: step.locationId, name: names.card(step.locationId) }, looked: step.looked.length, loot: named(step.loot), hazard: named(step.hazard), rest })) line(beat.text, null, beat.cards);
+        return;
+      }
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck");
         return;

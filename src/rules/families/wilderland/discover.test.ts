@@ -45,6 +45,22 @@ describe("Discover X (emce.discover)", () => {
     expect(codesOf(done, done.encounterDeck)).toEqual(["orc"]);
   });
 
+  it("tells the table what it looked at: the cards in order, the Loot objective attached and the Hazard revealed (the discover step)", () => {
+    const { state, hill } = atTravel(["mist", "loot1", "stalker", "orc"]);
+    const result = expectOk(reduce(state, { type: "Travel", locationId: hill }, ctxOf([...LOOT, discover(3)])));
+    const steps = result.steps.flat().filter((step) => step.kind === "discover");
+    expect(steps).toHaveLength(1);
+    const [step] = steps;
+    if (step?.kind !== "discover") throw new Error("expected a discover step");
+    expect(step.locationId).toBe(hill);
+    expect(step.looked).toEqual(state.encounterDeck.slice(0, 3));
+    expect(step.loot).toBe(Object.values(result.state.cards).find((card) => card.code === "loot1")?.id);
+    expect(step.hazard).toBe(Object.values(result.state.cards).find((card) => card.code === "stalker")?.id);
+    // A location without the keyword, or with it ignored, looks at nothing and says nothing.
+    const quiet = expectOk(reduce(state, { type: "Travel", locationId: hill }, ctxOf([...LOOT, discover(3), IGNORE])));
+    expect(quiet.steps.flat().some((step) => step.kind === "discover")).toBe(false);
+  });
+
   it("resolves a Hazard treachery as it is revealed, which goes to the discard pile", () => {
     const { state, hill } = atTravel(["hazard", "orc", "mist"]);
     const done = travel(state, hill, [...LOOT, discover(2)]);

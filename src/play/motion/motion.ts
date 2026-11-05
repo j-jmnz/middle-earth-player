@@ -29,6 +29,10 @@ export type Motion = {
   land: "squash" | "pop" | null;
 };
 
+// The decks of the second slot a card is revealed from, and the decks that are refilled from a discard pile of their own.
+const SECOND_DECK_PILES: Readonly<Record<string, true>> = { corsairDeck: true, evilCreaturesDeck: true, cavesDeck: true };
+const REFILLED = [["corsairDeck", "corsairDiscard"], ["evilCreaturesDeck", "evilCreaturesDiscard"]] as const;
+
 // How a card that left the table goes: "shake" (destroyed or discarded from play: it shakes, then shrinks and fades to its
 // pile), "glide" (to a pile from the hand or back to a deck: it eases in to the pile), "fade" (set aside: it fades where it stood).
 export type Leave = "shake" | "glide" | "fade";
@@ -40,7 +44,7 @@ export type Ghost = { slot: CardSlot; dx: number; dy: number; scale: number; rot
  * What `motionsBetween` can be told. A peek or a seat handoff has no motion: card-motion.native.tsx draws its layout at rest.
  */
 export type MotionOptions = {
-  // Where a card was in the state before (null when it was nowhere): a card that came from the Corsair deck comes off that pile, not the encounter deck (Boarding, dcce.boarding).
+  // Where a card was in the state before (null when it was nowhere): a card that came from a deck of the second slot (the Corsair deck: Boarding, dcce.boarding; the Evil Creatures deck; the Caves deck) comes off that pile, not the encounter deck.
   zoneWas?: (cardId: string) => ZoneName | null;
   // The location a card was grappled with in the state before, or null: a detached enemy starts under that location, facedown, and turns over as it lands in the staging area (dcce.grapple).
   grappledFrom?: (cardId: string) => string | null;
@@ -148,13 +152,15 @@ export function motionsBetween(
       motions.set(slot.id, { ...STILL(slot), scale: 0.82, fromOpacity: 0, land: "pop" });
     } else if (slot.zone === "staging" || slot.zone === "engaged") {
       const reveal = slot.kind === "card" && !slot.faceDown;
-      const corsair = options.zoneWas?.(slot.id) === "corsairDeck" && next.piles.corsairDeck != null;
+      // A card that came off a deck of the second slot (Boarding's Corsair cards, an Evil Creature or a Cave revealed) comes off that pile, not the encounter deck.
+      const wasZone = options.zoneWas?.(slot.id) ?? null;
+      const source = wasZone != null && wasZone in SECOND_DECK_PILES ? (next.piles[wasZone as PileId] ?? null) : null;
       // A Lost Island comes off the Uncharted deck, and a Grotto location off the Grotto deck, as a reveal does.
       const island = options.zoneWas?.(slot.id) === "unchartedDeck" ? (next.piles.unchartedDeck ?? next.piles.grottoDeck ?? null) : null;
       // Boarding: each Corsair card comes off the Corsair deck as a reveal does, then moves into the engagement row, the cards 90 ms apart.
-      const delay = corsair ? Math.min(boarded, SHAPE.maxStagger) * MOTION.stagger.ms : 0;
-      if (corsair) boarded += 1;
-      motions.set(slot.id, { ...from(slot, (corsair ? next.piles.corsairDeck : island) ?? next.piles.encounterDeck, 0, 0.4), flip: reveal, land: reveal ? "pop" : null, delay });
+      const delay = source ? Math.min(boarded, SHAPE.maxStagger) * MOTION.stagger.ms : 0;
+      if (source) boarded += 1;
+      motions.set(slot.id, { ...from(slot, source ?? island ?? next.piles.encounterDeck, 0, 0.4), flip: reveal, land: reveal ? "pop" : null, delay });
     } else motions.set(slot.id, { ...STILL(slot), scale: 0.82, fromOpacity: 0 });
   }
   const present = new Set(next.slots.map((slot) => slot.id));
@@ -185,14 +191,16 @@ export function motionsBetween(
       ghosts.push({ slot, dx: 0, dy: 0, scale: 0.85, rot: slotRotation(slot), leave: "fade" });
     }
   }
-  // The Corsair deck ran out and its discard pile was shuffled back into it: the discard pile's cards glide to the deck, and the deck's count pops (cardDepart).
-  const wasDiscard = prev.slots.find((slot) => slot.id === "pile:corsairDiscard");
-  const wasDeck = prev.slots.find((slot) => slot.id === "pile:corsairDeck");
-  const nowDeck = next.slots.find((slot) => slot.id === "pile:corsairDeck");
-  if (wasDiscard && wasDeck && nowDeck && wasDiscard.count > 0 && nowDeck.count > wasDeck.count && next.piles.corsairDiscard && next.slots.find((slot) => slot.id === "pile:corsairDiscard")?.count === 0) {
-    const a = center(wasDiscard);
-    const b = center(nowDeck);
-    ghosts.push({ slot: wasDiscard, dx: b.x - a.x, dy: b.y - a.y, scale: 1, rot: 0, leave: "glide" });
+  // A deck with a discard pile of its own (the Corsair deck, the Evil Creatures deck) ran out and the discard pile was shuffled back into it: the discard pile's cards glide to the deck, and the deck's count pops (cardDepart).
+  for (const [deckId, discardId] of REFILLED) {
+    const wasDiscard = prev.slots.find((slot) => slot.id === `pile:${discardId}`);
+    const wasDeck = prev.slots.find((slot) => slot.id === `pile:${deckId}`);
+    const nowDeck = next.slots.find((slot) => slot.id === `pile:${deckId}`);
+    if (wasDiscard && wasDeck && nowDeck && wasDiscard.count > 0 && nowDeck.count > wasDeck.count && next.piles[discardId] && next.slots.find((slot) => slot.id === `pile:${discardId}`)?.count === 0) {
+      const a = center(wasDiscard);
+      const b = center(nowDeck);
+      ghosts.push({ slot: wasDiscard, dx: b.x - a.x, dy: b.y - a.y, scale: 1, rot: 0, leave: "glide" });
+    }
   }
   return { motions, ghosts };
 }

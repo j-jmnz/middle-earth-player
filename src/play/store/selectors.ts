@@ -13,53 +13,15 @@ import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
 import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
 
 import { threatRows } from "./foresight.ts";
+import { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
 import { areaGroup, areaRoleOf, type AreaRole } from "./stormcaller-table.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
 
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
-// The four piles every table shows, and the second slot's (docs/design-system-table.md, Piles): the Corsair deck and its discard pile while the scenario
-// has a Corsair deck (dcce.corsair-deck), or the Uncharted deck alone while it deals one (dcce.uncharted-deck), or the Grotto deck alone while it deals that (dcce.grotto-deck). The victory display is a pile
-// too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
-export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck";
-export type VictoryPileId = "victory";
-export type PileId = BasePileId | SecondPileId | VictoryPileId;
-
-export const PILES: readonly BasePileId[] = ["deck", "discard", "encounterDeck", "encounterDiscard"];
-export const SECOND_PILES: readonly SecondPileId[] = ["corsairDeck", "corsairDiscard"];
-const UNCHARTED_PILES: readonly SecondPileId[] = ["unchartedDeck"];
-const GROTTO_PILES: readonly SecondPileId[] = ["grottoDeck"];
-
-export const PILE_WORDS: Readonly<Record<PileId, string>> = {
-  deck: "Deck",
-  discard: "Discard pile",
-  encounterDeck: "Encounter deck",
-  encounterDiscard: "Encounter discard pile",
-  corsairDeck: "Corsair deck",
-  corsairDiscard: "Corsair discard pile",
-  unchartedDeck: "Uncharted deck",
-  grottoDeck: "Grotto deck",
-  victory: "Victory display",
-};
-
-/** The second slot's piles this game has: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); else the Grotto deck while the scenario deals one (dcce.grotto-deck), else the Uncharted deck while it deals that. */
-export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted">): readonly SecondPileId[] {
-  if (game.corsairDeck !== undefined) return SECOND_PILES;
-  if (game.uncharted?.grotto === true) return GROTTO_PILES;
-  return game.uncharted !== undefined ? UNCHARTED_PILES : NONE_PILES;
-}
-
-/** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). A tap on one opens its list; a deck's does not (docs/design-system-table.md, Piles). */
-export function isDiscardPile(pile: PileId): boolean {
-  return pile === "discard" || pile === "encounterDiscard" || pile === "corsairDiscard";
-}
-
-/** Whether a tap on a pile opens its list: a discard pile or the victory display. */
-export function opensList(pile: PileId): boolean {
-  return isDiscardPile(pile) || pile === "victory";
-}
+// The piles, by name, live in pile-ids.ts and are read through here.
+export { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId };
 
 // How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
 export type FightKind = "defense" | "undefended" | "attack";
@@ -87,7 +49,6 @@ export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host"
 }
 
 const NONE: readonly string[] = [];
-const NONE_PILES: readonly SecondPileId[] = [];
 const EMPTY: readonly CardInstance[] = [];
 
 /**
@@ -273,7 +234,7 @@ export function zoneSelector(zone: ZoneId, seat: number, facts?: ZoneFacts): (ga
 // the two cards under its top, fanned behind it, and the Victory points its cards score (victoryPileSelector).
 export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[]; fan?: readonly CardInstance[]; points?: number };
 
-/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the Corsair pair. */
+/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the second slot's piles. */
 export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
   switch (pile) {
     case "deck":
@@ -291,6 +252,10 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "unchartedDeck":
     case "grottoDeck":
       return game.uncharted?.deck ?? NONE;
+    case "evilCreaturesDeck":
+    case "evilCreaturesDiscard":
+    case "cavesDeck":
+      return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;
   }

@@ -13,7 +13,7 @@ import { wrapName } from "./wrap.ts";
 
 const NO_IMAGES: readonly (SkImage | null)[] = [];
 
-const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard", unchartedDeck: "Uncharted", grottoDeck: "Grotto", victory: "Victory" };
+const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Discard", encounterDeck: "Encounter", encounterDiscard: "Discard", corsairDeck: "Corsair", corsairDiscard: "Discard", unchartedDeck: "Uncharted", grottoDeck: "Grotto", evilCreaturesDeck: "Evil", evilCreaturesDiscard: "Discard", cavesDeck: "Caves", victory: "Victory" };
 
 // The turn of each card fanned behind the victory pile's top, the nearest first (radians, about the pile's foot; layout.ts keeps VICTORY_FAN of room for it).
 const FAN_TURNS = [-0.12, -0.24];
@@ -82,8 +82,8 @@ function PlayableMark({ slot, t, s }: { slot: CardSlot; t: TableTokens; s: numbe
   );
 }
 
-// The piles that show the printed encounter back (the Eye): the encounter pair and the Corsair pair.
-const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard"]);
+// The piles that show the printed encounter back (the Eye): the encounter pair, the Corsair pair, the Evil Creatures pair and the Caves deck.
+const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard", "evilCreaturesDeck", "evilCreaturesDiscard", "cavesDeck"]);
 
 /**
  * A pile: a stack of backs (or the top card of a discard pile) with its count, or a dashed outline while it is empty. The victory display
