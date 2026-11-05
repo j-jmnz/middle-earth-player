@@ -50,10 +50,9 @@ describe("Lost in Mirkwood golden", () => {
         expect(log.earned.map((item) => item.code), golden.name).toContain(CODES.melanwar);
         expect(log.allyLines, golden.name).toBeUndefined();
       }
-      // The Spiders of Mirkwood and Dol Guldur Orcs cards discarded until X were found go to the pool (fewer when the deck ran out).
+      // The Spiders of Mirkwood and Dol Guldur Orcs cards discarded until X were found go to the pool; X counts the players still in the game (an eliminated seat is one less, rr.player-elimination).
       const pooled = Object.values(log.encounterPool ?? {}).reduce((sum, count) => sum + count, 0);
-      expect(pooled, golden.name).toBeGreaterThanOrEqual(1);
-      expect(pooled, golden.name).toBeLessThanOrEqual(golden.seatCount);
+      expect(pooled, golden.name).toBe(state.seats.filter((seat) => !seat.eliminated).length);
       // A treasure the players control is discovered; one still guarded or lost with its character is not.
       const held = Object.values(state.cards).filter((card) => (TREASURES as readonly string[]).includes(card.code) && card.zone === "play" && card.host != null).map((card) => card.code);
       expect(log.treasures ?? [], golden.name).toEqual(held);

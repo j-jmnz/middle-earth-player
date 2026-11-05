@@ -7,7 +7,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 import { rejectionReason } from "../../rules/engine/legal.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { isLocationCard, isLocationId, printedOf } from "../../rules/core/printed.ts";
 import { hideWillpower } from "../../rules/quest/hide.ts";
 import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
@@ -19,7 +19,7 @@ import { askWords } from "../words/ask.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
-import { isTreasureDraw, wilderlandBranchNow, wilderlandOptionLabel, wilderlandTravel } from "../words/wilderland.ts";
+import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/wilderland.ts";
 import { branchCaution } from "./wilderland-sheets.ts";
 import { seaOptionLabel, travelTaxCaution } from "../words/sea.ts";
 import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
@@ -99,7 +99,7 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
   if (!freeSlot(game) && !islandMayTravel(game, ctx.cards)) return [];
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
-    if (!card || targets.includes(id) || printedOf(ctx.cards, card.code).type !== "location") return [];
+    if (!card || targets.includes(id) || !isLocationCard(printedOf(ctx.cards, card.code))) return [];
     const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
     if (!reason) return [];
     const travel = recordsOfFace(card, effectsOf(ctx, card.code)).find((effect) => effect.timing === "travel");
@@ -247,7 +247,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const base = {
         kind: "pick" as const,
         key: `choose:${frame?.id ?? ""}:${window.options.join(",")}`,
-        step: effect ? TIMING_WORDS[effect.timing] : step(game),
+        // The claim of a freed guarded treasure is the settle sweep's, not the Setup that guarded it.
+        step: isFreedTreasureClaim(game, ctx, source, data?.picked?.at(-1) ?? null) ? "Claim" : effect ? TIMING_WORDS[effect.timing] : step(game),
         // Stand Together's further defenders (families/defense/defenders.ts): the sheet names the attack it is about.
         title: source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
         ...(defending && game.pendingAttack ? { stats: statOf(game, ctx, game.pendingAttack.enemyId, "attack") } : {}),
@@ -263,7 +264,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const now = { ...branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words), ...wilderlandBranchNow(game, ctx, choose, window.seat, source) };
         // A Choose with `upTo` (Command) stops on the sheet's armed pass, not on a row of the list: "Done", with the options used so far.
         const stop = commandDone(game, ctx, choose, window.seat, source, source ? names.card(source) : "This card");
-        const ask = torch?.note ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        const ask = torch?.note ?? wilderlandChooseNote(choose, game, ctx, words) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
           note: [`${ask}${who}`, line].filter((part) => part != null).join(" "),
@@ -290,7 +291,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);
       return {
         ...base,
-        note: [`${asked.prompt}${who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
+        note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
         ...(outOfPlay ? { confirm: asked.verb } : {}),
@@ -357,7 +358,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const area = viewOf(game, questSeat(game));
       const active = area.activeLocation ? game.cards[area.activeLocation] : undefined;
       const activePoints = active ? questPointsOf(game, active, ctx.cards) : null;
-      const waiting = area.staging.some((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "location");
+      const waiting = area.staging.some((id) => isLocationId(game, id, ctx.cards));
       const blocked = targets.length === 0 && active != null && waiting;
       const declineTax = travelTaxCaution(game, ctx, null, names);
       return {

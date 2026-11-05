@@ -162,7 +162,7 @@ describe("a treasure guarded in the staging area", () => {
     const guarded = wilderlandFixture({ treasure: "guarded" });
     expect(dungeonDetail(guarded.state, guarded.ctx, guarded.ids.treasure ?? "", name(guarded))).toBe("Guarded by troll");
     const free = wilderlandFixture({ treasure: "free" });
-    expect(dungeonDetail(free.state, free.ctx, free.ids.treasure ?? "", name(free))).toBe("Free of encounters");
+    expect(dungeonDetail(free.state, free.ctx, free.ids.treasure ?? "", name(free))).toBe("Free of encounters: the players claim it");
     // The guard is a card of its own: it says nothing of the treasure.
     expect(dungeonDetail(guarded.state, guarded.ctx, guarded.ids.guard ?? "", name(guarded))).toBeNull();
   });
@@ -171,7 +171,7 @@ describe("a treasure guarded in the staging area", () => {
     const fixture = wilderlandFixture({ treasure: "guarded" });
     const treasure = fixture.ids.treasure ?? "";
     const gone = updateCard(moveCard(fixture.state, fixture.ids.guard ?? "", { zone: "encounterDiscard" }), treasure, { attachments: [] });
-    expect(dungeonDetail(gone, fixture.ctx, treasure, name(fixture))).toBe("Free of encounters");
+    expect(dungeonDetail(gone, fixture.ctx, treasure, name(fixture))).toBe("Free of encounters: the players claim it");
   });
 
   it("is heard as guarded, or free of encounters, and only in the staging area", () => {

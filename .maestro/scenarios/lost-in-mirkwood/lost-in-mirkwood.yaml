@@ -16,7 +16,8 @@ tags:
       CHOICE_PROMPT: "Melanwar or the log"
       CHOICE_CONSEQUENCE: ".*guidance on traversing Wilderland.*"
       NO_XP: "true"
-# The win wrote the guidance line and the pool's encounter cards to the Campaign Log (the path reads them under the Pool line); Journey Up the Anduin's cards stay.
+# The win wrote the guidance line and the pool's encounter cards to the Campaign Log (the path reads them under the Pool line). Only the guidance line is part 2's own: the pool and treasure asserts below also match what Journey Up
+# the Anduin's win wrote (A Growing Threat), so they prove part 2 wrote something only once the fixture `lostmirk-won` exists and the run shows them after the win, not before.
 - assertVisible:
     id: path-ally-lines
     text: ".*guidance on traversing Wilderland.*"

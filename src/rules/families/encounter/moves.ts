@@ -11,7 +11,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { releaseAttachments } from "../../core/keywords.ts";
 import { pickedList, seatOf } from "../../interpret/player-verbs.ts";
-import { isLocationCard, printedOf, type CardType } from "../../core/printed.ts";
+import { isLocationId, printedOf, type CardType } from "../../core/printed.ts";
 import { engageWith } from "../../quest/quest.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { travelBlocked } from "../../interpret/restrictions.ts";
@@ -44,12 +44,6 @@ export function pushPicked(state: ScenarioState, id: string | null | undefined):
 // The set-aside card with this title (the first in set-aside order).
 export function setAsideNamed(state: ScenarioState, name: string, ctx: ReduceContext): string | undefined {
   return state.setAside.find((other) => printedOf(ctx.cards, state.cards[other]?.code ?? "").name === name);
-}
-
-// A location for the encounter moves: a location, or an Objective-Location (printed.ts isLocationCard).
-export function isLocationId(state: ScenarioState, id: string | null | undefined, ctx: ReduceContext): boolean {
-  const card = id ? state.cards[id] : undefined;
-  return card != null && isLocationCard(printedOf(ctx.cards, card.code));
 }
 
 export function typeOf(state: ScenarioState, id: string | null | undefined, ctx: ReduceContext): CardType | null {
@@ -124,7 +118,7 @@ export function moveEncounter(
       return wasInPlay ? engaged : announceEntered(engaged, id, seat, ctx);
     }
     case "activeLocation": {
-      if (!isLocationId(next, id, ctx)) return next;
+      if (!isLocationId(next, id, ctx.cards)) return next;
       // In a free active location slot, else in place of the last one (families/south/locations.ts).
       const placed = updateCard(makeActiveIn(next, id), id, { face: "up", controller: null });
       const active = queueEvent(placed, { trigger: "becameActive", seat: null, cardId: id });
@@ -136,7 +130,7 @@ export function moveEncounter(
 // The players travel to the location without resolving its Travel effect. An active location returns to the staging area.
 export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
-  if (!card || !isLocationId(state, id, ctx) || !inPlay(card.zone) || state.activeLocation === id || travelBlocked(state, ctx, id)) return state;
+  if (!card || !isLocationId(state, id, ctx.cards) || !inPlay(card.zone) || state.activeLocation === id || travelBlocked(state, ctx, id)) return state;
   const previous = freeSlot(state) ? null : (state.secondActiveLocation ?? state.activeLocation);
   let next = previous ? updateCard(moveCard(state, previous, { zone: "staging" }), previous, { controller: null }) : state;
   if (next.cards[id]?.zone !== "staging") next = moveCard(next, id, { zone: "staging" });

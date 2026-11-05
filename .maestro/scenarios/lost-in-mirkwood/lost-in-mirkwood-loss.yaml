@@ -10,7 +10,7 @@ tags:
     env:
       FIXTURE: lostmirk-lost
       SCENARIO_ID: lost-in-mirkwood
-# Back on the path, this part wrote none of its Ered Mithrin columns: no guidance line (Journey Up the Anduin's cards are still there).
+# Back on the path, this part wrote none of its Ered Mithrin columns: no guidance line.
 - tapOn:
     id: log-back
 - extendedWaitUntil:

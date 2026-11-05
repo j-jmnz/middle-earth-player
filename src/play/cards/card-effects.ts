@@ -17,7 +17,7 @@ import { heldWords } from "../words/sea.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { heldBy, modifiedStat, printedStat } from "../../rules/core/keywords.ts";
-import { printedOf, type PrintedCard } from "../../rules/core/printed.ts";
+import { isLocationCard, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { flagged, inPlay, modifierActive, type ScenarioState } from "../../rules/core/state.ts";
@@ -76,11 +76,11 @@ function flagWord(word: string, amount: number): string {
 
 // The numbers a card of this type prints, in the order the card shows them.
 function statsOf(printed: PrintedCard): readonly BadgeStat[] {
+  // A location, or an Objective-Location (Lost in Mirkwood), which travels and takes progress like one, shows a location's numbers.
+  if (isLocationCard(printed)) return ["threat", "questPoints"];
   switch (printed.type) {
     case "enemy":
       return ["engagementCost", "threat", "attack", "defense", "hitPoints"];
-    case "location":
-      return ["threat", "questPoints"];
     case "quest":
       return ["questPoints"];
     default:

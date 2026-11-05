@@ -137,13 +137,19 @@ function upgradedOfBack(back: Card["back"] | undefined): UpgradedStats | null {
   return { ...(back.willpower != null ? { willpower: back.willpower } : {}), ...(back.threat != null ? { threat: back.threat } : {}), ...(back.engagementCost != null ? { engagementCost: back.engagementCost } : {}), attack: back.attack, defense: back.defense, health: back.health, ...(back.victory != null ? { victory: back.victory } : {}) };
 }
 
-// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play/sweep.ts) lost
-// the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
 // Whether the card is a location for travel, exploring, progress and the victory display: a location, or an Objective-Location.
 export function isLocationCard(printed: PrintedCard): boolean {
   return printed.type === "location" || printed.objectiveLocation;
 }
 
+// Whether the instance with this id is a location card (isLocationCard).
+export function isLocationId(state: { cards: Readonly<Record<string, { code: string } | undefined>> }, id: string | null | undefined, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const card = id ? state.cards[id] : undefined;
+  return card != null && isLocationCard(printedOf(cards, card.code));
+}
+
+// The card type a card in play has: an ally among its controller's heroes (the zone heroType puts it in, families/play/sweep.ts) lost
+// the ally type and gained the hero type (rr.card-types: Sword-thain, Prince Imrahil). Everything else has its printed type.
 export function cardTypeOf(instance: { zone: string }, printed: PrintedCard): CardType {
   return instance.zone === "heroes" ? "hero" : printed.type;
 }

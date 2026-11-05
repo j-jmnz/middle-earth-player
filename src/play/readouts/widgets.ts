@@ -44,7 +44,7 @@ export function ringWords(readout: LocationReadout | null, nameOf: (code: string
 }
 
 // The seat whose dial says it holds something facedown, what the dial says and which mark it wears: the Ring-bearer under the Watcher (a Ring
-// mark, mec109.stage-4), or the hero that is the prisoner of Escape from Dol Guldur (a hero mark, 01123:B:1). A hero is never both.
+// mark, mec109.stage-4), or the hero that is the prisoner of Escape from Dol Guldur (a hero mark, 01123:B:1), or a hero an enemy holds in Carried Away (18074:A:1, the same mark). A hero is never two of these.
 export type HeldDial = { seat: number; words: string; mark: "oneRing" | "hero" };
 
 export function heldDial(game: ScenarioState, nameOf: (code: string) => string): HeldDial | null {
@@ -52,7 +52,11 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
   const ringLine = ringWords(ring, nameOf);
   if (ring?.heldBy != null && ringLine) return { seat: ring.heldBy, words: ringLine, mark: "oneRing" };
   const prisoner = Object.values(game.cards).find((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner != null);
-  return prisoner && prisoner.owner != null ? { seat: prisoner.owner, words: prisonerWords(nameOf(prisoner.code)), mark: "hero" } : null;
+  if (prisoner && prisoner.owner != null) return { seat: prisoner.owner, words: prisonerWords(nameOf(prisoner.code)), mark: "hero" };
+  // A hero an enemy holds (Carried Away, 18074:A:1): the first seat that has one, its dial says which enemy holds which hero.
+  const held = Object.values(game.cards).find((card) => card.zone === "captive" && card.guardedHero === true && card.owner != null);
+  const holder = held?.host ? game.cards[held.host] : undefined;
+  return held && held.owner != null ? { seat: held.owner, words: `${nameOf(held.code)} is held facedown${holder ? ` by ${nameOf(holder.code)}` : ""}`, mark: "hero" } : null;
 }
 
 /** What a prisoner's name says wherever it is shown: the dial, the preview, the list. */

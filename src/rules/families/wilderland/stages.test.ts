@@ -74,6 +74,17 @@ describe("a hero held by an enemy (18074)", () => {
     expect(releaseGuardedHero(carried, null)).toBe(carried);
   });
 
+  it("ReleaseGuardedHero: a hero whose owner is eliminated goes to its owner's discard pile, not back among the heroes", () => {
+    const { state, hero, enemy } = held();
+    const carried = carryAwayHero(inEffect(state, [hero, enemy]), ctx, []);
+    const seats = carried.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) as unknown as ScenarioState["seats"];
+    const freed = releaseGuardedHero({ ...carried, seats }, enemy);
+    expect(freed.cards[hero]).toMatchObject({ zone: "discard", face: "up", guardedHero: undefined, owner: undefined });
+    expect(freed.seats[0]?.discard).toContain(hero);
+    expect(freed.seats[0]?.heroes).not.toContain(hero);
+    expect(freed.seats[1]?.eliminated).toBeFalsy();
+  });
+
   it("DiscardGuardedHeroes: each held hero goes to its owner's discard pile, and a player left with no hero is eliminated", () => {
     let { state, hero, enemy } = held();
     state = carryAwayHero(inEffect(state, [hero, enemy]), ctx, []);
@@ -150,13 +161,34 @@ describe("a hand under a location (18075)", () => {
     const down = placeHandUnderLocation(inEffect(placeHandUnderLocation(inEffect(state, []), { seat: 0, sourceId: null, chosen: places[0] }, ctx, []), []), { seat: 1, sourceId: null, chosen: places[1] }, ctx, []);
     const back = returnFacedownToHands(down, places[0]!);
     expect(back.seats[0]?.hand).toEqual(expect.arrayContaining(mine));
-    expect(back.cards[mine[0]!]).toMatchObject({ zone: "hand", owner: undefined });
+    // Placing under turned the cards facedown; in the hand again they are faceup, so the player can play them.
+    expect(back.cards[mine[0]!]).toMatchObject({ zone: "hand", owner: undefined, face: "up" });
+    expect(back.cards[mine[1]!]).toMatchObject({ zone: "hand", face: "up" });
     expect(playerCardsUnder(back, places[1]!)).toEqual(theirs);
-    const gone = discardFacedownUnder(down);
+    const gone = discardFacedownUnder(down, ctx);
     expect(gone.seats[0]?.discard).toEqual(expect.arrayContaining(mine));
     expect(gone.seats[1]?.discard).toEqual(theirs);
     expect(playerCardsUnder(gone, places[0]!)).toEqual([]);
     expect(returnFacedownToHands(down, null)).toBe(down);
+  });
+
+  it("DiscardFacedownUnder leaves a player card attached facedown under a card that is not a location", () => {
+    const { state, places, mine } = hands();
+    const down = placeHandUnderLocation(inEffect(state, []), { seat: 0, sourceId: null, chosen: places[0] }, ctx, []);
+    const host = spawn(down, "ec1", { zone: "staging" });
+    const eagle = spawn(host.state, "filler", { zone: "hand", seat: 1 });
+    const under = updateCard(moveCard(eagle.state, eagle.id, { zone: "under", locationId: host.id }), eagle.id, { owner: 1 });
+    const gone = discardFacedownUnder(under, ctx);
+    expect(gone.cards[eagle.id]).toMatchObject({ zone: "under", host: host.id });
+    expect(gone.seats[0]?.discard).toEqual(expect.arrayContaining(mine));
+  });
+
+  it("PlaceHandUnderLocation keeps an owner a hand card already has", () => {
+    const { state, places, mine } = hands();
+    const marked = updateCard(state, mine[0]!, { owner: 1 });
+    const done = placeHandUnderLocation(inEffect(marked, []), { seat: 0, sourceId: null, chosen: places[0] }, ctx, []);
+    expect(done.cards[mine[0]!]?.owner).toBe(1);
+    expect(done.cards[mine[1]!]?.owner).toBe(0);
   });
 
   it("the pick field hasFacedownUnder is true for a card with a facedown player card under it", () => {

@@ -2,6 +2,8 @@
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck; and of A Storm on Cobas Haven, a tower the players control and the Ship enemy a location holds out of play. The engine decided each; nothing here changes one.
 import { freeOfEncounters } from "../../rules/families/objectives/index.ts";
+import { heroGuardedBy } from "../../rules/families/wilderland/carried.ts";
+import { cardsUnder } from "../../rules/core/zones.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
@@ -33,6 +35,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (!card) return null;
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
+  const lost = lostInMirkwoodDetail(game, ctx, card, name);
+  if (lost) return lost;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
   const kind = ctx.cards.get(card.code)?.type;
@@ -40,8 +44,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
     const guards = guardsOf(game, card);
     // A tower the players control that a Ship enemy guards again (Siege Ship, The Raiders' Assault) stays theirs: control is taken once.
     if (guards.length > 0) return `Guarded by ${guards.map(name).join(", ")}${playersControl(card) ? ". The players still control it." : ""}`;
-    // Nothing claims a treasure yet, so the line says only that it is free (emce.treasure).
-    if (kind === "treasure" && freeOfEncounters(game, cardId)) return "Free of encounters";
+    // A treasure free of encounters is claimed by the players at once (the settle sweep, emce.treasure): the first player chooses the character that carries it.
+    if (kind === "treasure" && freeOfEncounters(game, cardId)) return "Free of encounters: the players claim it";
     if (claimable(ctx, card.code) && freeOfEncounters(game, cardId)) return "Free of encounters: you can claim it";
     // A tower freed of encounters stays in the staging area, controlled by the players as a group (ControlWhenFree, 12134:A:2): it has no hero to hang on.
     if (playersControl(card)) return "Free of encounters: the players control it";
@@ -50,6 +54,27 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
   if (held.length > 0) return `${held.map((other) => name(other.id)).join(", ")} is held underneath, out of play, while this is the active location`;
   return null;
+}
+
+// Whose a seat's hero or hand is, as the preview says it: "Player 2's" two-handed, "your" solo.
+const ownerWords = (game: ScenarioState, seat: number): string => (game.seatCount > 1 ? `Player ${seat + 1}'s` : "your");
+
+// Lost in Mirkwood's cards (ledger lines 18074:B:2, 18075:B:2, 18075:B:3, 18076:B:1 to 18076:B:3): an enemy that holds a hero facedown, a location with a hand facedown under it, and the nemesis. The engine decided each; this only says it.
+function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
+  const heroId = heroGuardedBy(game, card.id);
+  const hero = heroId ? game.cards[heroId] : undefined;
+  if (heroId && hero?.owner != null) return `Holds ${name(heroId)}, ${ownerWords(game, hero.owner)} hero, facedown. Defeat or discard it to free the hero, exhausted.`;
+  const hands = new Map<number, number>();
+  for (const id of cardsUnder(game, card.id)) {
+    const owner = game.cards[id]?.owner;
+    if (owner != null) hands.set(owner, (hands.get(owner) ?? 0) + 1);
+  }
+  if (hands.size > 0) {
+    return [...hands].map(([seat, count]) => `${ownerWords(game, seat).replace(/^./, (first) => first.toUpperCase())} hand, ${count} ${count === 1 ? "card" : "cards"}, facedown under it: back to hand when explored, discarded if the players advance`).join(". ");
+  }
+  if (card.nemesis !== true) return null;
+  const stage = game.questStage ? ctx.cards.get(game.cards[game.questStage]?.code ?? "")?.questPoints : null;
+  return `The nemesis: immune to player card effects, takes no damage while the stage has fewer than ${stage ?? 8} progress, blocks the stage while in play, returns to the staging area and attacks the first player at the end of each round. Defeating it wins the game.`;
 }
 
 // The encounter cards attached to a card as its guards, in the order they were attached (rr.guarded).

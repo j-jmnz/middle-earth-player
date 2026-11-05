@@ -120,7 +120,7 @@ function unholdPrisoner(state: ScenarioState, damage: number): ScenarioState {
 }
 
 // The hero returns to the place it held among its seat's heroes (releasing appends it).
-function backInPlace(state: ScenarioState, seat: number, heroId: string, slot: number): ScenarioState {
+export function backInPlace(state: ScenarioState, seat: number, heroId: string, slot: number): ScenarioState {
   const current = state.seats[seat];
   if (!current) return state;
   const others = current.heroes.filter((id) => id !== heroId);

@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { cardMap, hero, idleScenario } from "../../core/test-fixture.ts";
 import { definePrinted } from "../../core/printed.ts";
+import { effectCause } from "../../core/cause.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { settle } from "../../engine/machine.ts";
@@ -12,7 +13,7 @@ import { reduce } from "../../engine/reduce.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { guardWith } from "../objectives/guard.ts";
-import { discardToPoolFromSets, putObjectiveLocation } from "./mirkwood.ts";
+import { discardToPoolFromSets, freeTreasures, putObjectiveLocation } from "./mirkwood.ts";
 import { run } from "./index.ts";
 import { codesOf } from "./fixture.ts";
 
@@ -86,7 +87,7 @@ describe("SearchGuardForTreasure (12168:A:2) and the claim of the freed treasure
   function searched(): ScenarioState {
     const deck = spawn(base(), "hall", { zone: "encounterDeck" }, "down");
     const camp = spawn(deck.state, "camp", { zone: "campaign" }).state;
-    return pushEffectFrame(camp, { frame: "setup", sourceId: deck.id, actor: 0, peril: false, effectId: treasureRecord.id, instructions: [{ verb: "SearchGuardForTreasure", code: "hall" }], cancel: null, blockCancel: null }, []);
+    return pushEffectFrame(camp, { frame: "setup", sourceId: deck.id, actor: 0, peril: false, effectId: treasureRecord.id, instructions: [{ verb: "SearchGuardForTreasure", code: "hall" }], cancel: null, blockCancel: null, cause: effectCause(treasureRecord) }, []);
   }
 
   it("asks the first player whether to search; declining changes nothing", () => {
@@ -118,6 +119,27 @@ describe("SearchGuardForTreasure (12168:A:2) and the claim of the freed treasure
     // The treasure types as a card with no Attach to line here, so the pick of a host is asked or resolved: it is no longer in the staging area under a guard.
     expect(claimed?.zone).not.toBe("staging");
     expect(freed.staging).not.toContain(treasure?.id);
+  });
+
+  it("credits the claim to the record that ran the search, and a game whose records guard no treasure never claims one", () => {
+    const other: Effect = { id: "other:campaignSetup:1", cardCode: "camp", lines: ["camp:A:3"], timing: "campaignSetup", instructions: [{ verb: "SearchGuardForTreasure", code: "orc" }] };
+    const c = ctx([other, treasureRecord]);
+    const waiting = settle(searched(), c, []);
+    const searchedState = reduce(waiting, { type: "Choose", optionId: "search" }, c);
+    if (!searchedState.ok) throw new Error("search refused");
+    let state = searchedState.state;
+    if (state.window?.kind === "choose") {
+      const picked = reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, c);
+      if (picked.ok) state = picked.state;
+    }
+    const treasure = Object.values(state.cards).find((card) => card.code.startsWith("t"));
+    const hall = Object.values(state.cards).find((card) => card.code === "hall");
+    expect(treasure?.setUpBy).toBe(treasureRecord.id);
+    const gone = moveCard(state, hall?.id ?? "", { zone: "encounterDiscard" });
+    const frame = freeTreasures(gone, c, []).stack.at(-1);
+    expect(frame?.data.kind === "effect" ? frame.data.effectId : null).toBe(treasureRecord.id);
+    // No record of the game guards a treasure: the freed treasure is left where it is.
+    expect(settle(gone, ctx([marker]), []).staging).toContain(treasure?.id);
   });
 });
 

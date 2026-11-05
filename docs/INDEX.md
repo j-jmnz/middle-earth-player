@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~68.6K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~68.8K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,7 +92,7 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–701 Ered Mithrin (~2.9K)
+  - 686–701 Ered Mithrin (~3.2K)
   - 702–710 Nightmare (~420)
   - 711–749 Deckbuilding (~1.8K) ← 1
   - 750–828 Effects (~3.2K)
@@ -105,7 +105,7 @@ Read the sections your task touches.
   - 869–894 Persistence and shipping (~1.7K)
   - 895–936 Screens (~4.7K) ← 2
     - 921–936 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~30.3K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~30.8K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -113,30 +113,30 @@ Read the sections your task touches.
   - 36–39 Canvas (~560) ← 2
   - 40–51 Spacing and the play area's rows (~1.6K) ← 7
   - 52–57 Pictures on the table (~320)
-  - 58–81 Cards (~4.1K) ← 9
-  - 82–87 The Sailing test (~690) ← 5
-  - 88–101 The Island Map (~1.7K) ← 8
-  - 102–105 Tokens and effects (~320)
-  - 106–119 Piles (~1.8K) ← 8
-  - 120–125 Marks of the open moment (~400) ← 1
-  - 126–194 Motion (~3.2K) ← 8
-  - 195–221 Spotlight (~2.4K) ← 18
-  - 222–227 Gestures (~420) ← 5
-  - 228–231 Hold, slide and release (~940)
-  - 232–237 Peeking at the other seat (~600) ← 1
-  - 238–253 Command column (~1.9K) ← 9
-  - 254–257 Two taps (~350) ← 2
-  - 258–261 One answer, one tap (~240)
-  - 262–265 Stops and Always use (~250)
-  - 266–269 Guide (~120)
-  - 270–280 Choice tray (~1.4K) ← 9
-  - 281–294 Reading panels (~1.5K) ← 6
-  - 295–304 Phase carousel (~680)
-  - 305–310 Quest advance (~530) ← 1
-  - 311–314 Undo (~140)
-  - 315–318 Haptics (~280)
-  - 319–329 Banner (~580) ← 1
-  - 330–333 Android Back (~90)
+  - 58–82 Cards (~4.4K) ← 9
+  - 83–88 The Sailing test (~690) ← 5
+  - 89–102 The Island Map (~1.7K) ← 8
+  - 103–106 Tokens and effects (~320)
+  - 107–120 Piles (~1.8K) ← 8
+  - 121–126 Marks of the open moment (~400) ← 1
+  - 127–195 Motion (~3.2K) ← 8
+  - 196–222 Spotlight (~2.4K) ← 18
+  - 223–228 Gestures (~420) ← 5
+  - 229–232 Hold, slide and release (~940)
+  - 233–238 Peeking at the other seat (~600) ← 1
+  - 239–254 Command column (~1.9K) ← 9
+  - 255–258 Two taps (~350) ← 2
+  - 259–262 One answer, one tap (~240)
+  - 263–266 Stops and Always use (~250)
+  - 267–270 Guide (~120)
+  - 271–281 Choice tray (~1.6K) ← 10
+  - 282–295 Reading panels (~1.5K) ← 6
+  - 296–305 Phase carousel (~680)
+  - 306–311 Quest advance (~530) ← 1
+  - 312–315 Undo (~140)
+  - 316–319 Haptics (~280)
+  - 320–330 Banner (~580) ← 1
+  - 331–334 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~24.5K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~9.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.8K tok)
   - 5–17 Rules (~620)
   - 18–89 Phases (~2.7K)
-  - 90–205 Open items (~5.8K)
-    - 92–107 Fixtures and Maestro (~720)
-    - 108–153 Rules and engine (~1.9K)
-    - 154–178 Screens and code (~1.3K)
-    - 179–205 Phone and tablet checks (~1.9K)
-  - 206–222 Standing decisions (~430)
+  - 90–207 Open items (~6.0K)
+    - 92–108 Fixtures and Maestro (~790)
+    - 109–154 Rules and engine (~1.9K)
+    - 155–179 Screens and code (~1.3K)
+    - 180–207 Phone and tablet checks (~2.0K)
+  - 208–224 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)

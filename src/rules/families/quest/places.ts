@@ -10,7 +10,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, modifiedStat } from "../../core/keywords.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
-import { isLocationCard, printedOf } from "../../core/printed.ts";
+import { isLocationId } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
@@ -20,17 +20,12 @@ import { makeActiveIn } from "../south/locations.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-function isLocation(state: ScenarioState, id: string | null, ctx: ReduceContext): id is string {
-  const card = id ? state.cards[id] : undefined;
-  return card != null && isLocationCard(printedOf(ctx.cards, card.code));
-}
-
 // The location becomes the active location; another active location goes back to the staging area with its progress. This is
 // not traveling, so no Travel cost or effect resolves and nothing hears "traveled"; a Forced effect "after it becomes the active
 // location" does (131013:A:2, 19034:A:1, 02121:A:1).
 export function makeActive(state: ScenarioState, instruction: Verb<"MakeActive">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
-  if (!isLocation(state, id, ctx) || state.cards[id]?.zone !== "staging") return state;
+  if (!id || !isLocationId(state, id, ctx.cards) || state.cards[id]?.zone !== "staging") return state;
   const next = makeActiveIn(state, id);
   return fireForced(next, { trigger: "becameActive", seat: null, cardId: id }, ctx, steps);
 }
@@ -56,7 +51,7 @@ export function moveProgress(
   const fromId = progressSource(state, instruction.from, focus.sourceId);
   const toId = refCard(state, "picked", scope);
   const from = fromId ? state.cards[fromId] : undefined;
-  if (!from || !fromId || !isLocation(state, toId, ctx) || fromId === toId) return state;
+  if (!from || !fromId || !toId || !isLocationId(state, toId, ctx.cards) || fromId === toId) return state;
   const limit = instruction.amount == null ? from.progress : Math.min(from.progress, resolveAmount(state, instruction.amount, scope, ctx));
   const moved = instruction.all ? from.progress : limit;
   if (moved <= 0) return state;

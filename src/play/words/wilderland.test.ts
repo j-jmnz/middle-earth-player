@@ -11,7 +11,7 @@ import { spawn } from "../../rules/core/zones.ts";
 
 import { sheetFor } from "../choice/sheets.ts";
 import type { SheetNames } from "../choice/sheet-types.ts";
-import { wilderlandAsk, wilderlandOptionLabel } from "./wilderland.ts";
+import { isFreedTreasureClaim, wilderlandAsk, wilderlandBranchWords, wilderlandChooseNote, wilderlandOptionLabel } from "./wilderland.ts";
 
 // Rules: emce.treasure, rr.guarded (data/rules/entries.json). What the choice sheet says when the players look at random undiscovered treasures: each option is the treasure's title and
 // its picture, and the sentence names the card that guards it.
@@ -124,23 +124,86 @@ describe("the Wilderland scenario's prompts", () => {
 
   it("names the number, the staging area and the owner when a hand goes under a location (18075:A:1), solo and two-handed", () => {
     const place: Instruction = { verb: "PlaceHandUnderLocation" };
-    const withHand = (seats: 1 | 2) => {
+    const withHands = (seats: 1 | 2, counts: readonly number[]) => {
       let game: ScenarioState = idleScenario(seats);
-      game = spawn(game, "frodo", { zone: "hand", seat: 0 }).state;
-      return spawn(game, "frodo", { zone: "hand", seat: 0 }).state;
+      counts.forEach((count, seat) => {
+        for (let index = 0; index < count; index += 1) game = spawn(game, "frodo", { zone: "hand", seat }).state;
+      });
+      return game;
     };
-    expect(wilderlandAsk(place, null, words, undefined, null, { game: withHand(1), ctx, options: ["a", "b"] })?.prompt).toBe(
-      "Choose a location in the staging area to put your hand under, 2 cards facedown. It gets +2 quest points, the cards return to your hand when it is explored, and they are discarded if the players advance.",
-    );
-    expect(wilderlandAsk(place, null, words, undefined, null, { game: withHand(2), ctx, options: ["a", "b"] })?.prompt).toContain("put Player 1's hand under");
+    expect(wilderlandAsk(place, null, words, undefined, null, { game: withHands(1, [2]), ctx, options: ["a", "b"] })).toEqual({
+      verb: "Choose",
+      prompt: "Put your 2 cards facedown under a location in the staging area. It gets +2 quest points, the cards return to your hand when it is explored, and are discarded if the players advance.",
+    });
+    // Player 2's window is open: the sentence leads with Player 2 and her 9 cards, not the first player's 1.
+    const two: ScenarioState = { ...withHands(2, [1, 9]), window: { kind: "choose", seat: 1, options: ["a", "b"] } };
+    const asks = wilderlandAsk(place, null, words, undefined, null, { game: two, ctx, options: ["a", "b"] });
+    expect(asks?.prompt).toMatch(/^Player 2: put your 9 cards facedown under a location in the staging area\. It gets \+9 quest points/);
+    expect(asks?.prompt).not.toContain("Player 1");
+    expect(asks?.owned).toBe(true);
+    const one: ScenarioState = { ...withHands(2, [1, 9]), window: { kind: "choose", seat: 0, options: ["a", "b"] } };
+    expect(wilderlandAsk(place, null, words, undefined, null, { game: one, ctx, options: ["a"] })?.prompt).toMatch(/^Player 1: put your 1 card facedown .* the card returns to your hand/);
   });
 
-  it("names the hit points and the first player when the nemesis is a tie (18076:A:1)", () => {
+  it("names the hit points, leading with the first player two-handed and with nothing solo (18076:A:1)", () => {
     const nemesis: Instruction = { verb: "SearchNemesis" };
-    let game: ScenarioState = idleScenario(2);
-    const one = spawn(game, "spawn", { zone: "spidersDeck" }, "down");
-    const two = spawn(one.state, "spawn", { zone: "spidersDeck" }, "down");
-    expect(wilderlandAsk(nemesis, null, words, undefined, null, { game: two.state, ctx, options: [one.id, two.id] })?.prompt).toMatch(/^Player 1: 2 enemies are tied for the most hit points \(9\)/);
+    const tied = (seats: 1 | 2) => {
+      const one = spawn(idleScenario(seats), "spawn", { zone: "spidersDeck" }, "down");
+      const two = spawn(one.state, "spawn", { zone: "spidersDeck" }, "down");
+      return { game: two.state, options: [one.id, two.id] };
+    };
+    const { game, options } = tied(2);
+    const asks = wilderlandAsk(nemesis, null, words, undefined, null, { game, ctx, options });
+    expect(asks?.prompt).toMatch(/^Player 1: 2 enemies are tied for the most hit points \(9\)/);
+    expect(asks?.owned).toBe(true);
+    const solo = tied(1);
+    const alone = wilderlandAsk(nemesis, null, words, undefined, null, { game: solo.game, ctx, options: solo.options });
+    expect(alone?.prompt).toMatch(/^2 enemies are tied for the most hit points \(9\)/);
+    expect(alone?.owned).toBeUndefined();
+  });
+
+  it("names the player and what frees the hero when a hero is carried away (18074:A:1)", () => {
+    const pick: Instruction = { verb: "Pick", pick: { type: "hero", control: "you" } };
+    const next: Instruction = { verb: "DiscardUntil", pick: { type: "enemy", control: "any" }, to: "staging" } as unknown as Instruction;
+    const two: ScenarioState = { ...idleScenario(2), window: { kind: "choose", seat: 1, options: ["h"] } };
+    const asks = wilderlandAsk(pick, null, words, next, null, { game: two, ctx, options: ["h"] });
+    expect(asks?.prompt).toMatch(/^Player 2: choose 1 hero you control to be carried away\./);
+    expect(asks?.prompt).toContain("guards it facedown until that enemy leaves play, then the hero returns exhausted");
+    expect(asks?.prompt).not.toContain("holds it");
+    expect(asks?.owned).toBe(true);
+    const solo = wilderlandAsk(pick, null, words, next, null, { game: idleScenario(1), ctx, options: ["h"] });
+    expect(solo?.prompt).toMatch(/^Choose 1 hero you control to be carried away\./);
+  });
+
+  it("offers Twilight Hall's search with the card, where it enters and how many treasures it will guard (12168:A:2)", () => {
+    const offer: Extract<Instruction, { verb: "Choose" }> = {
+      verb: "Choose",
+      who: "actor",
+      options: [
+        { id: "search", instructions: [{ verb: "SearchMove", code: "hall", to: "staging", remember: true }, { verb: "AttachRandomTreasure", to: "picked" }] },
+        { id: "decline", instructions: [] },
+      ],
+    };
+    const game = idleScenario(1);
+    expect(wilderlandChooseNote(offer, game, ctx, words)).toBe("Search the encounter deck for Twilight Hall? It enters the staging area guarding 1 of 3 random undiscovered treasures.");
+    expect(wilderlandBranchWords(offer, "search", words)).toBe("Search for Twilight Hall");
+    expect(wilderlandBranchWords(offer, "decline", words)).toBe("Don't search: no treasure this scenario");
+    const few = spawn(spawn(spawn(game, "ta", { zone: "setAside" }).state, "tb", { zone: "setAside" }).state, "tc", { zone: "setAside" }).state;
+    expect(wilderlandChooseNote(offer, few, ctx, words)).toBe("Search the encounter deck for Twilight Hall? It enters the staging area guarding the 1 random undiscovered treasure.");
+    expect(wilderlandChooseNote({ verb: "Choose", who: "actor", options: [{ id: "a", instructions: [] }, { id: "b", instructions: [] }] }, game, ctx, words)).toBeNull();
+  });
+
+  it("names the picked guard of a treasure draw, not the stage that ran it, and the guard that left play when the treasure is claimed", () => {
+    const draw: Instruction = { verb: "AttachRandomTreasure", to: "picked" };
+    const asks = wilderlandAsk(draw, "stage-id", words, undefined, "hall-id", { game: idleScenario(1), ctx, options: ["ta", "tb", "tc"] });
+    expect(asks?.prompt).toBe("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Twilight Hall is attached to it, and the players cannot claim it until Twilight Hall is dealt with.");
+    const treasure = spawn(idleScenario(1), "ta", { zone: "setAside" });
+    const claim: Instruction = { verb: "Pick", pick: { type: "card", control: "any", hostForPicked: true, who: "firstPlayer" } };
+    const withRecord = { effects: [{ id: "12168:campaignSetup:1", cardCode: "12168", lines: ["12168:A:2"], timing: "campaignSetup", instructions: [{ verb: "SearchGuardForTreasure", code: "hall" }] }], cards } as unknown as typeof ctx;
+    const claimed = wilderlandAsk(claim, treasure.id, { ...words, card: () => "Treasure A" }, { verb: "AttachPicked" }, treasure.id, { game: treasure.state, ctx: withRecord, options: ["h"] });
+    expect(claimed?.prompt).toBe("Twilight Hall has left play: Treasure A is free of encounters and the players claim it. Choose a character to carry it.");
+    expect(isFreedTreasureClaim(treasure.state, ctx, treasure.id, treasure.id)).toBe(true);
+    expect(isFreedTreasureClaim(treasure.state, ctx, treasure.id, null)).toBe(false);
   });
 
   it("warns that playing a card discards the hand of the player Lost in the Wild goes to", () => {

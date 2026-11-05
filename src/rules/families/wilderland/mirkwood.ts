@@ -1,13 +1,13 @@
 // Rules: emce.treasure, emce.guarded-x, emce.haldan, rr.victory, rr.guarded, rr.quest-advancement, emce.campaign-pool-encounter (data/rules/entries.json); ledger lines 12168:A:2, 12168:B:3, 18028:A:2, 18029:A:3, 18071:A:1.
 // Lost in Mirkwood's verbs: the quest stage a letter names, Haldan under the first player at Setup, the treasure guarded by a searched-for Twilight Hall and claimed once freed, the cards the Resolution discards into the pool, and the Objective-Location Searching for a Way Out puts into play.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
-import { effectCause } from "../../core/cause.ts";
+import { currentCause, effectCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { advanceToStage } from "../breaking/index.ts";
 import { freeOfEncounters } from "../objectives/free.ts";
@@ -17,6 +17,24 @@ import { resolveGuarded } from "./deep.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
+
+// The records of an effect list that carry a verb of a kind, found once for the list (it never changes after the reducer is handed it): "treasure" the verbs that guard a treasure, "objective" the marker that puts an Objective-Location into play.
+const KINDS = { treasure: ["SearchGuardForTreasure", "AttachRandomTreasure"], objective: ["PutObjectiveLocationAfterDiscard"] } as const;
+const INDEX = new WeakMap<readonly Effect[], Map<keyof typeof KINDS, readonly Effect[]>>();
+function recordsWithVerbs(effects: readonly Effect[], kind: keyof typeof KINDS): readonly Effect[] {
+  let byKind = INDEX.get(effects);
+  if (!byKind) {
+    byKind = new Map();
+    INDEX.set(effects, byKind);
+  }
+  let found = byKind.get(kind);
+  if (!found) {
+    const verbs: readonly string[] = KINDS[kind];
+    found = effects.filter((effect) => effect.instructions.some((instruction) => verbs.includes(instruction.verb)));
+    byKind.set(kind, found);
+  }
+  return found;
+}
 
 /** AdvanceToLetterStage: the quest advances to the stage one number up with the letter (A the first of its level, C the second); nothing happens when the quest has no such stage ("if able"). */
 export function advanceToLetterStage(state: ScenarioState, instruction: Verb<"AdvanceToLetterStage">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -35,7 +53,7 @@ export function takeControlOfSetAside(state: ScenarioState, instruction: Verb<"T
 }
 
 /** SearchGuardForTreasure: when a copy of the card is in the encounter deck or its discard pile, the first player chooses to search for it; the copy is added to the staging area, remembered, and AttachRandomTreasure guards a treasure with it. */
-export function searchGuardForTreasure(state: ScenarioState, instruction: Verb<"SearchGuardForTreasure">, focus: Focus): ScenarioState {
+export function searchGuardForTreasure(state: ScenarioState, instruction: Verb<"SearchGuardForTreasure">, focus: Focus, steps: EngineStep[]): ScenarioState {
   const found = [...state.encounterDeck, ...state.encounterDiscard].some((id) => state.cards[id]?.code === instruction.code);
   if (!found) return state;
   const choose: Instruction = {
@@ -46,19 +64,23 @@ export function searchGuardForTreasure(state: ScenarioState, instruction: Verb<"
       { id: "decline", instructions: [] },
     ],
   };
-  return queueFront(state, [{ instruction: choose, seat: focus.seat, chosen: null }]);
+  // The offer and what the search does are the record's: the queued instructions keep its cause, and the guarded treasure remembers the record (freeTreasures).
+  const cause = currentCause(steps, UNATTRIBUTED);
+  return queueFront(state, [{ instruction: choose, seat: focus.seat, chosen: null, ...("effect" in cause ? { cause } : {}) }]);
 }
 
 /** The settle sweep (emce.treasure: "Once that treasure is free of encounters, the players claim it"): a treasure in the staging area that is free of encounters (its guard left play) is claimed: a frame lets the first player choose the character it attaches to, as ClaimRandomTreasure does, and the players control it from then. Nothing resolves while a frame is open. */
 export function freeTreasures(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stack.length > 0 || state.lost || state.failure || state.staging.length === 0) return state;
-  const record = ctx.effects.find((effect) => effect.instructions.some((instruction) => instruction.verb === "SearchGuardForTreasure" || instruction.verb === "AttachRandomTreasure"));
-  if (!record) return state;
+  // Only a game whose records guard a treasure (a cached index of the effect list) looks at the staging area.
+  const setters = recordsWithVerbs(ctx.effects, "treasure");
+  if (setters.length === 0) return state;
   const id = state.staging.find((candidate) => {
     const card = state.cards[candidate];
     return card != null && card.zone === "staging" && printedOf(ctx.cards, card.code).campaignKind === "treasure" && freeOfEncounters(state, candidate);
   });
   if (!id) return state;
+  const record = setters.find((effect) => effect.id === state.cards[id]?.setUpBy) ?? setters[0]!;
   const aside = updateCard(moveCard(state, id, { zone: "setAside" }), id, { face: "up", controller: null });
   const instructions: Instruction[] = [{ verb: "Pick", pick: { type: "card", control: "any", hostForPicked: true, who: "firstPlayer" } }, { verb: "AttachPicked" }];
   return pushEffectFrame(aside, { frame: "ResolveEffect", sourceId: id, actor: state.firstPlayer, peril: false, effectId: record.id, instructions, picked: [id], cancel: null, blockCancel: null, cause: effectCause(record) }, steps);
@@ -81,7 +103,7 @@ export function discardToPoolFromSets(state: ScenarioState, sets: readonly strin
 
 /** After the cards progress was turned into are discarded: when Searching for a Way Out is in play, the topmost Objective-Location in the encounter discard pile enters play in the staging area and its Guarded keyword is resolved. */
 export function putObjectiveLocation(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const markers = new Set(ctx.effects.filter((effect) => effect.instructions.some((instruction) => instruction.verb === "PutObjectiveLocationAfterDiscard")).map((effect) => effect.cardCode));
+  const markers = new Set(recordsWithVerbs(ctx.effects, "objective").map((effect) => effect.cardCode));
   if (markers.size === 0 || !Object.values(state.cards).some((card) => markers.has(card.code) && inPlay(card.zone))) return state;
   const id = [...state.encounterDiscard].reverse().find((candidate) => printedOf(ctx.cards, state.cards[candidate]?.code ?? "").objectiveLocation);
   if (!id) return state;

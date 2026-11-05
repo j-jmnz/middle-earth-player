@@ -126,6 +126,8 @@ export type CardInstance = {
   // An encounter card attached to a guarded objective as its guard (rr.guarded): it is unlinked from the objective when it leaves play,
   // or when it attaches itself to another card (families/objectives.ts).
   guard?: true;
+  // The effect record that set a guarded treasure up (Lost in Mirkwood, families/wilderland/mirkwood.ts): the settle sweep credits the claim to it. Set only on a treasure a record's AttachRandomTreasure guarded.
+  setUpBy?: string;
   // A card of the encounter deck or its discard pile that a search "shuffles into the second encounter deck": SetAsideEncounterDeck keeps it in the deck when it sets the rest aside (families/sea/swap.ts, 11215:B:1).
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it

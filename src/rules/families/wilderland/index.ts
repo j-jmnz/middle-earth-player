@@ -62,7 +62,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "TakeControlOfSetAside":
       return takeControlOfSetAside(state, instruction, focus);
     case "SearchGuardForTreasure":
-      return searchGuardForTreasure(state, instruction, focus);
+      return searchGuardForTreasure(state, instruction, focus, steps);
     case "GrantSurgeToSubject":
       return grantSurge(state, eventSubject(state));
     case "CarryAwayHero":
@@ -76,7 +76,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ReturnFacedownToHands":
       return returnFacedownToHands(state, eventSubject(state));
     case "DiscardFacedownUnder":
-      return discardFacedownUnder(state);
+      return discardFacedownUnder(state, ctx);
     case "SearchNemesis":
       return searchNemesis(state, focus, ctx, steps);
     case "NemesisAttacks":

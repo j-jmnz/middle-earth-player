@@ -8,7 +8,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -34,19 +34,22 @@ export function attachRandomTreasure(state: ScenarioState, instruction: Verb, fo
   const guard = guardId ? state.cards[guardId] : undefined;
   if (!guardId || !guard || (guard.zone !== "staging" && guard.zone !== "engaged")) return state;
   const pool = undiscoveredTreasures(state, ctx);
-  if (focus.chosen != null) return pool.includes(focus.chosen) ? attach(state, focus.chosen, guardId) : state;
+  if (focus.chosen != null) return pool.includes(focus.chosen) ? attach(state, focus.chosen, guardId, steps) : state;
   const drawn = shuffleIds(pool, state.seed, state.seedCursor);
   const candidates = drawn.ids.slice(0, instruction.count ?? 3);
   const moved = { ...state, seedCursor: drawn.cursor };
   const first = candidates[0];
   if (first == null) return state;
-  if (candidates.length === 1 || !effectData(state)) return attach(moved, first, guardId);
+  if (candidates.length === 1 || !effectData(state)) return attach(moved, first, guardId, steps);
   return askTarget(moved, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, candidates);
 }
 
-function attach(state: ScenarioState, code: string, guardId: string): ScenarioState {
+function attach(state: ScenarioState, code: string, guardId: string, steps: EngineStep[]): ScenarioState {
   const spawned = spawn(state, code, { zone: "staging" });
-  return guardWith(spawned.state, guardId, spawned.id);
+  const cause = currentCause(steps, UNATTRIBUTED);
+  // The record that ran this is remembered on the treasure, so the claim of the freed treasure is credited to it.
+  const guarded = "effect" in cause ? updateCard(spawned.state, spawned.id, { setUpBy: cause.effect }) : spawned.state;
+  return guardWith(guarded, guardId, spawned.id);
 }
 
 /**

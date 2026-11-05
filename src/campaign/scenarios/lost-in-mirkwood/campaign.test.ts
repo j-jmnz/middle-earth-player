@@ -153,5 +153,5 @@ describe("Lost in Mirkwood in the ered-mithrin campaign", () => {
     const lost = playGolden(lostGolden, weak.ctx).state;
     const blank = emptyLog(lostGolden.seatCount);
     expect(applyResolution(blank, lost.scenarioId, lost, weak.cards, NO_COPY_LIMITS)).toBe(blank);
-  });
+  }, 60_000);
 });

@@ -5,6 +5,7 @@ import { definePrinted } from "../core/printed.ts";
 import { legalIntents, reduce } from "../engine/reduce.ts";
 import { blankScenario, updateCard, type ScenarioState } from "../core/state.ts";
 import { spawn } from "../core/zones.ts";
+import { resolveQuest } from "./quest.ts";
 
 const heroCard = hero("aragorn", "leadership", 10, 4);
 const quester = hero("sam", "leadership", 8, 1);
@@ -119,6 +120,20 @@ describe("quest resolution", () => {
     };
     return { state, ctx: { effects: [], cards } };
   }
+
+  // rr.step-3-4: a tie is neither successful nor unsuccessful (user ruling, 2026-11-05); no one committed against threat above 0 is unsuccessful, against 0 threat a tie.
+  it("hears an unsuccessful quest when nothing is committed against threat above 0, a successful one for more willpower, and neither for a tie", () => {
+    const heard = (input: Parameters<typeof atCommit>[0], committed: boolean) => {
+      const { state, cards } = atCommit(input);
+      const ready = committed ? state : { ...state, cards: Object.fromEntries(Object.entries(state.cards).map(([id, card]) => [id, { ...card, committed: false }])) };
+      return (resolveQuest(ready, cards, []).pendingEvents ?? []).map((event) => event.trigger).filter((trigger) => trigger === "questFailed" || trigger === "questSucceeded");
+    };
+    expect(heard({ willpower: 4, threat: 10, stages: ["stage-1"], stagingThreat: 5 }, false)).toEqual(["questFailed"]);
+    expect(heard({ willpower: 4, threat: 10, stages: ["stage-1"] }, false)).toEqual([]);
+    expect(heard({ willpower: 4, threat: 10, stages: ["stage-1"], stagingThreat: 4 }, true)).toEqual([]);
+    expect(heard({ willpower: 4, threat: 10, stages: ["stage-1"], stagingThreat: 5 }, true)).toEqual(["questFailed"]);
+    expect(heard({ willpower: 4, threat: 10, stages: ["stage-1"], stagingThreat: 3 }, true)).toEqual(["questSucceeded"]);
+  });
 
   it("raises every player's threat by the shortfall", () => {
     const { state, ctx } = twoSeatShortfall([10, 20]);

@@ -7,7 +7,7 @@ import { questFailureRaise } from "../families/quest/threat.ts";
 import { askQuestProgress } from "../families/attachments/quest.ts";
 import { resolveSideQuests, sideQuestTotals } from "../families/sidequests/quest.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
-import { isLocationCard, printedOf } from "../core/printed.ts";
+import { isLocationId } from "../core/printed.ts";
 import { advanceStage, clearCommitted, questPointsOf, resolveQuest } from "./quest.ts";
 import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -60,7 +60,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   let next = payOwed(state, ctx, steps);
   const advanced = steps.slice(before).flatMap((step) => (step.kind === "advance" && step.stormcaller !== true ? [step.cardId] : []));
   // A location the progress explored has left play. Responses to that are offered before the stage's own effects.
-  const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocation(next, step.targetId, ctx) ? [step.targetId] : []));
+  const explored = steps.slice(before).flatMap((step) => (step.kind === "destroy" && isLocationId(next, step.targetId, ctx.cards) ? [step.targetId] : []));
   // Goblin Trail (41014:A:2) puts progress on the current quest: its Response waits for the new stage's When Revealed (below), so the
   // progress lands on a stage that is revealed (rr.quest-advancement: advancing is immediate; rr.triggering-condition).
   const early = explored.filter((cardId) => advanced.length > 0 && progressesQuest(next, cardId, ctx));
@@ -129,11 +129,6 @@ export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: Redu
 function progressesQuest(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const code = state.cards[id]?.code;
   return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "response" && effect.trigger === "leftPlay" && effect.instructions.some((instruction) => instruction.verb === "ProgressQuest"));
-}
-
-function isLocation(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
-  const instance = state.cards[id];
-  return instance != null && isLocationCard(printedOf(ctx.cards, instance.code));
 }
 
 function finish(state: ScenarioState): ScenarioState {

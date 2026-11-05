@@ -3,6 +3,7 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
 import { printedOf } from "../../rules/core/printed.ts";
+import { undiscoveredTreasures } from "../../rules/families/wilderland/treasure.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { countMatching } from "../../rules/interpret/pick.ts";
@@ -42,19 +43,49 @@ function weighedDownAsk(instruction: Instruction, source: string | null, names: 
   return { verb: "Discard", prompt: `${name}: choose an attachment to discard from ${hero}.${itself ? ` ${name} can discard itself: ${hero} has no other attachment that is not an objective.` : ""}` };
 }
 
-// Truly Lost's hand (18075:A:1) and The Forest of Great Fear's nemesis (18076:A:1): the choice names its number, the side of the table it happens on and whose it is.
-function stageAsk(instruction: Instruction, names: ChoiceNames, facts: Facts | undefined): PickWords | null {
+// The seat whose decision the open choice is: the one the window asks, else the first player.
+function askedSeat(game: ScenarioState): number {
+  return game.window?.kind === "choose" ? game.window.seat : game.firstPlayer;
+}
+
+// Truly Lost's hand (18075:A:1) and The Forest of Great Fear's nemesis (18076:A:1): the choice names its number, the side of the table it happens on and whose it is. Two-handed the sentence leads with the player and says so (`owned`: the sheet adds no "Player N chooses." after it); solo it has no lead.
+function stageAsk(instruction: Instruction, facts: Facts | undefined): PickWords | null {
   const game = facts?.game;
   if (!game || (instruction.verb !== "PlaceHandUnderLocation" && instruction.verb !== "SearchNemesis")) return null;
-  const seat = game.window?.kind === "choose" ? game.window.seat : game.firstPlayer;
+  const seat = askedSeat(game);
+  const lead = game.seatCount > 1 ? `Player ${seat + 1}: ` : "";
+  const owned = game.seatCount > 1 ? { owned: true as const } : {};
+  const say = (text: string) => (lead ? `${lead}${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`);
   if (instruction.verb === "SearchNemesis") {
     const hitPoints = facts.options[0] ? printedOf(facts.ctx.cards, game.cards[facts.options[0]]?.code ?? "").health : undefined;
-    const who = game.seatCount > 1 ? `Player ${seat + 1}` : "You";
-    return { verb: "Choose", prompt: `${who}: ${facts.options.length} enemies are tied for the most hit points${hitPoints != null ? ` (${hitPoints})` : ""}. Choose the nemesis: it enters the staging area with +2 Threat, Attack and Defense and attacks the first player at the end of each round.` };
+    return { verb: "Choose", prompt: say(`${facts.options.length} enemies are tied for the most hit points${hitPoints != null ? ` (${hitPoints})` : ""}. Choose the nemesis: it enters the staging area with +2 Threat, Attack and Defense and attacks the first player at the end of each round.`), ...owned };
   }
   const count = game.seats[seat]?.hand.length ?? 0;
-  const whose = game.seatCount > 1 ? `Player ${seat + 1}'s` : "your";
-  return { verb: "Choose", prompt: `Choose a location in the staging area to put ${whose} hand under, ${count} ${count === 1 ? "card" : "cards"} facedown. It gets +${count} quest ${count === 1 ? "point" : "points"}, the cards return to ${whose} hand when it is explored, and they are discarded if the players advance.` };
+  const cardsWord = count === 1 ? "card" : "cards";
+  return { verb: "Choose", prompt: say(`put your ${count} ${cardsWord} facedown under a location in the staging area. It gets +${count} quest ${count === 1 ? "point" : "points"}, the ${cardsWord} ${count === 1 ? "returns" : "return"} to your hand when it is explored, and ${count === 1 ? "is" : "are"} discarded if the players advance.`), ...owned };
+}
+
+// The search Twilight Hall offers at Setup (12168:A:2): the Choose the engine queues, whose branches search for the card and guard a treasure with it, or leave it.
+function searchOffer(choose: Extract<Instruction, { verb: "Choose" }>): { code: string; count: number } | null {
+  const search = choose.options.find((option) => option.id === "search");
+  const find = search?.instructions.find((step) => step.verb === "SearchMove");
+  const draw = search?.instructions.find((step) => step.verb === "AttachRandomTreasure");
+  return choose.options.length === 2 && find?.verb === "SearchMove" && find.code != null && draw?.verb === "AttachRandomTreasure" ? { code: find.code, count: draw.count ?? 3 } : null;
+}
+
+/** The sentence over the Twilight Hall search offer (12168:A:2): the card, where it enters and the treasures it will guard, as many as are left to draw. Null for any other Choose. */
+export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choose" }>, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames): string | null {
+  const offer = searchOffer(choose);
+  if (!offer) return null;
+  const left = Math.min(offer.count, undiscoveredTreasures(game, ctx).length);
+  const hall = names.code(offer.code);
+  const guard = left === 0 ? "No undiscovered treasure is left to guard." : `It enters the staging area guarding ${left === 1 ? "the 1 random undiscovered treasure" : `1 of ${left} random undiscovered treasures`}.`;
+  return `Search the encounter deck for ${hall}? ${guard}`;
+}
+
+/** Whether the effect frame is the claim of a freed guarded treasure (the settle sweep, mirkwood.ts freeTreasures): its source is the treasure itself, picked from the start. */
+export function isFreedTreasureClaim(game: ScenarioState, ctx: ReduceContext, source: string | null, picked: string | null): boolean {
+  return source != null && source === picked && ctx.cards.get(game.cards[source]?.code ?? "")?.campaignKind === "treasure";
 }
 
 /** The sentence and the verb of the choice AttachRandomTreasure, ClaimRandomTreasure or Discover asks, or the character a claimed treasure goes on, or null for another instruction. */
@@ -62,6 +93,12 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   // The character a claimed treasure is attached to (120165:A:3): the Pick of a card it may attach to (`hostForPicked`) before AttachPicked; the treasure is named once the table knows it.
   if (instruction.verb === "Pick" && instruction.pick.hostForPicked === true && next?.verb === "AttachPicked") {
     const noun = hostNoun(facts, picked ?? null);
+    // A guarded treasure whose guard left play (emce.treasure: "once that treasure is free of encounters, the players claim it").
+    if (facts && picked && isFreedTreasureClaim(facts.game, facts.ctx, source, picked)) {
+      const searched = facts.ctx.effects.flatMap((effect) => effect.instructions).find((step) => step.verb === "SearchGuardForTreasure");
+      const guard = searched?.verb === "SearchGuardForTreasure" ? names.code(searched.code) : "Its guard";
+      return { verb: "Attach", prompt: `${guard} has left play: ${names.card(picked)} is free of encounters and the players claim it. Choose a ${noun} to carry it.` };
+    }
     return { verb: "Attach", prompt: picked ? `Choose a ${noun} to carry ${names.card(picked)}.` : `Choose a ${noun} to attach it to.` };
   }
   // Turayn's Response (12166:A:2): the next damage the chosen character is dealt this round is lessened.
@@ -69,7 +106,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
     const amount = typeof next.amount === "number" ? next.amount : 1;
     return { verb: "Protect", prompt: `Choose another character: the next time it would be dealt damage this round, cancel ${amount} of that damage.` };
   }
-  const stage = stageAsk(instruction, names, facts);
+  const stage = stageAsk(instruction, facts) ?? carriedAwayAsk(instruction, next, facts);
   if (stage) return stage;
   const weighed = weighedDownAsk(instruction, source, names, next, facts);
   if (weighed) return weighed;
@@ -88,9 +125,10 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
-  // The guard is attached to the treasure and keeps it from being claimed until it is dealt with (rr.guarded).
-  if (!source) return { verb: "Choose", prompt: choose };
-  const host = names.card(source);
+  // The guard is attached to the treasure and keeps it from being claimed until it is dealt with (rr.guarded). It is the card the record picked (Twilight Hall, searched for by the campaign card) or the source itself.
+  const guardId = instruction.to === "picked" && picked ? picked : source;
+  if (!guardId) return { verb: "Choose", prompt: choose };
+  const host = names.card(guardId);
   return { verb: "Choose", prompt: `${choose} ${host} is attached to it, and the players cannot claim it until ${host} is dealt with.` };
 }
 
@@ -118,7 +156,9 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
-export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, now?: BranchNow): string | null {
+export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow): string | null {
+  const offer = searchOffer(choose);
+  if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";
   const option = choose.options.find((entry) => entry.id === optionId);
   const step = option ? countedBranch(option) : null;
   const number = now?.counted?.[optionId];
@@ -207,8 +247,11 @@ export function setAsideLine(source: string, card: string): string {
   return `${source} sets ${card} aside. ${POOL_COPY}.`;
 }
 
-/** Carried Away (18074:A:1): the hero a player chooses, before the encounter deck is discarded to the enemy that will guard it. Null for any other pick. */
-export function wilderlandPickWords(pick: Instruction, next: Instruction | undefined): PickWords | null {
+/** Carried Away (18074:A:1): the hero a player chooses, before the encounter deck is discarded to the enemy that will guard it. Two-handed it leads with the player (`owned`). Null for any other pick. */
+function carriedAwayAsk(pick: Instruction, next: Instruction | undefined, facts: Facts | undefined): PickWords | null {
   if (pick.verb !== "Pick" || next?.verb !== "DiscardUntil" || pick.pick.type !== "hero") return null;
-  return { verb: "Carry away", prompt: "Choose 1 hero you control to be carried away. It loses its tokens and attachments, and the next enemy discarded from the encounter deck enters the staging area and holds it." };
+  const game = facts?.game;
+  const many = game != null && game.seatCount > 1;
+  const body = "choose 1 hero you control to be carried away. It loses its tokens and attachments. The next enemy discarded from the encounter deck enters the staging area and guards it facedown until that enemy leaves play, then the hero returns exhausted.";
+  return many ? { verb: "Carry away", prompt: `Player ${askedSeat(game) + 1}: ${body}`, owned: true } : { verb: "Carry away", prompt: `${body.charAt(0).toUpperCase()}${body.slice(1)}` };
 }

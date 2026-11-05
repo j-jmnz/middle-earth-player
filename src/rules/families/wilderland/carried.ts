@@ -6,9 +6,10 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
-import { inPlay, updateCard, withSeat, type ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
-import { captureHero, releaseHero } from "../south/captive.ts";
+import { backInPlace } from "../prisoner/index.ts";
+import { captureHero, heldFrom, releaseHero } from "../south/captive.ts";
 
 /** The hero the enemy guards, or null: the guarded hero lying under it, whether or not the enemy is still in play. */
 export function heroGuardedBy(state: ScenarioState, enemyId: string): string | null {
@@ -23,10 +24,9 @@ export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: E
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   const hero = heroId ? state.cards[heroId] : undefined;
   if (!enemyId || !heroId || !enemy || !hero || hero.zone !== "heroes" || hero.controller == null || !inPlay(enemy.zone) || printedOf(ctx.cards, enemy.code).type !== "enemy") return state;
-  const seat = hero.controller;
-  const slot = state.seats[seat]?.heroes.indexOf(heroId) ?? -1;
+  const held = heldFrom(state, heroId);
   const bare = releaseAttachments(state, heroId, ctx.cards, steps);
-  return updateCard(captureHero(bare, heroId, enemyId), heroId, { guardedHero: true, owner: seat, committed: false, ...(slot >= 0 ? { heroSlot: slot } : {}) });
+  return updateCard(captureHero(bare, heroId, enemyId), heroId, { guardedHero: true, committed: false, ...held });
 }
 
 /** ReleaseGuardedHero: the hero the subject (the defeated enemy) guarded returns among its owner's heroes where it was, faceup and exhausted. */
@@ -35,12 +35,11 @@ export function releaseGuardedHero(state: ScenarioState, subject: string | null)
   const hero = heroId ? state.cards[heroId] : undefined;
   if (!heroId || !hero || hero.owner == null) return state;
   const seat = hero.owner;
+  // An eliminated owner has left the game (rr.player-elimination): the hero goes to its discard pile instead of back among no one's heroes.
+  if (state.seats[seat]?.eliminated) return updateCard(moveCard(state, heroId, { zone: "discard", seat }), heroId, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
   const slot = hero.heroSlot;
   const released = releaseHero(state, heroId, seat, { exhausted: true, face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined, host: null });
-  const current = released.seats[seat];
-  if (slot == null || !current) return released;
-  const others = current.heroes.filter((id) => id !== heroId);
-  return withSeat(released, seat, { ...current, heroes: [...others.slice(0, slot), heroId, ...others.slice(slot)] });
+  return slot == null ? released : backInPlace(released, seat, heroId, slot);
 }
 
 /** DiscardGuardedHeroes: each hero an enemy guards goes to its owner's discard pile; a player with no hero left is eliminated. */
