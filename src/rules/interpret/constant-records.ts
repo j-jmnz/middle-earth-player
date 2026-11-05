@@ -31,6 +31,24 @@ export function memoOf<T>(memo: StateMemo<T>, state: ScenarioState, ctx: ReduceC
   return built;
 }
 
+const VERB_CODES = new WeakMap<readonly Effect[], Map<Instruction["verb"], ReadonlySet<string>>>();
+
+// The codes of the cards with a constant record of this verb (a keyword marker such as Deep, Loot or ControlWhenFree), found by card code. Which cards print one depends on the effect list only, which is never changed
+// after the reducer is handed it, so the index is kept for the list (a state-keyed `memoOf` would rebuild it for every state the settle sweeps read it on).
+export function constantVerbCodes(ctx: Pick<ReduceContext, "effects">, verb: Instruction["verb"]): ReadonlySet<string> {
+  let byVerb = VERB_CODES.get(ctx.effects);
+  if (!byVerb) {
+    byVerb = new Map();
+    VERB_CODES.set(ctx.effects, byVerb);
+  }
+  let codes = byVerb.get(verb);
+  if (!codes) {
+    codes = new Set(ctx.effects.filter((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === verb)).map((effect) => effect.cardCode));
+    byVerb.set(verb, codes);
+  }
+  return codes;
+}
+
 const CONSTANTS: StateMemo<readonly ConstantInstruction[]> = new WeakMap();
 
 // Every instruction of a constant effect whose card is in play and whose effect and instruction

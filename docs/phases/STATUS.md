@@ -75,7 +75,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 48 | The City of Corsairs | not started | Coming soon (user decision, 2026-11-01). Open: which Stormcaller card the campaign Setup flips (12151 has no Campaign Mode only side; only 110042 has one). |
 | 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Mount Gundabad stage 2 pictures (19137-19142); Crypt Stalker Easy count unconfirmed. |
 | 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app; phone checks; `ered-mithrin-start`, `booklet-ered-mithrin` flows not run. |
-| 51 | Wilderland mechanics family | not started | |
+| 51 | Wilderland mechanics family | completed | 2026-11-05. Engine only; review round done. Not built: Caves-deck bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover. |
 | 51b | Wilderland on the table | not started | |
 | 52 | Journey Up the Anduin | not started | |
 | 53 | Lost in Mirkwood | not started | |
@@ -105,6 +105,8 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
 ### Rules and engine
+- Wilderland: an Evil Creatures enemy shuffled back into the encounter deck keeps its deck mark (`deckRoute`); no card does this yet.
+- Wilderland readings not user-confirmed: Deep does nothing once its location is no longer active; a non-location Deep replacement other than a Dragon Sign goes to staging; Guarded (X) with no match leaves the objective unguarded.
 
 - Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
 - Dream-chaser: the two Grapple variants on Nightmare cards (fewest or most enemies grappled) stay unparsed.

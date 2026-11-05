@@ -2,7 +2,7 @@
 // for the deck's own detaching and attaching. Types and pure helpers only, so zones.ts can use them.
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
-import { leavePile, shufflePile } from "../../core/piles.ts";
+import { shufflePile } from "../../core/piles.ts";
 import type { Destination } from "../../core/zones.ts";
 
 /** A card of the Grotto deck, whichever side it shows: its Grotto side is a code of the deck, or the side it does not show is (an Underwater side lying on top of its Grotto side, `other`). */
@@ -17,11 +17,6 @@ function isGrottoCard(state: ScenarioState, card: Pick<CardInstance, "code" | "o
 export function unchartedRoute(state: ScenarioState, current: Pick<CardInstance, "code" | "other">, wanted: Destination): Destination {
   if (!isGrottoCard(state, current)) return wanted;
   return wanted.zone === "encounterDiscard" || wanted.zone === "encounterDeck" ? { zone: "unchartedDeck" } : wanted;
-}
-
-/** The card leaves the Uncharted deck. */
-export function leaveUnchartedDeck(state: ScenarioState, id: string): ScenarioState {
-  return leavePile(state, "unchartedDeck", id);
 }
 
 /** The card joins the bottom of the Uncharted deck, Lost Island side up and bare of tokens. A double-sided card of two catalog cards (the Grotto deck, dcce.grotto-deck) lies faceup on its Grotto side. */

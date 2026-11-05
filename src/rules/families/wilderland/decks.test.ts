@@ -77,16 +77,41 @@ describe("ShufflePile and ShuffleIntoPile (emce.caves-deck)", () => {
     expect(next.seedCursor).toBe(table().seedCursor);
   });
 
-  it("adds a new copy of a card to the deck and shuffles it in", () => {
-    const { state } = deal(table(), ["cave1", "cave2"], { zone: "cavesDeck" });
+  it("moves the copy the game already has from the encounter deck into the deck and shuffles it in, without a second copy", () => {
+    const base = deal(table(), ["cave1", "cave2"], { zone: "cavesDeck" }).state;
+    const { state, ids } = deal(base, ["mist", "sign"], { zone: "encounterDeck" });
     const next = run(state, { verb: "ShuffleIntoPile", pile: "caves", code: "sign" });
     expect(codesOf(next, pileOf(next, "cavesDeck")).sort()).toEqual(["cave1", "cave2", "sign"]);
-    expect(next.cards[pileOf(next, "cavesDeck")[0] ?? ""]?.zone).toBe("cavesDeck");
+    expect(pileOf(next, "cavesDeck")).toContain(ids[1]);
+    expect(next.cards[ids[1] ?? ""]).toMatchObject({ zone: "cavesDeck", face: "down" });
+    expect(next.encounterDeck).toEqual([ids[0]]);
+    expect(Object.values(next.cards).filter((card) => card.code === "sign")).toHaveLength(1);
+    expect(next.seedCursor).toBeGreaterThan(state.seedCursor);
   });
 
-  it("starts the deck when the game had dealt none", () => {
-    const next = run(table(), { verb: "ShuffleIntoPile", pile: "caves", code: "cave1" });
-    expect(codesOf(next, pileOf(next, "cavesDeck"))).toEqual(["cave1"]);
+  it("moves a set-aside copy too", () => {
+    const base = deal(table(), ["cave1"], { zone: "cavesDeck" }).state;
+    const { state, ids } = deal(base, ["sign"], { zone: "setAside" });
+    const next = run(state, { verb: "ShuffleIntoPile", pile: "caves", code: "sign" });
+    expect(pileOf(next, "cavesDeck")).toContain(ids[0]);
+    expect(next.setAside).toEqual([]);
+  });
+
+  it("removes the card from the game when the game dealt no such deck, and does not start one", () => {
+    const { state, ids } = deal(table(), ["cave1"], { zone: "encounterDeck" });
+    const next = run(state, { verb: "ShuffleIntoPile", pile: "caves", code: "cave1" });
+    expect(next.cards[ids[0] ?? ""]?.zone).toBe("removed");
+    expect(next.removed).toEqual([ids[0]]);
+    expect(next.encounterDeck).toEqual([]);
+    expect(next.piles).toBeUndefined();
+  });
+
+  it("does nothing when the game has no copy of the card", () => {
+    const { state } = deal(table(), ["cave1"], { zone: "cavesDeck" });
+    const next = run(state, { verb: "ShuffleIntoPile", pile: "caves", code: "sign" });
+    expect(next.piles).toEqual(state.piles);
+    expect(next.seedCursor).toBe(state.seedCursor);
+    expect(next.removed).toEqual([]);
   });
 });
 
@@ -166,7 +191,7 @@ describe("the Evil Creatures deck (emce.evil-creatures-deck)", () => {
 });
 
 describe("ShufflePileIntoEncounterDeck (emce.setup-lost-in-mirkwood)", () => {
-  it("shuffles the set-aside deck into the encounter deck, facedown, leaving the deck empty", () => {
+  it("shuffles the set-aside deck into the encounter deck, facedown; the deck stays, empty", () => {
     const base = deal(table(), ["mist"], { zone: "encounterDeck" }).state;
     const { state } = deal(base, ["orc", "ec1"], { zone: "spidersDeck" });
     const next = run(state, { verb: "ShufflePileIntoEncounterDeck", pile: "spiders" });

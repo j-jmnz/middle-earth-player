@@ -49,8 +49,8 @@ Read the sections your task touches.
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~3.8K)
-    - 223–234 Mechanic families (~2.9K) ← 5
+  - 209–234 Engine (~3.9K)
+    - 223–234 Mechanic families (~3.0K) ← 5
   - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.8K tok)
+- `docs/phases/STATUS.md` — Phase status (~8.9K tok)
   - 5–17 Rules (~620)
-  - 18–89 Phases (~2.5K)
-  - 90–194 Open items (~5.2K)
+  - 18–89 Phases (~2.6K)
+  - 90–196 Open items (~5.2K)
     - 92–106 Fixtures and Maestro (~640)
-    - 107–144 Rules and engine (~1.5K)
-    - 145–169 Screens and code (~1.3K)
-    - 170–194 Phone and tablet checks (~1.7K)
-  - 195–211 Standing decisions (~430)
+    - 107–146 Rules and engine (~1.6K)
+    - 147–171 Screens and code (~1.3K)
+    - 172–196 Phone and tablet checks (~1.7K)
+  - 197–213 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)

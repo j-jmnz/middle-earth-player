@@ -7,8 +7,8 @@ import { dealtFace } from "../families/dreamchaser/facts.ts";
 import { routeDestination } from "../families/sea/routes.ts";
 import { grappledWith } from "../families/grapple/values.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
-import { joinUnchartedDeck, leaveUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
-import { deckRoute, joinPile, leavePile } from "./piles.ts";
+import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
+import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
 import { ORC_GUARD_CODE } from "./printed.ts";
 import { flagged, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
@@ -17,7 +17,7 @@ export type Destination =
   | { zone: "seatQuest"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking/areas.ts); the card is in
   // `staging` and in that seat's list.
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap" | "cavesDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "spidersDeck" | "orcsDeck"; area?: number }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap" | PileZone; area?: number }
   // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
   // Without it the card takes the state's own slot, which on a seat's view (families/breaking/areas.ts) is that seat's.
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }
@@ -75,6 +75,8 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     if (!seat) return state;
     return patchSeatList(state, current.controller, listKey, without(seat[listKey], id));
   }
+  // The decks beside the encounter deck (Corsair, Uncharted, Ered Mithrin's) leave through one accessor (piles.ts).
+  if (isDeckZone(current.zone)) return leavePile(state, current.zone, id);
   switch (current.zone) {
     case "seatQuest": {
       if (current.controller == null) return state;
@@ -99,17 +101,6 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       return { ...state, encounterDiscard: without(state.encounterDiscard, id) };
     case "burdenDeck":
       return { ...state, burdenDeck: without(state.burdenDeck ?? [], id) };
-    // The decks beside the encounter deck leave through one accessor (piles.ts).
-    case "corsairDeck":
-    case "corsairDiscard":
-    case "cavesDeck":
-    case "evilCreaturesDeck":
-    case "evilCreaturesDiscard":
-    case "spidersDeck":
-    case "orcsDeck":
-      return leavePile(state, current.zone, id);
-    case "unchartedDeck":
-      return leaveUnchartedDeck(state, id);
     case "victory":
       return { ...state, victory: without(state.victory, id) };
     case "setAside":
@@ -243,6 +234,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   const zone = dest.zone;
   // A claimed objective (families/objectives.ts) that returns to the staging area is controlled by nobody again.
   const stamped = updateCard(state, id, { zone, controller: zone === "staging" && !current.claimed ? current.controller : null, ...(current.claimed ? { claimed: undefined } : {}) });
+  if (zone === "unchartedDeck") return joinUnchartedDeck(stamped, id);
+  if (isDeckZone(zone)) return joinPile(stamped, zone, id);
   switch (zone) {
     case "staging": {
       const listed = { ...stamped, staging: append(stamped.staging, id) };
@@ -258,16 +251,6 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, encounterDiscard: append(stamped.encounterDiscard, id) };
     case "burdenDeck":
       return { ...stamped, burdenDeck: append(stamped.burdenDeck ?? [], id) };
-    case "corsairDeck":
-    case "corsairDiscard":
-    case "cavesDeck":
-    case "evilCreaturesDeck":
-    case "evilCreaturesDiscard":
-    case "spidersDeck":
-    case "orcsDeck":
-      return joinPile(stamped, zone, id);
-    case "unchartedDeck":
-      return joinUnchartedDeck(stamped, id);
     case "stormcallerArea":
       return joinStormcallerArea(stamped, id);
     case "victory":

@@ -5,10 +5,13 @@ import { shuffleIds } from "./seed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
-/** The zones of Ered Mithrin's decks, kept in `ScenarioState.piles`. */
-export type PileZone = "cavesDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "spidersDeck" | "orcsDeck";
+/** The zones of Ered Mithrin's decks, kept in `ScenarioState.piles`. The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck"] as const;
+export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
-export type DeckZone = PileZone | "corsairDeck" | "corsairDiscard" | "unchartedDeck";
+const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
+export type DeckZone = (typeof DECK_ZONES)[number];
+const DECK_ZONE_SET: ReadonlySet<string> = new Set(DECK_ZONES);
 
 /** A deck and the discard pile it refills from, or null for a deck that has none. */
 export type DeckZones = { readonly deck: DeckZone; readonly discard: DeckZone | null };
@@ -20,7 +23,7 @@ export const DECKS = {
 } as const satisfies Record<string, DeckZones>;
 
 /** The decks with no discard pile: their cards are discarded to the encounter discard pile like any other encounter card (emce.caves-deck says nothing else), and an empty one stays empty. */
-export const PLAIN_PILES = {
+const PLAIN_PILES = {
   caves: { deck: "cavesDeck", discard: null },
   spiders: { deck: "spidersDeck", discard: null },
   orcs: { deck: "orcsDeck", discard: null },
@@ -28,17 +31,29 @@ export const PLAIN_PILES = {
 
 /** The piles a record names (`pile` of the wilderland verbs): every deck of Ered Mithrin. */
 export const NAMED_PILES = { evilCreatures: DECKS.evilCreatures, ...PLAIN_PILES } as const;
-export type PileName = keyof typeof NAMED_PILES;
 
 /** The decks a card remembers it was dealt into (CardInstance.deck), so it goes back to that deck's own discard pile. */
-export type MarkedDeck = NonNullable<CardInstance["deck"]>;
-const MARK: Readonly<Partial<Record<DeckZone, MarkedDeck>>> = { evilCreaturesDeck: "evilCreatures", evilCreaturesDiscard: "evilCreatures" };
+const MARK: Readonly<Partial<Record<DeckZone, CardInstance["deck"]>>> = { evilCreaturesDeck: "evilCreatures", evilCreaturesDiscard: "evilCreatures" };
 
 const NONE: readonly string[] = [];
 
-/** Whether the zone is one of these decks or discard piles. */
+/** Whether the zone is one of these decks or discard piles: moveCard (zones.ts) detaches a card from it, and attaches one to it, through this file. */
 export function isDeckZone(zone: string): zone is DeckZone {
-  return zone === "corsairDeck" || zone === "corsairDiscard" || zone === "unchartedDeck" || zone === "cavesDeck" || zone === "evilCreaturesDeck" || zone === "evilCreaturesDiscard" || zone === "spidersDeck" || zone === "orcsDeck";
+  return DECK_ZONE_SET.has(zone);
+}
+
+/** Whether the game has dealt the zone (`corsairDeck` or `piles` holds its list, `uncharted` exists): a deck the scenario did not deal is never refilled or revealed from. */
+export function pileDealt(state: Pick<ScenarioState, "corsairDeck" | "corsairDiscard" | "uncharted" | "piles">, zone: DeckZone): boolean {
+  switch (zone) {
+    case "corsairDeck":
+      return state.corsairDeck !== undefined;
+    case "corsairDiscard":
+      return state.corsairDiscard !== undefined;
+    case "unchartedDeck":
+      return state.uncharted !== undefined;
+    default:
+      return state.piles?.[zone] !== undefined;
+  }
 }
 
 /** The ids in the zone, top first; empty when the game has not dealt it. */
@@ -83,7 +98,7 @@ export function joinPile(state: ScenarioState, zone: DeckZone, id: string): Scen
   return mark !== undefined && joined.cards[id]?.deck !== mark ? updateCard(joined, id, { deck: mark }) : joined;
 }
 
-/** The zone's list shuffled with the game's seed, which moves the seed even for a deck of fewer than two cards. */
+/** The zone's list shuffled with the game's seed: one roll for each card but the first (n - 1), so a list of one card or none leaves the seed cursor where it was. */
 export function shufflePile(state: ScenarioState, zone: DeckZone): ScenarioState {
   const shuffled = shuffleIds(pileOf(state, zone), state.seed, state.seedCursor);
   return { ...withPile(state, zone, shuffled.ids), seedCursor: shuffled.cursor };
@@ -100,5 +115,6 @@ export function deckRoute<Dest extends { zone: string }>(current: Pick<CardInsta
   if (current.deck === undefined) return dest;
   const discard = DECKS[current.deck].discard;
   if (dest.zone === "encounterDiscard" || (dest.zone === "victory" && inPlayNow)) return { zone: discard };
+  // Open reading: an Evil Creatures enemy a card shuffles into the encounter deck stays there (the destination is kept); emce.evil-creatures-deck says only where it goes when it leaves play.
   return dest;
 }

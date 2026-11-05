@@ -29,6 +29,8 @@ export const CARDS = cardMap([
   definePrinted({ code: "oldford", name: "The Old Ford", type: "location", threat: 2, questPoints: 4, keywords: { immuneToPlayerCardEffects: true } }),
   definePrinted({ code: "urdug", name: "Urdug", type: "enemy", isUnique: true, threat: 3, engagementCost: 40, attack: 4, defense: 3, health: 4, keywords: { indestructible: true, immuneToPlayerCardEffects: true } }),
   definePrinted({ code: "hoard", name: "Dragon Hoard", type: "objective", keywords: { immuneToPlayerCardEffects: true } }),
+  definePrinted({ code: "relic", name: "Cursed Relic", type: "objective", health: 2, keywords: { indestructible: true } }),
+  definePrinted({ code: "pit", name: "Bottomless Pit", type: "location", threat: 1, questPoints: 2, health: 2, keywords: { indestructible: true } }),
   definePrinted({ code: "camp", name: "Campaign", type: "campaign" }),
 ]);
 

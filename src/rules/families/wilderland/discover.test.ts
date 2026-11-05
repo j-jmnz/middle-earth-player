@@ -91,7 +91,9 @@ describe("Discover X (emce.discover)", () => {
 
   it("shuffles the encounter discard pile into the deck when fewer than X cards remain, and goes on looking", () => {
     const { state, hill } = atTravel(["orc", "loot1"], ["mist", "stalker"]);
-    const done = travel(state, hill, [...LOOT, discover(4)]);
+    const result = expectOk(reduce(state, { type: "Travel", locationId: hill }, ctxOf([...LOOT, discover(4)])));
+    const done = result.state;
+    expect(result.steps.flat().filter((step) => step.kind === "resetEncounterDeck")).toMatchObject([{ count: 2, cause: { rule: "emce.discover" } }]);
     // The two cards of the deck were looked at first; the discard pile was shuffled into the deck for the other two. Everything looked at is dealt with.
     expect(done.encounterDeck).toEqual([]);
     expect(stagedCodes(done)).toEqual(["loot1", "stalker"]);
@@ -138,9 +140,13 @@ describe("Loot (emce.loot)", () => {
     expect(codesOf(done, done.staging)).toEqual(["loot1"]);
   });
 
-  it("stops when only Loot cards are left", () => {
-    const { state } = deal(table(), ["loot1", "loot2"], { zone: "encounterDeck" });
-    const done = reveal(state, LOOT);
-    expect(done.staging.length).toBeLessThanOrEqual(1);
+  it("reveals nothing when the passes run out with a Loot card on top: a Loot card enters play only through the discover keyword", () => {
+    const quest = (deck: readonly string[], discarded: readonly string[]): ScenarioState => ({ ...deal(deal(table(), deck, { zone: "encounterDeck" }).state, discarded, { zone: "encounterDiscard" }).state, phase: "Quest" });
+    for (const [deck, discarded] of [[["loot1", "loot2"], []], [["loot1"], ["loot2"]]] as const) {
+      const done = reveal(quest(deck, discarded), LOOT);
+      expect(done.staging).toEqual([]);
+      expect(done.stack).toEqual([]);
+      expect(codesOf(done, [...done.encounterDeck, ...done.encounterDiscard]).sort()).toEqual(["loot1", "loot2"]);
+    }
   });
 });

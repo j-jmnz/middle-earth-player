@@ -54,7 +54,7 @@ export type ZoneName =
   // The Uncharted deck (dcce.uncharted-deck), out of play, every card Lost Island side up; the Stormcaller's area (dcce.stormcallers-area) and the Island Map (dcce.island-map), in play, outside the staging area.
   | "unchartedDeck" | "stormcallerArea" | "islandMap"
   // The decks beside the encounter deck in Ered Mithrin (emce.caves-deck, emce.evil-creatures-deck), out of play (core/piles.ts): the Caves deck, the Evil Creatures deck and its own discard pile, and the two encounter sets Lost in Mirkwood sets aside.
-  | "cavesDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "spidersDeck" | "orcsDeck"
+  | PileZone
   | "victory"
   | "setAside"
   | "removed"

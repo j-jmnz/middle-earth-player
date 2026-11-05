@@ -12,6 +12,7 @@ import { placeContracts } from "../families/sidequests/contract.ts";
 import { setAsideEncounterCards } from "../families/sidequests/encounter.ts";
 import { pushPlayerSetup } from "../families/sidequests/setup.ts";
 import { drawOpeningHand, runInstruction, type ReduceContext } from "../interpret/interpret.ts";
+import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { handSetup, searchSetup } from "./search.ts";
@@ -44,7 +45,8 @@ export type StartSeat = {
   loot?: readonly string[];
 };
 
-type DealtZone = "cavesDeck" | "evilCreaturesDeck" | "spidersDeck" | "orcsDeck";
+// The zones a scenario deals: every pile but the Evil Creatures discard pile, which starts empty.
+type DealtZone = Exclude<PileZone, "evilCreaturesDiscard">;
 
 export type StartScenario = {
   seatCount: 1 | 2;

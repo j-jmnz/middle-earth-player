@@ -8,6 +8,7 @@ import { pileOf } from "../../core/piles.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { withMode, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
+import { freeOfEncounters } from "../objectives/index.ts";
 import { codesOf, ctxOf, deal, marker, record, table } from "./fixture.ts";
 
 const DEEP = marker("deepA", { verb: "Deep" });
@@ -75,6 +76,28 @@ describe("Deep (emce.deep)", () => {
     expect(done.cards[deepId]?.zone).toBe("encounterDiscard");
     expect(done.activeLocation).toBeNull();
     expect(codesOf(done, done.staging)).toEqual(["sign"]);
+  });
+
+  it("resolves the guarded keyword of a Dragon Sign that replaces the location: the sign is guarded by an enemy found in the encounter deck (emce.dragon-signs)", () => {
+    const { state, deepId } = atTravel(["sign", "cave1"]);
+    const deck = deal(state, ["mist", "orc", "ec1"], { zone: "encounterDeck" }).state;
+    const guarded = record("sign:whenRevealed:1", "sign", "whenRevealed", [{ verb: "GuardObjective", types: ["enemy"] }]);
+    const done = travel(deck, deepId, [DEEP, guarded]);
+    const sign = Object.values(done.cards).find((card) => card.code === "sign");
+    const guard = Object.values(done.cards).find((card) => card.code === "orc");
+    expect(sign?.zone).toBe("staging");
+    expect(guard).toMatchObject({ zone: "staging", host: sign?.id, guard: true });
+    expect(freeOfEncounters(done, sign?.id ?? null)).toBe(false);
+    expect(codesOf(done, done.encounterDiscard)).toEqual(["deepA", "mist"]);
+    expect(codesOf(done, done.encounterDeck)).toEqual(["ec1"]);
+  });
+
+  it("leaves a Dragon Sign without a guarded keyword unguarded", () => {
+    const { state, deepId } = atTravel(["sign"]);
+    const deck = deal(state, ["orc"], { zone: "encounterDeck" }).state;
+    const done = travel(deck, deepId, [DEEP]);
+    expect(codesOf(done, done.staging)).toEqual(["sign"]);
+    expect(codesOf(done, done.encounterDeck)).toEqual(["orc"]);
   });
 
   it("resolves after the Responses and Forced effects to the travel, and the replacement hears that it became the active location", () => {

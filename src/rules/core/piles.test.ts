@@ -2,7 +2,7 @@
 // and the decks of Ered Mithrin read and write their lists the same way, and a card of a deck with a discard pile of its own remembers it.
 import { describe, expect, it } from "vitest";
 
-import { deckRoute, isDeckZone, joinPile, leavePile, pileOf, shufflePile, withPile } from "./piles.ts";
+import { deckRoute, isDeckZone, joinPile, leavePile, pileDealt, pileOf, shufflePile, withPile } from "./piles.ts";
 import { idleScenario } from "./test-fixture.ts";
 import { spawn } from "./zones.ts";
 
@@ -34,7 +34,18 @@ describe("deck zones", () => {
     expect(leavePile(joined, "cavesDeck", "zzz")).toBe(joined);
   });
 
-  it("shuffle with the game's seed, moving it even for a list of one", () => {
+  it("know which decks the game has dealt", () => {
+    const state = idleScenario(1);
+    expect(pileDealt(state, "corsairDeck")).toBe(false);
+    expect(pileDealt(state, "cavesDeck")).toBe(false);
+    expect(pileDealt(state, "unchartedDeck")).toBe(false);
+    expect(pileDealt(withPile(state, "cavesDeck", []), "cavesDeck")).toBe(true);
+    expect(pileDealt(withPile(state, "cavesDeck", []), "spidersDeck")).toBe(false);
+    expect(pileDealt(withPile(state, "corsairDeck", []), "corsairDeck")).toBe(true);
+    expect(pileDealt({ ...state, uncharted: { deck: [], codes: [] } }, "unchartedDeck")).toBe(true);
+  });
+
+  it("shuffle with the game's seed, one roll for each card but the first, so a list of one leaves the cursor", () => {
     const state = withPile(idleScenario(1), "cavesDeck", ["a", "b", "c", "d", "e", "f"]);
     const shuffled = shufflePile(state, "cavesDeck");
     expect([...pileOf(shuffled, "cavesDeck")].sort()).toEqual(["a", "b", "c", "d", "e", "f"]);

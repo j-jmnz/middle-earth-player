@@ -56,8 +56,9 @@ export function startReveal(
   guards?: string,
 ): ScenarioState {
   // A Loot card on top of the deck is discarded, not revealed (emce.loot).
-  const ready = cardId ? state : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
-  const id = cardId ?? ready.encounterDeck[0];
+  const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
+  const ready = skipped.state;
+  const id = skipped.top;
   const instance = id ? ready.cards[id] : undefined;
   if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;

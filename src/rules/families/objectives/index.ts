@@ -65,7 +65,7 @@ function guardObjective(state: ScenarioState, instruction: Extract<Instruction, 
 
 // Guarded (X) on an objective (emce.guarded-x, wor.guarded-x): cards are discarded from the encounter deck until one of the types is discarded (the discard pile is shuffled into an empty deck), and that card is added to the staging area
 // and attached to the objective as a guarded objective. With no card of the types in the deck or the discard pile the objective stays unguarded.
-function guardedByType(state: ScenarioState, objectiveId: string, types: readonly string[], focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function guardedByType(state: ScenarioState, objectiveId: string, types: readonly string[], focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const { state: searched, found } = discardUntilType(state, types, ctx);
   if (found == null) return state;
   return guardWith(moveEncounter(searched, found, "staging", focus.seat, ctx, steps), found, objectiveId);

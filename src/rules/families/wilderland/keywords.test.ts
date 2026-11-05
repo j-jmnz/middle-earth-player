@@ -53,8 +53,12 @@ describe("Immune to player card effects (emce.immune)", () => {
 
   it("is printed on a location as well: it cannot be chosen by a player card, and can by the game", () => {
     const ford = spawn(table(), "oldford", { zone: "staging" });
-    expect(playerCardEffectCanChoose(ctx.cards.get("oldford")!, ford.state, ford.id)).toBe(false);
-    expect(playerCardEffectCanChoose(ctx.cards.get("plain")!, ford.state, ford.id)).toBe(true);
+    const plain = spawn(ford.state, "plain", { zone: "staging" });
+    const state = plain.state;
+    expect(playerCardEffectCanChoose(ctx.cards.get("oldford")!, state, ford.id)).toBe(false);
+    expect(playerCardEffectCanChoose(ctx.cards.get("plain")!, state, plain.id)).toBe(true);
+    // The game's own effect (a location as its source) may still choose it.
+    expect(pickCandidates(state, { type: "location", control: "any" }, 0, [], plain.id, ctx)).toContain(ford.id);
   });
 });
 
@@ -68,9 +72,11 @@ describe("Indestructible (emce.indestructible)", () => {
     expect(swept.cards[urdug.id]?.zone).not.toBe("encounterDiscard");
   });
 
-  it("is only an enemy's keyword: an objective or a location with damage is not kept", () => {
-    const orc = spawn(table(), "orc", { zone: "engaged", seat: 0 });
-    expect(hit(orc.state, orc.id, "framework").cards[orc.id]?.zone).toBe("encounterDiscard");
+  it("is only an enemy's keyword: an objective or a location that prints it is destroyed by its damage as any other card", () => {
+    const relic = spawn(table(), "relic", { zone: "staging" });
+    expect(hit(relic.state, relic.id, "framework").cards[relic.id]?.zone).toBe("encounterDiscard");
+    const pit = spawn(table(), "pit", { zone: "staging" });
+    expect(hit(pit.state, pit.id, "framework").cards[pit.id]?.zone).toBe("encounterDiscard");
   });
 
   it("is lost with the enemy's keywords when a card takes them away (losesKeywords)", () => {
